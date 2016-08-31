@@ -69,3 +69,4 @@ env
 *.pyc
 staticfiles
 .env
+import.sh
