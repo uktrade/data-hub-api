@@ -1,3 +1,15 @@
-FROM python:3.5-onbuild
+FROM python:3.5
 
-CMD ["sh","/usr/src/app/docker-entrypoint.sh"]
+RUN mkdir -p /app/leeloo
+WORKDIR /app/leeloo
+
+ADD requirements.txt .
+RUN pip install -r requirements.txt
+
+ADD . /app/leeloo
+
+RUN chmod a+x docker-entrypoint.sh
+ENTRYPOINT ["./docker-entrypoint.sh"]
+
+ENV ES_PORT 9200
+ENV ES_HOST es
