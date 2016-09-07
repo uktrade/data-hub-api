@@ -33,7 +33,7 @@ def root():
 
 def main():
     global CONNECTION
-    CONNECTION = db.poll_for_engine().connect()
+    CONNECTION = db.poll_for_connection()
     global METADATA
     METADATA = sqla.MetaData(bind=CONNECTION)
     METADATA.reflect()
