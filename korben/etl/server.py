@@ -6,7 +6,10 @@ import flask
 import sqlalchemy as sqla
 
 from korben import db
-from . import transform
+from . import extract, transform
+
+CONNECTION = None
+METADATA = None
 
 app = flask.Flask(__name__)  # NOQA
 
@@ -21,24 +24,12 @@ def handle_data_float(obj):
 def root():
     retval = {}
     for entity_name, guids in flask.request.json.items():
-        table = METADATA.tables[entity_name]
-        primary_key = next(
-            col.name for col in table.primary_key.columns.values()
-        )
-        select_statement = (
-            sqla
-            .select([table])
-            .where(table.columns[primary_key].in_(guids))
-        )
-        result = CONNECTION.execute(select_statement).fetchall()
+        result = extract.from_cdms_psql(METADATA, entity_name, guids)
         transform_func = functools.partial(
-            transform.to_leeloo, METADATA, entity_name
+            transform.from_cdms_psql, METADATA, entity_name
         )
-        retval[entity_name] = list(map(transform_func, map(dict, result)))
+        retval[entity_name] = list(map(transform_func, result))
     return json.dumps(retval, default=handle_data_float)
-
-CONNECTION = None
-METADATA = None
 
 def main():
     global CONNECTION
