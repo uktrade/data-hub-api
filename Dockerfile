@@ -13,3 +13,5 @@ ENTRYPOINT ["./docker-entrypoint.sh"]
 
 ENV ES_PORT 9200
 ENV ES_HOST es
+
+EXPOSE 8000
