@@ -1,5 +1,7 @@
 import uuid
 from django.db import models
+
+from api.models.company import Company
 from api.models.contact import Contact
 
 
@@ -30,6 +32,11 @@ class Interaction(models.Model):
     notes = models.TextField(null=True, blank=True)
 
     company = models.ForeignKey(
+        to=Company,
+        null=True,
+        related_name="interactions")
+
+    contact = models.ForeignKey(
         to=Contact,
         null=True,
         related_name="interactions")

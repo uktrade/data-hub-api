@@ -1,4 +1,3 @@
-from api.models.chcompany import CHCompany
 from api.serializers import SearchItemSerializer
 from datahubapi import settings
 
@@ -30,12 +29,14 @@ class SearchItem(object):
         self.incorporation_date = incorporation_date
         self.alt_title = alt_title
 
-    def add(self):
+    def save(self):
         try:
-            delete_for_company_number(self.company_number)
             serializer = SearchItemSerializer(self)
             data = serializer.data
-            settings.ES_CLIENT.create(index=self.Meta.es_index_name, doc_type=self.Meta.es_type_name, body=data)
+            settings.ES_CLIENT.create(index=self.Meta.es_index_name,
+                                      doc_type=self.Meta.es_type_name,
+                                      body=data,
+                                      refresh=True)
         except Exception as inst:
             print(inst)
 
@@ -65,38 +66,3 @@ class SearchItem(object):
                 'alt_title': {'type': 'string', 'index': 'not_analyzed', "boost": 3.0},
             }
         }
-
-
-def delete_for_company_number(company_number):
-
-    client = settings.ES_CLIENT
-
-    client.delete_by_query(
-        index=SearchItem.Meta.es_index_name,
-        doc_type=SearchItem.Meta.es_type_name,
-        q={'company_number': 'company_number'}
-    )
-
-
-def search_item_from_company(self, company):
-    ch = CHCompany.objects.get(pk=company.company_number)
-    return SearchItem(
-        source_id=company.id,
-        result_source='DIT',
-        result_type='COMPANY',
-        title=ch.company_name,
-        address_1=ch.registered_address_address_1,
-        address_2=ch.registered_address_address_2,
-        address_town=ch.registered_address_town,
-        address_county=ch.registered_address_county,
-        address_country=ch.registered_address_country,
-        address_postcode=ch.registered_address_postcode,
-        alt_address_1=company.trading_address_1,
-        alt_address_2=company.trading_address_2,
-        alt_address_town=company.trading_address_town,
-        alt_address_county=company.trading_address_county,
-        alt_address_country=company.trading_address_country,
-        alt_address_postcode=company.trading_address_postcode,
-        company_number=company.company_number,
-        incorporation_date=ch.incorporation_date
-    )

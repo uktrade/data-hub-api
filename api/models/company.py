@@ -8,8 +8,8 @@ class Company(models.Model):
 
     company_number = models.CharField(
         max_length=8,
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
         db_index=True,
         verbose_name="Company number")
 
