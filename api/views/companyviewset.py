@@ -1,11 +1,10 @@
-from rest_framework import viewsets, status
+from rest_framework import status, viewsets
 from rest_framework.response import Response
+
 from api.models.chcompany import CHCompany
 from api.models.company import Company
-from api.serializers import CHCompanySerializer
-from api.serializers import CompanySerializer
+from api.serializers import CompanySerializer, CHCompanySerializer
 # from korben.client import esclient
-
 
 
 class CompanyViewSet(viewsets.ModelViewSet):
