@@ -66,7 +66,14 @@ MAPPINGS = {
             ('optevia_Organisation_Id', 'company'),
         ),
         'foreign': (
-            (('optevia_interactionSet', 'optevia_Notes'), 'notes'),
+            (
+                (
+                    'optevia_Interaction_Id',
+                    'optevia_interactionSet',
+                    'optevia_Notes'
+                ),
+                'notes'
+            ),
         ),
     }
 }

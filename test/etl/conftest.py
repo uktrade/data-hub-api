@@ -15,7 +15,7 @@ ODATA_URL = 'http://services.odata.org/V2/(S(readwrite))/OData/OData.svc/'
 
 @pytest.fixture(scope='session')
 def db_engine():
-    return sqla.create_engine(config.etl_db_url).connect()
+    return sqla.create_engine(config.database_odata_url).connect()
 
 
 @pytest.fixture
