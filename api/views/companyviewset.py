@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework import status
 from api.models.company import Company
-from api.models.searchitem import search_item_from_company
+from api.services.searchservice import search_item_from_company
 from api.serializers import CompanySerializer
 from rest_framework.response import Response
 
