@@ -1,21 +1,28 @@
-import os
-import dj_database_url
+# -*- coding: utf-8 -*-
+"""
+Django settings for Leeloo project.
+For more information on this file, see
+https://docs.djangoproject.com/en/dev/topics/settings/
+For the full list of settings and their values, see
+https://docs.djangoproject.com/en/dev/ref/settings/
+"""
+
+import environ
+
 from elasticsearch import Elasticsearch, RequestsHttpConnection
 from requests_aws4auth import AWS4Auth
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-BASE_DIR = os.path.dirname(PROJECT_ROOT)
+ROOT_DIR = environ.Path(__file__) - 3
 
+env = environ.Env()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '35_@7(pnopt^zp&&qcfy)dp6+f91mr@f9r$wu16cnbr#reiv1b'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(os.getenv("DEBUG", False))
+DEBUG = env.bool('DEBUG')
 
 # As app is running behind a host-based router supplied by Heroku or other
 # PaaS, we can open ALLOWED_HOSTS
@@ -72,8 +79,9 @@ WSGI_APPLICATION = 'datahubapi.wsgi.application'
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(default="postgres://postgres:@localhost:/datahub", conn_max_age=500)
+    'default': env.db('DATABASE_URL')
 }
+DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 
 # Password validation
@@ -98,7 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-gb'
 
 TIME_ZONE = 'UTC'
 
@@ -110,19 +118,17 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
+PUBLIC_ROOT = str(ROOT_DIR('public'))
+STATIC_ROOT = str(ROOT_DIR('staticfiles'))
 STATIC_URL = '/static/'
 
 # Extra places for collectstatic to find static files.
 STATICFILES_DIRS = (
-    os.path.join(PROJECT_ROOT, 'static'),
+    str(ROOT_DIR.path('static')),
 )
 
-
 # Application authorisation
-UI_SECRET = os.getenv("UI_SECRET")
-
-SECRET_KEY = os.getenv("SECRET_KEY")  # needed for shell not sure why
+UI_SECRET = env('UI_SECRET')
 
 # DRF
 REST_FRAMEWORK = {
@@ -136,19 +142,21 @@ REST_FRAMEWORK = {
 
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
-ES_HOST = os.getenv("ES_HOST")
-ES_PORT = int(os.getenv("ES_PORT"))
-ES_ACCESS = os.getenv("ES_ACCESS")
-ES_SECRET = os.getenv("ES_SECRET")
-ES_REGION = os.getenv("ES_REGION")
+ES_HOST = env('ES_HOST')
+ES_PORT = env.int('ES_PORT')
+ES_ACCESS = env.bool('ES_ACCESS')
+if not ES_ACCESS:
+    ES_SECRET = env('ES_SECRET')
+    ES_REGION = env('ES_REGION')
 
-if ES_ACCESS is None:
+
+if ES_ACCESS:
     ES_CLIENT = Elasticsearch(
         hosts=[{'host': ES_HOST, 'port': ES_PORT}],
         connection_class=RequestsHttpConnection
     )
 else:
-    awsauth = AWS4Auth(ES_ACCESS, ES_SECRET, ES_REGION, 'es')
+    awsauth = AWS4Auth(ES_ACCESS, ES_SECRET, ES_REGION, ES_HOST)
 
     ES_CLIENT = Elasticsearch(
         hosts=[{'host': ES_HOST, 'port': ES_PORT}],
