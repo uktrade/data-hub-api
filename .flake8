@@ -1,0 +1,17 @@
+[flake8]
+# D100: Missing docstring in public module
+# D101: Missing docstring in public class
+# D102: Missing docstring in public method
+# D103: Missing docstring in public function
+# D104: Missing docstring in public package
+# D105: Missing docstring in magic method
+# D203: 1 blank line required before class docstring
+# F401: 'identifier' imported but unused
+# F403: 'from module import *' used; unable to detect undefined names
+# N801: class names should use CapWords convention
+exclude = */migrations/*,__pycache__,manage.py,datahubapi/*,gunicorn/*
+ignore = D203
+max-line-length = 120
+max-complexity = 10
+application-import-names = leeloo,korben
+import_order_style = smarkets
