@@ -2,11 +2,11 @@
 branch = True
 source = leeloo
 omit =
-    gunicorn
-    datahubapi
+    *gunicorn*
+    *datahubapi*
     *migrations*
     *test*
-    korben
+    *manage.py
 
 [report]
 exclude_lines =
