@@ -4,5 +4,7 @@ from api.serializers import CHCompanySerializer
 
 
 class CHCompanyViewSet(viewsets.ModelViewSet):
+    """DBMS Company."""
+
     queryset = CHCompany.objects.all()
     serializer_class = CHCompanySerializer

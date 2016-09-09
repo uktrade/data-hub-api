@@ -8,10 +8,12 @@ RUN pip install -r requirements.txt
 
 ADD . /app/leeloo
 
-RUN chmod a+x docker-entrypoint.sh
-ENTRYPOINT ["./docker-entrypoint.sh"]
+RUN chmod a+x start.sh
 
 ENV ES_PORT 9200
 ENV ES_HOST es
+ENV DEBUG True
+ENV ES_ACCESS True
 
 EXPOSE 8000
+CMD ./start.sh
