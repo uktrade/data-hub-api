@@ -30,3 +30,7 @@ pep8-naming==0.4.1
 gunicorn==19.6.0
 MarkupSafe==0.23
 python-dateutil==2.5.3
+
+# ES
+requests==2.11.1
+requests-aws4auth==0.9
