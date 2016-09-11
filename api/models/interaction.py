@@ -13,7 +13,17 @@ class Interaction(models.Model):
         max_length=20,
         null=True,
         blank=True,
-        verbose_name="Title")
+        verbose_name="Interaction type",
+        choices=(
+            ("Face to face", "Face to face"),
+            ("Social media", "Social media"),
+            ("Video/teleconference", "Video/teleconference"),
+            ("Email", "Email"),
+            ("Fax", "Fax"),
+            ("Letter", "Letter"),
+            ("Phone call", "Phone call"),
+        )
+    )
 
     subject = models.CharField(
         max_length=100,
@@ -21,7 +31,7 @@ class Interaction(models.Model):
         blank=True,
         verbose_name="Subject")
 
-    date_of_interaction = models.DateField(null = False)
+    date_of_interaction = models.DateField(null=False)
 
     advisor = models.CharField(
         max_length=100,
@@ -40,3 +50,9 @@ class Interaction(models.Model):
         to=Contact,
         null=True,
         related_name="interactions")
+
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.subject
