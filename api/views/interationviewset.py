@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from api.models.interaction import Interaction
-from api.serializers import InteractionSerializer
+from api.serializers.interactionserializer import InteractionSerializer, InteractionSaveSerializer
 from api.services.searchservice import delete_for_source_id, search_item_from_interaction
 
 
@@ -11,7 +11,7 @@ class InteractionViewSet(viewsets.ModelViewSet):
 
     def create(self, request, **kwargs):
         # Create a model object, validate and save
-        serializer = self.get_serializer(data=request.data)
+        serializer = InteractionSaveSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         new_interaction = serializer.save()
 
@@ -19,14 +19,14 @@ class InteractionViewSet(viewsets.ModelViewSet):
         search_item.save()
 
         # send back the newly record and inform the user if all is well.
-        response_serializer = self.get_serializer(new_interaction)
+        response_serializer = InteractionSaveSerializer(new_interaction)
         headers = self.get_success_headers(response_serializer.data)
         return Response(response_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer = InteractionSaveSerializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         interaction = serializer.save()
         delete_for_source_id(interaction.id)

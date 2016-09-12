@@ -26,5 +26,40 @@ class CompanySerializer(serializers.ModelSerializer):
             'account_manager',
             'countries_of_interest',
             'currently_exporting_to',
-            'connections'
+            'connections',
+            'business_description',
+            'contacts',
+            'interactions',
+            'created_date',
+            'modified_date',
+        )
+        depth = 2
+
+
+class CompanySaveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = (
+            'id',
+            'company_number',
+            'uk_based',
+            'business_type',
+            'registered_name',
+            'trading_name',
+            'sectors',
+            'website',
+            'number_of_employees',
+            'annual_turnover',
+            'trading_address_1',
+            'trading_address_2',
+            'trading_address_town',
+            'trading_address_county',
+            'trading_address_country',
+            'trading_address_postcode',
+            'region',
+            'account_manager',
+            'countries_of_interest',
+            'currently_exporting_to',
+            'connections',
+            'business_description',
         )

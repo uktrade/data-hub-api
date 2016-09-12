@@ -1,10 +1,11 @@
-from rest_framework import status, viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
-
 from api.models.chcompany import CHCompany
 from api.models.company import Company
-from api.serializers import CompanySerializer, CHCompanySerializer
+from api.serializers.chcompanyserializer import CHCompanySerializer
+from api.serializers.companyserialzer import CompanySerializer, CompanySaveSerializer
 # from korben.client import esclient
+
 
 
 class CompanyViewSet(viewsets.ModelViewSet):
@@ -15,14 +16,14 @@ class CompanyViewSet(viewsets.ModelViewSet):
         # eslient.check_ch_data(request)
 
         # Create a company, validate and save
-        serializer = self.get_serializer(data=request.data)
+        serializer = CompanySaveSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         new_company = serializer.save()
 
         # esclient.create(new_company)
 
         # send back the newly company record and inform the user if all is well.
-        response_serializer = self.get_serializer(new_company)
+        response_serializer = CompanySaveSerializer(new_company)
         headers = self.get_success_headers(response_serializer.data)
         return Response(response_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -30,7 +31,7 @@ class CompanyViewSet(viewsets.ModelViewSet):
         # esclient.check_ch_data(request)
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer = CompanySaveSerializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         company = serializer.save()
         # esclient.create(new_company)
