@@ -9,8 +9,6 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 
 import environ
 
-from elasticsearch import Elasticsearch, RequestsHttpConnection
-from requests_aws4auth import AWS4Auth
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 ROOT_DIR = environ.Path(__file__) - 3
@@ -46,7 +44,11 @@ THIRD_PARTY_APPS = (
     'rest_framework_swagger',
 )
 
-LOCAL_APPS = ('api',)
+LOCAL_APPS = (
+    'core',
+    'company',
+    'search',
+)
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -155,20 +157,3 @@ ES_ACCESS = env.bool('ES_ACCESS')
 if not ES_ACCESS:
     ES_SECRET = env('ES_SECRET')
     ES_REGION = env('ES_REGION')
-
-
-if ES_ACCESS:
-    ES_CLIENT = Elasticsearch(
-        hosts=[{'host': ES_HOST, 'port': ES_PORT}],
-        connection_class=RequestsHttpConnection
-    )
-else:
-    awsauth = AWS4Auth(ES_ACCESS, ES_SECRET, ES_REGION, ES_HOST)
-
-    ES_CLIENT = Elasticsearch(
-        hosts=[{'host': ES_HOST, 'port': ES_PORT}],
-        http_auth=awsauth,
-        use_ssl=True,
-        verify_certs=True,
-        connection_class=RequestsHttpConnection
-    )
