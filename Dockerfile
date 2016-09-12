@@ -6,6 +6,9 @@ WORKDIR /app/leeloo
 ADD requirements.txt .
 RUN pip install -r requirements.txt
 
+RUN git clone https://github.com/uktrade/data-hub-backend.git
+RUN pip install -e data-hub-backend/korben
+
 ADD . /app/leeloo
 
 RUN chmod a+x start.sh
