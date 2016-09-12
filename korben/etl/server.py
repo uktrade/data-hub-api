@@ -5,10 +5,9 @@ import json
 import flask
 import sqlalchemy as sqla
 
-from korben import db
+from korben import db, config
 from . import extract, transform
 
-CONNECTION = None
 METADATA = None
 
 app = flask.Flask(__name__)  # NOQA
@@ -20,6 +19,7 @@ def handle_data_float(obj):
     elif isinstance(obj, decimal.Decimal):
         return float(obj)
 
+
 @app.route('/', methods=['POST'])
 def root():
     retval = {}
@@ -28,13 +28,11 @@ def root():
         transform_func = functools.partial(
             transform.from_cdms_psql, METADATA, entity_name
         )
-        retval[entity_name] = list(map(transform_func, result))
+        retval[entity_name] = \
+                load.from_cdms_psql(entity_name, map(transform_func, result))
     return json.dumps(retval, default=handle_data_float)
 
+
 def main():
-    global CONNECTION
-    CONNECTION = db.poll_for_connection()
-    global METADATA
-    METADATA = sqla.MetaData(bind=CONNECTION)
-    METADATA.reflect()
+    METADATA = db.poll_for_metadata(config.database_url)
     app.run('0.0.0.0', '8080')
