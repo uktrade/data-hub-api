@@ -1,8 +1,102 @@
+"""Company models."""
+
 import uuid
+
 from django.db import models
 
 
-class CHCompany(models.Model):
+class Company(models.Model):
+    """Representation of the company as per CDMS."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    company_number = models.CharField(
+        max_length=8,
+        blank=True,
+        db_index=True
+    )
+    uk_based = models.BooleanField(default=True)
+    business_type = models.CharField(max_length=160, blank=False)
+    registered_name = models.CharField(max_length=160, blank=False)
+    trading_name = models.CharField(max_length=160, blank=True)
+    sectors = models.TextField(blank=True)
+    website = models.URLField(blank=True)
+    number_of_employees = models.CharField(max_length=20, blank=True)
+
+    annual_turnover = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True,
+        verbose_name="Annual turnover")
+
+    trading_address_1 = models.CharField(
+        max_length=300,
+        null=True,
+        blank=True,
+        verbose_name="Address line 1 (House number and street")
+
+    trading_address_2 = models.CharField(
+        max_length=300,
+        null=True,
+        blank=True,
+        verbose_name="Address line 2 (area)")
+
+    trading_address_town = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+        verbose_name="Address town")
+
+    trading_address_county = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+        verbose_name="Address county")
+
+    trading_address_country = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        verbose_name="Address country")
+
+    trading_address_postcode = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True,
+        verbose_name="Address postcode")
+
+    region = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+        verbose_name="Region")
+
+    account_manager = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        verbose_name="Account manger")
+
+    countries_of_interest = models.TextField(
+        null=True,
+        blank=True
+    )
+
+    currently_exporting_to = models.TextField(
+        null=True,
+        blank=True
+    )
+
+    connections = models.CharField(
+        max_length=200,
+        null=True,
+        blank=True,
+    )
+
+    def __str__(self):
+        return self.registered_name
+
+
+class CompanyHouseCompany(models.Model):
 
     company_number = models.CharField(
         max_length=8,
