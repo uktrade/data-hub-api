@@ -1,26 +1,28 @@
 import sqlalchemy as sqla
+from korben import config
+from .. import db
 from . import spec
 
-def from_cdms_psql(metadata, cdms_tablename, cdms_dict):
+
+def from_cdms_psql(cdms_tablename, cdms_dict):
     'Transform a CDMS row into a row suitable for insertion in to Leeloo'
+    metadata = db.poll_for_metadata(config.database_odata_url)
     out_dict = {}
     mapping = spec.MAPPINGS[cdms_tablename]
     for cdms_col, leeloo_col in mapping.get('local', []):
         if cdms_col:  # TODO: Should these even appear in mappings?
             out_dict[leeloo_col] = cdms_dict[cdms_col]
-    for (cdms_tablename, cdms_col), leeloo_col in mapping.get('foreign', []):
-        table = metadata.tables[cdms_tablename]
+    for fkey, leeloo_col in mapping.get('foreign', []):
+        join_col, remote_tablename, remote_col = fkey
+        remote_table = metadata.tables[remote_tablename]
         primary_key = next(
-            col.name for col in table.primary_key.columns.values()
+            col.name for col in remote_table.primary_key.columns.values()
         )
         select_statement = (
             sqla
-            .select([table.c[cdms_col]], table)
-            .where(table.columns[primary_key] == out_dict['id'])
+            .select([remote_table.c[remote_col]])
+            .where(remote_table.columns[primary_key] == cdms_dict[join_col])
         )
-        value = metadata.bind.connect()\
-                             .execute(select_statement)\
-                             .fetchone()\
-                             .scalar()
+        value = metadata.bind.execute(select_statement).scalar()
         out_dict[leeloo_col] = value
     return out_dict

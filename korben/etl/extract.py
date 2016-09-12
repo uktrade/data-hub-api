@@ -1,7 +1,8 @@
 import sqlalchemy as sqla
 
-def from_cdms_psql(metadata, entity_name, guids):
-    table = metadata.tables[entity_name]
+
+def from_cdms_psql(metadata, cdms_tablename, guids):
+    table = metadata.tables[cdms_tablename]
     primary_key = next(
         col.name for col in table.primary_key.columns.values()
     )
