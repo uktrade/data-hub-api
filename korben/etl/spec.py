@@ -1,4 +1,5 @@
 from korben import config
+from korben import db
 
 
 MAPPINGS = {
@@ -105,52 +106,4 @@ ES_TYPES = {
         }
     }
     for table in db.poll_for_metadata(config.database_url).tables
-}
-    'api_company': {
-        'properties': {
-            'id': ES_STRING_NOT_ANALYZED,
-            'company_number': ES_STRING_NOT_ANALYZED,
-            'uk_based': ES_STRING_NOT_ANALYZED,
-            'business_type': ES_STRING_NOT_ANALYZED,
-            'registered_name': ES_STRING_NOT_ANALYZED,
-            'trading_name': ES_STRING_NOT_ANALYZED,
-            'website': ES_STRING_NOT_ANALYZED,
-            'number_of_employees': ES_STRING_NOT_ANALYZED,
-            'annual_turnover': ES_STRING_NOT_ANALYZED,
-            'trading_address_1': ES_STRING_NOT_ANALYZED,
-            'trading_address_2': ES_STRING_NOT_ANALYZED,
-            'trading_address_town': ES_STRING_NOT_ANALYZED,
-            'trading_address_county': ES_STRING_NOT_ANALYZED,
-            'trading_address_country': ES_STRING_NOT_ANALYZED,
-            'trading_address_postcode': ES_STRING_NOT_ANALYZED,
-            'region': ES_STRING_NOT_ANALYZED,
-            'account_manager': ES_STRING_NOT_ANALYZED,
-            'connections': ES_STRING_NOT_ANALYZED,
-            'countries_of_interest': ES_STRING_NOT_ANALYZED,
-            'currently_exporting_to': ES_STRING_NOT_ANALYZED,
-            'sectors': ES_STRING_NOT_ANALYZED,
-        }
-    },
-    'api_chcompany': {
-        'properties': {
-            'company_number': ES_STRING_NOT_ANALYZED,
-            'company_name': ES_STRING_NOT_ANALYZED,
-            'registered_address_care_of': ES_STRING_NOT_ANALYZED,
-            'registered_address_po_box': ES_STRING_NOT_ANALYZED,
-            'registered_address_address_1': ES_STRING_NOT_ANALYZED,
-            'registered_address_address_2': ES_STRING_NOT_ANALYZED,
-            'registered_address_town': ES_STRING_NOT_ANALYZED,
-            'registered_address_county': ES_STRING_NOT_ANALYZED,
-            'registered_address_country': ES_STRING_NOT_ANALYZED,
-            'registered_address_postcode': ES_STRING_NOT_ANALYZED,
-            'company_category': ES_STRING_NOT_ANALYZED,
-            'company_status': ES_STRING_NOT_ANALYZED,
-            'sic_code_1': ES_STRING_NOT_ANALYZED,
-            'sic_code_2': ES_STRING_NOT_ANALYZED,
-            'sic_code_3': ES_STRING_NOT_ANALYZED,
-            'sic_code_4': ES_STRING_NOT_ANALYZED,
-            'uri': ES_STRING_NOT_ANALYZED,
-            'incorporation_date': ES_STRING_NOT_ANALYZED,
-        }
-    }
 }
