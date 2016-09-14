@@ -13,3 +13,7 @@ def from_cdms_psql(metadata, cdms_tablename, guids):
     )
     result = metadata.bind.connect().execute(select_statement).fetchall()
     return map(dict, result)
+
+
+def from_django_psql(metadata, django_tablename, pks):
+    pass
