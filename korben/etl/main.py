@@ -4,7 +4,7 @@ from .. import services
 from . import spec, extract, transform, load
 
 
-def from_cdms_psql(entity_name, guids, idempotent=False):
+def from_cdms_psql(entity_name, guids):
     cdms_tablename = entity_name + 'Set'
     mapping = spec.MAPPINGS[cdms_tablename]
     metadata = services.db.poll_for_metadata(config.database_odata_url)
@@ -12,8 +12,6 @@ def from_cdms_psql(entity_name, guids, idempotent=False):
     transform_func = functools.partial(
         transform.from_cdms_psql, cdms_tablename
     )
-    if not idempotent:
-        return load.to_leeloo(mapping['to'], map(transform_func, result))
     return load.to_leeloo_idempotent(
         mapping['to'], map(transform_func, result)
     )
