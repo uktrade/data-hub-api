@@ -1,5 +1,5 @@
 from korben import config
-from korben import db
+from korben import services
 
 
 MAPPINGS = {
@@ -105,5 +105,5 @@ ES_TYPES = {
             for col in table.colums
         }
     }
-    for table in db.poll_for_metadata(config.database_url).tables
+    for table in services.db.poll_for_metadata(config.database_url).tables
 }

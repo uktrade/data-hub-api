@@ -1,12 +1,12 @@
 import sqlalchemy as sqla
 from korben import config
-from .. import db
+from .. import services
 from . import spec
 
 
 def from_cdms_psql(cdms_tablename, cdms_dict):
     'Transform a CDMS row into a row suitable for insertion in to Leeloo'
-    metadata = db.poll_for_metadata(config.database_odata_url)
+    metadata = services.db.poll_for_metadata(config.database_odata_url)
     out_dict = {}
     mapping = spec.MAPPINGS[cdms_tablename]
     for cdms_col, leeloo_col in mapping.get('local', []):
