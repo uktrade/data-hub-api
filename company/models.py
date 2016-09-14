@@ -11,26 +11,32 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 class BusinessType(ReadOnlyModelMixin, BaseConstantModel):
+    """Company business type."""
     pass
 
 
 class Sector(ReadOnlyModelMixin, BaseConstantModel):
+    """Company sector."""
     pass
 
 
 class EmployeeRange(ReadOnlyModelMixin, BaseConstantModel):
+    """Company employee range."""
     pass
 
 
 class TurnoverRange(ReadOnlyModelMixin, BaseConstantModel):
+    """Company turnover range."""
     pass
 
 
 class UKRegion(ReadOnlyModelMixin, BaseConstantModel):
+    """UK region."""
     pass
 
 
 class Country(ReadOnlyModelMixin, BaseConstantModel):
+    """Country."""
     pass
 
 
@@ -91,10 +97,12 @@ class CompanyHouseCompany(ReadOnlyModelMixin, BaseModel):
 
 
 class InteractionType(ReadOnlyModelMixin, BaseConstantModel):
+    """Interaction type."""
     pass
 
 
 class Advisor(ReadOnlyModelMixin, BaseConstantModel):
+    """Advisor."""
     pass
 
 
@@ -115,10 +123,12 @@ class Interaction(ReadOnlyModelMixin, BaseModel):
 
 
 class Title(ReadOnlyModelMixin, BaseConstantModel):
+    """Contact title."""
     pass
 
 
 class Role(ReadOnlyModelMixin, BaseConstantModel):
+    """Contact role."""
     pass
 
 
