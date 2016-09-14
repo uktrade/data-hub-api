@@ -49,7 +49,7 @@ class Company(ReadOnlyModelMixin, BaseModel):
 
     id = models.UUIDField(primary_key=True, db_index=True)
     company_number = models.CharField(max_length=MAX_LENGTH, null=True, db_index=True)
-    uk_based = models.BooleanField(default=True, null=True)
+    uk_based = models.NullBooleanField(default=True, null=True)
     business_type = models.ForeignKey('BusinessType', null=True)
     trading_name = models.CharField(max_length=MAX_LENGTH, null=True)
     sector = models.ForeignKey('Sector', null=True)
