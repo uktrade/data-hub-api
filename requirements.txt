@@ -3,7 +3,6 @@ Django==1.10.1
 djangorestframework==3.4.6
 django-rest-swagger==2.0.5
 django-environ==0.4.0
-django-model-utils==2.5.2
 whitenoise==3.2.1
 
 # Persistency layer

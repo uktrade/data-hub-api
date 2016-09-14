@@ -153,7 +153,7 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 ES_HOST = env('ES_HOST')
 ES_PORT = env.int('ES_PORT')
-ES_ACCESS = env.bool('ES_ACCESS')
-if not ES_ACCESS:
-    ES_SECRET = env('ES_SECRET')
-    ES_REGION = env('ES_REGION')
+
+CHAR_FIELD_MAX_LENGTH=255
+
+
