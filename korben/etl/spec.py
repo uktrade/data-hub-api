@@ -1,8 +1,33 @@
 from korben import config
 from korben import services
 
+MAPPINGS = {}
 
-MAPPINGS = {
+CONSTANT_MAPPINGS = (
+    ('optevia_businesstypeId', 'optevia_businesstypeSet', 'optevia_name', 'company_businesstype'),
+    ('optevia_sectorId', 'optevia_sectorSet', 'optevia_name', 'company_sector'),
+    ('optevia_employeerangeId', 'optevia_employeerangeSet', 'optevia_name', 'company_employeerange'),
+    ('optevia_turnoverrangeId', 'optevia_turnoverrangeSet', 'optevia_name', 'company_turnoverrange'),
+    ('optevia_ukregionId', 'optevia_ukregionSet', 'optevia_name', 'company_ukregion'),
+    ('optevia_countryId', 'optevia_countrySet', 'optevia_Country', 'company_country'),
+    ('optevia_titleId', 'optevia_titleSet', 'optevia_name', 'company_title'),
+    ('optevia_contactroleId', 'optevia_contactroleSet', 'optevia_name', 'company_role'),
+    ('optevia_interactioncommunicationchannelId', 'optevia_interactioncommunicationchannelSet', 'optevia_name', 'company_interactiontype'),
+)
+
+
+for source_pkey, source_table, source_name, target_table in CONSTANT_MAPPINGS:
+    MAPPINGS.update({
+        source_table: {
+            'to': target_table,
+            'local': (
+                (source_pkey, 'id'),
+                (source_name, 'name'),
+            ),
+        },
+    })
+
+MAPPINGS.update({
     'AccountSet': {
         'to': 'company_company',
         'local': (
@@ -32,10 +57,10 @@ MAPPINGS = {
         'to': 'company_contact',
         'local': (
             ('ContactId', 'id'),
-            ('optevia_Title_Id', 'title'),
+            ('optevia_Title_Id', 'title_id'),
             ('FirstName', 'first_name'),
             ('LastName', 'last_name'),
-            ('optevia_ContactRole_Id', 'role'),
+            ('optevia_ContactRole_Id', 'role_id'),
             ('optevia_TelephoneNumber', 'phone'),  # many other options
             ('EMailAddress1', 'email'),
 
@@ -85,27 +110,7 @@ MAPPINGS = {
             ),
         ),
     },
-}
-
-CONSTANT_MAPPINGS = (
-    ('optevia_businesstypeId', 'optevia_businesstypeSet', 'company_businesstype'),
-    ('optevia_sectorId', 'optevia_sectorSet', 'company_sector'),
-    ('optevia_employeerangeId', 'optevia_employeerangeSet', 'company_employeerange'),
-    ('optevia_turnoverrangeId', 'optevia_turnoverrangeSet', 'company_turnoverrange'),
-    ('optevia_ukregionId', 'optevia_ukregionSet', 'company_ukregion'),
-)
-
-
-for primary_key, source_table, target_table in CONSTANT_MAPPINGS:
-    MAPPINGS.update({
-        source_table: {
-            'to': target_table,
-            'local': (
-                (primary_key, 'id'),
-                ('optevia_name', 'name'),
-            ),
-        },
-    })
+})
 
 
 ES_STRING_ANALYZED = {'type': 'string', 'index': 'analyzed'}
