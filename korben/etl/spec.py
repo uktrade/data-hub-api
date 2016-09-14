@@ -10,11 +10,6 @@ MAPPINGS = {
             ('optevia_CompaniesHouseNumber', 'company_number'),
             ('optevia_ukorganisation', 'uk_based'),
             ('optevia_BusinessType_Id', 'business_type_id'),
-
-            # not null wtf
-            # (None, 'registered_name'),
-            ('Name', 'registered_name'),
-
             ('Name', 'trading_name'),
             ('optevia_Sector_Id', 'sector_id'),
             ('WebSiteURL', 'website'),
