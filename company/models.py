@@ -45,7 +45,6 @@ class Company(ReadOnlyModelMixin, BaseModel):
     company_number = models.CharField(max_length=MAX_LENGTH, blank=True, db_index=True)
     uk_based = models.BooleanField(default=True)
     business_type = models.ForeignKey('BusinessType', null=False)
-    registered_name = models.CharField(max_length=MAX_LENGTH, blank=False)
     trading_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     sector = models.ForeignKey('Sector', null=True)
     website = models.URLField(blank=True)
