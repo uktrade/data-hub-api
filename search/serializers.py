@@ -1,6 +1,9 @@
+"""Search result serializers."""
 
-from rest_framework.serializers import Serializer
+from rest_framework import serializers
 
-class SearchResult(Serializer):
+
+class SearchResultSerializer(serializers.Serializer):
     """Serialize the ES search results."""
-    pass
+
+    source_id = serializers.CharField(required=False)

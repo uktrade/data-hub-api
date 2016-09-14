@@ -153,7 +153,9 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 ES_HOST = env('ES_HOST')
 ES_PORT = env.int('ES_PORT')
+ES_INDEX = 'datahub'
 
 CHAR_FIELD_MAX_LENGTH=255
+
 
 

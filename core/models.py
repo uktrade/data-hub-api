@@ -5,6 +5,7 @@ from django.utils.timezone import now
 class BaseModel(models.Model):
 
     modified_on = models.DateTimeField(default=now)
+    created_on = models.DateTimeField(default=now)
 
     class Meta:
         abstract = True

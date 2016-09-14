@@ -1,13 +1,32 @@
 """Search views."""
 
+from django.conf import settings
+
+from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from core.utils import get_elasticsearch_client
+
+from .serializers import SearchResultSerializer
+from .utils import search_by_term
 
 
 class Search(APIView):
-    """ View to handle the search.
-    """
+    """ View to handle the search."""
 
-    http_method_names = ('get', )
+    http_method_names = ('post', )
 
-    def get(self, request, format=None):
-        pass
+    def post(self, request, format=None):
+        query_term = request.POST['term']
+        offset = request.POST.get('offset', 0)
+        limit = request.POST.get('limit', 100)
+        client = get_elasticsearch_client()
+        results = search_by_term(
+            client=client,
+            index=settings.ES_INDEX,
+            term=query_term,
+            offset=offset,
+            limit=limit
+        )
+        serialized_results = SearchResultSerializer(results, many=True)
+        Response(data=serialized_results.data)
