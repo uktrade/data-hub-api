@@ -4,7 +4,7 @@ from korben import services
 
 MAPPINGS = {
     'AccountSet': {
-        'to': 'companies_company',
+        'to': 'company_company',
         'local': (
             ('AccountId', 'id'),
             ('optevia_CompaniesHouseNumber', 'company_number'),
@@ -24,10 +24,12 @@ MAPPINGS = {
             ('optevia_Country_Id', 'country_id'),
             ('optevia_UKRegion_Id', 'uk_region_id'),
             ('Description', 'description'),
+            ('ModifiedOn', 'modified_on'),
+            ('CreatedOn', 'created_on'),
         ),
     },
     'ContactSet': {
-        'to': 'companies_contact',
+        'to': 'company_contact',
         'local': (
             ('ContactId', 'id'),
             ('optevia_Title_Id', 'title'),
@@ -53,10 +55,13 @@ MAPPINGS = {
 
             (None, 'notes'),
             ('AccountId_Id', 'company_id'),
+
+            ('ModifiedOn', 'modified_on'),
+            ('CreatedOn', 'created_on'),
         ),
     },
     'optevia_activitylinkSet': {
-        'to': 'companies_interaction',
+        'to': 'company_interaction',
         'local': (
             ('optevia_activitylinkId', 'id'),
             ('optevia_InteractionCommunicationChannel_Id', 'interaction_type'),
@@ -65,6 +70,9 @@ MAPPINGS = {
             ('optevia_Advisor_Id', 'advisor_id'),
             ('optevia_Contact_Id', 'contact_id'),
             ('optevia_Organisation_Id', 'company_id'),
+
+            ('ModifiedOn', 'modified_on'),
+            ('CreatedOn', 'created_on'),
         ),
         'foreign': (
             (
@@ -80,11 +88,11 @@ MAPPINGS = {
 }
 
 CONSTANT_MAPPINGS = (
-    ('optevia_businesstypeId', 'optevia_businesstypeSet', 'companies_businesstype'),
-    ('optevia_sectorId', 'optevia_sectorSet', 'companies_sector'),
-    ('optevia_employeerangeId', 'optevia_employeerangeSet', 'companies_employeerange'),
-    ('optevia_turnoverrangeId', 'optevia_turnoverrangeSet', 'companies_turnoverrange'),
-    ('optevia_ukregionId', 'optevia_ukregionSet', 'companies_ukregion'),
+    ('optevia_businesstypeId', 'optevia_businesstypeSet', 'company_businesstype'),
+    ('optevia_sectorId', 'optevia_sectorSet', 'company_sector'),
+    ('optevia_employeerangeId', 'optevia_employeerangeSet', 'company_employeerange'),
+    ('optevia_turnoverrangeId', 'optevia_turnoverrangeSet', 'company_turnoverrange'),
+    ('optevia_ukregionId', 'optevia_ukregionSet', 'company_ukregion'),
 )
 
 
@@ -114,11 +122,11 @@ def update(original_dict, update_dict):
 
 ES_INDEX = 'datahub'
 ES_TYPES = {
-    table.name: {
+    name: {
         'properties': {
             col.name: ES_STRING_ANALYZED
-            for col in table.colums
+            for col in table.columns
         }
     }
-    for table in services.db.poll_for_metadata(config.database_url).tables
+    for name, table in services.db.poll_for_metadata(config.database_url).tables.items()
 }
