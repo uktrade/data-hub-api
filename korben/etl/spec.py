@@ -24,7 +24,7 @@ MAPPINGS = {
             ('optevia_Country_Id', 'country_id'),
             ('optevia_UKRegion_Id', 'uk_region_id'),
             ('Description', 'description'),
-        )
+        ),
     },
     'ContactSet': {
         'to': 'companies_contact',
@@ -53,7 +53,7 @@ MAPPINGS = {
 
             (None, 'notes'),
             ('AccountId_Id', 'company_id'),
-        )
+        ),
     },
     'optevia_activitylinkSet': {
         'to': 'companies_interaction',
@@ -76,8 +76,29 @@ MAPPINGS = {
                 'notes'
             ),
         ),
-    }
+    },
 }
+
+CONSTANT_MAPPINGS = (
+    ('optevia_businesstypeId', 'optevia_businesstypeSet', 'companies_businesstype'),
+    ('optevia_sectorId', 'optevia_sectorSet', 'companies_sector'),
+    ('optevia_employeerangeId', 'optevia_employeerangeSet', 'companies_employeerange'),
+    ('optevia_turnoverrangeId', 'optevia_turnoverrangeSet', 'companies_turnoverrange'),
+    ('optevia_ukregionId', 'optevia_ukregionSet', 'companies_ukregion'),
+)
+
+
+for primary_key, source_table, target_table in CONSTANT_MAPPINGS:
+    MAPPINGS.update({
+        source_table: {
+            'to': target_table,
+            'local': (
+                (primary_key, 'id'),
+                ('optevia_name', 'name'),
+            ),
+        },
+    })
+
 
 ES_STRING_ANALYZED = {'type': 'string', 'index': 'analyzed'}
 ES_STRING_NOT_ANALYZED = {'type': 'string', 'index': 'not_analyzed'}
