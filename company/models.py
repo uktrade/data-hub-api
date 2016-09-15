@@ -111,10 +111,10 @@ class Interaction(ReadOnlyModelMixin, BaseModel):
 
     id = models.UUIDField(primary_key=True, db_index=True)
     interaction_type = models.ForeignKey('InteractionType', null=True)
-    subject = models.TextField(blank=True)
+    subject = models.TextField(null=True)
     date_of_interaction = models.DateTimeField(null=False)
     advisor = models.ForeignKey('Advisor', null=True)
-    notes = models.TextField(blank=True)
+    notes = models.TextField(null=True)
     company = models.ForeignKey('Company', null=True)
     contact = models.ForeignKey('Contact', null=True)
 
@@ -150,7 +150,7 @@ class Contact(ReadOnlyModelMixin, BaseModel):
     address_postcode = models.CharField(max_length=MAX_LENGTH, null=True)
     alt_phone = models.CharField(max_length=MAX_LENGTH, null=True)
     alt_email = models.EmailField(null=True)
-    notes = models.TextField(blank=True)
+    notes = models.TextField(null=True)
     company = models.ForeignKey('Company', null=True)
     primary_contact_team = models.TextField(null=True)
 
