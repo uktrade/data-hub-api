@@ -70,8 +70,8 @@ class Company(ReadOnlyModelMixin, BaseModel):
         return self.registered_name
 
 
-class CompanyHouseCompany(ReadOnlyModelMixin, BaseModel):
-    """Representation of Company House company."""
+class CompaniesHouseCompany(ReadOnlyModelMixin, BaseModel):
+    """Representation of Companies House company."""
 
     company_number = models.CharField(max_length=MAX_LENGTH, primary_key=True, db_index=True)
     company_name = models.CharField(max_length=MAX_LENGTH)
