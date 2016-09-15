@@ -136,5 +136,5 @@ ES_TYPES = {
             for col in __django_tables[name].columns
         }
     }
-    for name in DJANGO_LOOKUP
+    for name in DJANGO_LOOKUP.keys()
 }
