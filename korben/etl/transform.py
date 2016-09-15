@@ -9,6 +9,11 @@ def from_cdms_psql(table, cdms_dict):
     for cdms_col, leeloo_col in mapping.get('local', []):
         if cdms_col:  # TODO: Should these even appear in mappings?
             out_dict[leeloo_col] = cdms_dict[cdms_col]
+    for cdms_cols, leeloo_col, func in mapping.get('local_fn', []):
+        args = []
+        for cdms_col in cdms_cols:
+            args.append(cdms_dict[cdms_col])
+        out_dict[leeloo_col] = func(*args)
     for fkey, leeloo_col in mapping.get('foreign', []):
         join_col, remote_tablename, remote_col = fkey
         remote_table = table.metadata.tables[remote_tablename]

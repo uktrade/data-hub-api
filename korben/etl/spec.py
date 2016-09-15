@@ -53,6 +53,15 @@ MAPPINGS.update({
             ('CreatedOn', 'created_on'),
         ),
     },
+    'SystemUserSet': {
+        'to': 'company_advisor',
+        'local': (
+            ('SystemUserId', 'id'),
+        ),
+        'local_fn': (
+            (('FirstName', 'LastName'), 'name', lambda first, last: "{0} {1}".format(first, last)),  # NOQA
+        ),
+    },
     'ContactSet': {
         'to': 'company_contact',
         'local': (
