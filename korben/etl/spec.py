@@ -89,7 +89,7 @@ MAPPINGS.update({
         'to': 'company_interaction',
         'local': (
             ('optevia_activitylinkId', 'id'),
-            ('optevia_InteractionCommunicationChannel_Id', 'interaction_type'),
+            ('optevia_InteractionCommunicationChannel_Id', 'interaction_type_id'),
             ('optevia_Subject', 'subject'),
             ('optevia_Date', 'date_of_interaction'),
             ('optevia_Advisor_Id', 'advisor_id'),
@@ -111,6 +111,8 @@ MAPPINGS.update({
         ),
     },
 })
+
+DJANGO_LOOKUP = {mapping['to']: name for name, mapping in MAPPINGS.items()}
 
 
 ES_STRING_ANALYZED = {'type': 'string', 'index': 'analyzed'}
