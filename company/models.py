@@ -112,7 +112,7 @@ class Interaction(ReadOnlyModelMixin, BaseModel):
     id = models.UUIDField(primary_key=True, db_index=True)
     interaction_type = models.ForeignKey('InteractionType', null=True)
     subject = models.TextField(null=True)
-    date_of_interaction = models.DateTimeField(null=False)
+    date_of_interaction = models.DateTimeField(null=True)
     advisor = models.ForeignKey('Advisor', null=True)
     notes = models.TextField(null=True)
     company = models.ForeignKey('Company', null=True)
