@@ -41,5 +41,5 @@ def to_leeloo_idempotent(table, data):
 
 def from_ch(data):
     metadata = services.db.poll_for_metadata(config.database_url)
-    table = metadata.tables['company_companyhousecompany']
+    table = metadata.tables['company_companieshousecompany']
     return metadata.bind.connect().execute(table.insert(), data)
