@@ -1,8 +1,7 @@
 import sqlalchemy as sqla
 
 
-def from_cdms_psql(metadata, cdms_tablename, guids):
-    table = metadata.tables[cdms_tablename]
+def from_cdms_psql(table, guids):
     primary_key = next(
         col.name for col in table.primary_key.columns.values()
     )
@@ -11,7 +10,7 @@ def from_cdms_psql(metadata, cdms_tablename, guids):
         .select([table])
         .where(table.columns[primary_key].in_(guids))
     )
-    result = metadata.bind.connect().execute(select_statement).fetchall()
+    result = table.metadata.bind.connect().execute(select_statement).fetchall()
     return map(dict, result)
 
 

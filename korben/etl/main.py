@@ -1,17 +1,12 @@
 import functools
-from .. import config
-from .. import services
+from korben import config, services
 from . import spec, extract, transform, load
 
 
-def from_cdms_psql(entity_name, guids):
-    cdms_tablename = entity_name + 'Set'
-    mapping = spec.MAPPINGS[cdms_tablename]
-    metadata = services.db.poll_for_metadata(config.database_odata_url)
-    result = extract.from_cdms_psql(metadata, cdms_tablename, guids)
-    transform_func = functools.partial(
-        transform.from_cdms_psql, cdms_tablename
-    )
-    return load.to_leeloo_idempotent(
-        mapping['to'], map(transform_func, result)
-    )
+def from_cdms_psql(table, guids):
+    mapping = spec.MAPPINGS[table.name]
+    result = extract.from_cdms_psql(table, guids)
+    transform_func = functools.partial(transform.from_cdms_psql, table)
+    django_metadata = services.db.poll_for_metadata(config.database_url)
+    django_table = django_metadata.tables[mapping['to']]
+    return load.to_leeloo_idempotent(django_table, map(transform_func, result))
