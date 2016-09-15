@@ -1,7 +1,12 @@
+import datetime
+import logging
+
 from sqlalchemy.dialects.postgresql import insert
 
 from korben import config
 from .. import services
+
+LOGGER = logging.getLogger('korben.etl.load')
 
 
 def to_cdms_psql(table, data):
@@ -24,7 +29,13 @@ def to_leeloo_idempotent(table, data):
         upsert = insert(table)\
             .values(**row)\
             .on_conflict_do_update(index_elements=[primary_key], set_=row)
-        results.append(table.metadata.bind.execute(upsert))
+        try:
+            results.append(table.metadata.bind.execute(upsert))
+        except:
+            LOGGER.error("{0} {1} ({2}) failed on something".format(
+                datetime.datetime.now(), table.name, row[primary_key]
+            ))
+            pass
     return results
 
 
