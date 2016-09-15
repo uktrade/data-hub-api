@@ -126,14 +126,15 @@ def update(original_dict, update_dict):
     updated_dict.update(update_dict)
     return updated_dict
 
+__django_tables = services.db.poll_for_metadata(config.database_url).tables
 
 ES_INDEX = 'datahub'
 ES_TYPES = {
     name: {
         'properties': {
             col.name: ES_STRING_ANALYZED
-            for col in table.columns
+            for col in __django_tables[name].columns
         }
     }
-    for name, table in services.db.poll_for_metadata(config.database_url).tables.items()
+    for name in DJANGO_LOOKUP
 }
