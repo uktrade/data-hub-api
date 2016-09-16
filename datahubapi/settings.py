@@ -42,6 +42,7 @@ DJANGO_APPS = (
 THIRD_PARTY_APPS = (
     'rest_framework',
     'rest_framework_swagger',
+    'django_extensions'
 )
 
 LOCAL_APPS = (

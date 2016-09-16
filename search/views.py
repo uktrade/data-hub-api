@@ -7,7 +7,6 @@ from rest_framework.views import APIView
 
 from core.utils import get_elasticsearch_client
 
-from .serializers import SearchResultSerializer
 from .utils import search_by_term
 
 
@@ -25,8 +24,7 @@ class Search(APIView):
             client=client,
             index=settings.ES_INDEX,
             term=query_term,
-            offset=offset,
-            limit=limit
+            offset=int(offset),
+            limit=int(limit)
         )
-        serialized_results = SearchResultSerializer(results, many=True)
-        Response(data=serialized_results.data)
+        return Response(data=results.hits.hits)

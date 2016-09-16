@@ -40,7 +40,25 @@ class Country(ReadOnlyModelMixin, BaseConstantModel):
     pass
 
 
-class Company(ReadOnlyModelMixin, BaseModel):
+class CompanyAbstract(ReadOnlyModelMixin, BaseModel):
+    """Share as much as possible in the company representation."""
+
+    company_number = models.CharField(max_length=MAX_LENGTH, null=True, db_index=True)
+    name = models.CharField(max_length=MAX_LENGTH, null=True)
+    address_1 = models.CharField(max_length=MAX_LENGTH, null=True)
+    address_2 = models.CharField(max_length=MAX_LENGTH, null=True)
+    address_town = models.CharField(max_length=MAX_LENGTH, null=True)
+    address_county = models.CharField(max_length=MAX_LENGTH, null=True)
+    address_country = models.CharField(max_length=MAX_LENGTH, null=True)
+    address_postcode = models.CharField(max_length=MAX_LENGTH, null=True)
+    address_care_of = models.CharField(max_length=MAX_LENGTH, blank=True)
+    po_box = models.CharField(max_length=MAX_LENGTH, blank=True)
+
+    class Meta:
+        abstract = True
+
+
+class Company(CompanyAbstract):
     """Representation of the company as per CDMS.
 
     This is a read-only model and any saving operation should be prevented.
@@ -48,21 +66,13 @@ class Company(ReadOnlyModelMixin, BaseModel):
     """
 
     id = models.UUIDField(primary_key=True, db_index=True)
-    company_number = models.CharField(max_length=MAX_LENGTH, null=True, db_index=True)
     uk_based = models.NullBooleanField(default=True, null=True)
     business_type = models.ForeignKey('BusinessType', null=True)
-    trading_name = models.CharField(max_length=MAX_LENGTH, null=True)
     sector = models.ForeignKey('Sector', null=True)
     website = models.URLField(null=True)
     country = models.ForeignKey('Country', null=True)
     employee_range = models.ForeignKey('EmployeeRange', null=True)
     turnover_range = models.ForeignKey('TurnoverRange', null=True)
-    trading_address_1 = models.CharField(max_length=MAX_LENGTH, null=True)
-    trading_address_2 = models.CharField(max_length=MAX_LENGTH, null=True)
-    trading_address_town = models.CharField(max_length=MAX_LENGTH, null=True)
-    trading_address_county = models.CharField(max_length=MAX_LENGTH, null=True)
-    trading_address_country = models.CharField(max_length=MAX_LENGTH, null=True)
-    trading_address_postcode = models.CharField(max_length=MAX_LENGTH, null=True)
     uk_region = models.ForeignKey('UKRegion', null=True)
     description = models.TextField(null=True)
 
@@ -70,19 +80,9 @@ class Company(ReadOnlyModelMixin, BaseModel):
         return self.registered_name
 
 
-class CompaniesHouseCompany(ReadOnlyModelMixin, BaseModel):
+class CompaniesHouseCompany(CompanyAbstract):
     """Representation of Companies House company."""
 
-    company_number = models.CharField(max_length=MAX_LENGTH, primary_key=True, db_index=True)
-    company_name = models.CharField(max_length=MAX_LENGTH)
-    registered_address_care_of = models.CharField(max_length=MAX_LENGTH, blank=True)
-    registered_address_po_box = models.CharField(max_length=MAX_LENGTH, blank=True)
-    registered_address_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
-    registered_address_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
-    registered_address_town = models.CharField(max_length=MAX_LENGTH, blank=True)
-    registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
-    registered_address_country = models.CharField(max_length=MAX_LENGTH, blank=True)
-    registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
     company_category = models.CharField(max_length=MAX_LENGTH, blank=True)
     company_status = models.CharField(max_length=MAX_LENGTH, blank=True)
     sic_code_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
