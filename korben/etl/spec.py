@@ -135,15 +135,16 @@ def update(original_dict, update_dict):
     updated_dict.update(update_dict)
     return updated_dict
 
-__django_tables = services.db.poll_for_metadata(config.database_url).tables
-
 ES_INDEX = 'datahub'
-ES_TYPES = {
-    name: {
-        'properties': {
-            col.name: ES_STRING_ANALYZED
-            for col in __django_tables[name].columns
-        }
-    }
-    for name in DJANGO_LOOKUP.keys()
-}
+ES_TYPES = {}
+for table in services.db.poll_for_metadata(config.database_url).tables.values():  # NOQA
+    if table.name not in DJANGO_LOOKUP:
+        continue
+    properties = {}
+    for column in table.columns:
+        if not column.foreign_keys:
+            properties[column.name] = ES_STRING_ANALYZED
+        else:
+            column_name = column.name[:-3]  # strip `_id` suffix
+            properties[column_name] = ES_STRING_ANALYZED
+    ES_TYPES[table.name] = {'properties': properties}
