@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand
 from django.db import connections
 from django.db.utils import OperationalError
 
+
 class Command(BaseCommand):
 
     help = 'Wait for db to be accessible'
