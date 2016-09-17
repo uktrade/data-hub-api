@@ -51,8 +51,8 @@ class CompanyAbstract(ReadOnlyModelMixin, BaseModel):
     address_county = models.CharField(max_length=MAX_LENGTH, null=True)
     address_country = models.CharField(max_length=MAX_LENGTH, null=True)
     address_postcode = models.CharField(max_length=MAX_LENGTH, null=True)
-    address_care_of = models.CharField(max_length=MAX_LENGTH, blank=True)
-    po_box = models.CharField(max_length=MAX_LENGTH, blank=True)
+    address_care_of = models.CharField(max_length=MAX_LENGTH, null=True)
+    po_box = models.CharField(max_length=MAX_LENGTH, null=True)
 
     class Meta:
         abstract = True
@@ -141,7 +141,7 @@ class Contact(ReadOnlyModelMixin, BaseModel):
     last_name = models.CharField(max_length=MAX_LENGTH, null=True)
     role = models.ForeignKey('Role', null=True)
     phone = models.CharField(max_length=MAX_LENGTH, null=True)
-    email = models.EmailField(null=True, blank=True)
+    email = models.EmailField(null=True)
     address_1 = models.CharField(max_length=MAX_LENGTH, null=True)
     address_2 = models.CharField(max_length=MAX_LENGTH, null=True)
     address_town = models.CharField(max_length=MAX_LENGTH, null=True)
