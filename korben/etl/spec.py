@@ -67,8 +67,6 @@ MAPPINGS.update({
         'local': (
             ('ContactId', 'id'),
             ('optevia_Title_Id', 'title_id'),
-            ('FirstName', 'first_name'),
-            ('LastName', 'last_name'),
             ('optevia_ContactRole_Id', 'role_id'),
             ('optevia_TelephoneNumber', 'phone'),  # many other options
             ('EMailAddress1', 'email'),
@@ -93,30 +91,26 @@ MAPPINGS.update({
             ('ModifiedOn', 'modified_on'),
             ('CreatedOn', 'created_on'),
         ),
+        'local_fn': (
+            (('FirstName', 'LastName'), 'name', lambda first, last: "{0} {1}".format(first, last)),  # NOQA
+        ),
     },
-    'optevia_activitylinkSet': {
+
+    # check commit history for my first idea, there’s a lot of legacy here
+    'optevia_interactionSet': {
         'to': 'company_interaction',
         'local': (
-            ('optevia_activitylinkId', 'id'),
+            ('ActivityId', 'id'),
             ('optevia_InteractionCommunicationChannel_Id', 'interaction_type_id'),
-            ('optevia_Subject', 'subject'),
-            ('optevia_Date', 'date_of_interaction'),
+            ('Subject', 'subject'),
+            ('ActualStart', 'date_of_interaction'),
             ('optevia_Advisor_Id', 'advisor_id'),
             ('optevia_Contact_Id', 'contact_id'),
             ('optevia_Organisation_Id', 'company_id'),
+            ('optevia_Notes', 'notes'),
 
             ('ModifiedOn', 'modified_on'),
             ('CreatedOn', 'created_on'),
-        ),
-        'foreign': (
-            (
-                (
-                    'optevia_Interaction_Id',
-                    'optevia_interactionSet',
-                    'optevia_Notes'
-                ),
-                'notes'
-            ),
         ),
     },
 })
