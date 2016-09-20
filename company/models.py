@@ -137,8 +137,7 @@ class Contact(ReadOnlyModelMixin, BaseModel):
 
     id = models.UUIDField(primary_key=True, db_index=True)
     title = models.ForeignKey('Title', null=True)
-    first_name = models.CharField(max_length=MAX_LENGTH, null=True)
-    last_name = models.CharField(max_length=MAX_LENGTH, null=True)
+    name = models.CharField(max_length=MAX_LENGTH, null=True)
     role = models.ForeignKey('Role', null=True)
     phone = models.CharField(max_length=MAX_LENGTH, null=True)
     email = models.EmailField(null=True)
