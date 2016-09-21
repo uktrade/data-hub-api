@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(core.mixins.ReadOnlyModelMixin, models.Model),
+            bases=(core.mixins.DeferredWritingOperationsModelMixin, models.Model),
         ),
         migrations.CreateModel(
             name='BusinessType',
@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(core.mixins.ReadOnlyModelMixin, models.Model),
+            bases=(core.mixins.DeferredWritingOperationsModelMixin, models.Model),
         ),
         migrations.CreateModel(
             name='CompaniesHouseCompany',
@@ -66,7 +66,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(core.mixins.ReadOnlyModelMixin, models.Model),
+            bases=(core.mixins.DeferredWritingOperationsModelMixin, models.Model),
         ),
         migrations.CreateModel(
             name='Company',
@@ -92,7 +92,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(core.mixins.ReadOnlyModelMixin, models.Model),
+            bases=(core.mixins.DeferredWritingOperationsModelMixin, models.Model),
         ),
         migrations.CreateModel(
             name='Contact',
@@ -118,7 +118,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(core.mixins.ReadOnlyModelMixin, models.Model),
+            bases=(core.mixins.DeferredWritingOperationsModelMixin, models.Model),
         ),
         migrations.CreateModel(
             name='Country',
@@ -129,7 +129,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(core.mixins.ReadOnlyModelMixin, models.Model),
+            bases=(core.mixins.DeferredWritingOperationsModelMixin, models.Model),
         ),
         migrations.CreateModel(
             name='EmployeeRange',
@@ -140,7 +140,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(core.mixins.ReadOnlyModelMixin, models.Model),
+            bases=(core.mixins.DeferredWritingOperationsModelMixin, models.Model),
         ),
         migrations.CreateModel(
             name='Interaction',
@@ -158,7 +158,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(core.mixins.ReadOnlyModelMixin, models.Model),
+            bases=(core.mixins.DeferredWritingOperationsModelMixin, models.Model),
         ),
         migrations.CreateModel(
             name='InteractionType',
@@ -169,7 +169,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(core.mixins.ReadOnlyModelMixin, models.Model),
+            bases=(core.mixins.DeferredWritingOperationsModelMixin, models.Model),
         ),
         migrations.CreateModel(
             name='Role',
@@ -180,7 +180,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(core.mixins.ReadOnlyModelMixin, models.Model),
+            bases=(core.mixins.DeferredWritingOperationsModelMixin, models.Model),
         ),
         migrations.CreateModel(
             name='Sector',
@@ -191,7 +191,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(core.mixins.ReadOnlyModelMixin, models.Model),
+            bases=(core.mixins.DeferredWritingOperationsModelMixin, models.Model),
         ),
         migrations.CreateModel(
             name='Title',
@@ -202,7 +202,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(core.mixins.ReadOnlyModelMixin, models.Model),
+            bases=(core.mixins.DeferredWritingOperationsModelMixin, models.Model),
         ),
         migrations.CreateModel(
             name='TurnoverRange',
@@ -213,7 +213,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(core.mixins.ReadOnlyModelMixin, models.Model),
+            bases=(core.mixins.DeferredWritingOperationsModelMixin, models.Model),
         ),
         migrations.CreateModel(
             name='UKRegion',
@@ -224,7 +224,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(core.mixins.ReadOnlyModelMixin, models.Model),
+            bases=(core.mixins.DeferredWritingOperationsModelMixin, models.Model),
         ),
         migrations.AddField(
             model_name='interaction',

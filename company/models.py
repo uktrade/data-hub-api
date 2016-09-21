@@ -2,45 +2,46 @@
 
 from django.conf import settings
 from django.db import models
+from django.utils.functional import cached_property
 
 from core.models import BaseConstantModel, BaseModel
-from core.mixins import ReadOnlyModelMixin
+from core.mixins import DeferredWritingOperationsModelMixin
 
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-class BusinessType(ReadOnlyModelMixin, BaseConstantModel):
+class BusinessType(DeferredWritingOperationsModelMixin, BaseConstantModel):
     """Company business type."""
     pass
 
 
-class Sector(ReadOnlyModelMixin, BaseConstantModel):
+class Sector(DeferredWritingOperationsModelMixin, BaseConstantModel):
     """Company sector."""
     pass
 
 
-class EmployeeRange(ReadOnlyModelMixin, BaseConstantModel):
+class EmployeeRange(DeferredWritingOperationsModelMixin, BaseConstantModel):
     """Company employee range."""
     pass
 
 
-class TurnoverRange(ReadOnlyModelMixin, BaseConstantModel):
+class TurnoverRange(DeferredWritingOperationsModelMixin, BaseConstantModel):
     """Company turnover range."""
     pass
 
 
-class UKRegion(ReadOnlyModelMixin, BaseConstantModel):
+class UKRegion(DeferredWritingOperationsModelMixin, BaseConstantModel):
     """UK region."""
     pass
 
 
-class Country(ReadOnlyModelMixin, BaseConstantModel):
+class Country(DeferredWritingOperationsModelMixin, BaseConstantModel):
     """Country."""
     pass
 
 
-class CompanyAbstract(ReadOnlyModelMixin, BaseModel):
+class CompanyAbstract(DeferredWritingOperationsModelMixin, BaseModel):
     """Share as much as possible in the company representation."""
 
     company_number = models.CharField(max_length=MAX_LENGTH, null=True, db_index=True)
@@ -96,17 +97,17 @@ class CompaniesHouseCompany(CompanyAbstract):
         return self.company_name
 
 
-class InteractionType(ReadOnlyModelMixin, BaseConstantModel):
+class InteractionType(DeferredWritingOperationsModelMixin, BaseConstantModel):
     """Interaction type."""
     pass
 
 
-class Advisor(ReadOnlyModelMixin, BaseConstantModel):
+class Advisor(DeferredWritingOperationsModelMixin, BaseConstantModel):
     """Advisor."""
     pass
 
 
-class Interaction(ReadOnlyModelMixin, BaseModel):
+class Interaction(DeferredWritingOperationsModelMixin, BaseModel):
     """Interaction from CDMS."""
 
     id = models.UUIDField(primary_key=True, db_index=True)
@@ -122,17 +123,17 @@ class Interaction(ReadOnlyModelMixin, BaseModel):
         return self.subject
 
 
-class Title(ReadOnlyModelMixin, BaseConstantModel):
+class Title(DeferredWritingOperationsModelMixin, BaseConstantModel):
     """Contact title."""
     pass
 
 
-class Role(ReadOnlyModelMixin, BaseConstantModel):
+class Role(DeferredWritingOperationsModelMixin, BaseConstantModel):
     """Contact role."""
     pass
 
 
-class Contact(ReadOnlyModelMixin, BaseModel):
+class Contact(DeferredWritingOperationsModelMixin, BaseModel):
     """Contact from CDMS."""
 
     id = models.UUIDField(primary_key=True, db_index=True)
@@ -155,3 +156,7 @@ class Contact(ReadOnlyModelMixin, BaseModel):
 
     def __str__(self):
         return "{0} {1}".format(self.first_name, self.last_name)
+
+    @cached_property
+    def name(self):
+        return self.__str__()

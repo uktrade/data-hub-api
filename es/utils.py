@@ -29,3 +29,4 @@ def format_es_results(hits):
         results.append(result)
 
     return results
+
