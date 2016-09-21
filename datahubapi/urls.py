@@ -4,12 +4,14 @@ from rest_framework import renderers, response, routers, schemas
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
 
-from company.views import CompanyViewSet
+from company.views import CompanyViewSet, ContactViewSet, InteractionViewSet
 from search.views import Search
 
 
-router = routers.DefaultRouter()
+router = routers.SimpleRouter()
 router.register(r'company', CompanyViewSet)
+router.register(r'contact', ContactViewSet)
+router.register(r'interaction', InteractionViewSet)
 
 
 @api_view()

@@ -2,46 +2,44 @@
 
 from django.conf import settings
 from django.db import models
-from django.utils.functional import cached_property
 
 from core.models import BaseConstantModel, BaseModel
-from core.mixins import DeferredWritingOperationsModelMixin
 
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-class BusinessType(DeferredWritingOperationsModelMixin, BaseConstantModel):
+class BusinessType(BaseConstantModel):
     """Company business type."""
     pass
 
 
-class Sector(DeferredWritingOperationsModelMixin, BaseConstantModel):
+class Sector(BaseConstantModel):
     """Company sector."""
     pass
 
 
-class EmployeeRange(DeferredWritingOperationsModelMixin, BaseConstantModel):
+class EmployeeRange(BaseConstantModel):
     """Company employee range."""
     pass
 
 
-class TurnoverRange(DeferredWritingOperationsModelMixin, BaseConstantModel):
+class TurnoverRange(BaseConstantModel):
     """Company turnover range."""
     pass
 
 
-class UKRegion(DeferredWritingOperationsModelMixin, BaseConstantModel):
+class UKRegion(BaseConstantModel):
     """UK region."""
     pass
 
 
-class Country(DeferredWritingOperationsModelMixin, BaseConstantModel):
+class Country(BaseConstantModel):
     """Country."""
     pass
 
 
-class CompanyAbstract(DeferredWritingOperationsModelMixin, BaseModel):
+class CompanyAbstract(BaseModel):
     """Share as much as possible in the company representation."""
 
     company_number = models.CharField(max_length=MAX_LENGTH, null=True, db_index=True)
@@ -57,6 +55,9 @@ class CompanyAbstract(DeferredWritingOperationsModelMixin, BaseModel):
 
     class Meta:
         abstract = True
+
+    def __str__(self):
+        return self.name
 
 
 class Company(CompanyAbstract):
@@ -77,9 +78,6 @@ class Company(CompanyAbstract):
     uk_region = models.ForeignKey('UKRegion', null=True)
     description = models.TextField(null=True)
 
-    def __str__(self):
-        return self.registered_name
-
 
 class CompaniesHouseCompany(CompanyAbstract):
     """Representation of Companies House company."""
@@ -97,17 +95,17 @@ class CompaniesHouseCompany(CompanyAbstract):
         return self.company_name
 
 
-class InteractionType(DeferredWritingOperationsModelMixin, BaseConstantModel):
+class InteractionType(BaseConstantModel):
     """Interaction type."""
     pass
 
 
-class Advisor(DeferredWritingOperationsModelMixin, BaseConstantModel):
+class Advisor(BaseConstantModel):
     """Advisor."""
     pass
 
 
-class Interaction(DeferredWritingOperationsModelMixin, BaseModel):
+class Interaction(BaseModel):
     """Interaction from CDMS."""
 
     id = models.UUIDField(primary_key=True, db_index=True)
@@ -123,17 +121,17 @@ class Interaction(DeferredWritingOperationsModelMixin, BaseModel):
         return self.subject
 
 
-class Title(DeferredWritingOperationsModelMixin, BaseConstantModel):
+class Title(BaseConstantModel):
     """Contact title."""
     pass
 
 
-class Role(DeferredWritingOperationsModelMixin, BaseConstantModel):
+class Role(BaseConstantModel):
     """Contact role."""
     pass
 
 
-class Contact(DeferredWritingOperationsModelMixin, BaseModel):
+class Contact(BaseModel):
     """Contact from CDMS."""
 
     id = models.UUIDField(primary_key=True, db_index=True)
@@ -155,8 +153,4 @@ class Contact(DeferredWritingOperationsModelMixin, BaseModel):
     primary_contact_team = models.TextField(null=True)
 
     def __str__(self):
-        return "{0} {1}".format(self.first_name, self.last_name)
-
-    @cached_property
-    def name(self):
-        return self.__str__()
+        return self.name

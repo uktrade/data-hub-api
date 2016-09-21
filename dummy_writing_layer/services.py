@@ -38,14 +38,7 @@ def save_model(model_instance):
 
 
 def update_model(model_instance):
-    client = get_elasticsearch_client()
-    data = from_model_to_es_document(model_instance)
-    write_to_es(client, model_instance._meta.db_table, data)
+    """Update an existing entry in ES."""
+    save_model(model_instance)
 
-
-def delete_model(model_instance):
-    client = get_elasticsearch_client()
-    data = from_model_to_es_document(model_instance)
-    data['archived'] = True
-    write_to_es(client, model_instance._meta.db_table, data)
 

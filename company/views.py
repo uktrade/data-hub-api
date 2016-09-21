@@ -1,12 +1,26 @@
-from rest_framework import viewsets
+"""Company and related resources view sets."""
 
-from .models import Company
-from .serializers import CompanySerializer
+from core.viewsets import ArchiveNoDeleteViewSet
+from .models import Company, Contact, Interaction
+from .serializers import CompanySerializer, ContactSerializer, InteractionSerializer
 
 
-class CompanyViewSet(viewsets.ModelViewSet):
+class CompanyViewSet(ArchiveNoDeleteViewSet):
     """Company ViewSet."""
 
     serializer_class = CompanySerializer
     queryset = Company.objects.all()
-    http_method_names = ('get', 'post', 'put', 'patch')
+
+
+class ContactViewSet(ArchiveNoDeleteViewSet):
+    """Contact ViewSet."""
+
+    serializer_class = ContactSerializer
+    queryset = Contact.objects.all()
+
+
+class InteractionViewSet(ArchiveNoDeleteViewSet):
+    """Interaction ViewSet."""
+
+    serializer_class = InteractionSerializer
+    queryset = Interaction.objects.all()
