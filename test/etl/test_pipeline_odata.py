@@ -12,6 +12,8 @@ isn’t required here). It basically does this:
 '''
 
 from etl.target_models import models
+from korben import etl
+from korben.sync import scrape
 
 TEST_MAPPINGS = {
     'Categories': {
@@ -58,7 +60,9 @@ TEST_MAPPINGS = {
 }
 
 
-
 def test_pipeline(odata_test_service, tmpfile, db_connection):
-    client = odata_test_service
-    import ipdb;ipdb.set_trace()
+    etl.spec.MAPPINGS = TEST_MAPPINGS
+    try:
+        scrape.main(None, odata_test_service)
+    except SystemExit:
+        pass  # don’t ask
