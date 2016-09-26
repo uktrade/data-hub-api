@@ -4,34 +4,16 @@ in a slightly simpler container environment (since custom Postgres compilation
 isn’t required here). It basically does this:
     - Overwrite transformation mapping (since this test doesn’t run against the
       full CDMS schema)
-    - Make a request to `$metadata` to get OData metadata XML (see conftest.py
-      in this directory)
-    - Translate the metadata XML to SQL `CREATE` statements
-    - Run these statements against the `test_odata` database
-    - Make changes in the OData service through the API
+    - Make changes in the OData service through the API (ie. simulate updates)
     - Check these updates are caught by the polling sync and that an ETL run is
-      gtriggered
-    - Verify that `test_odata` and `test` databases are in the expected state
+      triggered
+    - Test should cases cover verfication that “intermediate” and “production”
+      databases are in the expected state
 '''
-from korben.odata_psql import odata_sql_schema
-from korben.odata_psql import separate_constraints
+
+from etl.target_models import models
 
 TEST_MAPPINGS = {
-    'Products': {
-        'to': 'products',
-        'local': (
-            ('ID', 'id'),
-            ('ReleaseDate', 'release_date'),
-            ('Rating', 'rating'),
-            ('Price', 'price'),
-        ),
-        'foreign': (
-            '''
-            
-            '''
-            (('ID', 'id'), 'notes'),
-        ),
-    },
     'Categories': {
         'to': 'categories',
         'local': (
@@ -41,20 +23,42 @@ TEST_MAPPINGS = {
     },
     'Suppliers': {
         'to': 'suppliers',
-    }
+        'local': (
+            ('Address_Street', 'address_street'),
+            ('Address_City', 'address_city'),
+            ('Address_State', 'address_state'),
+            ('Address_ZipCode', 'address_zipcode'),
+            ('Address_Country', 'address_country'),
+            ('Concurrency', 'concurrency'),
+        ),
+    },
+    'Products': {
+        'to': 'products',
+        'local': (
+            ('ID', 'id'),
+            ('ReleaseDate', 'release_date'),
+            ('Rating', 'rating'),
+            ('Price', 'price'),
+            ('Name', 'name'),
+            ('Description', 'description'),
+            ('ReleaseDate', 'release_date'),
+            ('DiscontinuedDate', 'discontinued_date'),
+            ('Rating', 'rating'),
+            ('Price', 'price'),
+            (
+                'Products_Category_Categories_ID',
+                'products_category_categories_id',
+            ),
+            (
+                'Products_Supplier_Suppliers_ID',
+                'products_supplier_suppliers_id',
+            ),
+        ),
+    },
 }
+
 
 
 def test_pipeline(odata_test_service, tmpfile, db_connection):
     client = odata_test_service
-    resp = client.make_request('get', client.CDMS_REST_BASE_URL + '$metadata')
-    metadata = tmpfile()
-    with open(metadata.name, 'wb') as metadata_fh:
-        metadata_fh.write(resp.content)
-    sql_file = tmpfile()
-    sql = odata_sql_schema(metadata.name)
-    with open(sql_file.name, 'wb') as sql_fh:
-        sql_fh.write(sql)
-    create_sql, _ = separate_constraints(sql_file.name)
-    db_connection.execute(create_sql)
     import ipdb;ipdb.set_trace()
