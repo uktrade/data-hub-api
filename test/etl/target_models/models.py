@@ -1,11 +1,14 @@
 from django.db import models
 
+
 class Categories(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.TextField()
+
     class Meta:
         db_table = 'categories'
-        app_label = 'target_models'
+        app_label = 'etl.target_models'
+
 
 class Suppliers(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -18,7 +21,8 @@ class Suppliers(models.Model):
 
     class Meta:
         db_table = 'suppliers'
-        app_label = 'target_models'
+        app_label = 'etl.target_models'
+
 
 class Products(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -34,4 +38,4 @@ class Products(models.Model):
 
     class Meta:
         db_table = 'products'
-        app_label = 'target_models'
+        app_label = 'etl.target_models'
