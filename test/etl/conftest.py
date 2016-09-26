@@ -38,6 +38,6 @@ def tmpfile(request):
 def odata_test_service(request):
     resp = requests.get(ODATA_URL)
     root = etree.fromstring(resp.content)
+    config.cdms_base_url = root.attrib[ATOM_PREFIX + 'base']
     client = cdms_api.rest.api.CDMSRestApi(NoopAuth())
-    client.CDMS_REST_BASE_URL = root.attrib[ATOM_PREFIX + 'base']
     return client
