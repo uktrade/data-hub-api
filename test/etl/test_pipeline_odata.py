@@ -11,8 +11,6 @@ isn’t required here). It basically does this:
       databases are in the expected state
 '''
 
-from etl.target_models import models as target_models
-
 TEST_MAPPINGS = {
     'Categories': {
         'to': 'categories',
@@ -58,9 +56,11 @@ TEST_MAPPINGS = {
 }
 
 
-def test_pipeline(odata_test_service, db_odata):
+def test_scrape(tier0, odata_test_service, odata_fetchall):
     from korben import etl
     from korben.sync import scrape
+    from etl.target_models import models as target_models
+
     etl.spec.MAPPINGS = TEST_MAPPINGS
     scrape.main(None, odata_test_service)  # uses multiprocessing, but will
                                            # block until CHUNKSIZE pages are
@@ -71,5 +71,7 @@ def test_pipeline(odata_test_service, db_odata):
         (3, 'Categories'),
     )
     for count, table_name in expected:
-        result = db_odata('SELECT count(*) FROM "{0}"'.format(table_name))
+        result = odata_fetchall(
+            'SELECT count(*) FROM "{0}"'.format(table_name)
+        )
         assert count == result[0][0]
