@@ -11,9 +11,13 @@ isn’t required here). It basically does this:
       databases are in the expected state
 '''
 
+from korben import etl
+from korben.sync import scrape, django_initial
+
 def test_initial_etl(tier0, odata_test_service, odata_fetchall):
-    from korben import etl
-    from korben.sync import scrape, django_initial
+
+    # due to django's high level of awesomeness, we must import models here
+    # (ie. after tier0 fixture has initiated full django awesomeness levels)
     from etl.target_models import models as target_models
 
     # call scrape code on test service
