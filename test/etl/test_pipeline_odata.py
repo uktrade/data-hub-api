@@ -11,57 +11,12 @@ isn’t required here). It basically does this:
       databases are in the expected state
 '''
 
-TEST_MAPPINGS = {
-    'Categories': {
-        'to': 'categories',
-        'local': (
-            ('ID', 'id'),
-            ('Name', 'name'),
-        )
-    },
-    'Suppliers': {
-        'to': 'suppliers',
-        'local': (
-            ('Address_Street', 'address_street'),
-            ('Address_City', 'address_city'),
-            ('Address_State', 'address_state'),
-            ('Address_ZipCode', 'address_zipcode'),
-            ('Address_Country', 'address_country'),
-            ('Concurrency', 'concurrency'),
-        ),
-    },
-    'Products': {
-        'to': 'products',
-        'local': (
-            ('ID', 'id'),
-            ('ReleaseDate', 'release_date'),
-            ('Rating', 'rating'),
-            ('Price', 'price'),
-            ('Name', 'name'),
-            ('Description', 'description'),
-            ('ReleaseDate', 'release_date'),
-            ('DiscontinuedDate', 'discontinued_date'),
-            ('Rating', 'rating'),
-            ('Price', 'price'),
-            (
-                'Products_Category_Categories_ID',
-                'products_category_categories_id',
-            ),
-            (
-                'Products_Supplier_Suppliers_ID',
-                'products_supplier_suppliers_id',
-            ),
-        ),
-    },
-}
-
-
-def test_scrape(tier0, odata_test_service, odata_fetchall):
+def test_initial_etl(tier0, odata_test_service, odata_fetchall):
     from korben import etl
-    from korben.sync import scrape
+    from korben.sync import scrape, django_initial
     from etl.target_models import models as target_models
 
-    etl.spec.MAPPINGS = TEST_MAPPINGS
+    # call scrape code on test service
     scrape.main(None, odata_test_service)  # uses multiprocessing, but will
                                            # block until CHUNKSIZE pages are
                                            # processed
