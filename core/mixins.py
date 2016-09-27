@@ -1,6 +1,6 @@
 """General mixins."""
 
-from dummy_writing_layer.services import save_model
+from es.services import save_model
 
 
 class DeferredSaveModelMixin:

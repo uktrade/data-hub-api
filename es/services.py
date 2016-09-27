@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.db.models import ForeignKey
 
-from es.utils import get_elasticsearch_client
+from .utils import get_elasticsearch_client
 
 
 def from_model_to_es_document(model_instance):
