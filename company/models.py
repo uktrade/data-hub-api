@@ -2,6 +2,7 @@
 
 from django.conf import settings
 from django.db import models
+from django.utils.functional import cached_property
 
 from core.models import BaseConstantModel, BaseModel
 
@@ -68,7 +69,6 @@ class Company(CompanyAbstract):
     """
 
     id = models.UUIDField(primary_key=True, db_index=True)
-    uk_based = models.NullBooleanField(default=True, null=True)
     business_type = models.ForeignKey('BusinessType', null=True)
     sector = models.ForeignKey('Sector', null=True)
     website = models.URLField(null=True)
@@ -77,6 +77,17 @@ class Company(CompanyAbstract):
     turnover_range = models.ForeignKey('TurnoverRange', null=True)
     uk_region = models.ForeignKey('UKRegion', null=True)
     description = models.TextField(null=True)
+
+    @cached_property
+    def companies_house_data(self):
+        """Get the companies house data based on company number."""
+        result = {}
+        if self.company_number:
+            try:
+                result = CompaniesHouseCompany.objects.get(company_number=self.company_number)
+            except CompaniesHouseCompany.DoesNotExist:
+                pass
+        return result
 
 
 class CompaniesHouseCompany(CompanyAbstract):
@@ -92,7 +103,7 @@ class CompaniesHouseCompany(CompanyAbstract):
     incorporation_date = models.DateField(null=True)
 
     def __str__(self):
-        return self.company_name
+        return self.name
 
 
 class InteractionType(BaseConstantModel):
