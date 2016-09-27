@@ -72,4 +72,4 @@ def test_pipeline(odata_test_service, db_odata):
     )
     for count, table_name in expected:
         result = db_odata('SELECT count(*) FROM "{0}"'.format(table_name))
-        assert expected == result[0][0]  # <-- use a pair of spectacles
+        assert count == result[0][0]
