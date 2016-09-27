@@ -30,3 +30,8 @@ def test_initial_etl(tier0, odata_test_service, odata_fetchall):
             'SELECT count(*) FROM "{0}"'.format(table_name)
         )
         assert count == result[0][0]
+
+    # call django initial load function to move data through the ETL
+    django_initial.main(odata_test_service)
+    for count, model_name in expected:
+        assert count == getattr(target_models, model_name).objects.count()
