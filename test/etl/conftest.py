@@ -4,23 +4,13 @@ import tempfile
 from lxml import etree
 import pytest
 import requests
-import sqlalchemy as sqla
 
-from korben import cdms_api, config
+from korben import config
+from korben.cdms_api.rest.api import CDMSRestApi
 from korben.cdms_api.rest.auth.noop import NoopAuth
 
 ATOM_PREFIX = '{http://www.w3.org/XML/1998/namespace}'
 ODATA_URL = 'http://services.odata.org/V2/(S(readwrite))/OData/OData.svc/'
-
-
-@pytest.fixture(scope='session')
-def db_engine():
-    return sqla.create_engine(config.database_odata_url).connect()
-
-
-@pytest.fixture
-def db_connection(db_engine):
-    return db_engine.connect()
 
 
 @pytest.fixture
@@ -39,5 +29,5 @@ def odata_test_service(request):
     resp = requests.get(ODATA_URL)
     root = etree.fromstring(resp.content)
     config.cdms_base_url = root.attrib[ATOM_PREFIX + 'base']
-    client = cdms_api.rest.api.CDMSRestApi(NoopAuth())
+    client = CDMSRestApi(NoopAuth())
     return client
