@@ -11,12 +11,10 @@ import environ
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-ROOT_DIR = environ.Path(__file__) - 3
+ROOT_DIR = environ.Path(__file__) - 2
 
 env = environ.Env()
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -85,14 +83,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'datahubapi.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/1.9/ref/settings/#databases
-
 DATABASES = {
     'default': env.db('DATABASE_URL')
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
+FIXTURE_DIRS = [
+    str(ROOT_DIR('fixtures'))
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
@@ -156,7 +154,7 @@ ES_HOST = env('ES_HOST')
 ES_PORT = env.int('ES_PORT')
 ES_INDEX = 'datahub'
 
-CHAR_FIELD_MAX_LENGTH=255
+CHAR_FIELD_MAX_LENGTH = 255
 
 
 

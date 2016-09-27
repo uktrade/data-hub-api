@@ -1,0 +1,74 @@
+- model: company.company
+  pk: a73efeba-8499-11e6-ae22-56b6b6499611
+  fields: {
+    company_number: 123,
+    name: "Mercury ltd",
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a,
+    country: 80756b9a-5d95-e211-a939-e4115bead28a,
+    address_1: 82 Ramsgate Rd,
+    address_town: Willington,
+    address_postcode: NE28 5JB
+  }
+
+- model: company.company
+  pk: 0f5216e0-849f-11e6-ae22-56b6b6499611
+  fields: {
+    company_number: 456,
+    name: "Venus ltd",
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a,
+    country: 80756b9a-5d95-e211-a939-e4115bead28a,
+    address_1: 66 Marcham Road,
+    address_town: Bordley,
+    address_postcode: BD23 8RZ
+  }
+
+- model: company.companieshousecompany
+  id: 1,
+  fields: {
+    company_number: 123,
+    name: "Mercury ltd",
+    address_country: "United Kingdom",
+    address_1: 64 Ermin Street,
+    address_town: Y Ffor,
+    address_postcode: LL53 5RN,
+    incorporation_date: 2000-12-14
+  }
+
+- model: company.companieshousecompany
+  id: 2,
+  fields: {
+    company_number: 789,
+    name: "Mars ltd",
+    address_country: "United Kingdom",
+    address_1: 1 Coast Road,
+    address_town: Kirkby in Ashfield,
+    address_postcode: NG17 2AR,
+    incorporation_date: 2000-12-14
+  }
+
+- model: company.advisor
+  pk: e83a608e-84a4-11e6-ae22-56b6b6499611
+  fields: {name: John Smith}
+
+- model: company.advisor
+  pk: 56dc546a-84b0-11e6-ae22-56b6b6499611
+  fields: {name: Clint Eastwood}
+
+- model: company.contact
+  pk: 4cac04ee-84b1-11e6-ae22-56b6b6499611
+  fields: {
+    title: c2d9b924-6095-e211-a939-e4115bead28a,
+    role: 6af7d52b-63a3-e211-a646-e4115bead28a,
+    name: Oratio Nelson,
+    company: a73efeba-8499-11e6-ae22-56b6b6499611
+  }
+
+- model: company.interaction
+  pk: 96d5f57a-84a2-11e6-ae22-56b6b6499611
+  fields: {
+    interaction_type: 70c226d7-5d95-e211-a939-e4115bead28a,
+    advisor: e83a608e-84a4-11e6-ae22-56b6b6499611,
+    date_of_interaction: 2016-10-12,
+    company: a73efeba-8499-11e6-ae22-56b6b6499611,
+    contact: 4cac04ee-84b1-11e6-ae22-56b6b6499611
+  }
