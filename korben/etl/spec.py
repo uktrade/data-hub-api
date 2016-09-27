@@ -130,15 +130,26 @@ def update(original_dict, update_dict):
     return updated_dict
 
 ES_INDEX = 'datahub'
-ES_TYPES = {}
-for table in services.db.poll_for_metadata(config.database_url).tables.values():  # NOQA
-    if table.name not in DJANGO_LOOKUP:
-        continue
-    properties = {}
-    for column in table.columns:
-        if not column.foreign_keys:
-            properties[column.name] = ES_STRING_ANALYZED
-        else:
-            column_name = column.name[:-3]  # strip `_id` suffix
-            properties[column_name] = ES_STRING_ANALYZED
-    ES_TYPES[table.name] = {'properties': properties}
+__ES_TYPES = None
+
+def get_es_types():
+    'since this introspects the db to get table information, it must be called'
+    global __ES_TYPES
+    if __ES_TYPES is not None:
+        return __ES_TYPES
+    __ES_TYPES = {}
+    tables = (
+        services.db.poll_for_metadata(config.database_url).tables.values()
+    )
+    for table in tables:  # NOQA
+        if table.name not in DJANGO_LOOKUP:
+            continue
+        properties = {}
+        for column in table.columns:
+            if not column.foreign_keys:
+                properties[column.name] = ES_STRING_ANALYZED
+            else:
+                column_name = column.name[:-3]  # strip `_id` suffix
+                properties[column_name] = ES_STRING_ANALYZED
+        __ES_TYPES[table.name] = {'properties': properties}
+    return __ES_TYPES
