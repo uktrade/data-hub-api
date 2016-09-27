@@ -146,6 +146,7 @@ def get_es_types():
             continue
         properties = {}
         for column in table.columns:
+            # TODO: do a little type introspection for bools
             if not column.foreign_keys:
                 properties[column.name] = ES_STRING_ANALYZED
             else:
