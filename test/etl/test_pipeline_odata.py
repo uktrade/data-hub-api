@@ -12,7 +12,7 @@ isn’t required here). It basically does this:
 '''
 
 from korben import etl
-from korben.sync import scrape, django_initial
+from korben.sync import scrape, django_initial, poll
 
 def test_initial_etl(tier0, odata_test_service, odata_fetchall):
 
@@ -55,3 +55,12 @@ def test_tier0_postinitial(tier0, odata_test_service, tier0_postinitial, odata_f
         assert count == result[0][0]
     for count, model_name in expected:
         assert count == getattr(target_models, model_name).objects.count()
+
+
+def test_poll(tier0, odata_test_service, tier0_postinitial, odata_fetchall):
+    import ipdb;ipdb.set_trace()
+    category = {'ID': 123, 'Name': 'Dihedral'}
+    resp = odata_test_service.create('Categories', category)
+    assert resp.status_code == 201
+    poll.poll(odata_test_service, against='Name')
+    assert odata_fetchall('SELECT "Name" FROM "Categories" WHERE "ID"=123')[0].Name == category['Name']
