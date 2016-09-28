@@ -58,4 +58,5 @@ urlpatterns = [
     url('^$', schema_view),
     url(r'^', include(router.urls)),
     url(r'^search$', Search.as_view(), name='search'),
+    url(r'^metadata/', include('company.metadata_urls')),
 ]

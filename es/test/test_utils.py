@@ -1,4 +1,4 @@
-from elasticsearch.utils import format_es_results
+from es.utils import format_es_results
 
 
 def test_format_es_results():

@@ -68,7 +68,7 @@
   fields: {
     interaction_type: 70c226d7-5d95-e211-a939-e4115bead28a,
     advisor: e83a608e-84a4-11e6-ae22-56b6b6499611,
-    date_of_interaction: 2016-10-12,
+    date_of_interaction: "2001-12-15T02:59:43.1Z",
     company: a73efeba-8499-11e6-ae22-56b6b6499611,
     contact: 4cac04ee-84b1-11e6-ae22-56b6b6499611
   }
