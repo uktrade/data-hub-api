@@ -39,3 +39,19 @@ def test_initial_etl(tier0, odata_test_service, odata_fetchall):
     django_initial.main(odata_test_service)
     for count, model_name in expected:
         assert count == getattr(target_models, model_name).objects.count()
+
+
+def test_tier0_postinitial(tier0, odata_test_service, tier0_postinitial, odata_fetchall):
+    from etl.target_models import models as target_models
+    expected = (
+        (2, 'Suppliers'),
+        (9, 'Products'),
+        (3, 'Categories'),
+    )
+    for count, table_name in expected:
+        result = odata_fetchall(
+            'SELECT count(*) FROM "{0}"'.format(table_name)
+        )
+        assert count == result[0][0]
+    for count, model_name in expected:
+        assert count == getattr(target_models, model_name).objects.count()
