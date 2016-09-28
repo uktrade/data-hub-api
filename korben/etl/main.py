@@ -6,8 +6,8 @@ from korben.sync import utils as sync_utils
 from . import spec, extract, transform, load
 
 
-def from_odata_xml(table, xml_path):
-    entries = sync_utils.parse_atom_entries(None, None, None, xml_path)
+def from_odata_json(table, json_path):
+    entries = sync_utils.parse_json_entries(None, None, None, json_path)
     col_names = [col.name for col in table.columns]
     rows = map(
         functools.partial(sync_utils.entry_row, col_names, None), entries
