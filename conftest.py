@@ -18,7 +18,7 @@ def api_request_factory():
 
     from rest_framework.test import APIRequestFactory
 
-    return APIRequestFactory()
+    return APIRequestFactory
 
 
 @pytest.fixture

@@ -16,7 +16,7 @@ class CompanySerializer(serializers.ModelSerializer):
 
     Extends CDMS data with Company House data
     """
-
+    id = serializers.CharField(required=False)
     companies_house_data = CompaniesHouseCompanySerializer(read_only=True)
 
     class Meta:
@@ -29,7 +29,7 @@ class ContactSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Contact
-        depth = 1
+        depth = 2
 
 
 class InteractionSerializer(serializers.ModelSerializer):
@@ -37,4 +37,4 @@ class InteractionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Interaction
-        depth = 1
+        depth = 2

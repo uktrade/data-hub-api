@@ -1,4 +1,5 @@
 """Company models."""
+import uuid
 
 from django.conf import settings
 from django.db import models
@@ -68,7 +69,7 @@ class Company(CompanyAbstract):
     It can't be an unmanaged model because Django is in charge of creating the schema and the migrations.
     """
 
-    id = models.UUIDField(primary_key=True, db_index=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, db_index=True)
     business_type = models.ForeignKey('BusinessType', null=True)
     sector = models.ForeignKey('Sector', null=True)
     website = models.URLField(null=True)
