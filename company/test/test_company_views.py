@@ -43,6 +43,7 @@ def test_detail_company_with_company_number(api_client):
     response = api_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
+    assert response.data['id'] == str(company.pk)
     assert response.data['companies_house_data']['id'] == ch_company.id
 
 
@@ -163,4 +164,37 @@ def test_archive_company_reason(api_client):
 
 
 # Companies house company views tests
+
+def test_list_ch_companies(api_client):
+    """List the companies house companies."""
+
+    CompaniesHouseCompanyFactory()
+    CompaniesHouseCompanyFactory()
+
+    url = reverse('companieshousecompany-list')
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data['count'] == 2
+
+
+def test_detail_ch_company(api_client):
+    """Test companies house company detail."""
+
+    ch_company = CompaniesHouseCompanyFactory(company_number=123)
+
+    url = reverse('companieshousecompany-detail', kwargs={'pk': ch_company.id})
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data['id'] == ch_company.id
+
+
+def test_ch_company_cannot_be_written(api_client):
+    """Test CH company POST is not allowed."""
+
+    url = reverse('companieshousecompany-list')
+    response = api_client.post(url)
+
+    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 

@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from core.serializers import ConstantModelSerializer
-from .models import BusinessType, Country, EmployeeRange, InteractionType, Role, Title, UKRegion
+from .models import BusinessType, Country, EmployeeRange, InteractionType, Role, Sector, Title, UKRegion
 
 
 @api_view()
@@ -37,6 +37,13 @@ def interaction_type(request):
 def role(request):
     """List all the roles."""
     serializer = ConstantModelSerializer(Role.objects.all(), many=True)
+    return Response(data=serializer.data)
+
+
+@api_view()
+def sector(request):
+    """List all the sectors."""
+    serializer = ConstantModelSerializer(Sector.objects.all(), many=True)
     return Response(data=serializer.data)
 
 

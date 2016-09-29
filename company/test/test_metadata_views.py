@@ -17,6 +17,7 @@ metadata_view_names = (
     'country',
     'employee-range',
     'interaction-type',
+    'sector'
     'role',
     'title',
     'uk-region'
@@ -28,6 +29,7 @@ metadata_views_ids = (
     'countries view',
     'employee ranges view',
     'interaction types view',
+    'sector view',
     'roles view',
     'titles view',
     'UK regions view'
