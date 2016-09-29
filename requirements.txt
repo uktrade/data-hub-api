@@ -20,6 +20,7 @@ pytest-sugar==0.7.1
 ipython
 ipdb
 coveralls
+factory-boy==2.7.0
 
 # Code static analysis
 pep8==1.7.0

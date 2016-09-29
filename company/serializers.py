@@ -3,6 +3,20 @@ from rest_framework import serializers
 from .models import Company, CompaniesHouseCompany, Contact, Interaction
 
 
+class NestedContactSerializer(serializers.ModelSerializer):
+    """Nested Contact serializer."""
+
+    class Meta:
+        model = Contact
+
+
+class NestedInteractionSerializer(serializers.ModelSerializer):
+    """Nested Interaction Serializer."""
+
+    class Meta:
+        model = Interaction
+
+
 class CompaniesHouseCompanySerializer(serializers.ModelSerializer):
     """Companies House company serializer."""
 
@@ -12,12 +26,11 @@ class CompaniesHouseCompanySerializer(serializers.ModelSerializer):
 
 
 class CompanySerializer(serializers.ModelSerializer):
-    """Company serializer.
+    """Company serializer."""
 
-    Extends CDMS data with Company House data
-    """
-    id = serializers.CharField(required=False)
     companies_house_data = CompaniesHouseCompanySerializer(read_only=True)
+    interactions = NestedInteractionSerializer(many=True, read_only=True)
+    contacts = NestedContactSerializer(many=True, read_only=True)
 
     class Meta:
         model = Company

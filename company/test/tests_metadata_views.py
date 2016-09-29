@@ -1,4 +1,5 @@
-"""These tests rely on the metadata.yaml fixture to be imported,
+"""
+These tests rely on the metadata.yaml fixture to be imported,
 Check conftest.py in the root folder for the importing mechanism.
 """
 
@@ -36,9 +37,44 @@ metadata_views_ids = (
 @pytest.mark.parametrize('view_name',
                          metadata_view_names,
                          ids=metadata_views_ids)
-def test_metadata_view(view_name, api_client):
+def test_metadata_view_get(view_name, api_client):
     """Test a metadata view for 200 only."""
     url = reverse(viewname=view_name)
 
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.parametrize('view_name',
+                         metadata_view_names,
+                         ids=metadata_views_ids)
+def test_metadata_view_post(view_name, api_client):
+    """Test views are read only."""
+    url = reverse(viewname=view_name)
+
+    response = api_client.post(url)
+    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+
+@pytest.mark.parametrize('view_name',
+                         metadata_view_names,
+                         ids=metadata_views_ids)
+def test_metadata_view_put(view_name, api_client):
+    """Test views are read only."""
+    url = reverse(viewname=view_name)
+
+    response = api_client.put(url)
+    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+
+@pytest.mark.parametrize('view_name',
+                         metadata_view_names,
+                         ids=metadata_views_ids)
+def test_metadata_view_patch(view_name, api_client):
+    """Test views are read only."""
+    url = reverse(viewname=view_name)
+
+    response = api_client.patch(url)
+    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+

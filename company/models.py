@@ -44,7 +44,12 @@ class Country(BaseConstantModel):
 class CompanyAbstract(BaseModel):
     """Share as much as possible in the company representation."""
 
-    company_number = models.CharField(max_length=MAX_LENGTH, null=True, db_index=True)
+    company_number = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        db_index=True,
+        unique=True
+    )
     name = models.CharField(max_length=MAX_LENGTH, null=True)
     address_1 = models.CharField(max_length=MAX_LENGTH, null=True)
     address_2 = models.CharField(max_length=MAX_LENGTH, null=True)
@@ -120,14 +125,14 @@ class Advisor(BaseConstantModel):
 class Interaction(BaseModel):
     """Interaction from CDMS."""
 
-    id = models.UUIDField(primary_key=True, db_index=True)
+    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     interaction_type = models.ForeignKey('InteractionType', null=True)
     subject = models.TextField(null=True)
     date_of_interaction = models.DateTimeField(null=True)
     advisor = models.ForeignKey('Advisor', null=True)
     notes = models.TextField(null=True)
-    company = models.ForeignKey('Company', null=True)
-    contact = models.ForeignKey('Contact', null=True)
+    company = models.ForeignKey('Company', null=True, related_name='interactions')
+    contact = models.ForeignKey('Contact', null=True, related_name='interactions')
 
     def __str__(self):
         return self.subject
@@ -146,7 +151,7 @@ class Role(BaseConstantModel):
 class Contact(BaseModel):
     """Contact from CDMS."""
 
-    id = models.UUIDField(primary_key=True, db_index=True)
+    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     title = models.ForeignKey('Title', null=True)
     name = models.CharField(max_length=MAX_LENGTH, null=True)
     role = models.ForeignKey('Role', null=True)
@@ -161,7 +166,7 @@ class Contact(BaseModel):
     alt_phone = models.CharField(max_length=MAX_LENGTH, null=True)
     alt_email = models.EmailField(null=True)
     notes = models.TextField(null=True)
-    company = models.ForeignKey('Company', null=True)
+    company = models.ForeignKey('Company', null=True, related_name='contacts')
     primary_contact_team = models.TextField(null=True)
 
     def __str__(self):

@@ -1,4 +1,7 @@
-"""These tests rely on the test_data.yaml fixture to be imported"""
+"""
+These tests rely on the metadata.yaml fixture to be imported,
+Check conftest.py in the root folder for the importing mechanism.
+"""
 
 import pytest
 from django.conf import settings
@@ -6,19 +9,14 @@ from django.conf import settings
 from django.urls import reverse
 from rest_framework import status
 
-# mark the whole module for db use
+from core import constants
 from es.services import document_exists
 from es.utils import get_elasticsearch_client
 
+from .factories import CompanyFactory, CompaniesHouseCompanyFactory
+
+# mark the whole module for db use
 pytestmark = pytest.mark.django_db
-
-
-COMPANY_NUMBER_COMPANY_ID = 'a73efeba-8499-11e6-ae22-56b6b6499611'
-COMPANY_ID = '0f5216e0-849f-11e6-ae22-56b6b6499611'
-CH_COMPANY_ID = 1
-BUSINESS_TYPE_ID = '98d14e94-5d95-e211-a939-e4115bead28a' # LTD company
-SECTOR_ID = '355f977b-8ac3-e211-a646-e4115bead28a'  # retail
-COUNTRY_ID = '80756b9a-5d95-e211-a939-e4115bead28a'  # United Kingdom
 
 
 # CDMS company views tests
@@ -26,26 +24,34 @@ COUNTRY_ID = '80756b9a-5d95-e211-a939-e4115bead28a'  # United Kingdom
 def test_list_companies(api_client):
     """List the companies."""
 
+    CompanyFactory()
+    CompanyFactory()
     url = reverse('company-list')
     response = api_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
+    assert response.data['count'] == 2
 
 
 def test_detail_company_with_company_number(api_client):
     """Test company detail view with companies house data."""
 
-    url = reverse('company-detail', kwargs={'pk': COMPANY_NUMBER_COMPANY_ID})
+    ch_company = CompaniesHouseCompanyFactory(company_number=123)
+    company = CompanyFactory(company_number=123)
+
+    url = reverse('company-detail', kwargs={'pk': company.id})
     response = api_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.data['companies_house_data']['id'] == 1
+    assert response.data['companies_house_data']['id'] == ch_company.id
 
 
 def test_detail_company_without_company_number(api_client):
     """Test company detail view without companies house data."""
 
-    url = reverse('company-detail', kwargs={'pk': COMPANY_ID})
+    company = CompanyFactory()
+
+    url = reverse('company-detail', kwargs={'pk': company.id})
     response = api_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
@@ -59,9 +65,8 @@ def test_update_company(api_client):
     url = reverse('company-list')
     response = api_client.post(url, {
         'name': 'Foo',
-        'business_type': BUSINESS_TYPE_ID,
-        'sector': SECTOR_ID,
-        'country': COUNTRY_ID,
+        'business_type': constants.BusinessType.company.value.id,
+        'country': constants.Country.united_kingdom.value.id,
         'address_1': '75 Stramford Road',
         'address_postcode': 'SP10 4ET'
     })
@@ -93,9 +98,8 @@ def test_add_company(api_client):
     url = reverse('company-list')
     response = api_client.post(url, {
         'name': 'Acme',
-        'business_type': BUSINESS_TYPE_ID,
-        'sector': SECTOR_ID,
-        'country': COUNTRY_ID,
+        'business_type': constants.BusinessType.company.value.id,
+        'country': constants.Country.united_kingdom.value.id,
         'address_1': '75 Stramford Road',
         'address_postcode': 'SP10 4ET'
     })
@@ -110,4 +114,53 @@ def test_add_company(api_client):
         doc_type='company_company',
         document_id=response.data['id']
     )
+
+
+def test_archive_company_no_reason(api_client):
+    """Test company archive."""
+
+    company = CompanyFactory()
+    url = reverse('company-archive', kwargs={'pk': company.id})
+    response = api_client.post(url)
+
+    assert response.data['archived']
+    assert response.data['archived_reason'] == ''
+    assert response.data['id'] == str(company.id)
+
+    # make sure we're writing to ES
+    es_client = get_elasticsearch_client()
+    es_result = es_client.get(
+        index=settings.ES_INDEX,
+        doc_type='company_company',
+        id=response.data['id'],
+        realtime=True
+    )
+    assert es_result['_source']['archived']
+    assert es_result['_source']['archived_reason'] == ''
+
+
+def test_archive_company_reason(api_client):
+    """Test company archive."""
+
+    company = CompanyFactory()
+    url = reverse('company-archive', kwargs={'pk': company.id})
+    response = api_client.post(url, {'reason': 'foo'})
+
+    assert response.data['archived']
+    assert response.data['archived_reason'] == 'foo'
+    assert response.data['id'] == str(company.id)
+
+    # make sure we're writing to ES
+    es_client = get_elasticsearch_client()
+    es_result = es_client.get(
+        index=settings.ES_INDEX,
+        doc_type='company_company',
+        id=response.data['id'],
+        realtime=True
+    )
+    assert es_result['_source']['archived']
+    assert es_result['_source']['archived_reason'] == 'foo'
+
+
+# Companies house company views tests
 

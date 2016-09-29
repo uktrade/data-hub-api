@@ -11,7 +11,7 @@ class BaseModel(DeferredSaveModelMixin, models.Model):
     modified_on = models.DateTimeField(default=now, null=True)
     created_on = models.DateTimeField(default=now, null=True)
     archived = models.BooleanField(default=False)
-    archived_on = models.DateField(null=True)
+    archived_on = models.DateTimeField(default=now, null=True)
     archived_reason = models.TextField(null=True)
     archived_by = models.ForeignKey(User, null=True)
 
@@ -21,7 +21,6 @@ class BaseModel(DeferredSaveModelMixin, models.Model):
     def archive(self, reason=None):
         """Archive the model instance."""
         self.archived = True
-        self.archived_on = now()
         self.archived_reason = reason
         self.save()
 

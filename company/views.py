@@ -18,6 +18,9 @@ class CompanyViewSet(ArchiveNoDeleteViewSet):
         'employee_range',
         'turnover_range',
         'uk_region'
+    ).prefetch_related(
+        'contacts',
+        'interactions'
     ).all()
 
 

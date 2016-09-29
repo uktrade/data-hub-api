@@ -8,7 +8,6 @@ from pytest_django.lazy_django import skip_if_no_django
 def django_db_setup(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():
         call_command('loaddata', 'metadata.yaml')
-        call_command('loaddata', 'test_data.yaml')
 
 
 @pytest.fixture
