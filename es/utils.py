@@ -12,3 +12,15 @@ def get_elasticsearch_client():
         'port': settings.ES_PORT
     }])
 
+
+def format_es_results(es_results):
+    """Make the results JSON serializable."""
+
+    results = {
+        'total': es_results.hits.total,
+        'max_score': es_results.hits.max_score,
+        'hits': es_results.hits.hits,
+    }
+
+    return results
+

@@ -6,7 +6,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from es.utils import get_elasticsearch_client
+from es.utils import get_elasticsearch_client, format_es_results
 from .utils import search_by_term
 
 
@@ -31,4 +31,5 @@ class Search(APIView):
             offset=int(offset),
             limit=int(limit)
         )
-        return Response(data=results)
+        formatted_results = format_es_results(results)
+        return Response(data=formatted_results)

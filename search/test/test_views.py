@@ -51,18 +51,25 @@ def test_search_all_parameters(mocked_get_es_client, mocked_search_by_term):
 def test_search_by_term_returns_results(mocked_get_es_client, mocked_search_by_term):
     mocked_client = Mock(spec_set=Elasticsearch)
     mocked_get_es_client.return_value = mocked_client
-    mocked_search_by_term.return_value.hits.hits = [
-        {
-            '_id': 1,
-            '_type': 'company',
-            '_source': {'name': 'Foo'}
-        },
-        {
-            '_id': 2,
-            '_type': 'company',
-            '_source': {'name': 'Foo test'}
-        }
-    ]
+    mocked_results = Mock(
+        hits=Mock(
+            total=10,
+            max_score=1,
+            hits=[
+                {
+                    '_id': 1,
+                    '_type': 'company',
+                    '_source': {'name': 'Foo'}
+                },
+                {
+                    '_id': 2,
+                    '_type': 'company',
+                    '_source': {'name': 'Foo test'}
+                }
+            ]
+        )
+    )
+    mocked_search_by_term.return_value = mocked_results
 
     url = reverse('search')
     factory = APIRequestFactory()
@@ -72,10 +79,22 @@ def test_search_by_term_returns_results(mocked_get_es_client, mocked_search_by_t
     )
     response = Search.as_view()(request)
 
-    expected_response = [
-        {'id': 1, 'type': 'company', 'name': 'Foo'},
-        {'id': 2, 'type': 'company', 'name': 'Foo test'}
-    ]
+    expected_response = {
+        'max_score': 1,
+        'total': 10,
+        'hits': [
+                {
+                    '_id': 1,
+                    '_type': 'company',
+                    '_source': {'name': 'Foo'}
+                },
+                {
+                    '_id': 2,
+                    '_type': 'company',
+                    '_source': {'name': 'Foo test'}
+                }
+            ]
+    }
     assert response.data == expected_response
     assert response.status_code == status.HTTP_200_OK
     mocked_get_es_client.assert_called_with()
