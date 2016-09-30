@@ -107,6 +107,7 @@ def test_add_company(api_client):
 
     assert response.status_code == status.HTTP_201_CREATED
     assert response.data['name'] == 'Acme'
+    assert str(response.data['country']) == constants.Country.united_kingdom.value.id
 
     # make sure we're writing to ES
     es_client = get_elasticsearch_client()

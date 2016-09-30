@@ -26,7 +26,7 @@ def test_add_contact(api_client):
     response = api_client.post(url, {
         'name': 'Oratio Nelson',
         'title': constants.Title.admiral_of_the_fleet.value.id,
-        'company': CompanyFactory()
+        'company': CompanyFactory().pk
     })
 
     assert response.status_code == status.HTTP_201_CREATED

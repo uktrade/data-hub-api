@@ -25,7 +25,7 @@ class CompaniesHouseCompanySerializer(serializers.ModelSerializer):
         depth = 1
 
 
-class CompanySerializer(serializers.ModelSerializer):
+class CompanySerializerRead(serializers.ModelSerializer):
     """Company serializer."""
 
     companies_house_data = CompaniesHouseCompanySerializer(read_only=True)
@@ -37,7 +37,21 @@ class CompanySerializer(serializers.ModelSerializer):
         depth = 1
 
 
-class ContactSerializer(serializers.ModelSerializer):
+class CompanySerializerWrite(serializers.ModelSerializer):
+    """Company serializer for writing operations."""
+
+    class Meta:
+        model = Company
+
+
+class ContactSerializerWrite(serializers.ModelSerializer):
+    """Contact serializer for writing operations."""
+
+    class Meta:
+        model = Contact
+
+
+class ContactSerializerRead(serializers.ModelSerializer):
     """Contact serializer."""
 
     class Meta:
@@ -45,9 +59,16 @@ class ContactSerializer(serializers.ModelSerializer):
         depth = 2
 
 
-class InteractionSerializer(serializers.ModelSerializer):
+class InteractionSerializerRead(serializers.ModelSerializer):
     """Interaction Serializer."""
 
     class Meta:
         model = Interaction
         depth = 2
+
+
+class InteractionSerializerWrite(serializers.ModelSerializer):
+    """Interaction Serializer for writing operations."""
+
+    class Meta:
+        model = Interaction

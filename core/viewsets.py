@@ -9,7 +9,10 @@ class ArchiveNoDeleteViewSet(mixins.CreateModelMixin,
                              mixins.UpdateModelMixin,
                              mixins.ListModelMixin,
                              GenericViewSet):
-    """Implement the archive route."""
+    """Implement the archive route and the read/write serializers."""
+
+    read_serializer_class = None
+    write_serializer_class = None
 
     @detail_route(methods=['post'])
     def archive(self, request, pk):
@@ -18,5 +21,12 @@ class ArchiveNoDeleteViewSet(mixins.CreateModelMixin,
         reason = request.data.get('reason', '')
         obj = self.get_object()
         obj.archive(reason=reason)
-        serializer = self.serializer_class(obj)
+        serializer = self.read_serializer_class(obj)
         return Response(data=serializer.data)
+
+    def get_serializer_class(self):
+        """Return a different serializer class for reading or writing, if defined."""
+        if self.action in ('list', 'retrieve', 'archive'):
+            return self.read_serializer_class
+        elif self.action in ('create', 'update'):
+            return self.write_serializer_class

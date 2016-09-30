@@ -4,13 +4,17 @@ from rest_framework import mixins, viewsets
 
 from core.viewsets import ArchiveNoDeleteViewSet
 from .models import Company, CompaniesHouseCompany, Contact, Interaction
-from .serializers import CompanySerializer, CompaniesHouseCompanySerializer, ContactSerializer, InteractionSerializer
+from .serializers import (CompanySerializerRead, CompanySerializerWrite,
+                          CompaniesHouseCompanySerializer,
+                          ContactSerializerRead, ContactSerializerWrite,
+                          InteractionSerializerRead, InteractionSerializerWrite)
 
 
 class CompanyViewSet(ArchiveNoDeleteViewSet):
     """Company ViewSet."""
 
-    serializer_class = CompanySerializer
+    read_serializer_class = CompanySerializerRead
+    write_serializer_class = CompanySerializerWrite
     queryset = Company.objects.select_related(
         'business_type',
         'sector',
@@ -37,7 +41,8 @@ class CompaniesHouseCompanyReadOnlyViewSet(mixins.ListModelMixin,
 class ContactViewSet(ArchiveNoDeleteViewSet):
     """Contact ViewSet."""
 
-    serializer_class = ContactSerializer
+    read_serializer_class = ContactSerializerRead
+    write_serializer_class = ContactSerializerWrite
     queryset = Contact.objects.select_related(
         'title',
         'role',
@@ -48,7 +53,8 @@ class ContactViewSet(ArchiveNoDeleteViewSet):
 class InteractionViewSet(ArchiveNoDeleteViewSet):
     """Interaction ViewSet."""
 
-    serializer_class = InteractionSerializer
+    read_serializer_class = InteractionSerializerRead
+    write_serializer_class = InteractionSerializerWrite
     queryset = Interaction.objects.select_related(
         'interaction_type',
         'advisor',

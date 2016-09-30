@@ -17,11 +17,10 @@ metadata_view_names = (
     'country',
     'employee-range',
     'interaction-type',
-    'sector'
+    'sector',
     'role',
     'title',
     'uk-region'
-
 )
 
 metadata_views_ids = (
