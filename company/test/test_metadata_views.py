@@ -20,6 +20,7 @@ metadata_view_names = (
     'sector',
     'role',
     'title',
+    'turnover',
     'uk-region'
 )
 
@@ -31,6 +32,7 @@ metadata_views_ids = (
     'sector view',
     'roles view',
     'titles view',
+    'turnover view',
     'UK regions view'
 )
 
