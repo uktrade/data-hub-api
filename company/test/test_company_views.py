@@ -183,7 +183,7 @@ def test_detail_ch_company(api_client):
 
     ch_company = CompaniesHouseCompanyFactory(company_number=123)
 
-    url = reverse('companieshousecompany-detail', kwargs={'pk': ch_company.id})
+    url = reverse('companieshousecompany-detail', kwargs={'company_number': ch_company.company_number})
     response = api_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK

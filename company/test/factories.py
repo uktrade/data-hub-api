@@ -16,6 +16,7 @@ class CompaniesHouseCompanyFactory(factory.django.DjangoModelFactory):
     """Companies house company factory."""
 
     name = factory.Sequence(lambda x: 'name{0}'.format(x))
+    company_number = factory.Sequence(lambda x: x)
     incorporation_date = now()
 
     class Meta:

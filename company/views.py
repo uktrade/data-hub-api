@@ -31,6 +31,7 @@ class CompaniesHouseCompanyReadOnlyViewSet(mixins.ListModelMixin,
 
     serializer_class = CompaniesHouseCompanySerializer
     queryset = CompaniesHouseCompany.objects.all()
+    lookup_field = 'company_number'
 
 
 class ContactViewSet(ArchiveNoDeleteViewSet):
