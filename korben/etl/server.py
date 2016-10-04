@@ -9,7 +9,7 @@ from .main import from_cdms_psql
 app = flask.Flask(__name__)  # NOQA
 
 
-def handle_data_float(obj):
+def handle_date_float(obj):
     if isinstance(obj, datetime.date):
         return obj.isoformat()
     elif isinstance(obj, decimal.Decimal):
@@ -21,7 +21,7 @@ def root():
     retval = {}
     for entity_name, guids in flask.request.json.items():
         retval[entity_name] = from_cdms_psql(entity_name, guids)
-    return json.dumps(retval, default=handle_data_float)
+    return json.dumps(retval, default=handle_date_float)
 
 
 def main():
