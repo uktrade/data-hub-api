@@ -22,6 +22,7 @@ def from_cdms_psql(table, guids, idempotent=True):
     django_metadata = services.db.poll_for_metadata(config.database_url)
     django_table = django_metadata.tables[mapping['to']]
 
+    # TODO: call the leeloo API instead of database directly
     if idempotent:
         load_func = load.to_sqla_table_idempotent
     else:

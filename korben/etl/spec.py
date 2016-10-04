@@ -33,7 +33,6 @@ MAPPINGS.update({
         'local': (
             ('AccountId', 'id'),
             ('optevia_CompaniesHouseNumber', 'company_number'),
-            ('optevia_ukorganisation', 'uk_based'),
             ('optevia_BusinessType_Id', 'business_type_id'),
             ('Name', 'name'),
             ('optevia_Sector_Id', 'sector_id'),
@@ -51,6 +50,9 @@ MAPPINGS.update({
             ('Description', 'description'),
             ('ModifiedOn', 'modified_on'),
             ('CreatedOn', 'created_on'),
+        ),
+        'local_fn': (
+            ((), 'archived', lambda: False),
         ),
     },
     'SystemUserSet': {
@@ -93,6 +95,7 @@ MAPPINGS.update({
         ),
         'local_fn': (
             (('FirstName', 'LastName'), 'name', lambda first, last: "{0} {1}".format(first, last)),  # NOQA
+            ((), 'archived', lambda: False),
         ),
     },
 
@@ -111,6 +114,9 @@ MAPPINGS.update({
 
             ('ModifiedOn', 'modified_on'),
             ('CreatedOn', 'created_on'),
+        ),
+        'local_fn': (
+            ((), 'archived', lambda: False),
         ),
     },
 })
