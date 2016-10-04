@@ -38,6 +38,8 @@ def to_sqla_table_idempotent(table, data):
         upsert = insert(table)\
             .values(**row)\
             .on_conflict_do_update(index_elements=[primary_key], set_=row)
+        results.append(table.metadata.bind.execute(upsert))
+        '''
         try:
             results.append(table.metadata.bind.execute(upsert))
         except sqla_exc.IntegrityError as exc:
@@ -48,7 +50,6 @@ def to_sqla_table_idempotent(table, data):
                         parsed.group('pkey'), parsed.group('table')
                     )
                 )
-        '''
         except Exception as exc:
             LOGGER.error(exc)
             LOGGER.error("{0} {1} ({2}) failed on something".format(
