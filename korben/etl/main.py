@@ -15,7 +15,7 @@ def from_odata_json(table, json_path):
 def from_cdms_psql(table, guids, idempotent=True):
     mapping = spec.MAPPINGS[table.name]
     result = extract.from_cdms_psql(table, guids)
-    transform_func = functools.partial(transform.from_cdms_psql, table)
+    transform_func = functools.partial(transform.odata_to_django, table)
     django_metadata = services.db.poll_for_metadata(config.database_url)
     django_table = django_metadata.tables[mapping['to']]
 
