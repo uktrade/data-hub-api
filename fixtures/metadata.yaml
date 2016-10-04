@@ -17,6 +17,12 @@
 - model: company.businesstype
   pk: 9dd14e94-5d95-e211-a939-e4115bead28a
   fields: {name: Charity}
+- model: company.businesstype
+  pk: 9ed14e94-5d95-e211-a939-e4115bead28a
+  fields: {name: Private limited company }
+- model: company.businesstype
+  pk: 9fd14e94-5d95-e211-a939-e4115bead28a
+  fields: {name: Public limited company }
 
 # sector
 - model: company.sector
