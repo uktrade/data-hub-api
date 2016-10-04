@@ -2,13 +2,13 @@ import sqlalchemy as sqla
 from . import spec
 
 
-def to_cdms_psql(table, odata_dict):
-    'Transform a CDMS row into a row suitable for insertion in to Leeloo'
-    out_dict = {}
-    mapping = spec.MAPPINGS[table.name]
-    for cdms_col, leeloo_col in mapping.get('local', []):
-        if cdms_col:  # TODO: Should these even appear in mappings?
-            out_dict[leeloo_col] = cdms_dict[cdms_col]
+def django_to_odata(django_table, django_dict):
+    'Transform a Django dict to an OData dict'
+    odata_dict = {}
+    mapping = spec.MAPPINGS[spec.DJANGO_LOOKUP[table.name]]
+    for odata_col, django_col in mapping.get('local', []):
+        if odata_col:  # TODO: Should these even appear in mappings?
+            odata_dict[odata_col] = django_dict[django_col]
     for cdms_cols, leeloo_col, func in mapping.get('local_fn', []):
         args = []
         for cdms_col in cdms_cols:
@@ -30,7 +30,7 @@ def to_cdms_psql(table, odata_dict):
     return out_dict
 
 
-def from_cdms_psql(table, cdms_dict):
+def odata_to_django(table, cdms_dict):
     'Transform a CDMS row into a row suitable for insertion in to Leeloo'
     out_dict = {}
     mapping = spec.MAPPINGS[table.name]
