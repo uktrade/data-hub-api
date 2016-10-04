@@ -1,17 +1,14 @@
 import functools
 
-from korben import config, services, etl
-from korben.sync import utils as sync_utils
+from korben import config, services, etl, utils
 
 from . import spec, extract, transform, load
 
 
 def from_odata_json(table, json_path):
-    entries = sync_utils.parse_json_entries(None, None, None, json_path)
+    entries = utils.parse_json_entries(None, None, None, json_path)
     col_names = [col.name for col in table.columns]
-    rows = map(
-        functools.partial(sync_utils.entry_row, col_names, None), entries
-    )
+    rows = map(functools.partial(utils.entry_row, col_names), entries)
     return etl.load.to_sqla_table_idempotent(table, rows)
 
 
