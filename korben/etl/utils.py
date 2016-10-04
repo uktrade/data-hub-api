@@ -30,3 +30,10 @@ def fkey_deps(metadata):
         if depth > 10:
             raise Exception('fkey deps are too deep')
     return dependencies
+
+
+def primary_key(table):
+    'Return name of primary key for given table, raises if pkey is composite'
+    if len(table.primary_key.columns) > 1:
+        raise Exception('Composite primary keys are not supported')
+    return next(col.name for col in table.primary_key.columns.values())
