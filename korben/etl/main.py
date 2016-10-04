@@ -12,10 +12,10 @@ def from_odata_json(table, json_path):
     return etl.load.to_sqla_table_idempotent(table, rows)
 
 
-def from_cdms_psql(table, guids, idempotent=True):
+def from_odata(table, guids, idempotent=True):
     mapping = spec.MAPPINGS[table.name]
-    result = extract.from_cdms_psql(table, guids)
-    transform_func = functools.partial(transform.odata_to_django, table)
+    result = extract.from_odata(table, guids)
+    transform_func = functools.partial(transform.odata_to_django, table.name)
     django_metadata = services.db.poll_for_metadata(config.database_url)
     django_table = django_metadata.tables[mapping['to']]
 

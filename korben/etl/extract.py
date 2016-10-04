@@ -1,18 +1,12 @@
 import sqlalchemy as sqla
+from . import utils
 
 
-def from_cdms_psql(table, guids):
-    primary_key = next(
-        col.name for col in table.primary_key.columns.values()
-    )
+def from_odata(table, guids):
     select_statement = (
         sqla
         .select([table])
-        .where(table.columns[primary_key].in_(guids))
+        .where(table.columns[utils.primary_key(table)].in_(guids))
     )
     result = table.metadata.bind.connect().execute(select_statement).fetchall()
     return map(dict, result)
-
-
-def from_django_psql(metadata, django_tablename, pks):
-    pass

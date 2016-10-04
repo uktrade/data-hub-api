@@ -6,9 +6,9 @@ import re
 
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy import exc as sqla_exc
-import psycopg2
 
 from korben import config
+from korben import etl
 from .. import services
 
 LOGGER = logging.getLogger('korben.etl.load')
@@ -32,7 +32,7 @@ def to_sqla_table_idempotent(table, data):
     Idempotently load data into an SQLA table, temporarily write out details on
     integrity errors to a file
     '''
-    primary_key = next(col.name for col in table.primary_key.columns.values())
+    primary_key = etl.utils.primary_key(table)
     results = []
     for row in data:
         upsert = insert(table)\
