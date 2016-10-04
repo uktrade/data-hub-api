@@ -5,6 +5,7 @@ django-rest-swagger==2.0.5
 django-environ==0.4.0
 django-extensions==1.7.4
 whitenoise==3.2.1
+pyyaml
 
 # Persistency layer
 psycopg2==2.6.2
