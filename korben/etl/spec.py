@@ -98,12 +98,15 @@ MAPPINGS.update({
         ),
     },
 
-    # check commit history for my first idea, there’s a lot of legacy here
-    'optevia_interactionSet': {
+    # check commit history for more information
+    'detica_interactionSet': {
         'to': 'company_interaction',
         'local': (
             ('ActivityId', 'id'),
-            ('optevia_InteractionCommunicationChannel_Id', 'interaction_type_id'),
+            (
+                'optevia_InteractionCommunicationChannel_Id',
+                'interaction_type_id',
+            ),
             ('Subject', 'subject'),
             ('ActualStart', 'date_of_interaction'),
             ('optevia_Advisor_Id', 'advisor_id'),
