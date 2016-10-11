@@ -8,8 +8,6 @@ from core.mixins import DeferredSaveModelMixin
 class BaseModel(DeferredSaveModelMixin, models.Model):
     """Common fields for most of the models we use."""
 
-    modified_on = models.DateTimeField(default=now, null=True)
-    created_on = models.DateTimeField(default=now, null=True)
     archived = models.BooleanField(default=False)
     archived_on = models.DateTimeField(default=now, null=True)
     archived_reason = models.TextField(null=True)
