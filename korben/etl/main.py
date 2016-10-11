@@ -1,6 +1,6 @@
 import functools
 
-from korben import config, services, etl, utils
+from korben import services, etl, utils
 
 from . import spec, extract, transform, load
 
@@ -16,7 +16,7 @@ def from_odata(table, guids, idempotent=True):
     mapping = spec.MAPPINGS[table.name]
     result = extract.from_odata(table, guids)
     transform_func = functools.partial(transform.odata_to_django, table.name)
-    django_metadata = services.db.poll_for_metadata(config.database_url)
+    django_metadata = services.db.get_django_metadata()
     django_table = django_metadata.tables[mapping['to']]
 
     # TODO: call the leeloo API instead of database directly

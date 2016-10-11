@@ -1,4 +1,3 @@
-from korben import config
 from korben import services
 
 MAPPINGS = {}
@@ -144,9 +143,7 @@ def get_es_types():
     if __ES_TYPES is not None:
         return __ES_TYPES
     __ES_TYPES = {}
-    tables = (
-        services.db.poll_for_metadata(config.database_url).tables.values()
-    )
+    tables = services.db.get_django_metadata().tables.values()
     for table in tables:  # NOQA
         if table.name not in DJANGO_LOOKUP:
             continue

@@ -7,7 +7,6 @@ import re
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy import exc as sqla_exc
 
-from korben import config
 from korben import etl
 from .. import services
 
@@ -61,6 +60,6 @@ def to_sqla_table_idempotent(table, data):
 
 
 def from_ch(data):
-    metadata = services.db.poll_for_metadata(config.database_url)
+    metadata = services.db.get_django_metadata()
     table = metadata.tables['company_companieshousecompany']
     return metadata.bind.connect().execute(table.insert(), data)
