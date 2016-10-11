@@ -18,12 +18,12 @@ class CompanyViewSet(ArchiveNoDeleteViewSet):
     queryset = Company.objects.select_related(
         'business_type',
         'sector',
+        'archived_by',
         'registered_address_country',
         'trading_address_country',
         'employee_range',
         'turnover_range',
-        'account_manager',
-        'uk_region'
+        'account_manager'
     ).prefetch_related(
         'contacts',
         'interactions',
