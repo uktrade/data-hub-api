@@ -1,3 +1,7 @@
+'''
+Functions for transforming dicts from Django to OData shape and back again,
+according to spec.MAPPINGS
+'''
 from . import spec
 
 
