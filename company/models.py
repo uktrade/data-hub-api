@@ -8,7 +8,6 @@ from django.utils.functional import cached_property
 from core import constants
 from core.models import BaseConstantModel, BaseModel
 
-
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
@@ -82,8 +81,16 @@ class Company(CompanyAbstract):
     employee_range = models.ForeignKey('EmployeeRange', null=True)
     turnover_range = models.ForeignKey('TurnoverRange', null=True)
     account_manager = models.ForeignKey('Advisor', null=True)
-    export_to_countries = models.ManyToManyField('Country', related_name='company_export_to_countries')
-    future_interest_countries = models.ManyToManyField('Country', related_name='company_future_interest_countries')
+    export_to_countries = models.ManyToManyField(
+        'Country',
+        blank=True,
+        related_name='company_export_to_countries'
+    )
+    future_interest_countries = models.ManyToManyField(
+        'Country',
+        blank=True,
+        related_name='company_future_interest_countries'
+    )
     description = models.TextField(null=True)
     trading_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
     trading_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
@@ -179,6 +186,7 @@ class Contact(BaseModel):
     telephone_countrycode = models.CharField(max_length=MAX_LENGTH)
     telephone_number = models.CharField(max_length=MAX_LENGTH)
     email = models.EmailField()
+    address_same_as_company = models.BooleanField(default=False)
     address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
     address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
     address_3 = models.CharField(max_length=MAX_LENGTH, blank=True)
@@ -191,6 +199,33 @@ class Contact(BaseModel):
     telephone_alternative = models.CharField(max_length=MAX_LENGTH, null=True)
     email_alternative = models.EmailField(null=True)
     notes = models.TextField(null=True)
+
+    @cached_property
+    def address(self):
+        """Return the company address if the flag is selected."""
+
+        if self.address_same_as_company:
+            return {
+                'address_1': self.company.trading_address_1 or self.company.registered_address_1,
+                'address_2': self.company.trading_address_2 or self.company.registered_address_2,
+                'address_3': self.company.trading_address_3 or self.company.registered_address_3,
+                'address_4': self.company.trading_address_4 or self.company.registered_address_4,
+                'address_town': self.company.trading_address_town or self.company.registered_address_town,
+                'address_country': self.company.trading_address_country.name if self.company.trading_address else self.company.registered_address_country.name,
+                'address_county': self.company.trading_address_county or self.company.registered_address_county,
+                'address_postcode': self.company.trading_address_postcode or self.company.registered_address_postcode,
+            }
+        else:
+            return {
+               'address_1': self.address_1,
+               'address_2': self.address_2,
+               'address_3': self.address_3,
+               'address_4': self.address_4,
+               'address_town': self.address_town,
+               'address_country': self.address_country.name,
+               'address_county': self.address_county,
+               'address_postcode': self.address_postcode,
+            }
 
     def __str__(self):
         return self.name

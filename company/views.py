@@ -18,13 +18,17 @@ class CompanyViewSet(ArchiveNoDeleteViewSet):
     queryset = Company.objects.select_related(
         'business_type',
         'sector',
-        'country',
+        'registered_address_country',
+        'trading_address_country',
         'employee_range',
         'turnover_range',
+        'account_manager'
         'uk_region'
     ).prefetch_related(
         'contacts',
-        'interactions'
+        'interactions',
+        'export_to_countries',
+        'future_interest_countries'
     ).all()
 
 
@@ -34,7 +38,7 @@ class CompaniesHouseCompanyReadOnlyViewSet(mixins.ListModelMixin,
     """Companies House company GET only views."""
 
     serializer_class = CompaniesHouseCompanySerializer
-    queryset = CompaniesHouseCompany.objects.all()
+    queryset = CompaniesHouseCompany.objects.select_related('registered_address_country').all()
     lookup_field = 'company_number'
 
 
@@ -46,7 +50,11 @@ class ContactViewSet(ArchiveNoDeleteViewSet):
     queryset = Contact.objects.select_related(
         'title',
         'role',
-        'company'
+        'company',
+        'address_country',
+        'uk_region'
+    ).prefetch_related(
+        'teams'
     ).all()
 
 
