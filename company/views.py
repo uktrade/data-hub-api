@@ -22,7 +22,7 @@ class CompanyViewSet(ArchiveNoDeleteViewSet):
         'trading_address_country',
         'employee_range',
         'turnover_range',
-        'account_manager'
+        'account_manager',
         'uk_region'
     ).prefetch_related(
         'contacts',
