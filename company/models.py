@@ -211,7 +211,7 @@ class Contact(BaseModel):
                 'address_3': self.company.trading_address_3 or self.company.registered_address_3,
                 'address_4': self.company.trading_address_4 or self.company.registered_address_4,
                 'address_town': self.company.trading_address_town or self.company.registered_address_town,
-                'address_country': self.company.trading_address_country.name if self.company.trading_address else self.company.registered_address_country.name,
+                'address_country': self.company.trading_address_country.pk if self.company.trading_address else self.company.registered_address_country.name,
                 'address_county': self.company.trading_address_county or self.company.registered_address_county,
                 'address_postcode': self.company.trading_address_postcode or self.company.registered_address_postcode,
             }
@@ -222,7 +222,7 @@ class Contact(BaseModel):
                'address_3': self.address_3,
                'address_4': self.address_4,
                'address_town': self.address_town,
-               'address_country': self.address_country.name,
+               'address_country': self.address_country.pk,
                'address_county': self.address_county,
                'address_postcode': self.address_postcode,
             }
