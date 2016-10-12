@@ -58,7 +58,8 @@ class CompanySerializerRead(serializers.ModelSerializer):
         """Use the CH name, if there's one, else the name."""
         return obj.companies_house_data.name if obj.companies_house_data else obj.name
 
-    def get_registered_address(self, obj):
+    @staticmethod
+    def get_registered_address(obj):
         """Use CH address, if there's one, else the registered address."""
         obj = obj.companies_house_data or obj
         return {
@@ -87,7 +88,7 @@ class CompanySerializerRead(serializers.ModelSerializer):
                 'address_postcode': obj.trading_address_postcode,
             }
         else:
-            {}
+            return {}
 
     class Meta:
         model = Company

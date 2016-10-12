@@ -28,5 +28,5 @@ class ArchiveNoDeleteViewSet(mixins.CreateModelMixin,
         """Return a different serializer class for reading or writing, if defined."""
         if self.action in ('list', 'retrieve', 'archive'):
             return self.read_serializer_class
-        elif self.action in ('create', 'update'):
+        elif self.action in ('create', 'update', 'partial_update'):
             return self.write_serializer_class
