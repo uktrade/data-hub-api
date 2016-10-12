@@ -54,19 +54,6 @@ class CompanySerializerRead(serializers.ModelSerializer):
     uk_based = serializers.BooleanField()
 
     @staticmethod
-    def _format_address(obj):
-        return {
-            'registered_address_1': obj.registered_address_1,
-            'registered_address_2': obj.registered_address_2,
-            'registered_address_3': obj.registered_address_3,
-            'registered_address_4': obj.registered_address_4,
-            'registered_address_town': obj.registered_address_town,
-            'registered_address_country': obj.registered_address_country.name,
-            'registered_address_county': obj.registered_address_county,
-            'registered_address_postcode': obj.registered_address_postcode,
-        }
-
-    @staticmethod
     def get_registered_name(obj):
         """Use the CH name, if there's one, else the name."""
         return obj.companies_house_data.name if obj.companies_house_data else obj.name
@@ -74,21 +61,30 @@ class CompanySerializerRead(serializers.ModelSerializer):
     def get_registered_address(self, obj):
         """Use CH address, if there's one, else the registered address."""
         obj = obj.companies_house_data or obj
-        return self._format_address(obj)
+        return {
+            'address_1': obj.registered_address_1,
+            'address_2': obj.registered_address_2,
+            'address_3': obj.registered_address_3,
+            'address_4': obj.registered_address_4,
+            'address_town': obj.registered_address_town,
+            'address_country': obj.registered_address_country.name,
+            'address_county': obj.registered_address_county,
+            'address_postcode': obj.registered_address_postcode,
+        }
 
     @staticmethod
     def get_trading_address(obj):
         """Trading address exists in Leeloo only."""
         if obj.trading_address_country:
             return {
-                'trading_address_1': obj.trading_address_1,
-                'trading_address_2': obj.trading_address_2,
-                'trading_address_3': obj.trading_address_3,
-                'trading_address_4': obj.trading_address_4,
-                'trading_address_town': obj.trading_address_town,
-                'trading_address_country': obj.trading_address_country.name,
-                'trading_address_county': obj.trading_address_county,
-                'trading_address_postcode': obj.trading_address_postcode,
+                'address_1': obj.trading_address_1,
+                'address_2': obj.trading_address_2,
+                'address_3': obj.trading_address_3,
+                'address_4': obj.trading_address_4,
+                'address_town': obj.trading_address_town,
+                'address_country': obj.trading_address_country.name,
+                'address_county': obj.trading_address_county,
+                'address_postcode': obj.trading_address_postcode,
             }
         else:
             {}
