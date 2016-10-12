@@ -31,21 +31,23 @@ MAPPINGS.update({
         'to': 'company_company',
         'local': (
             ('AccountId', 'id'),
-            ('optevia_CompaniesHouseNumber', 'company_number'),
-            ('optevia_BusinessType_Id', 'business_type_id'),
             ('Name', 'name'),
+            ('optevia_Alias', 'alias'),
+            ('optevia_CompaniesHouseNumber', 'company_number'),
+            # ('optevia_ukorganisation', 'uk_based'), requires serialiser
+            ('optevia_BusinessType_Id', 'business_type_id'),
             ('optevia_Sector_Id', 'sector_id'),
-            ('WebSiteURL', 'website'),
-            ('optevia_EmployeeRange_Id', 'employee_range_id'),
-            ('optevia_TurnoverRange_Id', 'turnover_range_id'),
-            ('Address1_Line1', 'address_1'),
-            ('Address1_Line2', 'address_2'),
-            ('Address1_City', 'address_town'),
-            ('Address1_County', 'address_county'),
-            ('Address1_County', 'address_country'),
-            ('Address1_PostalCode', 'address_postcode'),
-            ('optevia_Country_Id', 'country_id'),
-            ('optevia_UKRegion_Id', 'uk_region_id'),
+            # ('optevia_EmployeeRange_Id', 'employee_range_id'), do these stay?
+            # ('optevia_TurnoverRange_Id', 'turnover_range_id'),
+            ('optevia_Address1', 'registered_address_1'),
+            ('optevia_Address2', 'registered_address_2'),
+            ('optevia_Address3', 'registered_address_3'),
+            ('optevia_Address4', 'registered_address_4'),
+            ('optevia_TownCity', 'registered_address_town'),
+            ('optevia_StateCounty', 'registered_address_county'),
+            ('optevia_PostCode', 'registered_address_postcode'),
+            ('optevia_Country_Id', 'registered_address_country_id'),
+            # ('optevia_UKRegion_Id', 'uk_region_id'), did it fall out?
             ('Description', 'description'),
             ('ModifiedOn', 'modified_on'),
             ('CreatedOn', 'created_on'),
@@ -66,35 +68,28 @@ MAPPINGS.update({
     'ContactSet': {
         'to': 'company_contact',
         'local': (
-            ('ContactId', 'id'),
-            ('optevia_Title_Id', 'title_id'),
-            ('optevia_ContactRole_Id', 'role_id'),
-            ('optevia_TelephoneNumber', 'phone'),  # many other options
+            ('Title', 'title_id'),
+            ('FirstName', 'first_name'),
+            ('LastName', 'last_name'),
+            # ('MiddleName', None),  data migration to move these
+            # ('optevia_LastVerified', None)  korben magic to add current on write
+            ('ParentCustomerId_Id', 'company_id'),
+            ('optevia_PrimaryContact', 'primary'),
+            ('optevia_CountryCode', 'telephone_countrycode'),
+            # ('optevia_AreaCode` `++` `optevia_TelephoneNumber` | `← * →` | `telephone_number` | Telephone number | Korben to fill area code |
             ('EMailAddress1', 'email'),
+            ('optevia_Address1', 'address_1'),
+            ('optevia_Address2', 'address_2'),
+            ('optevia_Address3', 'address_3'),
+            ('optevia_Address4', 'address_4'),
+            ('optevia_TownCity', 'address_town'),
+            ('optevia_StateCounty', 'address_county'),
+            ('optevia_PostCode', 'address_postcode'),
+            ('optevia_Country_Id', 'address_country_id'),
+            ('optevia_UKRegion_Id', 'uk_region_id'),
 
-            # a great number of address fields, using the first
-            ('Address1_Line1', 'address_1'),
-            ('Address1_Line2', 'address_2'),
-            ('Address1_City', 'address_town'),
-            ('Address1_County', 'address_county'),
-            ('Address1_Country', 'address_country'),
-            ('Address1_PostalCode', 'address_postcode'),
-
-            # many other telephone numbers
-            ('Address1_Telephone1', 'alt_phone'),
-
-            # or 'EMailAddress3',
-            ('EMailAddress2', 'alt_email'),
-
-            (None, 'notes'),
-            ('AccountId_Id', 'company_id'),
-
-            ('ModifiedOn', 'modified_on'),
-            ('CreatedOn', 'created_on'),
-        ),
-        'local_fn': (
-            (('FirstName', 'LastName'), 'name', lambda first, last: "{0} {1}".format(first, last)),  # NOQA
-            ((), 'archived', lambda: False),
+            # ('ModifiedOn', 'modified_on'),  not wanted in leeloo?
+            # ('CreatedOn', 'created_on'),
         ),
     },
 
@@ -139,6 +134,7 @@ def update(original_dict, update_dict):
 
 ES_INDEX = 'datahub'
 __ES_TYPES = None
+
 
 def get_es_types():
     'since this introspects the db to get table information, it must be called'
