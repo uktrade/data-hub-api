@@ -264,8 +264,7 @@ class Contact(BaseModel):
 
         Either 'same_as_company' or address_1, address_town and address_country must be defined.
         """
-        if not self.address_same_as_company:
-            if any((
+        some_address_fields_existence = any((
                 self.address_1,
                 self.address_2,
                 self.address_3,
@@ -274,11 +273,16 @@ class Contact(BaseModel):
                 self.address_county,
                 self.address_postcode,
                 self.address_country
-            )) and not all((
+            ))
+        all_required_fields_existence = all((
                 self.address_1,
                 self.address_country,
                 self.address_town
-            )):
-                raise ValidationError('Either address_same_as_company or address_1, town and country have to be defined.')
-
+            ))
+        
+        if not self.address_same_as_company:
+            if some_address_fields_existence and not all_required_fields_existence:
+                raise ValidationError('address_1, town and country are required if an address is entered.')
+            elif not some_address_fields_existence:
+                raise ValidationError('Please select either address_as_company or enter an address manually.')
         super(Contact, self).clean()

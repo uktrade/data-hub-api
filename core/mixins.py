@@ -8,5 +8,6 @@ class DeferredSaveModelMixin:
 
     def save(self, *args, **kwargs):
         """Save is temporarily allowed, also write to ES."""
+        self.clean()  # triggers custom validation
         super().save(*args, **kwargs)
         save_model(self)

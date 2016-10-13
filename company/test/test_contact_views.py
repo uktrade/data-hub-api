@@ -5,6 +5,7 @@ Check conftest.py in the root folder for the importing mechanism.
 
 import pytest
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 from django.urls import reverse
 from rest_framework import status
@@ -19,7 +20,7 @@ from .factories import CompanyFactory, ContactFactory
 pytestmark = pytest.mark.django_db
 
 
-def test_add_contact(api_client):
+def test_add_contact_address_same_as_company(api_client):
     """Test add new contact."""
 
     url = reverse('contact-list')
@@ -34,6 +35,79 @@ def test_add_contact(api_client):
         'telephone_countrycode': '+44',
         'telephone_number': '123456789',
         'address_same_as_company': True
+    })
+
+    assert response.status_code == status.HTTP_201_CREATED
+
+    # make sure we're writing to ES
+    es_client = get_elasticsearch_client()
+    assert document_exists(
+        client=es_client,
+        doc_type='company_contact',
+        document_id=response.data['id']
+    )
+
+
+def test_add_contact_no_address(api_client):
+    """Test add new contact without any address."""
+
+    url = reverse('contact-list')
+
+    with pytest.raises(ValidationError) as error:
+        api_client.post(url, {
+            'first_name': 'Oratio',
+            'last_name': 'Nelson',
+            'title': constants.Title.admiral_of_the_fleet.value.id,
+            'company': CompanyFactory().pk,
+            'role': constants.Role.owner.value.id,
+            'email': 'foo@bar.com',
+            'uk_region': constants.UKRegion.england.value.id,
+            'telephone_countrycode': '+44',
+            'telephone_number': '123456789'
+        })
+
+    assert 'Please select either address_as_company or enter an address manually.' in str(error.value)
+
+
+def test_add_contact_partial_manual_address(api_client):
+    """Test add new contact with a partial manual address."""
+
+    url = reverse('contact-list')
+
+    with pytest.raises(ValidationError) as error:
+        api_client.post(url, {
+            'first_name': 'Oratio',
+            'last_name': 'Nelson',
+            'title': constants.Title.admiral_of_the_fleet.value.id,
+            'company': CompanyFactory().pk,
+            'role': constants.Role.owner.value.id,
+            'email': 'foo@bar.com',
+            'uk_region': constants.UKRegion.england.value.id,
+            'telephone_countrycode': '+44',
+            'telephone_number': '123456789',
+            'address_1': 'test'
+        })
+
+    assert 'address_1, town and country are required if an address is entered.' in str(error.value)
+
+
+def test_add_contact_manual_address(api_client):
+    """Test add new contact manual address."""
+
+    url = reverse('contact-list')
+    response = api_client.post(url, {
+        'first_name': 'Oratio',
+        'last_name': 'Nelson',
+        'title': constants.Title.admiral_of_the_fleet.value.id,
+        'company': CompanyFactory().pk,
+        'role': constants.Role.owner.value.id,
+        'email': 'foo@bar.com',
+        'uk_region': constants.UKRegion.england.value.id,
+        'telephone_countrycode': '+44',
+        'telephone_number': '123456789',
+        'address_1': 'Foo st.',
+        'address_town': 'London',
+        'address_country': constants.Country.united_kingdom.value.id
     })
 
     assert response.status_code == status.HTTP_201_CREATED
