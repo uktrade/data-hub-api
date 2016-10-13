@@ -2,6 +2,7 @@
 import uuid
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.functional import cached_property
 
@@ -91,7 +92,7 @@ class Company(CompanyAbstract):
         blank=True,
         related_name='company_future_interest_countries'
     )
-    description = models.TextField(null=True)
+    description = models.TextField(blank=True)
     trading_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
     trading_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
     trading_address_3 = models.CharField(max_length=MAX_LENGTH, blank=True)
@@ -119,6 +120,29 @@ class Company(CompanyAbstract):
     def registered_name(self):
         """Use the CH name, if there's one, else the name."""
         return self.companies_house_data.name if self.companies_house_data else self.name
+
+    def clean(self):
+        """Custom validation for trading address.
+
+        Trading address fields are not mandatory in the model definition,
+        if one of the fields is used then address_1, town and country have to be filled in.
+        """
+        if any((
+            self.trading_address_1,
+            self.trading_address_2,
+            self.trading_address_3,
+            self.trading_address_4,
+            self.trading_address_town,
+            self.trading_address_county,
+            self.trading_address_postcode,
+            self.trading_address_country
+        )) and not all((
+            self.trading_address_1,
+            self.trading_address_country,
+            self.trading_address_town
+        )):
+            raise ValidationError('Trading address must have at least address_1, town and country.')
+        super(Company, self).clean()
 
 
 class CompaniesHouseCompany(CompanyAbstract):

@@ -34,10 +34,23 @@ def test_list_companies(api_client):
 
 
 def test_detail_company_with_company_number(api_client):
-    """Test company detail view with companies house data."""
+    """Test company detail view with companies house data.
 
-    ch_company = CompaniesHouseCompanyFactory(company_number=123)
-    company = CompanyFactory(company_number=123)
+    Make sure that the registered name and registered address are coming from CH data
+    """
+
+    ch_company = CompaniesHouseCompanyFactory(
+        company_number=123,
+        name='Foo ltd.',
+        registered_address_1='Hello st.',
+        registered_address_town='Fooland',
+        registered_address_country_id=constants.Country.united_states.value.id
+    )
+    company = CompanyFactory(
+        company_number=123,
+        name='Bar ltd.',
+        alias='Xyz trading'
+    )
 
     url = reverse('company-detail', kwargs={'pk': company.id})
     response = api_client.get(url)
@@ -45,6 +58,19 @@ def test_detail_company_with_company_number(api_client):
     assert response.status_code == status.HTTP_200_OK
     assert response.data['id'] == str(company.pk)
     assert response.data['companies_house_data']['id'] == ch_company.id
+    assert response.data['registered_name'] == ch_company.name
+    assert response.data['trading_name'] == company.alias
+    assert response.data['registered_address'] == {
+        'address_1': ch_company.registered_address_1,
+        'address_2': '',
+        'address_3': '',
+        'address_4': '',
+        'address_town': ch_company.registered_address_town,
+        'address_country': ch_company.registered_address_country_id,
+        'address_county': '',
+        'address_postcode': '',
+    }
+
 
 
 def test_detail_company_without_company_number(api_client):

@@ -76,19 +76,16 @@ class CompanySerializerRead(serializers.ModelSerializer):
     @staticmethod
     def get_trading_address(obj):
         """Trading address exists in Leeloo only."""
-        if obj.trading_address_country:
-            return {
-                'address_1': obj.trading_address_1,
-                'address_2': obj.trading_address_2,
-                'address_3': obj.trading_address_3,
-                'address_4': obj.trading_address_4,
-                'address_town': obj.trading_address_town,
-                'address_country': obj.trading_address_country.pk,
-                'address_county': obj.trading_address_county,
-                'address_postcode': obj.trading_address_postcode,
-            }
-        else:
-            return {}
+        return {
+            'address_1': obj.trading_address_1,
+            'address_2': obj.trading_address_2,
+            'address_3': obj.trading_address_3,
+            'address_4': obj.trading_address_4,
+            'address_town': obj.trading_address_town,
+            'address_country': obj.trading_address_country.pk,
+            'address_county': obj.trading_address_county,
+            'address_postcode': obj.trading_address_postcode,
+        }
 
     class Meta:
         model = Company

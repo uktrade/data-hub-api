@@ -13,6 +13,8 @@ class BusinessType(Enum):
     intermediary = Constant('Intermediary', '9bd14e94-5d95-e211-a939-e4115bead28a')
     partnership = Constant('Partnership', '9ad14e94-5d95-e211-a939-e4115bead28a')
     sole_trader = Constant('Sole Trader', '99d14e94-5d95-e211-a939-e4115bead28a')
+    private_limited_company = Constant('Private limited company', '9ed14e94-5d95-e211-a939-e4115bead28a')
+    public_limited_company = Constant('Public limited company', '9ed14e94-5d95-e211-a939-e4115bead28a')
 
 
 class Country(Enum):
@@ -306,6 +308,15 @@ class Role(Enum):
     partner = Constant('Partner', '74756b9a-5d95-e211-a939-e4115bead28a')
     student = Constant('Student', '75756b9a-5d95-e211-a939-e4115bead28a')
     unknown = Constant('Unknown', '6d756b9a-5d95-e211-a939-e4115bead28a')
+
+
+class Sector(Enum):
+    """Sectors (not all of them!)."""
+
+    aerospace_assembly_aircraft = Constant(
+        'Aerospace : Manufacturing and Assembly : Aircraft',
+        'b422c9d2-5f95-e211-a939-e4115bead28a'
+    )
 
 
 class Title(Enum):
