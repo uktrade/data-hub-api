@@ -9,7 +9,7 @@ from core import constants
 class CompanyFactory(factory.django.DjangoModelFactory):
     """Company factory."""
 
-    id = uuid.uuid4()
+    id = factory.Sequence(lambda x: '{0}'.format(uuid.uuid4()))
     name = factory.Sequence(lambda x: 'name{0}'.format(x))
     registered_address_1 = factory.Sequence(lambda x: '{0} Foo st.'.format(x))
     registered_address_town = 'London'
@@ -39,7 +39,7 @@ class CompaniesHouseCompanyFactory(factory.django.DjangoModelFactory):
 class ContactFactory(factory.django.DjangoModelFactory):
     """Contact factory"""
 
-    id = uuid.uuid4()
+    id = factory.Sequence(lambda x: '{0}'.format(uuid.uuid4()))
     title_id = constants.Title.wing_commander.value.id
     first_name = factory.Sequence(lambda x: 'name {0}'.format(x))
     last_name = factory.Sequence(lambda x: 'surname {0}'.format(x))
@@ -47,6 +47,9 @@ class ContactFactory(factory.django.DjangoModelFactory):
     company = factory.SubFactory(CompanyFactory)
     email = 'foo@bar.com'
     uk_region_id = constants.UKRegion.england.value.id
+    telephone_countrycode = '+44'
+    telephone_number = '123456789'
+    address_same_as_company = True
 
     class Meta:
         model = 'company.Contact'

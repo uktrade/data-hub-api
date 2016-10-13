@@ -211,7 +211,7 @@ class Contact(BaseModel):
     last_name = models.CharField(max_length=MAX_LENGTH)
     role = models.ForeignKey('Role')
     company = models.ForeignKey('Company', related_name='contacts')
-    teams = models.ManyToManyField('Team')
+    teams = models.ManyToManyField('Team', blank=True)
     telephone_countrycode = models.CharField(max_length=MAX_LENGTH)
     telephone_number = models.CharField(max_length=MAX_LENGTH)
     email = models.EmailField()
@@ -222,7 +222,7 @@ class Contact(BaseModel):
     address_4 = models.CharField(max_length=MAX_LENGTH, blank=True)
     address_town = models.CharField(max_length=MAX_LENGTH, blank=True)
     address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
-    address_country = models.ForeignKey('Country', blank=True)
+    address_country = models.ForeignKey('Country', null=True)
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
     uk_region = models.ForeignKey('UKRegion')
     telephone_alternative = models.CharField(max_length=MAX_LENGTH, null=True)
@@ -257,4 +257,28 @@ class Contact(BaseModel):
             }
 
     def __str__(self):
-        return self.name
+        return '{first_name} {last_name}'.format(first_name=self.first_name, last_name=self.last_name)
+
+    def clean(self):
+        """Custom validation for address.
+
+        Either 'same_as_company' or address_1, address_town and address_country must be defined.
+        """
+        if not self.address_same_as_company:
+            if any((
+                self.address_1,
+                self.address_2,
+                self.address_3,
+                self.address_4,
+                self.address_town,
+                self.address_county,
+                self.address_postcode,
+                self.address_country
+            )) and not all((
+                self.address_1,
+                self.address_country,
+                self.address_town
+            )):
+                raise ValidationError('Either address_same_as_company or address_1, town and country have to be defined.')
+
+        super(Contact, self).clean()

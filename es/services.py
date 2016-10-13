@@ -27,12 +27,16 @@ def write_to_es(client, doc_type, data):
 
     As temporary solution we perform a check on ES to see if the document with the give ID already exists.
     """
-    if document_exists(client, doc_type, data['id']):
+    # we pop the ID out because the dynamic mappings creates this field as long, while we use UUID
+    # need a way to force this type in the mapping
+
+    object_id = data.pop('id')
+    if document_exists(client, doc_type, object_id):
         client.update(
             index=settings.ES_INDEX,
             doc_type=doc_type,
             body={'doc': data},
-            id=data['id'],
+            id=object_id,
             refresh=True
         )
     else:
@@ -40,7 +44,7 @@ def write_to_es(client, doc_type, data):
             index=settings.ES_INDEX,
             doc_type=doc_type,
             body=data,
-            id=data['id'],
+            id=object_id,
             refresh=True
         )
 

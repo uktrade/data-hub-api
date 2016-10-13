@@ -24,13 +24,19 @@ def test_add_contact(api_client):
 
     url = reverse('contact-list')
     response = api_client.post(url, {
-        'name': 'Oratio Nelson',
+        'first_name': 'Oratio',
+        'last_name': 'Nelson',
         'title': constants.Title.admiral_of_the_fleet.value.id,
-        'company': CompanyFactory().pk
+        'company': CompanyFactory().pk,
+        'role': constants.Role.owner.value.id,
+        'email': 'foo@bar.com',
+        'uk_region': constants.UKRegion.england.value.id,
+        'telephone_countrycode': '+44',
+        'telephone_number': '123456789',
+        'address_same_as_company': True
     })
 
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.data['name'] == 'Oratio Nelson'
 
     # make sure we're writing to ES
     es_client = get_elasticsearch_client()
@@ -47,12 +53,12 @@ def test_modify_contact(api_client):
     contact = ContactFactory(name='foo')
 
     url = reverse('contact-detail', kwargs={'pk': contact.pk})
-    response = api_client.put(url, {
-        'name': 'bar',
+    response = api_client.patch(url, {
+        'first_name': 'bar',
     })
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.data['name'] == 'bar'
+    assert response.data['first_name'] == 'bar'
 
     # make sure we're writing to ES
     es_client = get_elasticsearch_client()
@@ -62,14 +68,14 @@ def test_modify_contact(api_client):
         id=response.data['id'],
         realtime=True
     )
-    assert es_result['_source']['name'] == 'bar'
+    assert es_result['_source']['first_name'] == 'bar'
 
 
 def test_archive_contact_no_reason(api_client):
     """Test archive contact without providing a reason."""
 
     contact = ContactFactory()
-    url = reverse('contact-archive', kwargs={'pk': contact.id})
+    url = reverse('contact-archive', kwargs={'pk': contact.pk})
     response = api_client.post(url)
 
     assert response.data['archived']
@@ -92,7 +98,7 @@ def test_archive_contact_reason(api_client):
     """Test archive contact providing a reason."""
 
     contact = ContactFactory()
-    url = reverse('contact-archive', kwargs={'pk': contact.id})
+    url = reverse('contact-archive', kwargs={'pk': contact.pk})
     response = api_client.post(url, {'reason': 'foo'})
 
     assert response.data['archived']
@@ -115,7 +121,7 @@ def test_contact_detail_view(api_client):
     """Contact detail view."""
 
     contact = ContactFactory()
-    url = reverse('contact-detail', kwargs={'pk': contact.id})
+    url = reverse('contact-detail', kwargs={'pk': contact.pk})
     response = api_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
