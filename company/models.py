@@ -127,7 +127,7 @@ class Company(CompanyAbstract):
         Trading address fields are not mandatory in the model definition,
         if one of the fields is used then address_1, town and country have to be filled in.
         """
-        if any((
+        some_address_fields_existence = any((
             self.trading_address_1,
             self.trading_address_2,
             self.trading_address_3,
@@ -136,11 +136,13 @@ class Company(CompanyAbstract):
             self.trading_address_county,
             self.trading_address_postcode,
             self.trading_address_country
-        )) and not all((
+        ))
+        all_required_fields_existence = all((
             self.trading_address_1,
             self.trading_address_country,
             self.trading_address_town
-        )):
+        ))
+        if some_address_fields_existence and not all_required_fields_existence:
             raise ValidationError('Trading address must have at least address_1, town and country.')
         super(Company, self).clean()
 
@@ -279,7 +281,7 @@ class Contact(BaseModel):
                 self.address_country,
                 self.address_town
             ))
-        
+
         if not self.address_same_as_company:
             if some_address_fields_existence and not all_required_fields_existence:
                 raise ValidationError('address_1, town and country are required if an address is entered.')
