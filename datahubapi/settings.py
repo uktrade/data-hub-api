@@ -154,6 +154,8 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 ES_HOST = env('ES_HOST')
 ES_PORT = env.int('ES_PORT')
 ES_INDEX = 'datahub'
+KORBEN_HOST = env('KORBEN_HOST')
+KORBEN_PORT = env('KORBEN_PORT')
 
 CHAR_FIELD_MAX_LENGTH = 255
 

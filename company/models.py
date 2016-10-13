@@ -1,5 +1,4 @@
 """Company models."""
-import uuid
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -75,7 +74,7 @@ class CompanyAbstract(BaseModel):
 class Company(CompanyAbstract):
     """Representation of the company as per CDMS."""
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, db_index=True)
+    id = models.UUIDField(primary_key=True, db_index=True)
     alias = models.CharField(max_length=MAX_LENGTH, blank=True, help_text='Trading name')
     business_type = models.ForeignKey('BusinessType')
     sector = models.ForeignKey('Sector')
@@ -152,6 +151,10 @@ class Company(CompanyAbstract):
             )
         super(Company, self).clean()
 
+    def _map_korben_response_to_model_instance(self):
+        """https://github.com/uktrade/data-hub-backend/blob/master/specs.md"""
+        pass
+
 
 class CompaniesHouseCompany(CompanyAbstract):
     """Representation of Companies House company."""
@@ -182,7 +185,7 @@ class Advisor(BaseConstantModel):
 class Interaction(BaseModel):
     """Interaction from CDMS."""
 
-    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, db_index=True)
     interaction_type = models.ForeignKey('InteractionType', null=True)
     subject = models.TextField(null=True)
     date_of_interaction = models.DateTimeField(null=True)
@@ -213,7 +216,7 @@ class Team(BaseConstantModel):
 class Contact(BaseModel):
     """Contact from CDMS."""
 
-    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, db_index=True)
     title = models.ForeignKey('Title')
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
