@@ -50,7 +50,7 @@ def test_add_contact(api_client):
 def test_modify_contact(api_client):
     """Modify an existing contact."""
 
-    contact = ContactFactory(name='foo')
+    contact = ContactFactory(first_name='foo')
 
     url = reverse('contact-detail', kwargs={'pk': contact.pk})
     response = api_client.patch(url, {
