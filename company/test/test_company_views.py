@@ -5,6 +5,7 @@ Check conftest.py in the root folder for the importing mechanism.
 
 import pytest
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 from django.urls import reverse
 from rest_framework import status
@@ -149,6 +150,52 @@ def test_add_company(api_client):
 
     assert response.status_code == status.HTTP_201_CREATED
     assert response.data['name'] == 'Acme'
+
+    # make sure we're writing to ES
+    es_client = get_elasticsearch_client()
+    assert document_exists(
+        client=es_client,
+        doc_type='company_company',
+        document_id=response.data['id']
+    )
+
+
+def test_add_company_partial_trading_address(api_client):
+    """Test add new company with partial trading address."""
+
+    url = reverse('company-list')
+
+    with pytest.raises(ValidationError) as error:
+        api_client.post(url, {
+            'name': 'Acme',
+            'business_type': constants.BusinessType.company.value.id,
+            'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_country': constants.Country.united_kingdom.value.id,
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'trading_address_1': 'test'
+        })
+
+    assert 'Trading address must have at least address_1, town and country.' in str(error.value)
+
+
+def test_add_company_with_trading_address(api_client):
+    """Test add new company with trading_address."""
+
+    url = reverse('company-list')
+    response = api_client.post(url, {
+        'name': 'Acme',
+        'business_type': constants.BusinessType.company.value.id,
+        'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
+        'registered_address_country': constants.Country.united_kingdom.value.id,
+        'registered_address_1': '75 Stramford Road',
+        'registered_address_town': 'London',
+        'trading_address_country': constants.Country.ireland.value.id,
+        'trading_address_1': '1 Hello st.',
+        'trading_address_town': 'Dublin'
+    })
+
+    assert response.status_code == status.HTTP_201_CREATED
 
     # make sure we're writing to ES
     es_client = get_elasticsearch_client()
