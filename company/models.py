@@ -93,6 +93,7 @@ class Company(CompanyAbstract):
         related_name='company_future_interest_countries'
     )
     description = models.TextField(blank=True)
+    uk_region = models.ForeignKey('UKRegion')
     trading_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
     trading_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
     trading_address_3 = models.CharField(max_length=MAX_LENGTH, blank=True)

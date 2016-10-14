@@ -17,6 +17,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     business_type_id = constants.BusinessType.private_limited_company.value.id
     sector_id = constants.Sector.aerospace_assembly_aircraft.value.id
     archived = False
+    uk_region_id = constants.UKRegion.england.value.id
     
     class Meta:
         model = 'company.Company'
