@@ -1,4 +1,4 @@
-from django.db.models import ForeignKey, ManyToManyField
+from django.db.models import DateField, ForeignKey, ManyToManyField
 
 
 def generate_enum_code_from_constant_model(model_queryset):
@@ -23,11 +23,13 @@ def model_to_dictionary(model_instance, fk_ids=False):
         if isinstance(field, ForeignKey):
             field_value = getattr(model_instance, field.name)
             if fk_ids:
-                data[field.name+'_id'] = field_value.id if field_value else None
+                data[field.name+'_id'] = str(field_value.id) if field_value else None
             else:
                 data[field.name] = field_value.name if field_value else None
         elif isinstance(field, ManyToManyField):
             pass
+        elif isinstance(field, DateField):
+            data[field.name] = str(getattr(model_instance, field.name))
         else:
             data[field.name] = getattr(model_instance, field.name)
     return data

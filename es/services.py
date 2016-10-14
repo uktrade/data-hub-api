@@ -6,14 +6,15 @@ from core.utils import model_to_dictionary
 from .utils import get_elasticsearch_client
 
 
-def save_model(model_instance, update=False):
+def save_model(model_instance):
     """Add or update data to ES."""
     client = get_elasticsearch_client()
     data = model_to_dictionary(model_instance)
     doc_type = model_instance._meta.db_table
 
     object_id = data.pop('id')
-    if update:
+
+    if document_exists(client, doc_type, object_id):
         client.update(
             index=settings.ES_INDEX,
             doc_type=doc_type,

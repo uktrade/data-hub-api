@@ -9,7 +9,7 @@ class Connector:
 
     def __init__(self, table_name):
         self.table_name = table_name
-        self.base_url = '{host}:{port}'.format(host=settings.KORBEN_HOST, port=settings.KORBEN_PORT)
+        self.base_url = 'http://{host}:{port}'.format(host=settings.KORBEN_HOST, port=settings.KORBEN_PORT)
 
     def post(self, data, update=False):
         """Perform POST operations: create and update.
@@ -18,7 +18,6 @@ class Connector:
         :param update: whether the POST request has to be treated as an UPDATE
         :return: requests Response object
         """
-
         if update:
             url = '{base_url}/update/{table_name}/{id}'.format(
                 base_url=self.base_url,
@@ -26,12 +25,12 @@ class Connector:
                 id=data['id']
             )
         else:
-            url = '{base_url}/create/{table_name}/'.format(
+            url = '{base_url}/create/{table_name}'.format(
                 base_url=self.base_url,
                 table_name=self.table_name
             )
 
-        response = requests.post(url=url, data=data)
+        response = requests.post(url=url, json=data)
         return response
 
     def get(self, data):

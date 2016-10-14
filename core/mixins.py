@@ -11,24 +11,32 @@ class DeferredSaveModelMixin:
     def save(self, *args, **kwargs):
         """Save to Korben first, then alter the model instance with the data received back from Korben.
 
-        Also (temporarily) write to ES."""
+        Also (temporarily) write to ES.
+
+        We force feed an ID to Django, so we cannot differentiate between update or create without querying the db
+
+        https://docs.djangoproject.com/en/1.10/ref/models/instances/#how-django-knows-to-update-vs-insert
+        """
         self.clean()  # triggers custom validation
-        update = True if self.id else False
+
+        # objects is not accessible via instances
+        update = type(self).objects.filter(id=self.id).exists()
 
         korben_connector = Connector(table_name=self._meta.db_table)
         korben_data = self._convert_model_to_korben_format()
         korben_response = korben_connector.post(data=korben_data, update=update)
 
         if korben_response:
-            self._map_korben_response_to_model_instance()
+            self._map_korben_response_to_model_instance(korben_response)
             super().save(*args, **kwargs)
 
             # update ES
-            save_model(self, update=update)
+            save_model(self)
 
-    def _map_korben_response_to_model_instance(self):
+    def _map_korben_response_to_model_instance(self, korben_response):
         """Override this method to control what needs to be converted back into the model."""
-        raise NotImplementedError('This method must be implemented at the model class level.')
+        for key, value in korben_response.json().items():
+            setattr(self, key, value)
 
     def _convert_model_to_korben_format(self):
         """Override this method to have more granular control of what gets sent to Korben."""
