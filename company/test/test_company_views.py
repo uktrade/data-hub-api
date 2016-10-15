@@ -176,7 +176,8 @@ def test_add_company_partial_trading_address(api_client):
             'trading_address_1': 'test'
         })
 
-    assert 'Trading address must have at least address_1, town and country.' in str(error.value)
+    assert 'If a trading address is specified, it must be complete.' \
+        in str(error.value)
 
 
 def test_add_company_with_trading_address(api_client):

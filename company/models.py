@@ -113,7 +113,9 @@ class Company(CompanyAbstract):
         """Get the companies house data based on company number."""
         if self.company_number:
             try:
-                return CompaniesHouseCompany.objects.get(company_number=self.company_number)
+                return CompaniesHouseCompany.objects.get(
+                    company_number=self.company_number
+                )
             except CompaniesHouseCompany.DoesNotExist:
                 return None
 
@@ -125,10 +127,11 @@ class Company(CompanyAbstract):
     def clean(self):
         """Custom validation for trading address.
 
-        Trading address fields are not mandatory in the model definition,
-        if one of the fields is used then address_1, town and country have to be filled in.
+        Trading address fields are not mandatory in the model definition, but
+        if any trading address field is supplied then address_1, town and
+        country must also be provided.
         """
-        some_address_fields_existence = any((
+        some_trading_address_fields = any((
             self.trading_address_1,
             self.trading_address_2,
             self.trading_address_3,
@@ -138,13 +141,15 @@ class Company(CompanyAbstract):
             self.trading_address_postcode,
             self.trading_address_country
         ))
-        all_required_fields_existence = all((
+        trading_address_fields_missing = not all((
             self.trading_address_1,
             self.trading_address_country,
             self.trading_address_town
         ))
-        if some_address_fields_existence and not all_required_fields_existence:
-            raise ValidationError('Trading address must have at least address_1, town and country.')
+        if some_trading_address_fields and trading_address_fields_missing:
+            raise ValidationError(
+                'If a trading address is specified, it must be complete.'
+            )
         super(Company, self).clean()
 
 
