@@ -49,4 +49,9 @@ def odata_to_django(odata_tablename, odata_dict):
             if not value:
                 continue
             django_dict[django_col] = value
+    for odata_cols, django_col, func in mapping.get('local_fn', []):
+        args = []
+        for odata_col in odata_cols:
+            args.append(odata_dict[odata_col])
+        django_dict[django_col] = func(*args)
     return django_dict
