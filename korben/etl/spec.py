@@ -51,13 +51,30 @@ MAPPINGS.update({
             ('optevia_StateCounty', 'registered_address_county'),
             ('optevia_PostCode', 'registered_address_postcode'),
             ('optevia_Country_Id', 'registered_address_country_id'),
-            # ('optevia_UKRegion_Id', 'uk_region_id'), did it fall out?
+            ('optevia_UKRegion_Id', 'uk_region_id'),
             ('Description', 'description'),
-            ('ModifiedOn', 'modified_on'),
-            ('CreatedOn', 'created_on'),
+            # ('ModifiedOn', 'modified_on'), no longer wanted?
+            # ('CreatedOn', 'created_on'),
         ),
         'local_fn': (
             ((), 'archived', lambda: False),
+        ),
+        'empty_strings': (
+            'alias',
+            'description',
+            'registered_address_1',
+            'registered_address_2',
+            'registered_address_3',
+            'registered_address_4',
+            'registered_address_county',
+            'registered_address_postcode',
+            'trading_address_1',
+            'trading_address_2',
+            'trading_address_3',
+            'trading_address_4',
+            'trading_address_town',
+            'trading_address_county',
+            'trading_address_postcode',
         ),
     },
     'SystemUserSet': {
