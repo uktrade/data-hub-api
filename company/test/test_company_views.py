@@ -58,6 +58,7 @@ def test_detail_company_with_company_number(api_client):
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data['id'] == str(company.pk)
+    assert response.data['companies_house_data']
     assert response.data['companies_house_data']['id'] == ch_company.id
     assert response.data['registered_name'] == ch_company.name
     assert response.data['trading_name'] == company.alias

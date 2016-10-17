@@ -1,4 +1,5 @@
 """General mixins."""
+from rest_framework import status
 
 from core.utils import model_to_dictionary
 from es.services import save_model
@@ -26,12 +27,14 @@ class DeferredSaveModelMixin:
         korben_data = self._convert_model_to_korben_format()
         korben_response = korben_connector.post(data=korben_data, update=update)
 
-        if korben_response:
+        if korben_response.status_code == status.HTTP_200_OK:
             self._map_korben_response_to_model_instance(korben_response)
             super().save(*args, **kwargs)
 
             # update ES
             save_model(self)
+        else:
+            raise Exception(korben_response.json())
 
     def _map_korben_response_to_model_instance(self, korben_response):
         """Override this method to control what needs to be converted back into the model."""

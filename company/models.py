@@ -42,7 +42,7 @@ class Country(BaseConstantModel):
     pass
 
 
-class CompanyAbstract(BaseModel):
+class CompanyAbstract(models.Model):
     """Share as much as possible in the company representation."""
 
     company_number = models.CharField(
@@ -72,7 +72,7 @@ class CompanyAbstract(BaseModel):
         return self.name
 
 
-class Company(CompanyAbstract):
+class Company(CompanyAbstract, BaseModel):
     """Representation of the company as per CDMS."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)

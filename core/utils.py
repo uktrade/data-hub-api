@@ -17,7 +17,6 @@ def model_to_dictionary(model_instance, fk_ids=False):
     :param fk_ids: If True it converts the FKs into this format 'country_id'=1
                    If False it converts the FKs into this format 'country'='United Kingdom'
     """
-
     data = {}
     for field in model_instance._meta.fields:
         if isinstance(field, ForeignKey):
@@ -28,8 +27,6 @@ def model_to_dictionary(model_instance, fk_ids=False):
                 data[field.name] = field_value.name if field_value else None
         elif isinstance(field, ManyToManyField):
             pass
-        elif isinstance(field, DateField):
-            data[field.name] = str(getattr(model_instance, field.name))
         else:
             data[field.name] = getattr(model_instance, field.name)
     return data

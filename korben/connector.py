@@ -1,22 +1,10 @@
 """Talk to Korben API for saving."""
 
-import json
-import uuid
 
 from django.conf import settings
 
 import requests
-
-class KorbenJSONEncoder(json.JSONEncoder):
-
-    handlers = {
-        uuid.UUID: str
-    }
-
-    def default(self, obj):
-        handler = self.handlers.get(type(obj))
-        if handler: return handler(obj)
-        return super().default(obj)
+from django.core.serializers.json import DjangoJSONEncoder
 
 
 class Connector:
@@ -26,7 +14,7 @@ class Connector:
     }
 
     def __init__(self, table_name):
-        self.encode_json = KorbenJSONEncoder().encode
+        self.encode_json = DjangoJSONEncoder().encode
         self.table_name = table_name
         self.base_url = 'http://{host}:{port}'.format(host=settings.KORBEN_HOST, port=settings.KORBEN_PORT)
 
@@ -38,10 +26,9 @@ class Connector:
         :return: requests Response object
         """
         if update:
-            url = '{base_url}/update/{table_name}/{id}'.format(
+            url = '{base_url}/update/{table_name}'.format(
                 base_url=self.base_url,
-                table_name=self.table_name,
-                id=data['id']
+                table_name=self.table_name
             )
         else:
             url = '{base_url}/create/{table_name}'.format(
