@@ -9,7 +9,7 @@ class BaseModel(DeferredSaveModelMixin, models.Model):
     """Common fields for most of the models we use."""
 
     archived = models.BooleanField(default=False)
-    archived_on = models.DateTimeField(default=now)
+    archived_on = models.DateTimeField(default=now, null=True)
     archived_reason = models.TextField(null=True)
     archived_by = models.ForeignKey(User, null=True)
 
