@@ -15,6 +15,7 @@ CONSTANT_MAPPINGS = (
     ('optevia_titleId', 'optevia_titleSet', 'optevia_name', 'company_title'),
     ('optevia_contactroleId', 'optevia_contactroleSet', 'optevia_name', 'company_role'),
     ('optevia_interactioncommunicationchannelId', 'optevia_interactioncommunicationchannelSet', 'optevia_name', 'company_interactiontype'),
+    ('TeamId', 'TeamSet', 'Name', 'company_team'),
 )
 
 
@@ -164,7 +165,7 @@ def get_es_types():
 COLNAME_LONGSHORT = {}
 COLNAME_SHORTLONG = {}
 _COLNAME_MAPPING_PATH = os.path.join(
-    os.dirname(__file__), 'cdms-psql-column-mapping.csv'
+    os.path.dirname(__file__), 'cdms-psql-column-mapping.csv'
 )
 with open(_COLNAME_MAPPING_PATH) as fh:
     for table_name, long_col, short_col in csv.reader(fh):
