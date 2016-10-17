@@ -1,3 +1,6 @@
+import csv
+import os
+import collections
 from korben import services
 
 MAPPINGS = {}
@@ -133,15 +136,15 @@ def update(original_dict, update_dict):
     return updated_dict
 
 ES_INDEX = 'datahub'
-__ES_TYPES = None
+_ES_TYPES = None
 
 
 def get_es_types():
     'since this introspects the db to get table information, it must be called'
-    global __ES_TYPES
-    if __ES_TYPES is not None:
-        return __ES_TYPES
-    __ES_TYPES = {}
+    global _ES_TYPES
+    if _ES_TYPES is not None:
+        return _ES_TYPES
+    _ES_TYPES = {}
     tables = services.db.get_django_metadata().tables.values()
     for table in tables:  # NOQA
         if table.name not in DJANGO_LOOKUP:
@@ -154,5 +157,16 @@ def get_es_types():
             else:
                 column_name = column.name[:-3]  # strip `_id` suffix
                 properties[column_name] = ES_STRING_ANALYZED
-        __ES_TYPES[table.name] = {'properties': properties}
-    return __ES_TYPES
+        _ES_TYPES[table.name] = {'properties': properties}
+    return _ES_TYPES
+
+
+COLNAME_LONGSHORT = {}
+COLNAME_SHORTLONG = {}
+_COLNAME_MAPPING_PATH = os.path.join(
+    os.dirname(__file__), 'cdms-psql-column-mapping.csv'
+)
+with open(_COLNAME_MAPPING_PATH) as fh:
+    for table_name, long_col, short_col in csv.reader(fh):
+        COLNAME_LONGSHORT[(table_name, long_col)] = short_col
+        COLNAME_SHORTLONG[(table_name, short_col)] = long_col

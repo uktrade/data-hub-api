@@ -55,3 +55,27 @@ def odata_to_django(odata_tablename, odata_dict):
             args.append(odata_dict[odata_col])
         django_dict[django_col] = func(*args)
     return django_dict
+
+
+def colnames_shortlong(table_name, data_in):
+    'Map from short column names to long column names'
+    data_out = {}
+    for col_short, value in data_in.items():
+        col_long = spec.COLNAME_SHORTLONG.get((table_name, col_short))
+        if col_long:
+            data_out[col_long] = value
+        else:
+            data_out[col_short] = value
+    return data_out
+
+
+def colnames_longshort(table_name, data_in):
+    'Map from long column names to short column names'
+    data_out = {}
+    for col_long, value in data_in.items():
+        col_short = spec.COLNAME_LONGSHORT.get((table_name, col_long))
+        if col_short:
+            data_out[col_short] = value
+        else:
+            data_out[col_long] = value
+    return data_out
