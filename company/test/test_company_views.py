@@ -146,7 +146,8 @@ def test_add_company(api_client):
         'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
         'registered_address_country': constants.Country.united_kingdom.value.id,
         'registered_address_1': '75 Stramford Road',
-        'registered_address_town': 'London'
+        'registered_address_town': 'London',
+        'uk_region': constants.UKRegion.england.value.id
     })
 
     assert response.status_code == status.HTTP_201_CREATED
@@ -174,11 +175,11 @@ def test_add_company_partial_trading_address(api_client):
             'registered_address_country': constants.Country.united_kingdom.value.id,
             'registered_address_1': '75 Stramford Road',
             'registered_address_town': 'London',
-            'trading_address_1': 'test'
+            'trading_address_1': 'test',
+            'uk_region': constants.UKRegion.england.value.id
         })
 
-    assert 'If a trading address is specified, it must be complete.' \
-        in str(error.value)
+    assert 'If a trading address is specified, it must be complete.' in str(error.value)
 
 
 def test_add_company_with_trading_address(api_client):
@@ -194,7 +195,8 @@ def test_add_company_with_trading_address(api_client):
         'registered_address_town': 'London',
         'trading_address_country': constants.Country.ireland.value.id,
         'trading_address_1': '1 Hello st.',
-        'trading_address_town': 'Dublin'
+        'trading_address_town': 'Dublin',
+        'uk_region': constants.UKRegion.england.value.id
     })
 
     assert response.status_code == status.HTTP_201_CREATED
