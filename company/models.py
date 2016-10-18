@@ -77,7 +77,7 @@ class Company(CompanyAbstract, BaseModel):
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     alias = models.CharField(max_length=MAX_LENGTH, blank=True, help_text='Trading name')
-    business_type = models.ForeignKey('BusinessType', null=True)
+    business_type = models.ForeignKey('BusinessType')
     sector = models.ForeignKey('Sector')
     employee_range = models.ForeignKey('EmployeeRange', null=True)
     turnover_range = models.ForeignKey('TurnoverRange', null=True)

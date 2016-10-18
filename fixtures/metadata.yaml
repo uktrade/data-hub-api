@@ -7563,3 +7563,36 @@
 - model: company.role
   pk: dc02a687-5da3-e211-a646-e4115bead28a
   fields: {name: Managing Director}
+
+
+# Undefined constants
+- model: company.businesstype
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.sector
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.employeerange
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.team
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.turnoverrange
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.ukregion
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.country
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.interactiontype
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.title
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.role
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
