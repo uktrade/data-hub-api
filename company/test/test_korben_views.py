@@ -20,7 +20,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_korben_company_create(api_client):
-    """Create a company"""
+    """Create a company."""
 
     url = reverse('korben:company_company')
     data = {
@@ -41,7 +41,7 @@ def test_korben_company_create(api_client):
 
 
 def test_korben_company_update(api_client):
-    """Update a company"""
+    """Update a company."""
 
     url = reverse('korben:company_company')
     company = factories.CompanyFactory()
@@ -60,12 +60,11 @@ def test_korben_company_update(api_client):
     response = api_client.post(url, data)
 
     assert response.status_code == status.HTTP_200_OK
-    company_from_db = Company.objects.get(pk=data['id'])
-    assert company_from_db.name == 'My little company'
+    assert Company.objects.filter(pk=data['id'], name='My little company').exists()
 
 
 def test_korben_contact_create(api_client):
-    """Create a contact"""
+    """Create a contact."""
 
     company = factories.CompanyFactory()
     url = reverse('korben:company_contact')
@@ -81,8 +80,34 @@ def test_korben_contact_create(api_client):
         'telephone_countrycode': '+44',
         'telephone_number': '123456789',
         'address_same_as_company': True,
+        'primary': True
     }
     response = api_client.post(url, data)
 
     assert response.status_code == status.HTTP_200_OK
     assert Contact.objects.get(pk=data['id'])
+
+
+def test_korben_contact_update(api_client):
+    """Update a contact."""
+
+    contact = factories.ContactFactory()
+    url = reverse('korben:company_contact')
+    data = {
+        'id': str(uuid.uuid4()),
+        'title_id': constants.Title.wing_commander.value.id,
+        'first_name': 'Mario',
+        'last_name': 'Smith',
+        'role_id': constants.Role.owner.value.id,
+        'company_id': contact.company.id,
+        'email': 'foo@bar.com',
+        'uk_region_id': constants.UKRegion.england.value.id,
+        'telephone_countrycode': '+44',
+        'telephone_number': '123456789',
+        'address_same_as_company': True,
+        'primary': True
+    }
+    response = api_client.post(url, data)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert Contact.objects.filter(pk=data['id'], first_name='Mario').exists()

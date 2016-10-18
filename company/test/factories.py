@@ -47,6 +47,7 @@ class ContactFactory(factory.django.DjangoModelFactory):
     role_id = constants.Role.owner.value.id
     company = factory.SubFactory(CompanyFactory)
     email = 'foo@bar.com'
+    primary = True
     uk_region_id = constants.UKRegion.england.value.id
     telephone_countrycode = '+44'
     telephone_number = '123456789'

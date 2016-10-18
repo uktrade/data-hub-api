@@ -34,7 +34,8 @@ def test_add_contact_address_same_as_company(api_client):
         'uk_region': constants.UKRegion.england.value.id,
         'telephone_countrycode': '+44',
         'telephone_number': '123456789',
-        'address_same_as_company': True
+        'address_same_as_company': True,
+        'primary': True
     })
 
     assert response.status_code == status.HTTP_201_CREATED
@@ -63,7 +64,8 @@ def test_add_contact_no_address(api_client):
             'email': 'foo@bar.com',
             'uk_region': constants.UKRegion.england.value.id,
             'telephone_countrycode': '+44',
-            'telephone_number': '123456789'
+            'telephone_number': '123456789',
+            'primary': True
         })
 
     assert 'Please select either address_as_company or enter an address manually.' in str(error.value)
@@ -85,7 +87,8 @@ def test_add_contact_partial_manual_address(api_client):
             'uk_region': constants.UKRegion.england.value.id,
             'telephone_countrycode': '+44',
             'telephone_number': '123456789',
-            'address_1': 'test'
+            'address_1': 'test',
+            'primary': True
         })
 
     assert 'address_1, town and country are required if an address is entered.' in str(error.value)
@@ -107,7 +110,8 @@ def test_add_contact_manual_address(api_client):
         'telephone_number': '123456789',
         'address_1': 'Foo st.',
         'address_town': 'London',
-        'address_country': constants.Country.united_kingdom.value.id
+        'address_country': constants.Country.united_kingdom.value.id,
+        'primary': True
     })
 
     assert response.status_code == status.HTTP_201_CREATED
