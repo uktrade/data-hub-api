@@ -1,6 +1,5 @@
 import csv
 import os
-import collections
 from korben import services
 
 MAPPINGS = {}
@@ -31,6 +30,8 @@ for source_pkey, source_table, source_name, target_table in CONSTANT_MAPPINGS:
     })
 
 MAPPINGS.update({
+    'optevia_serviceSet': {'to': None},
+    'optevia_projectserviceproviderSet': {'to': None},
     'AccountSet': {
         'to': 'company_company',
         'local': (
