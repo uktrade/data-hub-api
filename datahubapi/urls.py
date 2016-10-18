@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^search$', Search.as_view(), name='search'),
     url(r'^metadata/', include('company.metadata_urls')),
+    url(r'^korben/', include('company.korben_urls', namespace='korben')),
 ]
 
 if settings.DEBUG:
