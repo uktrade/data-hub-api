@@ -17,6 +17,10 @@ CONSTANT_MAPPINGS = (
     ('TeamId', 'TeamSet', 'Name', 'company_team'),
 )
 
+# Used to avoid having to make Django fields nullable, this is loaded into all
+# "enum" style tables in the Django database
+CONSTANT_UNDEFINED_ID = '0167b456-0ddd-49bd-8184-e3227a0b6396'
+
 
 for source_pkey, source_table, source_name, target_table in CONSTANT_MAPPINGS:
     MAPPINGS.update({
@@ -67,6 +71,7 @@ MAPPINGS.update({
             'registered_address_2',
             'registered_address_3',
             'registered_address_4',
+            'registered_address_town',
             'registered_address_county',
             'registered_address_postcode',
             'trading_address_1',
@@ -76,6 +81,12 @@ MAPPINGS.update({
             'trading_address_town',
             'trading_address_county',
             'trading_address_postcode',
+        ),
+        'use_undefined': (
+            'registered_address_country_id',
+            'business_type_id',
+            'sector_id',
+            'uk_region_id',
         ),
     },
     'SystemUserSet': {
@@ -109,9 +120,15 @@ MAPPINGS.update({
             ('optevia_PostCode', 'address_postcode'),
             ('optevia_Country_Id', 'address_country_id'),
             ('optevia_UKRegion_Id', 'uk_region_id'),
+            ('optevia_ContactRole_Id', 'role_id'),
 
             # ('ModifiedOn', 'modified_on'),  not wanted in leeloo?
             # ('CreatedOn', 'created_on'),
+        ),
+        'use_undefined': (
+            'role_id',
+            'company_id',
+            'uk_region_id',
         ),
     },
 
@@ -130,9 +147,11 @@ MAPPINGS.update({
             ('optevia_Contact_Id', 'contact_id'),
             ('optevia_Organisation_Id', 'company_id'),
             ('optevia_Notes', 'notes'),
+            ('optevia_ServiceProvider_Id', 'service_provider_id'),
+            ('optevia_Service_Id', 'service_id'),
 
-            ('ModifiedOn', 'modified_on'),
-            ('CreatedOn', 'created_on'),
+            # ('ModifiedOn', 'modified_on'),  not wanted in leeloo?
+            # ('CreatedOn', 'created_on'),
         ),
         'local_fn': (
             ((), 'archived', lambda: False),

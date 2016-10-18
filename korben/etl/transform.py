@@ -54,10 +54,11 @@ def odata_to_django(odata_tablename, odata_dict):
         for odata_col in odata_cols:
             args.append(odata_dict[odata_col])
         django_dict[django_col] = func(*args)
-
-    # do this last of all
     for django_col in mapping.get('empty_strings', ()):
         django_dict[django_col] = django_dict.get(django_col) or ''
+    for django_col in mapping.get('use_undefined', ()):
+        django_dict[django_col] =\
+            django_dict.get(django_col) or spec.CONSTANT_UNDEFINED_ID
     return django_dict
 
 
