@@ -219,6 +219,7 @@ class Contact(BaseModel):
     last_name = models.CharField(max_length=MAX_LENGTH)
     role = models.ForeignKey('Role')
     company = models.ForeignKey('Company', related_name='contacts')
+    primary = models.BooleanField()
     teams = models.ManyToManyField('Team', blank=True)
     telephone_countrycode = models.CharField(max_length=MAX_LENGTH)
     telephone_number = models.CharField(max_length=MAX_LENGTH)
