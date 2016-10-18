@@ -2,6 +2,8 @@
 Functions for transforming dicts from Django to OData shape and back again,
 according to spec.MAPPINGS
 '''
+import operator
+import functools
 from . import spec
 
 
@@ -36,10 +38,12 @@ def odata_to_django(odata_tablename, odata_dict):
     'Transform an OData dict to a Django dict'
     django_dict = {}
     mapping = spec.MAPPINGS[odata_tablename]
+
     for odata_col, django_col in mapping.get('local', ()):
         value = odata_dict.get(odata_col)
         if odata_col:
             django_dict[django_col] = value
+
     for odata_prefix, field_map in mapping.get('nonflat', ()):
         prefix_dict = odata_dict.get(odata_prefix)
         if not prefix_dict:
@@ -49,16 +53,29 @@ def odata_to_django(odata_tablename, odata_dict):
             if not value:
                 continue
             django_dict[django_col] = value
+
     for odata_cols, django_col, func in mapping.get('local_fn', ()):
         args = []
         for odata_col in odata_cols:
             args.append(odata_dict[odata_col])
         django_dict[django_col] = func(*args)
-    for django_col in mapping.get('empty_strings', ()):
-        django_dict[django_col] = django_dict.get(django_col) or ''
+
     for django_col in mapping.get('use_undefined', ()):
         django_dict[django_col] =\
             django_dict.get(django_col) or spec.CONSTANT_UNDEFINED_ID
+
+    for django_col, func in mapping.get('defaults', ()):
+        django_dict[django_col] = django_dict.get(django_col) or func()
+
+    for odata_cols, django_col, _ in mapping.get('concat', ()):
+        value = functools.reduce(
+            lambda acc, col: acc + (odata_dict[col] or ''), odata_cols, ''
+        )
+        django_dict[django_col] = value
+
+    # call this last
+    for django_col in mapping.get('empty_strings', ()):
+        django_dict[django_col] = django_dict.get(django_col) or ''
     return django_dict
 
 

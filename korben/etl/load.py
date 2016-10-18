@@ -47,11 +47,11 @@ def to_sqla_table_idempotent(table, data):
                 missing[table.name].add(row[primary_key])
                 missing[parsed.group('table')].add(parsed.group('pkey'))
                 continue
-            LOGGER.error(exc)
             LOGGER.error(
-                '%s %s (%s) failed on something',
+                '%s %s (%s) failed on :',
                 datetime.datetime.now(), table.name, row[primary_key]
             )
+            LOGGER.error(str(exc).split('\n')[0])
     return results, missing
 
 

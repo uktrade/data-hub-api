@@ -15,6 +15,7 @@ CONSTANT_MAPPINGS = (
     ('optevia_contactroleId', 'optevia_contactroleSet', 'optevia_name', 'company_role'),
     ('optevia_interactioncommunicationchannelId', 'optevia_interactioncommunicationchannelSet', 'optevia_name', 'company_interactiontype'),
     ('TeamId', 'TeamSet', 'Name', 'company_team'),
+    ('optevia_serviceId', 'optevia_serviceSet', 'optevia_name', 'company_service'),
 )
 
 # Used to avoid having to make Django fields nullable, this is loaded into all
@@ -34,7 +35,6 @@ for source_pkey, source_table, source_name, target_table in CONSTANT_MAPPINGS:
     })
 
 MAPPINGS.update({
-    'optevia_serviceSet': {'to': None},
     'optevia_projectserviceproviderSet': {'to': None},
     'AccountSet': {
         'to': 'company_company',
@@ -61,8 +61,8 @@ MAPPINGS.update({
             # ('ModifiedOn', 'modified_on'), no longer wanted?
             # ('CreatedOn', 'created_on'),
         ),
-        'local_fn': (
-            ((), 'archived', lambda: False),
+        'defaults': (
+            ('archived', lambda: False),
         ),
         'empty_strings': (
             'alias',
@@ -81,6 +81,7 @@ MAPPINGS.update({
             'trading_address_town',
             'trading_address_county',
             'trading_address_postcode',
+            'archived_reason',
         ),
         'use_undefined': (
             'registered_address_country_id',
@@ -101,15 +102,15 @@ MAPPINGS.update({
     'ContactSet': {
         'to': 'company_contact',
         'local': (
+            ('ContactId', 'id'),
             ('Title', 'title_id'),
-            ('FirstName', 'first_name'),
             ('LastName', 'last_name'),
+            # ('FirstName', 'first_name'),
             # ('MiddleName', None),  data migration to move these
             # ('optevia_LastVerified', None)  korben magic to add current on write
             ('ParentCustomerId_Id', 'company_id'),
             ('optevia_PrimaryContact', 'primary'),
             ('optevia_CountryCode', 'telephone_countrycode'),
-            # ('optevia_AreaCode` `++` `optevia_TelephoneNumber` | `← * →` | `telephone_number` | Telephone number | Korben to fill area code |
             ('EMailAddress1', 'email'),
             ('optevia_Address1', 'address_1'),
             ('optevia_Address2', 'address_2'),
@@ -125,10 +126,30 @@ MAPPINGS.update({
             # ('ModifiedOn', 'modified_on'),  not wanted in leeloo?
             # ('CreatedOn', 'created_on'),
         ),
+        'concat': (
+            (('optevia_AreaCode', 'optevia_TelephoneNumber'), 'telephone_number', 'optevia_TelephoneNumber'),
+            (('FirstName', 'MiddleName'), 'first_name', 'FirstName'),
+        ),
         'use_undefined': (
+            'title_id',
             'role_id',
             'company_id',
             'uk_region_id',
+            'telephone_number',
+        ),
+        'empty_strings': (
+            'archived_reason',
+            'address_1',
+            'address_2',
+            'address_3',
+            'address_4',
+            'address_town',
+            'address_county',
+            'address_postcode',
+        ),
+        'defaults': (
+            ('archived', lambda: False),
+            ('address_same_as_company', lambda: False),
         ),
     },
 
@@ -153,8 +174,11 @@ MAPPINGS.update({
             # ('ModifiedOn', 'modified_on'),  not wanted in leeloo?
             # ('CreatedOn', 'created_on'),
         ),
-        'local_fn': (
-            ((), 'archived', lambda: False),
+        'empty_strings': (
+            'archived_reason',
+        ),
+        'defaults': (
+            ('archived', lambda: False),
         ),
     },
 })
