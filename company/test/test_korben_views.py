@@ -11,7 +11,7 @@ from django.urls import reverse
 # mark the whole module for db use
 from rest_framework import status
 
-from company.models import Company
+from company.models import Company, Contact
 from core import constants
 
 from . import factories
@@ -63,3 +63,26 @@ def test_korben_company_update(api_client):
     company_from_db = Company.objects.get(pk=data['id'])
     assert company_from_db.name == 'My little company'
 
+
+def test_korben_contact_create(api_client):
+    """Create a contact"""
+
+    company = factories.CompanyFactory()
+    url = reverse('korben:company_contact')
+    data = {
+        'id': str(uuid.uuid4()),
+        'title_id': constants.Title.wing_commander.value.id,
+        'first_name': 'John',
+        'last_name': 'Smith',
+        'role_id': constants.Role.owner.value.id,
+        'company_id': company.id,
+        'email': 'foo@bar.com',
+        'uk_region_id': constants.UKRegion.england.value.id,
+        'telephone_countrycode': '+44',
+        'telephone_number': '123456789',
+        'address_same_as_company': True,
+    }
+    response = api_client.post(url, data)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert Contact.objects.get(pk=data['id'])
