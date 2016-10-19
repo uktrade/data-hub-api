@@ -42,11 +42,12 @@ class DeferredSaveModelMixin:
 
     def _map_korben_response_to_model_instance(self, korben_response):
         """Override this method to control what needs to be converted back into the model."""
+
         if korben_response.status_code == status.HTTP_200_OK:
             for key, value in korben_response.json().items():
                 setattr(self, key, value)
-            else:
-                raise KorbenException(korben_response.json())
+        else:
+            raise KorbenException(korben_response.json())
 
     def _convert_model_to_korben_format(self):
         """Override this method to have more granular control of what gets sent to Korben."""
