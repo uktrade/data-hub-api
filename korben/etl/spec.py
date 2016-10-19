@@ -151,6 +151,7 @@ MAPPINGS.update({
             'address_postcode',
         ),
         'defaults': (
+            ('primary', lambda: True),
             ('archived', lambda: False),
             ('address_same_as_company', lambda: False),
             ('email', lambda: FAKE_EMAIL),
