@@ -3,9 +3,9 @@ from functools import partial
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
 
-from company.models import Company, Contact, Interaction
+from company.models import Advisor, Company, Contact, Interaction
 
-EXPOSED_MODELS = (Company, Contact, Interaction)
+EXPOSED_MODELS = (Advisor, Company, Contact, Interaction)
 
 
 @require_POST
