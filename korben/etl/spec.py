@@ -168,8 +168,8 @@ MAPPINGS.update({
             ('optevia_Contact_Id', 'contact_id'),
             ('optevia_Organisation_Id', 'company_id'),
             ('optevia_Notes', 'notes'),
-            ('optevia_ServiceProvider_Id', 'service_provider_id'),
-            ('optevia_Service_Id', 'service_id'),
+            # ('optevia_ServiceProvider_Id', 'service_provider_id'), waiting for django model
+            # ('optevia_Service_Id', 'service_id'),
 
             # ('ModifiedOn', 'modified_on'),  not wanted in leeloo?
             # ('CreatedOn', 'created_on'),

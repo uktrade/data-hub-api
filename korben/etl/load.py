@@ -2,7 +2,6 @@ import collections
 import datetime
 import itertools
 import logging
-import os
 import re
 
 from sqlalchemy.dialects.postgresql import insert
@@ -17,6 +16,8 @@ INTEGRITY_DETAILS = re.compile('(\(.+\))=\((?P<pkey>.+)\).+"(?P<table>.+)"')
 
 def to_sqla_table(table, data):
     'Load data into an SQLA table'
+    if not isinstance(data, (list, map, filter)):
+        raise Exception('`data` arg is not a list, map or filter object')
     results = []
     for chunk in itertools.zip_longest(*[iter(data)] * 5000):
         results.append(
@@ -32,6 +33,8 @@ def to_sqla_table_idempotent(table, data):
     Idempotently load data into an SQLA table, temporarily write out details on
     integrity errors to a file
     '''
+    if not isinstance(data, (list, map, filter)):
+        raise Exception('`data` arg is not a list, map or filter object')
     primary_key = etl.utils.primary_key(table)
     results = []
     missing = collections.defaultdict(set)
