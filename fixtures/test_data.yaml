@@ -13,6 +13,7 @@
     registered_address_town: Willington,
     registered_address_postcode: NE28 5JB,
     registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a,
+    uk_region: 824cd12a-6095-e211-a939-e4115bead28a
   }
 
 - model: company.company
@@ -25,7 +26,8 @@
     registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a,
     registered_address_1: 66 Marcham Road,
     registered_address_town: Bordley,
-    registered_address_postcode: BD23 8RZ
+    registered_address_postcode: BD23 8RZ,
+    uk_region: 824cd12a-6095-e211-a939-e4115bead28a
   }
 
 - model: company.companieshousecompany
