@@ -2,15 +2,16 @@ from django.conf import settings
 from django.conf.urls import url, include
 from rest_framework import routers
 
-from company.views import CompanyViewSet, CompaniesHouseCompanyReadOnlyViewSet, ContactViewSet, InteractionViewSet
+from company import views
 from search.views import Search
 
 
 router = routers.SimpleRouter()
-router.register(r'company', CompanyViewSet)
-router.register(r'ch-company', CompaniesHouseCompanyReadOnlyViewSet)
-router.register(r'contact', ContactViewSet)
-router.register(r'interaction', InteractionViewSet)
+router.register(r'company', views.CompanyViewSet)
+router.register(r'ch-company', views.CompaniesHouseCompanyReadOnlyViewSet)
+router.register(r'contact', views.ContactViewSet)
+router.register(r'interaction', views.InteractionViewSet)
+router.register(r'advisor', views.AdvisorReadOnlyViewSet)
 
 
 urlpatterns = [
