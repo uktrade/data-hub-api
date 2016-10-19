@@ -45,12 +45,6 @@ class Country(BaseConstantModel):
 class CompanyAbstract(models.Model):
     """Share as much as possible in the company representation."""
 
-    company_number = models.CharField(
-        max_length=MAX_LENGTH,
-        null=True,
-        db_index=True,
-        unique=True
-    )
     name = models.CharField(max_length=MAX_LENGTH)
     registered_address_1 = models.CharField(max_length=MAX_LENGTH)
     registered_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
@@ -75,6 +69,7 @@ class CompanyAbstract(models.Model):
 class Company(CompanyAbstract, BaseModel):
     """Representation of the company as per CDMS."""
 
+    company_number = models.CharField(max_length=MAX_LENGTH, null=True)
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     alias = models.CharField(max_length=MAX_LENGTH, blank=True, help_text='Trading name')
     business_type = models.ForeignKey('BusinessType')
@@ -93,6 +88,7 @@ class Company(CompanyAbstract, BaseModel):
         related_name='company_future_interest_countries'
     )
     description = models.TextField(blank=True)
+    website = models.URLField(blank=True, null=True)
     uk_region = models.ForeignKey('UKRegion')
     trading_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
     trading_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
@@ -156,6 +152,12 @@ class Company(CompanyAbstract, BaseModel):
 class CompaniesHouseCompany(CompanyAbstract):
     """Representation of Companies House company."""
 
+    company_number = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        db_index=True,
+        unique=True
+    )
     company_category = models.CharField(max_length=MAX_LENGTH, blank=True)
     company_status = models.CharField(max_length=MAX_LENGTH, blank=True)
     sic_code_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
