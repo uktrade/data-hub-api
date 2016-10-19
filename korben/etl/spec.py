@@ -22,6 +22,8 @@ CONSTANT_MAPPINGS = (
 # "enum" style tables in the Django database
 CONSTANT_UNDEFINED_ID = '0167b456-0ddd-49bd-8184-e3227a0b6396'
 
+# ~8% of contacts in CDMS don’t have an email, we use the following placeholder
+FAKE_EMAIL = 'fake@no-email-address-supplied.com'
 
 for source_pkey, source_table, source_name, target_table in CONSTANT_MAPPINGS:
     MAPPINGS.update({
@@ -139,6 +141,7 @@ MAPPINGS.update({
         ),
         'empty_strings': (
             'archived_reason',
+            'telephone_countrycode',
             'address_1',
             'address_2',
             'address_3',
@@ -150,6 +153,7 @@ MAPPINGS.update({
         'defaults': (
             ('archived', lambda: False),
             ('address_same_as_company', lambda: False),
+            ('email', lambda: FAKE_EMAIL),
         ),
     },
 
