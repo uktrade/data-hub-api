@@ -6,6 +6,17 @@ from django.utils.timezone import now
 from core import constants
 
 
+class AdvisorFactory(factory.django.DjangoModelFactory):
+    """Advisor factory."""
+
+    id = factory.Sequence(lambda x: '{0}'.format(uuid.uuid4()))
+    first_name = factory.Sequence(lambda x: 'name {0}'.format(x))
+    last_name = factory.Sequence(lambda x: 'surname {0}'.format(x))
+
+    class Meta:
+        model = 'company.Advisor'
+
+
 class CompanyFactory(factory.django.DjangoModelFactory):
     """Company factory."""
 

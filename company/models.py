@@ -7,6 +7,7 @@ from django.db import models
 from django.utils.functional import cached_property
 
 from core import constants
+from core.mixins import DeferredSaveModelMixin
 from core.models import BaseConstantModel, BaseModel
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -176,7 +177,7 @@ class InteractionType(BaseConstantModel):
     pass
 
 
-class Advisor(models.Model):
+class Advisor(DeferredSaveModelMixin, models.Model):
     """Advisor."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)

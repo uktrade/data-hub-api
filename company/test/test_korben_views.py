@@ -11,7 +11,7 @@ from django.urls import reverse
 # mark the whole module for db use
 from rest_framework import status
 
-from company.models import Company, Contact
+from company.models import Company, Contact, Advisor
 from core import constants
 
 from . import factories
@@ -111,3 +111,18 @@ def test_korben_contact_update(api_client):
 
     assert response.status_code == status.HTTP_200_OK
     assert Contact.objects.filter(pk=data['id'], first_name='Mario').exists()
+
+
+def test_korben_advisor_create(api_client):
+    """Create an advisor."""
+
+    url = reverse('korben:company_advisor')
+    data = {
+        'id': str(uuid.uuid4()),
+        'first_name': 'John',
+        'last_name': 'Smith'
+    }
+    response = api_client.post(url, data)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert Advisor.objects.get(pk=data['id'])
