@@ -176,9 +176,19 @@ class InteractionType(BaseConstantModel):
     pass
 
 
-class Advisor(BaseConstantModel):
+class Advisor(models.Model):
     """Advisor."""
-    pass
+
+    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
+    first_name = models.CharField(max_length=MAX_LENGTH)
+    last_name = models.CharField(max_length=MAX_LENGTH)
+
+    @cached_property
+    def name(self):
+        return '{first_name} {last_name}'.format(first_name=self.first_name, last_name=self.last_name)
+
+    def __str__(self):
+        return self.name
 
 
 class Interaction(BaseModel):
