@@ -204,7 +204,7 @@ class Interaction(BaseModel):
     company = models.ForeignKey('Company', related_name='interactions')
     contact = models.ForeignKey('Contact', related_name='interactions')
     service = models.ForeignKey('Service')
-    service_provider = models.ForeignKey('Advisor', related_name='interaction_service_provider')
+    service_provider = models.ForeignKey('Team')
 
     def __str__(self):
         return self.subject
