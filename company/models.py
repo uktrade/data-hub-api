@@ -223,6 +223,11 @@ class Team(BaseConstantModel):
     pass
 
 
+class Service(BaseConstantModel):
+    """Service."""
+    pass
+
+
 class Contact(BaseModel):
     """Contact from CDMS."""
 
