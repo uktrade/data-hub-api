@@ -52,8 +52,16 @@ def odata_to_django(odata_tablename, odata_dict):
             django_dict[django_col] = value
 
     for odata_prefix, field_map in mapping.get('nonflat', ()):
+        # eurgh has to work two ways; once for data from cdms once for data
+        # from the odata database
         prefix_dict = odata_dict.get(odata_prefix)
         if not prefix_dict:
+            for odata_suffix, django_col in field_map:
+                value = odata_dict.get(
+                    "{0}_{1}".format(odata_prefix, odata_suffix)
+                )
+                if value:
+                    django_dict[django_col] = value
             continue
         for odata_suffix, django_col in field_map:
             value = prefix_dict.get(odata_suffix)
