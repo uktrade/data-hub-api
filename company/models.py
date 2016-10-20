@@ -197,12 +197,14 @@ class Interaction(BaseModel):
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     interaction_type = models.ForeignKey('InteractionType', null=True)
-    subject = models.TextField(null=True)
-    date_of_interaction = models.DateTimeField(null=True)
-    advisor = models.ForeignKey('Advisor', null=True)
-    notes = models.TextField(null=True)
-    company = models.ForeignKey('Company', null=True, related_name='interactions')
-    contact = models.ForeignKey('Contact', null=True, related_name='interactions')
+    subject = models.TextField()
+    date_of_interaction = models.DateTimeField()
+    advisor = models.ForeignKey('Advisor')
+    notes = models.TextField()
+    company = models.ForeignKey('Company', related_name='interactions')
+    contact = models.ForeignKey('Contact', related_name='interactions')
+    service = models.ForeignKey('Service')
+    service_provider = models.ForeignKey('Advisor', related_name='interaction_service_provider')
 
     def __str__(self):
         return self.subject
