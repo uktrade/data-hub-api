@@ -183,6 +183,7 @@ class Advisor(DeferredSaveModelMixin, models.Model):
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
+    dit_team = models.ForeignKey('Team')
 
     @cached_property
     def name(self):
@@ -199,12 +200,12 @@ class Interaction(BaseModel):
     interaction_type = models.ForeignKey('InteractionType', null=True)
     subject = models.TextField()
     date_of_interaction = models.DateTimeField()
-    advisor = models.ForeignKey('Advisor')
+    dit_advisor = models.ForeignKey('Advisor')
     notes = models.TextField()
     company = models.ForeignKey('Company', related_name='interactions')
     contact = models.ForeignKey('Contact', related_name='interactions')
     service = models.ForeignKey('Service')
-    service_provider = models.ForeignKey('Team')
+    dit_team = models.ForeignKey('Team')
 
     def __str__(self):
         return self.subject

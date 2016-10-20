@@ -15,6 +15,7 @@ METADATA_MAPPING = {
     'role': models.Role,
     'sector': models.Sector,
     'service': models.Service,
+    'team': models.Team,
     'title': models.Title,
     'turnover': models.TurnoverRange,
     'uk-region': models.UKRegion
