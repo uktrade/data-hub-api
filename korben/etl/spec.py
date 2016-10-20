@@ -183,11 +183,14 @@ MAPPINGS.update({
             # ('CreatedOn', 'created_on'),
         ),
         'nonflat': (
-            ('optevia_InteractionCommunicationChannel', (('Id', 'interaction_type_id'),),),
-            ('optevia_Advisor', (('Id', 'advisor_id'),),),
+            (
+                'optevia_InteractionCommunicationChannel',
+                (('Id', 'interaction_type_id'),),
+            ),
+            ('optevia_Advisor', (('Id', 'dit_advisor_id'),),),
             ('optevia_Contact', (('Id', 'contact_id'),),),
             ('optevia_Organisation', (('Id', 'company_id'),),),
-            ('optevia_ServiceProvider', (('Id', 'service_provider_id'),),),
+            ('optevia_ServiceProvider', (('Id', 'dit_team__id'),),),
             ('optevia_Service', (('Id', 'service_id'),),),
         ),
         'nonflat_defaults': (
