@@ -14,7 +14,7 @@ CONSTANT_MAPPINGS = (
     ('optevia_titleId', 'optevia_titleSet', 'optevia_name', 'company_title'),
     ('optevia_contactroleId', 'optevia_contactroleSet', 'optevia_name', 'company_role'),
     ('optevia_interactioncommunicationchannelId', 'optevia_interactioncommunicationchannelSet', 'optevia_name', 'company_interactiontype'),
-    ('TeamId', 'TeamSet', 'Name', 'company_team'),
+    ('BusinessUnitId', 'BusinessUnitSet', 'Name', 'company_team'),
     ('optevia_serviceId', 'optevia_serviceSet', 'optevia_name', 'company_service'),
 )
 
@@ -37,7 +37,6 @@ for source_pkey, source_table, source_name, target_table in CONSTANT_MAPPINGS:
     })
 
 MAPPINGS.update({
-    'optevia_projectserviceproviderSet': {'to': None},
     'AccountSet': {
         'to': 'company_company',
         'local': (
@@ -45,11 +44,7 @@ MAPPINGS.update({
             ('Name', 'name'),
             ('optevia_Alias', 'alias'),
             ('optevia_CompaniesHouseNumber', 'company_number'),
-            # ('optevia_ukorganisation', 'uk_based'), requires serialiser
-            ('optevia_BusinessType_Id', 'business_type_id'),
-            ('optevia_Sector_Id', 'sector_id'),
-            # ('optevia_EmployeeRange_Id', 'employee_range_id'), do these stay?
-            # ('optevia_TurnoverRange_Id', 'turnover_range_id'),
+            ('optevia_ukorganisation', 'uk_based'),
             ('optevia_Address1', 'registered_address_1'),
             ('optevia_Address2', 'registered_address_2'),
             ('optevia_Address3', 'registered_address_3'),
@@ -57,11 +52,15 @@ MAPPINGS.update({
             ('optevia_TownCity', 'registered_address_town'),
             ('optevia_StateCounty', 'registered_address_county'),
             ('optevia_PostCode', 'registered_address_postcode'),
-            ('optevia_Country_Id', 'registered_address_country_id'),
-            ('optevia_UKRegion_Id', 'uk_region_id'),
             ('Description', 'description'),
-            # ('ModifiedOn', 'modified_on'), no longer wanted?
-            # ('CreatedOn', 'created_on'),
+        ),
+        'nonflat': (
+            ('optevia_Country', (('Id', 'registered_address_country_id'),),),
+            ('optevia_UKRegion', (('Id', 'uk_region_id'),),),
+            ('optevia_BusinessType', (('Id', 'business_type_id'),),),
+            ('optevia_Sector', (('Id', 'sector_id'),),),
+            ('optevia_EmployeeRange', (('Id', 'employee_range_id'),),),
+            ('optevia_TurnoverRange', (('Id', 'turnover_range_id'),),),
         ),
         'defaults': (
             ('archived', lambda: False),
@@ -96,9 +95,11 @@ MAPPINGS.update({
         'to': 'company_advisor',
         'local': (
             ('SystemUserId', 'id'),
+            ('FirstName', 'first_name'),
+            ('LastName', 'last_name'),
         ),
-        'local_fn': (
-            (('FirstName', 'LastName'), 'name', lambda first, last: "{0} {1}".format(first, last)),  # NOQA
+        'concat': (
+            (('FirstName', 'MiddleName'), 'first_name', 'FirstName'),
         ),
     },
     'ContactSet': {
@@ -110,7 +111,6 @@ MAPPINGS.update({
             # ('FirstName', 'first_name'),
             # ('MiddleName', None),  data migration to move these
             # ('optevia_LastVerified', None)  korben magic to add current on write
-            ('ParentCustomerId_Id', 'company_id'),
             ('optevia_PrimaryContact', 'primary'),
             ('optevia_CountryCode', 'telephone_countrycode'),
             ('EMailAddress1', 'email'),
@@ -121,9 +121,12 @@ MAPPINGS.update({
             ('optevia_TownCity', 'address_town'),
             ('optevia_StateCounty', 'address_county'),
             ('optevia_PostCode', 'address_postcode'),
-            ('optevia_Country_Id', 'address_country_id'),
-            ('optevia_UKRegion_Id', 'uk_region_id'),
-            ('optevia_ContactRole_Id', 'role_id'),
+
+            # moved to `nonflat`
+            # ('ParentCustomerId_Id', 'company_id'),
+            # ('optevia_Country_Id', 'address_country_id'),
+            # ('optevia_UKRegion_Id', 'uk_region_id'),
+            # ('optevia_ContactRole_Id', 'role_id'),
 
             # ('ModifiedOn', 'modified_on'),  not wanted in leeloo?
             # ('CreatedOn', 'created_on'),
@@ -132,12 +135,20 @@ MAPPINGS.update({
             (('optevia_AreaCode', 'optevia_TelephoneNumber'), 'telephone_number', 'optevia_TelephoneNumber'),
             (('FirstName', 'MiddleName'), 'first_name', 'FirstName'),
         ),
+        'nonflat': (
+            ('ParentCustomerId', (('Id', 'company_id'),),),
+            ('optevia_Country', (('Id', 'address_country_id'),),),
+            ('optevia_UKRegion', (('Id', 'uk_region_id'),),),
+            ('optevia_ContactRole', (('Id', 'role_id'),),),
+        ),
+        'nonflat_defaults': (
+            ('ParentCustomerId', {'LogicalName': 'account'}),
+        ),
         'use_undefined': (
             'title_id',
             'role_id',
             'company_id',
             'uk_region_id',
-            'telephone_number',
         ),
         'empty_strings': (
             'archived_reason',
@@ -149,6 +160,7 @@ MAPPINGS.update({
             'address_town',
             'address_county',
             'address_postcode',
+            'telephone_number',
         ),
         'defaults': (
             ('primary', lambda: True),
@@ -163,21 +175,23 @@ MAPPINGS.update({
         'to': 'company_interaction',
         'local': (
             ('ActivityId', 'id'),
-            (
-                'optevia_InteractionCommunicationChannel_Id',
-                'interaction_type_id',
-            ),
             ('Subject', 'subject'),
             ('ActualStart', 'date_of_interaction'),
-            ('optevia_Advisor_Id', 'advisor_id'),
-            ('optevia_Contact_Id', 'contact_id'),
-            ('optevia_Organisation_Id', 'company_id'),
             ('optevia_Notes', 'notes'),
-            # ('optevia_ServiceProvider_Id', 'service_provider_id'), waiting for django model
-            # ('optevia_Service_Id', 'service_id'),
 
             # ('ModifiedOn', 'modified_on'),  not wanted in leeloo?
             # ('CreatedOn', 'created_on'),
+        ),
+        'nonflat': (
+            ('optevia_InteractionCommunicationChannel', (('Id', 'interaction_type_id'),),),
+            ('optevia_Advisor', (('Id', 'advisor_id'),),),
+            ('optevia_Contact', (('Id', 'contact_id'),),),
+            ('optevia_Organisation', (('Id', 'company_id'),),),
+            ('optevia_ServiceProvider', (('Id', 'service_provider_id'),),),
+            ('optevia_Service', (('Id', 'service_id'),),),
+        ),
+        'nonflat_defaults': (
+            ('optevia_Organisation', {'LogicalName': 'account'}),
         ),
         'empty_strings': (
             'archived_reason',

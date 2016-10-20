@@ -31,6 +31,13 @@ def django_to_odata(django_tablename, django_dict):
         if not unflattened:
             continue
         odata_dict[odata_prefix] = unflattened
+    for odata_prefix, defaults in mapping.get('nonflat_defaults', ()):
+        if odata_prefix not in odata_dict:
+            continue
+        # TODO: Make this less poor; it’s called defaults, but it overwrites :/
+        odata_dict[odata_prefix].update(defaults)
+    for _, django_col, odata_col in mapping.get('concat', ()):
+        odata_dict[odata_col] = django_dict[django_col]
     return mapping.get('etag', False), odata_dict
 
 
