@@ -101,6 +101,9 @@ MAPPINGS.update({
         'concat': (
             (('FirstName', 'MiddleName'), 'first_name', 'FirstName'),
         ),
+        'nonflat': (
+            ('BusinessUnitId', (('Id', 'dit_team_id'),),),
+        ),
     },
     'ContactSet': {
         'to': 'company_contact',
@@ -190,7 +193,7 @@ MAPPINGS.update({
             ('optevia_Advisor', (('Id', 'dit_advisor_id'),),),
             ('optevia_Contact', (('Id', 'contact_id'),),),
             ('optevia_Organisation', (('Id', 'company_id'),),),
-            ('optevia_ServiceProvider', (('Id', 'dit_team__id'),),),
+            ('optevia_ServiceProvider', (('Id', 'dit_team_id'),),),
             ('optevia_Service', (('Id', 'service_id'),),),
         ),
         'nonflat_defaults': (
