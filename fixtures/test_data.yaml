@@ -56,11 +56,19 @@
 
 - model: company.advisor
   pk: e83a608e-84a4-11e6-ae22-56b6b6499611
-  fields: {name: John Smith}
+  fields: {
+    first_name: John,
+    last_name: Smith,
+    dit_team: f06a6c6a-c7ef-e311-8a2b-e4115bead28a,
+  }
 
 - model: company.advisor
   pk: 56dc546a-84b0-11e6-ae22-56b6b6499611
-  fields: {name: Clint Eastwood}
+  fields: {
+    first_name: Clint,
+    last_name: Eastwood,
+    dit_team: f06a6c6a-c7ef-e311-8a2b-e4115bead28a,
+  }
 
 #- model: company.contact
 #  pk: 4cac04ee-84b1-11e6-ae22-56b6b6499611

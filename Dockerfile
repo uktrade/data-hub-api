@@ -9,6 +9,13 @@ RUN pip install -r requirements.txt
 RUN git clone https://github.com/uktrade/data-hub-backend.git
 RUN pip install -e data-hub-backend/korben
 
+# Install dockerize https://github.com/jwilder/dockerize
+RUN apt-get update && apt-get install -y wget
+
+ENV DOCKERIZE_VERSION v0.2.0
+RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+
 ADD . /app/leeloo/
 
 RUN chmod a+x start.sh
@@ -21,13 +28,6 @@ ENV DEBUG True
 ENV ES_ACCESS True
 
 
-
-# Install dockerize https://github.com/jwilder/dockerize
-RUN apt-get update && apt-get install -y wget
-
-ENV DOCKERIZE_VERSION v0.2.0
-RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
 EXPOSE 8000
 CMD ./start.sh
