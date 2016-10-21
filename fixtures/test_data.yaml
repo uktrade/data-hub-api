@@ -1,7 +1,7 @@
 - model: company.company
   pk: a73efeba-8499-11e6-ae22-56b6b6499611
   fields: {
-    company_number: 123,
+    company_number: 99919,
     name: "Mercury ltd",
     business_type: 98d14e94-5d95-e211-a939-e4115bead28a,
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a,
@@ -33,7 +33,7 @@
 - model: company.companieshousecompany
   id: 1,
   fields: {
-    company_number: 123,
+    company_number: 99919,
     name: "Mercury ltd",
     registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a,
     registered_address_1: 64 Ermin Street,
@@ -42,49 +42,29 @@
     incorporation_date: 2000-12-14
   }
 
-- model: company.companieshousecompany
-  id: 2,
-  fields: {
-    company_number: 789,
-    name: "Mars ltd",
-    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a,
-    registered_address_1: 1 Coast Road,
-    registered_address_town: Kirkby in Ashfield,
-    registered_address_postcode: NG17 2AR,
-    incorporation_date: 2000-12-14
-  }
-
 - model: company.advisor
   pk: e83a608e-84a4-11e6-ae22-56b6b6499611
   fields: {
-    first_name: John,
-    last_name: Smith,
+    first_name: Puck,
+    last_name: Head,
     dit_team: f06a6c6a-c7ef-e311-8a2b-e4115bead28a,
   }
 
-- model: company.advisor
-  pk: 56dc546a-84b0-11e6-ae22-56b6b6499611
+- model: company.contact
+  pk: 9b1138ab-ec7b-497f-b8c3-27fed21694ef
   fields: {
-    first_name: Clint,
-    last_name: Eastwood,
-    dit_team: f06a6c6a-c7ef-e311-8a2b-e4115bead28a,
+    title:  a26cb21e-6095-e211-a939-e4115bead28a,
+    first_name: Johnny,
+    last_name: Cakeman,
+    role : 6af7d52b-63a3-e211-a646-e4115bead28a,
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611,
+    primary: True,
+    telephone_countrycode: +44,
+    telephone_number: 67890123432,
+    email: johnny@cakeman.com,
+    address_1: 82 Ramsgate Rd,
+    address_town: Willington,
+    address_postcode: NE28 5JB,
+    address_country: 80756b9a-5d95-e211-a939-e4115bead28a,
+    uk_region: 824cd12a-6095-e211-a939-e4115bead28a,
   }
-
-#- model: company.contact
-#  pk: 4cac04ee-84b1-11e6-ae22-56b6b6499611
-#  fields: {
-#    title: c2d9b924-6095-e211-a939-e4115bead28a,
-#    role: 6af7d52b-63a3-e211-a646-e4115bead28a,
-#    name: Oratio Nelson,
-#    company: a73efeba-8499-11e6-ae22-56b6b6499611
-#  }
-#
-#- model: company.interaction
-#  pk: 96d5f57a-84a2-11e6-ae22-56b6b6499611
-#  fields: {
-#    interaction_type: 70c226d7-5d95-e211-a939-e4115bead28a,
-#    advisor: e83a608e-84a4-11e6-ae22-56b6b6499611,
-#    date_of_interaction: "2001-12-15T02:59:43.1Z",
-#    company: a73efeba-8499-11e6-ae22-56b6b6499611,
-#    contact: 4cac04ee-84b1-11e6-ae22-56b6b6499611
-#  }
