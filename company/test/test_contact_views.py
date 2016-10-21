@@ -128,9 +128,9 @@ def test_add_contact_manual_address(api_client):
 def test_modify_contact(api_client):
     """Modify an existing contact."""
 
-    contact = ContactFactory(first_name='foo')
+    pk = '9b1138ab-ec7b-497f-b8c3-27fed21694ef'
 
-    url = reverse('contact-detail', kwargs={'pk': contact.pk})
+    url = reverse('contact-detail', kwargs={'pk': pk})
     response = api_client.patch(url, {
         'first_name': 'bar',
     })
@@ -152,13 +152,13 @@ def test_modify_contact(api_client):
 def test_archive_contact_no_reason(api_client):
     """Test archive contact without providing a reason."""
 
-    contact = ContactFactory()
-    url = reverse('contact-archive', kwargs={'pk': contact.pk})
+    pk = '9b1138ab-ec7b-497f-b8c3-27fed21694ef'
+    url = reverse('contact-archive', kwargs={'pk': pk})
     response = api_client.post(url)
 
     assert response.data['archived']
     assert response.data['archived_reason'] == ''
-    assert response.data['id'] == str(contact.id)
+    assert response.data['id'] == pk
 
     # make sure we're writing to ES
     es_client = get_elasticsearch_client()
@@ -175,13 +175,13 @@ def test_archive_contact_no_reason(api_client):
 def test_archive_contact_reason(api_client):
     """Test archive contact providing a reason."""
 
-    contact = ContactFactory()
-    url = reverse('contact-archive', kwargs={'pk': contact.pk})
+    pk = '9b1138ab-ec7b-497f-b8c3-27fed21694ef'
+    url = reverse('contact-archive', kwargs={'pk': pk})
     response = api_client.post(url, {'reason': 'foo'})
 
     assert response.data['archived']
     assert response.data['archived_reason'] == 'foo'
-    assert response.data['id'] == str(contact.id)
+    assert response.data['id'] == pk
 
     # make sure we're writing to ES
     es_client = get_elasticsearch_client()
@@ -198,9 +198,9 @@ def test_archive_contact_reason(api_client):
 def test_contact_detail_view(api_client):
     """Contact detail view."""
 
-    contact = ContactFactory()
-    url = reverse('contact-detail', kwargs={'pk': contact.pk})
+    pk = '9b1138ab-ec7b-497f-b8c3-27fed21694ef'
+    url = reverse('contact-detail', kwargs={'pk': pk})
     response = api_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.data['id'] == str(contact.pk)
+    assert response.data['id'] == pk

@@ -41,16 +41,16 @@ class Connector:
         )
         return response
 
-    def get(self, data):
+    def get(self, object_id):
         """Get single object from Korben.
 
-        :param data: dict object containing the data to be passed to Korben
+        :param object_id: object id
         :return: requests Response object
         """
         url = '{base_url}/get/{table_name}/{id}'.format(
             base_url=self.base_url,
             table_name=self.table_name,
-            id=data['id']
+            id=object_id
         )
         response = requests.get(url)
         return response

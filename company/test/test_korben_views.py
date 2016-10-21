@@ -120,7 +120,8 @@ def test_korben_advisor_create(api_client):
     data = {
         'id': str(uuid.uuid4()),
         'first_name': 'John',
-        'last_name': 'Smith'
+        'last_name': 'Smith',
+        'dit_team_id': constants.Team.overseas_managers_iraq.value.id,
     }
     response = api_client.post(url, data)
 

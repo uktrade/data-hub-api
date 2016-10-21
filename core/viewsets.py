@@ -30,3 +30,9 @@ class ArchiveNoDeleteViewSet(mixins.CreateModelMixin,
             return self.read_serializer_class
         elif self.action in ('create', 'update', 'partial_update'):
             return self.write_serializer_class
+
+    def get_object(self):
+        """Force the update from korben"""
+        object = super(ArchiveNoDeleteViewSet, self).get_object()
+        object = object.update_from_korben()
+        return object

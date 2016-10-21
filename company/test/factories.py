@@ -12,6 +12,7 @@ class AdvisorFactory(factory.django.DjangoModelFactory):
     id = factory.Sequence(lambda x: '{0}'.format(uuid.uuid4()))
     first_name = factory.Sequence(lambda x: 'name {0}'.format(x))
     last_name = factory.Sequence(lambda x: 'surname {0}'.format(x))
+    dit_team_id = constants.Team.overseas_managers_iran.value.id
 
     class Meta:
         model = 'company.Advisor'
@@ -29,7 +30,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     sector_id = constants.Sector.aerospace_assembly_aircraft.value.id
     archived = False
     uk_region_id = constants.UKRegion.england.value.id
-    
+
     class Meta:
         model = 'company.Company'
 

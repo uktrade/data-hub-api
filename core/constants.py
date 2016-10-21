@@ -396,3 +396,14 @@ class UKRegion(Enum):
     wales = Constant('Wales', '8d4cd12a-6095-e211-a939-e4115bead28a')
     west_midlands = Constant('West Midlands', '854cd12a-6095-e211-a939-e4115bead28a')
     yorkshire_and_the_humber = Constant('Yorkshire and The Humber', '834cd12a-6095-e211-a939-e4115bead28a')
+
+
+class Team(Enum):
+    """Team"""
+
+    overseas_managers_iran = Constant(
+        'Overseas Managers - Iran', '153f6276-c7ef-e311-8a2b-e4115bead28a'
+    )
+    overseas_managers_iraq = Constant(
+        'Overseas Managers - Iraq', '173f6276-c7ef-e311-8a2b-e4115bead28a'
+    )
