@@ -40,6 +40,7 @@ def test_detail_company_with_company_number(api_client):
 
     Make sure that the registered name and registered address are coming from CH data
     """
+
     pk = 'a73efeba-8499-11e6-ae22-56b6b6499611'
 
     url = reverse('company-detail', kwargs={'pk': pk})

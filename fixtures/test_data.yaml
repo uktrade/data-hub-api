@@ -47,7 +47,7 @@
   fields: {
     first_name: Puck,
     last_name: Head,
-    dit_team: f06a6c6a-c7ef-e311-8a2b-e4115bead28a,
+    dit_team: 602b971d-5df6-e511-888e-e4115bead28a,
   }
 
 - model: company.contact

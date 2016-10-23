@@ -258,6 +258,7 @@ class Contact(BaseModel):
     telephone_alternative = models.CharField(max_length=MAX_LENGTH, null=True)
     email_alternative = models.EmailField(null=True)
     notes = models.TextField(null=True)
+    notes = models.TextField(null=True)
 
     @cached_property
     def address(self):
