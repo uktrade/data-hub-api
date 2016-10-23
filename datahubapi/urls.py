@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.conf.urls import url, include
+from django.contrib import admin
 from rest_framework import routers
 
 from company import views
@@ -16,6 +17,7 @@ router.register(r'advisor', views.AdvisorReadOnlyViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
+    url(r'^admin/', admin.site.urls),
     url(r'^search$', Search.as_view(), name='search'),
     url(r'^metadata/', include('company.metadata_urls')),
     url(r'^korben/', include('company.korben_urls', namespace='korben')),
