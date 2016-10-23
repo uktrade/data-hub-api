@@ -401,9 +401,9 @@ class UKRegion(Enum):
 class Team(Enum):
     """Team"""
 
-    overseas_managers_iran = Constant(
-        'Overseas Managers - Iran', '153f6276-c7ef-e311-8a2b-e4115bead28a'
+    healthcare_uk = Constant(
+        'Healthcare UK', '3ff47a07-002c-e311-a78e-e4115bead28a'
     )
-    overseas_managers_iraq = Constant(
-        'Overseas Managers - Iraq', '173f6276-c7ef-e311-8a2b-e4115bead28a'
+    crm = Constant(
+        'CRM', '5e8be8a8-3e95-e211-a939-e4115bead28a'
     )

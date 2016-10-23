@@ -12,7 +12,7 @@ class AdvisorFactory(factory.django.DjangoModelFactory):
     id = factory.Sequence(lambda x: '{0}'.format(uuid.uuid4()))
     first_name = factory.Sequence(lambda x: 'name {0}'.format(x))
     last_name = factory.Sequence(lambda x: 'surname {0}'.format(x))
-    dit_team_id = constants.Team.overseas_managers_iran.value.id
+    dit_team_id = constants.Team.healthcare_uk.value.id
 
     class Meta:
         model = 'company.Advisor'
