@@ -1,7 +1,8 @@
 """General mixins."""
+import reversion
 from rest_framework import status
 
-from core.utils import model_to_dictionary
+from core.utils import model_to_dictionary, get_korben_user
 from es.services import save_model
 from korben.connector import Connector
 from korben.exceptions import KorbenException
@@ -59,8 +60,11 @@ class DeferredSaveModelMixin:
 
         :return the new instance
         """
+        with reversion.create_revision():
+            korben_response = self.korben_connector.get(object_id=self.id)
+            self._map_korben_response_to_model_instance(korben_response)
+            self.save(use_korben=False)
 
-        korben_response = self.korben_connector.get(object_id=self.id)
-        self._map_korben_response_to_model_instance(korben_response)
-        self.save(use_korben=False)
+            reversion.set_user(get_korben_user())
+            reversion.set_comment('Updated by Korben')
         return self

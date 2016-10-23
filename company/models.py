@@ -316,3 +316,4 @@ class Contact(BaseModel):
             elif not some_address_fields_existence:
                 raise ValidationError('Please select either address_as_company or enter an address manually.')
         super(Contact, self).clean()
+
