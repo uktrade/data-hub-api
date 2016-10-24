@@ -48,22 +48,20 @@ def test_detail_company_with_company_number(api_client):
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data['id'] == str(pk)
-    '''
+
     assert response.data['companies_house_data']
-    assert response.data['companies_house_data']['id'] == ch_company.id
-    assert response.data['registered_name'] == ch_company.name
-    assert response.data['trading_name'] == company.alias
+    assert response.data['companies_house_data']['id'] == 1
+    assert response.data['registered_name'] == 'Mercury trading'
     assert response.data['registered_address'] == {
-        'address_1': ch_company.registered_address_1,
+        'address_1': '64 Ermin Street',
         'address_2': '',
         'address_3': '',
         'address_4': '',
-        'address_town': ch_company.registered_address_town,
-        'address_country': ch_company.registered_address_country.pk,
+        'address_town': 'Y Ffor',
+        'address_country': '80756b9a-5d95-e211-a939-e4115bead28a',
         'address_county': '',
-        'address_postcode': '',
+        'address_postcode': 'LL53 5RN',
     }
-    '''
 
 
 def test_detail_company_without_company_number(api_client):
@@ -78,20 +76,19 @@ def test_detail_company_without_company_number(api_client):
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data['id'] == str(pk)
-    '''
+
     assert response.data['companies_house_data'] is None
-    assert response.data['registered_name'] == company.name
+    assert response.data['registered_name'] == 'Venus ltd'
     assert response.data['registered_address'] == {
-        'address_1': company.registered_address_1,
+        'address_1': '66 Marcham Road',
         'address_2': '',
         'address_3': '',
         'address_4': '',
-        'address_town': company.registered_address_town,
-        'address_country': company.registered_address_country.pk,
+        'address_town': 'Bordley',
+        'address_country': '80756b9a-5d95-e211-a939-e4115bead28a',
         'address_county': '',
-        'address_postcode': '',
+        'address_postcode': 'BD23 8RZ',
     }
-    '''
 
 
 def test_update_company(api_client):
@@ -123,6 +120,7 @@ def test_add_company(api_client):
     url = reverse('company-list')
     response = api_client.post(url, {
         'name': 'Acme',
+        'alias': None,
         'business_type': constants.BusinessType.company.value.id,
         'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
         'registered_address_country': constants.Country.united_kingdom.value.id,

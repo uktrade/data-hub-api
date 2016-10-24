@@ -78,7 +78,7 @@ class CompanySerializerRead(serializers.ModelSerializer):
             'address_3': obj.registered_address_3,
             'address_4': obj.registered_address_4,
             'address_town': obj.registered_address_town,
-            'address_country': obj.registered_address_country.pk,
+            'address_country': str(obj.registered_address_country.pk),
             'address_county': obj.registered_address_county,
             'address_postcode': obj.registered_address_postcode,
         }
@@ -93,7 +93,7 @@ class CompanySerializerRead(serializers.ModelSerializer):
                 'address_3': obj.trading_address_3,
                 'address_4': obj.trading_address_4,
                 'address_town': obj.trading_address_town,
-                'address_country': obj.trading_address_country.pk,
+                'address_country': str(obj.trading_address_country.pk),
                 'address_county': obj.trading_address_county,
                 'address_postcode': obj.trading_address_postcode,
             }

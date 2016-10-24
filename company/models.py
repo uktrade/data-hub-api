@@ -48,17 +48,17 @@ class CompanyAbstract(models.Model):
 
     name = models.CharField(max_length=MAX_LENGTH)
     registered_address_1 = models.CharField(max_length=MAX_LENGTH)
-    registered_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
-    registered_address_3 = models.CharField(max_length=MAX_LENGTH, blank=True)
-    registered_address_4 = models.CharField(max_length=MAX_LENGTH, blank=True)
+    registered_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    registered_address_3 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    registered_address_4 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     registered_address_town = models.CharField(max_length=MAX_LENGTH)
-    registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
+    registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     registered_address_country = models.ForeignKey(
         'Country',
         related_name="%(app_label)s_%(class)s_related",
         related_query_name="%(app_label)s_%(class)ss",
     )
-    registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
+    registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
     class Meta:
         abstract = True
@@ -70,9 +70,9 @@ class CompanyAbstract(models.Model):
 class Company(CompanyAbstract, BaseModel):
     """Representation of the company as per CDMS."""
 
-    company_number = models.CharField(max_length=MAX_LENGTH, null=True)
+    company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
-    alias = models.CharField(max_length=MAX_LENGTH, blank=True, help_text='Trading name')
+    alias = models.CharField(max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name')
     business_type = models.ForeignKey('BusinessType')
     sector = models.ForeignKey('Sector')
     employee_range = models.ForeignKey('EmployeeRange', null=True)
@@ -91,14 +91,14 @@ class Company(CompanyAbstract, BaseModel):
     description = models.TextField(blank=True)
     website = models.URLField(blank=True, null=True)
     uk_region = models.ForeignKey('UKRegion')
-    trading_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
-    trading_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
-    trading_address_3 = models.CharField(max_length=MAX_LENGTH, blank=True)
-    trading_address_4 = models.CharField(max_length=MAX_LENGTH, blank=True)
-    trading_address_town = models.CharField(max_length=MAX_LENGTH, blank=True)
-    trading_address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
+    trading_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    trading_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    trading_address_3 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    trading_address_4 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    trading_address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    trading_address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_country = models.ForeignKey('Country', null=True, related_name='company_trading_address_country')
-    trading_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
+    trading_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
     @cached_property
     def uk_based(self):
@@ -246,19 +246,18 @@ class Contact(BaseModel):
     telephone_number = models.CharField(max_length=MAX_LENGTH)
     email = models.EmailField()
     address_same_as_company = models.BooleanField(default=False)
-    address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
-    address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
-    address_3 = models.CharField(max_length=MAX_LENGTH, blank=True)
-    address_4 = models.CharField(max_length=MAX_LENGTH, blank=True)
-    address_town = models.CharField(max_length=MAX_LENGTH, blank=True)
-    address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
+    address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    address_3 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    address_4 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_country = models.ForeignKey('Country', null=True)
-    address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
+    address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     uk_region = models.ForeignKey('UKRegion')
-    telephone_alternative = models.CharField(max_length=MAX_LENGTH, null=True)
-    email_alternative = models.EmailField(null=True)
-    notes = models.TextField(null=True)
-    notes = models.TextField(null=True)
+    telephone_alternative = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    email_alternative = models.EmailField(null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
 
     @cached_property
     def address(self):

@@ -34,7 +34,7 @@
   id: 1,
   fields: {
     company_number: 99919,
-    name: "Mercury ltd",
+    name: "Mercury trading",
     registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a,
     registered_address_1: 64 Ermin Street,
     registered_address_town: Y Ffor,
