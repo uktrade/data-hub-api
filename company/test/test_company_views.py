@@ -302,7 +302,7 @@ def test_promote_a_ch_company(api_client):
         'uk_region': constants.UKRegion.england.value.id
     })
 
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_201_CREATED
 
     assert not document_exists(
         client=es_client,
