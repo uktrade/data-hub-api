@@ -9,7 +9,7 @@ class BaseModel(DeferredSaveModelMixin, models.Model):
 
     archived = models.BooleanField(default=False)
     archived_on = models.DateTimeField(null=True)
-    archived_reason = models.TextField(blank=True)
+    archived_reason = models.TextField(blank=True, null=True)
     archived_by = models.ForeignKey(User, null=True)
 
     class Meta:

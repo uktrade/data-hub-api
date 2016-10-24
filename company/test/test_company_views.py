@@ -270,3 +270,48 @@ def test_ch_company_cannot_be_written(api_client):
 
     assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
+
+def test_promote_a_ch_company(api_client):
+    """Promote a CH company to full company, ES should be updated correctly."""
+
+    ch_company = CompaniesHouseCompanyFactory(company_number=1234567890)
+
+    # make sure it's in ES
+    es_client = get_elasticsearch_client()
+
+    assert document_exists(
+        client=es_client,
+        doc_type='company_companieshousecompany',
+        document_id=ch_company.pk
+    )
+
+    # promote a company to ch
+
+    url = reverse('company-list')
+    response = api_client.post(url, {
+        'name': 'Acme',
+        'company_number': 1234567890,
+        'business_type': constants.BusinessType.company.value.id,
+        'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
+        'registered_address_country': constants.Country.united_kingdom.value.id,
+        'registered_address_1': '75 Stramford Road',
+        'registered_address_town': 'London',
+        'trading_address_country': constants.Country.ireland.value.id,
+        'trading_address_1': '1 Hello st.',
+        'trading_address_town': 'Dublin',
+        'uk_region': constants.UKRegion.england.value.id
+    })
+
+    assert response.status_code == status.HTTP_200_OK
+
+    assert not document_exists(
+        client=es_client,
+        doc_type='company_companieshousecompany',
+        document_id=ch_company.pk
+    )
+
+    assert document_exists(
+        client=es_client,
+        doc_type='company_company',
+        document_id=response.data['id']
+    )

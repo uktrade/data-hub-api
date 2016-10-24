@@ -4,11 +4,14 @@ import uuid
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils.functional import cached_property
 
 from core import constants
 from core.mixins import DeferredSaveModelMixin
 from core.models import BaseConstantModel, BaseModel
+from core.utils import model_to_dictionary
 from es.connector import ESConnector
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -315,3 +318,18 @@ class Contact(BaseModel):
                 raise ValidationError('Please select either address_as_company or enter an address manually.')
         super(Contact, self).clean()
 
+
+# Write to ES stuff
+
+MODEL_TO_WRITE_TO_ES = (Company, CompaniesHouseCompany, Contact, Interaction)
+
+
+@receiver(post_save)
+def save_to_es(sender, instance, **kwargs):
+    """Save to ES."""
+
+    if sender in MODEL_TO_WRITE_TO_ES:
+        es_connector = ESConnector()
+        doc_type = type(instance)._meta.db_table  # cannot access _meta from the instance
+        data = model_to_dictionary(instance)
+        es_connector.save(doc_type=doc_type, data=data)
