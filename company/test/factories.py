@@ -47,6 +47,7 @@ class CompaniesHouseCompanyFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'company.CompaniesHouseCompany'
+        django_get_or_create = ('company_number', )
 
 
 class ContactFactory(factory.django.DjangoModelFactory):

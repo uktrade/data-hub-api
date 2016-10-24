@@ -7,7 +7,7 @@ import requests
 from django.core.serializers.json import DjangoJSONEncoder
 
 
-class Connector:
+class KorbenConnector:
 
     default_headers = {
         'Content-type': 'application/json',

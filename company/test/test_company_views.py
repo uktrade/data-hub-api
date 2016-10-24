@@ -191,6 +191,7 @@ def test_add_company_with_trading_address(api_client):
 
 def test_archive_company_no_reason(api_client):
     """Test company archive."""
+
     pk = 'a73efeba-8499-11e6-ae22-56b6b6499611'
     url = reverse('company-archive', kwargs={'pk': pk})
     response = api_client.post(url)

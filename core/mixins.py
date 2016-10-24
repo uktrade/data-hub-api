@@ -3,8 +3,8 @@ import reversion
 from rest_framework import status
 
 from core.utils import model_to_dictionary, get_korben_user
-from es.services import save_model
-from korben.connector import Connector
+from es.connector import ESConnector
+from korben.connector import KorbenConnector
 from korben.exceptions import KorbenException
 
 
@@ -14,7 +14,8 @@ class DeferredSaveModelMixin:
     def __init__(self, *args, **kwargs):
         """Add third part services connectors to the instance."""
 
-        self.korben_connector = Connector(table_name=self._meta.db_table)
+        self.korben_connector = KorbenConnector(table_name=self._meta.db_table)
+        self.es_connector = ESConnector()
         super(DeferredSaveModelMixin, self).__init__(*args, **kwargs)
 
     def save(self, use_korben=True, *args, **kwargs):
@@ -32,13 +33,13 @@ class DeferredSaveModelMixin:
         update = type(self).objects.filter(id=self.id).exists()
 
         if use_korben:
-            korben_data = self._convert_model_to_korben_format()
+            korben_data = self._model_to_korben_format()
             korben_response = self.korben_connector.post(data=korben_data, update=update)
             self._map_korben_response_to_model_instance(korben_response)
 
         retval = super().save(*args, **kwargs)
         # update ES
-        save_model(self)
+        self.es_connector.save(doc_type=self._meta.db_table, data=self._model_to_es_data())
         return retval
 
     def _map_korben_response_to_model_instance(self, korben_response):
@@ -50,10 +51,15 @@ class DeferredSaveModelMixin:
         else:
             raise KorbenException(korben_response.json())
 
-    def _convert_model_to_korben_format(self):
+    def _model_to_korben_format(self):
         """Override this method to have more granular control of what gets sent to Korben."""
 
         return model_to_dictionary(self, fk_ids=True)
+
+    def _model_to_es_data(self):
+        """Override this method to have more granular control of what gets written to EN."""
+
+        return model_to_dictionary(self)
 
     def update_from_korben(self):
         """Update the model fields from Korben.

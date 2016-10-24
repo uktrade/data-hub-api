@@ -9,6 +9,7 @@ from django.utils.functional import cached_property
 from core import constants
 from core.mixins import DeferredSaveModelMixin
 from core.models import BaseConstantModel, BaseModel
+from es.connector import ESConnector
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
