@@ -52,7 +52,7 @@ class CompaniesHouseCompanySerializer(serializers.ModelSerializer):
 class CompanySerializerRead(serializers.ModelSerializer):
     """Company serializer."""
 
-    registered_name = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField('get_registered_name')
     trading_name = serializers.CharField(source='alias')
     registered_address = serializers.SerializerMethodField()
     trading_address = serializers.SerializerMethodField()

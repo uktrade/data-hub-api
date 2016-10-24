@@ -51,15 +51,15 @@ def test_detail_company_with_company_number(api_client):
 
     assert response.data['companies_house_data']
     assert response.data['companies_house_data']['id'] == 1
-    assert response.data['registered_name'] == 'Mercury trading'
+    assert response.data['name'] == 'Mercury trading'
     assert response.data['registered_address'] == {
         'address_1': '64 Ermin Street',
-        'address_2': '',
-        'address_3': '',
-        'address_4': '',
+        'address_2': None,
+        'address_3': None,
+        'address_4': None,
         'address_town': 'Y Ffor',
         'address_country': '80756b9a-5d95-e211-a939-e4115bead28a',
-        'address_county': '',
+        'address_county': None,
         'address_postcode': 'LL53 5RN',
     }
 
@@ -78,15 +78,15 @@ def test_detail_company_without_company_number(api_client):
     assert response.data['id'] == str(pk)
 
     assert response.data['companies_house_data'] is None
-    assert response.data['registered_name'] == 'Venus ltd'
+    assert response.data['name'] == 'Venus ltd'
     assert response.data['registered_address'] == {
         'address_1': '66 Marcham Road',
-        'address_2': '',
-        'address_3': '',
-        'address_4': '',
+        'address_2': None,
+        'address_3': None,
+        'address_4': None,
         'address_town': 'Bordley',
         'address_country': '80756b9a-5d95-e211-a939-e4115bead28a',
-        'address_county': '',
+        'address_county': None,
         'address_postcode': 'BD23 8RZ',
     }
 

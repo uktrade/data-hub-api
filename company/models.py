@@ -118,11 +118,6 @@ class Company(CompanyAbstract, BaseModel):
             except CompaniesHouseCompany.DoesNotExist:
                 return None
 
-    @cached_property
-    def registered_name(self):
-        """Use the CH name, if there's one, else the name."""
-        return self.companies_house_data.name if self.companies_house_data else self.name
-
     def clean(self):
         """Custom validation for trading address.
 
