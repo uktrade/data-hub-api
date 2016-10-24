@@ -81,14 +81,16 @@ class Company(CompanyAbstract, BaseModel):
     export_to_countries = models.ManyToManyField(
         'Country',
         blank=True,
+        null=True,
         related_name='company_export_to_countries'
     )
     future_interest_countries = models.ManyToManyField(
         'Country',
         blank=True,
+        null=True,
         related_name='company_future_interest_countries'
     )
-    description = models.TextField(blank=True)
+    description = models.TextField(blank=True, null=True)
     website = models.URLField(blank=True, null=True)
     uk_region = models.ForeignKey('UKRegion')
     trading_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
