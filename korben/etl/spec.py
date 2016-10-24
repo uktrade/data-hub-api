@@ -1,10 +1,11 @@
 import csv
+from datetime import datetime
 import os
 from korben import services
 
 MAPPINGS = {}
 
-CONSTANT_MAPPINGS = (
+ENUM_MAPPINGS = (
     ('optevia_businesstypeId', 'optevia_businesstypeSet', 'optevia_name', 'company_businesstype'),
     ('optevia_sectorId', 'optevia_sectorSet', 'optevia_name', 'company_sector'),
     ('optevia_employeerangeId', 'optevia_employeerangeSet', 'optevia_name', 'company_employeerange'),
@@ -20,12 +21,12 @@ CONSTANT_MAPPINGS = (
 
 # Used to avoid having to make Django fields nullable, this is loaded into all
 # "enum" style tables in the Django database
-CONSTANT_UNDEFINED_ID = '0167b456-0ddd-49bd-8184-e3227a0b6396'
+ENUM_UNDEFINED_ID = '0167b456-0ddd-49bd-8184-e3227a0b6396'
 
 # ~8% of contacts in CDMS don’t have an email, we use the following placeholder
 FAKE_EMAIL = 'fake@no-email-address-supplied.com'
 
-for source_pkey, source_table, source_name, target_table in CONSTANT_MAPPINGS:
+for source_pkey, source_table, source_name, target_table in ENUM_MAPPINGS:
     MAPPINGS.update({
         source_table: {
             'to': target_table,
@@ -44,7 +45,7 @@ MAPPINGS.update({
             ('Name', 'name'),
             ('optevia_Alias', 'alias'),
             ('optevia_CompaniesHouseNumber', 'company_number'),
-            ('optevia_ukorganisation', 'uk_based'),
+            # ('optevia_ukorganisation', 'uk_based'),
             ('optevia_Address1', 'registered_address_1'),
             ('optevia_Address2', 'registered_address_2'),
             ('optevia_Address3', 'registered_address_3'),
@@ -111,9 +112,6 @@ MAPPINGS.update({
             ('ContactId', 'id'),
             ('Title', 'title_id'),
             ('LastName', 'last_name'),
-            # ('FirstName', 'first_name'),
-            # ('MiddleName', None),  data migration to move these
-            # ('optevia_LastVerified', None)  korben magic to add current on write
             ('optevia_PrimaryContact', 'primary'),
             ('optevia_CountryCode', 'telephone_countrycode'),
             ('EMailAddress1', 'email'),
@@ -124,12 +122,6 @@ MAPPINGS.update({
             ('optevia_TownCity', 'address_town'),
             ('optevia_StateCounty', 'address_county'),
             ('optevia_PostCode', 'address_postcode'),
-
-            # moved to `nonflat`
-            # ('ParentCustomerId_Id', 'company_id'),
-            # ('optevia_Country_Id', 'address_country_id'),
-            # ('optevia_UKRegion_Id', 'uk_region_id'),
-            # ('optevia_ContactRole_Id', 'role_id'),
 
             # ('ModifiedOn', 'modified_on'),  not wanted in leeloo?
             # ('CreatedOn', 'created_on'),
@@ -170,6 +162,8 @@ MAPPINGS.update({
             ('archived', lambda: False),
             ('address_same_as_company', lambda: False),
             ('email', lambda: FAKE_EMAIL),
+            # needs odata_defaults
+            # ('optevia_LastVerified', lambda: datetime.now().isoformat())
         ),
     },
 
@@ -201,6 +195,7 @@ MAPPINGS.update({
         ),
         'empty_strings': (
             'archived_reason',
+            'notes',
         ),
         'defaults': (
             ('archived', lambda: False),
@@ -209,6 +204,10 @@ MAPPINGS.update({
 })
 
 DJANGO_LOOKUP = {mapping['to']: name for name, mapping in MAPPINGS.items()}
+DJANGO_LOOKUP_ENUMS = {
+    target_table: source_name
+    for _, source_table, _, target_table in ENUM_MAPPINGS
+}
 
 
 ES_STRING_ANALYZED = {'type': 'string', 'index': 'analyzed'}

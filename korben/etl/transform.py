@@ -2,7 +2,6 @@
 Functions for transforming dicts from Django to OData shape and back again,
 according to spec.MAPPINGS
 '''
-import operator
 import functools
 from . import spec
 
@@ -77,7 +76,7 @@ def odata_to_django(odata_tablename, odata_dict):
 
     for django_col in mapping.get('use_undefined', ()):
         django_dict[django_col] =\
-            django_dict.get(django_col) or spec.CONSTANT_UNDEFINED_ID
+            django_dict.get(django_col) or spec.ENUM_UNDEFINED_ID
 
     for django_col, func in mapping.get('defaults', ()):
         django_dict[django_col] = django_dict.get(django_col) or func()
