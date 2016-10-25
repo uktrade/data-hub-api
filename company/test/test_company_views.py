@@ -61,17 +61,17 @@ def test_detail_company_with_company_number(api_client):
     assert response.data['id'] == str(company.pk)
     assert response.data['companies_house_data']
     assert response.data['companies_house_data']['id'] == ch_company.id
-    assert response.data['registered_name'] == ch_company.name
+    assert response.data['name'] == ch_company.name
     assert response.data['trading_name'] == company.alias
     assert response.data['registered_address'] == {
         'address_1': ch_company.registered_address_1,
-        'address_2': '',
-        'address_3': '',
-        'address_4': '',
+        'address_2': None,
+        'address_3': None,
+        'address_4': None,
         'address_town': ch_company.registered_address_town,
-        'address_country': ch_company.registered_address_country.pk,
-        'address_county': '',
-        'address_postcode': '',
+        'address_country': str(ch_company.registered_address_country.pk),
+        'address_county': None,
+        'address_postcode': None,
     }
 
 
@@ -94,16 +94,16 @@ def test_detail_company_without_company_number(api_client):
     assert response.status_code == status.HTTP_200_OK
     assert response.data['id'] == str(company.pk)
     assert response.data['companies_house_data'] is None
-    assert response.data['registered_name'] == company.name
+    assert response.data['name'] == company.name
     assert response.data['registered_address'] == {
         'address_1': company.registered_address_1,
-        'address_2': '',
-        'address_3': '',
-        'address_4': '',
+        'address_2': None,
+        'address_3': None,
+        'address_4': None,
         'address_town': company.registered_address_town,
-        'address_country': company.registered_address_country.pk,
-        'address_county': '',
-        'address_postcode': '',
+        'address_country': str(company.registered_address_country.pk),
+        'address_county': None,
+        'address_postcode': None,
     }
 
 

@@ -23,14 +23,16 @@ class ESConnector:
                 index=settings.ES_INDEX,
                 doc_type=doc_type,
                 body={'doc': data},
-                id=object_id
+                id=object_id,
+                refresh=True
             )
         else:
             self.client.create(
                 index=settings.ES_INDEX,
                 doc_type=doc_type,
                 body=data,
-                id=object_id
+                id=object_id,
+                refresh=True
             )
 
     def handle_ch_company(self, data):
@@ -43,5 +45,6 @@ class ESConnector:
             self.client.delete(
                 index=settings.ES_INDEX,
                 doc_type='company_companieshousecompany',
-                id=results[0].meta.id
+                id=results[0].meta.id,
+                refresh=True
             )

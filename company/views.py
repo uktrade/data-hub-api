@@ -55,7 +55,7 @@ class ContactViewSet(ArchiveNoDeleteViewSet):
         'uk_region'
     ).prefetch_related(
         'teams'
-    ).exclude(name='Undefined')
+    ).exclude(first_name='Undefined')
 
 
 class InteractionViewSet(ArchiveNoDeleteViewSet):
@@ -68,7 +68,7 @@ class InteractionViewSet(ArchiveNoDeleteViewSet):
         'advisor',
         'company',
         'contact'
-    ).exclude(name='Undefined')
+    ).all()
 
 
 class AdvisorReadOnlyViewSet(mixins.ListModelMixin,
@@ -77,4 +77,4 @@ class AdvisorReadOnlyViewSet(mixins.ListModelMixin,
     """Advisor GET only views."""
 
     serializer_class = AdvisorSerializer
-    queryset = Advisor.objects..exclude(name='Undefined')
+    queryset = Advisor.objects.exclude(first_name='Undefined')
