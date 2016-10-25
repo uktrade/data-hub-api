@@ -193,6 +193,11 @@ MAPPINGS.update({
         'nonflat_defaults': (
             ('optevia_Organisation', {'LogicalName': 'account'}),
         ),
+        'use_undefined': (
+            'company_id',
+            'service_id',
+            'dit_advisor_id',
+        ),
         'empty_strings': (
             'archived_reason',
             'notes',
