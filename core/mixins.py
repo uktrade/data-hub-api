@@ -57,7 +57,8 @@ class DeferredSaveModelMixin:
         :return the new instance
         """
         with reversion.create_revision():
-            korben_response = self.korben_connector.get(object_id=self.id)
+            korben_data = self._convert_model_to_korben_format()
+            korben_response = self.korben_connector.get(data=korben_data)
             self._map_korben_response_to_model_instance(korben_response)
             self.save(use_korben=False)
 

@@ -41,7 +41,7 @@ class KorbenConnector:
         )
         return response
 
-    def get(self, object_id):
+    def get(self, data):
         """Get single object from Korben.
 
         :param object_id: object id
@@ -50,7 +50,8 @@ class KorbenConnector:
         url = '{base_url}/get/{table_name}/{id}'.format(
             base_url=self.base_url,
             table_name=self.table_name,
-            id=object_id
+            id=data['id']
         )
-        response = requests.get(url)
+        response = requests.post(
+            url=url, data=self.encode_json(data), headers=self.default_headers)
         return response
