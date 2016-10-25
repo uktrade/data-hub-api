@@ -32,7 +32,7 @@ def test_list_companies(api_client):
     response = api_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.data['count'] == models.Company.objects.all().count()
+    assert response.data['count'] == 2
 
 
 def test_detail_company_with_company_number(api_client):
@@ -41,26 +41,37 @@ def test_detail_company_with_company_number(api_client):
     Make sure that the registered name and registered address are coming from CH data
     """
 
-    pk = 'a73efeba-8499-11e6-ae22-56b6b6499611'
+    ch_company = CompaniesHouseCompanyFactory(
+        company_number=123,
+        name='Foo ltd.',
+        registered_address_1='Hello st.',
+        registered_address_town='Fooland',
+        registered_address_country_id=constants.Country.united_states.value.id
+    )
+    company = CompanyFactory(
+        company_number=123,
+        name='Bar ltd.',
+        alias='Xyz trading'
+    )
 
-    url = reverse('company-detail', kwargs={'pk': pk})
+    url = reverse('company-detail', kwargs={'pk': company.id})
     response = api_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.data['id'] == str(pk)
-
+    assert response.data['id'] == str(company.pk)
     assert response.data['companies_house_data']
-    assert response.data['companies_house_data']['id'] == 1
-    assert response.data['name'] == 'Mercury trading'
+    assert response.data['companies_house_data']['id'] == ch_company.id
+    assert response.data['registered_name'] == ch_company.name
+    assert response.data['trading_name'] == company.alias
     assert response.data['registered_address'] == {
-        'address_1': '64 Ermin Street',
-        'address_2': None,
-        'address_3': None,
-        'address_4': None,
-        'address_town': 'Y Ffor',
-        'address_country': '80756b9a-5d95-e211-a939-e4115bead28a',
-        'address_county': None,
-        'address_postcode': 'LL53 5RN',
+        'address_1': ch_company.registered_address_1,
+        'address_2': '',
+        'address_3': '',
+        'address_4': '',
+        'address_town': ch_company.registered_address_town,
+        'address_country': ch_company.registered_address_country.pk,
+        'address_county': '',
+        'address_postcode': '',
     }
 
 
@@ -70,32 +81,44 @@ def test_detail_company_without_company_number(api_client):
     Make sure that the registered name and address are coming from CDMS.
     """
 
-    pk = '0f5216e0-849f-11e6-ae22-56b6b6499611'
-    url = reverse('company-detail', kwargs={'pk': pk})
+    company = CompanyFactory(
+        name='Foo ltd.',
+        registered_address_1='Hello st.',
+        registered_address_town='Fooland',
+        registered_address_country_id=constants.Country.united_states.value.id
+    )
+
+    url = reverse('company-detail', kwargs={'pk': company.id})
     response = api_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.data['id'] == str(pk)
-
+    assert response.data['id'] == str(company.pk)
     assert response.data['companies_house_data'] is None
-    assert response.data['name'] == 'Venus ltd'
+    assert response.data['registered_name'] == company.name
     assert response.data['registered_address'] == {
-        'address_1': '66 Marcham Road',
-        'address_2': None,
-        'address_3': None,
-        'address_4': None,
-        'address_town': 'Bordley',
-        'address_country': '80756b9a-5d95-e211-a939-e4115bead28a',
-        'address_county': None,
-        'address_postcode': 'BD23 8RZ',
+        'address_1': company.registered_address_1,
+        'address_2': '',
+        'address_3': '',
+        'address_4': '',
+        'address_town': company.registered_address_town,
+        'address_country': company.registered_address_country.pk,
+        'address_county': '',
+        'address_postcode': '',
     }
 
 
 def test_update_company(api_client):
     """Test company update."""
 
-    pk = '0f5216e0-849f-11e6-ae22-56b6b6499611'
-    url = reverse('company-detail', kwargs={'pk': pk})
+    company = CompanyFactory(
+        name='Foo ltd.',
+        registered_address_1='Hello st.',
+        registered_address_town='Fooland',
+        registered_address_country_id=constants.Country.united_states.value.id
+    )
+
+    # now update it
+    url = reverse('company-detail', kwargs={'pk': company.pk})
     response = api_client.patch(url, {
         'name': 'Acme',
     })
@@ -192,13 +215,13 @@ def test_add_company_with_trading_address(api_client):
 def test_archive_company_no_reason(api_client):
     """Test company archive."""
 
-    pk = 'a73efeba-8499-11e6-ae22-56b6b6499611'
-    url = reverse('company-archive', kwargs={'pk': pk})
+    company = CompanyFactory()
+    url = reverse('company-archive', kwargs={'pk': company.id})
     response = api_client.post(url)
 
     assert response.data['archived']
     assert response.data['archived_reason'] == ''
-    assert response.data['id'] == pk
+    assert response.data['id'] == str(company.id)
 
     # make sure we're writing to ES
     es_client = get_elasticsearch_client()
@@ -215,13 +238,13 @@ def test_archive_company_no_reason(api_client):
 def test_archive_company_reason(api_client):
     """Test company archive."""
 
-    pk = 'a73efeba-8499-11e6-ae22-56b6b6499611'
-    url = reverse('company-archive', kwargs={'pk': pk})
+    company = CompanyFactory()
+    url = reverse('company-archive', kwargs={'pk': company.id})
     response = api_client.post(url, {'reason': 'foo'})
 
     assert response.data['archived']
     assert response.data['archived_reason'] == 'foo'
-    assert response.data['id'] == pk
+    assert response.data['id'] == str(company.id)
 
     # make sure we're writing to ES
     es_client = get_elasticsearch_client()
