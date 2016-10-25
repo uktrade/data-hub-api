@@ -7046,7 +7046,7 @@
   pk: c06d755a-a73e-e611-8d53-e4115bed50dc
   fields: {name: "Unknown SP LEP"}
 
-# Undefined enums and company
+# Undefined enums, company, advisor
 - model: company.businesstype
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
   fields: {name: Undefined}
@@ -7091,4 +7091,11 @@
     registered_address_town: Undefined,
     registered_address_postcode: Undefined,
     uk_region: 0167b456-0ddd-49bd-8184-e3227a0b6396,
+  }
+- model: company.advisor
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {
+    first_name: Undefined,
+    last_name: Undefined,
+    dit_team: 0167b456-0ddd-49bd-8184-e3227a0b6396,
   }
