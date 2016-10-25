@@ -195,12 +195,15 @@ MAPPINGS.update({
         ),
         'use_undefined': (
             'company_id',
+            'contact_id',
             'service_id',
             'dit_advisor_id',
+            'dit_team_id',
         ),
         'empty_strings': (
             'archived_reason',
             'notes',
+            'subject',
         ),
         'defaults': (
             ('archived', lambda: False),
