@@ -7099,3 +7099,15 @@
     last_name: Undefined,
     dit_team: 0167b456-0ddd-49bd-8184-e3227a0b6396,
   }
+- model: company.contact
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {
+    title: 0167b456-0ddd-49bd-8184-e3227a0b6396,
+    primary: True,
+    first_name: Undefined,
+    last_name: Undefined,
+    role: 0167b456-0ddd-49bd-8184-e3227a0b6396,
+    company: 0167b456-0ddd-49bd-8184-e3227a0b6396,
+    address_country: 0167b456-0ddd-49bd-8184-e3227a0b6396,
+    uk_region: 0167b456-0ddd-49bd-8184-e3227a0b6396,
+  }
