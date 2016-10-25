@@ -29,7 +29,7 @@ class CompanyViewSet(ArchiveNoDeleteViewSet):
         'interactions',
         'export_to_countries',
         'future_interest_countries'
-    ).all()
+    ).exclude(name='Undefined')
 
 
 class CompaniesHouseCompanyReadOnlyViewSet(mixins.ListModelMixin,
@@ -55,7 +55,7 @@ class ContactViewSet(ArchiveNoDeleteViewSet):
         'uk_region'
     ).prefetch_related(
         'teams'
-    ).all()
+    ).exclude(name='Undefined')
 
 
 class InteractionViewSet(ArchiveNoDeleteViewSet):
@@ -68,7 +68,7 @@ class InteractionViewSet(ArchiveNoDeleteViewSet):
         'advisor',
         'company',
         'contact'
-    ).all()
+    ).exclude(name='Undefined')
 
 
 class AdvisorReadOnlyViewSet(mixins.ListModelMixin,
@@ -77,4 +77,4 @@ class AdvisorReadOnlyViewSet(mixins.ListModelMixin,
     """Advisor GET only views."""
 
     serializer_class = AdvisorSerializer
-    queryset = Advisor.objects.all()
+    queryset = Advisor.objects..exclude(name='Undefined')
