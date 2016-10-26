@@ -62,6 +62,7 @@ class CompanySerializerRead(serializers.ModelSerializer):
     export_to_countries = NestedCountrySerializer(many=True)
     future_interest_countries = NestedCountrySerializer(many=True)
     uk_based = serializers.BooleanField()
+    account_manager = AdvisorSerializer()
 
     @staticmethod
     def get_registered_name(obj):

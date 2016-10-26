@@ -96,7 +96,7 @@ class Company(CompanyAbstract, BaseModel):
     )
     description = models.TextField(blank=True, null=True)
     website = models.URLField(blank=True, null=True)
-    uk_region = models.ForeignKey('UKRegion')
+    uk_region = models.ForeignKey('UKRegion', null=True)
     trading_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_3 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -122,13 +122,10 @@ class Company(CompanyAbstract, BaseModel):
             except CompaniesHouseCompany.DoesNotExist:
                 return None
 
-    def clean(self):
-        """Custom validation for trading address.
-
-        Trading address fields are not mandatory in the model definition, but
+    def _validate_trading_address(self):
+        """Trading address fields are not mandatory in the model definition, but
         if any trading address field is supplied then address_1, town and
-        country must also be provided.
-        """
+        country must also be provided."""
         some_trading_address_fields = any((
             self.trading_address_1,
             self.trading_address_2,
@@ -145,8 +142,24 @@ class Company(CompanyAbstract, BaseModel):
             self.trading_address_town
         ))
         if some_trading_address_fields and trading_address_fields_missing:
+            return False
+        return True
+
+    def _validate_uk_region(self):
+        """UK region is mandatory if it's a UK company"""
+        if self.uk_based and not self.uk_region:
+            return False
+        return True
+
+    def clean(self):
+        """Custom validation."""
+        if not self._validate_trading_address():
             raise ValidationError(
                 'If a trading address is specified, it must be complete.'
+            )
+        if not self._validate_uk_region():
+            raise ValidationError(
+                'UK region is required for UK companies.'
             )
         super(Company, self).clean()
 
@@ -255,7 +268,6 @@ class Contact(BaseModel):
     address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_country = models.ForeignKey('Country', null=True)
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    uk_region = models.ForeignKey('UKRegion')
     telephone_alternative = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     email_alternative = models.EmailField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)

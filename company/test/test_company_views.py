@@ -137,8 +137,8 @@ def test_update_company(api_client):
     assert es_result['_source']['name'] == 'Acme'
 
 
-def test_add_company(api_client):
-    """Test add new company."""
+def test_add_uk_company(api_client):
+    """Test add new UK company."""
 
     url = reverse('company-list')
     response = api_client.post(url, {
@@ -150,6 +150,50 @@ def test_add_company(api_client):
         'registered_address_1': '75 Stramford Road',
         'registered_address_town': 'London',
         'uk_region': constants.UKRegion.england.value.id
+    })
+
+    assert response.status_code == status.HTTP_201_CREATED
+    assert response.data['name'] == 'Acme'
+
+    # make sure we're writing to ES
+    es_client = get_elasticsearch_client()
+    assert document_exists(
+        client=es_client,
+        doc_type='company_company',
+        document_id=response.data['id']
+    )
+
+
+def test_add_uk_company_without_uk_region(api_client):
+    """Test add new UK without UK region company."""
+
+    url = reverse('company-list')
+    with pytest.raises(ValidationError) as error:
+        response = api_client.post(url, {
+            'name': 'Acme',
+            'alias': None,
+            'business_type': constants.BusinessType.company.value.id,
+            'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_country': constants.Country.united_kingdom.value.id,
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+        })
+
+    assert 'UK region is required for UK companies.' in str(error.value)
+
+
+def test_add_not_uk_company(api_client):
+    """Test add new not UK company."""
+
+    url = reverse('company-list')
+    response = api_client.post(url, {
+        'name': 'Acme',
+        'alias': None,
+        'business_type': constants.BusinessType.company.value.id,
+        'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
+        'registered_address_country': constants.Country.united_states.value.id,
+        'registered_address_1': '75 Stramford Road',
+        'registered_address_town': 'London',
     })
 
     assert response.status_code == status.HTTP_201_CREATED
