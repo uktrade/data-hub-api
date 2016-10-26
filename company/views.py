@@ -52,7 +52,6 @@ class ContactViewSet(ArchiveNoDeleteViewSet):
         'role',
         'company',
         'address_country',
-        'uk_region'
     ).prefetch_related(
         'teams'
     ).exclude(first_name='Undefined')
