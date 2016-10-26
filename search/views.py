@@ -1,13 +1,12 @@
 """Search views."""
 
-from django.conf import settings
 from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from es.utils import get_elasticsearch_client, format_es_results
-from .utils import search_by_term
+from es.connector import ESConnector
+from es.utils import format_es_results
 
 
 class Search(APIView):
@@ -21,13 +20,14 @@ class Search(APIView):
             query_term = request.data['term']
         except MultiValueDictKeyError:
             raise ValidationError(detail=['Parameter "term" is mandatory.'])
+
         offset = request.data.get('offset', 0)
         limit = request.data.get('limit', 100)
-        client = get_elasticsearch_client()
-        results = search_by_term(
-            client=client,
-            index=settings.ES_INDEX,
+        doc_type = request.data.getlist('doc_type')
+
+        results = ESConnector().search_by_term(
             term=query_term,
+            doc_type=doc_type,
             offset=int(offset),
             limit=int(limit)
         )

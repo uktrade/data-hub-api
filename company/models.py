@@ -273,6 +273,11 @@ class Contact(BaseModel):
     notes = models.TextField(null=True, blank=True)
 
     @cached_property
+    def name(self):
+        """Need this for ES."""
+        return '{first_name} {last_name}'.format(first_name=self.first_name, last_name=self.last_name)
+
+    @cached_property
     def address(self):
         """Return the company address if the flag is selected."""
 
@@ -300,7 +305,7 @@ class Contact(BaseModel):
             }
 
     def __str__(self):
-        return '{first_name} {last_name}'.format(first_name=self.first_name, last_name=self.last_name)
+        return self.name
 
     def clean(self):
         """Custom validation for address.
@@ -327,7 +332,7 @@ class Contact(BaseModel):
             if some_address_fields_existence and not all_required_fields_existence:
                 raise ValidationError('address_1, town and country are required if an address is entered.')
             elif not some_address_fields_existence:
-                raise ValidationError('Please select either address_as_company or enter an address manually.')
+                raise ValidationError('Please select either address_same_as_company or enter an address manually.')
         super(Contact, self).clean()
 
 

@@ -398,6 +398,12 @@ class UKRegion(Enum):
     yorkshire_and_the_humber = Constant('Yorkshire and The Humber', '834cd12a-6095-e211-a939-e4115bead28a')
 
 
+class Service(Enum):
+    """Service"""
+
+    trade_enquiry = Constant('Trade - Enquiry', '330bba2b-3499-e211-a939-e4115bead28a')
+
+
 class Team(Enum):
     """Team"""
 

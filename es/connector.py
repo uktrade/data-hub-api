@@ -10,6 +10,7 @@ class ESConnector:
 
     def __init__(self):
         self.client = get_elasticsearch_client()
+        self.search = Search(using=self.client, index=settings.ES_INDEX)
 
     def save(self, doc_type, data):
         """Add or update data to ES."""
@@ -39,7 +40,7 @@ class ESConnector:
         """If trying to promote a company house to an internal company, delete che CH record."""
 
         query = Term(company_number=data['company_number'])
-        search = Search().using(self.client).index(settings.ES_INDEX).doc_type('company_companieshousecompany').query(query)
+        search = self.search.doc_type('company_companieshousecompany').query(query)
         results = search.execute()
         if results:
             self.client.delete(
@@ -48,3 +49,15 @@ class ESConnector:
                 id=results[0].meta.id,
                 refresh=True
             )
+
+    def search_by_term(self, term, doc_type=None, offset=0, limit=100):
+        """Perform a query term search."""
+
+        search_client = self.search.doc_type(*doc_type) if doc_type else self.search
+        search = search_client.query(
+            'query_string',
+            query=term
+        )[offset:offset + limit]
+        results = search.execute()
+
+        return results

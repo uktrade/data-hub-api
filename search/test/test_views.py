@@ -1,107 +1,63 @@
-from unittest.mock import patch, Mock
-
-from django.conf import settings
+import pytest
 from django.urls import reverse
-from elasticsearch import Elasticsearch
 from rest_framework import status
-from rest_framework.test import APIRequestFactory
 
-from search.views import Search
+from company.test.factories import CompaniesHouseCompanyFactory, ContactFactory, CompanyFactory, InteractionFactory
+
+pytestmark = pytest.mark.django_db
 
 
-def test_search_missing_required_parameter():
+def test_search_missing_required_parameter(api_client):
     url = reverse('search')
-    factory = APIRequestFactory()
-    request = factory.post(url)
-    response = Search.as_view()(request)
+    response = api_client.post(url)
+
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.data == ['Parameter "term" is mandatory.']
 
 
-@patch('search.views.search_by_term')
-@patch('search.views.get_elasticsearch_client')
-def test_search_all_parameters(mocked_get_es_client, mocked_search_by_term):
-    mocked_client = Mock(spec_set=Elasticsearch)
-    mocked_get_es_client.return_value = mocked_client
+def test_search_by_term(api_client):
     url = reverse('search')
-    factory = APIRequestFactory()
-    request = factory.post(
-        url,
-        {
-            'term': 'Foo',
-            'offset': '10',
-            'limit': '10'
-        }
-    )
-    response = Search.as_view()(request)
-
-    assert response.status_code == status.HTTP_200_OK
-    mocked_get_es_client.assert_called_with()
-    mocked_search_by_term.assert_called_with(
-        client=mocked_client,
-        index=settings.ES_INDEX,
-        limit=10,
-        offset=10,
-        term='Foo'
-    )
-
-
-@patch('search.views.search_by_term')
-@patch('search.views.get_elasticsearch_client')
-def test_search_by_term_returns_results(mocked_get_es_client, mocked_search_by_term):
-    mocked_client = Mock(spec_set=Elasticsearch)
-    mocked_get_es_client.return_value = mocked_client
-    mocked_results = Mock(
-        hits=Mock(
-            total=10,
-            max_score=1,
-            hits=[
-                {
-                    '_id': 1,
-                    '_type': 'company',
-                    '_source': {'name': 'Foo'}
-                },
-                {
-                    '_id': 2,
-                    '_type': 'company',
-                    '_source': {'name': 'Foo test'}
-                }
-            ]
-        )
-    )
-    mocked_search_by_term.return_value = mocked_results
-
-    url = reverse('search')
-    factory = APIRequestFactory()
-    request = factory.post(
+    response = api_client.post(
         url,
         {'term': 'Foo'}
     )
-    response = Search.as_view()(request)
 
-    expected_response = {
-        'max_score': 1,
-        'total': 10,
-        'hits': [
-                {
-                    '_id': 1,
-                    '_type': 'company',
-                    '_source': {'name': 'Foo'}
-                },
-                {
-                    '_id': 2,
-                    '_type': 'company',
-                    '_source': {'name': 'Foo test'}
-                }
-            ]
-    }
-    assert response.data == expected_response
     assert response.status_code == status.HTTP_200_OK
-    mocked_get_es_client.assert_called_with()
-    mocked_search_by_term.assert_called_with(
-        client=mocked_client,
-        index=settings.ES_INDEX,
-        limit=100,
-        offset=0,
-        term='Foo'
+
+
+def test_search_term_with_multiple_doc_type_filters(api_client):
+
+    InteractionFactory()
+    CompanyFactory()
+    ContactFactory()
+    CompaniesHouseCompanyFactory()
+
+    url = reverse('search')
+    expected_types = {'company_company', 'company_contact'}
+    response = api_client.post(
+        url,
+        {'term': 'Foo', 'doc_type': expected_types}
     )
+    returned_types = set([hit['_type'] for hit in response.data['hits']])
+
+    assert response.status_code == status.HTTP_200_OK
+    assert returned_types == expected_types
+
+
+def test_search_term_with_single_doc_type_filter(api_client):
+
+    InteractionFactory()
+    CompanyFactory()
+    ContactFactory()
+    CompaniesHouseCompanyFactory()
+
+    url = reverse('search')
+    expected_types = {'company_company'}
+    response = api_client.post(
+        url,
+        {'term': 'Foo', 'doc_type': expected_types}
+    )
+    returned_types = set([hit['_type'] for hit in response.data['hits']])
+
+    assert response.status_code == status.HTTP_200_OK
+    assert returned_types == expected_types

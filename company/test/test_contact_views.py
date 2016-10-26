@@ -66,7 +66,7 @@ def test_add_contact_no_address(api_client):
             'primary': True
         })
 
-    assert 'Please select either address_as_company or enter an address manually.' in str(error.value)
+    assert 'Please select either address_same_as_company or enter an address manually.' in str(error.value)
 
 
 def test_add_contact_partial_manual_address(api_client):

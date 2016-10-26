@@ -53,7 +53,8 @@ class ContactViewSet(ArchiveNoDeleteViewSet):
         'company',
         'address_country',
     ).prefetch_related(
-        'teams'
+        'teams',
+        'interactions'
     ).exclude(first_name='Undefined')
 
 

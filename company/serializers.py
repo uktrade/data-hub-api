@@ -143,6 +143,7 @@ class ContactSerializerRead(serializers.ModelSerializer):
     """Contact serializer."""
 
     teams = NestedTeamSerializer(many=True)
+    interactions = NestedInteractionSerializer(many=True)
     address = serializers.DictField()
 
     class Meta:
