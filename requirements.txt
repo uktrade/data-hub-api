@@ -1,7 +1,6 @@
 # Django and django related
 Django==1.10.1
 djangorestframework==3.4.6
-django-rest-swagger==2.0.5
 django-environ==0.4.0
 django-extensions==1.7.4
 django-reversion==2.0.6
@@ -18,11 +17,9 @@ elasticsearch-dsl==2.1.0
 
 # Testing
 pytest-django==3.0.0
-pytest-cov==2.3.1
 pytest-sugar==0.7.1
 ipython
 ipdb
-coveralls
 Werkzeug
 factory-boy==2.7.0
 django-debug-toolbar==1.6

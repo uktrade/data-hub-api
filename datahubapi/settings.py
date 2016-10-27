@@ -40,7 +40,6 @@ DJANGO_APPS = (
 
 THIRD_PARTY_APPS = (
     'rest_framework',
-    'rest_framework_swagger',
     'django_extensions',
     'reversion',
     'oauth2_provider',
