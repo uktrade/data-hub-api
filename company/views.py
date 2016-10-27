@@ -65,7 +65,7 @@ class InteractionViewSet(ArchiveNoDeleteViewSet):
     write_serializer_class = InteractionSerializerWrite
     queryset = Interaction.objects.select_related(
         'interaction_type',
-        'advisor',
+        'dit_advisor',
         'company',
         'contact'
     ).all()
