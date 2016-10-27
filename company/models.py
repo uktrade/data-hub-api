@@ -1,6 +1,7 @@
 """Company models."""
 import uuid
 
+from dateutil import parser
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -223,6 +224,14 @@ class Interaction(BaseModel):
 
     def __str__(self):
         return self.subject
+
+    def _map_korben_response_to_model_instance(self, korben_response):
+        """Handle date field."""
+
+        super(Interaction, self)._map_korben_response_to_model_instance(korben_response)
+        date_of_interaction_string = korben_response.json().get('date_of_interaction')
+        if date_of_interaction_string:
+            self.date_of_interaction = parser.parse(date_of_interaction_string)
 
 
 class Title(BaseConstantModel):
