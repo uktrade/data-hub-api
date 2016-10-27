@@ -23,7 +23,7 @@ class Search(APIView):
 
         offset = request.data.get('offset', 0)
         limit = request.data.get('limit', 100)
-        doc_type = request.data.getlist('doc_type')
+        doc_type = request.data.get('doc_type')
 
         results = ESConnector().search_by_term(
             term=query_term,

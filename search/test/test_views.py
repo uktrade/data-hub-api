@@ -19,7 +19,8 @@ def test_search_by_term(api_client):
     url = reverse('search')
     response = api_client.post(
         url,
-        {'term': 'Foo'}
+        {'term': 'Foo'},
+        format='json'
     )
 
     assert response.status_code == status.HTTP_200_OK
@@ -36,7 +37,8 @@ def test_search_term_with_multiple_doc_type_filters(api_client):
     expected_types = {'company_company', 'company_contact'}
     response = api_client.post(
         url,
-        {'term': 'Foo', 'doc_type': expected_types}
+        {'term': 'Foo', 'doc_type': expected_types},
+        format='json'
     )
     returned_types = set([hit['_type'] for hit in response.data['hits']])
 
@@ -55,7 +57,8 @@ def test_search_term_with_single_doc_type_filter(api_client):
     expected_types = {'company_company'}
     response = api_client.post(
         url,
-        {'term': 'Foo', 'doc_type': expected_types}
+        {'term': 'Foo', 'doc_type': expected_types},
+        format='json'
     )
     returned_types = set([hit['_type'] for hit in response.data['hits']])
 
