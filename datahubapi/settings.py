@@ -42,7 +42,8 @@ THIRD_PARTY_APPS = (
     'rest_framework',
     'rest_framework_swagger',
     'django_extensions',
-    'reversion'
+    'reversion',
+    'oauth2_provider',
 )
 
 LOCAL_APPS = (
@@ -145,7 +146,13 @@ UI_SECRET = env('UI_SECRET')
 REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': None,
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 100
+    'PAGE_SIZE': 100,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.ext.rest_framework.OAuth2Authentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
 }
 
 # Simplified static file serving.

@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.conf.urls import url, include
 from django.contrib import admin
+from oauth2_provider.views import TokenView
 from rest_framework import routers
 
 from company import views
@@ -21,6 +22,7 @@ urlpatterns = [
     url(r'^search$', Search.as_view(), name='search'),
     url(r'^metadata/', include('company.metadata_urls')),
     url(r'^korben/', include('company.korben_urls', namespace='korben')),
+    url(r'^token/$', TokenView.as_view(), name="token"),
 ]
 
 if settings.DEBUG:
@@ -28,4 +30,3 @@ if settings.DEBUG:
     urlpatterns += [
         url(r'^__debug__/', include(debug_toolbar.urls)),
     ]
-
