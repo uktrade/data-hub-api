@@ -5,18 +5,28 @@ Check conftest.py in the root folder for the importing mechanism.
 import uuid
 
 import pytest
-
+from django.conf import settings
 from django.urls import reverse
-
-# mark the whole module for db use
 from rest_framework import status
+from rest_framework.test import APIClient
 
 from company.models import Company, Contact, Advisor
+from company.test import factories
 from core import constants
 
-from . import factories
+# mark the whole module for db use
+from korben.utils import generate_signature
 
 pytestmark = pytest.mark.django_db
+
+
+def _signature(url, data):
+    """Return the signature to authenticate the api client for the tests in this module."""
+    return generate_signature(
+        url,
+        APIClient()._encode_data(data)[0],
+        settings.DATAHUB_SECRET
+    )
 
 
 def test_korben_company_create(api_client):
@@ -34,6 +44,8 @@ def test_korben_company_create(api_client):
         'archived': False,
         'uk_region_id': constants.UKRegion.england.value.id,
     }
+
+    api_client.credentials(**{'X-Signature': _signature(url, data)})
     response = api_client.post(url, data)
 
     assert response.status_code == status.HTTP_200_OK
@@ -57,6 +69,7 @@ def test_korben_company_update(api_client):
         'archived': False,
         'uk_region_id': constants.UKRegion.england.value.id,
     }
+    api_client.credentials(**{'X-Signature': _signature(url, data)})
     response = api_client.post(url, data)
 
     assert response.status_code == status.HTTP_200_OK
@@ -81,6 +94,7 @@ def test_korben_contact_create(api_client):
         'address_same_as_company': True,
         'primary': True
     }
+    api_client.credentials(**{'X-Signature': _signature(url, data)})
     response = api_client.post(url, data)
 
     assert response.status_code == status.HTTP_200_OK
@@ -105,6 +119,7 @@ def test_korben_contact_update(api_client):
         'address_same_as_company': True,
         'primary': True
     }
+    api_client.credentials(**{'X-Signature': _signature(url, data)})
     response = api_client.post(url, data)
 
     assert response.status_code == status.HTTP_200_OK
@@ -121,6 +136,7 @@ def test_korben_advisor_create(api_client):
         'last_name': 'Smith',
         'dit_team_id': constants.Team.healthcare_uk.value.id,
     }
+    api_client.credentials(**{'X-Signature': _signature(url, data)})
     response = api_client.post(url, data)
 
     assert response.status_code == status.HTTP_200_OK

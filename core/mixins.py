@@ -2,7 +2,8 @@
 import reversion
 from rest_framework import status
 
-from core.utils import model_to_dictionary, get_korben_user
+from core.utils import model_to_dictionary
+from korben.utils import get_korben_user
 from korben.connector import KorbenConnector
 from korben.exceptions import KorbenException
 

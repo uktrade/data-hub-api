@@ -49,6 +49,7 @@ LOCAL_APPS = (
     'core',
     'company',
     'search',
+    'korben',
 )
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -164,6 +165,7 @@ ES_PORT = env.int('ES_PORT')
 ES_INDEX = env('ES_INDEX')
 KORBEN_HOST = env('KORBEN_HOST')
 KORBEN_PORT = env('KORBEN_PORT')
+DATAHUB_SECRET = env('DATAHUB_SECRET')
 
 CHAR_FIELD_MAX_LENGTH = 255
 

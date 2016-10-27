@@ -1,14 +1,16 @@
 from functools import partial
 
 from django.http import HttpResponse
-from django.views.decorators.http import require_POST
+from rest_framework.decorators import api_view
+from rest_framework.decorators import authentication_classes
 
 from company.models import Advisor, Company, Contact, Interaction
-
+from .authentication import KorbenSharedSecretAuthentication
 EXPOSED_MODELS = (Advisor, Company, Contact, Interaction)
 
 
-@require_POST
+@api_view(['POST'])
+@authentication_classes((KorbenSharedSecretAuthentication, ))
 def korben_view(request, model):
     """View for Korben."""
 
@@ -31,3 +33,4 @@ for model in EXPOSED_MODELS:
     fn = partial(korben_view, model=model)
     path = r'{0}/$'.format(name)
     urls_args.append(((path, fn), {'name': name}))
+
