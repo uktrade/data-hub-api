@@ -6,6 +6,8 @@ from django.conf import settings
 import requests
 from django.core.serializers.json import DjangoJSONEncoder
 
+from .utils import generate_signature
+
 
 class KorbenConnector:
 
@@ -17,6 +19,9 @@ class KorbenConnector:
         self.encode_json = DjangoJSONEncoder().encode
         self.table_name = table_name
         self.base_url = 'http://{host}:{port}'.format(host=settings.KORBEN_HOST, port=settings.KORBEN_PORT)
+
+    def inject_auth_header(self, url, body):
+        self.default_headers['X-Signature'] = generate_signature(url, body, settings.DATAHUB_SECRET)
 
     def post(self, data, update=False):
         """Perform POST operations: create and update.
@@ -36,9 +41,9 @@ class KorbenConnector:
                 table_name=self.table_name
             )
 
-        response = requests.post(
-            url=url, data=self.encode_json(data), headers=self.default_headers
-        )
+        data = self.encode_json(data)
+        self.inject_auth_header(url, data)
+        response = requests.post(url=url, data=data, headers=self.default_headers)
         return response
 
     def get(self, data):
@@ -52,6 +57,7 @@ class KorbenConnector:
             table_name=self.table_name,
             id=data['id']
         )
-        response = requests.post(
-            url=url, data=self.encode_json(data), headers=self.default_headers)
+        data = self.encode_json(data)
+        self.inject_auth_header(url, data)
+        response = requests.post(url=url, data=data, headers=self.default_headers)
         return response
