@@ -26,6 +26,7 @@ class LeelooTestCase:
         self.user = self.get_user()
         self.application = self.get_application()
         self.token = self.get_token()
+        self.api_client = self.get_logged_in_api_client()
 
     def get_user(self):
         if self._user:
@@ -54,7 +55,7 @@ class LeelooTestCase:
         token = AccessToken(
             user=self.user,
             application=self.application,
-            token='123456789',
+            token='123456789',  # unsafe token, just for testing
             expires=datetime.datetime.now() + datetime.timedelta(hours=1),
             scope='write read'
         )

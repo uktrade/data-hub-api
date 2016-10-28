@@ -1,66 +1,63 @@
-import pytest
 from django.urls import reverse
 from rest_framework import status
 
 from company.test.factories import CompaniesHouseCompanyFactory, ContactFactory, CompanyFactory, InteractionFactory
-
-pytestmark = pytest.mark.django_db
-
-
-def test_search_missing_required_parameter(api_client):
-    url = reverse('search')
-    response = api_client.post(url)
-
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert response.data == ['Parameter "term" is mandatory.']
+from core.test_utils import LeelooTestCase
 
 
-def test_search_by_term(api_client):
-    url = reverse('search')
-    response = api_client.post(
-        url,
-        {'term': 'Foo'},
-        format='json'
-    )
+class SearchViewTestCase(LeelooTestCase):
 
-    assert response.status_code == status.HTTP_200_OK
+    def test_search_missing_required_parameter(self):
+        url = reverse('search')
+        response = self.api_client.post(url)
 
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == ['Parameter "term" is mandatory.']
 
-def test_search_term_with_multiple_doc_type_filters(api_client):
+    def test_search_by_term(api_client):
+        url = reverse('search')
+        response = api_client.post(
+            url,
+            {'term': 'Foo'},
+            format='json'
+        )
 
-    InteractionFactory()
-    CompanyFactory()
-    ContactFactory()
-    CompaniesHouseCompanyFactory()
+        assert response.status_code == status.HTTP_200_OK
 
-    url = reverse('search')
-    expected_types = {'company_company', 'company_contact'}
-    response = api_client.post(
-        url,
-        {'term': 'Foo', 'doc_type': expected_types},
-        format='json'
-    )
-    returned_types = set([hit['_type'] for hit in response.data['hits']])
+    def test_search_term_with_multiple_doc_type_filters(self):
 
-    assert response.status_code == status.HTTP_200_OK
-    assert returned_types == expected_types
+        InteractionFactory()
+        CompanyFactory()
+        ContactFactory()
+        CompaniesHouseCompanyFactory()
 
+        url = reverse('search')
+        expected_types = {'company_company', 'company_contact'}
+        response = self.api_client.post(
+            url,
+            {'term': 'Foo', 'doc_type': expected_types},
+            format='json'
+        )
+        returned_types = set([hit['_type'] for hit in response.data['hits']])
 
-def test_search_term_with_single_doc_type_filter(api_client):
+        assert response.status_code == status.HTTP_200_OK
+        assert returned_types == expected_types
 
-    InteractionFactory()
-    CompanyFactory()
-    ContactFactory()
-    CompaniesHouseCompanyFactory()
+    def test_search_term_with_single_doc_type_filter(self):
 
-    url = reverse('search')
-    expected_types = {'company_company'}
-    response = api_client.post(
-        url,
-        {'term': 'Foo', 'doc_type': expected_types},
-        format='json'
-    )
-    returned_types = set([hit['_type'] for hit in response.data['hits']])
+        InteractionFactory()
+        CompanyFactory()
+        ContactFactory()
+        CompaniesHouseCompanyFactory()
 
-    assert response.status_code == status.HTTP_200_OK
-    assert returned_types == expected_types
+        url = reverse('search')
+        expected_types = {'company_company'}
+        response = self.api_client.post(
+            url,
+            {'term': 'Foo', 'doc_type': expected_types},
+            format='json'
+        )
+        returned_types = set([hit['_type'] for hit in response.data['hits']])
+
+        assert response.status_code == status.HTTP_200_OK
+        assert returned_types == expected_types

@@ -1,8 +1,3 @@
-"""
-These tests rely on the metadata.yaml fixture to be imported,
-Check conftest.py in the root folder for the importing mechanism.
-"""
-
 import pytest
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -11,50 +6,19 @@ from django.urls import reverse
 from rest_framework import status
 
 from core import constants
+from core.test_utils import LeelooTestCase
 from es.services import document_exists
 from es.utils import get_elasticsearch_client
 
 from .factories import CompanyFactory, ContactFactory
 
-# mark the whole module for db use
-pytestmark = pytest.mark.django_db
 
+class ContactTestCase(LeelooTestCase):
+    def test_add_contact_address_same_as_company(self):
+        """Test add new contact."""
 
-def test_add_contact_address_same_as_company(api_client):
-    """Test add new contact."""
-
-    url = reverse('contact-list')
-    response = api_client.post(url, {
-        'first_name': 'Oratio',
-        'last_name': 'Nelson',
-        'title': constants.Title.admiral_of_the_fleet.value.id,
-        'company': CompanyFactory().pk,
-        'role': constants.Role.owner.value.id,
-        'email': 'foo@bar.com',
-        'telephone_countrycode': '+44',
-        'telephone_number': '123456789',
-        'address_same_as_company': True,
-        'primary': True
-    })
-
-    assert response.status_code == status.HTTP_201_CREATED
-
-    # make sure we're writing to ES
-    es_client = get_elasticsearch_client()
-    assert document_exists(
-        client=es_client,
-        doc_type='company_contact',
-        document_id=response.data['id']
-    )
-
-
-def test_add_contact_no_address(api_client):
-    """Test add new contact without any address."""
-
-    url = reverse('contact-list')
-
-    with pytest.raises(ValidationError) as error:
-        api_client.post(url, {
+        url = reverse('contact-list')
+        response = self.api_client.post(url, {
             'first_name': 'Oratio',
             'last_name': 'Nelson',
             'title': constants.Title.admiral_of_the_fleet.value.id,
@@ -63,19 +27,66 @@ def test_add_contact_no_address(api_client):
             'email': 'foo@bar.com',
             'telephone_countrycode': '+44',
             'telephone_number': '123456789',
+            'address_same_as_company': True,
             'primary': True
         })
 
-    assert 'Please select either address_same_as_company or enter an address manually.' in str(error.value)
+        assert response.status_code == status.HTTP_201_CREATED
 
+        # make sure we're writing to ES
+        es_client = get_elasticsearch_client()
+        assert document_exists(
+            client=es_client,
+            doc_type='company_contact',
+            document_id=response.data['id']
+        )
 
-def test_add_contact_partial_manual_address(api_client):
-    """Test add new contact with a partial manual address."""
+    def test_add_contact_no_address(self):
+        """Test add new contact without any address."""
 
-    url = reverse('contact-list')
+        url = reverse('contact-list')
 
-    with pytest.raises(ValidationError) as error:
-        api_client.post(url, {
+        with pytest.raises(ValidationError) as error:
+            self.api_client.post(url, {
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+                'title': constants.Title.admiral_of_the_fleet.value.id,
+                'company': CompanyFactory().pk,
+                'role': constants.Role.owner.value.id,
+                'email': 'foo@bar.com',
+                'telephone_countrycode': '+44',
+                'telephone_number': '123456789',
+                'primary': True
+            })
+
+        assert 'Please select either address_same_as_company or enter an address manually.' in str(error.value)
+
+    def test_add_contact_partial_manual_address(self):
+        """Test add new contact with a partial manual address."""
+
+        url = reverse('contact-list')
+
+        with pytest.raises(ValidationError) as error:
+            self.api_client.post(url, {
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+                'title': constants.Title.admiral_of_the_fleet.value.id,
+                'company': CompanyFactory().pk,
+                'role': constants.Role.owner.value.id,
+                'email': 'foo@bar.com',
+                'telephone_countrycode': '+44',
+                'telephone_number': '123456789',
+                'address_1': 'test',
+                'primary': True
+            })
+
+        assert 'address_1, town and country are required if an address is entered.' in str(error.value)
+
+    def test_add_contact_manual_address(self):
+        """Test add new contact manual address."""
+
+        url = reverse('contact-list')
+        response = self.api_client.post(url, {
             'first_name': 'Oratio',
             'last_name': 'Nelson',
             'title': constants.Title.admiral_of_the_fleet.value.id,
@@ -84,119 +95,95 @@ def test_add_contact_partial_manual_address(api_client):
             'email': 'foo@bar.com',
             'telephone_countrycode': '+44',
             'telephone_number': '123456789',
-            'address_1': 'test',
+            'address_1': 'Foo st.',
+            'address_town': 'London',
+            'address_country': constants.Country.united_kingdom.value.id,
             'primary': True
         })
 
-    assert 'address_1, town and country are required if an address is entered.' in str(error.value)
+        assert response.status_code == status.HTTP_201_CREATED
 
+        # make sure we're writing to ES
+        es_client = get_elasticsearch_client()
+        assert document_exists(
+            client=es_client,
+            doc_type='company_contact',
+            document_id=response.data['id']
+        )
 
-def test_add_contact_manual_address(api_client):
-    """Test add new contact manual address."""
+    def test_modify_contact(self):
+        """Modify an existing contact."""
 
-    url = reverse('contact-list')
-    response = api_client.post(url, {
-        'first_name': 'Oratio',
-        'last_name': 'Nelson',
-        'title': constants.Title.admiral_of_the_fleet.value.id,
-        'company': CompanyFactory().pk,
-        'role': constants.Role.owner.value.id,
-        'email': 'foo@bar.com',
-        'telephone_countrycode': '+44',
-        'telephone_number': '123456789',
-        'address_1': 'Foo st.',
-        'address_town': 'London',
-        'address_country': constants.Country.united_kingdom.value.id,
-        'primary': True
-    })
+        contact = ContactFactory(first_name='Foo')
 
-    assert response.status_code == status.HTTP_201_CREATED
+        url = reverse('contact-detail', kwargs={'pk': contact.pk})
+        response = self.api_client.patch(url, {
+            'first_name': 'bar',
+        })
 
-    # make sure we're writing to ES
-    es_client = get_elasticsearch_client()
-    assert document_exists(
-        client=es_client,
-        doc_type='company_contact',
-        document_id=response.data['id']
-    )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['first_name'] == 'bar'
 
+        # make sure we're writing to ES
+        es_client = get_elasticsearch_client()
+        es_result = es_client.get(
+            index=settings.ES_INDEX,
+            doc_type='company_contact',
+            id=response.data['id'],
+            realtime=True
+        )
+        assert es_result['_source']['first_name'] == 'bar'
 
-def test_modify_contact(api_client):
-    """Modify an existing contact."""
+    def test_archive_contact_no_reason(self):
+        """Test archive contact without providing a reason."""
 
-    contact = ContactFactory(first_name='Foo')
+        contact = ContactFactory()
+        url = reverse('contact-archive', kwargs={'pk': contact.pk})
+        response = self.api_client.post(url)
 
-    url = reverse('contact-detail', kwargs={'pk': contact.pk})
-    response = api_client.patch(url, {
-        'first_name': 'bar',
-    })
+        assert response.data['archived']
+        assert response.data['archived_reason'] == ''
+        assert response.data['id'] == contact.pk
 
-    assert response.status_code == status.HTTP_200_OK
-    assert response.data['first_name'] == 'bar'
+        # make sure we're writing to ES
+        es_client = get_elasticsearch_client()
+        es_result = es_client.get(
+            index=settings.ES_INDEX,
+            doc_type='company_contact',
+            id=response.data['id'],
+            realtime=True
+        )
+        assert es_result['_source']['archived']
+        assert es_result['_source']['archived_reason'] == ''
 
-    # make sure we're writing to ES
-    es_client = get_elasticsearch_client()
-    es_result = es_client.get(
-        index=settings.ES_INDEX,
-        doc_type='company_contact',
-        id=response.data['id'],
-        realtime=True
-    )
-    assert es_result['_source']['first_name'] == 'bar'
+    def test_archive_contact_reason(self):
+        """Test archive contact providing a reason."""
 
+        contact = ContactFactory()
+        url = reverse('contact-archive', kwargs={'pk': contact.pk})
+        response = self.api_client.post(url, {'reason': 'foo'})
 
-def test_archive_contact_no_reason(api_client):
-    """Test archive contact without providing a reason."""
+        assert response.data['archived']
+        assert response.data['archived_reason'] == 'foo'
+        assert response.data['id'] == contact.pk
 
-    contact = ContactFactory()
-    url = reverse('contact-archive', kwargs={'pk': contact.pk})
-    response = api_client.post(url)
+        # make sure we're writing to ES
+        es_client = get_elasticsearch_client()
+        es_result = es_client.get(
+            index=settings.ES_INDEX,
+            doc_type='company_contact',
+            id=response.data['id'],
+            realtime=True
+        )
+        assert es_result['_source']['archived']
+        assert es_result['_source']['archived_reason'] == 'foo'
 
-    assert response.data['archived']
-    assert response.data['archived_reason'] == ''
-    assert response.data['id'] == contact.pk
+    def test_contact_detail_view(self):
+        """Contact detail view."""
 
-    # make sure we're writing to ES
-    es_client = get_elasticsearch_client()
-    es_result = es_client.get(
-        index=settings.ES_INDEX,
-        doc_type='company_contact',
-        id=response.data['id'],
-        realtime=True
-    )
-    assert es_result['_source']['archived']
-    assert es_result['_source']['archived_reason'] == ''
+        contact = ContactFactory()
+        url = reverse('contact-detail', kwargs={'pk': contact.pk})
+        response = self.api_client.get(url)
 
-
-def test_archive_contact_reason(api_client):
-    """Test archive contact providing a reason."""
-
-    contact = ContactFactory()
-    url = reverse('contact-archive', kwargs={'pk': contact.pk})
-    response = api_client.post(url, {'reason': 'foo'})
-
-    assert response.data['archived']
-    assert response.data['archived_reason'] == 'foo'
-    assert response.data['id'] == contact.pk
-
-    # make sure we're writing to ES
-    es_client = get_elasticsearch_client()
-    es_result = es_client.get(
-        index=settings.ES_INDEX,
-        doc_type='company_contact',
-        id=response.data['id'],
-        realtime=True
-    )
-    assert es_result['_source']['archived']
-    assert es_result['_source']['archived_reason'] == 'foo'
-
-
-def test_contact_detail_view(api_client):
-    """Contact detail view."""
-
-    contact = ContactFactory()
-    url = reverse('contact-detail', kwargs={'pk': contact.pk})
-    response = api_client.get(url)
-
-    assert response.status_code == status.HTTP_200_OK
-    assert response.data['id'] == contact.pk
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['id'] == contact.pk
