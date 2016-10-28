@@ -1,7 +1,8 @@
+import datetime
+
 import pytest
 from django.contrib.auth.models import User
-from django.urls import reverse
-from oauth2_provider.models import Application
+from oauth2_provider.models import Application, AccessToken
 from rest_framework.test import APIClient
 
 
@@ -13,15 +14,23 @@ def get_test_user():
     return test
 
 
-class LeelooTest:
+class LeelooTestCase:
     """All the tests using the DB and accessing end points behind auth should use this class."""
 
     pytestmark = pytest.mark.django_db  # use db
 
     def __init__(self):
-        self.user = get_test_user()
+        self._user = None
+        self._application = None
+        self._token = None
+        self.user = self.get_user()
         self.application = self.get_application()
         self.token = self.get_token()
+
+    def get_user(self):
+        if self._user:
+            return self._user
+        return get_test_user()
 
     def get_logged_in_api_client(self):
         """
@@ -32,25 +41,30 @@ class LeelooTest:
         3) Add the auth credentials to the header
         """
         client = APIClient()
-        client.credentials(HTTP_AUHTORIZATION='Authorization: Bearer {token}'.format(token=self.token))
+        client.force_authenticate(user=self.user)
+        client.credentials(Authorization='Bearer {token}'.format(token=self.token))
         return client
 
     def get_token(self):
         """Get access token for user test."""
 
-        client = RequestsClient()
-        client.login(username=self.application.client_id, password=self.application.client_secret)
-        url = reverse('token')
-        data = {
-            'grant_type': 'password',
-            'username': self.user.username,
-            'password': 'password'
-        }
-        import ipdb; ipdb.set_trace()
-        response = client.post(url, data=data)
+        if self._token:
+            return self._token
+
+        token = AccessToken(
+            user=self.user,
+            application=self.application,
+            token='123456789',
+            expires=datetime.datetime.now() + datetime.timedelta(hours=1),
+            scope='write read'
+        )
+        return token.token
 
     def get_application(self):
         """Return the test application."""
+
+        if self._application:
+            return self._application
 
         application, _ = Application.objects.get_or_create(
                 user=get_test_user(),
