@@ -57,3 +57,5 @@ LOGGING = {
 RAVEN_CONFIG = {
     'DSN': SENTRY_DSN,
 }
+
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
