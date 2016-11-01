@@ -27,8 +27,8 @@ class SearchViewTestCase(LeelooTestCase):
     def test_search_term_with_multiple_doc_type_filters(self):
 
         InteractionFactory()
-        CompanyFactory()
-        ContactFactory()
+        CompanyFactory(name='Foo')
+        ContactFactory(first_name='Foo')
         CompaniesHouseCompanyFactory()
 
         url = reverse('search')
