@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from .models import Advisor, Company, CompaniesHouseCompany, Contact, Country, Interaction, Team
@@ -175,3 +176,11 @@ class InteractionSerializerWrite(serializers.ModelSerializer):
 
     class Meta:
         model = Interaction
+
+
+class UserSerializer(serializers.ModelSerializer):
+    """User serializer."""
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'first_name', 'last_name')

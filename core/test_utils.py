@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 from django.contrib.auth.models import User
+from django.test import TestCase
 from oauth2_provider.models import Application, AccessToken
 from rest_framework.test import APIClient
 
@@ -9,17 +10,17 @@ from rest_framework.test import APIClient
 def get_test_user():
     """Return the test user."""
 
-    test, _ = User.objects.get_or_create(username='Test')
+    test, _ = User.objects.get_or_create(username='Test', first_name='Testo', last_name='Useri')
     test.set_password('password')
     return test
 
 
-class LeelooTestCase:
+class LeelooTestCase(TestCase):
     """All the tests using the DB and accessing end points behind auth should use this class."""
 
     pytestmark = pytest.mark.django_db  # use db
 
-    def __init__(self):
+    def setUp(self):
         self._user = None
         self._application = None
         self._token = None

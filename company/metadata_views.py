@@ -1,6 +1,6 @@
 from functools import partial
 
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 
 from core.serializers import ConstantModelSerializer
@@ -23,8 +23,11 @@ METADATA_MAPPING = {
 
 
 @api_view()
+@authentication_classes([])
+@permission_classes([])
 def metadata_view(request, model):
     """Metadata generic view."""
+
     serializer = ConstantModelSerializer(model.objects.all(), many=True)
     return Response(data=serializer.data)
 

@@ -39,11 +39,11 @@ metadata_views_ids = (
 @pytest.mark.parametrize('view_name',
                          metadata_view_names,
                          ids=metadata_views_ids)
-def test_metadata_view_get(view_name):
+def test_metadata_view_get(view_name, api_client):
     """Test a metadata view for 200 only."""
+
     url = reverse(viewname=view_name)
-    authenticated_api_client = LeelooTestCase().get_logged_in_api_client()
-    response = authenticated_api_client.get(url)
+    response = api_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
 
@@ -51,22 +51,22 @@ def test_metadata_view_get(view_name):
 @pytest.mark.parametrize('view_name',
                          metadata_view_names,
                          ids=metadata_views_ids)
-def test_metadata_view_post(view_name):
+def test_metadata_view_post(view_name, api_client):
     """Test views are read only."""
+
     url = reverse(viewname=view_name)
-    authenticated_api_client = LeelooTestCase().get_logged_in_api_client()
-    response = authenticated_api_client.post(url)
+    response = api_client.post(url)
     assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
 @pytest.mark.parametrize('view_name',
                          metadata_view_names,
                          ids=metadata_views_ids)
-def test_metadata_view_put(view_name):
+def test_metadata_view_put(view_name, api_client):
     """Test views are read only."""
+
     url = reverse(viewname=view_name)
-    authenticated_api_client = LeelooTestCase().get_logged_in_api_client()
-    response = authenticated_api_client.put(url)
+    response = api_client.put(url)
 
     assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
@@ -74,10 +74,10 @@ def test_metadata_view_put(view_name):
 @pytest.mark.parametrize('view_name',
                          metadata_view_names,
                          ids=metadata_views_ids)
-def test_metadata_view_patch(view_name):
+def test_metadata_view_patch(view_name, api_client):
     """Test views are read only."""
+
     url = reverse(viewname=view_name)
-    authenticated_api_client = LeelooTestCase().get_logged_in_api_client()
-    response = authenticated_api_client.patch(url)
+    response = api_client.patch(url)
 
     assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED

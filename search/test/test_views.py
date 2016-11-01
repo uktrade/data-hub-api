@@ -14,9 +14,9 @@ class SearchViewTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == ['Parameter "term" is mandatory.']
 
-    def test_search_by_term(api_client):
+    def test_search_by_term(self):
         url = reverse('search')
-        response = api_client.post(
+        response = self.api_client.post(
             url,
             {'term': 'Foo'},
             format='json'
