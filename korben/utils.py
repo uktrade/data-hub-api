@@ -10,8 +10,14 @@ def get_korben_user():
     return korben
 
 
+def string_to_bytes(obj):
+    if type(obj) is str:
+        return bytes(obj, 'utf-8')
+    return obj
+
+
 def generate_signature(path, body, salt):
     """Generate the signature to be passed into the header."""
 
-    message = bytes(path, 'utf-8') + body + bytes(salt, 'utf-8')
+    message = string_to_bytes(path) + string_to_bytes(body) + string_to_bytes(salt)
     return sha256(message).hexdigest()
