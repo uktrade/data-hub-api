@@ -4,6 +4,9 @@ according to spec.MAPPINGS
 '''
 import functools
 from . import spec
+from korben.cdms_api.rest.utils import cdms_datetime_to_datetime
+from korben.cdms_api.rest.utils import datetime_to_cdms_datetime
+
 
 
 def django_to_odata(django_tablename, django_dict):
@@ -20,6 +23,12 @@ def django_to_odata(django_tablename, django_dict):
         value = django_dict.get(django_col)
         if odata_col and value:
             odata_dict[odata_col] = value
+
+    for odata_col, django_col in mapping.get('datetime', ()):
+        value = django_dict.get(django_col)
+        if odata_col and value:
+            odata_dict[odata_col] = datetime_to_cdms_datetime(value)
+
     for odata_prefix, field_map in mapping.get('nonflat', ()):
         unflattened = {}
         for odata_suffix, django_col in field_map:
@@ -49,6 +58,12 @@ def odata_to_django(odata_tablename, odata_dict):
         value = odata_dict.get(odata_col)
         if odata_col:
             django_dict[django_col] = value
+
+    for odata_col, django_col in mapping.get('datetime', ()):
+        value = odata_dict.get(odata_col)
+        if odata_col:
+            django_dict[django_col] =\
+                cdms_datetime_to_datetime(value).isoformat()
 
     for odata_prefix, field_map in mapping.get('nonflat', ()):
         # eurgh has to work two ways; once for data from cdms once for data
