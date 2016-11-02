@@ -1,6 +1,6 @@
 from django.conf import settings
 from elasticsearch_dsl import Search
-from elasticsearch_dsl.query import Term
+from elasticsearch_dsl.query import Term, MultiMatch
 
 from es.services import document_exists
 from es.utils import get_elasticsearch_client
@@ -51,13 +51,11 @@ class ESConnector:
             )
 
     def search_by_term(self, term, doc_type=None, offset=0, limit=100):
-        """Perform a query term search."""
+        """Perform a multi match search query."""
 
         search_client = self.search.doc_type(*doc_type) if doc_type else self.search
-        search = search_client.query(
-            'query_string',
-            query=term
-        )[offset:offset + limit]
+        query = MultiMatch(query=term, fields=['name^3', 'alias^3', '*_name', 'postcode'])
+        search = search_client.query(query)[offset:offset + limit]
         results = search.execute()
 
         return results
