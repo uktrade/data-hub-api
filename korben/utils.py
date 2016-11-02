@@ -1,4 +1,5 @@
 from hashlib import sha256
+from urllib.parse import urlparse
 
 from django.contrib.auth.models import User
 
@@ -19,5 +20,8 @@ def string_to_bytes(obj):
 def generate_signature(path, body, salt):
     """Generate the signature to be passed into the header."""
 
-    message = string_to_bytes(path) + string_to_bytes(body) + string_to_bytes(salt)
+    # make sure it's a path
+    url_object = urlparse(path)
+
+    message = string_to_bytes(url_object.path) + string_to_bytes(body) + string_to_bytes(salt)
     return sha256(message).hexdigest()
