@@ -13,10 +13,9 @@ from rest_framework.test import APIClient
 from company.models import Company, Contact, Advisor
 from company.test import factories
 from core import constants
-
-# mark the whole module for db use
 from korben.utils import generate_signature
 
+# mark the whole module for db use
 pytestmark = pytest.mark.django_db
 
 
@@ -92,6 +91,31 @@ def test_korben_contact_create(api_client):
         'telephone_countrycode': '+44',
         'telephone_number': '123456789',
         'address_same_as_company': True,
+        'primary': True
+    }
+    api_client.credentials(**{'X-Signature': _signature(url, data)})
+    response = api_client.post(url, data)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert Contact.objects.get(pk=data['id'])
+
+
+def test_korben_contact_incomplete_address_create(api_client):
+    """Create a contact with incomplete address."""
+
+    company = factories.CompanyFactory()
+    url = reverse('korben:company_contact')
+    data = {
+        'id': str(uuid.uuid4()),
+        'title_id': constants.Title.wing_commander.value.id,
+        'first_name': 'Bat',
+        'last_name': 'Man',
+        'role_id': constants.Role.owner.value.id,
+        'company_id': company.id,
+        'email': 'foo@bar.com',
+        'telephone_countrycode': '+44',
+        'telephone_number': '123456789',
+        'address_1': '14 Hello street',
         'primary': True
     }
     api_client.credentials(**{'X-Signature': _signature(url, data)})

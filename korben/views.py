@@ -21,7 +21,7 @@ def korben_view(request, model):
             setattr(obj, key, value)
     except model.DoesNotExist:
         obj = model(**data)
-    obj.save(use_korben=False)  # data come from Korben, don't need to double check
+    obj.save(as_korben=True)  # data come from Korben, kill validation
 
     return HttpResponse('OK')
 
