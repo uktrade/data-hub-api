@@ -173,11 +173,13 @@ MAPPINGS.update({
         'local': (
             ('ActivityId', 'id'),
             ('Subject', 'subject'),
-            ('ActualStart', 'date_of_interaction'),
             ('optevia_Notes', 'notes'),
 
             # ('ModifiedOn', 'modified_on'),  not wanted in leeloo?
             # ('CreatedOn', 'created_on'),
+        ),
+        'datetime': (
+            ('ActualStart', 'date_of_interaction'),
         ),
         'nonflat': (
             (
