@@ -10,7 +10,6 @@ from django.dispatch import receiver
 from django.utils.functional import cached_property
 
 from core import constants
-from core.mixins import DeferredSaveModelMixin
 from core.models import BaseConstantModel, BaseModel
 from core.utils import model_to_dictionary
 from es.connector import ESConnector
@@ -82,7 +81,7 @@ class Company(CompanyAbstract, BaseModel):
     sector = models.ForeignKey('Sector')
     employee_range = models.ForeignKey('EmployeeRange', null=True)
     turnover_range = models.ForeignKey('TurnoverRange', null=True)
-    account_manager = models.ForeignKey('Advisor', null=True)
+    account_manager = models.ForeignKey('user.Advisor', null=True)
     export_to_countries = models.ManyToManyField(
         'Country',
         blank=True,
@@ -192,23 +191,6 @@ class InteractionType(BaseConstantModel):
     pass
 
 
-class Advisor(BaseModel):
-    """Advisor."""
-
-    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
-    first_name = models.CharField(max_length=MAX_LENGTH)
-    last_name = models.CharField(max_length=MAX_LENGTH)
-    email = models.EmailField()
-    dit_team = models.ForeignKey('Team')
-
-    @cached_property
-    def name(self):
-        return '{first_name} {last_name}'.format(first_name=self.first_name, last_name=self.last_name)
-
-    def __str__(self):
-        return self.name
-
-
 class Interaction(BaseModel):
     """Interaction from CDMS."""
 
@@ -216,7 +198,7 @@ class Interaction(BaseModel):
     interaction_type = models.ForeignKey('InteractionType', null=True)
     subject = models.TextField()
     date_of_interaction = models.DateTimeField()
-    dit_advisor = models.ForeignKey('Advisor')
+    dit_advisor = models.ForeignKey('user.Advisor')
     notes = models.TextField()
     company = models.ForeignKey('Company', related_name='interactions')
     contact = models.ForeignKey('Contact', related_name='interactions')

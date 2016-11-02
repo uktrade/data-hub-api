@@ -5,7 +5,7 @@ from oauth2_provider.views import TokenView
 from rest_framework import routers
 
 from company import views
-from company.views import who_am_i
+from user.views import AdvisorReadOnlyViewSet, who_am_i
 from search.views import Search
 
 
@@ -14,7 +14,7 @@ router.register(r'company', views.CompanyViewSet)
 router.register(r'ch-company', views.CompaniesHouseCompanyReadOnlyViewSet)
 router.register(r'contact', views.ContactViewSet)
 router.register(r'interaction', views.InteractionViewSet)
-router.register(r'advisor', views.AdvisorReadOnlyViewSet)
+router.register(r'advisor', AdvisorReadOnlyViewSet)
 
 
 urlpatterns = [

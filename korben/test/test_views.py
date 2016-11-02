@@ -10,7 +10,8 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from company.models import Company, Contact, Advisor
+from company.models import Company, Contact
+from users.models import Advisor
 from company.test import factories
 from core import constants
 from korben.utils import generate_signature

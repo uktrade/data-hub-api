@@ -1,15 +1,13 @@
 """Company and related resources view sets."""
 
 from rest_framework import mixins, viewsets
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
 
 from core.viewsets import ArchiveNoDeleteViewSet
-from .models import Company, CompaniesHouseCompany, Contact, Interaction, Advisor
+from .models import Company, CompaniesHouseCompany, Contact, Interaction
 from .serializers import (CompanySerializerRead, CompanySerializerWrite,
                           CompaniesHouseCompanySerializer,
                           ContactSerializerRead, ContactSerializerWrite,
-                          InteractionSerializerRead, InteractionSerializerWrite, AdvisorSerializer, UserSerializer)
+                          InteractionSerializerRead, InteractionSerializerWrite)
 
 
 class CompanyViewSet(ArchiveNoDeleteViewSet):
@@ -71,20 +69,3 @@ class InteractionViewSet(ArchiveNoDeleteViewSet):
         'company',
         'contact'
     ).all()
-
-
-class AdvisorReadOnlyViewSet(mixins.ListModelMixin,
-                             mixins.RetrieveModelMixin,
-                             viewsets.GenericViewSet):
-    """Advisor GET only views."""
-
-    serializer_class = AdvisorSerializer
-    queryset = Advisor.objects.exclude(first_name='Undefined')
-
-
-@api_view()
-def who_am_i(request):
-    """Return the current user. This view is behind a login."""
-
-    serializer = UserSerializer(request.user)
-    return Response(data=serializer.data)

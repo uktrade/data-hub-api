@@ -1,17 +1,8 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from .models import Advisor, Company, CompaniesHouseCompany, Contact, Country, Interaction, Team
+from user.serializers import AdvisorSerializer
 
-
-class AdvisorSerializer(serializers.ModelSerializer):
-    """Advisor serializer."""
-
-    name = serializers.CharField()
-
-    class Meta:
-        model = Advisor
-        exclude = ('first_name', 'last_name')
+from .models import Company, CompaniesHouseCompany, Contact, Country, Interaction, Team
 
 
 class NestedContactSerializer(serializers.ModelSerializer):
@@ -176,11 +167,3 @@ class InteractionSerializerWrite(serializers.ModelSerializer):
 
     class Meta:
         model = Interaction
-
-
-class UserSerializer(serializers.ModelSerializer):
-    """User serializer."""
-
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'first_name', 'last_name')
