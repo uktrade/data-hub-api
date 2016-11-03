@@ -1,16 +1,34 @@
+import uuid
+
 import pytest
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.test import APIClient
 
 from core import constants
 from core.test_utils import LeelooTestCase
 from es.services import document_exists
 from es.utils import get_elasticsearch_client
+from korben.test.test_views import _signature
+from korben.utils import generate_signature
+
 
 from .factories import CompanyFactory, ContactFactory
+
+# mark the whole module for db use
+pytestmark = pytest.mark.django_db
+
+
+def _signature(url, data):
+    """Return the signature to authenticate the api client for the tests in this module."""
+    return generate_signature(
+        url,
+        APIClient()._encode_data(data)[0],
+        settings.DATAHUB_SECRET
+    )
 
 
 class ContactTestCase(LeelooTestCase):
@@ -187,3 +205,37 @@ class ContactTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['id'] == contact.pk
+
+    def test_get_invalid_contact_coming_from_korben(self):
+        """Do a GET with incomplete address coming from Korben."""
+
+        # create the incomplete address contact using the Korben API first
+
+        company = CompanyFactory()
+        url = reverse('korben:company_contact')
+        data = {
+            'id': str(uuid.uuid4()),
+            'title_id': constants.Title.wing_commander.value.id,
+            'first_name': 'Bat',
+            'last_name': 'Man',
+            'role_id': constants.Role.owner.value.id,
+            'company_id': company.id,
+            'email': 'foo@bar.com',
+            'telephone_countrycode': '+44',
+            'telephone_number': '123456789',
+            'address_1': '14 Hello street',
+            'primary': True
+        }
+        api_client = APIClient()
+        api_client.credentials(**{'X-Signature': _signature(url, data)})
+        response = api_client.post(url, data)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        # now do a GET
+
+        url = reverse('contact-detail', kwargs={'pk': data['id']})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['id'] == data['id']

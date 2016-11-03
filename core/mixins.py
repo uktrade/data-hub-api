@@ -17,21 +17,19 @@ class DeferredSaveModelMixin:
         self.korben_connector = KorbenConnector(table_name=self._meta.db_table)
         super(DeferredSaveModelMixin, self).__init__(*args, **kwargs)
 
-    def save(self, use_korben=True, *args, **kwargs):
+    def save(self, as_korben=False, *args, **kwargs):
         """Save to Korben first, then alter the model instance with the data received back from Korben.
 
         We force feed an ID to Django, so we cannot differentiate between update or create without querying the db
         https://docs.djangoproject.com/en/1.10/ref/models/instances/#how-django-knows-to-update-vs-insert
 
-        :param use_korben: bool - Whether or not it should make a call to Korben before saving.
+        :param as_korben: bool - Whether or not the data comes from Korben (CDMS), in that case don't trigger validation
         """
 
-        self.clean()  # triggers custom validation
-
-        # objects is not accessible via instances
-        update = type(self).objects.filter(id=self.id).exists()
-
-        if use_korben:
+        if not as_korben:
+            self.clean()  # triggers custom validation
+            # objects is not accessible via instances
+            update = type(self).objects.filter(id=self.id).exists()
             korben_data = self._convert_model_to_korben_format()
             korben_response = self.korben_connector.post(data=korben_data, update=update)
             self._map_korben_response_to_model_instance(korben_response)
@@ -61,7 +59,7 @@ class DeferredSaveModelMixin:
             korben_data = self._convert_model_to_korben_format()
             korben_response = self.korben_connector.get(data=korben_data)
             self._map_korben_response_to_model_instance(korben_response)
-            self.save(use_korben=False)
+            self.save(as_korben=True)
 
             reversion.set_user(get_korben_user())
             reversion.set_comment('Updated by Korben')
