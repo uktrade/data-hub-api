@@ -1,0 +1,64 @@
+# Undefined enums, company, advisor
+- model: company.businesstype
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.sector
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.employeerange
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.team
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.turnoverrange
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.ukregion
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.country
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.interactiontype
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.title
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.role
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.service
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+- model: company.company
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {
+    name: Undefined,
+    business_type: 0167b456-0ddd-49bd-8184-e3227a0b6396,
+    sector: 0167b456-0ddd-49bd-8184-e3227a0b6396,
+    registered_address_country: 0167b456-0ddd-49bd-8184-e3227a0b6396,
+    registered_address_1: Undefined,
+    registered_address_town: Undefined,
+    registered_address_postcode: Undefined,
+    uk_region: 0167b456-0ddd-49bd-8184-e3227a0b6396,
+  }
+- model: company.advisor
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {
+    first_name: Undefined,
+    last_name: Undefined,
+    dit_team: 0167b456-0ddd-49bd-8184-e3227a0b6396,
+  }
+- model: company.contact
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {
+    title: 0167b456-0ddd-49bd-8184-e3227a0b6396,
+    primary: True,
+    first_name: Undefined,
+    last_name: Undefined,
+    role: 0167b456-0ddd-49bd-8184-e3227a0b6396,
+    company: 0167b456-0ddd-49bd-8184-e3227a0b6396,
+    address_country: 0167b456-0ddd-49bd-8184-e3227a0b6396,
+  }
