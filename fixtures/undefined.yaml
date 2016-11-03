@@ -1,4 +1,18 @@
 # Undefined enums, company, advisor
+
+- model: company.team
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
+
+- model: company.advisor
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {
+    first_name: Undefined,
+    last_name: Undefined,
+    dit_team: 0167b456-0ddd-49bd-8184-e3227a0b6396,
+  }
+
+
 - model: company.businesstype
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
   fields: {name: Undefined}
@@ -6,9 +20,6 @@
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
   fields: {name: Undefined}
 - model: company.employeerange
-  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
-  fields: {name: Undefined}
-- model: company.team
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
   fields: {name: Undefined}
 - model: company.turnoverrange
@@ -43,13 +54,6 @@
     registered_address_town: Undefined,
     registered_address_postcode: Undefined,
     uk_region: 0167b456-0ddd-49bd-8184-e3227a0b6396,
-  }
-- model: company.advisor
-  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
-  fields: {
-    first_name: Undefined,
-    last_name: Undefined,
-    dit_team: 0167b456-0ddd-49bd-8184-e3227a0b6396,
   }
 - model: company.contact
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
