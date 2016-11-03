@@ -146,7 +146,6 @@ MAPPINGS.update({
             'title_id',
             'role_id',
             'company_id',
-            'uk_region_id',
         ),
         'empty_strings': (
             'archived_reason',
