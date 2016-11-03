@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 
 from django.urls import reverse
+from django.utils.timezone import now
 from rest_framework import status
 
 from core import constants
@@ -283,6 +284,17 @@ class CompanyTestCase(LeelooTestCase):
         )
         assert es_result['_source']['archived']
         assert es_result['_source']['archived_reason'] == 'foo'
+
+    def test_unarchive_company(self):
+        """Unarchive a company."""
+
+        company = CompanyFactory(archived=True, archived_on=now(), archived_reason='foo')
+        url = reverse('company-unarchive', kwargs={'pk': company.id})
+        response = self.api_client.get(url)
+
+        assert not response.data['archived']
+        assert response.data['archived_reason'] == ''
+        assert response.data['id'] == str(company.id)
 
 
 class CHCompanyTestCase(LeelooTestCase):

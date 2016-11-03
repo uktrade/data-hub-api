@@ -192,7 +192,7 @@ class InteractionType(BaseConstantModel):
     pass
 
 
-class Advisor(DeferredSaveModelMixin, models.Model):
+class Advisor(BaseModel):
     """Advisor."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)

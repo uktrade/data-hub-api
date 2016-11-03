@@ -1,5 +1,6 @@
 """General mixins."""
 import reversion
+from dateutil import parser
 from rest_framework import status
 
 from core.utils import model_to_dictionary
@@ -42,6 +43,9 @@ class DeferredSaveModelMixin:
         if korben_response.status_code == status.HTTP_200_OK:
             for key, value in korben_response.json().items():
                 setattr(self, key, value)
+            self.archived_on = parser.parse(self.archived_on) if self.archived_on else self.archived_on
+            self.modified_on = parser.parse(self.modified_on) if self.modified_on else self.modified_on
+            self.created_on = parser.parse(self.created_on) if self.created_on else self.created_on
         else:
             raise KorbenException(korben_response.json())
 
