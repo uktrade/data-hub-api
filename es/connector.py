@@ -2,8 +2,8 @@ from django.conf import settings
 from elasticsearch_dsl import Search
 from elasticsearch_dsl.query import Term, MultiMatch
 
-from es.services import document_exists
-from es.utils import get_elasticsearch_client
+from .services import document_exists
+from .utils import get_elasticsearch_client
 
 
 class ESConnector:
