@@ -24,6 +24,15 @@ class ArchiveNoDeleteViewSet(mixins.CreateModelMixin,
         serializer = self.read_serializer_class(obj)
         return Response(data=serializer.data)
 
+    @detail_route(methods=['get'])
+    def unarchive(self, request, pk):
+        """Unarchive the object."""
+
+        obj = self.get_object()
+        obj.unarchive()
+        serializer = self.read_serializer_class(obj)
+        return Response(data=serializer.data)
+
     def get_serializer_class(self):
         """Return a different serializer class for reading or writing, if defined."""
         if self.action in ('list', 'retrieve', 'archive'):
