@@ -1,6 +1,6 @@
 import socket
 
-from .common import *
+from .production import *
 
 MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 INSTALLED_APPS += ('debug_toolbar',)
