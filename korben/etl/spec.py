@@ -45,7 +45,6 @@ MAPPINGS.update({
             ('Name', 'name'),
             ('optevia_Alias', 'alias'),
             ('optevia_CompaniesHouseNumber', 'company_number'),
-            # ('optevia_ukorganisation', 'uk_based'),
             ('optevia_Address1', 'registered_address_1'),
             ('optevia_Address2', 'registered_address_2'),
             ('optevia_Address3', 'registered_address_3'),
@@ -54,6 +53,10 @@ MAPPINGS.update({
             ('optevia_StateCounty', 'registered_address_county'),
             ('optevia_PostCode', 'registered_address_postcode'),
             ('Description', 'description'),
+        ),
+        'datetime': (
+            ('ModifiedOn', 'modified_on'),
+            ('CreatedOn', 'created_on'),
         ),
         'nonflat': (
             ('optevia_Country', (('Id', 'registered_address_country_id'),),),
@@ -122,9 +125,10 @@ MAPPINGS.update({
             ('optevia_TownCity', 'address_town'),
             ('optevia_StateCounty', 'address_county'),
             ('optevia_PostCode', 'address_postcode'),
-
-            # ('ModifiedOn', 'modified_on'),  not wanted in leeloo?
-            # ('CreatedOn', 'created_on'),
+        ),
+        'datetime': (
+            ('ModifiedOn', 'modified_on'),
+            ('CreatedOn', 'created_on'),
         ),
         'concat': (
             (('optevia_AreaCode', 'optevia_TelephoneNumber'), 'telephone_number', 'optevia_TelephoneNumber'),
@@ -162,12 +166,8 @@ MAPPINGS.update({
             ('archived', lambda: False),
             ('address_same_as_company', lambda: False),
             ('email', lambda: FAKE_EMAIL),
-            # needs odata_defaults
-            # ('optevia_LastVerified', lambda: datetime.now().isoformat())
         ),
     },
-
-    # check commit history for more information
     'detica_interactionSet': {
         'to': 'company_interaction',
         'local': (
@@ -175,11 +175,11 @@ MAPPINGS.update({
             ('Subject', 'subject'),
             ('optevia_Notes', 'notes'),
 
-            # ('ModifiedOn', 'modified_on'),  not wanted in leeloo?
-            # ('CreatedOn', 'created_on'),
         ),
         'datetime': (
             ('ActualStart', 'date_of_interaction'),
+            ('ModifiedOn', 'modified_on'),
+            ('CreatedOn', 'created_on'),
         ),
         'nonflat': (
             (
