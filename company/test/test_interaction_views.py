@@ -116,3 +116,14 @@ class InteractionTestCase(LeelooTestCase):
         )
         assert es_result['_source']['archived']
         assert es_result['_source']['archived_reason'] == 'foo'
+
+    def test_unarchive_interaction(self):
+        """Test unarchive interaction."""
+
+        interaction = InteractionFactory(archived=True, archived_reason='foo')
+        url = reverse('interaction-unarchive', kwargs={'pk': interaction.pk})
+        response = self.api_client.get(url)
+
+        assert not response.data['archived']
+        assert response.data['archived_reason'] == ''
+        assert response.data['id'] == interaction.pk

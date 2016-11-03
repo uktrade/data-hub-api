@@ -196,6 +196,17 @@ class ContactTestCase(LeelooTestCase):
         assert es_result['_source']['archived']
         assert es_result['_source']['archived_reason'] == 'foo'
 
+    def test_unarchive_contact(self):
+        """Test unarchive contact."""
+
+        contact = ContactFactory(archived=True, archived_reason='foo')
+        url = reverse('contact-unarchive', kwargs={'pk': contact.pk})
+        response = self.api_client.get(url)
+
+        assert not response.data['archived']
+        assert response.data['archived_reason'] == ''
+        assert response.data['id'] == contact.pk
+
     def test_contact_detail_view(self):
         """Contact detail view."""
 
