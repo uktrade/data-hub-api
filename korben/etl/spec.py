@@ -137,7 +137,6 @@ MAPPINGS.update({
         'nonflat': (
             ('ParentCustomerId', (('Id', 'company_id'),),),
             ('optevia_Country', (('Id', 'address_country_id'),),),
-            ('optevia_UKRegion', (('Id', 'uk_region_id'),),),
             ('optevia_ContactRole', (('Id', 'role_id'),),),
         ),
         'nonflat_defaults': (
