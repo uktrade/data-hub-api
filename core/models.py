@@ -23,6 +23,7 @@ class BaseModel(DeferredSaveModelMixin, models.Model):
 
         self.archived = True
         self.archived_reason = reason
+        self.archived_on = now()
         self.save()
 
     def unarchive(self):
