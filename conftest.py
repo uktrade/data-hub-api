@@ -8,6 +8,8 @@ from pytest_django.lazy_django import skip_if_no_django
 def django_db_setup(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():
         call_command('loaddata', '/app/leeloo/fixtures/metadata.yaml')
+        call_command('loaddata', '/app/leeloo/fixtures/undefined.yaml')
+        call_command('loaddata', '/app/leeloo/fixtures/datahub_businesstypes.yaml')
 
 
 @pytest.fixture
