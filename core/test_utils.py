@@ -1,6 +1,7 @@
 import datetime
 
 import pytest
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.test import TestCase
 from oauth2_provider.models import Application, AccessToken
@@ -10,7 +11,8 @@ from rest_framework.test import APIClient
 def get_test_user():
     """Return the test user."""
 
-    test, _ = User.objects.get_or_create(username='Test', first_name='Testo', last_name='Useri')
+    user_model = get_user_model()
+    test, _ = user_model.objects.get_or_create(username='Test', first_name='Testo', last_name='Useri')
     test.set_password('password')
     return test
 

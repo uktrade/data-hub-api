@@ -1,13 +1,14 @@
 from hashlib import sha256
 from urllib.parse import urlparse
 
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 
 def get_korben_user():
     """Get or return the Korben user."""
 
-    korben, _ = User.objects.get_or_create(username='Korben')
+    user_model = get_user_model()
+    korben, _ = user_model.objects.get_or_create(username='Korben', first_name='Kor', last_name='Ben')
     return korben
 
 

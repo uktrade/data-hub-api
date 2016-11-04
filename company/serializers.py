@@ -1,8 +1,6 @@
 from rest_framework import serializers
 
-from user.serializers import AdvisorSerializer
-
-from .models import Company, CompaniesHouseCompany, Contact, Country, Interaction, Team
+from .models import Advisor, Company, CompaniesHouseCompany, Contact, Country, Interaction, Team
 
 
 class NestedContactSerializer(serializers.ModelSerializer):
@@ -39,6 +37,16 @@ class CompaniesHouseCompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = CompaniesHouseCompany
         depth = 1
+
+
+class AdvisorSerializer(serializers.ModelSerializer):
+    """Advisor serializer."""
+
+    name = serializers.CharField()
+
+    class Meta:
+        model = Advisor
+        exclude = ('first_name', 'last_name')
 
 
 class CompanySerializerRead(serializers.ModelSerializer):

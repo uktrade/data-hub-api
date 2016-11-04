@@ -2,6 +2,6 @@ from django.contrib import admin
 
 from reversion.admin import VersionAdmin
 
-from . models import Advisor
+from . models import User
 
-admin.site.register(Advisor, VersionAdmin)
+admin.site.register(User, VersionAdmin)

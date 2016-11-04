@@ -30,4 +30,3 @@ def model_to_dictionary(model_instance, fk_ids=False):
         else:
             data[field.name] = getattr(model_instance, field.name)
     return data
-

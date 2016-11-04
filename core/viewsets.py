@@ -20,7 +20,7 @@ class ArchiveNoDeleteViewSet(mixins.CreateModelMixin,
 
         reason = request.data.get('reason', '')
         obj = self.get_object()
-        obj.archive(reason=reason)
+        obj.archive(user=request.user, reason=reason)
         serializer = self.read_serializer_class(obj)
         return Response(data=serializer.data)
 

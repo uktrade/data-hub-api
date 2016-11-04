@@ -3,8 +3,8 @@
 from rest_framework import mixins, viewsets
 
 from core.viewsets import ArchiveNoDeleteViewSet
-from .models import Company, CompaniesHouseCompany, Contact, Interaction
-from .serializers import (CompanySerializerRead, CompanySerializerWrite,
+from .models import Advisor, Company, CompaniesHouseCompany, Contact, Interaction
+from .serializers import (AdvisorSerializer, CompanySerializerRead, CompanySerializerWrite,
                           CompaniesHouseCompanySerializer,
                           ContactSerializerRead, ContactSerializerWrite,
                           InteractionSerializerRead, InteractionSerializerWrite)
@@ -69,3 +69,12 @@ class InteractionViewSet(ArchiveNoDeleteViewSet):
         'company',
         'contact'
     ).all()
+
+
+class AdvisorReadOnlyViewSet(mixins.ListModelMixin,
+                             mixins.RetrieveModelMixin,
+                             viewsets.GenericViewSet):
+    """Advisor GET only views."""
+
+    serializer_class = AdvisorSerializer
+    queryset = Advisor.objects.exclude(first_name='Undefined')

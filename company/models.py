@@ -3,6 +3,7 @@ import uuid
 
 from dateutil import parser
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save, m2m_changed
@@ -10,6 +11,7 @@ from django.dispatch import receiver
 from django.utils.functional import cached_property
 
 from core import constants
+from core.mixins import DeferredSaveModelMixin
 from core.models import BaseConstantModel, BaseModel
 from core.utils import model_to_dictionary
 from es.connector import ESConnector
@@ -81,7 +83,7 @@ class Company(CompanyAbstract, BaseModel):
     sector = models.ForeignKey('Sector')
     employee_range = models.ForeignKey('EmployeeRange', null=True)
     turnover_range = models.ForeignKey('TurnoverRange', null=True)
-    account_manager = models.ForeignKey('user.Advisor', null=True)
+    account_manager = models.ForeignKey('Advisor', null=True)
     export_to_countries = models.ManyToManyField(
         'Country',
         blank=True,
@@ -198,7 +200,7 @@ class Interaction(BaseModel):
     interaction_type = models.ForeignKey('InteractionType', null=True)
     subject = models.TextField()
     date_of_interaction = models.DateTimeField()
-    dit_advisor = models.ForeignKey('user.Advisor')
+    dit_advisor = models.ForeignKey('Advisor')
     notes = models.TextField()
     company = models.ForeignKey('Company', related_name='interactions')
     contact = models.ForeignKey('Contact', related_name='interactions')
@@ -326,6 +328,39 @@ class Contact(BaseModel):
             elif not some_address_fields_existence:
                 raise ValidationError('Please select either address_same_as_company or enter an address manually.')
         super(Contact, self).clean()
+
+
+class Advisor(DeferredSaveModelMixin, models.Model):
+    """Advisor."""
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)
+    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
+    first_name = models.CharField(max_length=MAX_LENGTH)
+    last_name = models.CharField(max_length=MAX_LENGTH)
+    dit_team = models.ForeignKey('Team')
+    email = models.EmailField(default=constants.KORBEN_FAKE_EMAIL)
+
+    @cached_property
+    def name(self):
+        return '{first_name} {last_name}'.format(first_name=self.first_name, last_name=self.last_name)
+
+    def save(self, as_korben=True, *args, **kwargs):
+        """Create a user with an unusable password"""
+
+        if not self.user:
+            user_model = get_user_model()
+            self.user = user_model.objects.create(
+                email=self.email,
+                first_name=self.first_name,
+                last_name=self.last_name,
+                username=self.email.split('@')[0],
+            )
+            self.user.set_unusable_password()
+
+        super().save(as_korben=as_korben, *args, **kwargs)
+
+    def __str__(self):
+        return self.name
 
 
 # Write to ES stuff

@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.db import models
 from django.utils.timezone import now
 
@@ -11,17 +11,18 @@ class BaseModel(DeferredSaveModelMixin, models.Model):
     archived = models.BooleanField(default=False)
     archived_on = models.DateTimeField(null=True)
     archived_reason = models.TextField(blank=True, null=True)
-    archived_by = models.ForeignKey(User, null=True)
+    archived_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
     created_on = models.DateTimeField(null=True, blank=True)
     modified_on = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         abstract = True
 
-    def archive(self, reason=None):
+    def archive(self, user, reason=None):
         """Archive the model instance."""
 
         self.archived = True
+        self.archived_by = user
         self.archived_reason = reason
         self.archived_on = now()
         self.save()
@@ -31,6 +32,8 @@ class BaseModel(DeferredSaveModelMixin, models.Model):
 
         self.archived = False
         self.archived_reason = ''
+        self.archived_by = None
+        self.archived_on = None
         self.save()
 
     def clean(self):
