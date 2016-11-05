@@ -12,7 +12,11 @@ def get_test_user():
     """Return the test user."""
 
     user_model = get_user_model()
-    test, _ = user_model.objects.get_or_create(username='Test', first_name='Testo', last_name='Useri')
+    test, _ = user_model.objects.get_or_create(
+        username='Test',
+        first_name='Testo',
+        last_name='Useri'
+    )
     test.set_password('password')
     return test
 

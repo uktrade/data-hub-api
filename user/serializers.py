@@ -5,6 +5,8 @@ from rest_framework import serializers
 class UserSerializer(serializers.ModelSerializer):
     """User serializer."""
 
+    name = serializers.CharField(source='advisor.name')
+
     class Meta:
         model = get_user_model()
         fields = ('id', 'username', 'first_name', 'last_name', 'name')

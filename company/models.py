@@ -109,6 +109,9 @@ class Company(CompanyAbstract, BaseModel):
     trading_address_country = models.ForeignKey('Country', null=True, related_name='company_trading_address_country')
     trading_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
+    class Meta:
+        verbose_name_plural = 'companies'
+
     @cached_property
     def uk_based(self):
         """Whether a company is based in the UK or not."""
@@ -334,7 +337,7 @@ class Contact(BaseModel):
 class Advisor(DeferredSaveModelMixin, models.Model):
     """Advisor."""
 
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
@@ -347,3 +350,47 @@ class Advisor(DeferredSaveModelMixin, models.Model):
 
     def __str__(self):
         return self.name
+
+
+# Create a Django user when an advisor is created
+@receiver(post_save, sender=Advisor)
+def create_user_for_advisor(instance, created, **kwargs):
+    if created and not instance.user:
+        user_model = get_user_model()
+        user = user_model.objects.create(
+            email=instance.email,
+            first_name=instance.first_name,
+            last_name=instance.last_name,
+            username=instance.email.split('@')[0],
+        )
+        user.set_unusable_password()
+        instance.user = user
+        instance.save()
+
+
+# Create an advisor when a user is created (ie using the shell)
+# Users should be created through advisors, this covers the case of automated tests and users created with
+# the management command
+@receiver(post_save, sender=User)  # cannot use get_user_model() because app registry is not initialised
+def create_advisor_for_user(instance, created, **kwargs):
+    if created:
+        advisor = Advisor(
+            user=instance,
+            first_name=instance.first_name if instance.first_name else instance.email,
+            last_name=instance.last_name,
+            dit_team=Team.objects.get(name='Undefined'),
+            email=instance.email
+        )
+        advisor.save(as_korben=True)  # don't talk to Korben, this is not an Advisor we want to save in CDMS!
+
+
+# Write to ES stuff
+@receiver((post_save, m2m_changed))
+def save_to_es(sender, instance, **kwargs):
+    """Save to ES."""
+
+    if sender in (Company, CompaniesHouseCompany, Contact, Interaction):
+        es_connector = ESConnector()
+        doc_type = type(instance)._meta.db_table  # cannot access _meta from the instance
+        data = model_to_dictionary(instance)
+        es_connector.save(doc_type=doc_type, data=data)
