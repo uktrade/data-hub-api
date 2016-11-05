@@ -4,6 +4,7 @@ according to spec.MAPPINGS
 '''
 import functools
 from . import spec
+from korben.services import db
 from korben.cdms_api.rest.utils import cdms_datetime_to_datetime
 from korben.cdms_api.rest.utils import datetime_to_cdms_datetime
 
@@ -17,8 +18,15 @@ def django_to_odata(django_tablename, django_dict):
     the OData entity has ETag requirements and the dict is the passed
     django_dict transformed according to the spec in etl.specs.MAPPINGS
     '''
+
     odata_dict = {}
-    mapping = spec.MAPPINGS[spec.DJANGO_LOOKUP[django_tablename]]
+    odata_tablename = spec.DJANGO_LOOKUP[django_tablename]
+    mapping = spec.MAPPINGS[odata_tablename]
+
+    for django_col in mapping.get('use_undefined', ()):
+        if django_dict.get(django_col) == spec.ENUM_UNDEFINED_ID:
+            del django_dict[django_col]
+
     for odata_col, django_col in mapping.get('local', ()):
         value = django_dict.get(django_col)
         if odata_col and value:
@@ -39,13 +47,38 @@ def django_to_odata(django_tablename, django_dict):
         if not unflattened:
             continue
         odata_dict[odata_prefix] = unflattened
+
     for odata_prefix, defaults in mapping.get('nonflat_defaults', ()):
         if odata_prefix not in odata_dict:
             continue
         # TODO: Make this less poor; it’s called defaults, but it overwrites :/
         odata_dict[odata_prefix].update(defaults)
+
     for _, django_col, odata_col in mapping.get('concat', ()):
-        odata_dict[odata_col] = django_dict[django_col]
+        value = django_dict.get(django_col)
+        if value:
+            odata_dict[odata_col] = value
+
+    # handle adding single permitted “organization” id “root business unit”
+    # (see etl.spec module) where appropriate
+    # TODO: write this somewhere into the spec
+    odata_metadata = db.get_odata_metadata()
+    odata_table = odata_metadata.tables[odata_tablename]
+    if 'OrganizationId_Id' in odata_table.columns:
+        odata_dict['OrganizationId'] = {
+            'Id': spec.STAGING_ORGANIZATION_ID,
+        }
+    if 'OrganizationId' in odata_table.columns:
+        odata_dict['OrganizationId'] = spec.STAGING_ORGANIZATION_ID
+    if 'ParentBusinessUnitId_Id' in odata_table.columns:
+        odata_dict['ParentBusinessUnitId'] = {
+            'Id': spec.STAGING_ROOT_BUSINESSUNIT_ID,  # TODO: handle prod case
+        }
+    if 'BusinessUnitId_Id' in odata_table.columns:
+        odata_dict['BusinessUnitId'] = {
+            'Id': spec.STAGING_ROOT_BUSINESSUNIT_ID,  # TODO: handle prod case
+        }
+
     return mapping.get('etag', False), odata_dict
 
 
@@ -61,7 +94,7 @@ def odata_to_django(odata_tablename, odata_dict):
 
     for odata_col, django_col in mapping.get('datetime', ()):
         value = odata_dict.get(odata_col)
-        if odata_col:
+        if odata_col and value:
             django_dict[django_col] =\
                 cdms_datetime_to_datetime(value).isoformat()
 
