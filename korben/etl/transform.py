@@ -59,26 +59,6 @@ def django_to_odata(django_tablename, django_dict):
         if value:
             odata_dict[odata_col] = value
 
-    # handle adding single permitted “organization” id “root business unit”
-    # (see etl.spec module) where appropriate
-    # TODO: write this somewhere into the spec
-    odata_metadata = db.get_odata_metadata()
-    odata_table = odata_metadata.tables[odata_tablename]
-    if 'OrganizationId_Id' in odata_table.columns:
-        odata_dict['OrganizationId'] = {
-            'Id': spec.STAGING_ORGANIZATION_ID,
-        }
-    if 'OrganizationId' in odata_table.columns:
-        odata_dict['OrganizationId'] = spec.STAGING_ORGANIZATION_ID
-    if 'ParentBusinessUnitId_Id' in odata_table.columns:
-        odata_dict['ParentBusinessUnitId'] = {
-            'Id': spec.STAGING_ROOT_BUSINESSUNIT_ID,  # TODO: handle prod case
-        }
-    if 'BusinessUnitId_Id' in odata_table.columns:
-        odata_dict['BusinessUnitId'] = {
-            'Id': spec.STAGING_ROOT_BUSINESSUNIT_ID,  # TODO: handle prod case
-        }
-
     return mapping.get('etag', False), odata_dict
 
 

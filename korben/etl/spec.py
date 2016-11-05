@@ -23,11 +23,6 @@ ENUM_MAPPINGS = (
 # "enum" style tables in the Django database
 ENUM_UNDEFINED_ID = '0167b456-0ddd-49bd-8184-e3227a0b6396'
 
-# Some things require relation to the single organisation object permitted
-STAGING_ORGANIZATION_ID = '7589e590-3e95-e211-a939-e4115bead28a'
-STAGING_ROOT_BUSINESSUNIT_ID = '5e8be8a8-3e95-e211-a939-e4115bead28a'
-STAGING_SYSTEMUSER_ID = '9a1912a1-64c9-4fc5-84f6-4e08495e272b'
-
 # ~8% of contacts in CDMS don’t have an email, we use the following placeholder
 FAKE_EMAIL = 'fake@no-email-address-supplied.com'
 
