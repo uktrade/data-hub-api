@@ -4,6 +4,7 @@ import uuid
 from dateutil import parser
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save, m2m_changed
@@ -333,7 +334,7 @@ class Contact(BaseModel):
 class Advisor(DeferredSaveModelMixin, models.Model):
     """Advisor."""
 
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
@@ -344,36 +345,5 @@ class Advisor(DeferredSaveModelMixin, models.Model):
     def name(self):
         return '{first_name} {last_name}'.format(first_name=self.first_name, last_name=self.last_name)
 
-    def save(self, as_korben=True, *args, **kwargs):
-        """Create a user with an unusable password"""
-
-        if not self.user:
-            user_model = get_user_model()
-            self.user = user_model.objects.create(
-                email=self.email,
-                first_name=self.first_name,
-                last_name=self.last_name,
-                username=self.email.split('@')[0],
-            )
-            self.user.set_unusable_password()
-
-        super().save(as_korben=as_korben, *args, **kwargs)
-
     def __str__(self):
         return self.name
-
-
-# Write to ES stuff
-
-MODEL_TO_WRITE_TO_ES = (Company, CompaniesHouseCompany, Contact, Interaction)
-
-
-@receiver((post_save, m2m_changed))
-def save_to_es(sender, instance, **kwargs):
-    """Save to ES."""
-
-    if sender in MODEL_TO_WRITE_TO_ES:
-        es_connector = ESConnector()
-        doc_type = type(instance)._meta.db_table  # cannot access _meta from the instance
-        data = model_to_dictionary(instance)
-        es_connector.save(doc_type=doc_type, data=data)
