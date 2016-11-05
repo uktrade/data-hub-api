@@ -30,6 +30,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     sector_id = constants.Sector.aerospace_assembly_aircraft.value.id
     archived = False
     uk_region_id = constants.UKRegion.england.value.id
+    created_on = now()
 
     class Meta:
         model = 'company.Company'
@@ -64,6 +65,7 @@ class ContactFactory(factory.django.DjangoModelFactory):
     telephone_countrycode = '+44'
     telephone_number = '123456789'
     address_same_as_company = True
+    created_on = now()
 
     class Meta:
         model = 'company.Contact'
@@ -91,6 +93,7 @@ class InteractionFactory(factory.django.DjangoModelFactory):
     dit_advisor = factory.SubFactory(AdvisorFactory)
     service_id = constants.Service.trade_enquiry.value.id
     dit_team_id = constants.Team.healthcare_uk.value.id
+    created_on = now()
 
     class Meta:
         model = 'company.Interaction'
