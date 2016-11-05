@@ -8,6 +8,7 @@ class NestedContactSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Contact
+        depth = 1
 
 
 class NestedCountrySerializer(serializers.ModelSerializer):
