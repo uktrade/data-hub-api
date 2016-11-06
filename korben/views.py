@@ -1,5 +1,7 @@
 from functools import partial
 
+from dateutil.parser import parse as parse_date
+from django.db.models.fields import DateTimeField
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
@@ -21,6 +23,17 @@ def korben_view(request, model):
             setattr(obj, key, value)
     except model.DoesNotExist:
         obj = model(**request.data)
+
+    # create datetime objects for datetime fields
+    for field in obj._meta.fields:
+        if isinstance(field, DateTimeField):
+            try:
+                date_obj = parse_date(getattr(obj, field.name, None))
+                setattr(obj, field.name, date_obj)
+            except (ValueError, AttributeError):
+                if field.null: pass
+                else: raise
+
     obj.save(as_korben=True)  # data come from Korben, kill validation
 
     return HttpResponse('OK')
