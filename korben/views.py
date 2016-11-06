@@ -1,6 +1,7 @@
 from functools import partial
 
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.decorators import authentication_classes
 
@@ -14,13 +15,12 @@ EXPOSED_MODELS = (Advisor, Company, Contact, Interaction)
 def korben_view(request, model):
     """View for Korben."""
 
-    data = request.POST.dict()
     try:
-        obj = model.objects.get(id=data['id'])
-        for key, value in data.items():
+        obj = model.objects.get(id=request.data['id'])
+        for key, value in request.data.items():
             setattr(obj, key, value)
     except model.DoesNotExist:
-        obj = model(**data)
+        obj = model(**request.data)
     obj.save(as_korben=True)  # data come from Korben, kill validation
 
     return HttpResponse('OK')
@@ -32,5 +32,4 @@ for model in EXPOSED_MODELS:
     name = model._meta.db_table
     fn = partial(korben_view, model=model)
     path = r'{0}/$'.format(name)
-    urls_args.append(((path, fn), {'name': name}))
-
+    urls_args.append(((path, csrf_exempt(fn)), {'name': name}))
