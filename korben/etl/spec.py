@@ -101,12 +101,16 @@ MAPPINGS.update({
             ('SystemUserId', 'id'),
             ('FirstName', 'first_name'),
             ('LastName', 'last_name'),
+            ('InternalEMailAddress', 'email'),
         ),
         'concat': (
             (('FirstName', 'MiddleName'), 'first_name', 'FirstName'),
         ),
         'nonflat': (
             ('BusinessUnitId', (('Id', 'dit_team_id'),),),
+        ),
+        'defaults': (
+            ('email', lambda: FAKE_EMAIL),
         ),
     },
     'ContactSet': {
