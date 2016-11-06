@@ -198,6 +198,7 @@ class Advisor(BaseModel):
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
+    email = models.EmailField()
     dit_team = models.ForeignKey('Team')
 
     @cached_property
