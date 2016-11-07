@@ -19,8 +19,8 @@ def korben_view(request, model):
 
     try:
         obj = model.objects.get(id=request.data['id'])
-        for key, value in request.data.items():
-            setattr(obj, key, value)
+        for key in request.data:
+            setattr(obj, key, request.data[key])
     except model.DoesNotExist:
         obj = model(**request.data)
 
