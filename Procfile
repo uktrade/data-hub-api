@@ -1,1 +1,1 @@
-web: gunicorn datahubapi.wsgi
+web: python manage.py migrate && gunicorn datahubapi.wsgi
