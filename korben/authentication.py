@@ -14,8 +14,9 @@ class KorbenSharedSecretAuthentication(BaseAuthentication):
         - If authentication is not attempted, return None.
         - If authentication is attempted but fails, raise a AuthenticationFailed exception.
         """
+
         expected_signature = generate_signature(request.path, request.body, settings.DATAHUB_SECRET)
-        offered_signature = request.META.get('HTTP_X_SIGNATURE', '')
+        offered_signature = request.META.get('X-Signature', '')
         if not offered_signature:
             return None
         if constant_time_compare(expected_signature, offered_signature):

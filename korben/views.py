@@ -31,8 +31,10 @@ def korben_view(request, model):
                 date_obj = parse_date(getattr(obj, field.name, None))
                 setattr(obj, field.name, date_obj)
             except (ValueError, AttributeError):
-                if field.null: pass
-                else: raise
+                if field.null:
+                    pass
+                else:
+                    raise
 
     obj.save(as_korben=True)  # data come from Korben, kill validation
 
