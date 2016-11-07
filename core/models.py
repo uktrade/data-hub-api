@@ -1,8 +1,11 @@
+from dateutil import parser
 from django.conf import settings
 from django.db import models
 from django.utils.timezone import now
+from rest_framework import status
 
 from core.mixins import DeferredSaveModelMixin
+from korben.exceptions import KorbenException
 
 
 class BaseModel(DeferredSaveModelMixin, models.Model):
@@ -44,6 +47,17 @@ class BaseModel(DeferredSaveModelMixin, models.Model):
 
         self.created_on = self.created_on if self.created_on else now()
         self.modified_on = self.modified_on if self.modified_on else now()
+
+    def _map_korben_response_to_model_instance(self, korben_response):
+        """Handle date time object."""
+        if korben_response.status_code == status.HTTP_200_OK:
+            for key, value in korben_response.json().items():
+                setattr(self, key, value)
+            self.archived_on = parser.parse(self.archived_on) if self.archived_on else self.archived_on
+            self.modified_on = parser.parse(self.modified_on) if self.modified_on else self.modified_on
+            self.created_on = parser.parse(self.created_on) if self.created_on else self.created_on
+        else:
+            raise KorbenException(korben_response.json())
 
 
 class BaseConstantModel(models.Model):

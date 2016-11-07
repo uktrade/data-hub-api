@@ -292,14 +292,14 @@ class Contact(BaseModel):
             }
         else:
             return {
-               'address_1': self.address_1,
-               'address_2': self.address_2,
-               'address_3': self.address_3,
-               'address_4': self.address_4,
-               'address_town': self.address_town,
-               'address_country': self.address_country.pk if self.address_country else None,
-               'address_county': self.address_county,
-               'address_postcode': self.address_postcode,
+                'address_1': self.address_1,
+                'address_2': self.address_2,
+                'address_3': self.address_3,
+                'address_4': self.address_4,
+                'address_town': self.address_town,
+                'address_country': self.address_country.pk if self.address_country else None,
+                'address_county': self.address_county,
+                'address_postcode': self.address_postcode,
             }
 
     def __str__(self):
