@@ -2,10 +2,10 @@ from functools import partial
 
 from dateutil.parser import parse as parse_date
 from django.db.models.fields import DateTimeField
-from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view
-from rest_framework.decorators import authentication_classes
+from rest_framework.decorators import api_view, authentication_classes
+from rest_framework.response import Response
+from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from company.models import Advisor, Company, Contact, Interaction
 from .authentication import KorbenSharedSecretAuthentication
@@ -17,12 +17,13 @@ EXPOSED_MODELS = (Advisor, Company, Contact, Interaction)
 def korben_view(request, model):
     """View for Korben."""
 
+    data = request.data.dict()  # convert from QueryDict to dict
     try:
-        obj = model.objects.get(id=request.data['id'])
-        for key in request.data:
-            setattr(obj, key, request.data[key])
+        obj = model.objects.get(pk=data['id'])
+        for key, value in data.items():
+            setattr(obj, key, value)
     except model.DoesNotExist:
-        obj = model(**request.data)
+        obj = model(**data)
 
     # create datetime objects for datetime fields
     for field in obj._meta.fields:
@@ -34,11 +35,11 @@ def korben_view(request, model):
                 if field.null:
                     pass
                 else:
-                    raise
+                    return Response(data=data, status=HTTP_400_BAD_REQUEST)
 
-    obj.save(as_korben=True)  # data come from Korben, kill validation
+    obj.save(as_korben=True)  # data comes from Korben, kill validation
 
-    return HttpResponse('OK')
+    return Response(data={'message': 'OK'})
 
 
 urls_args = []
