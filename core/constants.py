@@ -4,9 +4,6 @@ from enum import Enum
 Constant = namedtuple('Constant', ('name', 'id'))
 
 
-KORBEN_FAKE_EMAIL = 'fake@no-email-address-supplied.com'
-
-
 class BusinessType(Enum):
     """Business types."""
 

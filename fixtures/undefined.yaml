@@ -12,7 +12,6 @@
     dit_team: 0167b456-0ddd-49bd-8184-e3227a0b6396,
   }
 
-
 - model: company.businesstype
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
   fields: {name: Undefined}

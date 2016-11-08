@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from django.db import models
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
@@ -222,6 +223,10 @@ class Interaction(BaseModel):
         if date_of_interaction_string:
             self.date_of_interaction = parser.parse(date_of_interaction_string)
 
+    def get_excluded_fields(self):
+        """Don't send user to Korben, it's a Django thing."""
+        return ['user']
+
 
 class Title(BaseConstantModel):
     """Contact title."""
@@ -342,7 +347,7 @@ class Advisor(DeferredSaveModelMixin, models.Model):
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
     dit_team = models.ForeignKey('Team')
-    email = models.EmailField(default=constants.KORBEN_FAKE_EMAIL)
+    email = models.EmailField()
 
     @cached_property
     def name(self):
@@ -351,21 +356,27 @@ class Advisor(DeferredSaveModelMixin, models.Model):
     def __str__(self):
         return self.name
 
+    def get_excluded_fields(self):
+        """Don't send user to Korben, it's a Django thing."""
+        return ['user']
+
 
 # Create a Django user when an advisor is created
-@receiver(post_save, sender=Advisor)
 def create_user_for_advisor(instance, created, **kwargs):
     if created and not instance.user:
         user_model = get_user_model()
-        user = user_model.objects.create(
+        user, _ = user_model.objects.get_or_create(
+            username=instance.email.split('@')[0],
             email=instance.email,
             first_name=instance.first_name,
             last_name=instance.last_name,
-            username=instance.email.split('@')[0],
         )
         user.set_unusable_password()
         instance.user = user
-        instance.save()
+        try:
+            instance.save()
+        except IntegrityError:  # somehow factories are saving it twice and it blows up, prevent it from happening
+            pass
 
 
 # Create an advisor when a user is created (ie using the shell)
