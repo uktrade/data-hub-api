@@ -10,9 +10,11 @@ def get_korben_user():
     user_model = get_user_model()
     korben, _ = user_model.objects.get_or_create(
         username='Korben',
-        first_name='Kor',
-        last_name='Ben',
-        email='kor.ben@foo.bar'
+        defaults={
+            'first_name': 'Kor',
+            'last_name': 'Ben',
+            'email': 'kor.ben@foo.bar'
+    }
     )
     return korben
 
