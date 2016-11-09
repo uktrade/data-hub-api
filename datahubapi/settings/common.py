@@ -20,7 +20,6 @@ SECRET_KEY = env('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG')
-
 # As app is running behind a host-based router supplied by Heroku or other
 # PaaS, we can open ALLOWED_HOSTS
 ALLOWED_HOSTS = ['*']
@@ -149,6 +148,7 @@ REST_FRAMEWORK = {
 
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
+APPEND_SLASH = False
 
 # Leeloo stuff
 ES_HOST = env('ES_HOST')
