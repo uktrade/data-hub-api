@@ -62,7 +62,10 @@ class CompanyTestCase(LeelooTestCase):
             'address_3': None,
             'address_4': None,
             'address_town': ch_company.registered_address_town,
-            'address_country': str(ch_company.registered_address_country.pk),
+            'address_country': {
+                'id': str(ch_company.registered_address_country.pk),
+                'name': ch_company.registered_address_country.name
+            },
             'address_county': None,
             'address_postcode': None,
         }
@@ -93,7 +96,10 @@ class CompanyTestCase(LeelooTestCase):
             'address_3': None,
             'address_4': None,
             'address_town': company.registered_address_town,
-            'address_country': str(company.registered_address_country.pk),
+            'address_country': {
+                'id': str(company.registered_address_country.pk),
+                'name': company.registered_address_country.name
+            },
             'address_county': None,
             'address_postcode': None,
         }

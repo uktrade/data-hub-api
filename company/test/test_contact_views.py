@@ -79,6 +79,27 @@ class ContactTestCase(LeelooTestCase):
 
         assert 'Please select either address_same_as_company or enter an address manually.' in str(error.value)
 
+    def test_add_contact_with_both_manual_and_same_as_company_address(self):
+
+        url = reverse('contact-list')
+
+        with pytest.raises(ValidationError) as error:
+            self.api_client.post(url, {
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+                'title': constants.Title.admiral_of_the_fleet.value.id,
+                'company': CompanyFactory().pk,
+                'role': constants.Role.owner.value.id,
+                'email': 'foo@bar.com',
+                'telephone_countrycode': '+44',
+                'telephone_number': '123456789',
+                'address_1': 'test',
+                'address_same_as_company': True,
+                'primary': True
+            })
+
+        assert 'Please select either address_same_as_company or enter an address manually, not both!' in str(error.value)
+
     def test_add_contact_partial_manual_address(self):
         """Test add new contact with a partial manual address."""
 

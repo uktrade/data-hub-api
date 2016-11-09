@@ -283,26 +283,40 @@ class Contact(BaseModel):
     @cached_property
     def address(self):
         """Return the company address if the flag is selected."""
+        address_country = None
 
         if self.address_same_as_company:
+            if self.company.trading_address_country:
+                address_country = {
+                   'id': self.company.trading_address_country.pk,
+                   'name': self.company.trading_address_country.name
+                }
+            else:
+                address_country = {
+                    'id':  self.company.registered_address_country.pk,
+                    'name':  self.company.registered_address_country.name
+                }
+
             return {
                 'address_1': self.company.trading_address_1 or self.company.registered_address_1,
                 'address_2': self.company.trading_address_2 or self.company.registered_address_2,
                 'address_3': self.company.trading_address_3 or self.company.registered_address_3,
                 'address_4': self.company.trading_address_4 or self.company.registered_address_4,
                 'address_town': self.company.trading_address_town or self.company.registered_address_town,
-                'address_country': self.company.trading_address_country.pk if self.company.trading_address_country else self.company.registered_address_country.name,
+                'address_country': address_country,
                 'address_county': self.company.trading_address_county or self.company.registered_address_county,
                 'address_postcode': self.company.trading_address_postcode or self.company.registered_address_postcode,
             }
         else:
+            if self.address_country:
+                address_country = {'id': self.address_country.pk , 'name': self.address_country.name}
             return {
                 'address_1': self.address_1,
                 'address_2': self.address_2,
                 'address_3': self.address_3,
                 'address_4': self.address_4,
                 'address_town': self.address_town,
-                'address_country': self.address_country.pk if self.address_country else None,
+                'address_country': address_country,
                 'address_county': self.address_county,
                 'address_postcode': self.address_postcode,
             }
@@ -330,7 +344,8 @@ class Contact(BaseModel):
                 self.address_country,
                 self.address_town
             ))
-
+        if self.address_same_as_company and some_address_fields_existence:
+            raise ValidationError('Please select either address_same_as_company or enter an address manually, not both!')
         if not self.address_same_as_company:
             if some_address_fields_existence and not all_required_fields_existence:
                 raise ValidationError('address_1, town and country are required if an address is entered.')
