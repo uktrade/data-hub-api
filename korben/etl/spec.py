@@ -117,7 +117,6 @@ MAPPINGS.update({
         'to': 'company_contact',
         'local': (
             ('ContactId', 'id'),
-            ('Title', 'title_id'),
             ('LastName', 'last_name'),
             ('optevia_PrimaryContact', 'primary'),
             ('optevia_CountryCode', 'telephone_countrycode'),
@@ -142,6 +141,7 @@ MAPPINGS.update({
             ('ParentCustomerId', (('Id', 'company_id'),),),
             ('optevia_Country', (('Id', 'address_country_id'),),),
             ('optevia_ContactRole', (('Id', 'role_id'),),),
+            ('optevia_Title', (('Id', 'title_id'),),),
         ),
         'nonflat_defaults': (
             ('ParentCustomerId', {'LogicalName': 'account'}),
