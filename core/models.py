@@ -50,16 +50,15 @@ class BaseModel(DeferredSaveModelMixin, models.Model):
 
     def _map_korben_response_to_model_instance(self, korben_response):
         """Handle date time object."""
-        if korben_response.status_code == status.HTTP_200_OK:
-            for key, value in korben_response.json().items():
-                setattr(self, key, value)
-            self.archived_on = parser.parse(self.archived_on) if self.archived_on else self.archived_on
-            self.modified_on = parser.parse(self.modified_on) if self.modified_on else self.modified_on
-            self.created_on = parser.parse(self.created_on) if self.created_on else self.created_on
-        elif korben_response.status_code == status.HTTP_404_NOT_FOUND:
-            return
-        else:
-            raise KorbenException(korben_response.json())
+
+        super(BaseModel, self)._map_korben_response_to_model_instance(korben_response)
+        archived_on = korben_response.json().get('archived_on')
+        modified_on = korben_response.json().get('modified_on')
+        created_on = korben_response.json().get('created_on')
+
+        self.archived_on = parser.parse(archived_on) if archived_on else archived_on
+        self.modified_on = parser.parse(modified_on) if modified_on else modified_on
+        self.created_on = parser.parse(created_on) if created_on else created_on
 
 
 class BaseConstantModel(models.Model):
