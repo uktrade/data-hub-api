@@ -148,7 +148,7 @@ REST_FRAMEWORK = {
 
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
-APPEND_SLASH = False
+APPEND_SLASH = True
 
 # Leeloo stuff
 ES_HOST = env('ES_HOST')

@@ -20,11 +20,11 @@ router.register(r'advisor', views.AdvisorReadOnlyViewSet)
 urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^admin/', admin.site.urls),
-    url(r'^search$', Search.as_view(), name='search'),
+    url(r'^search/$', Search.as_view(), name='search'),
     url(r'^metadata/', include('company.metadata_urls')),
     url(r'^token/$', TokenView.as_view(), name="token"),
     url(r'^korben/', include('korben.urls', namespace='korben')),
-    url(r'^whoami$', who_am_i, name='who_am_i'),
+    url(r'^whoami/$', who_am_i, name='who_am_i'),
     url(r'^dashboard/', include('dashboard.urls', namespace='dashboard'))
 ]
 
