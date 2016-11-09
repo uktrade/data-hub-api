@@ -1,5 +1,4 @@
 import collections
-from korben import config, services
 
 
 def fkey_deps(metadata):
