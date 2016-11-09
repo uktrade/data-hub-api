@@ -56,6 +56,8 @@ class BaseModel(DeferredSaveModelMixin, models.Model):
             self.archived_on = parser.parse(self.archived_on) if self.archived_on else self.archived_on
             self.modified_on = parser.parse(self.modified_on) if self.modified_on else self.modified_on
             self.created_on = parser.parse(self.created_on) if self.created_on else self.created_on
+        elif korben_response.status_code == status.HTTP_404_NOT_FOUND:
+            return
         else:
             raise KorbenException(korben_response.json())
 

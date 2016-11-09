@@ -43,6 +43,8 @@ class DeferredSaveModelMixin:
         if korben_response.status_code == status.HTTP_200_OK:
             for key, value in korben_response.json().items():
                 setattr(self, key, value)
+        elif korben_response.status_code == status.HTTP_404_NOT_FOUND:
+            return
         else:
             raise KorbenException(korben_response.json())
 
