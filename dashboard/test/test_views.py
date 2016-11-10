@@ -16,7 +16,7 @@ class DashboardTestCase(LeelooTestCase):
         interaction = InteractionFactory(dit_advisor=user.advisor)
 
         url = reverse('dashboard:intelligent-homepage')
-        response = self.api_client.get(url)
+        response = self.api_client.get(url, data={'days': 23})
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data['contacts']) == 1
