@@ -98,6 +98,7 @@ class Company(CompanyAbstract, BaseModel):
         null=True,
         related_name='company_future_interest_countries'
     )
+    lead = models.BooleanField(default=False)
     description = models.TextField(blank=True, null=True)
     website = models.URLField(blank=True, null=True)
     uk_region = models.ForeignKey('UKRegion', null=True)
