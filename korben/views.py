@@ -19,7 +19,7 @@ EXPOSED_MODELS = (Advisor, Company, Contact, Interaction)
 def korben_view(request, model):
     """View for Korben."""
 
-    data = request.data.dict()  # convert from QueryDict to dict
+    data = request.data
     try:
         obj = model.objects.get(pk=data['id'])
         for key, value in data.items():
