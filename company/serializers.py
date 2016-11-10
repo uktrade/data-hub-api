@@ -144,6 +144,7 @@ class ContactSerializerWrite(serializers.ModelSerializer):
 
     class Meta:
         model = Contact
+        exclude = ('teams',)
 
 
 class ContactSerializerRead(serializers.ModelSerializer):
