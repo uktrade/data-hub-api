@@ -16,7 +16,8 @@ class IntelligentHomepageView(APIView):
 
     def get(self, request, format=None):
         user = request.user
-        days_in_the_past = now()-timedelta(days=15)
+        days = request.GET.get('days', 15)
+        days_in_the_past = now()-timedelta(days=int(days))
 
         interactions = Interaction.objects.filter(
             dit_advisor=user.advisor,
