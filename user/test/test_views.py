@@ -13,7 +13,7 @@ class UserViewTestCase(LeelooTestCase):
         user_test = get_test_user()
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['username'] == user_test.username
-        assert response.data['first_name'] == user_test.first_name
-        assert response.data['last_name'] == user_test.last_name
-        assert response.data['id'] == user_test.pk
+        assert response.data['name'] == user_test.advisor.name
+        assert response.data['first_name'] == user_test.advisor.first_name
+        assert response.data['last_name'] == user_test.advisor.last_name
+        assert response.data['id'] == str(user_test.advisor.pk)
