@@ -22,7 +22,7 @@ class InteractionTestCase(LeelooTestCase):
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['id'] == interaction.pk
+        assert response.data['id'] == str(interaction.pk)
 
     def test_add_interaction(self):
         """Test add new interaction."""
@@ -82,7 +82,7 @@ class InteractionTestCase(LeelooTestCase):
 
         assert response.data['archived']
         assert response.data['archived_reason'] == ''
-        assert response.data['id'] == interaction.pk
+        assert response.data['id'] == str(interaction.pk)
 
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
@@ -104,7 +104,7 @@ class InteractionTestCase(LeelooTestCase):
 
         assert response.data['archived']
         assert response.data['archived_reason'] == 'foo'
-        assert response.data['id'] == interaction.pk
+        assert response.data['id'] == str(interaction.pk)
 
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
@@ -126,4 +126,4 @@ class InteractionTestCase(LeelooTestCase):
 
         assert not response.data['archived']
         assert response.data['archived_reason'] == ''
-        assert response.data['id'] == interaction.pk
+        assert response.data['id'] == str(interaction.pk)

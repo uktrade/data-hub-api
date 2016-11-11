@@ -2,6 +2,7 @@
 These tests rely on the metadata.yaml fixture to be imported,
 Check conftest.py in the root folder for the importing mechanism.
 """
+import json
 import uuid
 
 import pytest
@@ -21,18 +22,14 @@ pytestmark = pytest.mark.django_db
 
 def _signature(url, data):
     """Return the signature to authenticate the api client for the tests in this module."""
-    return generate_signature(
-        url,
-        APIClient()._encode_data(data)[0],
-        settings.DATAHUB_SECRET
-    )
+    return generate_signature(url, data, settings.DATAHUB_SECRET)
 
 
 def test_korben_company_create(api_client):
     """Create a company."""
 
     url = reverse('korben:company_company')
-    data = {
+    data_dict = {
         'id': str(uuid.uuid4()),
         'name': 'Foo',
         'registered_address_1': 'Foo st.',
@@ -44,11 +41,12 @@ def test_korben_company_create(api_client):
         'uk_region_id': constants.UKRegion.england.value.id,
     }
 
-    api_client.credentials(**{'X-Signature': _signature(url, data)})
-    response = api_client.post(url, data)
+    data = json.dumps(data_dict)
+    api_client.credentials(**{'HTTP_X_SIGNATURE': _signature(url, data)})
+    response = api_client.post(url, data, content_type='application/json')
 
     assert response.status_code == status.HTTP_200_OK
-    assert Company.objects.get(pk=data['id'])
+    assert Company.objects.get(pk=data_dict['id'])
 
 
 def test_korben_company_update(api_client):
@@ -57,7 +55,7 @@ def test_korben_company_update(api_client):
     url = reverse('korben:company_company')
     company = factories.CompanyFactory()
 
-    data = {
+    data_dict = {
         'id': str(company.id),
         'name': 'My little company',
         'registered_address_1': 'My st.',
@@ -68,11 +66,14 @@ def test_korben_company_update(api_client):
         'archived': False,
         'uk_region_id': constants.UKRegion.england.value.id,
     }
-    api_client.credentials(**{'X-Signature': _signature(url, data)})
-    response = api_client.post(url, data)
+    data = json.dumps(data_dict)
+    api_client.credentials(**{'HTTP_X_SIGNATURE': _signature(url, data)})
+    response = api_client.post(url, data, content_type='application/json')
 
     assert response.status_code == status.HTTP_200_OK
-    assert Company.objects.filter(pk=data['id'], name='My little company').exists()
+    assert Company.objects.filter(
+        pk=data_dict['id'], name='My little company'
+    ).exists()
 
 
 def test_korben_contact_create(api_client):
@@ -80,7 +81,7 @@ def test_korben_contact_create(api_client):
 
     company = factories.CompanyFactory()
     url = reverse('korben:company_contact')
-    data = {
+    data_dict = {
         'id': str(uuid.uuid4()),
         'title_id': constants.Title.wing_commander.value.id,
         'first_name': 'John',
@@ -93,11 +94,12 @@ def test_korben_contact_create(api_client):
         'address_same_as_company': True,
         'primary': True
     }
-    api_client.credentials(**{'X-Signature': _signature(url, data)})
-    response = api_client.post(url, data)
+    data = json.dumps(data_dict)
+    api_client.credentials(**{'HTTP_X_SIGNATURE': _signature(url, data)})
+    response = api_client.post(url, data, content_type='application/json')
 
     assert response.status_code == status.HTTP_200_OK
-    assert Contact.objects.get(pk=data['id'])
+    assert Contact.objects.get(pk=data_dict['id'])
 
 
 def test_korben_contact_incomplete_address_create(api_client):
@@ -105,7 +107,7 @@ def test_korben_contact_incomplete_address_create(api_client):
 
     company = factories.CompanyFactory()
     url = reverse('korben:company_contact')
-    data = {
+    data_dict = {
         'id': str(uuid.uuid4()),
         'title_id': constants.Title.wing_commander.value.id,
         'first_name': 'Bat',
@@ -118,11 +120,12 @@ def test_korben_contact_incomplete_address_create(api_client):
         'address_1': '14 Hello street',
         'primary': True
     }
-    api_client.credentials(**{'X-Signature': _signature(url, data)})
-    response = api_client.post(url, data)
+    data = json.dumps(data_dict)
+    api_client.credentials(**{'HTTP_X_SIGNATURE': _signature(url, data)})
+    response = api_client.post(url, data, content_type='application/json')
 
     assert response.status_code == status.HTTP_200_OK
-    assert Contact.objects.get(pk=data['id'])
+    assert Contact.objects.get(pk=data_dict['id'])
 
 
 def test_korben_contact_update(api_client):
@@ -130,7 +133,7 @@ def test_korben_contact_update(api_client):
 
     contact = factories.ContactFactory()
     url = reverse('korben:company_contact')
-    data = {
+    data_dict = {
         'id': str(uuid.uuid4()),
         'title_id': constants.Title.wing_commander.value.id,
         'first_name': 'Mario',
@@ -143,25 +146,27 @@ def test_korben_contact_update(api_client):
         'address_same_as_company': True,
         'primary': True
     }
-    api_client.credentials(**{'X-Signature': _signature(url, data)})
-    response = api_client.post(url, data)
+    data = json.dumps(data_dict)
+    api_client.credentials(**{'HTTP_X_SIGNATURE': _signature(url, data)})
+    response = api_client.post(url, data, content_type='application/json')
 
     assert response.status_code == status.HTTP_200_OK
-    assert Contact.objects.filter(pk=data['id'], first_name='Mario').exists()
+    assert Contact.objects.filter(pk=data_dict['id'], first_name='Mario').exists()
 
 
 def test_korben_advisor_create(api_client):
     """Create an advisor."""
 
     url = reverse('korben:company_advisor')
-    data = {
+    data_dict = {
         'id': str(uuid.uuid4()),
         'first_name': 'John',
         'last_name': 'Smith',
         'dit_team_id': constants.Team.healthcare_uk.value.id,
     }
-    api_client.credentials(**{'X-Signature': _signature(url, data)})
-    response = api_client.post(url, data)
+    data = json.dumps(data_dict)
+    api_client.credentials(**{'HTTP_X_SIGNATURE': _signature(url, data)})
+    response = api_client.post(url, data, content_type='application/json')
 
     assert response.status_code == status.HTTP_200_OK
-    assert Advisor.objects.get(pk=data['id'])
+    assert Advisor.objects.get(pk=data_dict['id'])

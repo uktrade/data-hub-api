@@ -13,6 +13,7 @@ class KorbenConnector:
 
     default_headers = {
         'Content-type': 'application/json',
+        'Accept': 'application/json',
     }
 
     def __init__(self, table_name):
@@ -31,19 +32,19 @@ class KorbenConnector:
         :return: requests Response object
         """
         if update:
-            url = '{base_url}/update/{table_name}'.format(
+            url = '{base_url}/update/{table_name}/'.format(
                 base_url=self.base_url,
                 table_name=self.table_name
             )
         else:
-            url = '{base_url}/create/{table_name}'.format(
+            url = '{base_url}/create/{table_name}/'.format(
                 base_url=self.base_url,
                 table_name=self.table_name
             )
 
         data = self.encode_json(data)
         self.inject_auth_header(url, data)
-        response = requests.post(url=url, data=data, headers=self.default_headers)
+        response = requests.post(url=url, json=data, headers=self.default_headers)
         return response
 
     def get(self, data):
@@ -52,12 +53,12 @@ class KorbenConnector:
         :param object_id: object id
         :return: requests Response object
         """
-        url = '{base_url}/get/{table_name}/{id}'.format(
+        url = '{base_url}/get/{table_name}/{id}/'.format(
             base_url=self.base_url,
             table_name=self.table_name,
             id=data['id']
         )
         data = self.encode_json(data)
         self.inject_auth_header(url, data)
-        response = requests.post(url=url, data=data, headers=self.default_headers)
+        response = requests.post(url=url, json=data, headers=self.default_headers)
         return response
