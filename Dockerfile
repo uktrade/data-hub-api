@@ -1,7 +1,7 @@
 FROM python:3.5
 
-RUN mkdir -p /app/leeloo
-WORKDIR /app/leeloo
+RUN mkdir -p /app
+WORKDIR /app
 
 ADD requirements.txt .
 RUN pip install -r requirements.txt
