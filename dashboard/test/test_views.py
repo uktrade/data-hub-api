@@ -11,8 +11,7 @@ class DashboardTestCase(LeelooTestCase):
     def test_intelligent_homepage(self):
 
         user = get_test_user()
-        company = CompanyFactory(account_manager=user.advisor, created_on=now())
-        contact = ContactFactory(company=company)
+        contact = ContactFactory(advisor=user.advisor)
         interaction = InteractionFactory(dit_advisor=user.advisor)
 
         url = reverse('dashboard:intelligent-homepage')

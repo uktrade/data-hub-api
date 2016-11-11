@@ -24,7 +24,7 @@ class IntelligentHomepageView(APIView):
             created_on__gte=days_in_the_past
         ).order_by('-created_on')
         contacts = Contact.objects.filter(
-            company__account_manager=user.advisor,
+            advisor=user.advisor,
             created_on__gte=days_in_the_past
         ).order_by('-created_on')
 
