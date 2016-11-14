@@ -1,5 +1,3 @@
-import pytest
-
 from datetime import timedelta
 
 from django.utils.timezone import now
@@ -11,7 +9,6 @@ from company.models import Contact, Interaction
 from .serializers import IntelligentHomepageSerializer
 
 
-@pytest.mark.skipif(True, reason='Is failing on not auto-populating date')
 class IntelligentHomepageView(APIView):
     """Return the data for the intelligent homepage."""
 
