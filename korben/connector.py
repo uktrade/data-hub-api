@@ -16,10 +16,16 @@ class KorbenConnector:
         'Accept': 'application/json',
     }
 
+    def encode_json_bytes(self, model_dict):
+        json_str = self._json_encoder.encode(model_dict)
+        return bytes(json_str, 'utf-8')
+
     def __init__(self, table_name):
-        self.encode_json = DjangoJSONEncoder().encode
+        self._json_encoder = DjangoJSONEncoder()
         self.table_name = table_name
-        self.base_url = 'http://{host}:{port}'.format(host=settings.KORBEN_HOST, port=settings.KORBEN_PORT)
+        self.base_url = 'http://{host}:{port}'.format(
+            host=settings.KORBEN_HOST, port=settings.KORBEN_PORT
+        )
 
     def inject_auth_header(self, url, body):
         self.default_headers['X-Signature'] = generate_signature(url, body, settings.DATAHUB_SECRET)
@@ -42,7 +48,7 @@ class KorbenConnector:
                 table_name=self.table_name
             )
 
-        data = self.encode_json(data)
+        data = self.encode_json_bytes(data)
         self.inject_auth_header(url, data)
         response = requests.post(url=url, data=data, headers=self.default_headers)
         return response
@@ -58,7 +64,7 @@ class KorbenConnector:
             table_name=self.table_name,
             id=data['id']
         )
-        data = self.encode_json(data)
+        data = self.encode_json_bytes(data)
         self.inject_auth_header(url, data)
         response = requests.post(url=url, data=data, headers=self.default_headers)
         return response
