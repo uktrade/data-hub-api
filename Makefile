@@ -1,6 +1,6 @@
 .PHONY: test-leeloo
 
-tessa:
+tests:
 	docker-compose build && docker-compose run leeloo pytest -s
 
 docker-cleanup:
