@@ -6,7 +6,6 @@ import functools
 from . import spec
 from korben.services import db
 from korben.cdms_api.rest.utils import cdms_datetime_to_datetime
-from korben.cdms_api.rest.utils import datetime_to_cdms_datetime
 
 
 
@@ -34,13 +33,12 @@ def django_to_odata(django_tablename, django_dict):
         if odata_col and value:
             odata_dict[odata_col] = value
 
-    ''' this is only required in one direction?
-    # Transform datetime strings to Dyanmics-style datetime strings
+    # Mapping datetime fields; this is handled separately to local because
+    # conversion is required in the opposite (OData -> Django) direction
     for odata_col, django_col in mapping.get('datetime', ()):
         value = django_dict.get(django_col)
         if odata_col and value:
-            odata_dict[odata_col] = datetime_to_cdms_datetime(value)
-    '''
+            odata_dict[odata_col] = value
 
     # Under the OData scheme, foreign keys are represented as dicts with some
     # identifier key, a name key and a relation name key. We generally (see
@@ -83,11 +81,14 @@ def odata_to_django(odata_tablename, odata_dict):
     django_dict = {}
     mapping = spec.MAPPINGS[odata_tablename]
 
+    # Simplest mapping from “local” dict key to renamed “local” key
     for odata_col, django_col in mapping.get('local', ()):
         value = odata_dict.get(odata_col)
         if odata_col:
             django_dict[django_col] = value
 
+    # Transform the fields containgin Dynamics-style datetime strings to ISO
+    # standard datetime strings
     for odata_col, django_col in mapping.get('datetime', ()):
         value = odata_dict.get(odata_col)
         if odata_col and value:
