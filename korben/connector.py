@@ -44,7 +44,7 @@ class KorbenConnector:
 
         data = self.encode_json(data)
         self.inject_auth_header(url, data)
-        response = requests.post(url=url, json=data, headers=self.default_headers)
+        response = requests.post(url=url, data=data, headers=self.default_headers)
         return response
 
     def get(self, data):
@@ -60,5 +60,5 @@ class KorbenConnector:
         )
         data = self.encode_json(data)
         self.inject_auth_header(url, data)
-        response = requests.post(url=url, json=data, headers=self.default_headers)
+        response = requests.post(url=url, data=data, headers=self.default_headers)
         return response
