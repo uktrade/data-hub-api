@@ -8,8 +8,7 @@ from rest_framework import status
 
 from datahub.company import models
 from datahub.core.test_utils import LeelooTestCase
-from datahub.es.services import document_exists
-from datahub.es.utils import get_elasticsearch_client
+from datahub.es.utils import document_exists, get_elasticsearch_client
 from .factories import CompanyFactory, CompaniesHouseCompanyFactory
 
 

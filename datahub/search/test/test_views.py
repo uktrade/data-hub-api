@@ -1,7 +1,8 @@
 from django.urls import reverse
 from rest_framework import status
 
-from datahub.company import CompaniesHouseCompanyFactory, ContactFactory, CompanyFactory, InteractionFactory
+from datahub.company.test.factories import (CompaniesHouseCompanyFactory, ContactFactory, CompanyFactory,
+                                            InteractionFactory)
 from datahub.core.test_utils import LeelooTestCase
 
 

@@ -1,18 +1,17 @@
 import uuid
 
 import pytest
-from core import constants
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.urls import reverse
-from korben.utils import generate_signature
 from rest_framework import status
 from rest_framework.test import APIClient
 
+
+from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
-from datahub.es import document_exists
-from datahub.es import get_elasticsearch_client
-from datahub.korben.test.test_views import _signature
+from datahub.es.utils import document_exists, get_elasticsearch_client
+from datahub.korben.utils import generate_signature
 from .factories import CompanyFactory, ContactFactory
 
 # mark the whole module for db use

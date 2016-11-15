@@ -1,12 +1,12 @@
-from core import constants
+
 from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
 from rest_framework import status
 
+from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
-from datahub.es import document_exists
-from datahub.es import get_elasticsearch_client
+from datahub.es.utils import document_exists, get_elasticsearch_client
 from .factories import AdvisorFactory, CompanyFactory, ContactFactory, InteractionFactory
 
 

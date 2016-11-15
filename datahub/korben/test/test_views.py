@@ -10,10 +10,10 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from datahub.company import Advisor, Company, Contact
-from datahub.company import factories
+from datahub.company.models import Advisor, Company, Contact
+from datahub.company.test import factories
 from datahub.core import constants
-from datahub.korben import generate_signature
+from datahub.korben.utils import generate_signature
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
