@@ -66,7 +66,7 @@ MIDDLEWARE_CLASSES = [
     'reversion.middleware.RevisionMiddleware',
 ]
 
-ROOT_URLCONF = 'datahubapi.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
