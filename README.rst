@@ -4,9 +4,15 @@ Leeloo Data Hub API
 
 .. image:: https://circleci.com/gh/uktrade/data-hub-leeloo/tree/master.svg?style=svg
     :target: https://circleci.com/gh/uktrade/data-hub-leeloo/tree/master
+    :alt: Circle CI
 
 .. image:: https://codecov.io/gh/uktrade/data-hub-leeloo/branch/master/graph/badge.svg
-  :target: https://codecov.io/gh/uktrade/data-hub-leeloo
+    :target: https://codecov.io/gh/uktrade/data-hub-leeloo
+    :alt: Codecov
+
+.. image:: https://codeclimate.com/github/uktrade/data-hub-leeloo/badges/gpa.svg
+   :target: https://codeclimate.com/github/uktrade/data-hub-leeloo
+   :alt: Code Climate
 
 
 Leeloo provides an API into Datahub for Datahub clients. Using Leeloo you can search for entities
