@@ -19,6 +19,7 @@ elasticsearch-dsl==2.1.0
 # Testing
 pytest-django==3.0.0
 pytest-sugar==0.7.1
+pytest-cov==2.4.0
 ipython
 ipdb
 Werkzeug

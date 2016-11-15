@@ -1,9 +1,7 @@
 [run]
 branch = True
-source = leeloo
+source = datahub
 omit =
-    *gunicorn*
-    *datahubapi*
     *migrations*
     *test*
     *manage.py
