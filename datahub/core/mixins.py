@@ -1,11 +1,14 @@
 """General mixins."""
+
 import reversion
 from rest_framework import status
 
-from datahub.core import model_to_dictionary
 from datahub.korben.connector import KorbenConnector
 from datahub.korben.exceptions import KorbenException
 from datahub.korben.utils import get_korben_user
+
+from .utils import model_to_dictionary
+
 
 class DeferredSaveModelMixin:
     """Handles add and update models."""
