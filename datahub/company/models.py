@@ -1,9 +1,9 @@
 """Company models."""
 import uuid
 
-from core import constants
-from core.models import BaseConstantModel, BaseModel
-from core.utils import model_to_dictionary
+from datahub.core import constants
+from datahub.core.models import BaseConstantModel, BaseModel
+from datahub.core.utils import model_to_dictionary
 from dateutil import parser
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -16,7 +16,7 @@ from django.dispatch import receiver
 from django.utils.functional import cached_property
 
 from datahub.core.mixins import DeferredSaveModelMixin
-from datahub.es import ESConnector
+from datahub.es.connector import ESConnector
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 

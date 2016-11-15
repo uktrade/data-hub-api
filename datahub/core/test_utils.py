@@ -1,8 +1,6 @@
 import datetime
-
 import pytest
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User
 from django.test import TestCase
 from oauth2_provider.models import Application, AccessToken
 from rest_framework.test import APIClient

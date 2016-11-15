@@ -2,7 +2,7 @@ from django.urls import reverse
 from django.utils.timezone import now
 from rest_framework import status
 
-from datahub.company import CompanyFactory, ContactFactory, InteractionFactory
+from datahub.company.test.factories import CompanyFactory, ContactFactory, InteractionFactory
 from datahub.core.test_utils import LeelooTestCase, get_test_user
 
 

@@ -40,3 +40,13 @@ def format_es_results(es_results):
 
     return results
 
+
+def document_exists(client, doc_type, document_id):
+    """Check whether the document with a specific ID exists."""
+
+    return client.exists(
+        index=settings.ES_INDEX,
+        doc_type=doc_type,
+        id=document_id,
+        realtime=True
+    )

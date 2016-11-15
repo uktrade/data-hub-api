@@ -4,7 +4,7 @@ from django.utils.timezone import now
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from datahub.company import Contact, Interaction
+from datahub.company.models import Contact, Interaction
 
 from .serializers import IntelligentHomepageSerializer
 

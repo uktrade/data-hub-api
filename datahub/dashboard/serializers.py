@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from datahub.company import NestedContactSerializer, NestedInteractionSerializer
+from datahub.company.serializers import NestedContactSerializer, NestedInteractionSerializer
 
 
 class IntelligentHomepageSerializer(serializers.Serializer):

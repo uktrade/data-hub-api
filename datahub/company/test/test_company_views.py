@@ -1,5 +1,5 @@
 import pytest
-from core import constants
+from datahub.core import constants
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.urls import reverse
@@ -8,8 +8,8 @@ from rest_framework import status
 
 from datahub.company import models
 from datahub.core.test_utils import LeelooTestCase
-from datahub.es import document_exists
-from datahub.es import get_elasticsearch_client
+from datahub.es.services import document_exists
+from datahub.es.utils import get_elasticsearch_client
 from .factories import CompanyFactory, CompaniesHouseCompanyFactory
 
 
