@@ -47,7 +47,8 @@ class AdvisorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Advisor
-        exclude = ('first_name', 'last_name')
+        exclude = ('user', )
+        depth = 1
 
 
 class CompanySerializerRead(serializers.ModelSerializer):

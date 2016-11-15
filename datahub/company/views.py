@@ -1,5 +1,5 @@
 """Company and related resources view sets."""
-
+ 
 from rest_framework import mixins, viewsets
 
 from datahub.core.viewsets import ArchiveNoDeleteViewSet
@@ -56,6 +56,10 @@ class ContactViewSet(ArchiveNoDeleteViewSet):
         'teams',
         'interactions'
     ).exclude(first_name='Undefined')
+
+    def create(self, request, *args, **kwargs):
+        request.data.update({'advisor': str(request.user.advisor.pk)})  # inject the user
+        return super().create(request, *args, **kwargs)
 
 
 class InteractionViewSet(ArchiveNoDeleteViewSet):

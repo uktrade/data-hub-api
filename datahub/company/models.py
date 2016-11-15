@@ -98,6 +98,7 @@ class Company(CompanyAbstract, BaseModel):
         null=True,
         related_name='company_future_interest_countries'
     )
+    lead = models.BooleanField(default=False)
     description = models.TextField(blank=True, null=True)
     website = models.URLField(blank=True, null=True)
     uk_region = models.ForeignKey('UKRegion', null=True)
@@ -257,6 +258,7 @@ class Contact(BaseModel):
     last_name = models.CharField(max_length=MAX_LENGTH)
     role = models.ForeignKey('Role')
     company = models.ForeignKey('Company', related_name='contacts')
+    advisor = models.ForeignKey('Advisor', null=True, blank=True)
     primary = models.BooleanField()
     teams = models.ManyToManyField('Team', blank=True)
     telephone_countrycode = models.CharField(max_length=MAX_LENGTH)

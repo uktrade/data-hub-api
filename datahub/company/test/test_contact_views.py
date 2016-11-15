@@ -1,3 +1,4 @@
+import json
 import uuid
 
 import pytest
@@ -20,11 +21,7 @@ pytestmark = pytest.mark.django_db
 
 def _signature(url, data):
     """Return the signature to authenticate the api client for the tests in this module."""
-    return generate_signature(
-        url,
-        APIClient()._encode_data(data)[0],
-        settings.DATAHUB_SECRET
-    )
+    return generate_signature(url, data, settings.DATAHUB_SECRET)
 
 
 class ContactTestCase(LeelooTestCase):
@@ -241,7 +238,7 @@ class ContactTestCase(LeelooTestCase):
 
         company = CompanyFactory()
         url = reverse('korben:company_contact')
-        data = {
+        data_dict = {
             'id': str(uuid.uuid4()),
             'title_id': constants.Title.wing_commander.value.id,
             'first_name': 'Bat',
@@ -254,16 +251,17 @@ class ContactTestCase(LeelooTestCase):
             'address_1': '14 Hello street',
             'primary': True
         }
+        data = json.dumps(data_dict)
         api_client = APIClient()
-        api_client.credentials(**{'X-Signature': _signature(url, data)})
-        response = api_client.post(url, data)
+        api_client.credentials(**{'HTTP_X_SIGNATURE': _signature(url, data)})
+        response = api_client.post(url, data, content_type='application/json')
 
         assert response.status_code == status.HTTP_200_OK
 
         # now do a GET
 
-        url = reverse('contact-detail', kwargs={'pk': data['id']})
+        url = reverse('contact-detail', kwargs={'pk': data_dict['id']})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['id'] == data['id']
+        assert response.data['id'] == data_dict['id']
