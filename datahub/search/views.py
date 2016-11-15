@@ -5,8 +5,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from datahub.es import ESConnector
-from datahub.es import format_es_results
+from datahub.es.connector import ESConnector
+from datahub.es.utils import format_es_results
 
 
 class Search(APIView):

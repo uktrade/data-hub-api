@@ -10,4 +10,5 @@ dependencies:
 
 test:
   override:
-    - make tests
+    - docker-compose build
+    - docker-compose run leeloo pytest -s

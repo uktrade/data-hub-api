@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
-from datahub.company import Advisor, Company, Contact, Interaction
+from datahub.company.models import Advisor, Company, Contact, Interaction
 from .authentication import KorbenSharedSecretAuthentication
 
 EXPOSED_MODELS = (Advisor, Company, Contact, Interaction)
