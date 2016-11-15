@@ -26,13 +26,13 @@ Management commands
 
 If the database is freshly built or a new versioned model is added run::
 
-    docker-compose -f run leeloo python manage.py createinitialrevisions
+    docker-compose run leeloo python manage.py createinitialrevisions
 
 Load metadata::
 
-    docker-compose -f run leeloo python manage.py loaddata /app/fixtures/metadata.yaml
-    docker-compose -f run leeloo python manage.py loaddata /app/leeloo/undefined.yaml
-    docker-compose -f run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml
+    docker-compose run leeloo python manage.py loaddata /app/fixtures/metadata.yaml
+    docker-compose run leeloo python manage.py loaddata /app/leeloo/undefined.yaml
+    docker-compose run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml
 
 Apply migrations::
     
