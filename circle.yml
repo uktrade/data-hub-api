@@ -1,0 +1,14 @@
+machine:
+  pre:
+   - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
+  services:
+    - docker
+
+dependencies:
+  override:
+    - sudo pip install docker-compose==1.8.0
+
+test:
+  override:
+    - docker-compose build
+    - docker-compose run leeloo pytest -s

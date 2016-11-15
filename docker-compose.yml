@@ -1,0 +1,51 @@
+version: '2'
+services:
+
+  leeloo:
+    build:
+      context: .
+    volumes:
+      - .:/app
+    entrypoint: |
+        dockerize -wait tcp://postgres:5432 -wait http://es:9200 -timeout 60s
+
+    ports:
+      - "8000:8000"
+    depends_on:
+      - korben
+      - postgres
+      - es
+    links:
+      - korben
+      - postgres
+      - es
+    environment:
+      SECRET_KEY: foobar
+      DATABASE_URL: postgresql://postgres@postgres/datahub
+      ES_INDEX: test
+      ES_HOST: es
+      ES_PORT: 9200
+      KORBEN_HOST: korben
+      KORBEN_PORT: 8080
+      DATAHUB_SECRET: secret
+      DEBUG: 'True'
+      DJANGO_SECRET_KEY: changeme
+      DJANGO_SETTINGS_MODULE: config.settings.local
+
+  korben:
+    build:
+      context: dummy-korben
+    ports:
+      - "8080:8080"
+
+  postgres:
+    image: postgres:9.5
+    restart: always
+    environment:
+      - POSTGRES_DB=datahub
+
+  es:
+    image: elasticsearch:2.4
+    restart: always
+    ports:
+      - "9200:9200"
