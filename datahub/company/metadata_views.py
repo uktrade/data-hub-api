@@ -26,7 +26,6 @@ METADATA_MAPPING = {
 @permission_classes([])
 def metadata_view(request, model):
     """Metadata generic view."""
-
     serializer = ConstantModelSerializer(model.objects.all(), many=True)
     return Response(data=serializer.data)
 

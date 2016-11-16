@@ -6,7 +6,6 @@ def generate_enum_code_from_constant_model(model_queryset):
 
     Paste the generated text into the constants file.
     """
-
     for q in model_queryset:
         print("{} = Constant('{}', '{}')".format(q.name.replace(' ', '_').lower(), q.name, q.id))
 
@@ -17,7 +16,6 @@ def _handle_fk(field_name, field_value, fk_ids):
     :param fk_ids: If True it converts the FKs into this format 'country_id'=1
                    If False it converts the FKs into this format 'country'='United Kingdom'
     """
-
     if fk_ids:
         return field_name + '_id', str(field_value.id) if field_value else None
     else:

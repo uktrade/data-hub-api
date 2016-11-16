@@ -3,10 +3,9 @@
 from rest_framework import mixins, viewsets
 
 from datahub.core.viewsets import ArchiveNoDeleteViewSet
-from .models import Advisor, Company, CompaniesHouseCompany, Contact, Interaction
-from .serializers import (AdvisorSerializer, CompanySerializerRead, CompanySerializerWrite,
-                          CompaniesHouseCompanySerializer,
-                          ContactSerializerRead, ContactSerializerWrite,
+from .models import Advisor, CompaniesHouseCompany, Company, Contact, Interaction
+from .serializers import (AdvisorSerializer, CompaniesHouseCompanySerializer, CompanySerializerRead,
+                          CompanySerializerWrite, ContactSerializerRead, ContactSerializerWrite,
                           InteractionSerializerRead, InteractionSerializerWrite)
 
 
@@ -58,7 +57,8 @@ class ContactViewSet(ArchiveNoDeleteViewSet):
     ).exclude(first_name='Undefined')
 
     def create(self, request, *args, **kwargs):
-        request.data.update({'advisor': str(request.user.advisor.pk)})  # inject the user
+        """Override create to inject the user from session."""
+        request.data.update({'advisor': str(request.user.advisor.pk)})
         return super().create(request, *args, **kwargs)
 
 

@@ -17,7 +17,6 @@ EXPOSED_MODELS = (Advisor, Company, Contact, Interaction)
 @authentication_classes((KorbenSharedSecretAuthentication, ))
 def korben_view(request, model):
     """View for Korben."""
-
     data = request.data
     try:
         obj = model.objects.get(pk=data['id'])

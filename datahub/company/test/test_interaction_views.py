@@ -11,10 +11,10 @@ from .factories import AdvisorFactory, CompanyFactory, ContactFactory, Interacti
 
 
 class InteractionTestCase(LeelooTestCase):
+    """Interaction test case."""
 
     def test_interaction_detail_view(self):
         """Interaction detail view."""
-
         interaction = InteractionFactory()
         url = reverse('interaction-detail', kwargs={'pk': interaction.pk})
         response = self.api_client.get(url)
@@ -24,7 +24,6 @@ class InteractionTestCase(LeelooTestCase):
 
     def test_add_interaction(self):
         """Test add new interaction."""
-
         url = reverse('interaction-list')
         response = self.api_client.post(url, {
             'interaction_type': constants.InteractionType.business_card.value.id,
@@ -50,7 +49,6 @@ class InteractionTestCase(LeelooTestCase):
 
     def test_modify_interaction(self):
         """Modify an existing interaction."""
-
         contact = InteractionFactory(subject='I am a subject')
 
         url = reverse('interaction-detail', kwargs={'pk': contact.pk})
@@ -73,7 +71,6 @@ class InteractionTestCase(LeelooTestCase):
 
     def test_archive_interaction_no_reason(self):
         """Test archive interaction without providing a reason."""
-
         interaction = InteractionFactory()
         url = reverse('interaction-archive', kwargs={'pk': interaction.pk})
         response = self.api_client.post(url)
@@ -95,7 +92,6 @@ class InteractionTestCase(LeelooTestCase):
 
     def test_archive_interaction_reason(self):
         """Test archive interaction providing a reason."""
-
         interaction = InteractionFactory()
         url = reverse('interaction-archive', kwargs={'pk': interaction.pk})
         response = self.api_client.post(url, {'reason': 'foo'})
@@ -117,7 +113,6 @@ class InteractionTestCase(LeelooTestCase):
 
     def test_unarchive_interaction(self):
         """Test unarchive interaction."""
-
         interaction = InteractionFactory(archived=True, archived_reason='foo')
         url = reverse('interaction-unarchive', kwargs={'pk': interaction.pk})
         response = self.api_client.get(url)

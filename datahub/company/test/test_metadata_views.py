@@ -40,7 +40,6 @@ metadata_views_ids = (
                          ids=metadata_views_ids)
 def test_metadata_view_get(view_name, api_client):
     """Test a metadata view for 200 only."""
-
     url = reverse(viewname=view_name)
     response = api_client.get(url)
 
@@ -52,7 +51,6 @@ def test_metadata_view_get(view_name, api_client):
                          ids=metadata_views_ids)
 def test_metadata_view_post(view_name, api_client):
     """Test views are read only."""
-
     url = reverse(viewname=view_name)
     response = api_client.post(url)
     assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
@@ -63,7 +61,6 @@ def test_metadata_view_post(view_name, api_client):
                          ids=metadata_views_ids)
 def test_metadata_view_put(view_name, api_client):
     """Test views are read only."""
-
     url = reverse(viewname=view_name)
     response = api_client.put(url)
 
@@ -75,7 +72,6 @@ def test_metadata_view_put(view_name, api_client):
                          ids=metadata_views_ids)
 def test_metadata_view_patch(view_name, api_client):
     """Test views are read only."""
-
     url = reverse(viewname=view_name)
     response = api_client.patch(url)
 

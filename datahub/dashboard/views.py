@@ -15,6 +15,7 @@ class IntelligentHomepageView(APIView):
     http_method_names = ['get']
 
     def get(self, request, format=None):
+        """Implement GET method."""
         user = request.user
         days = request.GET.get('days', 15)
         days_in_the_past = now() - timedelta(days=int(days))

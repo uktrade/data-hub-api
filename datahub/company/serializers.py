@@ -1,12 +1,12 @@
 from rest_framework import serializers
 
-from .models import Advisor, Company, CompaniesHouseCompany, Contact, Country, Interaction, Team
+from .models import Advisor, CompaniesHouseCompany, Company, Contact, Country, Interaction, Team
 
 
 class NestedContactSerializer(serializers.ModelSerializer):
     """Nested Contact serializer."""
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = Contact
         depth = 1
 
@@ -14,28 +14,28 @@ class NestedContactSerializer(serializers.ModelSerializer):
 class NestedCountrySerializer(serializers.ModelSerializer):
     """Nested Country serializer."""
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = Country
 
 
 class NestedInteractionSerializer(serializers.ModelSerializer):
     """Nested Interaction Serializer."""
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = Interaction
 
 
 class NestedTeamSerializer(serializers.ModelSerializer):
     """Nested Team serializer."""
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = Team
 
 
 class CompaniesHouseCompanySerializer(serializers.ModelSerializer):
     """Companies House company serializer."""
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = CompaniesHouseCompany
         depth = 1
 
@@ -45,7 +45,7 @@ class AdvisorSerializer(serializers.ModelSerializer):
 
     name = serializers.CharField()
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = Advisor
         exclude = ('user', )
         depth = 1
@@ -65,6 +65,29 @@ class CompanySerializerRead(serializers.ModelSerializer):
     future_interest_countries = NestedCountrySerializer(many=True)
     uk_based = serializers.BooleanField()
     account_manager = AdvisorSerializer()
+
+    class Meta:  # noqa: D101
+        model = Company
+        depth = 1
+        # we present the addresses as nested objects
+        exclude = (
+            'registered_address_1',
+            'registered_address_2',
+            'registered_address_3',
+            'registered_address_4',
+            'registered_address_town',
+            'registered_address_country',
+            'registered_address_county',
+            'registered_address_postcode',
+            'trading_address_1',
+            'trading_address_2',
+            'trading_address_3',
+            'trading_address_4',
+            'trading_address_town',
+            'trading_address_country',
+            'trading_address_county',
+            'trading_address_postcode',
+        )
 
     @staticmethod
     def get_registered_name(obj):
@@ -109,41 +132,18 @@ class CompanySerializerRead(serializers.ModelSerializer):
         else:
             return {}
 
-    class Meta:
-        model = Company
-        depth = 1
-        # we present the addresses as nested objects
-        exclude = (
-            'registered_address_1',
-            'registered_address_2',
-            'registered_address_3',
-            'registered_address_4',
-            'registered_address_town',
-            'registered_address_country',
-            'registered_address_county',
-            'registered_address_postcode',
-            'trading_address_1',
-            'trading_address_2',
-            'trading_address_3',
-            'trading_address_4',
-            'trading_address_town',
-            'trading_address_country',
-            'trading_address_county',
-            'trading_address_postcode',
-        )
-
 
 class CompanySerializerWrite(serializers.ModelSerializer):
     """Company serializer for writing operations."""
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = Company
 
 
 class ContactSerializerWrite(serializers.ModelSerializer):
     """Contact serializer for writing operations."""
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = Contact
         exclude = ('teams',)
 
@@ -155,7 +155,7 @@ class ContactSerializerRead(serializers.ModelSerializer):
     interactions = NestedInteractionSerializer(many=True)
     address = serializers.DictField()
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = Contact
         depth = 2
         # we present the addresses as nested objects
@@ -174,7 +174,7 @@ class ContactSerializerRead(serializers.ModelSerializer):
 class InteractionSerializerRead(serializers.ModelSerializer):
     """Interaction Serializer."""
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = Interaction
         depth = 2
 
@@ -182,5 +182,5 @@ class InteractionSerializerRead(serializers.ModelSerializer):
 class InteractionSerializerWrite(serializers.ModelSerializer):
     """Interaction Serializer for writing operations."""
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = Interaction
