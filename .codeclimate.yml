@@ -22,5 +22,13 @@ exclude_paths:
 - config/
 - fixtures/
 - dummy-korben/
-- '**/migrations/**
+- "**/migrations/"
+- "**.yml"
+- "**.txt"
+- "**.rst"
+- "**.sh"
+- Dockerfile
+- "**/test/"
+- "**/tests/"
+
 

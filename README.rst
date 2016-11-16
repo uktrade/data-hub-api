@@ -5,11 +5,14 @@ Leeloo Data Hub API
 .. image:: https://circleci.com/gh/uktrade/data-hub-leeloo/tree/master.svg?style=svg
     :target: https://circleci.com/gh/uktrade/data-hub-leeloo/tree/master
 
+
 .. image:: https://codecov.io/gh/uktrade/data-hub-leeloo/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/uktrade/data-hub-leeloo
 
+
 .. image:: https://codeclimate.com/github/uktrade/data-hub-leeloo/badges/gpa.svg
     :target: https://codeclimate.com/github/uktrade/data-hub-leeloo
+
 
 Leeloo provides an API into Datahub for Datahub clients. Using Leeloo you can search for entities
 and manage companies, contacts and interactions.
@@ -58,7 +61,7 @@ Load metadata::
 
 
     docker-compose run leeloo python manage.py loaddata /app/fixtures/metadata.yaml
-    docker-compose run leeloo python manage.py loaddata /app/leeloo/undefined.yaml
+    docker-compose run leeloo python manage.py loaddata /app/undefined.yaml
     docker-compose run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml
 
 

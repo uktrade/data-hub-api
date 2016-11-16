@@ -11,4 +11,4 @@ dependencies:
 test:
   override:
     - docker-compose build
-    - docker-compose run leeloo tests.sh
+    - docker-compose run leeloo bash tests.sh
