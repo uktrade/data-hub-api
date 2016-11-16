@@ -11,10 +11,4 @@ dependencies:
 test:
   override:
     - docker-compose build
-    - docker-compose run leeloo pytest -s --cov-report term-missing --cov
-
-deployment:
-  production:
-    branch: master
-    commands:
-      - bash <(curl -s https://codecov.io/bash -s $CIRCLE_ARTIFACTS)
+    - docker-compose run leeloo tests.sh

@@ -17,6 +17,7 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
 ADD . /app/
 
 RUN chmod a+x start.sh
+RUN chmod a+x tests.sh
 
 ENV ES_PORT 9200
 ENV ES_HOST es
@@ -24,7 +25,6 @@ ENV KORBEN_HOST korben
 ENV KORBEN_PORT 8080
 ENV DEBUG False
 ENV ES_ACCESS True
-ENV COVERAGE_FILE '/shared/.coverage'
 
 
 EXPOSE 8000
