@@ -8,7 +8,6 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
 from datahub.es.utils import document_exists, get_elasticsearch_client
@@ -73,7 +72,6 @@ class ContactTestCase(LeelooTestCase):
         assert 'Please select either address_same_as_company or enter an address manually.' in str(error.value)
 
     def test_add_contact_with_both_manual_and_same_as_company_address(self):
-
         url = reverse('contact-list')
 
         with pytest.raises(ValidationError) as error:
@@ -91,7 +89,8 @@ class ContactTestCase(LeelooTestCase):
                 'primary': True
             })
 
-        assert 'Please select either address_same_as_company or enter an address manually, not both!' in str(error.value)
+        assert 'Please select either address_same_as_company or enter an address manually, not both!' in str(
+            error.value)
 
     def test_add_contact_partial_manual_address(self):
         """Test add new contact with a partial manual address."""
