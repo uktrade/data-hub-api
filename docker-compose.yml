@@ -30,7 +30,7 @@ services:
       DEBUG: 'True'
       DJANGO_SECRET_KEY: changeme
       DJANGO_SETTINGS_MODULE: config.settings.local
-      CODECOV_TOKEN: ${CODECOV_TOKEN}
+      COV_TOKEN: ${COV_TOKEN}
 
   korben:
     build:
