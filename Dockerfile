@@ -1,5 +1,6 @@
 FROM python:3.5
 
+RUN mkdir -p /shared
 RUN mkdir -p /app
 WORKDIR /app
 

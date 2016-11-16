@@ -6,6 +6,7 @@ services:
       context: .
     volumes:
       - .:/app
+      - ${CIRCLE_ARTIFACTS}:/shared
     entrypoint: |
         dockerize -wait tcp://postgres:5432 -wait http://es:9200 -timeout 60s
 
