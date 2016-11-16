@@ -14,7 +14,7 @@ def get_korben_user():
             'first_name': 'Kor',
             'last_name': 'Ben',
             'email': 'kor.ben@foo.bar'
-    }
+        }
     )
     return korben
 

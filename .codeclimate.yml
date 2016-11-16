@@ -4,11 +4,16 @@ engines:
     enabled: true
     config:
       languages:
-      - python
+        python:
+          python_version: 3
+          mass_threshold: 32
   fixme:
     enabled: true
   radon:
     enabled: true
+    config:
+      python_version: 3
+      threshold: "B"
   pep8:
     enabled: true
 ratings:
@@ -20,6 +25,7 @@ exclude_paths:
 - dummy-korben/
 - "**/migrations/"
 - "**.yml"
+- "**.xml"
 - "**.txt"
 - "**.rst"
 - "**.sh"

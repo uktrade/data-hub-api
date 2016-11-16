@@ -1,5 +1,5 @@
 """Company and related resources view sets."""
- 
+
 from rest_framework import mixins, viewsets
 
 from datahub.core.viewsets import ArchiveNoDeleteViewSet

@@ -1,9 +1,6 @@
 """Company models."""
 import uuid
 
-from datahub.core import constants
-from datahub.core.models import BaseConstantModel, BaseModel
-from datahub.core.utils import model_to_dictionary
 from dateutil import parser
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -16,6 +13,9 @@ from django.dispatch import receiver
 from django.utils.functional import cached_property
 
 from datahub.core.mixins import DeferredSaveModelMixin
+from datahub.core import constants
+from datahub.core.models import BaseConstantModel, BaseModel
+from datahub.core.utils import model_to_dictionary
 from datahub.es.connector import ESConnector
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -290,13 +290,13 @@ class Contact(BaseModel):
         if self.address_same_as_company:
             if self.company.trading_address_country:
                 address_country = {
-                   'id': self.company.trading_address_country.pk,
-                   'name': self.company.trading_address_country.name
+                    'id': self.company.trading_address_country.pk,
+                    'name': self.company.trading_address_country.name
                 }
             else:
                 address_country = {
-                    'id':  self.company.registered_address_country.pk,
-                    'name':  self.company.registered_address_country.name
+                    'id': self.company.registered_address_country.pk,
+                    'name': self.company.registered_address_country.name
                 }
 
             return {
@@ -311,7 +311,7 @@ class Contact(BaseModel):
             }
         else:
             if self.address_country:
-                address_country = {'id': self.address_country.pk , 'name': self.address_country.name}
+                address_country = {'id': self.address_country.pk, 'name': self.address_country.name}
             return {
                 'address_1': self.address_1,
                 'address_2': self.address_2,
@@ -332,22 +332,24 @@ class Contact(BaseModel):
         Either 'same_as_company' or address_1, address_town and address_country must be defined.
         """
         some_address_fields_existence = any((
-                self.address_1,
-                self.address_2,
-                self.address_3,
-                self.address_4,
-                self.address_town,
-                self.address_county,
-                self.address_postcode,
-                self.address_country
-            ))
+            self.address_1,
+            self.address_2,
+            self.address_3,
+            self.address_4,
+            self.address_town,
+            self.address_county,
+            self.address_postcode,
+            self.address_country
+        ))
         all_required_fields_existence = all((
-                self.address_1,
-                self.address_country,
-                self.address_town
-            ))
+            self.address_1,
+            self.address_country,
+            self.address_town
+        ))
         if self.address_same_as_company and some_address_fields_existence:
-            raise ValidationError('Please select either address_same_as_company or enter an address manually, not both!')
+            raise ValidationError(
+                'Please select either address_same_as_company or enter an address manually, not both!'
+            )
         if not self.address_same_as_company:
             if some_address_fields_existence and not all_required_fields_existence:
                 raise ValidationError('address_1, town and country are required if an address is entered.')

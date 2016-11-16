@@ -73,9 +73,9 @@ class LeelooTestCase(TestCase):
             return self._application
 
         application, _ = Application.objects.get_or_create(
-                user=get_test_user(),
-                client_type=Application.CLIENT_CONFIDENTIAL,
-                authorization_grant_type=Application.GRANT_PASSWORD,
-                name='Test client'
-            )
+            user=get_test_user(),
+            client_type=Application.CLIENT_CONFIDENTIAL,
+            authorization_grant_type=Application.GRANT_PASSWORD,
+            name='Test client'
+        )
         return application

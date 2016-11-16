@@ -13,7 +13,6 @@ from .factories import CompanyFactory, CompaniesHouseCompanyFactory
 
 
 class CompanyTestCase(LeelooTestCase):
-
     def test_list_companies(self):
         """List the companies."""
 
@@ -265,7 +264,7 @@ class CompanyTestCase(LeelooTestCase):
         )
         assert es_result['_source']['archived']
         assert es_result['_source']['archived_reason'] == ''
-    
+
     def test_archive_company_reason(self):
         """Test company archive."""
 
@@ -301,7 +300,6 @@ class CompanyTestCase(LeelooTestCase):
 
 
 class CHCompanyTestCase(LeelooTestCase):
-
     def test_list_ch_companies(self):
         """List the companies house companies."""
 
@@ -312,7 +310,7 @@ class CHCompanyTestCase(LeelooTestCase):
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] ==  models.CompaniesHouseCompany.objects.all().count()
+        assert response.data['count'] == models.CompaniesHouseCompany.objects.all().count()
 
     def test_detail_ch_company(self):
         """Test companies house company detail."""

@@ -25,7 +25,7 @@ class DeferredSaveModelMixin:
         We force feed an ID to Django, so we cannot differentiate between update or create without querying the db
         https://docs.djangoproject.com/en/1.10/ref/models/instances/#how-django-knows-to-update-vs-insert
 
-        :param as_korben: bool - Whether or not the data comes from Korben (CDMS), in that case don't trigger validation
+        :param as_korben: bool - Whether or not the data comes from Korben, in that case don't trigger validation
         """
 
         if not as_korben:

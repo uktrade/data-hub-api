@@ -200,7 +200,7 @@ class Country(Enum):
     peru = Constant('Peru', '5061b8be-5d95-e211-a939-e4115bead28a')
     philippines = Constant('Philippines', '5161b8be-5d95-e211-a939-e4115bead28a')
     pitcairn_henderson_ducie_and_oeno_islands = Constant('Pitcairn, Henderson, Ducie and Oeno Islands',
-                                                             '5261b8be-5d95-e211-a939-e4115bead28a')
+                                                         '5261b8be-5d95-e211-a939-e4115bead28a')
     poland = Constant('Poland', '5361b8be-5d95-e211-a939-e4115bead28a')
     portugal = Constant('Portugal', '5461b8be-5d95-e211-a939-e4115bead28a')
     puerto_rico = Constant('Puerto Rico', '5561b8be-5d95-e211-a939-e4115bead28a')
