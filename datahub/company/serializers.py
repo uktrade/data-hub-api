@@ -154,6 +154,7 @@ class ContactSerializerRead(serializers.ModelSerializer):
     teams = NestedTeamSerializer(many=True)
     interactions = NestedInteractionSerializer(many=True)
     address = serializers.DictField()
+    name = serializers.CharField()
 
     class Meta:
         model = Contact
