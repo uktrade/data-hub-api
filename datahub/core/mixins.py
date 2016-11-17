@@ -1,6 +1,7 @@
 """General mixins."""
 
 import reversion
+from raven.contrib.django.raven_compat.models import client
 from rest_framework import status
 
 from datahub.korben.connector import KorbenConnector
@@ -44,6 +45,7 @@ class DeferredSaveModelMixin:
         elif korben_response.status_code == status.HTTP_404_NOT_FOUND:
             return
         else:
+            client.captureException(korben_response.json())
             raise KorbenException(korben_response.json())
 
     def get_excluded_fields(self):
