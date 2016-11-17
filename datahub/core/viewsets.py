@@ -9,11 +9,11 @@ from rest_framework.viewsets import GenericViewSet
 from datahub.korben.exceptions import KorbenException
 
 
-class ArchiveNoDeleteViewSet(mixins.CreateModelMixin,
-                             mixins.RetrieveModelMixin,
-                             mixins.UpdateModelMixin,
-                             mixins.ListModelMixin,
-                             GenericViewSet):
+class CoreViewSet(mixins.CreateModelMixin,
+                  mixins.RetrieveModelMixin,
+                  mixins.UpdateModelMixin,
+                  mixins.ListModelMixin,
+                  GenericViewSet):
     """Implement the archive route and the read/write serializers."""
 
     read_serializer_class = None
@@ -45,7 +45,7 @@ class ArchiveNoDeleteViewSet(mixins.CreateModelMixin,
 
     def get_object(self):
         """Force the update from korben."""
-        object = super(ArchiveNoDeleteViewSet, self).get_object()
+        object = super(CoreViewSet, self).get_object()
         object = object.update_from_korben()
         return object
 
@@ -55,7 +55,7 @@ class ArchiveNoDeleteViewSet(mixins.CreateModelMixin,
         These are not real Exceptions, rather user errors.
         """
         try:
-            super().create(request, *args, **kwargs)
+            return super().create(request, *args, **kwargs)
         except ValidationError as e:
             raise DRFValidationError(detail={'detail': e.message})
 
@@ -65,7 +65,7 @@ class ArchiveNoDeleteViewSet(mixins.CreateModelMixin,
         These are not real Exceptions, rather user errors.
         """
         try:
-            super().update(request, *args, **kwargs)
+            return super().update(request, *args, **kwargs)
         except ValidationError as e:
             raise DRFValidationError(detail={'detail': e.message})
 
@@ -73,5 +73,5 @@ class ArchiveNoDeleteViewSet(mixins.CreateModelMixin,
         """Override to handle the exceptions coming from Korben."""
         try:
             return super().retrieve(request, *args, **kwargs)
-        except KorbenException as e:
+        except KorbenException:
             raise APIException(detail={'detail': 'Korben error.'})
