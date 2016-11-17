@@ -70,8 +70,8 @@ class CompanyAbstract(models.Model):
     registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     registered_address_country = models.ForeignKey(
         'Country',
-        related_name="%(app_label)s_%(class)s_related",
-        related_query_name="(app_label)s_%(class)ss",
+        related_name="%(app_label)s_%(class)s_related",  # noqa: Q000
+        related_query_name="(app_label)s_%(class)ss",  # noqa: Q000
     )
     registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
