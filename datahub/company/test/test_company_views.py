@@ -1,6 +1,4 @@
-import pytest
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils.timezone import now
 from rest_framework import status
@@ -155,18 +153,18 @@ class CompanyTestCase(LeelooTestCase):
     def test_add_uk_company_without_uk_region(self):
         """Test add new UK without UK region company."""
         url = reverse('company-list')
-        with pytest.raises(ValidationError) as error:
-            self.api_client.post(url, {
-                'name': 'Acme',
-                'alias': None,
-                'business_type': constants.BusinessType.company.value.id,
-                'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
-                'registered_address_country': constants.Country.united_kingdom.value.id,
-                'registered_address_1': '75 Stramford Road',
-                'registered_address_town': 'London',
-            })
+        response = self.api_client.post(url, {
+            'name': 'Acme',
+            'alias': None,
+            'business_type': constants.BusinessType.company.value.id,
+            'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_country': constants.Country.united_kingdom.value.id,
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+        })
 
-        assert 'UK region is required for UK companies.' in str(error.value)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data['detail'] == 'UK region is required for UK companies.'
 
     def test_add_not_uk_company(self):
         """Test add new not UK company."""
@@ -195,19 +193,19 @@ class CompanyTestCase(LeelooTestCase):
     def test_add_company_partial_trading_address(self):
         """Test add new company with partial trading address."""
         url = reverse('company-list')
-        with pytest.raises(ValidationError) as error:
-            self.api_client.post(url, {
-                'name': 'Acme',
-                'business_type': constants.BusinessType.company.value.id,
-                'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
-                'registered_address_country': constants.Country.united_kingdom.value.id,
-                'registered_address_1': '75 Stramford Road',
-                'registered_address_town': 'London',
-                'trading_address_1': 'test',
-                'uk_region': constants.UKRegion.england.value.id
-            })
+        response = self.api_client.post(url, {
+            'name': 'Acme',
+            'business_type': constants.BusinessType.company.value.id,
+            'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_country': constants.Country.united_kingdom.value.id,
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'trading_address_1': 'test',
+            'uk_region': constants.UKRegion.england.value.id
+        })
 
-        assert 'If a trading address is specified, it must be complete.' in str(error.value)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data['detail'] == 'If a trading address is specified, it must be complete.'
 
     def test_add_company_with_trading_address(self):
         """Test add new company with trading_address."""
