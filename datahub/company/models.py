@@ -8,12 +8,12 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.db import models
-from django.db.models.signals import post_save, m2m_changed
+from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
 from django.utils.functional import cached_property
 
-from datahub.core.mixins import DeferredSaveModelMixin
 from datahub.core import constants
+from datahub.core.mixins import DeferredSaveModelMixin
 from datahub.core.models import BaseConstantModel, BaseModel
 from datahub.core.utils import model_to_dictionary
 from datahub.es.connector import ESConnector
@@ -23,31 +23,37 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 class BusinessType(BaseConstantModel):
     """Company business type."""
+
     pass
 
 
 class Sector(BaseConstantModel):
     """Company sector."""
+
     pass
 
 
 class EmployeeRange(BaseConstantModel):
     """Company employee range."""
+
     pass
 
 
 class TurnoverRange(BaseConstantModel):
     """Company turnover range."""
+
     pass
 
 
 class UKRegion(BaseConstantModel):
     """UK region."""
+
     pass
 
 
 class Country(BaseConstantModel):
     """Country."""
+
     pass
 
 
@@ -63,15 +69,16 @@ class CompanyAbstract(models.Model):
     registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     registered_address_country = models.ForeignKey(
         'Country',
-        related_name="%(app_label)s_%(class)s_related",
-        related_query_name="%(app_label)s_%(class)ss",
+        related_name='%(app_label)s_%(class)s_related',
+        related_query_name='(app_label)s_%(class)ss',
     )
     registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
-    class Meta:
+    class Meta:  # noqa: D101
         abstract = True
 
     def __str__(self):
+        """Admin displayed human readable name."""
         return self.name
 
 
@@ -111,7 +118,7 @@ class Company(CompanyAbstract, BaseModel):
     trading_address_country = models.ForeignKey('Country', null=True, related_name='company_trading_address_country')
     trading_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
-    class Meta:
+    class Meta:  # noqa: D101
         verbose_name_plural = 'companies'
 
     @cached_property
@@ -131,9 +138,11 @@ class Company(CompanyAbstract, BaseModel):
                 return None
 
     def _validate_trading_address(self):
-        """Trading address fields are not mandatory in the model definition, but
-        if any trading address field is supplied then address_1, town and
-        country must also be provided."""
+        """Trading address fields are not mandatory in the model definition.
+
+        If any trading address field is supplied then address_1, town and
+        country must also be provided.
+        """
         some_trading_address_fields = any((
             self.trading_address_1,
             self.trading_address_2,
@@ -154,7 +163,7 @@ class Company(CompanyAbstract, BaseModel):
         return True
 
     def _validate_uk_region(self):
-        """UK region is mandatory if it's a UK company"""
+        """UK region is mandatory if it's a UK company."""
         if self.uk_based and not self.uk_region:
             return False
         return True
@@ -191,11 +200,13 @@ class CompaniesHouseCompany(CompanyAbstract):
     incorporation_date = models.DateField(null=True)
 
     def __str__(self):
+        """Admin displayed human readable name."""
         return self.name
 
 
 class InteractionType(BaseConstantModel):
     """Interaction type."""
+
     pass
 
 
@@ -214,11 +225,11 @@ class Interaction(BaseModel):
     dit_team = models.ForeignKey('Team')
 
     def __str__(self):
+        """Admin displayed human readable name."""
         return self.subject
 
     def _map_korben_response_to_model_instance(self, korben_response):
         """Handle date field."""
-
         super(Interaction, self)._map_korben_response_to_model_instance(korben_response)
         date_of_interaction_string = korben_response.json().get('date_of_interaction')
         if date_of_interaction_string:
@@ -231,21 +242,25 @@ class Interaction(BaseModel):
 
 class Title(BaseConstantModel):
     """Contact title."""
+
     pass
 
 
 class Role(BaseConstantModel):
     """Contact role."""
+
     pass
 
 
 class Team(BaseConstantModel):
     """Team."""
+
     pass
 
 
 class Service(BaseConstantModel):
     """Service."""
+
     pass
 
 
@@ -324,6 +339,7 @@ class Contact(BaseModel):
             }
 
     def __str__(self):
+        """Admin displayed human readable name."""
         return self.name
 
     def clean(self):
@@ -370,9 +386,11 @@ class Advisor(DeferredSaveModelMixin, models.Model):
 
     @cached_property
     def name(self):
+        """Full name shorthand."""
         return '{first_name} {last_name}'.format(first_name=self.first_name, last_name=self.last_name)
 
     def __str__(self):
+        """Admin displayed human readable name."""
         return self.name
 
     def get_excluded_fields(self):
@@ -382,6 +400,7 @@ class Advisor(DeferredSaveModelMixin, models.Model):
 
 # Create a Django user when an advisor is created
 def create_user_for_advisor(instance, created, **kwargs):
+    """Create a user associated to an advisor."""
     if created and not instance.user:
         user_model = get_user_model()
         user, _ = user_model.objects.get_or_create(
@@ -403,6 +422,7 @@ def create_user_for_advisor(instance, created, **kwargs):
 # the management command
 @receiver(post_save, sender=User)  # cannot use get_user_model() because app registry is not initialised
 def create_advisor_for_user(instance, created, **kwargs):
+    """Create an advisor associated to a user."""
     if created:
         advisor = Advisor(
             user=instance,
@@ -418,7 +438,6 @@ def create_advisor_for_user(instance, created, **kwargs):
 @receiver((post_save, m2m_changed))
 def save_to_es(sender, instance, **kwargs):
     """Save to ES."""
-
     if sender in (Company, CompaniesHouseCompany, Contact, Interaction):
         es_connector = ESConnector()
         doc_type = type(instance)._meta.db_table  # cannot access _meta from the instance

@@ -1,13 +1,14 @@
 from django.urls import reverse
 from rest_framework import status
 
-from datahub.core.test_utils import LeelooTestCase, get_test_user
+from datahub.core.test_utils import get_test_user, LeelooTestCase
 
 
 class UserViewTestCase(LeelooTestCase):
+    """User view test case."""
 
     def test_who_am_i_authenticated(self):
-
+        """Who am I."""
         url = reverse('who_am_i')
         response = self.api_client.get(url)
         user_test = get_test_user()

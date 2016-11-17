@@ -7,6 +7,7 @@ from .utils import generate_signature, get_korben_user
 
 
 class KorbenSharedSecretAuthentication(BaseAuthentication):
+    """Shared secret authentication class."""
 
     def authenticate(self, request):
         """Use a shared secret to perform authentication.

@@ -1,7 +1,3 @@
-"""
-These tests rely on the metadata.yaml fixture to be imported,
-Check conftest.py in the root folder for the importing mechanism.
-"""
 import json
 import uuid
 
@@ -9,7 +5,6 @@ import pytest
 from django.conf import settings
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APIClient
 
 from datahub.company.models import Advisor, Company, Contact
 from datahub.company.test import factories
@@ -27,7 +22,6 @@ def _signature(url, data):
 
 def test_korben_company_create(api_client):
     """Create a company."""
-
     url = reverse('korben:company_company')
     data_dict = {
         'id': str(uuid.uuid4()),
@@ -51,7 +45,6 @@ def test_korben_company_create(api_client):
 
 def test_korben_company_update(api_client):
     """Update a company."""
-
     url = reverse('korben:company_company')
     company = factories.CompanyFactory()
 
@@ -78,7 +71,6 @@ def test_korben_company_update(api_client):
 
 def test_korben_contact_create(api_client):
     """Create a contact."""
-
     company = factories.CompanyFactory()
     url = reverse('korben:company_contact')
     data_dict = {
@@ -104,7 +96,6 @@ def test_korben_contact_create(api_client):
 
 def test_korben_contact_incomplete_address_create(api_client):
     """Create a contact with incomplete address."""
-
     company = factories.CompanyFactory()
     url = reverse('korben:company_contact')
     data_dict = {
@@ -130,7 +121,6 @@ def test_korben_contact_incomplete_address_create(api_client):
 
 def test_korben_contact_update(api_client):
     """Update a contact."""
-
     contact = factories.ContactFactory()
     url = reverse('korben:company_contact')
     data_dict = {
@@ -156,7 +146,6 @@ def test_korben_contact_update(api_client):
 
 def test_korben_advisor_create(api_client):
     """Create an advisor."""
-
     url = reverse('korben:company_advisor')
     data_dict = {
         'id': str(uuid.uuid4()),

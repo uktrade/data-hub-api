@@ -16,12 +16,11 @@ class BaseModel(DeferredSaveModelMixin, models.Model):
     created_on = models.DateTimeField(null=True, blank=True)
     modified_on = models.DateTimeField(null=True, blank=True)
 
-    class Meta:
+    class Meta:  # noqa: D101
         abstract = True
 
     def archive(self, user, reason=None):
         """Archive the model instance."""
-
         self.archived = True
         self.archived_by = user
         self.archived_reason = reason
@@ -30,7 +29,6 @@ class BaseModel(DeferredSaveModelMixin, models.Model):
 
     def unarchive(self):
         """Unarchive the model instance."""
-
         self.archived = False
         self.archived_reason = ''
         self.archived_by = None
@@ -42,13 +40,11 @@ class BaseModel(DeferredSaveModelMixin, models.Model):
 
         If the fields are empty, populate them.
         """
-
         self.created_on = self.created_on if self.created_on else now()
         self.modified_on = self.modified_on if self.modified_on else now()
 
     def _map_korben_response_to_model_instance(self, korben_response):
         """Handle date time object."""
-
         super(BaseModel, self)._map_korben_response_to_model_instance(korben_response)
         archived_on = korben_response.json().get('archived_on')
         modified_on = korben_response.json().get('modified_on')
@@ -65,9 +61,10 @@ class BaseConstantModel(models.Model):
     id = models.UUIDField(primary_key=True)
     name = models.TextField(blank=True)
 
-    class Meta:
+    class Meta:  # noqa: D101
         abstract = True
         ordering = ('name', )
 
     def __str__(self):
+        """Humand readable admin name."""
         return self.name

@@ -1,4 +1,4 @@
-"""Core utils"""
+"""Core utils."""
 import re
 
 from django.conf import settings
@@ -8,7 +8,6 @@ from elasticsearch import Elasticsearch
 
 def get_elasticsearch_client():
     """Return an instance of the elasticsearch client or similar."""
-
     if settings.HEROKU:
         bonsai = settings.ES_HOST
         auth = re.search('https\:\/\/(.*)\@', bonsai).group(1).split(':')
@@ -31,7 +30,6 @@ def get_elasticsearch_client():
 
 def format_es_results(es_results):
     """Make the results JSON serializable."""
-
     results = {
         'total': es_results.hits.total,
         'max_score': es_results.hits.max_score,
@@ -43,7 +41,6 @@ def format_es_results(es_results):
 
 def document_exists(client, doc_type, document_id):
     """Check whether the document with a specific ID exists."""
-
     return client.exists(
         index=settings.ES_INDEX,
         doc_type=doc_type,

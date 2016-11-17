@@ -1,19 +1,20 @@
 from django.conf import settings
 from elasticsearch_dsl import Search
-from elasticsearch_dsl.query import Term, MultiMatch
+from elasticsearch_dsl.query import MultiMatch, Term
 
 from .utils import document_exists, get_elasticsearch_client
 
 
 class ESConnector:
+    """Elastichsearch connector."""
 
     def __init__(self):
+        """Initialise client and search class."""
         self.client = get_elasticsearch_client()
         self.search = Search(using=self.client, index=settings.ES_INDEX)
 
     def save(self, doc_type, data):
         """Add or update data to ES."""
-
         if doc_type == 'company_company' and data['company_number']:
             self.handle_ch_company(data)
 
@@ -37,7 +38,6 @@ class ESConnector:
 
     def handle_ch_company(self, data):
         """If trying to promote a company house to an internal company, delete che CH record."""
-
         query = Term(company_number=data['company_number'])
         search = self.search.doc_type('company_companieshousecompany').query(query)
         results = search.execute()
@@ -51,7 +51,6 @@ class ESConnector:
 
     def search_by_term(self, term, doc_type=None, offset=0, limit=100):
         """Perform a multi match search query."""
-
         search_client = self.search.doc_type(*doc_type) if doc_type else self.search
         query = MultiMatch(query=term, fields=['name^3', 'alias^3', '*_name', 'postcode'])
         search = search_client.query(query)[offset:offset + limit]

@@ -1,5 +1,4 @@
 import pytest
-from datahub.core import constants
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.urls import reverse
@@ -7,15 +6,17 @@ from django.utils.timezone import now
 from rest_framework import status
 
 from datahub.company import models
+from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
 from datahub.es.utils import document_exists, get_elasticsearch_client
-from .factories import CompanyFactory, CompaniesHouseCompanyFactory
+from .factories import CompaniesHouseCompanyFactory, CompanyFactory
 
 
 class CompanyTestCase(LeelooTestCase):
+    """Company test case."""
+
     def test_list_companies(self):
         """List the companies."""
-
         CompanyFactory()
         CompanyFactory()
         url = reverse('company-list')
@@ -29,7 +30,6 @@ class CompanyTestCase(LeelooTestCase):
 
         Make sure that the registered name and registered address are coming from CH data
         """
-
         ch_company = CompaniesHouseCompanyFactory(
             company_number=123,
             name='Foo ltd.',
@@ -71,7 +71,6 @@ class CompanyTestCase(LeelooTestCase):
 
         Make sure that the registered name and address are coming from CDMS.
         """
-
         company = CompanyFactory(
             name='Foo ltd.',
             registered_address_1='Hello st.',
@@ -102,7 +101,6 @@ class CompanyTestCase(LeelooTestCase):
 
     def test_update_company(self):
         """Test company update."""
-
         company = CompanyFactory(
             name='Foo ltd.',
             registered_address_1='Hello st.',
@@ -131,7 +129,6 @@ class CompanyTestCase(LeelooTestCase):
 
     def test_add_uk_company(self):
         """Test add new UK company."""
-
         url = reverse('company-list')
         response = self.api_client.post(url, {
             'name': 'Acme',
@@ -157,10 +154,9 @@ class CompanyTestCase(LeelooTestCase):
 
     def test_add_uk_company_without_uk_region(self):
         """Test add new UK without UK region company."""
-
         url = reverse('company-list')
         with pytest.raises(ValidationError) as error:
-            response = self.api_client.post(url, {
+            self.api_client.post(url, {
                 'name': 'Acme',
                 'alias': None,
                 'business_type': constants.BusinessType.company.value.id,
@@ -174,7 +170,6 @@ class CompanyTestCase(LeelooTestCase):
 
     def test_add_not_uk_company(self):
         """Test add new not UK company."""
-
         url = reverse('company-list')
         response = self.api_client.post(url, {
             'name': 'Acme',
@@ -199,9 +194,7 @@ class CompanyTestCase(LeelooTestCase):
 
     def test_add_company_partial_trading_address(self):
         """Test add new company with partial trading address."""
-
         url = reverse('company-list')
-
         with pytest.raises(ValidationError) as error:
             self.api_client.post(url, {
                 'name': 'Acme',
@@ -218,7 +211,6 @@ class CompanyTestCase(LeelooTestCase):
 
     def test_add_company_with_trading_address(self):
         """Test add new company with trading_address."""
-
         url = reverse('company-list')
         response = self.api_client.post(url, {
             'name': 'Acme',
@@ -245,7 +237,6 @@ class CompanyTestCase(LeelooTestCase):
 
     def test_archive_company_no_reason(self):
         """Test company archive."""
-
         company = CompanyFactory()
         url = reverse('company-archive', kwargs={'pk': company.id})
         response = self.api_client.post(url)
@@ -267,7 +258,6 @@ class CompanyTestCase(LeelooTestCase):
 
     def test_archive_company_reason(self):
         """Test company archive."""
-
         company = CompanyFactory()
         url = reverse('company-archive', kwargs={'pk': company.id})
         response = self.api_client.post(url, {'reason': 'foo'})
@@ -289,7 +279,6 @@ class CompanyTestCase(LeelooTestCase):
 
     def test_unarchive_company(self):
         """Unarchive a company."""
-
         company = CompanyFactory(archived=True, archived_on=now(), archived_reason='foo')
         url = reverse('company-unarchive', kwargs={'pk': company.id})
         response = self.api_client.get(url)
@@ -300,9 +289,10 @@ class CompanyTestCase(LeelooTestCase):
 
 
 class CHCompanyTestCase(LeelooTestCase):
+    """Companies house company test case."""
+
     def test_list_ch_companies(self):
         """List the companies house companies."""
-
         CompaniesHouseCompanyFactory()
         CompaniesHouseCompanyFactory()
 
@@ -314,7 +304,6 @@ class CHCompanyTestCase(LeelooTestCase):
 
     def test_detail_ch_company(self):
         """Test companies house company detail."""
-
         ch_company = CompaniesHouseCompanyFactory(company_number=123)
 
         url = reverse('companieshousecompany-detail', kwargs={'company_number': ch_company.company_number})
@@ -325,7 +314,6 @@ class CHCompanyTestCase(LeelooTestCase):
 
     def test_ch_company_cannot_be_written(self):
         """Test CH company POST is not allowed."""
-
         url = reverse('companieshousecompany-list')
         response = self.api_client.post(url)
 
@@ -333,7 +321,6 @@ class CHCompanyTestCase(LeelooTestCase):
 
     def test_promote_a_ch_company(self):
         """Promote a CH company to full company, ES should be updated correctly."""
-
         ch_company = CompaniesHouseCompanyFactory(company_number=1234567890)
 
         # make sure it's in ES

@@ -17,7 +17,6 @@ class ArchiveNoDeleteViewSet(mixins.CreateModelMixin,
     @detail_route(methods=['post'])
     def archive(self, request, pk):
         """Archive the object."""
-
         reason = request.data.get('reason', '')
         obj = self.get_object()
         obj.archive(user=request.user, reason=reason)
@@ -27,7 +26,6 @@ class ArchiveNoDeleteViewSet(mixins.CreateModelMixin,
     @detail_route(methods=['get'])
     def unarchive(self, request, pk):
         """Unarchive the object."""
-
         obj = self.get_object()
         obj.unarchive()
         serializer = self.read_serializer_class(obj)
@@ -41,7 +39,7 @@ class ArchiveNoDeleteViewSet(mixins.CreateModelMixin,
             return self.write_serializer_class
 
     def get_object(self):
-        """Force the update from korben"""
+        """Force the update from korben."""
         object = super(ArchiveNoDeleteViewSet, self).get_object()
         object = object.update_from_korben()
         return object

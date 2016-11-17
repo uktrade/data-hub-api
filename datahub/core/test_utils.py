@@ -2,13 +2,12 @@ import datetime
 import pytest
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-from oauth2_provider.models import Application, AccessToken
+from oauth2_provider.models import AccessToken, Application
 from rest_framework.test import APIClient
 
 
 def get_test_user():
     """Return the test user."""
-
     user_model = get_user_model()
     test, _ = user_model.objects.get_or_create(
         username='Test',
@@ -25,6 +24,7 @@ class LeelooTestCase(TestCase):
     pytestmark = pytest.mark.django_db  # use db
 
     def setUp(self):
+        """Set ups some utils."""
         self._user = None
         self._application = None
         self._token = None
@@ -34,6 +34,7 @@ class LeelooTestCase(TestCase):
         self.api_client = self.get_logged_in_api_client()
 
     def get_user(self):
+        """Return the user."""
         if self._user:
             return self._user
         return get_test_user()
@@ -53,7 +54,6 @@ class LeelooTestCase(TestCase):
 
     def get_token(self):
         """Get access token for user test."""
-
         if self._token:
             return self._token
 
@@ -68,7 +68,6 @@ class LeelooTestCase(TestCase):
 
     def get_application(self):
         """Return the test application."""
-
         if self._application:
             return self._application
 

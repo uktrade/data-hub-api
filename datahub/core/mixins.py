@@ -15,7 +15,6 @@ class DeferredSaveModelMixin:
 
     def __init__(self, *args, **kwargs):
         """Add third part services connectors to the instance."""
-
         self.korben_connector = KorbenConnector(table_name=self._meta.db_table)
         super(DeferredSaveModelMixin, self).__init__(*args, **kwargs)
 
@@ -27,7 +26,6 @@ class DeferredSaveModelMixin:
 
         :param as_korben: bool - Whether or not the data comes from Korben, in that case don't trigger validation
         """
-
         if not as_korben:
             self.clean()  # triggers custom validation
             # objects is not accessible via instances
@@ -40,7 +38,6 @@ class DeferredSaveModelMixin:
 
     def _map_korben_response_to_model_instance(self, korben_response):
         """Override this method to control what needs to be converted back into the model."""
-
         if korben_response.status_code == status.HTTP_200_OK:
             for key, value in korben_response.json().items():
                 setattr(self, key, value)
@@ -55,7 +52,6 @@ class DeferredSaveModelMixin:
 
     def _convert_model_to_korben_format(self):
         """Override this method to have more granular control of what gets sent to Korben."""
-
         return model_to_dictionary(self, excluded_fields=self.get_excluded_fields(), fk_ids=True)
 
     def update_from_korben(self):

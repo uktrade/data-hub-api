@@ -320,7 +320,7 @@ class Sector(Enum):
 
 
 class Title(Enum):
-    """"Titles"""
+    """"Titles."""
 
     admiral = Constant('Admiral', 'c1d9b924-6095-e211-a939-e4115bead28a')
     admiral_of_the_fleet = Constant('Admiral of the Fleet', 'c2d9b924-6095-e211-a939-e4115bead28a')
@@ -372,7 +372,7 @@ class Title(Enum):
 
 
 class UKRegion(Enum):
-    """UK Regions"""
+    """UK Regions."""
 
     alderney = Constant('Alderney', '934cd12a-6095-e211-a939-e4115bead28a')
     all = Constant('All', '1718e330-6095-e211-a939-e4115bead28a')
@@ -399,13 +399,13 @@ class UKRegion(Enum):
 
 
 class Service(Enum):
-    """Service"""
+    """Service."""
 
     trade_enquiry = Constant('Trade - Enquiry', '330bba2b-3499-e211-a939-e4115bead28a')
 
 
 class Team(Enum):
-    """Team"""
+    """Team."""
 
     healthcare_uk = Constant(
         'Healthcare UK', '3ff47a07-002c-e311-a78e-e4115bead28a'
