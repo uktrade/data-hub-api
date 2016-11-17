@@ -73,5 +73,5 @@ class ArchiveNoDeleteViewSet(mixins.CreateModelMixin,
         """Override to handle the exceptions coming from Korben."""
         try:
             return super().retrieve(request, *args, **kwargs)
-        except KorbenException as e:
-            raise APIException(detail={'detail': 'Korben error.'})
+        except KorbenException:
+            return APIException(detail={'detail': 'Korben error.'})
