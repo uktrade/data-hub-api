@@ -84,7 +84,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'datahubapi.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 DATABASES = {
