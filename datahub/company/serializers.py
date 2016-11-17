@@ -47,7 +47,7 @@ class AdvisorSerializer(serializers.ModelSerializer):
 
     class Meta:  # noqa: D101
         model = Advisor
-        exclude = ('user', )
+        exclude = ('username', 'is_staff', 'is_active', 'date_joined')
         depth = 1
 
 

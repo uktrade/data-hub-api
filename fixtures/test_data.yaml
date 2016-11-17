@@ -45,6 +45,7 @@
 - model: company.advisor
   pk: e83a608e-84a4-11e6-ae22-56b6b6499611
   fields: {
+    username: Puck.Head,
     first_name: Puck,
     last_name: Head,
     dit_team: 602b971d-5df6-e511-888e-e4115bead28a,

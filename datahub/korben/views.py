@@ -32,7 +32,7 @@ def korben_view(request, model):
                 date_obj = parse_date(getattr(obj, field.name, None))
                 setattr(obj, field.name, date_obj)
             except (ValueError, AttributeError):
-                if field.null:
+                if field.null or field.default is not None:
                     pass
                 else:
                     return Response(data=data, status=HTTP_400_BAD_REQUEST)

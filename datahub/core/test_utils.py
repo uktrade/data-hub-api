@@ -5,6 +5,8 @@ from django.test import TestCase
 from oauth2_provider.models import AccessToken, Application
 from rest_framework.test import APIClient
 
+from datahub.core import constants
+
 
 def get_test_user():
     """Return the test user."""
@@ -12,7 +14,8 @@ def get_test_user():
     test, _ = user_model.objects.get_or_create(
         username='Test',
         first_name='Testo',
-        last_name='Useri'
+        last_name='Useri',
+        dit_team_id=constants.Team.crm.value.id,
     )
     test.set_password('password')
     return test
