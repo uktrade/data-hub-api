@@ -10,6 +10,10 @@ Leeloo Data Hub API
 
 .. image:: https://codeclimate.com/github/uktrade/data-hub-leeloo/badges/gpa.svg
     :target: https://codeclimate.com/github/uktrade/data-hub-leeloo
+    
+.. image:: https://landscape.io/github/uktrade/data-hub-leeloo/master/landscape.svg?style=flat
+   :target: https://landscape.io/github/uktrade/data-hub-leeloo/master
+   :alt: Code Health
 
 
 Leeloo provides an API into Datahub for Datahub clients. Using Leeloo you can search for entities
