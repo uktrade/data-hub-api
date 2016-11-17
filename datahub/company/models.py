@@ -18,6 +18,7 @@ from datahub.core.models import BaseConstantModel, BaseModel
 from datahub.core.utils import model_to_dictionary
 from datahub.es.connector import ESConnector
 
+
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
@@ -172,11 +173,13 @@ class Company(CompanyAbstract, BaseModel):
         """Custom validation."""
         if not self._validate_trading_address():
             raise ValidationError(
-                'If a trading address is specified, it must be complete.'
+                'If a trading address is specified, it must be complete.',
+                code='invalid'
             )
         if not self._validate_uk_region():
             raise ValidationError(
-                'UK region is required for UK companies.'
+                'UK region is required for UK companies.',
+                code='invalid'
             )
         super(Company, self).clean()
 
@@ -364,13 +367,20 @@ class Contact(BaseModel):
         ))
         if self.address_same_as_company and some_address_fields_existence:
             raise ValidationError(
-                'Please select either address_same_as_company or enter an address manually, not both!'
+                'Please select either address_same_as_company or enter an address manually, not both!',
+                code='invalid'
             )
         if not self.address_same_as_company:
             if some_address_fields_existence and not all_required_fields_existence:
-                raise ValidationError('address_1, town and country are required if an address is entered.')
+                raise ValidationError(
+                    'address_1, town and country are required if an address is entered.',
+                    code='invalid'
+                )
             elif not some_address_fields_existence:
-                raise ValidationError('Please select either address_same_as_company or enter an address manually.')
+                raise ValidationError(
+                    'Please select either address_same_as_company or enter an address manually.',
+                    code='invalid'
+                )
         super(Contact, self).clean()
 
 
