@@ -55,7 +55,7 @@ class ArchiveNoDeleteViewSet(mixins.CreateModelMixin,
         These are not real Exceptions, rather user errors.
         """
         try:
-            super().create(request, *args, **kwargs)
+            return super().create(request, *args, **kwargs)
         except ValidationError as e:
             raise DRFValidationError(detail={'detail': e.message})
 
@@ -65,7 +65,7 @@ class ArchiveNoDeleteViewSet(mixins.CreateModelMixin,
         These are not real Exceptions, rather user errors.
         """
         try:
-            super().update(request, *args, **kwargs)
+            return super().update(request, *args, **kwargs)
         except ValidationError as e:
             raise DRFValidationError(detail={'detail': e.message})
 
