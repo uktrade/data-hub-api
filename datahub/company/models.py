@@ -395,6 +395,7 @@ class Advisor(DeferredSaveModelMixin, AbstractUser):
     dit_team = models.ForeignKey('Team')
 
     def save(self, as_korben=False, *args, **kwargs):
+        """Make save play nice with missing data from korben."""
         if self.username is None:
             self.username = '{}.{}'.format(self.first_name, self.last_name)
 
