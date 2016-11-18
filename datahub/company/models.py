@@ -392,15 +392,12 @@ class Advisor(DeferredSaveModelMixin, AbstractUser):
         blank=True,
     )
     email = models.EmailField()
-    dit_team = models.ForeignKey('Team')
+    dit_team = models.ForeignKey('Team', default=constants.Team.undefined.value.id)
 
     def save(self, as_korben=False, *args, **kwargs):
         """Make save play nice with missing data from korben."""
-        if self.username is None:
-            self.username = '{}.{}'.format(self.first_name, self.last_name)
-
-        if self.dit_team_id is None:
-            self.dit_team_id = constants.Team.undefined.value.id
+        if not self.username:
+            self.username = self.email
 
         super().save(as_korben, *args, **kwargs)
 
