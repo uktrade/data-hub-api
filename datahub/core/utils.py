@@ -1,3 +1,4 @@
+from django.contrib.auth.backends import ModelBackend, get_user_model
 from django.db.models import ForeignKey, ManyToManyField
 
 
@@ -40,3 +41,31 @@ def model_to_dictionary(model_instance, excluded_fields=(), fk_ids=False):
         else:
             data[field.name] = getattr(model_instance, field.name)
     return data
+
+
+class CDMSUserBackend(ModelBackend):
+    """Model backend that authenticates against CDMS,
+    but still uses and provides core django functionality."""
+
+    def korben_authenticate(self, **kwargs):
+        """Authenticate CDMS user/advisor using korben."""
+        raise NotImplementedError()
+
+    def authenticate(self, username=None, password=None, **kwargs):
+        """Copied from parent impl, but with password check done by Korben."""
+        UserModel = get_user_model()
+        if username is None:
+            username = kwargs.get(UserModel.USERNAME_FIELD)
+        try:
+            user = UserModel._default_manager.get_by_natural_key(username)
+        except UserModel.DoesNotExist:
+            # Run the default password hasher once to reduce the timing
+            # difference between an existing and a non-existing user (#20760).
+            UserModel().set_password(password)
+        else:
+            if (
+                    self.korben_authenticate(
+                        username=username, password=password)
+                    and self.user_can_authenticate(user)
+            ):
+                return user
