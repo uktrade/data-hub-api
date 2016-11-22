@@ -74,6 +74,11 @@ class InteractionViewSet(CoreViewSet):
         'contact'
     ).all()
 
+    def create(self, request, *args, **kwargs):
+        """Override create to inject the user from session."""
+        request.data.update({'dit_advisor': str(request.user.pk)})
+        return super().create(request, *args, **kwargs)
+
 
 class AdvisorReadOnlyViewSet(mixins.ListModelMixin,
                              mixins.RetrieveModelMixin,
