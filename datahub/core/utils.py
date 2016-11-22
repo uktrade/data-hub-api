@@ -1,6 +1,8 @@
 from django.contrib.auth.backends import get_user_model, ModelBackend
 from django.db.models import ForeignKey, ManyToManyField
 
+from datahub.korben.connector import KorbenConnector
+
 
 def generate_enum_code_from_constant_model(model_queryset):
     """Generate the Enum code for a given constant model queryset.
@@ -49,9 +51,11 @@ class CDMSUserBackend(ModelBackend):
     Yet still uses and provides core django functionality.
     """
 
-    def korben_authenticate(self, **kwargs):
+    def korben_authenticate(self, username, password):
         """Authenticate CDMS user/advisor using korben."""
-        raise NotImplementedError()
+        conn = KorbenConnector(table_name='__unused__')
+
+        return conn.validate_credentials(username, password)
 
     def authenticate(self, username=None, password=None, **kwargs):
         """Copied from parent impl, but with password check done by Korben."""

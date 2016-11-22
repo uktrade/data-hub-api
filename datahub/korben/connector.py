@@ -70,3 +70,21 @@ class KorbenConnector:
         self.inject_auth_header(url, data)
         response = requests.post(url=url, data=data, headers=self.default_headers)
         return response
+
+    def validate_credentials(self, username, password):
+        """Validate CDMS User credentials.
+
+        :param username: str
+        :param password: str
+        :return: boolean success or fail
+        """
+        url = '{base_url}/validate-credentials/'.format(
+            base_url=self.base_url,
+        )
+        data = self.encode_json_bytes(dict(username=username, password=password))
+        self.inject_auth_header(url, data)
+        try:
+            response = requests.post(url=url, data=data, headers=self.default_headers)
+            return response.json()  # Returns JSON encoded boolean
+        except (requests.RequestException, ValueError):
+            return False
