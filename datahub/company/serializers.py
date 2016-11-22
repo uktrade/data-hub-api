@@ -175,6 +175,8 @@ class ContactSerializerRead(serializers.ModelSerializer):
 class InteractionSerializerRead(serializers.ModelSerializer):
     """Interaction Serializer."""
 
+    dit_advisor = AdvisorSerializer()
+
     class Meta:  # noqa: D101
         model = Interaction
         depth = 2
