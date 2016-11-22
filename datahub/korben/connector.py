@@ -3,6 +3,7 @@
 import requests
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
+from raven.contrib.django.raven_compat.models import client
 
 from .utils import generate_signature
 
@@ -86,5 +87,6 @@ class KorbenConnector:
         try:
             response = requests.post(url=url, data=data, headers=self.default_headers)
             return response.json()  # Returns JSON encoded boolean
-        except (requests.RequestException, ValueError):
+        except (requests.RequestException, ValueError) as e:
+            client.captureException(response.content)
             return False
