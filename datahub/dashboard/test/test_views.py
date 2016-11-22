@@ -1,5 +1,3 @@
-import pytest
-
 from django.urls import reverse
 from rest_framework import status
 
@@ -8,12 +6,11 @@ from datahub.core import constants
 from datahub.core.test_utils import get_test_user, LeelooTestCase
 
 
-@pytest.mark.skipif(True, reason='Is failing on not auto-populating date')
 class DashboardTestCase(LeelooTestCase):
     """Dashboard test case."""
 
     def test_intelligent_homepage(self):
-        """Intellingent homepage."""
+        """Intelligent homepage."""
         user = get_test_user()
 
         # add contact using the API to save the user from the session

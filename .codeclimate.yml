@@ -9,6 +9,7 @@ engines:
           mass_threshold: 32
       exclude_fingerprints:
         - 69aa4cac78f91a365e565175a509ada2
+        - 660e3d488a88ca2f495208adb50268d1
   fixme:
     enabled: true
   radon:
