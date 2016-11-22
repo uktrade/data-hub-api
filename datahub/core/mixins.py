@@ -19,23 +19,29 @@ class DeferredSaveModelMixin:
         self.korben_connector = KorbenConnector(table_name=self._meta.db_table)
         super(DeferredSaveModelMixin, self).__init__(*args, **kwargs)
 
-    def save(self, as_korben=False, *args, **kwargs):
-        """Save to Korben first, then alter the model instance with the data received back from Korben.
-
-        We force feed an ID to Django, so we cannot differentiate between update or create without querying the db
-        https://docs.djangoproject.com/en/1.10/ref/models/instances/#how-django-knows-to-update-vs-insert
+    def save(self, as_korben=False, **kwargs):
+        """
+        Override the Django save implementation to save to Korben.
 
         :param as_korben: bool - Whether or not the data comes from Korben, in that case don't trigger validation
         """
         if not as_korben:
-            self.clean()  # triggers custom validation
-            # objects is not accessible via instances
-            update = type(self).objects.filter(id=self.id).exists()
-            korben_data = self._convert_model_to_korben_format()
-            korben_response = self.korben_connector.post(data=korben_data, update=update)
-            self._map_korben_response_to_model_instance(korben_response)
+            self._save_to_korben()
+        super().save(**kwargs)
 
-        super().save(*args, **kwargs)
+    def _save_to_korben(self):
+        """
+        Save to Korben first, then alter the model instance with the data received back from Korben.
+
+        We force feed an ID to Django, so we cannot differentiate between update or create without querying the db
+        https://docs.djangoproject.com/en/1.10/ref/models/instances/#how-django-knows-to-update-vs-insert
+        """
+        self.clean()  # triggers custom validation
+        # objects is not accessible via instances
+        update = type(self).objects.filter(id=self.id).exists()
+        korben_data = self._convert_model_to_korben_format()
+        korben_response = self.korben_connector.post(data=korben_data, update=update)
+        self._map_korben_response_to_model_instance(korben_response)
 
     def _map_korben_response_to_model_instance(self, korben_response):
         """Override this method to control what needs to be converted back into the model."""

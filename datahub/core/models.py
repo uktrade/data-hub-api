@@ -25,7 +25,7 @@ class BaseModel(DeferredSaveModelMixin, models.Model):
         self.archived_by = user
         self.archived_reason = reason
         self.archived_on = now()
-        self.save()
+        self.save(as_korben=True)  # it will skip the custom validation
 
     def unarchive(self):
         """Unarchive the model instance."""
@@ -33,13 +33,14 @@ class BaseModel(DeferredSaveModelMixin, models.Model):
         self.archived_reason = ''
         self.archived_by = None
         self.archived_on = None
-        self.save()
+        self.save(as_korben=True)  # it will skip the custom validation
 
     def clean(self):
         """Custom validation for created_on and modified_on.
 
         If the fields are empty, populate them.
         """
+        super().clean()
         self.created_on = self.created_on if self.created_on else now()
         self.modified_on = self.modified_on if self.modified_on else now()
 
