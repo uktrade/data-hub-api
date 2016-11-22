@@ -58,7 +58,7 @@ class ContactViewSet(CoreViewSet):
 
     def create(self, request, *args, **kwargs):
         """Override create to inject the user from session."""
-        request.data.update({'advisor': str(request.user.advisor.pk)})
+        request.data.update({'advisor': str(request.user.pk)})
         return super().create(request, *args, **kwargs)
 
 

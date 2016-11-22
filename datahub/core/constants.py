@@ -413,3 +413,6 @@ class Team(Enum):
     crm = Constant(
         'CRM', '5e8be8a8-3e95-e211-a939-e4115bead28a'
     )
+    undefined = Constant(
+        'Undefined', '0167b456-0ddd-49bd-8184-e3227a0b6396'
+    )

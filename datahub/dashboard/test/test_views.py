@@ -30,7 +30,7 @@ class DashboardTestCase(LeelooTestCase):
             'address_same_as_company': True,
             'primary': True
         })
-        interaction = InteractionFactory(dit_advisor=user.advisor)
+        interaction = InteractionFactory(dit_advisor=user)
 
         url = reverse('dashboard:intelligent-homepage')
         response = self.api_client.get(url, data={'days': 23})

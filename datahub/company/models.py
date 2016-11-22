@@ -3,10 +3,8 @@ import uuid
 
 from dateutil import parser
 from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
 from django.db import models
 from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
@@ -93,7 +91,7 @@ class Company(CompanyAbstract, BaseModel):
     sector = models.ForeignKey('Sector')
     employee_range = models.ForeignKey('EmployeeRange', null=True)
     turnover_range = models.ForeignKey('TurnoverRange', null=True)
-    account_manager = models.ForeignKey('Advisor', null=True)
+    account_manager = models.ForeignKey('Advisor', null=True, related_name='companies')
     export_to_countries = models.ManyToManyField(
         'Country',
         blank=True,
@@ -220,7 +218,7 @@ class Interaction(BaseModel):
     interaction_type = models.ForeignKey('InteractionType', null=True)
     subject = models.TextField()
     date_of_interaction = models.DateTimeField()
-    dit_advisor = models.ForeignKey('Advisor')
+    dit_advisor = models.ForeignKey('Advisor', related_name='interactions')
     notes = models.TextField()
     company = models.ForeignKey('Company', related_name='interactions')
     contact = models.ForeignKey('Contact', related_name='interactions')
@@ -276,7 +274,7 @@ class Contact(BaseModel):
     last_name = models.CharField(max_length=MAX_LENGTH)
     role = models.ForeignKey('Role')
     company = models.ForeignKey('Company', related_name='contacts')
-    advisor = models.ForeignKey('Advisor', null=True, blank=True)
+    advisor = models.ForeignKey('Advisor', related_name='contacts', null=True, blank=True)
     primary = models.BooleanField()
     teams = models.ManyToManyField('Team', blank=True)
     telephone_countrycode = models.CharField(max_length=MAX_LENGTH)
@@ -384,15 +382,24 @@ class Contact(BaseModel):
         super(Contact, self).clean()
 
 
-class Advisor(DeferredSaveModelMixin, models.Model):
+class Advisor(DeferredSaveModelMixin, AbstractUser):
     """Advisor."""
 
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
-    first_name = models.CharField(max_length=MAX_LENGTH)
-    last_name = models.CharField(max_length=MAX_LENGTH)
-    dit_team = models.ForeignKey('Team')
+    username = models.CharField(
+        unique=True,
+        validators=[AbstractUser.username_validator],
+        blank=True,
+    )
     email = models.EmailField()
+    dit_team = models.ForeignKey('Team', default=constants.Team.undefined.value.id)
+
+    def save(self, as_korben=False, *args, **kwargs):
+        """Make save play nice with missing data from korben."""
+        if not self.username:
+            self.username = self.email
+
+        super().save(as_korben, *args, **kwargs)
 
     @cached_property
     def name(self):
@@ -404,44 +411,8 @@ class Advisor(DeferredSaveModelMixin, models.Model):
         return self.name
 
     def get_excluded_fields(self):
-        """Don't send user to Korben, it's a Django thing."""
-        return ['user']
-
-
-# Create a Django user when an advisor is created
-def create_user_for_advisor(instance, created, **kwargs):
-    """Create a user associated to an advisor."""
-    if created and not instance.user:
-        user_model = get_user_model()
-        user, _ = user_model.objects.get_or_create(
-            username=instance.email.split('@')[0],
-            email=instance.email,
-            first_name=instance.first_name,
-            last_name=instance.last_name,
-        )
-        user.set_unusable_password()
-        instance.user = user
-        try:
-            instance.save()
-        except IntegrityError:  # somehow factories are saving it twice and it blows up, prevent it from happening
-            pass
-
-
-# Create an advisor when a user is created (ie using the shell)
-# Users should be created through advisors, this covers the case of automated tests and users created with
-# the management command
-@receiver(post_save, sender=User)  # cannot use get_user_model() because app registry is not initialised
-def create_advisor_for_user(instance, created, **kwargs):
-    """Create an advisor associated to a user."""
-    if created:
-        advisor = Advisor(
-            user=instance,
-            first_name=instance.first_name if instance.first_name else instance.email,
-            last_name=instance.last_name,
-            dit_team=Team.objects.get(name='Undefined'),
-            email=instance.email
-        )
-        advisor.save(as_korben=True)  # don't talk to Korben, this is not an Advisor we want to save in CDMS!
+        """Don't send django user fields to Korben, it's a Django thing."""
+        return ['username', 'is_staff', 'is_active', 'date_joined']
 
 
 # Write to ES stuff

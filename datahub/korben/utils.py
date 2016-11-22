@@ -3,6 +3,8 @@ from urllib.parse import urlparse
 
 from django.contrib.auth import get_user_model
 
+from datahub.core import constants
+
 
 def get_korben_user():
     """Get or return the Korben user."""
@@ -12,7 +14,8 @@ def get_korben_user():
         defaults={
             'first_name': 'Kor',
             'last_name': 'Ben',
-            'email': 'kor.ben@foo.bar'
+            'email': 'kor.ben@foo.bar',
+            'dit_team_id': constants.Team.undefined.value.id,
         }
     )
     return korben
