@@ -237,7 +237,7 @@ class CompanyTestCase(LeelooTestCase):
         """Test company archive."""
         company = CompanyFactory()
         url = reverse('company-archive', kwargs={'pk': company.id})
-        response = self.api_client.post(url)
+        response = self.api_client.post(url, format='json')
 
         assert response.data['archived']
         assert response.data['archived_reason'] == ''
@@ -258,7 +258,7 @@ class CompanyTestCase(LeelooTestCase):
         """Test company archive."""
         company = CompanyFactory()
         url = reverse('company-archive', kwargs={'pk': company.id})
-        response = self.api_client.post(url, {'reason': 'foo'})
+        response = self.api_client.post(url, {'reason': 'foo'}, format='json')
 
         assert response.data['archived']
         assert response.data['archived_reason'] == 'foo'
