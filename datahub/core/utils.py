@@ -69,9 +69,7 @@ class CDMSUserBackend(ModelBackend):
             # difference between an existing and a non-existing user (#20760).
             user_model().set_password(password)
         else:
-            if (
-                    self.korben_authenticate(
-                        username=username, password=password
-                    ) and self.user_can_authenticate(user)
-            ):
+            korben_ok = self.korben_authenticate(username, password)
+            django_ok = self.user_can_authenticate(user)
+            if korben_ok and django_ok:
                 return user
