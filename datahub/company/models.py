@@ -298,50 +298,23 @@ class Contact(BaseModel):
         """Need this for ES."""
         return '{first_name} {last_name}'.format(first_name=self.first_name, last_name=self.last_name)
 
-    @cached_property
-    def address(self):
-        """Return the company address if the flag is selected."""
-        address_country = None
-
-        if self.address_same_as_company:
-            if self.company.trading_address_country:
-                address_country = {
-                    'id': self.company.trading_address_country.pk,
-                    'name': self.company.trading_address_country.name
-                }
-            else:
-                address_country = {
-                    'id': self.company.registered_address_country.pk,
-                    'name': self.company.registered_address_country.name
-                }
-
-            return {
-                'address_1': self.company.trading_address_1 or self.company.registered_address_1,
-                'address_2': self.company.trading_address_2 or self.company.registered_address_2,
-                'address_3': self.company.trading_address_3 or self.company.registered_address_3,
-                'address_4': self.company.trading_address_4 or self.company.registered_address_4,
-                'address_town': self.company.trading_address_town or self.company.registered_address_town,
-                'address_country': address_country,
-                'address_county': self.company.trading_address_county or self.company.registered_address_county,
-                'address_postcode': self.company.trading_address_postcode or self.company.registered_address_postcode,
-            }
-        else:
-            if self.address_country:
-                address_country = {'id': self.address_country.pk, 'name': self.address_country.name}
-            return {
-                'address_1': self.address_1,
-                'address_2': self.address_2,
-                'address_3': self.address_3,
-                'address_4': self.address_4,
-                'address_town': self.address_town,
-                'address_country': address_country,
-                'address_county': self.address_county,
-                'address_postcode': self.address_postcode,
-            }
-
     def __str__(self):
         """Admin displayed human readable name."""
         return self.name
+
+    def _populate_address_from_company(self):
+        """Populate the address fields from the company address.
+
+            Company trading address has priority over registered address.
+        """
+        self.address_1 = self.company.trading_address_1 or self.company.registered_address_1
+        self.address_2 = self.company.trading_address_2 or self.company.registered_address_2
+        self.address_3 = self.company.trading_address_3 or self.company.registered_address_3
+        self.address_4 = self.company.trading_address_4 or self.company.registered_address_4
+        self.address_town = self.company.trading_address_town or self.company.registered_address_town
+        self.address_country = self.company.trading_address_country or self.company.registered_address_country
+        self.address_county = self.company.trading_address_county or self.company.registered_address_county
+        self.address_postcode = self.company.trading_address_postcode or self.company.registered_address_postcode
 
     def clean(self):
         """Custom validation for address.
@@ -379,6 +352,9 @@ class Contact(BaseModel):
                     'Please select either address_same_as_company or enter an address manually.',
                     code='invalid'
                 )
+        # address validation passed, populate the address fields
+        if self.address_same_as_company:
+            self._populate_address_from_company()
         super(Contact, self).clean()
 
 
