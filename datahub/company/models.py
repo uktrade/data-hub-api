@@ -302,20 +302,6 @@ class Contact(BaseModel):
         """Admin displayed human readable name."""
         return self.name
 
-    def _populate_address_from_company(self):
-        """Populate the address fields from the company address.
-
-            Company trading address has priority over registered address.
-        """
-        self.address_1 = self.company.trading_address_1 or self.company.registered_address_1
-        self.address_2 = self.company.trading_address_2 or self.company.registered_address_2
-        self.address_3 = self.company.trading_address_3 or self.company.registered_address_3
-        self.address_4 = self.company.trading_address_4 or self.company.registered_address_4
-        self.address_town = self.company.trading_address_town or self.company.registered_address_town
-        self.address_country = self.company.trading_address_country or self.company.registered_address_country
-        self.address_county = self.company.trading_address_county or self.company.registered_address_county
-        self.address_postcode = self.company.trading_address_postcode or self.company.registered_address_postcode
-
     def clean(self):
         """Custom validation for address.
 
@@ -352,9 +338,6 @@ class Contact(BaseModel):
                     'Please select either address_same_as_company or enter an address manually.',
                     code='invalid'
                 )
-        # address validation passed, populate the address fields
-        if self.address_same_as_company:
-            self._populate_address_from_company()
         super(Contact, self).clean()
 
 

@@ -50,19 +50,17 @@ class CompanyTestCase(LeelooTestCase):
         assert response.data['companies_house_data']['id'] == ch_company.id
         assert response.data['name'] == ch_company.name
         assert response.data['trading_name'] == company.alias
-        assert response.data['registered_address'] == {
-            'address_1': ch_company.registered_address_1,
-            'address_2': None,
-            'address_3': None,
-            'address_4': None,
-            'address_town': ch_company.registered_address_town,
-            'address_country': {
-                'id': str(ch_company.registered_address_country.pk),
-                'name': ch_company.registered_address_country.name
-            },
-            'address_county': None,
-            'address_postcode': None,
+        assert response.data['registered_address_1'] == ch_company.registered_address_1
+        assert response.data['registered_address_2'] is None
+        assert response.data['registered_address_3'] is None
+        assert response.data['registered_address_4'] is None
+        assert response.data['registered_address_town'] == ch_company.registered_address_town
+        assert response.data['registered_address_country'] == {
+            'name': ch_company.registered_address_country.name,
+            'id': str(ch_company.registered_address_country.pk)
         }
+        assert response.data['registered_address_county'] is None
+        assert response.data['registered_address_postcode'] is None
 
     def test_detail_company_without_company_number(self):
         """Test company detail view without companies house data.
@@ -83,19 +81,17 @@ class CompanyTestCase(LeelooTestCase):
         assert response.data['id'] == str(company.pk)
         assert response.data['companies_house_data'] is None
         assert response.data['name'] == company.name
-        assert response.data['registered_address'] == {
-            'address_1': company.registered_address_1,
-            'address_2': None,
-            'address_3': None,
-            'address_4': None,
-            'address_town': company.registered_address_town,
-            'address_country': {
-                'id': str(company.registered_address_country.pk),
-                'name': company.registered_address_country.name
-            },
-            'address_county': None,
-            'address_postcode': None,
+        assert response.data['registered_address_1'] == company.registered_address_1
+        assert response.data['registered_address_2'] is None
+        assert response.data['registered_address_3'] is None
+        assert response.data['registered_address_4'] is None
+        assert response.data['registered_address_town'] == company.registered_address_town
+        assert response.data['registered_address_country'] == {
+            'name': company.registered_address_country.name,
+            'id': str(company.registered_address_country.pk)
         }
+        assert response.data['registered_address_county'] is None
+        assert response.data['registered_address_postcode'] is None
 
     def test_update_company(self):
         """Test company update."""

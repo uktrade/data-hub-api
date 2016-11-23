@@ -67,11 +67,11 @@ class CoreViewSet(mixins.CreateModelMixin,
         try:
             return super().update(request, *args, **kwargs)
         except ValidationError as e:
-            return DRFValidationError(detail={'detail': e.message})
+            raise DRFValidationError(detail={'detail': e.message})
 
     def retrieve(self, request, *args, **kwargs):
         """Override to handle the exceptions coming from Korben."""
         try:
             return super().retrieve(request, *args, **kwargs)
         except KorbenException:
-            return APIException(detail={'detail': 'Korben error.'})
+            raise APIException(detail={'detail': 'Korben error.'})
