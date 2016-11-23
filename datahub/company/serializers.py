@@ -196,7 +196,10 @@ class ContactSerializerRead(serializers.ModelSerializer):
         """Handle address."""
         if obj.address_same_as_company:
             if obj.company.trading_address_country:
-                return {'id': str(obj.company.trading_address_country.pk), 'name': obj.company.trading_address_country.name}
+                return {
+                    'id': str(obj.company.trading_address_country.pk),
+                    'name': obj.company.trading_address_country.name
+                }
             else:
                 return {}
         else:
