@@ -387,6 +387,7 @@ class Advisor(DeferredSaveModelMixin, AbstractUser):
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     username = models.CharField(
+        max_length=MAX_LENGTH,
         unique=True,
         validators=[AbstractUser.username_validator],
         blank=True,
