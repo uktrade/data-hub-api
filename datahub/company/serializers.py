@@ -77,33 +77,31 @@ class CompanySerializerRead(serializers.ModelSerializer):
         depth = 1
 
     @staticmethod
+    def _address_partial(obj, attr):
+        """Return the address partial from obj."""
+        obj = obj.companies_house_data or obj
+        return getattr(obj, attr)
+
+    @staticmethod
     def get_registered_name(obj):
         """Use the CH name, if there's one, else the name."""
         return obj.companies_house_data.name if obj.companies_house_data else obj.name
 
-    @staticmethod
-    def get_registered_address_1(obj):
+    def get_registered_address_1(self, obj):
         """Return CH address if present."""
-        obj = obj.companies_house_data or obj
-        return obj.registered_address_1
+        return self._address_partial(obj, 'registered_address_1')
 
-    @staticmethod
-    def get_registered_address_2(obj):
+    def get_registered_address_2(self, obj):
         """Return CH address if present."""
-        obj = obj.companies_house_data or obj
-        return obj.registered_address_2
+        return self._address_partial(obj, 'registered_address_2')
 
-    @staticmethod
-    def get_registered_address_3(obj):
+    def get_registered_address_3(self, obj):
         """Return CH address if present."""
-        obj = obj.companies_house_data or obj
-        return obj.registered_address_3
+        return self._address_partial(obj, 'registered_address_3')
 
-    @staticmethod
-    def get_registered_address_4(obj):
+    def get_registered_address_4(self, obj):
         """Return CH address if present."""
-        obj = obj.companies_house_data or obj
-        return obj.registered_address_4
+        return self._address_partial(obj, 'registered_address_4')
 
     @staticmethod
     def get_registered_address_country(obj):
@@ -114,23 +112,17 @@ class CompanySerializerRead(serializers.ModelSerializer):
         else:
             return {}
 
-    @staticmethod
-    def get_registered_address_county(obj):
+    def get_registered_address_county(self, obj):
         """Return CH address if present."""
-        obj = obj.companies_house_data or obj
-        return obj.registered_address_county
+        return self._address_partial(obj, 'registered_address_country')
 
-    @staticmethod
-    def get_registered_address_postcode(obj):
+    def get_registered_address_postcode(self, obj):
         """Return CH address if present."""
-        obj = obj.companies_house_data or obj
-        return obj.registered_address_postcode
+        return self._address_partial(obj, 'registered_address_postcode')
 
-    @staticmethod
-    def get_registered_address_town(obj):
+    def get_registered_address_town(self, obj):
         """Return CH address if present."""
-        obj = obj.companies_house_data or obj
-        return obj.registered_address_town
+        return self._address_partial(obj, 'registered_address_town')
 
 
 class CompanySerializerWrite(serializers.ModelSerializer):
