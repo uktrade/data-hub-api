@@ -24,4 +24,3 @@ class MetadataAdmin(admin.ModelAdmin):
     fields = ('name', 'selectable')
     list_display = ('name', 'selectable')
     readonly_fields = ('id', )
-

@@ -40,7 +40,7 @@ class UKRegion(BaseConstantModel):
 class Country(BaseConstantModel):
     """Country."""
 
-    class Meta:
+    class Meta:  # noqa: D101
         verbose_name_plural = 'countries'
 
 
