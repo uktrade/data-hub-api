@@ -70,28 +70,6 @@ class ContactTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data['detail'] == 'Please select either address_same_as_company or enter an address manually.'
 
-    def test_add_contact_with_both_manual_and_same_as_company_address(self):
-        """Test add contact with both manual and same as company address."""
-        url = reverse('contact-list')
-
-        response = self.api_client.post(url, {
-            'first_name': 'Oratio',
-            'last_name': 'Nelson',
-            'title': constants.Title.admiral_of_the_fleet.value.id,
-            'company': CompanyFactory().pk,
-            'role': constants.Role.owner.value.id,
-            'email': 'foo@bar.com',
-            'telephone_countrycode': '+44',
-            'telephone_number': '123456789',
-            'address_1': 'test',
-            'address_same_as_company': True,
-            'primary': True
-        })
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        expected_exception = 'Please select either address_same_as_company or enter an address manually, not both!'
-        assert response.data['detail'] == expected_exception
-
     def test_add_contact_partial_manual_address(self):
         """Test add new contact with a partial manual address."""
         url = reverse('contact-list')
@@ -149,7 +127,7 @@ class ContactTestCase(LeelooTestCase):
             'first_name': 'bar',
         })
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status.HTTP_200_OK, response.data
         assert response.data['first_name'] == 'bar'
 
         # make sure we're writing to ES
