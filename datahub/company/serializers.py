@@ -101,7 +101,7 @@ class CompanySerializerRead(serializers.ModelSerializer):
 
     def get_registered_address_county(self, obj):
         """Return CH address if present."""
-        return self._address_partial(obj, 'registered_address_country')
+        return self._address_partial(obj, 'registered_address_county')
 
     def get_registered_address_postcode(self, obj):
         """Return CH address if present."""
