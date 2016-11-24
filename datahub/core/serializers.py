@@ -6,3 +6,4 @@ class ConstantModelSerializer(serializers.Serializer):
 
     id = serializers.ReadOnlyField()
     name = serializers.ReadOnlyField()
+    selectable = serializers.BooleanField()
