@@ -1,6 +1,7 @@
 """General mixins."""
 
 import reversion
+from dateutil import parser
 from raven.contrib.django.raven_compat.models import client
 from rest_framework import status
 
@@ -48,6 +49,12 @@ class DeferredSaveModelMixin:
         if korben_response.status_code == status.HTTP_200_OK:
             for key, value in korben_response.json().items():
                 setattr(self, key, value)
+
+            for name in self.get_datetime_fields():
+                value = korben_response.json().get(name)
+
+                setattr(self, name, parser.parse(value) if value else value)
+
         elif korben_response.status_code == status.HTTP_404_NOT_FOUND:
             return
         else:
@@ -56,6 +63,10 @@ class DeferredSaveModelMixin:
 
     def get_excluded_fields(self):
         """Override this method to define which fields should not be send to Korben."""
+        return []
+
+    def get_datetime_fields(self):
+        """Return list of fields that should be mapped as datetime."""
         return []
 
     def _convert_model_to_korben_format(self):

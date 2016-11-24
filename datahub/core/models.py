@@ -1,4 +1,3 @@
-from dateutil import parser
 from django.conf import settings
 from django.db import models
 from django.utils.timezone import now
@@ -44,16 +43,9 @@ class BaseModel(DeferredSaveModelMixin, models.Model):
         self.created_on = self.created_on if self.created_on else now()
         self.modified_on = self.modified_on if self.modified_on else now()
 
-    def _map_korben_response_to_model_instance(self, korben_response):
-        """Handle date time object."""
-        super(BaseModel, self)._map_korben_response_to_model_instance(korben_response)
-        archived_on = korben_response.json().get('archived_on')
-        modified_on = korben_response.json().get('modified_on')
-        created_on = korben_response.json().get('created_on')
-
-        self.archived_on = parser.parse(archived_on) if archived_on else archived_on
-        self.modified_on = parser.parse(modified_on) if modified_on else modified_on
-        self.created_on = parser.parse(created_on) if created_on else created_on
+    def get_datetime_fields(self):
+        """Return list of fields that should be mapped as datetime."""
+        return ['archived_on', 'created_on', 'modified_on']
 
 
 class BaseConstantModel(models.Model):
