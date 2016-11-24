@@ -1,6 +1,6 @@
 # Undefined enums, company, advisor
 
-- model: company.team
+- model: metadata.team
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
   fields: {name: Undefined}
 
@@ -13,34 +13,34 @@
     dit_team: 0167b456-0ddd-49bd-8184-e3227a0b6396,
   }
 
-- model: company.businesstype
+- model: metadata.businesstype
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
   fields: {name: Undefined}
-- model: company.sector
+- model: metadata.sector
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
   fields: {name: Undefined}
-- model: company.employeerange
+- model: metadata.employeerange
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
   fields: {name: Undefined}
-- model: company.turnoverrange
+- model: metadata.turnoverrange
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
   fields: {name: Undefined}
-- model: company.ukregion
+- model: metadata.ukregion
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
   fields: {name: Undefined}
-- model: company.country
+- model: metadata.country
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
   fields: {name: Undefined}
-- model: company.interactiontype
+- model: metadata.interactiontype
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
   fields: {name: Undefined}
-- model: company.title
+- model: metadata.title
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
   fields: {name: Undefined}
-- model: company.role
+- model: metadata.role
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
   fields: {name: Undefined}
-- model: company.service
+- model: metadata.service
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
   fields: {name: Undefined}
 - model: company.company

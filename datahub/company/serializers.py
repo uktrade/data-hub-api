@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from .models import Advisor, CompaniesHouseCompany, Company, Contact, Country, Interaction, Team
+from .models import Advisor, CompaniesHouseCompany, Company, Contact, Interaction, Team
+from datahub.metadata.models import Country, Team
 
 
 class NestedContactSerializer(serializers.ModelSerializer):

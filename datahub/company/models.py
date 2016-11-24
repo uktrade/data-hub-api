@@ -11,48 +11,11 @@ from django.utils.functional import cached_property
 
 from datahub.core import constants
 from datahub.core.mixins import DeferredSaveModelMixin
-from datahub.core.models import BaseConstantModel, BaseModel
+from datahub.core.models import BaseModel
 from datahub.core.utils import model_to_dictionary
 from datahub.es.connector import ESConnector
 
-
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
-
-
-class BusinessType(BaseConstantModel):
-    """Company business type."""
-
-    pass
-
-
-class Sector(BaseConstantModel):
-    """Company sector."""
-
-    pass
-
-
-class EmployeeRange(BaseConstantModel):
-    """Company employee range."""
-
-    pass
-
-
-class TurnoverRange(BaseConstantModel):
-    """Company turnover range."""
-
-    pass
-
-
-class UKRegion(BaseConstantModel):
-    """UK region."""
-
-    pass
-
-
-class Country(BaseConstantModel):
-    """Country."""
-
-    pass
 
 
 class CompanyAbstract(models.Model):
@@ -66,7 +29,7 @@ class CompanyAbstract(models.Model):
     registered_address_town = models.CharField(max_length=MAX_LENGTH)
     registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     registered_address_country = models.ForeignKey(
-        'Country',
+        'metadata.Country',
         related_name="%(app_label)s_%(class)s_related",  # noqa: Q000
         related_query_name="(app_label)s_%(class)ss",  # noqa: Q000
     )
@@ -86,19 +49,19 @@ class Company(CompanyAbstract, BaseModel):
     company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     alias = models.CharField(max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name')
-    business_type = models.ForeignKey('BusinessType')
-    sector = models.ForeignKey('Sector')
-    employee_range = models.ForeignKey('EmployeeRange', null=True)
-    turnover_range = models.ForeignKey('TurnoverRange', null=True)
+    business_type = models.ForeignKey('metadata.BusinessType')
+    sector = models.ForeignKey('metadata.Sector')
+    employee_range = models.ForeignKey('metadata.EmployeeRange', null=True)
+    turnover_range = models.ForeignKey('metadata.TurnoverRange', null=True)
     account_manager = models.ForeignKey('Advisor', null=True, related_name='companies')
     export_to_countries = models.ManyToManyField(
-        'Country',
+        'metadata.Country',
         blank=True,
         null=True,
         related_name='company_export_to_countries'
     )
     future_interest_countries = models.ManyToManyField(
-        'Country',
+        'metadata.Country',
         blank=True,
         null=True,
         related_name='company_future_interest_countries'
@@ -106,14 +69,14 @@ class Company(CompanyAbstract, BaseModel):
     lead = models.BooleanField(default=False)
     description = models.TextField(blank=True, null=True)
     website = models.URLField(blank=True, null=True)
-    uk_region = models.ForeignKey('UKRegion', null=True)
+    uk_region = models.ForeignKey('metadata.UKRegion', null=True)
     trading_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_3 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_4 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    trading_address_country = models.ForeignKey('Country', null=True, related_name='company_trading_address_country')
+    trading_address_country = models.ForeignKey('metadata.Country', null=True, related_name='company_trading_address_country')
     trading_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
     class Meta:  # noqa: D101
@@ -204,25 +167,19 @@ class CompaniesHouseCompany(CompanyAbstract):
         return self.name
 
 
-class InteractionType(BaseConstantModel):
-    """Interaction type."""
-
-    pass
-
-
 class Interaction(BaseModel):
     """Interaction from CDMS."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
-    interaction_type = models.ForeignKey('InteractionType', null=True)
+    interaction_type = models.ForeignKey('metadata.InteractionType', null=True)
     subject = models.TextField()
     date_of_interaction = models.DateTimeField()
     dit_advisor = models.ForeignKey('Advisor', related_name='interactions')
     notes = models.TextField()
     company = models.ForeignKey('Company', related_name='interactions')
     contact = models.ForeignKey('Contact', related_name='interactions')
-    service = models.ForeignKey('Service')
-    dit_team = models.ForeignKey('Team')
+    service = models.ForeignKey('metadata.Service')
+    dit_team = models.ForeignKey('metadata.Team')
 
     def __str__(self):
         """Admin displayed human readable name."""
@@ -237,42 +194,18 @@ class Interaction(BaseModel):
         return super().get_datetime_fields() + ['date_of_interaction']
 
 
-class Title(BaseConstantModel):
-    """Contact title."""
-
-    pass
-
-
-class Role(BaseConstantModel):
-    """Contact role."""
-
-    pass
-
-
-class Team(BaseConstantModel):
-    """Team."""
-
-    pass
-
-
-class Service(BaseConstantModel):
-    """Service."""
-
-    pass
-
-
 class Contact(BaseModel):
     """Contact from CDMS."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
-    title = models.ForeignKey('Title')
+    title = models.ForeignKey('metadata.Title')
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
-    role = models.ForeignKey('Role')
+    role = models.ForeignKey('metadata.Role')
     company = models.ForeignKey('Company', related_name='contacts')
     advisor = models.ForeignKey('Advisor', related_name='contacts', null=True, blank=True)
     primary = models.BooleanField()
-    teams = models.ManyToManyField('Team', blank=True)
+    teams = models.ManyToManyField('metadata.Team', blank=True)
     telephone_countrycode = models.CharField(max_length=MAX_LENGTH)
     telephone_number = models.CharField(max_length=MAX_LENGTH)
     email = models.EmailField()
@@ -283,7 +216,7 @@ class Contact(BaseModel):
     address_4 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    address_country = models.ForeignKey('Country', null=True)
+    address_country = models.ForeignKey('metadata.Country', null=True)
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     telephone_alternative = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     email_alternative = models.EmailField(null=True, blank=True)
@@ -348,7 +281,7 @@ class Advisor(DeferredSaveModelMixin, AbstractUser):
         blank=True,
     )
     email = models.EmailField()
-    dit_team = models.ForeignKey('Team', default=constants.Team.undefined.value.id)
+    dit_team = models.ForeignKey('metadata.Team', default=constants.Team.undefined.value.id)
 
     def save(self, as_korben=False, *args, **kwargs):
         """Make save play nice with missing data from korben."""

@@ -53,11 +53,12 @@ class BaseConstantModel(models.Model):
 
     id = models.UUIDField(primary_key=True)
     name = models.TextField(blank=True)
+    selectable = models.BooleanField(default=True)
 
     class Meta:  # noqa: D101
         abstract = True
         ordering = ('name', )
 
     def __str__(self):
-        """Humand readable admin name."""
+        """Human readable admin name."""
         return self.name
