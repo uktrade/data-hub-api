@@ -1,7 +1,6 @@
 """Company models."""
 import uuid
 
-from dateutil import parser
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
@@ -229,16 +228,13 @@ class Interaction(BaseModel):
         """Admin displayed human readable name."""
         return self.subject
 
-    def _map_korben_response_to_model_instance(self, korben_response):
-        """Handle date field."""
-        super(Interaction, self)._map_korben_response_to_model_instance(korben_response)
-        date_of_interaction_string = korben_response.json().get('date_of_interaction')
-        if date_of_interaction_string:
-            self.date_of_interaction = parser.parse(date_of_interaction_string)
-
     def get_excluded_fields(self):
         """Don't send user to Korben, it's a Django thing."""
         return ['user']
+
+    def get_datetime_fields(self):
+        """Return list of fields that should be mapped as datetime."""
+        return super().get_datetime_fields() + ['date_of_interaction']
 
 
 class Title(BaseConstantModel):
@@ -415,6 +411,9 @@ class Advisor(DeferredSaveModelMixin, AbstractUser):
         """Don't send django user fields to Korben, it's a Django thing."""
         return ['username', 'is_staff', 'is_active', 'date_joined']
 
+    def get_datetime_fields(self):
+        """Return list of fields that should be mapped as datetime."""
+        return super().get_datetime_fields() + ['last_login']
 
 # Write to ES stuff
 @receiver((post_save, m2m_changed))

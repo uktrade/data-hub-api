@@ -6,10 +6,18 @@ from reversion.admin import VersionAdmin
 
 from . models import Advisor, Company, Contact, Interaction
 
-MODELS_TO_REGISTER = (Advisor, Company, Contact, Interaction)
+MODELS_TO_REGISTER = (Company, Contact, Interaction)
 
 for model in MODELS_TO_REGISTER:
     admin.site.register(model, VersionAdmin)
+
+
+@admin.register(Advisor)
+class AdvisorAdmin(VersionAdmin):
+    def reversion_register(self, model, **kwargs):
+        kwargs['exclude'] = ('last_login', )
+
+        super().reversion_register(model, **kwargs)
 
 
 class AdminLoginForm(AdminAuthenticationForm):
