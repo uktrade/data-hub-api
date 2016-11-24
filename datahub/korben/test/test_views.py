@@ -159,3 +159,20 @@ def test_korben_advisor_create(api_client):
 
     assert response.status_code == status.HTTP_200_OK
     assert Advisor.objects.get(pk=data_dict['id'])
+
+
+def test_korben_failed_authentication(api_client):
+    """Check that authentication fails."""
+
+    url = reverse('korben:company_advisor')
+    data_dict = {
+        'id': str(uuid.uuid4()),
+        'first_name': 'John',
+        'last_name': 'Smith',
+        'dit_team_id': constants.Team.healthcare_uk.value.id,
+    }
+    data = json.dumps(data_dict)
+    api_client.credentials(**{'HTTP_X_SIGNATURE':'foo'})
+    response = api_client.post(url, data, content_type='application/json')
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
