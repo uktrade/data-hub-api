@@ -6,17 +6,17 @@ from korben import services
 MAPPINGS = {}
 
 ENUM_MAPPINGS = (
-    ('optevia_businesstypeId', 'optevia_businesstypeSet', 'optevia_name', 'company_businesstype'),
-    ('optevia_sectorId', 'optevia_sectorSet', 'optevia_name', 'company_sector'),
-    ('optevia_employeerangeId', 'optevia_employeerangeSet', 'optevia_name', 'company_employeerange'),
-    ('optevia_turnoverrangeId', 'optevia_turnoverrangeSet', 'optevia_name', 'company_turnoverrange'),
-    ('optevia_ukregionId', 'optevia_ukregionSet', 'optevia_name', 'company_ukregion'),
-    ('optevia_countryId', 'optevia_countrySet', 'optevia_Country', 'company_country'),
-    ('optevia_titleId', 'optevia_titleSet', 'optevia_name', 'company_title'),
-    ('optevia_contactroleId', 'optevia_contactroleSet', 'optevia_name', 'company_role'),
-    ('optevia_interactioncommunicationchannelId', 'optevia_interactioncommunicationchannelSet', 'optevia_name', 'company_interactiontype'),
-    ('BusinessUnitId', 'BusinessUnitSet', 'Name', 'company_team'),
-    ('optevia_serviceId', 'optevia_serviceSet', 'optevia_name', 'company_service'),
+    ('optevia_businesstypeId', 'optevia_businesstypeSet', 'optevia_name', 'metadata_businesstype'),
+    ('optevia_sectorId', 'optevia_sectorSet', 'optevia_name', 'metadata_sector'),
+    ('optevia_employeerangeId', 'optevia_employeerangeSet', 'optevia_name', 'metadata_employeerange'),
+    ('optevia_turnoverrangeId', 'optevia_turnoverrangeSet', 'optevia_name', 'metadata_turnoverrange'),
+    ('optevia_ukregionId', 'optevia_ukregionSet', 'optevia_name', 'metadata_ukregion'),
+    ('optevia_countryId', 'optevia_countrySet', 'optevia_Country', 'metadata_country'),
+    ('optevia_titleId', 'optevia_titleSet', 'optevia_name', 'metadata_title'),
+    ('optevia_contactroleId', 'optevia_contactroleSet', 'optevia_name', 'metadata_role'),
+    ('optevia_interactioncommunicationchannelId', 'optevia_interactioncommunicationchannelSet', 'optevia_name', 'metadata_interactiontype'),
+    ('BusinessUnitId', 'BusinessUnitSet', 'Name', 'metadata_team'),
+    ('optevia_serviceId', 'optevia_serviceSet', 'optevia_name', 'metadata_service'),
 )
 
 # Used to avoid having to make Django fields nullable, this is loaded into all
