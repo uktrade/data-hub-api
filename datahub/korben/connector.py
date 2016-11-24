@@ -79,7 +79,7 @@ class KorbenConnector:
         :param password: str
         :return: boolean success or fail
         """
-        url = '{base_url}/validate-credentials/'.format(
+        url = '{base_url}/auth/validate-credentials/'.format(
             base_url=self.base_url,
         )
         data = self.encode_json_bytes(dict(username=username, password=password))
