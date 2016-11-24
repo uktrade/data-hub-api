@@ -41,7 +41,7 @@ class Country(BaseConstantModel):
     """Country."""
 
     class Meta:
-        verbose_plural = 'countries'
+        verbose_plural_name = 'countries'
 
 
 class Title(BaseConstantModel):
