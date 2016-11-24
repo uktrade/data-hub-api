@@ -20,7 +20,7 @@ urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^admin/', admin.site.urls),
     url(r'^search/$', Search.as_view(), name='search'),
-    url(r'^metadata/', include('datahub.company.metadata_urls')),
+    url(r'^metadata/', include('datahub.metadata.urls')),
     url(r'^token/$', TokenView.as_view(), name='token'),
     url(r'^korben/', include('datahub.korben.urls', namespace='korben')),
     url(r'^whoami/$', who_am_i, name='who_am_i'),

@@ -32,6 +32,7 @@ def metadata_view(request, model):
 
 urls_args = []
 
+# programatically generate metadata views
 for name, model in METADATA_MAPPING.items():
     fn = partial(metadata_view, model=model)
     path = r'{0}/$'.format(name)
