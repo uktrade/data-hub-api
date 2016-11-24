@@ -14,6 +14,7 @@ from datahub.core.mixins import DeferredSaveModelMixin
 from datahub.core.models import BaseModel
 from datahub.core.utils import model_to_dictionary
 from datahub.es.connector import ESConnector
+from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -29,7 +30,7 @@ class CompanyAbstract(models.Model):
     registered_address_town = models.CharField(max_length=MAX_LENGTH)
     registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     registered_address_country = models.ForeignKey(
-        'metadata.Country',
+        metadata_models.Country,
         related_name="%(app_label)s_%(class)s_related",  # noqa: Q000
         related_query_name="(app_label)s_%(class)ss",  # noqa: Q000
     )
@@ -49,19 +50,19 @@ class Company(CompanyAbstract, BaseModel):
     company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     alias = models.CharField(max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name')
-    business_type = models.ForeignKey('metadata.BusinessType')
-    sector = models.ForeignKey('metadata.Sector')
-    employee_range = models.ForeignKey('metadata.EmployeeRange', null=True)
-    turnover_range = models.ForeignKey('metadata.TurnoverRange', null=True)
+    business_type = models.ForeignKey(metadata_models.BusinessType)
+    sector = models.ForeignKey(metadata_models.Sector)
+    employee_range = models.ForeignKey(metadata_models.EmployeeRange, null=True)
+    turnover_range = models.ForeignKey(metadata_models.TurnoverRange, null=True)
     account_manager = models.ForeignKey('Advisor', null=True, related_name='companies')
     export_to_countries = models.ManyToManyField(
-        'metadata.Country',
+        metadata_models.Country,
         blank=True,
         null=True,
         related_name='company_export_to_countries'
     )
     future_interest_countries = models.ManyToManyField(
-        'metadata.Country',
+        metadata_models.Country,
         blank=True,
         null=True,
         related_name='company_future_interest_countries'
@@ -69,14 +70,18 @@ class Company(CompanyAbstract, BaseModel):
     lead = models.BooleanField(default=False)
     description = models.TextField(blank=True, null=True)
     website = models.URLField(blank=True, null=True)
-    uk_region = models.ForeignKey('metadata.UKRegion', null=True)
+    uk_region = models.ForeignKey(metadata_models.UKRegion, null=True)
     trading_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_3 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_4 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    trading_address_country = models.ForeignKey('metadata.Country', null=True, related_name='company_trading_address_country')
+    trading_address_country = models.ForeignKey(
+        metadata_models.Country,
+        null=True,
+        related_name='company_trading_address_country'
+    )
     trading_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
     class Meta:  # noqa: D101
@@ -171,15 +176,15 @@ class Interaction(BaseModel):
     """Interaction from CDMS."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
-    interaction_type = models.ForeignKey('metadata.InteractionType', null=True)
+    interaction_type = models.ForeignKey(metadata_models.InteractionType, null=True)
     subject = models.TextField()
     date_of_interaction = models.DateTimeField()
     dit_advisor = models.ForeignKey('Advisor', related_name='interactions')
     notes = models.TextField()
     company = models.ForeignKey('Company', related_name='interactions')
     contact = models.ForeignKey('Contact', related_name='interactions')
-    service = models.ForeignKey('metadata.Service')
-    dit_team = models.ForeignKey('metadata.Team')
+    service = models.ForeignKey(metadata_models.Service)
+    dit_team = models.ForeignKey(metadata_models.Team)
 
     def __str__(self):
         """Admin displayed human readable name."""
@@ -198,14 +203,14 @@ class Contact(BaseModel):
     """Contact from CDMS."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
-    title = models.ForeignKey('metadata.Title')
+    title = models.ForeignKey(metadata_models.Title)
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
-    role = models.ForeignKey('metadata.Role')
+    role = models.ForeignKey(metadata_models.Role)
     company = models.ForeignKey('Company', related_name='contacts')
     advisor = models.ForeignKey('Advisor', related_name='contacts', null=True, blank=True)
     primary = models.BooleanField()
-    teams = models.ManyToManyField('metadata.Team', blank=True)
+    teams = models.ManyToManyField(metadata_models.Team, blank=True)
     telephone_countrycode = models.CharField(max_length=MAX_LENGTH)
     telephone_number = models.CharField(max_length=MAX_LENGTH)
     email = models.EmailField()
@@ -216,7 +221,7 @@ class Contact(BaseModel):
     address_4 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    address_country = models.ForeignKey('metadata.Country', null=True)
+    address_country = models.ForeignKey(metadata_models.Country, null=True)
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     telephone_alternative = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     email_alternative = models.EmailField(null=True, blank=True)
@@ -281,7 +286,7 @@ class Advisor(DeferredSaveModelMixin, AbstractUser):
         blank=True,
     )
     email = models.EmailField()
-    dit_team = models.ForeignKey('metadata.Team', default=constants.Team.undefined.value.id)
+    dit_team = models.ForeignKey(metadata_models.Team, default=constants.Team.undefined.value.id)
 
     def save(self, as_korben=False, *args, **kwargs):
         """Make save play nice with missing data from korben."""

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from .models import Advisor, CompaniesHouseCompany, Company, Contact, Interaction, Team
-from datahub.metadata.models import Country, Team
+from datahub.metadata.serializers import NestedCountrySerializer, NestedTeamSerializer
+from .models import Advisor, CompaniesHouseCompany, Company, Contact, Interaction
 
 
 class NestedContactSerializer(serializers.ModelSerializer):
@@ -12,25 +12,11 @@ class NestedContactSerializer(serializers.ModelSerializer):
         depth = 1
 
 
-class NestedCountrySerializer(serializers.ModelSerializer):
-    """Nested Country serializer."""
-
-    class Meta:  # noqa: D101
-        model = Country
-
-
 class NestedInteractionSerializer(serializers.ModelSerializer):
     """Nested Interaction Serializer."""
 
     class Meta:  # noqa: D101
         model = Interaction
-
-
-class NestedTeamSerializer(serializers.ModelSerializer):
-    """Nested Team serializer."""
-
-    class Meta:  # noqa: D101
-        model = Team
 
 
 class CompaniesHouseCompanySerializer(serializers.ModelSerializer):

@@ -1,7 +1,10 @@
+
 import pytest
 
 from django.urls import reverse
 from rest_framework import status
+
+from .. import urls
 
 # mark the whole module for db use
 
@@ -18,7 +21,8 @@ metadata_view_names = (
     'role',
     'title',
     'turnover',
-    'uk-region'
+    'uk-region',
+    'team',
 )
 
 metadata_views_ids = (
@@ -31,7 +35,8 @@ metadata_views_ids = (
     'roles view',
     'titles view',
     'turnover view',
-    'UK regions view'
+    'UK regions view',
+    'teams view'
 )
 
 
@@ -76,3 +81,9 @@ def test_metadata_view_patch(view_name, api_client):
     response = api_client.patch(url)
 
     assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+
+def test_view_name_generation():
+    """Test urls are generated correctly."""
+    patterns = urls.urlpatterns
+    assert set(pattern.name for pattern in patterns) == set(metadata_view_names)
