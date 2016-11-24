@@ -40,7 +40,8 @@ class UKRegion(BaseConstantModel):
 class Country(BaseConstantModel):
     """Country."""
 
-    pass
+    class Meta:
+        verbose_plural = 'countries'
 
 
 class Title(BaseConstantModel):

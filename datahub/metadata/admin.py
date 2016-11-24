@@ -16,5 +16,12 @@ MODELS_TO_REGISTER = (
     models.Service
 )
 
-for model in MODELS_TO_REGISTER:
-    admin.site.register(model)
+
+@admin.site.register(MODELS_TO_REGISTER)
+class MetadataAdmin(admin.ModelAdmin):
+    """Custom Metadata Admin."""
+
+    fields = ('name', 'selectable')
+    list_display = ('name', 'selectable')
+    readonly_fields = ('id', )
+
