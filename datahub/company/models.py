@@ -415,6 +415,7 @@ class Advisor(DeferredSaveModelMixin, AbstractUser):
         """Return list of fields that should be mapped as datetime."""
         return super().get_datetime_fields() + ['last_login']
 
+
 # Write to ES stuff
 @receiver((post_save, m2m_changed))
 def save_to_es(sender, instance, **kwargs):

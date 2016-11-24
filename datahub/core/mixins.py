@@ -1,7 +1,7 @@
 """General mixins."""
 
-from dateutil import parser
 import reversion
+from dateutil import parser
 from raven.contrib.django.raven_compat.models import client
 from rest_framework import status
 
