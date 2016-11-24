@@ -17,7 +17,7 @@ MODELS_TO_REGISTER = (
 )
 
 
-@admin.site.register(MODELS_TO_REGISTER)
+@admin.register(*MODELS_TO_REGISTER)
 class MetadataAdmin(admin.ModelAdmin):
     """Custom Metadata Admin."""
 
