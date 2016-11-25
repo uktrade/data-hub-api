@@ -285,6 +285,8 @@ class Advisor(DeferredSaveModelMixin, AbstractUser):
         validators=[AbstractUser.username_validator],
         blank=True,
     )
+    first_name = models.CharField(max_length=MAX_LENGTH, blank=True)
+    last_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     email = models.EmailField()
     dit_team = models.ForeignKey(metadata_models.Team, default=constants.Team.undefined.value.id)
 
