@@ -68,10 +68,15 @@ def django_to_odata(django_tablename, django_dict):
     # We are concatenating some fields (eg. FirstName with MiddleName), make
     # sure that these are properly populated when sending data back to
     # Dyanmics.
-    for _, django_col, odata_col in mapping.get('concat', ()):
+    for concatenate_cols, django_col, main_odata_col in mapping.get('concat', ()):
+        # First clear out all source fields of concatenation
+        for col in concatenate_cols:
+            odata_dict[col] = ''
+
+        # Then place concatenated value in main field
         value = django_dict.get(django_col)
         if value:
-            odata_dict[odata_col] = value
+            odata_dict[main_odata_col] = value
 
     return mapping.get('etag', False), odata_dict
 
