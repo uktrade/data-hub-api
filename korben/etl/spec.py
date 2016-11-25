@@ -2,6 +2,7 @@ import csv
 from datetime import datetime
 import os
 from korben import services
+import uuid
 
 MAPPINGS = {}
 
@@ -34,6 +35,9 @@ for source_pkey, source_table, source_name, target_table in ENUM_MAPPINGS:
                 (source_pkey, 'id'),
                 (source_name, 'name'),
             ),
+        'defaults': (
+            ('selectable', lambda: True),
+        ),
         },
     })
 
@@ -68,6 +72,7 @@ MAPPINGS.update({
         ),
         'defaults': (
             ('archived', lambda: False),
+            ('lead', lambda: False),
         ),
         'empty_strings': (
             'alias',
@@ -111,6 +116,14 @@ MAPPINGS.update({
         ),
         'defaults': (
             ('email', lambda: FAKE_EMAIL),
+
+            # django user model -_-
+            ('password', lambda: uuid.uuid4().hex),
+            ('is_superuser', lambda: False),
+            ('username', lambda: uuid.uuid4().hex),
+            ('is_staff', lambda: False),
+            ('is_active', lambda: False),
+            ('date_joined', lambda: datetime.now()),
         ),
     },
     'ContactSet': {
