@@ -208,7 +208,7 @@ class Contact(BaseModel):
     title = models.ForeignKey(metadata_models.Title)
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
-    role = models.ForeignKey(metadata_models.Role)
+    job_title = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
     company = models.ForeignKey('Company', related_name='contacts')
     advisor = models.ForeignKey('Advisor', related_name='contacts', null=True, blank=True)
     primary = models.BooleanField()
