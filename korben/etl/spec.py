@@ -106,7 +106,7 @@ MAPPINGS.update({
             ('SystemUserId', 'id'),
             ('FirstName', 'first_name'),
             ('LastName', 'last_name'),
-            ('InternalEMailAddress', 'email'),
+            ('DomainName', 'email'),
         ),
         'concat': (
             (('FirstName', 'MiddleName'), 'first_name', 'FirstName'),
