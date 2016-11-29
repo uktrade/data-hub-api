@@ -10,7 +10,6 @@ class AdvisorFactory(factory.django.DjangoModelFactory):
     """Advisor factory."""
 
     id = factory.Sequence(lambda x: '{0}'.format(uuid.uuid4()))
-    username = factory.Sequence(lambda x: 'name{0}'.format(x))
     first_name = factory.Sequence(lambda x: 'name {0}'.format(x))
     last_name = factory.Sequence(lambda x: 'surname {0}'.format(x))
     dit_team_id = constants.Team.healthcare_uk.value.id

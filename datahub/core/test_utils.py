@@ -12,9 +12,9 @@ def get_test_user():
     """Return the test user."""
     user_model = get_user_model()
     test, _ = user_model.objects.get_or_create(
-        username='Test',
         first_name='Testo',
         last_name='Useri',
+        email='Testo@Useri.com',
         dit_team_id=constants.Team.crm.value.id,
     )
     test.set_password('password')

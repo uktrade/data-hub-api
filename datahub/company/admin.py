@@ -1,6 +1,4 @@
-from django import forms
 from django.contrib import admin
-from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth.admin import UserAdmin
 
 from reversion.admin import VersionAdmin
@@ -17,17 +15,11 @@ for model_cls in MODELS_TO_REGISTER:
 class AdvisorAdmin(VersionAdmin, UserAdmin):
     """Advisor admin."""
 
+    list_display = ('email', 'first_name', 'last_name', 'is_staff')
+    ordering = ('email', )
+
     def reversion_register(self, model, **kwargs):
         """Exclude last login from reversion changesets."""
         kwargs['exclude'] = ('last_login', )
 
         super().reversion_register(model, **kwargs)
-
-
-class AdminLoginForm(AdminAuthenticationForm):
-    """Admin login form override class."""
-
-    username = forms.CharField(widget=forms.TextInput(attrs={'autocomplete': 'off'}))
-
-
-admin.site.login_form = AdminLoginForm

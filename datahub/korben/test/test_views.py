@@ -151,6 +151,7 @@ def test_korben_advisor_create(api_client):
         'id': str(uuid.uuid4()),
         'first_name': 'John',
         'last_name': 'Smith',
+        'email': 'John.Smith@example.com',
         'dit_team_id': constants.Team.healthcare_uk.value.id,
     }
     data = json.dumps(data_dict)
