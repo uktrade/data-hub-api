@@ -40,4 +40,4 @@ def test_valid_user(korben_auth_mock):
     result = backend.authenticate(username=user.email, password='assume_valid')
     korben_auth_mock.assert_called_with(username=user.email, password='assume_valid')
 
-    assert str(result.pk) == str(user.pk)
+    assert str(result.pk) == user.pk
