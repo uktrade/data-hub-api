@@ -352,7 +352,7 @@ class Advisor(DeferredSaveModelMixin, AbstractBaseUser, PermissionsMixin):
 
     def get_datetime_fields(self):
         """Return list of fields that should be mapped as datetime."""
-        return super().get_datetime_fields() + ['last_login']
+        return super().get_datetime_fields() + ['last_login', 'date_joined']
 
     # Django User methods, required for Admin interface
 
