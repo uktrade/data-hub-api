@@ -123,7 +123,7 @@ MAPPINGS.update({
             ('username', lambda: uuid.uuid4().hex),
             ('is_staff', lambda: False),
             ('is_active', lambda: False),
-            ('date_joined', lambda: datetime.now()),
+            ('date_joined', lambda: datetime.now().isoformat()),
         ),
     },
     'ContactSet': {
