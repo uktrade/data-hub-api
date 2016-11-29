@@ -48,7 +48,6 @@ class ContactViewSet(CoreViewSet):
     write_serializer_class = ContactSerializerWrite
     queryset = Contact.objects.select_related(
         'title',
-        'role',
         'company',
         'address_country',
     ).prefetch_related(
