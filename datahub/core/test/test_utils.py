@@ -26,8 +26,8 @@ def test_invalid_credentials_with_valid_user(korben_auth_mock):
     korben_auth_mock.return_value = False
     backend = CDMSUserBackend()
 
-    assert backend.authenticate(username=user.username, password='invalid') is None
-    korben_auth_mock.assert_called_with(username=user.username, password='invalid')
+    assert backend.authenticate(username=user.email, password='invalid') is None
+    korben_auth_mock.assert_called_with(username=user.email, password='invalid')
 
 
 @mock.patch('datahub.core.utils.CDMSUserBackend.korben_authenticate')
@@ -37,7 +37,7 @@ def test_valid_user(korben_auth_mock):
     korben_auth_mock.return_value = True
     backend = CDMSUserBackend()
 
-    result = backend.authenticate(username=user.username, password='assume_valid')
-    korben_auth_mock.assert_called_with(username=user.username, password='assume_valid')
+    result = backend.authenticate(username=user.email, password='assume_valid')
+    korben_auth_mock.assert_called_with(username=user.email, password='assume_valid')
 
-    assert result.pk == user.pk
+    assert str(result.pk) == str(user.pk)
