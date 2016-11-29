@@ -63,7 +63,7 @@ class CDMSUserBackend(ModelBackend):
         if username is None:
             username = kwargs.get(user_model.USERNAME_FIELD)
         try:
-            user = user_model._default_manager.get_by_natural_key(username)
+            user = user_model._default_manager.filter(email__iexact=username).get()
         except user_model.DoesNotExist:
             # Run the default password hasher once to reduce the timing
             # difference between an existing and a non-existing user (#20760).

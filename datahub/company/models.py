@@ -315,7 +315,7 @@ class Advisor(DeferredSaveModelMixin, AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     first_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     last_name = models.CharField(max_length=MAX_LENGTH, blank=True)
-    email = models.EmailField(max_length=MAX_LENGTH, unique=True)
+    email = models.CharField(max_length=MAX_LENGTH, unique=True)  # CharField because CDMS users may not have tld
     dit_team = models.ForeignKey(metadata_models.Team, default=constants.Team.undefined.value.id)
     is_staff = models.BooleanField(
         'staff status',
