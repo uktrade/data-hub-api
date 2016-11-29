@@ -9,15 +9,17 @@ from datahub.core import constants
 def get_korben_user():
     """Get or return the Korben user."""
     user_model = get_user_model()
-    korben, _ = user_model.objects.get_or_create(
-        email='kor.ben@foo.bar',
-        defaults={
-            'first_name': 'Kor',
-            'last_name': 'Ben',
-            'dit_team_id': constants.Team.undefined.value.id,
-        }
-    )
-    return korben
+    try:
+        korben_user = user_model.objects.get(email='kor.ben@foo.bar')
+    except user_model.DoesNotExist:
+        korben_user = user_model(
+            email='kor.ben@foo.bar',
+            first_name='Kor',
+            last_name='Ben',
+            dit_team_id=constants.Team.undefined.value.id,
+        )
+        korben_user.save(as_korben=True)
+    return korben_user
 
 
 def string_to_bytes(obj):

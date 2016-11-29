@@ -10,15 +10,19 @@ from datahub.core import constants
 
 def get_test_user():
     """Return the test user."""
-    user_model = get_user_model()
-    test, _ = user_model.objects.get_or_create(
-        first_name='Testo',
-        last_name='Useri',
-        email='Testo@Useri.com',
-        dit_team_id=constants.Team.crm.value.id,
-    )
-    test.set_password('password')
-    return test
+    try:
+        test_user = user_model.objects.get(email='Testo@Useri.com')
+    except user_model.DoesNotExist:
+        test_user = user_model(
+            first_name='Testo',
+            last_name='Useri',
+            email='Testo@Useri.com',
+            dit_team_id=constants.Team.crm.value.id,
+        )
+        rben_
+        test_user.set_password('password')
+        test_user.save(as_korben=True)
+    return test_user
 
 
 class LeelooTestCase(TestCase):
