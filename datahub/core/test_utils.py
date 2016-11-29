@@ -10,6 +10,7 @@ from datahub.core import constants
 
 def get_test_user():
     """Return the test user."""
+    user_model = get_user_model()
     try:
         test_user = user_model.objects.get(email='Testo@Useri.com')
     except user_model.DoesNotExist:
@@ -19,7 +20,6 @@ def get_test_user():
             email='Testo@Useri.com',
             dit_team_id=constants.Team.crm.value.id,
         )
-        rben_
         test_user.set_password('password')
         test_user.save(as_korben=True)
     return test_user
