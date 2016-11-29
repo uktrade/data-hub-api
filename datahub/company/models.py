@@ -2,13 +2,11 @@
 import uuid
 
 from django.conf import settings
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
+from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
-from django.core.mail import send_mail
 from django.db import models
 from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
-from django.utils import timezone
 from django.utils.functional import cached_property
 
 from datahub.core import constants
@@ -277,33 +275,27 @@ class Contact(BaseModel):
         super(Contact, self).clean()
 
 
-class Advisor(DeferredSaveModelMixin, AbstractBaseUser, PermissionsMixin):
+class Advisor(DeferredSaveModelMixin, AbstractUser):
     """Advisor."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
+    username = models.CharField(
+        max_length=MAX_LENGTH,
+        unique=True,
+        validators=[AbstractUser.username_validator],
+        blank=True,
+    )
     first_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     last_name = models.CharField(max_length=MAX_LENGTH, blank=True)
-    email = models.EmailField(max_length=MAX_LENGTH, unique=True)
+    email = models.EmailField()
     dit_team = models.ForeignKey(metadata_models.Team, default=constants.Team.undefined.value.id)
-    is_staff = models.BooleanField(
-        'staff status',
-        default=False,
-        help_text='Designates whether the user can log into this admin site.',
-    )
-    is_active = models.BooleanField(
-        'active',
-        default=True,
-        help_text=(
-            'Designates whether this user should be treated as active. '
-            'Unselect this instead of deleting accounts.'
-        ),
-    )
-    date_joined = models.DateTimeField('date joined', default=timezone.now)
 
-    objects = UserManager()
+    def save(self, as_korben=False, *args, **kwargs):
+        """Make save play nice with missing data from korben."""
+        if not self.username:
+            self.username = self.email
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+        super().save(as_korben, *args, **kwargs)
 
     @cached_property
     def name(self):
@@ -321,20 +313,6 @@ class Advisor(DeferredSaveModelMixin, AbstractBaseUser, PermissionsMixin):
     def get_datetime_fields(self):
         """Return list of fields that should be mapped as datetime."""
         return super().get_datetime_fields() + ['last_login']
-
-    # Django User methods, required for Admin interface
-
-    def get_full_name(self):
-        """Returns the first_name plus the last_name, with a space in between."""
-        return self.name.strip()
-
-    def get_short_name(self):
-        """Returns the short name for the user."""
-        return self.first_name
-
-    def email_user(self, subject, message, from_email=None, **kwargs):
-        """Sends an email to this User."""
-        send_mail(subject, message, from_email, [self.email], **kwargs)
 
 
 # Write to ES stuff
