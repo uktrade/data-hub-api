@@ -53,6 +53,11 @@ Leeloo can run on any Heroku style platform. These environment variables MUST be
 Management commands
 -------------------
 
+Apply migrations::
+    
+    docker-compose run leeloo python manage.py migrate
+    
+
 If the database is freshly built or a new versioned model is added run::
 
 
@@ -66,8 +71,4 @@ Load metadata::
     docker-compose run leeloo python manage.py loaddata /app/undefined.yaml
     docker-compose run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml
 
-
-Apply migrations::
-    
-    docker-compose run leeloo python manage.py migrate
     
