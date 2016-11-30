@@ -2,6 +2,7 @@ import datetime
 import pytest
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from django.utils.timezone import now
 from oauth2_provider.models import AccessToken, Application
 from rest_framework.test import APIClient
 
@@ -18,6 +19,7 @@ def get_test_user():
             first_name='Testo',
             last_name='Useri',
             email='Testo@Useri.com',
+            date_joined=now(),
             dit_team_id=constants.Team.crm.value.id,
         )
         test_user.set_password('password')

@@ -10,7 +10,7 @@
     first_name: Undefined,
     last_name: Undefined,
     email: undefined@example.com,
-    date_joined: 2016-11-30T11:38:43+00:00,
+    date_joined: "2016-11-30T11:38:43+00:00",
     dit_team: 0167b456-0ddd-49bd-8184-e3227a0b6396,
   }
 

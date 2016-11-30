@@ -2,6 +2,7 @@ from hashlib import sha256
 from urllib.parse import urlparse
 
 from django.contrib.auth import get_user_model
+from django.utils.timezone import now
 
 from datahub.core import constants
 
@@ -16,6 +17,7 @@ def get_korben_user():
             email='kor.ben@foo.bar',
             first_name='Kor',
             last_name='Ben',
+            date_joined=now(),
             dit_team_id=constants.Team.undefined.value.id,
         )
         korben_user.save(as_korben=True)
