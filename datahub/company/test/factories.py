@@ -14,6 +14,7 @@ class AdvisorFactory(factory.django.DjangoModelFactory):
     last_name = factory.Sequence(lambda x: 'surname {0}'.format(x))
     dit_team_id = constants.Team.healthcare_uk.value.id
     email = factory.Sequence(lambda x: 'foo-{0}@bar.com'.format(x))
+    date_joined = now()
 
     class Meta:
         model = 'company.Advisor'

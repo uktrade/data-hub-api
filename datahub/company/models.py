@@ -330,7 +330,7 @@ class Advisor(DeferredSaveModelMixin, AbstractBaseUser, PermissionsMixin):
             'Unselect this instead of deleting accounts.'
         ),
     )
-    date_joined = models.DateTimeField('date joined', default=timezone.now)
+    date_joined = models.DateTimeField('date joined', auto_now_add=True)
 
     objects = AdvisorManager()
 
