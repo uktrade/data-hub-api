@@ -1,10 +1,10 @@
 .PHONY: test-leeloo
 
 tests:
-	docker-compose build && docker-compose run leeloo pytest -s
+	docker-compose build --no-cache && docker-compose run leeloo pytest -s
 
 flake8:
-	docker-compose build && docker-compose run leeloo flake8
+	docker-compose build --no-cache && docker-compose run leeloo flake8
 
 docker-cleanup:
 	docker rm -f `docker ps -qa` || echo
