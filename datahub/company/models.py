@@ -9,6 +9,7 @@ from django.db import models
 from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
 from django.utils.functional import cached_property
+from django.utils.timezone import now
 
 from datahub.core import constants
 from datahub.core.mixins import DeferredSaveModelMixin
@@ -329,7 +330,7 @@ class Advisor(DeferredSaveModelMixin, AbstractBaseUser, PermissionsMixin):
             'Unselect this instead of deleting accounts.'
         ),
     )
-    date_joined = models.DateTimeField('date joined', auto_now_add=True)
+    date_joined = models.DateTimeField('date joined', default=now)
 
     objects = AdvisorManager()
 
