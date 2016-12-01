@@ -2,7 +2,6 @@
 
 import reversion
 from dateutil import parser
-from raven.contrib.django.raven_compat.models import client
 from rest_framework import status
 
 from datahub.korben.connector import KorbenConnector
@@ -19,7 +18,7 @@ class DeferredSaveModelMixin:
         """Add third part services connectors to the instance."""
         self.korben_connector = KorbenConnector(table_name=self._meta.db_table)
         self.model = type(self)  # get the class from the instance
-        super(DeferredSaveModelMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def save(self, as_korben=False, **kwargs):
         """
@@ -95,6 +94,5 @@ class DeferredSaveModelMixin:
         elif korben_response.status_code == status.HTTP_404_NOT_FOUND:
             pass
         else:
-            client.captureException(korben_response.json())
             raise KorbenException(korben_response.json())
         return self
