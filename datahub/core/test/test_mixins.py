@@ -1,6 +1,7 @@
 from unittest import mock
 from unittest.mock import Mock
 
+import pytest
 from django.urls import reverse
 from django.utils.timezone import now
 from rest_framework import status
@@ -9,7 +10,7 @@ from reversion.models import Version
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.mixins import DeferredSaveModelMixin
 from datahub.core.test_utils import LeelooTestCase
-
+from datahub.korben.exceptions import KorbenException
 
 frozen_now = now()
 model_dict = {'foo': 'hello', 'bar': str(frozen_now)}
@@ -52,6 +53,19 @@ def test_update_from_korben_404_scenario(mocked_korben_connector):
     mocked_korben_connector().get.return_value = mocked_response
     class_instance_under_test = DummyModel()
     assert class_instance_under_test.update_from_korben() == class_instance_under_test
+
+
+@mock.patch('datahub.core.mixins.KorbenConnector')
+def test_update_from_korben_500_scenario(mocked_korben_connector):
+    """Korben 500."""
+    mocked_response = Mock()
+    mocked_response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    mocked_response.json.return_value = model_dict
+    mocked_korben_connector().get.return_value = mocked_response
+    class_instance_under_test = DummyModel()
+
+    with pytest.raises(KorbenException):
+        class_instance_under_test.update_from_korben()
 
 
 class KorbenUpdateTestCase(LeelooTestCase):
