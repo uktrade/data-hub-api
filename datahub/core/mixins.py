@@ -16,9 +16,13 @@ class DeferredSaveModelMixin:
 
     def __init__(self, *args, **kwargs):
         """Add third part services connectors to the instance."""
-        self.korben_connector = KorbenConnector(table_name=self._meta.db_table)
+        self.korben_connector = KorbenConnector(table_name=self._get_table_name_from_model())
         self.model = type(self)  # get the class from the instance
         super().__init__(*args, **kwargs)
+
+    def _get_table_name_from_model(self):
+        """Get table name from model."""
+        return self._meta.db_table
 
     def save(self, as_korben=False, **kwargs):
         """
