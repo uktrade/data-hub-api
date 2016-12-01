@@ -47,12 +47,13 @@ class DeferredSaveModelMixin:
     def _map_korben_response_to_model_instance(self, korben_response):
         """Override this method to control what needs to be converted back into the model."""
         if korben_response.status_code == status.HTTP_200_OK:
-            for key, value in korben_response.json().items():
+            json_data = korben_response.json()
+
+            for key, value in json_data.items():
                 setattr(self, key, value)
 
-            for name in self.get_datetime_fields():
-                value = korben_response.json().get(name)
-
+            for name in filter(lambda v: v in json_data, self.get_datetime_fields()):
+                value = json_data[name]
                 setattr(self, name, parser.parse(value) if value else value)
 
         elif korben_response.status_code == status.HTTP_404_NOT_FOUND:
