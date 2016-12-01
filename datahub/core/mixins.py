@@ -48,7 +48,6 @@ class DeferredSaveModelMixin:
         """Override this method to control what needs to be converted back into the model."""
         if korben_response.status_code == status.HTTP_200_OK:
             json_data = korben_response.json()
-
             for key, value in json_data.items():
                 setattr(self, key, value)
 
