@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from raven.contrib.django.raven_compat.models import client
 from rest_framework import mixins
 from rest_framework.decorators import detail_route
 from rest_framework.exceptions import APIException
@@ -74,4 +75,5 @@ class CoreViewSet(mixins.CreateModelMixin,
         try:
             return super().retrieve(request, *args, **kwargs)
         except KorbenException:
+            client.captureException()
             raise APIException(detail={'detail': 'Korben error.'})
