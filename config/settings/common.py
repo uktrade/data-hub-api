@@ -47,6 +47,7 @@ THIRD_PARTY_APPS = (
 LOCAL_APPS = (
     'datahub.core',
     'datahub.company',
+    'datahub.es',
     'datahub.metadata',
     'datahub.search',
     'datahub.korben',
