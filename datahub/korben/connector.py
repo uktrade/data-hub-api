@@ -42,7 +42,7 @@ class KorbenConnector:
         """Add the signature into the header."""
         self.default_headers['X-Signature'] = generate_signature(url, body, settings.DATAHUB_SECRET)
 
-    def post(self, data, update=False):
+    def post(self, data, table_name, update=False):
         """Perform POST operations: create and update.
 
         :param data: dict object containing the data to be passed to Korben
@@ -52,12 +52,12 @@ class KorbenConnector:
         if update:
             url = '{base_url}/update/{table_name}/'.format(
                 base_url=self.base_url,
-                table_name=self.table_name
+                table_name=table_name
             )
         else:
             url = '{base_url}/create/{table_name}/'.format(
                 base_url=self.base_url,
-                table_name=self.table_name
+                table_name=table_name
             )
 
         data = self.encode_json_bytes(data)
@@ -65,7 +65,7 @@ class KorbenConnector:
         response = requests.post(url=url, data=data, headers=self.default_headers)
         return response
 
-    def get(self, data):
+    def get(self, data, table_name):
         """Get single object from Korben.
 
         :param object_id: object id
@@ -73,7 +73,7 @@ class KorbenConnector:
         """
         url = '{base_url}/get/{table_name}/{id}/'.format(
             base_url=self.base_url,
-            table_name=self.table_name,
+            table_name=table_name,
             id=data['id']
         )
         data = self.encode_json_bytes(data)
@@ -97,5 +97,17 @@ class KorbenConnector:
             response = requests.post(url=url, data=data, headers=self.default_headers)
             return response.json()  # Returns JSON encoded boolean
         except (requests.RequestException, ValueError):
-            client.captureException()
+            client.captureException(response.content)
             return False
+
+    def ping(self):
+        """Perform the Korben ping."""
+
+        url = '{base_url}/ping/'.format(
+            base_url=self.base_url,
+        )
+        try:
+            response = requests.get(url=url)
+            return response
+        except requests.RequestException:  # Exception handling the request
+            client.captureException()

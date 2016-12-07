@@ -74,3 +74,8 @@ class ESConnector:
     def delete_index(self):
         """Delete the index."""
         self.client.indices.delete(index=settings.ES_INDEX, ignore=[400, 404])
+
+    def ping(self):
+        """Perform a ping check."""
+        get_elasticsearch_client()
+        self.client.
