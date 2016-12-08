@@ -122,6 +122,10 @@ MAPPINGS.update({
             ('is_active', lambda: False),
             ('date_joined', lambda: datetime.now().isoformat()),
         ),
+        'empty_strings': (
+            'first_name',
+            'last_name',
+        ),
     },
     'ContactSet': {
         'to': 'company_contact',
