@@ -47,7 +47,6 @@ MAPPINGS.update({
         'local': (
             ('AccountId', 'id'),
             ('Name', 'name'),
-            ('DomainName', 'email'),
             ('optevia_Alias', 'alias'),
             ('optevia_CompaniesHouseNumber', 'company_number'),
             ('optevia_Address1', 'registered_address_1'),
