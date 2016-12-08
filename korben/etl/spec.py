@@ -158,7 +158,6 @@ MAPPINGS.update({
         ),
         'use_undefined': (
             'title_id',
-            'role_id',
             'company_id',
         ),
         'empty_strings': (
