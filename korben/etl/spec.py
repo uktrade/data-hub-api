@@ -47,6 +47,7 @@ MAPPINGS.update({
         'local': (
             ('AccountId', 'id'),
             ('Name', 'name'),
+            ('DomainName', 'email'),
             ('optevia_Alias', 'alias'),
             ('optevia_CompaniesHouseNumber', 'company_number'),
             ('optevia_Address1', 'registered_address_1'),
@@ -115,12 +116,9 @@ MAPPINGS.update({
             ('BusinessUnitId', (('Id', 'dit_team_id'),),),
         ),
         'defaults': (
-            ('email', lambda: FAKE_EMAIL),
-
             # django user model -_-
             ('password', lambda: uuid.uuid4().hex),
             ('is_superuser', lambda: False),
-            ('username', lambda: uuid.uuid4().hex),
             ('is_staff', lambda: False),
             ('is_active', lambda: False),
             ('date_joined', lambda: datetime.now().isoformat()),
