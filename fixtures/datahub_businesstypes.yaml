@@ -5,3 +5,6 @@
 - model: metadata.businesstype
   pk: 9fd14e94-5d95-e211-a939-e4115bead28a
   fields: {name: Public limited company }
+- model: metadata.businesstype
+  pk: 50882b87-c984-4225-a20c-19e44f946a1a
+  fields: {name: Limited partnership}
