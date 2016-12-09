@@ -21,8 +21,17 @@ class KorbenConnector:
         self._json_encoder = DjangoJSONEncoder()
         self.table_name = table_name
         self.base_url = '{host}:{port}'.format(
-            host=settings.KORBEN_HOST, port=settings.KORBEN_PORT
+            host=self.handle_host(settings.KORBEN_HOST),
+            port=settings.KORBEN_PORT
         )
+
+    @staticmethod
+    def handle_host(host):
+        """Add the protocol if not specified."""
+        if 'http://' in host or 'https://' in host:
+            return host
+        else:
+            return 'http://{host}'.format(host=host)
 
     def encode_json_bytes(self, model_dict):
         """Encode json into byte."""
