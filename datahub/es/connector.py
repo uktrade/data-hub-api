@@ -78,4 +78,7 @@ class ESConnector:
     def ping(self):
         """Perform a ping check."""
         get_elasticsearch_client()
-        self.client.
+        self.client.count(
+            index=settings.ES_INDEX,
+            doc_type='company_company'
+        )

@@ -1,28 +1,54 @@
-from django.conf import settings
 from django.db import DatabaseError
+from elasticsearch import ElasticsearchException
+from rest_framework import status
 
 from datahub.company.models import Company
 from datahub.es.connector import ESConnector
 from datahub.korben.connector import KorbenConnector
 
 
-def check_database():
+class CheckDatabase:
     """Check the database is up and running."""
-    try:
-        Company.objects.all().count()
-        return True
-    except DatabaseError as e:
-        return False
+
+    name = 'database'
+
+    def check(self):
+        """Perform the check."""
+        try:
+            Company.objects.all().count()
+            return True, ''
+        except DatabaseError as e:
+            return False, e
 
 
-def check_elasticsearch():
+class CheckElasticsearch:
     """Check Elastic Search is up and running."""
-    connector = ESConnector()
+
+    name = 'elasticsearch'
+
+    def check(self):
+        """Perform the check."""
+        try:
+            connector = ESConnector()
+            connector.ping()
+            return True, ''
+        except ElasticsearchException as e:
+            return False, e
 
 
-def check_korben():
-    connector = KorbenConnector()
-    connector.ping()
+class CheckKorben:
+    """Get status from Korben."""
+
+    name = 'korben'
+
+    def check(self):
+        """Get status from Korben"""
+        connector = KorbenConnector()
+        response = connector.ping()
+        if response.status_code == status.HTTP_200_OK:
+            return True, ''
+        else:
+            return False, response.content
 
 
-checks = (check_database, check_elasticsearch, check_korben)
+services_to_check = (CheckDatabase, CheckElasticsearch, CheckKorben)

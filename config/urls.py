@@ -20,7 +20,7 @@ router.register(r'advisor', views.AdvisorReadOnlyViewSet)
 urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^admin/', admin.site.urls),
-    url(r'^ping/$', ping, name='ping'),
+    url(r'^ping.xml$', ping, name='ping'),
     url(r'^search/$', Search.as_view(), name='search'),
     url(r'^metadata/', include('datahub.metadata.urls')),
     url(r'^token/$', TokenView.as_view(), name='token'),
