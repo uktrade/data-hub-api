@@ -22,8 +22,9 @@ def ping(request):
         )
     else:
         body = PINGDOM_TEMPLATE.format(status='FALSE')
-        for service_result in filter(lambda x: x[0], checked.values()):
+        for service_result in filter(lambda x: x[0] is False, checked.values()):
             body += COMMENT_TEMPLATE.format(comment=service_result[1])
         return HttpResponse(
+            body,
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )

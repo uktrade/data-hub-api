@@ -16,10 +16,9 @@ class KorbenConnector:
         'Accept': 'application/json',
     }
 
-    def __init__(self, table_name):
+    def __init__(self):
         """Initalise the connector."""
         self._json_encoder = DjangoJSONEncoder()
-        self.table_name = table_name
         self.base_url = '{host}:{port}'.format(
             host=self.handle_host(settings.KORBEN_HOST),
             port=settings.KORBEN_PORT
