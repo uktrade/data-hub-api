@@ -97,7 +97,7 @@ class KorbenConnector:
             response = requests.post(url=url, data=data, headers=self.default_headers)
             return response.json()  # Returns JSON encoded boolean
         except (requests.RequestException, ValueError):
-            client.captureException(response.content)
+            client.captureException()
             return False
 
     def ping(self):
@@ -111,3 +111,4 @@ class KorbenConnector:
             return response
         except requests.RequestException:  # Exception handling the request
             client.captureException()
+            return False

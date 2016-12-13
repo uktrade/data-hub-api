@@ -45,10 +45,10 @@ class CheckKorben:
         """Get status from Korben"""
         connector = KorbenConnector()
         response = connector.ping()
-        if response.status_code == status.HTTP_200_OK:
+        if response and response.status_code == status.HTTP_200_OK:
             return True, ''
         else:
-            return False, response.content
+            return False, response.content if response else 'Unknown error'
 
 
 services_to_check = (CheckDatabase, CheckElasticsearch, CheckKorben)
