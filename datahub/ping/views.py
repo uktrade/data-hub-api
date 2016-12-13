@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from django.http import HttpResponse
 from rest_framework import status
 
@@ -7,28 +5,25 @@ from .services import services_to_check
 
 PINGDOM_TEMPLATE = """<pingdom_http_custom_check>
     <status>{status}</status>
-    <response_time>{time}</response_time>
-</pingdom_http_custom_check>"""
+</pingdom_http_custom_check>\n"""
 
-COMMENT_TEMPLATE = '<!--{comment}-->'
+COMMENT_TEMPLATE = '<!--{comment}-->\n'
 
 
 def ping(request):
-    start = datetime.now()
-    checks = {}
+    checked = {}
     for service in services_to_check:
-        checks[service.name] = service.check()
+        checked[service.name] = service().check()
 
-    end = datetime.now()
-    elapsed_time = end - start
-
-    if all(checks.items()):
+    if all(item[0] for item in checked.values()):
         return HttpResponse(
-            PINGDOM_TEMPLATE.format(status='OK', time=elapsed_time.seconds()),
+            PINGDOM_TEMPLATE.format(status='OK'),
             content_type='text/xml'
         )
     else:
-        PINGDOM_TEMPLATE.format(status='FALSE', time=elapsed_time.seconds()),
+        body = PINGDOM_TEMPLATE.format(status='FALSE')
+        for service_result in filter(lambda x: x[0], checked.values()):
+            body += COMMENT_TEMPLATE.format(comment=service_result[1])
         return HttpResponse(
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )

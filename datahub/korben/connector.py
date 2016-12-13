@@ -103,7 +103,7 @@ class KorbenConnector:
     def ping(self):
         """Perform the Korben ping."""
 
-        url = '{base_url}/ping/'.format(
+        url = '{base_url}/ping.xml'.format(
             base_url=self.base_url,
         )
         try:
