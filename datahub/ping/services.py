@@ -42,7 +42,7 @@ class CheckKorben:
     name = 'korben'
 
     def check(self):
-        """Get status from Korben"""
+        """Get status from Korben."""
         connector = KorbenConnector()
         response = connector.ping()
         if response and response.status_code == status.HTTP_200_OK:

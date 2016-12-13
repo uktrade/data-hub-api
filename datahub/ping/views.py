@@ -11,6 +11,7 @@ COMMENT_TEMPLATE = '<!--{comment}-->\n'
 
 
 def ping(request):
+    """Ping view."""
     checked = {}
     for service in services_to_check:
         checked[service.name] = service().check()
