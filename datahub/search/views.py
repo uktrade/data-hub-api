@@ -18,7 +18,7 @@ class Search(APIView):
         """Search is a POST."""
         try:
             query_term = request.data['term']
-        except MultiValueDictKeyError:
+        except (MultiValueDictKeyError, KeyError):
             raise ValidationError(detail=['Parameter "term" is mandatory.'])
 
         offset = request.data.get('offset', 0)
