@@ -178,7 +178,7 @@ class Interaction(BaseModel):
     """Interaction from CDMS."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
-    interaction_type = models.ForeignKey(metadata_models.InteractionType, null=True)
+    interaction_type = models.ForeignKey(metadata_models.InteractionType)
     subject = models.TextField()
     date_of_interaction = models.DateTimeField()
     dit_advisor = models.ForeignKey('Advisor', related_name='interactions')
