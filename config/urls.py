@@ -5,6 +5,7 @@ from oauth2_provider.views import TokenView
 from rest_framework import routers
 
 from datahub.company import views
+from datahub.ping.views import ping
 from datahub.search.views import Search
 from datahub.user.views import who_am_i
 
@@ -19,6 +20,7 @@ router.register(r'advisor', views.AdvisorReadOnlyViewSet)
 urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^admin/', admin.site.urls),
+    url(r'^ping.xml$', ping, name='ping'),
     url(r'^search/$', Search.as_view(), name='search'),
     url(r'^metadata/', include('datahub.metadata.urls')),
     url(r'^token/$', TokenView.as_view(), name='token'),

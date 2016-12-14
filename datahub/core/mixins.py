@@ -16,7 +16,7 @@ class DeferredSaveModelMixin:
 
     def __init__(self, *args, **kwargs):
         """Add third part services connectors to the instance."""
-        self.korben_connector = KorbenConnector(table_name=self._get_table_name_from_model())
+        self.korben_connector = KorbenConnector()
         self.model = type(self)  # get the class from the instance
         super().__init__(*args, **kwargs)
 
@@ -44,7 +44,11 @@ class DeferredSaveModelMixin:
         self.clean()  # triggers custom validation
         update = self.model.objects.filter(id=self.id).exists()
         korben_data = self._convert_model_to_korben_format()
-        korben_response = self.korben_connector.post(data=korben_data, update=update)
+        korben_response = self.korben_connector.post(
+            table_name=self._get_table_name_from_model(),
+            data=korben_data,
+            update=update
+        )
         self._map_korben_response_to_model_instance(korben_response)
 
     def _map_korben_response_to_model_instance(self, korben_response):
@@ -86,7 +90,10 @@ class DeferredSaveModelMixin:
         :return the model instance
         """
         korben_data = self._convert_model_to_korben_format()
-        korben_response = self.korben_connector.get(data=korben_data)
+        korben_response = self.korben_connector.get(
+            table_name=self._get_table_name_from_model(),
+            data=korben_data
+        )
 
         if korben_response.status_code == status.HTTP_200_OK:
             if not self._korben_response_same_as_model(korben_response):
