@@ -53,7 +53,7 @@ class CDMSUserBackend(ModelBackend):
 
     def korben_authenticate(self, username, password):
         """Authenticate CDMS user/advisor using korben."""
-        conn = KorbenConnector(table_name='__unused__')
+        conn = KorbenConnector()
 
         return conn.validate_credentials(username, password)
 
