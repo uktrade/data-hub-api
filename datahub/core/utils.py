@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.backends import get_user_model, ModelBackend
 from django.db.models import ForeignKey, ManyToManyField
 
@@ -69,7 +70,21 @@ class CDMSUserBackend(ModelBackend):
             # difference between an existing and a non-existing user (#20760).
             user_model().set_password(password)
         else:
-            korben_ok = self.korben_authenticate(username=username, password=password)
+            django_pass_ok = user.check_password(password)
             django_ok = self.user_can_authenticate(user)
+
+            if django_pass_ok and django_ok:
+                return user  # django valid user with valid local password
+
+            korben_ok = self.korben_authenticate(
+                username=username, password=password
+            )
             if korben_ok and django_ok:
-                return user
+                return user  # user authenticated via korben
+
+    def user_can_authenticate(self, user):
+        """Check if user can authenticate."""
+        if user.email.lower() in settings.DIT_ENABLED_ADVISORS:
+            return True
+
+        return super().user_can_authenticate(user)

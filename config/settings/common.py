@@ -119,7 +119,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'company.Advisor'
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
     'datahub.core.utils.CDMSUserBackend',
 ]
 
@@ -168,3 +167,5 @@ KORBEN_PORT = env('KORBEN_PORT')
 DATAHUB_SECRET = env('DATAHUB_SECRET')
 CHAR_FIELD_MAX_LENGTH = 255
 HEROKU = False
+
+DIT_ENABLED_ADVISORS = env.tuple('DIT_ENABLED_ADVISORS', default=())
