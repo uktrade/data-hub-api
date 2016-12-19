@@ -3,8 +3,7 @@ from unittest import mock
 import pytest
 
 from datahub.core.test_utils import get_test_user
-from datahub.core.utils import CDMSUserBackend
-
+from datahub.core.auth import CDMSUserBackend
 
 pytestmark = pytest.mark.django_db  # use db
 
