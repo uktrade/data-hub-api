@@ -119,7 +119,7 @@ MAPPINGS.update({
             ('password', lambda: uuid.uuid4().hex),
             ('is_superuser', lambda: False),
             ('is_staff', lambda: False),
-            ('is_active', lambda: False),
+            ('is_active', lambda: True),
             ('date_joined', lambda: datetime.now().isoformat()),
         ),
         'empty_strings': (
