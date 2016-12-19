@@ -79,7 +79,9 @@ class CDMSUserBackend(ModelBackend):
             korben_ok = self.korben_authenticate(
                 username=username, password=password
             )
+            print(korben_ok, django_ok)
             if korben_ok and django_ok:
+                print('User {} authenticated via Korben'.format(username))
                 return user  # user authenticated via korben
 
     def user_can_authenticate(self, user):
