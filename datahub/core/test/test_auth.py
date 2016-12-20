@@ -2,13 +2,13 @@ from unittest import mock
 
 import pytest
 
-from datahub.core.test_utils import get_test_user
 from datahub.core.auth import CDMSUserBackend
+from datahub.core.test_utils import get_test_user
 
 pytestmark = pytest.mark.django_db  # use db
 
 
-@mock.patch('datahub.core.utils.CDMSUserBackend.korben_authenticate')
+@mock.patch('datahub.core.auth.CDMSUserBackend.korben_authenticate')
 def test_invalid_credentials(korben_auth_mock):
     """Test empty result with invalid credentials."""
     korben_auth_mock.return_value = False
@@ -18,7 +18,7 @@ def test_invalid_credentials(korben_auth_mock):
     assert korben_auth_mock.called is False
 
 
-@mock.patch('datahub.core.utils.CDMSUserBackend.korben_authenticate')
+@mock.patch('datahub.core.auth.CDMSUserBackend.korben_authenticate')
 def test_invalid_credentials_with_valid_user(korben_auth_mock):
     """Test empty result with invalid password for valid user."""
     user = get_test_user()
@@ -29,7 +29,7 @@ def test_invalid_credentials_with_valid_user(korben_auth_mock):
     korben_auth_mock.assert_called_with(username=user.email, password='invalid')
 
 
-@mock.patch('datahub.core.utils.CDMSUserBackend.korben_authenticate')
+@mock.patch('datahub.core.auth.CDMSUserBackend.korben_authenticate')
 def test_valid_user(korben_auth_mock):
     """Test valid result with valid creds and user."""
     user = get_test_user()

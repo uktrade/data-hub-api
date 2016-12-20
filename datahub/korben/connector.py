@@ -95,10 +95,7 @@ class KorbenConnector:
         try:
             response = requests.post(url=url, data=data, headers=self.default_headers)
             return response.json()  # Returns JSON encoded boolean
-            print('Alright')
-            print(response.json)
         except (requests.RequestException, ValueError):
-            print('Nope')
             client.captureException()
             return False
 
