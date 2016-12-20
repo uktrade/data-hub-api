@@ -6,10 +6,17 @@ from django.utils.timezone import now
 from oauth2_provider.models import AccessToken, Application
 from rest_framework.test import APIClient
 
+from datahub.core import constants
+from datahub.metadata.models import Team
+
 
 def get_test_user():
     """Return the test user."""
     user_model = get_user_model()
+    team, _ = Team.objects.get_or_create(
+        id=constants.Team.undefined.value.id,
+        name=constants.Team.undefined.value.name
+    )
     try:
         test_user = user_model.objects.get(email='Testo@Useri.com')
     except user_model.DoesNotExist:
@@ -18,6 +25,7 @@ def get_test_user():
             last_name='Useri',
             email='Testo@Useri.com',
             date_joined=now(),
+            dit_team=team
         )
         test_user.set_password('password')
         test_user.save(as_korben=True)
