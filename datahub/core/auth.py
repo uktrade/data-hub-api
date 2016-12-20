@@ -26,7 +26,7 @@ class CDMSUserBackend:
             UserModel().set_password(password)
         else:
             if self.user_can_authenticate(username) and self.korben_authenticate(username=username, password=password):
-                    return user  # user authenticated via korben
+                return user  # user authenticated via Korben
 
     @staticmethod
     def user_can_authenticate(user):
