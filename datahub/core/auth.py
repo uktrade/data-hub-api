@@ -25,7 +25,7 @@ class CDMSUserBackend:
             # difference between an existing and a non-existing user (#20760).
             user_model().set_password(password)
         else:
-            if self.user_can_authenticate(username) and self.korben_authenticate(username=username, password=password):
+            if self.user_can_authenticate(user) and self.korben_authenticate(username=username, password=password):
                 return user  # user authenticated via Korben
 
     @staticmethod

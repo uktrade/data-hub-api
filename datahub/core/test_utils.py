@@ -6,8 +6,6 @@ from django.utils.timezone import now
 from oauth2_provider.models import AccessToken, Application
 from rest_framework.test import APIClient
 
-from datahub.core import constants
-
 
 def get_test_user():
     """Return the test user."""
@@ -20,7 +18,6 @@ def get_test_user():
             last_name='Useri',
             email='Testo@Useri.com',
             date_joined=now(),
-            dit_team_id=constants.Team.crm.value.id,
         )
         test_user.set_password('password')
         test_user.save(as_korben=True)
