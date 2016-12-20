@@ -18,7 +18,7 @@ pytestmark = pytest.mark.django_db
 3) User exists in CDMS but it's not whitelisted
 4) User doesn't exist in CDMS, but it does in Django
 
-All the users have the flag is_active=True, CDMS users have the password set to unusable.
+All the users have the flag is_active=True, CDMS users also have the password set to unusable.
 """
 
 
