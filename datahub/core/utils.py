@@ -1,8 +1,4 @@
-from django.conf import settings
-from django.contrib.auth.backends import get_user_model, ModelBackend
 from django.db.models import ForeignKey, ManyToManyField
-
-from datahub.korben.connector import KorbenConnector
 
 
 def generate_enum_code_from_constant_model(model_queryset):
@@ -44,47 +40,3 @@ def model_to_dictionary(model_instance, excluded_fields=(), fk_ids=False):
         else:
             data[field.name] = getattr(model_instance, field.name)
     return data
-
-
-class CDMSUserBackend(ModelBackend):
-    """Model backend that authenticates against CDMS.
-
-    Yet still uses and provides core django functionality.
-    """
-
-    def korben_authenticate(self, username, password):
-        """Authenticate CDMS user/advisor using korben."""
-        conn = KorbenConnector()
-
-        return conn.validate_credentials(username, password)
-
-    def authenticate(self, username=None, password=None, **kwargs):
-        """Copied from parent impl, but with password check done by Korben."""
-        user_model = get_user_model()
-        if username is None:
-            username = kwargs.get(user_model.USERNAME_FIELD)
-        try:
-            user = user_model._default_manager.filter(email__iexact=username).get()
-        except user_model.DoesNotExist:
-            # Run the default password hasher once to reduce the timing
-            # difference between an existing and a non-existing user (#20760).
-            user_model().set_password(password)
-        else:
-            django_pass_ok = user.check_password(password)
-            django_ok = self.user_can_authenticate(user)
-
-            if django_pass_ok and django_ok:
-                return user  # django valid user with valid local password
-
-            korben_ok = self.korben_authenticate(
-                username=username, password=password
-            )
-            if korben_ok and django_ok:
-                return user  # user authenticated via korben
-
-    def user_can_authenticate(self, user):
-        """Check if user can authenticate."""
-        if user.email.lower() in settings.DIT_ENABLED_ADVISORS:
-            return True
-
-        return super().user_can_authenticate(user)

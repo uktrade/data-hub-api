@@ -119,7 +119,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'company.Advisor'
 AUTHENTICATION_BACKENDS = [
-    'datahub.core.utils.CDMSUserBackend',
+    'datahub.core.auth.CDMSUserBackend',
+    'django.contrib.auth.backends.ModelBackend'
 ]
 
 
