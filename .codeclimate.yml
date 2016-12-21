@@ -2,18 +2,20 @@
 engines:
   duplication:
     enabled: true
+    exclude_fingerprints:
+      - 69aa4cac78f91a365e565175a509ada2
+      - 660e3d488a88ca2f495208adb50268d1
     config:
       languages:
         python:
           python_version: 3
           mass_threshold: 32
-      exclude_fingerprints:
-        - 69aa4cac78f91a365e565175a509ada2
-        - 660e3d488a88ca2f495208adb50268d1
   fixme:
     enabled: true
   radon:
     enabled: true
+    exclude_fingerprints:
+      - 578a67a5fc01bf16f9af5b9ec8c0c328
     config:
       python_version: 3
       threshold: "B"
