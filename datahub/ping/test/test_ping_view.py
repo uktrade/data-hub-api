@@ -17,6 +17,7 @@ def test_all_good(mock_korben_connector, client):
     response = client.get(url)
     assert response.status_code == status.HTTP_200_OK
     assert '<status>OK</status>' in str(response.content)
+    assert response._headers['content-type'] == ('Content-Type', 'text/xml')
 
 
 @mock.patch('datahub.ping.services.KorbenConnector')
@@ -32,6 +33,7 @@ def test_korben_not_returning_200(mock_korben_connector, client):
     assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
     assert '<status>FALSE</status>' in str(response.content)
     assert '<!--foobar-->' in str(response.content)
+    assert response._headers['content-type'] == ('Content-Type', 'text/xml')
 
 
 @mock.patch('datahub.ping.services.ESConnector')
@@ -42,3 +44,4 @@ def test_elasticsearch_error(mock_es_connector, client):
     response = client.get(url)
     assert '<status>FALSE</status>' in str(response.content)
     assert '<!--Unknown error-->' in str(response.content)
+    assert response._headers['content-type'] == ('Content-Type', 'text/xml')

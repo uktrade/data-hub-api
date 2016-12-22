@@ -3,7 +3,8 @@ from rest_framework import status
 
 from .services import services_to_check
 
-PINGDOM_TEMPLATE = """<pingdom_http_custom_check>
+PINGDOM_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
+<pingdom_http_custom_check>
     <status>{status}</status>
 </pingdom_http_custom_check>\n"""
 
@@ -27,5 +28,6 @@ def ping(request):
             body += COMMENT_TEMPLATE.format(comment=service_result[1])
         return HttpResponse(
             body,
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content_type='text/xml'
         )
