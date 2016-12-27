@@ -72,7 +72,7 @@ class DeferredSaveModelMixin:
 
     def _convert_model_to_korben_format(self):
         """Override this method to have more granular control of what gets sent to Korben."""
-        return model_to_dictionary(self, excluded_fields=self.get_excluded_fields(), fk_ids=True)
+        return model_to_dictionary(self, excluded_fields=self.get_excluded_fields(), expand_foreign_keys=False)
 
     def _korben_response_same_as_model(self, korben_response):
         """Check whether the korben response and the model have the same values.
