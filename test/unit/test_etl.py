@@ -16,6 +16,7 @@ DJANGO_DATA = dict(
     address_town='town',
     address_county='county',
     address_postcode='PC',
+    job_title='Jobber',
 
     # datetime fields
     modified_on='2016-11-25T13:32:22+00:00',
@@ -28,7 +29,6 @@ DJANGO_DATA = dict(
     # Non-flat fields
     company_id='4321',
     address_country_id='9876',
-    role_id='4567',
     title_id='0987',
 
     # Undefined fields skipped
@@ -61,7 +61,7 @@ ODATA_INPUT_DATA = dict(
         Id='4321',
         LogicalName='account',
     ),
-    optevia_ContactRole=dict(Id='4567'),
+    JobTitle='Jobber',
     optevia_Country=dict(Id='9876'),
     optevia_Title=dict(Id='0987')
 )
