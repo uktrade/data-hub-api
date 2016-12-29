@@ -3,13 +3,12 @@ import pytest
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.utils import model_to_dictionary
 
-
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
 
 
 def test_model_to_dictionary():
-    """Model to dictionary without excluded fields and expanded foreign keys"""
+    """Model to dictionary without excluded fields and expanded foreign keys."""
     model_instance = CompanyFactory()
 
     expected_keys = {
@@ -56,7 +55,7 @@ def test_model_to_dictionary():
 
 
 def test_model_to_dictionary_dont_expand_fk():
-    """Model to dictionary without excluded fields and not expanded foreign keys"""
+    """Model to dictionary without excluded fields and not expanded foreign keys."""
     model_instance = CompanyFactory()
     result = model_to_dictionary(model_instance, expand_foreign_keys=False)
     expected_keys = {
@@ -103,7 +102,7 @@ def test_model_to_dictionary_dont_expand_fk():
 
 
 def test_model_to_dictionary_exclude_fields():
-    """Model to dictionary excluding some fields and expanded foreign keys"""
+    """Model to dictionary excluding some fields and expanded foreign keys."""
     model_instance = CompanyFactory()
 
     expected_keys = {

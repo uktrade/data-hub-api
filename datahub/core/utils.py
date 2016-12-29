@@ -1,7 +1,7 @@
 from django.db.models import ForeignKey, ManyToManyField
 
 
-def generate_enum_code_from_constant_model(model_queryset):
+def generate_enum_code_from_queryset(model_queryset):
     """Generate the Enum code for a given constant model queryset.
 
     Paste the generated text into the constants file.
@@ -25,7 +25,7 @@ def _handle_fk(field_name, field_value, expand_foreign_keys):
 def model_to_dictionary(model_instance, excluded_fields=(), expand_foreign_keys=True):
     """Convert a model instance to a dictionary, expanding FKs and discarding M2Ms.
 
-     :param expand_foreign_keys: If True it expands the FK into this format 'country'='United Kingdom'
+    :param expand_foreign_keys: If True it expands the FK into this format 'country'='United Kingdom'
                    If False it uses the FK id format 'country_id'=1
     """
     data = {}
