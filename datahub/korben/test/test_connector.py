@@ -30,3 +30,27 @@ def test_ping_exception(mocked_get):
     """Ping Korben exception."""
     connector = KorbenConnector()
     assert connector.ping() is False
+
+
+@mock.patch('datahub.korben.connector.requests')
+def test_validate_credentials(mocked_requests):
+    """Test validate credentials."""
+    mocked_response = mock.Mock()
+    mocked_response.json.return_value = 'True'
+    mocked_requests.post.return_value = mocked_response
+    connector = KorbenConnector()
+    assert connector.validate_credentials('foo', 'bar') == 'True'
+
+
+@mock.patch('datahub.korben.connector.requests.post', side_effect=requests.exceptions.RequestException)
+def test_validate_credential_request_exception(mocked_post):
+    """Ping Korben exception."""
+    connector = KorbenConnector()
+    assert connector.validate_credentials('foo', 'bar') is False
+
+
+@mock.patch('datahub.korben.connector.requests.post', side_effect=ValueError)
+def test_validate_credential_valueerror_exception(mocked_post):
+    """Ping Korben exception."""
+    connector = KorbenConnector()
+    assert connector.validate_credentials('foo', 'bar') is False
