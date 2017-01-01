@@ -68,7 +68,7 @@ def get_django_user():
     return user
 
 
-@pytest.mark.auth
+@pytest.mark.liveserver
 @mock.patch('datahub.core.auth.CDMSUserBackend.korben_authenticate')
 def test_invalid_cdms_credentials(korben_auth_mock, settings, live_server):
     """Test login invalid cdms credentials."""
@@ -92,7 +92,7 @@ def test_invalid_cdms_credentials(korben_auth_mock, settings, live_server):
     assert 'Invalid credentials given' in response.text
 
 
-@pytest.mark.auth
+@pytest.mark.liveserver
 @mock.patch('datahub.core.auth.CDMSUserBackend.korben_authenticate')
 def test_valid_cdms_credentials(korben_auth_mock, settings, live_server):
     """Test login valid cdms credentials."""
@@ -116,7 +116,7 @@ def test_valid_cdms_credentials(korben_auth_mock, settings, live_server):
     assert '"token_type": "Bearer"' in response.text
 
 
-@pytest.mark.auth
+@pytest.mark.liveserver
 @mock.patch('datahub.core.auth.CDMSUserBackend.korben_authenticate')
 def test_valid_cdms_credentials_user_not_whitelisted(korben_auth_mock, settings, live_server):
     """Test login valid cdms credentials, but user not whitelisted."""
@@ -140,7 +140,7 @@ def test_valid_cdms_credentials_user_not_whitelisted(korben_auth_mock, settings,
     assert 'Invalid credentials given' in response.text
 
 
-@pytest.mark.auth
+@pytest.mark.liveserver
 @mock.patch('datahub.core.auth.CDMSUserBackend.korben_authenticate')
 def test_valid_django_user(korben_auth_mock, live_server):
     """Test login valid Django credentials."""

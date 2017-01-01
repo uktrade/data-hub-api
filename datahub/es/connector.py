@@ -1,7 +1,6 @@
 from django.conf import settings
 from elasticsearch_dsl import Search
 from elasticsearch_dsl.query import MultiMatch, Term
-from datahub.core.utils import model_to_dictionary
 from .utils import document_exists, get_elasticsearch_client
 
 
@@ -57,19 +56,6 @@ class ESConnector:
         results = search.execute()
 
         return results
-
-    def populate(self, doc_type, queryset):
-        """Populate the ES index."""
-        for row in queryset:
-            data = model_to_dictionary(row)
-            object_id = data.pop('id')  # take it out until we sort out the manual mapping
-            self.client.create(
-                index=settings.ES_INDEX,
-                doc_type=doc_type,
-                body=data,
-                id=object_id,
-                refresh=True
-            )
 
     def delete_index(self):
         """Delete the index."""
