@@ -141,12 +141,10 @@ class Company(CompanyAbstract, BaseModel):
         if not self._validate_trading_address():
             raise ValidationError(
                 'If a trading address is specified, it must be complete.',
-                code='invalid'
             )
         if not self._validate_uk_region():
             raise ValidationError(
-                'UK region is required for UK companies.',
-                code='invalid'
+                {'uk_trade': ['UK region is required for UK companies.']}
             )
         super(Company, self).clean()
 
