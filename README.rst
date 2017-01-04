@@ -70,7 +70,3 @@ Load metadata::
     docker-compose run leeloo python manage.py loaddata /app/fixtures/metadata.yaml
     docker-compose run leeloo python manage.py loaddata /app/undefined.yaml
     docker-compose run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml
-
-Populate Elastic Search::
-
-    docker-compose run leeloo python manage.py esfullsync
