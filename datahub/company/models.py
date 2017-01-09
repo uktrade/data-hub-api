@@ -49,6 +49,12 @@ class CompanyAbstract(models.Model):
 class Company(CompanyAbstract, BaseModel):
     """Representation of the company as per CDMS."""
 
+    REQUIRED_TRADING_ADDRESS_FIELDS = (
+        'trading_address_1',
+        'trading_address_country',
+        'trading_address_town'
+    )
+
     company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     alias = models.CharField(max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name')
@@ -111,7 +117,7 @@ class Company(CompanyAbstract, BaseModel):
         If any trading address field is supplied then address_1, town and
         country must also be provided.
         """
-        some_trading_address_fields = any((
+        any_trading_address_fields = any((
             self.trading_address_1,
             self.trading_address_2,
             self.trading_address_3,
@@ -121,14 +127,16 @@ class Company(CompanyAbstract, BaseModel):
             self.trading_address_postcode,
             self.trading_address_country
         ))
-        trading_address_fields_missing = not all((
-            self.trading_address_1,
-            self.trading_address_country,
-            self.trading_address_town
-        ))
-        if some_trading_address_fields and trading_address_fields_missing:
+        all_required_trading_address_fields = all(getattr(self, field)
+                                                  for field in self.REQUIRED_TRADING_ADDRESS_FIELDS)
+        if any_trading_address_fields and not all_required_trading_address_fields:
             return False
         return True
+
+    def _generate_trading_address_errors(self):
+        """Generate per field error."""
+        empty_fields = [field for field in self.REQUIRED_TRADING_ADDRESS_FIELDS if not getattr(self, field)]
+        return {field: ['This field may not be null.'] for field in empty_fields}
 
     def _validate_uk_region(self):
         """UK region is mandatory if it's a UK company."""
@@ -140,13 +148,11 @@ class Company(CompanyAbstract, BaseModel):
         """Custom validation."""
         if not self._validate_trading_address():
             raise ValidationError(
-                'If a trading address is specified, it must be complete.',
-                code='invalid'
+                self._generate_trading_address_errors(),
             )
         if not self._validate_uk_region():
             raise ValidationError(
-                'UK region is required for UK companies.',
-                code='invalid'
+                {'uk_region': ['UK region is required for UK companies.']}
             )
         super(Company, self).clean()
 
@@ -204,6 +210,12 @@ class Interaction(BaseModel):
 class Contact(BaseModel):
     """Contact from CDMS."""
 
+    REQUIRED_ADDRESS_FIELDS = (
+        'address_1',
+        'address_country',
+        'address_town'
+    )
+
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     title = models.ForeignKey(metadata_models.Title)
     first_name = models.CharField(max_length=MAX_LENGTH)
@@ -238,6 +250,11 @@ class Contact(BaseModel):
         """Admin displayed human readable name."""
         return self.name
 
+    def _generate_address_errors(self):
+        """Generate per field error."""
+        empty_fields = [field for field in self.REQUIRED_ADDRESS_FIELDS if not getattr(self, field)]
+        return {field: ['This field may not be null.'] for field in empty_fields}
+
     def clean(self):
         """Custom validation for address.
 
@@ -253,27 +270,16 @@ class Contact(BaseModel):
             self.address_postcode,
             self.address_country
         ))
-        all_required_fields_existence = all((
-            self.address_1,
-            self.address_country,
-            self.address_town
-        ))
+        all_required_fields_existence = all(getattr(self, field) for field in self.REQUIRED_ADDRESS_FIELDS)
         if self.address_same_as_company and some_address_fields_existence:
-            raise ValidationError(
-                'Please select either address_same_as_company or enter an address manually, not both!',
-                code='invalid'
-            )
+            error_message = 'Please select either address_same_as_company or enter an address manually, not both!'
+            raise ValidationError({'address_same_as_company': error_message})
         if not self.address_same_as_company:
             if some_address_fields_existence and not all_required_fields_existence:
-                raise ValidationError(
-                    'address_1, town and country are required if an address is entered.',
-                    code='invalid'
-                )
+                raise ValidationError(self._generate_address_errors())
             elif not some_address_fields_existence:
-                raise ValidationError(
-                    'Please select either address_same_as_company or enter an address manually.',
-                    code='invalid'
-                )
+                error_message = 'Please select either address_same_as_company or enter an address manually.'
+                raise ValidationError({'address_same_as_company': error_message})
         super(Contact, self).clean()
 
 

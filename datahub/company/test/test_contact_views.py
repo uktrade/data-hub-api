@@ -68,7 +68,9 @@ class ContactTestCase(LeelooTestCase):
         })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data['detail'] == 'Please select either address_same_as_company or enter an address manually.'
+        assert response.data['errors'] == {
+            'address_same_as_company': ['Please select either address_same_as_company or enter an address manually.']
+        }
 
     def test_add_contact_partial_manual_address(self):
         """Test add new contact with a partial manual address."""
@@ -88,7 +90,10 @@ class ContactTestCase(LeelooTestCase):
         })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data['detail'] == 'address_1, town and country are required if an address is entered.'
+        assert response.data['errors'] == {
+            'address_country': ['This field may not be null.'],
+            'address_town': ['This field may not be null.']
+        }
 
     def test_add_contact_manual_address(self):
         """Test add new contact manual address."""

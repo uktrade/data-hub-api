@@ -160,7 +160,7 @@ class CompanyTestCase(LeelooTestCase):
         })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data['detail'] == 'UK region is required for UK companies.'
+        assert response.data['errors'] == {'uk_region': ['UK region is required for UK companies.']}
 
     def test_add_not_uk_company(self):
         """Test add new not UK company."""
@@ -201,7 +201,10 @@ class CompanyTestCase(LeelooTestCase):
         })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data['detail'] == 'If a trading address is specified, it must be complete.'
+        assert response.data['errors'] == {
+            'trading_address_town': ['This field may not be null.'],
+            'trading_address_country': ['This field may not be null.']
+        }
 
     def test_add_company_with_trading_address(self):
         """Test add new company with trading_address."""
