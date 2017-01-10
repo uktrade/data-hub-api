@@ -94,7 +94,10 @@ class KorbenConnector:
         self.inject_auth_header(url, data)
         try:
             response = requests.post(url=url, data=data, headers=self.default_headers)
-            return response.json()  # Returns JSON encoded boolean
+            if response.ok:
+                return response.json()  # Returns JSON encoded boolean
+            else:
+                return False
         except (requests.RequestException, ValueError):
             client.captureException()
             return False
