@@ -59,6 +59,8 @@ class CoreViewSet(mixins.CreateModelMixin,
             return super().create(request, *args, **kwargs)
         except ValidationError as e:
             raise DRFValidationError({'errors': e.message_dict})
+        except KorbenException as e:
+            raise APIException(detail=e.message)
 
     def update(self, request, *args, **kwargs):
         """Override update to catch the validation errors coming from the models.
@@ -69,6 +71,8 @@ class CoreViewSet(mixins.CreateModelMixin,
             return super().update(request, *args, **kwargs)
         except ValidationError as e:
             raise DRFValidationError({'errors': e.message_dict})
+        except KorbenException as e:
+            raise APIException(detail=e.message)
 
     def retrieve(self, request, *args, **kwargs):
         """Override to handle the exceptions coming from Korben."""
@@ -76,4 +80,4 @@ class CoreViewSet(mixins.CreateModelMixin,
             return super().retrieve(request, *args, **kwargs)
         except KorbenException:
             client.captureException()
-            raise APIException(detail={'detail': 'Korben error.'})
+            raise APIException(detail='Korben error.')

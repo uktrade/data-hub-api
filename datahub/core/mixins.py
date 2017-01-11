@@ -49,7 +49,11 @@ class DeferredSaveModelMixin:
             data=korben_data,
             update=update
         )
-        self._map_korben_response_to_model_instance(korben_response)
+        if korben_response.ok:
+            self._map_korben_response_to_model_instance(korben_response)
+        else:
+            # If CDMS doesn't 200 don't save in Django and raise an error
+            raise KorbenException('CDMS error.')
 
     def _map_korben_response_to_model_instance(self, korben_response):
         """Override this method to control what needs to be converted back into the model."""

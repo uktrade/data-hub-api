@@ -1,9 +1,14 @@
+import random
+import string
+from unittest import mock
+
 from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
 from rest_framework import status
 
 from datahub.company import models
+from datahub.company.models import Company
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
 from datahub.es.utils import document_exists, get_elasticsearch_client
@@ -283,6 +288,28 @@ class CompanyTestCase(LeelooTestCase):
         assert not response.data['archived']
         assert response.data['archived_reason'] == ''
         assert response.data['id'] == str(company.id)
+
+    @mock.patch('datahub.core.mixins.KorbenConnector')
+    def test_add_company_cdms_error(self, mocked_korben_connector):
+        """Test add a company when CDMS is down."""
+        url = reverse('company-list')
+        mocked_korben_connector().post.return_value = mock.Mock(ok=False)
+        random_name = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
+        response = self.api_client.post(url, {
+            'name': random_name,
+            'alias': None,
+            'business_type': constants.BusinessType.company.value.id,
+            'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_country': constants.Country.united_states.value.id,
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+        })
+
+        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        assert response.json() == {'detail': 'CDMS error.'}
+
+        # make sure we DIDN'T write to DB
+        assert Company.objects.filter(name__iexact=random_name).exists() is False
 
 
 class CHCompanyTestCase(LeelooTestCase):

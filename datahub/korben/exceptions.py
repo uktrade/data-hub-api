@@ -4,4 +4,6 @@
 class KorbenException(Exception):
     """Generic Korben exception."""
 
-    pass
+    def __init__(self, message='Korben error.'):
+        """Define message."""
+        self.message = message
