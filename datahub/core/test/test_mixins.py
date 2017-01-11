@@ -15,6 +15,8 @@ from datahub.korben.exceptions import KorbenException
 frozen_now = now()
 model_dict = {'foo': 'hello', 'bar': str(frozen_now)}
 
+pytestmark = pytest.mark.skip(reason='Update from Korben temporarily disabled.')
+
 
 class DummyModel(DeferredSaveModelMixin):
     """Dummy model class using DeferredSaveModelMixin."""
