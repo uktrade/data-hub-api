@@ -44,11 +44,11 @@ class CoreViewSet(mixins.CreateModelMixin,
         elif self.action in ('create', 'update', 'partial_update'):
             return self.write_serializer_class
 
-    def get_object(self):
-        """Force the update from korben."""
-        object = super(CoreViewSet, self).get_object()
-        object = object.update_from_korben()
-        return object
+    # def get_object(self):
+    #     """Force the update from korben."""
+    #     object = super(CoreViewSet, self).get_object()
+    #     object = object.update_from_korben()
+    #     return objects
 
     def create(self, request, *args, **kwargs):
         """Override create to catch the validation errors coming from the models.
