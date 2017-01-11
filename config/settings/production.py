@@ -57,5 +57,5 @@ LOGGING = {
 RAVEN_CONFIG = {
     'DSN': SENTRY_DSN,
 }
-
+CELERY_RESULT_BACKEND = env('REDIS_URL')
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'

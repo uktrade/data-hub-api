@@ -1,25 +1,13 @@
 version: '2'
 services:
 
-  leeloo:
+  leeloo-common:
     build:
       context: .
     volumes:
       - .:/app
     entrypoint: |
-        dockerize -wait tcp://postgres:5432 -wait http://es:9200 -timeout 60s
-    ports:
-      - "8000:8000"
-    depends_on:
-      - korben
-      - postgres
-      - es
-      - redis
-    links:
-      - korben
-      - postgres
-      - es
-      - redis
+        dockerize -wait tcp://redis:6379 -wait tcp://postgres:5432 -wait http://es:9200 -timeout 60s
     environment:
       SECRET_KEY: foobar
       DATABASE_URL: postgresql://postgres@postgres/datahub
@@ -34,6 +22,39 @@ services:
       DJANGO_SETTINGS_MODULE: config.settings.local
       COV_TOKEN: ${COV_TOKEN}
       BROKER_URL: redis://redis
+      RESULT_BACKEND: redis://redis
+
+  leeloo:
+    extends:
+      service: leeloo-common
+    ports:
+      - "8000:8000"
+    depends_on:
+      - korben
+      - postgres
+      - es
+      - redis
+      - leeloo-celery-worker
+    links:
+      - korben
+      - postgres
+      - es
+      - redis
+
+  leeloo-celery-worker:
+    extends:
+      service: leeloo-common
+    command: celery -A config worker -l info
+    depends_on:
+      - korben
+      - postgres
+      - es
+      - redis
+    links:
+      - korben
+      - postgres
+      - es
+      - redis
 
   korben:
     build:
