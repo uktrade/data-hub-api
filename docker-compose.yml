@@ -14,10 +14,12 @@ services:
       - korben
       - postgres
       - es
+      - redis
     links:
       - korben
       - postgres
       - es
+      - redis
     environment:
       SECRET_KEY: foobar
       DATABASE_URL: postgresql://postgres@postgres/datahub
@@ -31,6 +33,7 @@ services:
       DJANGO_SECRET_KEY: changeme
       DJANGO_SETTINGS_MODULE: config.settings.local
       COV_TOKEN: ${COV_TOKEN}
+      BROKER_URL: redis://redis
 
   korben:
     build:
@@ -49,3 +52,9 @@ services:
     restart: always
     ports:
       - "9200:9200"
+
+  redis:
+    image: redis:3.2
+    restart: always
+    ports:
+      - "6379:6379"
