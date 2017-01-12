@@ -37,7 +37,7 @@ def korben_view(request, model):
                 else:
                     return Response(data=data, status=HTTP_400_BAD_REQUEST)
 
-    obj.save(as_korben=True)  # data comes from Korben, kill validation
+    obj.save(skip_custom_validation=True)  # data comes from Korben, kill validation
 
     return Response(data={'message': 'OK'})
 

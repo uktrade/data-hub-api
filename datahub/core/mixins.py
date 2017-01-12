@@ -1,12 +1,6 @@
 """General mixins."""
 
-import reversion
-from rest_framework import status
-
-from datahub.company import tasks
 from datahub.korben.connector import KorbenConnector
-from datahub.korben.exceptions import KorbenException
-from datahub.korben.utils import get_korben_user
 
 from .utils import model_to_dictionary
 
@@ -24,21 +18,11 @@ class DeferredSaveModelMixin:
         """Get table name from model."""
         return self._meta.db_table
 
-    def save(self, as_korben=False, **kwargs):
-        """
-        Override the Django save implementation to save to Korben.
-
-        :param as_korben: bool - Whether or not the data comes from Korben, in that case don't trigger validation
-        """
-        self.clean()  # triggers custom validation
-        update = self.model.objects.filter(id=self.id).exists()
+    def save(self, skip_custom_validation=False, **kwargs):
+        """Override the Django save implementation to save to Korben."""
+        if not skip_custom_validation:
+            self.clean()
         super().save(**kwargs)
-        if not as_korben:
-            tasks.save_to_korben.delay(
-                object_id=self.id,
-                model_name=type(self)._meta.db_table.replace('_', '.'),
-                update=update
-            )
 
     def save_to_korben(self, update):
         """
@@ -47,7 +31,7 @@ class DeferredSaveModelMixin:
         We force feed an ID to Django, so we cannot differentiate between update or create without querying the db
         https://docs.djangoproject.com/en/1.10/ref/models/instances/#how-django-knows-to-update-vs-insert
         """
-        korben_data = self._convert_model_to_korben_format()
+        korben_data = self.convert_model_to_korben_format()
         return self.korben_connector.post(
             table_name=self._get_table_name_from_model(),
             data=korben_data,
@@ -62,7 +46,7 @@ class DeferredSaveModelMixin:
         """Return list of fields that should be mapped as datetime."""
         return []
 
-    def _convert_model_to_korben_format(self):
+    def convert_model_to_korben_format(self):
         """Override this method to have more granular control of what gets sent to Korben."""
         return model_to_dictionary(self, excluded_fields=self.get_excluded_fields(), expand_foreign_keys=False)
 
@@ -75,27 +59,3 @@ class DeferredSaveModelMixin:
             if str(getattr(self, key)) != value:
                 return False
         return True
-
-    def update_from_korben(self):
-        """Update the model fields from Korben.
-
-        :return the model instance
-        """
-        korben_data = self._convert_model_to_korben_format()
-        korben_response = self.korben_connector.get(
-            table_name=self._get_table_name_from_model(),
-            data=korben_data
-        )
-
-        if korben_response.status_code == status.HTTP_200_OK:
-            if not self._korben_response_same_as_model(korben_response):
-                with reversion.create_revision():
-                    self._map_korben_response_to_model_instance(korben_response)
-                    self.save(as_korben=True)
-                    reversion.set_user(get_korben_user())
-                    reversion.set_comment('Updated by Korben')
-        elif korben_response.status_code == status.HTTP_404_NOT_FOUND:
-            pass
-        else:
-            raise KorbenException(korben_response.json())
-        return self
