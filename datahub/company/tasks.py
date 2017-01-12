@@ -4,7 +4,6 @@ from django.apps import apps
 from raven.contrib.django.raven_compat.models import client
 from requests import RequestException
 
-from datahub.core.models import TaskInfo
 from datahub.korben.connector import KorbenConnector
 from datahub.korben.exceptions import KorbenException
 
@@ -12,6 +11,7 @@ from datahub.korben.exceptions import KorbenException
 @shared_task(bind=True)
 def save_to_korben(self, object_id, user_id, db_table, update):
     """Save to Korben."""
+    from datahub.core.models import TaskInfo
     model_name = db_table.replace('_', '.')
     model_class = apps.get_model(model_name)
     object_to_save = model_class.objects.get(pk=object_id)
