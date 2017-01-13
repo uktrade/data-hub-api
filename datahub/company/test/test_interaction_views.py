@@ -1,3 +1,5 @@
+from unittest import mock
+from uuid import UUID
 
 from django.conf import settings
 from django.urls import reverse
@@ -22,7 +24,8 @@ class InteractionTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['id'] == str(interaction.pk)
 
-    def test_add_interaction(self):
+    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
+    def test_add_interaction(self, mocked_save_to_korben):
         """Test add new interaction."""
         url = reverse('interaction-list')
         response = self.api_client.post(url, {
@@ -38,7 +41,13 @@ class InteractionTestCase(LeelooTestCase):
         })
 
         assert response.status_code == status.HTTP_201_CREATED
-
+        # make sure we're spawning a task to save to Korben
+        mocked_save_to_korben.delay.assert_called_once_with(
+            db_table='company_interaction',
+            object_id=UUID(response.data['id']),
+            update=False,  # this is not an update!
+            user_id=self.user.id
+        )
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
         assert document_exists(
@@ -47,7 +56,8 @@ class InteractionTestCase(LeelooTestCase):
             document_id=response.data['id']
         )
 
-    def test_modify_interaction(self):
+    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
+    def test_modify_interaction(self, mocked_save_to_korben):
         """Modify an existing interaction."""
         contact = InteractionFactory(subject='I am a subject')
 
@@ -58,7 +68,13 @@ class InteractionTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['subject'] == 'I am another subject'
-
+        # make sure we're spawning a task to save to Korben
+        mocked_save_to_korben.delay.assert_called_once_with(
+            db_table='company_interaction',
+            object_id=UUID(response.data['id']),
+            update=True,  # this is an update!
+            user_id=self.user.id
+        )
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
         es_result = es_client.get(

@@ -1,5 +1,6 @@
 import json
 import uuid
+from unittest import mock
 
 import pytest
 from django.conf import settings
@@ -25,7 +26,8 @@ def _signature(url, data):
 class ContactTestCase(LeelooTestCase):
     """Contact test case."""
 
-    def test_add_contact_address_same_as_company(self):
+    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
+    def test_add_contact_address_same_as_company(self, mocked_save_to_korben):
         """Test add new contact."""
         url = reverse('contact-list')
         response = self.api_client.post(url, {
@@ -42,7 +44,13 @@ class ContactTestCase(LeelooTestCase):
         })
 
         assert response.status_code == status.HTTP_201_CREATED
-
+        # make sure we're spawning a task to save to Korben
+        mocked_save_to_korben.delay.assert_called_once_with(
+            db_table='company_contact',
+            object_id=uuid.UUID(response.data['id']),
+            update=False,  # this is not an update!
+            user_id=self.user.id
+        )
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
         assert document_exists(
@@ -51,7 +59,8 @@ class ContactTestCase(LeelooTestCase):
             document_id=response.data['id']
         )
 
-    def test_add_contact_no_address(self):
+    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
+    def test_add_contact_no_address(self, mocked_save_to_korben):
         """Test add new contact without any address."""
         url = reverse('contact-list')
 
@@ -67,12 +76,14 @@ class ContactTestCase(LeelooTestCase):
             'primary': True
         })
 
+        assert mocked_save_to_korben.delay.called is False
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data['errors'] == {
             'address_same_as_company': ['Please select either address_same_as_company or enter an address manually.']
         }
 
-    def test_add_contact_partial_manual_address(self):
+    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
+    def test_add_contact_partial_manual_address(self, mocked_save_to_korben):
         """Test add new contact with a partial manual address."""
         url = reverse('contact-list')
 
@@ -89,13 +100,15 @@ class ContactTestCase(LeelooTestCase):
             'primary': True
         })
 
+        assert mocked_save_to_korben.delay.called is False
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data['errors'] == {
             'address_country': ['This field may not be null.'],
             'address_town': ['This field may not be null.']
         }
 
-    def test_add_contact_manual_address(self):
+    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
+    def test_add_contact_manual_address(self, mocked_save_to_korben):
         """Test add new contact manual address."""
         url = reverse('contact-list')
         response = self.api_client.post(url, {
@@ -114,7 +127,13 @@ class ContactTestCase(LeelooTestCase):
         })
 
         assert response.status_code == status.HTTP_201_CREATED
-
+        # make sure we're spawning a task to save to Korben
+        mocked_save_to_korben.delay.assert_called_once_with(
+            db_table='company_contact',
+            object_id=uuid.UUID(response.data['id']),
+            update=False,  # this is not an update!
+            user_id=self.user.id
+        )
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
         assert document_exists(
@@ -123,7 +142,8 @@ class ContactTestCase(LeelooTestCase):
             document_id=response.data['id']
         )
 
-    def test_modify_contact(self):
+    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
+    def test_modify_contact(self, mocked_save_to_korben):
         """Modify an existing contact."""
         contact = ContactFactory(first_name='Foo')
 
@@ -134,7 +154,13 @@ class ContactTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_200_OK, response.data
         assert response.data['first_name'] == 'bar'
-
+        # make sure we're spawning a task to save to Korben
+        mocked_save_to_korben.delay.assert_called_once_with(
+            db_table='company_contact',
+            object_id=uuid.UUID(response.data['id']),
+            update=True,  # this is an update!
+            user_id=self.user.id
+        )
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
         es_result = es_client.get(

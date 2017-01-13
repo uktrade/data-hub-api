@@ -79,6 +79,11 @@ class TaskInfo(models.Model):
         """Return the result of the task."""
         return tasks.save_to_korben.AsyncResult(self.task_id)
 
+    @property
+    def status(self):
+        """Handy shortcut to get the task status."""
+        return self.async_result.status
+
     def __str__(self):
         """Humand readable name."""
         return self.name
