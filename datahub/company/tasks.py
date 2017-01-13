@@ -1,7 +1,7 @@
 from celery import shared_task
 from dateutil import parser
 from django.apps import apps
-from raven.contrib.django.raven_compat.models import client
+from raven.contrib.django.raven_compat.models import client, settings
 from requests import RequestException
 
 from datahub.korben.connector import KorbenConnector
@@ -29,13 +29,13 @@ def save_to_korben(self, object_id, user_id, db_table, update):
         data=data,
         table_name=db_table
     )
-    if parser.parse(remote_object.modified_on) <= object_to_save.modified_on:
+    if parser.parse(remote_object['modified_on']) <= object_to_save.modified_on:
         try:
             object_to_save.save_to_korben(update)
         except (KorbenException, RequestException) as e:
             client.captureException()
             raise self.retry(
                 exc=e,
-                countdown=5,
-                max_retries=1000,
+                countdown=settings.TASK_RETRY_DELAY_SECONDS,
+                max_retries=settings.TASK_MAX_RETRIES,
             )
