@@ -17,7 +17,7 @@ def save_to_korben(self, object_id, user_id, db_table, update):
     object_to_save = model_class.objects.get(pk=object_id)
     name = 'Saving {0} to CDMS.'.format(str(object_to_save))
     task_info, _ = TaskInfo.objects.get_or_create(
-        task_id=self.id,
+        task_id=self.request.id,
         defaults=dict(
             user_id=user_id,
             name=name

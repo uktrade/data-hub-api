@@ -40,6 +40,7 @@ services:
       - postgres
       - es
       - redis
+    command: /app/start.sh
 
   leeloo-celery-worker:
     extends:
