@@ -73,6 +73,7 @@ class TaskInfo(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)
+    note = models.CharField(max_length=255, null=True)
 
     @property
     def async_result(self):

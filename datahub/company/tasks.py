@@ -1,3 +1,5 @@
+import uuid
+
 from celery import shared_task
 from dateutil import parser
 from django.apps import apps
@@ -16,8 +18,13 @@ def save_to_korben(self, object_id, user_id, db_table, update):
     model_class = apps.get_model(model_name)
     object_to_save = model_class.objects.get(pk=object_id)
     name = 'Saving {0} to CDMS.'.format(str(object_to_save))
+    # We are generating a random task id if the task has not one
+    # this should only happen when this function is called directly instead of going through a queue
+    # it's BAD but we only call this function directly in the tests
+    # we are abusing the request task id, and any other solution tried didn't work
+    task_id = self.request.id or uuid.uuid4()
     task_info, _ = TaskInfo.objects.get_or_create(
-        task_id=self.request.id,
+        task_id=task_id,
         defaults=dict(
             user_id=user_id,
             name=name
@@ -29,7 +36,7 @@ def save_to_korben(self, object_id, user_id, db_table, update):
         data=data,
         table_name=db_table
     )
-    if parser.parse(remote_object['modified_on']) <= object_to_save.modified_on:
+    if parser.parse(remote_object.json()['modified_on']) <= object_to_save.modified_on:
         try:
             object_to_save.save_to_korben(update)
         except (KorbenException, RequestException) as e:
@@ -39,3 +46,6 @@ def save_to_korben(self, object_id, user_id, db_table, update):
                 countdown=settings.TASK_RETRY_DELAY_SECONDS,
                 max_retries=settings.TASK_MAX_RETRIES,
             )
+    else:
+        task_info.note = 'Stale object, not saved.'
+        task_info.save()
