@@ -78,7 +78,7 @@ class CoreViewSet(mixins.CreateModelMixin,
                 user_id=request.user.id,
                 db_table=type(object)._meta.db_table,
                 update=True
-             )
+            )
             return response
         except ValidationError as e:
             raise DRFValidationError({'errors': e.message_dict})

@@ -67,6 +67,7 @@ class BaseConstantModel(models.Model):
 
 class TaskInfo(models.Model):
     """Holds information about the tasks."""
+
     task_id = models.UUIDField()
     name = models.CharField(max_length=255)
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
@@ -79,4 +80,5 @@ class TaskInfo(models.Model):
         return tasks.save_to_korben.AsyncResult(self.task_id)
 
     def __str__(self):
+        """Humand readable name."""
         return self.name
