@@ -217,7 +217,7 @@ class Contact(BaseModel):
     )
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
-    title = models.ForeignKey(metadata_models.Title)
+    title = models.ForeignKey(metadata_models.Title, blank=True, null=True)
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
     job_title = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
