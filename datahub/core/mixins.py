@@ -1,12 +1,6 @@
 """General mixins."""
 
-import reversion
-from dateutil import parser
-from rest_framework import status
-
 from datahub.korben.connector import KorbenConnector
-from datahub.korben.exceptions import KorbenException
-from datahub.korben.utils import get_korben_user
 
 from .utils import model_to_dictionary
 
@@ -24,47 +18,25 @@ class DeferredSaveModelMixin:
         """Get table name from model."""
         return self._meta.db_table
 
-    def save(self, as_korben=False, **kwargs):
-        """
-        Override the Django save implementation to save to Korben.
-
-        :param as_korben: bool - Whether or not the data comes from Korben, in that case don't trigger validation
-        """
-        if not as_korben:
-            self._save_to_korben()
+    def save(self, skip_custom_validation=False, **kwargs):
+        """Override the Django save implementation to save to Korben."""
+        if not skip_custom_validation:
+            self.clean()
         super().save(**kwargs)
 
-    def _save_to_korben(self):
+    def save_to_korben(self, update):
         """
         Save to Korben first, then alter the model instance with the data received back from Korben.
 
         We force feed an ID to Django, so we cannot differentiate between update or create without querying the db
         https://docs.djangoproject.com/en/1.10/ref/models/instances/#how-django-knows-to-update-vs-insert
         """
-        self.clean()  # triggers custom validation
-        update = self.model.objects.filter(id=self.id).exists()
-        korben_data = self._convert_model_to_korben_format()
-        korben_response = self.korben_connector.post(
+        korben_data = self.convert_model_to_korben_format()
+        return self.korben_connector.post(
             table_name=self._get_table_name_from_model(),
             data=korben_data,
             update=update
         )
-        if korben_response.ok:
-            self._map_korben_response_to_model_instance(korben_response)
-        else:
-            # If CDMS doesn't 200 don't save in Django and raise an error
-            raise KorbenException('CDMS error.')
-
-    def _map_korben_response_to_model_instance(self, korben_response):
-        """Override this method to control what needs to be converted back into the model."""
-        if korben_response.status_code == status.HTTP_200_OK:
-            json_data = korben_response.json()
-            for key, value in json_data.items():
-                setattr(self, key, value)
-
-            for name in filter(lambda v: v in json_data, self.get_datetime_fields()):
-                value = json_data[name]
-                setattr(self, name, parser.parse(value) if value else value)
 
     def get_excluded_fields(self):
         """Override this method to define which fields should not be send to Korben."""
@@ -74,7 +46,7 @@ class DeferredSaveModelMixin:
         """Return list of fields that should be mapped as datetime."""
         return []
 
-    def _convert_model_to_korben_format(self):
+    def convert_model_to_korben_format(self):
         """Override this method to have more granular control of what gets sent to Korben."""
         return model_to_dictionary(self, excluded_fields=self.get_excluded_fields(), expand_foreign_keys=False)
 
@@ -87,27 +59,3 @@ class DeferredSaveModelMixin:
             if str(getattr(self, key)) != value:
                 return False
         return True
-
-    def update_from_korben(self):
-        """Update the model fields from Korben.
-
-        :return the model instance
-        """
-        korben_data = self._convert_model_to_korben_format()
-        korben_response = self.korben_connector.get(
-            table_name=self._get_table_name_from_model(),
-            data=korben_data
-        )
-
-        if korben_response.status_code == status.HTTP_200_OK:
-            if not self._korben_response_same_as_model(korben_response):
-                with reversion.create_revision():
-                    self._map_korben_response_to_model_instance(korben_response)
-                    self.save(as_korben=True)
-                    reversion.set_user(get_korben_user())
-                    reversion.set_comment('Updated by Korben')
-        elif korben_response.status_code == status.HTTP_404_NOT_FOUND:
-            pass
-        else:
-            raise KorbenException(korben_response.json())
-        return self

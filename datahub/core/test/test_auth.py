@@ -42,7 +42,7 @@ def get_cdms_user():
             dit_team=team
         )
         user.set_unusable_password()
-        user.save(as_korben=True)
+        user.save()
     return user
 
 
@@ -64,7 +64,7 @@ def get_django_user():
             dit_team=team
         )
         user.set_password('foobar')
-        user.save(as_korben=True)
+        user.save()
     return user
 
 

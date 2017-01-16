@@ -30,7 +30,7 @@ class DummyModel(DeferredSaveModelMixin):
     def _convert_model_to_korben_format(self):
         return model_dict
 
-    def save(self, as_korben=False, **kwargs):
+    def save(self, skip_custom_validation=False, **kwargs):
         """Dummy save."""
         pass
 

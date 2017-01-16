@@ -1,5 +1,4 @@
-import random
-import string
+import uuid
 from unittest import mock
 
 from django.conf import settings
@@ -8,7 +7,6 @@ from django.utils.timezone import now
 from rest_framework import status
 
 from datahub.company import models
-from datahub.company.models import Company
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
 from datahub.es.utils import document_exists, get_elasticsearch_client
@@ -98,7 +96,8 @@ class CompanyTestCase(LeelooTestCase):
         assert response.data['registered_address_county'] is None
         assert response.data['registered_address_postcode'] is None
 
-    def test_update_company(self):
+    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
+    def test_update_company(self, mocked_save_to_korben):
         """Test company update."""
         company = CompanyFactory(
             name='Foo ltd.',
@@ -115,7 +114,13 @@ class CompanyTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['name'] == 'Acme'
-
+        # make sure we're spawning a task to save to Korben
+        mocked_save_to_korben.delay.assert_called_once_with(
+            db_table='company_company',
+            object_id=uuid.UUID(response.data['id']),
+            update=True,  # this is an update!
+            user_id=self.user.id
+        )
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
         es_result = es_client.get(
@@ -126,7 +131,8 @@ class CompanyTestCase(LeelooTestCase):
         )
         assert es_result['_source']['name'] == 'Acme'
 
-    def test_add_uk_company(self):
+    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
+    def test_add_uk_company(self, mocked_save_to_korben):
         """Test add new UK company."""
         url = reverse('company-list')
         response = self.api_client.post(url, {
@@ -142,7 +148,13 @@ class CompanyTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data['name'] == 'Acme'
-
+        # make sure we're spawning a task to save to Korben
+        mocked_save_to_korben.delay.assert_called_once_with(
+            db_table='company_company',
+            object_id=uuid.UUID(response.data['id']),
+            update=False,  # this is not an update!
+            user_id=self.user.id
+        )
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
         assert document_exists(
@@ -151,7 +163,8 @@ class CompanyTestCase(LeelooTestCase):
             document_id=response.data['id']
         )
 
-    def test_add_uk_company_without_uk_region(self):
+    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
+    def test_add_uk_company_without_uk_region(self, mocked_save_to_korben):
         """Test add new UK without UK region company."""
         url = reverse('company-list')
         response = self.api_client.post(url, {
@@ -164,10 +177,12 @@ class CompanyTestCase(LeelooTestCase):
             'registered_address_town': 'London',
         })
 
+        assert mocked_save_to_korben.delay.called is False
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data['errors'] == {'uk_region': ['UK region is required for UK companies.']}
 
-    def test_add_not_uk_company(self):
+    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
+    def test_add_not_uk_company(self, mocked_save_to_korben):
         """Test add new not UK company."""
         url = reverse('company-list')
         response = self.api_client.post(url, {
@@ -182,7 +197,13 @@ class CompanyTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data['name'] == 'Acme'
-
+        # make sure we're spawning a task to save to Korben
+        mocked_save_to_korben.delay.assert_called_once_with(
+            db_table='company_company',
+            object_id=uuid.UUID(response.data['id']),
+            update=False,  # this is not an update!
+            user_id=self.user.id
+        )
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
         assert document_exists(
@@ -191,7 +212,8 @@ class CompanyTestCase(LeelooTestCase):
             document_id=response.data['id']
         )
 
-    def test_add_company_partial_trading_address(self):
+    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
+    def test_add_company_partial_trading_address(self, mocked_save_to_korben):
         """Test add new company with partial trading address."""
         url = reverse('company-list')
         response = self.api_client.post(url, {
@@ -205,13 +227,15 @@ class CompanyTestCase(LeelooTestCase):
             'uk_region': constants.UKRegion.england.value.id
         })
 
+        assert mocked_save_to_korben.delay.called is False
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data['errors'] == {
             'trading_address_town': ['This field may not be null.'],
             'trading_address_country': ['This field may not be null.']
         }
 
-    def test_add_company_with_trading_address(self):
+    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
+    def test_add_company_with_trading_address(self, mocked_save_to_korben):
         """Test add new company with trading_address."""
         url = reverse('company-list')
         response = self.api_client.post(url, {
@@ -228,7 +252,13 @@ class CompanyTestCase(LeelooTestCase):
         })
 
         assert response.status_code == status.HTTP_201_CREATED
-
+        # make sure we're spawning a task to save to Korben
+        mocked_save_to_korben.delay.assert_called_once_with(
+            db_table='company_company',
+            object_id=uuid.UUID(response.data['id']),
+            update=False,  # this is not an update!
+            user_id=self.user.id
+        )
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
         assert document_exists(
@@ -288,28 +318,6 @@ class CompanyTestCase(LeelooTestCase):
         assert not response.data['archived']
         assert response.data['archived_reason'] == ''
         assert response.data['id'] == str(company.id)
-
-    @mock.patch('datahub.core.mixins.KorbenConnector')
-    def test_add_company_cdms_error(self, mocked_korben_connector):
-        """Test add a company when CDMS is down."""
-        url = reverse('company-list')
-        mocked_korben_connector().post.return_value = mock.Mock(ok=False)
-        random_name = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
-        response = self.api_client.post(url, {
-            'name': random_name,
-            'alias': None,
-            'business_type': constants.BusinessType.company.value.id,
-            'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
-            'registered_address_country': constants.Country.united_states.value.id,
-            'registered_address_1': '75 Stramford Road',
-            'registered_address_town': 'London',
-        })
-
-        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-        assert response.json() == {'detail': 'CDMS error.'}
-
-        # make sure we DIDN'T write to DB
-        assert Company.objects.filter(name__iexact=random_name).exists() is False
 
 
 class CHCompanyTestCase(LeelooTestCase):

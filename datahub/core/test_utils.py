@@ -28,7 +28,7 @@ def get_test_user():
             dit_team=team
         )
         test_user.set_password('password')
-        test_user.save(as_korben=True)
+        test_user.save()
     return test_user
 
 

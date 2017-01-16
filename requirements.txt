@@ -12,6 +12,11 @@ python-dateutil==2.5.3
 # Persistency layer
 psycopg2==2.6.2
 
+# task
+celery[redis,sqs]==4.0.2
+boto==2.45
+flower==0.9.1
+
 # ES
 elasticsearch==2.4.0
 elasticsearch-dsl==2.1.0
