@@ -30,8 +30,7 @@ def to_sqla_table(table, data):
 
 def to_sqla_table_idempotent(table, data):
     '''
-    Idempotently load data into an SQLA table, temporarily write out details on
-    integrity errors to a file
+    Idempotently load data into an SQLA table, return errored rows
     '''
     if not isinstance(data, (list, map, filter)):
         raise Exception('`data` arg is not a list, map or filter object')
