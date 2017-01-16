@@ -2,10 +2,13 @@
 Functions for transforming dicts from Django to OData shape and back again,
 according to spec.MAPPINGS
 '''
+import datetime
 import functools
-from . import spec
-from korben.services import db
+
 from korben.cdms_api.rest.utils import cdms_datetime_to_datetime
+from korben.services import db
+
+from . import spec
 
 
 
@@ -97,8 +100,10 @@ def odata_to_django(odata_tablename, odata_dict):
     for odata_col, django_col in mapping.get('datetime', ()):
         value = odata_dict.get(odata_col)
         if odata_col and value:
-            django_dict[django_col] =\
-                cdms_datetime_to_datetime(value).isoformat()
+            result = cdms_datetime_to_datetime(value)
+            if isinstance(result, datetime.datetime):
+                result = result.isoformat()
+            django_dict[django_col] = result
 
     for odata_prefix, field_map in mapping.get('nonflat', ()):
         # eurgh has to work two ways; once for data from cdms once for data
