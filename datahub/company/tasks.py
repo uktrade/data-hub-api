@@ -3,6 +3,7 @@ import uuid
 from celery import shared_task
 from dateutil import parser
 from django.apps import apps
+from django.utils.timezone import make_naive
 from raven.contrib.django.raven_compat.models import client, settings
 from requests import RequestException
 
@@ -30,22 +31,23 @@ def save_to_korben(self, object_id, user_id, db_table, update):
             name=name
         )
     )
-    korben_connector = KorbenConnector()
-    data = object_to_save.convert_model_to_korben_format()
-    remote_object = korben_connector.get(
-        data=data,
-        table_name=db_table
-    )
-    if parser.parse(remote_object.json()['modified_on']) <= object_to_save.modified_on:
-        try:
-            object_to_save.save_to_korben(update)
-        except (KorbenException, RequestException) as e:
-            client.captureException()
-            raise self.retry(
-                exc=e,
-                countdown=settings.TASK_RETRY_DELAY_SECONDS,
-                max_retries=settings.TASK_MAX_RETRIES,
-            )
-    else:
-        task_info.note = 'Stale object, not saved.'
-        task_info.save()
+    # korben_connector = KorbenConnector()
+    # data = object_to_save.convert_model_to_korben_format()
+    # remote_object = korben_connector.get(
+    #     data=data,
+    #     table_name=db_table
+    # )
+    # cdms_time = parser.parse(remote_object.json()['modified_on'])
+    # if make_naive(cdms_time) <= object_to_save.modified_on:
+    try:
+        object_to_save.save_to_korben(update)
+    except (KorbenException, RequestException) as e:
+        client.captureException()
+        raise self.retry(
+            exc=e,
+            countdown=settings.TASK_RETRY_DELAY_SECONDS,
+            max_retries=settings.TASK_MAX_RETRIES,
+        )
+    # else:
+    #     itask_info.note = 'Stale object, not saved.'
+    #     task_info.save()
