@@ -18,3 +18,4 @@ class TaskInfoModelSerializer(serializers.ModelSerializer):
 
     class Meta:  # noqa: D101
         model = TaskInfo
+        depth = 1
