@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 from raven.contrib.django.raven_compat.models import client
 
+from datahub.korben.exceptions import KorbenException
 from .utils import generate_signature
 
 
@@ -62,7 +63,10 @@ class KorbenConnector:
         data = self.encode_json_bytes(data)
         self.inject_auth_header(url, data)
         response = requests.post(url=url, data=data, headers=self.default_headers)
-        return response
+        if response.ok:
+            return response
+        else:
+            raise KorbenException(message=response.content)
 
     def get(self, data, table_name):
         """Get single object from Korben.

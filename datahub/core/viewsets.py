@@ -7,6 +7,7 @@ from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from datahub.company import tasks
 from datahub.korben.exceptions import KorbenException
 
 
@@ -44,19 +45,21 @@ class CoreViewSet(mixins.CreateModelMixin,
         elif self.action in ('create', 'update', 'partial_update'):
             return self.write_serializer_class
 
-    # def get_object(self):
-    #     """Force the update from korben."""
-    #     object = super(CoreViewSet, self).get_object()
-    #     object = object.update_from_korben()
-    #     return objects
-
     def create(self, request, *args, **kwargs):
         """Override create to catch the validation errors coming from the models.
 
         These are not real Exceptions, rather user errors.
         """
         try:
-            return super().create(request, *args, **kwargs)
+            response = super().create(request, *args, **kwargs)
+            object = self.queryset[0]
+            tasks.save_to_korben.delay(
+                object_id=object.id,
+                user_id=request.user.id,
+                db_table=type(object)._meta.db_table,
+                update=False
+            )
+            return response
         except ValidationError as e:
             raise DRFValidationError({'errors': e.message_dict})
         except KorbenException as e:
@@ -68,7 +71,15 @@ class CoreViewSet(mixins.CreateModelMixin,
         These are not real Exceptions, rather user errors.
         """
         try:
-            return super().update(request, *args, **kwargs)
+            response = super().update(request, *args, **kwargs)
+            object = self.queryset[0]
+            tasks.save_to_korben.delay(
+                object_id=object.id,
+                user_id=request.user.id,
+                db_table=type(object)._meta.db_table,
+                update=True
+            )
+            return response
         except ValidationError as e:
             raise DRFValidationError({'errors': e.message_dict})
         except KorbenException as e:

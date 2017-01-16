@@ -48,6 +48,11 @@ Leeloo can run on any Heroku style platform. These environment variables MUST be
 - ES_PORT
 - KORBEN_HOST
 - KORBEN_PORT
+- CELERY_BROKER_URL
+- CELERY_RESULT_BACKEND
+- TASK_MAX_RETRIES (default=1000000)
+- RETRY_DELAY_SECONDS (default=5)
+- DIT_ENABLED_ADVISORS (default=())
 
 
 Management commands

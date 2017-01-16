@@ -5,6 +5,7 @@ engines:
     exclude_fingerprints:
       - 69aa4cac78f91a365e565175a509ada2
       - 660e3d488a88ca2f495208adb50268d1
+      - 335103688873a625dc7e953702e3e40b
     config:
       languages:
         python:

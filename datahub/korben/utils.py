@@ -20,7 +20,7 @@ def get_korben_user():
             date_joined=now(),
             dit_team_id=constants.Team.undefined.value.id,
         )
-        korben_user.save(as_korben=True)
+        korben_user.save()
     return korben_user
 
 

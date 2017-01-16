@@ -37,7 +37,3 @@ class AdvisorAdmin(VersionAdmin, UserAdmin):
         kwargs['exclude'] = ('last_login', )
 
         super().reversion_register(model, **kwargs)
-
-    def save_model(self, request, obj, form, change):
-        """Save model as korben, without propagation to CDMS."""
-        obj.save(as_korben=True)
