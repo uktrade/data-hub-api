@@ -58,4 +58,5 @@ RAVEN_CONFIG = {
     'DSN': SENTRY_DSN,
 }
 CELERY_RESULT_BACKEND = env('REDIS_URL')
+CELERY_BROKER_TRANSPORT_OPTIONS = {'region': 'eu-west-1'}
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
