@@ -267,6 +267,41 @@ class CompanyTestCase(LeelooTestCase):
             document_id=response.data['id']
         )
 
+    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
+    def test_add_company_with_website_without_scheme(self, mocked_save_to_korben):
+        """Test add new company with trading_address."""
+        url = reverse('company-list')
+        response = self.api_client.post(url, {
+            'name': 'Acme',
+            'business_type': constants.BusinessType.company.value.id,
+            'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_country': constants.Country.united_kingdom.value.id,
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'trading_address_country': constants.Country.ireland.value.id,
+            'trading_address_1': '1 Hello st.',
+            'trading_address_town': 'Dublin',
+            'uk_region': constants.UKRegion.england.value.id,
+            'website': 'www.google.com',
+        })
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data['website'] == 'www.google.com'
+        # make sure we're spawning a task to save to Korben
+        mocked_save_to_korben.delay.assert_called_once_with(
+            db_table='company_company',
+            object_id=uuid.UUID(response.data['id']),
+            update=False,  # this is not an update!
+            user_id=self.user.id
+        )
+        # make sure we're writing to ES
+        es_client = get_elasticsearch_client()
+        assert document_exists(
+            client=es_client,
+            doc_type='company_company',
+            document_id=response.data['id']
+        )
+
     def test_archive_company_no_reason(self):
         """Test company archive."""
         company = CompanyFactory()
