@@ -11,6 +11,7 @@ from django.dispatch import receiver
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 
+from datahub.company.validators import RelaxedURLValidator
 from datahub.core import constants
 from datahub.core.mixins import DeferredSaveModelMixin
 from datahub.core.models import BaseModel
@@ -77,7 +78,7 @@ class Company(CompanyAbstract, BaseModel):
     )
     lead = models.BooleanField(default=False)
     description = models.TextField(blank=True, null=True)
-    website = models.URLField(blank=True, null=True)
+    website = models.CharField(max_length=MAX_LENGTH, validators=[RelaxedURLValidator], blank=True, null=True)
     uk_region = models.ForeignKey(metadata_models.UKRegion, null=True)
     trading_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
