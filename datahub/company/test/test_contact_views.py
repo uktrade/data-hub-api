@@ -8,6 +8,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from datahub.company.models import Contact
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
 from datahub.es.utils import document_exists, get_elasticsearch_client
@@ -45,10 +46,11 @@ class ContactTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         # make sure we're spawning a task to save to Korben
+        expected_data = Contact.objects.get(pk=response.data['id']).convert_model_to_korben_format()
         mocked_save_to_korben.delay.assert_called_once_with(
             db_table='company_contact',
-            object_id=uuid.UUID(response.data['id']),
-            update=False,  # this is not an update!
+            data=expected_data,
+            update=False,
             user_id=self.user.id
         )
         # make sure we're writing to ES
@@ -128,10 +130,11 @@ class ContactTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         # make sure we're spawning a task to save to Korben
+        expected_data = Contact.objects.get(pk=response.data['id']).convert_model_to_korben_format()
         mocked_save_to_korben.delay.assert_called_once_with(
             db_table='company_contact',
-            object_id=uuid.UUID(response.data['id']),
-            update=False,  # this is not an update!
+            data=expected_data,
+            update=False,
             user_id=self.user.id
         )
         # make sure we're writing to ES
@@ -155,9 +158,12 @@ class ContactTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_200_OK, response.data
         assert response.data['first_name'] == 'bar'
         # make sure we're spawning a task to save to Korben
+        expected_data = contact.convert_model_to_korben_format()
+        expected_data['first_name'] = 'bar'
+        expected_data['id'] = uuid.UUID(expected_data['id'])
         mocked_save_to_korben.delay.assert_called_once_with(
             db_table='company_contact',
-            object_id=uuid.UUID(response.data['id']),
+            data=expected_data,
             update=True,  # this is an update!
             user_id=self.user.id
         )

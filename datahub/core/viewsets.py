@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from raven.contrib.django.raven_compat.models import client
 from rest_framework import mixins
 from rest_framework.decorators import detail_route
@@ -45,18 +46,28 @@ class CoreViewSet(mixins.CreateModelMixin,
         elif self.action in ('create', 'update', 'partial_update'):
             return self.write_serializer_class
 
+    def _save_to_korben(self, object_id, user_id, update):
+        """Spawn the task to save to Korben."""
+        model_class = self.get_serializer_class().Meta.model
+        obj = model_class.objects.get(pk=object_id)
+        tasks.save_to_korben.delay(
+            data=obj.convert_model_to_korben_format(),
+            user_id=user_id,
+            db_table=model_class._meta.db_table,
+            update=update
+        )
+
     def create(self, request, *args, **kwargs):
         """Override create to catch the validation errors coming from the models.
 
         These are not real Exceptions, rather user errors.
         """
         try:
-            response = super().create(request, *args, **kwargs)
-            object = self.queryset[0]
-            tasks.save_to_korben.delay(
-                object_id=object.id,
+            with transaction.atomic():
+                response = super().create(request, *args, **kwargs)
+            self._save_to_korben(
+                object_id=response.data['id'],
                 user_id=request.user.id,
-                db_table=type(object)._meta.db_table,
                 update=False
             )
             return response
@@ -71,12 +82,11 @@ class CoreViewSet(mixins.CreateModelMixin,
         These are not real Exceptions, rather user errors.
         """
         try:
-            response = super().update(request, *args, **kwargs)
-            object = self.queryset[0]
-            tasks.save_to_korben.delay(
-                object_id=object.id,
+            with transaction.atomic():
+                response = super().update(request, *args, **kwargs)
+            self._save_to_korben(
+                object_id=response.data['id'],
                 user_id=request.user.id,
-                db_table=type(object)._meta.db_table,
                 update=True
             )
             return response
