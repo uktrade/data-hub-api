@@ -22,7 +22,8 @@ def save_to_korben(self, data, user_id, db_table, update):
         task_id=task_id,
         defaults=dict(
             user_id=user_id,
-            name=name
+            name=name,
+            changes=data
         )
     )
     korben_connector = KorbenConnector()
