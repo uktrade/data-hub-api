@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.timezone import now
 
@@ -74,6 +75,7 @@ class TaskInfo(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)
     note = models.CharField(max_length=255, null=True)
+    changes = JSONField()
 
     @property
     def async_result(self):
@@ -86,5 +88,5 @@ class TaskInfo(models.Model):
         return self.async_result.status
 
     def __str__(self):
-        """Humand readable name."""
+        """Human readable name."""
         return self.name

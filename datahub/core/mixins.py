@@ -24,20 +24,6 @@ class DeferredSaveModelMixin:
             self.clean()
         super().save(**kwargs)
 
-    def save_to_korben(self, update):
-        """
-        Save to Korben first, then alter the model instance with the data received back from Korben.
-
-        We force feed an ID to Django, so we cannot differentiate between update or create without querying the db
-        https://docs.djangoproject.com/en/1.10/ref/models/instances/#how-django-knows-to-update-vs-insert
-        """
-        korben_data = self.convert_model_to_korben_format()
-        return self.korben_connector.post(
-            table_name=self._get_table_name_from_model(),
-            data=korben_data,
-            update=update
-        )
-
     def get_excluded_fields(self):
         """Override this method to define which fields should not be send to Korben."""
         return []

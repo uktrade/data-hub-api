@@ -1,9 +1,6 @@
 import uuid
 
 from celery import shared_task
-from dateutil import parser
-from django.apps import apps
-from django.utils.timezone import make_naive
 from raven.contrib.django.raven_compat.models import client, settings
 from requests import RequestException
 
@@ -12,13 +9,10 @@ from datahub.korben.exceptions import KorbenException
 
 
 @shared_task(bind=True)
-def save_to_korben(self, object_id, user_id, db_table, update):
+def save_to_korben(self, data, user_id, db_table, update):
     """Save to Korben."""
     from datahub.core.models import TaskInfo
-    model_name = db_table.replace('_', '.')
-    model_class = apps.get_model(model_name)
-    object_to_save = model_class.objects.get(pk=object_id)
-    name = 'Saving {0} to CDMS.'.format(str(object_to_save))
+    name = 'Saving to CDMS.'
     # We are generating a random task id if the task has not one
     # this should only happen when this function is called directly instead of going through a queue
     # it's BAD but we only call this function directly in the tests
@@ -28,19 +22,17 @@ def save_to_korben(self, object_id, user_id, db_table, update):
         task_id=task_id,
         defaults=dict(
             user_id=user_id,
-            name=name
+            name=name,
+            changes=data
         )
     )
-    # korben_connector = KorbenConnector()
-    # data = object_to_save.convert_model_to_korben_format()
-    # remote_object = korben_connector.get(
-    #     data=data,
-    #     table_name=db_table
-    # )
-    # cdms_time = parser.parse(remote_object.json()['modified_on'])
-    # if make_naive(cdms_time) <= object_to_save.modified_on:
+    korben_connector = KorbenConnector()
     try:
-        object_to_save.save_to_korben(update)
+        korben_connector.post(
+            table_name=db_table,
+            data=data,
+            update=update
+        )
     except (KorbenException, RequestException) as e:
         client.captureException()
         raise self.retry(
@@ -48,6 +40,3 @@ def save_to_korben(self, object_id, user_id, db_table, update):
             countdown=settings.TASK_RETRY_DELAY_SECONDS,
             max_retries=settings.TASK_MAX_RETRIES,
         )
-    # else:
-    #     itask_info.note = 'Stale object, not saved.'
-    #     task_info.save()
