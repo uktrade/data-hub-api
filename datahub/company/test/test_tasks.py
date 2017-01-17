@@ -20,7 +20,7 @@ def test_save_to_korben_task_happy_path(mocked_korben_connector):
     user = get_test_user()
 
     save_to_korben(
-        data={},
+        data={'foo': 'bar'},
         user_id=str(user.id),
         db_table='company_company',
         update=True
@@ -42,7 +42,7 @@ def test_save_to_korben_retry_exception(mocked_sentry_client, mocked_korben_conn
 
     with pytest.raises(Retry):
         save_to_korben(
-            data={},
+            data={'foo': 'bar'},
             user_id=str(user.id),
             db_table='company_company',
             update=True
