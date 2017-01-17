@@ -24,6 +24,7 @@ DEBUG = env.bool('DEBUG')
 # PaaS, we can open ALLOWED_HOSTS
 ALLOWED_HOSTS = ['*']
 
+TIME_ZONE = 'Etc/UTC'
 
 # Application definition
 

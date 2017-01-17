@@ -77,10 +77,13 @@ class TaskInfo(models.Model):
     note = models.CharField(max_length=255, null=True)
     changes = JSONField()
 
+    class Meta:  # noqa: D101
+        verbose_name_plural = 'Task info'
+
     @property
     def async_result(self):
         """Return the result of the task."""
-        return tasks.save_to_korben.AsyncResult(self.task_id)
+        return tasks.save_to_korben.AsyncResult(self.task_id.bytes)
 
     @property
     def status(self):
