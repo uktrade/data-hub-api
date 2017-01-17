@@ -2,10 +2,8 @@ import uuid
 
 from celery import shared_task
 from raven.contrib.django.raven_compat.models import client, settings
-from requests import RequestException
 
 from datahub.korben.connector import KorbenConnector
-from datahub.korben.exceptions import KorbenException
 
 
 @shared_task(bind=True)
@@ -33,7 +31,8 @@ def save_to_korben(self, data, user_id, db_table, update):
             data=data,
             update=update
         )
-    except (KorbenException, RequestException) as e:
+    # We want to retry on any exception because we don't want to lose user changes!!
+    except Exception as e:
         client.captureException()
         raise self.retry(
             exc=e,
