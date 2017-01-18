@@ -37,8 +37,6 @@ def save_to_korben(self, data, user_id, db_table, update):
         client.captureException()
         raise self.retry(
             exc=e,
-            countdown=int(
-                random.uniform(2, settings.TASK_RETRY_DELAY_SECONDS) ** self.request.retries
-            ),
+            countdown=int(self.request.retries * self.request.retries),
             max_retries=settings.TASK_MAX_RETRIES,
         )
