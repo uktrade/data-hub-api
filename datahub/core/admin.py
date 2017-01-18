@@ -16,7 +16,7 @@ class TaskInfoAdmin(admin.ModelAdmin):
 
     readonly_fields = ('changes_prettified', 'status')
     exclude = ('changes',)
-    list_display = ('name', 'user', 'created_on', 'status')
+    list_display = ('task_id', 'name', 'user', 'created_on', 'status')
     actions = ['respawn_task']
 
     def changes_prettified(self, instance):
