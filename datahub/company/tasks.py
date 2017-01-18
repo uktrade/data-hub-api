@@ -1,5 +1,5 @@
-import uuid
 import random
+import uuid
 
 from celery import shared_task
 from raven.contrib.django.raven_compat.models import client, settings
