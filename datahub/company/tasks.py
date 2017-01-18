@@ -21,7 +21,9 @@ def save_to_korben(self, data, user_id, db_table, update):
         defaults=dict(
             user_id=user_id,
             name=name,
-            changes=data
+            changes=data,
+            db_table=db_table,
+            update=update
         )
     )
     korben_connector = KorbenConnector()

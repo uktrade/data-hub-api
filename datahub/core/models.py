@@ -75,6 +75,8 @@ class TaskInfo(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)
     note = models.CharField(max_length=255, null=True)
+    db_table = models.CharField(max_length=100)
+    update = models.BooleanField()
     changes = JSONField()
 
     class Meta:  # noqa: D101
