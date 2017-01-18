@@ -1,4 +1,3 @@
-import random
 import uuid
 
 from celery import shared_task
