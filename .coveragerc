@@ -8,6 +8,7 @@ omit =
     *__init__.py
     *models.py
     *core/auth.py
+    *admin.py
 
 [report]
 exclude_lines =

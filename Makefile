@@ -1,7 +1,7 @@
 .PHONY: test-leeloo
 
 tests:
-	docker-compose run leeloo pytest -s
+	docker-compose run leeloo bash tests.sh
 
 flake8:
 	docker-compose run leeloo flake8

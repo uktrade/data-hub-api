@@ -51,6 +51,24 @@ services:
       - postgres
       - es
       - redis
+      - leeloo-flower
+    links:
+      - korben
+      - postgres
+      - es
+      - redis
+
+  leeloo-flower:
+    extends:
+      service: leeloo-common
+    ports:
+      - "5555:5555"
+    command: flower -A config --address=0.0.0.0 —port=5555
+    depends_on:
+      - korben
+      - postgres
+      - es
+      - redis
     links:
       - korben
       - postgres
