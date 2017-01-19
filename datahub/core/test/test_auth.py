@@ -20,6 +20,7 @@ pytestmark = pytest.mark.django_db
 3) User exists in CDMS and it's whitelisted, correct credentials case, CDMS Connection fails
 4) User exists in CDMS but it's not whitelisted
 5) User doesn't exist in CDMS, but it does in Django
+6) User exists in CDMS but password has changed
 
 All the users have the flag is_active=True, CDMS users also have the password set to unusable.
 """
@@ -175,6 +176,36 @@ def test_valid_cdms_credentials_and_cdms_communication_fails(korben_auth_mock, s
     )
     assert response.status_code == status.HTTP_200_OK
     assert '"token_type": "Bearer"' in response.text
+
+
+@pytest.mark.liveserver
+@mock.patch('datahub.core.auth.CDMSUserBackend.korben_authenticate')
+def test_password_changed_in_cdms(korben_auth_mock, settings, live_server):
+    """Test passwd changed in CDMS results in failed auth."""
+    settings.DIT_ENABLED_ADVISORS = ('cdms@user.com',)
+    korben_auth_mock.return_value = False
+
+    # Assume user logged in previously
+    cdms_user = get_cdms_user()
+    cdms_user.set_password('test')
+    cdms_user.is_active = True
+    cdms_user.save()
+
+    application, _ = Application.objects.get_or_create(
+        user=cdms_user,
+        client_type=Application.CLIENT_CONFIDENTIAL,
+        authorization_grant_type=Application.GRANT_PASSWORD,
+        name='Test auth client'
+    )
+    url = live_server + reverse('token')
+    auth = requests.auth.HTTPBasicAuth(application.client_id, application.client_secret)
+    response = requests.post(
+        url,
+        data={'grant_type': 'password', 'username': cdms_user.email, 'password': 'test'},
+        auth=auth
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert 'Invalid credentials given' in response.text
 
 
 @pytest.mark.liveserver
