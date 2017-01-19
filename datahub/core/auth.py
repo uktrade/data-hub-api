@@ -25,8 +25,14 @@ class CDMSUserBackend:
             # difference between an existing and a non-existing user (#20760).
             user_model().set_password(password)
         else:
-            if self.user_can_authenticate(user) and self.korben_authenticate(username=username, password=password):
-                return user  # user authenticated via Korben
+            korben_auth_result = self.korben_authenticate(username, password)
+            if korben_auth_result is None:
+                return None  # fallback to next auth backend -> django
+
+            if self.user_can_authenticate(user) and korben_auth_result:
+                # user authenticated via Korben, cache passwd hash for backup auth
+                user.set_password(password)
+                return user
 
     @staticmethod
     def user_can_authenticate(user):

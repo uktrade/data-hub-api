@@ -101,10 +101,10 @@ class KorbenConnector:
             if response.ok:
                 return response.json()  # Returns JSON encoded boolean
             else:
-                return False
+                return None
         except (requests.RequestException, ValueError):
             client.captureException()
-            return False
+            return None
 
     def ping(self):
         """Perform the Korben ping."""
