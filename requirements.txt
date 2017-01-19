@@ -9,7 +9,7 @@ django-reversion==2.0.6
 django-oauth-toolkit==0.11.0
 whitenoise==3.2.3
 pyyaml==3.12
-python-dateutil==2.5.3
+python-dateutil==2.6.0
 
 # Persistency layer
 psycopg2==2.6.2
@@ -49,5 +49,5 @@ pep8-naming==0.4.1
 gunicorn==19.6.0
 raven==5.32.0
 MarkupSafe==0.23
-python-dateutil==2.5.3
+python-dateutil==2.6.0
 requests==2.11.1
