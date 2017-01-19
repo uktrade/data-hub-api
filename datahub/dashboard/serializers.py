@@ -8,3 +8,6 @@ class IntelligentHomepageSerializer(serializers.Serializer):
 
     interactions = NestedInteractionSerializer(many=True)
     contacts = NestedContactSerializer(many=True)
+
+    class Meta:  # noqa: D101
+        fields = '__all__'
