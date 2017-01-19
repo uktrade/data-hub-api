@@ -46,11 +46,11 @@ def test_validate_credentials(mocked_requests):
 def test_validate_credential_request_exception(mocked_post):
     """Ping Korben exception."""
     connector = KorbenConnector()
-    assert connector.validate_credentials('foo', 'bar') is False
+    assert connector.validate_credentials('foo', 'bar') is None
 
 
 @mock.patch('datahub.korben.connector.requests.post', side_effect=ValueError)
 def test_validate_credential_valueerror_exception(mocked_post):
     """Ping Korben exception."""
     connector = KorbenConnector()
-    assert connector.validate_credentials('foo', 'bar') is False
+    assert connector.validate_credentials('foo', 'bar') is None

@@ -89,7 +89,7 @@ class KorbenConnector:
 
         :param username: str
         :param password: str
-        :return: boolean success or fail
+        :return: boolean success or fail, None if CDMS/Korben communication fails
         """
         url = '{base_url}/auth/validate-credentials/'.format(
             base_url=self.base_url,
@@ -101,10 +101,10 @@ class KorbenConnector:
             if response.ok:
                 return response.json()  # Returns JSON encoded boolean
             else:
-                return False
+                return None
         except (requests.RequestException, ValueError):
             client.captureException()
-            return False
+            return None
 
     def ping(self):
         """Perform the Korben ping."""
