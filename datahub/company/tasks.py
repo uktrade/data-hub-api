@@ -11,10 +11,7 @@ from datahub.korben.connector import KorbenConnector
 def handle_time(timestamp):
     """Return a naive datime object adjusted on the timezone."""
     time = parser.parse(timestamp)
-    if is_aware(time):
-        return make_naive(time, timezone=time.tzinfo)
-    else:
-        return time
+    return make_naive(time, timezone=time.tzinfo) if is_aware(time) else time
 
 
 @shared_task(bind=True)
