@@ -10,6 +10,9 @@ class ConstantModelSerializer(serializers.Serializer):
     name = serializers.ReadOnlyField()
     selectable = serializers.BooleanField()
 
+    class Meta:  # noqa: D101
+        fields = '__all__'
+
 
 class TaskInfoModelSerializer(serializers.ModelSerializer):
     """Task info model serializer."""
@@ -19,3 +22,4 @@ class TaskInfoModelSerializer(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = TaskInfo
         depth = 1
+        fields = '__all__'
