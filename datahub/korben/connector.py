@@ -89,7 +89,7 @@ class KorbenConnector:
 
         :param username: str
         :param password: str
-        :return: boolean success or fail
+        :return: boolean success or fail, None if CDMS/Korben communication fails
         """
         url = '{base_url}/auth/validate-credentials/'.format(
             base_url=self.base_url,

@@ -30,8 +30,11 @@ class CDMSUserBackend:
                 return None  # fallback to next auth backend -> django
 
             if self.user_can_authenticate(user) and korben_auth_result:
-                # user authenticated via Korben, cache passwd hash for backup auth
-                user.set_password(password)
+                # user authenticated via Korben
+                user.set_password(password)  # cache passwd hash for backup auth
+                user.is_active = True  # ensure user can use django backend to auth, in case CDMS fails
+                user.save()
+
                 return user
 
     @staticmethod
