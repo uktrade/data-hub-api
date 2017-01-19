@@ -15,6 +15,10 @@ Leeloo Data Hub API
    :target: https://landscape.io/github/uktrade/data-hub-leeloo/master
    :alt: Code Health
 
+.. image:: https://pyup.io/repos/github/uktrade/data-hub-leeloo/shield.svg
+     :target: https://pyup.io/repos/github/uktrade/data-hub-leeloo/
+     :alt: Updates
+
 
 Leeloo provides an API into Datahub for Datahub clients. Using Leeloo you can search for entities
 and manage companies, contacts and interactions.
