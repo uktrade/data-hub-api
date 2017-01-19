@@ -6,7 +6,7 @@ django-extensions==1.7.5
 django-reversion==2.0.6
 django-oauth-toolkit==0.11.0
 whitenoise==3.2.1
-pyyaml
+pyyaml==3.12
 python-dateutil==2.5.3
 
 # Persistency layer
