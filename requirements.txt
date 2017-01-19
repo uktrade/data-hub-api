@@ -1,6 +1,6 @@
 # Django and django related
 Django==1.10.1
-djangorestframework==3.4.6
+djangorestframework==3.5.3
 django-environ==0.4.0
 django-extensions==1.7.4
 django-reversion==2.0.6
