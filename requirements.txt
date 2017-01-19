@@ -47,7 +47,7 @@ flake8-string-format==0.2.3
 pep8-naming==0.4.1
 
 gunicorn==19.6.0
-raven==5.31.0
+raven==5.32.0
 MarkupSafe==0.23
 python-dateutil==2.5.3
 requests==2.11.1
