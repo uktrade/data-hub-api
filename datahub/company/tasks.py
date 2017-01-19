@@ -1,9 +1,20 @@
 import uuid
 
 from celery import shared_task
+from dateutil import parser
+from django.utils.timezone import make_naive, is_aware
 from raven.contrib.django.raven_compat.models import client, settings
 
 from datahub.korben.connector import KorbenConnector
+
+
+def handle_time(timestamp):
+    """Return a naive datime object adjusted on the timezone."""
+    time = parser.parse(timestamp)
+    if is_aware(time):
+        return make_naive(time, timezone=time.tzinfo)
+    else:
+        return time
 
 
 @shared_task(bind=True)
@@ -27,17 +38,27 @@ def save_to_korben(self, data, user_id, db_table, update):
         )
     )
     korben_connector = KorbenConnector()
-    try:
-        korben_connector.post(
-            table_name=db_table,
-            data=data,
-            update=update
-        )
-    # We want to retry on any exception because we don't want to lose user changes!!
-    except Exception as e:
-        client.captureException()
-        raise self.retry(
-            exc=e,
-            countdown=int(self.request.retries * self.request.retries),
-            max_retries=settings.TASK_MAX_RETRIES,
-        )
+    remote_object = korben_connector.get(
+        data=data,
+        table_name=db_table
+    )
+    cdms_time = handle_time(remote_object.json()['modified_on'])
+    object_time = handle_time(data['modified_on'])
+    if cdms_time <= object_time:
+        try:
+            korben_connector.post(
+                table_name=db_table,
+                data=data,
+                update=update
+            )
+        # We want to retry on any exception because we don't want to lose user changes!!
+        except Exception as e:
+            client.captureException()
+            raise self.retry(
+                exc=e,
+                countdown=int(self.request.retries * self.request.retries),
+                max_retries=settings.TASK_MAX_RETRIES,
+            )
+    else:
+        task_info.note = 'Stale object, not saved.'
+        task_info.save()
