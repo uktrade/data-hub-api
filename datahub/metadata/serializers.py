@@ -8,6 +8,7 @@ class NestedCountrySerializer(serializers.ModelSerializer):
 
     class Meta:  # noqa: D101
         model = Country
+        fields = '__all__'
 
 
 class NestedTeamSerializer(serializers.ModelSerializer):
@@ -15,3 +16,4 @@ class NestedTeamSerializer(serializers.ModelSerializer):
 
     class Meta:  # noqa: D101
         model = Team
+        fields = '__all__'
