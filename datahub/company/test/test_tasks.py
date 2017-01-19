@@ -15,19 +15,17 @@ from datahub.korben.exceptions import KorbenException
 pytestmark = pytest.mark.django_db
 
 
-@mock.patch('datahub.core.mixins.DeferredSaveModelMixin.save_to_korben')
 @mock.patch('datahub.company.tasks.KorbenConnector')
-def test_save_to_korben_task_stale_object(mocked_korben_connector, mocked_save_to_korben):
+def test_save_to_korben_task_stale_object(mocked_korben_connector):
     """Save to Korben task works."""
     date_in_the_future = datetime.datetime.now() + datetime.timedelta(1)
     mocked_korben_connector().get.return_value.json.return_value = {
         'modified_on': date_in_the_future.isoformat()
     }
-    company = CompanyFactory()
     user = get_test_user()
 
     save_to_korben(
-        object_id=str(company.id),
+        data={'foo': 'bar'},
         user_id=str(user.id),
         db_table='company_company',
         update=True
@@ -36,7 +34,7 @@ def test_save_to_korben_task_stale_object(mocked_korben_connector, mocked_save_t
     task_info = TaskInfo.objects.get(user=user)
     assert task_info.note == 'Stale object, not saved.'
     # check save_to_korben called
-    assert mocked_save_to_korben.called is False
+    assert mocked_korben_connector().post.called is False
 
 
 @mock.patch('datahub.company.tasks.KorbenConnector')
