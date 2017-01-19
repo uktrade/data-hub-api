@@ -3,9 +3,9 @@ from unittest import mock
 import datetime
 import pytest
 from celery.exceptions import Retry
+from django.utils.timezone import now
 
 from datahub.company.tasks import save_to_korben
-from datahub.company.test.factories import CompanyFactory
 from datahub.core.models import TaskInfo
 from datahub.core.test_utils import get_test_user
 
@@ -25,7 +25,7 @@ def test_save_to_korben_task_stale_object(mocked_korben_connector):
     user = get_test_user()
 
     save_to_korben(
-        data={'foo': 'bar'},
+        data={'modified_on': now().isoformat()},
         user_id=str(user.id),
         db_table='company_company',
         update=True
