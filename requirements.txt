@@ -1,5 +1,6 @@
+pip==9.0.1
 # Django and django related
-Django==1.10.1
+Django==1.10.5
 djangorestframework==3.5.3
 django-environ==0.4.0
 django-extensions==1.7.4
@@ -23,10 +24,10 @@ elasticsearch-dsl==2.1.0
 
 # Testing
 pytest-django==3.0.0
-pytest-sugar==0.7.1
+pytest-sugar==0.8.0
 pytest-cov==2.4.0
 ipython
-ipdb
+ipdb==0.10.1
 Werkzeug
 factory-boy==2.8.1
 django-debug-toolbar==1.6

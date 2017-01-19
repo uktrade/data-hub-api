@@ -10,6 +10,7 @@ class NestedContactSerializer(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = Contact
         depth = 1
+        fields = '__all__'
 
 
 class NestedInteractionSerializer(serializers.ModelSerializer):
@@ -17,6 +18,7 @@ class NestedInteractionSerializer(serializers.ModelSerializer):
 
     class Meta:  # noqa: D101
         model = Interaction
+        fields = '__all__'
 
 
 class CompaniesHouseCompanySerializer(serializers.ModelSerializer):
@@ -25,6 +27,7 @@ class CompaniesHouseCompanySerializer(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = CompaniesHouseCompany
         depth = 1
+        fields = '__all__'
 
 
 class AdvisorSerializer(serializers.ModelSerializer):
@@ -62,6 +65,7 @@ class CompanySerializerRead(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = Company
         depth = 1
+        fields = '__all__'
 
     @staticmethod
     def _address_partial(obj, attr):
@@ -117,6 +121,7 @@ class CompanySerializerWrite(serializers.ModelSerializer):
 
     class Meta:  # noqa: D101
         model = Company
+        fields = '__all__'
 
 
 class ContactSerializerWrite(serializers.ModelSerializer):
@@ -145,6 +150,7 @@ class ContactSerializerRead(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = Contact
         depth = 2
+        fields = '__all__'
 
     @staticmethod
     def get_address_1(obj):
@@ -204,6 +210,7 @@ class InteractionSerializerRead(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = Interaction
         depth = 2
+        fields = '__all__'
 
 
 class InteractionSerializerWrite(serializers.ModelSerializer):
@@ -211,3 +218,4 @@ class InteractionSerializerWrite(serializers.ModelSerializer):
 
     class Meta:  # noqa: D101
         model = Interaction
+        fields = '__all__'
