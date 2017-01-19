@@ -50,4 +50,4 @@ gunicorn==19.6.0
 raven==5.32.0
 MarkupSafe==0.23
 python-dateutil==2.5.3
-requests==2.11.1
+requests==2.12.5
