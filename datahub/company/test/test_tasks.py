@@ -1,7 +1,6 @@
-# import datetime
 from unittest import mock
-import pytest
 
+import pytest
 from celery.exceptions import Retry
 
 from datahub.company.tasks import save_to_korben

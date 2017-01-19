@@ -2,7 +2,7 @@ import uuid
 
 from celery import shared_task
 from dateutil import parser
-from django.utils.timezone import make_naive, is_aware
+from django.utils.timezone import is_aware, make_naive
 from raven.contrib.django.raven_compat.models import client, settings
 
 from datahub.korben.connector import KorbenConnector

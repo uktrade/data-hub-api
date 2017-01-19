@@ -7,7 +7,7 @@ def generate_enum_code_from_queryset(model_queryset):
     Paste the generated text into the constants file.
     """
     for q in model_queryset:
-        print("{} = Constant('{}', '{}')".format(q.name.replace(' ', '_').lower(), q.name, q.id))
+        return "{} = Constant('{}', '{}')".format(q.name.replace(' ', '_').lower(), q.name, q.id)
 
 
 def _handle_fk(field_name, field_value, expand_foreign_keys):
