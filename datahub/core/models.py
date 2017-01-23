@@ -70,7 +70,6 @@ class TaskInfo(models.Model):
     """Holds information about the tasks."""
 
     task_id = models.UUIDField()
-    name = models.CharField(max_length=255)
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)
@@ -85,13 +84,9 @@ class TaskInfo(models.Model):
     @property
     def async_result(self):
         """Return the result of the task."""
-        return tasks.save_to_korben.AsyncResult(self.task_id.bytes)
+        return tasks.save_to_korben.AsyncResult(str(self.task_id))
 
     @property
     def status(self):
         """Handy shortcut to get the task status."""
         return self.async_result.status
-
-    def __str__(self):
-        """Human readable name."""
-        return self.name

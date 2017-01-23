@@ -14,10 +14,18 @@ from .models import TaskInfo
 class TaskInfoAdmin(admin.ModelAdmin):
     """Admin for TaskInfo."""
 
-    readonly_fields = ('changes_prettified', 'status')
-    exclude = ('changes',)
-    list_display = ('task_id', 'name', 'user', 'created_on', 'status')
+    readonly_fields = ('changes_prettified', 'type', 'status', 'task_id', 'user', 'update')
+    exclude = ('changes', 'db_table')
+    list_display = ('task_id', 'user', 'type', 'created_on', 'status')
     actions = ['respawn_task']
+    list_filter = ['created_on', 'db_table']
+    search_fields = ['user', 'task_id']
+
+    def type(self, instance):
+        """Human readable save type from db_table."""
+        type = instance.db_table.split('_')[0] if '_' in instance.db_table else instance.db_table
+        return mark_safe(type)
+    type.short_description = 'type'
 
     def changes_prettified(self, instance):
         """Show JSON changes in a human readable way.

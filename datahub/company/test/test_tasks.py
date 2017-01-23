@@ -1,8 +1,9 @@
-# import datetime
+import datetime
 from unittest import mock
-import pytest
 
+import pytest
 from celery.exceptions import Retry
+from django.utils.timezone import now
 
 from datahub.company.tasks import save_to_korben
 from datahub.core.models import TaskInfo
@@ -15,12 +16,38 @@ pytestmark = pytest.mark.django_db
 
 
 @mock.patch('datahub.company.tasks.KorbenConnector')
-def test_save_to_korben_task_happy_path(mocked_korben_connector):
+def test_save_to_korben_task_stale_object(mocked_korben_connector):
     """Save to Korben task works."""
+    date_in_the_future = datetime.datetime.now() + datetime.timedelta(1)
+    mocked_korben_connector().get.return_value.json.return_value = {
+        'modified_on': date_in_the_future.isoformat()
+    }
     user = get_test_user()
 
     save_to_korben(
-        data={'foo': 'bar'},
+        data={'modified_on': now().isoformat()},
+        user_id=str(user.id),
+        db_table='company_company',
+        update=True
+    )
+
+    task_info = TaskInfo.objects.get(user=user)
+    assert task_info.note == 'Stale object, not saved.'
+    # check save_to_korben called
+    assert mocked_korben_connector().post.called is False
+
+
+@mock.patch('datahub.company.tasks.KorbenConnector')
+def test_save_to_korben_task_happy_path(mocked_korben_connector):
+    """Save to Korben task works."""
+    date_in_the_past = datetime.datetime.now() + datetime.timedelta(-1)
+    mocked_korben_connector().get.return_value.json.return_value = {
+        'modified_on': date_in_the_past.isoformat()
+    }
+    user = get_test_user()
+
+    save_to_korben(
+        data={'foo': 'bar', 'modified_on': now().isoformat()},
         user_id=str(user.id),
         db_table='company_company',
         update=True
@@ -38,11 +65,15 @@ def test_save_to_korben_task_happy_path(mocked_korben_connector):
 def test_save_to_korben_retry_exception(mocked_sentry_client, mocked_korben_connector):
     """Save to Korben task works."""
     mocked_korben_connector().post.side_effect = KorbenException()
+    date_in_the_past = datetime.datetime.now() + datetime.timedelta(-1)
+    mocked_korben_connector().get.return_value.json.return_value = {
+        'modified_on': date_in_the_past.isoformat()
+    }
     user = get_test_user()
 
     with pytest.raises(Retry):
         save_to_korben(
-            data={'foo': 'bar'},
+            data={'foo': 'bar', 'modified_on': now().isoformat()},
             user_id=str(user.id),
             db_table='company_company',
             update=True
