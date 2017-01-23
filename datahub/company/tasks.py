@@ -18,7 +18,6 @@ def handle_time(timestamp):
 def save_to_korben(self, data, user_id, db_table, update):
     """Save to Korben."""
     from datahub.core.models import TaskInfo
-    name = 'Saving to CDMS.'
     # We are generating a random task id if the task has not one
     # this should only happen when this function is called directly instead of going through a queue
     # it's BAD but we only call this function directly in the tests
@@ -28,7 +27,6 @@ def save_to_korben(self, data, user_id, db_table, update):
         task_id=task_id,
         defaults=dict(
             user_id=user_id,
-            name=name,
             changes=data,
             db_table=db_table,
             update=update

@@ -70,7 +70,6 @@ class TaskInfo(models.Model):
     """Holds information about the tasks."""
 
     task_id = models.UUIDField()
-    name = models.CharField(max_length=255)
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)

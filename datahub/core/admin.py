@@ -16,9 +16,10 @@ class TaskInfoAdmin(admin.ModelAdmin):
 
     readonly_fields = ('changes_prettified', 'status')
     exclude = ('changes',)
-    list_display = ('task_id', 'name', 'user', 'created_on', 'status')
+    list_display = ('task_id', 'user', 'db_table', 'created_on', 'status')
     actions = ['respawn_task']
-    list_filter = ['created_on']
+    list_filter = ['created_on', 'db_table']
+    search_fields = ['user', 'task_id']
 
     def changes_prettified(self, instance):
         """Show JSON changes in a human readable way.
