@@ -10,6 +10,8 @@ from datahub.korben.connector import KorbenConnector
 
 def handle_time(timestamp):
     """Return a naive datime object adjusted on the timezone."""
+    if timestamp is None:
+        return timestamp
     time = parser.parse(timestamp)
     return make_naive(time, timezone=time.tzinfo) if is_aware(time) else time
 
@@ -32,28 +34,28 @@ def save_to_korben(self, data, user_id, db_table, update):
             update=update
         )
     )
-    korben_connector = KorbenConnector()
-    remote_object = korben_connector.get(
-        data=data,
-        table_name=db_table
-    )
-    cdms_time = handle_time(remote_object.json()['modified_on'])
-    object_time = handle_time(data['modified_on'])
-    if cdms_time <= object_time:
-        try:
+    try:
+        korben_connector = KorbenConnector()
+        remote_object = korben_connector.get(
+            data=data,
+            table_name=db_table
+        )
+        cdms_time = handle_time(remote_object.json().get('modified_on'))
+        object_time = handle_time(data['modified_on'])
+        if cdms_time is None or (cdms_time <= object_time):
             korben_connector.post(
                 table_name=db_table,
                 data=data,
                 update=update
             )
         # We want to retry on any exception because we don't want to lose user changes!!
-        except Exception as e:
-            client.captureException()
-            raise self.retry(
-                exc=e,
-                countdown=int(self.request.retries * self.request.retries),
-                max_retries=settings.TASK_MAX_RETRIES,
-            )
-    else:
-        task_info.note = 'Stale object, not saved.'
-        task_info.save()
+        else:
+            task_info.note = 'Stale object, not saved.'
+            task_info.save()
+    except Exception as e:
+        client.captureException()
+        raise self.retry(
+            exc=e,
+            countdown=int(self.request.retries * self.request.retries),
+            max_retries=settings.TASK_MAX_RETRIES,
+        )
