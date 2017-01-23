@@ -1,6 +1,6 @@
+import datetime
 from unittest import mock
 
-import datetime
 import pytest
 from celery.exceptions import Retry
 from django.utils.timezone import now
