@@ -85,7 +85,7 @@ class TaskInfo(models.Model):
     @property
     def async_result(self):
         """Return the result of the task."""
-        return tasks.save_to_korben.AsyncResult(self.task_id.bytes)
+        return tasks.save_to_korben.AsyncResult(str(self.task_id))
 
     @property
     def status(self):
