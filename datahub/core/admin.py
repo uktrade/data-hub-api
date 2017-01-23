@@ -14,7 +14,7 @@ from .models import TaskInfo
 class TaskInfoAdmin(admin.ModelAdmin):
     """Admin for TaskInfo."""
 
-    readonly_fields = ('changes_prettified', 'status')
+    readonly_fields = ('changes_prettified', 'status', 'task_id')
     exclude = ('changes', 'db_table')
     list_display = ('task_id', 'user', 'type', 'created_on', 'status')
     actions = ['respawn_task']

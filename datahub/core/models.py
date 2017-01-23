@@ -90,7 +90,3 @@ class TaskInfo(models.Model):
     def status(self):
         """Handy shortcut to get the task status."""
         return self.async_result.status
-
-    def __str__(self):
-        """Human readable name."""
-        return self.name
