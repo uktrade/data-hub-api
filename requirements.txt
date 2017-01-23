@@ -20,7 +20,7 @@ boto==2.45
 flower==0.9.1
 
 # ES
-elasticsearch==2.4.0
+elasticsearch==5.1.0
 elasticsearch-dsl==2.1.0
 
 # Testing
