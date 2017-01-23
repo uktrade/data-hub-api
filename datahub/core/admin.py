@@ -19,11 +19,11 @@ class TaskInfoAdmin(admin.ModelAdmin):
     list_display = ('task_id', 'user', 'type', 'created_on', 'status')
     actions = ['respawn_task']
     list_filter = ['created_on', 'db_table']
-    search_fields = ['user', 'task_id']
+    search_fields = ['user__first_name', 'user__last_name', 'user__email', 'task_id']
 
     def type(self, instance):
         """Human readable save type from db_table."""
-        type = instance.db_table.split('_')[0] if '_' in instance.db_table else instance.db_table
+        type = instance.db_table.split('_')[1] if '_' in instance.db_table else instance.db_table
         return mark_safe(type)
     type.short_description = 'type'
 

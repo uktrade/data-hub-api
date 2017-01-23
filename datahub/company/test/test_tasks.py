@@ -38,12 +38,31 @@ def test_save_to_korben_task_stale_object(mocked_korben_connector):
 
 
 @mock.patch('datahub.company.tasks.KorbenConnector')
-def test_save_to_korben_task_happy_path(mocked_korben_connector):
+def test_save_to_korben_update_happy_path(mocked_korben_connector):
     """Save to Korben task works."""
     date_in_the_past = datetime.datetime.now() + datetime.timedelta(-1)
     mocked_korben_connector().get.return_value.json.return_value = {
         'modified_on': date_in_the_past.isoformat()
     }
+    user = get_test_user()
+
+    save_to_korben(
+        data={'foo': 'bar', 'modified_on': now().isoformat()},
+        user_id=str(user.id),
+        db_table='company_company',
+        update=True
+    )
+
+    # check task info created
+    assert TaskInfo.objects.get(user=user)
+    # check save_to_korben called
+    assert mocked_korben_connector().post.called
+
+
+@mock.patch('datahub.company.tasks.KorbenConnector')
+def test_save_to_korben_create_happy_path(mocked_korben_connector):
+    """Save to Korben task works."""
+    mocked_korben_connector().get.return_value.json.return_value = {}
     user = get_test_user()
 
     save_to_korben(
