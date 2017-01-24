@@ -2,7 +2,7 @@ from korben.etl import transform
 from korben.cdms_api.rest.utils import datetime_to_cdms_datetime
 
 
-DJANGO_DATA = dict(
+DJANGO_CONTACT_DATA = dict(
     # Local fields
     id='uuid',
     last_name='LN',
@@ -35,7 +35,7 @@ DJANGO_DATA = dict(
 )
 
 
-ODATA_INPUT_DATA = dict(
+ODATA_CONTACT_INPUT_DATA = dict(
     ContactId='uuid',
     LastName='LN',
     optevia_PrimaryContact='primary contact',
@@ -67,7 +67,7 @@ ODATA_INPUT_DATA = dict(
 )
 
 
-ODATA_OUTPUT_DATA = ODATA_INPUT_DATA.copy()
+ODATA_OUTPUT_DATA = ODATA_CONTACT_INPUT_DATA.copy()
 
 # Entities returned from odata use different datetime format
 ODATA_OUTPUT_DATA['ModifiedOn'] = '/Date(1480080742000)/'
@@ -75,14 +75,14 @@ ODATA_OUTPUT_DATA['CreatedOn'] = '/Date(1480080742000)/'
 
 
 def test_django_to_odata():
-    _, result = transform.django_to_odata('company_contact', DJANGO_DATA)
-    assert result == ODATA_INPUT_DATA
+    _, result = transform.django_to_odata('company_contact', DJANGO_CONTACT_DATA)
+    assert result == ODATA_CONTACT_INPUT_DATA
 
 
 def test_odata_to_django():
     result = transform.odata_to_django('ContactSet', ODATA_OUTPUT_DATA)
 
-    django_data = DJANGO_DATA.copy()
+    django_data = DJANGO_CONTACT_DATA.copy()
     # Add fields that should be populated by defaults
     django_data.update(dict(
         address_same_as_company=False, archived=False, archived_reason='',
