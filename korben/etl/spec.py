@@ -42,6 +42,18 @@ for source_pkey, source_table, source_name, target_table in ENUM_MAPPINGS:
     })
 
 MAPPINGS.update({
+    'ServiceDeliverySet': {
+        'nonflat': (
+            ('optevia_Service', (('Id', 'service_id'),),),
+            ('optevia_ServiceDeliveryStatus', (('Id', 'service_delivery_status'),),),
+            ('OwningTeam', (('Id', 'owning_team_id'),),),
+            ('optevia_UKRegion', (('Id', 'uk_region'),),),
+            ('optevia_Sector', (('Id', 'sector'),),),
+            ('optevia_LeadCountry', (('Id', 'lead_country'),),),
+            ('optevia_ServiceOffer', (('Id', 'service_offer'),),),
+            ('optevia_ServiceProvider', (('Id', 'service_provider'),),),
+        ),
+    },
     'AccountSet': {
         'to': 'company_company',
         'local': (
