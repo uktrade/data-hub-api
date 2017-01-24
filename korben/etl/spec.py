@@ -43,6 +43,7 @@ for source_pkey, source_table, source_name, target_table in ENUM_MAPPINGS:
 
 MAPPINGS.update({
     'ServiceDeliverySet': {
+        'to': 'service_delivery',
         'nonflat': (
             ('optevia_Service', (('Id', 'service_id'),),),
             ('optevia_ServiceDeliveryStatus', (('Id', 'status_id'),),),
