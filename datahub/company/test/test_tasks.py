@@ -6,7 +6,6 @@ from celery.exceptions import Retry
 from django.utils.timezone import now
 
 from datahub.company.tasks import save_to_korben
-from datahub.core.models import TaskInfo
 from datahub.core.test_utils import get_test_user
 
 # mark the whole module for db use

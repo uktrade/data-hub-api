@@ -1,5 +1,3 @@
-import uuid
-
 from celery import shared_task
 from celery.signals import before_task_publish
 from dateutil import parser
@@ -20,7 +18,7 @@ def handle_time(timestamp):
 @shared_task(bind=True)
 def save_to_korben(self, data, user_id, db_table, update):
     """Save to Korben."""
-    _ = user_id  # user is needed for signal handling, before_task_publish signal expects it to be there
+    _ = user_id  # noqa: F841; user is needed for signal handling, before_task_publish signal expects it to be there
     try:
         korben_connector = KorbenConnector()
         remote_object = korben_connector.get(
@@ -46,6 +44,7 @@ def save_to_korben(self, data, user_id, db_table, update):
 
 @before_task_publish.connect(sender='datahub.company.tasks.save_to_korben')
 def create_task_info(sender=None, headers=None, body=None, **kwargs):
+    """Create TaskInfo meta object for rerun and audit trail."""
     from datahub.core.models import TaskInfo
 
     _, task_kwargs, _ = body
