@@ -45,13 +45,13 @@ MAPPINGS.update({
     'ServiceDeliverySet': {
         'nonflat': (
             ('optevia_Service', (('Id', 'service_id'),),),
-            ('optevia_ServiceDeliveryStatus', (('Id', 'service_delivery_status'),),),
+            ('optevia_ServiceDeliveryStatus', (('Id', 'status_id'),),),
             ('OwningTeam', (('Id', 'owning_team_id'),),),
-            ('optevia_UKRegion', (('Id', 'uk_region'),),),
-            ('optevia_Sector', (('Id', 'sector'),),),
-            ('optevia_LeadCountry', (('Id', 'lead_country'),),),
-            ('optevia_ServiceOffer', (('Id', 'service_offer'),),),
-            ('optevia_ServiceProvider', (('Id', 'service_provider'),),),
+            ('optevia_UKRegion', (('Id', 'uk_region_id'),),),
+            ('optevia_Sector', (('Id', 'sector_id'),),),
+            ('optevia_LeadCountry', (('Id', 'lead_country_id'),),),
+            ('optevia_ServiceOffer', (('Id', 'service_offer_id'),),),
+            ('optevia_ServiceProvider', (('Id', 'service_provider_id'),),),
         ),
     },
     'AccountSet': {
