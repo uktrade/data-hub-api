@@ -16,7 +16,7 @@ class TaskInfoAdmin(admin.ModelAdmin):
 
     readonly_fields = ('changes_prettified', 'type', 'status', 'task_id', 'user', 'update')
     exclude = ('changes', 'db_table')
-    list_display = ('task_id', 'user', 'type', 'created_on', 'status')
+    list_display = ('task_id', 'manual_rerun_task', 'user', 'type', 'created_on', 'status')
     actions = ['respawn_task']
     list_filter = ['created_on', 'db_table']
     search_fields = ['user__first_name', 'user__last_name', 'user__email', 'task_id']
@@ -42,10 +42,12 @@ class TaskInfoAdmin(admin.ModelAdmin):
     def respawn_task(self, request, queryset):
         """Respawn a task getting the information from TaskInfo."""
         for t in queryset:
-            tasks.save_to_korben.delay(
+            async_result = tasks.save_to_korben.delay(
                 data=t.changes,
                 user_id=t.user_id,
                 db_table=t.db_table,
                 update=t.update
             )
+            t.manual_rerun_task_id = str(async_result.task_id)
+            t.save()
     respawn_task.short_description = 'Re-spawn the task (DANGEROUS!)'

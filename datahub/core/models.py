@@ -69,14 +69,14 @@ class BaseConstantModel(models.Model):
 class TaskInfo(models.Model):
     """Holds information about the tasks."""
 
-    task_id = models.UUIDField()
+    task_id = models.UUIDField(primary_key=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)
-    note = models.CharField(max_length=255, null=True)
     db_table = models.CharField(max_length=100)
     update = models.BooleanField()
     changes = JSONField()
+    manual_rerun_task = models.ForeignKey('self', null=True, blank=True)
 
     class Meta:  # noqa: D101
         verbose_name_plural = 'Task info'
