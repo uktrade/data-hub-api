@@ -20,6 +20,8 @@ class TaskInfoAdmin(admin.ModelAdmin):
     actions = ['respawn_task']
     list_filter = ['created_on', 'db_table']
     search_fields = ['user__first_name', 'user__last_name', 'user__email', 'task_id']
+    date_hierarchy = 'created_on'
+    ordering = ['-created_on']
 
     def type(self, instance):
         """Human readable save type from db_table."""
