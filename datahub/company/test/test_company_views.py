@@ -1,4 +1,3 @@
-import uuid
 from unittest import mock
 
 from django.conf import settings
@@ -117,7 +116,6 @@ class CompanyTestCase(LeelooTestCase):
         assert response.data['name'] == 'Acme'
         # make sure we're spawning a task to save to Korben
         expected_data = company.convert_model_to_korben_format()
-        expected_data['id'] = uuid.UUID(expected_data['id'])
         expected_data['name'] = 'Acme'
         mocked_save_to_korben.delay.assert_called_once_with(
             db_table='company_company',

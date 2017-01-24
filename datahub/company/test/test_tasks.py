@@ -6,7 +6,6 @@ from celery.exceptions import Retry
 from django.utils.timezone import now
 
 from datahub.company.tasks import save_to_korben
-from datahub.core.models import TaskInfo
 from datahub.core.test_utils import get_test_user
 
 # mark the whole module for db use
@@ -31,8 +30,6 @@ def test_save_to_korben_task_stale_object(mocked_korben_connector):
         update=True
     )
 
-    task_info = TaskInfo.objects.get(user=user)
-    assert task_info.note == 'Stale object, not saved.'
     # check save_to_korben called
     assert mocked_korben_connector().post.called is False
 
@@ -53,8 +50,6 @@ def test_save_to_korben_update_happy_path(mocked_korben_connector):
         update=True
     )
 
-    # check task info created
-    assert TaskInfo.objects.get(user=user)
     # check save_to_korben called
     assert mocked_korben_connector().post.called
 
@@ -72,8 +67,6 @@ def test_save_to_korben_create_happy_path(mocked_korben_connector):
         update=True
     )
 
-    # check task info created
-    assert TaskInfo.objects.get(user=user)
     # check save_to_korben called
     assert mocked_korben_connector().post.called
 

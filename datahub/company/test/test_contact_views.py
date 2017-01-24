@@ -160,7 +160,6 @@ class ContactTestCase(LeelooTestCase):
         # make sure we're spawning a task to save to Korben
         expected_data = contact.convert_model_to_korben_format()
         expected_data['first_name'] = 'bar'
-        expected_data['id'] = uuid.UUID(expected_data['id'])
         mocked_save_to_korben.delay.assert_called_once_with(
             db_table='company_contact',
             data=expected_data,
