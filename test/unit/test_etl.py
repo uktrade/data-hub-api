@@ -2,6 +2,28 @@ from korben.etl import transform
 from korben.cdms_api.rest.utils import datetime_to_cdms_datetime
 
 
+DJANGO_SERVICE_DELIVERY_DATA = dict(
+    service_id="foo",
+    status_id="bar",
+    owning_team_id="baz",
+    uk_region_id="flibble",
+    sector_id="flamble",
+    lead_country_id="fluzzle",
+    service_offer_id="flankle",
+    service_provider_id="flum",
+)
+
+ODATA_SERVICE_DELIVERY_INPUT_DATA = dict(
+    optevia_Service={'Id': "foo"},
+    optevia_ServiceDeliveryStatus={'Id': "bar"},
+    OwningTeam={'Id': "baz"},
+    optevia_UKRegion={'Id': "flibble"},
+    optevia_Sector={'Id': "flamble"},
+    optevia_LeadCountry={'Id': "fluzzle"},
+    optevia_ServiceOffer={'Id': "flankle"},
+    optevia_ServiceProvider={'Id': "flum"},
+)
+
 DJANGO_CONTACT_DATA = dict(
     # Local fields
     id='uuid',
@@ -74,12 +96,12 @@ ODATA_OUTPUT_DATA['ModifiedOn'] = '/Date(1480080742000)/'
 ODATA_OUTPUT_DATA['CreatedOn'] = '/Date(1480080742000)/'
 
 
-def test_django_to_odata():
+def test_django_to_odata_contact():
     _, result = transform.django_to_odata('company_contact', DJANGO_CONTACT_DATA)
     assert result == ODATA_CONTACT_INPUT_DATA
 
 
-def test_odata_to_django():
+def test_odata_to_django_contact():
     result = transform.odata_to_django('ContactSet', ODATA_OUTPUT_DATA)
 
     django_data = DJANGO_CONTACT_DATA.copy()
@@ -87,6 +109,18 @@ def test_odata_to_django():
     django_data.update(dict(
         address_same_as_company=False, archived=False, archived_reason='',
     ))
+    assert result == django_data
+
+
+def test_django_to_odata_service_delivery():
+    _, result = transform.django_to_odata('service_delivery', DJANGO_SERVICE_DELIVERY_DATA)
+    assert result == ODATA_SERVICE_DELIVERY_INPUT_DATA
+
+
+def test_odata_to_django_service_delivery():
+    result = transform.odata_to_django('ServiceDeliverySet', ODATA_SERVICE_DELIVERY_INPUT_DATA)
+
+    django_data = DJANGO_SERVICE_DELIVERY_DATA.copy()
     assert result == django_data
 
 
