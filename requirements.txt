@@ -3,7 +3,7 @@ pip==9.0.1
 Django==1.10.5
 djangorestframework==3.5.3
 django-environ==0.4.1
-django-extensions==1.7.5
+django-extensions==1.7.6
 django-reversion==2.0.6
 
 django-oauth-toolkit==0.11.0
