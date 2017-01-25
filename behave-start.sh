@@ -1,8 +1,8 @@
 #!/bin/bash -xe
-python /app/manage.py migrate
-python /app/manage.py collectstatic --noinput
-python /app/manage.py loaddata metadata.yaml
-python /app/manage.py loaddata undefined.yaml
-python /app/manage.py loaddata datahub_businesstypes.yaml
-python /app/manage.py behaveinitialsetup
-gunicorn config.wsgi
+python /app/leeloo/manage.py migrate
+python /app/leeloo/manage.py collectstatic --noinput
+python /app/leeloo/manage.py loaddata /app/leeloo/fixtures/metadata.yaml
+python /app/leeloo/manage.py loaddata /app/leeloo/fixtures/undefined.yaml
+python /app/leeloo/manage.py loaddata /app/leeloo/fixtures/datahub_businesstypes.yaml
+python /app/leeloo/manage.py behaveinitialsetup
+cd leeloo && gunicorn config.wsgi

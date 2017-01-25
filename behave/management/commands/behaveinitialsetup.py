@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from oauth2_provider.models import Application
 
-from leeloo.datahub.metadata.models import Team
+from datahub.metadata.models import Team
 
 
 class Command(BaseCommand):
@@ -28,22 +28,26 @@ class Command(BaseCommand):
     def setup_test_user(self):
         """Create a Django user."""
         user_model = get_user_model()
-        test_user = settings.TEST_USERNAME.lowercase()
+        test_user = settings.TEST_USERNAME.lower()
         test_user_password = settings.TEST_USER_PASSWORD
         user = user_model(
             email=test_user,
+            first_name='Behave',
+            last_name='User',
             is_active=True,
             dit_team=Team.objects.get(name='London International Trade Team')
         )
-        user.password(test_user_password)
+        user.set_password(test_user_password)
         user.save(skip_custom_validation=True)
         return user
 
     def add_cdms_user(self):
         """Add CDMS user to Django."""
         user_model = get_user_model()
-        cdms_user = settings.CDMS_USERNAME.lowercase()
+        cdms_user = settings.CDMS_USERNAME.lower()
         user = user_model(
+            first_name='CDMS',
+            last_name='User',
             email=cdms_user,
             is_active=True,
             dit_team=Team.objects.get(name='London International Trade Team')
