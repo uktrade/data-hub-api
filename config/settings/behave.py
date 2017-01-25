@@ -1,6 +1,9 @@
 from .common import *
 
 
+INSTALLED_APPS += ('behave',)
+
+
 API_CLIENT_SECRET = env('API_CLIENT_SECRET')
 API_CLIENT_ID = env('API_CLIENT_ID')
 APPLICATION_NAME = env('APPLICATION_NAME', default='Behave test suite')
