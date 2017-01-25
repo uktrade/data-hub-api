@@ -3,6 +3,8 @@ from korben.cdms_api.rest.utils import datetime_to_cdms_datetime
 
 
 DJANGO_SERVICE_DELIVERY_DATA = dict(
+    notes="bam",
+    start_date="2016-11-25T13:32:22+00:00",
     service_id="foo",
     status_id="bar",
     owning_team_id="baz",
@@ -14,6 +16,8 @@ DJANGO_SERVICE_DELIVERY_DATA = dict(
 )
 
 ODATA_SERVICE_DELIVERY_INPUT_DATA = dict(
+    optevia_Notes="bam",
+    optevia_OrderDate="2016-11-25T13:32:22+00:00",
     optevia_Service={'Id': "foo"},
     optevia_ServiceDeliveryStatus={'Id': "bar"},
     OwningTeam={'Id': "baz"},

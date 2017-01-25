@@ -44,15 +44,23 @@ for source_pkey, source_table, source_name, target_table in ENUM_MAPPINGS:
 MAPPINGS.update({
     'ServiceDeliverySet': {
         'to': 'service_delivery',
+        'local': (
+            ('optevia_Notes', 'notes'),
+        ),
         'nonflat': (
+            ('optevia_ServiceProvider', (('Id', 'service_provider_id'),),),
             ('optevia_Service', (('Id', 'service_id'),),),
             ('optevia_ServiceDeliveryStatus', (('Id', 'status_id'),),),
             ('OwningTeam', (('Id', 'owning_team_id'),),),
+            ('optevia_Advisor', (('Id', 'advisor_id'),),),
+            ('optevia_Contact', (('Id', 'contact_id'),),),
             ('optevia_UKRegion', (('Id', 'uk_region_id'),),),
             ('optevia_Sector', (('Id', 'sector_id'),),),
             ('optevia_LeadCountry', (('Id', 'lead_country_id'),),),
             ('optevia_ServiceOffer', (('Id', 'service_offer_id'),),),
-            ('optevia_ServiceProvider', (('Id', 'service_provider_id'),),),
+        ),
+        'datetime': (
+            ('optevia_OrderDate', 'start_date'),
         ),
     },
     'AccountSet': {
