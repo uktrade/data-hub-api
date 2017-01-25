@@ -27,3 +27,4 @@ ENV DEBUG False
 ENV ES_ACCESS True
 
 EXPOSE 8000
+CMD ./start.sh
