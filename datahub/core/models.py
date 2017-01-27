@@ -42,8 +42,9 @@ class BaseModel(DeferredSaveModelMixin, models.Model):
         If the fields are empty, populate them.
         """
         super().clean()
-        self.created_on = self.created_on if self.created_on else now()
-        self.modified_on = self.modified_on if self.modified_on else now()
+        current_time = now()
+        self.created_on = self.created_on or current_time
+        self.modified_on = current_time
 
     def get_datetime_fields(self):
         """Return list of fields that should be mapped as datetime."""

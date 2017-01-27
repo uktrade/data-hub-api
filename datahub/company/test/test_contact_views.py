@@ -5,6 +5,7 @@ from unittest import mock
 import pytest
 from django.conf import settings
 from django.urls import reverse
+from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -146,6 +147,7 @@ class ContactTestCase(LeelooTestCase):
         )
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
+    @freeze_time('2017-01-27 12:00:01')
     def test_modify_contact(self, mocked_save_to_korben):
         """Modify an existing contact."""
         contact = ContactFactory(first_name='Foo')

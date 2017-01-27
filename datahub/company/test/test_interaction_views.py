@@ -3,6 +3,7 @@ from unittest import mock
 from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
+from freezegun import freeze_time
 from rest_framework import status
 
 from datahub.company.models import Interaction
@@ -58,6 +59,7 @@ class InteractionTestCase(LeelooTestCase):
         )
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
+    @freeze_time('2017-01-27 12:00:01')
     def test_modify_interaction(self, mocked_save_to_korben):
         """Modify an existing interaction."""
         interaction = InteractionFactory(subject='I am a subject')

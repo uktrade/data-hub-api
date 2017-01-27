@@ -24,7 +24,7 @@ def test_save_to_korben_task_stale_object(mocked_korben_connector):
     user = get_test_user()
 
     save_to_korben(
-        data={'modified_on': now().isoformat()},
+        data={'id': 'test', 'modified_on': now().isoformat()},
         user_id=str(user.id),
         db_table='company_company',
         update=True
