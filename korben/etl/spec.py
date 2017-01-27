@@ -57,6 +57,7 @@ MAPPINGS.update({
             ('optevia_StateCounty', 'registered_address_county'),
             ('optevia_PostCode', 'registered_address_postcode'),
             ('Description', 'description'),
+            ('WebSiteURL', 'website'),
         ),
         'datetime': (
             ('ModifiedOn', 'modified_on'),
