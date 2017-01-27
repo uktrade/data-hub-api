@@ -1,3 +1,5 @@
+import logging
+
 from celery import shared_task
 from celery.signals import before_task_publish
 from dateutil import parser
@@ -5,6 +7,9 @@ from django.utils.timezone import is_aware, make_naive
 from raven.contrib.django.raven_compat.models import client, settings
 
 from datahub.korben.connector import KorbenConnector
+
+
+logger = logging.getLogger(__name__)
 
 
 def handle_time(timestamp):
@@ -33,6 +38,16 @@ def save_to_korben(self, data, user_id, db_table, update):
                 data=data,
                 update=update
             )
+        else:
+            logger.warning(
+                'Stale object ID: {id} '
+                'datahub time: {dhtime} CDMS time: {cdmstime}'.format(
+                    id=data['id'],
+                    dhtime=object_time.isoformat(),
+                    cdmstime=cdms_time.isoformat(),
+                )
+            )
+
     except Exception as e:
         client.captureException()
         raise self.retry(
