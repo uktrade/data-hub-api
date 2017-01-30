@@ -49,12 +49,16 @@ def save_to_korben(self, data, user_id, db_table, update):
             )
 
     except Exception as e:
-        client.captureException()
-        raise self.retry(
-            exc=e,
-            countdown=int(self.request.retries * self.request.retries),
-            max_retries=settings.TASK_MAX_RETRIES,
-        )
+        try:
+            client.captureException()
+        except:  # noqa: B901;
+            logger.exception('Sentry fails...')
+        finally:
+            raise self.retry(
+                exc=e,
+                countdown=int(self.request.retries * self.request.retries),
+                max_retries=settings.TASK_MAX_RETRIES,
+            )
 
 
 @before_task_publish.connect(sender='datahub.company.tasks.save_to_korben')
