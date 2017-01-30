@@ -51,7 +51,7 @@ def save_to_korben(self, data, user_id, db_table, update):
     except Exception as e:
         try:
             client.captureException()
-        except:
+        except:  # noqa: B901;
             logger.exception('Sentry fails...')
         finally:
             raise self.retry(
