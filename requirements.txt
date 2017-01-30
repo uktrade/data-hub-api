@@ -8,7 +8,7 @@ django-reversion==2.0.6
 django-pglocks==1.0.2
 
 django-oauth-toolkit==0.11.0
-whitenoise==3.2.3
+whitenoise==3.3.0
 pyyaml==3.12
 python-dateutil==2.5.3
 
@@ -29,7 +29,7 @@ pytest-django==3.0.0
 pytest-sugar==0.8.0
 pytest-cov==2.4.0
 Werkzeug==0.11.15
-ipython==5.1.0
+ipython==5.2.0
 ipdb==0.10.2
 factory-boy==2.8.1
 freezegun==0.3.8
