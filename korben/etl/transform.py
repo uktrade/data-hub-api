@@ -10,6 +10,7 @@ from korben.services import db
 
 from . import spec
 
+SENTINEL = object()  # used as undefined key marker in sync
 
 
 def django_to_odata(django_tablename, django_dict):
@@ -32,15 +33,15 @@ def django_to_odata(django_tablename, django_dict):
 
     # Simplest mapping from “local” dict key to renamed “local” key
     for odata_col, django_col in mapping.get('local', ()):
-        value = django_dict.get(django_col)
-        if odata_col and value:
+        value = django_dict.get(django_col, SENTINEL)
+        if odata_col and value is not SENTINEL:
             odata_dict[odata_col] = value
 
     # Mapping datetime fields; this is handled separately to local because
     # conversion is required in the opposite (OData -> Django) direction
     for odata_col, django_col in mapping.get('datetime', ()):
-        value = django_dict.get(django_col)
-        if odata_col and value:
+        value = django_dict.get(django_col, SENTINEL)
+        if odata_col and value is not SENTINEL:
             odata_dict[odata_col] = value
 
     # Under the OData scheme, foreign keys are represented as dicts with some
@@ -77,8 +78,8 @@ def django_to_odata(django_tablename, django_dict):
             odata_dict[col] = ''
 
         # Then place concatenated value in main field
-        value = django_dict.get(django_col)
-        if value:
+        value = django_dict.get(django_col, SENTINEL)
+        if value is not SENTINEL:
             odata_dict[main_odata_col] = value
 
     return mapping.get('etag', False), odata_dict
