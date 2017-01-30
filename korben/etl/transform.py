@@ -6,7 +6,6 @@ import datetime
 import functools
 
 from korben.cdms_api.rest.utils import cdms_datetime_to_datetime
-from korben.services import db
 
 from . import spec
 
@@ -72,7 +71,7 @@ def django_to_odata(django_tablename, django_dict):
     # We are concatenating some fields (eg. FirstName with MiddleName), make
     # sure that these are properly populated when sending data back to
     # Dyanmics.
-    for concatenate_cols, django_col, main_odata_col in mapping.get('concat', ()):
+    for concatenate_cols, django_col, main_odata_col in mapping.get('concat', ()):  # noqa: E501
         # First clear out all source fields of concatenation
         for col in concatenate_cols:
             odata_dict[col] = ''

@@ -7,17 +7,17 @@ import uuid
 MAPPINGS = {}
 
 ENUM_MAPPINGS = (
-    ('optevia_businesstypeId', 'optevia_businesstypeSet', 'optevia_name', 'metadata_businesstype'),
-    ('optevia_sectorId', 'optevia_sectorSet', 'optevia_name', 'metadata_sector'),
-    ('optevia_employeerangeId', 'optevia_employeerangeSet', 'optevia_name', 'metadata_employeerange'),
-    ('optevia_turnoverrangeId', 'optevia_turnoverrangeSet', 'optevia_name', 'metadata_turnoverrange'),
-    ('optevia_ukregionId', 'optevia_ukregionSet', 'optevia_name', 'metadata_ukregion'),
-    ('optevia_countryId', 'optevia_countrySet', 'optevia_Country', 'metadata_country'),
+    ('optevia_businesstypeId', 'optevia_businesstypeSet', 'optevia_name', 'metadata_businesstype'),  # noqa: E501
+    ('optevia_sectorId', 'optevia_sectorSet', 'optevia_name', 'metadata_sector'),  # noqa: E501
+    ('optevia_employeerangeId', 'optevia_employeerangeSet', 'optevia_name', 'metadata_employeerange'),  # noqa: E501
+    ('optevia_turnoverrangeId', 'optevia_turnoverrangeSet', 'optevia_name', 'metadata_turnoverrange'),  # noqa: E501
+    ('optevia_ukregionId', 'optevia_ukregionSet', 'optevia_name', 'metadata_ukregion'),  # noqa: E501
+    ('optevia_countryId', 'optevia_countrySet', 'optevia_Country', 'metadata_country'),  # noqa: E501
     ('optevia_titleId', 'optevia_titleSet', 'optevia_name', 'metadata_title'),
-    ('optevia_contactroleId', 'optevia_contactroleSet', 'optevia_name', 'metadata_role'),
-    ('optevia_interactioncommunicationchannelId', 'optevia_interactioncommunicationchannelSet', 'optevia_name', 'metadata_interactiontype'),
+    ('optevia_contactroleId', 'optevia_contactroleSet', 'optevia_name', 'metadata_role'),  # noqa: E501
+    ('optevia_interactioncommunicationchannelId', 'optevia_interactioncommunicationchannelSet', 'optevia_name', 'metadata_interactiontype'),  # noqa: E501
     ('BusinessUnitId', 'BusinessUnitSet', 'Name', 'metadata_team'),
-    ('optevia_serviceId', 'optevia_serviceSet', 'optevia_name', 'metadata_service'),
+    ('optevia_serviceId', 'optevia_serviceSet', 'optevia_name', 'metadata_service'),  # noqa: E501
 )
 
 # Used to avoid having to make Django fields nullable, this is loaded into all
@@ -35,9 +35,9 @@ for source_pkey, source_table, source_name, target_table in ENUM_MAPPINGS:
                 (source_pkey, 'id'),
                 (source_name, 'name'),
             ),
-        'defaults': (
-            ('selectable', lambda: True),
-        ),
+            'defaults': (
+                ('selectable', lambda: True),
+            ),
         },
     })
 
@@ -150,7 +150,7 @@ MAPPINGS.update({
             ('CreatedOn', 'created_on'),
         ),
         'concat': (
-            (('optevia_AreaCode', 'optevia_TelephoneNumber'), 'telephone_number', 'optevia_TelephoneNumber'),
+            (('optevia_AreaCode', 'optevia_TelephoneNumber'), 'telephone_number', 'optevia_TelephoneNumber'),  # noqa: E501
             (('FirstName', 'MiddleName'), 'first_name', 'FirstName'),
         ),
         'nonflat': (
@@ -247,6 +247,7 @@ def update(original_dict, update_dict):
     updated_dict = dict(original_dict)
     updated_dict.update(update_dict)
     return updated_dict
+
 
 ES_INDEX = 'datahub'
 _ES_TYPES = None
