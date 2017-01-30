@@ -20,7 +20,7 @@ def handle_time(timestamp):
     return make_naive(time, timezone=time.tzinfo) if is_aware(time) else time
 
 
-@shared_task(bind=True)
+@shared_task(bind=True, default_retry_delay=30 * 60)
 def save_to_korben(self, data, user_id, db_table, update):
     """Save to Korben."""
     _ = user_id  # noqa: F841; user is needed for signal handling, before_task_publish signal expects it to be there
