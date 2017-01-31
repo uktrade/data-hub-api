@@ -42,7 +42,6 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'users',
                 'verbose_name': 'user',
             },
-            bases=(models.Model, ),
             managers=[
                 ('objects', django.contrib.auth.models.UserManager()),
             ],
@@ -120,7 +119,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name_plural': 'companies',
             },
-            bases=(datahub.core.mixins.KorbenSaveModelMixin, datahub.core.models.ArchivableModel),
+            bases=(datahub.core.mixins.KorbenSaveModelMixin, models.Model),
         ),
         migrations.CreateModel(
             name='Contact',
@@ -152,7 +151,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(datahub.core.mixins.KorbenSaveModelMixin, datahub.core.models.ArchivableModel),
+            bases=(datahub.core.mixins.KorbenSaveModelMixin, models.Model),
         ),
         migrations.CreateModel(
             name='Country',
