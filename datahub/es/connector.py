@@ -51,6 +51,9 @@ class ESConnector:
     def search_by_term(self, term, doc_type=None, offset=0, limit=100):
         """Perform a multi match search query."""
         if doc_type:
+            if isinstance(doc_type, str):
+                doc_type = [doc_type]
+
             q = self.search.query(Q('terms', _type=doc_type)).filter(
                 'multi_match', query=term, fields=['name^3', 'alias^3', '*_name', '*_postcode']
             )
