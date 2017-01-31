@@ -1,4 +1,3 @@
-from contextlib import suppress
 import logging
 
 from celery import shared_task
@@ -50,8 +49,10 @@ def save_to_korben(self, data, user_id, db_table, update):
             )
 
     except Exception as e:
-        with suppress(Exception):  # If comm with sentry fails, still continue to re-try
+        try:
             client.captureException()
+        except Exception:
+            logger.exception('Capturing exc to sentry failed')
 
         raise self.retry(
             exc=e,
