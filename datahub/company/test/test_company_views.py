@@ -312,6 +312,7 @@ class CompanyTestCase(LeelooTestCase):
     def test_archive_company_no_reason(self):
         """Test company archive."""
         company = CompanyFactory()
+        import ipdb; ipdb.set_trace()
         url = reverse('company-archive', kwargs={'pk': company.id})
         response = self.api_client.post(url, format='json')
 
