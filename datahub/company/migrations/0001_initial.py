@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 import datahub.core.mixins
+import datahub.core.models
 from django.conf import settings
 import django.contrib.auth.models
 import django.contrib.auth.validators
@@ -41,7 +42,7 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'users',
                 'verbose_name': 'user',
             },
-            bases=(datahub.core.mixins.DeferredSaveModelMixin, models.Model),
+            bases=(models.Model, ),
             managers=[
                 ('objects', django.contrib.auth.models.UserManager()),
             ],
@@ -119,7 +120,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name_plural': 'companies',
             },
-            bases=(datahub.core.mixins.DeferredSaveModelMixin, models.Model),
+            bases=(datahub.core.mixins.KorbenSaveModelMixin, datahub.core.models.ArchivableModel),
         ),
         migrations.CreateModel(
             name='Contact',
@@ -151,7 +152,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(datahub.core.mixins.DeferredSaveModelMixin, models.Model),
+            bases=(datahub.core.mixins.KorbenSaveModelMixin, datahub.core.models.ArchivableModel),
         ),
         migrations.CreateModel(
             name='Country',
@@ -195,7 +196,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(datahub.core.mixins.DeferredSaveModelMixin, models.Model),
+            bases=(datahub.core.mixins.KorbenSaveModelMixin, models.Model),
         ),
         migrations.CreateModel(
             name='InteractionType',

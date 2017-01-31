@@ -82,21 +82,3 @@ class ContactFactory(factory.django.DjangoModelFactory):
             # a list of teams were passed in, use them
             for team in extracted:
                 self.teams.add(team)
-
-
-class InteractionFactory(factory.django.DjangoModelFactory):
-    """Interaction factory."""
-
-    company = factory.SubFactory(CompanyFactory)
-    contact = factory.SubFactory(ContactFactory)
-    subject = 'foo'
-    date_of_interaction = now()
-    notes = 'Bar'
-    dit_advisor = factory.SubFactory(AdvisorFactory)
-    service_id = constants.Service.trade_enquiry.value.id
-    dit_team_id = constants.Team.healthcare_uk.value.id
-    created_on = now()
-    interaction_type_id = constants.InteractionType.face_to_face.value.id
-
-    class Meta:
-        model = 'company.Interaction'

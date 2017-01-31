@@ -6,11 +6,12 @@ from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status
 
-from datahub.company.models import Interaction
+from datahub.company.test.factories import AdvisorFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
 from datahub.es.utils import document_exists, get_elasticsearch_client
-from .factories import AdvisorFactory, CompanyFactory, ContactFactory, InteractionFactory
+from datahub.interaction.models import Interaction
+from datahub.interaction.test.factories import InteractionFactory
 
 
 class InteractionTestCase(LeelooTestCase):

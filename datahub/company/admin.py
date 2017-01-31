@@ -3,9 +3,10 @@ from django.contrib.auth.admin import UserAdmin
 
 from reversion.admin import VersionAdmin
 
-from . models import Advisor, Company, Contact, Interaction
+from . models import Advisor, Company, Contact
 
-MODELS_TO_REGISTER = (Company, Contact, Interaction)
+
+MODELS_TO_REGISTER = (Company, Contact)
 
 for model_cls in MODELS_TO_REGISTER:
     admin.site.register(model_cls, VersionAdmin)
