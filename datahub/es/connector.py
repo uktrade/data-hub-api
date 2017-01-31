@@ -1,6 +1,6 @@
 from django.conf import settings
 from elasticsearch_dsl import Search
-from elasticsearch_dsl.query import MultiMatch, Term
+from elasticsearch_dsl.query import Q, Term
 from .utils import document_exists, get_elasticsearch_client
 
 
@@ -50,12 +50,19 @@ class ESConnector:
 
     def search_by_term(self, term, doc_type=None, offset=0, limit=100):
         """Perform a multi match search query."""
-        search_client = self.search.doc_type(*doc_type) if doc_type else self.search
-        query = MultiMatch(query=term, fields=['name^3', 'alias^3', '*_name', '*_postcode'])
-        search = search_client.query(query)[offset:offset + limit]
-        results = search.execute()
+        if doc_type:
+            if isinstance(doc_type, str):
+                doc_type = [doc_type]
 
-        return results
+            q = self.search.query(Q('terms', _type=doc_type)).filter(
+                'multi_match', query=term, fields=['name^3', 'alias^3', '*_name', '*_postcode']
+            )
+        else:
+            q = self.search.query(Q(
+                'multi_match', query=term, fields=['name^3', 'alias^3', '*_name', '*_postcode']
+            ))
+
+        return q[offset:offset + limit].execute()
 
     def delete_index(self):
         """Delete the index."""
