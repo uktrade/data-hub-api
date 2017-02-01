@@ -1,4 +1,3 @@
-from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSet
 from datahub.interaction.models import Interaction
 from datahub.interaction.serializers import InteractionSerializerRead, InteractionSerializerWrite

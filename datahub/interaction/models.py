@@ -4,7 +4,7 @@ from django.db import models
 from django.utils.functional import cached_property
 
 from datahub.core.mixins import KorbenSaveModelMixin
-from datahub.core.models import ArchivableModel, BaseModel
+from datahub.core.models import BaseModel
 
 
 class InteractionAbstract(KorbenSaveModelMixin, BaseModel):
