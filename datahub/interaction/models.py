@@ -51,13 +51,13 @@ class ServiceOffer(models.Model):
     """Service offer."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
-    service_provider = models.ForeignKey('metadata.ServiceProvider')
+    dit_team = models.ForeignKey('metadata.Team')
     service = models.ForeignKey('metadata.Service')
 
     @cached_property
     def name(self):
         """Generate name."""
-        return '{0} : {1}'.format(self.service.name, self.service_provider.name)
+        return '{0} : {1}'.format(self.service.name, self.dit_team.name)
 
     def __str__(self):
         """Human readable object name."""
@@ -69,7 +69,7 @@ class ServiceDelivery(InteractionAbstract):
 
     status = models.ForeignKey('metadata.ServiceDeliveryStatus')
     service_offer = models.ForeignKey(ServiceOffer, null=True, blank=True)
-    service_provider = models.ForeignKey('metadata.ServiceProvider')
+    dit_team = models.ForeignKey('metadata.Team')
     uk_region = models.ForeignKey('metadata.UKRegion', null=True, blank=True)
     sector = models.ForeignKey('metadata.Sector', null=True, blank=True)
     country_of_interest = models.ForeignKey('metadata.Country', null=True, blank=True)

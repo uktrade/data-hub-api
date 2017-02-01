@@ -14,7 +14,6 @@ MODELS_TO_REGISTER = (
     models.Role,
     models.Team,
     models.Service,
-    models.ServiceProvider
 )
 
 

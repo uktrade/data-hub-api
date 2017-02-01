@@ -23,7 +23,6 @@ metadata_view_names = (
     'turnover',
     'uk-region',
     'team',
-    'service-provider',
     'service-delivery-status',
 )
 
@@ -39,7 +38,6 @@ metadata_views_ids = (
     'turnover view',
     'UK regions view',
     'teams view',
-    'service provider view',
     'service delivery status view',
 )
 
