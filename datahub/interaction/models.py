@@ -26,7 +26,7 @@ class InteractionAbstract(KorbenSaveModelMixin, ArchivableModel, BaseModel):
         'company.Advisor',
         related_name="%(class)ss",  # noqa: Q000
     )
-    notes = models.TextField()
+    notes = models.TextField(max_length=4000)  # CDMS limit
 
     class Meta:  # noqa: D101
         abstract = True
