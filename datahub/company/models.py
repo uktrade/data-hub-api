@@ -189,7 +189,7 @@ class Interaction(BaseModel):
     subject = models.TextField()
     date_of_interaction = models.DateTimeField()
     dit_advisor = models.ForeignKey('Advisor', related_name='interactions')
-    notes = models.TextField()
+    notes = models.TextField(max_length=4000)
     company = models.ForeignKey('Company', related_name='interactions')
     contact = models.ForeignKey('Contact', related_name='interactions')
     service = models.ForeignKey(metadata_models.Service)
