@@ -1,5 +1,4 @@
 """General mixins."""
-from django.conf import settings
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 
