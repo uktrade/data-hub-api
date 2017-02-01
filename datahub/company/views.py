@@ -4,10 +4,10 @@ from rest_framework import mixins, viewsets
 
 from datahub.core.viewsets import CoreViewSet
 from .models import Advisor, CompaniesHouseCompany, Company, Contact, Interaction
-from .serializers import (
-    AdvisorSerializer, CompaniesHouseCompanySerializer, CompanySerializerRead,
-    CompanySerializerWrite, ContactSerializerRead, ContactSerializerWrite,
-    InteractionSerializerRead, InteractionSerializerWrite)
+from .serializers import (AdvisorSerializer, CompaniesHouseCompanySerializer,
+                          CompanySerializerRead, CompanySerializerWrite,
+                          ContactSerializerRead, ContactSerializerWrite,
+                          InteractionSerializerRead, InteractionSerializerWrite)
 
 
 class CompanyViewSet(CoreViewSet):

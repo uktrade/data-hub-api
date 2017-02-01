@@ -8,17 +8,17 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [('core', '0004_remove_taskinfo_name'), ]
+    dependencies = [('core', '0004_remove_taskinfo_name'),]
 
     operations = [
         migrations.RemoveField(
             model_name='taskinfo',
-            name='id', ),
+            name='id',),
         migrations.RemoveField(
             model_name='taskinfo',
-            name='note', ),
+            name='note',),
         migrations.AlterField(
             model_name='taskinfo',
             name='task_id',
-            field=models.UUIDField(primary_key=True, serialize=False), ),
+            field=models.UUIDField(primary_key=True, serialize=False),),
     ]

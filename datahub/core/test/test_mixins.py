@@ -15,8 +15,7 @@ from datahub.korben.exceptions import KorbenException
 frozen_now = now()
 model_dict = {'foo': 'hello', 'bar': str(frozen_now)}
 
-pytestmark = pytest.mark.skip(
-    reason='Update from Korben temporarily disabled.')
+pytestmark = pytest.mark.skip(reason='Update from Korben temporarily disabled.')
 
 
 class DummyModel(DeferredSaveModelMixin):
@@ -77,8 +76,7 @@ class KorbenUpdateTestCase(LeelooTestCase):
     """Korben update test case talking to the API."""
 
     @mock.patch('datahub.core.mixins.KorbenConnector')
-    def test_update_from_korben_different_object(self,
-                                                 mocked_korben_connector):
+    def test_update_from_korben_different_object(self, mocked_korben_connector):
         """Korben return a different object."""
         company = CompanyFactory()
         company_dict = company._convert_model_to_korben_format()

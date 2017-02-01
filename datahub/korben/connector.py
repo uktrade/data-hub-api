@@ -87,7 +87,7 @@ class KorbenConnector:
         :return: boolean success or fail, None if CDMS/Korben communication fails
         """
         url = '{base_url}/auth/validate-credentials/'.format(
-            base_url=self.base_url, )
+            base_url=self.base_url,)
         data = self.encode_json_bytes(
             dict(username=username, password=password))
         self.inject_auth_header(url, data)
@@ -104,7 +104,7 @@ class KorbenConnector:
 
     def ping(self):
         """Perform the Korben ping."""
-        url = '{base_url}/ping.xml'.format(base_url=self.base_url, )
+        url = '{base_url}/ping.xml'.format(base_url=self.base_url,)
         try:
             response = requests.get(url=url)
             return response

@@ -34,13 +34,13 @@ DJANGO_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.postgres', )
+    'django.contrib.postgres',)
 
 THIRD_PARTY_APPS = (
     'rest_framework',
     'django_extensions',
     'reversion',
-    'oauth2_provider', )
+    'oauth2_provider',)
 
 LOCAL_APPS = ('datahub.core', 'datahub.company', 'datahub.es',
               'datahub.metadata', 'datahub.search', 'datahub.korben',
@@ -74,7 +74,7 @@ TEMPLATES = [{
             'django.contrib.messages.context_processors.messages',
         ],
     },
-}, ]
+},]
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
@@ -120,7 +120,7 @@ STATIC_ROOT = str(ROOT_DIR('staticfiles'))
 STATIC_URL = '/static/'
 
 # Extra places for collectstatic to find static files.
-STATICFILES_DIRS = (str(ROOT_DIR.path('static')), )
+STATICFILES_DIRS = (str(ROOT_DIR.path('static')),)
 
 # DRF
 REST_FRAMEWORK = {
@@ -129,9 +129,9 @@ REST_FRAMEWORK = {
     'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'oauth2_provider.ext.rest_framework.OAuth2Authentication', ),
+        'oauth2_provider.ext.rest_framework.OAuth2Authentication',),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated', ),
+        'rest_framework.permissions.IsAuthenticated',),
 }
 
 # Simplified static file serving.

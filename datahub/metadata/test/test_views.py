@@ -20,7 +20,7 @@ metadata_view_names = (
     'title',
     'turnover',
     'uk-region',
-    'team', )
+    'team',)
 
 metadata_views_ids = (
     'business types view', 'countries view', 'employee ranges view',
@@ -70,5 +70,4 @@ def test_metadata_view_patch(view_name, api_client):
 def test_view_name_generation():
     """Test urls are generated correctly."""
     patterns = urls.urlpatterns
-    assert set(pattern.name
-               for pattern in patterns) == set(metadata_view_names)
+    assert set(pattern.name for pattern in patterns) == set(metadata_view_names)

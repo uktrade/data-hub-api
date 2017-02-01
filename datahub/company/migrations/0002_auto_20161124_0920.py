@@ -18,11 +18,11 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 default='0167b456-0ddd-49bd-8184-e3227a0b6396',
                 on_delete=django.db.models.deletion.CASCADE,
-                to='metadata.Team'), ),
+                to='metadata.Team'),),
         migrations.AlterField(
             model_name='advisor',
             name='email',
-            field=models.EmailField(max_length=254), ),
+            field=models.EmailField(max_length=254),),
         migrations.AlterField(
             model_name='advisor',
             name='username',
@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 unique=True,
                 validators=[
                     django.contrib.auth.validators.UnicodeUsernameValidator()
-                ]), ),
+                ]),),
         migrations.AlterField(
             model_name='companieshousecompany',
             name='registered_address_country',
@@ -40,20 +40,20 @@ class Migration(migrations.Migration):
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name='company_companieshousecompany_related',
                 related_query_name='(app_label)s_companieshousecompanys',
-                to='metadata.Country'), ),
+                to='metadata.Country'),),
         migrations.AlterField(
             model_name='company',
             name='business_type',
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
-                to='metadata.BusinessType'), ),
+                to='metadata.BusinessType'),),
         migrations.AlterField(
             model_name='company',
             name='employee_range',
             field=models.ForeignKey(
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to='metadata.EmployeeRange'), ),
+                to='metadata.EmployeeRange'),),
         migrations.AlterField(
             model_name='company',
             name='export_to_countries',
@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 related_name='company_export_to_countries',
-                to='metadata.Country'), ),
+                to='metadata.Country'),),
         migrations.AlterField(
             model_name='company',
             name='future_interest_countries',
@@ -69,7 +69,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 related_name='company_future_interest_countries',
-                to='metadata.Country'), ),
+                to='metadata.Country'),),
         migrations.AlterField(
             model_name='company',
             name='registered_address_country',
@@ -77,13 +77,13 @@ class Migration(migrations.Migration):
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name='company_company_related',
                 related_query_name='(app_label)s_companys',
-                to='metadata.Country'), ),
+                to='metadata.Country'),),
         migrations.AlterField(
             model_name='company',
             name='sector',
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
-                to='metadata.Sector'), ),
+                to='metadata.Sector'),),
         migrations.AlterField(
             model_name='company',
             name='trading_address_country',
@@ -91,72 +91,72 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name='company_trading_address_country',
-                to='metadata.Country'), ),
+                to='metadata.Country'),),
         migrations.AlterField(
             model_name='company',
             name='turnover_range',
             field=models.ForeignKey(
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to='metadata.TurnoverRange'), ),
+                to='metadata.TurnoverRange'),),
         migrations.AlterField(
             model_name='company',
             name='uk_region',
             field=models.ForeignKey(
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to='metadata.UKRegion'), ),
+                to='metadata.UKRegion'),),
         migrations.AlterField(
             model_name='contact',
             name='address_country',
             field=models.ForeignKey(
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to='metadata.Country'), ),
+                to='metadata.Country'),),
         migrations.AlterField(
             model_name='contact',
             name='role',
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
-                to='metadata.Role'), ),
+                to='metadata.Role'),),
         migrations.AlterField(
             model_name='contact',
             name='teams',
-            field=models.ManyToManyField(blank=True, to='metadata.Team'), ),
+            field=models.ManyToManyField(blank=True, to='metadata.Team'),),
         migrations.AlterField(
             model_name='contact',
             name='title',
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
-                to='metadata.Title'), ),
+                to='metadata.Title'),),
         migrations.AlterField(
             model_name='interaction',
             name='dit_team',
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
-                to='metadata.Team'), ),
+                to='metadata.Team'),),
         migrations.AlterField(
             model_name='interaction',
             name='interaction_type',
             field=models.ForeignKey(
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to='metadata.InteractionType'), ),
+                to='metadata.InteractionType'),),
         migrations.AlterField(
             model_name='interaction',
             name='service',
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
-                to='metadata.Service'), ),
-        migrations.DeleteModel(name='BusinessType', ),
-        migrations.DeleteModel(name='Country', ),
-        migrations.DeleteModel(name='EmployeeRange', ),
-        migrations.DeleteModel(name='InteractionType', ),
-        migrations.DeleteModel(name='Role', ),
-        migrations.DeleteModel(name='Sector', ),
-        migrations.DeleteModel(name='Service', ),
-        migrations.DeleteModel(name='Team', ),
-        migrations.DeleteModel(name='Title', ),
-        migrations.DeleteModel(name='TurnoverRange', ),
-        migrations.DeleteModel(name='UKRegion', ),
+                to='metadata.Service'),),
+        migrations.DeleteModel(name='BusinessType',),
+        migrations.DeleteModel(name='Country',),
+        migrations.DeleteModel(name='EmployeeRange',),
+        migrations.DeleteModel(name='InteractionType',),
+        migrations.DeleteModel(name='Role',),
+        migrations.DeleteModel(name='Sector',),
+        migrations.DeleteModel(name='Service',),
+        migrations.DeleteModel(name='Team',),
+        migrations.DeleteModel(name='Title',),
+        migrations.DeleteModel(name='TurnoverRange',),
+        migrations.DeleteModel(name='UKRegion',),
     ]

@@ -92,8 +92,8 @@ class Country(Enum):
     colombia = Constant('Colombia', '66af72a6-5d95-e211-a939-e4115bead28a')
     comoros = Constant('Comoros', '67af72a6-5d95-e211-a939-e4115bead28a')
     congo = Constant('Congo', '69af72a6-5d95-e211-a939-e4115bead28a')
-    congo_democratic_republic = Constant(
-        'Congo (Democratic Republic)', '68af72a6-5d95-e211-a939-e4115bead28a')
+    congo_democratic_republic = Constant('Congo (Democratic Republic)',
+                                         '68af72a6-5d95-e211-a939-e4115bead28a')
     cook_islands = Constant('Cook Islands',
                             '6aaf72a6-5d95-e211-a939-e4115bead28a')
     costa_rica = Constant('Costa Rica', '6baf72a6-5d95-e211-a939-e4115bead28a')

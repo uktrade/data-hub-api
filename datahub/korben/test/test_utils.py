@@ -7,7 +7,7 @@ from datahub.korben.utils import generate_signature, string_to_bytes
 data = (
     ('hello', bytes('hello', 'utf-8')),
     ({1, 2, 3}, {1, 2, 3}),
-    ('&$%', bytes('&$%', 'utf-8')), )
+    ('&$%', bytes('&$%', 'utf-8')),)
 ids = ('string', 'non string', 'utf-8 string')
 
 

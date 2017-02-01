@@ -12,7 +12,7 @@ from datahub.es.utils import format_es_results
 class Search(APIView):
     """This endpoint handles the search."""
 
-    http_method_names = ('post', )
+    http_method_names = ('post',)
 
     def post(self, request, format=None):
         """Search is a POST."""

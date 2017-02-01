@@ -65,10 +65,8 @@ class Company(CompanyAbstract, BaseModel):
         max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name')
     business_type = models.ForeignKey(metadata_models.BusinessType)
     sector = models.ForeignKey(metadata_models.Sector)
-    employee_range = models.ForeignKey(
-        metadata_models.EmployeeRange, null=True)
-    turnover_range = models.ForeignKey(
-        metadata_models.TurnoverRange, null=True)
+    employee_range = models.ForeignKey(metadata_models.EmployeeRange, null=True)
+    turnover_range = models.ForeignKey(metadata_models.TurnoverRange, null=True)
     account_manager = models.ForeignKey(
         'Advisor', null=True, related_name='companies')
     export_to_countries = models.ManyToManyField(
@@ -164,7 +162,7 @@ class Company(CompanyAbstract, BaseModel):
     def clean(self):
         """Custom validation."""
         if not self._validate_trading_address():
-            raise ValidationError(self._generate_trading_address_errors(), )
+            raise ValidationError(self._generate_trading_address_errors(),)
         if not self._validate_uk_region():
             raise ValidationError({
                 'uk_region': ['UK region is required for UK companies.']
@@ -345,13 +343,12 @@ class Advisor(DeferredSaveModelMixin, AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(
         'staff status',
         default=False,
-        help_text='Designates whether the user can log into this admin site.',
-    )
+        help_text='Designates whether the user can log into this admin site.',)
     is_active = models.BooleanField(
         'active',
         default=True,
         help_text=('Designates whether this user should be treated as active. '
-                   'Unselect this instead of deleting accounts.'), )
+                   'Unselect this instead of deleting accounts.'),)
     date_joined = models.DateTimeField('date joined', default=now)
 
     objects = AdvisorManager()

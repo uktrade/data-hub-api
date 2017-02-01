@@ -63,11 +63,10 @@ def test_model_to_dictionary_exclude_fields():
         'trading_address_2', 'registered_address_1', 'archived_on', 'archived',
         'registered_address_town', 'trading_address_postcode',
         'registered_address_country', 'uk_region', 'created_on',
-        'employee_range', 'registered_address_3',
-        'registered_address_postcode', 'name', 'website', 'trading_address_3',
-        'registered_address_county', 'lead', 'id', 'sector',
-        'trading_address_town', 'company_number', 'turnover_range',
-        'archived_reason', 'business_type'
+        'employee_range', 'registered_address_3', 'registered_address_postcode',
+        'name', 'website', 'trading_address_3', 'registered_address_county',
+        'lead', 'id', 'sector', 'trading_address_town', 'company_number',
+        'turnover_range', 'archived_reason', 'business_type'
     }
     excluded_fields = ('registered_address_4', 'trading_address_county',
                        'account_manager', 'trading_address_country',

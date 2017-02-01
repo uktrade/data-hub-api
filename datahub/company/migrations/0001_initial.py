@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [('auth', '0008_alter_user_username_max_length'), ]
+    dependencies = [('auth', '0008_alter_user_username_max_length'),]
 
     operations = [
         migrations.CreateModel(
@@ -71,8 +71,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'user',
             },
             bases=(datahub.core.mixins.DeferredSaveModelMixin, models.Model),
-            managers=[('objects', django.contrib.auth.models.UserManager()), ],
-        ),
+            managers=[('objects', django.contrib.auth.models.UserManager()),],),
         migrations.CreateModel(
             name='BusinessType',
             fields=[
@@ -81,8 +80,8 @@ class Migration(migrations.Migration):
             ],
             options={
                 'abstract': False,
-                'ordering': ('name', ),
-            }, ),
+                'ordering': ('name',),
+            },),
         migrations.CreateModel(
             name='CompaniesHouseCompany',
             fields=[
@@ -108,8 +107,8 @@ class Migration(migrations.Migration):
                     db_index=True, max_length=255, null=True, unique=True)),
                 ('company_category', models.CharField(
                     blank=True, max_length=255)),
-                ('company_status', models.CharField(
-                    blank=True, max_length=255)),
+                ('company_status', models.CharField(blank=True,
+                                                    max_length=255)),
                 ('sic_code_1', models.CharField(blank=True, max_length=255)),
                 ('sic_code_2', models.CharField(blank=True, max_length=255)),
                 ('sic_code_3', models.CharField(blank=True, max_length=255)),
@@ -117,7 +116,7 @@ class Migration(migrations.Migration):
                 ('uri', models.CharField(blank=True, max_length=255)),
                 ('incorporation_date', models.DateField(null=True)),
             ],
-            options={'abstract': False, }, ),
+            options={'abstract': False,},),
         migrations.CreateModel(
             name='Company',
             fields=[
@@ -181,9 +180,8 @@ class Migration(migrations.Migration):
                     on_delete=django.db.models.deletion.CASCADE,
                     to='company.BusinessType')),
             ],
-            options={'verbose_name_plural': 'companies', },
-            bases=(datahub.core.mixins.DeferredSaveModelMixin, models.Model),
-        ),
+            options={'verbose_name_plural': 'companies',},
+            bases=(datahub.core.mixins.DeferredSaveModelMixin, models.Model),),
         migrations.CreateModel(
             name='Contact',
             fields=[
@@ -203,8 +201,7 @@ class Migration(migrations.Migration):
                 ('telephone_countrycode', models.CharField(max_length=255)),
                 ('telephone_number', models.CharField(max_length=255)),
                 ('email', models.EmailField(max_length=254)),
-                ('address_same_as_company', models.BooleanField(
-                    default=False)),
+                ('address_same_as_company', models.BooleanField(default=False)),
                 ('address_1', models.CharField(
                     blank=True, max_length=255, null=True)),
                 ('address_2', models.CharField(
@@ -225,9 +222,8 @@ class Migration(migrations.Migration):
                     blank=True, max_length=254, null=True)),
                 ('notes', models.TextField(blank=True, null=True)),
             ],
-            options={'abstract': False, },
-            bases=(datahub.core.mixins.DeferredSaveModelMixin, models.Model),
-        ),
+            options={'abstract': False,},
+            bases=(datahub.core.mixins.DeferredSaveModelMixin, models.Model),),
         migrations.CreateModel(
             name='Country',
             fields=[
@@ -236,8 +232,8 @@ class Migration(migrations.Migration):
             ],
             options={
                 'abstract': False,
-                'ordering': ('name', ),
-            }, ),
+                'ordering': ('name',),
+            },),
         migrations.CreateModel(
             name='EmployeeRange',
             fields=[
@@ -246,8 +242,8 @@ class Migration(migrations.Migration):
             ],
             options={
                 'abstract': False,
-                'ordering': ('name', ),
-            }, ),
+                'ordering': ('name',),
+            },),
         migrations.CreateModel(
             name='Interaction',
             fields=[
@@ -281,9 +277,8 @@ class Migration(migrations.Migration):
                     related_name='interactions',
                     to=settings.AUTH_USER_MODEL)),
             ],
-            options={'abstract': False, },
-            bases=(datahub.core.mixins.DeferredSaveModelMixin, models.Model),
-        ),
+            options={'abstract': False,},
+            bases=(datahub.core.mixins.DeferredSaveModelMixin, models.Model),),
         migrations.CreateModel(
             name='InteractionType',
             fields=[
@@ -292,8 +287,8 @@ class Migration(migrations.Migration):
             ],
             options={
                 'abstract': False,
-                'ordering': ('name', ),
-            }, ),
+                'ordering': ('name',),
+            },),
         migrations.CreateModel(
             name='Role',
             fields=[
@@ -302,8 +297,8 @@ class Migration(migrations.Migration):
             ],
             options={
                 'abstract': False,
-                'ordering': ('name', ),
-            }, ),
+                'ordering': ('name',),
+            },),
         migrations.CreateModel(
             name='Sector',
             fields=[
@@ -312,8 +307,8 @@ class Migration(migrations.Migration):
             ],
             options={
                 'abstract': False,
-                'ordering': ('name', ),
-            }, ),
+                'ordering': ('name',),
+            },),
         migrations.CreateModel(
             name='Service',
             fields=[
@@ -322,8 +317,8 @@ class Migration(migrations.Migration):
             ],
             options={
                 'abstract': False,
-                'ordering': ('name', ),
-            }, ),
+                'ordering': ('name',),
+            },),
         migrations.CreateModel(
             name='Team',
             fields=[
@@ -332,8 +327,8 @@ class Migration(migrations.Migration):
             ],
             options={
                 'abstract': False,
-                'ordering': ('name', ),
-            }, ),
+                'ordering': ('name',),
+            },),
         migrations.CreateModel(
             name='Title',
             fields=[
@@ -342,8 +337,8 @@ class Migration(migrations.Migration):
             ],
             options={
                 'abstract': False,
-                'ordering': ('name', ),
-            }, ),
+                'ordering': ('name',),
+            },),
         migrations.CreateModel(
             name='TurnoverRange',
             fields=[
@@ -352,8 +347,8 @@ class Migration(migrations.Migration):
             ],
             options={
                 'abstract': False,
-                'ordering': ('name', ),
-            }, ),
+                'ordering': ('name',),
+            },),
         migrations.CreateModel(
             name='UKRegion',
             fields=[
@@ -362,34 +357,34 @@ class Migration(migrations.Migration):
             ],
             options={
                 'abstract': False,
-                'ordering': ('name', ),
-            }, ),
+                'ordering': ('name',),
+            },),
         migrations.AddField(
             model_name='interaction',
             name='dit_team',
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE,
-                to='company.Team'), ),
+                on_delete=django.db.models.deletion.CASCADE, to='company.Team'),
+        ),
         migrations.AddField(
             model_name='interaction',
             name='interaction_type',
             field=models.ForeignKey(
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to='company.InteractionType'), ),
+                to='company.InteractionType'),),
         migrations.AddField(
             model_name='interaction',
             name='service',
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
-                to='company.Service'), ),
+                to='company.Service'),),
         migrations.AddField(
             model_name='contact',
             name='address_country',
             field=models.ForeignKey(
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to='company.Country'), ),
+                to='company.Country'),),
         migrations.AddField(
             model_name='contact',
             name='advisor',
@@ -398,44 +393,44 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name='contacts',
-                to=settings.AUTH_USER_MODEL), ),
+                to=settings.AUTH_USER_MODEL),),
         migrations.AddField(
             model_name='contact',
             name='archived_by',
             field=models.ForeignKey(
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to=settings.AUTH_USER_MODEL), ),
+                to=settings.AUTH_USER_MODEL),),
         migrations.AddField(
             model_name='contact',
             name='company',
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name='contacts',
-                to='company.Company'), ),
+                to='company.Company'),),
         migrations.AddField(
             model_name='contact',
             name='role',
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE,
-                to='company.Role'), ),
+                on_delete=django.db.models.deletion.CASCADE, to='company.Role'),
+        ),
         migrations.AddField(
             model_name='contact',
             name='teams',
-            field=models.ManyToManyField(blank=True, to='company.Team'), ),
+            field=models.ManyToManyField(blank=True, to='company.Team'),),
         migrations.AddField(
             model_name='contact',
             name='title',
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
-                to='company.Title'), ),
+                to='company.Title'),),
         migrations.AddField(
             model_name='company',
             name='employee_range',
             field=models.ForeignKey(
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to='company.EmployeeRange'), ),
+                to='company.EmployeeRange'),),
         migrations.AddField(
             model_name='company',
             name='export_to_countries',
@@ -443,7 +438,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 related_name='company_export_to_countries',
-                to='company.Country'), ),
+                to='company.Country'),),
         migrations.AddField(
             model_name='company',
             name='future_interest_countries',
@@ -451,7 +446,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 related_name='company_future_interest_countries',
-                to='company.Country'), ),
+                to='company.Country'),),
         migrations.AddField(
             model_name='company',
             name='registered_address_country',
@@ -459,13 +454,13 @@ class Migration(migrations.Migration):
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name='company_company_related',
                 related_query_name='(app_label)s_companys',
-                to='company.Country'), ),
+                to='company.Country'),),
         migrations.AddField(
             model_name='company',
             name='sector',
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
-                to='company.Sector'), ),
+                to='company.Sector'),),
         migrations.AddField(
             model_name='company',
             name='trading_address_country',
@@ -473,21 +468,21 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name='company_trading_address_country',
-                to='company.Country'), ),
+                to='company.Country'),),
         migrations.AddField(
             model_name='company',
             name='turnover_range',
             field=models.ForeignKey(
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to='company.TurnoverRange'), ),
+                to='company.TurnoverRange'),),
         migrations.AddField(
             model_name='company',
             name='uk_region',
             field=models.ForeignKey(
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to='company.UKRegion'), ),
+                to='company.UKRegion'),),
         migrations.AddField(
             model_name='companieshousecompany',
             name='registered_address_country',
@@ -495,13 +490,13 @@ class Migration(migrations.Migration):
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name='company_companieshousecompany_related',
                 related_query_name='(app_label)s_companieshousecompanys',
-                to='company.Country'), ),
+                to='company.Country'),),
         migrations.AddField(
             model_name='advisor',
             name='dit_team',
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE,
-                to='company.Team'), ),
+                on_delete=django.db.models.deletion.CASCADE, to='company.Team'),
+        ),
         migrations.AddField(
             model_name='advisor',
             name='groups',
@@ -511,7 +506,7 @@ class Migration(migrations.Migration):
                 related_name='user_set',
                 related_query_name='user',
                 to='auth.Group',
-                verbose_name='groups'), ),
+                verbose_name='groups'),),
         migrations.AddField(
             model_name='advisor',
             name='user_permissions',
@@ -521,5 +516,5 @@ class Migration(migrations.Migration):
                 related_name='user_set',
                 related_query_name='user',
                 to='auth.Permission',
-                verbose_name='user permissions'), ),
+                verbose_name='user permissions'),),
     ]

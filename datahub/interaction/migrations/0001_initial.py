@@ -58,6 +58,6 @@ class Migration(migrations.Migration):
                     on_delete=django.db.models.deletion.CASCADE,
                     to='metadata.Service')),
             ],
-            options={'abstract': False, },
-            bases=(datahub.core.mixins.KorbenSaveModelMixin, models.Model), ),
+            options={'abstract': False,},
+            bases=(datahub.core.mixins.KorbenSaveModelMixin, models.Model),),
     ]

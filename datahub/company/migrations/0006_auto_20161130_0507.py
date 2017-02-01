@@ -7,12 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [('company', '0005_auto_20161129_0950'), ]
+    dependencies = [('company', '0005_auto_20161129_0950'),]
 
     operations = [
         migrations.AlterField(
             model_name='advisor',
             name='date_joined',
             field=models.DateTimeField(
-                auto_now_add=True, verbose_name='date joined'), ),
+                auto_now_add=True, verbose_name='date joined'),),
     ]

@@ -7,10 +7,8 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [('core', '0003_auto_20170118_1600'), ]
+    dependencies = [('core', '0003_auto_20170118_1600'),]
 
-    operations = [
-        migrations.RemoveField(
-            model_name='taskinfo',
-            name='name', ),
-    ]
+    operations = [migrations.RemoveField(
+        model_name='taskinfo',
+        name='name',),]

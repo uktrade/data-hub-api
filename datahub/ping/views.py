@@ -22,8 +22,7 @@ def ping(request):
             PINGDOM_TEMPLATE.format(status='OK'), content_type='text/xml')
     else:
         body = PINGDOM_TEMPLATE.format(status='FALSE')
-        for service_result in filter(lambda x: x[0] is False,
-                                     checked.values()):
+        for service_result in filter(lambda x: x[0] is False, checked.values()):
             body += COMMENT_TEMPLATE.format(comment=service_result[1])
         return HttpResponse(
             body,

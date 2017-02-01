@@ -62,7 +62,7 @@ class BaseConstantModel(models.Model):
 
     class Meta:  # noqa: D101
         abstract = True
-        ordering = ('name', )
+        ordering = ('name',)
 
     def __str__(self):
         """Human readable admin name."""

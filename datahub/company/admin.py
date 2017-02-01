@@ -28,17 +28,17 @@ class AdvisorAdmin(VersionAdmin, UserAdmin):
         }),
         ('Important dates', {
             'fields': ('last_login', 'date_joined')
-        }), )
+        }),)
     add_fieldsets = ((None, {
-        'classes': ('wide', ),
+        'classes': ('wide',),
         'fields': ('email', 'password1', 'password2'),
-    }), )
+    }),)
     list_display = ('email', 'first_name', 'last_name', 'is_staff')
     search_fields = ('first_name', 'last_name', 'email')
-    ordering = ('email', )
+    ordering = ('email',)
 
     def reversion_register(self, model, **kwargs):
         """Exclude last login from reversion changesets."""
-        kwargs['exclude'] = ('last_login', )
+        kwargs['exclude'] = ('last_login',)
 
         super().reversion_register(model, **kwargs)

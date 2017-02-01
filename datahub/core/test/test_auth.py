@@ -69,7 +69,7 @@ def get_django_user():
 @mock.patch('datahub.core.auth.CDMSUserBackend.korben_authenticate')
 def test_invalid_cdms_credentials(korben_auth_mock, settings, live_server):
     """Test login invalid cdms credentials."""
-    settings.DIT_ENABLED_ADVISORS = ('cdms@user.com', )
+    settings.DIT_ENABLED_ADVISORS = ('cdms@user.com',)
     korben_auth_mock.return_value = False
     cdms_user = get_cdms_user()
     application, _ = Application.objects.get_or_create(
@@ -96,7 +96,7 @@ def test_invalid_cdms_credentials(korben_auth_mock, settings, live_server):
 @mock.patch('datahub.korben.connector.requests')
 def test_cdms_returns_500(mocked_requests, settings, live_server):
     """Test login when CDMS is not available."""
-    settings.DIT_ENABLED_ADVISORS = ('cdms@user.com', )
+    settings.DIT_ENABLED_ADVISORS = ('cdms@user.com',)
     mocked_requests.post.return_value = mock.Mock(ok=False)
     cdms_user = get_cdms_user()
     application, _ = Application.objects.get_or_create(
@@ -123,7 +123,7 @@ def test_cdms_returns_500(mocked_requests, settings, live_server):
 @mock.patch('datahub.core.auth.CDMSUserBackend.korben_authenticate')
 def test_valid_cdms_credentials(korben_auth_mock, settings, live_server):
     """Test login valid cdms credentials."""
-    settings.DIT_ENABLED_ADVISORS = ('cdms@user.com', )
+    settings.DIT_ENABLED_ADVISORS = ('cdms@user.com',)
     korben_auth_mock.return_value = True
     cdms_user = get_cdms_user()
     application, _ = Application.objects.get_or_create(
@@ -157,7 +157,7 @@ def test_valid_cdms_credentials(korben_auth_mock, settings, live_server):
 def test_valid_cdms_credentials_and_cdms_communication_fails(
         korben_auth_mock, settings, live_server):
     """Test login valid cdms credentials when CDMS communication fails."""
-    settings.DIT_ENABLED_ADVISORS = ('cdms@user.com', )
+    settings.DIT_ENABLED_ADVISORS = ('cdms@user.com',)
     korben_auth_mock.return_value = None
 
     # Assume user logged in previously
@@ -190,7 +190,7 @@ def test_valid_cdms_credentials_and_cdms_communication_fails(
 @mock.patch('datahub.core.auth.CDMSUserBackend.korben_authenticate')
 def test_password_changed_in_cdms(korben_auth_mock, settings, live_server):
     """Test passwd changed in CDMS results in failed auth."""
-    settings.DIT_ENABLED_ADVISORS = ('cdms@user.com', )
+    settings.DIT_ENABLED_ADVISORS = ('cdms@user.com',)
     korben_auth_mock.return_value = False
 
     # Assume user logged in previously
@@ -221,8 +221,8 @@ def test_password_changed_in_cdms(korben_auth_mock, settings, live_server):
 
 @pytest.mark.liveserver
 @mock.patch('datahub.core.auth.CDMSUserBackend.korben_authenticate')
-def test_valid_cdms_credentials_user_not_whitelisted(korben_auth_mock,
-                                                     settings, live_server):
+def test_valid_cdms_credentials_user_not_whitelisted(korben_auth_mock, settings,
+                                                     live_server):
     """Test login valid cdms credentials, but user not whitelisted."""
     settings.DIT_ENABLED_ADVISORS = ()
     korben_auth_mock.return_value = True

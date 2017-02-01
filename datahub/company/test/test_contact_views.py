@@ -153,7 +153,7 @@ class ContactTestCase(LeelooTestCase):
         contact = ContactFactory(first_name='Foo')
 
         url = reverse('contact-detail', kwargs={'pk': contact.pk})
-        response = self.api_client.patch(url, {'first_name': 'bar', })
+        response = self.api_client.patch(url, {'first_name': 'bar',})
 
         assert response.status_code == status.HTTP_200_OK, response.data
         assert response.data['first_name'] == 'bar'

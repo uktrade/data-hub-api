@@ -8,7 +8,7 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [('company', '0008_merge_20161207_0414'), ]
+    dependencies = [('company', '0008_merge_20161207_0414'),]
 
     operations = [
         migrations.AlterField(
@@ -18,5 +18,5 @@ class Migration(migrations.Migration):
                 default='0167b456-0ddd-49bd-8184-e3227a0b6396',
                 on_delete=django.db.models.deletion.CASCADE,
                 to='metadata.InteractionType'),
-            preserve_default=False, ),
+            preserve_default=False,),
     ]

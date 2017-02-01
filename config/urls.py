@@ -25,11 +25,11 @@ urlpatterns = [
     url(r'^metadata/', include('datahub.metadata.urls')),
     url(r'^token/$', TokenView.as_view(), name='token'),
     url(r'^korben/', include('datahub.korben.urls', namespace='korben')),
-    url(r'^whoami/$', who_am_i, name='who_am_i'),
-    url(r'^dashboard/',
+    url(r'^whoami/$', who_am_i, name='who_am_i'), url(
+        r'^dashboard/',
         include('datahub.dashboard.urls', namespace='dashboard'))
 ]
 
 if settings.DEBUG:
     import debug_toolbar
-    urlpatterns += [url(r'^__debug__/', include(debug_toolbar.urls)), ]
+    urlpatterns += [url(r'^__debug__/', include(debug_toolbar.urls)),]

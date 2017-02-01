@@ -37,8 +37,8 @@ class CompanyTestCase(LeelooTestCase):
             name='Foo ltd.',
             registered_address_1='Hello st.',
             registered_address_town='Fooland',
-            registered_address_country_id=constants.Country.united_states.
-            value.id)
+            registered_address_country_id=constants.Country.united_states.value.
+            id)
         company = CompanyFactory(
             company_number=123, name='Bar ltd.', alias='Xyz trading')
 
@@ -74,8 +74,8 @@ class CompanyTestCase(LeelooTestCase):
             name='Foo ltd.',
             registered_address_1='Hello st.',
             registered_address_town='Fooland',
-            registered_address_country_id=constants.Country.united_states.
-            value.id)
+            registered_address_country_id=constants.Country.united_states.value.
+            id)
 
         url = reverse('company-detail', kwargs={'pk': company.id})
         response = self.api_client.get(url)
@@ -106,12 +106,12 @@ class CompanyTestCase(LeelooTestCase):
             name='Foo ltd.',
             registered_address_1='Hello st.',
             registered_address_town='Fooland',
-            registered_address_country_id=constants.Country.united_states.
-            value.id)
+            registered_address_country_id=constants.Country.united_states.value.
+            id)
 
         # now update it
         url = reverse('company-detail', kwargs={'pk': company.pk})
-        response = self.api_client.patch(url, {'name': 'Acme', })
+        response = self.api_client.patch(url, {'name': 'Acme',})
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['name'] == 'Acme'

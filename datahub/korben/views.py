@@ -14,7 +14,7 @@ EXPOSED_MODELS = (Advisor, Company, Contact, Interaction)
 
 
 @api_view(['POST'])
-@authentication_classes((KorbenSharedSecretAuthentication, ))
+@authentication_classes((KorbenSharedSecretAuthentication,))
 def korben_view(request, model):
     """View for Korben."""
     data = request.data
