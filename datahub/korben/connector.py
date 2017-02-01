@@ -22,8 +22,7 @@ class KorbenConnector:
         self._json_encoder = DjangoJSONEncoder()
         self.base_url = '{host}:{port}'.format(
             host=self.handle_host(settings.KORBEN_HOST),
-            port=settings.KORBEN_PORT
-        )
+            port=settings.KORBEN_PORT)
 
     @staticmethod
     def handle_host(host):
@@ -40,7 +39,8 @@ class KorbenConnector:
 
     def inject_auth_header(self, url, body):
         """Add the signature into the header."""
-        self.default_headers['X-Signature'] = generate_signature(url, body, settings.DATAHUB_SECRET)
+        self.default_headers['X-Signature'] = generate_signature(
+            url, body, settings.DATAHUB_SECRET)
 
     def post(self, data, table_name, update=False):
         """Perform POST operations: create and update.
@@ -51,18 +51,15 @@ class KorbenConnector:
         """
         if update:
             url = '{base_url}/update/{table_name}/'.format(
-                base_url=self.base_url,
-                table_name=table_name
-            )
+                base_url=self.base_url, table_name=table_name)
         else:
             url = '{base_url}/create/{table_name}/'.format(
-                base_url=self.base_url,
-                table_name=table_name
-            )
+                base_url=self.base_url, table_name=table_name)
 
         data = self.encode_json_bytes(data)
         self.inject_auth_header(url, data)
-        response = requests.post(url=url, data=data, headers=self.default_headers)
+        response = requests.post(
+            url=url, data=data, headers=self.default_headers)
         if response.ok:
             return response
         else:
@@ -75,13 +72,11 @@ class KorbenConnector:
         :return: requests Response object
         """
         url = '{base_url}/get/{table_name}/{id}/'.format(
-            base_url=self.base_url,
-            table_name=table_name,
-            id=data['id']
-        )
+            base_url=self.base_url, table_name=table_name, id=data['id'])
         data = self.encode_json_bytes(data)
         self.inject_auth_header(url, data)
-        response = requests.post(url=url, data=data, headers=self.default_headers)
+        response = requests.post(
+            url=url, data=data, headers=self.default_headers)
         return response
 
     def validate_credentials(self, username, password):
@@ -92,12 +87,13 @@ class KorbenConnector:
         :return: boolean success or fail, None if CDMS/Korben communication fails
         """
         url = '{base_url}/auth/validate-credentials/'.format(
-            base_url=self.base_url,
-        )
-        data = self.encode_json_bytes(dict(username=username, password=password))
+            base_url=self.base_url, )
+        data = self.encode_json_bytes(
+            dict(username=username, password=password))
         self.inject_auth_header(url, data)
         try:
-            response = requests.post(url=url, data=data, headers=self.default_headers)
+            response = requests.post(
+                url=url, data=data, headers=self.default_headers)
             if response.ok:
                 return response.json()  # Returns JSON encoded boolean
             else:
@@ -108,9 +104,7 @@ class KorbenConnector:
 
     def ping(self):
         """Perform the Korben ping."""
-        url = '{base_url}/ping.xml'.format(
-            base_url=self.base_url,
-        )
+        url = '{base_url}/ping.xml'.format(base_url=self.base_url, )
         try:
             response = requests.get(url=url)
             return response

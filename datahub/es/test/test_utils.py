@@ -18,4 +18,9 @@ def test_get_elasticsearch_client_heroku(mock_es, settings):
     settings.HEROKU = True
     settings.ES_HOST = 'https://foo:bar@test.com'
     get_elasticsearch_client()
-    mock_es.assert_called_once_with([{'host': 'test.com', 'use_ssl': True, 'port': 9200, 'http_auth': ('foo', 'bar')}])
+    mock_es.assert_called_once_with([{
+        'host': 'test.com',
+        'use_ssl': True,
+        'port': 9200,
+        'http_auth': ('foo', 'bar')
+    }])

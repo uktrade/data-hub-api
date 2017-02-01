@@ -1,7 +1,9 @@
 from .common import *
 
-MIDDLEWARE_CLASSES += ('raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware',)
-INSTALLED_APPS += ('raven.contrib.django.raven_compat',)
+MIDDLEWARE_CLASSES += (
+    'raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware',
+)
+INSTALLED_APPS += ('raven.contrib.django.raven_compat', )
 
 # Logging
 SENTRY_DSN = env('DJANGO_SENTRY_DSN')
@@ -15,13 +17,14 @@ LOGGING = {
     'formatters': {
         'verbose': {
             'format': '%(levelname)s %(asctime)s %(module)s '
-                      '%(process)d %(thread)d %(message)s'
+            '%(process)d %(thread)d %(message)s'
         },
     },
     'handlers': {
         'sentry': {
             'level': 'ERROR',
-            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+            'class':
+            'raven.contrib.django.raven_compat.handlers.SentryHandler',
         },
         'console': {
             'level': 'DEBUG',
@@ -53,8 +56,5 @@ LOGGING = {
     },
 }
 
-
-RAVEN_CONFIG = {
-    'DSN': SENTRY_DSN,
-}
+RAVEN_CONFIG = {'DSN': SENTRY_DSN, }
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'

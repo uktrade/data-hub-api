@@ -27,10 +27,12 @@ class CDMSUserBackend(ModelBackend):
             user_model().set_password(password)
         else:
             if self.user_can_authenticate(user):
-                korben_auth_result = self.korben_authenticate(username, password)
+                korben_auth_result = self.korben_authenticate(username,
+                                                              password)
                 if korben_auth_result:
                     # user authenticated via Korben
-                    user.set_password(password)  # cache passwd hash for backup auth
+                    user.set_password(
+                        password)  # cache passwd hash for backup auth
                     user.is_active = True  # ensure user can use django backend to auth, in case CDMS fails
                     user.save()
 

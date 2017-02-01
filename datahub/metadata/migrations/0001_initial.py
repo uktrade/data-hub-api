@@ -9,8 +9,7 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
@@ -21,10 +20,9 @@ class Migration(migrations.Migration):
                 ('selectable', models.BooleanField(default=True)),
             ],
             options={
-                'ordering': ('name',),
+                'ordering': ('name', ),
                 'abstract': False,
-            },
-        ),
+            }, ),
         migrations.CreateModel(
             name='Country',
             fields=[
@@ -33,10 +31,9 @@ class Migration(migrations.Migration):
                 ('selectable', models.BooleanField(default=True)),
             ],
             options={
-                'ordering': ('name',),
+                'ordering': ('name', ),
                 'abstract': False,
-            },
-        ),
+            }, ),
         migrations.CreateModel(
             name='EmployeeRange',
             fields=[
@@ -45,10 +42,9 @@ class Migration(migrations.Migration):
                 ('selectable', models.BooleanField(default=True)),
             ],
             options={
-                'ordering': ('name',),
+                'ordering': ('name', ),
                 'abstract': False,
-            },
-        ),
+            }, ),
         migrations.CreateModel(
             name='InteractionType',
             fields=[
@@ -57,10 +53,9 @@ class Migration(migrations.Migration):
                 ('selectable', models.BooleanField(default=True)),
             ],
             options={
-                'ordering': ('name',),
+                'ordering': ('name', ),
                 'abstract': False,
-            },
-        ),
+            }, ),
         migrations.CreateModel(
             name='Role',
             fields=[
@@ -69,10 +64,9 @@ class Migration(migrations.Migration):
                 ('selectable', models.BooleanField(default=True)),
             ],
             options={
-                'ordering': ('name',),
+                'ordering': ('name', ),
                 'abstract': False,
-            },
-        ),
+            }, ),
         migrations.CreateModel(
             name='Sector',
             fields=[
@@ -81,10 +75,9 @@ class Migration(migrations.Migration):
                 ('selectable', models.BooleanField(default=True)),
             ],
             options={
-                'ordering': ('name',),
+                'ordering': ('name', ),
                 'abstract': False,
-            },
-        ),
+            }, ),
         migrations.CreateModel(
             name='Service',
             fields=[
@@ -93,10 +86,9 @@ class Migration(migrations.Migration):
                 ('selectable', models.BooleanField(default=True)),
             ],
             options={
-                'ordering': ('name',),
+                'ordering': ('name', ),
                 'abstract': False,
-            },
-        ),
+            }, ),
         migrations.CreateModel(
             name='Team',
             fields=[
@@ -105,10 +97,9 @@ class Migration(migrations.Migration):
                 ('selectable', models.BooleanField(default=True)),
             ],
             options={
-                'ordering': ('name',),
+                'ordering': ('name', ),
                 'abstract': False,
-            },
-        ),
+            }, ),
         migrations.CreateModel(
             name='Title',
             fields=[
@@ -117,10 +108,9 @@ class Migration(migrations.Migration):
                 ('selectable', models.BooleanField(default=True)),
             ],
             options={
-                'ordering': ('name',),
+                'ordering': ('name', ),
                 'abstract': False,
-            },
-        ),
+            }, ),
         migrations.CreateModel(
             name='TurnoverRange',
             fields=[
@@ -129,10 +119,9 @@ class Migration(migrations.Migration):
                 ('selectable', models.BooleanField(default=True)),
             ],
             options={
-                'ordering': ('name',),
+                'ordering': ('name', ),
                 'abstract': False,
-            },
-        ),
+            }, ),
         migrations.CreateModel(
             name='UKRegion',
             fields=[
@@ -141,8 +130,7 @@ class Migration(migrations.Migration):
                 ('selectable', models.BooleanField(default=True)),
             ],
             options={
-                'ordering': ('name',),
+                'ordering': ('name', ),
                 'abstract': False,
-            },
-        ),
+            }, ),
     ]

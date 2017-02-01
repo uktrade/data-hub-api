@@ -99,7 +99,10 @@ class CompanySerializerRead(serializers.ModelSerializer):
         """Return CH address if present."""
         obj = obj.companies_house_data or obj
         if obj.registered_address_country:
-            return {'id': str(obj.registered_address_country.id), 'name': obj.registered_address_country.name}
+            return {
+                'id': str(obj.registered_address_country.id),
+                'name': obj.registered_address_country.name
+            }
         else:
             return {}
 
@@ -189,7 +192,10 @@ class ContactSerializerRead(serializers.ModelSerializer):
             else:
                 return {}
         else:
-            return {'id': str(obj.address_country.pk), 'name': obj.address_country.name} if obj.address_country else {}
+            return {
+                'id': str(obj.address_country.pk),
+                'name': obj.address_country.name
+            } if obj.address_country else {}
 
     @staticmethod
     def get_address_county(obj):

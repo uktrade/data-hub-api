@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 
 import environ
 
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
 ROOT_DIR = environ.Path(__file__) - 2
@@ -35,25 +34,17 @@ DJANGO_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.postgres',
-)
+    'django.contrib.postgres', )
 
 THIRD_PARTY_APPS = (
     'rest_framework',
     'django_extensions',
     'reversion',
-    'oauth2_provider',
-)
+    'oauth2_provider', )
 
-LOCAL_APPS = (
-    'datahub.core',
-    'datahub.company',
-    'datahub.es',
-    'datahub.metadata',
-    'datahub.search',
-    'datahub.korben',
-    'datahub.user'
-)
+LOCAL_APPS = ('datahub.core', 'datahub.company', 'datahub.es',
+              'datahub.metadata', 'datahub.search', 'datahub.korben',
+              'datahub.user')
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -71,59 +62,54 @@ MIDDLEWARE_CLASSES = [
 
 ROOT_URLCONF = 'config.urls'
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
+TEMPLATES = [{
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [],
+    'APP_DIRS': True,
+    'OPTIONS': {
+        'context_processors': [
+            'django.template.context_processors.debug',
+            'django.template.context_processors.request',
+            'django.contrib.auth.context_processors.auth',
+            'django.contrib.messages.context_processors.messages',
+        ],
     },
-]
+}, ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-
-DATABASES = {
-    'default': env.db('DATABASE_URL')
-}
+DATABASES = {'default': env.db('DATABASE_URL')}
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
-FIXTURE_DIRS = [
-    str(ROOT_DIR('fixtures'))
-]
+FIXTURE_DIRS = [str(ROOT_DIR('fixtures'))]
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 AUTH_USER_MODEL = 'company.Advisor'
 AUTHENTICATION_BACKENDS = [
     'datahub.core.auth.CDMSUserBackend',
     'django.contrib.auth.backends.ModelBackend'
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
@@ -134,23 +120,18 @@ STATIC_ROOT = str(ROOT_DIR('staticfiles'))
 STATIC_URL = '/static/'
 
 # Extra places for collectstatic to find static files.
-STATICFILES_DIRS = (
-    str(ROOT_DIR.path('static')),
-)
-
-
+STATICFILES_DIRS = (str(ROOT_DIR.path('static')), )
 
 # DRF
 REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': None,
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'DEFAULT_PAGINATION_CLASS':
+    'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'oauth2_provider.ext.rest_framework.OAuth2Authentication',
-    ),
+        'oauth2_provider.ext.rest_framework.OAuth2Authentication', ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
+        'rest_framework.permissions.IsAuthenticated', ),
 }
 
 # Simplified static file serving.
@@ -175,6 +156,7 @@ DIT_ENABLED_ADVISORS = env.tuple('DIT_ENABLED_ADVISORS', default=())
 CELERY_BROKER_URL = env('BROKER_URL')
 CELERY_RESULT_BACKEND = env('RESULT_BACKEND')
 CELERY_RESULT_EXPIRES = None
-CELERY_BROKER_TRANSPORT_OPTIONS = env.dict('BROKER_TRANSPORT_OPTIONS', default={})
+CELERY_BROKER_TRANSPORT_OPTIONS = env.dict(
+    'BROKER_TRANSPORT_OPTIONS', default={})
 TASK_MAX_RETRIES = env('TASK_MAX_RETRIES', default=1000000)
 TASK_RETRY_DELAY_SECONDS = env('TASK_RETRY_DELAY_SECONDS', default=5)

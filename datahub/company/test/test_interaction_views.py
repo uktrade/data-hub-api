@@ -30,7 +30,8 @@ class InteractionTestCase(LeelooTestCase):
         """Test add new interaction."""
         url = reverse('interaction-list')
         response = self.api_client.post(url, {
-            'interaction_type': constants.InteractionType.business_card.value.id,
+            'interaction_type':
+            constants.InteractionType.business_card.value.id,
             'subject': 'whatever',
             'date_of_interaction': now().isoformat(),
             'dit_advisor': AdvisorFactory().pk,
@@ -43,20 +44,19 @@ class InteractionTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         # make sure we're spawning a task to save to Korben
-        expected_data = Interaction.objects.get(pk=response.data['id']).convert_model_to_korben_format()
+        expected_data = Interaction.objects.get(
+            pk=response.data['id']).convert_model_to_korben_format()
         mocked_save_to_korben.delay.assert_called_once_with(
             db_table='company_interaction',
             data=expected_data,
             update=False,
-            user_id=self.user.id
-        )
+            user_id=self.user.id)
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
         assert document_exists(
             client=es_client,
             doc_type='company_interaction',
-            document_id=response.data['id']
-        )
+            document_id=response.data['id'])
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     @freeze_time('2017-01-27 12:00:01')
@@ -78,16 +78,14 @@ class InteractionTestCase(LeelooTestCase):
             db_table='company_interaction',
             data=expected_data,
             update=True,  # this is an update!
-            user_id=self.user.id
-        )
+            user_id=self.user.id)
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
         es_result = es_client.get(
             index=settings.ES_INDEX,
             doc_type='company_interaction',
             id=response.data['id'],
-            realtime=True
-        )
+            realtime=True)
         assert es_result['_source']['subject'] == 'I am another subject'
 
     def test_archive_interaction_no_reason(self):
@@ -106,8 +104,7 @@ class InteractionTestCase(LeelooTestCase):
             index=settings.ES_INDEX,
             doc_type='company_interaction',
             id=response.data['id'],
-            realtime=True
-        )
+            realtime=True)
         assert es_result['_source']['archived']
         assert es_result['_source']['archived_reason'] == ''
 
@@ -127,8 +124,7 @@ class InteractionTestCase(LeelooTestCase):
             index=settings.ES_INDEX,
             doc_type='company_interaction',
             id=response.data['id'],
-            realtime=True
-        )
+            realtime=True)
         assert es_result['_source']['archived']
         assert es_result['_source']['archived_reason'] == 'foo'
 

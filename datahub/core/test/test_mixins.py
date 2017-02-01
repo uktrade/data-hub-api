@@ -15,7 +15,8 @@ from datahub.korben.exceptions import KorbenException
 frozen_now = now()
 model_dict = {'foo': 'hello', 'bar': str(frozen_now)}
 
-pytestmark = pytest.mark.skip(reason='Update from Korben temporarily disabled.')
+pytestmark = pytest.mark.skip(
+    reason='Update from Korben temporarily disabled.')
 
 
 class DummyModel(DeferredSaveModelMixin):
@@ -43,7 +44,8 @@ def test_update_from_korben_model_didnt_change(mocked_korben_connector):
     mocked_response.json.return_value = model_dict
     mocked_korben_connector().get.return_value = mocked_response
     class_instance_under_test = DummyModel()
-    assert class_instance_under_test.update_from_korben() == class_instance_under_test
+    assert class_instance_under_test.update_from_korben(
+    ) == class_instance_under_test
 
 
 @mock.patch('datahub.core.mixins.KorbenConnector')
@@ -54,7 +56,8 @@ def test_update_from_korben_404_scenario(mocked_korben_connector):
     mocked_response.json.return_value = model_dict
     mocked_korben_connector().get.return_value = mocked_response
     class_instance_under_test = DummyModel()
-    assert class_instance_under_test.update_from_korben() == class_instance_under_test
+    assert class_instance_under_test.update_from_korben(
+    ) == class_instance_under_test
 
 
 @mock.patch('datahub.core.mixins.KorbenConnector')
@@ -74,7 +77,8 @@ class KorbenUpdateTestCase(LeelooTestCase):
     """Korben update test case talking to the API."""
 
     @mock.patch('datahub.core.mixins.KorbenConnector')
-    def test_update_from_korben_different_object(self, mocked_korben_connector):
+    def test_update_from_korben_different_object(self,
+                                                 mocked_korben_connector):
         """Korben return a different object."""
         company = CompanyFactory()
         company_dict = company._convert_model_to_korben_format()
@@ -82,7 +86,8 @@ class KorbenUpdateTestCase(LeelooTestCase):
 
         for name in company.get_datetime_fields():
             if korben_response_dict[name]:
-                korben_response_dict[name] = korben_response_dict[name].isoformat()
+                korben_response_dict[name] = korben_response_dict[
+                    name].isoformat()
 
         mocked_response = Mock()
         mocked_response.status_code = status.HTTP_200_OK

@@ -36,5 +36,7 @@ def test_unsuccessful_authentication(mocked_generate_signature):
     mocked_generate_signature.return_value = '123'
     request = RequestFactory()
     request = request.get('foobar', HTTP_X_SIGNATURE='567')
-    with pytest.raises(AuthenticationFailed, message='Shared secret authentication failed'):
+    with pytest.raises(
+            AuthenticationFailed,
+            message='Shared secret authentication failed'):
         KorbenSharedSecretAuthentication().authenticate(request)

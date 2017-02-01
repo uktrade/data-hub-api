@@ -16,8 +16,7 @@ def get_test_user():
     user_model = get_user_model()
     team, _ = Team.objects.get_or_create(
         id=constants.Team.undefined.value.id,
-        name=constants.Team.undefined.value.name
-    )
+        name=constants.Team.undefined.value.name)
     try:
         test_user = user_model.objects.get(email='Testo@Useri.com')
     except user_model.DoesNotExist:
@@ -26,8 +25,7 @@ def get_test_user():
             last_name='Useri',
             email='Testo@Useri.com',
             date_joined=now(),
-            dit_team=team
-        )
+            dit_team=team)
         test_user.set_password('password')
         test_user.save()
     return test_user
@@ -64,7 +62,8 @@ class LeelooTestCase(TestCase):
         """
         client = APIClient()
         client.force_authenticate(user=self.user)
-        client.credentials(Authorization='Bearer {token}'.format(token=self.token))
+        client.credentials(Authorization='Bearer {token}'.format(
+            token=self.token))
         return client
 
     def get_token(self):
@@ -77,8 +76,7 @@ class LeelooTestCase(TestCase):
             application=self.application,
             token='123456789',  # unsafe token, just for testing
             expires=datetime.datetime.now() + datetime.timedelta(hours=1),
-            scope='write read'
-        )
+            scope='write read')
         return token.token
 
     def get_application(self):
@@ -90,6 +88,5 @@ class LeelooTestCase(TestCase):
             user=get_test_user(),
             client_type=Application.CLIENT_CONFIDENTIAL,
             authorization_grant_type=Application.GRANT_PASSWORD,
-            name='Test client'
-        )
+            name='Test client')
         return application

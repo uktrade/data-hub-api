@@ -12,5 +12,4 @@ class Migration(migrations.Migration):
         ('metadata', '0002_auto_20161129_0528'),
     ]
 
-    operations = [
-    ]
+    operations = []

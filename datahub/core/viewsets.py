@@ -12,10 +12,8 @@ from datahub.company import tasks
 from datahub.korben.exceptions import KorbenException
 
 
-class CoreViewSet(mixins.CreateModelMixin,
-                  mixins.RetrieveModelMixin,
-                  mixins.UpdateModelMixin,
-                  mixins.ListModelMixin,
+class CoreViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
+                  mixins.UpdateModelMixin, mixins.ListModelMixin,
                   GenericViewSet):
     """Implement the archive route and the read/write serializers."""
 
@@ -54,8 +52,7 @@ class CoreViewSet(mixins.CreateModelMixin,
             data=obj.convert_model_to_korben_format(),
             user_id=user_id,
             db_table=model_class._meta.db_table,
-            update=update
-        )
+            update=update)
 
     def create(self, request, *args, **kwargs):
         """Override create to catch the validation errors coming from the models.
@@ -68,8 +65,7 @@ class CoreViewSet(mixins.CreateModelMixin,
             self._save_to_korben(
                 object_id=response.data['id'],
                 user_id=request.user.id,
-                update=False
-            )
+                update=False)
             return response
         except ValidationError as e:
             raise DRFValidationError({'errors': e.message_dict})
@@ -87,8 +83,7 @@ class CoreViewSet(mixins.CreateModelMixin,
             self._save_to_korben(
                 object_id=response.data['id'],
                 user_id=request.user.id,
-                update=True
-            )
+                update=True)
             return response
         except ValidationError as e:
             raise DRFValidationError({'errors': e.message_dict})

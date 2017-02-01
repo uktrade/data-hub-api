@@ -1,7 +1,8 @@
 from django.urls import reverse
 from rest_framework import status
 
-from datahub.company.test.factories import (CompaniesHouseCompanyFactory, CompanyFactory, ContactFactory,
+from datahub.company.test.factories import (CompaniesHouseCompanyFactory,
+                                            CompanyFactory, ContactFactory,
                                             InteractionFactory)
 from datahub.core.test_utils import LeelooTestCase
 
@@ -20,11 +21,7 @@ class SearchViewTestCase(LeelooTestCase):
     def test_search_by_term(self):
         """Search by term."""
         url = reverse('search')
-        response = self.api_client.post(
-            url,
-            {'term': 'Foo'},
-            format='json'
-        )
+        response = self.api_client.post(url, {'term': 'Foo'}, format='json')
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -38,10 +35,8 @@ class SearchViewTestCase(LeelooTestCase):
         url = reverse('search')
         expected_types = {'company_company', 'company_contact'}
         response = self.api_client.post(
-            url,
-            {'term': 'Foo', 'doc_type': expected_types},
-            format='json'
-        )
+            url, {'term': 'Foo',
+                  'doc_type': expected_types}, format='json')
         returned_types = set([hit['_type'] for hit in response.data['hits']])
 
         assert response.status_code == status.HTTP_200_OK
@@ -57,10 +52,8 @@ class SearchViewTestCase(LeelooTestCase):
         url = reverse('search')
         expected_types = {'company_company'}
         response = self.api_client.post(
-            url,
-            {'term': 'Foo', 'doc_type': expected_types},
-            format='json'
-        )
+            url, {'term': 'Foo',
+                  'doc_type': expected_types}, format='json')
         returned_types = set([hit['_type'] for hit in response.data['hits']])
 
         assert response.status_code == status.HTTP_200_OK

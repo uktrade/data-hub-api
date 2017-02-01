@@ -8,14 +8,13 @@ import django.utils.timezone
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('company', '0006_auto_20161130_0507'),
-    ]
+    dependencies = [('company', '0006_auto_20161130_0507'), ]
 
     operations = [
         migrations.AlterField(
             model_name='advisor',
             name='date_joined',
-            field=models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined'),
+            field=models.DateTimeField(
+                default=django.utils.timezone.now, verbose_name='date joined'),
         ),
     ]

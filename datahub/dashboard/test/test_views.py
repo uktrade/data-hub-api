@@ -34,6 +34,7 @@ class DashboardTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data['contacts']) == 1
-        assert response.data['contacts'][0]['id'] == str(api_response.data['id'])
+        assert response.data['contacts'][0]['id'] == str(
+            api_response.data['id'])
         assert len(response.data['interactions']) == 1
         assert response.data['interactions'][0]['id'] == str(interaction.pk)

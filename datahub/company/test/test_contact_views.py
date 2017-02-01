@@ -47,20 +47,19 @@ class ContactTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         # make sure we're spawning a task to save to Korben
-        expected_data = Contact.objects.get(pk=response.data['id']).convert_model_to_korben_format()
+        expected_data = Contact.objects.get(
+            pk=response.data['id']).convert_model_to_korben_format()
         mocked_save_to_korben.delay.assert_called_once_with(
             db_table='company_contact',
             data=expected_data,
             update=False,
-            user_id=self.user.id
-        )
+            user_id=self.user.id)
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
         assert document_exists(
             client=es_client,
             doc_type='company_contact',
-            document_id=response.data['id']
-        )
+            document_id=response.data['id'])
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_contact_no_address(self, mocked_save_to_korben):
@@ -82,7 +81,9 @@ class ContactTestCase(LeelooTestCase):
         assert mocked_save_to_korben.delay.called is False
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data['errors'] == {
-            'address_same_as_company': ['Please select either address_same_as_company or enter an address manually.']
+            'address_same_as_company': [
+                'Please select either address_same_as_company or enter an address manually.'
+            ]
         }
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
@@ -131,20 +132,19 @@ class ContactTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         # make sure we're spawning a task to save to Korben
-        expected_data = Contact.objects.get(pk=response.data['id']).convert_model_to_korben_format()
+        expected_data = Contact.objects.get(
+            pk=response.data['id']).convert_model_to_korben_format()
         mocked_save_to_korben.delay.assert_called_once_with(
             db_table='company_contact',
             data=expected_data,
             update=False,
-            user_id=self.user.id
-        )
+            user_id=self.user.id)
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
         assert document_exists(
             client=es_client,
             doc_type='company_contact',
-            document_id=response.data['id']
-        )
+            document_id=response.data['id'])
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     @freeze_time('2017-01-27 12:00:01')
@@ -153,9 +153,7 @@ class ContactTestCase(LeelooTestCase):
         contact = ContactFactory(first_name='Foo')
 
         url = reverse('contact-detail', kwargs={'pk': contact.pk})
-        response = self.api_client.patch(url, {
-            'first_name': 'bar',
-        })
+        response = self.api_client.patch(url, {'first_name': 'bar', })
 
         assert response.status_code == status.HTTP_200_OK, response.data
         assert response.data['first_name'] == 'bar'
@@ -166,16 +164,14 @@ class ContactTestCase(LeelooTestCase):
             db_table='company_contact',
             data=expected_data,
             update=True,  # this is an update!
-            user_id=self.user.id
-        )
+            user_id=self.user.id)
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
         es_result = es_client.get(
             index=settings.ES_INDEX,
             doc_type='company_contact',
             id=response.data['id'],
-            realtime=True
-        )
+            realtime=True)
         assert es_result['_source']['first_name'] == 'bar'
 
     def test_archive_contact_no_reason(self):
@@ -194,8 +190,7 @@ class ContactTestCase(LeelooTestCase):
             index=settings.ES_INDEX,
             doc_type='company_contact',
             id=response.data['id'],
-            realtime=True
-        )
+            realtime=True)
         assert es_result['_source']['archived']
         assert es_result['_source']['archived_reason'] == ''
 
@@ -215,8 +210,7 @@ class ContactTestCase(LeelooTestCase):
             index=settings.ES_INDEX,
             doc_type='company_contact',
             id=response.data['id'],
-            realtime=True
-        )
+            realtime=True)
         assert es_result['_source']['archived']
         assert es_result['_source']['archived_reason'] == 'foo'
 

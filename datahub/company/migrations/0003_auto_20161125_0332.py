@@ -7,19 +7,15 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('company', '0002_auto_20161124_0920'),
-    ]
+    dependencies = [('company', '0002_auto_20161124_0920'), ]
 
     operations = [
         migrations.AlterField(
             model_name='advisor',
             name='first_name',
-            field=models.CharField(blank=True, max_length=255),
-        ),
+            field=models.CharField(blank=True, max_length=255), ),
         migrations.AlterField(
             model_name='advisor',
             name='last_name',
-            field=models.CharField(blank=True, max_length=255),
-        ),
+            field=models.CharField(blank=True, max_length=255), ),
     ]

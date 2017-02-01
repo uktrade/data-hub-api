@@ -28,8 +28,10 @@ def test_korben_company_create(api_client):
         'name': 'Foo',
         'registered_address_1': 'Foo st.',
         'registered_address_town': 'London',
-        'registered_address_country_id': constants.Country.united_kingdom.value.id,
-        'business_type_id': constants.BusinessType.private_limited_company.value.id,
+        'registered_address_country_id':
+        constants.Country.united_kingdom.value.id,
+        'business_type_id':
+        constants.BusinessType.private_limited_company.value.id,
         'sector_id': constants.Sector.aerospace_assembly_aircraft.value.id,
         'archived': False,
         'uk_region_id': constants.UKRegion.england.value.id,
@@ -53,8 +55,10 @@ def test_korben_company_update(api_client):
         'name': 'My little company',
         'registered_address_1': 'My st.',
         'registered_address_town': 'London',
-        'registered_address_country_id': constants.Country.united_kingdom.value.id,
-        'business_type_id': constants.BusinessType.private_limited_company.value.id,
+        'registered_address_country_id':
+        constants.Country.united_kingdom.value.id,
+        'business_type_id':
+        constants.BusinessType.private_limited_company.value.id,
         'sector_id': constants.Sector.aerospace_assembly_aircraft.value.id,
         'archived': False,
         'uk_region_id': constants.UKRegion.england.value.id,
@@ -65,8 +69,7 @@ def test_korben_company_update(api_client):
 
     assert response.status_code == status.HTTP_200_OK
     assert Company.objects.filter(
-        pk=data_dict['id'], name='My little company'
-    ).exists()
+        pk=data_dict['id'], name='My little company').exists()
 
 
 def test_korben_contact_create(api_client):
@@ -141,7 +144,8 @@ def test_korben_contact_update(api_client):
     response = api_client.post(url, data, content_type='application/json')
 
     assert response.status_code == status.HTTP_200_OK
-    assert Contact.objects.filter(pk=data_dict['id'], first_name='Mario').exists()
+    assert Contact.objects.filter(
+        pk=data_dict['id'], first_name='Mario').exists()
 
 
 def test_korben_advisor_create(api_client):

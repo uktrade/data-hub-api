@@ -8,14 +8,15 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('company', '0009_auto_20161214_0343'),
-    ]
+    dependencies = [('company', '0009_auto_20161214_0343'), ]
 
     operations = [
         migrations.AlterField(
             model_name='contact',
             name='title',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='metadata.Title'),
-        ),
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to='metadata.Title'), ),
     ]

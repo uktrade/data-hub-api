@@ -8,20 +8,15 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('company', '0004_auto_20161129_0423'),
-    ]
+    dependencies = [('company', '0004_auto_20161129_0423'), ]
 
     operations = [
         migrations.AlterModelManagers(
             name='advisor',
-            managers=[
-                ('objects', datahub.company.models.AdvisorManager()),
-            ],
+            managers=[('objects', datahub.company.models.AdvisorManager()), ],
         ),
         migrations.AlterField(
             model_name='advisor',
             name='email',
-            field=models.CharField(max_length=255, unique=True),
-        ),
+            field=models.CharField(max_length=255, unique=True), ),
     ]

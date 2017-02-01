@@ -45,5 +45,4 @@ def document_exists(client, doc_type, document_id):
         index=settings.ES_INDEX,
         doc_type=doc_type,
         id=document_id,
-        realtime=True
-    )
+        realtime=True)

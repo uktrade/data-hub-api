@@ -18,8 +18,7 @@ def get_korben_user():
             first_name='Kor',
             last_name='Ben',
             date_joined=now(),
-            dit_team_id=constants.Team.undefined.value.id,
-        )
+            dit_team_id=constants.Team.undefined.value.id, )
         korben_user.save()
     return korben_user
 
@@ -35,5 +34,6 @@ def generate_signature(path, body, salt):
     """Generate the signature to be passed into the header."""
     # make sure it's a path
     url_object = urlparse(path)
-    message = string_to_bytes(url_object.path) + string_to_bytes(body) + string_to_bytes(salt)
+    message = string_to_bytes(
+        url_object.path) + string_to_bytes(body) + string_to_bytes(salt)
     return sha256(message).hexdigest()

@@ -24,11 +24,11 @@ def test_save_to_korben_task_stale_object(mocked_korben_connector):
     user = get_test_user()
 
     save_to_korben(
-        data={'id': 'test', 'modified_on': now().isoformat()},
+        data={'id': 'test',
+              'modified_on': now().isoformat()},
         user_id=str(user.id),
         db_table='company_company',
-        update=True
-    )
+        update=True)
 
     # check save_to_korben called
     assert mocked_korben_connector().post.called is False
@@ -44,11 +44,11 @@ def test_save_to_korben_update_happy_path(mocked_korben_connector):
     user = get_test_user()
 
     save_to_korben(
-        data={'foo': 'bar', 'modified_on': now().isoformat()},
+        data={'foo': 'bar',
+              'modified_on': now().isoformat()},
         user_id=str(user.id),
         db_table='company_company',
-        update=True
-    )
+        update=True)
 
     # check save_to_korben called
     assert mocked_korben_connector().post.called
@@ -61,11 +61,11 @@ def test_save_to_korben_create_happy_path(mocked_korben_connector):
     user = get_test_user()
 
     save_to_korben(
-        data={'foo': 'bar', 'modified_on': now().isoformat()},
+        data={'foo': 'bar',
+              'modified_on': now().isoformat()},
         user_id=str(user.id),
         db_table='company_company',
-        update=True
-    )
+        update=True)
 
     # check save_to_korben called
     assert mocked_korben_connector().post.called
@@ -73,8 +73,10 @@ def test_save_to_korben_create_happy_path(mocked_korben_connector):
 
 @mock.patch('datahub.company.tasks.KorbenConnector')
 @mock.patch('datahub.company.tasks.client')
-@mock.patch('datahub.company.tasks.save_to_korben.retry', mock.Mock(side_effect=Retry))
-def test_save_to_korben_retry_exception(mocked_sentry_client, mocked_korben_connector):
+@mock.patch(
+    'datahub.company.tasks.save_to_korben.retry', mock.Mock(side_effect=Retry))
+def test_save_to_korben_retry_exception(mocked_sentry_client,
+                                        mocked_korben_connector):
     """Save to Korben task works."""
     mocked_korben_connector().post.side_effect = KorbenException()
     date_in_the_past = datetime.datetime.now() + datetime.timedelta(-1)
@@ -85,9 +87,9 @@ def test_save_to_korben_retry_exception(mocked_sentry_client, mocked_korben_conn
 
     with pytest.raises(Retry):
         save_to_korben(
-            data={'foo': 'bar', 'modified_on': now().isoformat()},
+            data={'foo': 'bar',
+                  'modified_on': now().isoformat()},
             user_id=str(user.id),
             db_table='company_company',
-            update=True
-        )
+            update=True)
         mocked_sentry_client.captureException.assert_called_once_with()

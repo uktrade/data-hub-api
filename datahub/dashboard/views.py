@@ -22,12 +22,13 @@ class IntelligentHomepageView(APIView):
 
         interactions = Interaction.objects.filter(
             dit_advisor=user,
-            created_on__gte=days_in_the_past
-        ).order_by('-created_on')
+            created_on__gte=days_in_the_past).order_by('-created_on')
         contacts = Contact.objects.filter(
             advisor=user,
-            created_on__gte=days_in_the_past
-        ).order_by('-created_on')
+            created_on__gte=days_in_the_past).order_by('-created_on')
 
-        serializer = IntelligentHomepageSerializer({'interactions': interactions, 'contacts': contacts})
+        serializer = IntelligentHomepageSerializer({
+            'interactions': interactions,
+            'contacts': contacts
+        })
         return Response(data=serializer.data)

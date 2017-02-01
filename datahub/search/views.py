@@ -29,7 +29,6 @@ class Search(APIView):
             term=query_term,
             doc_type=doc_type,
             offset=int(offset),
-            limit=int(limit)
-        )
+            limit=int(limit))
         formatted_results = format_es_results(results)
         return Response(data=formatted_results)

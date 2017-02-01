@@ -19,15 +19,13 @@ def ping(request):
 
     if all(item[0] for item in checked.values()):
         return HttpResponse(
-            PINGDOM_TEMPLATE.format(status='OK'),
-            content_type='text/xml'
-        )
+            PINGDOM_TEMPLATE.format(status='OK'), content_type='text/xml')
     else:
         body = PINGDOM_TEMPLATE.format(status='FALSE')
-        for service_result in filter(lambda x: x[0] is False, checked.values()):
+        for service_result in filter(lambda x: x[0] is False,
+                                     checked.values()):
             body += COMMENT_TEMPLATE.format(comment=service_result[1])
         return HttpResponse(
             body,
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content_type='text/xml'
-        )
+            content_type='text/xml')

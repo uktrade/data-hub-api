@@ -8,14 +8,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('company', '0010_auto_20170113_0610'),
-    ]
+    dependencies = [('company', '0010_auto_20170113_0610'), ]
 
     operations = [
         migrations.AlterField(
             model_name='company',
             name='website',
-            field=models.CharField(blank=True, max_length=255, null=True, validators=[datahub.company.validators.RelaxedURLValidator]),
+            field=models.CharField(
+                blank=True,
+                max_length=255,
+                null=True,
+                validators=[datahub.company.validators.RelaxedURLValidator]),
         ),
     ]

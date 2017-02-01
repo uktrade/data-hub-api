@@ -5,8 +5,7 @@ from .models import TaskInfo
 from .serializers import TaskInfoModelSerializer
 
 
-class TaskInfoReadOnlyViewSet(mixins.ListModelMixin,
-                              mixins.RetrieveModelMixin,
+class TaskInfoReadOnlyViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
                               viewsets.GenericViewSet):
     """Task info read only viewset."""
 

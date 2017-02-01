@@ -7,22 +7,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('company', '0003_auto_20161125_0332'),
-    ]
+    dependencies = [('company', '0003_auto_20161125_0332'), ]
 
     operations = [
         migrations.AlterModelOptions(
             name='advisor',
-            options={},
-        ),
+            options={}, ),
         migrations.RemoveField(
             model_name='advisor',
-            name='username',
-        ),
+            name='username', ),
         migrations.AlterField(
             model_name='advisor',
             name='email',
-            field=models.EmailField(max_length=255, unique=True),
-        ),
+            field=models.EmailField(max_length=255, unique=True), ),
     ]

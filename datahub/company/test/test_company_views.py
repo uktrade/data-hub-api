@@ -37,13 +37,10 @@ class CompanyTestCase(LeelooTestCase):
             name='Foo ltd.',
             registered_address_1='Hello st.',
             registered_address_town='Fooland',
-            registered_address_country_id=constants.Country.united_states.value.id
-        )
+            registered_address_country_id=constants.Country.united_states.
+            value.id)
         company = CompanyFactory(
-            company_number=123,
-            name='Bar ltd.',
-            alias='Xyz trading'
-        )
+            company_number=123, name='Bar ltd.', alias='Xyz trading')
 
         url = reverse('company-detail', kwargs={'pk': company.id})
         response = self.api_client.get(url)
@@ -54,11 +51,13 @@ class CompanyTestCase(LeelooTestCase):
         assert response.data['companies_house_data']['id'] == ch_company.id
         assert response.data['name'] == ch_company.name
         assert response.data['trading_name'] == company.alias
-        assert response.data['registered_address_1'] == ch_company.registered_address_1
+        assert response.data[
+            'registered_address_1'] == ch_company.registered_address_1
         assert response.data['registered_address_2'] is None
         assert response.data['registered_address_3'] is None
         assert response.data['registered_address_4'] is None
-        assert response.data['registered_address_town'] == ch_company.registered_address_town
+        assert response.data[
+            'registered_address_town'] == ch_company.registered_address_town
         assert response.data['registered_address_country'] == {
             'name': ch_company.registered_address_country.name,
             'id': str(ch_company.registered_address_country.pk)
@@ -75,8 +74,8 @@ class CompanyTestCase(LeelooTestCase):
             name='Foo ltd.',
             registered_address_1='Hello st.',
             registered_address_town='Fooland',
-            registered_address_country_id=constants.Country.united_states.value.id
-        )
+            registered_address_country_id=constants.Country.united_states.
+            value.id)
 
         url = reverse('company-detail', kwargs={'pk': company.id})
         response = self.api_client.get(url)
@@ -85,11 +84,13 @@ class CompanyTestCase(LeelooTestCase):
         assert response.data['id'] == str(company.pk)
         assert response.data['companies_house_data'] is None
         assert response.data['name'] == company.name
-        assert response.data['registered_address_1'] == company.registered_address_1
+        assert response.data[
+            'registered_address_1'] == company.registered_address_1
         assert response.data['registered_address_2'] is None
         assert response.data['registered_address_3'] is None
         assert response.data['registered_address_4'] is None
-        assert response.data['registered_address_town'] == company.registered_address_town
+        assert response.data[
+            'registered_address_town'] == company.registered_address_town
         assert response.data['registered_address_country'] == {
             'name': company.registered_address_country.name,
             'id': str(company.registered_address_country.pk)
@@ -105,14 +106,12 @@ class CompanyTestCase(LeelooTestCase):
             name='Foo ltd.',
             registered_address_1='Hello st.',
             registered_address_town='Fooland',
-            registered_address_country_id=constants.Country.united_states.value.id
-        )
+            registered_address_country_id=constants.Country.united_states.
+            value.id)
 
         # now update it
         url = reverse('company-detail', kwargs={'pk': company.pk})
-        response = self.api_client.patch(url, {
-            'name': 'Acme',
-        })
+        response = self.api_client.patch(url, {'name': 'Acme', })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['name'] == 'Acme'
@@ -123,16 +122,14 @@ class CompanyTestCase(LeelooTestCase):
             db_table='company_company',
             data=expected_data,
             update=True,  # this is an update!
-            user_id=self.user.id
-        )
+            user_id=self.user.id)
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
         es_result = es_client.get(
             index=settings.ES_INDEX,
             doc_type='company_company',
             id=response.data['id'],
-            realtime=True
-        )
+            realtime=True)
         assert es_result['_source']['name'] == 'Acme'
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
@@ -144,7 +141,8 @@ class CompanyTestCase(LeelooTestCase):
             'alias': None,
             'business_type': constants.BusinessType.company.value.id,
             'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
-            'registered_address_country': constants.Country.united_kingdom.value.id,
+            'registered_address_country':
+            constants.Country.united_kingdom.value.id,
             'registered_address_1': '75 Stramford Road',
             'registered_address_town': 'London',
             'uk_region': constants.UKRegion.england.value.id
@@ -152,20 +150,19 @@ class CompanyTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data['name'] == 'Acme'
-        expected_data = Company.objects.get(pk=response.data['id']).convert_model_to_korben_format()
+        expected_data = Company.objects.get(
+            pk=response.data['id']).convert_model_to_korben_format()
         mocked_save_to_korben.delay.assert_called_once_with(
             db_table='company_company',
             data=expected_data,
             update=False,
-            user_id=self.user.id
-        )
+            user_id=self.user.id)
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
         assert document_exists(
             client=es_client,
             doc_type='company_company',
-            document_id=response.data['id']
-        )
+            document_id=response.data['id'])
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_uk_company_without_uk_region(self, mocked_save_to_korben):
@@ -176,14 +173,17 @@ class CompanyTestCase(LeelooTestCase):
             'alias': None,
             'business_type': constants.BusinessType.company.value.id,
             'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
-            'registered_address_country': constants.Country.united_kingdom.value.id,
+            'registered_address_country':
+            constants.Country.united_kingdom.value.id,
             'registered_address_1': '75 Stramford Road',
             'registered_address_town': 'London',
         })
 
         assert mocked_save_to_korben.delay.called is False
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data['errors'] == {'uk_region': ['UK region is required for UK companies.']}
+        assert response.data['errors'] == {
+            'uk_region': ['UK region is required for UK companies.']
+        }
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_not_uk_company(self, mocked_save_to_korben):
@@ -194,7 +194,8 @@ class CompanyTestCase(LeelooTestCase):
             'alias': None,
             'business_type': constants.BusinessType.company.value.id,
             'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
-            'registered_address_country': constants.Country.united_states.value.id,
+            'registered_address_country':
+            constants.Country.united_states.value.id,
             'registered_address_1': '75 Stramford Road',
             'registered_address_town': 'London',
         })
@@ -202,20 +203,19 @@ class CompanyTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data['name'] == 'Acme'
         # make sure we're spawning a task to save to Korben
-        expected_data = Company.objects.get(pk=response.data['id']).convert_model_to_korben_format()
+        expected_data = Company.objects.get(
+            pk=response.data['id']).convert_model_to_korben_format()
         mocked_save_to_korben.delay.assert_called_once_with(
             db_table='company_company',
             data=expected_data,
             update=False,
-            user_id=self.user.id
-        )
+            user_id=self.user.id)
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
         assert document_exists(
             client=es_client,
             doc_type='company_company',
-            document_id=response.data['id']
-        )
+            document_id=response.data['id'])
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_company_partial_trading_address(self, mocked_save_to_korben):
@@ -225,7 +225,8 @@ class CompanyTestCase(LeelooTestCase):
             'name': 'Acme',
             'business_type': constants.BusinessType.company.value.id,
             'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
-            'registered_address_country': constants.Country.united_kingdom.value.id,
+            'registered_address_country':
+            constants.Country.united_kingdom.value.id,
             'registered_address_1': '75 Stramford Road',
             'registered_address_town': 'London',
             'trading_address_1': 'test',
@@ -247,7 +248,8 @@ class CompanyTestCase(LeelooTestCase):
             'name': 'Acme',
             'business_type': constants.BusinessType.company.value.id,
             'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
-            'registered_address_country': constants.Country.united_kingdom.value.id,
+            'registered_address_country':
+            constants.Country.united_kingdom.value.id,
             'registered_address_1': '75 Stramford Road',
             'registered_address_town': 'London',
             'trading_address_country': constants.Country.ireland.value.id,
@@ -258,30 +260,31 @@ class CompanyTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         # make sure we're spawning a task to save to Korben
-        expected_data = Company.objects.get(pk=response.data['id']).convert_model_to_korben_format()
+        expected_data = Company.objects.get(
+            pk=response.data['id']).convert_model_to_korben_format()
         mocked_save_to_korben.delay.assert_called_once_with(
             db_table='company_company',
             data=expected_data,
             update=False,
-            user_id=self.user.id
-        )
+            user_id=self.user.id)
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
         assert document_exists(
             client=es_client,
             doc_type='company_company',
-            document_id=response.data['id']
-        )
+            document_id=response.data['id'])
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
-    def test_add_company_with_website_without_scheme(self, mocked_save_to_korben):
+    def test_add_company_with_website_without_scheme(self,
+                                                     mocked_save_to_korben):
         """Test add new company with trading_address."""
         url = reverse('company-list')
         response = self.api_client.post(url, {
             'name': 'Acme',
             'business_type': constants.BusinessType.company.value.id,
             'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
-            'registered_address_country': constants.Country.united_kingdom.value.id,
+            'registered_address_country':
+            constants.Country.united_kingdom.value.id,
             'registered_address_1': '75 Stramford Road',
             'registered_address_town': 'London',
             'trading_address_country': constants.Country.ireland.value.id,
@@ -294,20 +297,19 @@ class CompanyTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data['website'] == 'www.google.com'
         # make sure we're spawning a task to save to Korben
-        expected_data = Company.objects.get(pk=response.data['id']).convert_model_to_korben_format()
+        expected_data = Company.objects.get(
+            pk=response.data['id']).convert_model_to_korben_format()
         mocked_save_to_korben.delay.assert_called_once_with(
             db_table='company_company',
             data=expected_data,
             update=False,
-            user_id=self.user.id
-        )
+            user_id=self.user.id)
         # make sure we're writing to ES
         es_client = get_elasticsearch_client()
         assert document_exists(
             client=es_client,
             doc_type='company_company',
-            document_id=response.data['id']
-        )
+            document_id=response.data['id'])
 
     def test_archive_company_no_reason(self):
         """Test company archive."""
@@ -325,8 +327,7 @@ class CompanyTestCase(LeelooTestCase):
             index=settings.ES_INDEX,
             doc_type='company_company',
             id=response.data['id'],
-            realtime=True
-        )
+            realtime=True)
         assert es_result['_source']['archived']
         assert es_result['_source']['archived_reason'] == ''
 
@@ -346,14 +347,14 @@ class CompanyTestCase(LeelooTestCase):
             index=settings.ES_INDEX,
             doc_type='company_company',
             id=response.data['id'],
-            realtime=True
-        )
+            realtime=True)
         assert es_result['_source']['archived']
         assert es_result['_source']['archived_reason'] == 'foo'
 
     def test_unarchive_company(self):
         """Unarchive a company."""
-        company = CompanyFactory(archived=True, archived_on=now(), archived_reason='foo')
+        company = CompanyFactory(
+            archived=True, archived_on=now(), archived_reason='foo')
         url = reverse('company-unarchive', kwargs={'pk': company.id})
         response = self.api_client.get(url)
 
@@ -374,13 +375,16 @@ class CHCompanyTestCase(LeelooTestCase):
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == models.CompaniesHouseCompany.objects.all().count()
+        assert response.data[
+            'count'] == models.CompaniesHouseCompany.objects.all().count()
 
     def test_detail_ch_company(self):
         """Test companies house company detail."""
         ch_company = CompaniesHouseCompanyFactory(company_number=123)
 
-        url = reverse('companieshousecompany-detail', kwargs={'company_number': ch_company.company_number})
+        url = reverse(
+            'companieshousecompany-detail',
+            kwargs={'company_number': ch_company.company_number})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -403,8 +407,7 @@ class CHCompanyTestCase(LeelooTestCase):
         assert document_exists(
             client=es_client,
             doc_type='company_companieshousecompany',
-            document_id=ch_company.pk
-        )
+            document_id=ch_company.pk)
 
         # promote a company to ch
 
@@ -414,7 +417,8 @@ class CHCompanyTestCase(LeelooTestCase):
             'company_number': 1234567890,
             'business_type': constants.BusinessType.company.value.id,
             'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
-            'registered_address_country': constants.Country.united_kingdom.value.id,
+            'registered_address_country':
+            constants.Country.united_kingdom.value.id,
             'registered_address_1': '75 Stramford Road',
             'registered_address_town': 'London',
             'trading_address_country': constants.Country.ireland.value.id,
@@ -428,11 +432,9 @@ class CHCompanyTestCase(LeelooTestCase):
         assert not document_exists(
             client=es_client,
             doc_type='company_companieshousecompany',
-            document_id=ch_company.pk
-        )
+            document_id=ch_company.pk)
 
         assert document_exists(
             client=es_client,
             doc_type='company_company',
-            document_id=response.data['id']
-        )
+            document_id=response.data['id'])

@@ -7,13 +7,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('metadata', '0001_initial'),
-    ]
+    dependencies = [('metadata', '0001_initial'), ]
 
     operations = [
         migrations.AlterModelOptions(
             name='country',
-            options={'verbose_name_plural': 'countries'},
-        ),
+            options={'verbose_name_plural': 'countries'}, ),
     ]

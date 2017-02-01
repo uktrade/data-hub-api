@@ -7,18 +7,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('company', '0003_auto_20161125_0332'),
-    ]
+    dependencies = [('company', '0003_auto_20161125_0332'), ]
 
     operations = [
         migrations.RemoveField(
             model_name='contact',
-            name='role',
-        ),
+            name='role', ),
         migrations.AddField(
             model_name='contact',
             name='job_title',
-            field=models.CharField(blank=True, max_length=255, null=True),
-        ),
+            field=models.CharField(blank=True, max_length=255, null=True), ),
     ]

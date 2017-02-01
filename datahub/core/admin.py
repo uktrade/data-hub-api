@@ -14,19 +14,25 @@ from .models import TaskInfo
 class TaskInfoAdmin(admin.ModelAdmin):
     """Admin for TaskInfo."""
 
-    readonly_fields = ('changes_prettified', 'type', 'status', 'task_id', 'user', 'update')
+    readonly_fields = ('changes_prettified', 'type', 'status', 'task_id',
+                       'user', 'update')
     exclude = ('changes', 'db_table')
-    list_display = ('task_id', 'manual_rerun_task', 'user', 'type', 'created_on', 'status')
+    list_display = ('task_id', 'manual_rerun_task', 'user', 'type',
+                    'created_on', 'status')
     actions = ['respawn_task']
     list_filter = ['created_on', 'db_table']
-    search_fields = ['user__first_name', 'user__last_name', 'user__email', 'task_id']
+    search_fields = [
+        'user__first_name', 'user__last_name', 'user__email', 'task_id'
+    ]
     date_hierarchy = 'created_on'
     ordering = ['-created_on']
 
     def type(self, instance):
         """Human readable save type from db_table."""
-        type = instance.db_table.split('_')[1] if '_' in instance.db_table else instance.db_table
+        type = instance.db_table.split('_')[
+            1] if '_' in instance.db_table else instance.db_table
         return mark_safe(type)
+
     type.short_description = 'type'
 
     def changes_prettified(self, instance):
@@ -39,6 +45,7 @@ class TaskInfoAdmin(admin.ModelAdmin):
         response = highlight(response, JsonLexer(), formatter)
         style = '<style>' + formatter.get_style_defs() + '</style><br>'
         return mark_safe(style + response)
+
     changes_prettified.short_description = 'changes prettified'
 
     def respawn_task(self, request, queryset):
@@ -48,8 +55,8 @@ class TaskInfoAdmin(admin.ModelAdmin):
                 data=t.changes,
                 user_id=t.user_id,
                 db_table=t.db_table,
-                update=t.update
-            )
+                update=t.update)
             t.manual_rerun_task_id = str(async_result.task_id)
             t.save()
+
     respawn_task.short_description = 'Re-spawn the task (DANGEROUS!)'
