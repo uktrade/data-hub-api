@@ -20,8 +20,6 @@ class CoreViewSet(mixins.CreateModelMixin,
     read_serializer_class = None
     write_serializer_class = None
 
-
-
     def get_serializer_class(self):
         """Return a different serializer class for reading or writing, if defined."""
         if self.action in ('list', 'retrieve', 'archive'):

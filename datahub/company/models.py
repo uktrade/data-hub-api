@@ -14,7 +14,7 @@ from django.utils.timezone import now
 from datahub.company.validators import RelaxedURLValidator
 from datahub.core import constants
 from datahub.core.mixins import KorbenSaveModelMixin
-from datahub.core.models import ArchivableModel
+from datahub.core.models import ArchivableBaseModel, BaseModel
 from datahub.core.utils import model_to_dictionary
 from datahub.es.connector import ESConnector
 from datahub.metadata import models as metadata_models
