@@ -7,7 +7,7 @@ from datahub.core.mixins import KorbenSaveModelMixin
 from datahub.core.models import ArchivableModel, BaseModel
 
 
-class InteractionAbstract(KorbenSaveModelMixin, ArchivableModel, BaseModel):
+class InteractionAbstract(KorbenSaveModelMixin, BaseModel):
     """Common fields for all interaction flavours."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)

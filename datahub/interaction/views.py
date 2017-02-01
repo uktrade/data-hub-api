@@ -4,7 +4,7 @@ from datahub.interaction.models import Interaction
 from datahub.interaction.serializers import InteractionSerializerRead, InteractionSerializerWrite
 
 
-class InteractionViewSet(ArchivableViewSetMixin, CoreViewSet):
+class InteractionViewSet(CoreViewSet):
     """Interaction ViewSet."""
 
     read_serializer_class = InteractionSerializerRead
