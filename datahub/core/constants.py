@@ -11,10 +11,10 @@ class BusinessType(Enum):
     company = Constant('Company', '98d14e94-5d95-e211-a939-e4115bead28a')
     government_dept = Constant('Government Dept', '9cd14e94-5d95-e211-a939-e4115bead28a')
     intermediary = Constant('Intermediary', '9bd14e94-5d95-e211-a939-e4115bead28a')
-    partnership = Constant('Partnership', '9ad14e94-5d95-e211-a939-e4115bead28a')
+    partnership = Constant('Partnership', '8b6eaf7e-03e7-e611-bca1-e4115bead28a')
     sole_trader = Constant('Sole Trader', '99d14e94-5d95-e211-a939-e4115bead28a')
-    private_limited_company = Constant('Private limited company', '9ed14e94-5d95-e211-a939-e4115bead28a')
-    public_limited_company = Constant('Public limited company', '9ed14e94-5d95-e211-a939-e4115bead28a')
+    private_limited_company = Constant('Private limited company', '6f75408b-03e7-e611-bca1-e4115bead28a')
+    public_limited_company = Constant('Public limited company', 'dac8c591-03e7-e611-bca1-e4115bead28a')
 
 
 class Country(Enum):
