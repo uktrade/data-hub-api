@@ -18,7 +18,6 @@ ENUM_MAPPINGS = (
     ('optevia_interactioncommunicationchannelId', 'optevia_interactioncommunicationchannelSet', 'optevia_name', 'metadata_interactiontype'),  # noqa: E501
     ('BusinessUnitId', 'BusinessUnitSet', 'Name', 'metadata_team'),
     ('optevia_serviceId', 'optevia_serviceSet', 'optevia_name', 'metadata_service'),  # noqa: E501
-    ('optevia_serviceofferId', 'optevia_serviceofferSet', 'optevia_name', 'metadata_serviceoffer'),  # noqa: E501
     ('optevia_servicedeliverystatusSet', 'optevia_servicedeliverystatusId', 'optevia_name', 'metdata_servicedeliverystatus'),  # noqa: E501
 )
 
@@ -251,6 +250,16 @@ MAPPINGS.update({
         ),
         'datetime': (
             ('optevia_OrderDate', 'start_date'),
+        ),
+    },
+    'optevia_serviceofferSet': {
+        'to': 'company_serviceoffer',
+        'local': (
+            ('optevia_serviceofferId', 'id'),
+        ),
+        'nonflat': (
+            ('optevia_Service', (('Id', 'service_id'),),),
+            ('optevia_ServiceProvider', (('Id', 'service_provider_id'),),),
         ),
     },
 })
