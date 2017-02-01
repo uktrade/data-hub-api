@@ -31,15 +31,13 @@ class BaseModel(models.Model):
         return fields + ['created_on', 'modified_on']
 
 
-class ArchivableBaseModel(models.Model):
+class ArchivableModel(models.Model):
     """Handle model archivation."""
 
     archived = models.BooleanField(default=False)
     archived_on = models.DateTimeField(null=True)
     archived_reason = models.TextField(blank=True, null=True)
     archived_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
-    created_on = models.DateTimeField(null=True, blank=True)
-    modified_on = models.DateTimeField(null=True, blank=True)
 
     class Meta:  # noqa: D101
         abstract = True
@@ -60,20 +58,10 @@ class ArchivableBaseModel(models.Model):
         self.archived_on = None
         self.save(skip_custom_validation=True)
 
-    def clean(self):
-        """Custom validation for created_on and modified_on.
-
-        If the fields are empty, populate them.
-        """
-        super().clean()
-        current_time = now()
-        self.created_on = self.created_on or current_time
-        self.modified_on = current_time
-
     def get_datetime_fields(self):
         """Return list of fields that should be mapped as datetime."""
         fields = super().get_datetime_fields()
-        return fields + ['archived_on', 'created_on', 'modified_on']
+        return fields + ['archived_on']
 
 
 class BaseConstantModel(models.Model):

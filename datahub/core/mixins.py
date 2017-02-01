@@ -1,7 +1,5 @@
 """General mixins."""
 from django.conf import settings
-from django.db import models
-from django.utils.timezone import now
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 

@@ -3,30 +3,27 @@ import uuid
 from django.db import models
 
 from datahub.core.mixins import KorbenSaveModelMixin
-from datahub.core.models import BaseModel
+from datahub.core.models import ArchivableModel, BaseModel
 
 
-class InteractionAbstract(KorbenSaveModelMixin, BaseModel):
+class InteractionAbstract(KorbenSaveModelMixin, ArchivableModel, BaseModel):
     """Common fields for all interaction flavours."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     date = models.DateTimeField()
     company = models.ForeignKey(
         'company.Company',
-        related_name="%(app_label)s_%(class)s_related",  # noqa: Q000
-        related_query_name="(app_label)s_%(class)ss",  # noqa: Q000
+        related_name="%(class)ss",  # noqa: Q000
     )
     contact = models.ForeignKey(
         'company.Contact',
-        related_name="%(app_label)s_%(class)s_related",  # noqa: Q000
-        related_query_name="(app_label)s_%(class)ss",  # noqa: Q000
+        related_name="%(class)ss",  # noqa: Q000
     )
     service = models.ForeignKey('metadata.Service')
     subject = models.TextField()
     dit_advisor = models.ForeignKey(
         'company.Advisor',
-        related_name="%(app_label)s_%(class)s_related",  # noqa: Q000
-        related_query_name="(app_label)s_%(class)ss",  # noqa: Q000
+        related_name="%(class)ss",  # noqa: Q000
     )
     notes = models.TextField()
 

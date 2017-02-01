@@ -11,7 +11,7 @@ class InteractionFactory(factory.django.DjangoModelFactory):
     company = factory.SubFactory(CompanyFactory)
     contact = factory.SubFactory(ContactFactory)
     subject = 'foo'
-    date_of_interaction = now()
+    date = now()
     notes = 'Bar'
     dit_advisor = factory.SubFactory(AdvisorFactory)
     service_id = constants.Service.trade_enquiry.value.id

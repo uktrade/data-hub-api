@@ -14,7 +14,7 @@ from django.utils.timezone import now
 from datahub.company.validators import RelaxedURLValidator
 from datahub.core import constants
 from datahub.core.mixins import KorbenSaveModelMixin
-from datahub.core.models import ArchivableBaseModel, BaseModel
+from datahub.core.models import ArchivableModel, BaseModel
 from datahub.core.utils import model_to_dictionary
 from datahub.es.connector import ESConnector
 from datahub.metadata import models as metadata_models
@@ -22,7 +22,7 @@ from datahub.metadata import models as metadata_models
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-class CompanyAbstract(models.Model):
+class CompanyAbstract(BaseModel):
     """Share as much as possible in the company representation."""
 
     name = models.CharField(max_length=MAX_LENGTH)
@@ -34,8 +34,7 @@ class CompanyAbstract(models.Model):
     registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     registered_address_country = models.ForeignKey(
         metadata_models.Country,
-        related_name="%(app_label)s_%(class)s_related",  # noqa: Q000
-        related_query_name="(app_label)s_%(class)ss",  # noqa: Q000
+        related_name="%(class)ss",  # noqa: Q000
     )
     registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
@@ -181,7 +180,7 @@ class CompaniesHouseCompany(CompanyAbstract):
         return self.name
 
 
-class Contact(KorbenSaveModelMixin, ArchivableModel):
+class Contact(KorbenSaveModelMixin, ArchivableModel, BaseModel):
     """Contact from CDMS."""
 
     REQUIRED_ADDRESS_FIELDS = (
@@ -289,7 +288,7 @@ class AdvisorManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
-class Advisor(AbstractBaseUser, PermissionsMixin):
+class Advisor(KorbenSaveModelMixin, AbstractBaseUser, PermissionsMixin):
     """Advisor."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
