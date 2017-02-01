@@ -194,7 +194,7 @@ MAPPINGS.update({
 
         ),
         'datetime': (
-            ('ActualStart', 'date_of_interaction'),
+            ('ActualStart', 'date'),
             ('ModifiedOn', 'modified_on'),
             ('CreatedOn', 'created_on'),
         ),
@@ -243,13 +243,13 @@ MAPPINGS.update({
             ('optevia_ServiceProvider', (('Id', 'service_provider_id'),),),
             ('optevia_Organisation', (('Id', 'company_id'),),),
             ('optevia_Contact', (('Id', 'contact_id'),),),
-            ('optevia_Advisor', (('Id', 'advisor_id'),),),
+            ('optevia_Advisor', (('Id', 'dit_advisor_id'),),),
             ('optevia_UKRegion', (('Id', 'uk_region_id'),),),
             ('optevia_Sector', (('Id', 'sector_id'),),),
-            ('optevia_LeadCountry', (('Id', 'lead_country_id'),),),
+            ('optevia_LeadCountry', (('Id', 'country_of_interest_id'),),),
         ),
         'datetime': (
-            ('optevia_OrderDate', 'start_date'),
+            ('optevia_OrderDate', 'date'),
         ),
     },
     'optevia_serviceofferSet': {
