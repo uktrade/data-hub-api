@@ -98,7 +98,7 @@ def test_model_to_dictionary_dont_expand_fk():
 
     assert set(result.keys()) == expected_keys
     # KF ID
-    assert result['business_type_id'] == '9ed14e94-5d95-e211-a939-e4115bead28a'
+    assert result['business_type_id'] == '6f75408b-03e7-e611-bca1-e4115bead28a'
 
 
 def test_model_to_dictionary_exclude_fields():
