@@ -57,7 +57,7 @@ class ServiceOffer(models.Model):
     @cached_property
     def name(self):
         """Generate name."""
-        return "{0} : {1}".format(self.service.name, self.service_provider.name)
+        return '{0} : {1}'.format(self.service.name, self.service_provider.name)
 
     def __str__(self):
         """Human readable object name."""
