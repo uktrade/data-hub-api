@@ -35,6 +35,23 @@ ODATA_SERVICE_DELIVERY_INPUT_DATA = dict(
     optevia_CustomerCommentFeedback="bom",
 )
 
+ODATA_SERVICE_DELIVERY_INPUT_DATA_INTERMEDIATE = dict(
+    optevia_ServiceDeliveryStatus_Id="bar",
+    optevia_ServiceOffer_Id="flankle",
+    optevia_Service_Id="foo",
+    optevia_ServiceProvider_Id="flum",
+    optevia_Organisation_Id="flam",
+    optevia_Contact_Id="flim",
+    optevia_Advisor_Id="flom",
+    CDMS_UNUSED_FIELD='unused value',
+    optevia_UKRegion_Id="flibble",
+    optevia_Sector_Id="flamble",
+    optevia_LeadCountry_Id="fluzzle",
+    optevia_OrderDate="2016-11-25T13:32:22+00:00",
+    optevia_Notes="bam",
+    optevia_CustomerCommentFeedback="bom",
+)
+
 DJANGO_CONTACT_DATA = dict(
     # Local fields
     id='uuid',
@@ -135,6 +152,16 @@ def test_django_to_odata_service_delivery():
 def test_odata_to_django_service_delivery():
     result = transform.odata_to_django(
         'optevia_servicedeliverySet', ODATA_SERVICE_DELIVERY_INPUT_DATA
+    )
+
+    django_data = DJANGO_SERVICE_DELIVERY_DATA.copy()
+    assert result == django_data
+
+
+def test_odata_to_django_service_delivery_intermediate():
+    result = transform.odata_to_django(
+        'optevia_servicedeliverySet',
+        ODATA_SERVICE_DELIVERY_INPUT_DATA_INTERMEDIATE
     )
 
     django_data = DJANGO_SERVICE_DELIVERY_DATA.copy()
