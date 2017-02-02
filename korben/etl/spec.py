@@ -186,7 +186,7 @@ MAPPINGS.update({
         ),
     },
     'detica_interactionSet': {
-        'to': 'company_interaction',
+        'to': 'interaction_interaction',
         'local': (
             ('ActivityId', 'id'),
             ('Subject', 'subject'),
