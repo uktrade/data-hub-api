@@ -3,29 +3,36 @@ from korben.cdms_api.rest.utils import datetime_to_cdms_datetime
 
 
 DJANGO_SERVICE_DELIVERY_DATA = dict(
-    notes="bam",
-    start_date="2016-11-25T13:32:22+00:00",
-    service_id="foo",
     status_id="bar",
-    owning_team_id="baz",
+    service_offer_id="flankle",
+    service_id="foo",
+    service_provider_id="flum",
+    company_id="flam",
+    contact_id="flim",
+    dit_advisor_id="flom",
     uk_region_id="flibble",
     sector_id="flamble",
-    lead_country_id="fluzzle",
-    service_offer_id="flankle",
-    service_provider_id="flum",
+    country_of_interest_id="fluzzle",
+    date="2016-11-25T13:32:22+00:00",
+    notes="bam",
+    feedback="bom",
 )
 
 ODATA_SERVICE_DELIVERY_INPUT_DATA = dict(
-    optevia_Notes="bam",
-    optevia_OrderDate="2016-11-25T13:32:22+00:00",
-    optevia_Service={'Id': "foo"},
     optevia_ServiceDeliveryStatus={'Id': "bar"},
-    OwningTeam={'Id': "baz"},
+    optevia_ServiceOffer={'Id': "flankle"},
+    optevia_Service={'Id': "foo"},
+    optevia_ServiceProvider={'Id': "flum"},
+    optevia_Organisation={'Id': "flam"},
+    optevia_Contact={'Id': "flim"},
+    optevia_Advisor={'Id': "flom"},
+    CDMS_UNUSED_FIELD='unused value',
     optevia_UKRegion={'Id': "flibble"},
     optevia_Sector={'Id': "flamble"},
     optevia_LeadCountry={'Id': "fluzzle"},
-    optevia_ServiceOffer={'Id': "flankle"},
-    optevia_ServiceProvider={'Id': "flum"},
+    optevia_OrderDate="2016-11-25T13:32:22+00:00",
+    optevia_Notes="bam",
+    optevia_CustomerCommentFeedback="bom",
 )
 
 DJANGO_CONTACT_DATA = dict(
@@ -117,12 +124,18 @@ def test_odata_to_django_contact():
 
 
 def test_django_to_odata_service_delivery():
-    _, result = transform.django_to_odata('service_delivery', DJANGO_SERVICE_DELIVERY_DATA)
-    assert result == ODATA_SERVICE_DELIVERY_INPUT_DATA
+    _, result = transform.django_to_odata(
+        'interaction_servicedelivery', DJANGO_SERVICE_DELIVERY_DATA
+    )
+    expected = ODATA_SERVICE_DELIVERY_INPUT_DATA.copy()
+    expected.pop('CDMS_UNUSED_FIELD')
+    assert result == expected
 
 
 def test_odata_to_django_service_delivery():
-    result = transform.odata_to_django('ServiceDeliverySet', ODATA_SERVICE_DELIVERY_INPUT_DATA)
+    result = transform.odata_to_django(
+        'optevia_servicedeliverySet', ODATA_SERVICE_DELIVERY_INPUT_DATA
+    )
 
     django_data = DJANGO_SERVICE_DELIVERY_DATA.copy()
     assert result == django_data
