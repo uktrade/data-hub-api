@@ -30,6 +30,10 @@ def save_to_korben(self, data, user_id, db_table, update):
             data=data,
             table_name=db_table
         )
+        if remote_object.status_code == 404:
+            # Sync discrepancy create instead of update
+            update = False
+
         cdms_time = handle_time(remote_object.json().get('modified_on'))
         object_time = handle_time(data['modified_on'])
         if cdms_time is None or (cdms_time <= object_time):
