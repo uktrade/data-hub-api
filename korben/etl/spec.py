@@ -230,7 +230,7 @@ MAPPINGS.update({
         ),
     },
     'optevia_servicedeliverySet': {
-        'to': 'company_service_delivery',
+        'to': 'interaction_servicedelivery',
         'local': (
             ('optevia_Notes', 'notes'),
             ('optevia_CustomerCommentFeedback', 'feedback'),
@@ -253,7 +253,7 @@ MAPPINGS.update({
         ),
     },
     'optevia_serviceofferSet': {
-        'to': 'company_serviceoffer',
+        'to': 'interaction_serviceoffer',
         'local': (
             ('optevia_serviceofferId', 'id'),
         ),
