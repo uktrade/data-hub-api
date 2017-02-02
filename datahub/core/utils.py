@@ -46,3 +46,4 @@ def model_to_dictionary(model_instance, excluded_fields=(), expand_foreign_keys=
         else:
             data[field.name] = getattr(model_instance, field.name)
     return data
+

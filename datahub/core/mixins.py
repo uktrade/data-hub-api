@@ -8,10 +8,6 @@ from .utils import model_to_dictionary
 class KorbenSaveModelMixin:
     """Handles custom validation and whether we save to Korben or not."""
 
-    def _get_table_name_from_model(self):
-        """Get table name from model."""
-        return self._meta.db_table
-
     def save(self, skip_custom_validation=False, **kwargs):
         """Override the Django save implementation to save to Korben."""
         if not skip_custom_validation:
