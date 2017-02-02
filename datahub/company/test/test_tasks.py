@@ -72,6 +72,30 @@ def test_save_to_korben_create_happy_path(mocked_korben_connector):
 
 
 @mock.patch('datahub.company.tasks.KorbenConnector')
+def test_save_to_korben_update_to_create_path(mocked_korben_connector):
+    """Save to Korben task works."""
+    mocked_korben_connector().get().json.return_value = {}
+    mocked_korben_connector().get().status_code = 404
+    user = get_test_user()
+
+    curr_time = now().isoformat()
+
+    save_to_korben(
+        data={'foo': 'bar', 'modified_on': curr_time},
+        user_id=str(user.id),
+        db_table='company_company',
+        update=True
+    )
+
+    # check save_to_korben called
+    mocked_korben_connector().post.assert_called_with(
+        table_name='company_company',
+        data={'foo': 'bar', 'modified_on': curr_time},
+        update=False,
+    )
+
+
+@mock.patch('datahub.company.tasks.KorbenConnector')
 @mock.patch('datahub.company.tasks.client')
 @mock.patch('datahub.company.tasks.save_to_korben.retry', mock.Mock(side_effect=Retry))
 def test_save_to_korben_retry_exception(mocked_sentry_client, mocked_korben_connector):
