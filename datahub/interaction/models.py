@@ -10,7 +10,7 @@ from datahub.core.models import BaseModel
 class InteractionAbstract(KorbenSaveModelMixin, BaseModel):
     """Common fields for all interaction flavours."""
 
-    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     date = models.DateTimeField()
     company = models.ForeignKey(
         'company.Company',
@@ -50,7 +50,7 @@ class Interaction(InteractionAbstract):
 class ServiceOffer(models.Model):
     """Service offer."""
 
-    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     dit_team = models.ForeignKey('metadata.Team')
     service = models.ForeignKey('metadata.Service')
 
@@ -77,8 +77,8 @@ class ServiceDelivery(InteractionAbstract):
     def save(self, skip_custom_validation=False, **kwargs):
         """Add service offer."""
         service_offer, _ = ServiceOffer.objects.get_or_create(
-            service_provider_id=self.service_provider.id,
-            service_id=self.service.id
+            dit_team=self.dit_team,
+            service=self.service
         )
         self.service_offer = service_offer
         super().save(skip_custom_validation=skip_custom_validation, **kwargs)

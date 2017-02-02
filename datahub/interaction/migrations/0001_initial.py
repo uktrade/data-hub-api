@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 ('archived', models.BooleanField(default=False)),
                 ('archived_on', models.DateTimeField(null=True)),
                 ('archived_reason', models.TextField(blank=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, primary_key=True, serialize=False)),
+                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('date', models.DateTimeField()),
                 ('subject', models.TextField()),
                 ('notes', models.TextField(max_length=4000)),
@@ -53,7 +53,7 @@ class Migration(migrations.Migration):
                 ('archived', models.BooleanField(default=False)),
                 ('archived_on', models.DateTimeField(null=True)),
                 ('archived_reason', models.TextField(blank=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, primary_key=True, serialize=False)),
+                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('date', models.DateTimeField()),
                 ('subject', models.TextField()),
                 ('notes', models.TextField(max_length=4000)),
@@ -74,7 +74,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ServiceOffer',
             fields=[
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, primary_key=True, serialize=False)),
+                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('dit_team', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='metadata.Team')),
                 ('service', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='metadata.Service')),
             ],

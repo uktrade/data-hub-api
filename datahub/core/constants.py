@@ -416,3 +416,9 @@ class Team(Enum):
     undefined = Constant(
         'Undefined', '0167b456-0ddd-49bd-8184-e3227a0b6396'
     )
+
+
+class ServiceDeliveryStatus(Enum):
+    """Service delivery status."""
+
+    offered = Constant('Offered', '45329c18-6095-e211-a939-e4115bead28a')
