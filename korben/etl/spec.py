@@ -227,6 +227,10 @@ MAPPINGS.update({
     },
     'optevia_servicedeliverySet': {
         'to': 'interaction_servicedelivery',
+        'local': (
+            ('optevia_Notes', 'notes'),
+            ('optevia_CustomerCommentFeedback', 'feedback'),
+        ),
         'nonflat': (
             ('optevia_ServiceDeliveryStatus', (('Id', 'status_id'),),),
             ('optevia_ServiceOffer', (('Id', 'service_offer_id'),),),
