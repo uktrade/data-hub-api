@@ -235,7 +235,7 @@ MAPPINGS.update({
             ('optevia_ServiceDeliveryStatus', (('Id', 'status_id'),),),
             ('optevia_ServiceOffer', (('Id', 'service_offer_id'),),),
             ('optevia_Service', (('Id', 'service_id'),),),
-            ('optevia_ServiceProvider', (('Id', 'service_provider_id'),),),
+            ('optevia_ServiceProvider', (('Id', 'dit_team_id'),),),
             ('optevia_Organisation', (('Id', 'company_id'),),),
             ('optevia_Contact', (('Id', 'contact_id'),),),
             ('optevia_Advisor', (('Id', 'dit_advisor_id'),),),
@@ -252,12 +252,10 @@ MAPPINGS.update({
             'service_id',
             'dit_advisor_id',
             'dit_team_id',
-            'interaction_type_id',
         ),
         'empty_strings': (
             'notes',
             'feedback',
-            'subject',
         ),
     },
     'optevia_serviceofferSet': {
