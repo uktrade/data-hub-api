@@ -382,7 +382,7 @@ class CHCompanyTestCase(LeelooTestCase):
         """Test companies house company detail."""
         ch_company = CompaniesHouseCompanyFactory(company_number=123)
 
-        url = reverse('companieshousecompany-detail', kwargs={'company_number': ch_company.company_number})
+        url = reverse('companieshousecompany-detail', kwargs={'pk': ch_company.pk})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
