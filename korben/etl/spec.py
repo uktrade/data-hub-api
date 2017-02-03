@@ -221,12 +221,8 @@ MAPPINGS.update({
             'interaction_type_id',
         ),
         'empty_strings': (
-            'archived_reason',
             'notes',
             'subject',
-        ),
-        'defaults': (
-            ('archived', lambda: False),
         ),
     },
     'optevia_servicedeliverySet': {
@@ -235,7 +231,6 @@ MAPPINGS.update({
             ('optevia_ServiceDeliveryStatus', (('Id', 'status_id'),),),
             ('optevia_ServiceOffer', (('Id', 'service_offer_id'),),),
             ('optevia_Service', (('Id', 'service_id'),),),
-            # ('optevia_Event', (('Id', 'event_id'),),),  # Skip for now
             ('optevia_ServiceProvider', (('Id', 'service_provider_id'),),),
             ('optevia_Organisation', (('Id', 'company_id'),),),
             ('optevia_Contact', (('Id', 'contact_id'),),),
@@ -247,9 +242,18 @@ MAPPINGS.update({
         'datetime': (
             ('optevia_OrderDate', 'date'),
         ),
-        'local': (
-            ('optevia_Notes', 'notes'),
-            ('optevia_CustomerCommentFeedback', 'feedback'),
+        'use_undefined': (
+            'company_id',
+            'contact_id',
+            'service_id',
+            'dit_advisor_id',
+            'dit_team_id',
+            'interaction_type_id',
+        ),
+        'empty_strings': (
+            'notes',
+            'feedback',
+            'subject',
         ),
     },
     'optevia_serviceofferSet': {
