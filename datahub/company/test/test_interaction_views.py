@@ -1,6 +1,5 @@
 from unittest import mock
 
-from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
 from freezegun import freeze_time
@@ -9,7 +8,6 @@ from rest_framework import status
 from datahub.company.models import Interaction
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
-from datahub.es.utils import document_exists, get_elasticsearch_client
 from .factories import AdvisorFactory, CompanyFactory, ContactFactory, InteractionFactory
 
 
@@ -50,13 +48,6 @@ class InteractionTestCase(LeelooTestCase):
             update=False,
             user_id=self.user.id
         )
-        # make sure we're writing to ES
-        es_client = get_elasticsearch_client()
-        assert document_exists(
-            client=es_client,
-            doc_type='company_interaction',
-            document_id=response.data['id']
-        )
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     @freeze_time('2017-01-27 12:00:01')
@@ -80,15 +71,6 @@ class InteractionTestCase(LeelooTestCase):
             update=True,  # this is an update!
             user_id=self.user.id
         )
-        # make sure we're writing to ES
-        es_client = get_elasticsearch_client()
-        es_result = es_client.get(
-            index=settings.ES_INDEX,
-            doc_type='company_interaction',
-            id=response.data['id'],
-            realtime=True
-        )
-        assert es_result['_source']['subject'] == 'I am another subject'
 
     def test_archive_interaction_no_reason(self):
         """Test archive interaction without providing a reason."""
@@ -100,17 +82,6 @@ class InteractionTestCase(LeelooTestCase):
         assert response.data['archived_reason'] == ''
         assert response.data['id'] == str(interaction.pk)
 
-        # make sure we're writing to ES
-        es_client = get_elasticsearch_client()
-        es_result = es_client.get(
-            index=settings.ES_INDEX,
-            doc_type='company_interaction',
-            id=response.data['id'],
-            realtime=True
-        )
-        assert es_result['_source']['archived']
-        assert es_result['_source']['archived_reason'] == ''
-
     def test_archive_interaction_reason(self):
         """Test archive interaction providing a reason."""
         interaction = InteractionFactory()
@@ -120,17 +91,6 @@ class InteractionTestCase(LeelooTestCase):
         assert response.data['archived']
         assert response.data['archived_reason'] == 'foo'
         assert response.data['id'] == str(interaction.pk)
-
-        # make sure we're writing to ES
-        es_client = get_elasticsearch_client()
-        es_result = es_client.get(
-            index=settings.ES_INDEX,
-            doc_type='company_interaction',
-            id=response.data['id'],
-            realtime=True
-        )
-        assert es_result['_source']['archived']
-        assert es_result['_source']['archived_reason'] == 'foo'
 
     def test_unarchive_interaction(self):
         """Test unarchive interaction."""
