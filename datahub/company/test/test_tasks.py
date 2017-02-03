@@ -5,7 +5,7 @@ import pytest
 from celery.exceptions import Retry
 from django.utils.timezone import now
 
-from datahub.company.tasks import save_to_korben
+from datahub.company.tasks import save_to_es, save_to_korben
 from datahub.core.test_utils import get_test_user
 
 # mark the whole module for db use
@@ -115,3 +115,23 @@ def test_save_to_korben_retry_exception(mocked_sentry_client, mocked_korben_conn
             update=True
         )
         mocked_sentry_client.captureException.assert_called_once_with()
+
+
+@mock.patch('datahub.company.tasks.ESConnector')
+def test_save_to_es_happy_path(esc_mock):
+    """Test saving to ES."""
+    save_to_es(doc_type='test', data={})
+    esc_mock().save.assert_called_with(doc_type='test', data={})
+
+
+@mock.patch('datahub.company.tasks.client')
+@mock.patch('datahub.company.tasks.ESConnector')
+@mock.patch('datahub.company.tasks.save_to_es.retry', mock.Mock(side_effect=Retry))
+def test_save_to_es_sad_path(esc_mock, sentry_mock):
+    """Test saving to ES."""
+    esc_mock.side_effect = Exception()
+
+    with pytest.raises(Retry):
+        save_to_es(doc_type='test', data={})
+
+    sentry_mock.captureException.assert_called_once_with()
