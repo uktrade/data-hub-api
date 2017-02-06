@@ -31,9 +31,9 @@ class CompanyViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
     ).exclude(name='Undefined')
 
 
-class CompaniesHouseCompanyReadOnlyViewSet(mixins.ListModelMixin,
-                                           mixins.RetrieveModelMixin,
-                                           viewsets.GenericViewSet):
+class CompaniesHouseCompanyReadOnlyViewSetV1(mixins.ListModelMixin,
+                                             mixins.RetrieveModelMixin,
+                                             viewsets.GenericViewSet):
     """Companies House company GET only views."""
 
     serializer_class = CompaniesHouseCompanySerializer
@@ -61,9 +61,9 @@ class ContactViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
         return super().create(request, *args, **kwargs)
 
 
-class AdvisorReadOnlyViewSet(mixins.ListModelMixin,
-                             mixins.RetrieveModelMixin,
-                             viewsets.GenericViewSet):
+class AdvisorReadOnlyViewSetV1(mixins.ListModelMixin,
+                               mixins.RetrieveModelMixin,
+                               viewsets.GenericViewSet):
     """Advisor GET only views."""
 
     serializer_class = AdvisorSerializer

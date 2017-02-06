@@ -8,28 +8,27 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import AdvisorFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
-from datahub.interaction.models import Interaction
-from datahub.interaction.test.factories import InteractionFactory
+from datahub.interaction.models import ServiceDelivery
+from datahub.interaction.test.factories import ServiceDeliveryFactory
 
 
-class InteractionTestCase(LeelooTestCase):
-    """Interaction test case."""
+class ServiceDeliveryTestCase(LeelooTestCase):
+    """Service Delivery test case."""
 
-    def test_interaction_detail_view(self):
-        """Interaction detail view."""
-        interaction = InteractionFactory()
-        url = reverse('v1:interaction-detail', kwargs={'pk': interaction.pk})
+    def test_service_delivery_detail_view(self):
+        """Service Delivery detail view."""
+        servicedelivery = ServiceDeliveryFactory()
+        url = reverse('v2:servicedelivery-detail', kwargs={'pk': servicedelivery.pk})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['id'] == str(interaction.pk)
+        assert response.data['id'] == str(servicedelivery.pk)
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
-    def test_add_interaction(self, mocked_save_to_korben):
-        """Test add new interaction."""
-        url = reverse('v1:interaction-list')
+    def test_add_servicedelivery(self, mocked_save_to_korben):
+        """Test add new service delivery."""
+        url = reverse('v2:servicedelivery-list')
         response = self.api_client.post(url, {
-            'interaction_type': constants.InteractionType.business_card.value.id,
             'subject': 'whatever',
             'date': now().isoformat(),
             'dit_advisor': AdvisorFactory().pk,
@@ -42,9 +41,9 @@ class InteractionTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         # make sure we're spawning a task to save to Korben
-        expected_data = Interaction.objects.get(pk=response.data['id']).convert_model_to_korben_format()
+        expected_data = ServiceDelivery.objects.get(pk=response.data['id']).convert_model_to_korben_format()
         mocked_save_to_korben.delay.assert_called_once_with(
-            db_table='interaction_interaction',
+            db_table='interaction_servicedelivery',
             data=expected_data,
             update=False,
             user_id=self.user.id
@@ -52,11 +51,11 @@ class InteractionTestCase(LeelooTestCase):
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     @freeze_time('2017-01-27 12:00:01')
-    def test_modify_interaction(self, mocked_save_to_korben):
-        """Modify an existing interaction."""
-        interaction = InteractionFactory(subject='I am a subject')
+    def test_modify_service_delivery(self, mocked_save_to_korben):
+        """Modify an existing service delivery."""
+        servicedelivery = ServiceDeliveryFactory(subject='I am a subject')
 
-        url = reverse('v1:interaction-detail', kwargs={'pk': interaction.pk})
+        url = reverse('v2:servicedelivery-detail', kwargs={'pk': servicedelivery.pk})
         response = self.api_client.patch(url, {
             'subject': 'I am another subject',
         })
@@ -64,11 +63,11 @@ class InteractionTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['subject'] == 'I am another subject'
         # make sure we're spawning a task to save to Korben
-        expected_data = interaction.convert_model_to_korben_format()
+        expected_data = servicedelivery.convert_model_to_korben_format()
         expected_data['subject'] = 'I am another subject'
         mocked_save_to_korben.delay.assert_called_once_with(
-            db_table='interaction_interaction',
+            db_table='interaction_servicedelivery',
             data=expected_data,
-            update=True,  # this is an update!
+            update=True,
             user_id=self.user.id
         )

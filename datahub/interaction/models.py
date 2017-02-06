@@ -27,6 +27,7 @@ class InteractionAbstract(KorbenSaveModelMixin, BaseModel):
         related_name="%(class)ss",  # noqa: Q000
     )
     notes = models.TextField(max_length=4000)  # CDMS limit
+    dit_team = models.ForeignKey('metadata.Team')
 
     class Meta:  # noqa: D101
         abstract = True
@@ -44,15 +45,14 @@ class Interaction(InteractionAbstract):
     """Interaction."""
 
     interaction_type = models.ForeignKey('metadata.InteractionType')
-    dit_team = models.ForeignKey('metadata.Team')
 
 
 class ServiceOffer(models.Model):
     """Service offer."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    dit_team = models.ForeignKey('metadata.Team')
     service = models.ForeignKey('metadata.Service')
+    dit_team = models.ForeignKey('metadata.Team')
 
     @cached_property
     def name(self):
@@ -69,7 +69,6 @@ class ServiceDelivery(InteractionAbstract):
 
     status = models.ForeignKey('metadata.ServiceDeliveryStatus')
     service_offer = models.ForeignKey(ServiceOffer, null=True, blank=True)
-    dit_team = models.ForeignKey('metadata.Team')
     uk_region = models.ForeignKey('metadata.UKRegion', null=True, blank=True)
     sector = models.ForeignKey('metadata.Sector', null=True, blank=True)
     country_of_interest = models.ForeignKey('metadata.Country', null=True, blank=True)

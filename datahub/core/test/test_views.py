@@ -1,7 +1,7 @@
 from unittest import mock
 
-from django.urls import reverse
 from rest_framework import status
+from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import LeelooTestCase
 from .factories import TaskInfoFactory

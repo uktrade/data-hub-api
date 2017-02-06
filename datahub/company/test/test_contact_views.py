@@ -4,9 +4,9 @@ from unittest import mock
 
 import pytest
 from django.conf import settings
-from django.urls import reverse
 from freezegun import freeze_time
 from rest_framework import status
+from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
 from datahub.company.models import Contact
@@ -31,7 +31,7 @@ class ContactTestCase(LeelooTestCase):
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_contact_address_same_as_company(self, mocked_save_to_korben):
         """Test add new contact."""
-        url = reverse('contact-list')
+        url = reverse('v1:contact-list')
         response = self.api_client.post(url, {
             'first_name': 'Oratio',
             'last_name': 'Nelson',
@@ -65,7 +65,7 @@ class ContactTestCase(LeelooTestCase):
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_contact_no_address(self, mocked_save_to_korben):
         """Test add new contact without any address."""
-        url = reverse('contact-list')
+        url = reverse('v1:contact-list')
 
         response = self.api_client.post(url, {
             'first_name': 'Oratio',
@@ -88,7 +88,7 @@ class ContactTestCase(LeelooTestCase):
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_contact_partial_manual_address(self, mocked_save_to_korben):
         """Test add new contact with a partial manual address."""
-        url = reverse('contact-list')
+        url = reverse('v1:contact-list')
 
         response = self.api_client.post(url, {
             'first_name': 'Oratio',
@@ -113,7 +113,7 @@ class ContactTestCase(LeelooTestCase):
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_contact_manual_address(self, mocked_save_to_korben):
         """Test add new contact manual address."""
-        url = reverse('contact-list')
+        url = reverse('v1:contact-list')
         response = self.api_client.post(url, {
             'first_name': 'Oratio',
             'last_name': 'Nelson',
@@ -152,7 +152,7 @@ class ContactTestCase(LeelooTestCase):
         """Modify an existing contact."""
         contact = ContactFactory(first_name='Foo')
 
-        url = reverse('contact-detail', kwargs={'pk': contact.pk})
+        url = reverse('v1:contact-detail', kwargs={'pk': contact.pk})
         response = self.api_client.patch(url, {
             'first_name': 'bar',
         })
@@ -181,7 +181,7 @@ class ContactTestCase(LeelooTestCase):
     def test_archive_contact_no_reason(self):
         """Test archive contact without providing a reason."""
         contact = ContactFactory()
-        url = reverse('contact-archive', kwargs={'pk': contact.pk})
+        url = reverse('v1:contact-archive', kwargs={'pk': contact.pk})
         response = self.api_client.post(url)
 
         assert response.data['archived']
@@ -202,7 +202,7 @@ class ContactTestCase(LeelooTestCase):
     def test_archive_contact_reason(self):
         """Test archive contact providing a reason."""
         contact = ContactFactory()
-        url = reverse('contact-archive', kwargs={'pk': contact.pk})
+        url = reverse('v1:contact-archive', kwargs={'pk': contact.pk})
         response = self.api_client.post(url, {'reason': 'foo'})
 
         assert response.data['archived']
@@ -223,7 +223,7 @@ class ContactTestCase(LeelooTestCase):
     def test_unarchive_contact(self):
         """Test unarchive contact."""
         contact = ContactFactory(archived=True, archived_reason='foo')
-        url = reverse('contact-unarchive', kwargs={'pk': contact.pk})
+        url = reverse('v1:contact-unarchive', kwargs={'pk': contact.pk})
         response = self.api_client.get(url)
 
         assert not response.data['archived']
@@ -233,7 +233,7 @@ class ContactTestCase(LeelooTestCase):
     def test_contact_detail_view(self):
         """Contact detail view."""
         contact = ContactFactory()
-        url = reverse('contact-detail', kwargs={'pk': contact.pk})
+        url = reverse('v1:contact-detail', kwargs={'pk': contact.pk})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -265,7 +265,7 @@ class ContactTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_200_OK
 
         # now do a GET
-        url = reverse('contact-detail', kwargs={'pk': data_dict['id']})
+        url = reverse('v1:contact-detail', kwargs={'pk': data_dict['id']})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK

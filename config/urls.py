@@ -11,17 +11,18 @@ from datahub.ping.views import ping
 from datahub.search.views import Search
 from datahub.user.views import who_am_i
 
-router = routers.SimpleRouter()
-router.register(r'company', company_views.CompanyViewSetV1)
-router.register(r'ch-company', company_views.CompaniesHouseCompanyReadOnlyViewSet)
-router.register(r'contact', company_views.ContactViewSetV1)
-router.register(r'interaction', interaction_views.InteractionViewSetV1)
-router.register(r'advisor', company_views.AdvisorReadOnlyViewSet)
-router.register(r'task-info', core_views.TaskInfoReadOnlyViewSet)
+router_v1 = routers.SimpleRouter()
+router_v1.register(r'company', company_views.CompanyViewSetV1)
+router_v1.register(r'ch-company', company_views.CompaniesHouseCompanyReadOnlyViewSetV1)
+router_v1.register(r'contact', company_views.ContactViewSetV1)
+router_v1.register(r'interaction', interaction_views.InteractionViewSetV1)
+router_v1.register(r'advisor', company_views.AdvisorReadOnlyViewSetV1)
+router_v1.register(r'task-info', core_views.TaskInfoReadOnlyViewSetV1)
 
+router_v2 = routers.SimpleRouter()
+router_v2.register(r'service-delivery', interaction_views.ServiceDeliveryViewSetV2)
 
-urlpatterns = [
-    url(r'^', include(router.urls)),
+unversioned_urls = [
     url(r'^admin/', admin.site.urls),
     url(r'^ping.xml$', ping, name='ping'),
     url(r'^search/$', Search.as_view(), name='search'),
@@ -31,6 +32,11 @@ urlpatterns = [
     url(r'^whoami/$', who_am_i, name='who_am_i'),
     url(r'^dashboard/', include('datahub.dashboard.urls', namespace='dashboard'))
 ]
+
+urlpatterns = [
+    url(r'^', include(router_v1.urls, namespace='v1')),  # V1 has actually no version in the URL
+    url(r'^v2/', include(router_v2.urls, namespace='v2')),
+] + unversioned_urls
 
 if settings.DEBUG:
     import debug_toolbar
