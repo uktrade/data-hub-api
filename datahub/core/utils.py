@@ -1,4 +1,9 @@
+from contextlib import contextmanager
+from logging import getLogger
+
 from django.db.models import DateField, DateTimeField, ForeignKey, ManyToManyField, UUIDField
+
+logger = getLogger(__name__)
 
 
 def generate_enum_code_from_queryset(model_queryset):
@@ -46,3 +51,12 @@ def model_to_dictionary(model_instance, excluded_fields=(), expand_foreign_keys=
         else:
             data[field.name] = getattr(model_instance, field.name)
     return data
+
+
+@contextmanager
+def log_and_ignore_exceptions():
+    """Write non-fatal exceptions to the log and ignore them afterwards."""
+    try:
+        yield
+    except Exception:
+        logger.exception('Silently ignoring non-fatal exception')
