@@ -374,11 +374,21 @@ class Advisor(DeferredSaveModelMixin, AbstractBaseUser, PermissionsMixin):
 @receiver((post_save, m2m_changed))
 def save_to_es(sender, instance, **kwargs):
     """Save to ES."""
-    if sender in (Company, CompaniesHouseCompany, Contact):
-        from datahub.company import tasks
+    from datahub.company import tasks
 
+    if sender in (Company, Contact):
         tasks.save_to_es.delay(
             # cannot access _meta from the instance
             doc_type=type(instance)._meta.db_table,
             data=model_to_dictionary(instance),
+        )
+    elif sender is CompaniesHouseCompany:
+        # CH company is indexed by CH number instead
+        data = model_to_dictionary(instance)
+        data['id'] = data['company_number']
+
+        tasks.save_to_es.delay(
+            # cannot access _meta from the instance
+            doc_type=type(instance)._meta.db_table,
+            data=data,
         )
