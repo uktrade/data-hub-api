@@ -12,10 +12,10 @@ from datahub.search.views import Search
 from datahub.user.views import who_am_i
 
 router = routers.SimpleRouter()
-router.register(r'company', company_views.CompanyViewSet)
+router.register(r'company', company_views.CompanyViewSetV1)
 router.register(r'ch-company', company_views.CompaniesHouseCompanyReadOnlyViewSet)
-router.register(r'contact', company_views.ContactViewSet)
-router.register(r'interaction', interaction_views.InteractionViewSet)
+router.register(r'contact', company_views.ContactViewSetV1)
+router.register(r'interaction', interaction_views.InteractionViewSetV1)
 router.register(r'advisor', company_views.AdvisorReadOnlyViewSet)
 router.register(r'task-info', core_views.TaskInfoReadOnlyViewSet)
 

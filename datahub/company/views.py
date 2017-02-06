@@ -3,13 +3,13 @@
 from rest_framework import mixins, viewsets
 
 from datahub.core.mixins import ArchivableViewSetMixin
-from datahub.core.viewsets import CoreViewSet
+from datahub.core.viewsets import CoreViewSetV1
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
 from .serializers import (AdvisorSerializer, CompaniesHouseCompanySerializer, CompanySerializerRead,
                           CompanySerializerWrite, ContactSerializerRead, ContactSerializerWrite)
 
 
-class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
+class CompanyViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
     """Company ViewSet."""
 
     read_serializer_class = CompanySerializerRead
@@ -41,7 +41,7 @@ class CompaniesHouseCompanyReadOnlyViewSet(mixins.ListModelMixin,
     lookup_field = 'company_number'
 
 
-class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):
+class ContactViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
     """Contact ViewSet."""
 
     read_serializer_class = ContactSerializerRead

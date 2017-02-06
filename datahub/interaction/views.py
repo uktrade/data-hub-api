@@ -1,9 +1,9 @@
-from datahub.core.viewsets import CoreViewSet
+from datahub.core.viewsets import CoreViewSetV1
 from datahub.interaction.models import Interaction
 from datahub.interaction.serializers import InteractionSerializerRead, InteractionSerializerWrite
 
 
-class InteractionViewSet(CoreViewSet):
+class InteractionViewSetV1(CoreViewSetV1):
     """Interaction ViewSet."""
 
     read_serializer_class = InteractionSerializerRead
