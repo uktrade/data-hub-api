@@ -73,6 +73,7 @@ class ServiceDelivery(InteractionAbstract):
     uk_region = models.ForeignKey('metadata.UKRegion', null=True, blank=True)
     sector = models.ForeignKey('metadata.Sector', null=True, blank=True)
     country_of_interest = models.ForeignKey('metadata.Country', null=True, blank=True)
+    feedback = models.TextField(max_length=4000, blank=True)  # CDMS limit
 
     def save(self, skip_custom_validation=False, **kwargs):
         """Add service offer."""
