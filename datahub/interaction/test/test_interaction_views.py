@@ -72,3 +72,85 @@ class InteractionTestCase(LeelooTestCase):
             update=True,  # this is an update!
             user_id=self.user.id
         )
+
+    def test_modify_bad_data_interaction(self):
+        """Modify an existing interaction with bad data in."""
+        interaction = InteractionFactory(subject='I am a subject')
+        interaction.dit_advisor_id = '0167b456-0ddd-49bd-8184-e3227a0b6396'  # Undefined
+        interaction.save(skip_custom_validation=True)
+
+        url = reverse('interaction-detail', kwargs={'pk': interaction.pk})
+        response = self.api_client.patch(url, {
+            'subject': 'I am another subject',
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_modify_bad_data_interaction_type(self):
+        """Modify an existing interaction with bad data in."""
+        interaction = InteractionFactory(subject='I am a subject')
+        interaction.interaction_type_id = '0167b456-0ddd-49bd-8184-e3227a0b6396'  # Undefined
+        interaction.save(skip_custom_validation=True)
+
+        url = reverse('interaction-detail', kwargs={'pk': interaction.pk})
+        response = self.api_client.patch(url, {
+            'subject': 'I am another subject',
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_modify_bad_data_team(self):
+        """Modify an existing interaction with bad data in."""
+        interaction = InteractionFactory(subject='I am a subject')
+        interaction.dit_team_id = '0167b456-0ddd-49bd-8184-e3227a0b6396'  # Undefined
+        interaction.save(skip_custom_validation=True)
+
+        url = reverse('interaction-detail', kwargs={'pk': interaction.pk})
+        response = self.api_client.patch(url, {
+            'subject': 'I am another subject',
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_modify_bad_service(self):
+        """Modify an existing interaction with bad data in."""
+        interaction = InteractionFactory(subject='I am a subject')
+        interaction.service_id = '0167b456-0ddd-49bd-8184-e3227a0b6396'  # Undefined
+        interaction.save(skip_custom_validation=True)
+
+        url = reverse('interaction-detail', kwargs={'pk': interaction.pk})
+        response = self.api_client.patch(url, {
+            'subject': 'I am another subject',
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_archive_interaction_no_reason(self):
+        """Test archive interaction without providing a reason."""
+        interaction = InteractionFactory()
+        url = reverse('interaction-archive', kwargs={'pk': interaction.pk})
+        response = self.api_client.post(url)
+
+        assert response.data['archived']
+        assert response.data['archived_reason'] == ''
+        assert response.data['id'] == str(interaction.pk)
+
+    def test_archive_interaction_reason(self):
+        """Test archive interaction providing a reason."""
+        interaction = InteractionFactory()
+        url = reverse('interaction-archive', kwargs={'pk': interaction.pk})
+        response = self.api_client.post(url, {'reason': 'foo'})
+
+        assert response.data['archived']
+        assert response.data['archived_reason'] == 'foo'
+        assert response.data['id'] == str(interaction.pk)
+
+    def test_unarchive_interaction(self):
+        """Test unarchive interaction."""
+        interaction = InteractionFactory(archived=True, archived_reason='foo')
+        url = reverse('interaction-unarchive', kwargs={'pk': interaction.pk})
+        response = self.api_client.get(url)
+
+        assert not response.data['archived']
+        assert response.data['archived_reason'] == ''
+        assert response.data['id'] == str(interaction.pk)
