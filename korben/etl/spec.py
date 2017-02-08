@@ -267,7 +267,7 @@ MAPPINGS.update({
         ),
         'nonflat': (
             ('optevia_Service', (('Id', 'service_id'),),),
-            ('optevia_ServiceProvider', (('Id', 'service_provider_id'),),),
+            ('optevia_ServiceProvider', (('Id', 'dit_team_id'),),),
         ),
     },
 })
