@@ -13,7 +13,7 @@ class InteractionSerializerRead(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = Interaction
         depth = 2
-        fields = '__all__'
+        exclude = ('date', )
 
 
 class InteractionSerializerWrite(serializers.ModelSerializer):
@@ -23,4 +23,4 @@ class InteractionSerializerWrite(serializers.ModelSerializer):
 
     class Meta:  # noqa: D101
         model = Interaction
-        fields = '__all__'
+        exclude = ('date', )
