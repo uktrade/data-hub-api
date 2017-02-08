@@ -3,6 +3,7 @@ from korben.cdms_api.rest.utils import datetime_to_cdms_datetime
 
 
 DJANGO_SERVICE_DELIVERY_DATA = dict(
+    id="arf",
     status_id="bar",
     service_offer_id="flankle",
     service_id="foo",
@@ -16,9 +17,11 @@ DJANGO_SERVICE_DELIVERY_DATA = dict(
     date="2016-11-25T13:32:22+00:00",
     notes="bam",
     feedback="bom",
+    subject="",  # this should be moved out of abstract in leeloo
 )
 
 ODATA_SERVICE_DELIVERY_INPUT_DATA = dict(
+    optevia_servicedeliveryId="arf",
     optevia_ServiceDeliveryStatus={'Id': "bar"},
     optevia_ServiceOffer={'Id': "flankle"},
     optevia_Service={'Id': "foo"},
@@ -36,6 +39,7 @@ ODATA_SERVICE_DELIVERY_INPUT_DATA = dict(
 )
 
 ODATA_SERVICE_DELIVERY_INPUT_DATA_INTERMEDIATE = dict(
+    optevia_servicedeliveryId="arf",
     optevia_ServiceDeliveryStatus_Id="bar",
     optevia_ServiceOffer_Id="flankle",
     optevia_Service_Id="foo",
