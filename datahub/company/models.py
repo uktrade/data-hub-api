@@ -13,15 +13,15 @@ from django.utils.timezone import now
 
 from datahub.company.validators import RelaxedURLValidator
 from datahub.core import constants
-from datahub.core.mixins import DeferredSaveModelMixin
-from datahub.core.models import BaseModel
+from datahub.core.mixins import KorbenSaveModelMixin
+from datahub.core.models import ArchivableModel, BaseModel
 from datahub.core.utils import model_to_dictionary
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-class CompanyAbstract(models.Model):
+class CompanyAbstract(BaseModel):
     """Share as much as possible in the company representation."""
 
     name = models.CharField(max_length=MAX_LENGTH)
@@ -33,8 +33,7 @@ class CompanyAbstract(models.Model):
     registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     registered_address_country = models.ForeignKey(
         metadata_models.Country,
-        related_name="%(app_label)s_%(class)s_related",  # noqa: Q000
-        related_query_name="(app_label)s_%(class)ss",  # noqa: Q000
+        related_name="%(class)ss",  # noqa: Q000
     )
     registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
@@ -46,7 +45,7 @@ class CompanyAbstract(models.Model):
         return self.name
 
 
-class Company(CompanyAbstract, BaseModel):
+class Company(KorbenSaveModelMixin, ArchivableModel, CompanyAbstract):
     """Representation of the company as per CDMS."""
 
     REQUIRED_TRADING_ADDRESS_FIELDS = (
@@ -175,49 +174,7 @@ class CompaniesHouseCompany(CompanyAbstract):
         return self.name
 
 
-class Interaction(BaseModel):
-    """Interaction from CDMS."""
-
-    FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS = (
-        'dit_advisor', 'dit_team', 'service', 'interaction_type',
-    )
-
-    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
-    interaction_type = models.ForeignKey(metadata_models.InteractionType)
-    subject = models.TextField()
-    date_of_interaction = models.DateTimeField()
-    dit_advisor = models.ForeignKey('Advisor', related_name='interactions')
-    notes = models.TextField(max_length=4000)
-    company = models.ForeignKey('Company', related_name='interactions')
-    contact = models.ForeignKey('Contact', related_name='interactions')
-    service = models.ForeignKey(metadata_models.Service)
-    dit_team = models.ForeignKey(metadata_models.Team)
-
-    def __str__(self):
-        """Admin displayed human readable name."""
-        return self.subject
-
-    def get_excluded_fields(self):
-        """Don't send user to Korben, it's a Django thing."""
-        return ['user']
-
-    def get_datetime_fields(self):
-        """Return list of fields that should be mapped as datetime."""
-        return super().get_datetime_fields() + ['date_of_interaction']
-
-    def clean(self):
-        """Custom validation."""
-        super().clean()
-
-        for field in self.FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS:
-            value = getattr(self, field + '_id')
-            if str(value) == '0167b456-0ddd-49bd-8184-e3227a0b6396':  # Undefined
-                raise ValidationError(message={
-                    field: ['This field is required'],
-                })
-
-
-class Contact(BaseModel):
+class Contact(KorbenSaveModelMixin, ArchivableModel, BaseModel):
     """Contact from CDMS."""
 
     REQUIRED_ADDRESS_FIELDS = (
@@ -325,7 +282,7 @@ class AdvisorManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
-class Advisor(DeferredSaveModelMixin, AbstractBaseUser, PermissionsMixin):
+class Advisor(KorbenSaveModelMixin, AbstractBaseUser, PermissionsMixin):
     """Advisor."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
@@ -361,14 +318,6 @@ class Advisor(DeferredSaveModelMixin, AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         """Admin displayed human readable name."""
         return self.name
-
-    def get_excluded_fields(self):
-        """Don't send django user fields to Korben, it's a Django thing."""
-        return ['is_staff', 'is_active', 'date_joined']
-
-    def get_datetime_fields(self):
-        """Return list of fields that should be mapped as datetime."""
-        return super().get_datetime_fields() + ['last_login', 'date_joined']
 
     # Django User methods, required for Admin interface
 

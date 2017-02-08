@@ -1,22 +1,12 @@
 """General mixins."""
-
-from datahub.korben.connector import KorbenConnector
+from rest_framework.decorators import detail_route
+from rest_framework.response import Response
 
 from .utils import model_to_dictionary
 
 
-class DeferredSaveModelMixin:
-    """Handles add and update models."""
-
-    def __init__(self, *args, **kwargs):
-        """Add third part services connectors to the instance."""
-        self.korben_connector = KorbenConnector()
-        self.model = type(self)  # get the class from the instance
-        super().__init__(*args, **kwargs)
-
-    def _get_table_name_from_model(self):
-        """Get table name from model."""
-        return self._meta.db_table
+class KorbenSaveModelMixin:
+    """Handles custom validation and whether we save to Korben or not."""
 
     def save(self, skip_custom_validation=False, **kwargs):
         """Override the Django save implementation to save to Korben."""
@@ -36,12 +26,23 @@ class DeferredSaveModelMixin:
         """Override this method to have more granular control of what gets sent to Korben."""
         return model_to_dictionary(self, excluded_fields=self.get_excluded_fields(), expand_foreign_keys=False)
 
-    def _korben_response_same_as_model(self, korben_response):
-        """Check whether the korben response and the model have the same values.
 
-        :return True if the model and the korben response are the same, otherwise False
-        """
-        for key, value in korben_response.json().items():
-            if str(getattr(self, key)) != value:
-                return False
-        return True
+class ArchivableViewSetMixin:
+    """To be used with archivable models."""
+
+    @detail_route(methods=['post'])
+    def archive(self, request, pk):
+        """Archive the object."""
+        reason = request.data.get('reason', '')
+        obj = self.get_object()
+        obj.archive(user=request.user, reason=reason)
+        serializer = self.read_serializer_class(obj)
+        return Response(data=serializer.data)
+
+    @detail_route(methods=['get'])
+    def unarchive(self, request, pk):
+        """Unarchive the object."""
+        obj = self.get_object()
+        obj.unarchive()
+        serializer = self.read_serializer_class(obj)
+        return Response(data=serializer.data)

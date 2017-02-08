@@ -2,14 +2,14 @@
 
 from rest_framework import mixins, viewsets
 
+from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSet
-from .models import Advisor, CompaniesHouseCompany, Company, Contact, Interaction
+from .models import Advisor, CompaniesHouseCompany, Company, Contact
 from .serializers import (AdvisorSerializer, CompaniesHouseCompanySerializer, CompanySerializerRead,
-                          CompanySerializerWrite, ContactSerializerRead, ContactSerializerWrite,
-                          InteractionSerializerRead, InteractionSerializerWrite)
+                          CompanySerializerWrite, ContactSerializerRead, ContactSerializerWrite)
 
 
-class CompanyViewSet(CoreViewSet):
+class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
     """Company ViewSet."""
 
     read_serializer_class = CompanySerializerRead
@@ -41,7 +41,7 @@ class CompaniesHouseCompanyReadOnlyViewSet(mixins.ListModelMixin,
     lookup_field = 'company_number'
 
 
-class ContactViewSet(CoreViewSet):
+class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):
     """Contact ViewSet."""
 
     read_serializer_class = ContactSerializerRead
@@ -58,24 +58,6 @@ class ContactViewSet(CoreViewSet):
     def create(self, request, *args, **kwargs):
         """Override create to inject the user from session."""
         request.data.update({'advisor': str(request.user.pk)})
-        return super().create(request, *args, **kwargs)
-
-
-class InteractionViewSet(CoreViewSet):
-    """Interaction ViewSet."""
-
-    read_serializer_class = InteractionSerializerRead
-    write_serializer_class = InteractionSerializerWrite
-    queryset = Interaction.objects.select_related(
-        'interaction_type',
-        'dit_advisor',
-        'company',
-        'contact'
-    ).all()
-
-    def create(self, request, *args, **kwargs):
-        """Override create to inject the user from session."""
-        request.data.update({'dit_advisor': str(request.user.pk)})
         return super().create(request, *args, **kwargs)
 
 
