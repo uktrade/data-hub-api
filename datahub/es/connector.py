@@ -1,6 +1,7 @@
 from django.conf import settings
 from elasticsearch_dsl import Search
 from elasticsearch_dsl.query import Q, Term
+
 from .utils import document_exists, get_elasticsearch_client
 
 
