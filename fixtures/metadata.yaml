@@ -7039,3 +7039,34 @@
 - model: metadata.team
   pk: c06d755a-a73e-e611-8d53-e4115bed50dc
   fields: {name: "Unknown SP LEP"}
+
+
+# Service delivery status
+- model: metadata.servicedeliverystatus
+  fields: {id: "42099351-5224-e311-a78e-e4115bead28a", name: "UKEF - Application Approved"}
+- model: metadata.servicedeliverystatus
+  fields: {id: "10cc8460-5224-e311-a78e-e4115bead28a", name: "UKEF - Application Denied"}
+- model: metadata.servicedeliverystatus
+  fields: {id: "8843926e-5224-e311-a78e-e4115bead28a", name: "UKEF - Application Received"}
+- model: metadata.servicedeliverystatus
+  fields: {id: "08a96e7d-5224-e311-a78e-e4115bead28a", name: "UKEF - Closed"}
+- model: metadata.servicedeliverystatus
+  fields: {id: "1c981688-5224-e311-a78e-e4115bead28a", name: "UKEF - Deal Not Proceeding to Application"}
+- model: metadata.servicedeliverystatus
+  fields: {id: "10c59b97-5224-e311-a78e-e4115bead28a", name: "UKEF - In Discussion - Awaiting Financials"}
+- model: metadata.servicedeliverystatus
+  fields: {id: "53fa1da6-5224-e311-a78e-e4115bead28a", name: "UKEF - In Discussion - Application Likely"}
+- model: metadata.servicedeliverystatus
+  fields: {id: "5e9401b1-5224-e311-a78e-e4115bead28a", name: "UKEF - In Discussion - Early Stage"}
+- model: metadata.servicedeliverystatus
+  fields: {id: "0ad733bd-5224-e311-a78e-e4115bead28a", name: "UKEF - In Discussion - RAU Reviewed"}
+- model: metadata.servicedeliverystatus
+  fields: {id: "45329c18-6095-e211-a939-e4115bead28a", name: "Offered"}
+- model: metadata.servicedeliverystatus
+  fields: {id: "46329c18-6095-e211-a939-e4115bead28a", name: "Current"}
+- model: metadata.servicedeliverystatus
+  fields: {id: "47329c18-6095-e211-a939-e4115bead28a", name: "Completed"}
+- model: metadata.servicedeliverystatus
+  fields: {id: "48329c18-6095-e211-a939-e4115bead28a", name: "Withdrawn"}
+- model: metadata.servicedeliverystatus
+  fields: {id: "49329c18-6095-e211-a939-e4115bead28a", name: "On Hold"}

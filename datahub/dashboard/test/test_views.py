@@ -1,9 +1,10 @@
 from django.urls import reverse
 from rest_framework import status
 
-from datahub.company.test.factories import CompanyFactory, InteractionFactory
+from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
 from datahub.core.test_utils import get_test_user, LeelooTestCase
+from datahub.interaction.test.factories import InteractionFactory
 
 
 class DashboardTestCase(LeelooTestCase):
