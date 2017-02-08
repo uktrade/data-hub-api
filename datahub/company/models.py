@@ -178,6 +178,10 @@ class CompaniesHouseCompany(CompanyAbstract):
 class Interaction(BaseModel):
     """Interaction from CDMS."""
 
+    FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS = (
+        'dit_advisor', 'dit_team', 'service', 'interaction_type',
+    )
+
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     interaction_type = models.ForeignKey(metadata_models.InteractionType)
     subject = models.TextField()
@@ -200,6 +204,17 @@ class Interaction(BaseModel):
     def get_datetime_fields(self):
         """Return list of fields that should be mapped as datetime."""
         return super().get_datetime_fields() + ['date_of_interaction']
+
+    def clean(self):
+        """Custom validation."""
+        super().clean()
+
+        for field in self.FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS:
+            value = getattr(self, field + '_id')
+            if str(value) == '0167b456-0ddd-49bd-8184-e3227a0b6396':  # Undefined
+                raise ValidationError(message={
+                    field: ['This field is required'],
+                })
 
 
 class Contact(BaseModel):
