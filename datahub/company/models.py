@@ -201,6 +201,14 @@ class Interaction(BaseModel):
         """Return list of fields that should be mapped as datetime."""
         return super().get_datetime_fields() + ['date_of_interaction']
 
+    def clean(self):
+        """Custom validation."""
+        super().clean()
+        if self.dit_advisor_id and self.dit_advisor.first_name == 'Undefined':
+            raise ValidationError(message={
+                'dit_advisor': ['The advisor is mandatory.'],
+            })
+
 
 class Contact(BaseModel):
     """Contact from CDMS."""
