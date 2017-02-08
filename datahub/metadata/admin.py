@@ -13,7 +13,7 @@ MODELS_TO_REGISTER = (
     models.Title,
     models.Role,
     models.Team,
-    models.Service
+    models.Service,
 )
 
 

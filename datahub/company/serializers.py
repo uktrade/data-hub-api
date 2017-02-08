@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
+from datahub.interaction.models import Interaction
 from datahub.metadata.serializers import NestedCountrySerializer, NestedTeamSerializer
-from .models import Advisor, CompaniesHouseCompany, Company, Contact, Interaction
+from .models import Advisor, CompaniesHouseCompany, Company, Contact
 
 
 class NestedContactSerializer(serializers.ModelSerializer):
@@ -200,22 +201,3 @@ class ContactSerializerRead(serializers.ModelSerializer):
     def get_address_postcode(obj):
         """Handle address."""
         return obj.company.trading_address_postcode if obj.address_same_as_company else obj.address_postcode
-
-
-class InteractionSerializerRead(serializers.ModelSerializer):
-    """Interaction Serializer."""
-
-    dit_advisor = AdvisorSerializer()
-
-    class Meta:  # noqa: D101
-        model = Interaction
-        depth = 2
-        fields = '__all__'
-
-
-class InteractionSerializerWrite(serializers.ModelSerializer):
-    """Interaction Serializer for writing operations."""
-
-    class Meta:  # noqa: D101
-        model = Interaction
-        fields = '__all__'

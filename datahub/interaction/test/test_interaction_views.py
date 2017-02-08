@@ -5,10 +5,11 @@ from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status
 
-from datahub.company.models import Interaction
+from datahub.company.test.factories import AdvisorFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
-from .factories import AdvisorFactory, CompanyFactory, ContactFactory, InteractionFactory
+from datahub.interaction.models import Interaction
+from datahub.interaction.test.factories import InteractionFactory
 
 
 class InteractionTestCase(LeelooTestCase):
@@ -43,7 +44,7 @@ class InteractionTestCase(LeelooTestCase):
         # make sure we're spawning a task to save to Korben
         expected_data = Interaction.objects.get(pk=response.data['id']).convert_model_to_korben_format()
         mocked_save_to_korben.delay.assert_called_once_with(
-            db_table='company_interaction',
+            db_table='interaction_interaction',
             data=expected_data,
             update=False,
             user_id=self.user.id
@@ -66,7 +67,7 @@ class InteractionTestCase(LeelooTestCase):
         expected_data = interaction.convert_model_to_korben_format()
         expected_data['subject'] = 'I am another subject'
         mocked_save_to_korben.delay.assert_called_once_with(
-            db_table='company_interaction',
+            db_table='interaction_interaction',
             data=expected_data,
             update=True,  # this is an update!
             user_id=self.user.id
@@ -123,33 +124,3 @@ class InteractionTestCase(LeelooTestCase):
         })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-
-    def test_archive_interaction_no_reason(self):
-        """Test archive interaction without providing a reason."""
-        interaction = InteractionFactory()
-        url = reverse('interaction-archive', kwargs={'pk': interaction.pk})
-        response = self.api_client.post(url)
-
-        assert response.data['archived']
-        assert response.data['archived_reason'] == ''
-        assert response.data['id'] == str(interaction.pk)
-
-    def test_archive_interaction_reason(self):
-        """Test archive interaction providing a reason."""
-        interaction = InteractionFactory()
-        url = reverse('interaction-archive', kwargs={'pk': interaction.pk})
-        response = self.api_client.post(url, {'reason': 'foo'})
-
-        assert response.data['archived']
-        assert response.data['archived_reason'] == 'foo'
-        assert response.data['id'] == str(interaction.pk)
-
-    def test_unarchive_interaction(self):
-        """Test unarchive interaction."""
-        interaction = InteractionFactory(archived=True, archived_reason='foo')
-        url = reverse('interaction-unarchive', kwargs={'pk': interaction.pk})
-        response = self.api_client.get(url)
-
-        assert not response.data['archived']
-        assert response.data['archived_reason'] == ''
-        assert response.data['id'] == str(interaction.pk)

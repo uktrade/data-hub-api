@@ -4,37 +4,16 @@ from django.db import models
 from django.utils.timezone import now
 
 from datahub.company import tasks
-from datahub.core.mixins import DeferredSaveModelMixin
 
 
-class BaseModel(DeferredSaveModelMixin, models.Model):
+class BaseModel(models.Model):
     """Common fields for most of the models we use."""
 
-    archived = models.BooleanField(default=False)
-    archived_on = models.DateTimeField(null=True)
-    archived_reason = models.TextField(blank=True, null=True)
-    archived_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
     created_on = models.DateTimeField(null=True, blank=True)
     modified_on = models.DateTimeField(null=True, blank=True)
 
     class Meta:  # noqa: D101
         abstract = True
-
-    def archive(self, user, reason=None):
-        """Archive the model instance."""
-        self.archived = True
-        self.archived_by = user
-        self.archived_reason = reason
-        self.archived_on = now()
-        self.save(skip_custom_validation=True)  # it will skip the custom validation
-
-    def unarchive(self):
-        """Unarchive the model instance."""
-        self.archived = False
-        self.archived_reason = ''
-        self.archived_by = None
-        self.archived_on = None
-        self.save(skip_custom_validation=True)  # it will skip the custom validation
 
     def clean(self):
         """Custom validation for created_on and modified_on.
@@ -48,7 +27,41 @@ class BaseModel(DeferredSaveModelMixin, models.Model):
 
     def get_datetime_fields(self):
         """Return list of fields that should be mapped as datetime."""
-        return ['archived_on', 'created_on', 'modified_on']
+        fields = super().get_datetime_fields()
+        return fields + ['created_on', 'modified_on']
+
+
+class ArchivableModel(models.Model):
+    """Handle model archivation."""
+
+    archived = models.BooleanField(default=False)
+    archived_on = models.DateTimeField(null=True)
+    archived_reason = models.TextField(blank=True, null=True)
+    archived_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
+
+    class Meta:  # noqa: D101
+        abstract = True
+
+    def archive(self, user, reason=None):
+        """Archive the model instance."""
+        self.archived = True
+        self.archived_by = user
+        self.archived_reason = reason
+        self.archived_on = now()
+        self.save(skip_custom_validation=True)
+
+    def unarchive(self):
+        """Unarchive the model instance."""
+        self.archived = False
+        self.archived_reason = ''
+        self.archived_by = None
+        self.archived_on = None
+        self.save(skip_custom_validation=True)
+
+    def get_datetime_fields(self):
+        """Return list of fields that should be mapped as datetime."""
+        fields = super().get_datetime_fields()
+        return fields + ['archived_on']
 
 
 class BaseConstantModel(models.Model):
