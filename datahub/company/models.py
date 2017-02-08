@@ -178,6 +178,10 @@ class CompaniesHouseCompany(CompanyAbstract):
 class Interaction(BaseModel):
     """Interaction from CDMS."""
 
+    FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS = (
+        'dit_advisor', 'dit_team', 'service', 'interaction_type',
+    )
+
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     interaction_type = models.ForeignKey(metadata_models.InteractionType)
     subject = models.TextField()
@@ -204,10 +208,13 @@ class Interaction(BaseModel):
     def clean(self):
         """Custom validation."""
         super().clean()
-        if self.dit_advisor_id and self.dit_advisor.first_name == 'Undefined':
-            raise ValidationError(message={
-                'dit_advisor': ['The advisor is mandatory.'],
-            })
+
+        for field in self.FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS:
+            value = getattr(self, field + '_id')
+            if str(value) == '0167b456-0ddd-49bd-8184-e3227a0b6396':  # Undefined
+                raise ValidationError(message={
+                    field: ['This field is required'],
+                })
 
 
 class Contact(BaseModel):
