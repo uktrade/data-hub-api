@@ -66,3 +66,9 @@ class Service(BaseConstantModel):
     """Service."""
 
     pass
+
+
+class ServiceDeliveryStatus(BaseConstantModel):
+    """Service delivery status."""
+
+    pass
