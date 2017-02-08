@@ -18,7 +18,7 @@ ENUM_MAPPINGS = (
     ('optevia_interactioncommunicationchannelId', 'optevia_interactioncommunicationchannelSet', 'optevia_name', 'metadata_interactiontype'),  # noqa: E501
     ('BusinessUnitId', 'BusinessUnitSet', 'Name', 'metadata_team'),
     ('optevia_serviceId', 'optevia_serviceSet', 'optevia_name', 'metadata_service'),  # noqa: E501
-    ('optevia_servicedeliverystatusSet', 'optevia_servicedeliverystatusId', 'optevia_name', 'metdata_servicedeliverystatus'),  # noqa: E501
+    ('optevia_servicedeliverystatusId', 'optevia_servicedeliverystatusSet', 'optevia_name', 'metadata_servicedeliverystatus'),  # noqa: E501
 )
 
 # Used to avoid having to make Django fields nullable, this is loaded into all

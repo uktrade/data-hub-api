@@ -1,4 +1,5 @@
 import collections
+from . import spec
 
 
 def fkey_deps(metadata):
@@ -6,10 +7,14 @@ def fkey_deps(metadata):
     added = set()
     depth = 0
     # run until we've covered all tables
-    while len(added) < len(metadata.tables):
+    tables = {
+        name: table for name, table in metadata.tables.items()
+        if name in spec.DJANGO_LOOKUP
+    }
+    while len(added) < len(tables):
         remaining = filter(
             lambda x: x[0] not in added,  # table_name isn't added
-            metadata.tables.items()
+            tables.items()
         )
         for table_name, table in remaining:
             table_deps = set([
