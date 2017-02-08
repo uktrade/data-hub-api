@@ -256,6 +256,7 @@ MAPPINGS.update({
         ),
         'empty_strings': (
             'notes',
+            'subject',
             'feedback',
         ),
     },
