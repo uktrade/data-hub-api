@@ -38,6 +38,7 @@ class CompaniesHouseCompanyReadOnlyViewSet(mixins.ListModelMixin,
 
     serializer_class = CompaniesHouseCompanySerializer
     queryset = CompaniesHouseCompany.objects.select_related('registered_address_country').all()
+    lookup_field = 'company_number'
 
 
 class ContactViewSet(CoreViewSet):
@@ -84,4 +85,4 @@ class AdvisorReadOnlyViewSet(mixins.ListModelMixin,
     """Advisor GET only views."""
 
     serializer_class = AdvisorSerializer
-    queryset = Advisor.objects.exclude(first_name='Undefined')
+    queryset = Advisor.objects.all()

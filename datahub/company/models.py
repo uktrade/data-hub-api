@@ -178,6 +178,10 @@ class CompaniesHouseCompany(CompanyAbstract):
 class Interaction(BaseModel):
     """Interaction from CDMS."""
 
+    FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS = (
+        'dit_advisor', 'dit_team', 'service', 'interaction_type',
+    )
+
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     interaction_type = models.ForeignKey(metadata_models.InteractionType)
     subject = models.TextField()
@@ -200,6 +204,17 @@ class Interaction(BaseModel):
     def get_datetime_fields(self):
         """Return list of fields that should be mapped as datetime."""
         return super().get_datetime_fields() + ['date_of_interaction']
+
+    def clean(self):
+        """Custom validation."""
+        super().clean()
+
+        for field in self.FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS:
+            value = getattr(self, field + '_id')
+            if str(value) == '0167b456-0ddd-49bd-8184-e3227a0b6396':  # Undefined
+                raise ValidationError(message={
+                    field: ['This field is required'],
+                })
 
 
 class Contact(BaseModel):
@@ -374,11 +389,17 @@ class Advisor(DeferredSaveModelMixin, AbstractBaseUser, PermissionsMixin):
 @receiver((post_save, m2m_changed))
 def save_to_es(sender, instance, **kwargs):
     """Save to ES."""
+    from datahub.company import tasks
+
     if sender in (Company, CompaniesHouseCompany, Contact):
-        from datahub.company import tasks
+        data = model_to_dictionary(instance)
+
+        if sender is CompaniesHouseCompany:
+            # CH company is indexed by CH number instead
+            data['id'] = data['company_number']
 
         tasks.save_to_es.delay(
             # cannot access _meta from the instance
             doc_type=type(instance)._meta.db_table,
-            data=model_to_dictionary(instance),
+            data=data,
         )
