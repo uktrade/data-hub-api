@@ -31,7 +31,7 @@ class InteractionTestCase(LeelooTestCase):
         response = self.api_client.post(url, {
             'interaction_type': constants.InteractionType.business_card.value.id,
             'subject': 'whatever',
-            'date_of_interaction': now().isoformat(),
+            'date': now().isoformat(),
             'dit_advisor': AdvisorFactory().pk,
             'notes': 'hello',
             'company': CompanyFactory().pk,

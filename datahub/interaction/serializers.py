@@ -8,19 +8,16 @@ class InteractionSerializerRead(serializers.ModelSerializer):
     """Interaction Serializer."""
 
     dit_advisor = AdvisorSerializer()
-    date_of_interaction = serializers.DateTimeField(source='date')
 
     class Meta:  # noqa: D101
         model = Interaction
         depth = 2
-        exclude = ('date', )
+        fields = '__all__'
 
 
 class InteractionSerializerWrite(serializers.ModelSerializer):
     """Interaction Serializer for writing operations."""
 
-    date_of_interaction = serializers.DateTimeField(source='date')
-
     class Meta:  # noqa: D101
         model = Interaction
-        exclude = ('date', )
+        fields = '___all__'
