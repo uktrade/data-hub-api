@@ -20,4 +20,4 @@ class InteractionSerializerWrite(serializers.ModelSerializer):
 
     class Meta:  # noqa: D101
         model = Interaction
-        fields = '___all__'
+        fields = '__all__'
