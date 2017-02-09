@@ -16,7 +16,6 @@ from datahub.core import constants
 from datahub.core.mixins import KorbenSaveModelMixin
 from datahub.core.models import ArchivableModel, BaseModel
 from datahub.core.utils import model_to_dictionary
-from datahub.es.connector import ESConnector
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -160,12 +159,7 @@ class Company(KorbenSaveModelMixin, ArchivableModel, CompanyAbstract):
 class CompaniesHouseCompany(CompanyAbstract):
     """Representation of Companies House company."""
 
-    company_number = models.CharField(
-        max_length=MAX_LENGTH,
-        null=True,
-        db_index=True,
-        unique=True
-    )
+    company_number = models.CharField(max_length=MAX_LENGTH, unique=True)
     company_category = models.CharField(max_length=MAX_LENGTH, blank=True)
     company_status = models.CharField(max_length=MAX_LENGTH, blank=True)
     sic_code_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
@@ -344,8 +338,17 @@ class Advisor(KorbenSaveModelMixin, AbstractBaseUser, PermissionsMixin):
 @receiver((post_save, m2m_changed))
 def save_to_es(sender, instance, **kwargs):
     """Save to ES."""
+    from datahub.company import tasks
+
     if sender in (Company, CompaniesHouseCompany, Contact):
-        es_connector = ESConnector()
-        doc_type = type(instance)._meta.db_table  # cannot access _meta from the instance
         data = model_to_dictionary(instance)
-        es_connector.save(doc_type=doc_type, data=data)
+
+        if sender is CompaniesHouseCompany:
+            # CH company is indexed by CH number instead
+            data['id'] = data['company_number']
+
+        tasks.save_to_es.delay(
+            # cannot access _meta from the instance
+            doc_type=type(instance)._meta.db_table,
+            data=data,
+        )
