@@ -79,7 +79,7 @@ class InteractionTestCase(LeelooTestCase):
         interaction.dit_advisor_id = '0167b456-0ddd-49bd-8184-e3227a0b6396'  # Undefined
         interaction.save(skip_custom_validation=True)
 
-        url = reverse('interaction-detail', kwargs={'pk': interaction.pk})
+        url = reverse('v1:interaction-detail', kwargs={'pk': interaction.pk})
         response = self.api_client.patch(url, {
             'subject': 'I am another subject',
         })
@@ -92,7 +92,7 @@ class InteractionTestCase(LeelooTestCase):
         interaction.interaction_type_id = '0167b456-0ddd-49bd-8184-e3227a0b6396'  # Undefined
         interaction.save(skip_custom_validation=True)
 
-        url = reverse('interaction-detail', kwargs={'pk': interaction.pk})
+        url = reverse('v1:interaction-detail', kwargs={'pk': interaction.pk})
         response = self.api_client.patch(url, {
             'subject': 'I am another subject',
         })
@@ -105,7 +105,7 @@ class InteractionTestCase(LeelooTestCase):
         interaction.dit_team_id = '0167b456-0ddd-49bd-8184-e3227a0b6396'  # Undefined
         interaction.save(skip_custom_validation=True)
 
-        url = reverse('interaction-detail', kwargs={'pk': interaction.pk})
+        url = reverse('v1:interaction-detail', kwargs={'pk': interaction.pk})
         response = self.api_client.patch(url, {
             'subject': 'I am another subject',
         })
@@ -118,7 +118,7 @@ class InteractionTestCase(LeelooTestCase):
         interaction.service_id = '0167b456-0ddd-49bd-8184-e3227a0b6396'  # Undefined
         interaction.save(skip_custom_validation=True)
 
-        url = reverse('interaction-detail', kwargs={'pk': interaction.pk})
+        url = reverse('v1:interaction-detail', kwargs={'pk': interaction.pk})
         response = self.api_client.patch(url, {
             'subject': 'I am another subject',
         })
