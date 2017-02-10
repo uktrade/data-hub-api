@@ -67,4 +67,4 @@ class AdvisorReadOnlyViewSetV1(mixins.ListModelMixin,
     """Advisor GET only views."""
 
     serializer_class = AdvisorSerializer
-    queryset = Advisor.objects.exclude(first_name='Undefined')
+    queryset = Advisor.objects.all()

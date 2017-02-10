@@ -1,5 +1,6 @@
 import uuid
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.functional import cached_property
 
@@ -44,7 +45,22 @@ class InteractionAbstract(KorbenSaveModelMixin, BaseModel):
 class Interaction(InteractionAbstract):
     """Interaction."""
 
+    FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS = (
+        'dit_advisor', 'dit_team', 'service', 'interaction_type',
+    )
+
     interaction_type = models.ForeignKey('metadata.InteractionType')
+
+    def clean(self):
+        """Custom validation."""
+        super().clean()
+
+        for field in self.FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS:
+            value = getattr(self, field + '_id')
+            if str(value) == '0167b456-0ddd-49bd-8184-e3227a0b6396':  # Undefined
+                raise ValidationError(message={
+                    field: ['This field is required'],
+                })
 
 
 class ServiceOffer(models.Model):
@@ -72,6 +88,7 @@ class ServiceDelivery(InteractionAbstract):
     uk_region = models.ForeignKey('metadata.UKRegion', null=True, blank=True)
     sector = models.ForeignKey('metadata.Sector', null=True, blank=True)
     country_of_interest = models.ForeignKey('metadata.Country', null=True, blank=True)
+    feedback = models.TextField(max_length=4000, blank=True)  # CDMS limit
 
     def save(self, skip_custom_validation=False, **kwargs):
         """Add service offer."""

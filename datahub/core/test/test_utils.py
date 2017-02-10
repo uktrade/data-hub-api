@@ -1,7 +1,7 @@
 import pytest
 
 from datahub.company.test.factories import CompanyFactory
-from datahub.core.utils import model_to_dictionary
+from datahub.core.utils import log_and_ignore_exceptions, model_to_dictionary
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
@@ -146,3 +146,12 @@ def test_model_to_dictionary_exclude_fields():
     )
     result = model_to_dictionary(model_instance, excluded_fields=excluded_fields)
     assert set(result.keys()) == expected_keys
+
+
+def test_log_and_ignore_exceptions():
+    """Ensure that exception does not bubble up."""
+    try:
+        with log_and_ignore_exceptions():
+            raise Exception('test')
+    except:  # noqa: B901;
+        pytest.fail('Should not happen!')

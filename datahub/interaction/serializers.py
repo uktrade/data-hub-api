@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework_json_api import serializers as json_api_serializers
 
 from datahub.company.serializers import AdvisorSerializer
-from datahub.interaction.models import Interaction, ServiceDelivery
+from .models import Interaction, ServiceDelivery
 
 
 class InteractionSerializerRead(serializers.ModelSerializer):
