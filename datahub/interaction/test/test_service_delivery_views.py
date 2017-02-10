@@ -1,4 +1,3 @@
-import json
 from unittest import mock
 
 from django.utils.timezone import now
@@ -29,57 +28,18 @@ class ServiceDeliveryTestCase(LeelooTestCase):
     def test_add_service_delivery(self, mocked_save_to_korben):
         """Test add new service delivery."""
         url = reverse('v2:servicedelivery-list')
-        data = {
-            'type': 'ServiceDelivery',
-            'attributes': {
+        response = self.api_client.post(url, data={
                 'subject': 'whatever',
                 'date': now().isoformat(),
                 'notes': 'hello',
-            },
-            'relationships': {
-                'status': {
-                    'data': {
-                        'type': 'ServiceDeliveryStatus',
-                        'id': constants.ServiceDeliveryStatus.offered.value.id
-                    }
-                },
-                'dit_advisor': {
-                    'data': {
-                        'type': 'Advisor',
-                        'id': AdvisorFactory().pk
-                    }
-                },
-                'company': {
-                    'data': {
-                        'type': 'Company',
-                        'id': CompanyFactory().pk
-                    }
-                },
-                'contact': {
-                    'data': {
-                        'type': 'Contact',
-                        'id': ContactFactory().pk
-                    }
-                },
-                'service': {
-                    'data': {
-                        'type': 'Service',
-                        'id': constants.Service.trade_enquiry.value.id
-                    }
-                },
-                'dit_team': {
-                    'data': {
-                        'type': 'Team',
-                        'id': constants.Team.healthcare_uk.value.id
-                    }
-                }
-            }
-        }
-        response = self.api_client.post(url,
-                                        data=json.dumps({'data': data}),
-                                        content_type='application/vnd.api+json')
-
-        assert response.status_code == status.HTTP_201_CREATED
+                'status': constants.ServiceDeliveryStatus.offered.value.id,
+                'dit_advisor': AdvisorFactory().pk,
+                'company': CompanyFactory().pk,
+                'contact': ContactFactory().pk,
+                'service': constants.Service.trade_enquiry.value.id,
+                'dit_team': constants.Team.healthcare_uk.value.id,
+        })
+        assert response.status_code == status.HTTP_201_CREATED, response.content
         # make sure we're spawning a task to save to Korben
         expected_data = ServiceDelivery.objects.get(pk=response.data['id']).convert_model_to_korben_format()
         mocked_save_to_korben.delay.assert_called_once_with(
