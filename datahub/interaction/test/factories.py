@@ -36,7 +36,7 @@ class ServiceDeliveryFactory(factory.django.DjangoModelFactory):
     dit_team_id = constants.Team.healthcare_uk.value.id
     created_on = now()
     status_id = constants.ServiceDeliveryStatus.offered.value.id
-    uk_region = constants.UKRegion.east_midlands.value.id
+    uk_region_id = constants.UKRegion.east_midlands.value.id
 
     class Meta:
         model = 'interaction.ServiceDelivery'

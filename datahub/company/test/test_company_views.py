@@ -321,7 +321,6 @@ class CompanyTestCase(LeelooTestCase):
         company = CompanyFactory()
         url = reverse('v1:company-archive', kwargs={'pk': company.id})
         with mock.patch('datahub.core.viewsets.tasks.save_to_es') as es_save:
-            url = reverse('company-archive', kwargs={'pk': company.id})
             response = self.api_client.post(url, format='json')
 
             assert response.data['archived']
