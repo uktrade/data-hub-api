@@ -15,17 +15,7 @@ class CoreViewSet(mixins.CreateModelMixin,
                   mixins.UpdateModelMixin,
                   mixins.ListModelMixin,
                   GenericViewSet):
-    """Implement the archive route and the read/write serializers."""
-
-    read_serializer_class = None
-    write_serializer_class = None
-
-    def get_serializer_class(self):
-        """Return a different serializer class for reading or writing, if defined."""
-        if self.action in ('list', 'retrieve', 'archive'):
-            return self.read_serializer_class
-        elif self.action in ('create', 'update', 'partial_update'):
-            return self.write_serializer_class
+    """Save to korben hook."""
 
     def _save_to_korben(self, object_id, user_id, update):
         """Spawn the task to save to Korben."""
@@ -83,3 +73,23 @@ class CoreViewSet(mixins.CreateModelMixin,
         except KorbenException:
             client.captureException()
             raise APIException(detail='Korben error.')
+
+
+class CoreViewSetV1(CoreViewSet):
+    """Implement the read/write serializers."""
+
+    read_serializer_class = None
+    write_serializer_class = None
+
+    def get_serializer_class(self):
+        """Return a different serializer class for reading or writing, if defined."""
+        if self.action in ('list', 'retrieve', 'archive'):
+            return self.read_serializer_class
+        elif self.action in ('create', 'update', 'partial_update'):
+            return self.write_serializer_class
+
+
+class CoreViewSetV2(CoreViewSet):
+    """JSON API V2 views."""
+
+    pass

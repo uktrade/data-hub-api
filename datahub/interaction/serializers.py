@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from datahub.company.serializers import AdvisorSerializer
-from .models import Interaction
+from .models import Interaction, ServiceDelivery
 
 
 class InteractionSerializerRead(serializers.ModelSerializer):
@@ -21,3 +21,11 @@ class InteractionSerializerWrite(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = Interaction
         fields = '__all__'
+
+
+class ServiceDeliverySerializerV2(serializers.ModelSerializer):
+    """Service Delivery serializer."""
+
+    class Meta:  # noqa: D101
+        model = ServiceDelivery
+        exclude = ('service_offer', )

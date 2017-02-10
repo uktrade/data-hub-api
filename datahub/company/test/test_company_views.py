@@ -1,9 +1,9 @@
 from unittest import mock
 
-from django.urls import reverse
 from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status
+from rest_framework.reverse import reverse
 
 from datahub.company import models
 from datahub.company.models import Company
@@ -20,7 +20,7 @@ class CompanyTestCase(LeelooTestCase):
         """List the companies."""
         CompanyFactory()
         CompanyFactory()
-        url = reverse('company-list')
+        url = reverse('v1:company-list')
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -44,7 +44,7 @@ class CompanyTestCase(LeelooTestCase):
             alias='Xyz trading'
         )
 
-        url = reverse('company-detail', kwargs={'pk': company.id})
+        url = reverse('v1:company-detail', kwargs={'pk': company.id})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -77,7 +77,7 @@ class CompanyTestCase(LeelooTestCase):
             registered_address_country_id=constants.Country.united_states.value.id
         )
 
-        url = reverse('company-detail', kwargs={'pk': company.id})
+        url = reverse('v1:company-detail', kwargs={'pk': company.id})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -108,7 +108,7 @@ class CompanyTestCase(LeelooTestCase):
         )
 
         # now update it
-        url = reverse('company-detail', kwargs={'pk': company.pk})
+        url = reverse('v1:company-detail', kwargs={'pk': company.pk})
         with mock.patch('datahub.core.viewsets.tasks.save_to_es') as es_save:
             response = self.api_client.patch(url, {
                 'name': 'Acme',
@@ -136,7 +136,7 @@ class CompanyTestCase(LeelooTestCase):
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_uk_company(self, mocked_save_to_korben):
         """Test add new UK company."""
-        url = reverse('company-list')
+        url = reverse('v1:company-list')
         with mock.patch('datahub.core.viewsets.tasks.save_to_es') as es_save:
             response = self.api_client.post(url, {
                 'name': 'Acme',
@@ -170,7 +170,7 @@ class CompanyTestCase(LeelooTestCase):
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_uk_company_without_uk_region(self, mocked_save_to_korben):
         """Test add new UK without UK region company."""
-        url = reverse('company-list')
+        url = reverse('v1:company-list')
         response = self.api_client.post(url, {
             'name': 'Acme',
             'alias': None,
@@ -188,7 +188,7 @@ class CompanyTestCase(LeelooTestCase):
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_not_uk_company(self, mocked_save_to_korben):
         """Test add new not UK company."""
-        url = reverse('company-list')
+        url = reverse('v1:company-list')
         with mock.patch('datahub.core.viewsets.tasks.save_to_es') as es_save:
             response = self.api_client.post(url, {
                 'name': 'Acme',
@@ -222,7 +222,7 @@ class CompanyTestCase(LeelooTestCase):
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_company_partial_trading_address(self, mocked_save_to_korben):
         """Test add new company with partial trading address."""
-        url = reverse('company-list')
+        url = reverse('v1:company-list')
         response = self.api_client.post(url, {
             'name': 'Acme',
             'business_type': constants.BusinessType.company.value.id,
@@ -244,7 +244,7 @@ class CompanyTestCase(LeelooTestCase):
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_company_with_trading_address(self, mocked_save_to_korben):
         """Test add new company with trading_address."""
-        url = reverse('company-list')
+        url = reverse('v1:company-list')
         with mock.patch('datahub.core.viewsets.tasks.save_to_es') as es_save:
             response = self.api_client.post(url, {
                 'name': 'Acme',
@@ -280,7 +280,7 @@ class CompanyTestCase(LeelooTestCase):
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_company_with_website_without_scheme(self, mocked_save_to_korben):
         """Test add new company with trading_address."""
-        url = reverse('company-list')
+        url = reverse('v1:company-list')
         with mock.patch('datahub.core.viewsets.tasks.save_to_es') as es_save:
             response = self.api_client.post(url, {
                 'name': 'Acme',
@@ -318,8 +318,8 @@ class CompanyTestCase(LeelooTestCase):
     def test_archive_company_no_reason(self):
         """Test company archive."""
         company = CompanyFactory()
+        url = reverse('v1:company-archive', kwargs={'pk': company.id})
         with mock.patch('datahub.core.viewsets.tasks.save_to_es') as es_save:
-            url = reverse('company-archive', kwargs={'pk': company.id})
             response = self.api_client.post(url, format='json')
 
             assert response.data['archived']
@@ -337,7 +337,7 @@ class CompanyTestCase(LeelooTestCase):
     def test_archive_company_reason(self):
         """Test company archive."""
         company = CompanyFactory()
-        url = reverse('company-archive', kwargs={'pk': company.id})
+        url = reverse('v1:company-archive', kwargs={'pk': company.id})
         with mock.patch('datahub.core.viewsets.tasks.save_to_es') as es_save:
             response = self.api_client.post(url, {'reason': 'foo'}, format='json')
 
@@ -356,7 +356,7 @@ class CompanyTestCase(LeelooTestCase):
     def test_unarchive_company(self):
         """Unarchive a company."""
         company = CompanyFactory(archived=True, archived_on=now(), archived_reason='foo')
-        url = reverse('company-unarchive', kwargs={'pk': company.id})
+        url = reverse('v1:company-unarchive', kwargs={'pk': company.id})
         response = self.api_client.get(url)
 
         assert not response.data['archived']
@@ -372,7 +372,7 @@ class CHCompanyTestCase(LeelooTestCase):
         CompaniesHouseCompanyFactory()
         CompaniesHouseCompanyFactory()
 
-        url = reverse('companieshousecompany-list')
+        url = reverse('v1:companieshousecompany-list')
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -382,7 +382,7 @@ class CHCompanyTestCase(LeelooTestCase):
         """Test companies house company detail."""
         ch_company = CompaniesHouseCompanyFactory(company_number=123)
 
-        url = reverse('companieshousecompany-detail', kwargs={'company_number': ch_company.company_number})
+        url = reverse('v1:companieshousecompany-detail', kwargs={'company_number': ch_company.company_number})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -390,7 +390,7 @@ class CHCompanyTestCase(LeelooTestCase):
 
     def test_ch_company_cannot_be_written(self):
         """Test CH company POST is not allowed."""
-        url = reverse('companieshousecompany-list')
+        url = reverse('v1:companieshousecompany-list')
         response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
@@ -400,7 +400,7 @@ class CHCompanyTestCase(LeelooTestCase):
         CompaniesHouseCompanyFactory(company_number=1234567890)
 
         # promote a company to ch
-        url = reverse('company-list')
+        url = reverse('v1:company-list')
         response = self.api_client.post(url, {
             'name': 'Acme',
             'company_number': 1234567890,

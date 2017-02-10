@@ -1,9 +1,9 @@
 from unittest import mock
 
-from django.urls import reverse
 from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status
+from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdvisorFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
@@ -18,7 +18,7 @@ class InteractionTestCase(LeelooTestCase):
     def test_interaction_detail_view(self):
         """Interaction detail view."""
         interaction = InteractionFactory()
-        url = reverse('interaction-detail', kwargs={'pk': interaction.pk})
+        url = reverse('v1:interaction-detail', kwargs={'pk': interaction.pk})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -27,7 +27,7 @@ class InteractionTestCase(LeelooTestCase):
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_interaction(self, mocked_save_to_korben):
         """Test add new interaction."""
-        url = reverse('interaction-list')
+        url = reverse('v1:interaction-list')
         response = self.api_client.post(url, {
             'interaction_type': constants.InteractionType.business_card.value.id,
             'subject': 'whatever',
@@ -56,7 +56,7 @@ class InteractionTestCase(LeelooTestCase):
         """Modify an existing interaction."""
         interaction = InteractionFactory(subject='I am a subject')
 
-        url = reverse('interaction-detail', kwargs={'pk': interaction.pk})
+        url = reverse('v1:interaction-detail', kwargs={'pk': interaction.pk})
         response = self.api_client.patch(url, {
             'subject': 'I am another subject',
         })
@@ -79,7 +79,7 @@ class InteractionTestCase(LeelooTestCase):
         interaction.dit_advisor_id = '0167b456-0ddd-49bd-8184-e3227a0b6396'  # Undefined
         interaction.save(skip_custom_validation=True)
 
-        url = reverse('interaction-detail', kwargs={'pk': interaction.pk})
+        url = reverse('v1:interaction-detail', kwargs={'pk': interaction.pk})
         response = self.api_client.patch(url, {
             'subject': 'I am another subject',
         })
@@ -92,7 +92,7 @@ class InteractionTestCase(LeelooTestCase):
         interaction.interaction_type_id = '0167b456-0ddd-49bd-8184-e3227a0b6396'  # Undefined
         interaction.save(skip_custom_validation=True)
 
-        url = reverse('interaction-detail', kwargs={'pk': interaction.pk})
+        url = reverse('v1:interaction-detail', kwargs={'pk': interaction.pk})
         response = self.api_client.patch(url, {
             'subject': 'I am another subject',
         })
@@ -105,7 +105,7 @@ class InteractionTestCase(LeelooTestCase):
         interaction.dit_team_id = '0167b456-0ddd-49bd-8184-e3227a0b6396'  # Undefined
         interaction.save(skip_custom_validation=True)
 
-        url = reverse('interaction-detail', kwargs={'pk': interaction.pk})
+        url = reverse('v1:interaction-detail', kwargs={'pk': interaction.pk})
         response = self.api_client.patch(url, {
             'subject': 'I am another subject',
         })
@@ -118,7 +118,7 @@ class InteractionTestCase(LeelooTestCase):
         interaction.service_id = '0167b456-0ddd-49bd-8184-e3227a0b6396'  # Undefined
         interaction.save(skip_custom_validation=True)
 
-        url = reverse('interaction-detail', kwargs={'pk': interaction.pk})
+        url = reverse('v1:interaction-detail', kwargs={'pk': interaction.pk})
         response = self.api_client.patch(url, {
             'subject': 'I am another subject',
         })

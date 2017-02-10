@@ -16,7 +16,7 @@ python-dateutil==2.5.3
 psycopg2==2.6.2
 
 # task
-celery[redis,sqs]==4.0.2
+celery[redis]==4.0.2
 boto==2.45
 flower==0.9.1
 
