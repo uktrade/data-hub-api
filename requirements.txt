@@ -2,6 +2,7 @@ pip==9.0.1
 # Django and django related
 Django==1.10.5
 djangorestframework==3.5.3
+djangorestframework-jsonapi==2.1.1
 django-environ==0.4.1
 django-extensions==1.7.6
 django-reversion==2.0.6
@@ -16,7 +17,7 @@ python-dateutil==2.5.3
 psycopg2==2.6.2
 
 # task
-celery[redis,sqs]==4.0.2
+celery[redis]==4.0.2
 boto==2.45
 flower==0.9.1
 

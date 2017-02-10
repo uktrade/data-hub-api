@@ -144,6 +144,8 @@ STATICFILES_DIRS = (
 # DRF
 REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': None,
+    'EXCEPTION_HANDLER': 'datahub.core.exceptions.versioned_exception_handler',
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
     'DEFAULT_AUTHENTICATION_CLASSES': (
