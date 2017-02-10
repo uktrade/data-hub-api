@@ -10,8 +10,8 @@ from datahub.company.test.factories import AdvisorFactory, CompanyFactory, Conta
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
 
-from ..models import ServiceDelivery
 from .factories import ServiceDeliveryFactory
+from ..models import ServiceDelivery
 
 
 class ServiceDeliveryTestCase(LeelooTestCase):
@@ -37,16 +37,16 @@ class ServiceDeliveryTestCase(LeelooTestCase):
                 'notes': 'hello',
             },
             'relationships': {
-                'dit_advisor': {
-                    'data': {
-                        'type': 'Advisor',
-                        'id': AdvisorFactory().pk
-                    }
-                },
                 'status': {
                     'data': {
                         'type': 'ServiceDeliveryStatus',
                         'id': constants.ServiceDeliveryStatus.offered.value.id
+                    }
+                },
+                'dit_advisor': {
+                    'data': {
+                        'type': 'Advisor',
+                        'id': AdvisorFactory().pk
                     }
                 },
                 'company': {
