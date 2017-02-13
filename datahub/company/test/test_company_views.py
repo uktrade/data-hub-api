@@ -1,6 +1,5 @@
 from unittest import mock
 
-from django.urls import reverse
 from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status

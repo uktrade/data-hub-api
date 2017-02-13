@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from datahub.core.viewsets import CoreViewSetV1, CoreViewSetV2
 from datahub.interaction.models import Interaction, ServiceDelivery
 from datahub.interaction.serializers import (InteractionSerializerRead,
@@ -5,16 +7,7 @@ from datahub.interaction.serializers import (InteractionSerializerRead,
                                              ServiceDeliverySerializerV2)
 
 
-class InterceptUserMixin:
-    """Add the user to the model instance."""
-
-    def create(self, request, *args, **kwargs):
-        """Override create to inject the user from session."""
-        request.data.update({'dit_advisor': str(request.user.pk)})
-        return super().create(request, *args, **kwargs)
-
-
-class InteractionViewSetV1(InterceptUserMixin, CoreViewSetV1):
+class InteractionViewSetV1(CoreViewSetV1):
     """Interaction ViewSet."""
 
     read_serializer_class = InteractionSerializerRead
@@ -26,9 +19,23 @@ class InteractionViewSetV1(InterceptUserMixin, CoreViewSetV1):
         'contact'
     ).all()
 
+    def create(self, request, *args, **kwargs):
+        """Override create to inject the user from session."""
+        request.data.update({'dit_advisor': str(request.user.pk)})
+        return super().create(request, *args, **kwargs)
 
-class ServiceDeliveryViewSetV2(InterceptUserMixin, CoreViewSetV2):
+
+class ServiceDeliveryViewSetV2(CoreViewSetV2):
     """Service delivery viewset."""
 
     serializer_class = ServiceDeliverySerializerV2
     queryset = ServiceDelivery.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        """Override create to inject the user from session."""
+        request.data.update({
+            'dit_advisor': OrderedDict([
+                ('type', 'Advisor'), ('id', str(request.user.pk))
+            ])
+        })
+        return super().create(request, *args, **kwargs)
