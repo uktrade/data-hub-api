@@ -3,13 +3,13 @@
 from rest_framework import mixins, viewsets
 
 from datahub.core.mixins import ArchivableViewSetMixin
-from datahub.core.viewsets import CoreViewSet
+from datahub.core.viewsets import CoreViewSetV1
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
 from .serializers import (AdvisorSerializer, CompaniesHouseCompanySerializer, CompanySerializerRead,
                           CompanySerializerWrite, ContactSerializerRead, ContactSerializerWrite)
 
 
-class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
+class CompanyViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
     """Company ViewSet."""
 
     read_serializer_class = CompanySerializerRead
@@ -31,9 +31,8 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
     ).exclude(name='Undefined')
 
 
-class CompaniesHouseCompanyReadOnlyViewSet(mixins.ListModelMixin,
-                                           mixins.RetrieveModelMixin,
-                                           viewsets.GenericViewSet):
+class CompaniesHouseCompanyReadOnlyViewSetV1(
+        mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     """Companies House company GET only views."""
 
     serializer_class = CompaniesHouseCompanySerializer
@@ -41,7 +40,7 @@ class CompaniesHouseCompanyReadOnlyViewSet(mixins.ListModelMixin,
     lookup_field = 'company_number'
 
 
-class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):
+class ContactViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
     """Contact ViewSet."""
 
     read_serializer_class = ContactSerializerRead
@@ -61,9 +60,8 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):
         return super().create(request, *args, **kwargs)
 
 
-class AdvisorReadOnlyViewSet(mixins.ListModelMixin,
-                             mixins.RetrieveModelMixin,
-                             viewsets.GenericViewSet):
+class AdvisorReadOnlyViewSetV1(
+        mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     """Advisor GET only views."""
 
     serializer_class = AdvisorSerializer

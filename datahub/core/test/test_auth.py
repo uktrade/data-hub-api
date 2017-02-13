@@ -3,10 +3,10 @@ from unittest import mock
 import pytest
 import requests
 from django.contrib.auth import get_user_model
-from django.urls import reverse
 from django.utils.timezone import now
 from oauth2_provider.models import Application
 from rest_framework import status
+from rest_framework.reverse import reverse
 
 from datahub.core import constants
 from datahub.metadata.models import Team

@@ -2,9 +2,9 @@ from unittest import mock
 from unittest.mock import Mock
 
 import pytest
-from django.urls import reverse
 from elasticsearch import ElasticsearchException
 from rest_framework import status
+from rest_framework.reverse import reverse
 
 pytestmark = pytest.mark.django_db
 
