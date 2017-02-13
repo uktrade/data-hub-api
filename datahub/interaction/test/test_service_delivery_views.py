@@ -1,3 +1,4 @@
+import json
 from unittest import mock
 
 from django.utils.timezone import now
@@ -8,8 +9,9 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import AdvisorFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
-from datahub.interaction.models import ServiceDelivery
-from datahub.interaction.test.factories import ServiceDeliveryFactory
+
+from .factories import ServiceDeliveryFactory
+from ..models import ServiceDelivery
 
 
 class ServiceDeliveryTestCase(LeelooTestCase):
@@ -20,24 +22,62 @@ class ServiceDeliveryTestCase(LeelooTestCase):
         servicedelivery = ServiceDeliveryFactory()
         url = reverse('v2:servicedelivery-detail', kwargs={'pk': servicedelivery.pk})
         response = self.api_client.get(url)
-
         assert response.status_code == status.HTTP_200_OK
         assert response.data['id'] == str(servicedelivery.pk)
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
-    def test_add_servicedelivery(self, mocked_save_to_korben):
+    def test_add_service_delivery(self, mocked_save_to_korben):
         """Test add new service delivery."""
         url = reverse('v2:servicedelivery-list')
-        response = self.api_client.post(url, {
-            'subject': 'whatever',
-            'date': now().isoformat(),
-            'dit_advisor': AdvisorFactory().pk,
-            'notes': 'hello',
-            'company': CompanyFactory().pk,
-            'contact': ContactFactory().pk,
-            'service': constants.Service.trade_enquiry.value.id,
-            'dit_team': constants.Team.healthcare_uk.value.id
-        })
+        data = {
+            'type': 'ServiceDelivery',
+            'attributes': {
+                'subject': 'whatever',
+                'date': now().isoformat(),
+                'notes': 'hello',
+            },
+            'relationships': {
+                'status': {
+                    'data': {
+                        'type': 'ServiceDeliveryStatus',
+                        'id': constants.ServiceDeliveryStatus.offered.value.id
+                    }
+                },
+                'dit_advisor': {
+                    'data': {
+                        'type': 'Advisor',
+                        'id': AdvisorFactory().pk
+                    }
+                },
+                'company': {
+                    'data': {
+                        'type': 'Company',
+                        'id': CompanyFactory().pk
+                    }
+                },
+                'contact': {
+                    'data': {
+                        'type': 'Contact',
+                        'id': ContactFactory().pk
+                    }
+                },
+                'service': {
+                    'data': {
+                        'type': 'Service',
+                        'id': constants.Service.trade_enquiry.value.id
+                    }
+                },
+                'dit_team': {
+                    'data': {
+                        'type': 'Team',
+                        'id': constants.Team.healthcare_uk.value.id
+                    }
+                }
+            }
+        }
+        response = self.api_client.post(url,
+                                        data=json.dumps({'data': data}),
+                                        content_type='application/vnd.api+json')
 
         assert response.status_code == status.HTTP_201_CREATED
         # make sure we're spawning a task to save to Korben
