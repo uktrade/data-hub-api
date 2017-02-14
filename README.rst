@@ -56,7 +56,6 @@ Leeloo can run on any Heroku style platform. These environment variables MUST be
 - RESULT_BACKEND
 - BROKER_TRANSPORT_OPTIONS (default={})
 - TASK_MAX_RETRIES (default=1000000)
-- RETRY_DELAY_SECONDS (default=5)
 - DIT_ENABLED_ADVISORS (default=())
 
 
