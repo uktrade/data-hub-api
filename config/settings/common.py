@@ -148,12 +148,13 @@ REST_FRAMEWORK = {
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
-    'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'oauth2_provider.ext.rest_framework.OAuth2Authentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication'
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-    ),
+    ],
 }
 
 # Simplified static file serving.
@@ -180,4 +181,3 @@ CELERY_RESULT_BACKEND = env('RESULT_BACKEND')
 CELERY_RESULT_EXPIRES = None
 CELERY_BROKER_TRANSPORT_OPTIONS = env.dict('BROKER_TRANSPORT_OPTIONS', default={})
 TASK_MAX_RETRIES = env('TASK_MAX_RETRIES', default=1000)
-TASK_RETRY_DELAY_SECONDS = env('TASK_RETRY_DELAY_SECONDS', default=5)
