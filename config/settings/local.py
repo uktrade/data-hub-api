@@ -2,6 +2,8 @@ import socket
 
 from .common import *
 
+# DRF
+REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'] += ['rest_framework.authentication.SessionAuthentication']
 MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 INSTALLED_APPS += ('debug_toolbar',)
 
