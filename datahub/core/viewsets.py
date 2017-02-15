@@ -101,4 +101,4 @@ class CoreViewSetV2(CoreViewSet):
     pagination_class = json_api_pagination.LimitOffsetPagination
     parser_classes = (json_api_parsers.JSONParser, parsers.FormParser, parsers.MultiPartParser)
     renderer_classes = (json_api_renderers.JSONRenderer, BrowsableAPIRenderer)
-    metadata_class = (JSONAPIMetadata, )
+    metadata_class = JSONAPIMetadata
