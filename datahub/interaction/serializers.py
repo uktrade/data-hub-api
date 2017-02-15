@@ -29,4 +29,19 @@ class ServiceDeliverySerializerV2(json_api_serializers.ModelSerializer):
 
     class Meta:  # noqa: D101
         model = ServiceDelivery
-        exclude = ('service_offer', )
+        fields = (
+            'id',
+            'date',
+            'company',
+            'contact',
+            'service',
+            'subject',
+            'dit_advisor',
+            'notes',
+            'dit_team',
+            'status',
+            'uk_region',
+            'sector',
+            'country_of_interest',
+            'feedback',
+            'url', )
