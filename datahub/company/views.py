@@ -1,5 +1,6 @@
 """Company and related resources view sets."""
-
+from django_filters import FilterSet
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, viewsets
 
 from datahub.core.mixins import ArchivableViewSetMixin
@@ -60,9 +61,25 @@ class ContactViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
         return super().create(request, *args, **kwargs)
 
 
+class AdvisorFilter(FilterSet):
+    """Advisor filter."""
+
+    class Meta:  # noqa: D101
+        model = Advisor
+        fields = dict(
+            first_name=['exact', 'icontains'],
+            last_name=['exact', 'icontains'],
+            email=['exact', 'icontains'],
+        )
+
+
 class AdvisorReadOnlyViewSetV1(
         mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     """Advisor GET only views."""
 
     serializer_class = AdvisorSerializer
     queryset = Advisor.objects.all()
+    filter_backends = (
+        DjangoFilterBackend,
+    )
+    filter_class = AdvisorFilter
