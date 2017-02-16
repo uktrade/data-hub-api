@@ -173,6 +173,9 @@ class CompaniesHouseCompany(CompanyAbstract):
         """Admin displayed human readable name."""
         return self.name
 
+    class Meta:  # noqa: D101
+        verbose_name_plural = 'Companies House companies'
+
 
 class Contact(KorbenSaveModelMixin, ArchivableModel, BaseModel):
     """Contact from CDMS."""

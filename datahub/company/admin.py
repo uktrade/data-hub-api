@@ -3,13 +3,38 @@ from django.contrib.auth.admin import UserAdmin
 
 from reversion.admin import VersionAdmin
 
-from . models import Advisor, Company, Contact
+from . models import Advisor, CompaniesHouseCompany, Company, Contact
 
 
-MODELS_TO_REGISTER = (Company, Contact)
+@admin.register(Company)
+class CompanyAdmin(VersionAdmin):
+    """Company admin."""
 
-for model_cls in MODELS_TO_REGISTER:
-    admin.site.register(model_cls, VersionAdmin)
+    search_fields = ['name', 'id', 'company_number']
+
+
+@admin.register(Contact)
+class ContactAdmin(VersionAdmin):
+    """Contact admin."""
+
+    search_fields = ['first_name', 'last_name', 'company__name']
+
+
+@admin.register(CompaniesHouseCompany)
+class CHCompany(admin.ModelAdmin):
+    """Companies House company admin."""
+
+    search_fields = ['name', 'company_number']
+
+    def get_readonly_fields(self, request, obj=None):
+        """All fields readonly."""
+        readonly_fields = list(set(
+            [field.name for field in self.opts.local_fields] +
+            [field.name for field in self.opts.local_many_to_many]
+        ))
+        if 'is_submitted' in readonly_fields:
+            readonly_fields.remove('is_submitted')
+        return readonly_fields
 
 
 @admin.register(Advisor)
