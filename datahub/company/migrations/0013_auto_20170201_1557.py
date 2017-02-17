@@ -33,5 +33,6 @@ class Migration(migrations.Migration):
                     'id, archived, archived_by_id, archived_reason, archived_on, modified_on, created_on,'
                     'interaction_type_id, subject, "date", dit_advisor_id, notes, company_id, contact_id, service_id, dit_team_id'
                 ' FROM interaction_interaction',
+            elidable=True,
         )
     ]
