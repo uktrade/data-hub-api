@@ -23,7 +23,7 @@ flower==0.9.1
 
 # ES
 elasticsearch==2.4.0
-elasticsearch-dsl==2.1.0
+elasticsearch-dsl==5.1.0
 
 # Testing
 pytest-django==3.1.2
