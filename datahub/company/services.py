@@ -9,6 +9,7 @@ import requests
 from django.conf import settings
 from lxml import etree
 
+from datahub.company.models import CompaniesHouseCompany
 from datahub.core.utils import stream_to_fp
 
 
@@ -62,3 +63,28 @@ def iter_ch_csv_from_url(url):
                     continue  # We're overriding field names, skip header row
 
                 yield filter_irrelevant_ch_columns(row)
+
+
+def is_changed(company, csv_data):
+    """Return whatever company data changed."""
+    return any(csv_data[name] != getattr(company, name) for name in csv_data)
+
+
+def sync_ch():
+    """Do the sync."""
+    ch_csv_urls = get_ch_latest_dump_file_list(settings.CH_DOWNLOAD_URL)
+
+    for csv_url in ch_csv_urls:
+        for ch_company_row in iter_ch_csv_from_url(csv_url):
+            company, created = CompaniesHouseCompany.objects.get_or_create(
+                company_number=ch_company_row.pop('company_number'),
+                defaults=ch_company_row,
+            )
+
+            if created or not is_changed(company, ch_company_row):
+                continue
+
+            for key, value in ch_company_row.items():
+                setattr(company, key, value)
+
+            company.save()
