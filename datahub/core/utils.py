@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 from logging import getLogger
 
+import requests
 from django.db.models import DateField, DateTimeField, ForeignKey, ManyToManyField, UUIDField
 
 logger = getLogger(__name__)
@@ -60,3 +61,10 @@ def log_and_ignore_exceptions():
         yield
     except Exception:
         logger.exception('Silently ignoring non-fatal exception')
+
+
+def stream_to_fp(url, fp):
+    """Efficiently stream given url to given file pointer."""
+    response = requests.get(url, stream=True)
+    for chunk in response.iter_content(chunk_size=4096):
+        fp.write(chunk)
