@@ -7,6 +7,7 @@ from logging import getLogger
 
 import requests
 from django.conf import settings
+from django.core.management.base import BaseCommand
 from lxml import etree
 
 from datahub.company.models import CompaniesHouseCompany
@@ -88,3 +89,11 @@ def sync_ch():
                 setattr(company, key, value)
 
             company.save()
+
+
+class Command(BaseCommand):
+    """Companies House sync command."""
+
+    def handle(self, *args, **options):
+        """Handle."""
+        sync_ch()
