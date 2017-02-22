@@ -1,4 +1,9 @@
 pip==9.0.1
+
+# For CH Sync
+lxml==3.6.4
+cssselect==1.0.1
+
 # Django and django related
 Django==1.10.5
 djangorestframework==3.5.4

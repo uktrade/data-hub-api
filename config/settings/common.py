@@ -8,6 +8,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 
 import environ
+from .companieshouse import *
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
