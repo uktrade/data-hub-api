@@ -42,7 +42,7 @@ def filter_irrelevant_ch_columns(row):
     try:
         ret['incorporation_date'] = datetime.strptime(
             ret['incorporation_date'], '%d/%m/%Y'
-        )
+        ).date()
     except (TypeError, ValueError):
         pass
 
