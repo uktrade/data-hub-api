@@ -63,7 +63,7 @@ def log_and_ignore_exceptions():
         logger.exception('Silently ignoring non-fatal exception')
 
 
-def stream_to_fp(url, fp):
+def stream_to_file_pointer(url, fp):
     """Efficiently stream given url to given file pointer."""
     response = requests.get(url, stream=True)
     for chunk in response.iter_content(chunk_size=4096):

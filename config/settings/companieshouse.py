@@ -1,3 +1,5 @@
+CH_UNITED_KINGDOM_COUNTRY_ID = '80756b9a-5d95-e211-a939-e4115bead28a'
+
 CH_DOWNLOAD_URL = 'http://download.companieshouse.gov.uk/en_output.html'
 
 CH_CSV_FIELD_NAMES = (
@@ -60,6 +62,7 @@ CH_RELEVANT_FIELDS = (
     # shared
     'name',
     'company_number',
+    'incorporation_date',
     'registered_address_1',
     'registered_address_2',
     'registered_address_town',
