@@ -7,6 +7,7 @@ import zipfile
 from contextlib import contextmanager
 from datetime import datetime
 from logging import getLogger
+from urllib.parse import urlparse
 
 import requests
 from django.conf import settings
@@ -26,9 +27,13 @@ def get_ch_latest_dump_file_list(url, selector='.omega a'):
     parser = etree.HTMLParser()
     root = etree.parse(io.BytesIO(response.content), parser).getroot()
 
+    url_base = urlparse(url)
+
     result = []
     for anchor in root.cssselect(selector):
-        result.append(anchor.attrib['href'])
+        href = anchor.attrib['href']
+        # Fix broken url
+        result.append('{0.scheme}://{0.hostname}/{1}'.format(url_base, href))
     return result
 
 

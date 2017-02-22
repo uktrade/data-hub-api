@@ -1,4 +1,3 @@
-
 from datetime import date
 from os import path
 from unittest import mock
@@ -25,7 +24,10 @@ def test_fetching_ch_urls_list(requests_mock):
     </html>
     """
 
-    assert sync_ch.get_ch_latest_dump_file_list('anything') == ['test1', 'test2']
+    assert sync_ch.get_ch_latest_dump_file_list('https://example.com/anything.html') == [
+        'https://example.com/test1',
+        'https://example.com/test2',
+    ]
 
 
 def test_column_filtering():
