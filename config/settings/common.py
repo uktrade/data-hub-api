@@ -169,7 +169,7 @@ KORBEN_PORT = env('KORBEN_PORT')
 DATAHUB_SECRET = env('DATAHUB_SECRET')
 CHAR_FIELD_MAX_LENGTH = 255
 HEROKU = False
-DIT_ENABLED_ADVISORS = env.tuple('DIT_ENABLED_ADVISORS', default=())
+DIT_ENABLED_ADVISORS = [name.lower() for name in env.tuple('DIT_ENABLED_ADVISORS', default=())]
 
 # celery
 CELERY_BROKER_URL = env('BROKER_URL')

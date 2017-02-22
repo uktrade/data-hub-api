@@ -10,6 +10,5 @@ dependencies:
 
 test:
   override:
-    - docker-compose build
-    - docker-compose run leeloo bash tests.sh
-    - docker-compose run leeloo flake8
+    - case $CIRCLE_NODE_INDEX in 0) make tests-auth ;; 1) make tests ;; 2) make flake8 ;; esac:
+        parallel: true
