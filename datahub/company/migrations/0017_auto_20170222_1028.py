@@ -16,7 +16,6 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             sql='CREATE EXTENSION IF NOT EXISTS citext;',
             reverse_sql=migrations.RunSQL.noop,
-            elidable=True
         ),
         migrations.AlterField(
             model_name='advisor',
