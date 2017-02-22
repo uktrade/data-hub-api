@@ -13,6 +13,7 @@ from django.utils.timezone import now
 
 from datahub.company.validators import RelaxedURLValidator
 from datahub.core import constants
+from datahub.core import fields as core_fields
 from datahub.core.mixins import KorbenSaveModelMixin
 from datahub.core.models import ArchivableModel, BaseModel
 from datahub.core.utils import model_to_dictionary
@@ -291,7 +292,7 @@ class Advisor(KorbenSaveModelMixin, AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     first_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     last_name = models.CharField(max_length=MAX_LENGTH, blank=True)
-    email = models.CharField(max_length=MAX_LENGTH, unique=True)  # CharField because CDMS users may not have tld
+    email = core_fields.CICharField(max_length=MAX_LENGTH, unique=True)  # CDMS users may not have tld
     dit_team = models.ForeignKey(metadata_models.Team, default=constants.Team.undefined.value.id)
     is_staff = models.BooleanField(
         'staff status',
