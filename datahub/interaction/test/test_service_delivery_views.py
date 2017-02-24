@@ -69,9 +69,11 @@ class ServiceDeliveryTestCase(LeelooTestCase):
                 }
             }
         }
-        response = self.api_client.post(url,
-                                        data=json.dumps({'data': data}),
-                                        content_type='application/vnd.api+json')
+        response = self.api_client.post(
+            url,
+            data=json.dumps({'data': data}),
+            content_type='application/vnd.api+json'
+        )
         assert response.status_code == status.HTTP_201_CREATED
         # make sure we're spawning a task to save to Korben
         expected_data = ServiceDelivery.objects.get(pk=response.data['id']).convert_model_to_korben_format()
@@ -81,6 +83,62 @@ class ServiceDeliveryTestCase(LeelooTestCase):
             update=False,
             user_id=self.user.id
         )
+
+    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
+    def test_add_service_delivery_incorrect_accept_header_format(self, mocked_save_to_korben):
+        """Test add new service delivery incorrect accept header format."""
+        url = reverse('v2:servicedelivery-list')
+        data = {
+            'type': 'ServiceDelivery',
+            'attributes': {
+                'subject': 'whatever',
+                'date': now().isoformat(),
+                'notes': 'hello',
+            },
+            'relationships': {
+                'status': {
+                    'data': {
+                        'type': 'ServiceDeliveryStatus',
+                        'id': constants.ServiceDeliveryStatus.offered.value.id
+                    }
+                },
+                'company': {
+                    'data': {
+                        'type': 'Company',
+                        'id': CompanyFactory().pk
+                    }
+                },
+                'contact': {
+                    'data': {
+                        'type': 'Contact',
+                        'id': ContactFactory().pk
+                    }
+                },
+                'service': {
+                    'data': {
+                        'type': 'Service',
+                        'id': constants.Service.trade_enquiry.value.id
+                    }
+                },
+                'dit_team': {
+                    'data': {
+                        'type': 'Team',
+                        'id': constants.Team.healthcare_uk.value.id
+                    }
+                }
+            }
+        }
+        response = self.api_client.post(
+            url,
+            data=json.dumps({'data': data}),
+            content_type='application/vnd.api+json',
+            **{'HTTP_ACCEPT': 'application/json'}
+        )
+        assert response.status_code == status.HTTP_406_NOT_ACCEPTABLE
+        expected_content = b'{"errors":{"detail":"Could not satisfy the request Accept header."}}'
+        assert response.content == expected_content
+        # make sure we're not spawning a task to save to Korben
+        assert mocked_save_to_korben.delay.called is False
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     @freeze_time('2017-01-27 12:00:01')
