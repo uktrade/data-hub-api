@@ -170,6 +170,9 @@ DATAHUB_SECRET = env('DATAHUB_SECRET')
 CHAR_FIELD_MAX_LENGTH = 255
 HEROKU = False
 
+#  TODO remove this line when db level whitelisting gets deployed
+DIT_ENABLED_ADVISORS = [name.lower() for name in env.tuple('DIT_ENABLED_ADVISORS', default=())]
+
 # celery
 CELERY_BROKER_URL = env('BROKER_URL')
 CELERY_RESULT_BACKEND = env('RESULT_BACKEND')

@@ -63,11 +63,11 @@ Management commands
 
 Enable users to login::
 
-    docker-compose run leeloo python manage.py enableusers test@bar.com foo@bar.com
+    docker-compose run leeloo python manage.py manageusers test@bar.com foo@bar.com --enable
 
 Disable users to login::
 
-    docker-compose run leeloo python manage.py enableusers test@bar.com foo@bar.com --disable
+    docker-compose run leeloo python manage.py manageusers test@bar.com foo@bar.com --disable
 
 
 Apply migrations::

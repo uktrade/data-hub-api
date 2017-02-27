@@ -56,13 +56,13 @@ class AdvisorAdmin(VersionAdmin, UserAdmin):
     )
     list_display = ('email', 'first_name', 'last_name', 'is_staff', 'enabled')
     search_fields = ('first_name', 'last_name', 'email')
-    ordering = ('email', )
+    ordering = ('email', 'enabled')
+    list_filter = ('enabled', )
     actions = ['enable_users', 'disable_users']
 
     def reversion_register(self, model, **kwargs):
         """Exclude last login from reversion changesets."""
         kwargs['exclude'] = ('last_login', )
-
         super().reversion_register(model, **kwargs)
 
     def enable_users(self, request, queryset):
