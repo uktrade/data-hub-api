@@ -51,6 +51,7 @@ def get_or_create_user(email, last_name, first_name, password=None):
         )
         if password:
             user.set_password(password)
+            user.enabled = False
         else:
             user.set_unusable_password()
         user.save()
