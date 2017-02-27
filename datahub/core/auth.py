@@ -45,4 +45,4 @@ class CDMSUserBackend(ModelBackend):
 
     def user_can_authenticate(self, user):
         """Reject users that are not whitelisted."""
-        return user.email.lower() in settings.DIT_ENABLED_ADVISORS
+        return user.enabled
