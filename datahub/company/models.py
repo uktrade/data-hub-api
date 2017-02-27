@@ -308,6 +308,7 @@ class Advisor(KorbenSaveModelMixin, AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField('date joined', default=now)
+    enabled = models.BooleanField(default=False)
 
     objects = AdvisorManager()
 
