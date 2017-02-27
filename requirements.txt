@@ -1,10 +1,16 @@
 pip==9.0.1
+
+# For CH Sync
+lxml==3.6.4
+cssselect==1.0.1
+
 # Django and django related
 Django==1.10.5
 djangorestframework==3.5.4
 djangorestframework-jsonapi==2.1.1
 django-environ==0.4.1
 django-extensions==1.7.6
+django-filter==1.0.1
 django-reversion==2.0.6
 django-pglocks==1.0.2
 
@@ -49,6 +55,6 @@ flake8-string-format==0.2.3
 pep8-naming==0.4.1
 
 gunicorn==19.6.0
-raven==5.32.0
+raven==6.0.0
 MarkupSafe==0.23
 requests==2.13.0

@@ -25,49 +25,54 @@ pytestmark = pytest.mark.django_db
 All the users have the flag is_active=True, CDMS users also have the password set to unusable.
 """
 
+DJANGO_USER_PASSWORD = 'foobar'
 
-def get_cdms_user():
-    """Return the cdms user."""
+
+def get_or_create_user(email, last_name, first_name, password=None):
+    """Generic function to create or return a user.
+
+    If password is None then it's set to unusable (CDMS user).
+    """
     user_model = get_user_model()
     team, _ = Team.objects.get_or_create(
         id=constants.Team.undefined.value.id,
         name=constants.Team.undefined.value.name
     )
     try:
-        user = user_model.objects.get(email='cdms@user.com')
+        user = user_model.objects.get(email=email)
     except user_model.DoesNotExist:
         user = user_model(
-            first_name='CDMS',
-            last_name='User',
-            email='cdms@user.com',
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
             date_joined=now(),
             dit_team=team
         )
-        user.set_unusable_password()
+        if password:
+            user.set_password(password)
+        else:
+            user.set_unusable_password()
         user.save()
     return user
+
+
+def get_cdms_user():
+    """Shortcut to create cdms user."""
+    return get_or_create_user(
+        email='cdms@user.com',
+        last_name='Useri',
+        first_name='CDMS',
+    )
 
 
 def get_django_user():
-    """Return the django user."""
-    user_model = get_user_model()
-    team, _ = Team.objects.get_or_create(
-        id=constants.Team.undefined.value.id,
-        name=constants.Team.undefined.value.name
+    """Shortcut to create a Django user."""
+    return get_or_create_user(
+        email='django@user.com',
+        last_name='Useri',
+        first_name='Testo',
+        password=DJANGO_USER_PASSWORD
     )
-    try:
-        user = user_model.objects.get(email='django@user.com')
-    except user_model.DoesNotExist:
-        user = user_model(
-            first_name='Django',
-            last_name='User',
-            email='django@user.com',
-            date_joined=now(),
-            dit_team=team
-        )
-        user.set_password('foobar')
-        user.save()
-    return user
 
 
 @pytest.mark.liveserver
@@ -146,6 +151,40 @@ def test_valid_cdms_credentials(korben_auth_mock, settings, live_server):
     # Validate credentials are saved
     assert cdms_user.check_password('test') is True
     assert cdms_user.is_active is True
+
+
+@pytest.mark.liveserver
+@mock.patch('datahub.core.auth.CDMSUserBackend.korben_authenticate')
+def test_valid_cdms_credentials_case_insensitive_email(korben_auth_mock, settings, live_server):
+    """Test login valid cdms credentials."""
+    settings.DIT_ENABLED_ADVISORS = ('casesensitive@user.com',)
+    korben_auth_mock.return_value = True
+    user = get_or_create_user(
+        email='CaSeSenSitiVe@user.com',
+        last_name='Sensitive',
+        first_name='Case',
+    )
+    application, _ = Application.objects.get_or_create(
+        user=user,
+        client_type=Application.CLIENT_CONFIDENTIAL,
+        authorization_grant_type=Application.GRANT_PASSWORD,
+        name='Test auth client'
+    )
+    url = live_server + reverse('token')
+    auth = requests.auth.HTTPBasicAuth(application.client_id, application.client_secret)
+    response = requests.post(
+        url,
+        data={'grant_type': 'password', 'username': 'CaseSensiTive@user.com', 'password': 'test'},
+        auth=auth
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert '"token_type": "Bearer"' in response.text
+
+    user.refresh_from_db()
+
+    # Validate credentials are saved
+    assert user.check_password('test') is True
+    assert user.is_active is True
 
 
 @pytest.mark.liveserver
@@ -248,7 +287,7 @@ def test_valid_django_user(korben_auth_mock, live_server):
     auth = requests.auth.HTTPBasicAuth(application.client_id, application.client_secret)
     response = requests.post(
         url,
-        data={'grant_type': 'password', 'username': django_user.email, 'password': 'foobar'},
+        data={'grant_type': 'password', 'username': django_user.email, 'password': DJANGO_USER_PASSWORD},
         auth=auth
     )
     assert response.status_code == status.HTTP_200_OK
