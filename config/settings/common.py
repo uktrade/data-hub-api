@@ -69,6 +69,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'reversion.middleware.RevisionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware'
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -156,7 +157,6 @@ REST_FRAMEWORK = {
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
 
-STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 APPEND_SLASH = True
 
@@ -169,6 +169,8 @@ KORBEN_PORT = env('KORBEN_PORT')
 DATAHUB_SECRET = env('DATAHUB_SECRET')
 CHAR_FIELD_MAX_LENGTH = 255
 HEROKU = False
+
+#  TODO remove this line when db level whitelisting gets deployed
 DIT_ENABLED_ADVISORS = [name.lower() for name in env.tuple('DIT_ENABLED_ADVISORS', default=())]
 
 # celery
