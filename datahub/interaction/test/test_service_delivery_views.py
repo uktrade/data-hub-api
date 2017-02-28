@@ -162,3 +162,29 @@ class ServiceDeliveryTestCase(LeelooTestCase):
             update=True,
             user_id=self.user.id
         )
+
+    def test_filter_service_deliveries_by_company(self):
+        """Filter by company."""
+        company = CompanyFactory()
+        servicedelivery = ServiceDeliveryFactory(company=company)
+        servicedelivery2 = ServiceDeliveryFactory(company=company)
+        ServiceDeliveryFactory()
+        url = reverse('v2:servicedelivery-list')
+        response = self.api_client.get(url, data={'company': company.pk})
+        content = json.loads(response.content.decode('utf-8'))
+        assert response.status_code == status.HTTP_200_OK
+        assert content['meta']['pagination']['count'] == 2
+        assert {element['id'] for element in content['data']} == {str(servicedelivery.pk), str(servicedelivery2.pk)}
+
+    def test_filter_service_deliveries_by_contact(self):
+        """Filter by contact."""
+        contact = ContactFactory()
+        servicedelivery = ServiceDeliveryFactory(contact=contact)
+        servicedelivery2 = ServiceDeliveryFactory(contact=contact)
+        ServiceDeliveryFactory()
+        url = reverse('v2:servicedelivery-list')
+        response = self.api_client.get(url, data={'contact': contact.pk})
+        content = json.loads(response.content.decode('utf-8'))
+        assert response.status_code == status.HTTP_200_OK
+        assert content['meta']['pagination']['count'] == 2
+        assert {element['id'] for element in content['data']} == {str(servicedelivery.pk), str(servicedelivery2.pk)}
