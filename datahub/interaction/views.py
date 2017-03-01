@@ -45,11 +45,6 @@ class ServiceDeliveryFilter(FilterSet):
 class ServiceDeliveryViewSetV2(CoreViewSetV2):
     """Service delivery viewset."""
 
-    serializer_class = ServiceDeliverySerializerV2
-    queryset = ServiceDelivery.objects.all()
-    filter_backends = (DjangoFilterBackend,)
-    filter_class = ServiceDeliveryFilter
-
     def create(self, request, *args, **kwargs):
         """Override create to inject the user from session."""
         request.data.update({
