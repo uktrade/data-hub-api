@@ -10,7 +10,7 @@ from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
 
-from .factories import ServiceDeliveryFactory
+from .factories import ServiceDeliveryFactory, ServiceOfferFactory
 from ..models import ServiceDelivery
 
 
@@ -19,7 +19,11 @@ class ServiceDeliveryTestCase(LeelooTestCase):
 
     def test_service_delivery_detail_view(self):
         """Service Delivery detail view."""
-        servicedelivery = ServiceDeliveryFactory()
+        service_offer = ServiceOfferFactory()
+        servicedelivery = ServiceDeliveryFactory(
+            service=service_offer.service,
+            dit_team=service_offer.dit_team
+        )
         url = reverse('v2:servicedelivery-detail', kwargs={'pk': servicedelivery.pk})
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
@@ -28,6 +32,7 @@ class ServiceDeliveryTestCase(LeelooTestCase):
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_service_delivery(self, mocked_save_to_korben):
         """Test add new service delivery."""
+        service_offer = ServiceOfferFactory()
         url = reverse('v2:servicedelivery-list')
         data = {
             'type': 'ServiceDelivery',
@@ -58,13 +63,13 @@ class ServiceDeliveryTestCase(LeelooTestCase):
                 'service': {
                     'data': {
                         'type': 'Service',
-                        'id': constants.Service.trade_enquiry.value.id
+                        'id': service_offer.service.id
                     }
                 },
                 'dit_team': {
                     'data': {
                         'type': 'Team',
-                        'id': constants.Team.healthcare_uk.value.id
+                        'id': service_offer.dit_team.id
                     }
                 }
             }
@@ -144,7 +149,12 @@ class ServiceDeliveryTestCase(LeelooTestCase):
     @freeze_time('2017-01-27 12:00:01')
     def test_modify_service_delivery(self, mocked_save_to_korben):
         """Modify an existing service delivery."""
-        servicedelivery = ServiceDeliveryFactory(subject='I am a subject')
+        service_offer = ServiceOfferFactory()
+        servicedelivery = ServiceDeliveryFactory(
+            service=service_offer.service,
+            dit_team=service_offer.dit_team,
+            subject='I am a subject'
+        )
 
         url = reverse('v2:servicedelivery-detail', kwargs={'pk': servicedelivery.pk})
         response = self.api_client.patch(url, {

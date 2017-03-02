@@ -14,6 +14,8 @@ MODELS_TO_REGISTER = (
     models.Role,
     models.Team,
     models.Service,
+    models.ServiceDeliveryStatus,
+    models.Event
 )
 
 
@@ -24,3 +26,4 @@ class MetadataAdmin(admin.ModelAdmin):
     fields = ('name', 'selectable')
     list_display = ('name', 'selectable')
     readonly_fields = ('id', )
+    search_fields = ('name', 'pk')
