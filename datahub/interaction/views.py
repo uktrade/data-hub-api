@@ -1,10 +1,16 @@
 from collections import OrderedDict
 
+from django_filters import CharFilter
+from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import FilterSet
+
 from datahub.core.viewsets import CoreViewSetV1, CoreViewSetV2
 from datahub.interaction.models import Interaction, ServiceDelivery
-from datahub.interaction.serializers import (InteractionSerializerRead,
-                                             InteractionSerializerWrite,
-                                             ServiceDeliverySerializerV2)
+from datahub.interaction.serializers import (
+    InteractionSerializerRead,
+    InteractionSerializerWrite,
+    ServiceDeliverySerializerV2
+)
 
 
 class InteractionViewSetV1(CoreViewSetV1):
@@ -25,11 +31,24 @@ class InteractionViewSetV1(CoreViewSetV1):
         return super().create(request, *args, **kwargs)
 
 
+class ServiceDeliveryFilter(FilterSet):
+    """Service delivery filter."""
+
+    company = CharFilter(name='company__pk', lookup_expr='exact')
+    contact = CharFilter(name='contact__pk', lookup_expr='exact')
+
+    class Meta:  # noqa: D101
+        model = ServiceDelivery
+        fields = ['company', 'contact']
+
+
 class ServiceDeliveryViewSetV2(CoreViewSetV2):
     """Service delivery viewset."""
 
     serializer_class = ServiceDeliverySerializerV2
     queryset = ServiceDelivery.objects.all()
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = ServiceDeliveryFilter
 
     def create(self, request, *args, **kwargs):
         """Override create to inject the user from session."""

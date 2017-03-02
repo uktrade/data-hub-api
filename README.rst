@@ -56,11 +56,19 @@ Leeloo can run on any Heroku style platform. These environment variables MUST be
 - RESULT_BACKEND
 - BROKER_TRANSPORT_OPTIONS (default={})
 - TASK_MAX_RETRIES (default=1000000)
-- DIT_ENABLED_ADVISORS (default=())
 
 
 Management commands
 -------------------
+
+Enable users to login::
+
+    docker-compose run leeloo python manage.py manageusers test@bar.com foo@bar.com --enable
+
+Disable users to login::
+
+    docker-compose run leeloo python manage.py manageusers test@bar.com foo@bar.com --disable
+
 
 Apply migrations::
     
