@@ -43,8 +43,6 @@ class ServiceDeliveryFactory(factory.django.DjangoModelFactory):
     date = now()
     notes = 'Bar'
     dit_advisor = factory.SubFactory(AdvisorFactory)
-    service_id = constants.Service.trade_enquiry.value.id
-    dit_team_id = constants.Team.healthcare_uk.value.id
     created_on = now()
     status_id = constants.ServiceDeliveryStatus.offered.value.id
     uk_region_id = constants.UKRegion.east_midlands.value.id

@@ -75,6 +75,6 @@ class ServiceDeliveryStatus(BaseConstantModel):
 
 
 class Event(BaseConstantModel):
-    """Event"""
+    """Event."""
 
     pass

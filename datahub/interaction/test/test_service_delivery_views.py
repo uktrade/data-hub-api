@@ -153,6 +153,7 @@ class ServiceDeliveryTestCase(LeelooTestCase):
         servicedelivery = ServiceDeliveryFactory(
             service=service_offer.service,
             dit_team=service_offer.dit_team,
+            event=service_offer.event,
             subject='I am a subject'
         )
 
@@ -198,3 +199,57 @@ class ServiceDeliveryTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_200_OK
         assert content['meta']['pagination']['count'] == 2
         assert {element['id'] for element in content['data']} == {str(servicedelivery.pk), str(servicedelivery2.pk)}
+
+    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
+    def test_add_service_delivery_incorrect_service_team_event_combination(self, mocked_save_to_korben):
+        """Test add new service delivery with invalid service/team/even combination."""
+        url = reverse('v2:servicedelivery-list')
+        data = {
+            'type': 'ServiceDelivery',
+            'attributes': {
+                'subject': 'whatever',
+                'date': now().isoformat(),
+                'notes': 'hello',
+            },
+            'relationships': {
+                'status': {
+                    'data': {
+                        'type': 'ServiceDeliveryStatus',
+                        'id': constants.ServiceDeliveryStatus.offered.value.id
+                    }
+                },
+                'company': {
+                    'data': {
+                        'type': 'Company',
+                        'id': CompanyFactory().pk
+                    }
+                },
+                'contact': {
+                    'data': {
+                        'type': 'Contact',
+                        'id': ContactFactory().pk
+                    }
+                },
+                'service': {
+                    'data': {
+                        'type': 'Service',
+                        'id': constants.Service.trade_enquiry.value.id
+                    }
+                },
+                'dit_team': {
+                    'data': {
+                        'type': 'Team',
+                        'id': constants.Team.healthcare_uk.value.id
+                    }
+                }
+            }
+        }
+        response = self.api_client.post(
+            url,
+            data=json.dumps({'data': data}),
+            content_type='application/vnd.api+json'
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        content = b'{"errors":[{"service":["This combination of service and service provider does not exist."]}]}'
+        assert response.content == content
+        assert not mocked_save_to_korben.delay.called

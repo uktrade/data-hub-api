@@ -43,14 +43,14 @@ class InteractionAbstract(KorbenSaveModelMixin, BaseModel):
 
     def clean(self):
         """Custom validation."""
-        super().clean()
-
         for field in self.FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS:
             value = getattr(self, field + '_id')
             if str(value) == '0167b456-0ddd-49bd-8184-e3227a0b6396':  # Undefined
                 raise ValidationError(message={
                     field: ['This field is required'],
                 })
+
+        super().clean()
 
 
 class Interaction(InteractionAbstract):
@@ -109,7 +109,6 @@ class ServiceDelivery(InteractionAbstract):
 
     def clean(self):
         """Custom validation."""
-        super().clean()
         try:
             query = dict(
                 dit_team=self.dit_team,
@@ -121,3 +120,4 @@ class ServiceDelivery(InteractionAbstract):
             raise ValidationError(message={
                 'service': ['This combination of service and service provider does not exist.'],
             })
+        super().clean()
