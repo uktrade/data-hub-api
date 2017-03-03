@@ -188,7 +188,10 @@ class ServiceDeliveryTestCase(LeelooTestCase):
             service=service_offer.service,
             dit_team=service_offer.dit_team
         )
-        ServiceDeliveryFactory()
+        ServiceDeliveryFactory(
+            service=service_offer.service,
+            dit_team=service_offer.dit_team
+        )
         url = reverse('v2:servicedelivery-list')
         response = self.api_client.get(url, data={'company': company.pk})
         content = json.loads(response.content.decode('utf-8'))
@@ -205,11 +208,15 @@ class ServiceDeliveryTestCase(LeelooTestCase):
             service=service_offer.service,
             dit_team=service_offer.dit_team
         )
-        servicedelivery2 = ServiceDeliveryFactory(contact=contact,
+        servicedelivery2 = ServiceDeliveryFactory(
+            contact=contact,
             service=service_offer.service,
             dit_team=service_offer.dit_team
-                                                  )
-        ServiceDeliveryFactory()
+        )
+        ServiceDeliveryFactory(
+            service=service_offer.service,
+            dit_team=service_offer.dit_team
+        )
         url = reverse('v2:servicedelivery-list')
         response = self.api_client.get(url, data={'contact': contact.pk})
         content = json.loads(response.content.decode('utf-8'))
