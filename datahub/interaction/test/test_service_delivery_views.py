@@ -177,8 +177,17 @@ class ServiceDeliveryTestCase(LeelooTestCase):
     def test_filter_service_deliveries_by_company(self):
         """Filter by company."""
         company = CompanyFactory()
-        servicedelivery = ServiceDeliveryFactory(company=company)
-        servicedelivery2 = ServiceDeliveryFactory(company=company)
+        service_offer = ServiceOfferFactory()
+        servicedelivery = ServiceDeliveryFactory(
+            company=company,
+            service=service_offer.service,
+            dit_team=service_offer.dit_team
+        )
+        servicedelivery2 = ServiceDeliveryFactory(
+            company=company,
+            service=service_offer.service,
+            dit_team=service_offer.dit_team
+        )
         ServiceDeliveryFactory()
         url = reverse('v2:servicedelivery-list')
         response = self.api_client.get(url, data={'company': company.pk})
@@ -190,8 +199,16 @@ class ServiceDeliveryTestCase(LeelooTestCase):
     def test_filter_service_deliveries_by_contact(self):
         """Filter by contact."""
         contact = ContactFactory()
-        servicedelivery = ServiceDeliveryFactory(contact=contact)
-        servicedelivery2 = ServiceDeliveryFactory(contact=contact)
+        service_offer = ServiceOfferFactory()
+        servicedelivery = ServiceDeliveryFactory(
+            contact=contact,
+            service=service_offer.service,
+            dit_team=service_offer.dit_team
+        )
+        servicedelivery2 = ServiceDeliveryFactory(contact=contact,
+            service=service_offer.service,
+            dit_team=service_offer.dit_team
+                                                  )
         ServiceDeliveryFactory()
         url = reverse('v2:servicedelivery-list')
         response = self.api_client.get(url, data={'contact': contact.pk})
