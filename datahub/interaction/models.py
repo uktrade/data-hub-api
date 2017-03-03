@@ -74,13 +74,10 @@ class ServiceOffer(models.Model):
     @cached_property
     def name(self):
         """Generate name."""
-        name = '{0} : {1}'.format(
-            self.service.name,
-            self.dit_team.name,
-        )
-        if self.event:
-            name += ' : {0}'.format(self.event.name)
-        return name
+        name_elements = [
+            getattr(self, key).name
+            for key in ['service', 'dit_name', 'event'] if getattr(self, key) is not None]
+        return ' : '.join(name_elements)
 
     def __str__(self):
         """Human readable object name."""
