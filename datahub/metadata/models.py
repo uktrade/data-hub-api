@@ -78,3 +78,9 @@ class Event(BaseConstantModel):
     """Event."""
 
     pass
+
+
+class HeadquarterType(BaseConstantModel):
+    """Head Quarter."""
+
+    pass
