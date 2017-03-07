@@ -422,3 +422,11 @@ class ServiceDeliveryStatus(Enum):
     """Service delivery status."""
 
     offered = Constant('Offered', '45329c18-6095-e211-a939-e4115bead28a')
+
+
+class HeadquarterType(Enum):
+    """Headquarter type."""
+
+    ukhq = Constant('ukhq', '3e6debb4-1596-40c5-aa25-f00da0e05af9')
+    ehq = Constant('ehq', 'eb59eaeb-eeb8-4f54-9506-a5e08773046b')
+    ghq = Constant('ghq', '43281c5e-92a4-4794-867b-b4d5f801e6f3')

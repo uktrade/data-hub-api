@@ -1,3 +1,14 @@
+# headquarter type
+- model: metadata.headquartertype
+  pk: 3e6debb4-1596-40c5-aa25-f00da0e05af9
+  fields: {name: ukhq}
+- model: metadata.headquartertype
+  pk: eb59eaeb-eeb8-4f54-9506-a5e08773046b
+  fields: {name: ehq}
+- model: metadata.headquartertype
+  pk: 43281c5e-92a4-4794-867b-b4d5f801e6f3
+  fields: {name: ghq}
+
 # business type
 - model: metadata.businesstype
   pk: 98d14e94-5d95-e211-a939-e4115bead28a
