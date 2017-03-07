@@ -76,7 +76,7 @@ class ServiceOffer(models.Model):
         """Generate name."""
         name_elements = [
             getattr(self, key).name
-            for key in ['service', 'dit_name', 'event'] if getattr(self, key) is not None]
+            for key in ['service', 'dit_team', 'event'] if getattr(self, key) is not None]
         return ' : '.join(name_elements)
 
     def __str__(self):
