@@ -92,9 +92,7 @@ class Company(KorbenSaveModelMixin, ArchivableModel, CompanyAbstract):
     )
     trading_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     headquarter_type = models.ForeignKey(metadata_models.HeadquarterType, blank=True, null=True)
-    classification = models.ForeignKey(
-        metadata_models.CompanyClassification, default=constants.CompanyClassification.undefined.value.id,
-    )
+    classification = models.ForeignKey(metadata_models.CompanyClassification, null=True)
 
     class Meta:  # noqa: D101
         verbose_name_plural = 'companies'
@@ -150,6 +148,9 @@ class Company(KorbenSaveModelMixin, ArchivableModel, CompanyAbstract):
 
     def clean(self):
         """Custom validation."""
+        if not self.classification_id:
+            self.classification_id = constants.CompanyClassification.undefined.value.id
+
         if not self._validate_trading_address():
             raise ValidationError(
                 self._generate_trading_address_errors(),
