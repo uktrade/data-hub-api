@@ -91,7 +91,10 @@ class Company(KorbenSaveModelMixin, ArchivableModel, CompanyAbstract):
         related_name='company_trading_address_country'
     )
     trading_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    headquarter_type = models.OneToOneField(metadata_models.HeadquarterType, blank=True, null=True)
+    headquarter_type = models.ForeignKey(metadata_models.HeadquarterType, blank=True, null=True)
+    classification = models.ForeignKey(
+        metadata_models.CompanyClassification, default=constants.CompanyClassification.undefined.value.id,
+    )
 
     class Meta:  # noqa: D101
         verbose_name_plural = 'companies'

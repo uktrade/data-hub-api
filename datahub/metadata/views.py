@@ -20,7 +20,8 @@ METADATA_MAPPING = {
     'uk-region': models.UKRegion,
     'service-delivery-status': models.ServiceDeliveryStatus,
     'event': models.Event,
-    'headquarter_type': models.HeadquarterType,
+    'headquarter-type': models.HeadquarterType,
+    'company-classification': models.CompanyClassification,
 }
 
 

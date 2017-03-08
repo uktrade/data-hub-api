@@ -84,3 +84,9 @@ class HeadquarterType(BaseConstantModel):
     """Head Quarter."""
 
     pass
+
+
+class CompanyClassification(BaseConstantModel):
+    """Company classification."""
+
+    pass
