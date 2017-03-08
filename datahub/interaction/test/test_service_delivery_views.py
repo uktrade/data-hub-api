@@ -274,6 +274,11 @@ class ServiceDeliveryTestCase(LeelooTestCase):
             content_type='application/vnd.api+json'
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        content = b'{"errors":[{"service":["This combination of service and service provider does not exist."]}]}'
-        assert response.content == content
+        content = {
+            'errors': [{
+                'detail': 'This combination of service and service provider does not exist.',
+                'source': {'pointer': '/data/attributes/service'},
+                'status': '400'}
+            ]}
+        assert json.loads(response.content.decode('utf-8')) == content
         assert not mocked_save_to_korben.delay.called

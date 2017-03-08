@@ -34,12 +34,20 @@ class CoreViewSet(mixins.CreateModelMixin,
             update=update
         )
 
+    @staticmethod
+    def _handle_model_validation_error(exception, version):
+        """Return different validation format based on version."""
+        if version and version == 'v2':
+            raise DRFValidationError(detail=exception.message_dict)
+        raise DRFValidationError({'errors': exception.message_dict})
+
     def create(self, request, *args, **kwargs):
         """Override create to catch the validation errors coming from the models.
 
         These are not real Exceptions, rather user errors.
         """
         try:
+
             with transaction.atomic():
                 response = super().create(request, *args, **kwargs)
             self._save_to_korben(
@@ -49,7 +57,7 @@ class CoreViewSet(mixins.CreateModelMixin,
             )
             return response
         except ValidationError as e:
-            raise DRFValidationError({'errors': e.message_dict})
+            self._handle_model_validation_error(e, request.version)
         except KorbenException as e:
             raise APIException(detail=e.message)
 
@@ -68,7 +76,7 @@ class CoreViewSet(mixins.CreateModelMixin,
             )
             return response
         except ValidationError as e:
-            raise DRFValidationError({'errors': e.message_dict})
+            self._handle_model_validation_error(e, request.version)
         except KorbenException as e:
             raise APIException(detail=e.message)
 
