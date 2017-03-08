@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='company',
             name='classification',
-            field=models.ForeignKey(default='0167b456-0ddd-49bd-8184-e3227a0b6396', on_delete=django.db.models.deletion.CASCADE, to='metadata.CompanyClassification'),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='metadata.CompanyClassification'),
         ),
         migrations.AlterField(
             model_name='company',
