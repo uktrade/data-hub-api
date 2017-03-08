@@ -24,7 +24,8 @@ metadata_view_names = (
     'uk-region',
     'team',
     'service-delivery-status',
-    'event'
+    'event',
+    'headquarter_type',
 )
 
 metadata_views_ids = (
@@ -40,7 +41,8 @@ metadata_views_ids = (
     'UK regions view',
     'teams view',
     'service delivery status view',
-    'event view'
+    'event view',
+    'headquarter type view',
 )
 
 

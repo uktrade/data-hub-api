@@ -91,6 +91,7 @@ class Company(KorbenSaveModelMixin, ArchivableModel, CompanyAbstract):
         related_name='company_trading_address_country'
     )
     trading_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    headquarter_type = models.OneToOneField(metadata_models.HeadquarterType, blank=True, null=True)
 
     class Meta:  # noqa: D101
         verbose_name_plural = 'companies'
