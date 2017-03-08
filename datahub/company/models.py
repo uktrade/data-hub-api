@@ -148,6 +148,9 @@ class Company(KorbenSaveModelMixin, ArchivableModel, CompanyAbstract):
 
     def clean(self):
         """Custom validation."""
+        if self.classification_id is None:
+            self.classification_id = constants.CompanyClassification.undefined.value.id
+
         if not self._validate_trading_address():
             raise ValidationError(
                 self._generate_trading_address_errors(),
