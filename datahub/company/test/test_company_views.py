@@ -76,6 +76,7 @@ class CompanyTestCase(LeelooTestCase):
             registered_address_town='Fooland',
             registered_address_country_id=constants.Country.united_states.value.id,
             headquarter_type_id=constants.HeadquarterType.ukhq.value.id,
+            classification_id=constants.CompanyClassification.tier_a.value.id,
         )
 
         url = reverse('v1:company-detail', kwargs={'pk': company.id})
@@ -96,7 +97,8 @@ class CompanyTestCase(LeelooTestCase):
         }
         assert response.data['registered_address_county'] is None
         assert response.data['registered_address_postcode'] is None
-        assert response.data['headquarter_type']['name'] == 'ukhq'
+        assert response.data['headquarter_type']['name'] == constants.HeadquarterType.ukhq.value.name
+        assert response.data['classification']['name'] == constants.CompanyClassification.tier_a.value.name
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     @freeze_time('2017-01-27 12:00:01')
@@ -150,6 +152,7 @@ class CompanyTestCase(LeelooTestCase):
                 'registered_address_town': 'London',
                 'uk_region': constants.UKRegion.england.value.id,
                 'headquarter_type': constants.HeadquarterType.ghq.value.id,
+                'classification': constants.CompanyClassification.tier_a.value.id,
             })
 
             assert response.status_code == status.HTTP_201_CREATED

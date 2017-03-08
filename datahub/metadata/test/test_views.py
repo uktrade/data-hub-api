@@ -25,7 +25,8 @@ metadata_view_names = (
     'team',
     'service-delivery-status',
     'event',
-    'headquarter_type',
+    'headquarter-type',
+    'company-classification',
 )
 
 metadata_views_ids = (
@@ -43,6 +44,7 @@ metadata_views_ids = (
     'service delivery status view',
     'event view',
     'headquarter type view',
+    'company classification view',
 )
 
 

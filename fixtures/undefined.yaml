@@ -47,6 +47,9 @@
 - model: metadata.service
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
   fields: {name: Undefined}
+- model: metadata.companyclassification
+  pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
+  fields: {name: Undefined}
 - model: company.company
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
   fields: {
