@@ -18,12 +18,13 @@ class ESConnector:
         if doc_type == 'company_company' and data['company_number']:
             self.handle_ch_company(data)
 
-        object_id = data.pop('id')  # take it out until we sort out the manual mapping
+        data_to_use = dict(data)
+        object_id = data_to_use.pop('id')  # take it out until we sort out the manual mapping
         if document_exists(self.client, doc_type, object_id):
             self.client.update(
                 index=settings.ES_INDEX,
                 doc_type=doc_type,
-                body={'doc': data},
+                body={'doc': data_to_use},
                 id=object_id,
                 refresh=True
             )
@@ -31,7 +32,7 @@ class ESConnector:
             self.client.create(
                 index=settings.ES_INDEX,
                 doc_type=doc_type,
-                body=data,
+                body=data_to_use,
                 id=object_id,
                 refresh=True
             )
