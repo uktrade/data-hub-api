@@ -15,6 +15,7 @@ def test_model_to_dictionary():
         'registered_address_4',
         'trading_address_county',
         'account_manager',
+        'classification',
         'trading_address_country',
         'trading_address_4',
         'registered_address_2',
@@ -23,6 +24,7 @@ def test_model_to_dictionary():
         'trading_address_1',
         'description',
         'modified_on',
+        'headquarter_type',
         'trading_address_2',
         'registered_address_1',
         'archived_on',
@@ -66,9 +68,11 @@ def test_model_to_dictionary_dont_expand_fk():
         'account_manager_id',
         'trading_address_4',
         'employee_range_id',
+        'headquarter_type_id',
         'registered_address_town',
         'trading_address_county',
         'business_type_id',
+        'classification_id',
         'trading_address_1',
         'registered_address_country_id',
         'uk_region_id',
@@ -117,6 +121,8 @@ def test_model_to_dictionary_exclude_fields():
         'registered_address_town',
         'trading_address_postcode',
         'registered_address_country',
+        'headquarter_type',
+        'classification',
         'uk_region',
         'created_on',
         'employee_range',
@@ -142,7 +148,7 @@ def test_model_to_dictionary_exclude_fields():
         'trading_address_country',
         'trading_address_4',
         'registered_address_2',
-        'alias'
+        'alias',
     )
     result = model_to_dictionary(model_instance, excluded_fields=excluded_fields)
     assert set(result.keys()) == expected_keys

@@ -10,7 +10,7 @@ from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
 
-from .factories import ServiceDeliveryFactory
+from .factories import ServiceDeliveryFactory, ServiceOfferFactory
 from ..models import ServiceDelivery
 
 
@@ -19,7 +19,11 @@ class ServiceDeliveryTestCase(LeelooTestCase):
 
     def test_service_delivery_detail_view(self):
         """Service Delivery detail view."""
-        servicedelivery = ServiceDeliveryFactory()
+        service_offer = ServiceOfferFactory()
+        servicedelivery = ServiceDeliveryFactory(
+            service=service_offer.service,
+            dit_team=service_offer.dit_team
+        )
         url = reverse('v2:servicedelivery-detail', kwargs={'pk': servicedelivery.pk})
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
@@ -28,6 +32,7 @@ class ServiceDeliveryTestCase(LeelooTestCase):
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_service_delivery(self, mocked_save_to_korben):
         """Test add new service delivery."""
+        service_offer = ServiceOfferFactory()
         url = reverse('v2:servicedelivery-list')
         data = {
             'type': 'ServiceDelivery',
@@ -58,13 +63,13 @@ class ServiceDeliveryTestCase(LeelooTestCase):
                 'service': {
                     'data': {
                         'type': 'Service',
-                        'id': constants.Service.trade_enquiry.value.id
+                        'id': service_offer.service.id
                     }
                 },
                 'dit_team': {
                     'data': {
                         'type': 'Team',
-                        'id': constants.Team.healthcare_uk.value.id
+                        'id': service_offer.dit_team.id
                     }
                 }
             }
@@ -144,7 +149,13 @@ class ServiceDeliveryTestCase(LeelooTestCase):
     @freeze_time('2017-01-27 12:00:01')
     def test_modify_service_delivery(self, mocked_save_to_korben):
         """Modify an existing service delivery."""
-        servicedelivery = ServiceDeliveryFactory(subject='I am a subject')
+        service_offer = ServiceOfferFactory()
+        servicedelivery = ServiceDeliveryFactory(
+            service=service_offer.service,
+            dit_team=service_offer.dit_team,
+            event=service_offer.event,
+            subject='I am a subject'
+        )
 
         url = reverse('v2:servicedelivery-detail', kwargs={'pk': servicedelivery.pk})
         response = self.api_client.patch(url, {
@@ -166,9 +177,21 @@ class ServiceDeliveryTestCase(LeelooTestCase):
     def test_filter_service_deliveries_by_company(self):
         """Filter by company."""
         company = CompanyFactory()
-        servicedelivery = ServiceDeliveryFactory(company=company)
-        servicedelivery2 = ServiceDeliveryFactory(company=company)
-        ServiceDeliveryFactory()
+        service_offer = ServiceOfferFactory()
+        servicedelivery = ServiceDeliveryFactory(
+            company=company,
+            service=service_offer.service,
+            dit_team=service_offer.dit_team
+        )
+        servicedelivery2 = ServiceDeliveryFactory(
+            company=company,
+            service=service_offer.service,
+            dit_team=service_offer.dit_team
+        )
+        ServiceDeliveryFactory(
+            service=service_offer.service,
+            dit_team=service_offer.dit_team
+        )
         url = reverse('v2:servicedelivery-list')
         response = self.api_client.get(url, data={'company': company.pk})
         content = json.loads(response.content.decode('utf-8'))
@@ -179,12 +202,83 @@ class ServiceDeliveryTestCase(LeelooTestCase):
     def test_filter_service_deliveries_by_contact(self):
         """Filter by contact."""
         contact = ContactFactory()
-        servicedelivery = ServiceDeliveryFactory(contact=contact)
-        servicedelivery2 = ServiceDeliveryFactory(contact=contact)
-        ServiceDeliveryFactory()
+        service_offer = ServiceOfferFactory()
+        servicedelivery = ServiceDeliveryFactory(
+            contact=contact,
+            service=service_offer.service,
+            dit_team=service_offer.dit_team
+        )
+        servicedelivery2 = ServiceDeliveryFactory(
+            contact=contact,
+            service=service_offer.service,
+            dit_team=service_offer.dit_team
+        )
+        ServiceDeliveryFactory(
+            service=service_offer.service,
+            dit_team=service_offer.dit_team
+        )
         url = reverse('v2:servicedelivery-list')
         response = self.api_client.get(url, data={'contact': contact.pk})
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_200_OK
         assert content['meta']['pagination']['count'] == 2
         assert {element['id'] for element in content['data']} == {str(servicedelivery.pk), str(servicedelivery2.pk)}
+
+    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
+    def test_add_service_delivery_incorrect_service_team_event_combination(self, mocked_save_to_korben):
+        """Test add new service delivery with invalid service/team/even combination."""
+        url = reverse('v2:servicedelivery-list')
+        data = {
+            'type': 'ServiceDelivery',
+            'attributes': {
+                'subject': 'whatever',
+                'date': now().isoformat(),
+                'notes': 'hello',
+            },
+            'relationships': {
+                'status': {
+                    'data': {
+                        'type': 'ServiceDeliveryStatus',
+                        'id': constants.ServiceDeliveryStatus.offered.value.id
+                    }
+                },
+                'company': {
+                    'data': {
+                        'type': 'Company',
+                        'id': CompanyFactory().pk
+                    }
+                },
+                'contact': {
+                    'data': {
+                        'type': 'Contact',
+                        'id': ContactFactory().pk
+                    }
+                },
+                'service': {
+                    'data': {
+                        'type': 'Service',
+                        'id': constants.Service.trade_enquiry.value.id
+                    }
+                },
+                'dit_team': {
+                    'data': {
+                        'type': 'Team',
+                        'id': constants.Team.healthcare_uk.value.id
+                    }
+                }
+            }
+        }
+        response = self.api_client.post(
+            url,
+            data=json.dumps({'data': data}),
+            content_type='application/vnd.api+json'
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        content = {
+            'errors': [{
+                'detail': 'This combination of service and service provider does not exist.',
+                'source': {'pointer': '/data/attributes/service'},
+                'status': '400'}
+            ]}
+        assert json.loads(response.content.decode('utf-8')) == content
+        assert not mocked_save_to_korben.delay.called

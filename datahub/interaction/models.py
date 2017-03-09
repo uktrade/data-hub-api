@@ -41,6 +41,17 @@ class InteractionAbstract(KorbenSaveModelMixin, BaseModel):
         """Return list of fields that should be mapped as datetime."""
         return super().get_datetime_fields() + ['date']
 
+    def clean(self):
+        """Custom validation."""
+        for field in self.FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS:
+            value = getattr(self, field + '_id')
+            if str(value) == '0167b456-0ddd-49bd-8184-e3227a0b6396':  # Undefined
+                raise ValidationError(message={
+                    field: ['This field is required'],
+                })
+
+        super().clean()
+
 
 class Interaction(InteractionAbstract):
     """Interaction."""
@@ -51,17 +62,6 @@ class Interaction(InteractionAbstract):
 
     interaction_type = models.ForeignKey('metadata.InteractionType')
 
-    def clean(self):
-        """Custom validation."""
-        super().clean()
-
-        for field in self.FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS:
-            value = getattr(self, field + '_id')
-            if str(value) == '0167b456-0ddd-49bd-8184-e3227a0b6396':  # Undefined
-                raise ValidationError(message={
-                    field: ['This field is required'],
-                })
-
 
 class ServiceOffer(models.Model):
     """Service offer."""
@@ -69,11 +69,15 @@ class ServiceOffer(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     service = models.ForeignKey('metadata.Service')
     dit_team = models.ForeignKey('metadata.Team')
+    event = models.ForeignKey('metadata.Event', null=True, blank=True)
 
     @cached_property
     def name(self):
         """Generate name."""
-        return '{0} : {1}'.format(self.service.name, self.dit_team.name)
+        name_elements = [
+            getattr(self, key).name
+            for key in ['service', 'dit_team', 'event'] if getattr(self, key) is not None]
+        return ' : '.join(name_elements)
 
     def __str__(self):
         """Human readable object name."""
@@ -83,18 +87,34 @@ class ServiceOffer(models.Model):
 class ServiceDelivery(InteractionAbstract):
     """Service delivery."""
 
+    FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS = (
+        'dit_advisor',
+        'dit_team',
+        'service',
+        'uk_region',
+        'country_of_interest',
+        'event'
+    )
+
     status = models.ForeignKey('metadata.ServiceDeliveryStatus')
     service_offer = models.ForeignKey(ServiceOffer, null=True, blank=True)
     uk_region = models.ForeignKey('metadata.UKRegion', null=True, blank=True)
     sector = models.ForeignKey('metadata.Sector', null=True, blank=True)
     country_of_interest = models.ForeignKey('metadata.Country', null=True, blank=True)
     feedback = models.TextField(max_length=4000, blank=True)  # CDMS limit
+    event = models.ForeignKey('metadata.Event', null=True, blank=True)
 
-    def save(self, skip_custom_validation=False, **kwargs):
-        """Add service offer."""
-        service_offer, _ = ServiceOffer.objects.get_or_create(
-            dit_team=self.dit_team,
-            service=self.service
-        )
-        self.service_offer = service_offer
-        super().save(skip_custom_validation=skip_custom_validation, **kwargs)
+    def clean(self):
+        """Custom validation."""
+        try:
+            query = dict(
+                dit_team=self.dit_team,
+                service=self.service,
+                event=self.event
+            )
+            self.service_offer = ServiceOffer.objects.get(**query)
+        except ServiceOffer.DoesNotExist:
+            raise ValidationError(message={
+                'service': ['This combination of service and service provider does not exist.'],
+            })
+        super().clean()

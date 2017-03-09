@@ -37,6 +37,7 @@ class ServiceDeliverySerializerV2(json_api_serializers.ModelSerializer):
             'service',
             'subject',
             'dit_advisor',
+            'event',
             'notes',
             'dit_team',
             'status',

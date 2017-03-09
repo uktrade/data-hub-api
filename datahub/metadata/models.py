@@ -72,3 +72,21 @@ class ServiceDeliveryStatus(BaseConstantModel):
     """Service delivery status."""
 
     pass
+
+
+class Event(BaseConstantModel):
+    """Event."""
+
+    pass
+
+
+class HeadquarterType(BaseConstantModel):
+    """Head Quarter."""
+
+    pass
+
+
+class CompanyClassification(BaseConstantModel):
+    """Company classification."""
+
+    pass

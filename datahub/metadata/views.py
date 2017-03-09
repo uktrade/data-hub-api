@@ -19,6 +19,9 @@ METADATA_MAPPING = {
     'turnover': models.TurnoverRange,
     'uk-region': models.UKRegion,
     'service-delivery-status': models.ServiceDeliveryStatus,
+    'event': models.Event,
+    'headquarter-type': models.HeadquarterType,
+    'company-classification': models.CompanyClassification,
 }
 
 
@@ -33,7 +36,7 @@ def metadata_view(request, model):
 
 urls_args = []
 
-# programatically generate metadata views
+# programmatically generate metadata views
 for name, model in METADATA_MAPPING.items():
     fn = partial(metadata_view, model=model)
     path = r'{0}/$'.format(name)
