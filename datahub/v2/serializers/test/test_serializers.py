@@ -1,5 +1,8 @@
 import datetime
 
+import colander
+import pytest
+
 from datahub.v2.serializers.service_deliveries import ServiceDeliverySchema
 
 
@@ -57,7 +60,7 @@ def test_service_deliveries_serializer():
                 },
                 'country_of_interest': {
                     'data': {
-                        'type': 'Country',
+                        'type': 'flibble',
                         'id': 'dsdasdsadsa'
                     }
                 },
@@ -70,6 +73,7 @@ def test_service_deliveries_serializer():
             }
         }
 
-    result = ServiceDeliverySchema().deserialize(data)
-    print(result)
-    assert False
+    with pytest.raises(colander.Invalid) as e:
+        result = ServiceDeliverySchema().deserialize(data)
+    import ipdb; ipdb.set_trace()
+    assert e.asdict()

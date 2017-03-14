@@ -46,6 +46,11 @@ class Event(RelationshipSchema):
     pass
 
 
+def create_relationship_entity_schema(type_name):
+    data_schema = colander.MappingSchema()
+    data_schema.add(colander.String()
+
+
 class ServiceDeliveryAttributes(colander.MappingSchema):
 
     subject = colander.SchemaNode(colander.String())
