@@ -20,7 +20,7 @@ class ServiceDeliveryDatabaseRepo:
         except self.model.DoesNotExist:
             return {}
 
-    def filter(self, company_id=DEFAULT, contact_id=DEFAULT):
+    def filter(self, company_id=DEFAULT, contact_id=DEFAULT, offset=0, limit=100):
         """Filter objects."""
         queryset = self.model.objects
         if company_id:
@@ -29,7 +29,7 @@ class ServiceDeliveryDatabaseRepo:
             queryset.filter(contact__pk=contact_id)
         return self.serializer(queryset.all(), many=True).data
 
-    def upsert(self, data):
+    def upsert(self, data, user):
         """Insert or update an object."""
         obj_id = data.pop('id')
         obj, _ = self.model.objects.update_or_create(
@@ -37,16 +37,3 @@ class ServiceDeliveryDatabaseRepo:
             defaults=data
         )
         return self.serializer(obj).data
-
-
-class ServiceDeliveryJSONRepo:
-    """Json based repo."""
-
-    def __init__(self, config=None):
-        self.folder = config['source']
-
-    def get(self, object_id):
-        pass
-
-    def filter(self, company_id=DEFAULT, contact_id=DEFAULT):
-        pass

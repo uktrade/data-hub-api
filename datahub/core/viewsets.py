@@ -110,6 +110,11 @@ class CoreViewSetV2(ViewSet):
     parser_classes = (json_api_parsers.JSONParser, parsers.FormParser, parsers.MultiPartParser)
     renderer_classes = (json_api_renderers.JSONRenderer, BrowsableAPIRenderer)
     metadata_class = JSONAPIMetadata
+    repo_class = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        assert self.repo_class, 'A repo class needs to be defined.'
 
     def list(self, request, *args, **kwargs):
         pass
