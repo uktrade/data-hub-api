@@ -5,35 +5,40 @@ from datahub.v2.serializers.service_deliveries import ServiceDeliverySchema
 
 DEFAULT = object()
 
+mapping = {
+    'company': 'Company',
+    'contact': 'Contact',
+    'country': 'Country',
+    'dit_advisor': 'Advisor',
+    'dit_team': 'Team',
+    'sector': 'Sector',
+    'service': 'Service',
+    'status': 'Status',
+    'uk_region': 'UKRegion'
+}
+
 
 def build_relationship(model_instance, attribute):
-    mapping = {
-        'company': 'Company',
-        'contact': 'Contact',
-        'country': 'Country',
-        'dit_advisor': 'Advisor',
-        'dit_team': 'Team',
-        'sector': 'Sector',
-        'service': 'Service',
-        'status': 'Status',
-        'uk_region': 'UKRegion'
-    }
     entity_name = mapping[attribute]
     data_dict = {'data': {'type': entity_name, 'id': str(model_instance.pk)}}
     return data_dict
 
 
-def model_to_json_api(model_instance):
+def build_attribute(model_instance, attribute):
+    value = getattr(model_instance,attribute, None)
+    if isinstance(value, datetime.datetime):
+        return value.isoformat()
+    else:
+        return value
+
+
+def model_to_json_api(model_instance, schema_instance):
     attributes = dict()
     relationships = dict()
-    for item in ServiceDeliverySchema():
+    for item in schema_instance:
         if item.name == 'attributes':
             for subitem in item:
-                value = getattr(model_instance, subitem.name, None)
-                if isinstance(value, datetime.datetime):
-                    attributes[subitem.name] = value.isoformat()
-                else:
-                    attributes[subitem.name] = value
+                attributes[subitem.name] = build_attribute(model_instance, subitem.name)
         elif item.name == 'relationships':
             for subitem in item:
                 relationship_instance = getattr(model_instance, subitem.name, None)
@@ -54,7 +59,7 @@ class ServiceDeliveryDatabaseRepo:
         """Get and return a single object by its id."""
         try:
             model_instance = self.model.objects.get(id=object_id)
-            return model_to_json_api(model_instance)
+            return model_to_json_api(model_instance, schema_instance=self.schema())
         except self.model.DoesNotExist:
             return {}
 
