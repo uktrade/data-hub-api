@@ -14,3 +14,4 @@ class ServiceDeliveriesRepoTestCase(TestCase):
         result = ServiceDeliveryDatabaseRepo().get(service_delivery.pk)
         print(result)
         assert result['relationships']
+        assert result['relationships']['company']['data']['type'] == 'Company'

@@ -4,6 +4,23 @@ from datahub.v2.serializers.service_deliveries import ServiceDeliverySchema
 DEFAULT = object()
 
 
+def build_relationship(model_instance, attribute):
+    mapping = {
+        'company': 'Company',
+        'contact': 'Contact',
+        'country': 'Country',
+        'dit_advisor': 'Advisor',
+        'dit_team': 'Team',
+        'sector': 'Sector',
+        'service': 'Service',
+        'status': 'Status',
+        'uk_region': 'UKRegion'
+    }
+    entity_name = mapping[attribute]
+    data_dict = {'data': {'type': entity_name, 'id': str(model_instance.pk)}}
+    return data_dict
+
+
 def model_to_json_api(model_instance):
     attributes = dict()
     relationships = dict()
@@ -13,7 +30,9 @@ def model_to_json_api(model_instance):
                 attributes[subitem.name] = getattr(model_instance, subitem.name, None)
         elif item.name == 'relationships':
             for subitem in item:
-                relationships[subitem.name] = getattr(model_instance, subitem.name, None)
+                relationship_instance = getattr(model_instance, subitem.name, None)
+                if relationship_instance:
+                    relationships[subitem.name] = build_relationship(relationship_instance, subitem.name)
     return {'attributes': attributes, 'relationships': relationships}
 
 
