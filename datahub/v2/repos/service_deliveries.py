@@ -1,3 +1,5 @@
+import datetime
+
 from datahub.interaction.models import ServiceDelivery
 from datahub.v2.serializers.service_deliveries import ServiceDeliverySchema
 
@@ -27,7 +29,11 @@ def model_to_json_api(model_instance):
     for item in ServiceDeliverySchema():
         if item.name == 'attributes':
             for subitem in item:
-                attributes[subitem.name] = getattr(model_instance, subitem.name, None)
+                value = getattr(model_instance, subitem.name, None)
+                if isinstance(value, datetime.datetime):
+                    attributes[subitem.name] = value.isoformat()
+                else:
+                    attributes[subitem.name] = value
         elif item.name == 'relationships':
             for subitem in item:
                 relationship_instance = getattr(model_instance, subitem.name, None)

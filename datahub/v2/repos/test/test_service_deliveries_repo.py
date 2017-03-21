@@ -15,3 +15,4 @@ class ServiceDeliveriesRepoTestCase(TestCase):
         print(result)
         assert result['relationships']
         assert result['relationships']['company']['data']['type'] == 'Company'
+        assert result['attributes']['date'] == service_delivery.date.isoformat()
