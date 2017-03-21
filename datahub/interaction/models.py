@@ -112,7 +112,7 @@ class ServiceDelivery(InteractionAbstract):
                 service=self.service,
                 event=self.event
             )
-            self.service_offer = ServiceOffer.objects.get(**query)
+            self.service_offer = ServiceOffer.objects.filter(**query).first()
         except ServiceOffer.DoesNotExist:
             raise ValidationError(message={
                 'service': ['This combination of service and service provider does not exist.'],
