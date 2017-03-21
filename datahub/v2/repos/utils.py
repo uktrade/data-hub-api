@@ -21,3 +21,4 @@ def model_to_dict(model_instance):
 def queryset_to_list_of_dicts(queryset):
     """Transform queryset to a list of dicts."""
     return [model_to_dict(instance) for instance in queryset]
+

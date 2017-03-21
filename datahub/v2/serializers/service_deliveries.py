@@ -59,3 +59,4 @@ class ServiceDeliverySchema(colander.Schema):
     type = colander.SchemaNode(colander.String())
     attributes = ServiceDeliveryAttributes()
     relationships = ServiceDeliveryRelationships()
+
