@@ -1,5 +1,4 @@
 import datetime
-from django.core.exceptions import ObjectDoesNotExist
 
 from datahub.interaction.models import ServiceDelivery
 from datahub.v2.serializers.service_deliveries import ServiceDeliverySchema
