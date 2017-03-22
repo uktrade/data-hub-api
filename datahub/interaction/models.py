@@ -106,15 +106,22 @@ class ServiceDelivery(InteractionAbstract):
 
     def clean(self):
         """Custom validation."""
-        try:
-            query = dict(
-                dit_team=self.dit_team,
-                service=self.service,
-                event=self.event
-            )
-            self.service_offer = ServiceOffer.objects.get(**query)
-        except ServiceOffer.DoesNotExist:
-            raise ValidationError(message={
-                'service': ['This combination of service and service provider does not exist.'],
-            })
+        if not self.service_offer_id:
+            try:
+                query = dict(
+                    dit_team=self.dit_team,
+                    service=self.service,
+                    event=self.event
+                )
+                service_offer = ServiceOffer.objects.filter(**query).first()
+                if not service_offer:
+                    raise ServiceOffer.DoesNotExist()
+
+                self.service_offer = service_offer
+            except ServiceOffer.DoesNotExist:
+                raise ValidationError(message={
+                    'service': ['This combination of service and service provider does not exist.'],
+                })
+        else:
+            self.event = self.service_offer.event
         super().clean()
