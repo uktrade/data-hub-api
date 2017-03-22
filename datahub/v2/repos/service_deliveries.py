@@ -5,17 +5,21 @@ from datahub.v2.serializers.service_deliveries import ServiceDeliverySchema
 
 DEFAULT = object()
 
-mapping = {
-    'company': 'Company',
-    'contact': 'Contact',
-    'country': 'Country',
-    'dit_advisor': 'Advisor',
-    'dit_team': 'Team',
-    'sector': 'Sector',
-    'service': 'Service',
-    'status': 'Status',
-    'uk_region': 'UKRegion'
+_mapping = {
+    ('company', 'Company'),
+    ('contact', 'Contact'),
+    ('country', 'Country'),
+    ('dit_advisor', 'Advisor'),
+    ('dit_team', 'Team'),
+    ('sector', 'Sector'),
+    ('service', 'Service'),
+    ('status', 'Status'),
+    ('uk_region', 'UKRegion')
 }
+
+
+mapping_attr_to_type = dict(_mapping)
+mapping_type_to_attr = dict((v, k) for (k, v) in _mapping)
 
 
 class ServiceDeliveryDatabaseRepo:
@@ -40,18 +44,13 @@ class ServiceDeliveryDatabaseRepo:
             queryset.filter(contact__pk=contact_id)
         return self.schema(queryset.all(), many=True).data
 
-    def upsert(self, data, user):
+    def upsert(self, data):
         """Insert or update an object."""
-        obj_id = data.pop('id')
-        obj, _ = self.model.objects.update_or_create(
-            pk=obj_id,
-            defaults=data
-        )
-        return self.schema(obj).data
+        return json_api_to_model(data, model_class=self.model)
 
 
 def build_relationship(model_instance, attribute):
-    entity_name = mapping[attribute]
+    entity_name = mapping_attr_to_type[attribute]
     data_dict = {'data': {'type': entity_name, 'id': str(model_instance.pk)}}
     return data_dict
 
@@ -77,3 +76,11 @@ def model_to_json_api(model_instance, schema_instance):
                 if relationship_instance:
                     relationships[subitem.name] = build_relationship(relationship_instance, subitem.name)
     return {'attributes': attributes, 'relationships': relationships}
+
+
+def json_api_to_model(data, model_class):
+    model_attrs = data.get('attributes', {})
+    for key, value in data.get('relationships', {}).items():
+        model_attrs[key+'_id'] = value['data']['id']
+    return model_class(**model_attrs)
+
