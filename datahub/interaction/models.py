@@ -122,4 +122,6 @@ class ServiceDelivery(InteractionAbstract):
                 raise ValidationError(message={
                     'service': ['This combination of service and service provider does not exist.'],
                 })
+        else:
+            self.event = self.service_offer.event
         super().clean()
