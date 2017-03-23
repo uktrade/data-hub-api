@@ -1,7 +1,7 @@
 import datetime
 
 from datahub.interaction.models import ServiceDelivery
-from datahub.v2.serializers.service_deliveries import ServiceDeliverySchema
+from datahub.v2.schemas.service_deliveries import ServiceDeliverySchema
 
 DEFAULT = object()
 
