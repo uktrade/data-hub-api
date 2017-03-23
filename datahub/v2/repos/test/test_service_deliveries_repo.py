@@ -88,6 +88,8 @@ class ServiceDeliveriesRepoTestCase(TestCase):
         assert result[0]['relationships']
         assert result[0]['relationships']['company']['data']['type'] == 'Company'
         assert result[0]['attributes']['date'] == service_delivery_1.date.isoformat()
+        assert result[0]['attributes']['id'] == service_delivery_1.id
         assert result[1]['relationships']
         assert result[1]['relationships']['company']['data']['type'] == 'Company'
         assert result[1]['attributes']['date'] == service_delivery_2.date.isoformat()
+        assert result[1]['attributes']['id'] == service_delivery_2.id

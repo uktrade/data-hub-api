@@ -37,6 +37,7 @@ class RelationshipType(SchemaType):
 
 
 class ServiceDeliveryAttributes(colander.MappingSchema):
+    id = colander.SchemaNode(colander.String())
     subject = colander.SchemaNode(colander.String())
     date = colander.SchemaNode(colander.DateTime())
     notes = colander.SchemaNode(colander.String())
