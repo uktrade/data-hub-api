@@ -14,8 +14,6 @@ pytestmark = pytest.mark.django_db
 
 
 class ServiceDeliveriesRepoTestCase(TestCase):
-
-    @pytest.mark.wip()
     def test_get(self):
         service_offer = factories.ServiceOfferFactory()
         service_delivery = factories.ServiceDeliveryFactory(
@@ -75,21 +73,13 @@ class ServiceDeliveriesRepoTestCase(TestCase):
         result = ServiceDeliveryDatabaseRepo().upsert(data=data)
         assert isinstance(result, ServiceDelivery)
 
-    @pytest.mark.wip()
-    def test_filter(self):
+    def test_filter_with_pagination(self):
         service_offer = factories.ServiceOfferFactory()
-        service_delivery_1 = factories.ServiceDeliveryFactory(
-            service=service_offer.service,
-            dit_team=service_offer.dit_team)
-        service_delivery_2 = factories.ServiceDeliveryFactory(
-            service=service_offer.service,
-            dit_team=service_offer.dit_team)
-        result = ServiceDeliveryDatabaseRepo().filter()
-        assert result[0]['relationships']
-        assert result[0]['relationships']['company']['data']['type'] == 'Company'
-        assert result[0]['attributes']['date'] == service_delivery_1.date.isoformat()
-        assert result[0]['attributes']['id'] == service_delivery_1.id
-        assert result[1]['relationships']
-        assert result[1]['relationships']['company']['data']['type'] == 'Company'
-        assert result[1]['attributes']['date'] == service_delivery_2.date.isoformat()
-        assert result[1]['attributes']['id'] == service_delivery_2.id
+        service_deliveries = [
+            factories.ServiceDeliveryFactory(
+                service=service_offer.service,
+                dit_team=service_offer.dit_team)
+            for i in range(6)]
+        result = ServiceDeliveryDatabaseRepo().filter(offset=2, limit=3)
+        assert result[0]['attributes']['id'] == service_deliveries[2].id
+        assert result[2]['attributes']['id'] == service_deliveries[4].id

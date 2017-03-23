@@ -38,11 +38,13 @@ class ServiceDeliveryDatabaseRepo:
     def filter(self, company_id=DEFAULT, contact_id=DEFAULT, offset=0, limit=100):
         """Filter objects."""
         queryset = self.model.objects
-        if company_id:
+        if company_id != DEFAULT:
             queryset.filter(company__pk=company_id)
-        if contact_id:
+        if contact_id != DEFAULT:
             queryset.filter(contact__pk=contact_id)
-        return [model_to_json_api(item, self.schema()) for item in queryset.all()]
+        start, end = offset, offset + limit
+        items = list(queryset.all()[start:end])
+        return [model_to_json_api(item, self.schema()) for item in items]
 
     def upsert(self, data):
         """Insert or update an object."""
