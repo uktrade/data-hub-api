@@ -15,7 +15,10 @@ pytestmark = pytest.mark.django_db
 
 
 class ServiceDeliveriesRepoTestCase(TestCase):
+    """Service delivery repo test case."""
+
     def test_get(self):
+        """Test get service delivery."""
         service_offer = factories.ServiceOfferFactory()
         service_delivery = factories.ServiceDeliveryFactory(
             service=service_offer.service,
@@ -27,10 +30,12 @@ class ServiceDeliveriesRepoTestCase(TestCase):
         assert result['attributes']['date'] == service_delivery.date.isoformat()
 
     def test_get_does_not_exist(self):
+        """Test SD does not exist."""
         with pytest.raises(ObjectDoesNotExist):
             ServiceDeliveryDatabaseRepo().get(uuid.uuid4())
 
     def test_insert(self):
+        """Test add service delivery."""
         service_offer = factories.ServiceOfferFactory()
         user = get_test_user()
         data = {
@@ -86,6 +91,7 @@ class ServiceDeliveriesRepoTestCase(TestCase):
         assert result.dit_team_id == service_offer.dit_team.pk
 
     def test_update(self):
+        """Test update existing service delivery."""
         service_offer = factories.ServiceOfferFactory()
         service_delivery = factories.ServiceDeliveryFactory(
             service=service_offer.service,
@@ -114,6 +120,7 @@ class ServiceDeliveriesRepoTestCase(TestCase):
         assert result.contact_id == contact.pk
 
     def test_filter_with_pagination(self):
+        """Test filter with pagination."""
         service_offer = factories.ServiceOfferFactory()
         service_deliveries = [
             factories.ServiceDeliveryFactory(

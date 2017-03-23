@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+"""Service deliveries schema tests."""
 
 import datetime
 import unittest
@@ -6,48 +6,57 @@ import unittest
 import colander
 import pytest
 
-from datahub.v2.serializers.service_deliveries import ServiceDeliverySchema, RelationshipType
+from datahub.v2.schemas.service_deliveries import RelationshipType, ServiceDeliverySchema
 
 
 class TestRelationshipType(unittest.TestCase):
+    """Relationship type."""
+
     def setUp(self):
+        """Create a dummy schema."""
         class MySchema(colander.MappingSchema):
-            item = colander.SchemaNode(RelationshipType("flibble"))
+            item = colander.SchemaNode(RelationshipType('flibble'))
         self.schema = MySchema
 
     def test_deserialize_empty(self):
+        """Deserialize empty."""
         with pytest.raises(colander.Invalid) as e:
             self.schema().deserialize({'item': {}})
-        assert e.value.asdict()['item'] == '{} has no key data'
+        assert e.value.asdict()['item'] == '{} has no key data'  # noqa: P103
 
     def test_deserialize_missing_type(self):
+        """Deserialize missing type."""
         with pytest.raises(colander.Invalid) as e:
             self.schema().deserialize({'item': {'data': {}}})
         assert e.value.asdict()['item'] == """{'data': {}} has no key type"""
 
     def test_deserialize_incorrect_type(self):
+        """Deserialize incorrect type."""
         with pytest.raises(colander.Invalid) as e:
-            self.schema().deserialize({'item': {'data': {'type': "bamble"}}})
-        print(e.value.asdict()['item'])
-        assert e.value.asdict()['item'] == "type bamble should be flibble"
+            self.schema().deserialize({'item': {'data': {'type': 'bamble'}}})
+        assert e.value.asdict()['item'] == 'type bamble should be flibble'
 
     def test_serialize_empty(self):
+        """Serialize empty."""
         with pytest.raises(colander.Invalid) as e:
             self.schema().serialize({'item': {}})
-        assert e.value.asdict()['item'] == '{} has no key data'
+        assert e.value.asdict()['item'] == '{} has no key data'  # noqa: P103
 
     def test_serialize_missing_type(self):
+        """Serialize missing type."""
         with pytest.raises(colander.Invalid) as e:
             self.schema().serialize({'item': {'data': {}}})
         assert e.value.asdict()['item'] == """{'data': {}} has no key type"""
 
     def test_serialize_incorrect_type(self):
+        """Serialize incorrect type."""
         with pytest.raises(colander.Invalid) as e:
-            self.schema().serialize({'item': {'data': {'type': "bamble"}}})
-        assert e.value.asdict()['item'] == "type bamble should be flibble"
+            self.schema().serialize({'item': {'data': {'type': 'bamble'}}})
+        assert e.value.asdict()['item'] == 'type bamble should be flibble'
 
 
-def test_service_deliveries_serializer():
+def test_service_deliveries_schema():
+    """SD schema test."""
     data = {
         'type': 'ServiceDelivery',
         'attributes': {

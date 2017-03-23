@@ -1,15 +1,19 @@
-# -*- coding: utf-8 -*-
+"""Schemas."""
 
 import colander
 
-from colander import SchemaType, Invalid, null
+from colander import Invalid, null, SchemaType
 
 
 class RelationshipType(SchemaType):
+    """Define a relationship type in colander."""
+
     def __init__(self, typename):
+        """Define the typename."""
         self.typename = typename
 
     def serialize(self, node, appstruct):
+        """Serialize data checking for typename."""
         if appstruct is null:
             return null
         appstruct = dict(appstruct)
@@ -23,6 +27,7 @@ class RelationshipType(SchemaType):
         return appstruct and 'true' or 'false'
 
     def deserialize(self, node, cstruct):
+        """Deserialize data."""
         if cstruct is null:
             return null
         cstruct = dict(cstruct)
@@ -37,6 +42,8 @@ class RelationshipType(SchemaType):
 
 
 class ServiceDeliveryAttributes(colander.MappingSchema):
+    """Colander schema for service deliveries attributes."""
+
     id = colander.SchemaNode(colander.String())
     subject = colander.SchemaNode(colander.String())
     date = colander.SchemaNode(colander.DateTime())
@@ -45,6 +52,8 @@ class ServiceDeliveryAttributes(colander.MappingSchema):
 
 
 class ServiceDeliveryRelationships(colander.MappingSchema):
+    """Colander schema for service deliveries relationships."""
+
     status = colander.SchemaNode(RelationshipType(typename='Status'))
     company = colander.SchemaNode(RelationshipType(typename='Company'))
     contact = colander.SchemaNode(RelationshipType(typename='Contact'))
@@ -57,7 +66,8 @@ class ServiceDeliveryRelationships(colander.MappingSchema):
 
 
 class ServiceDeliverySchema(colander.Schema):
+    """Colander schema for service deliveries."""
+
     type = colander.SchemaNode(colander.String())
     attributes = ServiceDeliveryAttributes()
     relationships = ServiceDeliveryRelationships()
-
