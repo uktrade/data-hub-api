@@ -9,7 +9,7 @@ from datahub.interaction.serializers import (
     InteractionSerializerRead,
     InteractionSerializerWrite
 )
-from datahub.v2.repos import ServiceDeliveryDatabaseRepo
+from datahub.v2.repos.service_deliveries import ServiceDeliveryDatabaseRepo
 
 
 class InteractionViewSetV1(CoreViewSetV1):

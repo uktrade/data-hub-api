@@ -48,16 +48,18 @@ class ServiceDeliveryDatabaseRepo:
 
     def upsert(self, data):
         """Insert or update an object."""
-        return json_api_to_model(data, model_class=self.model)
+        return json_api_to_model(data, self.model)
 
 
 def build_relationship(model_instance, attribute):
+    """Build relationships object from models."""
     entity_name = mapping_attr_to_type[attribute]
     data_dict = {'data': {'type': entity_name, 'id': str(model_instance.pk)}}
     return data_dict
 
 
 def build_attribute(model_instance, attribute):
+    """Build attributes object from model."""
     value = getattr(model_instance, attribute, None)
     if isinstance(value, datetime.datetime):
         return value.isoformat()
@@ -66,6 +68,7 @@ def build_attribute(model_instance, attribute):
 
 
 def model_to_json_api(model_instance, schema_instance):
+    """Convert the model instance to the JSON api format."""
     attributes = dict()
     relationships = dict()
     for item in schema_instance:
@@ -81,7 +84,21 @@ def model_to_json_api(model_instance, schema_instance):
 
 
 def json_api_to_model(data, model_class):
+    """Take JSON api format data and tries to save or update a model instance."""
     model_attrs = data.get('attributes', {})
     for key, value in data.get('relationships', {}).items():
         model_attrs[key + '_id'] = value['data']['id']
-    return model_class(**model_attrs)
+    model_id = model_attrs.pop('id', None)
+    if model_id:
+        return update_model(model_class, model_attrs, model_id)
+    else:
+        return model_class.objects.create(**model_attrs)
+
+
+def update_model(model_class, model_attrs, object_id):
+    """Update an existing model."""
+    obj = model_class.objects.get(pk=object_id)
+    for key, value in model_attrs.items():
+        setattr(obj, key, value)
+    obj.save()
+    return obj

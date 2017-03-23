@@ -6,6 +6,7 @@ from django.test import TestCase
 from django.utils.timezone import now
 
 from datahub.core import constants
+from datahub.core.test_utils import get_test_user
 from datahub.interaction.models import ServiceDelivery
 from datahub.interaction.test import factories
 from datahub.v2.repos.service_deliveries import ServiceDeliveryDatabaseRepo
@@ -30,6 +31,8 @@ class ServiceDeliveriesRepoTestCase(TestCase):
             ServiceDeliveryDatabaseRepo().get(uuid.uuid4())
 
     def test_insert(self):
+        service_offer = factories.ServiceOfferFactory()
+        user = get_test_user()
         data = {
             'type': 'ServiceDelivery',
             'attributes': {
@@ -59,19 +62,56 @@ class ServiceDeliveriesRepoTestCase(TestCase):
                 'service': {
                     'data': {
                         'type': 'Service',
-                        'id': constants.Service.trade_enquiry.value.id
+                        'id': service_offer.service.pk
                     }
                 },
                 'dit_team': {
                     'data': {
                         'type': 'Team',
-                        'id': constants.Team.healthcare_uk.value.id
+                        'id': service_offer.dit_team.pk
+                    }
+                },
+                'dit_advisor': {
+                    'data': {
+                        'type': 'Advisor',
+                        'id': user.pk
                     }
                 }
             }
         }
         result = ServiceDeliveryDatabaseRepo().upsert(data=data)
         assert isinstance(result, ServiceDelivery)
+        assert result.dit_advisor.pk == user.pk
+        assert result.service_id == service_offer.service.pk
+        assert result.dit_team_id == service_offer.dit_team.pk
+
+    def test_update(self):
+        service_offer = factories.ServiceOfferFactory()
+        service_delivery = factories.ServiceDeliveryFactory(
+            service=service_offer.service,
+            dit_team=service_offer.dit_team,
+            subject='foo'
+        )
+        contact = factories.ContactFactory()
+        data = {
+            'type': 'ServiceDelivery',
+            'attributes': {
+                'id': str(service_delivery.pk),
+                'subject': 'whatever',
+            },
+            'relationships': {
+                'contact': {
+                    'data': {
+                        'type': 'Team',
+                        'id': contact.pk
+                    }
+                }
+            }
+        }
+        result = ServiceDeliveryDatabaseRepo().upsert(data=data)
+        assert isinstance(result, ServiceDelivery)
+        assert result.subject == 'whatever'
+        assert result.contact_id == contact.pk
 
     def test_filter_with_pagination(self):
         service_offer = factories.ServiceOfferFactory()
