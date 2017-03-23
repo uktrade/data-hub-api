@@ -164,3 +164,25 @@ class ServiceDeliveriesRepoTestCase(TestCase):
         result = ServiceDeliveryDatabaseRepo().filter(contact_id=str(contact.pk))
         assert len(result) == 1
         assert result[0]['attributes']['id'] == str(service_delivery.pk)
+
+    def test_filter_by_contact_and_company_ids(self):
+        """Test filter by contact and company ids."""
+        service_offer = factories.ServiceOfferFactory()
+        contact = factories.ContactFactory()
+        company = factories.CompanyFactory()
+        factories.ServiceDeliveryFactory(
+            service=service_offer.service,
+            dit_team=service_offer.dit_team,
+        )
+        service_delivery = factories.ServiceDeliveryFactory(
+            service=service_offer.service,
+            dit_team=service_offer.dit_team,
+            contact=contact,
+            company=company
+        )
+        result = ServiceDeliveryDatabaseRepo().filter(
+            contact_id=str(contact.pk),
+            company_id=str(company.pk)
+        )
+        assert len(result) == 1
+        assert result[0]['attributes']['id'] == str(service_delivery.pk)
