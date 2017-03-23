@@ -81,6 +81,5 @@ def model_to_json_api(model_instance, schema_instance):
 def json_api_to_model(data, model_class):
     model_attrs = data.get('attributes', {})
     for key, value in data.get('relationships', {}).items():
-        model_attrs[key+'_id'] = value['data']['id']
+        model_attrs[key + '_id'] = value['data']['id']
     return model_class(**model_attrs)
-
