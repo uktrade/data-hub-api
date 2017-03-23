@@ -1,4 +1,5 @@
 import datetime
+import uuid
 
 from datahub.interaction.models import ServiceDelivery
 from datahub.v2.schemas.service_deliveries import ServiceDeliverySchema
@@ -37,13 +38,13 @@ class ServiceDeliveryDatabaseRepo:
 
     def filter(self, company_id=DEFAULT, contact_id=DEFAULT, offset=0, limit=100):
         """Filter objects."""
-        queryset = self.model.objects
+        filters = {}
         if company_id != DEFAULT:
-            queryset.filter(company__pk=company_id)
+            filters['company__pk'] = company_id
         if contact_id != DEFAULT:
-            queryset.filter(contact__pk=contact_id)
+            filters['contact__pk'] = contact_id
         start, end = offset, offset + limit
-        items = list(queryset.all()[start:end])
+        items = list(self.model.objects.filter(**filters).all()[start:end])
         return [model_to_json_api(item, self.schema()) for item in items]
 
     def upsert(self, data):
@@ -63,6 +64,8 @@ def build_attribute(model_instance, attribute):
     value = getattr(model_instance, attribute, None)
     if isinstance(value, datetime.datetime):
         return value.isoformat()
+    if isinstance(value, uuid.UUID):
+        return str(value)
     else:
         return value
 
