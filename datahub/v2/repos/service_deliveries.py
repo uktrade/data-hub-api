@@ -42,7 +42,7 @@ class ServiceDeliveryDatabaseRepo:
             queryset.filter(company__pk=company_id)
         if contact_id:
             queryset.filter(contact__pk=contact_id)
-        return self.schema(queryset.all(), many=True).data
+        return [model_to_json_api(item, self.schema()) for item in queryset.all()]
 
     def upsert(self, data):
         """Insert or update an object."""
