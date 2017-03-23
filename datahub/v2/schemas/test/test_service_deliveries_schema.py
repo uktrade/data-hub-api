@@ -2,6 +2,7 @@
 
 import datetime
 import unittest
+import uuid
 
 import colander
 import pytest
@@ -63,7 +64,8 @@ def test_service_deliveries_schema():
             'subject': 'whatever',
             'date': datetime.datetime.now().isoformat(),
             'notes': 'hello',
-            'feedback': 'foo'
+            'feedback': 'foo',
+            'id': str(uuid.uuid4())
         },
         'relationships': {
             'status': {
