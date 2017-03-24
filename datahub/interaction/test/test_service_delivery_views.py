@@ -24,10 +24,10 @@ class ServiceDeliveryTestCase(LeelooTestCase):
             service=service_offer.service,
             dit_team=service_offer.dit_team
         )
-        url = reverse('v2:servicedelivery-detail', kwargs={'pk': servicedelivery.pk})
+        url = reverse('v2:servicedelivery-detail', kwargs={'object_id': servicedelivery.pk})
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['id'] == str(servicedelivery.pk)
+        assert str(response.data['attributes']['id']) == str(servicedelivery.pk)
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_service_delivery(self, mocked_save_to_korben):
@@ -157,7 +157,7 @@ class ServiceDeliveryTestCase(LeelooTestCase):
             subject='I am a subject'
         )
 
-        url = reverse('v2:servicedelivery-detail', kwargs={'pk': servicedelivery.pk})
+        url = reverse('v2:servicedelivery-detail', kwargs={'object_id': servicedelivery.pk})
         response = self.api_client.patch(url, {
             'subject': 'I am another subject',
         })

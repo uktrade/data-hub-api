@@ -19,8 +19,16 @@ router_v1.register(r'interaction', interaction_views.InteractionViewSetV1)
 router_v1.register(r'advisor', company_views.AdvisorReadOnlyViewSetV1)
 router_v1.register(r'task-info', core_views.TaskInfoReadOnlyViewSetV1)
 
-router_v2 = routers.SimpleRouter()
-router_v2.register(r'service-delivery', interaction_views.ServiceDeliveryViewSetV2)
+v2_urls = [
+    url(
+        r'^service_delivery/$',
+        interaction_views.ServiceDeliveryListViewV2.as_view(),
+        name='servicedelivery-list'),
+    url(
+        r'^service_delivery/(?P<object_id>[0-9a-z-]{36})/$',
+        interaction_views.ServiceDeliveryDetailViewV2.as_view(),
+        name='servicedelivery-detail'),
+]
 
 unversioned_urls = [
     url(r'^admin/', admin.site.urls),
@@ -35,7 +43,7 @@ unversioned_urls = [
 
 urlpatterns = [
     url(r'^', include(router_v1.urls, namespace='v1')),  # V1 has actually no version in the URL
-    url(r'^v2/', include(router_v2.urls, namespace='v2')),
+    url(r'v2/', include(v2_urls, namespace='v2')),
 ] + unversioned_urls
 
 if settings.DEBUG:
