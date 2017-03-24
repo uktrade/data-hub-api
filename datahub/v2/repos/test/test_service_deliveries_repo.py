@@ -28,6 +28,7 @@ class ServiceDeliveriesRepoTestCase(TestCase):
         assert result['relationships']
         assert result['relationships']['company']['data']['type'] == 'Company'
         assert result['attributes']['date'] == service_delivery.date.isoformat()
+        assert result['type'] == 'ServiceDelivery'
 
     def test_get_does_not_exist(self):
         """Test SD does not exist."""

@@ -91,6 +91,7 @@ class ServiceDelivery(InteractionAbstract):
         'country_of_interest',
         'event'
     )
+    ENTITY_NAME = 'ServiceDelivery'
 
     status = models.ForeignKey('metadata.ServiceDeliveryStatus')
     service_offer = models.ForeignKey(ServiceOffer, null=True, blank=True)

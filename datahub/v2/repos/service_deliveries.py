@@ -78,12 +78,16 @@ def model_to_json_api(model_instance, schema_instance):
         if item.name == 'attributes':
             for subitem in item:
                 attributes[subitem.name] = build_attribute(model_instance, subitem.name)
-        elif item.name == 'relationships':
+        if item.name == 'relationships':
             for subitem in item:
                 relationship_instance = getattr(model_instance, subitem.name, None)
                 if relationship_instance:
                     relationships[subitem.name] = build_relationship(relationship_instance, subitem.name)
-    return {'attributes': attributes, 'relationships': relationships}
+    return {
+        'type': model_instance.ENTITY_NAME,
+        'attributes': attributes,
+        'relationships': relationships
+    }
 
 
 def json_api_to_model(data, model_class):

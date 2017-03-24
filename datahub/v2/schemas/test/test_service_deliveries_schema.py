@@ -56,21 +56,21 @@ class TestRelationshipType(unittest.TestCase):
         assert e.value.asdict()['item'] == 'type bamble should be flibble'
 
 
-def test_service_deliveries_schema():
+def test_service_deliveries_schema_invalid():
     """SD schema test."""
     data = {
-        'type': 'ServiceDelivery',
+        'type': 'ServiceDeliver',
         'attributes': {
             'subject': 'whatever',
             'date': datetime.datetime.now().isoformat(),
             'notes': 'hello',
             'feedback': 'foo',
-            'id': str(uuid.uuid4())
+            'id': 'hello'
         },
         'relationships': {
             'status': {
                 'data': {
-                    'type': 'ServiceDeliveryStatus',
+                    'type': 'Status',
                     'id': 'constants.ServiceDeliveryStatus.offered.value.id'
                 }
             },
@@ -126,11 +126,60 @@ def test_service_deliveries_schema():
     }
 
     expected = {
+        'attributes.id': 'Invalid UUID string',
+        'type': 'Value must be ServiceDelivery',
         'relationships.country_of_interest': 'type flibble should be Country',
         'relationships.event': 'type event should be Event',
-        'relationships.status': 'type ServiceDeliveryStatus should be Status'}
+        'relationships.status': 'type ServiceDeliveryStatus should be ServiceDeliveryStatus'}
 
     with pytest.raises(colander.Invalid) as e:
         ServiceDeliverySchema().deserialize(data)
 
     assert e.value.asdict() == expected
+
+
+def test_service_deliveries_valid_schema():
+    """SD schema test."""
+    data = {
+        'type': 'ServiceDelivery',
+        'attributes': {
+            'subject': 'whatever',
+            'date': datetime.datetime.now().isoformat(),
+            'notes': 'hello',
+            'id': str(uuid.uuid4())
+        },
+        'relationships': {
+            'status': {
+                'data': {
+                    'type': 'ServiceDeliveryStatus',
+                    'id': 'constants.ServiceDeliveryStatus.offered.value.id'
+                }
+            },
+            'company': {
+                'data': {
+                    'type': 'Company',
+                    'id': 'CompanyFactory().pk'
+                }
+            },
+            'contact': {
+                'data': {
+                    'type': 'Contact',
+                    'id': 'ContactFactory().pk'
+                }
+            },
+            'service': {
+                'data': {
+                    'type': 'Service',
+                    'id': 'service_offer.service.id'
+                }
+            },
+            'dit_team': {
+                'data': {
+                    'type': 'Team',
+                    'id': 'service_offer.dit_team.id'
+                }
+            },
+        }
+    }
+
+    assert ServiceDeliverySchema().deserialize(data)
