@@ -1,6 +1,8 @@
 import datetime
 import uuid
 
+import collections
+
 from datahub.interaction.models import ServiceDelivery
 from datahub.v2.schemas.service_deliveries import ServiceDeliverySchema
 
@@ -28,13 +30,17 @@ class ServiceDeliveryDatabaseRepo:
 
     def __init__(self, config=None):
         """Initialise the repo using the config."""
-        self.model = ServiceDelivery
-        self.schema = ServiceDeliverySchema
+        self.model_class = ServiceDelivery
+        self.schema_class = ServiceDeliverySchema
+
+    def validate(self, data):
+        """Validate the data against the schema."""
+        self.schema_class().deserialize(data)
 
     def get(self, object_id):
         """Get and return a single object by its id."""
-        model_instance = self.model.objects.get(id=object_id)
-        return model_to_json_api(model_instance, schema_instance=self.schema())
+        model_instance = self.model_class.objects.get(id=object_id)
+        return model_to_json_api(model_instance, schema_instance=self.schema_class())
 
     def filter(self, company_id=DEFAULT, contact_id=DEFAULT, offset=0, limit=100):
         """Filter objects."""
@@ -44,12 +50,29 @@ class ServiceDeliveryDatabaseRepo:
         if contact_id != DEFAULT:
             filters['contact__pk'] = contact_id
         start, end = offset, offset + limit
-        items = list(self.model.objects.filter(**filters).all()[start:end])
-        return [model_to_json_api(item, self.schema()) for item in items]
+        items = list(self.model_class.objects.filter(**filters).all()[start:end])
+        return [model_to_json_api(item, self.schema_class()) for item in items]
 
     def upsert(self, data):
         """Insert or update an object."""
-        return json_api_to_model(data, self.model)
+        model_id = data.get('attributes', {}).get('id', None)
+        if model_id:
+            object_from_db = self.model_class.objects.get(pk=model_id)
+            object_from_db = model_to_json_api(object_from_db, self.schema_class())
+            data = dict_update_nested(object_from_db, data)
+        self.validate(data)
+        return json_api_to_model(data, self.model_class)
+
+
+def dict_update_nested(dictionary, update):
+    """Like update but for nested dictionary."""
+    for k, v in update.items():
+        if isinstance(v, collections.Mapping):
+            r = update(dictionary.get(k, {}), v)
+            dictionary[k] = r
+        else:
+            dictionary[k] = update[k]
+    return dictionary
 
 
 def build_relationship(model_instance, attribute):

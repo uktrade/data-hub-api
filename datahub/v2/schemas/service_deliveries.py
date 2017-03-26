@@ -1,5 +1,7 @@
 """Schemas."""
 
+import uuid
+
 import colander
 
 from colander import Invalid, null, SchemaType
@@ -57,7 +59,8 @@ class ServiceDeliveryAttributes(colander.MappingSchema):
 
     id = colander.SchemaNode(
         colander.String(),
-        validator=colander.uuid
+        validator=colander.uuid,
+        missing=uuid.uuid4
     )
     subject = colander.SchemaNode(colander.String())
     date = colander.SchemaNode(colander.DateTime())
