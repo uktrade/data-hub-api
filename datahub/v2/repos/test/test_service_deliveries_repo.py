@@ -109,7 +109,7 @@ class ServiceDeliveriesRepoTestCase(TestCase):
             'relationships': {
                 'contact': {
                     'data': {
-                        'type': 'Team',
+                        'type': 'Contact',
                         'id': contact.pk
                     }
                 }
@@ -129,8 +129,8 @@ class ServiceDeliveriesRepoTestCase(TestCase):
                 dit_team=service_offer.dit_team)
             for i in range(6)]
         result = ServiceDeliveryDatabaseRepo().filter(offset=2, limit=3)
-        assert result[0]['attributes']['id'] == service_deliveries[2].id
-        assert result[2]['attributes']['id'] == service_deliveries[4].id
+        assert result[0]['attributes']['id'] == str(service_deliveries[2].id)
+        assert result[2]['attributes']['id'] == str(service_deliveries[4].id)
 
     def test_filter_by_company_id(self):
         """Test filter by company id."""

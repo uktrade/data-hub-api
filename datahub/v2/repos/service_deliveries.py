@@ -16,7 +16,7 @@ _mapping = {
     ('dit_team', 'Team'),
     ('sector', 'Sector'),
     ('service', 'Service'),
-    ('status', 'Status'),
+    ('status', 'ServiceDeliveryStatus'),
     ('uk_region', 'UKRegion')
 }
 
@@ -57,18 +57,28 @@ class ServiceDeliveryDatabaseRepo:
         """Insert or update an object."""
         model_id = data.get('attributes', {}).get('id', None)
         if model_id:
-            object_from_db = self.model_class.objects.get(pk=model_id)
-            object_from_db = model_to_json_api(object_from_db, self.schema_class())
-            data = dict_update_nested(object_from_db, data)
+            data = merge_db_data_and_request_data(
+                model_id,
+                data,
+                self.model_class,
+                self.schema_class
+            )
         self.validate(data)
         return json_api_to_model(data, self.model_class)
+
+
+def merge_db_data_and_request_data(model_id, data, model_class, schema_class):
+    """If partial data is passed, we need to merge it with the existing data in the db."""
+    object_from_db = model_class.objects.get(pk=model_id)
+    object_from_db = model_to_json_api(object_from_db, schema_class())
+    return dict_update_nested(object_from_db, data)
 
 
 def dict_update_nested(dictionary, update):
     """Like update but for nested dictionary."""
     for k, v in update.items():
         if isinstance(v, collections.Mapping):
-            r = update(dictionary.get(k, {}), v)
+            r = dict_update_nested(dictionary.get(k, {}), v)
             dictionary[k] = r
         else:
             dictionary[k] = update[k]
