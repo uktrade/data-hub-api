@@ -22,27 +22,3 @@ class InteractionSerializerWrite(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = Interaction
         fields = '__all__'
-
-
-class ServiceDeliverySerializerV2(json_api_serializers.ModelSerializer):
-    """Service Delivery serializer."""
-
-    class Meta:  # noqa: D101
-        model = ServiceDelivery
-        fields = (
-            'id',
-            'date',
-            'company',
-            'contact',
-            'service',
-            'subject',
-            'dit_advisor',
-            'event',
-            'notes',
-            'dit_team',
-            'status',
-            'uk_region',
-            'sector',
-            'country_of_interest',
-            'feedback',
-            'url', )

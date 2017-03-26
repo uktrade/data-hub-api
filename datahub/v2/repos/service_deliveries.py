@@ -3,6 +3,9 @@ import uuid
 
 import collections
 
+from django.utils import encoding
+from rest_framework.reverse import reverse
+
 from datahub.interaction.models import ServiceDelivery
 from datahub.v2.schemas.service_deliveries import ServiceDeliverySchema
 
@@ -32,6 +35,8 @@ class ServiceDeliveryDatabaseRepo:
         """Initialise the repo using the config."""
         self.model_class = ServiceDelivery
         self.schema_class = ServiceDeliverySchema
+        self.config = config or {}
+        self.request = self.config.get('request')
 
     def validate(self, data):
         """Validate the data against the schema."""
@@ -40,7 +45,7 @@ class ServiceDeliveryDatabaseRepo:
     def get(self, object_id):
         """Get and return a single object by its id."""
         model_instance = self.model_class.objects.get(id=object_id)
-        return model_to_json_api(model_instance, schema_instance=self.schema_class())
+        return model_to_json_api(model_instance, self.schema_class(), request=self.request)
 
     def filter(self, company_id=DEFAULT, contact_id=DEFAULT, offset=0, limit=100):
         """Filter objects."""
@@ -51,11 +56,11 @@ class ServiceDeliveryDatabaseRepo:
             filters['contact__pk'] = contact_id
         start, end = offset, offset + limit
         items = list(self.model_class.objects.filter(**filters).all()[start:end])
-        return [model_to_json_api(item, self.schema_class()) for item in items]
+        return [model_to_json_api(item, self.schema_class(), self.request) for item in items]
 
     def upsert(self, data):
         """Insert or update an object."""
-        model_id = data.get('attributes', {}).get('id', None)
+        model_id = data.get('id', None)
         if model_id:
             data = merge_db_data_and_request_data(
                 model_id,
@@ -95,18 +100,16 @@ def build_relationship(model_instance, attribute):
 def build_attribute(model_instance, attribute):
     """Build attributes object from model."""
     value = getattr(model_instance, attribute, None)
-    if isinstance(value, datetime.datetime):
-        return value.isoformat()
-    if isinstance(value, uuid.UUID):
-        return str(value)
-    else:
-        return value
+    if value:
+        value = encoding.force_text(value)
+    return value
 
 
-def model_to_json_api(model_instance, schema_instance):
+def model_to_json_api(model_instance, schema_instance, request):
     """Convert the model instance to the JSON api format."""
     attributes = dict()
     relationships = dict()
+    links = {'self': build_self_link(model_instance, request)}
     for item in schema_instance:
         if item.name == 'attributes':
             for subitem in item:
@@ -117,18 +120,26 @@ def model_to_json_api(model_instance, schema_instance):
                 if relationship_instance:
                     relationships[subitem.name] = build_relationship(relationship_instance, subitem.name)
     return {
+        'id': encoding.force_text(model_instance.pk),
         'type': model_instance.ENTITY_NAME,
         'attributes': attributes,
-        'relationships': relationships
+        'relationships': relationships,
+        'links': links
     }
+
+
+def build_self_link(model_instance, request):
+    viewname = model_instance.DETAIL_VIEW_NAME
+    object_id = encoding.force_text(model_instance.pk)
+    return reverse(viewname, kwargs={'object_id': object_id}, request=request)
 
 
 def json_api_to_model(data, model_class):
     """Take JSON api format data and tries to save or update a model instance."""
     model_attrs = data.get('attributes', {})
+    model_id = data.pop('id', None)
     for key, value in data.get('relationships', {}).items():
         model_attrs[key + '_id'] = value['data']['id']
-    model_id = model_attrs.pop('id', None)
     if model_id:
         return update_model(model_class, model_attrs, model_id)
     else:

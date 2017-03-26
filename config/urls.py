@@ -10,6 +10,7 @@ from datahub.interaction import views as interaction_views
 from datahub.ping.views import ping
 from datahub.search.views import Search
 from datahub.user.views import who_am_i
+from datahub.v2.urls import urlpatterns as v2_urls
 
 router_v1 = routers.SimpleRouter()
 router_v1.register(r'company', company_views.CompanyViewSetV1)
@@ -19,16 +20,7 @@ router_v1.register(r'interaction', interaction_views.InteractionViewSetV1)
 router_v1.register(r'advisor', company_views.AdvisorReadOnlyViewSetV1)
 router_v1.register(r'task-info', core_views.TaskInfoReadOnlyViewSetV1)
 
-v2_urls = [
-    url(
-        r'^service_delivery/$',
-        interaction_views.ServiceDeliveryListViewV2.as_view(),
-        name='servicedelivery-list'),
-    url(
-        r'^service_delivery/(?P<object_id>[0-9a-z-]{36})/$',
-        interaction_views.ServiceDeliveryDetailViewV2.as_view(),
-        name='servicedelivery-detail'),
-]
+
 
 unversioned_urls = [
     url(r'^admin/', admin.site.urls),

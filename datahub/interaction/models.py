@@ -92,6 +92,7 @@ class ServiceDelivery(InteractionAbstract):
         'event'
     )
     ENTITY_NAME = 'ServiceDelivery'
+    DETAIL_VIEW_NAME = 'v2:servicedelivery-detail'
 
     status = models.ForeignKey('metadata.ServiceDeliveryStatus')
     service_offer = models.ForeignKey(ServiceOffer, null=True, blank=True)

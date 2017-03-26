@@ -10,8 +10,8 @@ from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
 
-from .factories import ServiceDeliveryFactory, ServiceOfferFactory
-from ..models import ServiceDelivery
+from datahub.interaction.test.factories import ServiceDeliveryFactory, ServiceOfferFactory
+from datahub.interaction.models import ServiceDelivery
 
 
 class ServiceDeliveryTestCase(LeelooTestCase):
@@ -26,8 +26,26 @@ class ServiceDeliveryTestCase(LeelooTestCase):
         )
         url = reverse('v2:servicedelivery-detail', kwargs={'object_id': servicedelivery.pk})
         response = self.api_client.get(url)
+        content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_200_OK
-        assert str(response.data['attributes']['id']) == str(servicedelivery.pk)
+        assert set(content.keys()) == {'data'}
+        assert set(content['data'].keys()) == {'type', 'id', 'attributes', 'relationships', 'links'}
+        assert content['data']['links']['self']
+
+    def test_service_delivery_list_view(self):
+        """Service delivery liste view."""
+        service_offer = ServiceOfferFactory()
+        service_deliveries = [
+            ServiceDeliveryFactory(
+                service=service_offer.service,
+                dit_team=service_offer.dit_team)
+            for i in range(6)]
+        url = reverse('v2:servicedelivery-list')
+        response = self.api_client.get(url)
+        content = json.loads(response.content.decode('utf-8'))
+        assert response.status_code == status.HTTP_200_OK
+        assert set(content.keys()) == {'links', 'data', 'meta'}
+        assert set(content['links'].keys()) == {'first', 'last', 'next', 'prev'}
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_service_delivery(self, mocked_save_to_korben):

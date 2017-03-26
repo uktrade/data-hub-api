@@ -57,11 +57,6 @@ class IsExactly:
 class ServiceDeliveryAttributes(colander.MappingSchema):
     """Colander schema for service deliveries attributes."""
 
-    id = colander.SchemaNode(
-        colander.String(),
-        validator=colander.uuid,
-        missing=uuid.uuid4
-    )
     subject = colander.SchemaNode(colander.String())
     date = colander.SchemaNode(colander.DateTime())
     notes = colander.SchemaNode(
@@ -103,6 +98,11 @@ class ServiceDeliverySchema(colander.Schema):
     type = colander.SchemaNode(
         colander.String(),
         validator=IsExactly('ServiceDelivery')
+    )
+    id = colander.SchemaNode(
+        colander.String(),
+        validator=colander.uuid,
+        missing=uuid.uuid4
     )
     attributes = ServiceDeliveryAttributes()
     relationships = ServiceDeliveryRelationships()

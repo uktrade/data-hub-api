@@ -60,12 +60,12 @@ def test_service_deliveries_schema_invalid():
     """SD schema test."""
     data = {
         'type': 'ServiceDeliver',
+        'id': 'hello',
         'attributes': {
             'subject': 'whatever',
             'date': datetime.datetime.now().isoformat(),
             'notes': 'hello',
             'feedback': 'foo',
-            'id': 'hello'
         },
         'relationships': {
             'status': {
@@ -142,11 +142,11 @@ def test_service_deliveries_valid_schema():
     """SD schema test."""
     data = {
         'type': 'ServiceDelivery',
+        'id': str(uuid.uuid4()),
         'attributes': {
             'subject': 'whatever',
             'date': datetime.datetime.now().isoformat(),
             'notes': 'hello',
-            'id': str(uuid.uuid4())
         },
         'relationships': {
             'status': {

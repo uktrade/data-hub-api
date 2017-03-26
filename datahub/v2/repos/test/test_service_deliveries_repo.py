@@ -3,6 +3,7 @@ import uuid
 import pytest
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
+from django.utils import encoding
 from django.utils.timezone import now
 
 from datahub.core import constants
@@ -27,8 +28,9 @@ class ServiceDeliveriesRepoTestCase(TestCase):
         result = ServiceDeliveryDatabaseRepo().get(service_delivery.pk)
         assert result['relationships']
         assert result['relationships']['company']['data']['type'] == 'Company'
-        assert result['attributes']['date'] == service_delivery.date.isoformat()
+        assert result['attributes']['date'] == encoding.force_text(service_delivery.date)
         assert result['type'] == 'ServiceDelivery'
+        assert result['id'] == str(service_delivery.pk)
 
     def test_get_does_not_exist(self):
         """Test SD does not exist."""
@@ -102,8 +104,8 @@ class ServiceDeliveriesRepoTestCase(TestCase):
         contact = factories.ContactFactory()
         data = {
             'type': 'ServiceDelivery',
+            'id': str(service_delivery.pk),
             'attributes': {
-                'id': str(service_delivery.pk),
                 'subject': 'whatever',
             },
             'relationships': {
@@ -129,8 +131,8 @@ class ServiceDeliveriesRepoTestCase(TestCase):
                 dit_team=service_offer.dit_team)
             for i in range(6)]
         result = ServiceDeliveryDatabaseRepo().filter(offset=2, limit=3)
-        assert result[0]['attributes']['id'] == str(service_deliveries[2].id)
-        assert result[2]['attributes']['id'] == str(service_deliveries[4].id)
+        assert result[0]['id'] == str(service_deliveries[2].id)
+        assert result[2]['id'] == str(service_deliveries[4].id)
 
     def test_filter_by_company_id(self):
         """Test filter by company id."""
@@ -147,7 +149,7 @@ class ServiceDeliveriesRepoTestCase(TestCase):
         )
         result = ServiceDeliveryDatabaseRepo().filter(company_id=str(company.pk))
         assert len(result) == 1
-        assert result[0]['attributes']['id'] == str(service_delivery.pk)
+        assert result[0]['id'] == str(service_delivery.pk)
 
     def test_filter_by_contact_id(self):
         """Test filter by contact id."""
@@ -164,7 +166,7 @@ class ServiceDeliveriesRepoTestCase(TestCase):
         )
         result = ServiceDeliveryDatabaseRepo().filter(contact_id=str(contact.pk))
         assert len(result) == 1
-        assert result[0]['attributes']['id'] == str(service_delivery.pk)
+        assert result[0]['id'] == str(service_delivery.pk)
 
     def test_filter_by_contact_and_company_ids(self):
         """Test filter by contact and company ids."""
@@ -186,4 +188,4 @@ class ServiceDeliveriesRepoTestCase(TestCase):
             company_id=str(company.pk)
         )
         assert len(result) == 1
-        assert result[0]['attributes']['id'] == str(service_delivery.pk)
+        assert result[0]['id'] == str(service_delivery.pk)
