@@ -1,4 +1,3 @@
-from collections import OrderedDict
 import functools
 
 from rest_framework import parsers
@@ -6,9 +5,9 @@ from rest_framework.renderers import BrowsableAPIRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.reverse import reverse
-from rest_framework_json_api import parsers as json_api_parsers
 
 from datahub.v2.renderers import JSONRenderer
+from datahub.v2.parsers import JSONParser
 from datahub.v2.repos import service_deliveries as service_deliveries_repos
 
 
@@ -18,9 +17,9 @@ class ServiceDeliveryListViewV2(APIView):
     repo_class = service_deliveries_repos.ServiceDeliveryDatabaseRepo
     param_keys = frozenset({'company_id', 'contact_id', 'offset', 'limit'})
     renderer_classes = (JSONRenderer, BrowsableAPIRenderer)
-    parser_classes = (json_api_parsers.JSONParser, parsers.FormParser, parsers.MultiPartParser)
+    parser_classes = (JSONParser, parsers.FormParser, parsers.MultiPartParser)
     VIEW_NAME = 'v2:servicedelivery-list'
-    DETAIL_VIEW_NAME = 'v2:servicedelivery-detail'
+    entity_name = "ServiceDelivery"
 
     def get(self, request):
         params = {k: v for (k, v) in request.query_params.items() if k in self.param_keys}
@@ -33,14 +32,13 @@ class ServiceDeliveryListViewV2(APIView):
     def post(self, request):
         data = dict(request.data)
         data.update({
-            'dit_advisor': OrderedDict([
-                ('type', 'Advisor'), ('id', str(request.user.pk))])})
+            'dit_advisor': {
+                'type': 'Advisor',
+                'id': str(request.user.pk)}})
         url_builder = functools.partial(
             reverse, viewname=self.VIEW_NAME, request=request)
         repo_config = {'url_builder': url_builder}
-        import ipdb; ipdb.set_trace()
         service_delivery = self.repo_class(config=repo_config).upsert(data)
-        import ipdb; ipdb.set_trace()
         return Response(service_delivery)
 
 
@@ -49,7 +47,9 @@ class ServiceDeliveryDetailViewV2(APIView):
 
     repo_class = service_deliveries_repos.ServiceDeliveryDatabaseRepo
     renderer_classes = (JSONRenderer, BrowsableAPIRenderer)
+    parser_classes = (JSONParser, parsers.FormParser, parsers.MultiPartParser)
     VIEW_NAME = 'v2:servicedelivery-detail'
+    entity_name = "ServiceDelivery"
 
     def get(self, request, object_id):
         url_builder = functools.partial(
