@@ -177,20 +177,19 @@ def update_model(model_class, model_attrs, object_id):
 def build_meta():
     """Metadata to be shown in the list view."""
     return {
-            'pagination': {
-                'count': None,
-                'limit': None,
-                'offset': None
-            }
+        'pagination': {
+            'count': None,
+            'limit': None,
+            'offset': None
+        }
     }
 
 
 def build_links():
     """Pagination links to be"""
-
     return {
-            'first': '',
-            'last': '',
-            'next': '',
-            'prev': ''
+        'first': '',
+        'last': '',
+        'next': '',
+        'prev': ''
     }
