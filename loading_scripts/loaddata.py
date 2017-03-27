@@ -1,13 +1,17 @@
 # pip install boto3
+# Run inside manage.py shell_plus
 
 import datetime
-import tempfile
-import json
 import io
+import json
 import re
-from collections import OrderedDict, namedtuple
+import tempfile
+from collections import namedtuple, OrderedDict
 
 import boto3
+
+from datahub.interaction.models import ServiceDelivery
+
 
 DATETIME_RE = re.compile('/Date\(([-+]?\d+)\)/')
 
@@ -22,10 +26,7 @@ b = s3.Bucket('cornelius.prod.uktrade.io')
 
 
 def cdms_datetime_to_datetime(value):
-    """
-    Parses a cdms datetime as string and returns the equivalent datetime value.
-    Dates in CDMS are always UTC.
-    """
+    """Parses a cdms datetime as string and returns the equivalent datetime value. Dates in CDMS are always UTC."""
     if isinstance(value, datetime.datetime):
         return value
     match = DATETIME_RE.match(value or '')
@@ -38,6 +39,7 @@ def cdms_datetime_to_datetime(value):
 
 
 def extract(bucket, prefix, spec):
+    """Extract data from bucket using given prefix and mapping spec."""
     row_mapping = namedtuple('row_mapping', spec.values())
 
     def get_by_path(srcdict, path):
@@ -54,7 +56,7 @@ def extract(bucket, prefix, spec):
 
     for key in keys:
         with tempfile.TemporaryFile() as f:
-            print('Processing: {}'.format(key))
+            print('Processing: {}'.format(key))  # noqa: T003
             bucket.download_fileobj(key, f)
             f.seek(0, 0)
             try:
@@ -68,6 +70,7 @@ def extract(bucket, prefix, spec):
             ))
 
     return ret
+
 
 spec_model = ServiceDelivery
 spec = OrderedDict([
@@ -114,7 +117,7 @@ i = 0
 for row in res:
     i += 1
     if i % 100 == 0:
-        print(i)
+        print(i)  # noqa: T003
 
     try:
         data = row._asdict()
@@ -130,4 +133,4 @@ for row in res:
             obj.save()
 
     except Exception as e:
-        print(e)
+        print(e)  # noqa: T003
