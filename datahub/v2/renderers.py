@@ -16,17 +16,31 @@ class JSONRenderer(renderers.JSONRenderer):
 
         data is a RepoResponse class instance.
         """
+        import ipdb; ipdb.set_trace()
         renderer_context = renderer_context or {}
-        repo_data = data
-        data = repo_data.data
-        render_data = {'data': data}
-        if isinstance(data, list):
-            render_data['meta'] = repo_data.metadata
-            render_data['links'] = repo_data.links
+        view = renderer_context.get('view')
+        if view_has_errors(view):
+            self.render_errors(data, accepted_media_type, renderer_context)
+
+        render_data = {'data': data.data}
+        if isinstance(data.data, list):
+            render_data['meta'] = data.metadata
+            render_data['links'] = data.links
 
         return super(JSONRenderer, self).render(
             render_data, accepted_media_type, renderer_context
         )
+
+
+def view_has_errors(view):
+    try:
+        code = str(view.response.status_code)
+    except (AttributeError, ValueError):
+        pass
+    else:
+        if code.startswith('4') or code.startswith('5'):
+            return True
+    return False
 
 
 def format_errors(data):

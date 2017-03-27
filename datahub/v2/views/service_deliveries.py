@@ -1,10 +1,12 @@
 from collections import OrderedDict
 import functools
 
+from rest_framework import parsers
 from rest_framework.renderers import BrowsableAPIRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.reverse import reverse
+from rest_framework_json_api import parsers as json_api_parsers
 
 from datahub.v2.renderers import JSONRenderer
 from datahub.v2.repos import service_deliveries as service_deliveries_repos
@@ -16,6 +18,7 @@ class ServiceDeliveryListViewV2(APIView):
     repo_class = service_deliveries_repos.ServiceDeliveryDatabaseRepo
     param_keys = frozenset({'company_id', 'contact_id', 'offset', 'limit'})
     renderer_classes = (JSONRenderer, BrowsableAPIRenderer)
+    parser_classes = (json_api_parsers.JSONParser, parsers.FormParser, parsers.MultiPartParser)
     VIEW_NAME = 'v2:servicedelivery-list'
     DETAIL_VIEW_NAME = 'v2:servicedelivery-detail'
 
@@ -35,7 +38,9 @@ class ServiceDeliveryListViewV2(APIView):
         url_builder = functools.partial(
             reverse, viewname=self.VIEW_NAME, request=request)
         repo_config = {'url_builder': url_builder}
+        import ipdb; ipdb.set_trace()
         service_delivery = self.repo_class(config=repo_config).upsert(data)
+        import ipdb; ipdb.set_trace()
         return Response(service_delivery)
 
 

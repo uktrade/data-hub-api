@@ -49,6 +49,56 @@ class ServiceDeliveryTestCase(LeelooTestCase):
         assert set(content['meta'].keys()) == {'pagination'}
         assert set(content['meta']['pagination'].keys()) == {'count', 'limit', 'offset'}
 
+    def test_add_service_delivery_incorrect_format(self):
+        """Test add new service delivery with incorrect format."""
+        service_offer = ServiceOfferFactory()
+        url = reverse('v2:servicedelivery-list')
+        data = {
+            'type': 'ServiceDelivery',
+            'attributes': {
+                'subject': 'whatever',
+                'date': now().isoformat(),
+                'notes': 'hello',
+            },
+            'relationships': {
+                'status': {
+                    'data': {
+                        'type': 'foobar',
+                        'id': constants.ServiceDeliveryStatus.offered.value.id
+                    }
+                },
+                'company': {
+                    'data': {
+                        'type': 'Company',
+                        'id': CompanyFactory().pk
+                    }
+                },
+                'contact': {
+                    'data': {
+                        'type': 'Contact',
+                        'id': ContactFactory().pk
+                    }
+                },
+                'service': {
+                    'data': {
+                        'type': 'Service',
+                        'id': service_offer.service.id
+                    }
+                },
+                'dit_team': {
+                    'data': {
+                        'type': 'Team',
+                        'id': service_offer.dit_team.id
+                    }
+                }
+            }
+        }
+        response = self.api_client.post(
+            url,
+            data=json.dumps({'data': data}),
+            content_type='application/vnd.api+json'
+        )
+
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_service_delivery(self, mocked_save_to_korben):
         """Test add new service delivery."""
