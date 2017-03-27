@@ -16,7 +16,6 @@ class JSONRenderer(renderers.JSONRenderer):
 
         data is a RepoResponse class instance.
         """
-        import ipdb; ipdb.set_trace()
         renderer_context = renderer_context or {}
         view = renderer_context.get('view')
         if view_has_errors(view):
