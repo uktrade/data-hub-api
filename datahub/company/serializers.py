@@ -120,6 +120,8 @@ class CompanySerializerRead(serializers.ModelSerializer):
 class CompanySerializerWrite(serializers.ModelSerializer):
     """Company serializer for writing operations."""
 
+    classification = serializers.PrimaryKeyRelatedField(read_only=True)
+
     class Meta:  # noqa: D101
         model = Company
         fields = '__all__'

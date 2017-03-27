@@ -137,6 +137,24 @@ class CompanyTestCase(LeelooTestCase):
                 data=expected_es_data,
             )
 
+    def test_classification_is_ro(self):
+        """Test that classification is fail-safe & read-only."""
+        company = CompanyFactory(
+            name='Foo ltd.',
+            registered_address_1='Hello st.',
+            registered_address_town='Fooland',
+            registered_address_country_id=constants.Country.united_states.value.id,
+            classification_id=constants.CompanyClassification.tier_a.value.id,
+        )
+
+        url = reverse('v1:company-detail', kwargs={'pk': company.pk})
+        self.api_client.patch(url, {
+            'classification': constants.CompanyClassification.tier_b.value.id,
+        })
+
+        company.refresh_from_db()
+        assert str(company.classification_id) == constants.CompanyClassification.tier_a.value.id
+
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_uk_company(self, mocked_save_to_korben):
         """Test add new UK company."""
