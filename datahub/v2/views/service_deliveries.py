@@ -17,11 +17,12 @@ class ServiceDeliveryListViewV2(APIView):
     param_keys = frozenset({'company_id', 'contact_id', 'offset', 'limit'})
     renderer_classes = (JSONRenderer, BrowsableAPIRenderer)
     VIEW_NAME = 'v2:servicedelivery-list'
+    DETAIL_VIEW_NAME = 'v2:servicedelivery-detail'
 
     def get(self, request):
         params = {k: v for (k, v) in request.query_params.items() if k in self.param_keys}
         url_builder = functools.partial(
-            reverse, viewname=self.VIEW_NAME, request=request)
+            reverse, viewname=self.DETAIL_VIEW_NAME, request=request)
         repo_config = {'url_builder': url_builder}
         service_deliveries = self.repo_class(config=repo_config).filter(**params)
         return Response(service_deliveries)
@@ -52,7 +53,7 @@ class ServiceDeliveryDetailViewV2(APIView):
         service_delivery = self.repo_class(config=repo_config).get(object_id=object_id)
         return Response(service_delivery)
 
-    def post(self, request, object_id):
+    def post(self, request):
         data = dict(request.data)
         url_builder = functools.partial(
             reverse, viewname=self.VIEW_NAME, request=request)

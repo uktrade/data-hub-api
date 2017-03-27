@@ -46,6 +46,8 @@ class ServiceDeliveryTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_200_OK
         assert set(content.keys()) == {'links', 'data', 'meta'}
         assert set(content['links'].keys()) == {'first', 'last', 'next', 'prev'}
+        assert set(content['meta'].keys()) == {'pagination'}
+        assert set(content['meta']['pagination'].keys()) == {'count', 'limit', 'offset'}
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_service_delivery(self, mocked_save_to_korben):
