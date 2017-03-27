@@ -28,6 +28,14 @@ mapping_attr_to_type = dict(_mapping)
 mapping_type_to_attr = dict((v, k) for (k, v) in _mapping)
 
 
+class RepoResponse:
+    """Encapsulate the repo response."""
+
+    def __init__(self, data, metadata=None):
+        self.data = data
+        self.metadata = metadata
+
+
 class ServiceDeliveryDatabaseRepo:
     """DB repo."""
 
@@ -119,13 +127,13 @@ def model_to_json_api(model_instance, schema_instance, url_builder):
                 relationship_instance = getattr(model_instance, subitem.name, None)
                 if relationship_instance:
                     relationships[subitem.name] = build_relationship(relationship_instance, subitem.name)
-    return {
+    return RepoResponse(data={
         'id': encoding.force_text(model_instance.pk),
         'type': model_instance.ENTITY_NAME,
         'attributes': attributes,
         'relationships': relationships,
         'links': links
-    }
+    })
 
 
 def build_self_link(model_instance, url_builder):

@@ -12,11 +12,14 @@ class JSONRenderer(renderers.JSONRenderer):
         )
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
-        """Produce the json to be rendered."""
+        """Produce the json to be rendered.
+
+        data is a RepoResponse class instance.
+        """
         renderer_context = renderer_context or {}
         request = renderer_context.get('request')
         view = renderer_context.get('view')
-        render_data = {'data': data}
+        render_data = {'data': data.data}
         if isinstance(data, list):
             render_data['meta'] = self.build_meta(
                 data_size=len(data)
