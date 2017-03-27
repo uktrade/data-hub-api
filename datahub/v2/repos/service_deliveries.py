@@ -36,7 +36,7 @@ class ServiceDeliveryDatabaseRepo:
         self.model_class = ServiceDelivery
         self.schema_class = ServiceDeliverySchema
         self.config = config or {}
-        self.request = self.config.get('request')
+        self.url_builder = config['url_builder']
 
     def validate(self, data):
         """Validate the data against the schema."""
@@ -45,7 +45,7 @@ class ServiceDeliveryDatabaseRepo:
     def get(self, object_id):
         """Get and return a single object by its id."""
         model_instance = self.model_class.objects.get(id=object_id)
-        return model_to_json_api(model_instance, self.schema_class(), request=self.request)
+        return model_to_json_api(model_instance, self.schema_class(), url_builder=self.url_builder)
 
     def filter(self, company_id=DEFAULT, contact_id=DEFAULT, offset=0, limit=100):
         """Filter objects."""
@@ -56,7 +56,7 @@ class ServiceDeliveryDatabaseRepo:
             filters['contact__pk'] = contact_id
         start, end = offset, offset + limit
         items = list(self.model_class.objects.filter(**filters).all()[start:end])
-        return [model_to_json_api(item, self.schema_class(), self.request) for item in items]
+        return [model_to_json_api(item, self.schema_class(), self.url_builder) for item in items]
 
     def upsert(self, data):
         """Insert or update an object."""
@@ -105,11 +105,11 @@ def build_attribute(model_instance, attribute):
     return value
 
 
-def model_to_json_api(model_instance, schema_instance, request):
+def model_to_json_api(model_instance, schema_instance, url_builder):
     """Convert the model instance to the JSON api format."""
     attributes = dict()
     relationships = dict()
-    links = {'self': build_self_link(model_instance, request)}
+    links = {'self': build_self_link(model_instance, url_builder)}
     for item in schema_instance:
         if item.name == 'attributes':
             for subitem in item:
@@ -128,10 +128,9 @@ def model_to_json_api(model_instance, schema_instance, request):
     }
 
 
-def build_self_link(model_instance, request):
-    viewname = model_instance.DETAIL_VIEW_NAME
+def build_self_link(model_instance, url_builder):
     object_id = encoding.force_text(model_instance.pk)
-    return reverse(viewname, kwargs={'object_id': object_id}, request=request)
+    return url_builder(kwargs={'object_id': object_id})
 
 
 def json_api_to_model(data, model_class):
