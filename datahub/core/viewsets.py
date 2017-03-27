@@ -101,35 +101,3 @@ class CoreViewSetV1(CoreViewSet):
             return self.read_serializer_class
         elif self.action in ('create', 'update', 'partial_update'):
             return self.write_serializer_class
-
-
-class CoreViewSetV2(ViewSet):
-    """JSON API V2 views."""
-
-    pagination_class = json_api_pagination.LimitOffsetPagination
-    parser_classes = (json_api_parsers.JSONParser, parsers.FormParser, parsers.MultiPartParser)
-    renderer_classes = (json_api_renderers.JSONRenderer, BrowsableAPIRenderer)
-    metadata_class = JSONAPIMetadata
-    repo_class = None
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        assert self.repo_class, 'A repo class needs to be defined.'
-
-    def list(self, request, *args, **kwargs):
-        pass
-
-    def retrieve(self, request, *args, **kwargs):
-        pass
-
-    def create(self, request, *args, **kwargs):
-        pass
-
-    def update(self, request, pk=None):
-        pass
-
-    def partial_update(self, request, pk=None):
-        pass
-
-    def destroy(self, request, pk=None):
-        pass
