@@ -148,9 +148,11 @@ class CompanyTestCase(LeelooTestCase):
         )
 
         url = reverse('v1:company-detail', kwargs={'pk': company.pk})
-        self.api_client.patch(url, {
+        response = self.api_client.patch(url, {
             'classification': constants.CompanyClassification.tier_b.value.id,
         })
+
+        assert response.status_code == 200  # testing that this should be silently ignored error
 
         company.refresh_from_db()
         assert str(company.classification_id) == constants.CompanyClassification.tier_a.value.id
