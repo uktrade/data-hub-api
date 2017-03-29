@@ -37,10 +37,6 @@ class InteractionAbstract(KorbenSaveModelMixin, BaseModel):
         """Admin displayed human readable name."""
         return self.subject
 
-    def get_datetime_fields(self):
-        """Return list of fields that should be mapped as datetime."""
-        return super().get_datetime_fields() + ['date']
-
     def clean(self):
         """Custom validation."""
         for field in self.FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS:
