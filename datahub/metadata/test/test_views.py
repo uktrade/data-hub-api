@@ -125,8 +125,9 @@ ordered_metadata_view_test_ids = (
                          ordered_metadata_view_params,
                          ids=ordered_metadata_view_test_ids)
 def test_ordered_metadata_order_view(view_name, expected_names, api_client):
-    """Test that turnover and no. of employee ranges are returned in order (determined by the 
-    order column).
+    """Test that turnover and no. of employee ranges are returned in order.
+
+    The response elements should be ordered according to the order column in the model.
     """
     url = reverse(viewname=view_name)
     response = api_client.get(url)
