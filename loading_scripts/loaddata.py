@@ -7,12 +7,14 @@ import json
 import re
 import tempfile
 from collections import namedtuple, OrderedDict
+from logging import getLogger
 
 import boto3
 
 from datahub.interaction.models import ServiceDelivery
 
 
+logger = getLogger(__name__)
 DATETIME_RE = re.compile('/Date\(([-+]?\d+)\)/')
 
 
@@ -22,20 +24,25 @@ s3 = boto3.resource(
     aws_access_key_id='foo',
     aws_secret_access_key='bar',
 )
-b = s3.Bucket('cornelius.prod.uktrade.io')
+s3_bucket = s3.Bucket('cornelius.prod.uktrade.io')
 
 
 def cdms_datetime_to_datetime(value):
     """Parses a cdms datetime as string and returns the equivalent datetime value. Dates in CDMS are always UTC."""
+    if not value:
+        return None
+
     if isinstance(value, datetime.datetime):
         return value
+
     match = DATETIME_RE.match(value or '')
     if match:
         parsed_val = int(match.group(1))
         parsed_val = datetime.datetime.utcfromtimestamp(parsed_val / 1000)
         return parsed_val.replace(tzinfo=datetime.timezone.utc)
     else:
-        return value
+        logger.warning('Unrecognized value for a datetime: {} returning `None` instead'.format(value))
+        return None
 
 
 def extract(bucket, prefix, spec):
@@ -62,6 +69,7 @@ def extract(bucket, prefix, spec):
             try:
                 results = json.load(io.TextIOWrapper(f))['d']['results']
             except KeyError:
+                logger.error('Failed to load result page: {}'.format(key))
                 results = []
 
         for row in results:
@@ -106,16 +114,14 @@ spec = OrderedDict([
 # ])
 
 res = extract(
-    b,
+    s3_bucket,
     'CACHE/XRMServices/2011/OrganizationData.svc/optevia_servicedeliverySet',
     # 'CACHE/XRMServices/2011/OrganizationData.svc/optevia_eventSet',
     # 'CACHE/XRMServices/2011/OrganizationData.svc/optevia_serviceofferSet',
     spec,
 )
 
-i = 0
-for row in res:
-    i += 1
+for i, row in enumerate(res):
     if i % 100 == 0:
         print(i)  # noqa: T003
 
@@ -133,4 +139,4 @@ for row in res:
             obj.save()
 
     except Exception as e:
-        print(e)  # noqa: T003
+        logger.exception('Exception during importing data')
