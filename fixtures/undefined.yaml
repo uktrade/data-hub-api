@@ -22,10 +22,10 @@
   fields: {name: Undefined}
 - model: metadata.employeerange
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
-  fields: {name: Undefined}
+  fields: {name: Undefined, order: .inf}
 - model: metadata.turnoverrange
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
-  fields: {name: Undefined}
+  fields: {name: Undefined, order: .inf}
 - model: metadata.ukregion
   pk: 0167b456-0ddd-49bd-8184-e3227a0b6396
   fields: {name: Undefined}
