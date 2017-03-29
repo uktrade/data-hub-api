@@ -25,11 +25,6 @@ class BaseModel(models.Model):
         self.created_on = self.created_on or current_time
         self.modified_on = current_time
 
-    def get_datetime_fields(self):
-        """Return list of fields that should be mapped as datetime."""
-        fields = super().get_datetime_fields()
-        return fields + ['created_on', 'modified_on']
-
 
 class ArchivableModel(models.Model):
     """Handle model archivation."""
@@ -57,11 +52,6 @@ class ArchivableModel(models.Model):
         self.archived_by = None
         self.archived_on = None
         self.save(skip_custom_validation=True)
-
-    def get_datetime_fields(self):
-        """Return list of fields that should be mapped as datetime."""
-        fields = super().get_datetime_fields()
-        return fields + ['archived_on']
 
 
 class BaseConstantModel(models.Model):

@@ -18,10 +18,6 @@ class KorbenSaveModelMixin:
         """Override this method to define which fields should not be send to Korben."""
         return []
 
-    def get_datetime_fields(self):
-        """Return list of fields that should be mapped as datetime."""
-        return []
-
     def convert_model_to_korben_format(self):
         """Override this method to have more granular control of what gets sent to Korben."""
         return model_to_dictionary(self, excluded_fields=self.get_excluded_fields(), expand_foreign_keys=False)
