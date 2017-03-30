@@ -95,3 +95,43 @@ def test_view_name_generation():
     """Test urls are generated correctly."""
     patterns = urls.urlpatterns
     assert set(pattern.name for pattern in patterns) == set(metadata_view_names)
+
+
+ordered_metadata_view_params = (
+    ('turnover', [
+        '£0 to £1.34M',
+        '£1.34 to £6.7M',
+        '£6.7 to £33.5M',
+        '£33.5M+',
+        'Undefined'
+    ]),
+    ('employee-range', [
+        '1 to 9',
+        '10 to 49',
+        '50 to 249',
+        '250 to 499',
+        '500+',
+        'Undefined'
+    ]),
+)
+
+ordered_metadata_view_test_ids = (
+    'turnover',
+    'employee-range',
+)
+
+
+@pytest.mark.parametrize('view_name,expected_names',
+                         ordered_metadata_view_params,
+                         ids=ordered_metadata_view_test_ids)
+def test_ordered_metadata_order_view(view_name, expected_names, api_client):
+    """Test that turnover and no. of employee ranges are returned in order.
+
+    The response elements should be ordered according to the order column in the model.
+    """
+    url = reverse(viewname=view_name)
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK
+    response_names = [value['name'] for value in response.json()]
+    assert response_names == expected_names

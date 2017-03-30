@@ -6,8 +6,6 @@ MODELS_TO_REGISTER = (
     models.BusinessType,
     models.InteractionType,
     models.Sector,
-    models.EmployeeRange,
-    models.TurnoverRange,
     models.UKRegion,
     models.Country,
     models.Title,
@@ -18,6 +16,11 @@ MODELS_TO_REGISTER = (
     models.Event
 )
 
+MODELS_TO_REGISTER_WITH_ORDER = (
+    models.EmployeeRange,
+    models.TurnoverRange
+)
+
 
 @admin.register(*MODELS_TO_REGISTER)
 class MetadataAdmin(admin.ModelAdmin):
@@ -25,5 +28,15 @@ class MetadataAdmin(admin.ModelAdmin):
 
     fields = ('name', 'selectable')
     list_display = ('name', 'selectable')
-    readonly_fields = ('id', )
+    readonly_fields = ('id',)
+    search_fields = ('name', 'pk')
+
+
+@admin.register(*MODELS_TO_REGISTER_WITH_ORDER)
+class OrderedMetadataAdmin(admin.ModelAdmin):
+    """Admin for ordered metadata models."""
+
+    fields = ('name', 'order', 'selectable')
+    list_display = ('name', 'order', 'selectable')
+    readonly_fields = ('id',)
     search_fields = ('name', 'pk')
