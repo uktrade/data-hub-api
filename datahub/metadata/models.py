@@ -1,4 +1,4 @@
-from datahub.core.models import BaseConstantModel
+from datahub.core.models import BaseConstantModel, BaseOrderedConstantModel
 
 
 class BusinessType(BaseConstantModel):
@@ -19,13 +19,13 @@ class Sector(BaseConstantModel):
     pass
 
 
-class EmployeeRange(BaseConstantModel):
+class EmployeeRange(BaseOrderedConstantModel):
     """Company employee range."""
 
     pass
 
 
-class TurnoverRange(BaseConstantModel):
+class TurnoverRange(BaseOrderedConstantModel):
     """Company turnover range."""
 
     pass
