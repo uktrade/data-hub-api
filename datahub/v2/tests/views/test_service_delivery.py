@@ -35,7 +35,7 @@ class ServiceDeliveryTestCase(LeelooTestCase):
     def test_service_delivery_list_view(self):
         """Service delivery liste view."""
         service_offer = ServiceOfferFactory()
-        service_deliveries = [
+        [
             ServiceDeliveryFactory(
                 service=service_offer.service,
                 dit_team=service_offer.dit_team)
@@ -98,6 +98,14 @@ class ServiceDeliveryTestCase(LeelooTestCase):
             data=json.dumps({'data': data}),
             content_type='application/vnd.api+json'
         )
+        content = json.loads(response.content.decode('utf-8'))
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        expected_content = {'errors': {
+            'status': 400,
+            'detail': 'type foobar should be ServiceDeliveryStatus',
+            'source': {'pointer': '/data/relationships/status'}
+        }}
+        assert content == expected_content
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_service_delivery(self, mocked_save_to_korben):

@@ -59,9 +59,7 @@ class JSONParser(parsers.JSONParser):
             return {}
 
     def parse(self, stream, media_type=None, parser_context=None):
-        """
-        Parses the incoming bytestream as JSON and returns the resulting data
-        """
+        """Parse the incoming bytestream as JSON and returns the resulting data."""
         result = super(JSONParser, self).parse(
             stream, media_type=media_type, parser_context=parser_context)
 

@@ -1,8 +1,10 @@
 import collections
 
+import colander
 from django.utils import encoding
 
 from datahub.interaction.models import ServiceDelivery
+from datahub.v2.exceptions import RepoDataValidation
 from datahub.v2.schemas.service_deliveries import ServiceDeliverySchema
 
 DEFAULT = object()
@@ -47,8 +49,13 @@ class ServiceDeliveryDatabaseRepo:
         self.url_builder = config['url_builder']
 
     def validate(self, data):
-        """Validate the data against the schema."""
-        self.schema_class().deserialize(data)
+        """Validate the data against the schema, raising DRF friendly validation errors."""
+        try:
+            self.schema_class().deserialize(data)
+        except colander.Invalid as e:
+            raise RepoDataValidation(
+                detail=e.asdict()
+            )
 
     def get(self, object_id):
         """Get and return a single object by its id."""

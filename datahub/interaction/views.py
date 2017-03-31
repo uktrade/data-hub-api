@@ -1,8 +1,5 @@
-from django_filters import CharFilter
-from django_filters.rest_framework import FilterSet
-
 from datahub.core.viewsets import CoreViewSetV1
-from datahub.interaction.models import Interaction, ServiceDelivery
+from datahub.interaction.models import Interaction
 from datahub.interaction.serializers import (
     InteractionSerializerRead,
     InteractionSerializerWrite,

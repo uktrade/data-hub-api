@@ -1,5 +1,6 @@
 import functools
 
+import colander
 from rest_framework import parsers
 from rest_framework.renderers import BrowsableAPIRenderer
 from rest_framework.response import Response
@@ -39,6 +40,7 @@ class ServiceDeliveryListViewV2(APIView):
             reverse, viewname=self.VIEW_NAME, request=request)
         repo_config = {'url_builder': url_builder}
         service_delivery = self.repo_class(config=repo_config).upsert(data)
+
         return Response(service_delivery)
 
 
@@ -64,4 +66,5 @@ class ServiceDeliveryDetailViewV2(APIView):
             reverse, viewname=self.VIEW_NAME, request=request)
         repo_config = {'url_builder': url_builder}
         service_delivery = self.repo_class(config=repo_config).upsert(data)
+
         return Response(service_delivery)
