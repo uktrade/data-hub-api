@@ -40,4 +40,4 @@ class DashboardTestCase(LeelooTestCase):
         resp_interaction = response.data['interactions'][0]
         assert resp_interaction['id'] == str(interaction.pk)
         assert isinstance(resp_interaction['company'], dict)
-        assert isinstance(resp_interaction['company']['name'], str)
+        assert resp_interaction['company']['name'] == interaction.company.name
