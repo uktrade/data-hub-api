@@ -37,4 +37,7 @@ class DashboardTestCase(LeelooTestCase):
         assert len(response.data['contacts']) == 1
         assert response.data['contacts'][0]['id'] == str(api_response.data['id'])
         assert len(response.data['interactions']) == 1
-        assert response.data['interactions'][0]['id'] == str(interaction.pk)
+        resp_interaction = response.data['interactions'][0]
+        assert resp_interaction['id'] == str(interaction.pk)
+        assert isinstance(resp_interaction['company'], dict)
+        assert resp_interaction['company']['name'] == interaction.company.name
