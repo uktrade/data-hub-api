@@ -47,9 +47,11 @@ class IsExactly:
     """Validator to check an exact value is passed."""
 
     def __init__(self, check_value):
+        """Take the check value."""
         self.check_value = check_value
 
     def __call__(self, node, value):
+        """Take the actual value to be checked."""
         if not value == self.check_value:
             raise Invalid(node, 'Value must be {value}'.format(value=self.check_value))
 

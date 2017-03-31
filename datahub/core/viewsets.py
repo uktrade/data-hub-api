@@ -2,15 +2,9 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from raven.contrib.django.raven_compat.models import client
 from rest_framework import mixins
-from rest_framework import parsers
 from rest_framework.exceptions import APIException
 from rest_framework.exceptions import ValidationError as DRFValidationError
-from rest_framework.renderers import BrowsableAPIRenderer
-from rest_framework.viewsets import GenericViewSet, ViewSet
-from rest_framework_json_api import pagination as json_api_pagination
-from rest_framework_json_api import parsers as json_api_parsers
-from rest_framework_json_api import renderers as json_api_renderers
-from rest_framework_json_api.metadata import JSONAPIMetadata
+from rest_framework.viewsets import GenericViewSet
 
 from datahub.company import tasks
 from datahub.korben.exceptions import KorbenException

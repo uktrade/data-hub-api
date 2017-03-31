@@ -33,6 +33,7 @@ class RepoResponse:
     """
 
     def __init__(self, data, metadata=None, links=None):
+        """Set data, metadata and links."""
         self.data = data
         self.metadata = metadata
         self.links = links
@@ -104,12 +105,12 @@ def model_to_json_api_data(model_instance, schema_instance, url_builder):
                 if relationship_instance:
                     relationships[subitem.name] = build_relationship(relationship_instance, subitem.name)
     return {
-            'id': encoding.force_text(model_instance.pk),
-            'type': model_instance.ENTITY_NAME,
-            'attributes': attributes,
-            'relationships': relationships,
-            'links': links
-        }
+        'id': encoding.force_text(model_instance.pk),
+        'type': model_instance.ENTITY_NAME,
+        'attributes': attributes,
+        'relationships': relationships,
+        'links': links
+    }
 
 
 def build_relationship(model_instance, attribute):
@@ -182,7 +183,10 @@ def update_model(model_class, model_attrs, object_id):
 
 
 def build_meta():
-    """Metadata to be shown in the list view."""
+    """Metadata to be shown in the list view.
+
+    Not in use yet.
+    """
     return {
         'pagination': {
             'count': None,
@@ -193,7 +197,7 @@ def build_meta():
 
 
 def build_links():
-    """Pagination links to be"""
+    """Pagination links to be populated in the future."""
     return {
         'first': '',
         'last': '',

@@ -2,11 +2,27 @@ from rest_framework import renderers
 
 
 class JSONRenderer(renderers.JSONRenderer):
+    """Take data and convert them in the right format.
+
+    Output format:
+    {
+            "data": {
+                "type": "identities",
+                "id": 1,
+                "attributes": {
+                    "first_name": "John",
+                    "last_name": "Coltrane"
+                }
+            }
+        }
+
+    """
 
     media_type = 'application/vnd.api+json'
     format = 'vnd.api+json'
 
     def render_errors(self, data, accepted_media_type=None, renderer_context=None):
+        """Handle the errors rendering."""
         return super(JSONRenderer, self).render(
             data, accepted_media_type, renderer_context
         )
@@ -33,7 +49,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
 
 def view_has_errors(view):
-    """Return True of"""
+    """Return True if view has errors."""
     try:
         code = str(view.response.status_code)
     except (AttributeError, ValueError):

@@ -1,3 +1,5 @@
+"""Json api parser."""
+
 from rest_framework import parsers
 from rest_framework.exceptions import ParseError
 from rest_framework_json_api.exceptions import Conflict
@@ -8,7 +10,7 @@ from .renderers import JSONRenderer
 
 class JSONParser(parsers.JSONParser):
     """
-    A JSON API client will send a payload that looks like this:
+    A JSON API client will send a payload that looks like this.
 
         {
             "data": {
@@ -23,11 +25,13 @@ class JSONParser(parsers.JSONParser):
 
     We extract the attributes so that DRF serializers can work as normal.
     """
+
     media_type = 'application/vnd.api+json'
     renderer_class = JSONRenderer
 
     @staticmethod
     def parse_attributes(data):
+        """Parse the attributes object."""
         if 'attributes' in data:
             return format_keys(data.get('attributes'), 'underscore')
         else:
@@ -35,6 +39,7 @@ class JSONParser(parsers.JSONParser):
 
     @staticmethod
     def parse_relationships(data):
+        """Parse the relationships object."""
         if 'relationships' in data:
             relationships = format_keys(data.get('relationships'), 'underscore')
         else:
@@ -52,6 +57,7 @@ class JSONParser(parsers.JSONParser):
 
     @staticmethod
     def parse_metadata(result):
+        """Parse the metadata."""
         metadata = result.get('meta')
         if metadata:
             return {'_meta': metadata}
@@ -74,8 +80,8 @@ class JSONParser(parsers.JSONParser):
         resource_name = parser_context['view'].entity_name
         if data.get('type') != resource_name and request.method in ('PUT', 'POST', 'PATCH'):
             raise Conflict(
-                "The resource object's type ({data_type}) is not the type "
-                "that constitute the collection represented by the endpoint ({resource_type}).".format(
+                'The resource object\'s type ({data_type}) is not the type '
+                'that constitute the collection represented by the endpoint ({resource_type}).'.format(
                     data_type=data.get('type'),
                     resource_type=resource_name
                 )
