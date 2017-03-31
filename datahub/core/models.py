@@ -25,11 +25,6 @@ class BaseModel(models.Model):
         self.created_on = self.created_on or current_time
         self.modified_on = current_time
 
-    def get_datetime_fields(self):
-        """Return list of fields that should be mapped as datetime."""
-        fields = super().get_datetime_fields()
-        return fields + ['created_on', 'modified_on']
-
 
 class ArchivableModel(models.Model):
     """Handle model archivation."""
@@ -58,11 +53,6 @@ class ArchivableModel(models.Model):
         self.archived_on = None
         self.save(skip_custom_validation=True)
 
-    def get_datetime_fields(self):
-        """Return list of fields that should be mapped as datetime."""
-        fields = super().get_datetime_fields()
-        return fields + ['archived_on']
-
 
 class BaseConstantModel(models.Model):
     """Constant tables for FKs."""
@@ -78,6 +68,17 @@ class BaseConstantModel(models.Model):
     def __str__(self):
         """Human readable admin name."""
         return self.name
+
+
+class BaseOrderedConstantModel(BaseConstantModel):
+    """Constants where values are manually ordered (by the order column) when displayed."""
+
+    # Uses a float to make reordering easier
+    order = models.FloatField(default=0.0)
+
+    class Meta:  # noqa: D101
+        abstract = True
+        ordering = ('order', )
 
 
 class TaskInfo(models.Model):
