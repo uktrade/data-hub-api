@@ -1,3 +1,5 @@
+import uuid
+
 from colander import Invalid, null, SchemaType
 
 
@@ -34,7 +36,8 @@ class RelationshipType(SchemaType):
         if cstruct['data']['type'] != self.typename:
             raise Invalid(node, 'type %s should be %s' % (
                 cstruct['data']['type'], self.typename))
-        return False
+        cstruct['data']['id'] = uuid.UUID(cstruct['data']['id'])
+        return cstruct
 
 
 class IsExactly:

@@ -7,6 +7,7 @@ import uuid
 import colander
 import pytest
 
+from datahub.core.test_utils import get_test_user
 from datahub.v2.schemas.service_deliveries import ServiceDeliverySchema
 from datahub.v2.schemas.utils import RelationshipType
 
@@ -72,55 +73,55 @@ def test_service_deliveries_schema_invalid():
             'status': {
                 'data': {
                     'type': 'Status',
-                    'id': 'constants.ServiceDeliveryStatus.offered.value.id'
+                    'id': str(uuid.uuid4()),
                 }
             },
             'company': {
                 'data': {
                     'type': 'Company',
-                    'id': 'CompanyFactory().pk'
+                    'id': str(uuid.uuid4()),
                 }
             },
             'contact': {
                 'data': {
                     'type': 'Contact',
-                    'id': 'ContactFactory().pk'
+                    'id': str(uuid.uuid4()),
                 }
             },
             'service': {
                 'data': {
                     'type': 'Service',
-                    'id': 'service_offer.service.id'
+                    'id': str(uuid.uuid4()),
                 }
             },
             'dit_team': {
                 'data': {
                     'type': 'Team',
-                    'id': 'service_offer.dit_team.id'
+                    'id': str(uuid.uuid4()),
                 }
             },
             'uk_region': {
                 'data': {
                     'type': 'UKRegion',
-                    'id': 'dsdasdsadsa'
+                    'id': str(uuid.uuid4()),
                 }
             },
             'sector': {
                 'data': {
                     'type': 'Sector',
-                    'id': 'dsdasdsadsa'
+                    'id': str(uuid.uuid4()),
                 }
             },
             'country_of_interest': {
                 'data': {
                     'type': 'flibble',
-                    'id': 'dsdasdsadsa'
+                    'id': str(uuid.uuid4()),
                 }
             },
             'event': {
                 'data': {
                     'type': 'event',
-                    'id': 'dsdasdsadsa'
+                    'id': str(uuid.uuid4()),
                 }
             },
         }
@@ -129,18 +130,20 @@ def test_service_deliveries_schema_invalid():
     expected = {
         'id': 'Invalid UUID string',
         'type': 'Value must be ServiceDelivery',
+        'relationships.dit_advisor': 'Required',
         'relationships.country_of_interest': 'type flibble should be Country',
         'relationships.event': 'type event should be Event',
         'relationships.status': 'type Status should be ServiceDeliveryStatus'}
 
     with pytest.raises(colander.Invalid) as e:
         ServiceDeliverySchema().deserialize(data)
-
     assert e.value.asdict() == expected
 
 
+@pytest.mark.django_db
 def test_service_deliveries_valid_schema():
     """SD schema test."""
+    user = get_test_user()
     data = {
         'type': 'ServiceDelivery',
         'id': str(uuid.uuid4()),
@@ -153,33 +156,39 @@ def test_service_deliveries_valid_schema():
             'status': {
                 'data': {
                     'type': 'ServiceDeliveryStatus',
-                    'id': 'constants.ServiceDeliveryStatus.offered.value.id'
+                    'id': str(uuid.uuid4()),
                 }
             },
             'company': {
                 'data': {
                     'type': 'Company',
-                    'id': 'CompanyFactory().pk'
+                    'id': str(uuid.uuid4()),
                 }
             },
             'contact': {
                 'data': {
                     'type': 'Contact',
-                    'id': 'ContactFactory().pk'
+                    'id': str(uuid.uuid4()),
                 }
             },
             'service': {
                 'data': {
                     'type': 'Service',
-                    'id': 'service_offer.service.id'
+                    'id': str(uuid.uuid4()),
                 }
             },
             'dit_team': {
                 'data': {
                     'type': 'Team',
-                    'id': 'service_offer.dit_team.id'
+                    'id': str(uuid.uuid4()),
                 }
             },
+            'dit_advisor': {
+                'data': {
+                    'type': 'Advisor',
+                    'id': str(user.pk)
+                }
+            }
         }
     }
 

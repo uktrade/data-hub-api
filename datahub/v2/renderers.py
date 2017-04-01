@@ -34,6 +34,7 @@ class JSONRenderer(renderers.JSONRenderer):
         """
         renderer_context = renderer_context or {}
         view = renderer_context.get('view')
+        response = renderer_context.get('response')
         if view_has_errors(view):
             data = {'errors': format_errors(data, view.response.status_code)}
             return self.render_errors(data, accepted_media_type, renderer_context)
@@ -42,7 +43,8 @@ class JSONRenderer(renderers.JSONRenderer):
         if isinstance(data.data, list):
             render_data['meta'] = data.metadata
             render_data['links'] = data.links
-
+        if data.status:  # 201
+            response.status_code = data.status
         return super(JSONRenderer, self).render(
             render_data, accepted_media_type, renderer_context
         )
@@ -70,15 +72,7 @@ def format_errors(data, status_code):
         'relationships.event': 'type event should be Event',
     }
 
-    If one error, return:
-    {
-        'status': 400,
-        'detail': 'type foobar should be ServiceDeliveryStatus',
-        'source': {'pointer': '/data/relationships/status'}
-    }
-
-
-    else:
+    return a list with errors in the following format:
 
     [{
         'status': 400,
@@ -100,6 +94,4 @@ def format_errors(data, status_code):
         error['source'] = {'pointer': key}
         error['status'] = status_code
         errors.append(error)
-    if len(errors) > 1:
-        return errors
-    return errors[0]
+    return errors

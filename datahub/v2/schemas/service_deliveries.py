@@ -1,7 +1,5 @@
 """Schemas."""
 
-import uuid
-
 import colander
 
 from .utils import IsExactly, RelationshipType
@@ -31,6 +29,7 @@ class ServiceDeliveryRelationships(colander.MappingSchema):
     contact = colander.SchemaNode(RelationshipType(typename='Contact'))
     service = colander.SchemaNode(RelationshipType(typename='Service'))
     dit_team = colander.SchemaNode(RelationshipType(typename='Team'))
+    dit_advisor = colander.SchemaNode(RelationshipType(typename='Advisor'))
     sector = colander.SchemaNode(
         RelationshipType(typename='Sector'),
         missing=colander.null
@@ -59,7 +58,7 @@ class ServiceDeliverySchema(colander.Schema):
     id = colander.SchemaNode(
         colander.String(),
         validator=colander.uuid,
-        missing=uuid.uuid4
+        missing=colander.null
     )
     attributes = ServiceDeliveryAttributes()
     relationships = ServiceDeliveryRelationships()

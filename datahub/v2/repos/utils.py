@@ -12,11 +12,12 @@ class RepoResponse:
     Data can be either a dictionary (detail view) or a list
     """
 
-    def __init__(self, data, metadata=None, links=None):
+    def __init__(self, data, metadata=None, links=None, status=None):
         """Set data, metadata and links."""
         self.data = data
         self.metadata = metadata
         self.links = links
+        self.status = status
 
 
 def attributes_to_types(mapping):
@@ -83,7 +84,7 @@ def build_attribute(model_instance, attribute):
     """Build attributes object from model."""
     value = getattr(model_instance, attribute, None)
     if value:
-        value = encoding.force_text(value)
+        return encoding.force_text(value)
     return value
 
 
@@ -105,12 +106,13 @@ def dict_update_nested(dictionary, update):
     return dictionary
 
 
-def build_repo_response(data):
+def build_repo_response(data, status=None):
     """Enriched repo response, containing data, metadata and links."""
     return RepoResponse(
         data=data,
         metadata=build_meta(),
-        links=build_links()
+        links=build_links(),
+        status=status
     )
 
 
@@ -168,3 +170,13 @@ def build_links():
 def extract_id_for_relationship_from_data(data, relationship_name):
     """Give JSON api formatted data and a relationship name return the ID."""
     return data.get('relationships', {}).get(relationship_name, {}).get('data', {}).get('id')
+
+
+def remove_null(data):
+    """Remove fields from deserialized data with colander.null."""
+    cleaned_data = {
+        'attributes': {k: v for k, v in data['attributes'].items() if v},
+        'relationships': {k: v for k, v in data['relationships'].items() if v}
+    }
+    data.update(cleaned_data)
+    return data

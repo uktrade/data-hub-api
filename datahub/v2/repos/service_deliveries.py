@@ -1,5 +1,5 @@
 import colander
-from django.utils import encoding
+from rest_framework import status
 
 from datahub.interaction.models import ServiceDelivery, ServiceOffer
 from datahub.v2.exceptions import RepoDataValidation
@@ -18,10 +18,14 @@ class ServiceDeliveryDatabaseRepo:
         self.config = config
         self.url_builder = config['url_builder']
 
-    def validate(self, data):
-        """Validate the data against the schema, raising DRF friendly validation errors."""
+    def get_validated_data(self, data):
+        """Validate the data against the schema, raising DRF friendly validation errors.
+
+        Return the deserialized data.
+        """
         try:
-            self.schema_class().deserialize(data)
+            data = self.schema_class().deserialize(data)
+            return utils.remove_null(data)
         except colander.Invalid as e:
             raise RepoDataValidation(
                 detail=e.asdict()
@@ -56,9 +60,12 @@ class ServiceDeliveryDatabaseRepo:
                 self.schema_class,
                 url_builder=self.url_builder
             )
-        self.validate(data)
+        data = self.get_validated_data(data)
         data = self.inject_service_offer(data)
-        return utils.json_api_to_model(data, self.model_class)
+        entity = utils.json_api_to_model(data, self.model_class)
+        data = utils.model_to_json_api_data(entity, self.schema_class(), self.url_builder)
+        status_code = status.HTTP_200_OK if model_id else status.HTTP_201_CREATED
+        return utils.build_repo_response(data=data, status=status_code)
 
     def inject_service_offer(self, data):
         """Add the service offer, looking one up by team, service and event."""
@@ -100,6 +107,6 @@ class ServiceDeliveryDatabaseRepo:
             service_offer = ServiceOffer.objects.filter(**query).first()
             if not service_offer:
                 return None
-            return encoding.force_text(service_offer.pk)
+            return service_offer.pk
         except ServiceOffer.DoesNotExist:
             return None

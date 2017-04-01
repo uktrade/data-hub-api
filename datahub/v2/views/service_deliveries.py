@@ -1,5 +1,6 @@
 import functools
 
+from django.utils import encoding
 from rest_framework import parsers
 from rest_framework.renderers import BrowsableAPIRenderer
 from rest_framework.response import Response
@@ -32,17 +33,25 @@ class ServiceDeliveryListViewV2(APIView):
 
     def post(self, request):
         """Handle the POST."""
-        data = dict(request.data)
-        data.update({
-            'dit_advisor': {
-                'type': 'Advisor',
-                'id': str(request.user.pk)}})
+        data = self.inject_advisor(request)
         url_builder = functools.partial(
             reverse, viewname=self.detail_view_name, request=request)
         repo_config = {'url_builder': url_builder}
         service_delivery = self.repo_class(config=repo_config).upsert(data)
-
         return Response(service_delivery)
+
+    @staticmethod
+    def inject_advisor(request):
+        """Add the advisor id to the data."""
+        data = dict(request.data)
+        data['relationships'].update({
+            'dit_advisor': {
+                'data': {
+                    'type': 'Advisor',
+                    'id': encoding.force_text(request.user.pk)}
+            }
+        })
+        return data
 
 
 class ServiceDeliveryDetailViewV2(APIView):
@@ -60,22 +69,4 @@ class ServiceDeliveryDetailViewV2(APIView):
             reverse, viewname=self.detail_view_name, request=request)
         repo_config = {'url_builder': url_builder}
         service_delivery = self.repo_class(config=repo_config).get(object_id=object_id)
-        return Response(service_delivery)
-
-    def post(self, request):
-        """Handle the POST."""
-        return self.upsert(request)
-
-    def patch(self, request, object_id):
-        """Handle the PATCH."""
-        return self.upsert(request)
-
-    def upsert(self, request):
-        """Perform upsert POST and PATCH."""
-        data = dict(request.data)
-        url_builder = functools.partial(
-            reverse, viewname=self.detail_view_name, request=request)
-        repo_config = {'url_builder': url_builder}
-        service_delivery = self.repo_class(config=repo_config).upsert(data)
-
         return Response(service_delivery)

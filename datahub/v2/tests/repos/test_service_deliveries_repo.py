@@ -5,10 +5,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from django.utils import encoding
 from django.utils.timezone import now
+from freezegun import freeze_time
 
 from datahub.core import constants
 from datahub.core.test_utils import get_test_user
-from datahub.interaction.models import ServiceDelivery
 from datahub.interaction.test import factories
 from datahub.v2.repos.service_deliveries import ServiceDeliveryDatabaseRepo
 from datahub.v2.repos.utils import RepoResponse
@@ -43,10 +43,13 @@ class ServiceDeliveriesRepoTestCase(TestCase):
         with pytest.raises(ObjectDoesNotExist):
             ServiceDeliveryDatabaseRepo(config=DUMMY_CONFIG).get(uuid.uuid4())
 
+    @freeze_time('2017-04-01 20:49:40.566277+00:00')
     def test_insert(self):
         """Test add service delivery."""
         service_offer = factories.ServiceOfferFactory()
         user = get_test_user()
+        company = factories.CompanyFactory()
+        contact = factories.ContactFactory()
         data = {
             'type': 'ServiceDelivery',
             'attributes': {
@@ -64,40 +67,58 @@ class ServiceDeliveriesRepoTestCase(TestCase):
                 'company': {
                     'data': {
                         'type': 'Company',
-                        'id': factories.CompanyFactory().pk
+                        'id': str(company.pk)
                     }
                 },
                 'contact': {
                     'data': {
                         'type': 'Contact',
-                        'id': factories.ContactFactory().pk
+                        'id': str(contact.pk)
                     }
                 },
                 'service': {
                     'data': {
                         'type': 'Service',
-                        'id': service_offer.service.pk
+                        'id': str(service_offer.service.pk)
                     }
                 },
                 'dit_team': {
                     'data': {
                         'type': 'Team',
-                        'id': service_offer.dit_team.pk
+                        'id': str(service_offer.dit_team.pk)
                     }
                 },
                 'dit_advisor': {
                     'data': {
                         'type': 'Advisor',
-                        'id': user.pk
+                        'id': str(user.pk)
                     }
                 },
             }
         }
         result = ServiceDeliveryDatabaseRepo(config=DUMMY_CONFIG).upsert(data=data)
-        assert isinstance(result, ServiceDelivery)
-        assert result.dit_advisor.pk == user.pk
-        assert result.service_id == service_offer.service.pk
-        assert result.dit_team_id == service_offer.dit_team.pk
+        data = result.data
+        assert isinstance(result, RepoResponse)
+        expected_attributes = {
+            'date': '2017-04-01 20:49:40.566277+00:00',
+            'subject': 'whatever',
+            'feedback': '',
+            'notes': 'hello'
+        }
+        assert data['attributes'] == expected_attributes
+        assert data['type'] == 'ServiceDelivery'
+        expected_relationships = {
+            'dit_advisor': {'data': {'type': 'Advisor', 'id': str(user.pk)}},
+            'status': {'data': {
+                'type': 'ServiceDeliveryStatus', 'id': constants.ServiceDeliveryStatus.offered.value.id}
+            },
+            'contact': {'data': {'type': 'Contact', 'id': str(contact.pk)}},
+            'dit_team': {'data': {'type': 'Team', 'id': str(service_offer.dit_team.pk)}},
+            'service': {'data': {'type': 'Service', 'id': str(service_offer.service.pk)}},
+            'company': {'data': {'type': 'Company', 'id': str(company.pk)}},
+            'service_offer': {'data': {'type': 'ServiceOffer', 'id': str(service_offer.pk)}}
+        }
+        assert data['relationships'] == expected_relationships
 
     def test_update(self):
         """Test update existing service delivery."""
@@ -124,9 +145,10 @@ class ServiceDeliveriesRepoTestCase(TestCase):
             }
         }
         result = ServiceDeliveryDatabaseRepo(config=DUMMY_CONFIG).upsert(data=data)
-        assert isinstance(result, ServiceDelivery)
-        assert result.subject == 'whatever'
-        assert result.contact_id == contact.pk
+        data = result.data
+        assert isinstance(result, RepoResponse)
+        assert data['attributes']['subject'] == 'whatever'
+        assert data['relationships']['contact']['data']['id'] == str(contact.pk)
 
     def test_filter_with_pagination(self):
         """Test filter with pagination."""
