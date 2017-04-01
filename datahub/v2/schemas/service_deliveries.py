@@ -4,7 +4,7 @@ import uuid
 
 import colander
 
-from .utils import RelationshipType, IsExactly
+from .utils import IsExactly, RelationshipType
 
 
 class ServiceDeliveryAttributes(colander.MappingSchema):
@@ -63,5 +63,3 @@ class ServiceDeliverySchema(colander.Schema):
     )
     attributes = ServiceDeliveryAttributes()
     relationships = ServiceDeliveryRelationships()
-
-

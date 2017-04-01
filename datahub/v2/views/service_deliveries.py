@@ -51,7 +51,7 @@ class ServiceDeliveryDetailViewV2(APIView):
     repo_class = service_deliveries_repos.ServiceDeliveryDatabaseRepo
     renderer_classes = (JSONRenderer, BrowsableAPIRenderer)
     parser_classes = (JSONParser, parsers.FormParser, parsers.MultiPartParser)
-    detail_view_name= 'v2:servicedelivery-detail'
+    detail_view_name = 'v2:servicedelivery-detail'
     entity_name = 'ServiceDelivery'
 
     def get(self, request, object_id):

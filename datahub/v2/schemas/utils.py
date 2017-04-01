@@ -1,4 +1,4 @@
-from colander import SchemaType, null, Invalid
+from colander import Invalid, null, SchemaType
 
 
 class RelationshipType(SchemaType):
