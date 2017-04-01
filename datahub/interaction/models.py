@@ -101,9 +101,9 @@ class ServiceDelivery(InteractionAbstract):
         ('sector', 'Sector'),
         ('service', 'Service'),
         ('status', 'ServiceDeliveryStatus'),
-        ('uk_region', 'UKRegion')
+        ('uk_region', 'UKRegion'),
+        ('service_offer', 'ServiceOffer')
     }
-
 
     status = models.ForeignKey('metadata.ServiceDeliveryStatus')
     service_offer = models.ForeignKey(ServiceOffer, null=True, blank=True)
@@ -115,22 +115,6 @@ class ServiceDelivery(InteractionAbstract):
 
     def clean(self):
         """Custom validation."""
-        if not self.service_offer_id:
-            try:
-                query = dict(
-                    dit_team=self.dit_team,
-                    service=self.service,
-                    event=self.event
-                )
-                service_offer = ServiceOffer.objects.filter(**query).first()
-                if not service_offer:
-                    raise ServiceOffer.DoesNotExist()
-
-                self.service_offer = service_offer
-            except ServiceOffer.DoesNotExist:
-                raise ValidationError(message={
-                    'service': ['This combination of service and service provider does not exist.'],
-                })
-        else:
+        if self.service_offer and not self.event:
             self.event = self.service_offer.event
         super().clean()

@@ -163,3 +163,8 @@ def build_links():
         'next': '',
         'prev': ''
     }
+
+
+def extract_id_for_relationship_from_data(data, relationship_name):
+    """Give JSON api formatted data and a relationship name return the ID."""
+    return data.get('relationships', {}).get(relationship_name, {}).get('data', {}).get('id')

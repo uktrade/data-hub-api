@@ -1,6 +1,7 @@
 import colander
+from django.utils import encoding
 
-from datahub.interaction.models import ServiceDelivery
+from datahub.interaction.models import ServiceDelivery, ServiceOffer
 from datahub.v2.exceptions import RepoDataValidation
 from datahub.v2.schemas.service_deliveries import ServiceDeliverySchema
 
@@ -56,4 +57,49 @@ class ServiceDeliveryDatabaseRepo:
                 url_builder=self.url_builder
             )
         self.validate(data)
+        data = self.inject_service_offer(data)
         return utils.json_api_to_model(data, self.model_class)
+
+    def inject_service_offer(self, data):
+        """Add the service offer, looking one up by team, service and event."""
+        dit_team_id = utils.extract_id_for_relationship_from_data(data, 'dit_team')
+        service_id = utils.extract_id_for_relationship_from_data(data, 'service')
+        event_id = utils.extract_id_for_relationship_from_data(data, 'event')
+        service_offer_id = self.get_service_offer_id(
+            dit_team_id=dit_team_id,
+            service_id=service_id,
+            event_id=event_id
+        )
+        if not service_offer_id:
+            raise RepoDataValidation(
+                detail={'relationships.service': 'This combination of service and service provider does not exist.'}
+            )
+        else:
+            data['relationships'].update({
+                'service_offer': {
+                    'data': {
+                        'type': 'ServiceOffer',
+                        'id': service_offer_id
+                    },
+                }
+            })
+            return data
+
+    @staticmethod
+    def get_service_offer_id(dit_team_id, service_id, event_id):
+        """Check that the combination of dit_team, service and event results into a valid service offer.
+
+        If True if returns the service offer id, if not it returns None.
+        """
+        try:
+            query = dict(
+                dit_team_id=dit_team_id,
+                service_id=service_id,
+                event_id=event_id
+            )
+            service_offer = ServiceOffer.objects.filter(**query).first()
+            if not service_offer:
+                return None
+            return encoding.force_text(service_offer.pk)
+        except ServiceOffer.DoesNotExist:
+            return None

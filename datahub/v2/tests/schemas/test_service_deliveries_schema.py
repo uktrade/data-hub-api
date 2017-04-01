@@ -7,7 +7,8 @@ import uuid
 import colander
 import pytest
 
-from datahub.v2.schemas.service_deliveries import RelationshipType, ServiceDeliverySchema
+from datahub.v2.schemas.service_deliveries import ServiceDeliverySchema
+from datahub.v2.schemas.utils import RelationshipType
 
 
 class TestRelationshipType(unittest.TestCase):

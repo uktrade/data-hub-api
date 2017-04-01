@@ -90,7 +90,7 @@ class ServiceDeliveriesRepoTestCase(TestCase):
                         'type': 'Advisor',
                         'id': user.pk
                     }
-                }
+                },
             }
         }
         result = ServiceDeliveryDatabaseRepo(config=DUMMY_CONFIG).upsert(data=data)
