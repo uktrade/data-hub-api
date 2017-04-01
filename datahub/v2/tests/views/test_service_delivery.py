@@ -14,8 +14,8 @@ from datahub.interaction.models import ServiceDelivery
 from datahub.interaction.test.factories import ServiceDeliveryFactory, ServiceOfferFactory
 
 
-class ServiceDeliveryTestCase(LeelooTestCase):
-    """Service Delivery test case."""
+class ServiceDeliveryViewTestCase(LeelooTestCase):
+    """Service Delivery view test case."""
 
     def test_service_delivery_detail_view(self):
         """Service Delivery detail view."""
@@ -274,7 +274,6 @@ class ServiceDeliveryTestCase(LeelooTestCase):
         response = self.api_client.get(url, data={'company': company.pk})
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_200_OK
-        assert content['meta']['pagination']['count'] == 2
         assert {element['id'] for element in content['data']} == {str(servicedelivery.pk), str(servicedelivery2.pk)}
 
     def test_filter_service_deliveries_by_contact(self):
@@ -299,7 +298,6 @@ class ServiceDeliveryTestCase(LeelooTestCase):
         response = self.api_client.get(url, data={'contact': contact.pk})
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_200_OK
-        assert content['meta']['pagination']['count'] == 2
         assert {element['id'] for element in content['data']} == {str(servicedelivery.pk), str(servicedelivery2.pk)}
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')

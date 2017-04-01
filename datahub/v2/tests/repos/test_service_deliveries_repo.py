@@ -11,8 +11,12 @@ from datahub.core.test_utils import get_test_user
 from datahub.interaction.models import ServiceDelivery
 from datahub.interaction.test import factories
 from datahub.v2.repos.service_deliveries import ServiceDeliveryDatabaseRepo
+from datahub.v2.repos.utils import RepoResponse
 
 pytestmark = pytest.mark.django_db
+
+
+DUMMY_CONFIG = config = {'url_builder': lambda kwargs: None}
 
 
 class ServiceDeliveriesRepoTestCase(TestCase):
@@ -25,17 +29,19 @@ class ServiceDeliveriesRepoTestCase(TestCase):
             service=service_offer.service,
             dit_team=service_offer.dit_team
         )
-        result = ServiceDeliveryDatabaseRepo().get(service_delivery.pk)
-        assert result['relationships']
-        assert result['relationships']['company']['data']['type'] == 'Company'
-        assert result['attributes']['date'] == encoding.force_text(service_delivery.date)
-        assert result['type'] == 'ServiceDelivery'
-        assert result['id'] == str(service_delivery.pk)
+        result = ServiceDeliveryDatabaseRepo(config=DUMMY_CONFIG).get(service_delivery.pk)
+        data = result.data
+        assert isinstance(result, RepoResponse)
+        assert data['relationships']
+        assert data['relationships']['company']['data']['type'] == 'Company'
+        assert data['attributes']['date'] == encoding.force_text(service_delivery.date)
+        assert data['type'] == 'ServiceDelivery'
+        assert data['id'] == str(service_delivery.pk)
 
     def test_get_does_not_exist(self):
         """Test SD does not exist."""
         with pytest.raises(ObjectDoesNotExist):
-            ServiceDeliveryDatabaseRepo().get(uuid.uuid4())
+            ServiceDeliveryDatabaseRepo(config=DUMMY_CONFIG).get(uuid.uuid4())
 
     def test_insert(self):
         """Test add service delivery."""
@@ -87,7 +93,7 @@ class ServiceDeliveriesRepoTestCase(TestCase):
                 }
             }
         }
-        result = ServiceDeliveryDatabaseRepo().upsert(data=data)
+        result = ServiceDeliveryDatabaseRepo(config=DUMMY_CONFIG).upsert(data=data)
         assert isinstance(result, ServiceDelivery)
         assert result.dit_advisor.pk == user.pk
         assert result.service_id == service_offer.service.pk
@@ -117,7 +123,7 @@ class ServiceDeliveriesRepoTestCase(TestCase):
                 }
             }
         }
-        result = ServiceDeliveryDatabaseRepo().upsert(data=data)
+        result = ServiceDeliveryDatabaseRepo(config=DUMMY_CONFIG).upsert(data=data)
         assert isinstance(result, ServiceDelivery)
         assert result.subject == 'whatever'
         assert result.contact_id == contact.pk
@@ -130,9 +136,11 @@ class ServiceDeliveriesRepoTestCase(TestCase):
                 service=service_offer.service,
                 dit_team=service_offer.dit_team)
             for i in range(6)]
-        result = ServiceDeliveryDatabaseRepo().filter(offset=2, limit=3)
-        assert result[0]['id'] == str(service_deliveries[2].id)
-        assert result[2]['id'] == str(service_deliveries[4].id)
+        result = ServiceDeliveryDatabaseRepo(config=DUMMY_CONFIG).filter(offset=2, limit=3)
+        data = result.data
+        assert isinstance(result, RepoResponse)
+        assert data[0]['id'] == str(service_deliveries[2].id)
+        assert data[2]['id'] == str(service_deliveries[4].id)
 
     def test_filter_by_company_id(self):
         """Test filter by company id."""
@@ -147,9 +155,11 @@ class ServiceDeliveriesRepoTestCase(TestCase):
             dit_team=service_offer.dit_team,
             company=company
         )
-        result = ServiceDeliveryDatabaseRepo().filter(company_id=str(company.pk))
-        assert len(result) == 1
-        assert result[0]['id'] == str(service_delivery.pk)
+        result = ServiceDeliveryDatabaseRepo(config=DUMMY_CONFIG).filter(company_id=str(company.pk))
+        data = result.data
+        assert isinstance(result, RepoResponse)
+        assert len(data) == 1
+        assert data[0]['id'] == str(service_delivery.pk)
 
     def test_filter_by_contact_id(self):
         """Test filter by contact id."""
@@ -164,9 +174,11 @@ class ServiceDeliveriesRepoTestCase(TestCase):
             dit_team=service_offer.dit_team,
             contact=contact
         )
-        result = ServiceDeliveryDatabaseRepo().filter(contact_id=str(contact.pk))
-        assert len(result) == 1
-        assert result[0]['id'] == str(service_delivery.pk)
+        result = ServiceDeliveryDatabaseRepo(config=DUMMY_CONFIG).filter(contact_id=str(contact.pk))
+        data = result.data
+        assert isinstance(result, RepoResponse)
+        assert len(data) == 1
+        assert data[0]['id'] == str(service_delivery.pk)
 
     def test_filter_by_contact_and_company_ids(self):
         """Test filter by contact and company ids."""
@@ -183,9 +195,11 @@ class ServiceDeliveriesRepoTestCase(TestCase):
             contact=contact,
             company=company
         )
-        result = ServiceDeliveryDatabaseRepo().filter(
+        result = ServiceDeliveryDatabaseRepo(config=DUMMY_CONFIG).filter(
             contact_id=str(contact.pk),
             company_id=str(company.pk)
         )
-        assert len(result) == 1
-        assert result[0]['id'] == str(service_delivery.pk)
+        data = result.data
+        assert isinstance(result, RepoResponse)
+        assert len(data) == 1
+        assert data[0]['id'] == str(service_delivery.pk)

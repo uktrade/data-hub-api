@@ -126,11 +126,11 @@ def test_service_deliveries_schema_invalid():
     }
 
     expected = {
-        'attributes.id': 'Invalid UUID string',
+        'id': 'Invalid UUID string',
         'type': 'Value must be ServiceDelivery',
         'relationships.country_of_interest': 'type flibble should be Country',
         'relationships.event': 'type event should be Event',
-        'relationships.status': 'type ServiceDeliveryStatus should be ServiceDeliveryStatus'}
+        'relationships.status': 'type Status should be ServiceDeliveryStatus'}
 
     with pytest.raises(colander.Invalid) as e:
         ServiceDeliverySchema().deserialize(data)

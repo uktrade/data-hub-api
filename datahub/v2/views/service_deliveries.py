@@ -18,13 +18,14 @@ class ServiceDeliveryListViewV2(APIView):
     param_keys = frozenset({'company_id', 'contact_id', 'offset', 'limit'})
     renderer_classes = (JSONRenderer, BrowsableAPIRenderer)
     parser_classes = (JSONParser, parsers.FormParser, parsers.MultiPartParser)
-    VIEW_NAME = 'v2:servicedelivery-list'
+    detail_view_name = 'v2:servicedelivery-detail'
+    entity_name = 'ServiceDelivery'
 
     def get(self, request):
         """Handle the GET."""
         params = {k: v for (k, v) in request.query_params.items() if k in self.param_keys}
         url_builder = functools.partial(
-            reverse, viewname=self.DETAIL_VIEW_NAME, request=request)
+            reverse, viewname=self.detail_view_name, request=request)
         repo_config = {'url_builder': url_builder}
         service_deliveries = self.repo_class(config=repo_config).filter(**params)
         return Response(service_deliveries)
@@ -37,7 +38,7 @@ class ServiceDeliveryListViewV2(APIView):
                 'type': 'Advisor',
                 'id': str(request.user.pk)}})
         url_builder = functools.partial(
-            reverse, viewname=self.VIEW_NAME, request=request)
+            reverse, viewname=self.detail_view_name, request=request)
         repo_config = {'url_builder': url_builder}
         service_delivery = self.repo_class(config=repo_config).upsert(data)
 
@@ -50,12 +51,13 @@ class ServiceDeliveryDetailViewV2(APIView):
     repo_class = service_deliveries_repos.ServiceDeliveryDatabaseRepo
     renderer_classes = (JSONRenderer, BrowsableAPIRenderer)
     parser_classes = (JSONParser, parsers.FormParser, parsers.MultiPartParser)
-    VIEW_NAME = 'v2:servicedelivery-detail'
+    detail_view_name= 'v2:servicedelivery-detail'
+    entity_name = 'ServiceDelivery'
 
     def get(self, request, object_id):
         """Handle the GET."""
         url_builder = functools.partial(
-            reverse, viewname=self.VIEW_NAME, request=request)
+            reverse, viewname=self.detail_view_name, request=request)
         repo_config = {'url_builder': url_builder}
         service_delivery = self.repo_class(config=repo_config).get(object_id=object_id)
         return Response(service_delivery)
@@ -64,7 +66,7 @@ class ServiceDeliveryDetailViewV2(APIView):
         """Handle the POST."""
         return self.upsert(request)
 
-    def patch(self, request):
+    def patch(self, request, object_id):
         """Handle the PATCH."""
         return self.upsert(request)
 
@@ -72,7 +74,7 @@ class ServiceDeliveryDetailViewV2(APIView):
         """Perform upsert POST and PATCH."""
         data = dict(request.data)
         url_builder = functools.partial(
-            reverse, viewname=self.VIEW_NAME, request=request)
+            reverse, viewname=self.detail_view_name, request=request)
         repo_config = {'url_builder': url_builder}
         service_delivery = self.repo_class(config=repo_config).upsert(data)
 

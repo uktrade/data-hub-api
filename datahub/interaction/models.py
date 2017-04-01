@@ -92,6 +92,18 @@ class ServiceDelivery(InteractionAbstract):
         'event'
     )
     ENTITY_NAME = 'ServiceDelivery'
+    API_MAPPING = {
+        ('company', 'Company'),
+        ('contact', 'Contact'),
+        ('country', 'Country'),
+        ('dit_advisor', 'Advisor'),
+        ('dit_team', 'Team'),
+        ('sector', 'Sector'),
+        ('service', 'Service'),
+        ('status', 'ServiceDeliveryStatus'),
+        ('uk_region', 'UKRegion')
+    }
+
 
     status = models.ForeignKey('metadata.ServiceDeliveryStatus')
     service_offer = models.ForeignKey(ServiceOffer, null=True, blank=True)
