@@ -33,10 +33,9 @@ def extract(bucket, entity_name, spec):
 
         return value
 
-    keys = utils.get_cdms_entity_s3_keys(bucket, entity_name)
     ret = set()
 
-    for row in utils.iterate_over_cdms_entities_from_s3(bucket, *keys):
+    for row in utils.iterate_over_cdms_entities_from_s3(bucket, entity_name):
         ret.add(row_mapping(
             *(get_by_path(row, field) for field in spec.keys())
         ))

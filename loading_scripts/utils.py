@@ -36,9 +36,9 @@ def load_json_from_s3_bucket(bucket, key):  # noqa
         return json.load(io.TextIOWrapper(f))
 
 
-def iterate_over_cdms_entities_from_s3(bucket, *keys):
+def iterate_over_cdms_entities_from_s3(bucket, entity_name):
     """Combine all entities from multiple cdms dump pages into single stream of JSON objects."""
-    for key in keys:
+    for key in get_cdms_entity_s3_keys(bucket, entity_name):
         print('Processing: {}'.format(key))  # noqa: T003
         json_data = load_json_from_s3_bucket(bucket, key)
         try:
