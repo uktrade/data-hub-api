@@ -10,41 +10,41 @@ pytestmark = pytest.mark.django_db
 
 def test_company_model_sets_classification_to_undefined():
     """Test setting classification to undef by default."""
-    c = CompanyFactory()  # Calls save
-    assert c.classification_id == constants.CompanyClassification.undefined.value.id
+    company = CompanyFactory()  # Calls save
+    assert company.classification_id == constants.CompanyClassification.undefined.value.id
 
 
 def test_company_can_have_one_list_owner_assigned():
     """Test that company can have one list owner assigned."""
-    c = CompanyFactory()
-    a = AdvisorFactory()
+    company = CompanyFactory()
+    advisor = AdvisorFactory()
 
-    assert c.one_list_account_owner is None  # Test that it's nullable
+    assert company.one_list_account_owner is None  # Test that it's nullable
 
-    c.one_list_account_owner = a
-    c.save()
+    company.one_list_account_owner = advisor
+    company.save()
 
     # re-fetch object for completeness
-    c2 = Company.objects.get(pk=str(c.pk))
+    company_refetch = Company.objects.get(pk=str(company.pk))
 
-    assert str(c2.one_list_account_owner_id) == str(a.pk)
+    assert str(company_refetch.one_list_account_owner_id) == str(advisor.pk)
 
 
 def test_company_can_have_hierarchy():
     """Test that company can have hierarchy."""
-    c1 = CompanyFactory()
-    c2 = CompanyFactory()
+    first_company = CompanyFactory()
+    second_company = CompanyFactory()
 
-    assert c1.parent is None
-    assert c1.subsidiaries.count() == 0
-    assert c2.parent is None
-    assert c2.subsidiaries.count() == 0
+    assert first_company.parent is None
+    assert first_company.subsidiaries.count() == 0
+    assert second_company.parent is None
+    assert second_company.subsidiaries.count() == 0
 
-    c2.parent = c1
-    c2.save()
+    second_company.parent = first_company
+    second_company.save()
 
-    c1.refresh_from_db()
-    c2.refresh_from_db()
+    first_company.refresh_from_db()
+    second_company.refresh_from_db()
 
-    assert c2.parent is c1
-    assert c2 in c1.subsidiaries.all()
+    assert second_company.parent is first_company
+    assert second_company in first_company.subsidiaries.all()
