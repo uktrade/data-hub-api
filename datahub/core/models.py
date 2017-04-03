@@ -70,6 +70,17 @@ class BaseConstantModel(models.Model):
         return self.name
 
 
+class BaseOrderedConstantModel(BaseConstantModel):
+    """Constants where values are manually ordered (by the order column) when displayed."""
+
+    # Uses a float to make reordering easier
+    order = models.FloatField(default=0.0)
+
+    class Meta:  # noqa: D101
+        abstract = True
+        ordering = ('order', )
+
+
 class TaskInfo(models.Model):
     """Holds information about the tasks."""
 

@@ -770,37 +770,34 @@
 
 # Employee range
 - model: metadata.employeerange
-  pk: 3cafd8d0-5d95-e211-a939-e4115bead28a
-  fields: {name: 22-23}
-- model: metadata.employeerange
   pk: 3dafd8d0-5d95-e211-a939-e4115bead28a
-  fields: {name: 1 to 9}
+  fields: {name: 1 to 9, order: 100.0}
 - model: metadata.employeerange
   pk: 3eafd8d0-5d95-e211-a939-e4115bead28a
-  fields: {name: 10 to 49}
+  fields: {name: 10 to 49, order: 200.0}
 - model: metadata.employeerange
   pk: 3fafd8d0-5d95-e211-a939-e4115bead28a
-  fields: {name: 50 to 249}
+  fields: {name: 50 to 249, order: 300.0}
 - model: metadata.employeerange
   pk: 40afd8d0-5d95-e211-a939-e4115bead28a
-  fields: {name: 250 to 499}
+  fields: {name: 250 to 499, order: 400.0}
 - model: metadata.employeerange
   pk: 41afd8d0-5d95-e211-a939-e4115bead28a
-  fields: {name: 500+}
+  fields: {name: 500+, order: 500.0}
 
-# Turn over range
+# Turnover range
 - model: metadata.turnoverrange
   pk: 774cd12a-6095-e211-a939-e4115bead28a
-  fields: {name: "\xA30 to \xA31.34M"}
+  fields: {name: "\xA30 to \xA31.34M", order: 100.0}
 - model: metadata.turnoverrange
   pk: 784cd12a-6095-e211-a939-e4115bead28a
-  fields: {name: "\xA31.34 to \xA36.7M"}
+  fields: {name: "\xA31.34 to \xA36.7M", order: 200.0}
 - model: metadata.turnoverrange
   pk: 794cd12a-6095-e211-a939-e4115bead28a
-  fields: {name: "\xA36.7 to \xA333.5M"}
+  fields: {name: "\xA36.7 to \xA333.5M", order: 300.0}
 - model: metadata.turnoverrange
   pk: 7a4cd12a-6095-e211-a939-e4115bead28a
-  fields: {name: "\xA333.5M+"}
+  fields: {name: "\xA333.5M+", order: 400.0}
 
 # UK region
 - model: metadata.ukregion
