@@ -1,13 +1,11 @@
 import logging
 
 from celery import shared_task
-from celery.signals import before_task_publish
 from dateutil import parser
 from django.utils.timezone import is_aware, make_naive
 from raven.contrib.django.raven_compat.models import client, settings
 
 from datahub.core.utils import log_and_ignore_exceptions
-from datahub.es.connector import ESConnector
 from datahub.korben.connector import KorbenConnector
 
 
@@ -63,37 +61,3 @@ def save_to_korben(self, data, user_id, db_table, update):
             countdown=int(self.request.retries * self.request.retries),
             max_retries=settings.TASK_MAX_RETRIES,
         )
-
-
-@shared_task(bind=True, ignore_result=True)
-def save_to_es(self, doc_type, data):
-    """Perform save to ES."""
-    try:
-        esc = ESConnector()
-        esc.save(doc_type=doc_type, data=data)
-    except Exception as e:
-        with log_and_ignore_exceptions():
-            client.captureException()
-
-        raise self.retry(
-            exc=e,
-            countdown=int(self.request.retries * self.request.retries),
-            max_retries=settings.TASK_MAX_RETRIES,
-        )
-
-
-@before_task_publish.connect(sender='datahub.company.tasks.save_to_korben')
-def create_task_info(sender=None, headers=None, body=None, **kwargs):
-    """Create TaskInfo meta object for rerun and audit trail."""
-    from datahub.core.models import TaskInfo
-
-    _, task_kwargs, _ = body
-
-    task_info = TaskInfo(
-        task_id=headers['id'],
-        changes=task_kwargs['data'],
-        user_id=task_kwargs['user_id'],
-        db_table=task_kwargs['db_table'],
-        update=task_kwargs['update'],
-    )
-    task_info.save()

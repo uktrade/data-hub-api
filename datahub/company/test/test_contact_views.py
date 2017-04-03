@@ -12,7 +12,6 @@ from rest_framework.test import APIClient
 from datahub.company.models import Contact
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
-from datahub.core.utils import model_to_dictionary
 from datahub.korben.utils import generate_signature
 from .factories import CompanyFactory, ContactFactory
 
@@ -32,36 +31,29 @@ class ContactTestCase(LeelooTestCase):
     def test_add_contact_address_same_as_company(self, mocked_save_to_korben):
         """Test add new contact."""
         url = reverse('v1:contact-list')
-        with mock.patch('datahub.core.viewsets.tasks.save_to_es') as es_save:
-            response = self.api_client.post(url, {
-                'first_name': 'Oratio',
-                'last_name': 'Nelson',
-                'title': constants.Title.admiral_of_the_fleet.value.id,
-                'company': CompanyFactory().pk,
-                'job_title': constants.Role.owner.value.name,
-                'email': 'foo@bar.com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
-                'address_same_as_company': True,
-                'primary': True
-            })
+        response = self.api_client.post(url, {
+            'first_name': 'Oratio',
+            'last_name': 'Nelson',
+            'title': constants.Title.admiral_of_the_fleet.value.id,
+            'company': CompanyFactory().pk,
+            'job_title': constants.Role.owner.value.name,
+            'email': 'foo@bar.com',
+            'telephone_countrycode': '+44',
+            'telephone_number': '123456789',
+            'address_same_as_company': True,
+            'primary': True
+        })
 
-            assert response.status_code == status.HTTP_201_CREATED
-            # make sure we're spawning a task to save to Korben
-            contact = Contact.objects.get(pk=response.data['id'])
-            expected_data = contact.convert_model_to_korben_format()
-            mocked_save_to_korben.delay.assert_called_once_with(
-                db_table='company_contact',
-                data=expected_data,
-                update=False,
-                user_id=self.user.id
-            )
-            # make sure we're writing to ES
-            expected_es_data = model_to_dictionary(contact)
-            es_save.delay.assert_called_with(
-                doc_type='company_contact',
-                data=expected_es_data,
-            )
+        assert response.status_code == status.HTTP_201_CREATED
+        # make sure we're spawning a task to save to Korben
+        contact = Contact.objects.get(pk=response.data['id'])
+        expected_data = contact.convert_model_to_korben_format()
+        mocked_save_to_korben.delay.assert_called_once_with(
+            db_table='company_contact',
+            data=expected_data,
+            update=False,
+            user_id=self.user.id
+        )
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     def test_add_contact_no_address(self, mocked_save_to_korben):
@@ -114,38 +106,31 @@ class ContactTestCase(LeelooTestCase):
     def test_add_contact_manual_address(self, mocked_save_to_korben):
         """Test add new contact manual address."""
         url = reverse('v1:contact-list')
-        with mock.patch('datahub.core.viewsets.tasks.save_to_es') as es_save:
-            response = self.api_client.post(url, {
-                'first_name': 'Oratio',
-                'last_name': 'Nelson',
-                'title': constants.Title.admiral_of_the_fleet.value.id,
-                'company': CompanyFactory().pk,
-                'job_title': constants.Role.owner.value.name,
-                'email': 'foo@bar.com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
-                'address_1': 'Foo st.',
-                'address_town': 'London',
-                'address_country': constants.Country.united_kingdom.value.id,
-                'primary': True
-            })
+        response = self.api_client.post(url, {
+            'first_name': 'Oratio',
+            'last_name': 'Nelson',
+            'title': constants.Title.admiral_of_the_fleet.value.id,
+            'company': CompanyFactory().pk,
+            'job_title': constants.Role.owner.value.name,
+            'email': 'foo@bar.com',
+            'telephone_countrycode': '+44',
+            'telephone_number': '123456789',
+            'address_1': 'Foo st.',
+            'address_town': 'London',
+            'address_country': constants.Country.united_kingdom.value.id,
+            'primary': True
+        })
 
-            assert response.status_code == status.HTTP_201_CREATED
-            # make sure we're spawning a task to save to Korben
-            contact = Contact.objects.get(pk=response.data['id'])
-            expected_data = contact.convert_model_to_korben_format()
-            mocked_save_to_korben.delay.assert_called_once_with(
-                db_table='company_contact',
-                data=expected_data,
-                update=False,
-                user_id=self.user.id
-            )
-            # make sure we're writing to ES
-            expected_es_data = model_to_dictionary(contact)
-            es_save.delay.assert_called_with(
-                doc_type='company_contact',
-                data=expected_es_data,
-            )
+        assert response.status_code == status.HTTP_201_CREATED
+        # make sure we're spawning a task to save to Korben
+        contact = Contact.objects.get(pk=response.data['id'])
+        expected_data = contact.convert_model_to_korben_format()
+        mocked_save_to_korben.delay.assert_called_once_with(
+            db_table='company_contact',
+            data=expected_data,
+            update=False,
+            user_id=self.user.id
+        )
 
     @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
     @freeze_time('2017-01-27 12:00:01')
@@ -153,67 +138,41 @@ class ContactTestCase(LeelooTestCase):
         """Modify an existing contact."""
         contact = ContactFactory(first_name='Foo')
         url = reverse('v1:contact-detail', kwargs={'pk': contact.pk})
-        with mock.patch('datahub.core.viewsets.tasks.save_to_es') as es_save:
-            response = self.api_client.patch(url, {
-                'first_name': 'bar',
-            })
+        response = self.api_client.patch(url, {
+            'first_name': 'bar',
+        })
 
-            assert response.status_code == status.HTTP_200_OK, response.data
-            assert response.data['first_name'] == 'bar'
-            # make sure we're spawning a task to save to Korben
-            expected_korben_data = contact.convert_model_to_korben_format()
-            expected_korben_data['first_name'] = 'bar'
-            mocked_save_to_korben.delay.assert_called_once_with(
-                db_table='company_contact',
-                data=expected_korben_data,
-                update=True,  # this is an update!
-                user_id=self.user.id
-            )
-            # make sure we're writing to ES
-            expected_es_data = model_to_dictionary(contact)
-            expected_es_data['first_name'] = 'bar'
-            es_save.delay.assert_called_once_with(
-                doc_type='company_contact',
-                data=expected_es_data,
-            )
+        assert response.status_code == status.HTTP_200_OK, response.data
+        assert response.data['first_name'] == 'bar'
+        # make sure we're spawning a task to save to Korben
+        expected_korben_data = contact.convert_model_to_korben_format()
+        expected_korben_data['first_name'] = 'bar'
+        mocked_save_to_korben.delay.assert_called_once_with(
+            db_table='company_contact',
+            data=expected_korben_data,
+            update=True,  # this is an update!
+            user_id=self.user.id
+        )
 
     def test_archive_contact_no_reason(self):
         """Test archive contact without providing a reason."""
         contact = ContactFactory()
         url = reverse('v1:contact-archive', kwargs={'pk': contact.pk})
-        with mock.patch('datahub.core.viewsets.tasks.save_to_es') as es_save:
-            response = self.api_client.post(url)
+        response = self.api_client.post(url)
 
-            assert response.data['archived']
-            assert response.data['archived_reason'] == ''
-            assert response.data['id'] == contact.pk
-
-            # make sure we're writing to ES
-            contact.refresh_from_db()
-            expected_es_data = model_to_dictionary(contact)
-            es_save.delay.assert_called_once_with(
-                doc_type='company_contact',
-                data=expected_es_data,
-            )
+        assert response.data['archived']
+        assert response.data['archived_reason'] == ''
+        assert response.data['id'] == contact.pk
 
     def test_archive_contact_reason(self):
         """Test archive contact providing a reason."""
         contact = ContactFactory()
         url = reverse('v1:contact-archive', kwargs={'pk': contact.pk})
-        with mock.patch('datahub.core.viewsets.tasks.save_to_es') as es_save:
-            response = self.api_client.post(url, {'reason': 'foo'})
+        response = self.api_client.post(url, {'reason': 'foo'})
 
-            assert response.data['archived']
-            assert response.data['archived_reason'] == 'foo'
-            assert response.data['id'] == contact.pk
-
-            # make sure we're writing to ES
-            contact.refresh_from_db()
-            expected_es_data = model_to_dictionary(contact)
-            es_save.delay.assert_called_once_with(
-                doc_type='company_contact',
-                data=expected_es_data,
-            )
+        assert response.data['archived']
+        assert response.data['archived_reason'] == 'foo'
+        assert response.data['id'] == contact.pk
 
     def test_unarchive_contact(self):
         """Test unarchive contact."""

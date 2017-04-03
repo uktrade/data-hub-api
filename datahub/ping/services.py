@@ -34,4 +34,4 @@ class CheckKorben:
             return False, response.content if response else 'Unknown error'
 
 
-services_to_check = (CheckDatabase, CheckElasticsearch, CheckKorben)
+services_to_check = (CheckDatabase, CheckKorben)

@@ -60,12 +60,10 @@ services:
     depends_on:
       - korben
       - postgres
-      - es
       - redis
     links:
       - korben
       - postgres
-      - es
       - redis
 
   korben:
