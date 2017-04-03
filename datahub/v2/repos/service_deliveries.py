@@ -2,7 +2,7 @@ import colander
 from rest_framework import status
 
 from datahub.interaction.models import ServiceDelivery, ServiceOffer
-from datahub.v2.exceptions import RepoDataValidation
+from datahub.v2.exceptions import RepoDataValidationError
 from datahub.v2.schemas.service_deliveries import ServiceDeliverySchema
 
 from . import utils
@@ -11,10 +11,14 @@ from . import utils
 class ServiceDeliveryDatabaseRepo:
     """DB repo."""
 
-    def __init__(self, config=None):
-        """Initialise the repo using the config."""
-        self.model_class = ServiceDelivery
-        self.schema_class = ServiceDeliverySchema
+    model_class = ServiceDelivery
+    schema_class = ServiceDeliverySchema
+
+    def __init__(self, config):
+        """Initialise the repo using the config.
+
+        config is a dictionary containing the url_builder function.
+        """
         self.config = config
         self.url_builder = config['url_builder']
 
@@ -27,7 +31,7 @@ class ServiceDeliveryDatabaseRepo:
             data = self.schema_class().deserialize(data)
             return utils.remove_null(data)
         except colander.Invalid as e:
-            raise RepoDataValidation(
+            raise RepoDataValidationError(
                 detail=e.asdict()
             )
 
@@ -45,7 +49,8 @@ class ServiceDeliveryDatabaseRepo:
         if contact_id != utils.DEFAULT:
             filters['contact__pk'] = contact_id
         start, end = offset, offset + limit
-        entities = list(self.model_class.objects.filter(**filters).all()[start:end])
+        queryset = self.model_class.objects.filter(**filters)
+        entities = list(queryset[start:end])
         data = [utils.model_to_json_api_data(entity, self.schema_class(), self.url_builder) for entity in entities]
         return utils.build_repo_response(data=data)
 
@@ -78,7 +83,7 @@ class ServiceDeliveryDatabaseRepo:
             event_id=event_id
         )
         if not service_offer_id:
-            raise RepoDataValidation(
+            raise RepoDataValidationError(
                 detail={'relationships.service': 'This combination of service and service provider does not exist.'}
             )
         else:

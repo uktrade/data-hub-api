@@ -1,7 +1,7 @@
 from rest_framework.exceptions import ValidationError
 
 
-class RepoDataValidation(ValidationError):
+class RepoDataValidationError(ValidationError):
     """Validation errors coming from the schema class."""
 
     pass

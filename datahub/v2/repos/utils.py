@@ -1,5 +1,6 @@
 import collections
 
+import colander
 from django.utils import encoding
 
 
@@ -175,8 +176,8 @@ def extract_id_for_relationship_from_data(data, relationship_name):
 def remove_null(data):
     """Remove fields from deserialized data with colander.null."""
     cleaned_data = {
-        'attributes': {k: v for k, v in data['attributes'].items() if v},
-        'relationships': {k: v for k, v in data['relationships'].items() if v}
+        'attributes': {k: v for k, v in data['attributes'].items() if v is not colander.null},
+        'relationships': {k: v for k, v in data['relationships'].items() if v is not colander.null}
     }
     data.update(cleaned_data)
     return data
