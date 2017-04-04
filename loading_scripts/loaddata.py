@@ -1,6 +1,7 @@
 # pip install boto3
 # Run inside manage.py shell_plus
 
+import os
 from collections import namedtuple, OrderedDict
 from logging import getLogger
 
@@ -16,10 +17,10 @@ logger = getLogger(__name__)
 s3 = boto3.resource(
     's3',
     region_name='eu-west-2',
-    aws_access_key_id='foo',
-    aws_secret_access_key='bar',
+    aws_access_key_id=os.environ['CDMS_DUMP_S3_KEY_ID'],
+    aws_secret_access_key=os.environ['CDMS_DUMP_S3_KEY'],
 )
-s3_bucket = s3.Bucket('cornelius.dev.uktrade.io')
+s3_bucket = s3.Bucket(os.environ['CDMS_DUMP_S3_BUCKET'])
 
 
 def extract(bucket, entity_name, spec):
