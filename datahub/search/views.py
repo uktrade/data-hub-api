@@ -5,11 +5,14 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from datahub.company import models
+
 
 class Search(APIView):
     """This endpoint handles the search."""
 
     http_method_names = ('post', )
+    type_model_mapping = {'company': models.Company, 'contact': models.Contact}
 
     def post(self, request, format=None):
         """Search is a POST."""
