@@ -49,7 +49,6 @@ THIRD_PARTY_APPS = (
 LOCAL_APPS = (
     'datahub.core',
     'datahub.company',
-    'datahub.es',
     'datahub.interaction',
     'datahub.metadata',
     'datahub.search',
@@ -161,9 +160,6 @@ REST_FRAMEWORK = {
 APPEND_SLASH = True
 
 # Leeloo stuff
-ES_HOST = env('ES_HOST')
-ES_PORT = env.int('ES_PORT')
-ES_INDEX = env('ES_INDEX')
 KORBEN_HOST = env('KORBEN_HOST')
 KORBEN_PORT = env('KORBEN_PORT')
 DATAHUB_SECRET = env('DATAHUB_SECRET')

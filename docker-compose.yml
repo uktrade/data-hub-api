@@ -7,13 +7,10 @@ services:
     volumes:
       - .:/app
     entrypoint: |
-        dockerize -wait tcp://redis:6379 -wait tcp://postgres:5432 -wait http://es:9200 -timeout 60s
+        dockerize -wait tcp://redis:6379 -wait tcp://postgres:5432 -timeout 60s
     environment:
       SECRET_KEY: foobar
       DATABASE_URL: postgresql://postgres@postgres/datahub
-      ES_INDEX: test
-      ES_HOST: es
-      ES_PORT: 9200
       KORBEN_HOST: korben
       KORBEN_PORT: 8080
       DATAHUB_SECRET: secret
@@ -32,13 +29,11 @@ services:
     depends_on:
       - korben
       - postgres
-      - es
       - redis
       - leeloo-celery-worker
     links:
       - korben
       - postgres
-      - es
       - redis
     command: /app/start.sh
 
@@ -49,13 +44,11 @@ services:
     depends_on:
       - korben
       - postgres
-      - es
       - redis
       - leeloo-flower
     links:
       - korben
       - postgres
-      - es
       - redis
 
   leeloo-flower:
@@ -67,12 +60,10 @@ services:
     depends_on:
       - korben
       - postgres
-      - es
       - redis
     links:
       - korben
       - postgres
-      - es
       - redis
 
   korben:
@@ -86,12 +77,6 @@ services:
     restart: always
     environment:
       - POSTGRES_DB=datahub
-
-  es:
-    image: elasticsearch:2.3
-    restart: always
-    ports:
-      - "9200:9200"
 
   redis:
     image: redis:3.2
