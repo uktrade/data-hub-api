@@ -101,7 +101,7 @@ def test_invalid_cdms_credentials(korben_auth_mock, settings, live_server):
 
 
 @pytest.mark.liveserver
-@mock.patch('datahub.korben.connector.requests')
+@mock.patch('datahub.core.auth.CDMSUserBackend.requests')
 def test_cdms_returns_500(mocked_requests, live_server):
     """Test login when CDMS is not available."""
     mocked_requests.post.return_value = mock.Mock(ok=False)
