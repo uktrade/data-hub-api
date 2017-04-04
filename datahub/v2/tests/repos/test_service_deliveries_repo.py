@@ -32,7 +32,16 @@ class ServiceDeliveriesRepoTestCase(TestCase):
         result = ServiceDeliveryDatabaseRepo(config=DUMMY_CONFIG).get(service_delivery.pk)
         data = result.data
         assert isinstance(result, RepoResponse)
-        assert data['relationships']
+        expected_relationships = {
+            'contact': {'data': {'id': str(service_delivery.contact.pk), 'type': 'Contact'}},
+            'status': {'data': {'id': str(service_delivery.status.pk), 'type': 'ServiceDeliveryStatus'}},
+            'company': {'data': {'id': str(service_delivery.company.pk), 'type': 'Company'}},
+            'service': {'data': {'id': str(service_delivery.service.pk), 'type': 'Service'}},
+            'dit_team': {'data': {'id': str(service_delivery.dit_team.pk), 'type': 'Team'}},
+            'uk_region': {'data': {'id': str(service_delivery.uk_region.pk), 'type': 'UKRegion'}},
+            'dit_advisor': {'data': {'id': str(service_delivery.dit_advisor.pk), 'type': 'Advisor'}}
+        }
+        assert data['relationships'] == expected_relationships
         assert data['relationships']['company']['data']['type'] == 'Company'
         assert data['attributes']['date'] == encoding.force_text(service_delivery.date)
         assert data['type'] == 'ServiceDelivery'

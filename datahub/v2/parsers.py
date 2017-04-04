@@ -30,7 +30,7 @@ class JSONParser(parsers.JSONParser):
 
     def parse(self, stream, media_type=None, parser_context=None):
         """Parse the incoming bytestream as JSON and returns the resulting data."""
-        result = super(JSONParser, self).parse(
+        result = super().parse(
             stream, media_type=media_type, parser_context=parser_context)
 
         if not isinstance(result, dict) or 'data' not in result:

@@ -55,11 +55,8 @@ def view_has_errors(view):
     try:
         code = str(view.response.status_code)
     except (AttributeError, ValueError):
-        pass
-    else:
-        if code.startswith('4') or code.startswith('5'):
-            return True
-    return False
+        return False
+    return code.startswith('4') or code.startswith('5')
 
 
 def format_errors(data, status_code):

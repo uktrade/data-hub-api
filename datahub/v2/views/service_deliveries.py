@@ -32,7 +32,10 @@ class ServiceDeliveryListViewV2(APIView):
         return Response(service_deliveries)
 
     def post(self, request):
-        """Handle the POST."""
+        """Handle the POST.
+
+        Objects are created and update through a POST request.
+        """
         data = self.inject_advisor(request)
         url_builder = functools.partial(
             reverse, viewname=self.detail_view_name, request=request)

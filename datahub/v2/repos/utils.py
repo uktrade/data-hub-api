@@ -21,31 +21,6 @@ class RepoResponse:
         self.status = status
 
 
-def attributes_to_types(mapping):
-    """Take a dictionary of tuples.
-
-    {('foo', 'Foo'), ('bar', 'Bar')}
-
-    return a dictionary
-
-    {'foo': 'Foo', 'bar': 'Bar'}
-    """
-    return dict(mapping)
-
-
-def types_to_attributes(mapping):
-    """
-    Take a dictionary of tuples.
-
-    {('foo', 'Foo'), ('bar', 'Bar')}
-
-    return a dictionary inverting keys with values
-
-    {'Foo': 'foo', 'Bar': 'bar'}
-    """
-    return dict((v, k) for (k, v) in mapping)
-
-
 def model_to_json_api_data(model_instance, schema_instance, url_builder):
     """Convert the model instance to the JSON api format."""
     attributes = dict()
@@ -72,6 +47,18 @@ def model_to_json_api_data(model_instance, schema_instance, url_builder):
         'relationships': relationships,
         'links': links
     }
+
+
+def attributes_to_types(mapping):
+    """Take a dictionary of tuples.
+
+    {('foo', 'Foo'), ('bar', 'Bar')}
+
+    return a dictionary
+
+    {'foo': 'Foo', 'bar': 'Bar'}
+    """
+    return dict(mapping)
 
 
 def build_relationship(model_instance, attribute, attribute_to_type_mapping):

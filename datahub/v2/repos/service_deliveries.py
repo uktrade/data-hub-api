@@ -103,15 +103,12 @@ class ServiceDeliveryDatabaseRepo:
 
         If True if returns the service offer id, if not it returns None.
         """
-        try:
-            query = dict(
-                dit_team_id=dit_team_id,
-                service_id=service_id,
-                event_id=event_id
-            )
-            service_offer = ServiceOffer.objects.filter(**query).first()
-            if not service_offer:
-                return None
-            return service_offer.pk
-        except ServiceOffer.DoesNotExist:
+        query = dict(
+            dit_team_id=dit_team_id,
+            service_id=service_id,
+            event_id=event_id
+        )
+        service_offer = ServiceOffer.objects.filter(**query).first()
+        if not service_offer:
             return None
+        return service_offer.pk

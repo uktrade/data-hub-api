@@ -25,8 +25,8 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
         response = self.api_client.get(url)
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_200_OK
-        assert set(content.keys()) == {'data'}
-        assert set(content['data'].keys()) == {'type', 'id', 'attributes', 'relationships', 'links'}
+        assert content.keys() == {'data'}
+        assert content['data'].keys() == {'type', 'id', 'attributes', 'relationships', 'links'}
         assert content['data']['links']['self']
 
     def test_service_delivery_list_view(self):
@@ -41,10 +41,10 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
         response = self.api_client.get(url)
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_200_OK
-        assert set(content.keys()) == {'links', 'data', 'meta'}
-        assert set(content['links'].keys()) == {'first', 'last', 'next', 'prev'}
-        assert set(content['meta'].keys()) == {'pagination'}
-        assert set(content['meta']['pagination'].keys()) == {'count', 'limit', 'offset'}
+        assert content.keys() == {'links', 'data', 'meta'}
+        assert content['links'].keys() == {'first', 'last', 'next', 'prev'}
+        assert content['meta'].keys() == {'pagination'}
+        assert content['meta']['pagination'].keys() == {'count', 'limit', 'offset'}
 
     def test_add_service_delivery_incorrect_format(self):
         """Test add new service delivery with incorrect format."""
