@@ -344,23 +344,3 @@ class Advisor(KorbenSaveModelMixin, AbstractBaseUser, PermissionsMixin):
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Sends an email to this User."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
-
-
-# Write to ES stuff
-@receiver((post_save, m2m_changed))
-def save_to_es(sender, instance, **kwargs):
-    """Save to ES."""
-    from datahub.company import tasks
-
-    if sender in (Company, CompaniesHouseCompany, Contact):
-        data = model_to_dictionary(instance)
-
-        if sender is CompaniesHouseCompany:
-            # CH company is indexed by CH number instead
-            data['id'] = data['company_number']
-
-        tasks.save_to_es.delay(
-            # cannot access _meta from the instance
-            doc_type=type(instance)._meta.db_table,
-            data=data,
-        )
