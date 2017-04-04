@@ -49,10 +49,6 @@ Leeloo can run on any Heroku style platform. These environment variables MUST be
 - DJANGO_SETTINGS_MODULE
 - KORBEN_HOST
 - KORBEN_PORT
-- BROKER_URL
-- RESULT_BACKEND
-- BROKER_TRANSPORT_OPTIONS (default={})
-- TASK_MAX_RETRIES (default=1000000)
 
 
 Management commands

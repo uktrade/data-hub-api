@@ -1,34 +1,19 @@
-import json
-import uuid
-from unittest import mock
-
 import pytest
-from django.conf import settings
-from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
 
-from datahub.company.models import Contact
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
-from datahub.korben.utils import generate_signature
 from .factories import CompanyFactory, ContactFactory
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
 
 
-def _signature(url, data):
-    """Return the signature to authenticate the api client for the tests in this module."""
-    return generate_signature(url, data, settings.DATAHUB_SECRET)
-
-
 class ContactTestCase(LeelooTestCase):
     """Contact test case."""
 
-    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
-    def test_add_contact_address_same_as_company(self, mocked_save_to_korben):
+    def test_add_contact_address_same_as_company(self):
         """Test add new contact."""
         url = reverse('v1:contact-list')
         response = self.api_client.post(url, {
@@ -45,18 +30,8 @@ class ContactTestCase(LeelooTestCase):
         })
 
         assert response.status_code == status.HTTP_201_CREATED
-        # make sure we're spawning a task to save to Korben
-        contact = Contact.objects.get(pk=response.data['id'])
-        expected_data = contact.convert_model_to_korben_format()
-        mocked_save_to_korben.delay.assert_called_once_with(
-            db_table='company_contact',
-            data=expected_data,
-            update=False,
-            user_id=self.user.id
-        )
 
-    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
-    def test_add_contact_no_address(self, mocked_save_to_korben):
+    def test_add_contact_no_address(self):
         """Test add new contact without any address."""
         url = reverse('v1:contact-list')
         response = self.api_client.post(url, {
@@ -71,14 +46,12 @@ class ContactTestCase(LeelooTestCase):
             'primary': True
         })
 
-        assert mocked_save_to_korben.delay.called is False
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data['errors'] == {
             'address_same_as_company': ['Please select either address_same_as_company or enter an address manually.']
         }
 
-    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
-    def test_add_contact_partial_manual_address(self, mocked_save_to_korben):
+    def test_add_contact_partial_manual_address(self):
         """Test add new contact with a partial manual address."""
         url = reverse('v1:contact-list')
 
@@ -95,15 +68,13 @@ class ContactTestCase(LeelooTestCase):
             'primary': True
         })
 
-        assert mocked_save_to_korben.delay.called is False
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data['errors'] == {
             'address_country': ['This field may not be null.'],
             'address_town': ['This field may not be null.']
         }
 
-    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
-    def test_add_contact_manual_address(self, mocked_save_to_korben):
+    def test_add_contact_manual_address(self):
         """Test add new contact manual address."""
         url = reverse('v1:contact-list')
         response = self.api_client.post(url, {
@@ -122,19 +93,8 @@ class ContactTestCase(LeelooTestCase):
         })
 
         assert response.status_code == status.HTTP_201_CREATED
-        # make sure we're spawning a task to save to Korben
-        contact = Contact.objects.get(pk=response.data['id'])
-        expected_data = contact.convert_model_to_korben_format()
-        mocked_save_to_korben.delay.assert_called_once_with(
-            db_table='company_contact',
-            data=expected_data,
-            update=False,
-            user_id=self.user.id
-        )
 
-    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
-    @freeze_time('2017-01-27 12:00:01')
-    def test_modify_contact(self, mocked_save_to_korben):
+    def test_modify_contact(self):
         """Modify an existing contact."""
         contact = ContactFactory(first_name='Foo')
         url = reverse('v1:contact-detail', kwargs={'pk': contact.pk})
@@ -144,15 +104,6 @@ class ContactTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_200_OK, response.data
         assert response.data['first_name'] == 'bar'
-        # make sure we're spawning a task to save to Korben
-        expected_korben_data = contact.convert_model_to_korben_format()
-        expected_korben_data['first_name'] = 'bar'
-        mocked_save_to_korben.delay.assert_called_once_with(
-            db_table='company_contact',
-            data=expected_korben_data,
-            update=True,  # this is an update!
-            user_id=self.user.id
-        )
 
     def test_archive_contact_no_reason(self):
         """Test archive contact without providing a reason."""
@@ -192,35 +143,3 @@ class ContactTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['id'] == contact.pk
-
-    def test_get_invalid_contact_coming_from_korben(self):
-        """Do a GET with incomplete address coming from Korben."""
-        # create the incomplete address contact using the Korben API first
-        company = CompanyFactory()
-        url = reverse('korben:company_contact')
-        data_dict = {
-            'id': str(uuid.uuid4()),
-            'title_id': constants.Title.wing_commander.value.id,
-            'first_name': 'Bat',
-            'last_name': 'Man',
-            'job_title': constants.Role.owner.value.name,
-            'company_id': company.id,
-            'email': 'foo@bar.com',
-            'telephone_countrycode': '+44',
-            'telephone_number': '123456789',
-            'address_1': '14 Hello street',
-            'primary': True
-        }
-        data = json.dumps(data_dict)
-        api_client = APIClient()
-        api_client.credentials(**{'HTTP_X_SIGNATURE': _signature(url, data)})
-        response = api_client.post(url, data, content_type='application/json')
-
-        assert response.status_code == status.HTTP_200_OK
-
-        # now do a GET
-        url = reverse('v1:contact-detail', kwargs={'pk': data_dict['id']})
-        response = self.api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['id'] == data_dict['id']

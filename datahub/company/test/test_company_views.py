@@ -1,12 +1,8 @@
-from unittest import mock
-
 from django.utils.timezone import now
-from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company import models
-from datahub.company.models import Company
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
 from .factories import CompaniesHouseCompanyFactory, CompanyFactory
@@ -99,9 +95,7 @@ class CompanyTestCase(LeelooTestCase):
         assert response.data['headquarter_type']['name'] == constants.HeadquarterType.ukhq.value.name
         assert response.data['classification']['name'] == constants.CompanyClassification.tier_a.value.name
 
-    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
-    @freeze_time('2017-01-27 12:00:01')
-    def test_update_company(self, mocked_save_to_korben):
+    def test_update_company(self):
         """Test company update."""
         company = CompanyFactory(
             name='Foo ltd.',
@@ -118,15 +112,6 @@ class CompanyTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['name'] == 'Acme'
-        # make sure we're spawning a task to save to Korben
-        expected_data = company.convert_model_to_korben_format()
-        expected_data['name'] = 'Acme'
-        mocked_save_to_korben.delay.assert_called_once_with(
-            db_table='company_company',
-            data=expected_data,
-            update=True,  # this is an update!
-            user_id=self.user.id
-        )
 
     def test_classification_is_ro(self):
         """Test that classification is fail-safe & read-only."""
@@ -147,8 +132,7 @@ class CompanyTestCase(LeelooTestCase):
         company.refresh_from_db()
         assert str(company.classification_id) == constants.CompanyClassification.tier_a.value.id
 
-    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
-    def test_add_uk_company(self, mocked_save_to_korben):
+    def test_add_uk_company(self):
         """Test add new UK company."""
         url = reverse('v1:company-list')
         response = self.api_client.post(url, {
@@ -166,17 +150,8 @@ class CompanyTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data['name'] == 'Acme'
-        company = Company.objects.get(pk=response.data['id'])
-        expected_data = company.convert_model_to_korben_format()
-        mocked_save_to_korben.delay.assert_called_once_with(
-            db_table='company_company',
-            data=expected_data,
-            update=False,
-            user_id=self.user.id
-        )
 
-    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
-    def test_add_uk_company_without_uk_region(self, mocked_save_to_korben):
+    def test_add_uk_company_without_uk_region(self):
         """Test add new UK without UK region company."""
         url = reverse('v1:company-list')
         response = self.api_client.post(url, {
@@ -189,12 +164,10 @@ class CompanyTestCase(LeelooTestCase):
             'registered_address_town': 'London',
         })
 
-        assert mocked_save_to_korben.delay.called is False
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data['errors'] == {'uk_region': ['UK region is required for UK companies.']}
 
-    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
-    def test_add_not_uk_company(self, mocked_save_to_korben):
+    def test_add_not_uk_company(self):
         """Test add new not UK company."""
         url = reverse('v1:company-list')
         response = self.api_client.post(url, {
@@ -209,18 +182,8 @@ class CompanyTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data['name'] == 'Acme'
-        # make sure we're spawning a task to save to Korben
-        company = Company.objects.get(pk=response.data['id'])
-        expected_data = company.convert_model_to_korben_format()
-        mocked_save_to_korben.delay.assert_called_once_with(
-            db_table='company_company',
-            data=expected_data,
-            update=False,
-            user_id=self.user.id
-        )
 
-    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
-    def test_add_company_partial_trading_address(self, mocked_save_to_korben):
+    def test_add_company_partial_trading_address(self):
         """Test add new company with partial trading address."""
         url = reverse('v1:company-list')
         response = self.api_client.post(url, {
@@ -234,15 +197,13 @@ class CompanyTestCase(LeelooTestCase):
             'uk_region': constants.UKRegion.england.value.id
         })
 
-        assert mocked_save_to_korben.delay.called is False
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data['errors'] == {
             'trading_address_town': ['This field may not be null.'],
             'trading_address_country': ['This field may not be null.']
         }
 
-    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
-    def test_add_company_with_trading_address(self, mocked_save_to_korben):
+    def test_add_company_with_trading_address(self):
         """Test add new company with trading_address."""
         url = reverse('v1:company-list')
         response = self.api_client.post(url, {
@@ -259,18 +220,8 @@ class CompanyTestCase(LeelooTestCase):
         })
 
         assert response.status_code == status.HTTP_201_CREATED
-        # make sure we're spawning a task to save to Korben
-        company = Company.objects.get(pk=response.data['id'])
-        expected_data = company.convert_model_to_korben_format()
-        mocked_save_to_korben.delay.assert_called_once_with(
-            db_table='company_company',
-            data=expected_data,
-            update=False,
-            user_id=self.user.id
-        )
 
-    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
-    def test_add_company_with_website_without_scheme(self, mocked_save_to_korben):
+    def test_add_company_with_website_without_scheme(self):
         """Test add new company with trading_address."""
         url = reverse('v1:company-list')
         response = self.api_client.post(url, {
@@ -289,15 +240,6 @@ class CompanyTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data['website'] == 'www.google.com'
-        # make sure we're spawning a task to save to Korben
-        company = Company.objects.get(pk=response.data['id'])
-        expected_data = company.convert_model_to_korben_format()
-        mocked_save_to_korben.delay.assert_called_once_with(
-            db_table='company_company',
-            data=expected_data,
-            update=False,
-            user_id=self.user.id
-        )
 
     def test_archive_company_no_reason(self):
         """Test company archive."""

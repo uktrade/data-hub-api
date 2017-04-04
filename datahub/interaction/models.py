@@ -1,14 +1,12 @@
 import uuid
 
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.functional import cached_property
 
-from datahub.core.mixins import KorbenSaveModelMixin
 from datahub.core.models import BaseModel
 
 
-class InteractionAbstract(KorbenSaveModelMixin, BaseModel):
+class InteractionAbstract(BaseModel):
     """Common fields for all interaction flavours."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -37,24 +35,9 @@ class InteractionAbstract(KorbenSaveModelMixin, BaseModel):
         """Admin displayed human readable name."""
         return self.subject
 
-    def clean(self):
-        """Custom validation."""
-        for field in self.FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS:
-            value = getattr(self, field + '_id')
-            if str(value) == '0167b456-0ddd-49bd-8184-e3227a0b6396':  # Undefined
-                raise ValidationError(message={
-                    field: ['This field is required'],
-                })
-
-        super().clean()
-
 
 class Interaction(InteractionAbstract):
     """Interaction."""
-
-    FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS = (
-        'dit_advisor', 'dit_team', 'service', 'interaction_type',
-    )
 
     interaction_type = models.ForeignKey('metadata.InteractionType')
 
@@ -83,14 +66,6 @@ class ServiceOffer(models.Model):
 class ServiceDelivery(InteractionAbstract):
     """Service delivery."""
 
-    FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS = (
-        'dit_advisor',
-        'dit_team',
-        'service',
-        'uk_region',
-        'country_of_interest',
-        'event'
-    )
     ENTITY_NAME = 'ServiceDelivery'
     API_MAPPING = {
         ('company', 'Company'),

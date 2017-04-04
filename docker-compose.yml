@@ -7,7 +7,7 @@ services:
     volumes:
       - .:/app
     entrypoint: |
-        dockerize -wait tcp://redis:6379 -wait tcp://postgres:5432 -wait http://es:9200 -timeout 60s
+        dockerize -wait tcp://postgres:5432 -timeout 60s
     environment:
       SECRET_KEY: foobar
       DATABASE_URL: postgresql://postgres@postgres/datahub
@@ -16,6 +16,8 @@ services:
       DJANGO_SECRET_KEY: changeme
       DJANGO_SETTINGS_MODULE: config.settings.local
       COV_TOKEN: ${COV_TOKEN}
+      KORBEN_HOST: korben
+      KORBEN_PORT: 8080
 
   leeloo:
     extends:
@@ -24,9 +26,17 @@ services:
       - "8000:8000"
     depends_on:
       - postgres
+      - korben
     links:
       - postgres
+      - korben
     command: /app/start.sh
+
+  korben:
+    build:
+      context: dummy-korben
+    ports:
+      - "8080:8080"
 
   postgres:
     image: postgres:9.5

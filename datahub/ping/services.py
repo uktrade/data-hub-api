@@ -1,8 +1,6 @@
 from django.db import DatabaseError
-from rest_framework import status
 
 from datahub.company.models import Company
-from datahub.korben.connector import KorbenConnector
 
 
 class CheckDatabase:
@@ -17,5 +15,6 @@ class CheckDatabase:
             return True, ''
         except DatabaseError as e:
             return False, e
+
 
 services_to_check = (CheckDatabase, )
