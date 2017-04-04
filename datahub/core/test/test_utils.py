@@ -48,7 +48,9 @@ def test_model_to_dictionary():
         'company_number',
         'turnover_range',
         'archived_reason',
-        'business_type'
+        'business_type',
+        'parent',
+        'one_list_account_owner',
     }
     result = model_to_dictionary(model_instance)
     assert set(result.keys()) == expected_keys
@@ -97,7 +99,9 @@ def test_model_to_dictionary_dont_expand_fk():
         'trading_address_country_id',
         'archived',
         'archived_on',
-        'company_number'
+        'company_number',
+        'parent_id',
+        'one_list_account_owner_id',
     }
 
     assert set(result.keys()) == expected_keys
@@ -139,7 +143,9 @@ def test_model_to_dictionary_exclude_fields():
         'company_number',
         'turnover_range',
         'archived_reason',
-        'business_type'
+        'business_type',
+        'parent',
+        'one_list_account_owner',
     }
     excluded_fields = (
         'registered_address_4',
