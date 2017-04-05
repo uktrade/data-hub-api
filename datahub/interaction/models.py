@@ -106,12 +106,12 @@ class ServiceDelivery(InteractionAbstract):
     }
 
     status = models.ForeignKey('metadata.ServiceDeliveryStatus')
-    service_offer = models.ForeignKey(ServiceOffer, null=True, blank=True)
-    uk_region = models.ForeignKey('metadata.UKRegion', null=True, blank=True)
-    sector = models.ForeignKey('metadata.Sector', null=True, blank=True)
-    country_of_interest = models.ForeignKey('metadata.Country', null=True, blank=True)
-    feedback = models.TextField(max_length=4000, blank=True)  # CDMS limit
-    event = models.ForeignKey('metadata.Event', null=True, blank=True)
+    service_offer = models.ForeignKey(ServiceOffer, null=True)
+    uk_region = models.ForeignKey('metadata.UKRegion', null=True)
+    sector = models.ForeignKey('metadata.Sector', null=True)
+    country_of_interest = models.ForeignKey('metadata.Country', null=True)
+    feedback = models.TextField(max_length=4000, null=True)  # CDMS limit
+    event = models.ForeignKey('metadata.Event', null=True)
 
     def clean(self):
         """Custom validation."""

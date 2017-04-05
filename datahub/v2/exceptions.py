@@ -10,5 +10,6 @@ class RepoDataValidationError(ValidationError):
 
 class Conflict(APIException):
     """Conflict exception."""
+
     status_code = status.HTTP_409_CONFLICT
     default_detail = 'Conflict.'

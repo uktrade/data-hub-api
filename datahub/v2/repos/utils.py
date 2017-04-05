@@ -1,4 +1,5 @@
 import collections
+import datetime
 import uuid
 
 import colander
@@ -74,6 +75,8 @@ def build_attribute(model_instance, attribute):
     value = getattr(model_instance, attribute, None)
     if isinstance(value, uuid.UUID):
         return encoding.force_text(value)
+    if isinstance(value, datetime.datetime):
+        return value.isoformat()
     return value
 
 
@@ -116,7 +119,10 @@ def json_api_to_model(data, model_class):
     model_attrs = data.get('attributes', {})
     model_id = data.pop('id', None)
     for key, value in data.get('relationships', {}).items():
-        model_attrs[key + '_id'] = value['data']['id']
+        try:
+            model_attrs[key + '_id'] = value['data']['id']
+        except TypeError:
+            model_attrs[key + '_id'] = None
     if model_id:
         return update_model(model_class, model_attrs, model_id)
     else:
@@ -158,7 +164,9 @@ def build_links():
 
 def extract_id_for_relationship_from_data(data, relationship_name):
     """Give JSON api formatted data and a relationship name return the ID."""
-    return data.get('relationships', {}).get(relationship_name, {}).get('data', {}).get('id')
+    relationship_data = data.get('relationships', {}).get(relationship_name, {})
+    if relationship_data:
+        return relationship_data.get('data', {}).get('id')
 
 
 def replace_colander_null(data):

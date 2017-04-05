@@ -219,7 +219,7 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
             dit_team=service_offer.dit_team,
             event=service_offer.event,
             subject='I am a subject',
-            feedback='foobar'
+            uk_region_id=constants.UKRegion.east_midlands.value.id
         )
 
         url = reverse('v2:servicedelivery-list')
@@ -227,9 +227,12 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
             'type': 'ServiceDelivery',
             'attributes': {
                 'subject': 'I am another subject',
-                'feedback': None
             },
-            'relationships': {},
+            'relationships': {
+                'uk_region': {
+                    'data': None
+                }
+            },
             'id': str(servicedelivery.pk)
         }
         response = self.api_client.post(
@@ -241,7 +244,7 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_200_OK
         content = json.loads(response.content.decode('utf-8'))
         assert content['data']['attributes']['subject'] == 'I am another subject'
-        assert content['data']['attributes']['feedback'] == None
+        assert 'uk_region' not in content['data']['relationships'].keys()
 
     def test_filter_service_deliveries_by_company(self):
         """Filter by company."""
