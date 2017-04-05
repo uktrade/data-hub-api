@@ -1,9 +1,6 @@
 from django.conf import settings
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.timezone import now
-
-from datahub.company import tasks
 
 
 class BaseModel(models.Model):
@@ -43,7 +40,7 @@ class ArchivableModel(models.Model):
         self.archived_by = user
         self.archived_reason = reason
         self.archived_on = now()
-        self.save(skip_custom_validation=True)
+        self.save()
 
     def unarchive(self):
         """Unarchive the model instance."""
@@ -51,7 +48,7 @@ class ArchivableModel(models.Model):
         self.archived_reason = ''
         self.archived_by = None
         self.archived_on = None
-        self.save(skip_custom_validation=True)
+        self.save()
 
 
 class BaseConstantModel(models.Model):
@@ -79,33 +76,3 @@ class BaseOrderedConstantModel(BaseConstantModel):
     class Meta:  # noqa: D101
         abstract = True
         ordering = ('order', )
-
-
-class TaskInfo(models.Model):
-    """Holds information about the tasks."""
-
-    task_id = models.UUIDField(primary_key=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    created_on = models.DateTimeField(auto_now_add=True)
-    modified_on = models.DateTimeField(auto_now=True)
-    db_table = models.CharField(max_length=100)
-    update = models.BooleanField()
-    changes = JSONField()
-    manual_rerun_task = models.ForeignKey('self', null=True, blank=True)
-
-    class Meta:  # noqa: D101
-        verbose_name_plural = 'Task info'
-
-    @property
-    def async_result(self):
-        """Return the result of the task."""
-        return tasks.save_to_korben.AsyncResult(str(self.task_id))
-
-    @property
-    def status(self):
-        """Handy shortcut to get the task status."""
-        return self.async_result.status
-
-    def __str__(self):
-        """Return task UUID."""
-        return str(self.task_id)

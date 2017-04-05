@@ -49,11 +49,9 @@ THIRD_PARTY_APPS = (
 LOCAL_APPS = (
     'datahub.core',
     'datahub.company',
-    'datahub.es',
     'datahub.interaction',
     'datahub.metadata',
     'datahub.search',
-    'datahub.korben',
     'datahub.user'
 )
 
@@ -160,21 +158,9 @@ REST_FRAMEWORK = {
 APPEND_SLASH = True
 
 # Leeloo stuff
-ES_HOST = env('ES_HOST')
-ES_PORT = env.int('ES_PORT')
-ES_INDEX = env('ES_INDEX')
 KORBEN_HOST = env('KORBEN_HOST')
 KORBEN_PORT = env('KORBEN_PORT')
 DATAHUB_SECRET = env('DATAHUB_SECRET')
 CHAR_FIELD_MAX_LENGTH = 255
 HEROKU = False
 
-#  TODO remove this line when db level whitelisting gets deployed
-DIT_ENABLED_ADVISORS = [name.lower() for name in env.tuple('DIT_ENABLED_ADVISORS', default=())]
-
-# celery
-CELERY_BROKER_URL = env('BROKER_URL')
-CELERY_RESULT_BACKEND = env('RESULT_BACKEND')
-CELERY_RESULT_EXPIRES = None
-CELERY_BROKER_TRANSPORT_OPTIONS = env.dict('BROKER_TRANSPORT_OPTIONS', default={})
-TASK_MAX_RETRIES = env('TASK_MAX_RETRIES', default=1000)

@@ -5,7 +5,6 @@ from oauth2_provider.views import TokenView
 from rest_framework import routers
 
 from datahub.company import views as company_views
-from datahub.core import views as core_views
 from datahub.interaction import views as interaction_views
 from datahub.ping.views import ping
 from datahub.search.views import Search
@@ -18,8 +17,6 @@ router_v1.register(r'ch-company', company_views.CompaniesHouseCompanyReadOnlyVie
 router_v1.register(r'contact', company_views.ContactViewSetV1)
 router_v1.register(r'interaction', interaction_views.InteractionViewSetV1)
 router_v1.register(r'advisor', company_views.AdvisorReadOnlyViewSetV1)
-router_v1.register(r'task-info', core_views.TaskInfoReadOnlyViewSetV1)
-
 
 
 unversioned_urls = [
@@ -28,7 +25,6 @@ unversioned_urls = [
     url(r'^search/$', Search.as_view(), name='search'),
     url(r'^metadata/', include('datahub.metadata.urls')),
     url(r'^token/$', TokenView.as_view(), name='token'),
-    url(r'^korben/', include('datahub.korben.urls', namespace='korben')),
     url(r'^whoami/$', who_am_i, name='who_am_i'),
     url(r'^dashboard/', include('datahub.dashboard.urls', namespace='dashboard'))
 ]

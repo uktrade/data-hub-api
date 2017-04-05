@@ -6,17 +6,13 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.db import models
-from django.db.models.signals import m2m_changed, post_save
-from django.dispatch import receiver
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 
 from datahub.company.validators import RelaxedURLValidator
 from datahub.core import constants
 from datahub.core import fields as core_fields
-from datahub.core.mixins import KorbenSaveModelMixin
 from datahub.core.models import ArchivableModel, BaseModel
-from datahub.core.utils import model_to_dictionary
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -45,8 +41,13 @@ class CompanyAbstract(BaseModel):
         """Admin displayed human readable name."""
         return self.name
 
+    def save(self, *args, **kwargs):
+        """Override the Django save implementation to hook the custom validation."""
+        self.clean()
+        super().save(*args, **kwargs)
 
-class Company(KorbenSaveModelMixin, ArchivableModel, CompanyAbstract):
+
+class Company(ArchivableModel, CompanyAbstract):
     """Representation of the company as per CDMS."""
 
     REQUIRED_TRADING_ADDRESS_FIELDS = (
@@ -185,7 +186,7 @@ class CompaniesHouseCompany(CompanyAbstract):
         verbose_name_plural = 'Companies House companies'
 
 
-class Contact(KorbenSaveModelMixin, ArchivableModel, BaseModel):
+class Contact(ArchivableModel, BaseModel):
     """Contact from CDMS."""
 
     REQUIRED_ADDRESS_FIELDS = (
@@ -260,6 +261,11 @@ class Contact(KorbenSaveModelMixin, ArchivableModel, BaseModel):
                 raise ValidationError({'address_same_as_company': error_message})
         super(Contact, self).clean()
 
+    def save(self, *args, **kwargs):
+        """Override the Django save implementation to hook the custom validation."""
+        self.clean()
+        super().save(*args, **kwargs)
+
 
 class AdvisorManager(BaseUserManager):
     """Django user manager made friendly to not having username field."""
@@ -293,7 +299,7 @@ class AdvisorManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
-class Advisor(KorbenSaveModelMixin, AbstractBaseUser, PermissionsMixin):
+class Advisor(AbstractBaseUser, PermissionsMixin):
     """Advisor."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
@@ -344,23 +350,3 @@ class Advisor(KorbenSaveModelMixin, AbstractBaseUser, PermissionsMixin):
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Sends an email to this User."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
-
-
-# Write to ES stuff
-@receiver((post_save, m2m_changed))
-def save_to_es(sender, instance, **kwargs):
-    """Save to ES."""
-    from datahub.company import tasks
-
-    if sender in (Company, CompaniesHouseCompany, Contact):
-        data = model_to_dictionary(instance)
-
-        if sender is CompaniesHouseCompany:
-            # CH company is indexed by CH number instead
-            data['id'] = data['company_number']
-
-        tasks.save_to_es.delay(
-            # cannot access _meta from the instance
-            doc_type=type(instance)._meta.db_table,
-            data=data,
-        )

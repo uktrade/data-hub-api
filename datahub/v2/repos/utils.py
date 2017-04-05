@@ -52,7 +52,7 @@ def model_to_json_api_data(model_instance, schema_instance, url_builder):
 
 
 def attributes_to_types(mapping):
-    """Take a dictionary of tuples.
+    """Take a set of tuples.
 
     {('foo', 'Foo'), ('bar', 'Bar')}
 
