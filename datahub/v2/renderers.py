@@ -36,7 +36,7 @@ class JSONRenderer(renderers.JSONRenderer):
         view = renderer_context.get('view')
         response = renderer_context.get('response')
         if view_has_errors(view):
-            data = {'errors': format_errors(data, view.response.status_code)}
+            data = {'errors': format_errors(data)}
             return self.render_errors(data, accepted_media_type, renderer_context)
 
         render_data = {'data': data.data}
@@ -59,7 +59,7 @@ def view_has_errors(view):
     return code.startswith('4') or code.startswith('5')
 
 
-def format_errors(data, status_code):
+def format_errors(data):
     """Format the errors.
 
     Take data in this format
@@ -89,6 +89,5 @@ def format_errors(data, status_code):
         key = '/data/{path}'.format(path=k.replace('.', '/'))
         error['detail'] = v
         error['source'] = {'pointer': key}
-        error['status'] = status_code
         errors.append(error)
     return errors

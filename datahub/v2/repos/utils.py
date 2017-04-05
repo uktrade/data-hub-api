@@ -1,4 +1,5 @@
 import collections
+import uuid
 
 import colander
 from django.utils import encoding
@@ -33,7 +34,7 @@ def model_to_json_api_data(model_instance, schema_instance, url_builder):
                 attributes[subitem.name] = build_attribute(model_instance, subitem.name)
         if item.name == 'relationships':
             for subitem in item:
-                relationship_instance = getattr(model_instance, subitem.name, None)
+                relationship_instance = getattr(model_instance, subitem.name)
                 if relationship_instance:
                     relationships[subitem.name] = build_relationship(
                         relationship_instance,
@@ -64,14 +65,14 @@ def attributes_to_types(mapping):
 def build_relationship(model_instance, attribute, attribute_to_type_mapping):
     """Build relationships object from models."""
     entity_name = attribute_to_type_mapping[attribute]
-    data_dict = {'data': {'type': entity_name, 'id': str(model_instance.pk)}}
+    data_dict = {'data': {'type': entity_name, 'id': encoding.force_text(model_instance.pk)}}
     return data_dict
 
 
 def build_attribute(model_instance, attribute):
     """Build attributes object from model."""
     value = getattr(model_instance, attribute, None)
-    if value:
+    if isinstance(value, uuid.UUID):
         return encoding.force_text(value)
     return value
 
@@ -160,11 +161,11 @@ def extract_id_for_relationship_from_data(data, relationship_name):
     return data.get('relationships', {}).get(relationship_name, {}).get('data', {}).get('id')
 
 
-def remove_null(data):
-    """Remove fields from deserialized data with colander.null."""
+def replace_colander_null(data):
+    """Replace colander.null with None in deserialized data."""
     cleaned_data = {
-        'attributes': {k: v for k, v in data['attributes'].items() if v is not colander.null},
-        'relationships': {k: v for k, v in data['relationships'].items() if v is not colander.null}
+        'attributes': {k: None if v is colander.null else v for k, v in data['attributes'].items()},
+        'relationships': {k: None if v is colander.null else v for k, v in data['relationships'].items()}
     }
     data.update(cleaned_data)
     return data

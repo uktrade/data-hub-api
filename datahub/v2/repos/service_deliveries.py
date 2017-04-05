@@ -29,7 +29,7 @@ class ServiceDeliveryDatabaseRepo:
         """
         try:
             data = self.schema_class().deserialize(data)
-            return utils.remove_null(data)
+            return utils.replace_colander_null(data)
         except colander.Invalid as e:
             raise RepoDataValidationError(
                 detail=e.asdict()

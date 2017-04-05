@@ -2,8 +2,8 @@
 
 from rest_framework import parsers
 from rest_framework.exceptions import ParseError
-from rest_framework_json_api.exceptions import Conflict
 
+from .exceptions import Conflict
 from .renderers import JSONRenderer
 
 
@@ -49,6 +49,4 @@ class JSONParser(parsers.JSONParser):
                     resource_type=resource_name
                 )
             )
-        # if not data.get('id') and request.method in ('PATCH', 'PUT'):
-        #    raise ParseError("The resource identifier object must contain an 'id' member.")
         return data

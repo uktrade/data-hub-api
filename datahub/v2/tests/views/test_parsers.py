@@ -35,7 +35,6 @@ class JSONParserTestCase(LeelooTestCase):
         content = json.loads(response.content.decode('utf-8'))
         expected_content = {'errors': [
             {'source': {'pointer': '/data/detail'},
-             'status': 400,
              'detail': 'Received document does not contain primary data.'}]
         }
         assert content == expected_content
@@ -68,7 +67,7 @@ class JSONParserTestCase(LeelooTestCase):
         expected_content = {'errors': [
             {'detail': 'The resource object\'s type (whatever) is not the type that constitute the collection '
                        'represented by the endpoint (ServiceDelivery).',
-             'source': {'pointer': '/data/detail'},
-             'status': 409}]
+             'source': {'pointer': '/data/detail'}
+             }]
         }
         assert content == expected_content

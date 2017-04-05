@@ -98,7 +98,6 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         expected_content = {'errors': [{
-            'status': 400,
             'detail': 'type foobar should be ServiceDeliveryStatus',
             'source': {'pointer': '/data/relationships/status'}
         }]}
@@ -207,7 +206,6 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_406_NOT_ACCEPTABLE
         expected_content = {'errors': [{
-            'status': 406,
             'detail': 'Could not satisfy the request Accept header.',
             'source': {'pointer': '/data/detail'}
         }]}
@@ -220,7 +218,8 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
             service=service_offer.service,
             dit_team=service_offer.dit_team,
             event=service_offer.event,
-            subject='I am a subject'
+            subject='I am a subject',
+            feedback='foobar'
         )
 
         url = reverse('v2:servicedelivery-list')
@@ -228,6 +227,7 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
             'type': 'ServiceDelivery',
             'attributes': {
                 'subject': 'I am another subject',
+                'feedback': None
             },
             'relationships': {},
             'id': str(servicedelivery.pk)
@@ -241,6 +241,7 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_200_OK
         content = json.loads(response.content.decode('utf-8'))
         assert content['data']['attributes']['subject'] == 'I am another subject'
+        assert content['data']['attributes']['feedback'] == None
 
     def test_filter_service_deliveries_by_company(self):
         """Filter by company."""
@@ -342,7 +343,6 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
         content = {
             'errors': [{
                 'detail': 'This combination of service and service provider does not exist.',
-                'source': {'pointer': '/data/relationships/service'},
-                'status': 400}
-            ]}
+                'source': {'pointer': '/data/relationships/service'}
+            }]}
         assert json.loads(response.content.decode('utf-8')) == content
