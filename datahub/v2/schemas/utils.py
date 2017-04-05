@@ -26,7 +26,7 @@ class RelationshipType(SchemaType):
 
     def deserialize(self, node, cstruct):
         """Deserialize data.
- 
+
         {'data': None}
         {'data': {'type': 'foo', 'id: 1}}
         """
