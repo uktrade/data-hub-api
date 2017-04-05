@@ -72,7 +72,7 @@ def build_relationship(model_instance, attribute, attribute_to_type_mapping):
 
 def build_attribute(model_instance, attribute):
     """Build attributes object from model."""
-    value = getattr(model_instance, attribute, None)
+    value = getattr(model_instance, attribute)
     if isinstance(value, uuid.UUID):
         return encoding.force_text(value)
     if isinstance(value, datetime.datetime):
