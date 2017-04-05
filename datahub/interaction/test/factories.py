@@ -46,6 +46,7 @@ class ServiceDeliveryFactory(factory.django.DjangoModelFactory):
     created_on = now()
     status_id = constants.ServiceDeliveryStatus.offered.value.id
     uk_region_id = constants.UKRegion.east_midlands.value.id
+    feedback = 'foobar'
 
     class Meta:
         model = 'interaction.ServiceDelivery'

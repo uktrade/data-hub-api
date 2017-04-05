@@ -2,26 +2,6 @@
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 
-from .utils import model_to_dictionary
-
-
-class KorbenSaveModelMixin:
-    """Handles custom validation and whether we save to Korben or not."""
-
-    def save(self, skip_custom_validation=False, **kwargs):
-        """Override the Django save implementation to save to Korben."""
-        if not skip_custom_validation:
-            self.clean()
-        super().save(**kwargs)
-
-    def get_excluded_fields(self):
-        """Override this method to define which fields should not be send to Korben."""
-        return []
-
-    def convert_model_to_korben_format(self):
-        """Override this method to have more granular control of what gets sent to Korben."""
-        return model_to_dictionary(self, excluded_fields=self.get_excluded_fields(), expand_foreign_keys=False)
-
 
 class ArchivableViewSetMixin:
     """To be used with archivable models."""

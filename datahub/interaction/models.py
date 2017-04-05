@@ -1,14 +1,12 @@
 import uuid
 
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.functional import cached_property
 
-from datahub.core.mixins import KorbenSaveModelMixin
 from datahub.core.models import BaseModel
 
 
-class InteractionAbstract(KorbenSaveModelMixin, BaseModel):
+class InteractionAbstract(BaseModel):
     """Common fields for all interaction flavours."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -37,24 +35,9 @@ class InteractionAbstract(KorbenSaveModelMixin, BaseModel):
         """Admin displayed human readable name."""
         return self.subject
 
-    def clean(self):
-        """Custom validation."""
-        for field in self.FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS:
-            value = getattr(self, field + '_id')
-            if str(value) == '0167b456-0ddd-49bd-8184-e3227a0b6396':  # Undefined
-                raise ValidationError(message={
-                    field: ['This field is required'],
-                })
-
-        super().clean()
-
 
 class Interaction(InteractionAbstract):
     """Interaction."""
-
-    FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS = (
-        'dit_advisor', 'dit_team', 'service', 'interaction_type',
-    )
 
     interaction_type = models.ForeignKey('metadata.InteractionType')
 
@@ -83,41 +66,30 @@ class ServiceOffer(models.Model):
 class ServiceDelivery(InteractionAbstract):
     """Service delivery."""
 
-    FIELDS_THAT_SHOULD_NOT_ALLOW_UNDEFS = (
-        'dit_advisor',
-        'dit_team',
-        'service',
-        'uk_region',
-        'country_of_interest',
-        'event'
-    )
+    ENTITY_NAME = 'ServiceDelivery'
+    API_MAPPING = {
+        ('company', 'Company'),
+        ('contact', 'Contact'),
+        ('country', 'Country'),
+        ('dit_advisor', 'Advisor'),
+        ('dit_team', 'Team'),
+        ('sector', 'Sector'),
+        ('service', 'Service'),
+        ('status', 'ServiceDeliveryStatus'),
+        ('uk_region', 'UKRegion'),
+        ('service_offer', 'ServiceOffer')
+    }
 
     status = models.ForeignKey('metadata.ServiceDeliveryStatus')
-    service_offer = models.ForeignKey(ServiceOffer, null=True, blank=True)
-    uk_region = models.ForeignKey('metadata.UKRegion', null=True, blank=True)
-    sector = models.ForeignKey('metadata.Sector', null=True, blank=True)
-    country_of_interest = models.ForeignKey('metadata.Country', null=True, blank=True)
-    feedback = models.TextField(max_length=4000, blank=True)  # CDMS limit
-    event = models.ForeignKey('metadata.Event', null=True, blank=True)
+    service_offer = models.ForeignKey(ServiceOffer, null=True)
+    uk_region = models.ForeignKey('metadata.UKRegion', null=True)
+    sector = models.ForeignKey('metadata.Sector', null=True)
+    country_of_interest = models.ForeignKey('metadata.Country', null=True)
+    feedback = models.TextField(max_length=4000, null=True)  # CDMS limit
+    event = models.ForeignKey('metadata.Event', null=True)
 
     def clean(self):
         """Custom validation."""
-        if not self.service_offer_id:
-            try:
-                query = dict(
-                    dit_team=self.dit_team,
-                    service=self.service,
-                    event=self.event
-                )
-                service_offer = ServiceOffer.objects.filter(**query).first()
-                if not service_offer:
-                    raise ServiceOffer.DoesNotExist()
-
-                self.service_offer = service_offer
-            except ServiceOffer.DoesNotExist:
-                raise ValidationError(message={
-                    'service': ['This combination of service and service provider does not exist.'],
-                })
-        else:
+        if self.service_offer and not self.event:
             self.event = self.service_offer.event
         super().clean()

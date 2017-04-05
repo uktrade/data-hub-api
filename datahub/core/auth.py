@@ -1,7 +1,66 @@
+import requests
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
+from django.core.serializers.json import DjangoJSONEncoder
 
-from datahub.korben.connector import KorbenConnector
+
+from .utils import generate_signature
+
+
+class KorbenConnector:
+    """Korben connector."""
+
+    default_headers = {
+        'Content-type': 'application/json',
+        'Accept': 'application/json',
+    }
+
+    def __init__(self):
+        """Initalise the connector."""
+        self._json_encoder = DjangoJSONEncoder()
+        self.base_url = '{host}:{port}'.format(
+            host=self.handle_host(settings.KORBEN_HOST),
+            port=settings.KORBEN_PORT
+        )
+
+    @staticmethod
+    def handle_host(host):
+        """Add the protocol if not specified."""
+        if 'http://' in host or 'https://' in host:
+            return host
+        else:
+            return 'http://{host}'.format(host=host)
+
+    def encode_json_bytes(self, model_dict):
+        """Encode json into byte."""
+        json_str = self._json_encoder.encode(model_dict)
+        return bytes(json_str, 'utf-8')
+
+    def inject_auth_header(self, url, body):
+        """Add the signature into the header."""
+        self.default_headers['X-Signature'] = generate_signature(url, body, settings.DATAHUB_SECRET)
+
+    def validate_credentials(self, username, password):
+        """Validate CDMS User credentials.
+
+        :param username: str
+        :param password: str
+        :return: boolean success or fail, None if CDMS/Korben communication fails
+        """
+        url = '{base_url}/auth/validate-credentials/'.format(
+            base_url=self.base_url,
+        )
+        data = self.encode_json_bytes(dict(username=username, password=password))
+        self.inject_auth_header(url, data)
+        try:
+            response = requests.post(url=url, data=data, headers=self.default_headers)
+            if response.ok:
+                return response.json()  # Returns JSON encoded boolean
+            else:
+                return None
+        except (requests.RequestException, ValueError):
+            return None
 
 
 class CDMSUserBackend(ModelBackend):
