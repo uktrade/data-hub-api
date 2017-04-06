@@ -18,6 +18,9 @@ services:
       COV_TOKEN: ${COV_TOKEN}
       KORBEN_HOST: korben
       KORBEN_PORT: 8080
+      ES_INDEX: test
+      ES_HOST: es
+      ES_PORT: 9200
 
   leeloo:
     extends:
@@ -27,9 +30,11 @@ services:
     depends_on:
       - postgres
       - korben
+      - es
     links:
       - postgres
       - korben
+      - es
     command: /app/start.sh
 
   korben:
@@ -43,3 +48,9 @@ services:
     restart: always
     environment:
       - POSTGRES_DB=datahub
+
+  es:
+    image: elasticsearch:2.3
+    restart: always
+    ports:
+      - "9200:9200"
