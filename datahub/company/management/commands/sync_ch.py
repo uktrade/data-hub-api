@@ -97,19 +97,14 @@ def sync_ch(tmp_file_creator, endpoint=None):
     ch_csv_urls = get_ch_latest_dump_file_list(endpoint)
 
     for csv_url in ch_csv_urls:
-        for ch_company_row in iter_ch_csv_from_url(csv_url, tmp_file_creator):
-            company, created = CompaniesHouseCompany.objects.get_or_create(
-                company_number=ch_company_row.pop('company_number'),
-                defaults=ch_company_row,
-            )
+        objects = [CompaniesHouseCompany(**ch_company_row) for ch_company_row in
+                   iter_ch_csv_from_url(csv_url, tmp_file_creator)]
+        CompaniesHouseCompany.objects.bulk_create(objs=objects)
 
-            if created or not is_changed(company, ch_company_row):
-                continue
 
-            for key, value in ch_company_row.items():
-                setattr(company, key, value)
-
-            company.save()
+def truncate_ch_companies_table():
+    """Delete all the companies house companies."""
+    CompaniesHouseCompany.objects.all().delete()
 
 
 class Command(BaseCommand):
