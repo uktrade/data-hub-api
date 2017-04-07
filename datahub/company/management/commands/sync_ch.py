@@ -6,6 +6,7 @@ import zipfile
 
 from contextlib import contextmanager
 from datetime import datetime
+from itertools import chain, islice
 from logging import getLogger
 from urllib.parse import urlparse
 
@@ -19,6 +20,9 @@ from datahub.company.models import CompaniesHouseCompany
 from datahub.core.utils import log_and_ignore_exceptions, stream_to_file_pointer
 
 logger = getLogger(__name__)
+
+
+BULK_CREATE_BATCH_SIZE = 1000
 
 
 def get_ch_latest_dump_file_list(url, selector='.omega a'):
@@ -97,9 +101,18 @@ def sync_ch(tmp_file_creator, endpoint=None):
     ch_csv_urls = get_ch_latest_dump_file_list(endpoint)
 
     for csv_url in ch_csv_urls:
-        objects = [CompaniesHouseCompany(**ch_company_row) for ch_company_row in
-                   iter_ch_csv_from_url(csv_url, tmp_file_creator)]
-        CompaniesHouseCompany.objects.bulk_create(objs=objects)
+        ch_company_rows = iter_ch_csv_from_url(csv_url, tmp_file_creator)
+        for batchiter in slice_interable_into_chuncks(ch_company_rows, BULK_CREATE_BATCH_SIZE):
+            objects = [CompaniesHouseCompany(**ch_company_row) for ch_company_row in batchiter]
+            CompaniesHouseCompany.objects.bulk_create(objs=objects)
+
+
+def slice_interable_into_chuncks(iterable, size):
+    """Return an iterable of iterables with constant (or lower) size."""
+    iterable = iter(iterable)
+    while True:
+        batchiter = islice(iterable, size)
+        yield chain([batchiter.next()], batchiter)
 
 
 def truncate_ch_companies_table():
