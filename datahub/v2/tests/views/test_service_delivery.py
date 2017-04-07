@@ -1,4 +1,5 @@
 import json
+import uuid
 
 from django.utils.timezone import now
 from rest_framework import status
@@ -28,6 +29,15 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
         assert content.keys() == {'data'}
         assert content['data'].keys() == {'type', 'id', 'attributes', 'relationships', 'links'}
         assert content['data']['links']['self']
+
+    def test_service_delivery_detail_view_not_found(self):
+        """Service Delivery detail view not found."""
+        url = reverse('v2:servicedelivery-detail', kwargs={'object_id': uuid.uuid4()})
+        response = self.api_client.get(url)
+        content = json.loads(response.content.decode('utf-8'))
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        expected_content = {'errors': [{'source': {'pointer': '/data/detail'}, 'detail': 'Not found.'}]}
+        assert content == expected_content
 
     def test_service_delivery_list_view(self):
         """Service delivery liste view."""
