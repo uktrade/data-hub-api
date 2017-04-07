@@ -70,7 +70,7 @@ class ServiceDelivery(InteractionAbstract):
     API_MAPPING = {
         ('company', 'Company'),
         ('contact', 'Contact'),
-        ('country', 'Country'),
+        ('country_of_interest', 'Country'),
         ('dit_advisor', 'Advisor'),
         ('dit_team', 'Team'),
         ('sector', 'Sector'),
