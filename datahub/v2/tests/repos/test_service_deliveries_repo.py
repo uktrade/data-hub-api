@@ -9,6 +9,7 @@ from freezegun import freeze_time
 from datahub.core import constants
 from datahub.core.test_utils import get_test_user
 from datahub.interaction.test import factories
+from datahub.v2.exceptions import DoesNotExistException
 from datahub.v2.repos.service_deliveries import ServiceDeliveryDatabaseRepo
 from datahub.v2.repos.utils import RepoResponse
 
@@ -48,7 +49,7 @@ class ServiceDeliveriesRepoTestCase(TestCase):
 
     def test_get_does_not_exist(self):
         """Test SD does not exist."""
-        with pytest.raises(ObjectDoesNotExist):
+        with pytest.raises(DoesNotExistException):
             ServiceDeliveryDatabaseRepo(config=DUMMY_CONFIG).get(uuid.uuid4())
 
     @freeze_time('2017-04-01 20:49:40.566277+00:00')
