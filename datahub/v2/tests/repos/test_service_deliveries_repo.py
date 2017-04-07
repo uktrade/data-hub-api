@@ -1,7 +1,6 @@
 import uuid
 
 import pytest
-from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from django.utils.timezone import now
 from freezegun import freeze_time
