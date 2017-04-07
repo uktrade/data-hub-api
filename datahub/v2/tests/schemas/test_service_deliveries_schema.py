@@ -30,13 +30,19 @@ class TestRelationshipType(unittest.TestCase):
     def test_deserialize_missing_type(self):
         """Deserialize missing type."""
         with pytest.raises(colander.Invalid) as e:
-            self.schema().deserialize({'item': {'data': {}}})
-        assert e.value.asdict()['item'] == """{'data': {}} has no key type"""
+            self.schema().deserialize({'item': {'data': {'id': 1}}})
+        assert e.value.asdict()['item'] == """{'data': {'id': 1}} has no key type"""
+
+    def test_deserialize_missing_id(self):
+        """Deserialize missing id."""
+        with pytest.raises(colander.Invalid) as e:
+            self.schema().deserialize({'item': {'data': {'type': 'foo'}}})
+        assert e.value.asdict()['item'] == """{'data': {'type': 'foo'}} has no key id"""
 
     def test_deserialize_incorrect_type(self):
         """Deserialize incorrect type."""
         with pytest.raises(colander.Invalid) as e:
-            self.schema().deserialize({'item': {'data': {'type': 'bamble'}}})
+            self.schema().deserialize({'item': {'data': {'id': 1, 'type': 'bamble'}}})
         assert e.value.asdict()['item'] == 'type bamble should be flibble'
 
     def test_serialize_empty(self):

@@ -25,18 +25,25 @@ class RelationshipType(SchemaType):
         return appstruct and 'true' or 'false'
 
     def deserialize(self, node, cstruct):
-        """Deserialize data."""
+        """Deserialize data.
+
+        {'data': None}
+        {'data': {'type': 'foo', 'id: 1}}
+        """
         if cstruct is null:
             return null
         cstruct = dict(cstruct)
         if 'data' not in cstruct:
             raise Invalid(node, '%r has no key data' % cstruct)
-        if 'type' not in cstruct['data']:
-            raise Invalid(node, '%r has no key type' % cstruct)
-        if cstruct['data']['type'] != self.typename:
-            raise Invalid(node, 'type %s should be %s' % (
-                cstruct['data']['type'], self.typename))
-        cstruct['data']['id'] = uuid.UUID(cstruct['data']['id'])
+        if cstruct['data']:
+            if 'type' not in cstruct['data']:
+                raise Invalid(node, '%r has no key type' % cstruct)
+            if 'id' not in cstruct['data']:
+                raise Invalid(node, '%r has no key id' % cstruct)
+            if cstruct['data']['type'] != self.typename:
+                raise Invalid(node, 'type %s should be %s' % (
+                    cstruct['data']['type'], self.typename))
+            cstruct['data']['id'] = uuid.UUID(cstruct['data']['id'])
         return cstruct
 
 

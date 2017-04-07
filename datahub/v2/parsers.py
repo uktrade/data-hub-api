@@ -2,8 +2,8 @@
 
 from rest_framework import parsers
 from rest_framework.exceptions import ParseError
-from rest_framework_json_api.exceptions import Conflict
 
+from .exceptions import Conflict
 from .renderers import JSONRenderer
 
 

@@ -3,7 +3,6 @@ import uuid
 import pytest
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
-from django.utils import encoding
 from django.utils.timezone import now
 from freezegun import freeze_time
 
@@ -43,7 +42,7 @@ class ServiceDeliveriesRepoTestCase(TestCase):
         }
         assert data['relationships'] == expected_relationships
         assert data['relationships']['company']['data']['type'] == 'Company'
-        assert data['attributes']['date'] == encoding.force_text(service_delivery.date)
+        assert data['attributes']['date'] == service_delivery.date.isoformat()
         assert data['type'] == 'ServiceDelivery'
         assert data['id'] == str(service_delivery.pk)
 
@@ -109,9 +108,9 @@ class ServiceDeliveriesRepoTestCase(TestCase):
         data = result.data
         assert isinstance(result, RepoResponse)
         expected_attributes = {
-            'date': '2017-04-01 20:49:40.566277+00:00',
+            'date': '2017-04-01T20:49:40.566277+00:00',
             'subject': 'whatever',
-            'feedback': '',
+            'feedback': None,
             'notes': 'hello'
         }
         assert data['attributes'] == expected_attributes

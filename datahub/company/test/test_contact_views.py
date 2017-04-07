@@ -31,6 +31,25 @@ class ContactTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
 
+    def test_add_contact_invalid_email_address(self):
+        """Test add new contact."""
+        url = reverse('v1:contact-list')
+        response = self.api_client.post(url, {
+            'first_name': 'Oratio',
+            'last_name': 'Nelson',
+            'title': constants.Title.admiral_of_the_fleet.value.id,
+            'company': CompanyFactory().pk,
+            'job_title': constants.Role.owner.value.name,
+            'email': 'invalid dot com',
+            'telephone_countrycode': '+44',
+            'telephone_number': '123456789',
+            'address_same_as_company': True,
+            'primary': True
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.content == b'{"email":["Enter a valid email address."]}'
+
     def test_add_contact_no_address(self):
         """Test add new contact without any address."""
         url = reverse('v1:contact-list')
