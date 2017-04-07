@@ -2,7 +2,7 @@ import colander
 from rest_framework import status
 
 from datahub.interaction.models import ServiceDelivery, ServiceOffer
-from datahub.v2.exceptions import RepoDataValidationError
+from datahub.v2.exceptions import DoesNotExistException, RepoDataValidationError
 from datahub.v2.schemas.service_deliveries import ServiceDeliverySchema
 
 from . import utils
@@ -37,7 +37,10 @@ class ServiceDeliveryDatabaseRepo:
 
     def get(self, object_id):
         """Get and return a single object by its id."""
-        entity = self.model_class.objects.get(id=object_id)
+        try:
+            entity = self.model_class.objects.get(id=object_id)
+        except self.model_class.DoesNotExist:
+            raise DoesNotExistException()
         data = utils.model_to_json_api_data(entity, self.schema_class(), url_builder=self.url_builder)
         return utils.build_repo_response(data=data)
 
