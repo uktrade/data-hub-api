@@ -64,6 +64,8 @@ class CDMSUserBackend(ModelBackend):
 
     def _cdms_login(self, url, username, password, user_agent=None):
         """
+        Login to the CDMS.
+
         This goes through the following steps:
         1. get login page
         2. submit the form with username and password
@@ -107,6 +109,8 @@ class CDMSUserBackend(ModelBackend):
     @staticmethod
     def _submit_form(session, source, url=None, params=None):
         """
+        Submit CDMS STS form.
+
         It submits the form contained in the `source` param optionally
         overriding form `params` and form `url`.
         This is needed as UKTI has a few STSes and the token has to be

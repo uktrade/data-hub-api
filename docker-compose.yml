@@ -21,6 +21,7 @@ services:
       ES_INDEX: test
       ES_HOST: es
       ES_PORT: 9200
+      CDMS_AUTH_URL: http://example.com
     depends_on:
       - postgres
       - es
