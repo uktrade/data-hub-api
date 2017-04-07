@@ -51,7 +51,7 @@ def filter_irrelevant_ch_columns(row):
             ret['incorporation_date'], '%d/%m/%Y'
         ).date()
     except (TypeError, ValueError):
-        pass
+        ret['incorporation_date'] = None
 
     # bad hacks
     ret['registered_address_country_id'] = settings.CH_UNITED_KINGDOM_COUNTRY_ID
@@ -81,16 +81,9 @@ def iter_ch_csv_from_url(url, tmp_file_creator):
         logger.info('Downloaded: {url}'.format(url=url))
 
         with open_ch_zipped_csv(tf) as csv_reader:
-            for index, row in enumerate(csv_reader):
-                if index == 0:
-                    continue  # We're overriding field names, skip header row
-
+            next(csv_reader)  # skip the csv header
+            for row in csv_reader:
                 yield filter_irrelevant_ch_columns(row)
-
-
-def is_changed(company, csv_data):
-    """Return whatever company data changed."""
-    return any(csv_data[name] != getattr(company, name) for name in csv_data)
 
 
 @transaction.atomic
