@@ -6,13 +6,14 @@ import zipfile
 
 from contextlib import contextmanager
 from datetime import datetime
-from itertools import chain, islice
+from itertools import islice
 from logging import getLogger
 from urllib.parse import urlparse
 
 import requests
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.db import transaction
 from lxml import etree
 from raven.contrib.django.raven_compat.models import client
 
@@ -20,9 +21,6 @@ from datahub.company.models import CompaniesHouseCompany
 from datahub.core.utils import log_and_ignore_exceptions, stream_to_file_pointer
 
 logger = getLogger(__name__)
-
-
-BULK_CREATE_BATCH_SIZE = 1000
 
 
 def get_ch_latest_dump_file_list(url, selector='.omega a'):
@@ -95,24 +93,29 @@ def is_changed(company, csv_data):
     return any(csv_data[name] != getattr(company, name) for name in csv_data)
 
 
+@transaction.atomic
 def sync_ch(tmp_file_creator, endpoint=None):
     """Do the sync."""
     endpoint = endpoint or settings.CH_DOWNLOAD_URL
     ch_csv_urls = get_ch_latest_dump_file_list(endpoint)
 
+    truncate_ch_companies_table()
     for csv_url in ch_csv_urls:
         ch_company_rows = iter_ch_csv_from_url(csv_url, tmp_file_creator)
-        for batchiter in slice_interable_into_chuncks(ch_company_rows, BULK_CREATE_BATCH_SIZE):
+        for batchiter in slice_interable_into_chuncks(ch_company_rows, settings.BULK_CREATE_BATCH_SIZE):
             objects = [CompaniesHouseCompany(**ch_company_row) for ch_company_row in batchiter]
-            CompaniesHouseCompany.objects.bulk_create(objs=objects)
+            CompaniesHouseCompany.objects.bulk_create(
+                objs=objects,
+                batch_size=settings.BULK_CREATE_BATCH_SIZE
+            )
 
 
 def slice_interable_into_chuncks(iterable, size):
     """Return an iterable of iterables with constant (or lower) size."""
-    iterable = iter(iterable)
-    while True:
+    batchiter = islice(iterable, size)
+    while batchiter:
+        yield batchiter
         batchiter = islice(iterable, size)
-        yield chain([batchiter.next()], batchiter)
 
 
 def truncate_ch_companies_table():
