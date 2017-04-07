@@ -49,6 +49,7 @@ Leeloo can run on any Heroku style platform. These environment variables MUST be
 - DJANGO_SETTINGS_MODULE
 - KORBEN_HOST
 - KORBEN_PORT
+- BULK_CREATE_BATCH_SIZE (default=50000)
 
 
 Management commands
