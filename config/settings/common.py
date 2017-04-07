@@ -139,8 +139,6 @@ STATICFILES_DIRS = (
     str(ROOT_DIR.path('static')),
 )
 
-
-
 # DRF
 REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': None,
@@ -158,8 +156,6 @@ REST_FRAMEWORK = {
 APPEND_SLASH = True
 
 # Leeloo stuff
-KORBEN_HOST = env('KORBEN_HOST')
-KORBEN_PORT = env('KORBEN_PORT')
 ES_HOST = env('ES_HOST')
 ES_PORT = env.int('ES_PORT')
 ES_INDEX = env('ES_INDEX')
