@@ -8,7 +8,7 @@ from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core import constants
+from datahub.core import auth, constants
 from datahub.metadata.models import Team
 
 pytestmark = pytest.mark.django_db
@@ -289,3 +289,56 @@ def test_valid_django_user(auth_mock, live_server):
     )
     assert response.status_code == status.HTTP_200_OK
     assert '"token_type": "Bearer"' in response.text
+
+
+def test_submit_form():
+    """Test successfully submitting cdms form."""
+    response_mock = mock.Mock()
+    response_mock.ok = True
+    response_mock.content = '''
+    <form action="foo">
+    <input name="test1" value="test1_val" type="text">
+    </form>
+    '''
+    session_mock = mock.Mock()
+    session_mock.post.return_value = response_mock
+    source = '''
+    <form action="foo2">
+    <input name="test2" value="test2_val" type="text">
+    </form>
+    '''
+
+    resp = auth.CDMSUserBackend._submit_form(
+        session_mock,
+        source,
+        params={'injected': 'param'},
+    )
+
+    assert resp is response_mock
+    session_mock.post.assert_called_once_with(
+        'foo2',
+        dict(
+            test2='test2_val',
+            injected='param',
+        ),
+    )
+
+
+def test_submit_form_unauthenticated():
+    """Test successfully submitting cdms form but auth failed."""
+    response_mock = mock.Mock()
+    response_mock.ok = False
+    session_mock = mock.Mock()
+    session_mock.post.return_value = response_mock
+    source = '''
+    <form action="foo2">
+    <input name="test2" value="test2_val" type="text">
+    </form>
+    '''
+
+    with pytest.raises(auth.CDMSInvalidCredentialsError):
+        auth.CDMSUserBackend._submit_form(
+            session_mock,
+            source,
+            params={'injected': 'param'},
+        )
