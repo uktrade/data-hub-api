@@ -13,7 +13,7 @@ class CDMSUserBackend(ModelBackend):
     """Model backend that authenticates against CDMS and checks for whitelisting."""
 
     def validate_cdms_credentials(self, username, password):
-        """Authenticate CDMS user/advisor using korben."""
+        """Authenticate CDMS user/advisor using cdms login page."""
         try:
             return self._cdms_login(
                 url=settings.CDMS_AUTH_URL,
@@ -26,7 +26,7 @@ class CDMSUserBackend(ModelBackend):
             return False  # Invalid credentials
 
     def authenticate(self, username=None, password=None, **kwargs):
-        """Copied from parent impl, but with password check done by Korben."""
+        """Copied from parent impl, but with password check done by cdms."""
         user_model = get_user_model()
         if username is None:
             username = kwargs.get(user_model.USERNAME_FIELD)
@@ -40,7 +40,7 @@ class CDMSUserBackend(ModelBackend):
             if self.user_can_authenticate(user):
                 auth_result = self.validate_cdms_credentials(username, password)
                 if auth_result is True:
-                    # user authenticated via Korben
+                    # user authenticated via CDMS
                     user.set_password(password)  # cache passwd hash for backup auth
                     user.is_active = True  # ensure user can use django backend to auth, in case CDMS fails
                     user.save()
