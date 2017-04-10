@@ -47,8 +47,6 @@ Leeloo can run on any Heroku style platform. These environment variables MUST be
 - DJANGO_SECRET_KEY
 - DJANGO_SENTRY_DSN
 - DJANGO_SETTINGS_MODULE
-- KORBEN_HOST
-- KORBEN_PORT
 
 
 Management commands
