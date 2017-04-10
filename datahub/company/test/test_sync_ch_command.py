@@ -7,7 +7,6 @@ from django.conf import settings
 
 from datahub.company.management.commands import sync_ch
 from datahub.company.models import CompaniesHouseCompany
-from datahub.company.test.factories import CompaniesHouseCompanyFactory
 
 
 @mock.patch('datahub.company.management.commands.sync_ch.requests')
