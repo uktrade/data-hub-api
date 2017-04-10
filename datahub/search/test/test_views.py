@@ -7,7 +7,6 @@ from datahub.core.test_utils import LeelooTestCase
 from datahub.interaction.test.factories import InteractionFactory
 
 
-@pytest.mark.xfail(reason='Failing until we implement the new search.')
 class SearchViewTestCase(LeelooTestCase):
     """Search test case."""
 
@@ -19,6 +18,7 @@ class SearchViewTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == ['Parameter "term" is mandatory.']
 
+    @pytest.mark.xfail(reason='ES logic removed')
     def test_search_by_term(self):
         """Search by term."""
         url = reverse('search')
@@ -30,6 +30,7 @@ class SearchViewTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_200_OK
 
+    @pytest.mark.xfail(reason='ES logic removed')
     def test_search_term_with_multiple_doc_type_filters(self):
         """Multiple doc type filters."""
         InteractionFactory()
@@ -49,6 +50,7 @@ class SearchViewTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_200_OK
         assert returned_types == expected_types
 
+    @pytest.mark.xfail(reason='ES logic removed')
     def test_search_term_with_single_doc_type_filter(self):
         """Single doc type filter."""
         InteractionFactory()

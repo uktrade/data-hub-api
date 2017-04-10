@@ -1,9 +1,11 @@
 version: '2'
 services:
 
-  leeloo-common:
+  leeloo:
     build:
       context: .
+    ports:
+      - "8000:8000"
     volumes:
       - .:/app
     entrypoint: |
@@ -16,30 +18,26 @@ services:
       DJANGO_SECRET_KEY: changeme
       DJANGO_SETTINGS_MODULE: config.settings.local
       COV_TOKEN: ${COV_TOKEN}
-      KORBEN_HOST: korben
-      KORBEN_PORT: 8080
-
-  leeloo:
-    extends:
-      service: leeloo-common
-    ports:
-      - "8000:8000"
+      ES_INDEX: test
+      ES_HOST: es
+      ES_PORT: 9200
+      CDMS_AUTH_URL: http://example.com
     depends_on:
       - postgres
-      - korben
+      - es
     links:
       - postgres
-      - korben
+      - es
     command: /app/start.sh
-
-  korben:
-    build:
-      context: dummy-korben
-    ports:
-      - "8080:8080"
 
   postgres:
     image: postgres:9.5
     restart: always
     environment:
       - POSTGRES_DB=datahub
+
+  es:
+    image: elasticsearch:2.3
+    restart: always
+    ports:
+      - "9200:9200"
