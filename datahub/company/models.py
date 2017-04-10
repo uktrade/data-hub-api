@@ -168,7 +168,7 @@ class Company(ArchivableModel, CompanyAbstract):
 class CompaniesHouseCompany(CompanyAbstract):
     """Representation of Companies House company."""
 
-    company_number = models.CharField(max_length=MAX_LENGTH, primary_key=True)
+    company_number = models.CharField(max_length=MAX_LENGTH, unique=True)
     company_category = models.CharField(max_length=MAX_LENGTH, blank=True)
     company_status = models.CharField(max_length=MAX_LENGTH, blank=True)
     sic_code_1 = models.CharField(max_length=MAX_LENGTH, blank=True)

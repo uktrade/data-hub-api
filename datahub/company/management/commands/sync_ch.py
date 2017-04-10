@@ -6,14 +6,14 @@ import zipfile
 
 from contextlib import contextmanager
 from datetime import datetime
-from itertools import islice
+from itertools import chain, islice
 from logging import getLogger
 from urllib.parse import urlparse
 
 import requests
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.db import transaction
+from django.db import connection
 from lxml import etree
 from raven.contrib.django.raven_compat.models import client
 
@@ -35,7 +35,8 @@ def get_ch_latest_dump_file_list(url, selector='.omega a'):
     for anchor in root.cssselect(selector):
         href = anchor.attrib['href']
         # Fix broken url
-        result.append('{0.scheme}://{0.hostname}/{1}'.format(url_base, href))
+        if 'AsOneFile' not in href:
+            result.append('{0.scheme}://{0.hostname}/{1}'.format(url_base, href))
     return result
 
 
@@ -75,10 +76,8 @@ def open_ch_zipped_csv(fp):
 def iter_ch_csv_from_url(url, tmp_file_creator):
     """Fetch & cache CH zipped CSV, and then iterate though contents."""
     with tmp_file_creator() as tf:
-        logger.info('Downloading: {url}'.format(url=url))
         stream_to_file_pointer(url, tf)
         tf.seek(0, 0)
-        logger.info('Downloaded: {url}'.format(url=url))
 
         with open_ch_zipped_csv(tf) as csv_reader:
             next(csv_reader)  # skip the csv header
@@ -86,7 +85,6 @@ def iter_ch_csv_from_url(url, tmp_file_creator):
                 yield filter_irrelevant_ch_columns(row)
 
 
-@transaction.atomic
 def sync_ch(tmp_file_creator, endpoint=None):
     """Do the sync."""
     endpoint = endpoint or settings.CH_DOWNLOAD_URL
@@ -104,16 +102,25 @@ def sync_ch(tmp_file_creator, endpoint=None):
 
 
 def slice_interable_into_chuncks(iterable, size):
-    """Return an iterable of iterables with constant (or lower) size."""
-    batchiter = islice(iterable, size)
-    while batchiter:
-        yield batchiter
-        batchiter = islice(iterable, size)
+    """Return an iterable of iterables with constant size (or smaller)."""
+    while True:
+        try:
+            first = next(iterable)
+            yield chain([first], islice(iterable, size - 1))
+        except StopIteration:
+            break
 
 
 def truncate_ch_companies_table():
-    """Delete all the companies house companies."""
-    CompaniesHouseCompany.objects.all().delete()
+    """Delete all the companies house companies.
+
+    delete() is too slow, we use truncate.
+    """
+
+    cursor = connection.cursor()
+    table_name = CompaniesHouseCompany._meta.db_table
+    query = 'truncate {table};'.format(table=table_name)
+    cursor.execute(query)
 
 
 class Command(BaseCommand):
