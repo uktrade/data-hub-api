@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 import requests
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.db import connection
+from django.db import connection, transaction
 from lxml import etree
 from raven.contrib.django.raven_compat.models import client
 
@@ -85,12 +85,12 @@ def iter_ch_csv_from_url(url, tmp_file_creator):
                 yield filter_irrelevant_ch_columns(row)
 
 
-def sync_ch(tmp_file_creator, endpoint=None):
+def sync_ch(tmp_file_creator, endpoint=None, truncate_first=False):
     """Do the sync."""
     endpoint = endpoint or settings.CH_DOWNLOAD_URL
     ch_csv_urls = get_ch_latest_dump_file_list(endpoint)
-
-    truncate_ch_companies_table()
+    if truncate_first:
+        truncate_ch_companies_table()
     for csv_url in ch_csv_urls:
         ch_company_rows = iter_ch_csv_from_url(csv_url, tmp_file_creator)
         for batchiter in slice_interable_into_chuncks(ch_company_rows, settings.BULK_CREATE_BATCH_SIZE):
@@ -111,12 +111,12 @@ def slice_interable_into_chuncks(iterable, size):
             break
 
 
+@transaction.atomic
 def truncate_ch_companies_table():
     """Delete all the companies house companies.
 
     delete() is too slow, we use truncate.
     """
-
     cursor = connection.cursor()
     table_name = CompaniesHouseCompany._meta.db_table
     query = 'truncate {table};'.format(table=table_name)
@@ -129,7 +129,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """Handle."""
         try:
-            sync_ch(tmp_file_creator=tempfile.TemporaryFile)
+            sync_ch(tmp_file_creator=tempfile.TemporaryFile, truncate_first=True)
         except Exception as e:
             with log_and_ignore_exceptions():
                 client.captureException()
