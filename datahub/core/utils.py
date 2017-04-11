@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 from hashlib import sha256
+from itertools import zip_longest
 from logging import getLogger
 from urllib.parse import urlparse
 
@@ -46,3 +47,12 @@ def generate_signature(path, body, salt):
     url_object = urlparse(path)
     message = string_to_bytes(url_object.path) + string_to_bytes(body) + string_to_bytes(salt)
     return sha256(message).hexdigest()
+
+
+def slice_iterable_into_chunks(iterable, size):
+    """Collect data into fixed-length chunks or blocks.
+
+    https://docs.python.org/3/library/itertools.html#itertools-recipes
+    """
+    args = [iter(iterable)] * size
+    return zip_longest(*args, fillvalue=None)
