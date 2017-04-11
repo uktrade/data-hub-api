@@ -2,7 +2,8 @@ from hashlib import sha256
 
 import pytest
 
-from datahub.core.utils import generate_signature, log_and_ignore_exceptions, string_to_bytes
+from datahub.core.utils import generate_signature, log_and_ignore_exceptions, slice_iterable_into_chunks, \
+    string_to_bytes
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
@@ -42,3 +43,11 @@ def test_generate_signature():
     body = 'bar'
     expected_signature = sha256(bytes('/hellofoobar', 'utf-8')).hexdigest()
     assert generate_signature(path, salt, body) == expected_signature
+
+
+def test_slice_iterable_into_chunks():
+    """Test slice iterable into chunks."""
+    size = 10
+    iterable = range(100)
+    chunks = list(slice_iterable_into_chunks(iterable, size))
+    assert len(chunks) == 10

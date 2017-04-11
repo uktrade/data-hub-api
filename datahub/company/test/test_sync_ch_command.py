@@ -53,8 +53,9 @@ def test_unzip_and_csv_read_on_the_fly():
 @pytest.mark.django_db
 @mock.patch('datahub.company.management.commands.sync_ch.stream_to_file_pointer', mock.MagicMock())
 @mock.patch('datahub.company.management.commands.sync_ch.get_ch_latest_dump_file_list')
-def test_full_ch_sync(file_list_mock):
+def test_full_ch_sync(file_list_mock, settings):
     """Test the whole process."""
+    settings.BULK_CREATE_BATCH_SIZE = 2
     file_list_mock.return_value = ['irrelevant']
     fixture_loc = path.join(path.dirname(__file__), 'fixtures', 'CH_data_test.zip')
 

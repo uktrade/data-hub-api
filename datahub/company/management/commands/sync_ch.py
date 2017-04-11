@@ -3,10 +3,8 @@ import csv
 import io
 import tempfile
 import zipfile
-
 from contextlib import contextmanager
 from datetime import datetime
-from itertools import chain, islice
 from logging import getLogger
 from urllib.parse import urlparse
 
@@ -18,7 +16,7 @@ from lxml import etree
 from raven.contrib.django.raven_compat.models import client
 
 from datahub.company.models import CompaniesHouseCompany
-from datahub.core.utils import log_and_ignore_exceptions, stream_to_file_pointer
+from datahub.core.utils import log_and_ignore_exceptions, slice_iterable_into_chunks, stream_to_file_pointer
 
 logger = getLogger(__name__)
 
@@ -86,29 +84,24 @@ def iter_ch_csv_from_url(url, tmp_file_creator):
 
 
 def sync_ch(tmp_file_creator, endpoint=None, truncate_first=False):
-    """Do the sync."""
+    """Do the sync.
+
+    We are batching the records instead of letting bulk_create doing it because Django casts the objects into a list
+    https://github.com/django/django/blob/master/django/db/models/query.py#L420
+    this would create a list with millions of objects, that will try to be saved in batches in a single transaction
+    """
     endpoint = endpoint or settings.CH_DOWNLOAD_URL
     ch_csv_urls = get_ch_latest_dump_file_list(endpoint)
     if truncate_first:
         truncate_ch_companies_table()
     for csv_url in ch_csv_urls:
         ch_company_rows = iter_ch_csv_from_url(csv_url, tmp_file_creator)
-        for batchiter in slice_interable_into_chuncks(ch_company_rows, settings.BULK_CREATE_BATCH_SIZE):
-            objects = [CompaniesHouseCompany(**ch_company_row) for ch_company_row in batchiter]
+        for batchiter in slice_iterable_into_chunks(ch_company_rows, settings.BULK_CREATE_BATCH_SIZE):
+            objects = [CompaniesHouseCompany(**ch_company_row) for ch_company_row in batchiter if ch_company_row]
             CompaniesHouseCompany.objects.bulk_create(
                 objs=objects,
                 batch_size=settings.BULK_CREATE_BATCH_SIZE
             )
-
-
-def slice_interable_into_chuncks(iterable, size):
-    """Return an iterable of iterables with constant size (or smaller)."""
-    while True:
-        try:
-            first = next(iterable)
-            yield chain([first], islice(iterable, size - 1))
-        except StopIteration:
-            break
 
 
 @transaction.atomic
