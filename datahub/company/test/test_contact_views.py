@@ -1,4 +1,5 @@
 import pytest
+from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -13,23 +14,57 @@ pytestmark = pytest.mark.django_db
 class ContactTestCase(LeelooTestCase):
     """Contact test case."""
 
+    @freeze_time('2017-04-18 13:25:30.986208+00:00')
     def test_add_contact_address_same_as_company(self):
         """Test add new contact."""
         url = reverse('v1:contact-list')
+        company = CompanyFactory()
         response = self.api_client.post(url, {
             'first_name': 'Oratio',
             'last_name': 'Nelson',
             'title': constants.Title.admiral_of_the_fleet.value.id,
-            'company': CompanyFactory().pk,
+            'company': company.pk,
             'job_title': constants.Role.owner.value.name,
             'email': 'foo@bar.com',
             'telephone_countrycode': '+44',
             'telephone_number': '123456789',
             'address_same_as_company': True,
-            'primary': True
+            'primary': True,
         })
 
         assert response.status_code == status.HTTP_201_CREATED
+        expected_response = {'email_alternative': None,
+                             'contactable_by_dit_partners': False,
+                             'telephone_alternative': None,
+                             'modified_on': '2017-04-18T13:25:30.986208',
+                             'advisor': str(self.user.pk),
+                             'email': 'foo@bar.com',
+                             'address_1': None,
+                             'address_2': None,
+                             'address_4': None,
+                             'address_county': None,
+                             'first_name': 'Oratio',
+                             'archived_on': None,
+                             'telephone_countrycode': '+44',
+                             'address_postcode': None,
+                             'archived': False,
+                             'contactable_by_dit': False,
+                             'address_3': None,
+                             'address_country': None,
+                             'address_same_as_company': True,
+                             'company': str(company.pk),
+                             'title': constants.Title.admiral_of_the_fleet.value.id,
+                             'notes': None,
+                             'address_town': None,
+                             'last_name': 'Nelson',
+                             'created_on': '2017-04-18T13:25:30.986208',
+                             'primary': True,
+                             'job_title': 'Owner',
+                             'telephone_number': '123456789',
+                             'id': response.json()['id'],
+                             'archived_by': None,
+                             'archived_reason': None}
+        assert response.json() == expected_response
 
     def test_add_contact_invalid_email_address(self):
         """Test add new contact."""
