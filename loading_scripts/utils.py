@@ -54,5 +54,7 @@ def iterate_over_cdms_entities_from_s3(bucket, entity_name):
 def get_cdms_entity_s3_keys(bucket, entity_name):
     """Filter the relevant S3 keys for CDMS entity."""
     all_objects = bucket.objects.filter(Prefix=PREFIX + entity_name)
-
-    return [k.key for k in all_objects if k.key.endswith('response_body')]
+    filtered_objects = []
+    for k in all_objects:
+        if k.key.endswith('response_body'):
+            yield k.key
