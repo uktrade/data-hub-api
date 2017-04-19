@@ -15,11 +15,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='contact',
             name='contactable_by_email',
-            field=models.NullBooleanField(),
+            field=models.BooleanField(default=True),
         ),
         migrations.AddField(
             model_name='contact',
             name='contactable_by_phone',
-            field=models.NullBooleanField(),
+            field=models.BooleanField(default=True),
         ),
     ]
