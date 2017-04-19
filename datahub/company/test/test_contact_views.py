@@ -52,7 +52,7 @@ class ContactTestCase(LeelooTestCase):
                              'contactable_by_dit': False,
                              'contactable_by_dit_partners': False,
                              'contactable_by_email': True,
-                             'contactable_by_phone': True,
+                             'contactable_by_phone': False,
                              'created_on': '2017-04-18T13:25:30.986208',
                              'email': 'foo@bar.com',
                              'email_alternative': None,
