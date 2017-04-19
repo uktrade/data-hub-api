@@ -10,6 +10,7 @@ from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
 
 from datahub.interaction.test.factories import ServiceDeliveryFactory, ServiceOfferFactory
+from datahub.metadata.test.factories import EventFactory
 
 
 class ServiceDeliveryViewTestCase(LeelooTestCase):
@@ -20,7 +21,7 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
         service_offer = ServiceOfferFactory()
         servicedelivery = ServiceDeliveryFactory(
             service=service_offer.service,
-            dit_team=service_offer.dit_team
+            dit_team=service_offer.dit_team,
         )
         url = reverse('v2:servicedelivery-detail', kwargs={'object_id': servicedelivery.pk})
         response = self.api_client.get(url)
@@ -41,11 +42,16 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
 
     def test_service_delivery_list_view(self):
         """Service delivery liste view."""
-        service_offer = ServiceOfferFactory()
+        event = EventFactory()
+        service_offer = ServiceOfferFactory(
+            event=event
+        )
         [
             ServiceDeliveryFactory(
                 service=service_offer.service,
-                dit_team=service_offer.dit_team)
+                dit_team=service_offer.dit_team,
+                event=service_offer.event
+            )
             for i in range(6)]
         url = reverse('v2:servicedelivery-list')
         response = self.api_client.get(url)
