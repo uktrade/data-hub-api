@@ -48,12 +48,6 @@ def odata_to_django(odata_tablename, odata_dict):
                 continue
             django_dict[django_col] = value
 
-    for odata_cols, django_col, func in mapping.get('local_fn', ()):
-        args = []
-        for odata_col in odata_cols:
-            args.append(odata_dict[odata_col])
-        django_dict[django_col] = func(*args)
-
     for django_col in mapping.get('use_undefined', ()):
         django_dict[django_col] =\
             django_dict.get(django_col) or spec.ENUM_UNDEFINED_ID
@@ -64,7 +58,4 @@ def odata_to_django(odata_tablename, odata_dict):
         )
         django_dict[django_col] = value
 
-    # call this last
-    for django_col in mapping.get('empty_strings', ()):
-        django_dict[django_col] = django_dict.get(django_col) or ''
     return django_dict
