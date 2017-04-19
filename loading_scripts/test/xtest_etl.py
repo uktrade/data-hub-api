@@ -1,5 +1,4 @@
-from korben.etl import transform
-from korben.cdms_api.rest.utils import datetime_to_cdms_datetime
+from datahub.korben.etl import transform
 
 
 DJANGO_SERVICE_DELIVERY_DATA = dict(
@@ -128,11 +127,6 @@ ODATA_OUTPUT_DATA['ModifiedOn'] = '/Date(1480080742000)/'
 ODATA_OUTPUT_DATA['CreatedOn'] = '/Date(1480080742000)/'
 
 
-def test_django_to_odata_contact():
-    _, result = transform.django_to_odata('company_contact', DJANGO_CONTACT_DATA)
-    assert result == ODATA_CONTACT_INPUT_DATA
-
-
 def test_odata_to_django_contact():
     result = transform.odata_to_django('ContactSet', ODATA_OUTPUT_DATA)
 
@@ -142,15 +136,6 @@ def test_odata_to_django_contact():
         address_same_as_company=False, archived=False, archived_reason='',
     ))
     assert result == django_data
-
-
-def test_django_to_odata_service_delivery():
-    _, result = transform.django_to_odata(
-        'interaction_servicedelivery', DJANGO_SERVICE_DELIVERY_DATA
-    )
-    expected = ODATA_SERVICE_DELIVERY_INPUT_DATA.copy()
-    expected.pop('CDMS_UNUSED_FIELD')
-    assert result == expected
 
 
 def test_odata_to_django_service_delivery():
@@ -173,13 +158,6 @@ def test_odata_to_django_service_delivery_intermediate():
 
 
 def test_round_trip_for_concat():
-    original_result = transform.odata_to_django('ContactSet', ODATA_OUTPUT_DATA)
-    _, result_interim = transform.django_to_odata('company_contact', original_result)
-
-    # We need to convert datetime format here
-    result_interim['ModifiedOn'] = datetime_to_cdms_datetime(result_interim['ModifiedOn'])
-    result_interim['CreatedOn'] = datetime_to_cdms_datetime(result_interim['CreatedOn'])
-
-    end_result = transform.odata_to_django('ContactSet', result_interim)
-
-    assert end_result == original_result
+    result = transform.odata_to_django('ContactSet', ODATA_OUTPUT_DATA)
+    print(result)
+    raise NotImplementedError()

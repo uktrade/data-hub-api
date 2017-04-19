@@ -2,7 +2,7 @@ from collections import namedtuple
 from datetime import datetime, timezone
 from unittest import mock
 
-from loading_scripts import utils
+from datahub.korben import utils
 
 
 def test_cdms_datetime_to_datetime():
