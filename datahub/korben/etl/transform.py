@@ -58,9 +58,6 @@ def odata_to_django(odata_tablename, odata_dict):
         django_dict[django_col] =\
             django_dict.get(django_col) or spec.ENUM_UNDEFINED_ID
 
-    for django_col, func in mapping.get('defaults', ()):
-        django_dict[django_col] = django_dict.get(django_col) or func()
-
     for odata_cols, django_col, _ in mapping.get('concat', ()):
         value = functools.reduce(
             lambda acc, col: acc + (odata_dict[col] or ''), odata_cols, ''
@@ -71,27 +68,3 @@ def odata_to_django(odata_tablename, odata_dict):
     for django_col in mapping.get('empty_strings', ()):
         django_dict[django_col] = django_dict.get(django_col) or ''
     return django_dict
-
-
-def colnames_shortlong(table_name, data_in):
-    'Map from short column names to long column names'
-    data_out = {}
-    for col_short, value in data_in.items():
-        col_long = spec.COLNAME_SHORTLONG.get((table_name, col_short))
-        if col_long:
-            data_out[col_long] = value
-        else:
-            data_out[col_short] = value
-    return data_out
-
-
-def colnames_longshort(table_name, data_in):
-    'Map from long column names to short column names'
-    data_out = {}
-    for col_long, value in data_in.items():
-        col_short = spec.COLNAME_LONGSHORT.get((table_name, col_long))
-        if col_short:
-            data_out[col_short] = value
-        else:
-            data_out[col_long] = value
-    return data_out
