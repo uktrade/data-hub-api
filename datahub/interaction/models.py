@@ -77,7 +77,8 @@ class ServiceDelivery(InteractionAbstract):
         ('service', 'Service'),
         ('status', 'ServiceDeliveryStatus'),
         ('uk_region', 'UKRegion'),
-        ('service_offer', 'ServiceOffer')
+        ('service_offer', 'ServiceOffer'),
+        ('event', 'Event')
     }
 
     status = models.ForeignKey('metadata.ServiceDeliveryStatus')
