@@ -66,4 +66,6 @@
     address_town: Willington,
     address_postcode: NE28 5JB,
     address_country: 80756b9a-5d95-e211-a939-e4115bead28a,
+    contactable_by_dit: True,
+    contactable_by_dit_partners: True
   }

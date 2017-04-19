@@ -219,6 +219,8 @@ class Contact(ArchivableModel, BaseModel):
     telephone_alternative = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     email_alternative = models.EmailField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
+    contactable_by_dit = models.BooleanField(default=False)
+    contactable_by_dit_partners = models.BooleanField(default=False)
 
     @cached_property
     def name(self):
