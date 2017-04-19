@@ -30,6 +30,7 @@ class ContactTestCase(LeelooTestCase):
             'telephone_number': '123456789',
             'address_same_as_company': True,
             'primary': True,
+            'contactable_by_email': True
         })
 
         assert response.status_code == status.HTTP_201_CREATED
