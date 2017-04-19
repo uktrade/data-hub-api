@@ -221,6 +221,8 @@ class Contact(ArchivableModel, BaseModel):
     notes = models.TextField(null=True, blank=True)
     contactable_by_dit = models.BooleanField(default=False)
     contactable_by_dit_partners = models.BooleanField(default=False)
+    contactable_by_email = models.NullBooleanField()
+    contactable_by_phone = models.NullBooleanField()
 
     @cached_property
     def name(self):
@@ -236,7 +238,13 @@ class Contact(ArchivableModel, BaseModel):
         empty_fields = [field for field in self.REQUIRED_ADDRESS_FIELDS if not getattr(self, field)]
         return {field: ['This field may not be null.'] for field in empty_fields}
 
-    def clean(self):
+    def validate_contact_preferences(self):
+        """At least one of the contract preferences must be set to True."""
+        if not self.contactable_by_email and not self.contactable_by_phone:
+            error_message = ''
+            raise ValidationError({'contactable_by_email': error_message})
+
+    def validate_address(self):
         """Custom validation for address.
 
         Either 'same_as_company' or address_1, address_town and address_country must be defined.
@@ -261,6 +269,11 @@ class Contact(ArchivableModel, BaseModel):
             elif not some_address_fields_existence:
                 error_message = 'Please select either address_same_as_company or enter an address manually.'
                 raise ValidationError({'address_same_as_company': error_message})
+
+    def clean(self):
+        """Custom validation."""
+        self.validate_address()
+        self.validate_contact_preferences()
         super(Contact, self).clean()
 
     def save(self, *args, **kwargs):
