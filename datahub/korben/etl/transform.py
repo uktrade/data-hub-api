@@ -5,7 +5,7 @@ according to spec.MAPPINGS
 import datetime
 import functools
 
-from korben.cdms_api.rest.utils import cdms_datetime_to_datetime
+from datahub.korben.utils import cdms_datetime_to_datetime
 
 from . import spec
 
