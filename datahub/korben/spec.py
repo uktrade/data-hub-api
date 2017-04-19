@@ -159,9 +159,6 @@ MAPPINGS.update({
             ('optevia_Country', (('Id', 'address_country_id'),),),
             ('optevia_Title', (('Id', 'title_id'),),),
         ),
-        'nonflat_defaults': (
-            ('ParentCustomerId', {'LogicalName': 'account'}),
-        ),
         'use_undefined': (
             'title_id',
             'company_id',
@@ -208,9 +205,6 @@ MAPPINGS.update({
             ('optevia_Organisation', (('Id', 'company_id'),),),
             ('optevia_ServiceProvider', (('Id', 'dit_team_id'),),),
             ('optevia_Service', (('Id', 'service_id'),),),
-        ),
-        'nonflat_defaults': (
-            ('optevia_Organisation', {'LogicalName': 'account'}),
         ),
         'use_undefined': (
             'company_id',
