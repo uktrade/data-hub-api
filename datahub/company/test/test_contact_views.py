@@ -50,6 +50,8 @@ class ContactTestCase(LeelooTestCase):
                              'company': str(company.pk),
                              'contactable_by_dit': False,
                              'contactable_by_dit_partners': False,
+                             'contactable_by_email': True,
+                             'contactable_by_phone': True,
                              'created_on': '2017-04-18T13:25:30.986208',
                              'email': 'foo@bar.com',
                              'email_alternative': None,
@@ -143,10 +145,61 @@ class ContactTestCase(LeelooTestCase):
             'address_1': 'Foo st.',
             'address_town': 'London',
             'address_country': constants.Country.united_kingdom.value.id,
-            'primary': True
+            'primary': True,
+            'contactable_by_email': True
         })
 
         assert response.status_code == status.HTTP_201_CREATED
+
+    def test_add_contact_with_contact_preferences_not_set(self):
+        """Don't set any contact preference."""
+        url = reverse('v1:contact-list')
+        response = self.api_client.post(url, {
+            'first_name': 'Oratio',
+            'last_name': 'Nelson',
+            'title': constants.Title.admiral_of_the_fleet.value.id,
+            'company': CompanyFactory().pk,
+            'job_title': constants.Role.owner.value.name,
+            'email': 'foo@bar.com',
+            'telephone_countrycode': '+44',
+            'telephone_number': '123456789',
+            'address_same_as_company': True,
+            'primary': True,
+        })
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        expected_response = {'errors': {'contactable_by_email': ['A contact should have at least one way of being '
+                                                                 'contacted. Please select either email or phone, '
+                                                                 'or both'],
+                                        'contactable_by_phone': ['A contact should have at least one way '
+                                                                 'of being contacted. Please select either '
+                                                                 'email or phone, or both']}}
+        assert response.json() == expected_response
+
+    def test_add_contact_with_contact_preferences_set_to_false(self):
+        """Contact preference both set to false."""
+        url = reverse('v1:contact-list')
+        response = self.api_client.post(url, {
+            'first_name': 'Oratio',
+            'last_name': 'Nelson',
+            'title': constants.Title.admiral_of_the_fleet.value.id,
+            'company': CompanyFactory().pk,
+            'job_title': constants.Role.owner.value.name,
+            'email': 'foo@bar.com',
+            'telephone_countrycode': '+44',
+            'telephone_number': '123456789',
+            'address_same_as_company': True,
+            'primary': True,
+            'contactable_by_email': False,
+            'contactable_by_phone': False
+        })
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        expected_response = {'errors': {'contactable_by_email': ['A contact should have at least one way of being '
+                                                                 'contacted. Please select either email or phone, '
+                                                                 'or both'],
+                                        'contactable_by_phone': ['A contact should have at least one way '
+                                                                 'of being contacted. Please select either '
+                                                                 'email or phone, or both']}}
+        assert response.json() == expected_response
 
     def test_modify_contact(self):
         """Modify an existing contact."""
