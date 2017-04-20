@@ -8,6 +8,8 @@ class Mapping(object):
             pass
         if concat is not None:
             pass
+    def __contains__(self, field_name):
+        return field_name in (x for _, x in self.fields)
 
 class MetadataMapping(Mapping):
     def __init__(self, source_pkey, from_entitytype, name_field, ToModel):
