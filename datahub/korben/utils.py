@@ -103,3 +103,10 @@ def get_cdms_entity_s3_keys(bucket, entity_name):
     for k in all_objects:
         if k.key.endswith('response_body'):
             yield k.key
+
+
+def get_by_path(srcdict, path):
+    value = srcdict
+    for chunk in path.split('.'):
+        value = value.get(chunk)
+    return value

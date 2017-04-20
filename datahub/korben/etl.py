@@ -5,57 +5,58 @@ according to spec.MAPPINGS
 import datetime
 import functools
 
+from django.db.models.fields import DateTimeField
+
+from datahub.core import constants
 from datahub.korben.utils import cdms_datetime_to_datetime
 
 from . import spec
 
-def odata_to_django(odata_tablename, odata_dict):
+
+def extract(bucket, mapping):
+    """Extract data from bucket using given prefix and mapping spec."""
+    return utils.iterate_over_cdms_entities_from_s3(bucket, mapping.to_entitytype)
+
+
+def transform(mapping, odata_dict):
     'Transform an OData dict to a Django dict'
     django_dict = {}
-    mapping = spec.MAPPINGS[odata_tablename]
 
-    # Simplest mapping from “local” dict key to renamed “local” key
-    for odata_col, django_col in mapping.get('local', ()):
-        value = odata_dict.get(odata_col)
-        if odata_col:
-            django_dict[django_col] = value
+    if value is None:
+        if mapping[path] in mapping.undef:
+            return constants.Undefined
 
-    # Transform the fields containgin Dynamics-style datetime strings to ISO
-    # standard datetime strings
-    for odata_col, django_col in mapping.get('datetime', ()):
-        value = odata_dict.get(odata_col)
-        if odata_col and value:
-            result = cdms_datetime_to_datetime(value)
-            if isinstance(result, datetime.datetime):
-                result = result.isoformat()
-            django_dict[django_col] = result
+    for left, right in mapping.fields:
 
-    for odata_prefix, field_map in mapping.get('nonflat', ()):
-        # eurgh has to work two ways; once for data from cdms once for data
-        # from the odata database
-        prefix_dict = odata_dict.get(odata_prefix)
-        if not prefix_dict:
-            for odata_suffix, django_col in field_map:
-                value = odata_dict.get(
-                    "{0}_{1}".format(odata_prefix, odata_suffix)
-                )
-                if value:
-                    django_dict[django_col] = value
-            continue
-        for odata_suffix, django_col in field_map:
-            value = prefix_dict.get(odata_suffix)
-            if not value:
-                continue
-            django_dict[django_col] = value
+        value = utils.get_by_path(odata_dict, left)
 
-    for django_col in mapping.get('use_undefined', ()):
-        django_dict[django_col] =\
-            django_dict.get(django_col) or spec.ENUM_UNDEFINED_ID
+        # set undefined if required
+        if value is None and mapping[left] in mapping.undef:
+            value = constants.Undefined
 
-    for odata_cols, django_col, _ in mapping.get('concat', ()):
+        # transform to compatible datetime string
+        if isinstance(mapping.ToModel._meta.get_field(left), DateTimeField):
+            value = utils.cdms_datetime_to_datetime(value)
+
+    # concat as required
+    for lefts, right in mapping.concat:
         value = functools.reduce(
-            lambda acc, col: acc + (odata_dict[col] or ''), odata_cols, ''
+            lambda acc, left: acc + odata_dict.get(left, ''), lefts, ''
         )
-        django_dict[django_col] = value
+        django_dict[right] = value
 
     return django_dict
+
+
+def load(Model, data):
+    try:
+        obj_id = data.pop('id')
+        obj, created = Model.objects.get_or_create(id=obj_id, defaults=data)
+        if not created:
+            for name, value in data.items():
+                setattr(obj, name, value)
+            obj.save()
+
+    except Exception as e:
+        logger.exception(e)
+        logger.exception('Exception during importing data')

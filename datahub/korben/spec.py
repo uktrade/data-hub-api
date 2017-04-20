@@ -1,87 +1,98 @@
 import itertools
+
+from datahub.korben.mapping import Mapping, MetadataMapping
+
 import datahub.company.models as company
 import datahub.interaction.models as interaction
 import datahub.metadata.models as metadata
-from datahub.korben.etl.mapping import Mapping, MetadataMapping
 
 metadata_specs = (
     (
-        'optevia_businesstypeId',
         'optevia_businesstypeSet',
-        'optevia_name',
         metadata.BusinessType
+        'optevia_businesstypeId',
+        'optevia_name',
     ),
     (
-        'optevia_sectorId',
         'optevia_sectorSet',
-        'optevia_name',
         metadata.Sector
+        'optevia_sectorId',
+        'optevia_name',
     ),
     (
-        'optevia_employeerangeId',
         'optevia_employeerangeSet',
-        'optevia_name',
         metadata.EmployeeRange
+        'optevia_employeerangeId',
+        'optevia_name',
     ),
     (
-        'optevia_turnoverrangeId',
         'optevia_turnoverrangeSet',
-        'optevia_name',
         metadata.TurnoverRange
+        'optevia_turnoverrangeId',
+        'optevia_name',
     ),
     (
-        'optevia_ukregionId',
         'optevia_ukregionSet',
-        'optevia_name',
         metadata.UKRegion
+        'optevia_ukregionId',
+        'optevia_name',
     ),
     (
-        'optevia_countryId',
         'optevia_countrySet',
-        'optevia_Country',
         metadata.Country
+        'optevia_countryId',
+        'optevia_Country',
     ),
     (
-        'optevia_titleId',
         'optevia_titleSet',
-        'optevia_name',
         metadata.Title
+        'optevia_titleId',
+        'optevia_name',
     ),
     (
-        'optevia_contactroleId',
         'optevia_contactroleSet',
-        'optevia_name',
         metadata.Role
+        'optevia_contactroleId',
+        'optevia_name',
     ),
     (
-        'optevia_interactioncommunicationchannelId',
         'optevia_interactioncommunicationchannelSet',
-        'optevia_name',
         metadata.InteractionType
+        'optevia_interactioncommunicationchannelId',
+        'optevia_name',
     ),
     (
-        'BusinessUnitId',
         'BusinessUnitSet',
-        'Name',
         metadata.Team
+        'BusinessUnitId',
+        'Name',
     ),
     (
-        'optevia_serviceId',
         'optevia_serviceSet',
-        'optevia_name',
         metadata.Service
+        'optevia_serviceId',
+        'optevia_name',
     ),
     (
-        'optevia_servicedeliverystatusId',
         'optevia_servicedeliverystatusSet',
-        'optevia_name',
         metadata.ServiceDeliveryStatus
+        'optevia_servicedeliverystatusId',
+        'optevia_name',
+    ),
+    (
+        'optevia_eventSet',
+        metadata.Event
+        'optevia_eventId',
+        'optevia_name',
     ),
 )
 
 mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
-    Mapping(from_entitytype='AccountSet', ToModel=company.Company, fields=(
-            ('AccountId', 'id'),
+    Mapping(
+        from_entitytype='AccountSet',
+        ToModel=company.Company,
+        pk='AccountId',
+        fields=(
             ('Name', 'name'),
             ('optevia_Alias', 'alias'),
             ('optevia_CompaniesHouseNumber', 'company_number'),
@@ -111,17 +122,21 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
         ),
     ),
     Mapping(
-        from_entitytype='SystemUserSet', ToModel=company.Advisor, fields=(
-            ('SystemUserId', 'id'),
-            ('FirstName', 'first_name'),
+        from_entitytype='SystemUserSet',
+        ToModel=company.Advisor,
+        pk='SystemUserId',
+        fields=(
             ('LastName', 'last_name'),
             ('DomainName', 'email'),
             ('BusinessUnitId.Id', 'dit_team_id'),
         ),
         concat=((('FirstName', 'MiddleName'), 'first_name'),),
     ),
-    Mapping(from_entitytype='ContactSet', ToModel='company_contact', fields=(
-            ('ContactId', 'id'),
+    Mapping(
+        from_entitytype='ContactSet',
+        ToModel='company_contact',
+        pk='ContactId',
+        fields=(
             ('JobTitle', 'job_title'),
             ('LastName', 'last_name'),
             ('optevia_PrimaryContact', 'primary'),
@@ -139,15 +154,16 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
             ('optevia_Title.Id', 'title_id'),
         ),
         concat=(
-            (('optevia_AreaCode', 'optevia_TelephoneNumber'), 'telephone_number', 'optevia_TelephoneNumber'),  # noqa: E501
+            (('optevia_AreaCode', 'optevia_TelephoneNumber'), 'telephone_number', 'optevia_TelephoneNumber'),
             (('FirstName', 'MiddleName'), 'first_name', 'FirstName'),
         ),
         undef=('title_id', 'company_id'),
     ),
     Mapping(
-        from_entitytype='detica_interactionSet', ToModel=interaction.Interaction,
+        from_entitytype='detica_interactionSet',
+        ToModel=interaction.Interaction,
+        pk='ActivityId',
         fields=(
-            ('ActivityId', 'id'),
             ('Subject', 'subject'),
             ('optevia_Notes', 'notes'),
             ('optevia_InteractionCommunicationChannel.Id', 'interaction_type_id'),
@@ -169,20 +185,20 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
     Mapping(
         from_entitytype='optevia_servicedeliverySet',
         ToModel=interaction.ServiceDelivery,
+        pk='optevia_servicedeliveryId',
         fields=(
-            ('optevia_servicedeliveryId', 'id'),
+            ('optevia_Advisor.Id', 'dit_advisor_id'),
+            ('optevia_Contact.Id', 'contact_id'),
+            ('optevia_Event.Id', 'event_id'),
+            ('optevia_LeadCountry.Id', 'country_of_interest_id'),
             ('optevia_Notes', 'notes'),
-            ('optevia_CustomerCommentFeedback', 'feedback'),
+            ('optevia_Organisation.Id', 'company_id'),
+            ('optevia_Sector.Id', 'sector_id'),
+            ('optevia_Service.Id', 'service_id'),
             ('optevia_ServiceDeliveryStatus.Id', 'status_id'),
             ('optevia_ServiceOffer.Id', 'service_offer_id'),
-            ('optevia_Service.Id', 'service_id'),
             ('optevia_ServiceProvider.Id', 'dit_team_id'),
-            ('optevia_Organisation.Id', 'company_id'),
-            ('optevia_Contact.Id', 'contact_id'),
-            ('optevia_Advisor.Id', 'dit_advisor_id'),
             ('optevia_UKRegion.Id', 'uk_region_id'),
-            ('optevia_Sector.Id', 'sector_id'),
-            ('optevia_LeadCountry.Id', 'country_of_interest_id'),
         ),
         undef=(
             'company_id',
@@ -195,13 +211,24 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
     Mapping(
         from_entitytype='optevia_serviceofferSet',
         ToModel=interaction.ServiceOffer,
+        pk='optevia_serviceofferId',
         fields=(
-            ('optevia_serviceofferId', 'id'),
+            ('optevia_Service.Id', 'service_id'),
+            ('optevia_ServiceProvider.Id', 'dit_team_id'),
+        ),
+    ),
+    Mapping(
+        from_entitytype='optevia_serviceofferSet',
+        ToModel=interaction.ServiceOffer,
+        pk='optevia_serviceofferId',
+        fields=(
+            ('optevia_Event.Id', 'event_id'),
             ('optevia_Service.Id', 'service_id'),
             ('optevia_ServiceProvider.Id', 'dit_team_id'),
         ),
     ),
 )
 
+
 def get_mapping(Model):
-    return next(filter(lambda m: m.ToModel == Model, mappings))
+    return next(filter(lambda mapping: mapping.ToModel == Model, mappings))

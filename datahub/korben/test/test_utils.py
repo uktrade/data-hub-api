@@ -5,7 +5,7 @@ import itertools
 from django.apps import apps
 from django.conf import settings
 
-from datahub.korben.etl import utils
+from datahub.korben import utils
 from datahub.metadata import models as metadata
 from datahub.company import models as company
 from datahub.interaction import models as interaction
