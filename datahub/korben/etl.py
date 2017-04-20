@@ -23,7 +23,7 @@ def extract(bucket, entity_name):
 
 def transform(mapping, odata_dict):
     'Transform an OData dict to a Django dict'
-    django_dict = {}
+    django_dict = {mapping.ToModel._meta.pk.name: odata_dict[mapping.pk]}
 
     for left, right in mapping.fields:
 
@@ -36,6 +36,8 @@ def transform(mapping, odata_dict):
         # transform to compatible datetime string
         if isinstance(mapping.ToModel._meta.get_field(right), DateTimeField):
             value = utils.cdms_datetime_to_datetime(value)
+
+        django_dict[right] = value
 
     # concat as required
     for lefts, right in mapping.concat:
@@ -57,5 +59,5 @@ def load(Model, data):
             obj.save()
 
     except Exception as e:
-        logger.exception(e)
+        print(e)
         logger.exception('Exception during importing data')

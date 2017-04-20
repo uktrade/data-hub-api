@@ -26,10 +26,14 @@ s3_bucket = s3.Bucket(os.environ['CDMS_DUMP_S3_BUCKET'])
 
 model_deps = utils.fkey_deps(set(mapping.ToModel for mapping in spec.mappings))
 
-for depth in list(model_deps.keys())[1:]:
+def transform(mapping, data):
+    for item in data:
+        yield etl.transform(mapping, item)
+
+for depth in list(model_deps.keys())[1:]:  # skip metadata
     for Model in model_deps[depth]:
         mapping = spec.get_mapping(Model)
         data = etl.extract(s3_bucket, mapping.from_entitytype)
-        data_transformed = map(functools.partial(etl.transform, mapping), data)
+        data_transformed = transform(mapping, data)
         for item in data_transformed:
             etl.load(mapping.ToModel, item)
