@@ -4,6 +4,7 @@ according to spec.MAPPINGS
 '''
 import datetime
 import functools
+from logging import getLogger
 
 from django.db.models.fields import DateTimeField
 
@@ -11,20 +12,18 @@ from datahub.core import constants
 from datahub.korben.utils import cdms_datetime_to_datetime
 
 from . import spec
+from . import utils
 
+logger = getLogger(__name__)
 
-def extract(bucket, mapping):
+def extract(bucket, entity_name):
     """Extract data from bucket using given prefix and mapping spec."""
-    return utils.iterate_over_cdms_entities_from_s3(bucket, mapping.to_entitytype)
+    return utils.iterate_over_cdms_entities_from_s3(bucket, entity_name)
 
 
 def transform(mapping, odata_dict):
     'Transform an OData dict to a Django dict'
     django_dict = {}
-
-    if value is None:
-        if mapping[path] in mapping.undef:
-            return constants.Undefined
 
     for left, right in mapping.fields:
 
@@ -35,13 +34,13 @@ def transform(mapping, odata_dict):
             value = constants.Undefined
 
         # transform to compatible datetime string
-        if isinstance(mapping.ToModel._meta.get_field(left), DateTimeField):
+        if isinstance(mapping.ToModel._meta.get_field(right), DateTimeField):
             value = utils.cdms_datetime_to_datetime(value)
 
     # concat as required
     for lefts, right in mapping.concat:
         value = functools.reduce(
-            lambda acc, left: acc + odata_dict.get(left, ''), lefts, ''
+            lambda acc, left: acc + (odata_dict.get(left) or ''), lefts, ''
         )
         django_dict[right] = value
 

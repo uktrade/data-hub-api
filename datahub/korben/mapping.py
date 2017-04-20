@@ -22,8 +22,9 @@ class Mapping(object):
         return field_name in self.values()
 
     def __getitem__(self, name):
-        _, value = next(filter(lambda (key, value): key == name, self.fields))
-        return value
+        for key, value in self.fields:
+            if value == name:
+                return value
 
 
 class MetadataMapping(Mapping):
