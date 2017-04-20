@@ -1,11 +1,16 @@
 import functools
+import itertools
 import os
 from collections import namedtuple, OrderedDict
 from logging import getLogger
 
 import boto3
 
+from django.apps import apps
+
 from . import etl
+from . import utils
+from . import spec
 
 
 logger = getLogger(__name__)
@@ -19,20 +24,12 @@ s3 = boto3.resource(
 )
 s3_bucket = s3.Bucket(os.environ['CDMS_DUMP_S3_BUCKET'])
 
-local_apps = ('company', 'interaction', 'metadata')
-models = itertools.chain.from_iterable(
-    apps.get_app_config(name).models.values() for name in local_apps
-)
-model_deps = dict(
-    utils.fkey_deps(
-        set(filter(lambda M: not M._meta.auto_created, models))
-    )
-)
+model_deps = utils.fkey_deps(set(mapping.ToModel for mapping in spec.mappings))
 
-for depth in model_deps.keys():
+for depth in list(model_deps.keys())[1:]:
     for Model in model_deps[depth]:
         mapping = spec.get_mapping(Model)
-        data_raw = extract(s3_bucket, mapping.from_entitytype)
+        data = etl.extract(s3_bucket, mapping.from_entitytype)
         data_transformed = map(functools.partial(etl.transform, mapping), data)
         for item in data_transformed:
-            load(mapping.ToModel, item)
+            etl.load(mapping.ToModel, item)

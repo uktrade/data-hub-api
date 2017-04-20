@@ -9,79 +9,79 @@ import datahub.metadata.models as metadata
 metadata_specs = (
     (
         'optevia_businesstypeSet',
-        metadata.BusinessType
+        metadata.BusinessType,
         'optevia_businesstypeId',
         'optevia_name',
     ),
     (
         'optevia_sectorSet',
-        metadata.Sector
+        metadata.Sector,
         'optevia_sectorId',
         'optevia_name',
     ),
     (
         'optevia_employeerangeSet',
-        metadata.EmployeeRange
+        metadata.EmployeeRange,
         'optevia_employeerangeId',
         'optevia_name',
     ),
     (
         'optevia_turnoverrangeSet',
-        metadata.TurnoverRange
+        metadata.TurnoverRange,
         'optevia_turnoverrangeId',
         'optevia_name',
     ),
     (
         'optevia_ukregionSet',
-        metadata.UKRegion
+        metadata.UKRegion,
         'optevia_ukregionId',
         'optevia_name',
     ),
     (
         'optevia_countrySet',
-        metadata.Country
+        metadata.Country,
         'optevia_countryId',
         'optevia_Country',
     ),
     (
         'optevia_titleSet',
-        metadata.Title
+        metadata.Title,
         'optevia_titleId',
         'optevia_name',
     ),
     (
         'optevia_contactroleSet',
-        metadata.Role
+        metadata.Role,
         'optevia_contactroleId',
         'optevia_name',
     ),
     (
         'optevia_interactioncommunicationchannelSet',
-        metadata.InteractionType
+        metadata.InteractionType,
         'optevia_interactioncommunicationchannelId',
         'optevia_name',
     ),
     (
         'BusinessUnitSet',
-        metadata.Team
+        metadata.Team,
         'BusinessUnitId',
         'Name',
     ),
     (
         'optevia_serviceSet',
-        metadata.Service
+        metadata.Service,
         'optevia_serviceId',
         'optevia_name',
     ),
     (
         'optevia_servicedeliverystatusSet',
-        metadata.ServiceDeliveryStatus
+        metadata.ServiceDeliveryStatus,
         'optevia_servicedeliverystatusId',
         'optevia_name',
     ),
     (
         'optevia_eventSet',
-        metadata.Event
+        metadata.Event,
         'optevia_eventId',
         'optevia_name',
     ),
@@ -134,7 +134,7 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
     ),
     Mapping(
         from_entitytype='ContactSet',
-        ToModel='company_contact',
+        ToModel=company.Contact,
         pk='ContactId',
         fields=(
             ('JobTitle', 'job_title'),
@@ -154,8 +154,8 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
             ('optevia_Title.Id', 'title_id'),
         ),
         concat=(
-            (('optevia_AreaCode', 'optevia_TelephoneNumber'), 'telephone_number', 'optevia_TelephoneNumber'),
-            (('FirstName', 'MiddleName'), 'first_name', 'FirstName'),
+            (('optevia_AreaCode', 'optevia_TelephoneNumber'), 'telephone_number'),
+            (('FirstName', 'MiddleName'), 'first_name'),
         ),
         undef=('title_id', 'company_id'),
     ),
@@ -231,4 +231,7 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
 
 
 def get_mapping(Model):
-    return next(filter(lambda mapping: mapping.ToModel == Model, mappings))
+    try:
+        return next(filter(lambda mapping: mapping.ToModel == Model, mappings))
+    except StopIteration:
+        raise Exception("No mapping for {0}".format(Model))
