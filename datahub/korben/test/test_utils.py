@@ -10,6 +10,12 @@ from datahub.metadata import models as metadata
 from datahub.company import models as company
 from datahub.interaction import models as interaction
 
+def test_fkey_deps_raises_without_set():
+    'Raise if not passed a set'
+    with pytest.raises(Exception) as exc:
+        utils.fkey_deps([])
+    assert  'Pass a set of models' in str(exc)
+
 def test_fkey_deps_raises_on_incomplete_modelset():
     'Raise if fkey_deps isn’t told everything it needs to know'
     with pytest.raises(Exception) as exc:
