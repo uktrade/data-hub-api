@@ -202,3 +202,6 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
         ),
     ),
 )
+
+def get_mapping(Model):
+    return next(filter(lambda m: m.ToModel == Model, mappings))
