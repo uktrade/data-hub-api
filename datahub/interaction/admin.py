@@ -18,7 +18,9 @@ class ServiceDeliveryAdmin(VersionAdmin):
 
     search_fields = ['id', 'company__company_number', 'company__company_name', 'contact_email']
 
+
 @admin.register(ServiceOffer)
 class ServiceOdfferAdmin(VersionAdmin):
     """Service Offer admin."""
+
     pass

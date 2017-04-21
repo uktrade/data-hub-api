@@ -1,5 +1,4 @@
 import collections
-import itertools
 import datetime
 import io
 import json
@@ -7,7 +6,7 @@ import re
 import tempfile
 
 from logging import getLogger
-from django.apps import apps
+
 from django.db.models.fields.related import ForeignKey
 
 from . import spec
@@ -17,7 +16,8 @@ DATETIME_RE = re.compile(r'/Date\(([-+]?\d+)\)/')
 PREFIX = 'CACHE/XRMServices/2011/OrganizationData.svc/'
 
 
-def yield_fkeys(Model):
+def yield_fkeys(Model):  # noqa N803
+    """Return mapped foreignkeys for a model."""
     mapping = spec.get_mapping(Model)
     for field in Model._meta.get_fields():
         if isinstance(field, ForeignKey) and field.column in mapping:
@@ -27,6 +27,7 @@ def yield_fkeys(Model):
 
 
 def fkey_deps(models):
+    """Return dict showing dependencies of model set."""
     if not isinstance(models, set):
         raise Exception('Pass a set of models')
     dependencies = collections.defaultdict(set)
@@ -99,13 +100,13 @@ def iterate_over_cdms_entities_from_s3(bucket, entity_name):
 def get_cdms_entity_s3_keys(bucket, entity_name):
     """Filter the relevant S3 keys for CDMS entity."""
     all_objects = bucket.objects.filter(Prefix=PREFIX + entity_name)
-    filtered_objects = []
     for k in all_objects:
         if k.key.endswith('response_body'):
             yield k.key
 
 
 def get_by_path(srcdict, path):
+    """Get a value for a dict by dotted path."""
     value = srcdict
     for chunk in path.split('.'):
         value = value.get(chunk)

@@ -1,10 +1,12 @@
-import itertools
+"""Specifications of mappings."""
 
-from datahub.korben.mapping import Mapping, MetadataMapping
+import itertools
 
 import datahub.company.models as company
 import datahub.interaction.models as interaction
 import datahub.metadata.models as metadata
+
+from datahub.korben.mapping import Mapping, MetadataMapping
 
 metadata_specs = (
     (
@@ -230,8 +232,9 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
 )
 
 
-def get_mapping(Model):
+def get_mapping(Model):  # noqa N803
+    """Return the mapping for a Django model."""
     try:
         return next(filter(lambda mapping: mapping.ToModel == Model, mappings))
     except StopIteration:
-        raise Exception("No mapping for {0}".format(Model))
+        raise Exception('No mapping for {0}'.format(Model))

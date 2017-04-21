@@ -1,20 +1,20 @@
-'''
-Functions for transforming dicts from Django to OData shape and back again,
-according to spec.MAPPINGS
-'''
-import datetime
+"""
+ETL.
+
+Extract, transform and load functions for converting from CDMS JSON to Postgres
+rows via Django models according to specs.mappings.
+"""
 import functools
 from logging import getLogger
 
 from django.db.models.fields import DateTimeField
 
 from datahub.core import constants
-from datahub.korben.utils import cdms_datetime_to_datetime
 
-from . import spec
 from . import utils
 
 logger = getLogger(__name__)
+
 
 def extract(bucket, entity_name):
     """Extract data from bucket using given prefix and mapping spec."""
@@ -22,7 +22,7 @@ def extract(bucket, entity_name):
 
 
 def transform(mapping, odata_dict):
-    'Transform an OData dict to a Django dict'
+    """Transform an OData dict to a Django dict."""
     django_dict = {mapping.ToModel._meta.pk.name: odata_dict[mapping.pk]}
 
     for left, right in mapping.fields:
@@ -51,7 +51,8 @@ def transform(mapping, odata_dict):
     return django_dict
 
 
-def load(Model, data):
+def load(Model, data):  # noqa N803
+    """Get or create and save Model instance from data."""
     try:
         obj_id = data.pop('id')
         obj, created = Model.objects.get_or_create(id=obj_id, defaults=data)
@@ -61,5 +62,5 @@ def load(Model, data):
             obj.save()
 
     except Exception as e:
-        print(e)
+        logger.exception(e)
         logger.exception('Exception during importing data')
