@@ -1,16 +1,11 @@
-import functools
-import itertools
 import os
-from collections import namedtuple, OrderedDict
 from logging import getLogger
 
 import boto3
 
-from django.apps import apps
-
 from . import etl
-from . import utils
 from . import spec
+from . import utils
 
 
 logger = getLogger(__name__)
@@ -26,9 +21,12 @@ s3_bucket = s3.Bucket(os.environ['CDMS_DUMP_S3_BUCKET'])
 
 model_deps = utils.fkey_deps(set(mapping.ToModel for mapping in spec.mappings))
 
+
 def transform(mapping, data):
+    """Yield from transform."""
     for item in data:
         yield etl.transform(mapping, item)
+
 
 for depth in model_deps.keys():
     for Model in model_deps[depth]:
