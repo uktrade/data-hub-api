@@ -112,9 +112,7 @@ class IProjectTeamAbstract(models.Model):
     class Meta:  # noqa: D101
         abstract = True
 
-    project_manager_team = models.ForeignKey('company.AdvisorTeam', null=True)  # TODO
     project_manager = models.ForeignKey('company.Advisor', null=True)
-    project_assurance_team = models.ForeignKey('company.AdvisorTeam', null=True)  # TODO
     project_assurance_advisor = models.ForeignKey('company.Advisor', null=True)
 
 
