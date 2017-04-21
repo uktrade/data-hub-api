@@ -30,7 +30,7 @@ def transform(mapping, data):
     for item in data:
         yield etl.transform(mapping, item)
 
-for depth in list(model_deps.keys())[1:]:  # skip metadata
+for depth in model_deps.keys():
     for Model in model_deps[depth]:
         mapping = spec.get_mapping(Model)
         data = etl.extract(s3_bucket, mapping.from_entitytype)
