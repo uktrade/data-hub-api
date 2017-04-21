@@ -6,6 +6,7 @@ from django.apps import apps
 from django.conf import settings
 
 from datahub.korben import utils
+from datahub.korben import spec
 from datahub.metadata import models as metadata
 from datahub.company import models as company
 from datahub.interaction import models as interaction
@@ -31,17 +32,9 @@ def test_fkey_deps_success_advisor():
     assert result == {0: {metadata.Team}, 1: {company.Advisor}}
 
 def test_fkey_deps_snapshot():
-    'Throw all local app models at fkey_deps'
-    local_apps = ('company', 'interaction', 'metadata')
-    models = itertools.chain.from_iterable(
-        apps.get_app_config(name).models.values() for name in local_apps
-    )
-    result = dict(
-        utils.fkey_deps(
-            set(filter(lambda M: not M._meta.auto_created, models))
-        )
-    )
-    assert result == {
+    'Throw all mapped models at fkey_deps'
+    result = utils.fkey_deps(set(mapping.ToModel for mapping in spec.mappings))
+    assert dict(result) == {
         0: {
             metadata.BusinessType,
             metadata.InteractionType,
@@ -56,10 +49,6 @@ def test_fkey_deps_snapshot():
             metadata.Service,
             metadata.ServiceDeliveryStatus,
             metadata.Event,
-            metadata.HeadquarterType,
-            metadata.CompanyClassification,
-            company.CompaniesHouseCompany,
-            company.Contact,
         },
         1: {
             company.Company,
@@ -67,6 +56,9 @@ def test_fkey_deps_snapshot():
             interaction.ServiceOffer,
         },
         2: {
+            company.Contact,
+        },
+        3: {
             interaction.Interaction,
             interaction.ServiceDelivery,
         },
