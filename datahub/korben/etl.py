@@ -28,16 +28,18 @@ def transform(mapping, odata_dict):
     for left, right in mapping.fields:
 
         value = utils.get_by_path(odata_dict, left)
+        django_dict[right] = value
 
         # set undefined if required
-        if value is None and mapping[left] in mapping.undef:
-            value = constants.Undefined
+        if value is None:
+            if mapping[right] in mapping.undef:
+                django_dict[right] = constants.UNDEFINED
+            else:
+                del django_dict[right]  # let the model handle it
 
         # transform to compatible datetime string
         if isinstance(mapping.ToModel._meta.get_field(right), DateTimeField):
-            value = utils.cdms_datetime_to_datetime(value)
-
-        django_dict[right] = value
+            django_dict[right] = utils.cdms_datetime_to_datetime(value)
 
     # concat as required
     for lefts, right in mapping.concat:
