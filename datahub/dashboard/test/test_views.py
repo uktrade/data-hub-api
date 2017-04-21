@@ -26,7 +26,8 @@ class DashboardTestCase(LeelooTestCase):
             'telephone_countrycode': '+44',
             'telephone_number': '123456789',
             'address_same_as_company': True,
-            'primary': True
+            'primary': True,
+            'contactable_by_email': True
         })
         interaction = InteractionFactory(dit_advisor=user)
 
