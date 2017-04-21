@@ -334,11 +334,14 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         default=True,
         help_text=(
             'Designates whether this user should be treated as active. '
-            'Unselect this instead of deleting accounts.'
+            'Deselect this instead of deleting accounts.'
         ),
     )
     date_joined = models.DateTimeField('date joined', default=now)
     enabled = models.BooleanField(default=False)
+    advisor_team = models.ForeignKey(
+        'metadata.AdvisorTeam', on_delete=models.SET_DEFAULT, related_name='advisors'
+    )
 
     objects = AdvisorManager()
 
