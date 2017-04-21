@@ -92,6 +92,10 @@ class CompanyClassification(BaseConstantModel):
     pass
 
 
+class InvestmentProjectPhase(BaseConstantModel):
+    """Investment project phase."""
+
+
 class InvestmentType(BaseConstantModel):
     """Investment type (for investment projects)."""
 
@@ -105,7 +109,7 @@ class NonFDIType(BaseConstantModel):
 
 
 class ReferralSourceActivity(BaseConstantModel):
-    """Referral source activity (for investment projects)."""
+    """Referral source activity type (for investment projects)."""
 
 
 class ReferralSourceWebsite(BaseConstantModel):
@@ -118,3 +122,7 @@ class ReferralSourceMarketing(BaseConstantModel):
 
 class InvestmentBusinessActivity(BaseConstantModel):
     """Business activity (for investment projects)."""
+
+
+class InvestmentStrategicDriver(BaseConstantModel):
+    """Strategic driver (for investment projects)."""

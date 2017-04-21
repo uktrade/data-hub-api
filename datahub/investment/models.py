@@ -29,6 +29,9 @@ class IProjectAbstract(models.Model):
     investor_company = models.ForeignKey(
         'company.Company', related_name="investor_investment_projects", null=True
     )
+    intermediate_company = models.ForeignKey(
+        'company.Company', related_name="intermediate_investment_projects", null=True
+    )
     investment_recipient_company = models.ForeignKey(
         'company.Company', related_name="recipient_investment_projects", null=True
     )
@@ -41,7 +44,9 @@ class IProjectAbstract(models.Model):
     referral_source_advisor = models.ForeignKey(
         'company.Advisor', related_name='referred_investment_projects', null=True
     )
-    referral_source_activity = models.ForeignKey('metadata.ReferralSourceActivity', null=True)
+    referral_source_activity = models.ForeignKey(
+        'metadata.ReferralSourceActivity', related='investment_projects', null=True
+    )
     referral_source_activity_website = models.ForeignKey(
         'metadata.ReferralSourceActivity', related='investment_projects', null=True
     )
@@ -58,7 +63,10 @@ class IProjectAbstract(models.Model):
         'metadata.NonFDIType', related='investment_projects', null=True
     )
     sector = models.ForeignKey('metadata.Sectors', related_name='+', null=True)
-    business_activity = models.ForeignKey('metadata.InvestmentBusinessActivity', related_name='+')
+    business_activity = models.ManyToManyField(
+        'metadata.InvestmentBusinessActivity',
+        related_name='+'
+    )
 
 
 class IProjectValueAbstract(models.Model):
@@ -85,7 +93,7 @@ class IProjectRequirementsAbstract(models.Model):
         abstract = True
 
     client_requirements = models.TextField(blank=True, null=True)
-    site_decided = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
+    site_decided = models.BooleanField(null=True)
     address_line_1 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
     address_line_2 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
     address_line_3 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
@@ -93,7 +101,9 @@ class IProjectRequirementsAbstract(models.Model):
 
     competitor_countries = models.ManyToManyField('metadata.Country', related_name='+')
     uk_region_locations = models.ManyToManyField('metadata.UKRegion', related_name='+')
-    strategic_drivers = models.ManyToManyField()  # TODO
+    strategic_drivers = models.ManyToManyField(
+        'metadata.InvestmentStrategicDriver', related_name='investment_projects'
+    )
 
 
 class IProjectTeamAbstract(models.Model):
@@ -105,7 +115,7 @@ class IProjectTeamAbstract(models.Model):
     project_manager_team = models.ForeignKey('company.AdvisorTeam', null=True)  # TODO
     project_manager = models.ForeignKey('company.Advisor', null=True)
     project_assurance_team = models.ForeignKey('company.AdvisorTeam', null=True)  # TODO
-    project_assurance = models.ForeignKey('company.Advisor', null=True)
+    project_assurance_advisor = models.ForeignKey('company.Advisor', null=True)
 
 
 class InvestmentProject(IProjectAbstract, IProjectValueAbstract, IProjectRequirementsAbstract,
