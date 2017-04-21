@@ -1,6 +1,8 @@
 from collections import namedtuple
 from enum import Enum
 
+UNDEFINED = '0167b456-0ddd-49bd-8184-e3227a0b6396'
+
 Constant = namedtuple('Constant', ('name', 'id'))
 
 
@@ -414,7 +416,7 @@ class Team(Enum):
         'CRM', '5e8be8a8-3e95-e211-a939-e4115bead28a'
     )
     undefined = Constant(
-        'Undefined', '0167b456-0ddd-49bd-8184-e3227a0b6396'
+        'Undefined', UNDEFINED
     )
 
 
@@ -442,4 +444,4 @@ class CompanyClassification(Enum):
     tier_c = Constant('Tier C - Local Accounts (UKTI Managed)', 'bd1bf800-8d53-e311-aef3-441ea13961e2')
     tier_dl = Constant('Tier D - LEP Managed Branch (not IST)', '12798372-8eb4-e511-88b6-e4115bead28a')
     tier_dg = Constant('Tier D - POST Identified/Managed', '572dfefe-cd1d-e611-9bdc-e4115bead28a')
-    undefined = Constant('Undefined', '0167b456-0ddd-49bd-8184-e3227a0b6396')
+    undefined = Constant('Undefined', UNDEFINED)
