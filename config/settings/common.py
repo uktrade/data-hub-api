@@ -50,6 +50,7 @@ LOCAL_APPS = (
     'datahub.core',
     'datahub.company',
     'datahub.interaction',
+    'datahub.investment',
     'datahub.metadata',
     'datahub.search',
     'datahub.user'
