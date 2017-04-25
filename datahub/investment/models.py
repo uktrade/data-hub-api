@@ -4,13 +4,13 @@ import uuid
 from django.conf import settings
 from django.db import models
 
-from datahub.core.models import ArchivableModel, BaseModel
+from datahub.core.models import BaseModel
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 class IProjectAbstract(models.Model):
-    """TODO"""
+    """TODO: document."""
 
     class Meta:  # noqa: D101
         abstract = True
@@ -29,13 +29,13 @@ class IProjectAbstract(models.Model):
     not_shareable_reason = models.TextField(blank=True, null=True)
 
     investor_company = models.ForeignKey(
-        'company.Company', related_name="investor_investment_projects", null=True
+        'company.Company', related_name='investor_investment_projects', null=True
     )
     intermediate_company = models.ForeignKey(
-        'company.Company', related_name="intermediate_investment_projects", null=True
+        'company.Company', related_name='intermediate_investment_projects', null=True
     )
     investment_recipient_company = models.ForeignKey(
-        'company.Company', related_name="recipient_investment_projects", null=True
+        'company.Company', related_name='recipient_investment_projects', null=True
     )
     client_contacts = models.ManyToManyField(
         'company.Contact', related_name='investment_projects', null=True
@@ -72,7 +72,7 @@ class IProjectAbstract(models.Model):
 
 
 class IProjectValueAbstract(models.Model):
-    """TODO"""
+    """TODO: document."""
 
     class Meta:  # noqa: D101
         abstract = True
@@ -89,7 +89,7 @@ class IProjectValueAbstract(models.Model):
 
 
 class IProjectRequirementsAbstract(models.Model):
-    """TODO"""
+    """TODO: document."""
 
     class Meta:  # noqa: D101
         abstract = True
@@ -109,7 +109,7 @@ class IProjectRequirementsAbstract(models.Model):
 
 
 class IProjectTeamAbstract(models.Model):
-    """TODO"""
+    """TODO: document."""
 
     class Meta:  # noqa: D101
         abstract = True
@@ -120,6 +120,6 @@ class IProjectTeamAbstract(models.Model):
 
 class InvestmentProject(IProjectAbstract, IProjectValueAbstract, IProjectRequirementsAbstract,
                         IProjectTeamAbstract, BaseModel):
-    """TODO"""
+    """TODO: document."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
