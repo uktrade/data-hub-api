@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.test.factories import ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
 from datahub.investment.test.factories import InvestmentProjectFactory
@@ -22,6 +23,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
 
     def test_create_project_success(self):
         """Test successfully creating a project."""
+        contacts = [ContactFactory(), ContactFactory()]
         url = reverse('investment:v3:project')
         request_data = {
             'name': 'project name',
@@ -33,20 +35,32 @@ class InvestmentViewsTestCase(LeelooTestCase):
             },
             'phase': {
                 'id': constants.InvestmentProjectPhase.assign_pm.value.id
-            }
+            },
+            'client_contacts': [{
+                'id': str(contacts[0].id)
+            }, {
+                'id': str(contacts[1].id)
+            }]
         }
         response = self.api_client.post(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
-        for key in ('name', 'description', 'nda_signed',
-                    'estimated_land_date'):
-            assert response_data[key] == request_data[key]
-        for key in ('investment_type', 'phase'):
-            assert response_data[key]['id'] == request_data[key]['id']
+        assert response_data['name'] == request_data['name']
+        assert response_data['description'] == request_data['description']
+        assert response_data['nda_signed'] == request_data['nda_signed']
+        assert (response_data['estimated_land_date'] == request_data[
+            'estimated_land_date'])
+        assert (response_data['investment_type']['id'] == request_data[
+            'investment_type']['id'])
+        assert response_data['phase']['id'] == request_data['phase']['id']
+        assert len(response_data['client_contacts']) == 2
+        assert sorted(contact['id'] for contact in response_data[
+            'client_contacts']) == sorted(contact.id for contact in contacts)
 
     def test_get_project_success(self):
         """Test successfully getting a project."""
-        project = InvestmentProjectFactory()
+        contacts = [ContactFactory().id, ContactFactory().id]
+        project = InvestmentProjectFactory(client_contacts=contacts)
         url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
@@ -60,20 +74,30 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert (response_data['investment_type']['id'] ==
                 str(project.investment_type.id))
         assert (response_data['phase']['id'] == str(project.phase.id))
+        assert sorted(contact['id'] for contact in response_data[
+            'client_contacts']) == sorted(contacts)
 
     def test_patch_project_success(self):
         """Test successfully partially updating a project."""
-        project = InvestmentProjectFactory()
+        project = InvestmentProjectFactory(
+            client_contacts=[ContactFactory().id, ContactFactory().id]
+        )
         url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
+        new_contact = ContactFactory()
         request_data = {
             'name': 'new name',
-            'description': 'new description'
+            'description': 'new description',
+            'client_contacts': [{
+                'id': str(new_contact.id)
+            }]
         }
         response = self.api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['name'] == request_data['name']
         assert response_data['description'] == request_data['description']
+        assert len(response_data['client_contacts']) == 1
+        assert response_data['client_contacts'][0]['id'] == str(new_contact.id)
 
     def test_get_value_success(self):
         """Test successfully getting a project value object."""
@@ -103,10 +127,15 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['total_investment'] == '999'
 
     def test_get_requirements_success(self):
-        """Test successfully getting a project value object."""
+        """Test successfully getting a project requirements object."""
+        countries = [
+            constants.Country.united_kingdom.value.id,
+            constants.Country.united_states.value.id
+        ]
         project = InvestmentProjectFactory(client_requirements='client reqs',
                                            site_decided=True,
-                                           address_line_1='address 1')
+                                           address_line_1='address 1',
+                                           competitor_countries=countries)
         url = reverse('investment:v3:requirements-item',
                       kwargs={'pk': project.pk})
         response = self.api_client.get(url)
@@ -115,9 +144,11 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['client_requirements'] == 'client reqs'
         assert response_data['site_decided'] is True
         assert response_data['address_line_1'] == 'address 1'
+        assert sorted(country['id'] for country in response_data[
+            'competitor_countries']) == sorted(countries)
 
     def test_patch_requirements_success(self):
-        """Test successfully partially updating a project value object."""
+        """Test successfully partially updating a requirements object."""
         project = InvestmentProjectFactory(client_requirements='client reqs',
                                            site_decided=True,
                                            address_line_1='address 1')
