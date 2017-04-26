@@ -101,3 +101,36 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['number_new_jobs'] == 555
         assert response_data['government_assistance'] is True
         assert response_data['total_investment'] == '999'
+
+    def test_get_requirements_success(self):
+        """Test successfully getting a project value object."""
+        project = InvestmentProjectFactory(client_requirements='client reqs',
+                                           site_decided=True,
+                                           address_line_1='address 1')
+        url = reverse('investment:v3:requirements-item',
+                      kwargs={'pk': project.pk})
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['client_requirements'] == 'client reqs'
+        assert response_data['site_decided'] is True
+        assert response_data['address_line_1'] == 'address 1'
+
+    def test_patch_requirements_success(self):
+        """Test successfully partially updating a project value object."""
+        project = InvestmentProjectFactory(client_requirements='client reqs',
+                                           site_decided=True,
+                                           address_line_1='address 1')
+        url = reverse('investment:v3:requirements-item',
+                      kwargs={'pk': project.pk})
+        request_data = {
+            'address_line_1': 'address 1 new',
+            'address_line_2': 'address 2 new'
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['client_requirements'] == 'client reqs'
+        assert response_data['site_decided'] is True
+        assert response_data['address_line_1'] == 'address 1 new'
+        assert response_data['address_line_2'] == 'address 2 new'

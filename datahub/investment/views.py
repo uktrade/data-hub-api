@@ -1,17 +1,23 @@
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.investment.models import InvestmentProject
 from datahub.investment.serializers import (
-    InvestmentProjectSerializer, InvestmentProjectValueSerializer
+    IProjectSerializer, IProjectValueSerializer, IProjectRequirementsSerializer
 )
 
 
-class InvestmentProjectViewSet(CoreViewSetV3):
-    read_serializer_class = InvestmentProjectSerializer
-    write_serializer_class = InvestmentProjectSerializer
+class IProjectViewSet(CoreViewSetV3):
+    read_serializer_class = IProjectSerializer
+    write_serializer_class = IProjectSerializer
     queryset = InvestmentProject.objects.all()
 
 
-class InvestmentProjectValueViewSet(CoreViewSetV3):
-    read_serializer_class = InvestmentProjectValueSerializer
-    write_serializer_class = InvestmentProjectValueSerializer
+class IProjectValueViewSet(CoreViewSetV3):
+    read_serializer_class = IProjectValueSerializer
+    write_serializer_class = IProjectValueSerializer
+    queryset = InvestmentProject.objects.all()
+
+
+class IProjectRequirementsViewSet(CoreViewSetV3):
+    read_serializer_class = IProjectRequirementsSerializer
+    write_serializer_class = IProjectRequirementsSerializer
     queryset = InvestmentProject.objects.all()

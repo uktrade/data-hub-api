@@ -1,22 +1,27 @@
 from django.conf.urls import include, url
 
 from datahub.investment.views import (
-    InvestmentProjectViewSet, InvestmentProjectValueViewSet
+    IProjectViewSet, IProjectValueViewSet, IProjectRequirementsViewSet
 )
 
 app_name = 'investment'
 
-project_collection = InvestmentProjectViewSet.as_view({
+project_collection = IProjectViewSet.as_view({
     'get': 'list',
     'post': 'create'
 })
 
-project_item = InvestmentProjectViewSet.as_view({
+project_item = IProjectViewSet.as_view({
     'get': 'retrieve',
     'patch': 'partial_update'
 })
 
-value_item = InvestmentProjectValueViewSet.as_view({
+value_item = IProjectValueViewSet.as_view({
+    'get': 'retrieve',
+    'patch': 'partial_update'
+})
+
+requirements_item = IProjectRequirementsViewSet.as_view({
     'get': 'retrieve',
     'patch': 'partial_update'
 })
@@ -26,7 +31,9 @@ urlpatterns_v3 = [
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/project$', project_item,
         name='project-item'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/value$', value_item,
-        name='value-item')
+        name='value-item'),
+    url(r'^investment/(?P<pk>[0-9a-z-]{36})/requirements$', requirements_item,
+        name='requirements-item')
 ]
 
 urlpatterns = [
