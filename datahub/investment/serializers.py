@@ -10,22 +10,29 @@ class InvestmentProjectSerializer(serializers.ModelSerializer):
     """Serialiser for investment project endpoints."""
     investment_type = NestedRelatedField(meta_models.InvestmentType)
     phase = NestedRelatedField(meta_models.InvestmentProjectPhase)
-    investor_company = NestedRelatedField(Company)
-    intermediate_company = NestedRelatedField(Company)
-    investment_recipient_company = NestedRelatedField(Company)
+    investor_company = NestedRelatedField(Company, required=False, allow_null=True)
+    intermediate_company = NestedRelatedField(Company, required=False, allow_null=True)
+    investment_recipient_company = NestedRelatedField(Company, required=False, allow_null=True)
     # client_contacts TODO
 
-    client_relationship_manager = NestedRelatedField(Advisor, extra_fields=('first_name',
-                                                                            'last_name'))
-    referral_source_advisor = NestedRelatedField(Advisor, extra_fields=('first_name',
-                                                                        'last_name'))
-    referral_source_activity = NestedRelatedField(meta_models.ReferralSourceActivity)
-    referral_source_activity_website = NestedRelatedField(meta_models.ReferralSourceWebsite)
-    referral_source_activity_marketing = NestedRelatedField(meta_models.ReferralSourceMarketing)
-    referral_source_activity_event = NestedRelatedField(meta_models.Event)
-    fdi_type = NestedRelatedField(meta_models.FDIType)
-    non_fdi_type = NestedRelatedField(meta_models.NonFDIType)
-    sector = NestedRelatedField(meta_models.Sector)
+    client_relationship_manager = NestedRelatedField(
+        Advisor, required=False, allow_null=True, extra_fields=('first_name', 'last_name')
+    )
+    referral_source_advisor = NestedRelatedField(
+        Advisor, required=False, allow_null=True, extra_fields=('first_name', 'last_name')
+    )
+    referral_source_activity = NestedRelatedField(meta_models.ReferralSourceActivity,
+                                                  required=False, allow_null=True)
+    referral_source_activity_website = NestedRelatedField(meta_models.ReferralSourceWebsite,
+                                                          required=False, allow_null=True)
+    referral_source_activity_marketing = NestedRelatedField(meta_models.ReferralSourceMarketing,
+                                                            required=False, allow_null=True)
+    referral_source_activity_event = NestedRelatedField(meta_models.Event, required=False,
+                                                        allow_null=True)
+    fdi_type = NestedRelatedField(meta_models.FDIType, required=False, allow_null=True)
+    non_fdi_type = NestedRelatedField(meta_models.NonFDIType, required=False, allow_null=True)
+    sector = NestedRelatedField(meta_models.Sector, required=False, allow_null=True)
+
     # business_activity TODO
 
     class Meta:  # noqa: D101
