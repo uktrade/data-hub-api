@@ -1,7 +1,7 @@
 from django.conf.urls import include, url
 
 from datahub.investment.views import (
-    IProjectViewSet, IProjectValueViewSet, IProjectRequirementsViewSet
+    IProjectRequirementsViewSet, IProjectValueViewSet, IProjectViewSet
 )
 
 app_name = 'investment'
