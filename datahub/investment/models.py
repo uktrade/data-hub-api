@@ -19,8 +19,10 @@ class IProjectAbstract(models.Model):
     description = models.TextField()
     nda_signed = models.BooleanField()
     estimated_land_date = models.DateField(null=True)
-    investment_type = models.ForeignKey('metadata.InvestmentType', null=True)  # FIXME
-    phase = models.ForeignKey('metadata.InvestmentProjectPhase', related_name='+', null=True)  # FIXME
+    investment_type = models.ForeignKey('metadata.InvestmentType',
+                                        related_name='investment_projects')
+    phase = models.ForeignKey('metadata.InvestmentProjectPhase',
+                              related_name='investment_projects')
 
     project_code = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     document_link = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -81,6 +83,7 @@ class IProjectValueAbstract(models.Model):
     foreign_equity_investment = models.DecimalField(null=True, max_digits=19, decimal_places=0)
     government_assistance = models.NullBooleanField()
     number_new_jobs = models.IntegerField(null=True)
+    # TODO salary
     number_safeguarded_jobs = models.IntegerField(null=True)
     r_and_d_budget = models.NullBooleanField()
     non_fdi_r_and_d_budget = models.NullBooleanField()

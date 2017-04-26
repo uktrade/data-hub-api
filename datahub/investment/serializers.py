@@ -37,11 +37,23 @@ class InvestmentProjectSerializer(serializers.ModelSerializer):
 
     class Meta:  # noqa: D101
         model = InvestmentProject
-        fields = ('id', 'name', 'project_code', 'description', 'document_link', 'nda_signed',
-                  'estimated_land_date', 'project_shareable', 'anonymous_description',
-                  'not_shareable_reason', 'investment_type', 'phase', 'investor_company',
-                  'intermediate_company', 'investment_recipient_company',
-                  'client_relationship_manager', 'referral_source_advisor',
-                  'referral_source_activity', 'referral_source_activity_website',
-                  'referral_source_activity_marketing',
-                  'referral_source_activity_event', 'fdi_type', 'non_fdi_type', 'sector')
+        fields = (
+            'id', 'name', 'project_code', 'description', 'document_link', 'nda_signed',
+            'estimated_land_date', 'project_shareable', 'anonymous_description',
+            'not_shareable_reason', 'investment_type', 'phase', 'investor_company',
+            'intermediate_company', 'investment_recipient_company',
+            'client_relationship_manager', 'referral_source_advisor',
+            'referral_source_activity', 'referral_source_activity_website',
+            'referral_source_activity_marketing',
+            'referral_source_activity_event', 'fdi_type', 'non_fdi_type', 'sector'
+        )
+
+
+class InvestmentProjectValueSerializer(serializers.ModelSerializer):
+    class Meta:  # noqa: D101
+        model = InvestmentProject
+        fields = (
+            'total_investment', 'foreign_equity_investment', 'government_assistance',
+            'number_new_jobs', 'number_safeguarded_jobs', 'r_and_d_budget',
+            'non_fdi_r_and_d_budget', 'new_tech_to_uk', 'export_revenue'
+        )
