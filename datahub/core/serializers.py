@@ -22,7 +22,8 @@ class NestedRelatedField(serializers.RelatedField):
         'required': 'This field is required.',
         'missing_pk': 'pk not provided.',
         'does_not_exist': 'Invalid pk "{pk_value}" - object does not exist.',
-        'incorrect_type': 'Incorrect type. Expected pk value, received {data_type}.',
+        'incorrect_type': 'Incorrect type. Expected object, received {'
+                          'data_type}.',
     }
 
     def __init__(self, model, extra_fields=('name',), **kwargs):
@@ -35,8 +36,8 @@ class NestedRelatedField(serializers.RelatedField):
         return self._model.objects.all()
 
     def to_internal_value(self, data):
-        data = self.pk_field.to_internal_value(data['id'])
         try:
+            data = self.pk_field.to_internal_value(data['id'])
             return self.get_queryset().get(pk=data)
         except ObjectDoesNotExist:
             self.fail('does_not_exist', pk_value=data)
