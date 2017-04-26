@@ -17,7 +17,11 @@ class ConstantModelSerializer(serializers.Serializer):
 
 
 class NestedRelatedField(serializers.RelatedField):
-    """TODO."""
+    """DRF serialiser field for foreign keys and many-to-many fields.
+
+    Serialises as a dict with 'id' plus other specified keys.
+    """
+
     default_error_messages = {
         'required': 'This field is required.',
         'missing_pk': 'pk not provided.',
@@ -27,15 +31,24 @@ class NestedRelatedField(serializers.RelatedField):
     }
 
     def __init__(self, model, extra_fields=('name',), **kwargs):
+        """Initialises the related field.
+
+        :param model:           Model of the related field.
+        :param extra_fields:    Extra fields to include in the representation.
+        :param kwargs:          Keyword arguments to pass to
+                                RelatedField.__init__()
+        """
         super().__init__(**kwargs)
         self.pk_field = UUIDField()
         self._fields = extra_fields
         self._model = model
 
     def get_queryset(self):
+        """Returns the queryset corresponding to the model."""
         return self._model.objects.all()
 
     def to_internal_value(self, data):
+        """Converts a user-provided value to a model instance."""
         try:
             data = self.pk_field.to_internal_value(data['id'])
             return self.get_queryset().get(pk=data)
@@ -47,14 +60,17 @@ class NestedRelatedField(serializers.RelatedField):
             self.fail('incorrect_type', data_type=type(data).__name__)
 
     def to_representation(self, value):
-        extra = {field: _value_for_json(getattr(value, field)) for field in self._fields}
+        """Converts a model instance to a dict representation."""
+        extra = {field: _value_for_json(getattr(value, field)) for field in
+                 self._fields}
         return {
-            'id': self.pk_field.to_representation(value.pk),
-            **extra
+            **extra,
+            'id': self.pk_field.to_representation(value.pk)
         }
 
 
 def _value_for_json(val):
+    """Returns a JSON-serialisable version of a value."""
     if isinstance(val, UUID):
         return str(val)
     return val

@@ -8,6 +8,7 @@ from datahub.investment.models import InvestmentProject
 
 class IProjectSerializer(serializers.ModelSerializer):
     """Serialiser for investment project endpoints."""
+
     investment_type = NestedRelatedField(meta_models.InvestmentType)
     phase = NestedRelatedField(meta_models.InvestmentProjectPhase)
     investor_company = NestedRelatedField(
@@ -73,6 +74,7 @@ class IProjectSerializer(serializers.ModelSerializer):
 
 class IProjectValueSerializer(serializers.ModelSerializer):
     """Serialiser for investment project value objects."""
+
     class Meta:  # noqa: D101
         model = InvestmentProject
         fields = (
@@ -85,6 +87,7 @@ class IProjectValueSerializer(serializers.ModelSerializer):
 
 class IProjectRequirementsSerializer(serializers.ModelSerializer):
     """Serialiser for investment project requirements objects."""
+
     competitor_countries = NestedRelatedField(
         meta_models.Country, many=True, required=False
     )
