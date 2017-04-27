@@ -1,8 +1,8 @@
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.investment.models import InvestmentProject
 from datahub.investment.serializers import (
-    IProjectRequirementsSerializer, IProjectSerializer,
-    IProjectValueSerializer, IProjectTeamSerializer
+    IProjectRequirementsSerializer, IProjectSerializer, IProjectTeamSerializer,
+    IProjectValueSerializer
 )
 
 

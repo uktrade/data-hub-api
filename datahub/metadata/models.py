@@ -129,4 +129,4 @@ class InvestmentStrategicDriver(BaseConstantModel):
 
 
 class SalaryRange(BaseOrderedConstantModel):
-    """Salary ranges (used for investment projects)"""
+    """Salary ranges (used for investment projects)."""

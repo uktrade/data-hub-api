@@ -128,12 +128,14 @@ class IProjectTeamAbstract(models.Model):
 
     @property
     def project_manager_team(self):
+        """The DIT team associated with the project manager."""
         if self.project_manager:
             return self.project_manager.dit_team
         return None
 
     @property
     def project_assurance_team(self):
+        """The DIT team associated with the project assurance advisor."""
         if self.project_assurance_advisor:
             return self.project_assurance_advisor.dit_team
         return None
