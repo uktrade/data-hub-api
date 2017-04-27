@@ -117,8 +117,24 @@ class IProjectTeamAbstract(models.Model):
     class Meta:  # noqa: D101
         abstract = True
 
-    project_manager = models.ForeignKey('company.Advisor', null=True, related_name='+')
-    project_assurance_advisor = models.ForeignKey('company.Advisor', null=True, related_name='+')
+    project_manager = models.ForeignKey(
+        'company.Advisor', null=True, related_name='+'
+    )
+    project_assurance_advisor = models.ForeignKey(
+        'company.Advisor', null=True, related_name='+'
+    )
+
+    @property
+    def project_manager_team(self):
+        if self.project_manager:
+            return self.project_manager.dit_team
+        return None
+
+    @property
+    def project_assurance_team(self):
+        if self.project_assurance_advisor:
+            return self.project_assurance_advisor.dit_team
+        return None
 
 
 class InvestmentProject(IProjectAbstract, IProjectValueAbstract, IProjectRequirementsAbstract,
