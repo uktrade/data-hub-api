@@ -126,7 +126,3 @@ class InvestmentBusinessActivity(BaseConstantModel):
 
 class InvestmentStrategicDriver(BaseConstantModel):
     """Strategic driver (for investment projects)."""
-
-
-class AdvisorTeam(BaseConstantModel):
-    """Adviser team."""

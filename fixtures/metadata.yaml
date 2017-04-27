@@ -7149,8 +7149,3 @@
 # InvestmentStrategicDriver
 - model: metadata.investmentstrategicdriver
   fields: {id: "382aa6d1-a362-4166-a09d-f579d9f3be75", name: "TODO"}
-
-
-# AdvisorTeam
-- model: metadata.advisorteam
-  fields: {id: "b4f20501-57d7-4df2-949f-5a85be96d479", name: "East Midlands"}
