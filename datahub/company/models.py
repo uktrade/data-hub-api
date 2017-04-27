@@ -339,9 +339,6 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     )
     date_joined = models.DateTimeField('date joined', default=now)
     enabled = models.BooleanField(default=False)
-    advisor_team = models.ForeignKey(
-        'metadata.AdvisorTeam', on_delete=models.SET_NULL, related_name='advisors', null=True
-    )
 
     objects = AdvisorManager()
 
