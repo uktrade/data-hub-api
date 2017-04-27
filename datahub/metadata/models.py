@@ -126,3 +126,6 @@ class InvestmentBusinessActivity(BaseConstantModel):
 
 class InvestmentStrategicDriver(BaseConstantModel):
     """Strategic driver (for investment projects)."""
+
+class SalaryRange(BaseConstantModel):
+    """Salary ranges (used for investment projects)"""
