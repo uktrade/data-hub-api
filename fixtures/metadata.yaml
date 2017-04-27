@@ -7108,7 +7108,17 @@
 
 # InvestmentProjectPhase
 - model: metadata.investmentprojectphase
+  fields: {id: "8cecd05f-f515-4f1f-beaf-09dde1920440", name: "Create"}
+- model: metadata.investmentprojectphase
+  fields: {id: "8a320cc9-ae2e-443e-9d26-2f36452c2ced", name: "Prospect"}
+- model: metadata.investmentprojectphase
   fields: {id: "c9864359-fb1a-4646-a4c1-97d10189fc03", name: "Assign PM"}
+- model: metadata.investmentprojectphase
+  fields: {id: "7606cc19-20da-4b74-aba1-2cec0d753ad8", name: "Active"}
+- model: metadata.investmentprojectphase
+  fields: {id: "49b8f6f3-0c50-4150-a965-2c974f3149e3", name: "Verify win"}
+- model: metadata.investmentprojectphase
+  fields: {id: "945ea6d1-eee3-4f5b-9144-84a75b71b8e6", name: "Won"}
 
 
 # InvestmentType
@@ -7148,7 +7158,25 @@
 
 # InvestmentStrategicDriver
 - model: metadata.investmentstrategicdriver
-  fields: {id: "382aa6d1-a362-4166-a09d-f579d9f3be75", name: "TODO"}
+  fields: {id: "382aa6d1-a362-4166-a09d-f579d9f3be75", name: "Access to market"}
+- model: metadata.investmentstrategicdriver
+  fields: {id: "03593ab6-b583-4620-b7dc-c5d194d16943", name: "Access to resources"}
+- model: metadata.investmentstrategicdriver
+  fields: {id: "a2cef09f-cdbb-4eae-b191-0391260af9ad", name: "Access to clients"}
+- model: metadata.investmentstrategicdriver
+  fields: {id: "e6ebf75c-56a6-4cf3-ba67-9b479217d733", name: "Technology seeking"}
+- model: metadata.investmentstrategicdriver
+  fields: {id: "7cc42486-30bb-46d5-813d-6ad1c918ef08", name: "Skills seeking"}
+- model: metadata.investmentstrategicdriver
+  fields: {id: "8d0fbd93-e39c-4e55-8d80-955257906de9", name: "Proximity to supplier"}
+- model: metadata.investmentstrategicdriver
+  fields: {id: "15a69447-3802-4089-8dd1-b1175ab210fe", name: "Incentive driven"}
+- model: metadata.investmentstrategicdriver
+  fields: {id: "7b80f131-90f7-49e3-80d2-6b31baabf227", name: "Regulatory driven"}
+- model: metadata.investmentstrategicdriver
+  fields: {id: "1be97a9e-2e65-49ee-a420-ab8928d296e5", name: "Cost reduction"}
+- model: metadata.investmentstrategicdriver
+  fields: {id: "611a661c-08fe-4924-8847-f3b1fb021313", name: "Other"}
 
 
 # SalaryRange
