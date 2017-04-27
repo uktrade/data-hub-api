@@ -92,7 +92,7 @@ class CompanyClassification(BaseConstantModel):
     pass
 
 
-class InvestmentProjectPhase(BaseConstantModel):
+class InvestmentProjectPhase(BaseOrderedConstantModel):
     """Investment project phase."""
 
 
@@ -127,5 +127,6 @@ class InvestmentBusinessActivity(BaseConstantModel):
 class InvestmentStrategicDriver(BaseConstantModel):
     """Strategic driver (for investment projects)."""
 
-class SalaryRange(BaseConstantModel):
+
+class SalaryRange(BaseOrderedConstantModel):
     """Salary ranges (used for investment projects)"""

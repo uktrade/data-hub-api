@@ -7108,17 +7108,17 @@
 
 # InvestmentProjectPhase
 - model: metadata.investmentprojectphase
-  fields: {id: 8cecd05f-f515-4f1f-beaf-09dde1920440, name: "Create"}
+  fields: {id: 8cecd05f-f515-4f1f-beaf-09dde1920440, name: "Create", order: 100.0}
 - model: metadata.investmentprojectphase
-  fields: {id: 8a320cc9-ae2e-443e-9d26-2f36452c2ced, name: "Prospect"}
+  fields: {id: 8a320cc9-ae2e-443e-9d26-2f36452c2ced, name: "Prospect", order: 200.0}
 - model: metadata.investmentprojectphase
-  fields: {id: c9864359-fb1a-4646-a4c1-97d10189fc03, name: "Assign PM"}
+  fields: {id: c9864359-fb1a-4646-a4c1-97d10189fc03, name: "Assign PM", order: 300.0}
 - model: metadata.investmentprojectphase
-  fields: {id: 7606cc19-20da-4b74-aba1-2cec0d753ad8, name: "Active"}
+  fields: {id: 7606cc19-20da-4b74-aba1-2cec0d753ad8, name: "Active", order: 400.0}
 - model: metadata.investmentprojectphase
-  fields: {id: 49b8f6f3-0c50-4150-a965-2c974f3149e3, name: "Verify win"}
+  fields: {id: 49b8f6f3-0c50-4150-a965-2c974f3149e3, name: "Verify win", order: 500.0}
 - model: metadata.investmentprojectphase
-  fields: {id: 945ea6d1-eee3-4f5b-9144-84a75b71b8e6, name: "Won"}
+  fields: {id: 945ea6d1-eee3-4f5b-9144-84a75b71b8e6, name: "Won", order: 600.0}
 
 
 # InvestmentType
@@ -7272,8 +7272,6 @@
   fields: {id: 93959cec-7250-4c0a-9466-af4ebaf4a676, name: "Shared service centre"}
 - model: metadata.investmentbusinessactivity
   fields: {id: befab707-5abd-4f47-8477-57f091e6dac9, name: "Other"}
-- model: metadata.investmentbusinessactivity
-  fields: {id: , name: ""}
 
 # InvestmentStrategicDriver
 - model: metadata.investmentstrategicdriver
@@ -7300,10 +7298,10 @@
 
 # SalaryRange
 - model: metadata.salaryrange
-  fields: {id: 2943bf3d-32dd-43be-8ad4-969b006dee7b, name: "Below £25,000"}
+  fields: {id: 2943bf3d-32dd-43be-8ad4-969b006dee7b, name: "Below £25,000", order: 100.0}
 - model: metadata.salaryrange
-  fields: {id: 7e54d92f-d816-4918-8fdf-9553189d13d5, name: "£25,000 – £29,000"}
+  fields: {id: 7e54d92f-d816-4918-8fdf-9553189d13d5, name: "£25,000 – £29,000", order: 200.0}
 - model: metadata.salaryrange
-  fields: {id: 90049e2b-e70c-4f20-ba0e-f98772d631e7, name: "£30,000 – £34,000"}
+  fields: {id: 90049e2b-e70c-4f20-ba0e-f98772d631e7, name: "£30,000 – £34,000", order: 300.0}
 - model: metadata.salaryrange
-  fields: {id: f41e3603-90f7-46b8-b201-5b4eecb4bea5, name: "£35,000 and above"}
+  fields: {id: f41e3603-90f7-46b8-b201-5b4eecb4bea5, name: "£35,000 and above", order: 400.0}
