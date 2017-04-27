@@ -106,3 +106,29 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
             'competitor_countries', 'uk_region_locations',
             'strategic_drivers'
         )
+
+
+class IProjectTeamSerializer(serializers.ModelSerializer):
+    """Serialiser for investment project team objects."""
+
+    project_manager = NestedRelatedField(
+        Advisor, required=False, allow_null=True,
+        extra_fields=('first_name', 'last_name')
+    )
+    project_assurance_advisor = NestedRelatedField(
+        Advisor, required=False, allow_null=True,
+        extra_fields=('first_name', 'last_name')
+    )
+    project_manager_team = NestedRelatedField(
+        meta_models.Team, read_only=True
+    )
+    project_assurance_team = NestedRelatedField(
+        meta_models.Team, read_only=True
+    )
+
+    class Meta:  # noqa: D101
+        model = InvestmentProject
+        fields = (
+            'project_manager', 'project_assurance_advisor',
+            'project_manager_team', 'project_assurance_team'
+        )

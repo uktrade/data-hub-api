@@ -1,7 +1,8 @@
 from django.conf.urls import include, url
 
 from datahub.investment.views import (
-    IProjectRequirementsViewSet, IProjectValueViewSet, IProjectViewSet
+    IProjectRequirementsViewSet, IProjectValueViewSet, IProjectViewSet,
+    IProjectTeamViewSet
 )
 
 app_name = 'investment'
@@ -26,6 +27,11 @@ requirements_item = IProjectRequirementsViewSet.as_view({
     'patch': 'partial_update'
 })
 
+team_item = IProjectTeamViewSet.as_view({
+    'get': 'retrieve',
+    'patch': 'partial_update'
+})
+
 urlpatterns_v3 = [
     url(r'^investment/project$', project_collection, name='project'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/project$', project_item,
@@ -33,7 +39,9 @@ urlpatterns_v3 = [
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/value$', value_item,
         name='value-item'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/requirements$', requirements_item,
-        name='requirements-item')
+        name='requirements-item'),
+    url(r'^investment/(?P<pk>[0-9a-z-]{36})/team', team_item,
+        name='team-item')
 ]
 
 urlpatterns = [

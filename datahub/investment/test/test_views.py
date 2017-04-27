@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import ContactFactory
+from datahub.company.test.factories import AdvisorFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
 from datahub.investment.test.factories import InvestmentProjectFactory
@@ -165,3 +165,80 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['site_decided'] is True
         assert response_data['address_line_1'] == 'address 1 new'
         assert response_data['address_line_2'] == 'address 2 new'
+
+    def test_get_team_success(self):
+        """Test successfully getting a project requirements object."""
+        crm_team = constants.Team.crm.value
+        huk_team = constants.Team.healthcare_uk.value
+        pm_advisor = AdvisorFactory(dit_team_id=crm_team.id)
+        pa_advisor = AdvisorFactory(dit_team_id=huk_team.id)
+        project = InvestmentProjectFactory(
+            project_manager_id=pm_advisor.id,
+            project_assurance_advisor_id=pa_advisor.id
+        )
+        url = reverse('investment:v3:team-item',
+                      kwargs={'pk': project.pk})
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data == {
+            'project_manager': {
+                'id': str(pm_advisor.pk),
+                'first_name': pm_advisor.first_name,
+                'last_name': pm_advisor.last_name
+            },
+            'project_assurance_advisor': {
+                'id': str(pa_advisor.pk),
+                'first_name': pa_advisor.first_name,
+                'last_name': pa_advisor.last_name
+            },
+            'project_manager_team': {
+                'id': str(crm_team.id),
+                'name': crm_team.name
+            },
+            'project_assurance_team': {
+                'id': str(huk_team.id),
+                'name': huk_team.name
+            }
+        }
+
+    def test_patch_team_success(self):
+        """Test successfully partially updating a requirements object."""
+        crm_team = constants.Team.crm.value
+        huk_team = constants.Team.healthcare_uk.value
+        advisor_1 = AdvisorFactory(dit_team_id=crm_team.id)
+        advisor_2 = AdvisorFactory(dit_team_id=huk_team.id)
+        project = InvestmentProjectFactory(
+            project_manager_id=advisor_1.id,
+            project_assurance_advisor_id=advisor_2.id
+        )
+        url = reverse('investment:v3:team-item',
+                      kwargs={'pk': project.pk})
+        request_data = {
+            'project_manager': {
+                'id': str(advisor_2.id)
+            }
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data == {
+            'project_manager': {
+                'id': str(advisor_2.pk),
+                'first_name': advisor_2.first_name,
+                'last_name': advisor_2.last_name
+            },
+            'project_assurance_advisor': {
+                'id': str(advisor_2.pk),
+                'first_name': advisor_2.first_name,
+                'last_name': advisor_2.last_name
+            },
+            'project_manager_team': {
+                'id': str(huk_team.id),
+                'name': huk_team.name
+            },
+            'project_assurance_team': {
+                'id': str(huk_team.id),
+                'name': huk_team.name
+            }
+        }
