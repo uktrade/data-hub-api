@@ -75,11 +75,16 @@ class IProjectSerializer(serializers.ModelSerializer):
 class IProjectValueSerializer(serializers.ModelSerializer):
     """Serialiser for investment project value objects."""
 
+    average_salary = NestedRelatedField(
+        meta_models.InvestmentBusinessActivity, required=False,
+        allow_null=True
+    )
+
     class Meta:  # noqa: D101
         model = InvestmentProject
         fields = (
             'total_investment', 'foreign_equity_investment',
-            'government_assistance', 'number_new_jobs',
+            'government_assistance', 'number_new_jobs', 'average_salary',
             'number_safeguarded_jobs', 'r_and_d_budget',
             'non_fdi_r_and_d_budget', 'new_tech_to_uk', 'export_revenue'
         )

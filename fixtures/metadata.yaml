@@ -7149,3 +7149,14 @@
 # InvestmentStrategicDriver
 - model: metadata.investmentstrategicdriver
   fields: {id: "382aa6d1-a362-4166-a09d-f579d9f3be75", name: "TODO"}
+
+
+# SalaryRange
+- model: metadata.salaryrange
+  fields: {id: "2943bf3d-32dd-43be-8ad4-969b006dee7b", name: "Below £25,000"}
+- model: metadata.salaryrange
+  fields: {id: "7e54d92f-d816-4918-8fdf-9553189d13d5", name: "£25,000 – £29,000"}
+- model: metadata.salaryrange
+  fields: {id: "90049e2b-e70c-4f20-ba0e-f98772d631e7", name: "£30,000 – £34,000"}
+- model: metadata.salaryrange
+  fields: {id: "f41e3603-90f7-46b8-b201-5b4eecb4bea5", name: "£35,000 and above"}

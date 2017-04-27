@@ -83,7 +83,9 @@ class IProjectValueAbstract(models.Model):
     foreign_equity_investment = models.DecimalField(null=True, max_digits=19, decimal_places=0)
     government_assistance = models.NullBooleanField()
     number_new_jobs = models.IntegerField(null=True)
-    # TODO salary
+    average_salary = models.ForeignKey(
+        'metadata.SalaryRange', related_name='+', null=True
+    )
     number_safeguarded_jobs = models.IntegerField(null=True)
     r_and_d_budget = models.NullBooleanField()
     non_fdi_r_and_d_budget = models.NullBooleanField()
