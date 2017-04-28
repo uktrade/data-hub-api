@@ -1,3 +1,5 @@
+"""Model instance factories for investment tests."""
+
 import uuid
 from datetime import date
 

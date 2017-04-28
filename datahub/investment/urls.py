@@ -1,3 +1,5 @@
+"""Investment views URL config."""
+
 from django.conf.urls import include, url
 
 from datahub.investment.views import (

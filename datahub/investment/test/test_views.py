@@ -1,3 +1,5 @@
+"""Tests for investment views."""
+
 import re
 
 from rest_framework import status
@@ -107,7 +109,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'client_contacts']) == sorted(contact.id for contact in contacts)
 
     def test_create_project_minimal_success(self):
-        """Test successfully creating a project."""
+        """Test successfully creating a project with minimal data."""
         url = reverse('investment:v3:project')
         request_data = {
             'name': 'project name',

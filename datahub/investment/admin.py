@@ -1,3 +1,5 @@
+"""Admin registration for investment models."""
+
 from django.contrib import admin
 
 from reversion.admin import VersionAdmin

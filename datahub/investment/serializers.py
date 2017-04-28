@@ -1,3 +1,5 @@
+"""Investment serialisers for views."""
+
 from rest_framework import serializers
 
 import datahub.metadata.models as meta_models

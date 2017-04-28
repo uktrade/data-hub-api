@@ -1,3 +1,5 @@
+"""Investment views."""
+
 from django_filters.rest_framework import DjangoFilterBackend
 
 from datahub.core.viewsets import CoreViewSetV3
