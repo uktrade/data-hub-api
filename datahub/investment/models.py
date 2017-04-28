@@ -12,7 +12,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 class IProjectAbstract(models.Model):
-    """TODO: document."""
+    """The core part of an investment project."""
 
     class Meta:  # noqa: D101
         abstract = True
@@ -76,12 +76,18 @@ class IProjectAbstract(models.Model):
 
     @property
     def project_code(self):
+        """A user-friendly project code.
+        
+        If a CDMS project code is held, that is returned. Otherwise a Data 
+        Hub project code begining with DHP- is returned.
+        """
         if self.cdms_project_code:
             return self.cdms_project_code
         return 'DHP-{}'.format(self.investmentprojectcode.id)
 
     @property
     def document_link(self):
+        """URL to the document storage area in SharePoint."""
         if self.cdms_project_code:
             url_format = settings.CDMS_SHAREPOINT_PROJECT_URL
         else:
@@ -90,7 +96,7 @@ class IProjectAbstract(models.Model):
 
 
 class IProjectValueAbstract(models.Model):
-    """TODO: document."""
+    """The value part of an investment project."""
 
     class Meta:  # noqa: D101
         abstract = True
@@ -110,7 +116,7 @@ class IProjectValueAbstract(models.Model):
 
 
 class IProjectRequirementsAbstract(models.Model):
-    """TODO: document."""
+    """The requirements part of an investment project."""
 
     class Meta:  # noqa: D101
         abstract = True
@@ -160,19 +166,27 @@ class IProjectTeamAbstract(models.Model):
 class InvestmentProject(IProjectAbstract, IProjectValueAbstract,
                             IProjectRequirementsAbstract,
                             IProjectTeamAbstract, BaseModel):
-    """TODO: document."""
+    """An investment project."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
 
 
 class InvestmentProjectCode(models.Model):
-    """TODO: document."""
+    """An investment project number used for project codes.
+    
+    These are generated for new projects (but not for projects migrated 
+    from CDMS).
+    """
 
     project = models.OneToOneField(InvestmentProject)
 
 
 @receiver(post_save, sender=InvestmentProject)
 def project_post_save(sender,  **kwargs):
+    """Creates a project code for investment projects on creation.
+    
+    Projects with a CDMS project code do not get a new project code.
+    """
     instance = kwargs['instance']
     created = kwargs['created']
     raw = kwargs['raw']
