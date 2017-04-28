@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from uuid import UUID
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -71,7 +70,7 @@ class NestedRelatedField(serializers.RelatedField):
 
     def get_choices(self, cutoff=None):
         """Returns choices for DRF UI.
-        
+
         Standard implementation uses a dict, but that doesn't work as our
         representation isn't hashable.
         """
@@ -100,6 +99,7 @@ def _value_for_json(val):
 
 class _Choices:
     """Wrapper for choices to make them compatible with DRF."""
+
     def __init__(self, choices):
         self._choices = choices
 
