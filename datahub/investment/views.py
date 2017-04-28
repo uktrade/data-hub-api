@@ -42,6 +42,7 @@ class IProjectViewSet(CoreViewSetV3):
                      'investment_recipient_company')
 
     def get_view_name(self):
+        """Returns the view set name for the DRF UI."""
         return 'Investment projects'
 
 
@@ -56,6 +57,7 @@ class IProjectValueViewSet(CoreViewSetV3):
     queryset = InvestmentProject.objects.select_related('average_salary')
 
     def get_view_name(self):
+        """Returns the view set name for the DRF UI."""
         return 'Investment project values'
 
 
@@ -74,6 +76,7 @@ class IProjectRequirementsViewSet(CoreViewSetV3):
     )
 
     def get_view_name(self):
+        """Returns the view set name for the DRF UI."""
         return 'Investment project requirements'
 
 
@@ -93,4 +96,5 @@ class IProjectTeamViewSet(CoreViewSetV3):
     )
 
     def get_view_name(self):
+        """Returns the view set name for the DRF UI."""
         return 'Investment project teams'
