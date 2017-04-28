@@ -83,7 +83,7 @@ class IProjectAbstract(models.Model):
         """
         if self.cdms_project_code:
             return self.cdms_project_code
-        return 'DHP-{}'.format(self.investmentprojectcode.id)
+        return 'DHP-{:08d}'.format(self.investmentprojectcode.id)
 
     @property
     def document_link(self):
