@@ -3,6 +3,8 @@ import uuid
 
 from django.conf import settings
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from datahub.core.models import BaseModel
 
@@ -24,8 +26,8 @@ class IProjectAbstract(models.Model):
     phase = models.ForeignKey('metadata.InvestmentProjectPhase',
                               related_name='investment_projects')
 
-    project_code = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    document_link = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    cdms_project_code = models.CharField(max_length=MAX_LENGTH, blank=True,
+                                         null=True)
     project_shareable = models.BooleanField(default=False)
     anonymous_description = models.TextField(blank=True, null=True)
     not_shareable_reason = models.TextField(blank=True, null=True)
@@ -40,7 +42,7 @@ class IProjectAbstract(models.Model):
         'company.Company', related_name='recipient_investment_projects', null=True
     )
     client_contacts = models.ManyToManyField(
-        'company.Contact', related_name='investment_projects', null=True
+        'company.Contact', related_name='investment_projects'
     )
     client_relationship_manager = models.ForeignKey(
         'company.Advisor', related_name='investment_projects', null=True
@@ -71,6 +73,20 @@ class IProjectAbstract(models.Model):
         'metadata.InvestmentBusinessActivity',
         related_name='+'
     )
+
+    @property
+    def project_code(self):
+        if self.cdms_project_code:
+            return self.cdms_project_code
+        return 'DHP-{}'.format(self.investmentprojectcode.id)
+
+    @property
+    def document_link(self):
+        if self.cdms_project_code:
+            url_format = settings.CDMS_SHAREPOINT_PROJECT_URL
+        else:
+            url_format = settings.DH_SHAREPOINT_PROJECT_URL
+        return url_format.format(project_code=self.project_code)
 
 
 class IProjectValueAbstract(models.Model):
@@ -141,8 +157,24 @@ class IProjectTeamAbstract(models.Model):
         return None
 
 
-class InvestmentProject(IProjectAbstract, IProjectValueAbstract, IProjectRequirementsAbstract,
-                        IProjectTeamAbstract, BaseModel):
+class InvestmentProject(IProjectAbstract, IProjectValueAbstract,
+                            IProjectRequirementsAbstract,
+                            IProjectTeamAbstract, BaseModel):
     """TODO: document."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
+
+
+class InvestmentProjectCode(models.Model):
+    """TODO: document."""
+
+    project = models.OneToOneField(InvestmentProject)
+
+
+@receiver(post_save, sender=InvestmentProject)
+def project_post_save(sender,  **kwargs):
+    instance = kwargs['instance']
+    created = kwargs['created']
+    raw = kwargs['raw']
+    if created and not raw and not instance.cdms_project_code:
+        InvestmentProjectCode.objects.get_or_create(project=instance)
