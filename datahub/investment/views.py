@@ -41,6 +41,9 @@ class IProjectViewSet(CoreViewSetV3):
     filter_fields = ('investor_company_id', 'intermediate_company_id',
                      'investment_recipient_company')
 
+    def get_view_name(self):
+        return 'Investment projects'
+
 
 class IProjectValueViewSet(CoreViewSetV3):
     """Investment project value views.
@@ -51,6 +54,9 @@ class IProjectValueViewSet(CoreViewSetV3):
     read_serializer_class = IProjectValueSerializer
     write_serializer_class = IProjectValueSerializer
     queryset = InvestmentProject.objects.select_related('average_salary')
+
+    def get_view_name(self):
+        return 'Investment project values'
 
 
 class IProjectRequirementsViewSet(CoreViewSetV3):
@@ -67,6 +73,9 @@ class IProjectRequirementsViewSet(CoreViewSetV3):
         'strategic_drivers'
     )
 
+    def get_view_name(self):
+        return 'Investment project requirements'
+
 
 class IProjectTeamViewSet(CoreViewSetV3):
     """Investment project team views.
@@ -82,3 +91,6 @@ class IProjectTeamViewSet(CoreViewSetV3):
         'project_assurance_advisor',
         'project_assurance_advisor__dit_team'
     )
+
+    def get_view_name(self):
+        return 'Investment project teams'
