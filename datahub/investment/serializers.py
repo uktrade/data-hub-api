@@ -9,6 +9,9 @@ from datahub.investment.models import InvestmentProject
 class IProjectSerializer(serializers.ModelSerializer):
     """Serialiser for investment project endpoints."""
 
+    project_code = serializers.CharField(read_only=True)
+    document_link = serializers.CharField(read_only=True)
+
     investment_type = NestedRelatedField(meta_models.InvestmentType)
     phase = NestedRelatedField(meta_models.InvestmentProjectPhase)
     investor_company = NestedRelatedField(
