@@ -8,6 +8,7 @@ from datahub.core.serializers import NestedRelatedField
 
 
 def test_nested_rel_field_to_internal():
+    """Tests that model instances are returned for a dict with an 'id' key."""
     model = MagicMock()
     field = NestedRelatedField(model)
     uuid_ = uuid4()
@@ -16,6 +17,7 @@ def test_nested_rel_field_to_internal():
 
 
 def test_nested_rel_field_to_internal_invalid_id():
+    """Tests that a dict with an invalid UUID raises an exception."""
     model = MagicMock()
     field = NestedRelatedField(model)
     with pytest.raises(ValidationError):
@@ -23,6 +25,7 @@ def test_nested_rel_field_to_internal_invalid_id():
 
 
 def test_nested_rel_field_to_repr():
+    """Tests that a model instance is converted to a dict."""
     model = Mock()
     uuid_ = uuid4()
     instance = Mock(id=uuid_, pk=uuid_)
@@ -35,6 +38,7 @@ def test_nested_rel_field_to_repr():
 
 
 def test_nested_rel_field_to_repr_extra_fields():
+    """Tests that a model instance is converted to a dict with extra fields."""
     model = Mock()
     uuid_ = uuid4()
     instance = Mock(id=uuid_, pk=uuid_, test_field='12as')
