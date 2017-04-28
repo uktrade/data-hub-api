@@ -59,9 +59,23 @@ def test_nested_rel_field_to_repr_extra_fields():
     uuid_ = uuid4()
     uuid2_ = uuid4()
     instance = Mock(id=uuid_, pk=uuid_, test_field='12as', test2=uuid2_)
-    field = NestedRelatedField(model, extra_fields=('test_field','test2'))
+    field = NestedRelatedField(model, extra_fields=('test_field', 'test2'))
     assert field.to_representation(instance) == {
         'id': str(instance.id),
         'test_field': instance.test_field,
         'test2': str(uuid2_)
     }
+
+
+def test_nested_rel_field_to_choices():
+    """Tests that model choices are returned."""
+    model = Mock()
+    uuid_ = uuid4()
+    instance = Mock(id=uuid_, pk=uuid_)
+    instance.name = 'instance name'
+    model.objects.all.return_value = [instance] * 2
+    field = NestedRelatedField(model)
+    assert list(field.get_choices().items()) == [({
+        'id': str(instance.id),
+        'name': instance.name
+    }, str(instance))] * 2
