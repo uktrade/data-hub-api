@@ -1,3 +1,5 @@
+from django_filters.rest_framework import DjangoFilterBackend
+
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.investment.models import InvestmentProject
 from datahub.investment.serializers import (
@@ -33,6 +35,9 @@ class IProjectViewSet(CoreViewSetV3):
         'client_contacts',
         'business_activity'
     )
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('investor_company_id', 'intermediate_company_id',
+                     'investment_recipient_company')
 
 
 class IProjectValueViewSet(CoreViewSetV3):

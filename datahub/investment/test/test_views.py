@@ -3,7 +3,8 @@ import re
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import AdvisorFactory, ContactFactory
+from datahub.company.test.factories import (AdvisorFactory, CompanyFactory,
+                                            ContactFactory)
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
 from datahub.investment.test.factories import InvestmentProjectFactory
@@ -23,9 +24,28 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['count'] == 1
         assert response_data['results'][0]['id'] == str(project.id)
 
+    def test_list_projects_investor_company_success(self):
+        """Test successfully listing projects for an investor company."""
+        company = CompanyFactory()
+        project = InvestmentProjectFactory(investor_company_id=company.id)
+        InvestmentProjectFactory()
+        url = reverse('investment:v3:project')
+        response = self.api_client.get(url, {
+            'investor_company_id': str(company.id)
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 1
+        assert response_data['results'][0]['id'] == str(project.id)
+
     def test_create_project_success(self):
         """Test successfully creating a project."""
         contacts = [ContactFactory(), ContactFactory()]
+        investor_company = CompanyFactory()
+        recipient_company = CompanyFactory()
+        intermediate_company = CompanyFactory()
+        advisor = AdvisorFactory()
         url = reverse('investment:v3:project')
         request_data = {
             'name': 'project name',
@@ -42,7 +62,19 @@ class InvestmentViewsTestCase(LeelooTestCase):
                 'id': str(contacts[0].id)
             }, {
                 'id': str(contacts[1].id)
-            }]
+            }],
+            'investor_company': {
+                'id': str(investor_company.id)
+            },
+            'investment_recipient_company': {
+                'id': str(recipient_company.id)
+            },
+            'intermediate_company': {
+                'id': str(intermediate_company.id)
+            },
+            'referral_source_advisor': {
+                'id': str(advisor.id)
+            }
         }
         response = self.api_client.post(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_201_CREATED
@@ -50,19 +82,76 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['name'] == request_data['name']
         assert response_data['description'] == request_data['description']
         assert response_data['nda_signed'] == request_data['nda_signed']
+        assert (response_data['estimated_land_date'] == request_data[
+            'estimated_land_date'])
+
         assert re.match('^DHP-\d+$', response_data['project_code'])
         expected_url = 'http://example/dh/{}/'.format(
             response_data['project_code']
         )
         assert response_data['document_link'] == expected_url
-        assert (response_data['estimated_land_date'] == request_data[
-            'estimated_land_date'])
+
         assert (response_data['investment_type']['id'] == request_data[
             'investment_type']['id'])
+        assert response_data['investor_company']['id'] == str(
+            investor_company.id)
+        assert response_data['investment_recipient_company']['id'] == str(
+            recipient_company.id)
+        assert response_data['intermediate_company']['id'] == str(
+            intermediate_company.id)
+        assert response_data['referral_source_advisor']['id'] == str(
+            advisor.id)
         assert response_data['phase']['id'] == request_data['phase']['id']
         assert len(response_data['client_contacts']) == 2
         assert sorted(contact['id'] for contact in response_data[
             'client_contacts']) == sorted(contact.id for contact in contacts)
+
+    def test_create_project_minimal_success(self):
+        """Test successfully creating a project."""
+        url = reverse('investment:v3:project')
+        request_data = {
+            'name': 'project name',
+            'description': 'project description',
+            'nda_signed': False,
+            'estimated_land_date': '2020-12-12',
+            'investment_type': {
+                'id': constants.InvestmentType.fdi.value.id
+            }
+        }
+        response = self.api_client.post(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data['name'] == request_data['name']
+        assert response_data['description'] == request_data['description']
+        assert response_data['nda_signed'] == request_data['nda_signed']
+        assert (response_data['estimated_land_date'] == request_data[
+            'estimated_land_date'])
+
+        assert re.match('^DHP-\d+$', response_data['project_code'])
+        expected_url = 'http://example/dh/{}/'.format(
+            response_data['project_code']
+        )
+        assert response_data['document_link'] == expected_url
+
+        assert (response_data['phase']['id'] ==
+                constants.InvestmentProjectPhase.created.value.id)
+        assert (response_data['investment_type']['id'] == request_data[
+            'investment_type']['id'])
+
+    def test_create_project_fail(self):
+        """Test creating a project with missing required values."""
+        url = reverse('investment:v3:project')
+        request_data = {
+            'name': 'project name'
+        }
+        response = self.api_client.post(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'description': ['This field is required.'],
+            'investment_type': ['This field is required.'],
+            'estimated_land_date': ['This field is required.']
+        }
 
     def test_get_project_success(self):
         """Test successfully getting a project."""
