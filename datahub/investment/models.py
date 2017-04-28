@@ -1,4 +1,5 @@
 """Investment project models."""
+
 import uuid
 
 from django.conf import settings

@@ -1,3 +1,5 @@
+"""Tests for investment models."""
+
 import pytest
 
 from django.core.exceptions import ObjectDoesNotExist
