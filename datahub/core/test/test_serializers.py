@@ -24,6 +24,22 @@ def test_nested_rel_field_to_internal_invalid_id():
         field.to_internal_value({'id': 'xxx'})
 
 
+def test_nested_rel_field_to_internal_no_id():
+    """Tests that a dict without an id raises an exception."""
+    model = MagicMock()
+    field = NestedRelatedField(model)
+    with pytest.raises(ValidationError):
+        field.to_internal_value({})
+
+
+def test_nested_rel_field_to_internal_wrong_type():
+    """Tests that a non-dict value raises an exception."""
+    model = MagicMock()
+    field = NestedRelatedField(model)
+    with pytest.raises(ValidationError):
+        field.to_internal_value([])
+
+
 def test_nested_rel_field_to_repr():
     """Tests that a model instance is converted to a dict."""
     model = Mock()
@@ -41,9 +57,11 @@ def test_nested_rel_field_to_repr_extra_fields():
     """Tests that a model instance is converted to a dict with extra fields."""
     model = Mock()
     uuid_ = uuid4()
-    instance = Mock(id=uuid_, pk=uuid_, test_field='12as')
-    field = NestedRelatedField(model, extra_fields=('test_field',))
+    uuid2_ = uuid4()
+    instance = Mock(id=uuid_, pk=uuid_, test_field='12as', test2=uuid2_)
+    field = NestedRelatedField(model, extra_fields=('test_field','test2'))
     assert field.to_representation(instance) == {
         'id': str(instance.id),
-        'test_field': instance.test_field
+        'test_field': instance.test_field,
+        'test2': str(uuid2_)
     }
