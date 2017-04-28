@@ -448,6 +448,7 @@ class CompanyClassification(Enum):
 class InvestmentProjectPhase(Enum):
     """Investment project phase constants."""
 
+    created = Constant('Created', '8cecd05f-f515-4f1f-beaf-09dde1920440')
     assign_pm = Constant('Assign PM', 'c9864359-fb1a-4646-a4c1-97d10189fc03')
 
 

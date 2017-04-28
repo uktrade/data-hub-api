@@ -6,6 +6,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.models import BaseModel
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -20,18 +21,19 @@ class IProjectAbstract(models.Model):
     name = models.CharField(max_length=MAX_LENGTH)
     description = models.TextField()
     nda_signed = models.BooleanField()
-    estimated_land_date = models.DateField(null=True)
+    estimated_land_date = models.DateField()
     investment_type = models.ForeignKey('metadata.InvestmentType',
                                         related_name='investment_projects')
-    phase = models.ForeignKey('metadata.InvestmentProjectPhase',
-                              related_name='investment_projects')
 
     cdms_project_code = models.CharField(max_length=MAX_LENGTH, blank=True,
                                          null=True)
-    project_shareable = models.BooleanField(default=False)
+    project_shareable = models.NullBooleanField()
     anonymous_description = models.TextField(blank=True, null=True)
     not_shareable_reason = models.TextField(blank=True, null=True)
 
+    phase = models.ForeignKey('metadata.InvestmentProjectPhase',
+                              related_name='investment_projects',
+                              default=InvestmentProjectPhase.created.value.id)
     investor_company = models.ForeignKey(
         'company.Company', related_name='investor_investment_projects', null=True
     )

@@ -13,7 +13,8 @@ class IProjectSerializer(serializers.ModelSerializer):
     document_link = serializers.CharField(read_only=True)
 
     investment_type = NestedRelatedField(meta_models.InvestmentType)
-    phase = NestedRelatedField(meta_models.InvestmentProjectPhase)
+    phase = NestedRelatedField(meta_models.InvestmentProjectPhase,
+                               required=False)
     investor_company = NestedRelatedField(
         Company, required=False, allow_null=True
     )
