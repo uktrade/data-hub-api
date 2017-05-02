@@ -19,5 +19,8 @@ ADD . /app/
 RUN chmod a+x start.sh
 RUN chmod a+x tests.sh
 
+ENV ES_PORT 9200
+ENV ES_HOST es
+
 EXPOSE 8000
 CMD ./start.sh
