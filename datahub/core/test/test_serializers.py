@@ -2,6 +2,7 @@ from unittest.mock import call, MagicMock, Mock
 from uuid import uuid4
 
 import pytest
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.exceptions import ValidationError
 
 from datahub.core.serializers import NestedRelatedField
@@ -38,6 +39,15 @@ def test_nested_rel_field_to_internal_wrong_type():
     field = NestedRelatedField(model)
     with pytest.raises(ValidationError):
         field.to_internal_value([])
+
+
+def test_nested_rel_field_to_internal_non_existent_id():
+    """Tests an id of a non-existent object raises an exception."""
+    model = MagicMock()
+    model.objects().all.get.return_value = ObjectDoesNotExist
+    field = NestedRelatedField(model)
+    with pytest.raises(ValidationError):
+        field.to_internal_value({})
 
 
 def test_nested_rel_field_to_repr():
@@ -79,3 +89,17 @@ def test_nested_rel_field_to_choices():
         'id': str(instance.id),
         'name': instance.name
     }, str(instance))] * 2
+
+
+def test_nested_rel_field_to_choices_limit():
+    """Tests that model choices are limited and returned."""
+    model = Mock()
+    uuid_ = uuid4()
+    instance = Mock(id=uuid_, pk=uuid_)
+    instance.name = 'instance name'
+    model.objects.all.return_value = [instance] * 2
+    field = NestedRelatedField(model)
+    assert list(field.get_choices(1).items()) == [({
+        'id': str(instance.id),
+        'name': instance.name
+    }, str(instance))]
