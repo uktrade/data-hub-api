@@ -37,51 +37,57 @@ class IProjectAbstract(models.Model):
                               default=InvestmentProjectPhase.created.value.id)
     investor_company = models.ForeignKey(
         'company.Company', related_name='investor_investment_projects',
-        null=True
+        null=True, blank=True
     )
     intermediate_company = models.ForeignKey(
         'company.Company', related_name='intermediate_investment_projects',
-        null=True
+        null=True, blank=True
     )
     investment_recipient_company = models.ForeignKey(
         'company.Company', related_name='recipient_investment_projects',
-        null=True
+        null=True, blank=True
     )
     client_contacts = models.ManyToManyField(
-        'company.Contact', related_name='investment_projects'
+        'company.Contact', related_name='investment_projects', blank=True
     )
     client_relationship_manager = models.ForeignKey(
-        'company.Advisor', related_name='investment_projects', null=True
+        'company.Advisor', related_name='investment_projects', null=True,
+        blank=True
     )
     referral_source_advisor = models.ForeignKey(
         'company.Advisor', related_name='referred_investment_projects',
-        null=True
+        null=True, blank=True
     )
     referral_source_activity = models.ForeignKey(
         'metadata.ReferralSourceActivity', related_name='investment_projects',
-        null=True
+        null=True, blank=True
     )
     referral_source_activity_website = models.ForeignKey(
         'metadata.ReferralSourceWebsite', related_name='investment_projects',
-        null=True
+        null=True, blank=True
     )
     referral_source_activity_marketing = models.ForeignKey(
         'metadata.ReferralSourceMarketing', related_name='investment_projects',
-        null=True
+        null=True, blank=True
     )
     referral_source_activity_event = models.ForeignKey(
-        'metadata.Event', related_name='investment_projects', null=True
+        'metadata.Event', related_name='investment_projects', null=True,
+        blank=True
     )
     fdi_type = models.ForeignKey(
-        'metadata.FDIType', related_name='investment_projects', null=True
+        'metadata.FDIType', related_name='investment_projects', null=True,
+        blank=True
     )
     non_fdi_type = models.ForeignKey(
-        'metadata.NonFDIType', related_name='investment_projects', null=True
+        'metadata.NonFDIType', related_name='investment_projects', null=True,
+        blank=True
     )
-    sector = models.ForeignKey('metadata.Sector', related_name='+', null=True)
+    sector = models.ForeignKey('metadata.Sector', related_name='+', null=True,
+                               blank=True)
     business_activity = models.ManyToManyField(
         'metadata.InvestmentBusinessActivity',
-        related_name='+'
+        related_name='+',
+        blank=True
     )
 
     @property
@@ -112,15 +118,16 @@ class IProjectValueAbstract(models.Model):
         abstract = True
 
     total_investment = models.DecimalField(null=True, max_digits=19,
-                                           decimal_places=0)
-    foreign_equity_investment = models.DecimalField(null=True, max_digits=19,
-                                                    decimal_places=0)
-    government_assistance = models.NullBooleanField()
-    number_new_jobs = models.IntegerField(null=True)
-    average_salary = models.ForeignKey(
-        'metadata.SalaryRange', related_name='+', null=True
+                                           decimal_places=0, blank=True)
+    foreign_equity_investment = models.DecimalField(
+        null=True, max_digits=19, decimal_places=0, blank=True
     )
-    number_safeguarded_jobs = models.IntegerField(null=True)
+    government_assistance = models.NullBooleanField()
+    number_new_jobs = models.IntegerField(null=True, blank=True)
+    average_salary = models.ForeignKey(
+        'metadata.SalaryRange', related_name='+', null=True, blank=True
+    )
+    number_safeguarded_jobs = models.IntegerField(null=True, blank=True)
     r_and_d_budget = models.NullBooleanField()
     non_fdi_r_and_d_budget = models.NullBooleanField()
     new_tech_to_uk = models.NullBooleanField()
@@ -145,12 +152,12 @@ class IProjectRequirementsAbstract(models.Model):
                                              max_length=MAX_LENGTH)
 
     competitor_countries = models.ManyToManyField('metadata.Country',
-                                                  related_name='+')
+                                                  related_name='+', blank=True)
     uk_region_locations = models.ManyToManyField('metadata.UKRegion',
-                                                 related_name='+')
+                                                 related_name='+', blank=True)
     strategic_drivers = models.ManyToManyField(
         'metadata.InvestmentStrategicDriver',
-        related_name='investment_projects'
+        related_name='investment_projects', blank=True
     )
 
 
@@ -161,10 +168,10 @@ class IProjectTeamAbstract(models.Model):
         abstract = True
 
     project_manager = models.ForeignKey(
-        'company.Advisor', null=True, related_name='+'
+        'company.Advisor', null=True, related_name='+', blank=True
     )
     project_assurance_advisor = models.ForeignKey(
-        'company.Advisor', null=True, related_name='+'
+        'company.Advisor', null=True, related_name='+', blank=True
     )
 
     @property
