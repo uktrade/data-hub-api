@@ -2,6 +2,7 @@
 
 import re
 
+import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -9,6 +10,7 @@ from datahub.company.test.factories import (AdvisorFactory, CompanyFactory,
                                             ContactFactory)
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
+from datahub.investment import views
 from datahub.investment.test.factories import InvestmentProjectFactory
 
 
@@ -342,3 +344,12 @@ class InvestmentViewsTestCase(LeelooTestCase):
                 'name': huk_team.name
             }
         }
+
+
+@pytest.mark.parametrize('view_set', (views.IProjectTeamViewSet,
+                                      views.IProjectRequirementsViewSet,
+                                      views.IProjectViewSet,
+                                      views.IProjectValueViewSet))
+def test_view_set_name(view_set):
+    """Test that the view name is a string."""
+    assert isinstance(view_set().get_view_name(), str)
