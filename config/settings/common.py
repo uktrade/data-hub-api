@@ -44,6 +44,7 @@ THIRD_PARTY_APPS = (
     'django_extensions',
     'reversion',
     'oauth2_provider',
+    'django_filters',
 )
 
 LOCAL_APPS = (
