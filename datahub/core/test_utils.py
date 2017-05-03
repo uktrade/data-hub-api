@@ -7,9 +7,6 @@ from django.utils.timezone import now
 from oauth2_provider.models import AccessToken, Application
 from rest_framework.test import APIClient
 
-from datahub.core import constants
-from datahub.metadata.models import Team
-
 
 def get_test_user():
     """Return the test user."""

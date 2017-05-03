@@ -2,7 +2,6 @@ import pytest
 
 from datahub.company.models import Company
 from datahub.company.test.factories import AdvisorFactory, CompanyFactory
-from datahub.core import constants
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db

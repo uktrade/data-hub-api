@@ -8,8 +8,7 @@ from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core import auth, constants
-from datahub.metadata.models import Team
+from datahub.core import auth
 
 pytestmark = pytest.mark.django_db
 

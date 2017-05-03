@@ -9,8 +9,6 @@ from logging import getLogger
 
 from django.db.models.fields import DateTimeField
 
-from datahub.core import constants
-
 from . import utils
 
 logger = getLogger(__name__)
