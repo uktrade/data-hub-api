@@ -1,4 +1,4 @@
-FROM python:3.5
+FROM python:3.6
 
 RUN mkdir -p /shared
 RUN mkdir -p /app
@@ -18,6 +18,9 @@ ADD . /app/
 
 RUN chmod a+x start.sh
 RUN chmod a+x tests.sh
+
+ENV ES_PORT 9200
+ENV ES_HOST es
 
 EXPOSE 8000
 CMD ./start.sh
