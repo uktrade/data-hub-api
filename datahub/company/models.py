@@ -67,13 +67,11 @@ class Company(ArchivableModel, CompanyAbstract):
     export_to_countries = models.ManyToManyField(
         metadata_models.Country,
         blank=True,
-        null=True,
         related_name='company_export_to_countries'
     )
     future_interest_countries = models.ManyToManyField(
         metadata_models.Country,
         blank=True,
-        null=True,
         related_name='company_future_interest_countries'
     )
     lead = models.BooleanField(default=False)
