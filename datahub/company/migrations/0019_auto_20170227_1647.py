@@ -6,18 +6,6 @@ from django.conf import settings
 from django.db import migrations
 
 
-def enable_users(apps, schema_editor):
-    """Enable the users already enabled in the env var."""
-    Advisor = apps.get_model("company", "Advisor")
-    Advisor.objects.filter(email__in=settings.DIT_ENABLED_ADVISORS).update(enabled=True)
-
-
-def disable_users(apps, schema_editor):
-    """Disable all the users."""
-    Advisor = apps.get_model("company", "Advisor")
-    Advisor.objects.all().update(enabled=False)
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -25,5 +13,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(enable_users, reverse_code=disable_users)
+        migrations.RunPython(migrations.RunPython.noop, reverse_code=migrations.RunPython.noop)
     ]

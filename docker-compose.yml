@@ -1,85 +1,34 @@
 version: '2'
 services:
 
-  leeloo-common:
+  leeloo:
     build:
       context: .
+    ports:
+      - "8000:8000"
     volumes:
       - .:/app
     entrypoint: |
-        dockerize -wait tcp://redis:6379 -wait tcp://postgres:5432 -wait http://es:9200 -timeout 60s
+        dockerize -wait tcp://postgres:5432 -timeout 60s
     environment:
       SECRET_KEY: foobar
       DATABASE_URL: postgresql://postgres@postgres/datahub
-      ES_INDEX: test
-      ES_HOST: es
-      ES_PORT: 9200
-      KORBEN_HOST: korben
-      KORBEN_PORT: 8080
       DATAHUB_SECRET: secret
       DEBUG: 'True'
       DJANGO_SECRET_KEY: changeme
       DJANGO_SETTINGS_MODULE: config.settings.local
       COV_TOKEN: ${COV_TOKEN}
-      BROKER_URL: redis://redis
-      RESULT_BACKEND: redis://redis
-
-  leeloo:
-    extends:
-      service: leeloo-common
-    ports:
-      - "8000:8000"
+      ES_INDEX: test
+      ES_HOST: es
+      ES_PORT: 9200
+      CDMS_AUTH_URL: http://example.com
     depends_on:
-      - korben
       - postgres
       - es
-      - redis
-      - leeloo-celery-worker
     links:
-      - korben
       - postgres
       - es
-      - redis
     command: /app/start.sh
-
-  leeloo-celery-worker:
-    extends:
-      service: leeloo-common
-    command: celery -A config worker -l info
-    depends_on:
-      - korben
-      - postgres
-      - es
-      - redis
-      - leeloo-flower
-    links:
-      - korben
-      - postgres
-      - es
-      - redis
-
-  leeloo-flower:
-    extends:
-      service: leeloo-common
-    ports:
-      - "5555:5555"
-    command: flower -A config --address=0.0.0.0 —port=5555
-    depends_on:
-      - korben
-      - postgres
-      - es
-      - redis
-    links:
-      - korben
-      - postgres
-      - es
-      - redis
-
-  korben:
-    build:
-      context: dummy-korben
-    ports:
-      - "8080:8080"
 
   postgres:
     image: postgres:9.5
@@ -92,9 +41,3 @@ services:
     restart: always
     ports:
       - "9200:9200"
-
-  redis:
-    image: redis:3.2
-    restart: always
-    ports:
-      - "6379:6379"

@@ -6,17 +6,13 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.db import models
-from django.db.models.signals import m2m_changed, post_save
-from django.dispatch import receiver
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 
 from datahub.company.validators import RelaxedURLValidator
 from datahub.core import constants
 from datahub.core import fields as core_fields
-from datahub.core.mixins import KorbenSaveModelMixin
 from datahub.core.models import ArchivableModel, BaseModel
-from datahub.core.utils import model_to_dictionary
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -45,8 +41,13 @@ class CompanyAbstract(BaseModel):
         """Admin displayed human readable name."""
         return self.name
 
+    def save(self, *args, **kwargs):
+        """Override the Django save implementation to hook the custom validation."""
+        self.clean()
+        super().save(*args, **kwargs)
 
-class Company(KorbenSaveModelMixin, ArchivableModel, CompanyAbstract):
+
+class Company(ArchivableModel, CompanyAbstract):
     """Representation of the company as per CDMS."""
 
     REQUIRED_TRADING_ADDRESS_FIELDS = (
@@ -66,13 +67,11 @@ class Company(KorbenSaveModelMixin, ArchivableModel, CompanyAbstract):
     export_to_countries = models.ManyToManyField(
         metadata_models.Country,
         blank=True,
-        null=True,
         related_name='company_export_to_countries'
     )
     future_interest_countries = models.ManyToManyField(
         metadata_models.Country,
         blank=True,
-        null=True,
         related_name='company_future_interest_countries'
     )
     lead = models.BooleanField(default=False)
@@ -93,6 +92,8 @@ class Company(KorbenSaveModelMixin, ArchivableModel, CompanyAbstract):
     trading_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     headquarter_type = models.ForeignKey(metadata_models.HeadquarterType, blank=True, null=True)
     classification = models.ForeignKey(metadata_models.CompanyClassification, null=True)
+    parent = models.ForeignKey('self', null=True, related_name='subsidiaries')
+    one_list_account_owner = models.ForeignKey('Advisor', null=True, related_name='one_list_owned_companies')
 
     class Meta:  # noqa: D101
         verbose_name_plural = 'companies'
@@ -183,7 +184,7 @@ class CompaniesHouseCompany(CompanyAbstract):
         verbose_name_plural = 'Companies House companies'
 
 
-class Contact(KorbenSaveModelMixin, ArchivableModel, BaseModel):
+class Contact(ArchivableModel, BaseModel):
     """Contact from CDMS."""
 
     REQUIRED_ADDRESS_FIELDS = (
@@ -216,6 +217,10 @@ class Contact(KorbenSaveModelMixin, ArchivableModel, BaseModel):
     telephone_alternative = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     email_alternative = models.EmailField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
+    contactable_by_dit = models.BooleanField(default=False)
+    contactable_by_dit_partners = models.BooleanField(default=False)
+    contactable_by_email = models.BooleanField(default=True)
+    contactable_by_phone = models.BooleanField(default=True)
 
     @cached_property
     def name(self):
@@ -231,7 +236,15 @@ class Contact(KorbenSaveModelMixin, ArchivableModel, BaseModel):
         empty_fields = [field for field in self.REQUIRED_ADDRESS_FIELDS if not getattr(self, field)]
         return {field: ['This field may not be null.'] for field in empty_fields}
 
-    def clean(self):
+    def validate_contact_preferences(self):
+        """At least one of the contract preferences must be set to True."""
+        if not self.contactable_by_email and not self.contactable_by_phone:
+            error_message = 'A contact should have at least one way of being contacted. ' \
+                            'Please select either email or phone, or both'
+            raise ValidationError({'contactable_by_email': [error_message],
+                                   'contactable_by_phone': [error_message]})
+
+    def validate_address(self):
         """Custom validation for address.
 
         Either 'same_as_company' or address_1, address_town and address_country must be defined.
@@ -256,7 +269,17 @@ class Contact(KorbenSaveModelMixin, ArchivableModel, BaseModel):
             elif not some_address_fields_existence:
                 error_message = 'Please select either address_same_as_company or enter an address manually.'
                 raise ValidationError({'address_same_as_company': error_message})
+
+    def clean(self):
+        """Custom validation."""
+        self.validate_address()
+        self.validate_contact_preferences()
         super(Contact, self).clean()
+
+    def save(self, *args, **kwargs):
+        """Override the Django save implementation to hook the custom validation."""
+        self.clean()
+        super().save(*args, **kwargs)
 
 
 class AdvisorManager(BaseUserManager):
@@ -291,7 +314,7 @@ class AdvisorManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
-class Advisor(KorbenSaveModelMixin, AbstractBaseUser, PermissionsMixin):
+class Advisor(AbstractBaseUser, PermissionsMixin):
     """Advisor."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
@@ -342,23 +365,3 @@ class Advisor(KorbenSaveModelMixin, AbstractBaseUser, PermissionsMixin):
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Sends an email to this User."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
-
-
-# Write to ES stuff
-@receiver((post_save, m2m_changed))
-def save_to_es(sender, instance, **kwargs):
-    """Save to ES."""
-    from datahub.company import tasks
-
-    if sender in (Company, CompaniesHouseCompany, Contact):
-        data = model_to_dictionary(instance)
-
-        if sender is CompaniesHouseCompany:
-            # CH company is indexed by CH number instead
-            data['id'] = data['company_number']
-
-        tasks.save_to_es.delay(
-            # cannot access _meta from the instance
-            doc_type=type(instance)._meta.db_table,
-            data=data,
-        )

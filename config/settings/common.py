@@ -44,16 +44,15 @@ THIRD_PARTY_APPS = (
     'django_extensions',
     'reversion',
     'oauth2_provider',
+    'django_filters',
 )
 
 LOCAL_APPS = (
     'datahub.core',
     'datahub.company',
-    'datahub.es',
     'datahub.interaction',
     'datahub.metadata',
     'datahub.search',
-    'datahub.korben',
     'datahub.user'
 )
 
@@ -141,12 +140,9 @@ STATICFILES_DIRS = (
     str(ROOT_DIR.path('static')),
 )
 
-
-
 # DRF
 REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': None,
-    'EXCEPTION_HANDLER': 'datahub.core.exceptions.versioned_exception_handler',
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
@@ -164,18 +160,8 @@ APPEND_SLASH = True
 ES_HOST = env('ES_HOST')
 ES_PORT = env.int('ES_PORT')
 ES_INDEX = env('ES_INDEX')
-KORBEN_HOST = env('KORBEN_HOST')
-KORBEN_PORT = env('KORBEN_PORT')
 DATAHUB_SECRET = env('DATAHUB_SECRET')
+CDMS_AUTH_URL = env('CDMS_AUTH_URL')
 CHAR_FIELD_MAX_LENGTH = 255
 HEROKU = False
-
-#  TODO remove this line when db level whitelisting gets deployed
-DIT_ENABLED_ADVISORS = [name.lower() for name in env.tuple('DIT_ENABLED_ADVISORS', default=())]
-
-# celery
-CELERY_BROKER_URL = env('BROKER_URL')
-CELERY_RESULT_BACKEND = env('RESULT_BACKEND')
-CELERY_RESULT_EXPIRES = None
-CELERY_BROKER_TRANSPORT_OPTIONS = env.dict('BROKER_TRANSPORT_OPTIONS', default={})
-TASK_MAX_RETRIES = env('TASK_MAX_RETRIES', default=1000)
+BULK_CREATE_BATCH_SIZE = env.int('BULK_CREATE_BATCH_SIZE', default=50000)

@@ -3,7 +3,6 @@ import csv
 import io
 import tempfile
 import zipfile
-
 from contextlib import contextmanager
 from datetime import datetime
 from logging import getLogger
@@ -12,11 +11,12 @@ from urllib.parse import urlparse
 import requests
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.db import connection, transaction
 from lxml import etree
 from raven.contrib.django.raven_compat.models import client
 
 from datahub.company.models import CompaniesHouseCompany
-from datahub.core.utils import log_and_ignore_exceptions, stream_to_file_pointer
+from datahub.core.utils import log_and_ignore_exceptions, slice_iterable_into_chunks, stream_to_file_pointer
 
 logger = getLogger(__name__)
 
@@ -33,7 +33,8 @@ def get_ch_latest_dump_file_list(url, selector='.omega a'):
     for anchor in root.cssselect(selector):
         href = anchor.attrib['href']
         # Fix broken url
-        result.append('{0.scheme}://{0.hostname}/{1}'.format(url_base, href))
+        if 'AsOneFile' not in href:
+            result.append('{0.scheme}://{0.hostname}/{1}'.format(url_base, href))
     return result
 
 
@@ -49,7 +50,7 @@ def filter_irrelevant_ch_columns(row):
             ret['incorporation_date'], '%d/%m/%Y'
         ).date()
     except (TypeError, ValueError):
-        pass
+        ret['incorporation_date'] = None
 
     # bad hacks
     ret['registered_address_country_id'] = settings.CH_UNITED_KINGDOM_COUNTRY_ID
@@ -73,43 +74,46 @@ def open_ch_zipped_csv(fp):
 def iter_ch_csv_from_url(url, tmp_file_creator):
     """Fetch & cache CH zipped CSV, and then iterate though contents."""
     with tmp_file_creator() as tf:
-        logger.info('Downloading: {url}'.format(url=url))
         stream_to_file_pointer(url, tf)
         tf.seek(0, 0)
-        logger.info('Downloaded: {url}'.format(url=url))
 
         with open_ch_zipped_csv(tf) as csv_reader:
-            for index, row in enumerate(csv_reader):
-                if index == 0:
-                    continue  # We're overriding field names, skip header row
-
+            next(csv_reader)  # skip the csv header
+            for row in csv_reader:
                 yield filter_irrelevant_ch_columns(row)
 
 
-def is_changed(company, csv_data):
-    """Return whatever company data changed."""
-    return any(csv_data[name] != getattr(company, name) for name in csv_data)
+def sync_ch(tmp_file_creator, endpoint=None, truncate_first=False):
+    """Do the sync.
 
-
-def sync_ch(tmp_file_creator, endpoint=None):
-    """Do the sync."""
+    We are batching the records instead of letting bulk_create doing it because Django casts the objects into a list
+    https://github.com/django/django/blob/master/django/db/models/query.py#L420
+    this would create a list with millions of objects, that will try to be saved in batches in a single transaction
+    """
     endpoint = endpoint or settings.CH_DOWNLOAD_URL
     ch_csv_urls = get_ch_latest_dump_file_list(endpoint)
-
+    if truncate_first:
+        truncate_ch_companies_table()
     for csv_url in ch_csv_urls:
-        for ch_company_row in iter_ch_csv_from_url(csv_url, tmp_file_creator):
-            company, created = CompaniesHouseCompany.objects.get_or_create(
-                company_number=ch_company_row.pop('company_number'),
-                defaults=ch_company_row,
+        ch_company_rows = iter_ch_csv_from_url(csv_url, tmp_file_creator)
+        for batchiter in slice_iterable_into_chunks(ch_company_rows, settings.BULK_CREATE_BATCH_SIZE):
+            objects = [CompaniesHouseCompany(**ch_company_row) for ch_company_row in batchiter if ch_company_row]
+            CompaniesHouseCompany.objects.bulk_create(
+                objs=objects,
+                batch_size=settings.BULK_CREATE_BATCH_SIZE
             )
 
-            if created or not is_changed(company, ch_company_row):
-                continue
 
-            for key, value in ch_company_row.items():
-                setattr(company, key, value)
+@transaction.atomic
+def truncate_ch_companies_table():
+    """Delete all the companies house companies.
 
-            company.save()
+    delete() is too slow, we use truncate.
+    """
+    cursor = connection.cursor()
+    table_name = CompaniesHouseCompany._meta.db_table
+    query = 'truncate {table};'.format(table=table_name)
+    cursor.execute(query)
 
 
 class Command(BaseCommand):
@@ -118,7 +122,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """Handle."""
         try:
-            sync_ch(tmp_file_creator=tempfile.TemporaryFile)
+            sync_ch(tmp_file_creator=tempfile.TemporaryFile, truncate_first=True)
         except Exception as e:
             with log_and_ignore_exceptions():
                 client.captureException()

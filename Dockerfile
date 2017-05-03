@@ -1,4 +1,4 @@
-FROM python:3.5
+FROM python:3.6
 
 RUN mkdir -p /shared
 RUN mkdir -p /app
@@ -21,10 +21,6 @@ RUN chmod a+x tests.sh
 
 ENV ES_PORT 9200
 ENV ES_HOST es
-ENV KORBEN_HOST korben
-ENV KORBEN_PORT 8080
-ENV DEBUG False
-ENV ES_ACCESS True
 
 EXPOSE 8000
 CMD ./start.sh
