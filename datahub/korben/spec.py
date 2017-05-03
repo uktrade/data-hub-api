@@ -116,12 +116,6 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
             ('optevia_EmployeeRange.Id', 'employee_range_id'),
             ('optevia_TurnoverRange.Id', 'turnover_range_id'),
         ),
-        undef=(
-            'registered_address_country_id',
-            'business_type_id',
-            'sector_id',
-            'uk_region_id',
-        ),
     ),
     Mapping(
         from_entitytype='SystemUserSet',
@@ -159,7 +153,6 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
             (('optevia_AreaCode', 'optevia_TelephoneNumber'), 'telephone_number'),
             (('FirstName', 'MiddleName'), 'first_name'),
         ),
-        undef=('title_id', 'company_id'),
     ),
     Mapping(
         from_entitytype='detica_interactionSet',
@@ -174,14 +167,6 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
             ('optevia_Organisation.Id', 'company_id'),
             ('optevia_ServiceProvider.Id', 'dit_team_id'),
             ('optevia_Service.Id', 'service_id'),
-        ),
-        undef=(
-            'company_id',
-            'contact_id',
-            'service_id',
-            'dit_advisor_id',
-            'dit_team_id',
-            'interaction_type_id',
         ),
     ),
     Mapping(
@@ -201,13 +186,6 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
             ('optevia_ServiceOffer.Id', 'service_offer_id'),
             ('optevia_ServiceProvider.Id', 'dit_team_id'),
             ('optevia_UKRegion.Id', 'uk_region_id'),
-        ),
-        undef=(
-            'company_id',
-            'contact_id',
-            'service_id',
-            'dit_advisor_id',
-            'dit_team_id',
         ),
     ),
     Mapping(
