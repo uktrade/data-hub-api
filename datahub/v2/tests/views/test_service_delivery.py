@@ -1,8 +1,7 @@
 import json
-from unittest import mock
+import uuid
 
 from django.utils.timezone import now
-from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -10,27 +9,117 @@ from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
 
-from .factories import ServiceDeliveryFactory, ServiceOfferFactory
-from ..models import ServiceDelivery
+from datahub.interaction.test.factories import ServiceDeliveryFactory, ServiceOfferFactory
+from datahub.metadata.test.factories import EventFactory
 
 
-class ServiceDeliveryTestCase(LeelooTestCase):
-    """Service Delivery test case."""
+class ServiceDeliveryViewTestCase(LeelooTestCase):
+    """Service Delivery view test case."""
 
     def test_service_delivery_detail_view(self):
         """Service Delivery detail view."""
         service_offer = ServiceOfferFactory()
         servicedelivery = ServiceDeliveryFactory(
             service=service_offer.service,
-            dit_team=service_offer.dit_team
+            dit_team=service_offer.dit_team,
         )
-        url = reverse('v2:servicedelivery-detail', kwargs={'pk': servicedelivery.pk})
+        url = reverse('v2:servicedelivery-detail', kwargs={'object_id': servicedelivery.pk})
         response = self.api_client.get(url)
+        content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['id'] == str(servicedelivery.pk)
+        assert content.keys() == {'data'}
+        assert content['data'].keys() == {'type', 'id', 'attributes', 'relationships', 'links'}
+        assert content['data']['links']['self']
 
-    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
-    def test_add_service_delivery(self, mocked_save_to_korben):
+    def test_service_delivery_detail_view_not_found(self):
+        """Service Delivery detail view not found."""
+        url = reverse('v2:servicedelivery-detail', kwargs={'object_id': uuid.uuid4()})
+        response = self.api_client.get(url)
+        content = json.loads(response.content.decode('utf-8'))
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        expected_content = {'errors': [{'source': {'pointer': '/data/detail'}, 'detail': 'Not found.'}]}
+        assert content == expected_content
+
+    def test_service_delivery_list_view(self):
+        """Service delivery liste view."""
+        event = EventFactory()
+        service_offer = ServiceOfferFactory(
+            event=event
+        )
+        [
+            ServiceDeliveryFactory(
+                service=service_offer.service,
+                dit_team=service_offer.dit_team,
+                event=service_offer.event
+            )
+            for i in range(6)]
+        url = reverse('v2:servicedelivery-list')
+        response = self.api_client.get(url)
+        content = json.loads(response.content.decode('utf-8'))
+        assert response.status_code == status.HTTP_200_OK
+        assert content.keys() == {'links', 'data', 'meta'}
+        assert content['links'].keys() == {'first', 'last', 'next', 'prev'}
+        assert content['meta'].keys() == {'pagination'}
+        assert content['meta']['pagination'].keys() == {'count', 'limit', 'offset'}
+
+    def test_add_service_delivery_incorrect_format(self):
+        """Test add new service delivery with incorrect format."""
+        service_offer = ServiceOfferFactory()
+        url = reverse('v2:servicedelivery-list')
+        data = {
+            'type': 'ServiceDelivery',
+            'attributes': {
+                'subject': 'whatever',
+                'date': now().isoformat(),
+                'notes': 'hello',
+            },
+            'relationships': {
+                'status': {
+                    'data': {
+                        'type': 'foobar',
+                        'id': constants.ServiceDeliveryStatus.offered.value.id
+                    }
+                },
+                'company': {
+                    'data': {
+                        'type': 'Company',
+                        'id': CompanyFactory().pk
+                    }
+                },
+                'contact': {
+                    'data': {
+                        'type': 'Contact',
+                        'id': ContactFactory().pk
+                    }
+                },
+                'service': {
+                    'data': {
+                        'type': 'Service',
+                        'id': service_offer.service.id
+                    }
+                },
+                'dit_team': {
+                    'data': {
+                        'type': 'Team',
+                        'id': service_offer.dit_team.id
+                    }
+                }
+            }
+        }
+        response = self.api_client.post(
+            url,
+            data=json.dumps({'data': data}),
+            content_type='application/vnd.api+json'
+        )
+        content = json.loads(response.content.decode('utf-8'))
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        expected_content = {'errors': [{
+            'detail': 'type foobar should be ServiceDeliveryStatus',
+            'source': {'pointer': '/data/relationships/status'}
+        }]}
+        assert content == expected_content
+
+    def test_add_service_delivery(self):
         """Test add new service delivery."""
         service_offer = ServiceOfferFactory()
         url = reverse('v2:servicedelivery-list')
@@ -80,17 +169,8 @@ class ServiceDeliveryTestCase(LeelooTestCase):
             content_type='application/vnd.api+json'
         )
         assert response.status_code == status.HTTP_201_CREATED
-        # make sure we're spawning a task to save to Korben
-        expected_data = ServiceDelivery.objects.get(pk=response.data['id']).convert_model_to_korben_format()
-        mocked_save_to_korben.delay.assert_called_once_with(
-            db_table='interaction_servicedelivery',
-            data=expected_data,
-            update=False,
-            user_id=self.user.id
-        )
 
-    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
-    def test_add_service_delivery_incorrect_accept_header_format(self, mocked_save_to_korben):
+    def test_add_service_delivery_incorrect_accept_header_format(self):
         """Test add new service delivery incorrect accept header format."""
         url = reverse('v2:servicedelivery-list')
         data = {
@@ -139,40 +219,48 @@ class ServiceDeliveryTestCase(LeelooTestCase):
             content_type='application/vnd.api+json',
             **{'HTTP_ACCEPT': 'application/json'}
         )
+        content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_406_NOT_ACCEPTABLE
-        expected_content = b'{"errors":{"detail":"Could not satisfy the request Accept header."}}'
-        assert response.content == expected_content
-        # make sure we're not spawning a task to save to Korben
-        assert mocked_save_to_korben.delay.called is False
+        expected_content = {'errors': [{
+            'detail': 'Could not satisfy the request Accept header.',
+            'source': {'pointer': '/data/detail'}
+        }]}
+        assert content == expected_content
 
-    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
-    @freeze_time('2017-01-27 12:00:01')
-    def test_modify_service_delivery(self, mocked_save_to_korben):
+    def test_modify_service_delivery(self):
         """Modify an existing service delivery."""
         service_offer = ServiceOfferFactory()
         servicedelivery = ServiceDeliveryFactory(
             service=service_offer.service,
             dit_team=service_offer.dit_team,
             event=service_offer.event,
-            subject='I am a subject'
+            subject='I am a subject',
+            uk_region_id=constants.UKRegion.east_midlands.value.id
         )
 
-        url = reverse('v2:servicedelivery-detail', kwargs={'pk': servicedelivery.pk})
-        response = self.api_client.patch(url, {
-            'subject': 'I am another subject',
-        })
+        url = reverse('v2:servicedelivery-list')
+        data = {
+            'type': 'ServiceDelivery',
+            'attributes': {
+                'subject': 'I am another subject',
+            },
+            'relationships': {
+                'uk_region': {
+                    'data': None
+                }
+            },
+            'id': str(servicedelivery.pk)
+        }
+        response = self.api_client.post(
+            url,
+            data=json.dumps({'data': data}),
+            content_type='application/vnd.api+json'
+        )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['subject'] == 'I am another subject'
-        # make sure we're spawning a task to save to Korben
-        expected_data = servicedelivery.convert_model_to_korben_format()
-        expected_data['subject'] = 'I am another subject'
-        mocked_save_to_korben.delay.assert_called_once_with(
-            db_table='interaction_servicedelivery',
-            data=expected_data,
-            update=True,
-            user_id=self.user.id
-        )
+        content = json.loads(response.content.decode('utf-8'))
+        assert content['data']['attributes']['subject'] == 'I am another subject'
+        assert 'uk_region' not in content['data']['relationships'].keys()
 
     def test_filter_service_deliveries_by_company(self):
         """Filter by company."""
@@ -193,10 +281,9 @@ class ServiceDeliveryTestCase(LeelooTestCase):
             dit_team=service_offer.dit_team
         )
         url = reverse('v2:servicedelivery-list')
-        response = self.api_client.get(url, data={'company': company.pk})
+        response = self.api_client.get(url, data={'company_id': company.pk})
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_200_OK
-        assert content['meta']['pagination']['count'] == 2
         assert {element['id'] for element in content['data']} == {str(servicedelivery.pk), str(servicedelivery2.pk)}
 
     def test_filter_service_deliveries_by_contact(self):
@@ -218,14 +305,12 @@ class ServiceDeliveryTestCase(LeelooTestCase):
             dit_team=service_offer.dit_team
         )
         url = reverse('v2:servicedelivery-list')
-        response = self.api_client.get(url, data={'contact': contact.pk})
+        response = self.api_client.get(url, data={'contact_id': contact.pk})
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_200_OK
-        assert content['meta']['pagination']['count'] == 2
         assert {element['id'] for element in content['data']} == {str(servicedelivery.pk), str(servicedelivery2.pk)}
 
-    @mock.patch('datahub.core.viewsets.tasks.save_to_korben')
-    def test_add_service_delivery_incorrect_service_team_event_combination(self, mocked_save_to_korben):
+    def test_add_service_delivery_incorrect_service_team_event_combination(self):
         """Test add new service delivery with invalid service/team/even combination."""
         url = reverse('v2:servicedelivery-list')
         data = {
@@ -277,8 +362,6 @@ class ServiceDeliveryTestCase(LeelooTestCase):
         content = {
             'errors': [{
                 'detail': 'This combination of service and service provider does not exist.',
-                'source': {'pointer': '/data/attributes/service'},
-                'status': '400'}
-            ]}
+                'source': {'pointer': '/data/relationships/service'}
+            }]}
         assert json.loads(response.content.decode('utf-8')) == content
-        assert not mocked_save_to_korben.delay.called

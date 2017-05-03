@@ -30,7 +30,6 @@ ratings:
 exclude_paths:
 - config/
 - fixtures/
-- dummy-korben/
 - "**/migrations/"
 - "**.yml"
 - "**.xml"

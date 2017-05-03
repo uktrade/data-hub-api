@@ -27,7 +27,7 @@ Installation
 ------------
 
 Leeloo uses Docker compose to setup and run all the necessary components.
-The docker-compose.yaml file provided is meant to be used for running tests. Refer to the main repo for the development and live Docker Compose file.
+The `docker-compose.yml` file provided is meant to be used for running tests. Refer to the main repo for the development and live Docker Compose file.
 
 
 Build and run the necessary containers for the required environment::
@@ -47,15 +47,10 @@ Leeloo can run on any Heroku style platform. These environment variables MUST be
 - DJANGO_SECRET_KEY
 - DJANGO_SENTRY_DSN
 - DJANGO_SETTINGS_MODULE
+- BULK_CREATE_BATCH_SIZE (default=50000)
 - ES_HOST
-- ES_INDEX
 - ES_PORT
-- KORBEN_HOST
-- KORBEN_PORT
-- BROKER_URL
-- RESULT_BACKEND
-- BROKER_TRANSPORT_OPTIONS (default={})
-- TASK_MAX_RETRIES (default=1000000)
+- ES_INDEX
 
 
 Management commands
@@ -85,5 +80,5 @@ Load metadata::
 
 
     docker-compose run leeloo python manage.py loaddata /app/fixtures/metadata.yaml
-    docker-compose run leeloo python manage.py loaddata /app/undefined.yaml
+    docker-compose run leeloo python manage.py loaddata /app/fixtures/undefined.yaml
     docker-compose run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml

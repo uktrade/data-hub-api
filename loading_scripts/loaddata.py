@@ -1,51 +1,29 @@
 # pip install boto3
 # Run inside manage.py shell_plus
 
-import datetime
-import io
-import json
-import re
-import tempfile
+import os
 from collections import namedtuple, OrderedDict
 from logging import getLogger
 
 import boto3
 
 from datahub.interaction.models import ServiceDelivery
+from loading_scripts import utils
 
 
 logger = getLogger(__name__)
-DATETIME_RE = re.compile('/Date\(([-+]?\d+)\)/')
 
 
 s3 = boto3.resource(
     's3',
     region_name='eu-west-2',
-    aws_access_key_id='foo',
-    aws_secret_access_key='bar',
+    aws_access_key_id=os.environ['CDMS_DUMP_S3_KEY_ID'],
+    aws_secret_access_key=os.environ['CDMS_DUMP_S3_KEY'],
 )
-s3_bucket = s3.Bucket('cornelius.prod.uktrade.io')
+s3_bucket = s3.Bucket(os.environ['CDMS_DUMP_S3_BUCKET'])
 
 
-def cdms_datetime_to_datetime(value):
-    """Parses a cdms datetime as string and returns the equivalent datetime value. Dates in CDMS are always UTC."""
-    if not value:
-        return None
-
-    if isinstance(value, datetime.datetime):
-        return value
-
-    match = DATETIME_RE.match(value or '')
-    if match:
-        parsed_val = int(match.group(1))
-        parsed_val = datetime.datetime.utcfromtimestamp(parsed_val / 1000)
-        return parsed_val.replace(tzinfo=datetime.timezone.utc)
-    else:
-        logger.warning('Unrecognized value for a datetime: {} returning `None` instead'.format(value))
-        return None
-
-
-def extract(bucket, prefix, spec):
+def extract(bucket, entity_name, spec):
     """Extract data from bucket using given prefix and mapping spec."""
     row_mapping = namedtuple('row_mapping', spec.values())
 
@@ -56,26 +34,12 @@ def extract(bucket, prefix, spec):
 
         return value
 
-    objects = bucket.objects.filter(Prefix=prefix)
-
-    keys = [key.key for key in objects if key.key.endswith('response_body')]
     ret = set()
 
-    for key in keys:
-        with tempfile.TemporaryFile() as f:
-            print('Processing: {}'.format(key))  # noqa: T003
-            bucket.download_fileobj(key, f)
-            f.seek(0, 0)
-            try:
-                results = json.load(io.TextIOWrapper(f))['d']['results']
-            except KeyError:
-                logger.error('Failed to load result page: {}'.format(key))
-                results = []
-
-        for row in results:
-            ret.add(row_mapping(
-                *(get_by_path(row, field) for field in spec.keys())
-            ))
+    for row in utils.iterate_over_cdms_entities_from_s3(bucket, entity_name):
+        ret.add(row_mapping(
+            *(get_by_path(row, field) for field in spec.keys())
+        ))
 
     return ret
 
@@ -115,9 +79,9 @@ spec = OrderedDict([
 
 res = extract(
     s3_bucket,
-    'CACHE/XRMServices/2011/OrganizationData.svc/optevia_servicedeliverySet',
-    # 'CACHE/XRMServices/2011/OrganizationData.svc/optevia_eventSet',
-    # 'CACHE/XRMServices/2011/OrganizationData.svc/optevia_serviceofferSet',
+    'optevia_servicedeliverySet',
+    # 'optevia_eventSet',
+    # 'optevia_serviceofferSet',
     spec,
 )
 
@@ -127,7 +91,7 @@ for i, row in enumerate(res):
 
     try:
         data = row._asdict()
-        data['date'] = cdms_datetime_to_datetime(data['date'])
+        data['date'] = utils.cdms_datetime_to_datetime(data['date'])
         data['notes'] = data['notes'] or ''
         obj_id = data.pop('id')
         obj, created = spec_model.objects.get_or_create(

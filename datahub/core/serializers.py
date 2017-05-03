@@ -1,7 +1,5 @@
 from rest_framework import serializers
 
-from datahub.core.models import TaskInfo
-
 
 class ConstantModelSerializer(serializers.Serializer):
     """Constant models serializer."""
@@ -11,15 +9,4 @@ class ConstantModelSerializer(serializers.Serializer):
     selectable = serializers.BooleanField()
 
     class Meta:  # noqa: D101
-        fields = '__all__'
-
-
-class TaskInfoModelSerializer(serializers.ModelSerializer):
-    """Task info model serializer."""
-
-    status = serializers.CharField()
-
-    class Meta:  # noqa: D101
-        model = TaskInfo
-        depth = 1
         fields = '__all__'
