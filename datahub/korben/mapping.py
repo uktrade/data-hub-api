@@ -4,17 +4,12 @@
 class Mapping(object):
     """Container for spec of a mapping between CDMS entity and Django model."""
 
-    def __init__(self, from_entitytype, ToModel, pk, fields, undef=None, concat=None):  # noqa N803
+    def __init__(self, from_entitytype, ToModel, pk, fields, concat=None):  # noqa N803
         """Set up instance."""
         self.from_entitytype = from_entitytype
         self.ToModel = ToModel
         self.pk = pk
         self.fields = fields
-
-        if undef is not None:
-            self.undef = undef
-        else:
-            self.undef = ()
 
         if concat is not None:
             self.concat = concat

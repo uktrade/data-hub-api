@@ -25,10 +25,7 @@ shellplus:
 load-metadata:
 	docker-compose run leeloo python manage.py loaddata /app/fixtures/metadata.yaml
 
-load-undefined:
-	docker-compose run leeloo python manage.py loaddata /app/fixtures/undefined.yaml
-
 load-businesstypes:
 	docker-compose run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml
 
-load-all-metadata:	load-metadata load-undefined load-businesstypes
+load-all-metadata:	load-metadata load-businesstypes

@@ -149,9 +149,6 @@ class Company(ArchivableModel, CompanyAbstract):
 
     def clean(self):
         """Custom validation."""
-        if not self.classification_id:
-            self.classification_id = constants.CompanyClassification.undefined.value.id
-
         if not self._validate_trading_address():
             raise ValidationError(
                 self._generate_trading_address_errors(),
@@ -321,7 +318,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     last_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     email = core_fields.CICharField(max_length=MAX_LENGTH, unique=True)  # CDMS users may not have tld
-    dit_team = models.ForeignKey(metadata_models.Team, default=constants.Team.undefined.value.id)
+    dit_team = models.ForeignKey(metadata_models.Team, null=True)
     is_staff = models.BooleanField(
         'staff status',
         default=False,

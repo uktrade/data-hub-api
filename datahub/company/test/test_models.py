@@ -8,12 +8,6 @@ from datahub.core import constants
 pytestmark = pytest.mark.django_db
 
 
-def test_company_model_sets_classification_to_undefined():
-    """Test setting classification to undef by default."""
-    company = CompanyFactory()  # Calls save
-    assert company.classification_id == constants.CompanyClassification.undefined.value.id
-
-
 def test_company_can_have_one_list_owner_assigned():
     """Test that company can have one list owner assigned."""
     company = CompanyFactory()

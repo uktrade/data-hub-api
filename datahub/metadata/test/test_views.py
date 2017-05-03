@@ -103,7 +103,6 @@ ordered_metadata_view_params = (
         '£1.34 to £6.7M',
         '£6.7 to £33.5M',
         '£33.5M+',
-        'Undefined'
     ]),
     ('employee-range', [
         '1 to 9',
@@ -111,7 +110,6 @@ ordered_metadata_view_params = (
         '50 to 249',
         '250 to 499',
         '500+',
-        'Undefined'
     ]),
 )
 
