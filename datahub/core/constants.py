@@ -443,3 +443,16 @@ class CompanyClassification(Enum):
     tier_dl = Constant('Tier D - LEP Managed Branch (not IST)', '12798372-8eb4-e511-88b6-e4115bead28a')
     tier_dg = Constant('Tier D - POST Identified/Managed', '572dfefe-cd1d-e611-9bdc-e4115bead28a')
     undefined = Constant('Undefined', '0167b456-0ddd-49bd-8184-e3227a0b6396')
+
+
+class InvestmentProjectPhase(Enum):
+    """Investment project phase constants."""
+
+    created = Constant('Created', '8cecd05f-f515-4f1f-beaf-09dde1920440')
+    assign_pm = Constant('Assign PM', 'c9864359-fb1a-4646-a4c1-97d10189fc03')
+
+
+class InvestmentType(Enum):
+    """Investment type constants."""
+
+    fdi = Constant('FDI', '3e143372-496c-4d1e-8278-6fdd3da9b48b')

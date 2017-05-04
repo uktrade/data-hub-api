@@ -51,6 +51,7 @@ LOCAL_APPS = (
     'datahub.core',
     'datahub.company',
     'datahub.interaction',
+    'datahub.investment',
     'datahub.metadata',
     'datahub.search',
     'datahub.user'
@@ -165,3 +166,5 @@ CDMS_AUTH_URL = env('CDMS_AUTH_URL')
 CHAR_FIELD_MAX_LENGTH = 255
 HEROKU = False
 BULK_CREATE_BATCH_SIZE = env.int('BULK_CREATE_BATCH_SIZE', default=50000)
+CDMS_SHAREPOINT_PROJECT_URL = env('CDMS_SHAREPOINT_PROJECT_URL')
+DH_SHAREPOINT_PROJECT_URL = env('DH_SHAREPOINT_PROJECT_URL')

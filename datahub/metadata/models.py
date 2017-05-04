@@ -90,3 +90,43 @@ class CompanyClassification(BaseConstantModel):
     """Company classification."""
 
     pass
+
+
+class InvestmentProjectPhase(BaseOrderedConstantModel):
+    """Investment project phase."""
+
+
+class InvestmentType(BaseConstantModel):
+    """Investment type (for investment projects)."""
+
+
+class FDIType(BaseConstantModel):
+    """Investment type for foreign direct investments (for investment projects)."""
+
+
+class NonFDIType(BaseConstantModel):
+    """Investment type for non-foreign direct investments (for investment projects)."""
+
+
+class ReferralSourceActivity(BaseConstantModel):
+    """Referral source activity type (for investment projects)."""
+
+
+class ReferralSourceWebsite(BaseConstantModel):
+    """Referral source website (for investment projects)."""
+
+
+class ReferralSourceMarketing(BaseConstantModel):
+    """Referral source – marketing activities (for investment projects)."""
+
+
+class InvestmentBusinessActivity(BaseConstantModel):
+    """Business activity (for investment projects)."""
+
+
+class InvestmentStrategicDriver(BaseConstantModel):
+    """Strategic driver (for investment projects)."""
+
+
+class SalaryRange(BaseOrderedConstantModel):
+    """Salary ranges (used for investment projects)."""
