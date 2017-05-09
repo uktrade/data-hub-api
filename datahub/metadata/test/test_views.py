@@ -27,6 +27,16 @@ metadata_view_names = (
     'event',
     'headquarter-type',
     'company-classification',
+    'investment-type',
+    'fdi-type',
+    'non-fdi-type',
+    'referral-source-activity',
+    'referral-source-website',
+    'referral-source-marketing',
+    'investment-business-activity',
+    'investment-strategic-driver',
+    'salary-range',
+    'investment-project-phase',
 )
 
 metadata_views_ids = (
@@ -45,6 +55,16 @@ metadata_views_ids = (
     'event view',
     'headquarter type view',
     'company classification view',
+    'investment type view',
+    'fdi type view',
+    'non fdi type view',
+    'referral source activity view',
+    'referral source website view',
+    'referral source marketing view',
+    'investment business activity view',
+    'investment strategic driver view',
+    'salary range view',
+    'investment project phase view',
 )
 
 
@@ -111,11 +131,27 @@ ordered_metadata_view_params = (
         '250 to 499',
         '500+',
     ]),
+    ('salary-range', [
+        'Below £25,000',
+        '£25,000 – £29,000',
+        '£30,000 – £34,000',
+        '£35,000 and above'
+    ]),
+    ('investment-project-phase', [
+        'Create',
+        'Prospect',
+        'Assign PM',
+        'Active',
+        'Verify win',
+        'Won'
+    ]),
 )
 
 ordered_metadata_view_test_ids = (
     'turnover',
     'employee-range',
+    'salary-range',
+    'investment-project-phase',
 )
 
 

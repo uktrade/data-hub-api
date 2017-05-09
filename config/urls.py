@@ -31,7 +31,8 @@ unversioned_urls = [
 
 urlpatterns = [
     url(r'^', include(router_v1.urls, namespace='v1')),  # V1 has actually no version in the URL
-    url(r'v2/', include(v2_urls, namespace='v2')),
+    url(r'^v2/', include(v2_urls, namespace='v2')),
+    url(r'^', include('datahub.investment.urls')),
 ] + unversioned_urls
 
 if settings.DEBUG:

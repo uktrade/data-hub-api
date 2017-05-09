@@ -329,7 +329,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         default=True,
         help_text=(
             'Designates whether this user should be treated as active. '
-            'Unselect this instead of deleting accounts.'
+            'Deselect this instead of deleting accounts.'
         ),
     )
     date_joined = models.DateTimeField('date joined', default=now)

@@ -22,6 +22,16 @@ METADATA_MAPPING = {
     'event': models.Event,
     'headquarter-type': models.HeadquarterType,
     'company-classification': models.CompanyClassification,
+    'investment-type': models.InvestmentType,
+    'fdi-type': models.FDIType,
+    'non-fdi-type': models.NonFDIType,
+    'referral-source-activity': models.ReferralSourceActivity,
+    'referral-source-website': models.ReferralSourceWebsite,
+    'referral-source-marketing': models.ReferralSourceMarketing,
+    'investment-business-activity': models.InvestmentBusinessActivity,
+    'investment-strategic-driver': models.InvestmentStrategicDriver,
+    'salary-range': models.SalaryRange,
+    'investment-project-phase': models.InvestmentProjectPhase,
 }
 
 
