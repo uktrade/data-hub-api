@@ -11,7 +11,6 @@ def django_db_setup(django_db_setup, django_db_blocker):
     fixtures_dir = PurePath(__file__).parent / 'fixtures'
     with django_db_blocker.unblock():
         call_command('loaddata', fixtures_dir / 'metadata.yaml')
-        call_command('loaddata', fixtures_dir / 'undefined.yaml')
         call_command('loaddata', fixtures_dir / 'datahub_businesstypes.yaml')
 
 

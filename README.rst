@@ -80,5 +80,4 @@ Load metadata::
 
 
     docker-compose run leeloo python manage.py loaddata /app/fixtures/metadata.yaml
-    docker-compose run leeloo python manage.py loaddata /app/fixtures/undefined.yaml
-    docker-compose run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml
+    docker-compose run leeloo python manage.py loaddata /app/fixtures/
