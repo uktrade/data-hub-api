@@ -29,7 +29,7 @@ class CompanyViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
         'interactions',
         'export_to_countries',
         'future_interest_countries'
-    ).exclude(name='Undefined')
+    )
 
 
 class CompaniesHouseCompanyReadOnlyViewSetV1(
@@ -53,7 +53,7 @@ class ContactViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
     ).prefetch_related(
         'teams',
         'interactions'
-    ).exclude(first_name='Undefined')
+    )
 
     def create(self, request, *args, **kwargs):
         """Override create to inject the user from session."""
