@@ -82,3 +82,40 @@ Load metadata::
     docker-compose run leeloo python manage.py loaddata /app/fixtures/metadata.yaml
     docker-compose run leeloo python manage.py loaddata /app/fixtures/undefined.yaml
     docker-compose run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml
+
+
+Architectural notes
+===================
+
+The version 2 folders structure differs from the usual Django pattern. Instead of having the code divided in apps modules,
+there are the following folders: `repos`, `schemas`, `views` and `tests`.
+The models are still living in their relative apps folders, but they should be moved into a `models` folder once
+the migration to v2 is completed
+
+The version 2 of the API implements the repository pattern, the main components are:
+
+**schemas**
+  they are subclasses of `colander.Schema`. Single fields validation happens here and an instance of the schema is
+  used by the repo to deserialize and validate, the incoming data. The data serialisation is manually handled in
+  the repo class.
+
+**repos**
+  repo classes MUST implement three methods: `get`, `filter` and `upsert`. Repos take a `config` variable when
+  initialised, it's a dictionary with all the necessary configuration settings. At the moment our repos are a
+  wrapper around the Django ORM, this is the reason why any cross fields validation that relies on database
+  access happens in the repo.
+
+Other components are required by Django and DRF, they are views, renderers and parsers.
+
+**parsers**
+  the parser class MUST implement the `parse` method, it also enforces the media type and some basic data structure validation.
+
+**renderers**
+  the render class MUST implement the `render` method. It handles the rendering and it's in charge of rendering
+  the exceptions in the correct format.
+
+The response-request flow happens in this way: the request hits the parser class, which does some basic checks.
+Then the data is passed to the view which calls the correct repo class method passing the data through.
+The repo class does the schema validation and any other validation, raising the correct type of error if necessary.
+The repo handles the serialisation, returning the data in the right format back to the view.
+The view then passes the correctly serialised data to the renderer class, which then generates the response.
