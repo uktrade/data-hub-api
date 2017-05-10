@@ -22,8 +22,6 @@ services:
       ES_HOST: es
       ES_PORT: 9200
       CDMS_AUTH_URL: http://example.com
-      CDMS_SHAREPOINT_PROJECT_URL: http://example/cdms/{project_code}/
-      DH_SHAREPOINT_PROJECT_URL: http://example/dh/{project_code}/
     depends_on:
       - postgres
       - es

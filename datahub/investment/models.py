@@ -101,15 +101,6 @@ class IProjectAbstract(models.Model):
             return self.cdms_project_code
         return 'DHP-{:08d}'.format(self.investmentprojectcode.id)
 
-    @property
-    def document_link(self):
-        """URL to the document storage area in SharePoint."""
-        if self.cdms_project_code:
-            url_format = settings.CDMS_SHAREPOINT_PROJECT_URL
-        else:
-            url_format = settings.DH_SHAREPOINT_PROJECT_URL
-        return url_format.format(project_code=self.project_code)
-
 
 class IProjectValueAbstract(models.Model):
     """The value part of an investment project."""

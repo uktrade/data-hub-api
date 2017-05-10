@@ -88,12 +88,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['nda_signed'] == request_data['nda_signed']
         assert (response_data['estimated_land_date'] == request_data[
             'estimated_land_date'])
-
         assert re.match('^DHP-\d+$', response_data['project_code'])
-        expected_url = 'http://example/dh/{}/'.format(
-            response_data['project_code']
-        )
-        assert response_data['document_link'] == expected_url
 
         assert (response_data['investment_type']['id'] == request_data[
             'investment_type']['id'])
@@ -130,12 +125,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['nda_signed'] == request_data['nda_signed']
         assert (response_data['estimated_land_date'] == request_data[
             'estimated_land_date'])
-
         assert re.match('^DHP-\d+$', response_data['project_code'])
-        expected_url = 'http://example/dh/{}/'.format(
-            response_data['project_code']
-        )
-        assert response_data['document_link'] == expected_url
 
         assert (response_data['phase']['id'] ==
                 constants.InvestmentProjectPhase.created.value.id)
@@ -170,7 +160,6 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['description'] == project.description
         assert response_data['nda_signed'] == project.nda_signed
         assert response_data['project_code'] == project.project_code
-        assert response_data['document_link'] == project.document_link
         assert (response_data['estimated_land_date'] ==
                 str(project.estimated_land_date))
         assert (response_data['investment_type']['id'] ==
