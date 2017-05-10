@@ -138,7 +138,6 @@ ordered_metadata_view_params = (
         '£35,000 and above'
     ]),
     ('investment-project-phase', [
-        'Create',
         'Prospect',
         'Assign PM',
         'Active',

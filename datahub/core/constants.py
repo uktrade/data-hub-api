@@ -2,6 +2,7 @@ from collections import namedtuple
 from enum import Enum
 
 Constant = namedtuple('Constant', ('name', 'id'))
+OrderedConstant = namedtuple('OrderedConstant', ('name', 'id', 'order'))
 
 
 class BusinessType(Enum):
@@ -444,8 +445,19 @@ class CompanyClassification(Enum):
 class InvestmentProjectPhase(Enum):
     """Investment project phase constants."""
 
-    created = Constant('Created', '8cecd05f-f515-4f1f-beaf-09dde1920440')
-    assign_pm = Constant('Assign PM', 'c9864359-fb1a-4646-a4c1-97d10189fc03')
+    prospect = OrderedConstant(
+        'Prospect', '8a320cc9-ae2e-443e-9d26-2f36452c2ced', 200.0
+    )
+    assign_pm = OrderedConstant(
+        'Assign PM', 'c9864359-fb1a-4646-a4c1-97d10189fc03', 300.0
+    )
+    active = OrderedConstant(
+        'Active', '7606cc19-20da-4b74-aba1-2cec0d753ad8', 400.0
+    )
+    verify_win = OrderedConstant(
+        'Verify win', '49b8f6f3-0c50-4150-a965-2c974f3149e3', 500.0
+    )
+    won = OrderedConstant('Won', '945ea6d1-eee3-4f5b-9144-84a75b71b8e6', 600.0)
 
 
 class InvestmentType(Enum):
