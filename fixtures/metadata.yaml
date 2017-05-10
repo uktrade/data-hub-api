@@ -7108,8 +7108,6 @@
 
 # InvestmentProjectPhase
 - model: metadata.investmentprojectphase
-  fields: {id: 8cecd05f-f515-4f1f-beaf-09dde1920440, name: "Create", order: 100.0}
-- model: metadata.investmentprojectphase
   fields: {id: 8a320cc9-ae2e-443e-9d26-2f36452c2ced, name: "Prospect", order: 200.0}
 - model: metadata.investmentprojectphase
   fields: {id: c9864359-fb1a-4646-a4c1-97d10189fc03, name: "Assign PM", order: 300.0}

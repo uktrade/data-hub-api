@@ -138,7 +138,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['document_link'] == expected_url
 
         assert (response_data['phase']['id'] ==
-                constants.InvestmentProjectPhase.created.value.id)
+                constants.InvestmentProjectPhase.prospect.value.id)
         assert (response_data['investment_type']['id'] == request_data[
             'investment_type']['id'])
 

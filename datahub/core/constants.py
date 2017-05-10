@@ -445,9 +445,6 @@ class CompanyClassification(Enum):
 class InvestmentProjectPhase(Enum):
     """Investment project phase constants."""
 
-    created = OrderedConstant(
-        'Created', '8cecd05f-f515-4f1f-beaf-09dde1920440', 100.0
-    )
     prospect = OrderedConstant(
         'Prospect', '8a320cc9-ae2e-443e-9d26-2f36452c2ced', 200.0
     )

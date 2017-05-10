@@ -34,7 +34,7 @@ class IProjectAbstract(models.Model):
 
     phase = models.ForeignKey('metadata.InvestmentProjectPhase',
                               related_name='investment_projects',
-                              default=InvestmentProjectPhase.created.value.id)
+                              default=InvestmentProjectPhase.prospect.value.id)
     investor_company = models.ForeignKey(
         'company.Company', related_name='investor_investment_projects',
         null=True, blank=True
