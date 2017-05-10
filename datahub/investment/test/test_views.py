@@ -128,7 +128,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert re.match('^DHP-\d+$', response_data['project_code'])
 
         assert (response_data['phase']['id'] ==
-                constants.InvestmentProjectPhase.created.value.id)
+                constants.InvestmentProjectPhase.prospect.value.id)
         assert (response_data['investment_type']['id'] == request_data[
             'investment_type']['id'])
 
