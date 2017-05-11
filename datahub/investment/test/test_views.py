@@ -205,6 +205,53 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert len(response_data['client_contacts']) == 1
         assert response_data['client_contacts'][0]['id'] == str(new_contact.id)
 
+    def test_change_phase_failure(self):
+        """Test that moving to the Assign PM phase fails when required
+        fields haven't been complete.
+        """
+        project = InvestmentProjectFactory(
+            client_contacts=[ContactFactory().id, ContactFactory().id]
+        )
+        url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
+        request_data = {
+            'phase': {
+                'id': constants.InvestmentProjectPhase.assign_pm.value.id
+            }
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'business_activity': ['This field is required.'],
+            'client_relationship_manager': ['This field is required.'],
+            'investor_company': ['This field is required.'],
+            'referral_source_advisor': ['This field is required.']
+        }
+
+    def test_change_phase_success(self):
+        """Test that moving to the Assign PM phase succeeds when required
+        fields have been completed.
+        """
+        advisor = AdvisorFactory()
+        company = CompanyFactory()
+        project = InvestmentProjectFactory(
+            client_contacts=[ContactFactory().id, ContactFactory().id],
+            business_activity=[
+                constants.InvestmentBusinessActivity.retail.value.id
+            ],
+            client_relationship_manager_id=advisor.id,
+            investor_company_id=company.id,
+            referral_source_advisor_id=advisor.id
+        )
+        url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
+        request_data = {
+            'phase': {
+                'id': constants.InvestmentProjectPhase.assign_pm.value.id
+            }
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
     def test_get_value_success(self):
         """Test successfully getting a project value object."""
         project = InvestmentProjectFactory(total_investment=999,
