@@ -7,8 +7,11 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from datahub.core.constants import InvestmentProjectPhase
+from datahub.core.constants import (
+    InvestmentProjectPhase, InvestmentType, ReferralSourceActivity
+)
 from datahub.core.models import BaseModel
+from datahub.investment.validate import get_incomplete_project_fields
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -100,6 +103,10 @@ class IProjectAbstract(models.Model):
         if self.cdms_project_code:
             return self.cdms_project_code
         return 'DHP-{:08d}'.format(self.investmentprojectcode.id)
+
+    @property
+    def project_section_complete(self):
+        return not get_incomplete_project_fields(self)
 
 
 class IProjectValueAbstract(models.Model):

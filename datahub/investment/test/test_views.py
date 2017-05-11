@@ -43,7 +43,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['count'] == 1
         assert response_data['results'][0]['id'] == str(project.id)
 
-    def test_create_project_success(self):
+    def test_create_project_complete_success(self):
         """Test successfully creating a project."""
         contacts = [ContactFactory(), ContactFactory()]
         investor_company = CompanyFactory()
@@ -51,6 +51,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         intermediate_company = CompanyFactory()
         advisor = AdvisorFactory()
         url = reverse('investment:v3:project')
+        aerospace_id = constants.Sector.aerospace_assembly_aircraft.value.id
         request_data = {
             'name': 'project name',
             'description': 'project description',
@@ -60,7 +61,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
                 'id': constants.InvestmentType.fdi.value.id
             },
             'phase': {
-                'id': constants.InvestmentProjectPhase.assign_pm.value.id
+                'id': constants.InvestmentProjectPhase.prospect.value.id
             },
             'client_contacts': [{
                 'id': str(contacts[0].id)
@@ -78,6 +79,18 @@ class InvestmentViewsTestCase(LeelooTestCase):
             },
             'referral_source_advisor': {
                 'id': str(advisor.id)
+            },
+            'client_relationship_manager': {
+                'id': str(advisor.id)
+            },
+            'sector': {
+                'id': str(aerospace_id)
+            },
+            'business_activity': [{
+                'id': constants.InvestmentBusinessActivity.retail.value.id
+            }],
+            'referral_source_activity': {
+                'id': constants.ReferralSourceActivity.cold_call.value.id
             }
         }
         response = self.api_client.post(url, data=request_data, format='json')
@@ -88,6 +101,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['nda_signed'] == request_data['nda_signed']
         assert (response_data['estimated_land_date'] == request_data[
             'estimated_land_date'])
+        assert response_data['project_section_complete'] is True
         assert re.match('^DHP-\d+$', response_data['project_code'])
 
         assert (response_data['investment_type']['id'] == request_data[
@@ -125,6 +139,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['nda_signed'] == request_data['nda_signed']
         assert (response_data['estimated_land_date'] == request_data[
             'estimated_land_date'])
+        assert response_data['project_section_complete'] is False
         assert re.match('^DHP-\d+$', response_data['project_code'])
 
         assert (response_data['phase']['id'] ==

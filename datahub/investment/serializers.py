@@ -4,8 +4,10 @@ from rest_framework import serializers
 
 import datahub.metadata.models as meta_models
 from datahub.company.models import Advisor, Company, Contact
+from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.serializers import NestedRelatedField
 from datahub.investment.models import InvestmentProject
+from datahub.investment.validate import get_incomplete_project_fields
 
 
 class IProjectSerializer(serializers.ModelSerializer):
@@ -59,6 +61,20 @@ class IProjectSerializer(serializers.ModelSerializer):
     business_activity = NestedRelatedField(
         meta_models.InvestmentBusinessActivity, many=True, required=False
     )
+    project_section_complete = serializers.BooleanField(read_only=True)
+
+    def validate(self, data):
+        previous_phase = (self.instance.phase if self.instance else
+                          InvestmentProjectPhase.prospect.value)
+        desired_phase = data.get('phase', previous_phase)
+
+        if desired_phase.order >= InvestmentProjectPhase.assign_pm.value.order:
+            required_field_errors = get_incomplete_project_fields(
+                self.instance, data
+            )
+            if required_field_errors:
+                raise serializers.ValidationError(required_field_errors)
+        return data
 
     class Meta:  # noqa: D101
         model = InvestmentProject
@@ -73,7 +89,7 @@ class IProjectSerializer(serializers.ModelSerializer):
             'referral_source_activity_website',
             'referral_source_activity_marketing',
             'referral_source_activity_event', 'fdi_type', 'non_fdi_type',
-            'sector', 'business_activity'
+            'sector', 'business_activity', 'project_section_complete'
         )
 
 
