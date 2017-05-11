@@ -28,20 +28,6 @@ def test_project_code_datahub():
     )
 
 
-def test_document_link_cdms():
-    """Tests that correct document URLs are generated for CDMS projects."""
-    project = InvestmentProjectFactory(cdms_project_code='P-79661656')
-    assert project.document_link == 'http://example/cdms/P-79661656/'
-
-
-def test_document_link_datahub():
-    """Tests that correct document URLs are generated for Data Hub projects."""
-    project = InvestmentProjectFactory()
-    assert project.document_link == 'http://example/dh/{}/'.format(
-        project.project_code
-    )
-
-
 def test_project_manager_team_none():
     """Tests project_manager_team for a project without a project manager."""
     project = InvestmentProjectFactory()
