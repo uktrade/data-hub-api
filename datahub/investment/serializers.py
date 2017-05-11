@@ -12,7 +12,6 @@ class IProjectSerializer(serializers.ModelSerializer):
     """Serialiser for investment project endpoints."""
 
     project_code = serializers.CharField(read_only=True)
-    document_link = serializers.CharField(read_only=True)
 
     investment_type = NestedRelatedField(meta_models.InvestmentType)
     phase = NestedRelatedField(meta_models.InvestmentProjectPhase,
@@ -64,7 +63,7 @@ class IProjectSerializer(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = InvestmentProject
         fields = (
-            'id', 'name', 'project_code', 'description', 'document_link',
+            'id', 'name', 'project_code', 'description',
             'nda_signed', 'estimated_land_date', 'project_shareable',
             'anonymous_description', 'not_shareable_reason',
             'investment_type', 'phase', 'investor_company',
