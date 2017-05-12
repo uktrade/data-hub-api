@@ -43,7 +43,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['count'] == 1
         assert response_data['results'][0]['id'] == str(project.id)
 
-    def test_create_project_success(self):
+    def test_create_project_complete_success(self):
         """Test successfully creating a project."""
         contacts = [ContactFactory(), ContactFactory()]
         investor_company = CompanyFactory()
@@ -51,6 +51,9 @@ class InvestmentViewsTestCase(LeelooTestCase):
         intermediate_company = CompanyFactory()
         advisor = AdvisorFactory()
         url = reverse('investment:v3:project')
+        aerospace_id = constants.Sector.aerospace_assembly_aircraft.value.id
+        new_site_id = (constants.FDIType.creation_of_new_site_or_activity
+                       .value.id)
         request_data = {
             'name': 'project name',
             'description': 'project description',
@@ -60,13 +63,22 @@ class InvestmentViewsTestCase(LeelooTestCase):
                 'id': constants.InvestmentType.fdi.value.id
             },
             'phase': {
-                'id': constants.InvestmentProjectPhase.assign_pm.value.id
+                'id': constants.InvestmentProjectPhase.prospect.value.id
             },
+            'business_activity': [{
+                'id': constants.InvestmentBusinessActivity.retail.value.id
+            }],
             'client_contacts': [{
                 'id': str(contacts[0].id)
             }, {
                 'id': str(contacts[1].id)
             }],
+            'client_relationship_manager': {
+                'id': str(advisor.id)
+            },
+            'fdi_type': {
+                'id': new_site_id
+            },
             'investor_company': {
                 'id': str(investor_company.id)
             },
@@ -76,8 +88,14 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'intermediate_company': {
                 'id': str(intermediate_company.id)
             },
+            'referral_source_activity': {
+                'id': constants.ReferralSourceActivity.cold_call.value.id
+            },
             'referral_source_advisor': {
                 'id': str(advisor.id)
+            },
+            'sector': {
+                'id': str(aerospace_id)
             }
         }
         response = self.api_client.post(url, data=request_data, format='json')
@@ -88,6 +106,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['nda_signed'] == request_data['nda_signed']
         assert (response_data['estimated_land_date'] == request_data[
             'estimated_land_date'])
+        assert response_data['project_section_complete'] is True
         assert re.match('^DHP-\d+$', response_data['project_code'])
 
         assert (response_data['investment_type']['id'] == request_data[
@@ -125,6 +144,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['nda_signed'] == request_data['nda_signed']
         assert (response_data['estimated_land_date'] == request_data[
             'estimated_land_date'])
+        assert response_data['project_section_complete'] is False
         assert re.match('^DHP-\d+$', response_data['project_code'])
 
         assert (response_data['phase']['id'] ==
@@ -189,6 +209,58 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['description'] == request_data['description']
         assert len(response_data['client_contacts']) == 1
         assert response_data['client_contacts'][0]['id'] == str(new_contact.id)
+
+    def test_change_phase_failure(self):
+        """Tests moving an incomplete project to the Assign PM phase."""
+        project = InvestmentProjectFactory(
+            sector_id=None
+        )
+        url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
+        request_data = {
+            'phase': {
+                'id': constants.InvestmentProjectPhase.assign_pm.value.id
+            }
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'business_activity': ['This field is required.'],
+            'client_contacts': ['This field is required.'],
+            'client_relationship_manager': ['This field is required.'],
+            'fdi_type': ['This field is required.'],
+            'investor_company': ['This field is required.'],
+            'referral_source_activity': ['This field is required.'],
+            'referral_source_advisor': ['This field is required.'],
+            'sector': ['This field is required.']
+        }
+
+    def test_change_phase_success(self):
+        """Tests moving a complete project to the Assign PM phase."""
+        advisor = AdvisorFactory()
+        company = CompanyFactory()
+        new_site_id = (constants.FDIType.creation_of_new_site_or_activity
+                       .value.id)
+        cold_call_id = constants.ReferralSourceActivity.cold_call.value.id
+        project = InvestmentProjectFactory(
+            business_activity=[
+                constants.InvestmentBusinessActivity.retail.value.id
+            ],
+            client_contacts=[ContactFactory().id, ContactFactory().id],
+            client_relationship_manager_id=advisor.id,
+            fdi_type_id=new_site_id,
+            investor_company_id=company.id,
+            referral_source_activity_id=cold_call_id,
+            referral_source_advisor_id=advisor.id
+        )
+        url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
+        request_data = {
+            'phase': {
+                'id': constants.InvestmentProjectPhase.assign_pm.value.id
+            }
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
 
     def test_get_value_success(self):
         """Test successfully getting a project value object."""
