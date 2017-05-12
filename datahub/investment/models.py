@@ -9,7 +9,9 @@ from django.dispatch import receiver
 
 from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.models import BaseModel
-from datahub.investment.validate import get_incomplete_project_fields
+from datahub.investment.validate import (
+    get_incomplete_project_fields, get_incomplete_value_fields
+)
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -131,6 +133,11 @@ class IProjectValueAbstract(models.Model):
     non_fdi_r_and_d_budget = models.NullBooleanField()
     new_tech_to_uk = models.NullBooleanField()
     export_revenue = models.NullBooleanField()
+
+    @property
+    def value_complete(self):
+        """Whether the value section is complete."""
+        return not get_incomplete_value_fields(instance=self)
 
 
 class IProjectRequirementsAbstract(models.Model):
