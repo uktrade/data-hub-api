@@ -17,8 +17,8 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     description = factory.Sequence(lambda x: 'desc {0}'.format(x))
     nda_signed = False
     estimated_land_date = date(2020, 1, 1)
-
     investment_type_id = constants.InvestmentType.fdi.value.id
+
     phase_id = constants.InvestmentProjectPhase.prospect.value.id
     sector_id = constants.Sector.aerospace_assembly_aircraft.value.id
     created_on = now()

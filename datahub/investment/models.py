@@ -7,9 +7,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from datahub.core.constants import (
-    InvestmentProjectPhase, InvestmentType, ReferralSourceActivity
-)
+from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.models import BaseModel
 from datahub.investment.validate import get_incomplete_project_fields
 
@@ -106,6 +104,7 @@ class IProjectAbstract(models.Model):
 
     @property
     def project_section_complete(self):
+        """Whether the project section is complete."""
         return not get_incomplete_project_fields(self)
 
 
