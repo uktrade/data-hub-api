@@ -1,5 +1,3 @@
-from django.forms import model_to_dict
-
 from datahub.core.constants import (
     InvestmentType, ReferralSourceActivity as Activity
 )
@@ -21,62 +19,79 @@ def get_incomplete_project_fields(instance=None, update_data=None):
     if update_data is None:
         update_data = {}
 
-    merged_data = model_to_dict(instance) if instance else {}
-    merged_data.update(update_data)
+    data = _UpdatedDataView(instance, update_data)
 
     errors = {}
     truthy_required_fields = [
         'sector',
         'referral_source_advisor',
-        'client_contacts',
         'client_relationship_manager',
-        'business_activity',
         'investor_company',
         'referral_source_activity'
     ]
 
-    if (_get_value_id(merged_data, 'referral_source_activity') ==
+    to_many_required_fields = [
+        'client_contacts',
+        'business_activity'
+    ]
+
+    if (data.get_value_id('referral_source_activity') ==
             Activity.event.value.id):
         truthy_required_fields.append('referral_source_activity_event')
 
-    if (_get_value_id(merged_data, 'referral_source_activity') ==
+    if (data.get_value_id('referral_source_activity') ==
             Activity.marketing.value.id):
         truthy_required_fields.append('referral_source_activity_marketing')
 
-    if (_get_value_id(merged_data, 'referral_source_activity') ==
+    if (data.get_value_id('referral_source_activity') ==
             Activity.website.value.id):
         truthy_required_fields.append('referral_source_activity_website')
 
-    if (_get_value_id(merged_data, 'investment_type') ==
-            InvestmentType.fdi.value.id):
+    if data.get_value_id('investment_type') == InvestmentType.fdi.value.id:
         truthy_required_fields.append('fdi_type')
 
-    if (_get_value_id(merged_data, 'investment_type') ==
-            InvestmentType.non_fdi.value.id):
+    if data.get_value_id('investment_type') == InvestmentType.non_fdi.value.id:
         truthy_required_fields.append('non_fdi_type')
 
     for field_name in truthy_required_fields:
-        _validate_truthy(merged_data, field_name, errors)
+        _validate_truthy(data.get_value(field_name), field_name, errors)
+
+    for field_name in to_many_required_fields:
+        _validate_truthy(data.get_value_to_many(field_name), field_name,
+                         errors)
 
     return errors
 
 
-def _get_value(merged_data, field_name):
-    return merged_data.get(field_name)
-
-
-def _get_value_id(merged_data, field_name):
-    value = _get_value(merged_data, field_name)
-    return str(value) if value else None
-
-
-def _validate_truthy(merged_data, field_name, errors):
-    value = _get_value(merged_data, field_name)
+def _validate_truthy(value, field_name, errors):
     if not value:
         errors[field_name] = REQUIRED_MESSAGE
 
 
-def _validate_string_or_number(merged_data, field_name, errors):
-    value = _get_value(merged_data, field_name)
+def _validate_string_or_number(value, field_name, errors):
     if value not in (None, ''):
         errors[field_name] = REQUIRED_MESSAGE
+
+
+class _UpdatedDataView:
+    def __init__(self, instance, data):
+        self.instance = instance
+        self.data = data
+
+    def get_value(self, field_name):
+        if field_name in self.data:
+            return self.data[field_name]
+        if self.instance:
+            return getattr(self.instance, field_name)
+        return None
+
+    def get_value_to_many(self, field_name):
+        if field_name in self.data:
+            return self.data[field_name]
+        if self.instance:
+            return getattr(self.instance, field_name).all()
+        return None
+
+    def get_value_id(self, field_name):
+        value = self.get_value(field_name)
+        return str(value.id) if value else None

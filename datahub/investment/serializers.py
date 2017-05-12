@@ -74,7 +74,7 @@ class IProjectSerializer(serializers.ModelSerializer):
 
         if desired_phase.order >= InvestmentProjectPhase.assign_pm.value.order:
             required_field_errors = get_incomplete_project_fields(
-                self.instance, data
+                instance=self.instance, update_data=data
             )
             if required_field_errors:
                 raise serializers.ValidationError(required_field_errors)
