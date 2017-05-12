@@ -52,6 +52,8 @@ class InvestmentViewsTestCase(LeelooTestCase):
         advisor = AdvisorFactory()
         url = reverse('investment:v3:project')
         aerospace_id = constants.Sector.aerospace_assembly_aircraft.value.id
+        new_site_id = (constants.FDIType.creation_of_new_site_or_activity
+                       .value.id)
         request_data = {
             'name': 'project name',
             'description': 'project description',
@@ -63,11 +65,20 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'phase': {
                 'id': constants.InvestmentProjectPhase.prospect.value.id
             },
+            'business_activity': [{
+                'id': constants.InvestmentBusinessActivity.retail.value.id
+            }],
             'client_contacts': [{
                 'id': str(contacts[0].id)
             }, {
                 'id': str(contacts[1].id)
             }],
+            'client_relationship_manager': {
+                'id': str(advisor.id)
+            },
+            'fdi_type': {
+                'id': new_site_id
+            },
             'investor_company': {
                 'id': str(investor_company.id)
             },
@@ -77,20 +88,14 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'intermediate_company': {
                 'id': str(intermediate_company.id)
             },
-            'referral_source_advisor': {
-                'id': str(advisor.id)
+            'referral_source_activity': {
+                'id': constants.ReferralSourceActivity.cold_call.value.id
             },
-            'client_relationship_manager': {
+            'referral_source_advisor': {
                 'id': str(advisor.id)
             },
             'sector': {
                 'id': str(aerospace_id)
-            },
-            'business_activity': [{
-                'id': constants.InvestmentBusinessActivity.retail.value.id
-            }],
-            'referral_source_activity': {
-                'id': constants.ReferralSourceActivity.cold_call.value.id
             }
         }
         response = self.api_client.post(url, data=request_data, format='json')
@@ -206,11 +211,9 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['client_contacts'][0]['id'] == str(new_contact.id)
 
     def test_change_phase_failure(self):
-        """Test that moving to the Assign PM phase fails when required
-        fields haven't been complete.
-        """
+        """Tests moving an incomplete project to the Assign PM phase."""
         project = InvestmentProjectFactory(
-            client_contacts=[ContactFactory().id, ContactFactory().id]
+            sector_id=None
         )
         url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
         request_data = {
@@ -223,24 +226,31 @@ class InvestmentViewsTestCase(LeelooTestCase):
         response_data = response.json()
         assert response_data == {
             'business_activity': ['This field is required.'],
+            'client_contacts': ['This field is required.'],
             'client_relationship_manager': ['This field is required.'],
+            'fdi_type': ['This field is required.'],
             'investor_company': ['This field is required.'],
-            'referral_source_advisor': ['This field is required.']
+            'referral_source_activity': ['This field is required.'],
+            'referral_source_advisor': ['This field is required.'],
+            'sector': ['This field is required.']
         }
 
     def test_change_phase_success(self):
-        """Test that moving to the Assign PM phase succeeds when required
-        fields have been completed.
-        """
+        """Tests moving a complete project to the Assign PM phase."""
         advisor = AdvisorFactory()
         company = CompanyFactory()
+        new_site_id = (constants.FDIType.creation_of_new_site_or_activity
+                       .value.id)
+        cold_call_id = constants.ReferralSourceActivity.cold_call.value.id
         project = InvestmentProjectFactory(
-            client_contacts=[ContactFactory().id, ContactFactory().id],
             business_activity=[
                 constants.InvestmentBusinessActivity.retail.value.id
             ],
+            client_contacts=[ContactFactory().id, ContactFactory().id],
             client_relationship_manager_id=advisor.id,
+            fdi_type_id=new_site_id,
             investor_company_id=company.id,
+            referral_source_activity_id=cold_call_id,
             referral_source_advisor_id=advisor.id
         )
         url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})

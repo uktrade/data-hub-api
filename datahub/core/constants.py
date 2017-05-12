@@ -470,6 +470,8 @@ class InvestmentType(Enum):
 
 
 class ReferralSourceActivity(Enum):
+    """Referral source activity constants."""
+
     cold_call = Constant(
         'Cold call', '0c4f8e74-d34f-4aca-b764-a44cdc2d0087'
     )
@@ -508,3 +510,11 @@ class InvestmentBusinessActivity(Enum):
 
     retail = Constant('Retail', 'a2dbd807-ae52-421c-8d1d-88adfc7a506b')
 
+
+class FDIType(Enum):
+    """Investment FDI type constants."""
+
+    creation_of_new_site_or_activity = Constant(
+        'Creation of new site or activity',
+        'f8447013-cfdc-4f35-a146-6619665388b3'
+    )

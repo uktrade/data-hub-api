@@ -64,6 +64,10 @@ class IProjectSerializer(serializers.ModelSerializer):
     project_section_complete = serializers.BooleanField(read_only=True)
 
     def validate(self, data):
+        """Validates the object after individual fields have been validated.
+
+        Performs phase-dependent validation of the different sections.
+        """
         previous_phase = (self.instance.phase if self.instance else
                           InvestmentProjectPhase.prospect.value)
         desired_phase = data.get('phase', previous_phase)

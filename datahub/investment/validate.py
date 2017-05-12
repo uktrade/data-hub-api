@@ -8,8 +8,15 @@ REQUIRED_MESSAGE = 'This field is required.'
 
 
 def get_incomplete_project_fields(instance=None, update_data=None):
+    """Checks whether the project section is complete.
+
+    :param instance:    Model instance (for update operations only)
+    :param update_data: Data being updated
+    :return:            dict containing errors for incomplete fields
+    """
     if instance is None and update_data is None:
-        raise TypeError('One of instance and update_data must not be None')
+        raise TypeError('One of instance and update_data must be provided '
+                        'and not None')
 
     if update_data is None:
         update_data = {}
@@ -18,30 +25,33 @@ def get_incomplete_project_fields(instance=None, update_data=None):
     merged_data.update(update_data)
 
     errors = {}
-    truthy_required_fields = ['sector',
-                              'referral_source_advisor',
-                              'client_contacts',
-                              'client_relationship_manager',
-                              'business_activity',
-                              'investor_company']
+    truthy_required_fields = [
+        'sector',
+        'referral_source_advisor',
+        'client_contacts',
+        'client_relationship_manager',
+        'business_activity',
+        'investor_company',
+        'referral_source_activity'
+    ]
 
-    if (_get_value(merged_data, 'referral_source_activity') ==
+    if (_get_value_id(merged_data, 'referral_source_activity') ==
             Activity.event.value.id):
         truthy_required_fields.append('referral_source_activity_event')
 
-    if (_get_value(merged_data, 'referral_source_activity') ==
+    if (_get_value_id(merged_data, 'referral_source_activity') ==
             Activity.marketing.value.id):
         truthy_required_fields.append('referral_source_activity_marketing')
 
-    if (_get_value(merged_data, 'referral_source_activity') ==
+    if (_get_value_id(merged_data, 'referral_source_activity') ==
             Activity.website.value.id):
         truthy_required_fields.append('referral_source_activity_website')
 
-    if (_get_value(merged_data, 'investment_type') ==
+    if (_get_value_id(merged_data, 'investment_type') ==
             InvestmentType.fdi.value.id):
         truthy_required_fields.append('fdi_type')
 
-    if (_get_value(merged_data, 'investment_type') ==
+    if (_get_value_id(merged_data, 'investment_type') ==
             InvestmentType.non_fdi.value.id):
         truthy_required_fields.append('non_fdi_type')
 
@@ -53,6 +63,11 @@ def get_incomplete_project_fields(instance=None, update_data=None):
 
 def _get_value(merged_data, field_name):
     return merged_data.get(field_name)
+
+
+def _get_value_id(merged_data, field_name):
+    value = _get_value(merged_data, field_name)
+    return str(value) if value else None
 
 
 def _validate_truthy(merged_data, field_name, errors):
