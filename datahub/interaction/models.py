@@ -14,19 +14,22 @@ class InteractionAbstract(BaseModel):
     company = models.ForeignKey(
         'company.Company',
         related_name="%(class)ss",  # noqa: Q000
+        null=True,
     )
     contact = models.ForeignKey(
         'company.Contact',
         related_name="%(class)ss",  # noqa: Q000
+        null=True,
     )
-    service = models.ForeignKey('metadata.Service')
+    service = models.ForeignKey('metadata.Service', null=True)
     subject = models.TextField()
     dit_advisor = models.ForeignKey(
         'company.Advisor',
         related_name="%(class)ss",  # noqa: Q000
+        null=True,
     )
     notes = models.TextField(max_length=4000)  # CDMS limit
-    dit_team = models.ForeignKey('metadata.Team')
+    dit_team = models.ForeignKey('metadata.Team', null=True)
 
     class Meta:  # noqa: D101
         abstract = True
@@ -39,7 +42,7 @@ class InteractionAbstract(BaseModel):
 class Interaction(InteractionAbstract):
     """Interaction."""
 
-    interaction_type = models.ForeignKey('metadata.InteractionType')
+    interaction_type = models.ForeignKey('metadata.InteractionType', null=True)
 
 
 class ServiceOffer(models.Model):
@@ -47,7 +50,7 @@ class ServiceOffer(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     service = models.ForeignKey('metadata.Service')
-    dit_team = models.ForeignKey('metadata.Team')
+    dit_team = models.ForeignKey('metadata.Team', null=True)
     event = models.ForeignKey('metadata.Event', null=True, blank=True)
 
     @cached_property
