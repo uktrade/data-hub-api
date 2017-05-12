@@ -31,6 +31,7 @@ class CompanyAbstract(BaseModel):
     registered_address_country = models.ForeignKey(
         metadata_models.Country,
         related_name="%(class)ss",  # noqa: Q000
+        null=True,
     )
     registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
@@ -59,8 +60,8 @@ class Company(ArchivableModel, CompanyAbstract):
     company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     alias = models.CharField(max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name')
-    business_type = models.ForeignKey(metadata_models.BusinessType)
-    sector = models.ForeignKey(metadata_models.Sector)
+    business_type = models.ForeignKey(metadata_models.BusinessType, null=True)
+    sector = models.ForeignKey(metadata_models.Sector, null=True)
     employee_range = models.ForeignKey(metadata_models.EmployeeRange, null=True)
     turnover_range = models.ForeignKey(metadata_models.TurnoverRange, null=True)
     account_manager = models.ForeignKey('Advisor', null=True, related_name='companies')
@@ -195,7 +196,7 @@ class Contact(ArchivableModel, BaseModel):
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
     job_title = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    company = models.ForeignKey('Company', related_name='contacts')
+    company = models.ForeignKey('Company', related_name='contacts', null=True)
     advisor = models.ForeignKey('Advisor', related_name='contacts', null=True, blank=True)
     primary = models.BooleanField()
     teams = models.ManyToManyField(metadata_models.Team, blank=True)
