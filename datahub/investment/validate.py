@@ -68,11 +68,6 @@ def _validate_truthy(value, field_name, errors):
         errors[field_name] = REQUIRED_MESSAGE
 
 
-def _validate_string_or_number(value, field_name, errors):
-    if value not in (None, ''):
-        errors[field_name] = REQUIRED_MESSAGE
-
-
 class _UpdatedDataView:
     def __init__(self, instance, data):
         self.instance = instance
