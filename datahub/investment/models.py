@@ -114,8 +114,10 @@ class IProjectValueAbstract(models.Model):
     class Meta:  # noqa: D101
         abstract = True
 
+    client_cannot_provide_total_investment = models.NullBooleanField()
     total_investment = models.DecimalField(null=True, max_digits=19,
                                            decimal_places=0, blank=True)
+    client_cannot_provide_foreign_investment = models.NullBooleanField()
     foreign_equity_investment = models.DecimalField(
         null=True, max_digits=19, decimal_places=0, blank=True
     )
@@ -147,7 +149,12 @@ class IProjectRequirementsAbstract(models.Model):
                                       max_length=MAX_LENGTH)
     address_line_postcode = models.CharField(blank=True, null=True,
                                              max_length=MAX_LENGTH)
+    client_considering_other_countries = models.NullBooleanField()
 
+    uk_company = models.ForeignKey(
+        'company.Company', related_name='investee_projects',
+        null=True, blank=True
+    )
     competitor_countries = models.ManyToManyField('metadata.Country',
                                                   related_name='+', blank=True)
     uk_region_locations = models.ManyToManyField('metadata.UKRegion',
