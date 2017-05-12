@@ -63,8 +63,65 @@ def get_incomplete_project_fields(instance=None, update_data=None):
     return errors
 
 
+def get_incomplete_value_fields(instance=None, update_data=None):
+    """Checks whether the value section is complete.
+
+    :param instance:    Model instance (for update operations only)
+    :param update_data: Data being updated
+    :return:            dict containing errors for incomplete fields
+    """
+    if instance is None and update_data is None:
+        raise TypeError('One of instance and update_data must be provided '
+                        'and not None')
+
+    if update_data is None:
+        update_data = {}
+
+    data = _UpdatedDataView(instance, update_data)
+
+    errors = {}
+    truthy_required_fields = []
+    not_none_or_blank_fields = [
+        'client_cannot_provide_total_investment',
+        'client_cannot_provide_foreign_investment',
+        'total_investment',
+        'foreign_equity_investment',
+        'government_assistance',
+        'number_new_jobs',
+        'number_safeguarded_jobs',
+        'r_and_d_budget',
+        'non_fdi_r_and_d_budget',
+        'new_tech_to_uk',
+        'export_revenue',
+    ]
+
+    if data.get_value('client_cannot_provide_total_investment') is False:
+        not_none_or_blank_fields.append('total_investment')
+
+    if data.get_value('client_cannot_provide_foreign_investment') is False:
+        not_none_or_blank_fields.append('foreign_equity_investment')
+
+    num_new_jobs = data.get_value('number_new_jobs')
+    if num_new_jobs is not None and num_new_jobs > 0:
+        truthy_required_fields.append('average_salary')
+
+    for field_name in truthy_required_fields:
+        _validate_truthy(data.get_value(field_name), field_name, errors)
+
+    for field_name in not_none_or_blank_fields:
+        _validate_not_none_or_blank(data.get_value(field_name), field_name,
+                                    errors)
+
+    return errors
+
+
 def _validate_truthy(value, field_name, errors):
     if not value:
+        errors[field_name] = REQUIRED_MESSAGE
+
+
+def _validate_not_none_or_blank(value, field_name, errors):
+    if value in (None, ''):
         errors[field_name] = REQUIRED_MESSAGE
 
 

@@ -232,7 +232,20 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'investor_company': ['This field is required.'],
             'referral_source_activity': ['This field is required.'],
             'referral_source_advisor': ['This field is required.'],
-            'sector': ['This field is required.']
+            'sector': ['This field is required.'],
+            'client_cannot_provide_foreign_investment': [
+                'This field is required.'],
+            'client_cannot_provide_total_investment': [
+                'This field is required.'],
+            'export_revenue': ['This field is required.'],
+            'foreign_equity_investment': ['This field is required.'],
+            'government_assistance': ['This field is required.'],
+            'new_tech_to_uk': ['This field is required.'],
+            'non_fdi_r_and_d_budget': ['This field is required.'],
+            'number_new_jobs': ['This field is required.'],
+            'number_safeguarded_jobs': ['This field is required.'],
+            'r_and_d_budget': ['This field is required.'],
+            'total_investment': ['This field is required.']
         }
 
     def test_change_phase_success(self):
@@ -248,10 +261,21 @@ class InvestmentViewsTestCase(LeelooTestCase):
             ],
             client_contacts=[ContactFactory().id, ContactFactory().id],
             client_relationship_manager_id=advisor.id,
+            client_cannot_provide_foreign_investment=False,
+            client_cannot_provide_total_investment=False,
             fdi_type_id=new_site_id,
             investor_company_id=company.id,
             referral_source_activity_id=cold_call_id,
-            referral_source_advisor_id=advisor.id
+            referral_source_advisor_id=advisor.id,
+            total_investment=100,
+            foreign_equity_investment=100,
+            government_assistance=True,
+            number_new_jobs=0,
+            number_safeguarded_jobs=0,
+            r_and_d_budget=False,
+            non_fdi_r_and_d_budget=False,
+            new_tech_to_uk=False,
+            export_revenue=True
         )
         url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
         request_data = {
