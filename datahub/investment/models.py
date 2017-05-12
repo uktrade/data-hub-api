@@ -9,6 +9,7 @@ from django.dispatch import receiver
 
 from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.models import BaseModel
+from datahub.investment.validate import get_incomplete_project_fields
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -95,11 +96,16 @@ class IProjectAbstract(models.Model):
         """A user-friendly project code.
 
         If a CDMS project code is held, that is returned. Otherwise a Data
-        Hub project code begining with DHP- is returned.
+        Hub project code beginning with DHP- is returned.
         """
         if self.cdms_project_code:
             return self.cdms_project_code
         return 'DHP-{:08d}'.format(self.investmentprojectcode.id)
+
+    @property
+    def project_section_complete(self):
+        """Whether the project section is complete."""
+        return not get_incomplete_project_fields(instance=self)
 
 
 class IProjectValueAbstract(models.Model):
