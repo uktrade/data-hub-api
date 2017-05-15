@@ -114,7 +114,7 @@ def get_incomplete_reqs_fields(instance=None, update_data=None):
     errors = _validate(
         data, not_none_or_blank_fields=not_none_or_blank_fields,
         to_many_fields=to_many_required_fields
-        )
+    )
     return errors
 
 

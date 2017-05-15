@@ -8,8 +8,8 @@ from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.serializers import NestedRelatedField
 from datahub.investment.models import InvestmentProject
 from datahub.investment.validate import (
-    get_incomplete_project_fields, get_incomplete_value_fields,
-    get_incomplete_reqs_fields
+    get_incomplete_project_fields, get_incomplete_reqs_fields,
+    get_incomplete_value_fields
 )
 
 
