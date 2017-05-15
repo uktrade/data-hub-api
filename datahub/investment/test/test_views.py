@@ -54,6 +54,8 @@ class InvestmentViewsTestCase(LeelooTestCase):
         aerospace_id = constants.Sector.aerospace_assembly_aircraft.value.id
         new_site_id = (constants.FDIType.creation_of_new_site_or_activity
                        .value.id)
+        retail_business_activity = constants.InvestmentBusinessActivity.retail
+        business_activity_id = retail_business_activity.value.id
         request_data = {
             'name': 'project name',
             'description': 'project description',
@@ -66,7 +68,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
                 'id': constants.InvestmentProjectPhase.prospect.value.id
             },
             'business_activities': [{
-                'id': constants.InvestmentBusinessActivity.retail.value.id
+                'id': business_activity_id
             }],
             'client_contacts': [{
                 'id': str(contacts[0].id)
@@ -123,6 +125,9 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert len(response_data['client_contacts']) == 2
         assert sorted(contact['id'] for contact in response_data[
             'client_contacts']) == sorted(contact.id for contact in contacts)
+        assert len(response_data['business_activities']) == 1
+        assert (response_data['business_activities'][0]['id'] ==
+                business_activity_id)
 
     def test_create_project_minimal_success(self):
         """Test successfully creating a project with minimal data."""
