@@ -522,6 +522,7 @@ class FDIType(Enum):
 
 class AverageSalary(Enum):
     """Average salary constants."""
+
     below_25000 = OrderedConstant(
         'Below £25,000', '2943bf3d-32dd-43be-8ad4-969b006dee7b', 100.0
     )

@@ -5,8 +5,8 @@ from datahub.company.test.factories import (AdvisorFactory, CompanyFactory,
 from datahub.core import constants
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.investment.validate import (
-    get_incomplete_project_fields, get_incomplete_value_fields,
-    get_incomplete_reqs_fields
+    get_incomplete_project_fields, get_incomplete_reqs_fields,
+    get_incomplete_value_fields
 )
 from datahub.metadata.models import ReferralSourceActivity
 
