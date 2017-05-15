@@ -186,8 +186,6 @@ def test_validate_reqs_fail():
     """Tests validating an incomplete reqs section."""
     project = InvestmentProjectFactory(sector_id=None)
     errors = get_incomplete_reqs_fields(instance=project)
-    from pprint import pprint
-    pprint(errors)
     assert errors == {
         'client_considering_other_countries': 'This field is required.',
         'client_requirements': 'This field is required.',
