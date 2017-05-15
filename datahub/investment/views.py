@@ -35,7 +35,7 @@ class IProjectViewSet(CoreViewSetV3):
         'sector'
     ).prefetch_related(
         'client_contacts',
-        'business_activity'
+        'business_activities'
     )
     filter_backends = (DjangoFilterBackend,)
     filter_fields = ('investor_company_id', 'intermediate_company_id',

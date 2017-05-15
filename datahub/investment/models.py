@@ -88,7 +88,7 @@ class IProjectAbstract(models.Model):
     )
     sector = models.ForeignKey('metadata.Sector', related_name='+', null=True,
                                blank=True)
-    business_activity = models.ManyToManyField(
+    business_activities = models.ManyToManyField(
         'metadata.InvestmentBusinessActivity',
         related_name='+',
         blank=True
