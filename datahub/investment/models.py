@@ -9,7 +9,10 @@ from django.dispatch import receiver
 
 from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.models import BaseModel
-from datahub.investment.validate import get_incomplete_project_fields
+from datahub.investment.validate import (
+    get_incomplete_project_fields, get_incomplete_reqs_fields,
+    get_incomplete_value_fields
+)
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -114,8 +117,10 @@ class IProjectValueAbstract(models.Model):
     class Meta:  # noqa: D101
         abstract = True
 
+    client_cannot_provide_total_investment = models.NullBooleanField()
     total_investment = models.DecimalField(null=True, max_digits=19,
                                            decimal_places=0, blank=True)
+    client_cannot_provide_foreign_investment = models.NullBooleanField()
     foreign_equity_investment = models.DecimalField(
         null=True, max_digits=19, decimal_places=0, blank=True
     )
@@ -129,6 +134,11 @@ class IProjectValueAbstract(models.Model):
     non_fdi_r_and_d_budget = models.NullBooleanField()
     new_tech_to_uk = models.NullBooleanField()
     export_revenue = models.NullBooleanField()
+
+    @property
+    def value_complete(self):
+        """Whether the value section is complete."""
+        return not get_incomplete_value_fields(instance=self)
 
 
 class IProjectRequirementsAbstract(models.Model):
@@ -147,7 +157,12 @@ class IProjectRequirementsAbstract(models.Model):
                                       max_length=MAX_LENGTH)
     address_line_postcode = models.CharField(blank=True, null=True,
                                              max_length=MAX_LENGTH)
+    client_considering_other_countries = models.NullBooleanField()
 
+    uk_company = models.ForeignKey(
+        'company.Company', related_name='investee_projects',
+        null=True, blank=True
+    )
     competitor_countries = models.ManyToManyField('metadata.Country',
                                                   related_name='+', blank=True)
     uk_region_locations = models.ManyToManyField('metadata.UKRegion',
@@ -156,6 +171,11 @@ class IProjectRequirementsAbstract(models.Model):
         'metadata.InvestmentStrategicDriver',
         related_name='investment_projects', blank=True
     )
+
+    @property
+    def requirements_complete(self):
+        """Whether the requirements section is complete."""
+        return not get_incomplete_reqs_fields(instance=self)
 
 
 class IProjectTeamAbstract(models.Model):

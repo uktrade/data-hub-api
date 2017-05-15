@@ -7,7 +7,10 @@ from datahub.company.models import Advisor, Company, Contact
 from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.serializers import NestedRelatedField
 from datahub.investment.models import InvestmentProject
-from datahub.investment.validate import get_incomplete_project_fields
+from datahub.investment.validate import (
+    get_incomplete_project_fields, get_incomplete_reqs_fields,
+    get_incomplete_value_fields
+)
 
 
 class IProjectSerializer(serializers.ModelSerializer):
@@ -73,11 +76,17 @@ class IProjectSerializer(serializers.ModelSerializer):
         desired_phase = data.get('phase', previous_phase)
 
         if desired_phase.order >= InvestmentProjectPhase.assign_pm.value.order:
-            required_field_errors = get_incomplete_project_fields(
+            errors = get_incomplete_project_fields(
                 instance=self.instance, update_data=data
             )
-            if required_field_errors:
-                raise serializers.ValidationError(required_field_errors)
+            errors.update(get_incomplete_value_fields(
+                instance=self.instance, update_data=data
+            ))
+            errors.update(get_incomplete_reqs_fields(
+                instance=self.instance, update_data=data
+            ))
+            if errors:
+                raise serializers.ValidationError(errors)
         return data
 
     class Meta:  # noqa: D101
@@ -104,6 +113,7 @@ class IProjectValueSerializer(serializers.ModelSerializer):
         meta_models.InvestmentBusinessActivity, required=False,
         allow_null=True
     )
+    value_complete = serializers.BooleanField(read_only=True)
 
     class Meta:  # noqa: D101
         model = InvestmentProject
@@ -111,7 +121,9 @@ class IProjectValueSerializer(serializers.ModelSerializer):
             'total_investment', 'foreign_equity_investment',
             'government_assistance', 'number_new_jobs', 'average_salary',
             'number_safeguarded_jobs', 'r_and_d_budget',
-            'non_fdi_r_and_d_budget', 'new_tech_to_uk', 'export_revenue'
+            'non_fdi_r_and_d_budget', 'new_tech_to_uk', 'export_revenue',
+            'value_complete', 'client_cannot_provide_total_investment',
+            'client_cannot_provide_foreign_investment'
         )
 
 
@@ -127,6 +139,8 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
     strategic_drivers = NestedRelatedField(
         meta_models.InvestmentStrategicDriver, many=True, required=False
     )
+    requirements_complete = serializers.BooleanField(read_only=True)
+    uk_company = NestedRelatedField(Company, required=False, allow_null=True)
 
     class Meta:  # noqa: D101
         model = InvestmentProject
@@ -134,7 +148,8 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
             'client_requirements', 'site_decided', 'address_line_1',
             'address_line_2', 'address_line_3', 'address_line_postcode',
             'competitor_countries', 'uk_region_locations',
-            'strategic_drivers'
+            'strategic_drivers', 'client_considering_other_countries',
+            'uk_company', 'requirements_complete'
         )
 
 
