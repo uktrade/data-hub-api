@@ -12,16 +12,8 @@ def get_incomplete_project_fields(instance=None, update_data=None):
     :param update_data: Data being updated
     :return:            dict containing errors for incomplete fields
     """
-    if instance is None and update_data is None:
-        raise TypeError('One of instance and update_data must be provided '
-                        'and not None')
+    data = _create_data_view(instance, update_data)
 
-    if update_data is None:
-        update_data = {}
-
-    data = _UpdatedDataView(instance, update_data)
-
-    errors = {}
     truthy_required_fields = [
         'sector',
         'referral_source_advisor',
@@ -53,13 +45,8 @@ def get_incomplete_project_fields(instance=None, update_data=None):
     if data.get_value_id('investment_type') == InvestmentType.non_fdi.value.id:
         truthy_required_fields.append('non_fdi_type')
 
-    for field_name in truthy_required_fields:
-        _validate_truthy(data.get_value(field_name), field_name, errors)
-
-    for field_name in to_many_required_fields:
-        _validate_truthy(data.get_value_to_many(field_name), field_name,
-                         errors)
-
+    errors = _validate(data, truthy_required_fields,
+                       to_many_fields=to_many_required_fields)
     return errors
 
 
@@ -70,16 +57,8 @@ def get_incomplete_value_fields(instance=None, update_data=None):
     :param update_data: Data being updated
     :return:            dict containing errors for incomplete fields
     """
-    if instance is None and update_data is None:
-        raise TypeError('One of instance and update_data must be provided '
-                        'and not None')
+    data = _create_data_view(instance, update_data)
 
-    if update_data is None:
-        update_data = {}
-
-    data = _UpdatedDataView(instance, update_data)
-
-    errors = {}
     truthy_required_fields = []
     not_none_or_blank_fields = [
         'client_cannot_provide_total_investment',
@@ -105,13 +84,68 @@ def get_incomplete_value_fields(instance=None, update_data=None):
     if num_new_jobs is not None and num_new_jobs > 0:
         truthy_required_fields.append('average_salary')
 
-    for field_name in truthy_required_fields:
-        _validate_truthy(data.get_value(field_name), field_name, errors)
+    errors = _validate(data, truthy_required_fields, not_none_or_blank_fields)
+    return errors
 
-    for field_name in not_none_or_blank_fields:
-        _validate_not_none_or_blank(data.get_value(field_name), field_name,
-                                    errors)
 
+def get_incomplete_reqs_fields(instance=None, update_data=None):
+    """Checks whether the requirements section is complete.
+
+    :param instance:    Model instance (for update operations only)
+    :param update_data: Data being updated
+    :return:            dict containing errors for incomplete fields
+    """
+    data = _create_data_view(instance, update_data)
+
+    to_many_required_fields = [
+        'strategic_drivers',
+        'uk_region_locations'
+    ]
+    not_none_or_blank_fields = [
+        'client_requirements',
+        'client_considering_other_countries',
+        'uk_region_locations',
+        'site_decided'
+    ]
+
+    if data.get_value('client_considering_other_countries'):
+        to_many_required_fields.append('competitor_countries')
+
+    errors = _validate(
+        data, not_none_or_blank_fields=not_none_or_blank_fields,
+        to_many_fields=to_many_required_fields
+        )
+    return errors
+
+
+def _create_data_view(instance, update_data):
+    if instance is None and update_data is None:
+        raise TypeError('One of instance and update_data must be provided '
+                        'and not None')
+
+    if update_data is None:
+        update_data = {}
+
+    return _UpdatedDataView(instance, update_data)
+
+
+def _validate(data, truthy_fields=None, not_none_or_blank_fields=None,
+              to_many_fields=None):
+    errors = {}
+
+    if truthy_fields:
+        for field_name in truthy_fields:
+            _validate_truthy(data.get_value(field_name), field_name, errors)
+
+    if not_none_or_blank_fields:
+        for field_name in not_none_or_blank_fields:
+            _validate_not_none_or_blank(data.get_value(field_name), field_name,
+                                        errors)
+
+    if to_many_fields:
+        for field_name in to_many_fields:
+            _validate_truthy(data.get_value_to_many(field_name), field_name,
+                             errors)
     return errors
 
 
