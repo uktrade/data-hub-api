@@ -12,7 +12,7 @@ def get_incomplete_project_fields(instance=None, update_data=None):
     :param update_data: Data being updated
     :return:            dict containing errors for incomplete fields
     """
-    data = _create_data_view(instance, update_data)
+    data = _UpdatedDataView(instance, update_data)
 
     truthy_required_fields = [
         'sector',
@@ -57,7 +57,7 @@ def get_incomplete_value_fields(instance=None, update_data=None):
     :param update_data: Data being updated
     :return:            dict containing errors for incomplete fields
     """
-    data = _create_data_view(instance, update_data)
+    data = _UpdatedDataView(instance, update_data)
 
     truthy_required_fields = []
     not_none_or_blank_fields = [
@@ -95,7 +95,7 @@ def get_incomplete_reqs_fields(instance=None, update_data=None):
     :param update_data: Data being updated
     :return:            dict containing errors for incomplete fields
     """
-    data = _create_data_view(instance, update_data)
+    data = _UpdatedDataView(instance, update_data)
 
     to_many_required_fields = [
         'strategic_drivers',
@@ -116,17 +116,6 @@ def get_incomplete_reqs_fields(instance=None, update_data=None):
         to_many_fields=to_many_required_fields
     )
     return errors
-
-
-def _create_data_view(instance, update_data):
-    if instance is None and update_data is None:
-        raise TypeError('One of instance and update_data must be provided '
-                        'and not None')
-
-    if update_data is None:
-        update_data = {}
-
-    return _UpdatedDataView(instance, update_data)
 
 
 def _validate(data, truthy_fields=None, not_none_or_blank_fields=None,
@@ -160,9 +149,16 @@ def _validate_not_none_or_blank(value, field_name, errors):
 
 
 class _UpdatedDataView:
-    def __init__(self, instance, data):
+    def __init__(self, instance, update_data):
+        if instance is None and update_data is None:
+            raise TypeError('One of instance and update_data must be provided '
+                            'and not None')
+
+        if update_data is None:
+            update_data = {}
+
         self.instance = instance
-        self.data = data
+        self.data = update_data
 
     def get_value(self, field_name):
         if field_name in self.data:
