@@ -298,17 +298,43 @@ class InvestmentViewsTestCase(LeelooTestCase):
         }
         response = self.api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['project_section_complete'] is True
 
     def test_get_value_success(self):
         """Test successfully getting a project value object."""
-        project = InvestmentProjectFactory(total_investment=999,
-                                           number_new_jobs=100)
+        project = InvestmentProjectFactory(
+            client_cannot_provide_foreign_investment=False,
+            client_cannot_provide_total_investment=False,
+            total_investment=100,
+            foreign_equity_investment=100,
+            government_assistance=True,
+            number_new_jobs=0,
+            number_safeguarded_jobs=10,
+            r_and_d_budget=False,
+            non_fdi_r_and_d_budget=False,
+            new_tech_to_uk=False,
+            export_revenue=True
+        )
         url = reverse('investment:v3:value-item', kwargs={'pk': project.pk})
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert response_data['total_investment'] == '999'
-        assert response_data['number_new_jobs'] == 100
+        assert (response_data['client_cannot_provide_foreign_investment'] is
+                False)
+        assert (response_data['client_cannot_provide_total_investment'] is
+                False)
+        assert response_data['total_investment'] == '100'
+        assert response_data['foreign_equity_investment'] == '100'
+        assert response_data['government_assistance'] is True
+        assert response_data['total_investment'] == '100'
+        assert response_data['number_new_jobs'] == 0
+        assert response_data['number_safeguarded_jobs'] == 10
+        assert response_data['r_and_d_budget'] is False
+        assert response_data['non_fdi_r_and_d_budget'] is False
+        assert response_data['new_tech_to_uk'] is False
+        assert response_data['export_revenue'] is True
+        assert response_data['value_complete'] is True
 
     def test_patch_value_success(self):
         """Test successfully partially updating a project value object."""
@@ -325,6 +351,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['number_new_jobs'] == 555
         assert response_data['government_assistance'] is True
         assert response_data['total_investment'] == '999'
+        assert response_data['value_complete'] is False
 
     def test_get_requirements_success(self):
         """Test successfully getting a project requirements object."""
@@ -332,10 +359,19 @@ class InvestmentViewsTestCase(LeelooTestCase):
             constants.Country.united_kingdom.value.id,
             constants.Country.united_states.value.id
         ]
-        project = InvestmentProjectFactory(client_requirements='client reqs',
-                                           site_decided=True,
-                                           address_line_1='address 1',
-                                           competitor_countries=countries)
+        strategic_drivers = [
+            constants.InvestmentStrategicDriver.access_to_market.value.id
+        ]
+        uk_region_locations = [constants.UKRegion.england.value.id]
+        project = InvestmentProjectFactory(
+            client_requirements='client reqs',
+            site_decided=True,
+            address_line_1='address 1',
+            client_considering_other_countries=True,
+            competitor_countries=countries,
+            strategic_drivers=strategic_drivers,
+            uk_region_locations=uk_region_locations
+        )
         url = reverse('investment:v3:requirements-item',
                       kwargs={'pk': project.pk})
         response = self.api_client.get(url)
@@ -343,9 +379,13 @@ class InvestmentViewsTestCase(LeelooTestCase):
         response_data = response.json()
         assert response_data['client_requirements'] == 'client reqs'
         assert response_data['site_decided'] is True
+        assert response_data['client_considering_other_countries'] is True
+        assert response_data['requirements_complete'] is True
         assert response_data['address_line_1'] == 'address 1'
         assert sorted(country['id'] for country in response_data[
             'competitor_countries']) == sorted(countries)
+        assert sorted(driver['id'] for driver in response_data[
+            'strategic_drivers']) == sorted(strategic_drivers)
 
     def test_patch_requirements_success(self):
         """Test successfully partially updating a requirements object."""
@@ -361,6 +401,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         response = self.api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
+        assert response_data['requirements_complete'] is False
         assert response_data['client_requirements'] == 'client reqs'
         assert response_data['site_decided'] is True
         assert response_data['address_line_1'] == 'address 1 new'

@@ -113,6 +113,7 @@ class IProjectValueSerializer(serializers.ModelSerializer):
         meta_models.InvestmentBusinessActivity, required=False,
         allow_null=True
     )
+    value_complete = serializers.BooleanField(read_only=True)
 
     class Meta:  # noqa: D101
         model = InvestmentProject
@@ -120,7 +121,9 @@ class IProjectValueSerializer(serializers.ModelSerializer):
             'total_investment', 'foreign_equity_investment',
             'government_assistance', 'number_new_jobs', 'average_salary',
             'number_safeguarded_jobs', 'r_and_d_budget',
-            'non_fdi_r_and_d_budget', 'new_tech_to_uk', 'export_revenue'
+            'non_fdi_r_and_d_budget', 'new_tech_to_uk', 'export_revenue',
+            'value_complete', 'client_cannot_provide_total_investment',
+            'client_cannot_provide_foreign_investment'
         )
 
 
@@ -136,6 +139,8 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
     strategic_drivers = NestedRelatedField(
         meta_models.InvestmentStrategicDriver, many=True, required=False
     )
+    requirements_complete = serializers.BooleanField(read_only=True)
+    uk_company = NestedRelatedField(Company, required=False, allow_null=True)
 
     class Meta:  # noqa: D101
         model = InvestmentProject
@@ -143,7 +148,8 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
             'client_requirements', 'site_decided', 'address_line_1',
             'address_line_2', 'address_line_3', 'address_line_postcode',
             'competitor_countries', 'uk_region_locations',
-            'strategic_drivers'
+            'strategic_drivers', 'client_considering_other_countries',
+            'uk_company', 'requirements_complete'
         )
 
 

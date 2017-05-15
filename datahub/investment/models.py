@@ -10,7 +10,8 @@ from django.dispatch import receiver
 from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.models import BaseModel
 from datahub.investment.validate import (
-    get_incomplete_project_fields, get_incomplete_value_fields
+    get_incomplete_project_fields, get_incomplete_value_fields,
+    get_incomplete_reqs_fields
 )
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -170,6 +171,11 @@ class IProjectRequirementsAbstract(models.Model):
         'metadata.InvestmentStrategicDriver',
         related_name='investment_projects', blank=True
     )
+
+    @property
+    def requirements_complete(self):
+        """Whether the requirements section is complete."""
+        return not get_incomplete_reqs_fields(instance=self)
 
 
 class IProjectTeamAbstract(models.Model):
