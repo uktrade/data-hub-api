@@ -24,7 +24,7 @@ def get_incomplete_project_fields(instance=None, update_data=None):
 
     to_many_required_fields = [
         'client_contacts',
-        'business_activity'
+        'business_activities'
     ]
 
     if (data.get_value_id('referral_source_activity') ==

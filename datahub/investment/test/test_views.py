@@ -54,6 +54,8 @@ class InvestmentViewsTestCase(LeelooTestCase):
         aerospace_id = constants.Sector.aerospace_assembly_aircraft.value.id
         new_site_id = (constants.FDIType.creation_of_new_site_or_activity
                        .value.id)
+        retail_business_activity = constants.InvestmentBusinessActivity.retail
+        business_activity_id = retail_business_activity.value.id
         request_data = {
             'name': 'project name',
             'description': 'project description',
@@ -65,8 +67,8 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'phase': {
                 'id': constants.InvestmentProjectPhase.prospect.value.id
             },
-            'business_activity': [{
-                'id': constants.InvestmentBusinessActivity.retail.value.id
+            'business_activities': [{
+                'id': business_activity_id
             }],
             'client_contacts': [{
                 'id': str(contacts[0].id)
@@ -123,6 +125,9 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert len(response_data['client_contacts']) == 2
         assert sorted(contact['id'] for contact in response_data[
             'client_contacts']) == sorted(contact.id for contact in contacts)
+        assert len(response_data['business_activities']) == 1
+        assert (response_data['business_activities'][0]['id'] ==
+                business_activity_id)
 
     def test_create_project_minimal_success(self):
         """Test successfully creating a project with minimal data."""
@@ -225,7 +230,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'business_activity': ['This field is required.'],
+            'business_activities': ['This field is required.'],
             'client_contacts': ['This field is required.'],
             'client_relationship_manager': ['This field is required.'],
             'fdi_type': ['This field is required.'],
@@ -264,7 +269,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
             constants.InvestmentStrategicDriver.access_to_market.value.id
         ]
         project = InvestmentProjectFactory(
-            business_activity=[
+            business_activities=[
                 constants.InvestmentBusinessActivity.retail.value.id
             ],
             client_contacts=[ContactFactory().id, ContactFactory().id],
@@ -338,11 +343,13 @@ class InvestmentViewsTestCase(LeelooTestCase):
 
     def test_patch_value_success(self):
         """Test successfully partially updating a project value object."""
+        salary_id = constants.SalaryRange.below_25000.value.id
         project = InvestmentProjectFactory(total_investment=999,
                                            number_new_jobs=100)
         url = reverse('investment:v3:value-item', kwargs={'pk': project.pk})
         request_data = {
             'number_new_jobs': 555,
+            'average_salary': {'id': salary_id},
             'government_assistance': True
         }
         response = self.api_client.patch(url, data=request_data, format='json')
@@ -352,6 +359,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['government_assistance'] is True
         assert response_data['total_investment'] == '999'
         assert response_data['value_complete'] is False
+        assert response_data['average_salary']['id'] == salary_id
 
     def test_get_requirements_success(self):
         """Test successfully getting a project requirements object."""

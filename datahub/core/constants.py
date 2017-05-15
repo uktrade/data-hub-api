@@ -520,7 +520,7 @@ class FDIType(Enum):
     )
 
 
-class AverageSalary(Enum):
+class SalaryRange(Enum):
     """Average salary constants."""
 
     below_25000 = OrderedConstant(
