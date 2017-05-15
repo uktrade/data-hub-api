@@ -4,7 +4,9 @@ from datahub.company.test.factories import (AdvisorFactory, CompanyFactory,
                                             ContactFactory)
 from datahub.core import constants
 from datahub.investment.test.factories import InvestmentProjectFactory
-from datahub.investment.validate import get_incomplete_project_fields
+from datahub.investment.validate import (
+    get_incomplete_project_fields, get_incomplete_value_fields
+)
 from datahub.metadata.models import ReferralSourceActivity
 
 pytestmark = pytest.mark.django_db
@@ -121,3 +123,59 @@ def test_validate_project_update_data():
     assert 'referral_source_activity_marketing' in errors
     assert 'referral_source_activity_website' not in errors
     assert 'referral_source_activity_event' not in errors
+
+
+def test_validate_value_fail():
+    """Tests validating an incomplete value section."""
+    project = InvestmentProjectFactory(sector_id=None)
+    errors = get_incomplete_value_fields(instance=project)
+    assert errors == {
+        'client_cannot_provide_foreign_investment': 'This field is required.',
+        'client_cannot_provide_total_investment': 'This field is required.',
+        'export_revenue': 'This field is required.',
+        'foreign_equity_investment': 'This field is required.',
+        'government_assistance': 'This field is required.',
+        'new_tech_to_uk': 'This field is required.',
+        'non_fdi_r_and_d_budget': 'This field is required.',
+        'number_new_jobs': 'This field is required.',
+        'number_safeguarded_jobs': 'This field is required.',
+        'r_and_d_budget': 'This field is required.',
+        'total_investment': 'This field is required.'
+    }
+
+
+def test_validate_value_instance_success():
+    """Tests validating a complete value section using a model instance."""
+    project = InvestmentProjectFactory(
+        client_cannot_provide_foreign_investment=False,
+        client_cannot_provide_total_investment=False,
+        total_investment=100,
+        foreign_equity_investment=100,
+        government_assistance=True,
+        number_new_jobs=0,
+        number_safeguarded_jobs=0,
+        r_and_d_budget=False,
+        non_fdi_r_and_d_budget=False,
+        new_tech_to_uk=False,
+        export_revenue=True
+    )
+    errors = get_incomplete_value_fields(instance=project)
+    assert not errors
+
+
+def test_validate_average_salary_required_missing():
+    """Tests average salary conditional validation."""
+    # average_salary_id = constants.AverageSalary.below_25000.value.id
+    project = InvestmentProjectFactory(number_new_jobs=100)
+    errors = get_incomplete_value_fields(instance=project)
+    assert 'average_salary' in errors
+
+
+def test_validate_average_salary_required_present():
+    """Tests average salary conditional validation."""
+    average_salary_id = constants.AverageSalary.below_25000.value.id
+    project = InvestmentProjectFactory(
+        number_new_jobs=100, average_salary_id=average_salary_id
+    )
+    errors = get_incomplete_value_fields(instance=project)
+    assert 'average_salary' not in errors

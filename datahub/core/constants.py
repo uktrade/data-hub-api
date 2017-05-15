@@ -518,3 +518,9 @@ class FDIType(Enum):
         'Creation of new site or activity',
         'f8447013-cfdc-4f35-a146-6619665388b3'
     )
+
+
+class AverageSalary(Enum):
+    below_25000 = OrderedConstant(
+        'Below £25,000', '2943bf3d-32dd-43be-8ad4-969b006dee7b', 100.0
+    )
