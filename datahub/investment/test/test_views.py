@@ -65,7 +65,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'phase': {
                 'id': constants.InvestmentProjectPhase.prospect.value.id
             },
-            'business_activity': [{
+            'business_activities': [{
                 'id': constants.InvestmentBusinessActivity.retail.value.id
             }],
             'client_contacts': [{
@@ -225,7 +225,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'business_activity': ['This field is required.'],
+            'business_activities': ['This field is required.'],
             'client_contacts': ['This field is required.'],
             'client_relationship_manager': ['This field is required.'],
             'fdi_type': ['This field is required.'],
@@ -264,7 +264,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
             constants.InvestmentStrategicDriver.access_to_market.value.id
         ]
         project = InvestmentProjectFactory(
-            business_activity=[
+            business_activities=[
                 constants.InvestmentBusinessActivity.retail.value.id
             ],
             client_contacts=[ContactFactory().id, ContactFactory().id],

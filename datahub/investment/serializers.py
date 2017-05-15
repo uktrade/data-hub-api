@@ -61,7 +61,7 @@ class IProjectSerializer(serializers.ModelSerializer):
     sector = NestedRelatedField(
         meta_models.Sector, required=False, allow_null=True
     )
-    business_activity = NestedRelatedField(
+    business_activities = NestedRelatedField(
         meta_models.InvestmentBusinessActivity, many=True, required=False
     )
     project_section_complete = serializers.BooleanField(read_only=True)
@@ -102,7 +102,7 @@ class IProjectSerializer(serializers.ModelSerializer):
             'referral_source_activity_website',
             'referral_source_activity_marketing',
             'referral_source_activity_event', 'fdi_type', 'non_fdi_type',
-            'sector', 'business_activity', 'project_section_complete'
+            'sector', 'business_activities', 'project_section_complete'
         )
 
 
