@@ -5,7 +5,8 @@ from datahub.company.test.factories import (AdvisorFactory, CompanyFactory,
 from datahub.core import constants
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.investment.validate import (
-    get_incomplete_project_fields, get_incomplete_value_fields
+    get_incomplete_project_fields, get_incomplete_value_fields,
+    get_incomplete_reqs_fields
 )
 from datahub.metadata.models import ReferralSourceActivity
 
@@ -179,3 +180,54 @@ def test_validate_average_salary_required_present():
     )
     errors = get_incomplete_value_fields(instance=project)
     assert 'average_salary' not in errors
+
+
+def test_validate_reqs_fail():
+    """Tests validating an incomplete reqs section."""
+    project = InvestmentProjectFactory(sector_id=None)
+    errors = get_incomplete_reqs_fields(instance=project)
+    from pprint import pprint
+    pprint(errors)
+    assert errors == {
+        'client_considering_other_countries': 'This field is required.',
+        'client_requirements': 'This field is required.',
+        'site_decided': 'This field is required.',
+        'strategic_drivers': 'This field is required.',
+        'uk_region_locations': 'This field is required.'
+    }
+
+
+def test_validate_reqs_instance_success():
+    """Tests validating a complete reqs section using a model instance."""
+    strategic_drivers = [
+        constants.InvestmentStrategicDriver.access_to_market.value.id
+    ]
+    uk_region_locations = [constants.UKRegion.england.value.id]
+    project = InvestmentProjectFactory(
+        client_considering_other_countries=False,
+        client_requirements='client reqs',
+        site_decided=False,
+        strategic_drivers=strategic_drivers,
+        uk_region_locations=uk_region_locations
+    )
+    errors = get_incomplete_reqs_fields(instance=project)
+    assert not errors
+
+
+def test_validate_reqs_competitor_countries_missing():
+    """Tests missing competitor countries conditional validation."""
+    project = InvestmentProjectFactory(
+        client_considering_other_countries=True
+    )
+    errors = get_incomplete_reqs_fields(instance=project)
+    assert 'competitor_countries' in errors
+
+
+def test_validate_reqs_competitor_countries_present():
+    """Tests required competitor countries conditional validation."""
+    project = InvestmentProjectFactory(
+        client_considering_other_countries=True,
+        competitor_countries=[constants.Country.united_states.value.id]
+    )
+    errors = get_incomplete_reqs_fields(instance=project)
+    assert 'competitor_countries' not in errors
