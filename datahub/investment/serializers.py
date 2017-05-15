@@ -110,7 +110,7 @@ class IProjectValueSerializer(serializers.ModelSerializer):
     """Serialiser for investment project value objects."""
 
     average_salary = NestedRelatedField(
-        meta_models.InvestmentBusinessActivity, required=False,
+        meta_models.SalaryRange, required=False,
         allow_null=True
     )
     value_complete = serializers.BooleanField(read_only=True)
