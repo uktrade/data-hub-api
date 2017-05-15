@@ -245,7 +245,12 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'number_new_jobs': ['This field is required.'],
             'number_safeguarded_jobs': ['This field is required.'],
             'r_and_d_budget': ['This field is required.'],
-            'total_investment': ['This field is required.']
+            'total_investment': ['This field is required.'],
+            'client_considering_other_countries': ['This field is required.'],
+            'client_requirements': ['This field is required.'],
+            'site_decided': ['This field is required.'],
+            'strategic_drivers': ['This field is required.'],
+            'uk_region_locations': ['This field is required.'],
         }
 
     def test_change_phase_success(self):
@@ -255,6 +260,9 @@ class InvestmentViewsTestCase(LeelooTestCase):
         new_site_id = (constants.FDIType.creation_of_new_site_or_activity
                        .value.id)
         cold_call_id = constants.ReferralSourceActivity.cold_call.value.id
+        strategic_drivers = [
+            constants.InvestmentStrategicDriver.access_to_market.value.id
+        ]
         project = InvestmentProjectFactory(
             business_activity=[
                 constants.InvestmentBusinessActivity.retail.value.id
@@ -275,7 +283,12 @@ class InvestmentViewsTestCase(LeelooTestCase):
             r_and_d_budget=False,
             non_fdi_r_and_d_budget=False,
             new_tech_to_uk=False,
-            export_revenue=True
+            export_revenue=True,
+            client_considering_other_countries=False,
+            client_requirements='client reqs',
+            site_decided=False,
+            strategic_drivers=strategic_drivers,
+            uk_region_locations=[constants.UKRegion.england.value.id]
         )
         url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
         request_data = {

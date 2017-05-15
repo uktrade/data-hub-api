@@ -8,7 +8,8 @@ from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.serializers import NestedRelatedField
 from datahub.investment.models import InvestmentProject
 from datahub.investment.validate import (
-    get_incomplete_project_fields, get_incomplete_value_fields
+    get_incomplete_project_fields, get_incomplete_value_fields,
+    get_incomplete_reqs_fields
 )
 
 
@@ -79,6 +80,9 @@ class IProjectSerializer(serializers.ModelSerializer):
                 instance=self.instance, update_data=data
             )
             errors.update(get_incomplete_value_fields(
+                instance=self.instance, update_data=data
+            ))
+            errors.update(get_incomplete_reqs_fields(
                 instance=self.instance, update_data=data
             ))
             if errors:
