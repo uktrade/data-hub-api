@@ -18,7 +18,7 @@ def test_validate_project_fail():
     project = InvestmentProjectFactory(sector_id=None)
     errors = get_incomplete_project_fields(instance=project)
     assert errors == {
-        'business_activity': 'This field is required.',
+        'business_activities': 'This field is required.',
         'client_contacts': 'This field is required.',
         'client_relationship_manager': 'This field is required.',
         'fdi_type': 'This field is required.',
@@ -38,7 +38,7 @@ def test_validate_project_instance_success():
     cold_call_id = constants.ReferralSourceActivity.cold_call.value.id
     investment_type_id = constants.InvestmentType.commitment_to_invest.value.id
     project = InvestmentProjectFactory(
-        business_activity=[
+        business_activities=[
             constants.InvestmentBusinessActivity.retail.value.id
         ],
         client_contacts=[ContactFactory().id, ContactFactory().id],
@@ -174,7 +174,7 @@ def test_validate_average_salary_required_missing():
 
 def test_validate_average_salary_required_present():
     """Tests average salary conditional validation."""
-    average_salary_id = constants.AverageSalary.below_25000.value.id
+    average_salary_id = constants.SalaryRange.below_25000.value.id
     project = InvestmentProjectFactory(
         number_new_jobs=100, average_salary_id=average_salary_id
     )
