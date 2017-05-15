@@ -174,7 +174,7 @@ def test_validate_average_salary_required_missing():
 
 def test_validate_average_salary_required_present():
     """Tests average salary conditional validation."""
-    average_salary_id = constants.AverageSalary.below_25000.value.id
+    average_salary_id = constants.SalaryRange.below_25000.value.id
     project = InvestmentProjectFactory(
         number_new_jobs=100, average_salary_id=average_salary_id
     )

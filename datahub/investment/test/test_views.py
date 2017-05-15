@@ -338,11 +338,13 @@ class InvestmentViewsTestCase(LeelooTestCase):
 
     def test_patch_value_success(self):
         """Test successfully partially updating a project value object."""
+        salary_id = constants.SalaryRange.below_25000.value.id
         project = InvestmentProjectFactory(total_investment=999,
                                            number_new_jobs=100)
         url = reverse('investment:v3:value-item', kwargs={'pk': project.pk})
         request_data = {
             'number_new_jobs': 555,
+            'average_salary': {'id': salary_id},
             'government_assistance': True
         }
         response = self.api_client.patch(url, data=request_data, format='json')
@@ -352,6 +354,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['government_assistance'] is True
         assert response_data['total_investment'] == '999'
         assert response_data['value_complete'] is False
+        assert response_data['average_salary']['id'] == salary_id
 
     def test_get_requirements_success(self):
         """Test successfully getting a project requirements object."""
