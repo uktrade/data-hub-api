@@ -215,7 +215,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert len(response_data['client_contacts']) == 1
         assert response_data['client_contacts'][0]['id'] == str(new_contact.id)
 
-    def test_change_phase_failure(self):
+    def test_change_phase_assign_pm_failure(self):
         """Tests moving an incomplete project to the Assign PM phase."""
         project = InvestmentProjectFactory(
             sector_id=None
@@ -249,7 +249,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'uk_region_locations': ['This field is required.'],
         }
 
-    def test_change_phase_success(self):
+    def test_change_phase_assign_pm_success(self):
         """Tests moving a complete project to the Assign PM phase."""
         advisor = AdvisorFactory()
         company = CompanyFactory()
@@ -288,6 +288,82 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['project_section_complete'] is True
+
+    def test_change_phase_active_failure(self):
+        """Tests moving an incomplete project to the Assign PM phase."""
+        project = InvestmentProjectFactory(
+            sector_id=None
+        )
+        url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
+        request_data = {
+            'phase': {
+                'id': constants.InvestmentProjectPhase.active.value.id
+            }
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'business_activities': ['This field is required.'],
+            'client_contacts': ['This field is required.'],
+            'client_relationship_manager': ['This field is required.'],
+            'fdi_type': ['This field is required.'],
+            'investor_company': ['This field is required.'],
+            'referral_source_activity': ['This field is required.'],
+            'referral_source_advisor': ['This field is required.'],
+            'sector': ['This field is required.'],
+            'client_cannot_provide_total_investment': [
+                'This field is required.'],
+            'number_new_jobs': ['This field is required.'],
+            'total_investment': ['This field is required.'],
+            'client_considering_other_countries': ['This field is required.'],
+            'client_requirements': ['This field is required.'],
+            'site_decided': ['This field is required.'],
+            'strategic_drivers': ['This field is required.'],
+            'uk_region_locations': ['This field is required.'],
+            'project_assurance_advisor': ['This field is required.'],
+            'project_manager': ['This field is required.'],
+        }
+
+    def test_change_phase_active_success(self):
+        """Tests moving a complete project to the Assign PM phase."""
+        advisor = AdvisorFactory()
+        company = CompanyFactory()
+        new_site_id = (constants.FDIType.creation_of_new_site_or_activity
+                       .value.id)
+        cold_call_id = constants.ReferralSourceActivity.cold_call.value.id
+        strategic_drivers = [
+            constants.InvestmentStrategicDriver.access_to_market.value.id
+        ]
+        project = InvestmentProjectFactory(
+            business_activities=[
+                constants.InvestmentBusinessActivity.retail.value.id
+            ],
+            client_contacts=[ContactFactory().id, ContactFactory().id],
+            client_relationship_manager_id=advisor.id,
+            fdi_type_id=new_site_id,
+            investor_company_id=company.id,
+            referral_source_activity_id=cold_call_id,
+            referral_source_advisor_id=advisor.id,
+            client_cannot_provide_total_investment=False,
+            total_investment=100,
+            number_new_jobs=0,
+            client_considering_other_countries=False,
+            client_requirements='client reqs',
+            site_decided=False,
+            strategic_drivers=strategic_drivers,
+            uk_region_locations=[constants.UKRegion.england.value.id],
+            project_assurance_advisor=advisor,
+            project_manager=advisor
+        )
+        url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
+        request_data = {
+            'phase': {
+                'id': constants.InvestmentProjectPhase.active.value.id
+            }
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
 
     def test_get_value_success(self):
         """Test successfully getting a project value object."""
