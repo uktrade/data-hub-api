@@ -7,7 +7,10 @@ REQUIRED_MESSAGE = 'This field is required.'
 
 
 def get_validators():
-    """Returns a tuple of validators for phase-dependent validation."""
+    """Returns validators used for phase-dependent validation.
+
+    Returned as a tuple of (phase, callable) pairs.
+    """
     return (
         (Phase.assign_pm.value, get_incomplete_project_fields),
         (Phase.assign_pm.value, get_incomplete_value_fields),
