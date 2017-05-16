@@ -1,8 +1,18 @@
 from datahub.core.constants import (
-    InvestmentType, ReferralSourceActivity as Activity
+    InvestmentType, InvestmentProjectPhase as Phase,
+    ReferralSourceActivity as Activity
 )
 
 REQUIRED_MESSAGE = 'This field is required.'
+
+
+def get_validators():
+    """Returns a tuple of validators for phase-dependent validation."""
+    return (
+        (Phase.assign_pm.value, get_incomplete_project_fields),
+        (Phase.assign_pm.value, get_incomplete_value_fields),
+        (Phase.assign_pm.value, get_incomplete_reqs_fields),
+    )
 
 
 def get_incomplete_project_fields(instance=None, update_data=None):
