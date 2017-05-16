@@ -73,27 +73,11 @@ def get_incomplete_value_fields(instance=None, update_data=None):
     truthy_required_fields = []
     not_none_or_blank_fields = [
         'client_cannot_provide_total_investment',
-        'client_cannot_provide_foreign_investment',
-        'total_investment',
-        'foreign_equity_investment',
-        'government_assistance',
         'number_new_jobs',
-        'number_safeguarded_jobs',
-        'r_and_d_budget',
-        'non_fdi_r_and_d_budget',
-        'new_tech_to_uk',
-        'export_revenue',
     ]
 
-    if data.get_value('client_cannot_provide_total_investment') is False:
+    if not data.get_value('client_cannot_provide_total_investment'):
         not_none_or_blank_fields.append('total_investment')
-
-    if data.get_value('client_cannot_provide_foreign_investment') is False:
-        not_none_or_blank_fields.append('foreign_equity_investment')
-
-    num_new_jobs = data.get_value('number_new_jobs')
-    if num_new_jobs is not None and num_new_jobs > 0:
-        truthy_required_fields.append('average_salary')
 
     errors = _validate(data, truthy_required_fields, not_none_or_blank_fields)
     return errors
