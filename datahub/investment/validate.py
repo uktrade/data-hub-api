@@ -1,5 +1,5 @@
 from datahub.core.constants import (
-    InvestmentType, InvestmentProjectPhase as Phase,
+    InvestmentProjectPhase as Phase, InvestmentType,
     ReferralSourceActivity as Activity
 )
 
