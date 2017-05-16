@@ -7,10 +7,7 @@ from datahub.company.models import Advisor, Company, Contact
 from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.serializers import NestedRelatedField
 from datahub.investment.models import InvestmentProject
-from datahub.investment.validate import (
-    get_incomplete_project_fields, get_incomplete_reqs_fields,
-    get_incomplete_value_fields
-)
+from datahub.investment.validate import get_validators
 
 
 class IProjectSerializer(serializers.ModelSerializer):
@@ -74,19 +71,16 @@ class IProjectSerializer(serializers.ModelSerializer):
         previous_phase = (self.instance.phase if self.instance else
                           InvestmentProjectPhase.prospect.value)
         desired_phase = data.get('phase', previous_phase)
+        errors = {}
 
-        if desired_phase.order >= InvestmentProjectPhase.assign_pm.value.order:
-            errors = get_incomplete_project_fields(
-                instance=self.instance, update_data=data
-            )
-            errors.update(get_incomplete_value_fields(
-                instance=self.instance, update_data=data
-            ))
-            errors.update(get_incomplete_reqs_fields(
-                instance=self.instance, update_data=data
-            ))
-            if errors:
-                raise serializers.ValidationError(errors)
+        for phase, validator in get_validators():
+            if desired_phase.order >= phase.order:
+                errors.update(validator(
+                    instance=self.instance, update_data=data
+                ))
+
+        if errors:
+            raise serializers.ValidationError(errors)
         return data
 
     class Meta:  # noqa: D101
