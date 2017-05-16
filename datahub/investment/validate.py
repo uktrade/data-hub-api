@@ -12,6 +12,7 @@ def get_validators():
         (Phase.assign_pm.value, get_incomplete_project_fields),
         (Phase.assign_pm.value, get_incomplete_value_fields),
         (Phase.assign_pm.value, get_incomplete_reqs_fields),
+        (Phase.active.value, get_incomplete_team_fields)
     )
 
 
@@ -125,6 +126,24 @@ def get_incomplete_reqs_fields(instance=None, update_data=None):
         data, not_none_or_blank_fields=not_none_or_blank_fields,
         to_many_fields=to_many_required_fields
     )
+    return errors
+
+
+def get_incomplete_team_fields(instance=None, update_data=None):
+    """Checks whether the team section is complete.
+
+    :param instance:    Model instance (for update operations only)
+    :param update_data: Data being updated
+    :return:            dict containing errors for incomplete fields
+    """
+    data = _UpdatedDataView(instance, update_data)
+
+    truthy_required_fields = [
+        'project_manager',
+        'project_assurance_advisor'
+    ]
+
+    errors = _validate(data, truthy_required_fields)
     return errors
 
 

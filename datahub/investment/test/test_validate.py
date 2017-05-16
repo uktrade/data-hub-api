@@ -6,7 +6,7 @@ from datahub.core import constants
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.investment.validate import (
     get_incomplete_project_fields, get_incomplete_reqs_fields,
-    get_incomplete_value_fields
+    get_incomplete_team_fields, get_incomplete_value_fields
 )
 from datahub.metadata.models import ReferralSourceActivity
 
@@ -229,3 +229,24 @@ def test_validate_reqs_competitor_countries_present():
     )
     errors = get_incomplete_reqs_fields(instance=project)
     assert 'competitor_countries' not in errors
+
+
+def test_validate_team_fail():
+    """Tests validating an incomplete team section."""
+    project = InvestmentProjectFactory(sector_id=None)
+    errors = get_incomplete_team_fields(instance=project)
+    assert errors == {
+        'project_assurance_advisor': 'This field is required.',
+        'project_manager': 'This field is required.'
+    }
+
+
+def test_validate_team_instance_success():
+    """Tests validating a complete team section using a model instance."""
+    advisor = AdvisorFactory()
+    project = InvestmentProjectFactory(
+        project_manager=advisor,
+        project_assurance_advisor=advisor
+    )
+    errors = get_incomplete_team_fields(instance=project)
+    assert not errors
