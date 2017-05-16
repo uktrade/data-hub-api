@@ -38,8 +38,7 @@ class IProjectViewSet(CoreViewSetV3):
         'business_activities'
     )
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('investor_company_id', 'intermediate_company_id',
-                     'investment_recipient_company')
+    filter_fields = ('investor_company_id',)
 
     def get_view_name(self):
         """Returns the view set name for the DRF UI."""
