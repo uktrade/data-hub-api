@@ -164,10 +164,12 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
     project_assurance_team = NestedRelatedField(
         meta_models.Team, read_only=True
     )
+    team_complete = serializers.BooleanField(read_only=True)
 
     class Meta:  # noqa: D101
         model = InvestmentProject
         fields = (
             'project_manager', 'project_assurance_advisor',
-            'project_manager_team', 'project_assurance_team'
+            'project_manager_team', 'project_assurance_team',
+            'team_complete'
         )
