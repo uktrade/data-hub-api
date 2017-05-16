@@ -11,7 +11,7 @@ from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.models import BaseModel
 from datahub.investment.validate import (
     get_incomplete_project_fields, get_incomplete_reqs_fields,
-    get_incomplete_value_fields
+    get_incomplete_team_fields, get_incomplete_value_fields
 )
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -204,6 +204,11 @@ class IProjectTeamAbstract(models.Model):
         if self.project_assurance_advisor:
             return self.project_assurance_advisor.dit_team
         return None
+
+    @property
+    def team_complete(self):
+        """Whether the team section is complete."""
+        return not get_incomplete_team_fields(instance=self)
 
 
 class InvestmentProject(IProjectAbstract, IProjectValueAbstract,

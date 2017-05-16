@@ -448,7 +448,24 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'project_assurance_team': {
                 'id': str(huk_team.id),
                 'name': huk_team.name
-            }
+            },
+            'team_complete': True
+        }
+
+    def test_get_team_empty(self):
+        """Test successfully getting an empty project requirements object."""
+        project = InvestmentProjectFactory()
+        url = reverse('investment:v3:team-item',
+                      kwargs={'pk': project.pk})
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data == {
+            'project_manager': None,
+            'project_assurance_advisor': None,
+            'project_manager_team': None,
+            'project_assurance_team': None,
+            'team_complete': False
         }
 
     def test_patch_team_success(self):
@@ -489,7 +506,8 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'project_assurance_team': {
                 'id': str(huk_team.id),
                 'name': huk_team.name
-            }
+            },
+            'team_complete': True
         }
 
 
