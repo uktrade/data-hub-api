@@ -213,7 +213,7 @@ class InvestmentProject(IProjectAbstract, IProjectValueAbstract,
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
 
     def __str__(self):
-        """Human-readable name for admin section etc.."""
+        """Human-readable name for admin section etc."""
         return '{} – {}'.format(self.investor_company or 'No company',
                                 self.name)
 
