@@ -61,6 +61,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'description': 'project description',
             'nda_signed': False,
             'estimated_land_date': '2020-12-12',
+            'project_shareable': False,
             'investment_type': {
                 'id': constants.InvestmentType.fdi.value.id
             },
@@ -129,48 +130,83 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert (response_data['business_activities'][0]['id'] ==
                 business_activity_id)
 
-    def test_create_project_minimal_success(self):
-        """Test successfully creating a project with minimal data."""
-        url = reverse('investment:v3:project')
-        request_data = {
-            'name': 'project name',
-            'description': 'project description',
-            'nda_signed': False,
-            'estimated_land_date': '2020-12-12',
-            'investment_type': {
-                'id': constants.InvestmentType.fdi.value.id
-            }
-        }
-        response = self.api_client.post(url, data=request_data, format='json')
-        assert response.status_code == status.HTTP_201_CREATED
-        response_data = response.json()
-        assert response_data['name'] == request_data['name']
-        assert response_data['description'] == request_data['description']
-        assert response_data['nda_signed'] == request_data['nda_signed']
-        assert (response_data['estimated_land_date'] == request_data[
-            'estimated_land_date'])
-        assert response_data['project_section_complete'] is False
-        assert re.match('^DHP-\d+$', response_data['project_code'])
-
-        assert (response_data['phase']['id'] ==
-                constants.InvestmentProjectPhase.prospect.value.id)
-        assert (response_data['investment_type']['id'] == request_data[
-            'investment_type']['id'])
-
     def test_create_project_fail(self):
         """Test creating a project with missing required values."""
         url = reverse('investment:v3:project')
+        request_data = {}
+        response = self.api_client.post(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'business_activities': ['This field is required.'],
+            'client_contacts': ['This field is required.'],
+            'client_relationship_manager': ['This field is required.'],
+            'description': ['This field is required.'],
+            'estimated_land_date': ['This field is required.'],
+            'investor_company': ['This field is required.'],
+            'investment_type': ['This field is required.'],
+            'name': ['This field is required.'],
+            'nda_signed': ['This field is required.'],
+            'project_shareable': ['This field is required.'],
+            'referral_source_activity': ['This field is required.'],
+            'referral_source_advisor': ['This field is required.'],
+            'sector': ['This field is required.']
+        }
+
+    def test_create_project_fail_none(self):
+        """Test creating a project with None for required values."""
+        url = reverse('investment:v3:project')
         request_data = {
-            'name': 'project name'
+            'business_activities': None,
+            'client_contacts': None,
+            'client_relationship_manager': None,
+            'description': None,
+            'estimated_land_date': None,
+            'investor_company': None,
+            'investment_type': None,
+            'name': None,
+            'nda_signed': None,
+            'project_shareable': None,
+            'referral_source_activity': None,
+            'referral_source_advisor': None,
+            'sector': None
         }
         response = self.api_client.post(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'description': ['This field is required.'],
-            'investment_type': ['This field is required.'],
-            'estimated_land_date': ['This field is required.']
+            'business_activities': ['This field may not be null.'],
+            'client_contacts': ['This field may not be null.'],
+            'client_relationship_manager': ['This field may not be null.'],
+            'description': ['This field may not be null.'],
+            'estimated_land_date': ['This field may not be null.'],
+            'investor_company': ['This field may not be null.'],
+            'investment_type': ['This field may not be null.'],
+            'name': ['This field may not be null.'],
+            'nda_signed': ['This field may not be null.'],
+            'project_shareable': ['This field may not be null.'],
+            'referral_source_activity': ['This field may not be null.'],
+            'referral_source_advisor': ['This field may not be null.'],
+            'sector': ['This field may not be null.']
         }
+
+    def test_create_project_fail_empty_to_many(self):
+        """Test creating a project with empty to-many field values."""
+        url = reverse('investment:v3:project')
+        request_data = {
+            'business_activities': [],
+            'client_contacts': []
+        }
+        response = self.api_client.post(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data.keys() >= {
+            'business_activities', 'client_contacts'
+        }
+        assert response_data['business_activities'] == [
+            'This list may not be ''empty.']
+        assert response_data['client_contacts'] == [
+            'This list may not be ''empty.']
 
     def test_get_project_success(self):
         """Test successfully getting a project."""
@@ -192,6 +228,25 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert (response_data['phase']['id'] == str(project.phase.id))
         assert sorted(contact['id'] for contact in response_data[
             'client_contacts']) == sorted(contacts)
+
+    def test_patch_project_conditional_failure(self):
+        """Test updating a company with missing conditionally required value.
+        """
+        project = InvestmentProjectFactory(
+            client_contacts=[ContactFactory().id, ContactFactory().id]
+        )
+        url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
+        request_data = {
+            'investment_type': {
+                'id': str(constants.InvestmentType.fdi.value.id)
+            }
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'fdi_type': ['This field is required.']
+        }
 
     def test_patch_project_success(self):
         """Test successfully partially updating a project."""
@@ -217,9 +272,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
 
     def test_change_phase_assign_pm_failure(self):
         """Tests moving an incomplete project to the Assign PM phase."""
-        project = InvestmentProjectFactory(
-            sector_id=None
-        )
+        project = InvestmentProjectFactory()
         url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
         request_data = {
             'phase': {
@@ -230,14 +283,6 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'business_activities': ['This field is required.'],
-            'client_contacts': ['This field is required.'],
-            'client_relationship_manager': ['This field is required.'],
-            'fdi_type': ['This field is required.'],
-            'investor_company': ['This field is required.'],
-            'referral_source_activity': ['This field is required.'],
-            'referral_source_advisor': ['This field is required.'],
-            'sector': ['This field is required.'],
             'client_cannot_provide_total_investment': [
                 'This field is required.'],
             'number_new_jobs': ['This field is required.'],
@@ -251,24 +296,11 @@ class InvestmentViewsTestCase(LeelooTestCase):
 
     def test_change_phase_assign_pm_success(self):
         """Tests moving a complete project to the Assign PM phase."""
-        advisor = AdvisorFactory()
-        company = CompanyFactory()
-        new_site_id = (constants.FDIType.creation_of_new_site_or_activity
-                       .value.id)
-        cold_call_id = constants.ReferralSourceActivity.cold_call.value.id
         strategic_drivers = [
             constants.InvestmentStrategicDriver.access_to_market.value.id
         ]
         project = InvestmentProjectFactory(
-            business_activities=[
-                constants.InvestmentBusinessActivity.retail.value.id
-            ],
             client_contacts=[ContactFactory().id, ContactFactory().id],
-            client_relationship_manager_id=advisor.id,
-            fdi_type_id=new_site_id,
-            investor_company_id=company.id,
-            referral_source_activity_id=cold_call_id,
-            referral_source_advisor_id=advisor.id,
             client_cannot_provide_total_investment=False,
             total_investment=100,
             number_new_jobs=0,
@@ -292,7 +324,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
     def test_change_phase_active_failure(self):
         """Tests moving an incomplete project to the Assign PM phase."""
         project = InvestmentProjectFactory(
-            sector_id=None
+            client_contacts=[ContactFactory().id, ContactFactory().id]
         )
         url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
         request_data = {
@@ -304,14 +336,6 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'business_activities': ['This field is required.'],
-            'client_contacts': ['This field is required.'],
-            'client_relationship_manager': ['This field is required.'],
-            'fdi_type': ['This field is required.'],
-            'investor_company': ['This field is required.'],
-            'referral_source_activity': ['This field is required.'],
-            'referral_source_advisor': ['This field is required.'],
-            'sector': ['This field is required.'],
             'client_cannot_provide_total_investment': [
                 'This field is required.'],
             'number_new_jobs': ['This field is required.'],
@@ -336,15 +360,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
             constants.InvestmentStrategicDriver.access_to_market.value.id
         ]
         project = InvestmentProjectFactory(
-            business_activities=[
-                constants.InvestmentBusinessActivity.retail.value.id
-            ],
             client_contacts=[ContactFactory().id, ContactFactory().id],
-            client_relationship_manager_id=advisor.id,
-            fdi_type_id=new_site_id,
-            investor_company_id=company.id,
-            referral_source_activity_id=cold_call_id,
-            referral_source_advisor_id=advisor.id,
             client_cannot_provide_total_investment=False,
             total_investment=100,
             number_new_jobs=0,

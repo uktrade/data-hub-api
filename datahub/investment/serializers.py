@@ -18,8 +18,9 @@ class IProjectSerializer(serializers.ModelSerializer):
     investment_type = NestedRelatedField(meta_models.InvestmentType)
     phase = NestedRelatedField(meta_models.InvestmentProjectPhase,
                                required=False)
+    project_shareable = serializers.BooleanField(required=True)
     investor_company = NestedRelatedField(
-        Company, required=False, allow_null=True
+        Company, required=True, allow_null=False
     )
     intermediate_company = NestedRelatedField(
         Company, required=False, allow_null=True
@@ -27,27 +28,26 @@ class IProjectSerializer(serializers.ModelSerializer):
     investment_recipient_company = NestedRelatedField(
         Company, required=False, allow_null=True
     )
-    client_contacts = NestedRelatedField(Contact, many=True, required=False)
+    client_contacts = NestedRelatedField(
+        Contact, many=True, required=True, allow_null=False, allow_empty=False
+    )
 
     client_relationship_manager = NestedRelatedField(
-        Advisor, required=False, allow_null=True,
+        Advisor, required=True, allow_null=False,
         extra_fields=('first_name', 'last_name')
     )
     referral_source_advisor = NestedRelatedField(
-        Advisor, required=False, allow_null=True,
+        Advisor, required=True, allow_null=False,
         extra_fields=('first_name', 'last_name')
     )
     referral_source_activity = NestedRelatedField(
-        meta_models.ReferralSourceActivity, required=False, allow_null=True
+        meta_models.ReferralSourceActivity, required=True, allow_null=False
     )
     referral_source_activity_website = NestedRelatedField(
         meta_models.ReferralSourceWebsite, required=False, allow_null=True
     )
     referral_source_activity_marketing = NestedRelatedField(
         meta_models.ReferralSourceMarketing, required=False, allow_null=True
-    )
-    referral_source_activity_event = NestedRelatedField(
-        meta_models.Event, required=False, allow_null=True
     )
     fdi_type = NestedRelatedField(
         meta_models.FDIType, required=False, allow_null=True
@@ -56,10 +56,11 @@ class IProjectSerializer(serializers.ModelSerializer):
         meta_models.NonFDIType, required=False, allow_null=True
     )
     sector = NestedRelatedField(
-        meta_models.Sector, required=False, allow_null=True
+        meta_models.Sector, required=True, allow_null=False
     )
     business_activities = NestedRelatedField(
-        meta_models.InvestmentBusinessActivity, many=True, required=False
+        meta_models.InvestmentBusinessActivity, many=True, required=True,
+        allow_null=False, allow_empty=False
     )
     project_section_complete = serializers.BooleanField(read_only=True)
 
@@ -98,6 +99,9 @@ class IProjectSerializer(serializers.ModelSerializer):
             'referral_source_activity_event', 'fdi_type', 'non_fdi_type',
             'sector', 'business_activities', 'project_section_complete'
         )
+        # DRF defaults to required=False even though this field is
+        # non-nullable
+        extra_kwargs = {'nda_signed': {'required': True}}
 
 
 class IProjectValueSerializer(serializers.ModelSerializer):

@@ -15,39 +15,20 @@ pytestmark = pytest.mark.django_db
 
 def test_validate_project_fail():
     """Tests validating an incomplete project section."""
-    project = InvestmentProjectFactory(sector_id=None)
+    project = InvestmentProjectFactory(
+        investment_type_id=constants.InvestmentType.fdi.value.id,
+        fdi_type_id=None
+    )
     errors = get_incomplete_project_fields(instance=project)
     assert errors == {
-        'business_activities': 'This field is required.',
-        'client_contacts': 'This field is required.',
-        'client_relationship_manager': 'This field is required.',
-        'fdi_type': 'This field is required.',
-        'investor_company': 'This field is required.',
-        'referral_source_activity': 'This field is required.',
-        'referral_source_advisor': 'This field is required.',
-        'sector': 'This field is required.'
+        'fdi_type': 'This field is required.'
     }
 
 
 def test_validate_project_instance_success():
     """Tests validating a complete project section using a model instance."""
-    advisor = AdvisorFactory()
-    company = CompanyFactory()
-    new_site_id = (constants.FDIType.creation_of_new_site_or_activity
-                   .value.id)
-    cold_call_id = constants.ReferralSourceActivity.cold_call.value.id
-    investment_type_id = constants.InvestmentType.commitment_to_invest.value.id
     project = InvestmentProjectFactory(
-        business_activities=[
-            constants.InvestmentBusinessActivity.retail.value.id
-        ],
-        client_contacts=[ContactFactory().id, ContactFactory().id],
-        client_relationship_manager_id=advisor.id,
-        fdi_type_id=new_site_id,
-        investment_type_id=investment_type_id,
-        investor_company_id=company.id,
-        referral_source_activity_id=cold_call_id,
-        referral_source_advisor_id=advisor.id
+        client_contacts=[ContactFactory().id, ContactFactory().id]
     )
     errors = get_incomplete_project_fields(instance=project)
     assert not errors
