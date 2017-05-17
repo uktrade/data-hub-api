@@ -74,9 +74,8 @@ class IProjectAbstract(models.Model):
         'metadata.ReferralSourceMarketing', related_name='investment_projects',
         null=True, blank=True
     )
-    referral_source_activity_event = models.ForeignKey(
-        'metadata.Event', related_name='investment_projects', null=True,
-        blank=True
+    referral_source_activity_event = models.CharField(
+        max_length=MAX_LENGTH, null=True, blank=True
     )
     fdi_type = models.ForeignKey(
         'metadata.FDIType', related_name='investment_projects', null=True,
