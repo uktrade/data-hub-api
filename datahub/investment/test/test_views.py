@@ -230,8 +230,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'client_contacts']) == sorted(contacts)
 
     def test_patch_project_conditional_failure(self):
-        """Test updating a company with missing conditionally required value.
-        """
+        """Test updating a project w/ missing conditionally required value."""
         project = InvestmentProjectFactory(
             client_contacts=[ContactFactory().id, ContactFactory().id]
         )
@@ -352,10 +351,6 @@ class InvestmentViewsTestCase(LeelooTestCase):
     def test_change_phase_active_success(self):
         """Tests moving a complete project to the Active phase."""
         advisor = AdvisorFactory()
-        company = CompanyFactory()
-        new_site_id = (constants.FDIType.creation_of_new_site_or_activity
-                       .value.id)
-        cold_call_id = constants.ReferralSourceActivity.cold_call.value.id
         strategic_drivers = [
             constants.InvestmentStrategicDriver.access_to_market.value.id
         ]

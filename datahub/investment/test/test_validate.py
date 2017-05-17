@@ -1,7 +1,6 @@
 import pytest
 
-from datahub.company.test.factories import (AdvisorFactory, CompanyFactory,
-                                            ContactFactory)
+from datahub.company.test.factories import (AdvisorFactory, ContactFactory)
 from datahub.core import constants
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.investment.validate import (
