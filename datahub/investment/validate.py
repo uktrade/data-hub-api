@@ -12,7 +12,7 @@ def get_validators():
     Returned as a tuple of (phase, callable) pairs.
     """
     return (
-        (Phase.assign_pm.value, get_incomplete_project_fields),
+        (Phase.prospect.value, get_incomplete_project_fields),
         (Phase.assign_pm.value, get_incomplete_value_fields),
         (Phase.assign_pm.value, get_incomplete_reqs_fields),
         (Phase.active.value, get_incomplete_team_fields)
@@ -28,18 +28,7 @@ def get_incomplete_project_fields(instance=None, update_data=None):
     """
     data = _UpdatedDataView(instance, update_data)
 
-    truthy_required_fields = [
-        'sector',
-        'referral_source_advisor',
-        'client_relationship_manager',
-        'investor_company',
-        'referral_source_activity'
-    ]
-
-    to_many_required_fields = [
-        'client_contacts',
-        'business_activities'
-    ]
+    truthy_required_fields = []
 
     if (data.get_value_id('referral_source_activity') ==
             Activity.event.value.id):
@@ -59,8 +48,7 @@ def get_incomplete_project_fields(instance=None, update_data=None):
     if data.get_value_id('investment_type') == InvestmentType.non_fdi.value.id:
         truthy_required_fields.append('non_fdi_type')
 
-    errors = _validate(data, truthy_required_fields,
-                       to_many_fields=to_many_required_fields)
+    errors = _validate(data, truthy_required_fields)
     return errors
 
 

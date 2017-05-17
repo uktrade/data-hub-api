@@ -29,7 +29,6 @@ class IProjectViewSet(CoreViewSetV3):
         'referral_source_activity',
         'referral_source_activity_website',
         'referral_source_activity_marketing',
-        'referral_source_activity_event',
         'fdi_type',
         'non_fdi_type',
         'sector'
