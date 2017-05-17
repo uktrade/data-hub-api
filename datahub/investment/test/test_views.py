@@ -322,7 +322,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['project_section_complete'] is True
 
     def test_change_phase_active_failure(self):
-        """Tests moving an incomplete project to the Assign PM phase."""
+        """Tests moving an incomplete project to the Active phase."""
         project = InvestmentProjectFactory(
             client_contacts=[ContactFactory().id, ContactFactory().id]
         )
@@ -350,7 +350,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         }
 
     def test_change_phase_active_success(self):
-        """Tests moving a complete project to the Assign PM phase."""
+        """Tests moving a complete project to the Active phase."""
         advisor = AdvisorFactory()
         company = CompanyFactory()
         new_site_id = (constants.FDIType.creation_of_new_site_or_activity
