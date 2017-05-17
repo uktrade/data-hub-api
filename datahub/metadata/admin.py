@@ -13,12 +13,22 @@ MODELS_TO_REGISTER = (
     models.Team,
     models.Service,
     models.ServiceDeliveryStatus,
-    models.Event
+    models.Event,
+    models.InvestmentType,
+    models.FDIType,
+    models.NonFDIType,
+    models.ReferralSourceActivity,
+    models.ReferralSourceMarketing,
+    models.ReferralSourceWebsite,
+    models.InvestmentBusinessActivity,
+    models.InvestmentStrategicDriver
 )
 
 MODELS_TO_REGISTER_WITH_ORDER = (
     models.EmployeeRange,
-    models.TurnoverRange
+    models.TurnoverRange,
+    models.SalaryRange,
+    models.InvestmentProjectPhase
 )
 
 
