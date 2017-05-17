@@ -97,3 +97,6 @@ class ServiceDelivery(InteractionAbstract):
         if self.service_offer and not self.event:
             self.event = self.service_offer.event
         super().clean()
+
+    class Meta(InteractionAbstract.Meta):  # noqa: D101
+        verbose_name_plural = 'service deliveries'

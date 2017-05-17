@@ -71,7 +71,8 @@ class Service(BaseConstantModel):
 class ServiceDeliveryStatus(BaseConstantModel):
     """Service delivery status."""
 
-    pass
+    class Meta(BaseConstantModel.Meta):  # noqa: D101
+        verbose_name_plural = 'service delivery statuses'
 
 
 class Event(BaseConstantModel):
@@ -111,6 +112,9 @@ class NonFDIType(BaseConstantModel):
 class ReferralSourceActivity(BaseConstantModel):
     """Referral source activity type (for investment projects)."""
 
+    class Meta(BaseConstantModel.Meta):  # noqa: D101
+        verbose_name_plural = 'referral source activities'
+
 
 class ReferralSourceWebsite(BaseConstantModel):
     """Referral source website (for investment projects)."""
@@ -122,6 +126,9 @@ class ReferralSourceMarketing(BaseConstantModel):
 
 class InvestmentBusinessActivity(BaseConstantModel):
     """Business activity (for investment projects)."""
+
+    class Meta(BaseConstantModel.Meta):  # noqa: D101
+        verbose_name_plural = 'investment business activities'
 
 
 class InvestmentStrategicDriver(BaseConstantModel):

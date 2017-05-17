@@ -62,7 +62,6 @@ class IProjectSerializer(serializers.ModelSerializer):
         meta_models.InvestmentBusinessActivity, many=True, required=True,
         allow_null=False, allow_empty=False
     )
-    project_section_complete = serializers.BooleanField(read_only=True)
 
     def validate(self, data):
         """Validates the object after individual fields have been validated.
@@ -97,7 +96,7 @@ class IProjectSerializer(serializers.ModelSerializer):
             'referral_source_activity_website',
             'referral_source_activity_marketing',
             'referral_source_activity_event', 'fdi_type', 'non_fdi_type',
-            'sector', 'business_activities', 'project_section_complete'
+            'sector', 'business_activities'
         )
         # DRF defaults to required=False even though this field is
         # non-nullable

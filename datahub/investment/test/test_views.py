@@ -109,7 +109,6 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['nda_signed'] == request_data['nda_signed']
         assert (response_data['estimated_land_date'] == request_data[
             'estimated_land_date'])
-        assert response_data['project_section_complete'] is True
         assert re.match('^DHP-\d+$', response_data['project_code'])
 
         assert (response_data['investment_type']['id'] == request_data[
@@ -317,8 +316,6 @@ class InvestmentViewsTestCase(LeelooTestCase):
         }
         response = self.api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['project_section_complete'] is True
 
     def test_change_phase_active_failure(self):
         """Tests moving an incomplete project to the Active phase."""
