@@ -1,8 +1,22 @@
 from datahub.core.constants import (
-    InvestmentType, ReferralSourceActivity as Activity
+    InvestmentProjectPhase as Phase, InvestmentType,
+    ReferralSourceActivity as Activity
 )
 
 REQUIRED_MESSAGE = 'This field is required.'
+
+
+def get_validators():
+    """Returns validators used for phase-dependent validation.
+
+    Returned as a tuple of (phase, callable) pairs.
+    """
+    return (
+        (Phase.assign_pm.value, get_incomplete_project_fields),
+        (Phase.assign_pm.value, get_incomplete_value_fields),
+        (Phase.assign_pm.value, get_incomplete_reqs_fields),
+        (Phase.active.value, get_incomplete_team_fields)
+    )
 
 
 def get_incomplete_project_fields(instance=None, update_data=None):
@@ -62,27 +76,11 @@ def get_incomplete_value_fields(instance=None, update_data=None):
     truthy_required_fields = []
     not_none_or_blank_fields = [
         'client_cannot_provide_total_investment',
-        'client_cannot_provide_foreign_investment',
-        'total_investment',
-        'foreign_equity_investment',
-        'government_assistance',
         'number_new_jobs',
-        'number_safeguarded_jobs',
-        'r_and_d_budget',
-        'non_fdi_r_and_d_budget',
-        'new_tech_to_uk',
-        'export_revenue',
     ]
 
-    if data.get_value('client_cannot_provide_total_investment') is False:
+    if not data.get_value('client_cannot_provide_total_investment'):
         not_none_or_blank_fields.append('total_investment')
-
-    if data.get_value('client_cannot_provide_foreign_investment') is False:
-        not_none_or_blank_fields.append('foreign_equity_investment')
-
-    num_new_jobs = data.get_value('number_new_jobs')
-    if num_new_jobs is not None and num_new_jobs > 0:
-        truthy_required_fields.append('average_salary')
 
     errors = _validate(data, truthy_required_fields, not_none_or_blank_fields)
     return errors
@@ -115,6 +113,24 @@ def get_incomplete_reqs_fields(instance=None, update_data=None):
         data, not_none_or_blank_fields=not_none_or_blank_fields,
         to_many_fields=to_many_required_fields
     )
+    return errors
+
+
+def get_incomplete_team_fields(instance=None, update_data=None):
+    """Checks whether the team section is complete.
+
+    :param instance:    Model instance (for update operations only)
+    :param update_data: Data being updated
+    :return:            dict containing errors for incomplete fields
+    """
+    data = _UpdatedDataView(instance, update_data)
+
+    truthy_required_fields = [
+        'project_manager',
+        'project_assurance_advisor'
+    ]
+
+    errors = _validate(data, truthy_required_fields)
     return errors
 
 
