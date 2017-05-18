@@ -15,7 +15,7 @@ class DashboardTestCase(LeelooTestCase):
         user = get_test_user()
 
         # add contact using the API to save the user from the session
-        url = reverse('v1:contact-list')
+        url = reverse('api-v1:contact-list')
         api_response = self.api_client.post(url, {
             'first_name': 'Oratio',
             'last_name': 'Nelson',

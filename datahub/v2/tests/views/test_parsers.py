@@ -10,7 +10,7 @@ class JSONParserTestCase(LeelooTestCase):
 
     def test_data_key_not_in_post_body(self):
         """Test data key is missing from post body."""
-        url = reverse('v2:servicedelivery-list')
+        url = reverse('api-v2:servicedelivery-list')
         data = {
             'type': 'ServiceDelivery',
             'attributes': {
@@ -41,7 +41,7 @@ class JSONParserTestCase(LeelooTestCase):
 
     def test_data_contains_incorrect_entity_name(self):
         """Test add new service delivery with incorrect format."""
-        url = reverse('v2:servicedelivery-list')
+        url = reverse('api-v2:servicedelivery-list')
         data = {
             'type': 'whatever',
             'attributes': {
