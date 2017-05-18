@@ -25,7 +25,7 @@ class CDMSUserBackend(ModelBackend):
         except (CDMSInvalidCredentialsError, AssertionError):
             return False  # Invalid credentials
 
-    def authenticate(self, username=None, password=None, **kwargs):
+    def authenticate(self, request, username=None, password=None, **kwargs):
         """Copied from parent impl, but with password check done by cdms."""
         user_model = get_user_model()
         if username is None:
