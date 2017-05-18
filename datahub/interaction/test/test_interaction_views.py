@@ -14,7 +14,7 @@ class InteractionTestCase(LeelooTestCase):
     def test_interaction_detail_view(self):
         """Interaction detail view."""
         interaction = InteractionFactory()
-        url = reverse('v1:interaction-detail', kwargs={'pk': interaction.pk})
+        url = reverse('api-v1:interaction-detail', kwargs={'pk': interaction.pk})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -22,7 +22,7 @@ class InteractionTestCase(LeelooTestCase):
 
     def test_add_interaction(self):
         """Test add new interaction."""
-        url = reverse('v1:interaction-list')
+        url = reverse('api-v1:interaction-list')
         response = self.api_client.post(url, {
             'interaction_type': constants.InteractionType.business_card.value.id,
             'subject': 'whatever',
@@ -43,7 +43,7 @@ class InteractionTestCase(LeelooTestCase):
         """Modify an existing interaction."""
         interaction = InteractionFactory(subject='I am a subject')
 
-        url = reverse('v1:interaction-detail', kwargs={'pk': interaction.pk})
+        url = reverse('api-v1:interaction-detail', kwargs={'pk': interaction.pk})
         response = self.api_client.patch(url, {
             'subject': 'I am another subject',
         })
