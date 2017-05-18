@@ -31,6 +31,7 @@ class CompanyAbstract(BaseModel):
     registered_address_country = models.ForeignKey(
         metadata_models.Country,
         related_name="%(class)ss",  # noqa: Q000
+        null=True,
     )
     registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
@@ -59,8 +60,8 @@ class Company(ArchivableModel, CompanyAbstract):
     company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     alias = models.CharField(max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name')
-    business_type = models.ForeignKey(metadata_models.BusinessType)
-    sector = models.ForeignKey(metadata_models.Sector)
+    business_type = models.ForeignKey(metadata_models.BusinessType, null=True)
+    sector = models.ForeignKey(metadata_models.Sector, null=True)
     employee_range = models.ForeignKey(metadata_models.EmployeeRange, null=True)
     turnover_range = models.ForeignKey(metadata_models.TurnoverRange, null=True)
     account_manager = models.ForeignKey('Advisor', null=True, related_name='companies')
@@ -149,9 +150,6 @@ class Company(ArchivableModel, CompanyAbstract):
 
     def clean(self):
         """Custom validation."""
-        if not self.classification_id:
-            self.classification_id = constants.CompanyClassification.undefined.value.id
-
         if not self._validate_trading_address():
             raise ValidationError(
                 self._generate_trading_address_errors(),
@@ -198,7 +196,7 @@ class Contact(ArchivableModel, BaseModel):
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
     job_title = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    company = models.ForeignKey('Company', related_name='contacts')
+    company = models.ForeignKey('Company', related_name='contacts', null=True)
     advisor = models.ForeignKey('Advisor', related_name='contacts', null=True, blank=True)
     primary = models.BooleanField()
     teams = models.ManyToManyField(metadata_models.Team, blank=True)
@@ -321,7 +319,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     last_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     email = core_fields.CICharField(max_length=MAX_LENGTH, unique=True)  # CDMS users may not have tld
-    dit_team = models.ForeignKey(metadata_models.Team, default=constants.Team.undefined.value.id)
+    dit_team = models.ForeignKey(metadata_models.Team, null=True)
     is_staff = models.BooleanField(
         'staff status',
         default=False,
@@ -332,7 +330,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         default=True,
         help_text=(
             'Designates whether this user should be treated as active. '
-            'Unselect this instead of deleting accounts.'
+            'Deselect this instead of deleting accounts.'
         ),
     )
     date_joined = models.DateTimeField('date joined', default=now)

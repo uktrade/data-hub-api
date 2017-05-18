@@ -27,7 +27,7 @@ class CoreViewSetV1(mixins.CreateModelMixin,
         These are not real Exceptions, rather user errors.
         """
         try:
-                return super().create(request, *args, **kwargs)
+            return super().create(request, *args, **kwargs)
         except ValidationError as e:
             raise DRFValidationError({'errors': e.message_dict})
 
@@ -40,3 +40,6 @@ class CoreViewSetV1(mixins.CreateModelMixin,
             return super().update(request, *args, **kwargs)
         except ValidationError as e:
             raise DRFValidationError({'errors': e.message_dict})
+
+
+CoreViewSetV3 = CoreViewSetV1
