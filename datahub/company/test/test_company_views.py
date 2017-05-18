@@ -15,7 +15,7 @@ class CompanyTestCase(LeelooTestCase):
         """List the companies."""
         CompanyFactory()
         CompanyFactory()
-        url = reverse('v1:company-list')
+        url = reverse('api-v1:company-list')
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -39,7 +39,7 @@ class CompanyTestCase(LeelooTestCase):
             alias='Xyz trading'
         )
 
-        url = reverse('v1:company-detail', kwargs={'pk': company.id})
+        url = reverse('api-v1:company-detail', kwargs={'pk': company.id})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -74,7 +74,7 @@ class CompanyTestCase(LeelooTestCase):
             classification_id=constants.CompanyClassification.tier_a.value.id,
         )
 
-        url = reverse('v1:company-detail', kwargs={'pk': company.id})
+        url = reverse('api-v1:company-detail', kwargs={'pk': company.id})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -105,7 +105,7 @@ class CompanyTestCase(LeelooTestCase):
         )
 
         # now update it
-        url = reverse('v1:company-detail', kwargs={'pk': company.pk})
+        url = reverse('api-v1:company-detail', kwargs={'pk': company.pk})
         response = self.api_client.patch(url, {
             'name': 'Acme',
         })
@@ -123,7 +123,7 @@ class CompanyTestCase(LeelooTestCase):
             classification_id=constants.CompanyClassification.tier_a.value.id,
         )
 
-        url = reverse('v1:company-detail', kwargs={'pk': company.pk})
+        url = reverse('api-v1:company-detail', kwargs={'pk': company.pk})
         response = self.api_client.patch(url, {
             'classification': constants.CompanyClassification.tier_b.value.id,
         })
@@ -134,7 +134,7 @@ class CompanyTestCase(LeelooTestCase):
 
     def test_add_uk_company(self):
         """Test add new UK company."""
-        url = reverse('v1:company-list')
+        url = reverse('api-v1:company-list')
         response = self.api_client.post(url, {
             'name': 'Acme',
             'alias': None,
@@ -153,7 +153,7 @@ class CompanyTestCase(LeelooTestCase):
 
     def test_add_uk_company_without_uk_region(self):
         """Test add new UK without UK region company."""
-        url = reverse('v1:company-list')
+        url = reverse('api-v1:company-list')
         response = self.api_client.post(url, {
             'name': 'Acme',
             'alias': None,
@@ -169,7 +169,7 @@ class CompanyTestCase(LeelooTestCase):
 
     def test_add_not_uk_company(self):
         """Test add new not UK company."""
-        url = reverse('v1:company-list')
+        url = reverse('api-v1:company-list')
         response = self.api_client.post(url, {
             'name': 'Acme',
             'alias': None,
@@ -185,7 +185,7 @@ class CompanyTestCase(LeelooTestCase):
 
     def test_add_company_partial_trading_address(self):
         """Test add new company with partial trading address."""
-        url = reverse('v1:company-list')
+        url = reverse('api-v1:company-list')
         response = self.api_client.post(url, {
             'name': 'Acme',
             'business_type': constants.BusinessType.company.value.id,
@@ -205,7 +205,7 @@ class CompanyTestCase(LeelooTestCase):
 
     def test_add_company_with_trading_address(self):
         """Test add new company with trading_address."""
-        url = reverse('v1:company-list')
+        url = reverse('api-v1:company-list')
         response = self.api_client.post(url, {
             'name': 'Acme',
             'business_type': constants.BusinessType.company.value.id,
@@ -223,7 +223,7 @@ class CompanyTestCase(LeelooTestCase):
 
     def test_add_company_with_website_without_scheme(self):
         """Test add new company with trading_address."""
-        url = reverse('v1:company-list')
+        url = reverse('api-v1:company-list')
         response = self.api_client.post(url, {
             'name': 'Acme',
             'business_type': constants.BusinessType.company.value.id,
@@ -244,7 +244,7 @@ class CompanyTestCase(LeelooTestCase):
     def test_archive_company_no_reason(self):
         """Test company archive."""
         company = CompanyFactory()
-        url = reverse('v1:company-archive', kwargs={'pk': company.id})
+        url = reverse('api-v1:company-archive', kwargs={'pk': company.id})
         response = self.api_client.post(url, format='json')
 
         assert response.data['archived']
@@ -254,7 +254,7 @@ class CompanyTestCase(LeelooTestCase):
     def test_archive_company_reason(self):
         """Test company archive."""
         company = CompanyFactory()
-        url = reverse('v1:company-archive', kwargs={'pk': company.id})
+        url = reverse('api-v1:company-archive', kwargs={'pk': company.id})
         response = self.api_client.post(url, {'reason': 'foo'}, format='json')
 
         assert response.data['archived']
@@ -264,7 +264,7 @@ class CompanyTestCase(LeelooTestCase):
     def test_unarchive_company(self):
         """Unarchive a company."""
         company = CompanyFactory(archived=True, archived_on=now(), archived_reason='foo')
-        url = reverse('v1:company-unarchive', kwargs={'pk': company.id})
+        url = reverse('api-v1:company-unarchive', kwargs={'pk': company.id})
         response = self.api_client.get(url)
 
         assert not response.data['archived']
@@ -280,7 +280,7 @@ class CHCompanyTestCase(LeelooTestCase):
         CompaniesHouseCompanyFactory()
         CompaniesHouseCompanyFactory()
 
-        url = reverse('v1:companieshousecompany-list')
+        url = reverse('api-v1:companieshousecompany-list')
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -290,7 +290,7 @@ class CHCompanyTestCase(LeelooTestCase):
         """Test companies house company detail."""
         ch_company = CompaniesHouseCompanyFactory(company_number=123)
 
-        url = reverse('v1:companieshousecompany-detail', kwargs={'company_number': ch_company.company_number})
+        url = reverse('api-v1:companieshousecompany-detail', kwargs={'company_number': ch_company.company_number})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -298,7 +298,7 @@ class CHCompanyTestCase(LeelooTestCase):
 
     def test_ch_company_cannot_be_written(self):
         """Test CH company POST is not allowed."""
-        url = reverse('v1:companieshousecompany-list')
+        url = reverse('api-v1:companieshousecompany-list')
         response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
@@ -308,7 +308,7 @@ class CHCompanyTestCase(LeelooTestCase):
         CompaniesHouseCompanyFactory(company_number=1234567890)
 
         # promote a company to ch
-        url = reverse('v1:company-list')
+        url = reverse('api-v1:company-list')
         response = self.api_client.post(url, {
             'name': 'Acme',
             'company_number': 1234567890,
