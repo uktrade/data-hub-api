@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from reversion.admin import VersionAdmin
 
-from .models import Interaction, ServiceDelivery
+from .models import Interaction, ServiceDelivery, ServiceOffer
 
 
 @admin.register(Interaction)
@@ -17,3 +17,10 @@ class ServiceDeliveryAdmin(VersionAdmin):
     """Service Delivery admin."""
 
     search_fields = ['id', 'company__company_number', 'company__company_name', 'contact_email']
+
+
+@admin.register(ServiceOffer)
+class ServiceOdfferAdmin(VersionAdmin):
+    """Service Offer admin."""
+
+    pass

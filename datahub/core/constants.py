@@ -2,6 +2,7 @@ from collections import namedtuple
 from enum import Enum
 
 Constant = namedtuple('Constant', ('name', 'id'))
+OrderedConstant = namedtuple('OrderedConstant', ('name', 'id', 'order'))
 
 
 class BusinessType(Enum):
@@ -413,9 +414,6 @@ class Team(Enum):
     crm = Constant(
         'CRM', '5e8be8a8-3e95-e211-a939-e4115bead28a'
     )
-    undefined = Constant(
-        'Undefined', '0167b456-0ddd-49bd-8184-e3227a0b6396'
-    )
 
 
 class ServiceDeliveryStatus(Enum):
@@ -442,4 +440,97 @@ class CompanyClassification(Enum):
     tier_c = Constant('Tier C - Local Accounts (UKTI Managed)', 'bd1bf800-8d53-e311-aef3-441ea13961e2')
     tier_dl = Constant('Tier D - LEP Managed Branch (not IST)', '12798372-8eb4-e511-88b6-e4115bead28a')
     tier_dg = Constant('Tier D - POST Identified/Managed', '572dfefe-cd1d-e611-9bdc-e4115bead28a')
-    undefined = Constant('Undefined', '0167b456-0ddd-49bd-8184-e3227a0b6396')
+
+
+class InvestmentProjectPhase(Enum):
+    """Investment project phase constants."""
+
+    prospect = OrderedConstant(
+        'Prospect', '8a320cc9-ae2e-443e-9d26-2f36452c2ced', 200.0
+    )
+    assign_pm = OrderedConstant(
+        'Assign PM', 'c9864359-fb1a-4646-a4c1-97d10189fc03', 300.0
+    )
+    active = OrderedConstant(
+        'Active', '7606cc19-20da-4b74-aba1-2cec0d753ad8', 400.0
+    )
+    verify_win = OrderedConstant(
+        'Verify win', '49b8f6f3-0c50-4150-a965-2c974f3149e3', 500.0
+    )
+    won = OrderedConstant('Won', '945ea6d1-eee3-4f5b-9144-84a75b71b8e6', 600.0)
+
+
+class InvestmentType(Enum):
+    """Investment type constants."""
+
+    fdi = Constant('FDI', '3e143372-496c-4d1e-8278-6fdd3da9b48b')
+    non_fdi = Constant('Non-FDI', '9c364e64-2b28-401b-b2df-50e08b0bca44')
+    commitment_to_invest = Constant('Commitment to invest',
+                                    '031269ab-b7ec-40e9-8a4e-7371404f0622')
+
+
+class ReferralSourceActivity(Enum):
+    """Referral source activity constants."""
+
+    cold_call = Constant(
+        'Cold call', '0c4f8e74-d34f-4aca-b764-a44cdc2d0087'
+    )
+    direct_enquiry = Constant(
+        'Direct enquiry', '7d98f3a6-3e3f-40ac-a6f3-3f0c251ec1d2'
+    )
+    event = Constant(
+        'Event', '3816a95b-6a76-4ad0-8ae9-b0d7e7d2b79c'
+    )
+    marketing = Constant(
+        'Marketing', '0acf0e68-e09e-4e5d-92b6-e72e5a5c7ea4'
+    )
+    multiplier = Constant(
+        'Multiplier', 'e95cddb3-9407-4c8a-b5a6-2616117b0aae'
+    )
+    none = Constant(
+        'None', 'aba8f653-264f-48d8-950e-07f9c418c7b0'
+    )
+    other = Constant(
+        'Other', '318e6e9e-2a0e-4e4b-a495-c48aeee4b996'
+    )
+    relationship_management_activity = Constant(
+        'Relationship management activity',
+        '668e999c-a669-4d9b-bfbf-6275ceed86da'
+    )
+    personal_reference = Constant(
+        'Personal reference', 'c03c4043-18b4-4463-a36b-a1af1b35f95d'
+    )
+    website = Constant(
+        'Website', '812b2f62-fe62-4cc8-b69c-58f3e2ebac17'
+    )
+
+
+class InvestmentBusinessActivity(Enum):
+    """Investment business activity constants."""
+
+    retail = Constant('Retail', 'a2dbd807-ae52-421c-8d1d-88adfc7a506b')
+
+
+class FDIType(Enum):
+    """Investment FDI type constants."""
+
+    creation_of_new_site_or_activity = Constant(
+        'Creation of new site or activity',
+        'f8447013-cfdc-4f35-a146-6619665388b3'
+    )
+
+
+class SalaryRange(Enum):
+    """Average salary constants."""
+
+    below_25000 = OrderedConstant(
+        'Below £25,000', '2943bf3d-32dd-43be-8ad4-969b006dee7b', 100.0
+    )
+
+
+class InvestmentStrategicDriver(Enum):
+    """Investment strategic driver constants."""
+
+    access_to_market = Constant(
+        'Access to market', '382aa6d1-a362-4166-a09d-f579d9f3be75'
+    )

@@ -2,7 +2,7 @@ from collections import namedtuple
 from datetime import datetime, timezone
 from unittest import mock
 
-from loading_scripts import utils
+from datahub.korben import utils
 
 
 def test_cdms_datetime_to_datetime():
@@ -22,8 +22,8 @@ def test_cdms_datetime_to_datetime_returns_none_on_error():
     assert utils.cdms_datetime_to_datetime('invalid') is None
 
 
-@mock.patch('loading_scripts.utils.get_cdms_entity_s3_keys')
-@mock.patch('loading_scripts.utils.load_json_from_s3_bucket')
+@mock.patch('datahub.korben.utils.get_cdms_entity_s3_keys')
+@mock.patch('datahub.korben.utils.load_json_from_s3_bucket')
 def test_iterate_over_cdms_entities(import_mock, keys_mock):
     """Test combined iteration."""
     keys_mock.return_value = ['location1', 'location2']
@@ -41,4 +41,4 @@ def test_cdms_keys_filtering():
         s3_result('test/response_body'),
     ]
 
-    assert utils.get_cdms_entity_s3_keys(bucket, 'test') == ['test/response_body']
+    assert list(utils.get_cdms_entity_s3_keys(bucket, 'test')) == ['test/response_body']

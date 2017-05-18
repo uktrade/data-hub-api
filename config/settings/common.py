@@ -51,9 +51,11 @@ LOCAL_APPS = (
     'datahub.core',
     'datahub.company',
     'datahub.interaction',
+    'datahub.investment',
     'datahub.metadata',
     'datahub.search',
-    'datahub.user'
+    'datahub.user',
+    'datahub.korben',
 )
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

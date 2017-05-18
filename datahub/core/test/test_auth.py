@@ -8,8 +8,7 @@ from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core import auth, constants
-from datahub.metadata.models import Team
+from datahub.core import auth
 
 pytestmark = pytest.mark.django_db
 
@@ -34,10 +33,6 @@ def get_or_create_user(email, last_name, first_name, password=None):
     If password is None then it's set to unusable (CDMS user).
     """
     user_model = get_user_model()
-    team, _ = Team.objects.get_or_create(
-        id=constants.Team.undefined.value.id,
-        name=constants.Team.undefined.value.name
-    )
     try:
         user = user_model.objects.get(email=email)
     except user_model.DoesNotExist:
@@ -46,7 +41,6 @@ def get_or_create_user(email, last_name, first_name, password=None):
             last_name=last_name,
             email=email,
             date_joined=now(),
-            dit_team=team,
             enabled=True
         )
         if password:
