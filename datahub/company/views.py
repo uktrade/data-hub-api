@@ -4,7 +4,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, viewsets
 
 from datahub.core.mixins import ArchivableViewSetMixin
-from datahub.core.viewsets import CoreViewSetV1
+from datahub.core.viewsets import CoreViewSetV1, CoreViewSetV3
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
 from .serializers import (AdvisorSerializer, CompaniesHouseCompanySerializer, CompanySerializerRead,
                           CompanySerializerWrite, ContactSerializerRead, ContactSerializerWrite)
@@ -41,7 +41,7 @@ class CompaniesHouseCompanyReadOnlyViewSetV1(
     lookup_field = 'company_number'
 
 
-class ContactViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
+class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     """Contact ViewSet."""
 
     read_serializer_class = ContactSerializerRead
