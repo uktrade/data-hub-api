@@ -25,8 +25,8 @@ contact_archive = ContactViewSet.as_view({
 
 
 contact_urls = [
-    url(r'^$', contact_collection, name='list'),
-    url(r'^(?P<pk>[0-9a-z-]{36})$', contact_item, name='detail'),
-    url(r'^(?P<pk>[0-9a-z-]{36})/archive$', contact_archive, name='archive'),
-    url(r'^(?P<pk>[0-9a-z-]{36})/unarchive$', contact_archive, name='unarchive'),
+    url(r'^contact$', contact_collection, name='list'),
+    url(r'^contact/(?P<pk>[0-9a-z-]{36})$', contact_item, name='detail'),
+    url(r'^contact/(?P<pk>[0-9a-z-]{36})/archive$', contact_archive, name='archive'),
+    url(r'^contact/(?P<pk>[0-9a-z-]{36})/unarchive$', contact_archive, name='unarchive'),
 ]

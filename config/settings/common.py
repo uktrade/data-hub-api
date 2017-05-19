@@ -155,7 +155,7 @@ REST_FRAMEWORK = {
 # https://warehouse.python.org/project/whitenoise/
 
 
-APPEND_SLASH = True
+APPEND_SLASH = False
 
 # Leeloo stuff
 ES_HOST = env('ES_HOST')
