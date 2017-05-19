@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.utils.timezone import now
 from rest_framework import mixins
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.viewsets import GenericViewSet
@@ -40,6 +41,32 @@ class CoreViewSetV1(mixins.CreateModelMixin,
             return super().update(request, *args, **kwargs)
         except ValidationError as e:
             raise DRFValidationError({'errors': e.message_dict})
+
+    def perform_create(self, serializer):
+        """Custom logic for creating the model instance."""
+        extra_data = self.get_additional_data(True)
+        serializer.save(**extra_data)
+
+    def perform_update(self, serializer):
+        """Custom logic for updating the model instance."""
+        extra_data = self.get_additional_data(False)
+        serializer.save(**extra_data)
+
+    def get_additional_data(self, create):
+        """
+        Returns additional data to be saved in the model instance.
+
+        :param create:  True for is a model instance is being created; False
+                        for updates
+        :return:        dict of additional data to be saved
+        """
+        current_time = now()
+        extra_data = {
+            'modified_on': current_time
+        }
+        if create:
+            extra_data['created_on'] = current_time
+        return extra_data
 
 
 CoreViewSetV3 = CoreViewSetV1
