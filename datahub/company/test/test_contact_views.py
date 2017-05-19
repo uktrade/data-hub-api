@@ -17,7 +17,7 @@ class ContactTestCase(LeelooTestCase):
     @freeze_time('2017-04-18 13:25:30.986208+00:00')
     def test_add_contact_address_same_as_company(self):
         """Test add new contact."""
-        url = reverse('api-v1:contact-list')
+        url = reverse('api-v3:contact:list')
         company = CompanyFactory()
         response = self.api_client.post(url, {
             'first_name': 'Oratio',
@@ -71,7 +71,7 @@ class ContactTestCase(LeelooTestCase):
 
     def test_add_contact_invalid_email_address(self):
         """Test add new contact."""
-        url = reverse('api-v1:contact-list')
+        url = reverse('api-v3:contact:list')
         response = self.api_client.post(url, {
             'first_name': 'Oratio',
             'last_name': 'Nelson',
@@ -90,7 +90,7 @@ class ContactTestCase(LeelooTestCase):
 
     def test_add_contact_no_address(self):
         """Test add new contact without any address."""
-        url = reverse('api-v1:contact-list')
+        url = reverse('api-v3:contact:list')
         response = self.api_client.post(url, {
             'first_name': 'Oratio',
             'last_name': 'Nelson',
@@ -110,7 +110,7 @@ class ContactTestCase(LeelooTestCase):
 
     def test_add_contact_partial_manual_address(self):
         """Test add new contact with a partial manual address."""
-        url = reverse('api-v1:contact-list')
+        url = reverse('api-v3:contact:list')
 
         response = self.api_client.post(url, {
             'first_name': 'Oratio',
@@ -133,7 +133,7 @@ class ContactTestCase(LeelooTestCase):
 
     def test_add_contact_manual_address(self):
         """Test add new contact manual address."""
-        url = reverse('api-v1:contact-list')
+        url = reverse('api-v3:contact:list')
         response = self.api_client.post(url, {
             'first_name': 'Oratio',
             'last_name': 'Nelson',
@@ -154,7 +154,7 @@ class ContactTestCase(LeelooTestCase):
 
     def test_add_contact_with_contact_preferences_not_set(self):
         """Don't set any contact preference."""
-        url = reverse('api-v1:contact-list')
+        url = reverse('api-v3:contact:list')
         response = self.api_client.post(url, {
             'first_name': 'Oratio',
             'last_name': 'Nelson',
@@ -178,7 +178,7 @@ class ContactTestCase(LeelooTestCase):
 
     def test_add_contact_with_contact_preferences_set_to_false(self):
         """Contact preference both set to false."""
-        url = reverse('api-v1:contact-list')
+        url = reverse('api-v3:contact:list')
         response = self.api_client.post(url, {
             'first_name': 'Oratio',
             'last_name': 'Nelson',
@@ -205,7 +205,7 @@ class ContactTestCase(LeelooTestCase):
     def test_modify_contact(self):
         """Modify an existing contact."""
         contact = ContactFactory(first_name='Foo')
-        url = reverse('api-v1:contact-detail', kwargs={'pk': contact.pk})
+        url = reverse('api-v3:contact:detail', kwargs={'pk': contact.pk})
         response = self.api_client.patch(url, {
             'first_name': 'bar',
         })
@@ -216,7 +216,7 @@ class ContactTestCase(LeelooTestCase):
     def test_archive_contact_no_reason(self):
         """Test archive contact without providing a reason."""
         contact = ContactFactory()
-        url = reverse('api-v1:contact-archive', kwargs={'pk': contact.pk})
+        url = reverse('api-v3:contact:archive', kwargs={'pk': contact.pk})
         response = self.api_client.post(url)
 
         assert response.data['archived']
@@ -226,7 +226,7 @@ class ContactTestCase(LeelooTestCase):
     def test_archive_contact_reason(self):
         """Test archive contact providing a reason."""
         contact = ContactFactory()
-        url = reverse('api-v1:contact-archive', kwargs={'pk': contact.pk})
+        url = reverse('api-v3:contact:archive', kwargs={'pk': contact.pk})
         response = self.api_client.post(url, {'reason': 'foo'})
 
         assert response.data['archived']
@@ -236,7 +236,7 @@ class ContactTestCase(LeelooTestCase):
     def test_unarchive_contact(self):
         """Test unarchive contact."""
         contact = ContactFactory(archived=True, archived_reason='foo')
-        url = reverse('api-v1:contact-unarchive', kwargs={'pk': contact.pk})
+        url = reverse('api-v3:contact:unarchive', kwargs={'pk': contact.pk})
         response = self.api_client.get(url)
 
         assert not response.data['archived']
@@ -246,7 +246,7 @@ class ContactTestCase(LeelooTestCase):
     def test_contact_detail_view(self):
         """Contact detail view."""
         contact = ContactFactory()
-        url = reverse('api-v1:contact-detail', kwargs={'pk': contact.pk})
+        url = reverse('api-v3:contact:detail', kwargs={'pk': contact.pk})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
