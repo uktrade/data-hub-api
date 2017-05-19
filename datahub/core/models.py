@@ -12,16 +12,6 @@ class BaseModel(models.Model):
     class Meta:  # noqa: D101
         abstract = True
 
-    def clean(self):
-        """Custom validation for created_on and modified_on.
-
-        If the fields are empty, populate them.
-        """
-        super().clean()
-        current_time = now()
-        self.created_on = self.created_on or current_time
-        self.modified_on = current_time
-
 
 class ArchivableModel(models.Model):
     """Handle model archivation."""

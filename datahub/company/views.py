@@ -55,10 +55,11 @@ class ContactViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
         'interactions'
     )
 
-    def perform_create(self, serializer):
+    def get_additional_data(self, update):
         """Override create to inject the user from session."""
-        request = serializer.context['request']
-        serializer.save(advisor=request.user)
+        data = super().get_additional_data(update)
+        data['advisor'] = self.request.user
+        return data
 
 
 class AdvisorFilter(FilterSet):
