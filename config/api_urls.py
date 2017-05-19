@@ -30,6 +30,6 @@ v2_urls = v2_urlpatterns
 # API V3
 
 v3_urls = [
-    url(r'^investment/', include((investment_urls, 'investment'), namespace='investment')),
-    url(r'^contact/', include((company_urls.contact_urls, 'contact'), namespace='contact'))
+    url(r'^', include((investment_urls, 'investment'), namespace='investment')),
+    url(r'^', include((company_urls.contact_urls, 'contact'), namespace='contact'))
 ]
