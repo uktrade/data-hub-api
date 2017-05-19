@@ -18,7 +18,7 @@ class InteractionViewSetV1(CoreViewSetV1):
         'contact'
     ).all()
 
-    def create(self, request, *args, **kwargs):
+    def perform_create(self, serializer):
         """Override create to inject the user from session."""
-        request.data.update({'dit_advisor': str(request.user.pk)})
-        return super().create(request, *args, **kwargs)
+        request = serializer.context['request']
+        serializer.save(dit_advisor=request.user)
