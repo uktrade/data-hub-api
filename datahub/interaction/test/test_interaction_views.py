@@ -36,6 +36,8 @@ class InteractionTestCase(LeelooTestCase):
         })
 
         assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data['dit_advisor'] == str(self.user.pk)
 
     def test_modify_interaction(self):
         """Modify an existing interaction."""
