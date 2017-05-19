@@ -17,7 +17,6 @@ class AddContactTestCase(LeelooTestCase):
     @freeze_time('2017-04-18 13:25:30.986208+00:00')
     def test_with_address_same_as_company(self):
         """Test add new contact with same address as company."""
-
         url = reverse('api-v3:contact:list')
         company = CompanyFactory()
         response = self.api_client.post(url, {
@@ -74,7 +73,6 @@ class AddContactTestCase(LeelooTestCase):
 
     def test_fails_with_invalid_email_address(self):
         """Test that fails if the email address is invalid."""
-
         url = reverse('api-v3:contact:list')
         response = self.api_client.post(url, {
             'first_name': 'Oratio',
@@ -96,7 +94,6 @@ class AddContactTestCase(LeelooTestCase):
 
     def test_fails_without_address(self):
         """Test that fails without any address."""
-
         url = reverse('api-v3:contact:list')
         response = self.api_client.post(url, {
             'first_name': 'Oratio',
@@ -117,7 +114,6 @@ class AddContactTestCase(LeelooTestCase):
 
     def test_fails_with_only_partial_manual_address(self):
         """Test that fails if only partial manual address supplied."""
-
         url = reverse('api-v3:contact:list')
         response = self.api_client.post(url, {
             'first_name': 'Oratio',
@@ -140,7 +136,6 @@ class AddContactTestCase(LeelooTestCase):
 
     def test_with_manual_address(self):
         """Test add with manual address."""
-
         url = reverse('api-v3:contact:list')
         response = self.api_client.post(url, {
             'first_name': 'Oratio',
@@ -162,7 +157,6 @@ class AddContactTestCase(LeelooTestCase):
 
     def test_fails_with_contact_preferences_not_set(self):
         """Test that fails without any contact preference."""
-
         url = reverse('api-v3:contact:list')
         response = self.api_client.post(url, {
             'first_name': 'Oratio',
@@ -189,9 +183,11 @@ class AddContactTestCase(LeelooTestCase):
         }
 
     def test_fails_with_all_contact_preferences_set_to_false(self):
-        """At least one contact preference has to be True, this tests
-        that if all are set to False, it fails."""
+        """Test contact preferences.
 
+        At least one contact preference has to be True, this tests
+        that if all are set to False, it fails.
+        """
         url = reverse('api-v3:contact:list')
         response = self.api_client.post(url, {
             'first_name': 'Oratio',
@@ -225,7 +221,6 @@ class EditContactTestCase(LeelooTestCase):
 
     def test_edit(self):
         """Test that it successfully edits an existing contact."""
-
         contact = ContactFactory(first_name='Foo')
         url = reverse('api-v3:contact:detail', kwargs={'pk': contact.pk})
         response = self.api_client.patch(url, {
@@ -241,7 +236,6 @@ class ArchiveContactTestCase(LeelooTestCase):
 
     def test_archive_without_reason(self):
         """Test archive contact without providing a reason."""
-
         contact = ContactFactory()
         url = reverse('api-v3:contact:archive', kwargs={'pk': contact.pk})
         response = self.api_client.post(url)
@@ -252,7 +246,6 @@ class ArchiveContactTestCase(LeelooTestCase):
 
     def test_archive_with_reason(self):
         """Test archive contact providing a reason."""
-
         contact = ContactFactory()
         url = reverse('api-v3:contact:archive', kwargs={'pk': contact.pk})
         response = self.api_client.post(url, {'reason': 'foo'})
@@ -263,7 +256,6 @@ class ArchiveContactTestCase(LeelooTestCase):
 
     def test_unarchive(self):
         """Test unarchive contact."""
-
         contact = ContactFactory(archived=True, archived_reason='foo')
         url = reverse('api-v3:contact:unarchive', kwargs={'pk': contact.pk})
         response = self.api_client.get(url)
@@ -278,10 +270,41 @@ class ViewContactTestCase(LeelooTestCase):
 
     def test_view(self):
         """Test view."""
-
         contact = ContactFactory()
         url = reverse('api-v3:contact:detail', kwargs={'pk': contact.pk})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['id'] == contact.pk
+
+
+class ContactListTestCase(LeelooTestCase):
+    """List/filter contacts test case."""
+
+    def test_all(self):
+        """Test getting all contacts"""
+        ContactFactory.create_batch(5)
+
+        url = reverse('api-v3:contact:list')
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 5
+
+    def test_filter_by_company(self):
+        """Test getting contacts by company id"""
+        company1 = CompanyFactory()
+        company2 = CompanyFactory()
+
+        ContactFactory.create_batch(3, company=company1)
+        contacts = ContactFactory.create_batch(2, company=company2)
+
+        url = '{}?company_id={}'.format(
+            reverse('api-v3:contact:list'),
+            company2.id
+        )
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert {contact['id'] for contact in response.data['results']} == {contact.id for contact in contacts}

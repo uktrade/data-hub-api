@@ -54,6 +54,10 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'teams',
         'interactions'
     )
+    filter_backends = (
+        DjangoFilterBackend,
+    )
+    filter_fields = ['company_id']
 
     def perform_create(self, serializer):
         """Override create to inject the user from session."""
