@@ -33,7 +33,7 @@ def configure_connection():
         )
 
 
-def get_basic_search_query(term, entities=['company'], offset=0, limit=100):
+def get_basic_search_query(term, entities=('company',), offset=0, limit=100):
     """Performs basic search looking for name and then _all in entity.
 
     Also returns number of results in other entities.
@@ -59,15 +59,15 @@ def get_search_by_entity_query(term=None, filters=None, entity=None, offset=0, l
     )
 
     query_filter = []
-    for k, v in filter(lambda f: '.' not in f[0], filters.items()):
-        query_filter.append(Q('term', **{k: v}))
 
-    # query nested fields
-    for k, v in filter(lambda f: '.' in f[0], filters.items()):
-        query_filter.append(
-            Q('nested', path=k.split('.')[0],
-              query=Q('term', **{k: v}))
-        )
+    for k, v in filters.items():
+        if '.' not in k:
+            query_filter.append(Q('term', **{k: v}))
+        else:
+            # query nested fields
+            query_filter.append(
+                Q('nested', path=k.split('.')[0], query=Q('term', **{k: v}))
+            )
 
     s = Search(index=ES_INDEX).query('bool', must=query)
     s = s.post_filter('bool', must=query_filter)
@@ -88,22 +88,6 @@ def get_search_contact_query(**kwargs):
 def bulk(actions=None, chunk_size=None, **kwargs):
     """Send data in bulk to Elasticsearch."""
     return es_bulk(connections.get_connection(), actions=actions, chunk_size=chunk_size, **kwargs)
-
-
-def legacy_search_by_term_query(term, doc_type=None, offset=0, limit=100):
-    """Searches for term in the index."""
-    if doc_type:
-        q = Search(index=ES_INDEX).filter(
-            'multi_match', query=term, fields=['name^3', 'alias^3', '*_name', '*_postcode']
-        )
-        q = q.query('bool', filter=[Q('terms', _type=doc_type)])
-
-    else:
-        q = Search(index=ES_INDEX).query(Q(
-            'multi_match', query=term, fields=['name^3', 'alias^3', '*_name', '*_postcode']
-        ))
-
-    return q[offset:offset + limit]
 
 
 def document_exists(client, doc_type, document_id):
@@ -127,4 +111,4 @@ def remap_fields(filter):
         'trading_address_country': 'trading_address_country.id',
         'advisor': 'advisor.id',
     }
-    return dict(zip(map(lambda x: name_map.get(x, x), filter.keys()), filter.values()))
+    return {name_map.get(k, k): v for k, v in filter.items()}
