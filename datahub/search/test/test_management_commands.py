@@ -18,8 +18,10 @@ def test_id_name_dict():
 
     res = sync_es._id_name_dict(obj)
 
-    assert res['id'] == str(obj.id)
-    assert res['name'] == obj.name
+    assert res == {
+        'id': str(obj.id),
+        'name': obj.name,
+    }
 
 
 def test_id_type_dict():
@@ -30,8 +32,10 @@ def test_id_type_dict():
 
     res = sync_es._id_type_dict(obj)
 
-    assert res['id'] == str(obj.id)
-    assert res['type'] == obj.type
+    assert res == {
+        'id': str(obj.id),
+        'type': obj.type,
+    }
 
 
 def test_contact_dict():
@@ -43,9 +47,11 @@ def test_contact_dict():
 
     res = sync_es._contact_dict(obj)
 
-    assert res['id'] == str(obj.id)
-    assert res['first_name'] == obj.first_name
-    assert res['last_name'] == obj.last_name
+    assert res == {
+        'id': str(obj.id),
+        'first_name': obj.first_name,
+        'last_name': obj.last_name,
+    }
 
 
 def test_company_dict():
@@ -56,8 +62,10 @@ def test_company_dict():
 
     res = sync_es._company_dict(obj)
 
-    assert res['id'] == str(obj.id)
-    assert res['company_number'] == obj.company_number
+    assert res == {
+        'id': str(obj.id),
+        'company_number': obj.company_number,
+    }
 
 
 def test_model_to_dict():
@@ -88,10 +96,12 @@ def test_es_document():
     }
     res = sync_es._es_document(doc_type, source)
 
-    assert res['_index'] == settings.ES_INDEX
-    assert res['_type'] == doc_type
-    assert res['_id'] == source.get('id')
-    assert res['_source'] == source
+    assert res == {
+        '_index': settings.ES_INDEX,
+        '_type': doc_type,
+        '_id': source.get('id'),
+        '_source': source
+    }
 
 
 @mock.patch('datahub.search.management.commands.sync_es._model_to_dict')
