@@ -19,16 +19,19 @@ class DashboardTestCase(LeelooTestCase):
         api_response = self.api_client.post(url, {
             'first_name': 'Oratio',
             'last_name': 'Nelson',
-            'title': constants.Title.admiral_of_the_fleet.value.id,
-            'company': CompanyFactory().pk,
-            'role': constants.Role.owner.value.id,
+            'company': {
+                'id': CompanyFactory().pk
+            },
+            'job_title': constants.Role.owner.value.name,
             'email': 'foo@bar.com',
             'telephone_countrycode': '+44',
             'telephone_number': '123456789',
             'address_same_as_company': True,
             'primary': True,
             'contactable_by_email': True
-        })
+        }, format='json')
+
+        assert api_response.status_code == status.HTTP_201_CREATED
         interaction = InteractionFactory(dit_advisor=user)
 
         url = reverse('dashboard:intelligent-homepage')

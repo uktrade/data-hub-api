@@ -1,7 +1,12 @@
+from django.conf import settings
+
 from rest_framework import serializers
 
+from datahub.core.serializers import NestedRelatedField
 from datahub.interaction.models import Interaction
+from datahub.metadata import models as meta_models
 from datahub.metadata.serializers import NestedCountrySerializer, NestedTeamSerializer
+
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
 
 
@@ -127,7 +132,44 @@ class CompanySerializerWrite(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ContactSerializerWrite(serializers.ModelSerializer):
+class ContactSerializerV3(serializers.ModelSerializer):
+    """Contact serializer for writing operations V3."""
+
+    title = NestedRelatedField(
+        meta_models.Title, required=False, allow_null=True
+    )
+    company = NestedRelatedField(
+        Company, required=False, allow_null=True
+    )
+    advisor = NestedRelatedField(
+        Advisor, read_only=True,
+        extra_fields=('first_name', 'last_name')
+    )
+    address_country = NestedRelatedField(
+        meta_models.Country, required=False, allow_null=True
+    )
+    archived = serializers.BooleanField(read_only=True)
+    archived_on = serializers.DateTimeField(read_only=True)
+    archived_reason = serializers.CharField(read_only=True)
+    archived_by = NestedRelatedField(
+        settings.AUTH_USER_MODEL, read_only=True,
+        extra_fields=('first_name', 'last_name')
+    )
+
+    class Meta:  # noqa: D101
+        model = Contact
+        fields = (
+            'id', 'title', 'first_name', 'last_name', 'job_title', 'company', 'advisor',
+            'primary', 'telephone_countrycode', 'telephone_number', 'email',
+            'address_same_as_company', 'address_1', 'address_2', 'address_3', 'address_4',
+            'address_town', 'address_county', 'address_country', 'address_postcode',
+            'telephone_alternative', 'email_alternative', 'notes', 'contactable_by_dit',
+            'contactable_by_dit_partners', 'contactable_by_email', 'contactable_by_phone',
+            'archived', 'archived_on', 'archived_reason', 'archived_by'
+        )
+
+
+class ContactSerializerV1Write(serializers.ModelSerializer):
     """Contact serializer for writing operations."""
 
     class Meta:  # noqa: D101
@@ -135,7 +177,7 @@ class ContactSerializerWrite(serializers.ModelSerializer):
         exclude = ('teams', )
 
 
-class ContactSerializerRead(serializers.ModelSerializer):
+class ContactSerializerV1Read(serializers.ModelSerializer):
     """Contact serializer."""
 
     teams = NestedTeamSerializer(many=True)
