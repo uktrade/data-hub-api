@@ -89,6 +89,7 @@ def test_model_to_dict():
         'b': str(obj.b)
     }
 
+
 def test_es_document():
     """Tests _es_document."""
     doc_type = 'company'
