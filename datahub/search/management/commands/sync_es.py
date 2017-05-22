@@ -16,42 +16,6 @@ logger = getLogger(__name__)
 ES_INDEX = settings.ES_INDEX
 
 DataSet = namedtuple('DataSet', ('queryset', 'es_model',))
-FieldsColumnFn = namedtuple('FieldsColumnFn', ('fields', 'fn'))
-
-fields_column_fn = (
-    FieldsColumnFn(fields=('companies_house_data'),
-                   fn=lambda col: _company_dict(col)),
-    FieldsColumnFn(fields=('account_manager', 'archived_by', 'one_list_account_owner',),
-                   fn=lambda col: _contact_dict(col)),
-    FieldsColumnFn(fields=('business_type', 'classification', 'employee_range',
-                           'headquarter_type', 'parent', 'registered_address_country',
-                           'sector', 'trading_address_country', 'turnover_range', 'uk_region',
-                           'address_country', 'company', 'title',),
-                   fn=lambda col: _id_name_dict(col)),
-    FieldsColumnFn(fields=('interactions',),
-                   fn=lambda col: list(map(_id_type_dict, col.all()))),
-    FieldsColumnFn(fields=('contacts',),
-                   fn=lambda col: list(map(_contact_dict, col.all()))),
-    FieldsColumnFn(fields=('id',),
-                   fn=lambda col: str(col)),
-    FieldsColumnFn(fields=('export_to_countries', 'future_interest_countries',),
-                   fn=lambda col: list(map(_id_name_dict, col.all()))),
-)
-
-# there is no typo in 'servicedeliverys' :(
-_ignored_fields = (
-    'subsidiaries', 'servicedeliverys', 'investment_projects',
-    'investor_investment_projects', 'intermediate_investment_projects',
-    'investee_projects', 'recipient_investment_projects', 'teams',
-)
-
-
-def get_dataset():
-    """Returns dataset that will be synchronised with Elasticsearch."""
-    return (
-        DataSet(Company.objects.all(), ESCompany),
-        DataSet(Contact.objects.all(), ESContact),
-    )
 
 
 def _id_name_dict(obj):
@@ -86,7 +50,45 @@ def _company_dict(obj):
     }
 
 
-def _model_to_dict(model, fields_column_fn=fields_column_fn):
+FieldsColumnFn = namedtuple('FieldsColumnFn', ('fields', 'fn'))
+
+_fields_column_fn = (
+    FieldsColumnFn(fields=('companies_house_data'),
+                   fn=_company_dict),
+    FieldsColumnFn(fields=('account_manager', 'archived_by', 'one_list_account_owner',),
+                   fn=_contact_dict),
+    FieldsColumnFn(fields=('business_type', 'classification', 'employee_range',
+                           'headquarter_type', 'parent', 'registered_address_country',
+                           'sector', 'trading_address_country', 'turnover_range', 'uk_region',
+                           'address_country', 'company', 'title',),
+                   fn=_id_name_dict),
+    FieldsColumnFn(fields=('interactions',),
+                   fn=lambda col: list(map(_id_type_dict, col.all()))),
+    FieldsColumnFn(fields=('contacts',),
+                   fn=lambda col: list(map(_contact_dict, col.all()))),
+    FieldsColumnFn(fields=('id',),
+                   fn=lambda col: str(col)),
+    FieldsColumnFn(fields=('export_to_countries', 'future_interest_countries',),
+                   fn=lambda col: list(map(_id_name_dict, col.all()))),
+)
+
+# there is no typo in 'servicedeliverys' :(
+_ignored_fields = (
+    'subsidiaries', 'servicedeliverys', 'investment_projects',
+    'investor_investment_projects', 'intermediate_investment_projects',
+    'investee_projects', 'recipient_investment_projects', 'teams',
+)
+
+
+def get_dataset():
+    """Returns dataset that will be synchronised with Elasticsearch."""
+    return (
+        DataSet(Company.objects.all(), ESCompany),
+        DataSet(Contact.objects.all(), ESContact),
+    )
+
+
+def _model_to_dict(model, fields_column_fn=_fields_column_fn):
     """Converts model instance to a dictionary suitable for ElasticSearch."""
     result = {}
     for fcf in fields_column_fn:
