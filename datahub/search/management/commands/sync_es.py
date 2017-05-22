@@ -53,7 +53,7 @@ def _company_dict(obj):
 FieldsColumnFn = namedtuple('FieldsColumnFn', ('fields', 'fn'))
 
 _fields_column_fn = (
-    FieldsColumnFn(fields=('companies_house_data'),
+    FieldsColumnFn(fields=('companies_house_data', ),
                    fn=_company_dict),
     FieldsColumnFn(fields=('account_manager', 'archived_by', 'one_list_account_owner',),
                    fn=_contact_dict),
@@ -63,13 +63,13 @@ _fields_column_fn = (
                            'address_country', 'company', 'title',),
                    fn=_id_name_dict),
     FieldsColumnFn(fields=('interactions',),
-                   fn=lambda col: list(map(_id_type_dict, col.all()))),
+                   fn=lambda col: [_id_type_dict(c) for c in col.all()]),
     FieldsColumnFn(fields=('contacts',),
-                   fn=lambda col: list(map(_contact_dict, col.all()))),
+                   fn=lambda col: [_contact_dict(c) for c in col.all()]),
     FieldsColumnFn(fields=('id',),
                    fn=lambda col: str(col)),
     FieldsColumnFn(fields=('export_to_countries', 'future_interest_countries',),
-                   fn=lambda col: list(map(_id_name_dict, col.all()))),
+                   fn=lambda col: [_id_name_dict(c) for c in col.all()]),
 )
 
 # there is no typo in 'servicedeliverys' :(
@@ -93,7 +93,7 @@ def _model_to_dict(model, fields_column_fn=_fields_column_fn):
     result = {}
     for fcf in fields_column_fn:
         result.update({field: fcf.fn(getattr(model, field))
-                       for field in fcf.fields if hasattr(model, field) and getattr(model, field)})
+                       for field in fcf.fields if getattr(model, field, None)})
 
     fields = [field for field in model._meta.get_fields() if field.name not in _ignored_fields]
 
