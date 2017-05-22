@@ -14,7 +14,6 @@ contact_collection = ContactViewSetV3.as_view({
 
 contact_item = ContactViewSetV3.as_view({
     'get': 'retrieve',
-    'put': 'update',
     'patch': 'partial_update'
 })
 
