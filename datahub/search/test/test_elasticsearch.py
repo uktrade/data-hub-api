@@ -4,6 +4,7 @@ from datahub.search import elasticsearch
 
 
 def test_get_basic_search_query():
+    """Tests basic search query."""
     query = elasticsearch.get_basic_search_query('test', entities=('contact',), offset=5, limit=5)
 
     assert query.to_dict() == {
@@ -31,6 +32,7 @@ def test_get_basic_search_query():
 
 
 def test_search_by_entity_query():
+    """Tests search by entity."""
     filters = {
         'address_town': 'Woodside',
         'trading_address_country.id': '80756b9a-5d95-e211-a939-e4115bead28a',
@@ -78,6 +80,7 @@ def test_search_by_entity_query():
 
 @mock.patch('datahub.search.elasticsearch.get_search_by_entity_query')
 def test_get_search_company_query(get_search_by_entity_query):
+    """Tests detailed company search."""
     get_search_by_entity_query.return_value = {}
 
     elasticsearch.get_search_company_query(offset=0, limit=5)
@@ -87,6 +90,7 @@ def test_get_search_company_query(get_search_by_entity_query):
 
 @mock.patch('datahub.search.elasticsearch.get_search_by_entity_query')
 def test_get_search_contact_query(get_search_by_entity_query):
+    """Tests defailed contact search."""
     get_search_by_entity_query.return_value = {}
 
     elasticsearch.get_search_contact_query(offset=0, limit=5)
