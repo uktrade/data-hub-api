@@ -6,8 +6,11 @@ from rest_framework import mixins, viewsets
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSetV1, CoreViewSetV3
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
-from .serializers import (AdvisorSerializer, CompaniesHouseCompanySerializer, CompanySerializerRead,
-                          CompanySerializerWrite, ContactSerializerRead, ContactSerializerWrite)
+from .serializers import (
+    AdvisorSerializer, CompaniesHouseCompanySerializer, CompanySerializerRead,
+    CompanySerializerWrite, ContactSerializerV1Read, ContactSerializerV1Write,
+    ContactSerializerV3
+)
 
 
 class CompanyViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
@@ -41,11 +44,11 @@ class CompaniesHouseCompanyReadOnlyViewSetV1(
     lookup_field = 'company_number'
 
 
-class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
+class ContactViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
     """Contact ViewSet."""
 
-    read_serializer_class = ContactSerializerRead
-    write_serializer_class = ContactSerializerWrite
+    read_serializer_class = ContactSerializerV1Read
+    write_serializer_class = ContactSerializerV1Write
     queryset = Contact.objects.select_related(
         'title',
         'company',
@@ -53,6 +56,25 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     ).prefetch_related(
         'teams',
         'interactions'
+    )
+
+    def perform_create(self, serializer):
+        """Override create to inject the user from session."""
+        request = serializer.context['request']
+        serializer.save(advisor=request.user)
+
+
+class ContactViewSetV3(ArchivableViewSetMixin, CoreViewSetV3):
+    """Contact ViewSet v3."""
+
+    read_serializer_class = ContactSerializerV3
+    write_serializer_class = ContactSerializerV3
+    queryset = Contact.objects.select_related(
+        'title',
+        'company',
+        'advisor',
+        'address_country',
+        'archived_by'
     )
     filter_backends = (
         DjangoFilterBackend,
