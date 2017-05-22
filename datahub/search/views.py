@@ -19,7 +19,7 @@ class SearchBasicAPIView(APIView):
         term = request.query_params['term']
 
         entity = request.query_params.get('entity', 'company')
-        if entity not in ('company', 'contact', ):
+        if entity not in ('company', 'contact',):
             raise ValidationError('Entity is neither "company" nor "contact".')
 
         offset = int(request.query_params.get('offset', 0))
@@ -34,11 +34,11 @@ class SearchBasicAPIView(APIView):
 
         response = {
             'count': results.hits.total,
-            'aggregations': list(map(lambda x: {'count': x['doc_count'], 'entity': x['key']},
-                                     results.aggregations['count_by_type']['buckets'])),
+            'aggregations': [{'count': x['doc_count'], 'entity': x['key']}
+                             for x in results.aggregations['count_by_type']['buckets']],
         }
 
-        hits = list(map(lambda x: x.to_dict(), results.hits))
+        hits = [x.to_dict() for x in results.hits]
 
         if entity == 'company':
             response['companies'] = hits
