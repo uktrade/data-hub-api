@@ -1,6 +1,7 @@
 from unittest import mock
 
 import pytest
+from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.core import constants
@@ -9,7 +10,7 @@ from datahub.core.test_utils import LeelooTestCase
 pytestmark = pytest.mark.django_db
 
 
-@pytest.mark.usefixtures('client', 'setup_data')
+@pytest.mark.usefixtures('setup_data')
 class SearchTestCase(LeelooTestCase):
     """Tests search views."""
 
@@ -58,6 +59,25 @@ class SearchTestCase(LeelooTestCase):
         })
 
         assert response.data['count'] == 0
+
+    @mock.patch('datahub.search.views.elasticsearch.ES_INDEX', 'test')
+    def test_basic_search_companies_no_term(self):
+        """Tests case where there should be no results."""
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    @mock.patch('datahub.search.views.elasticsearch.ES_INDEX', 'test')
+    def test_basic_search_companies_invalid_entity(self):
+        """Tests case where there should be no results."""
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': 'test',
+            'entity': 'sloths',
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @mock.patch('datahub.search.views.elasticsearch.ES_INDEX', 'test')
     def test_basic_search_paging(self):

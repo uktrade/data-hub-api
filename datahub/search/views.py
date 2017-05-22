@@ -14,8 +14,14 @@ class SearchBasicAPIView(APIView):
 
     def get(self, request, format=None):
         """Performs basic search."""
+        if 'term' not in request.query_params:
+            raise ValidationError('Missing required "term" field.')
         term = request.query_params['term']
+
         entity = request.query_params.get('entity', 'company')
+        if entity not in ('company', 'contact', ):
+            raise ValidationError('Entity is neither "company" nor "contact".')
+
         offset = int(request.query_params.get('offset', 0))
         limit = int(request.query_params.get('limit', 100))
 
@@ -35,9 +41,9 @@ class SearchBasicAPIView(APIView):
         hits = list(map(lambda x: x.to_dict(), results.hits))
 
         if entity == 'company':
-            response.update({'companies': hits})
+            response['companies'] = hits
         elif entity == 'contact':
-            response.update({'contacts': hits})
+            response['contacts'] = hits
 
         return Response(data=response)
 
@@ -62,7 +68,7 @@ class SearchCompanyAPIView(APIView):
         if len(filters.keys()) == 0:
             raise ValidationError('Missing required at least one filter.')
 
-        original_query = request.data.get('original_query')
+        original_query = request.data.get('original_query', '')
 
         offset = int(request.query_params.get('offset', 0))
         limit = int(request.query_params.get('limit', 100))
@@ -76,7 +82,7 @@ class SearchCompanyAPIView(APIView):
 
         response = {
             'count': results.hits.total,
-            'results': list(map(lambda x: x.to_dict(), results.hits)),
+            'results': [x.to_dict() for x in results.hits],
         }
 
         return Response(data=response)
@@ -101,7 +107,7 @@ class SearchContactAPIView(APIView):
         if len(filters.keys()) == 0:
             raise ValidationError('Missing required at least one filter.')
 
-        original_query = request.data.get('original_query')
+        original_query = request.data.get('original_query', '')
 
         offset = int(request.data.get('offset', 0))
         limit = int(request.data.get('limit', 100))
@@ -115,7 +121,7 @@ class SearchContactAPIView(APIView):
 
         response = {
             'count': results.hits.total,
-            'results': list(map(lambda x: x.to_dict(), results.hits)),
+            'results': [x.to_dict() for x in results.hits],
         }
 
         return Response(data=response)

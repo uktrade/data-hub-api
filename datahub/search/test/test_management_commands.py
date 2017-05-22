@@ -74,18 +74,20 @@ def test_model_to_dict():
     obj.a = 123
     obj.b = 456
     obj.c = 'what?'
-    obj._meta = type('_Meta', (object,), {})()
+    obj._meta = mock.Mock()
     obj._meta.get_fields = lambda: []
 
-    fields_column_fn = sync_es.FieldsColumnFn(fields=('a', 'b'),
-                                              fn=lambda col: str(col)),
+    mapping = {
+        'a': str,
+        'b': str,
+    }
 
-    res = sync_es._model_to_dict(obj, fields_column_fn=fields_column_fn)
+    res = sync_es._model_to_dict(obj, mapping)
 
-    assert res['a'] == str(obj.a)
-    assert res['b'] == str(obj.b)
-    assert 'c' not in res
-
+    assert res == {
+        'a': str(obj.a),
+        'b': str(obj.b)
+    }
 
 def test_es_document():
     """Tests _es_document."""
@@ -115,7 +117,7 @@ def test_models_to_dict(model_to_dict):
         {}, {}
     )
 
-    res = list(sync_es._models_to_dict(data))
+    res = list(sync_es._models_to_dict(data, {}))
 
     assert len(res) == 2
 
@@ -147,8 +149,8 @@ def test_batch_rows():
 def test_sync_dataset(get_dataset, bulk):
     """Tests syncing dataset up to Elasticsearch."""
     get_dataset.return_value = (
-        sync_es.DataSet((CompanyFactory(), CompanyFactory(),), sync_es.ESCompany),
-        sync_es.DataSet((ContactFactory(),), sync_es.ESContact),
+        sync_es.DataSet((CompanyFactory(), CompanyFactory(),), sync_es.ESCompany, {}),
+        sync_es.DataSet((ContactFactory(),), sync_es.ESContact, {}),
     )
 
     management.call_command(sync_es.Command(), batch_size=1)

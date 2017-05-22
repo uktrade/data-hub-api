@@ -61,12 +61,13 @@ def get_search_by_entity_query(term=None, filters=None, entity=None, offset=0, l
     query_filter = []
 
     for k, v in filters.items():
+        term = Q('term', **{k: v})
         if '.' not in k:
-            query_filter.append(Q('term', **{k: v}))
+            query_filter.append(term)
         else:
             # query nested fields
             query_filter.append(
-                Q('nested', path=k.split('.')[0], query=Q('term', **{k: v}))
+                Q('nested', path=k.split('.')[0], query=term)
             )
 
     s = Search(index=ES_INDEX).query('bool', must=query)
