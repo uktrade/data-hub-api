@@ -4,10 +4,8 @@ from logging import getLogger
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.paginator import Paginator
-from raven.contrib.django.raven_compat.models import client
 
 from datahub.company.models import Company, Contact
-from datahub.core.utils import log_and_ignore_exceptions
 from datahub.search.elasticsearch import bulk
 from datahub.search.models import Company as ESCompany, Contact as ESContact
 
@@ -15,7 +13,7 @@ logger = getLogger(__name__)
 
 ES_INDEX = settings.ES_INDEX
 
-DataSet = namedtuple('DataSet', ('queryset', 'es_model',))
+DataSet = namedtuple('DataSet', ('queryset', 'es_model', 'mapping',))
 
 
 def _id_name_dict(obj):
@@ -50,27 +48,37 @@ def _company_dict(obj):
     }
 
 
-FieldsColumnFn = namedtuple('FieldsColumnFn', ('fields', 'fn'))
+_company_mappings = {
+    'companies_house_data': _company_dict,
+    'account_manager': _contact_dict,
+    'archived_by': _contact_dict,
+    'one_list_account_owner': _contact_dict,
+    'business_type': _id_name_dict,
+    'classification': _id_name_dict,
+    'employee_range': _id_name_dict,
+    'headquarter_type': _id_name_dict,
+    'parent': _id_name_dict,
+    'registered_address_country': _id_name_dict,
+    'sector': _id_name_dict,
+    'trading_address_country': _id_name_dict,
+    'turnover_range': _id_name_dict,
+    'uk_region': _id_name_dict,
+    'address_country': _id_name_dict,
+    'contacts': lambda col: [_contact_dict(c) for c in col.all()],
+    'id': str,
+    'interactions': lambda col: [_id_type_dict(c) for c in col.all()],
+    'export_to_countries': lambda col: [_id_name_dict(c) for c in col.all()],
+    'future_interest_countries': lambda col: [_id_name_dict(c) for c in col.all()],
+}
 
-_fields_column_fn = (
-    FieldsColumnFn(fields=('companies_house_data', ),
-                   fn=_company_dict),
-    FieldsColumnFn(fields=('account_manager', 'archived_by', 'one_list_account_owner',),
-                   fn=_contact_dict),
-    FieldsColumnFn(fields=('business_type', 'classification', 'employee_range',
-                           'headquarter_type', 'parent', 'registered_address_country',
-                           'sector', 'trading_address_country', 'turnover_range', 'uk_region',
-                           'address_country', 'company', 'title',),
-                   fn=_id_name_dict),
-    FieldsColumnFn(fields=('interactions',),
-                   fn=lambda col: [_id_type_dict(c) for c in col.all()]),
-    FieldsColumnFn(fields=('contacts',),
-                   fn=lambda col: [_contact_dict(c) for c in col.all()]),
-    FieldsColumnFn(fields=('id',),
-                   fn=lambda col: str(col)),
-    FieldsColumnFn(fields=('export_to_countries', 'future_interest_countries',),
-                   fn=lambda col: [_id_name_dict(c) for c in col.all()]),
-)
+_contact_mappings = {
+    'id': str,
+    'title': _id_name_dict,
+    'address_country': _id_name_dict,
+    'advisor': _id_name_dict,
+    'company': _company_dict,
+    'interactions': lambda col: [_id_type_dict(c) for c in col.all()],
+}
 
 # there is no typo in 'servicedeliverys' :(
 _ignored_fields = (
@@ -83,17 +91,15 @@ _ignored_fields = (
 def get_dataset():
     """Returns dataset that will be synchronised with Elasticsearch."""
     return (
-        DataSet(Company.objects.all(), ESCompany),
-        DataSet(Contact.objects.all(), ESContact),
+        DataSet(Company.objects.all(), ESCompany, _company_mappings),
+        DataSet(Contact.objects.all(), ESContact, _contact_mappings),
     )
 
 
-def _model_to_dict(model, fields_column_fn=_fields_column_fn):
+def _model_to_dict(model, column_mapping):
     """Converts model instance to a dictionary suitable for ElasticSearch."""
-    result = {}
-    for fcf in fields_column_fn:
-        result.update({field: fcf.fn(getattr(model, field))
-                       for field in fcf.fields if getattr(model, field, None)})
+    result = {col: fn(getattr(model, col)) for col, fn in column_mapping.items()
+              if getattr(model, col, None)}
 
     fields = [field for field in model._meta.get_fields() if field.name not in _ignored_fields]
 
@@ -114,10 +120,10 @@ def _es_document(doc_type, source):
     }
 
 
-def _models_to_dict(models):
+def _models_to_dict(models, mapping):
     """Converts models to dicts."""
     for row in models:
-        yield _model_to_dict(row)
+        yield _model_to_dict(row, mapping)
 
 
 def _dict_to_es(doc_type, d):
@@ -133,11 +139,13 @@ def _batch_rows(qs, batch_size=100):
         yield paginator.page(page).object_list
 
 
-def sync_dataset(dataset, doc_type, batch_size=1):
+def sync_dataset(item, batch_size=1):
     """Sends dataset to ElasticSearch in batches of batch_size."""
-    batches = _batch_rows(dataset, batch_size=batch_size)
+    batches = _batch_rows(item.queryset, batch_size=batch_size)
     for batch in batches:
-        actions = list(_dict_to_es(doc_type, _models_to_dict(batch)))
+        actions = list(_dict_to_es(item.es_model._doc_type.name,
+                                   _models_to_dict(batch, item.mapping)
+                                   ))
         bulk(actions=actions,
              chunk_size=len(actions),
              request_timeout=300,
@@ -146,7 +154,7 @@ def sync_dataset(dataset, doc_type, batch_size=1):
              )
 
 
-def sync_es(batch_size, dataset=None):
+def sync_es(batch_size, dataset):
     """Sends data to Elasticsearch."""
     # Makes sure mappings exist in Elasticsearch.
     # Those calls are idempotent
@@ -154,7 +162,7 @@ def sync_es(batch_size, dataset=None):
     ESContact.init(index=ES_INDEX)
 
     for item in dataset:
-        sync_dataset(item.queryset, item.es_model._doc_type.name, batch_size=batch_size)
+        sync_dataset(item, batch_size=batch_size)
 
 
 class Command(BaseCommand):
@@ -171,11 +179,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Handle."""
-        try:
-            sync_es(batch_size=options['batch_size'], dataset=get_dataset())
-        except Exception as e:
-            with log_and_ignore_exceptions():
-                client.captureException()
-
-            logger.exception('Failed to sync to ES.')
-            self.stderr.write(e)
+        sync_es(batch_size=options['batch_size'], dataset=get_dataset())
