@@ -62,7 +62,7 @@ class SearchTestCase(LeelooTestCase):
 
     @mock.patch('datahub.search.views.elasticsearch.ES_INDEX', 'test')
     def test_basic_search_companies_no_term(self):
-        """Tests case where there should be no results."""
+        """Tests case where there is not term provided."""
         url = reverse('api-v3:search:basic')
         response = self.api_client.get(url, {})
 
@@ -70,7 +70,7 @@ class SearchTestCase(LeelooTestCase):
 
     @mock.patch('datahub.search.views.elasticsearch.ES_INDEX', 'test')
     def test_basic_search_companies_invalid_entity(self):
-        """Tests case where there should be no results."""
+        """Tests case where provided entity is invalid."""
         url = reverse('api-v3:search:basic')
         response = self.api_client.get(url, {
             'term': 'test',
