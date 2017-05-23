@@ -53,20 +53,14 @@ class CoreViewSetV1(mixins.CreateModelMixin,
         serializer.save(**extra_data)
 
     def get_additional_data(self, create):
-        """
-        Returns additional data to be saved in the model instance.
+        """Returns additional data to be saved in the model instance.
+
+        Intended to be overridden by subclasses.
 
         :param create:  True for is a model instance is being created; False
                         for updates
         :return:        dict of additional data to be saved
         """
-        current_time = now()
-        extra_data = {
-            'modified_on': current_time
-        }
-        if create:
-            extra_data['created_on'] = current_time
-        return extra_data
-
+        return {}
 
 CoreViewSetV3 = CoreViewSetV1
