@@ -1,5 +1,4 @@
 from django.core.exceptions import ValidationError
-from django.utils.timezone import now
 from rest_framework import mixins
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.viewsets import GenericViewSet
@@ -62,5 +61,6 @@ class CoreViewSetV1(mixins.CreateModelMixin,
         :return:        dict of additional data to be saved
         """
         return {}
+
 
 CoreViewSetV3 = CoreViewSetV1
