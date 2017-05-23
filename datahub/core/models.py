@@ -56,7 +56,6 @@ class BaseConstantModel(models.Model):
 
     id = models.UUIDField(primary_key=True)
     name = models.TextField(blank=True)
-    selectable = models.BooleanField(default=True)
 
     class Meta:  # noqa: D101
         abstract = True
