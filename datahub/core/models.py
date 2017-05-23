@@ -6,8 +6,8 @@ from django.utils.timezone import now
 class BaseModel(models.Model):
     """Common fields for most of the models we use."""
 
-    created_on = models.DateTimeField(null=True, blank=True)
-    modified_on = models.DateTimeField(null=True, blank=True)
+    created_on = models.DateTimeField(null=True, blank=True, auto_now_add=True)
+    modified_on = models.DateTimeField(null=True, blank=True, auto_now=True)
 
     class Meta:  # noqa: D101
         abstract = True

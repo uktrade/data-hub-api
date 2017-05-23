@@ -18,8 +18,9 @@ class InteractionViewSetV1(CoreViewSetV1):
         'contact'
     ).all()
 
-    def get_additional_data(self, update):
-        """Override create to inject the user from session."""
-        data = super().get_additional_data(update)
-        data['dit_advisor'] = self.request.user
+    def get_additional_data(self, create):
+        """Set dit_advisor to the user on model instance creation."""
+        data = {}
+        if create:
+            data['dit_advisor'] = self.request.user
         return data
