@@ -5,7 +5,7 @@ from rest_framework import serializers
 from datahub.core.serializers import NestedRelatedField
 from datahub.interaction.models import Interaction
 from datahub.metadata import models as meta_models
-from datahub.metadata.serializers import NestedCountrySerializer, NestedTeamSerializer
+from datahub.metadata.serializers import NestedCountrySerializer
 
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
 
@@ -174,13 +174,12 @@ class ContactSerializerV1Write(serializers.ModelSerializer):
 
     class Meta:  # noqa: D101
         model = Contact
-        exclude = ('teams', )
+        fields = '__all__'
 
 
 class ContactSerializerV1Read(serializers.ModelSerializer):
     """Contact serializer."""
 
-    teams = NestedTeamSerializer(many=True)
     interactions = NestedInteractionSerializer(many=True)
     name = serializers.CharField()
     address_1 = serializers.SerializerMethodField()
