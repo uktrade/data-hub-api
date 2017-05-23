@@ -41,5 +41,26 @@ class CoreViewSetV1(mixins.CreateModelMixin,
         except ValidationError as e:
             raise DRFValidationError({'errors': e.message_dict})
 
+    def perform_create(self, serializer):
+        """Custom logic for creating the model instance."""
+        extra_data = self.get_additional_data(True)
+        serializer.save(**extra_data)
+
+    def perform_update(self, serializer):
+        """Custom logic for updating the model instance."""
+        extra_data = self.get_additional_data(False)
+        serializer.save(**extra_data)
+
+    def get_additional_data(self, create):
+        """Returns additional data to be saved in the model instance.
+
+        Intended to be overridden by subclasses.
+
+        :param create:  True for is a model instance is being created; False
+                        for updates
+        :return:        dict of additional data to be saved
+        """
+        return {}
+
 
 CoreViewSetV3 = CoreViewSetV1
