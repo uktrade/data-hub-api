@@ -10,7 +10,6 @@ class ConstantModelSerializer(serializers.Serializer):
 
     id = serializers.ReadOnlyField()
     name = serializers.ReadOnlyField()
-    selectable = serializers.BooleanField()
 
     class Meta:  # noqa: D101
         fields = '__all__'
