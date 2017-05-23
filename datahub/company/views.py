@@ -54,7 +54,6 @@ class ContactViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
         'company',
         'address_country',
     ).prefetch_related(
-        'teams',
         'interactions'
     )
 

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Country, Team
+from .models import Country
 
 
 class NestedCountrySerializer(serializers.ModelSerializer):
@@ -8,12 +8,4 @@ class NestedCountrySerializer(serializers.ModelSerializer):
 
     class Meta:  # noqa: D101
         model = Country
-        fields = '__all__'
-
-
-class NestedTeamSerializer(serializers.ModelSerializer):
-    """Nested Team serializer."""
-
-    class Meta:  # noqa: D101
-        model = Team
         fields = '__all__'
