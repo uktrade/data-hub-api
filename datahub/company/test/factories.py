@@ -72,14 +72,3 @@ class ContactFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'company.Contact'
-
-    @factory.post_generation
-    def teams(self, create, extracted, **kwargs):
-        """Deal with M2M teams."""
-        if not create:
-            return
-
-        if extracted:
-            # a list of teams were passed in, use them
-            for team in extracted:
-                self.teams.add(team)
