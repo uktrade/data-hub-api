@@ -279,7 +279,7 @@ class Contact(ArchivableModel, BaseModel):
         super().save(*args, **kwargs)
 
 
-class AdvisorManager(BaseUserManager):
+class AdviserManager(BaseUserManager):
     """Django user manager made friendly to not having username field."""
 
     use_in_migrations = True
@@ -335,7 +335,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField('date joined', default=now)
     enabled = models.BooleanField(default=False)
 
-    objects = AdvisorManager()
+    objects = AdviserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.AlterModelManagers(
             name='advisor',
             managers=[
-                ('objects', datahub.company.models.AdvisorManager()),
+                ('objects', datahub.company.models.AdviserManager()),
             ],
         ),
         migrations.AlterField(
