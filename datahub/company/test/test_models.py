@@ -10,17 +10,17 @@ pytestmark = pytest.mark.django_db
 def test_company_can_have_one_list_owner_assigned():
     """Test that company can have one list owner assigned."""
     company = CompanyFactory()
-    advisor = AdvisorFactory()
+    adviser = AdvisorFactory()
 
     assert company.one_list_account_owner is None  # Test that it's nullable
 
-    company.one_list_account_owner = advisor
+    company.one_list_account_owner = adviser
     company.save()
 
     # re-fetch object for completeness
     company_refetch = Company.objects.get(pk=str(company.pk))
 
-    assert str(company_refetch.one_list_account_owner_id) == str(advisor.pk)
+    assert str(company_refetch.one_list_account_owner_id) == str(adviser.pk)
 
 
 def test_company_can_have_hierarchy():

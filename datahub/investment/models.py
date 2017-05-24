@@ -58,7 +58,7 @@ class IProjectAbstract(models.Model):
         'company.Advisor', related_name='investment_projects', null=True,
         blank=True
     )
-    referral_source_advisor = models.ForeignKey(
+    referral_source_adviser = models.ForeignKey(
         'company.Advisor', related_name='referred_investment_projects',
         null=True, blank=True
     )
@@ -181,7 +181,7 @@ class IProjectTeamAbstract(models.Model):
     project_manager = models.ForeignKey(
         'company.Advisor', null=True, related_name='+', blank=True
     )
-    project_assurance_advisor = models.ForeignKey(
+    project_assurance_adviser = models.ForeignKey(
         'company.Advisor', null=True, related_name='+', blank=True
     )
 
@@ -195,8 +195,8 @@ class IProjectTeamAbstract(models.Model):
     @property
     def project_assurance_team(self):
         """The DIT team associated with the project assurance advisor."""
-        if self.project_assurance_advisor:
-            return self.project_assurance_advisor.dit_team
+        if self.project_assurance_adviser:
+            return self.project_assurance_adviser.dit_team
         return None
 
     @property

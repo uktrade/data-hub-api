@@ -13,7 +13,7 @@ class InteractionViewSetV1(CoreViewSetV1):
     write_serializer_class = InteractionSerializerWrite
     queryset = Interaction.objects.select_related(
         'interaction_type',
-        'dit_advisor',
+        'dit_adviser',
         'company',
         'contact'
     ).all()
@@ -22,5 +22,5 @@ class InteractionViewSetV1(CoreViewSetV1):
         """Set dit_advisor to the user on model instance creation."""
         data = {}
         if create:
-            data['dit_advisor'] = self.request.user
+            data['dit_adviser'] = self.request.user
         return data

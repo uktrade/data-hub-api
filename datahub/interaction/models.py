@@ -23,7 +23,7 @@ class InteractionAbstract(BaseModel):
     )
     service = models.ForeignKey('metadata.Service', null=True)
     subject = models.TextField()
-    dit_advisor = models.ForeignKey(
+    dit_adviser = models.ForeignKey(
         'company.Advisor',
         related_name="%(class)ss",  # noqa: Q000
         null=True,
@@ -74,7 +74,7 @@ class ServiceDelivery(InteractionAbstract):
         ('company', 'Company'),
         ('contact', 'Contact'),
         ('country_of_interest', 'Country'),
-        ('dit_advisor', 'Advisor'),
+        ('dit_adviser', 'Advisor'),
         ('dit_team', 'Team'),
         ('sector', 'Sector'),
         ('service', 'Service'),

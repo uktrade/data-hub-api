@@ -141,7 +141,7 @@ class ContactSerializerV3(serializers.ModelSerializer):
     company = NestedRelatedField(
         Company, required=False, allow_null=True
     )
-    advisor = NestedRelatedField(
+    adviser = NestedRelatedField(
         Advisor, read_only=True,
         extra_fields=('first_name', 'last_name')
     )
@@ -159,7 +159,7 @@ class ContactSerializerV3(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = Contact
         fields = (
-            'id', 'title', 'first_name', 'last_name', 'job_title', 'company', 'advisor',
+            'id', 'title', 'first_name', 'last_name', 'job_title', 'company', 'adviser',
             'primary', 'telephone_countrycode', 'telephone_number', 'email',
             'address_same_as_company', 'address_1', 'address_2', 'address_3', 'address_4',
             'address_town', 'address_county', 'address_country', 'address_postcode',

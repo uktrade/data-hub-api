@@ -38,7 +38,8 @@ class ServiceDeliveriesRepoTestCase(TestCase):
             'service': {'data': {'id': str(service_delivery.service.pk), 'type': 'Service'}},
             'dit_team': {'data': {'id': str(service_delivery.dit_team.pk), 'type': 'Team'}},
             'uk_region': {'data': {'id': str(service_delivery.uk_region.pk), 'type': 'UKRegion'}},
-            'dit_advisor': {'data': {'id': str(service_delivery.dit_advisor.pk), 'type': 'Advisor'}}
+            'dit_adviser': {'data': {'id': str(
+                service_delivery.dit_adviser.pk), 'type': 'Advisor'}}
         }
         assert data['relationships'] == expected_relationships
         assert data['relationships']['company']['data']['type'] == 'Company'
@@ -96,7 +97,7 @@ class ServiceDeliveriesRepoTestCase(TestCase):
                         'id': str(service_offer.dit_team.pk)
                     }
                 },
-                'dit_advisor': {
+                'dit_adviser': {
                     'data': {
                         'type': 'Advisor',
                         'id': str(user.pk)
@@ -116,7 +117,7 @@ class ServiceDeliveriesRepoTestCase(TestCase):
         assert data['attributes'] == expected_attributes
         assert data['type'] == 'ServiceDelivery'
         expected_relationships = {
-            'dit_advisor': {'data': {'type': 'Advisor', 'id': str(user.pk)}},
+            'dit_adviser': {'data': {'type': 'Advisor', 'id': str(user.pk)}},
             'status': {'data': {
                 'type': 'ServiceDeliveryStatus', 'id': constants.ServiceDeliveryStatus.offered.value.id}
             },

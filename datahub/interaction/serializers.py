@@ -7,7 +7,7 @@ from .models import Interaction
 class InteractionSerializerRead(serializers.ModelSerializer):
     """Interaction Serializer."""
 
-    dit_advisor = AdvisorSerializer()
+    dit_adviser = AdvisorSerializer()
 
     class Meta:  # noqa: D101
         model = Interaction

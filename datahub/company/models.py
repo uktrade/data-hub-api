@@ -197,7 +197,7 @@ class Contact(ArchivableModel, BaseModel):
     last_name = models.CharField(max_length=MAX_LENGTH)
     job_title = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
     company = models.ForeignKey('Company', related_name='contacts', null=True, blank=True)
-    advisor = models.ForeignKey('Advisor', related_name='contacts', null=True, blank=True)
+    adviser = models.ForeignKey('Advisor', related_name='contacts', null=True, blank=True)
     primary = models.BooleanField()
     telephone_countrycode = models.CharField(max_length=MAX_LENGTH)
     telephone_number = models.CharField(max_length=MAX_LENGTH)

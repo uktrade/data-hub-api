@@ -182,17 +182,17 @@ def test_validate_team_fail():
     project = InvestmentProjectFactory(sector_id=None)
     errors = get_incomplete_team_fields(instance=project)
     assert errors == {
-        'project_assurance_advisor': 'This field is required.',
+        'project_assurance_adviser': 'This field is required.',
         'project_manager': 'This field is required.'
     }
 
 
 def test_validate_team_instance_success():
     """Tests validating a complete team section using a model instance."""
-    advisor = AdvisorFactory()
+    adviser = AdvisorFactory()
     project = InvestmentProjectFactory(
-        project_manager=advisor,
-        project_assurance_advisor=advisor
+        project_manager=adviser,
+        project_assurance_adviser=adviser
     )
     errors = get_incomplete_team_fields(instance=project)
     assert not errors
