@@ -48,7 +48,7 @@ class ServiceDeliveryListViewV2(APIView):
         """Add the advisor id to the data."""
         data = dict(request.data)
         data['relationships'].update({
-            'dit_advisor': {
+            'dit_adviser': {
                 'data': {
                     'type': 'Advisor',
                     'id': encoding.force_text(request.user.pk)}

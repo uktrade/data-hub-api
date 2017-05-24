@@ -25,7 +25,7 @@ class IProjectViewSet(CoreViewSetV3):
         'intermediate_company',
         'investment_recipient_company',
         'client_relationship_manager',
-        'referral_source_advisor',
+        'referral_source_adviser',
         'referral_source_activity',
         'referral_source_activity_website',
         'referral_source_activity_marketing',
@@ -89,8 +89,8 @@ class IProjectTeamViewSet(CoreViewSetV3):
     queryset = InvestmentProject.objects.select_related(
         'project_manager',
         'project_manager__dit_team',
-        'project_assurance_advisor',
-        'project_assurance_advisor__dit_team'
+        'project_assurance_adviser',
+        'project_assurance_adviser__dit_team'
     )
 
     def get_view_name(self):

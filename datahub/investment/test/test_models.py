@@ -37,8 +37,8 @@ def test_project_manager_team_none():
 def test_project_manager_team_valid():
     """Tests project_manager_team for a project with a project manager."""
     huk_team = constants.Team.healthcare_uk.value
-    advisor = AdvisorFactory(dit_team_id=huk_team.id)
-    project = InvestmentProjectFactory(project_manager_id=advisor.id)
+    adviser = AdvisorFactory(dit_team_id=huk_team.id)
+    project = InvestmentProjectFactory(project_manager_id=adviser.id)
     assert str(project.project_manager_team.id) == huk_team.id
 
 
@@ -51,6 +51,6 @@ def test_project_assurance_team_none():
 def test_project_assurance_team_valid():
     """Tests project_assurance_team for a project w/ an assurance advisor."""
     huk_team = constants.Team.healthcare_uk.value
-    advisor = AdvisorFactory(dit_team_id=huk_team.id)
-    project = InvestmentProjectFactory(project_assurance_advisor_id=advisor.id)
+    adviser = AdvisorFactory(dit_team_id=huk_team.id)
+    project = InvestmentProjectFactory(project_assurance_adviser_id=adviser.id)
     assert str(project.project_assurance_team.id) == huk_team.id

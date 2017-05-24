@@ -30,7 +30,7 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     sector_id = Sector.aerospace_assembly_aircraft.value.id
     investor_company = factory.SubFactory(CompanyFactory)
     client_relationship_manager = factory.SubFactory(AdvisorFactory)
-    referral_source_advisor = factory.SubFactory(AdvisorFactory)
+    referral_source_adviser = factory.SubFactory(AdvisorFactory)
     project_shareable = False
     business_activities = [InvestmentBusinessActivity.retail.value.id]
     created_on = now()

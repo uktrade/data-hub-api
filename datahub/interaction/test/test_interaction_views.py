@@ -29,7 +29,7 @@ class InteractionTestCase(LeelooTestCase):
             'interaction_type': constants.InteractionType.business_card.value.id,
             'subject': 'whatever',
             'date': now().isoformat(),
-            'dit_advisor': AdvisorFactory().pk,
+            'dit_adviser': AdvisorFactory().pk,
             'notes': 'hello',
             'company': CompanyFactory().pk,
             'contact': ContactFactory().pk,
@@ -39,7 +39,7 @@ class InteractionTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
-        assert response_data['dit_advisor'] == str(self.user.pk)
+        assert response_data['dit_adviser'] == str(self.user.pk)
         assert response_data['modified_on'] == '2017-04-18T13:25:30.986208'
         assert response_data['created_on'] == '2017-04-18T13:25:30.986208'
 

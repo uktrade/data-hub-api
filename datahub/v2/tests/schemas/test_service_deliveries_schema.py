@@ -136,7 +136,7 @@ def test_service_deliveries_schema_invalid():
     expected = {
         'id': 'Invalid UUID string',
         'type': 'Value must be ServiceDelivery',
-        'relationships.dit_advisor': 'Required',
+        'relationships.dit_adviser': 'Required',
         'relationships.country_of_interest': 'type flibble should be Country',
         'relationships.event': 'type event should be Event',
         'relationships.status': 'type Status should be ServiceDeliveryStatus'}
@@ -189,7 +189,7 @@ def test_service_deliveries_valid_schema():
                     'id': str(uuid.uuid4()),
                 }
             },
-            'dit_advisor': {
+            'dit_adviser': {
                 'data': {
                     'type': 'Advisor',
                     'id': str(user.pk)

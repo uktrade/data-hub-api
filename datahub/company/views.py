@@ -61,7 +61,7 @@ class ContactViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
         """Set advisor to the user on model instance creation."""
         data = {}
         if create:
-            data['advisor'] = self.request.user
+            data['adviser'] = self.request.user
         return data
 
 
@@ -73,7 +73,7 @@ class ContactViewSetV3(ArchivableViewSetMixin, CoreViewSetV3):
     queryset = Contact.objects.select_related(
         'title',
         'company',
-        'advisor',
+        'adviser',
         'address_country',
         'archived_by'
     )
@@ -86,7 +86,7 @@ class ContactViewSetV3(ArchivableViewSetMixin, CoreViewSetV3):
         """Set advisor to the user on model instance creation."""
         data = {}
         if create:
-            data['advisor'] = self.request.user
+            data['adviser'] = self.request.user
         return data
 
 

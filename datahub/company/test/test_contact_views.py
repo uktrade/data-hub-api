@@ -46,7 +46,7 @@ class AddContactV1TestCase(LeelooTestCase):
             'address_postcode': None,
             'address_same_as_company': True,
             'address_town': None,
-            'advisor': str(self.user.pk),
+            'adviser': str(self.user.pk),
             'archived': False,
             'archived_by': None,
             'archived_on': None,
@@ -352,7 +352,7 @@ class AddContactV3TestCase(LeelooTestCase):
                 'id': company.pk,
                 'name': company.name
             },
-            'advisor': {
+            'adviser': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
                 'last_name': self.user.last_name
@@ -562,7 +562,7 @@ class EditContactV3TestCase(LeelooTestCase):
             email='foo@bar.com',
             email_alternative='foo2@bar.com',
             primary=True,
-            advisor=self.user,
+            adviser=self.user,
             telephone_countrycode='+44',
             telephone_number='123456789',
             telephone_alternative='987654321',
@@ -604,7 +604,7 @@ class EditContactV3TestCase(LeelooTestCase):
             'email': 'foo@bar.com',
             'email_alternative': 'foo2@bar.com',
             'primary': True,
-            'advisor': {
+            'adviser': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
                 'last_name': self.user.last_name
@@ -697,7 +697,7 @@ class ViewContactV3TestCase(LeelooTestCase):
             email='foo@bar.com',
             email_alternative='foo2@bar.com',
             primary=True,
-            advisor=self.user,
+            adviser=self.user,
             telephone_countrycode='+44',
             telephone_number='123456789',
             telephone_alternative='987654321',
@@ -733,7 +733,7 @@ class ViewContactV3TestCase(LeelooTestCase):
                 'id': company.pk,
                 'name': company.name
             },
-            'advisor': {
+            'adviser': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
                 'last_name': self.user.last_name
