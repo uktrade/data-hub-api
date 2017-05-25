@@ -1,8 +1,9 @@
 from django.conf import settings
 from rest_framework import serializers
 
-from datahub.company.models import Advisor, Company, Contact
+from datahub.company.models import Advisor, Company
 from datahub.core.serializers import NestedRelatedField
+from datahub.leads.models import BusinessLead
 from datahub.metadata import models as meta_models
 
 
@@ -28,7 +29,7 @@ class BusinessLeadSerializer(serializers.ModelSerializer):
     )
 
     class Meta:  # noqa: D101
-        model = Contact
+        model = BusinessLead
         fields = (
             'id', 'first_name', 'last_name', 'job_title', 'company_name',
             'company', 'advisor', 'telephone_number', 'email',
