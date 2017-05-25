@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import datahub.company.models
 import datahub.company.validators
 from django.conf import settings
+from django.contrib.postgres.operations import CITextExtension
 import django.contrib.postgres.fields.citext
 from django.db import migrations, models
 import django.db.models.deletion
@@ -24,6 +25,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        CITextExtension(),
         migrations.CreateModel(
             name='Advisor',
             fields=[
