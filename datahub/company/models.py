@@ -3,6 +3,7 @@ import uuid
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.postgres.fields.citext import CICharField
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.db import models
@@ -11,7 +12,6 @@ from django.utils.timezone import now
 
 from datahub.company.validators import RelaxedURLValidator
 from datahub.core import constants
-from datahub.core import fields as core_fields
 from datahub.core.models import ArchivableModel, BaseModel
 from datahub.metadata import models as metadata_models
 
@@ -317,7 +317,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     first_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     last_name = models.CharField(max_length=MAX_LENGTH, blank=True)
-    email = core_fields.CICharField(max_length=MAX_LENGTH, unique=True)  # CDMS users may not have tld
+    email = CICharField(max_length=MAX_LENGTH, unique=True)  # CDMS users may not have tld
     dit_team = models.ForeignKey(metadata_models.Team, null=True)
     is_staff = models.BooleanField(
         'staff status',
