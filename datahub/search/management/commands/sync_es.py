@@ -91,8 +91,8 @@ _ignored_fields = (
 def get_dataset():
     """Returns dataset that will be synchronised with Elasticsearch."""
     return (
-        DataSet(Company.objects.all(), ESCompany, _company_mappings),
-        DataSet(Contact.objects.all(), ESContact, _contact_mappings),
+        DataSet(Company.objects.all().order_by('pk'), ESCompany, _company_mappings),
+        DataSet(Contact.objects.all().order_by('pk'), ESContact, _contact_mappings),
     )
 
 

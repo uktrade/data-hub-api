@@ -150,8 +150,8 @@ def test_batch_rows():
 def test_sync_dataset(get_dataset, bulk):
     """Tests syncing dataset up to Elasticsearch."""
     get_dataset.return_value = (
-        sync_es.DataSet((CompanyFactory(), CompanyFactory(),), sync_es.ESCompany, {}),
-        sync_es.DataSet((ContactFactory(),), sync_es.ESContact, {}),
+        sync_es.DataSet([CompanyFactory(), CompanyFactory()], sync_es.ESCompany, {}),
+        sync_es.DataSet([ContactFactory()], sync_es.ESContact, {}),
     )
 
     management.call_command(sync_es.Command(), batch_size=1)
