@@ -15,6 +15,6 @@ lead_item = BusinessLeadViewSet.as_view({
 })
 
 urlpatterns = [
-    url(r'^business-leads', lead_collection, name='lead'),
-    url(r'^business-leads/(?P<pk>[0-9a-z-]{36})', lead_item, name='lead-item')
+    url(r'^business-leads$', lead_collection, name='lead-collection'),
+    url(r'^business-leads/(?P<pk>[0-9a-z-]{36})$', lead_item, name='lead-item')
 ]

@@ -17,10 +17,20 @@ class BusinessLeadViewsTestCase(LeelooTestCase):
         """
         lead_this_user = BusinessLeadFactory(advisor=self.user)
         BusinessLeadFactory()  # this lead is attached to another user
-        url = reverse('api-v3:business-leads:lead')
+        url = reverse('api-v3:business-leads:lead-collection')
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['count'] == 1
         assert response_data['results'][0]['id'] == str(lead_this_user.id)
+
+    def test_get_other_user_lead_fail(self):
+        """Tests that getting a lead belonging to another user fails."""
+        lead = BusinessLeadFactory()  # this lead is attached to another user
+        url = reverse('api-v3:business-leads:lead-item', kwargs={
+            'pk': lead.pk
+        })
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
