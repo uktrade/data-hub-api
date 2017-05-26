@@ -789,11 +789,8 @@ class ContactListV3TestCase(LeelooTestCase):
         ContactFactory.create_batch(3, company=company1)
         contacts = ContactFactory.create_batch(2, company=company2)
 
-        url = '{}?company_id={}'.format(
-            reverse('api-v3:contact:list'),
-            company2.id
-        )
-        response = self.api_client.get(url)
+        url = reverse('api-v3:contact:list')
+        response = self.api_client.get(url, {'company_id': company2.id})
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2

@@ -63,11 +63,8 @@ class InteractionTestCase(LeelooTestCase):
         InteractionFactory.create_batch(3, contact=contact1)
         interactions = InteractionFactory.create_batch(2, contact=contact2)
 
-        url = '{}?contact_id={}'.format(
-            reverse('api-v1:interaction-list'),
-            contact2.id
-        )
-        response = self.api_client.get(url)
+        url = reverse('api-v1:interaction-list')
+        response = self.api_client.get(url, {'contact_id': contact2.id})
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
