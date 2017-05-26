@@ -2,12 +2,13 @@
 
 from django_filters.rest_framework import DjangoFilterBackend
 
+from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.leads.models import BusinessLead
 from datahub.leads.serializers import BusinessLeadSerializer
 
 
-class BusinessLeadViewSet(CoreViewSetV3):
+class BusinessLeadViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     """
     Business lead views.
 

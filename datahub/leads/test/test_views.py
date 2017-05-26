@@ -1,10 +1,15 @@
 """Tests for business lead views."""
 
+from datetime import datetime
+
+from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import LeelooTestCase
 from datahub.leads.test.factories import BusinessLeadFactory
+
+FROZEN_TIME = '2017-04-18T13:25:30.986208'
 
 
 class BusinessLeadViewsTestCase(LeelooTestCase):
@@ -159,3 +164,40 @@ class BusinessLeadViewsTestCase(LeelooTestCase):
             'company_name': ['Company name or first name and last name '
                              'required']
         }
+
+    @freeze_time(FROZEN_TIME)
+    def test_archive_success(self):
+        """Tests archiving a business lead."""
+        lead = BusinessLeadFactory(advisor=self.user)
+        url = reverse('api-v3:business-leads:archive-lead-item', kwargs={
+            'pk': lead.pk
+        })
+        request_data = {
+            'reason': 'archive test'
+        }
+        response = self.api_client.post(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['archived'] is True
+        assert response_data['archived_by']['id'] == str(self.user.pk)
+        assert response_data['archived_reason'] == 'archive test'
+        assert response_data['archived_on'] == FROZEN_TIME
+
+    def test_unarchive_success(self):
+        """Tests unarchiving a business lead."""
+        lead = BusinessLeadFactory(
+            advisor=self.user, archived=True, archived_by=self.user,
+            archived_reason='unarchive test', archived_on=datetime(2016, 1, 1)
+        )
+        url = reverse('api-v3:business-leads:unarchive-lead-item', kwargs={
+            'pk': lead.pk
+        })
+        response = self.api_client.post(url, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['archived'] is False
+        assert response_data['archived_by'] is None
+        assert response_data['archived_reason'] == ''
+        assert response_data['archived_on'] is None
