@@ -107,7 +107,7 @@ class Contact(DocType):
     address_country = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
     advisor = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
     archived_by = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
-    company = Nested(properties={'id': String(index='not_analyzed'), 'company_number': String()})
+    company = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
 
     class Meta:
         """Default document meta data."""

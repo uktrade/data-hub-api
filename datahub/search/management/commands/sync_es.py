@@ -76,7 +76,7 @@ _contact_mappings = {
     'title': _id_name_dict,
     'address_country': _id_name_dict,
     'advisor': _id_name_dict,
-    'company': _company_dict,
+    'company': _id_name_dict,
     'interactions': lambda col: [_id_type_dict(c) for c in col.all()],
 }
 
