@@ -54,3 +54,21 @@ class InteractionTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['subject'] == 'I am another subject'
+
+    def test_list_filtered(self):
+        """List of interactions filtered by contact"""
+        contact1 = ContactFactory()
+        contact2 = ContactFactory()
+
+        InteractionFactory.create_batch(3, contact=contact1)
+        interactions = InteractionFactory.create_batch(2, contact=contact2)
+
+        url = '{}?contact_id={}'.format(
+            reverse('api-v1:interaction-list'),
+            contact2.id
+        )
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert {i['id'] for i in response.data['results']} == {str(i.id) for i in interactions}
