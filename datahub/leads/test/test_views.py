@@ -87,7 +87,7 @@ class BusinessLeadViewsTestCase(LeelooTestCase):
         """Tests successfully creating a business lead."""
 
         url = reverse('api-v3:business-leads:lead-collection')
-        request_data =  {
+        request_data = {
             'first_name': 'First name',
             'last_name': 'Last name',
             'telephone_number': '+44 7000 123456'
@@ -101,3 +101,63 @@ class BusinessLeadViewsTestCase(LeelooTestCase):
         assert (response_data['telephone_number'] == request_data[
             'telephone_number'])
         assert response_data['advisor']['id'] == str(self.user.pk)
+
+    def test_create_lead_failure(self):
+        """Tests creating a business lead without required fields."""
+
+        url = reverse('api-v3:business-leads:lead-collection')
+        request_data = {}
+        response = self.api_client.post(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'first_name': ['Company name or first name and last name '
+                           'required'],
+            'last_name': ['Company name or first name and last name required'],
+            'company_name': ['Company name or first name and last name '
+                             'required'],
+            'email': ['Email address or phone number required'],
+            'telephone_number': ['Email address or phone number required']
+        }
+
+    def test_patch_success(self):
+        """Tests updating a business lead."""
+        lead = BusinessLeadFactory(advisor=self.user)
+        url = reverse('api-v3:business-leads:lead-item', kwargs={
+            'pk': lead.pk
+        })
+        request_data = {
+            'first_name': 'New first name',
+            'email_alternative': 'altemail@blah.com'
+        }
+        response = self.api_client.patch(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['first_name'] == request_data['first_name']
+        assert (response_data['email_alternative'] == request_data[
+            'email_alternative'])
+
+    def test_patch_failure(self):
+        """Tests updating a business lead."""
+        lead = BusinessLeadFactory(advisor=self.user)
+        url = reverse('api-v3:business-leads:lead-item', kwargs={
+            'pk': lead.pk
+        })
+        request_data = {
+            'first_name': None,
+            'company_name': None,
+            'company': None
+        }
+        response = self.api_client.patch(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'first_name': ['Company name or first name and last name '
+                           'required'],
+            'last_name': ['Company name or first name and last name required'],
+            'company_name': ['Company name or first name and last name '
+                             'required']
+        }
