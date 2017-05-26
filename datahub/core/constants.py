@@ -321,7 +321,7 @@ class Sector(Enum):
 
 
 class Title(Enum):
-    """"Titles."""
+    """Titles."""
 
     admiral = Constant('Admiral', 'c1d9b924-6095-e211-a939-e4115bead28a')
     admiral_of_the_fleet = Constant('Admiral of the Fleet', 'c2d9b924-6095-e211-a939-e4115bead28a')

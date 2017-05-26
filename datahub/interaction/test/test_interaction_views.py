@@ -1,4 +1,5 @@
 from django.utils.timezone import now
+from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -14,15 +15,16 @@ class InteractionTestCase(LeelooTestCase):
     def test_interaction_detail_view(self):
         """Interaction detail view."""
         interaction = InteractionFactory()
-        url = reverse('v1:interaction-detail', kwargs={'pk': interaction.pk})
+        url = reverse('api-v1:interaction-detail', kwargs={'pk': interaction.pk})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['id'] == str(interaction.pk)
 
+    @freeze_time('2017-04-18 13:25:30.986208+00:00')
     def test_add_interaction(self):
         """Test add new interaction."""
-        url = reverse('v1:interaction-list')
+        url = reverse('api-v1:interaction-list')
         response = self.api_client.post(url, {
             'interaction_type': constants.InteractionType.business_card.value.id,
             'subject': 'whatever',
@@ -36,12 +38,16 @@ class InteractionTestCase(LeelooTestCase):
         })
 
         assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data['dit_advisor'] == str(self.user.pk)
+        assert response_data['modified_on'] == '2017-04-18T13:25:30.986208'
+        assert response_data['created_on'] == '2017-04-18T13:25:30.986208'
 
     def test_modify_interaction(self):
         """Modify an existing interaction."""
         interaction = InteractionFactory(subject='I am a subject')
 
-        url = reverse('v1:interaction-detail', kwargs={'pk': interaction.pk})
+        url = reverse('api-v1:interaction-detail', kwargs={'pk': interaction.pk})
         response = self.api_client.patch(url, {
             'subject': 'I am another subject',
         })

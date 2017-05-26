@@ -3,6 +3,7 @@ import uuid
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.postgres.fields.citext import CICharField
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.db import models
@@ -11,7 +12,6 @@ from django.utils.timezone import now
 
 from datahub.company.validators import RelaxedURLValidator
 from datahub.core import constants
-from datahub.core import fields as core_fields
 from datahub.core.models import ArchivableModel, BaseModel
 from datahub.metadata import models as metadata_models
 
@@ -196,10 +196,9 @@ class Contact(ArchivableModel, BaseModel):
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
     job_title = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    company = models.ForeignKey('Company', related_name='contacts', null=True)
+    company = models.ForeignKey('Company', related_name='contacts', null=True, blank=True)
     advisor = models.ForeignKey('Advisor', related_name='contacts', null=True, blank=True)
     primary = models.BooleanField()
-    teams = models.ManyToManyField(metadata_models.Team, blank=True)
     telephone_countrycode = models.CharField(max_length=MAX_LENGTH)
     telephone_number = models.CharField(max_length=MAX_LENGTH)
     email = models.EmailField()
@@ -210,7 +209,7 @@ class Contact(ArchivableModel, BaseModel):
     address_4 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    address_country = models.ForeignKey(metadata_models.Country, null=True)
+    address_country = models.ForeignKey(metadata_models.Country, null=True, blank=True)
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     telephone_alternative = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     email_alternative = models.EmailField(null=True, blank=True)
@@ -318,7 +317,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     first_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     last_name = models.CharField(max_length=MAX_LENGTH, blank=True)
-    email = core_fields.CICharField(max_length=MAX_LENGTH, unique=True)  # CDMS users may not have tld
+    email = CICharField(max_length=MAX_LENGTH, unique=True)  # CDMS users may not have tld
     dit_team = models.ForeignKey(metadata_models.Team, null=True)
     is_staff = models.BooleanField(
         'staff status',

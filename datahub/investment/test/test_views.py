@@ -20,7 +20,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
     def test_list_projects_success(self):
         """Test successfully listing projects."""
         project = InvestmentProjectFactory()
-        url = reverse('investment:v3:project')
+        url = reverse('api-v3:investment:project')
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -33,7 +33,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         company = CompanyFactory()
         project = InvestmentProjectFactory(investor_company_id=company.id)
         InvestmentProjectFactory()
-        url = reverse('investment:v3:project')
+        url = reverse('api-v3:investment:project')
         response = self.api_client.get(url, {
             'investor_company_id': str(company.id)
         })
@@ -50,7 +50,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         recipient_company = CompanyFactory()
         intermediate_company = CompanyFactory()
         advisor = AdvisorFactory()
-        url = reverse('investment:v3:project')
+        url = reverse('api-v3:investment:project')
         aerospace_id = constants.Sector.aerospace_assembly_aircraft.value.id
         new_site_id = (constants.FDIType.creation_of_new_site_or_activity
                        .value.id)
@@ -131,7 +131,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
 
     def test_create_project_fail(self):
         """Test creating a project with missing required values."""
-        url = reverse('investment:v3:project')
+        url = reverse('api-v3:investment:project')
         request_data = {}
         response = self.api_client.post(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -154,7 +154,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
 
     def test_create_project_fail_none(self):
         """Test creating a project with None for required values."""
-        url = reverse('investment:v3:project')
+        url = reverse('api-v3:investment:project')
         request_data = {
             'business_activities': None,
             'client_contacts': None,
@@ -191,7 +191,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
 
     def test_create_project_fail_empty_to_many(self):
         """Test creating a project with empty to-many field values."""
-        url = reverse('investment:v3:project')
+        url = reverse('api-v3:investment:project')
         request_data = {
             'business_activities': [],
             'client_contacts': []
@@ -211,7 +211,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         """Test successfully getting a project."""
         contacts = [ContactFactory().id, ContactFactory().id]
         project = InvestmentProjectFactory(client_contacts=contacts)
-        url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
+        url = reverse('api-v3:investment:project-item', kwargs={'pk': project.pk})
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -233,7 +233,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         project = InvestmentProjectFactory(
             client_contacts=[ContactFactory().id, ContactFactory().id]
         )
-        url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
+        url = reverse('api-v3:investment:project-item', kwargs={'pk': project.pk})
         request_data = {
             'investment_type': {
                 'id': str(constants.InvestmentType.fdi.value.id)
@@ -251,7 +251,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         project = InvestmentProjectFactory(
             client_contacts=[ContactFactory().id, ContactFactory().id]
         )
-        url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
+        url = reverse('api-v3:investment:project-item', kwargs={'pk': project.pk})
         new_contact = ContactFactory()
         request_data = {
             'name': 'new name',
@@ -271,7 +271,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
     def test_change_phase_assign_pm_failure(self):
         """Tests moving an incomplete project to the Assign PM phase."""
         project = InvestmentProjectFactory()
-        url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
+        url = reverse('api-v3:investment:project-item', kwargs={'pk': project.pk})
         request_data = {
             'phase': {
                 'id': constants.InvestmentProjectPhase.assign_pm.value.id
@@ -308,7 +308,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
             strategic_drivers=strategic_drivers,
             uk_region_locations=[constants.UKRegion.england.value.id]
         )
-        url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
+        url = reverse('api-v3:investment:project-item', kwargs={'pk': project.pk})
         request_data = {
             'phase': {
                 'id': constants.InvestmentProjectPhase.assign_pm.value.id
@@ -322,7 +322,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         project = InvestmentProjectFactory(
             client_contacts=[ContactFactory().id, ContactFactory().id]
         )
-        url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
+        url = reverse('api-v3:investment:project-item', kwargs={'pk': project.pk})
         request_data = {
             'phase': {
                 'id': constants.InvestmentProjectPhase.active.value.id
@@ -364,7 +364,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
             project_assurance_advisor=advisor,
             project_manager=advisor
         )
-        url = reverse('investment:v3:project-item', kwargs={'pk': project.pk})
+        url = reverse('api-v3:investment:project-item', kwargs={'pk': project.pk})
         request_data = {
             'phase': {
                 'id': constants.InvestmentProjectPhase.active.value.id
@@ -388,7 +388,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
             new_tech_to_uk=False,
             export_revenue=True
         )
-        url = reverse('investment:v3:value-item', kwargs={'pk': project.pk})
+        url = reverse('api-v3:investment:value-item', kwargs={'pk': project.pk})
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -413,7 +413,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         salary_id = constants.SalaryRange.below_25000.value.id
         project = InvestmentProjectFactory(total_investment=999,
                                            number_new_jobs=100)
-        url = reverse('investment:v3:value-item', kwargs={'pk': project.pk})
+        url = reverse('api-v3:investment:value-item', kwargs={'pk': project.pk})
         request_data = {
             'number_new_jobs': 555,
             'average_salary': {'id': salary_id},
@@ -447,7 +447,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
             strategic_drivers=strategic_drivers,
             uk_region_locations=uk_region_locations
         )
-        url = reverse('investment:v3:requirements-item',
+        url = reverse('api-v3:investment:requirements-item',
                       kwargs={'pk': project.pk})
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
@@ -467,7 +467,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         project = InvestmentProjectFactory(client_requirements='client reqs',
                                            site_decided=True,
                                            address_line_1='address 1')
-        url = reverse('investment:v3:requirements-item',
+        url = reverse('api-v3:investment:requirements-item',
                       kwargs={'pk': project.pk})
         request_data = {
             'address_line_1': 'address 1 new',
@@ -492,7 +492,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
             project_manager_id=pm_advisor.id,
             project_assurance_advisor_id=pa_advisor.id
         )
-        url = reverse('investment:v3:team-item',
+        url = reverse('api-v3:investment:team-item',
                       kwargs={'pk': project.pk})
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
@@ -522,7 +522,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
     def test_get_team_empty(self):
         """Test successfully getting an empty project requirements object."""
         project = InvestmentProjectFactory()
-        url = reverse('investment:v3:team-item',
+        url = reverse('api-v3:investment:team-item',
                       kwargs={'pk': project.pk})
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
@@ -545,7 +545,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
             project_manager_id=advisor_1.id,
             project_assurance_advisor_id=advisor_2.id
         )
-        url = reverse('investment:v3:team-item',
+        url = reverse('api-v3:investment:team-item',
                       kwargs={'pk': project.pk})
         request_data = {
             'project_manager': {

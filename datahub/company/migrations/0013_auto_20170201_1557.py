@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('company', '0012_auto_20170201_1458'),
-        ('interaction', '0001_initial')
+        # ('interaction', '0001_initial')  # Commented out to avoid cyclic dependencies, will be removed shortly
     ]
 
     operations = [

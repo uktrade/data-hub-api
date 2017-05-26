@@ -36,8 +36,8 @@ MODELS_TO_REGISTER_WITH_ORDER = (
 class MetadataAdmin(admin.ModelAdmin):
     """Custom Metadata Admin."""
 
-    fields = ('name', 'selectable')
-    list_display = ('name', 'selectable')
+    fields = ('name', )
+    list_display = ('name', )
     readonly_fields = ('id',)
     search_fields = ('name', 'pk')
 
@@ -46,7 +46,7 @@ class MetadataAdmin(admin.ModelAdmin):
 class OrderedMetadataAdmin(admin.ModelAdmin):
     """Admin for ordered metadata models."""
 
-    fields = ('name', 'order', 'selectable')
-    list_display = ('name', 'order', 'selectable')
+    fields = ('name', 'order', )
+    list_display = ('name', 'order', )
     readonly_fields = ('id',)
     search_fields = ('name', 'pk')
