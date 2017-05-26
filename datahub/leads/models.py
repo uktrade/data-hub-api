@@ -27,6 +27,8 @@ class BusinessLead(ArchivableModel, BaseModel):
     job_title = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
     company_name = models.CharField(max_length=MAX_LENGTH, null=True,
                                     blank=True)
+    trading_name = models.CharField(max_length=MAX_LENGTH, null=True,
+                                    blank=True)
     company = models.ForeignKey('company.Company', null=True, blank=True,
                                 related_name='business_leads')
     advisor = models.ForeignKey('company.Advisor', null=True, blank=True,
