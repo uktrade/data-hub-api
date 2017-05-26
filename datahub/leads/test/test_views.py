@@ -44,9 +44,9 @@ class BusinessLeadViewsTestCase(LeelooTestCase):
             'address_postcode': None,
             'address_town': None,
             'advisor': {
-                'first_name': 'Testo',
-                'id': str(lead.advisor.pk),
-                'last_name': 'Useri'
+                'first_name': self.user.first_name,
+                'id': str(self.user.pk),
+                'last_name': self.user.last_name
             },
             'archived': False,
             'archived_by': None,
@@ -54,7 +54,7 @@ class BusinessLeadViewsTestCase(LeelooTestCase):
             'archived_reason': None,
             'company': {
                 'id': str(lead.company.pk),
-                'name': 'name1'
+                'name': str(lead.company.name)
             },
             'company_name': 'company name 1',
             'contactable_by_dit': False,
@@ -69,7 +69,8 @@ class BusinessLeadViewsTestCase(LeelooTestCase):
             'last_name': 'surname 1',
             'notes': None,
             'telephone_alternative': None,
-            'telephone_number': '+44 123456789'
+            'telephone_number': '+44 123456789',
+            'trading_name': None
         }
 
     def test_get_other_user_lead_failure(self):
@@ -81,3 +82,22 @@ class BusinessLeadViewsTestCase(LeelooTestCase):
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_create_lead_success(self):
+        """Tests successfully creating a business lead."""
+
+        url = reverse('api-v3:business-leads:lead-collection')
+        request_data =  {
+            'first_name': 'First name',
+            'last_name': 'Last name',
+            'telephone_number': '+44 7000 123456'
+        }
+        response = self.api_client.post(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data['first_name'] == request_data['first_name']
+        assert response_data['last_name'] == request_data['last_name']
+        assert (response_data['telephone_number'] == request_data[
+            'telephone_number'])
+        assert response_data['advisor']['id'] == str(self.user.pk)
