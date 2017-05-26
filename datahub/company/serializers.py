@@ -165,5 +165,5 @@ class ContactSerializer(serializers.ModelSerializer):
             'address_town', 'address_county', 'address_country', 'address_postcode',
             'telephone_alternative', 'email_alternative', 'notes', 'contactable_by_dit',
             'contactable_by_dit_partners', 'contactable_by_email', 'contactable_by_phone',
-            'archived', 'archived_on', 'archived_reason', 'archived_by'
+            'archived', 'archived_on', 'archived_reason', 'archived_by', 'created_on'
         )
