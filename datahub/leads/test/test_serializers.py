@@ -9,6 +9,10 @@ pytestmark = pytest.mark.django_db
 
 
 def test_no_contact_details_update():
+    """
+    Tests updating a business lead without a phone number or email
+    address.
+    """
     lead = BusinessLeadFactory()
     data = {
         'email': None,
@@ -24,6 +28,7 @@ def test_no_contact_details_update():
 
 
 def test_no_name_update():
+    """Tests updating a business lead without a name or company."""
     lead = BusinessLeadFactory()
     data = {
         'first_name': None,
@@ -42,6 +47,7 @@ def test_no_name_update():
 
 
 def test_no_name_contact_create():
+    """Tests creating a business lead without names and contact details."""
     data = {}
     serializer = BusinessLeadSerializer(data=data)
 

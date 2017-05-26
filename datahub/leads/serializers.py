@@ -7,7 +7,6 @@ from datahub.core.validate_utils import UpdatedDataView
 from datahub.leads.models import BusinessLead
 from datahub.metadata import models as meta_models
 
-
 NAME_REQUIRED_MESSAGE = 'Company name or first name and last name required'
 CONTACT_REQUIRED_MESSAGE = 'Email address or phone number required'
 
@@ -34,6 +33,12 @@ class BusinessLeadSerializer(serializers.ModelSerializer):
     )
 
     def validate(self, data):
+        """
+        Validates the form after individual fields have been validated.
+
+        Ensures that either a person or company name has been provided,
+        and an email address or phone number.
+        """
         errors = {}
         data_view = UpdatedDataView(self.instance, data)
         company_name = data_view.get_value('company_name')
@@ -45,7 +50,7 @@ class BusinessLeadSerializer(serializers.ModelSerializer):
         email = data_view.get_value('email')
 
         if not any((company_name, company, trading_name)) and not (
-                    first_name and last_name):
+                first_name and last_name):
             errors['company_name'] = NAME_REQUIRED_MESSAGE
             errors['first_name'] = NAME_REQUIRED_MESSAGE
             errors['last_name'] = NAME_REQUIRED_MESSAGE

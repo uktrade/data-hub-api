@@ -85,7 +85,6 @@ class BusinessLeadViewsTestCase(LeelooTestCase):
 
     def test_create_lead_success(self):
         """Tests successfully creating a business lead."""
-
         url = reverse('api-v3:business-leads:lead-collection')
         request_data = {
             'first_name': 'First name',
@@ -104,7 +103,6 @@ class BusinessLeadViewsTestCase(LeelooTestCase):
 
     def test_create_lead_failure(self):
         """Tests creating a business lead without required fields."""
-
         url = reverse('api-v3:business-leads:lead-collection')
         request_data = {}
         response = self.api_client.post(url, format='json', data=request_data)
