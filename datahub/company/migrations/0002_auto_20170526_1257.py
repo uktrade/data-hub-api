@@ -19,6 +19,10 @@ def rebuild_category_mptt(apps, schema_editor):
     manager.rebuild()
 
 
+def noop_reverse(apps, schema_editor):
+    pass
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -55,5 +59,5 @@ class Migration(migrations.Migration):
             name='parent',
             field=mptt.fields.TreeForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='subsidiaries', to='company.Company'),
         ),
-        migrations.RunPython(rebuild_category_mptt),
+        migrations.RunPython(rebuild_category_mptt, noop_reverse),
     ]
