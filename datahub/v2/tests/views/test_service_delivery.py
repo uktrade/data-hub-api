@@ -23,7 +23,7 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
             service=service_offer.service,
             dit_team=service_offer.dit_team,
         )
-        url = reverse('v2:servicedelivery-detail', kwargs={'object_id': servicedelivery.pk})
+        url = reverse('api-v2:servicedelivery-detail', kwargs={'object_id': servicedelivery.pk})
         response = self.api_client.get(url)
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_200_OK
@@ -33,7 +33,7 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
 
     def test_service_delivery_detail_view_not_found(self):
         """Service Delivery detail view not found."""
-        url = reverse('v2:servicedelivery-detail', kwargs={'object_id': uuid.uuid4()})
+        url = reverse('api-v2:servicedelivery-detail', kwargs={'object_id': uuid.uuid4()})
         response = self.api_client.get(url)
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -53,7 +53,7 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
                 event=service_offer.event
             )
             for i in range(6)]
-        url = reverse('v2:servicedelivery-list')
+        url = reverse('api-v2:servicedelivery-list')
         response = self.api_client.get(url)
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_200_OK
@@ -65,7 +65,7 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
     def test_add_service_delivery_incorrect_format(self):
         """Test add new service delivery with incorrect format."""
         service_offer = ServiceOfferFactory()
-        url = reverse('v2:servicedelivery-list')
+        url = reverse('api-v2:servicedelivery-list')
         data = {
             'type': 'ServiceDelivery',
             'attributes': {
@@ -122,7 +122,7 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
     def test_add_service_delivery(self):
         """Test add new service delivery."""
         service_offer = ServiceOfferFactory()
-        url = reverse('v2:servicedelivery-list')
+        url = reverse('api-v2:servicedelivery-list')
         data = {
             'type': 'ServiceDelivery',
             'attributes': {
@@ -172,7 +172,7 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
 
     def test_add_service_delivery_incorrect_accept_header_format(self):
         """Test add new service delivery incorrect accept header format."""
-        url = reverse('v2:servicedelivery-list')
+        url = reverse('api-v2:servicedelivery-list')
         data = {
             'type': 'ServiceDelivery',
             'attributes': {
@@ -238,7 +238,7 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
             uk_region_id=constants.UKRegion.east_midlands.value.id
         )
 
-        url = reverse('v2:servicedelivery-list')
+        url = reverse('api-v2:servicedelivery-list')
         data = {
             'type': 'ServiceDelivery',
             'attributes': {
@@ -280,7 +280,7 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
             service=service_offer.service,
             dit_team=service_offer.dit_team
         )
-        url = reverse('v2:servicedelivery-list')
+        url = reverse('api-v2:servicedelivery-list')
         response = self.api_client.get(url, data={'company_id': company.pk})
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_200_OK
@@ -304,7 +304,7 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
             service=service_offer.service,
             dit_team=service_offer.dit_team
         )
-        url = reverse('v2:servicedelivery-list')
+        url = reverse('api-v2:servicedelivery-list')
         response = self.api_client.get(url, data={'contact_id': contact.pk})
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_200_OK
@@ -312,7 +312,7 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
 
     def test_add_service_delivery_incorrect_service_team_event_combination(self):
         """Test add new service delivery with invalid service/team/even combination."""
-        url = reverse('v2:servicedelivery-list')
+        url = reverse('api-v2:servicedelivery-list')
         data = {
             'type': 'ServiceDelivery',
             'attributes': {
