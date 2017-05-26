@@ -14,6 +14,7 @@ pytestmark = pytest.mark.django_db
 class AddContactTestCase(LeelooTestCase):
     """Add contact test case."""
 
+    @freeze_time('2017-04-18 13:25:30.986208+00:00')
     def test_with_manual_address(self):
         """Test add with manual address."""
         company = CompanyFactory()
@@ -98,10 +99,10 @@ class AddContactTestCase(LeelooTestCase):
             'archived': False,
             'archived_by': None,
             'archived_on': None,
-            'archived_reason': None
+            'archived_reason': None,
+            'created_on': '2017-04-18T13:25:30.986208'
         }
 
-    @freeze_time('2017-04-18 13:25:30.986208+00:00')
     def test_with_address_same_as_company(self):
         """Test add new contact with same address as company."""
         url = reverse('api-v3:contact:list')
@@ -264,6 +265,7 @@ class AddContactTestCase(LeelooTestCase):
 class EditContactTestCase(LeelooTestCase):
     """Edit contact test case."""
 
+    @freeze_time('2017-04-18 13:25:30.986208+00:00')
     def test_patch(self):
         """Test that it successfully patch an existing contact."""
         company = CompanyFactory()
@@ -347,7 +349,8 @@ class EditContactTestCase(LeelooTestCase):
             'archived': False,
             'archived_by': None,
             'archived_on': None,
-            'archived_reason': None
+            'archived_reason': None,
+            'created_on': '2017-04-18T13:25:30.986208'
         }
 
 
@@ -399,6 +402,7 @@ class ArchiveContactTestCase(LeelooTestCase):
 class ViewContactTestCase(LeelooTestCase):
     """View contact test case."""
 
+    @freeze_time('2017-04-18 13:25:30.986208+00:00')
     def test_view(self):
         """Test view."""
         company = CompanyFactory()
@@ -479,7 +483,8 @@ class ViewContactTestCase(LeelooTestCase):
             'archived': False,
             'archived_by': None,
             'archived_on': None,
-            'archived_reason': None
+            'archived_reason': None,
+            'created_on': '2017-04-18T13:25:30.986208'
         }
 
 
