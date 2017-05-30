@@ -101,7 +101,7 @@ class Company(MPTTModel, ArchivableModel, CompanyAbstract):
     class Meta:  # noqa: D101
         verbose_name_plural = 'companies'
 
-    class MPTTMeta:  # noqa: D010
+    class MPTTMeta:  # noqa: D101
         order_insertion_by = ['name']
 
     @cached_property
