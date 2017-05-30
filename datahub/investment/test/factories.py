@@ -18,9 +18,9 @@ from datahub.company.test.factories import (
 class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     """Company factory."""
 
-    id = factory.Sequence(lambda x: '{0}'.format(uuid.uuid4()))
-    name = factory.Sequence(lambda x: 'name {0}'.format(x))
-    description = factory.Sequence(lambda x: 'desc {0}'.format(x))
+    id = factory.Sequence(lambda _: str(uuid.uuid4()))
+    name = factory.Sequence(lambda n: f'name {n}')
+    description = factory.Sequence(lambda n: f'desc {n}')
     nda_signed = False
     estimated_land_date = date(2020, 1, 1)
     investment_type_id = InvestmentType.commitment_to_invest.value.id
