@@ -7,8 +7,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    replaces = [('metadata', '0001_initial'), ('metadata', '0002_auto_20161130_0507'), ('metadata', '0002_auto_20161129_0528'), ('metadata', '0003_merge_20161207_0414'), ('metadata', '0004_servicedeliverystatus'), ('metadata', '0005_event'), ('metadata', '0006_headquartertype'), ('metadata', '0007_companyclassification'), ('metadata', '0008_auto_20170329_1447'), ('metadata', '0009_fditype_investmentbusinessactivity_investmentprojectphase_investmentstrategicdriver_investmenttype_n'), ('metadata', '0009_auto_20170502_1258'), ('metadata', '0010_merge_20170502_1317'), ('metadata', '0011_correct_model_plural_names'), ('metadata', '0012_auto_20170523_0940')]
-
     initial = True
 
     dependencies = [
