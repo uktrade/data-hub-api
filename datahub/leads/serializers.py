@@ -50,13 +50,15 @@ class BusinessLeadSerializer(serializers.ModelSerializer):
         telephone_number = data_view.get_value('telephone_number')
         email = data_view.get_value('email')
 
-        if not any((company_name, company, trading_name)) and not (
-                first_name and last_name):
+        has_company_name = any((company_name, company, trading_name))
+        has_contact_name = first_name and last_name
+
+        if not (has_company_name or has_contact_name):
             errors['company_name'] = NAME_REQUIRED_MESSAGE
             errors['first_name'] = NAME_REQUIRED_MESSAGE
             errors['last_name'] = NAME_REQUIRED_MESSAGE
 
-        if not email and not telephone_number:
+        if not (email or telephone_number):
             errors['telephone_number'] = CONTACT_REQUIRED_MESSAGE
             errors['email'] = CONTACT_REQUIRED_MESSAGE
 
