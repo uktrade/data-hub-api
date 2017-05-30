@@ -34,10 +34,11 @@ class BusinessLeadSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """
-        Validates the form after individual fields have been validated.
+        Performs cross-field validation after individual fields have been
+        validated.
 
         Ensures that either a person or company name has been provided,
-        and an email address or phone number.
+        as well as an email address or phone number.
         """
         errors = {}
         data_view = UpdatedDataView(self.instance, data)
