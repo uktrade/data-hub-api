@@ -12,8 +12,6 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    replaces = [('interaction', '0001_initial'), ('interaction', '0002_auto_20170201_1648'), ('interaction', '0003_servicedelivery_feedback'), ('interaction', '0004_auto_20170302_1421'), ('interaction', '0005_auto_20170405_1406'), ('interaction', '0006_auto_20170511_1242'), ('interaction', '0007_correct_model_plural_names'), ('interaction', '0008_fix_created_on_modified_on')]
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('metadata', '0001_squashed_0012_auto_20170523_0940'),
