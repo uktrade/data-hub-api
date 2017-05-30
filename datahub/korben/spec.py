@@ -215,4 +215,4 @@ def get_mapping(Model):  # noqa N803
     try:
         return next(filter(lambda mapping: mapping.ToModel == Model, mappings))
     except StopIteration:
-        raise Exception('No mapping for {0}'.format(Model))
+        raise Exception(f'No mapping for {Model}')

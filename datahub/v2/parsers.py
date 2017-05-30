@@ -41,12 +41,11 @@ class JSONParser(parsers.JSONParser):
 
         # Check for inconsistencies
         resource_name = parser_context['view'].entity_name
-        if data.get('type') != resource_name and request.method in ('PUT', 'POST', 'PATCH'):
+        data_type = data.get('type')
+        if data_type != resource_name and request.method in ('PUT', 'POST', 'PATCH'):
             raise ConflictException(
-                'The resource object\'s type ({data_type}) is not the type '
-                'that constitute the collection represented by the endpoint ({resource_type}).'.format(
-                    data_type=data.get('type'),
-                    resource_type=resource_name
-                )
+                f'The resource object\'s type ({data_type}) is not the type '
+                f'that constitute the collection represented by the endpoint '
+                f'({resource_name}).'
             )
         return data

@@ -6,8 +6,8 @@ import factory
 class EventFactory(factory.django.DjangoModelFactory):
     """Event factory."""
 
-    id = factory.Sequence(lambda x: '{0}'.format(uuid.uuid4()))
-    name = factory.Sequence(lambda x: 'name {0}'.format(x))
+    id = factory.Sequence(lambda _: str(uuid.uuid4()))
+    name = factory.Sequence(lambda n: f'name {n}')
 
     class Meta:
         model = 'metadata.Event'
@@ -16,8 +16,8 @@ class EventFactory(factory.django.DjangoModelFactory):
 class ServiceFactory(factory.django.DjangoModelFactory):
     """Service factory."""
 
-    id = factory.Sequence(lambda x: '{0}'.format(uuid.uuid4()))
-    name = factory.Sequence(lambda x: 'name {0}'.format(x))
+    id = factory.Sequence(lambda _: str(uuid.uuid4()))
+    name = factory.Sequence(lambda n: f'name {n}')
 
     class Meta:
         model = 'metadata.Service'
@@ -26,8 +26,8 @@ class ServiceFactory(factory.django.DjangoModelFactory):
 class TeamFactory(factory.django.DjangoModelFactory):
     """Team factory."""
 
-    id = factory.Sequence(lambda x: '{0}'.format(uuid.uuid4()))
-    name = factory.Sequence(lambda x: 'name {0}'.format(x))
+    id = factory.Sequence(lambda _: str(uuid.uuid4()))
+    name = factory.Sequence(lambda n: 'name {n}')
 
     class Meta:
         model = 'metadata.Team'
