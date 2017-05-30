@@ -1,4 +1,4 @@
-"""Tests for business lead serialisers."""
+"""Tests for cross-field validation in the business lead serialisers."""
 
 import pytest
 

@@ -12,13 +12,13 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 class BusinessLead(ArchivableModel, BaseModel):
     """Business lead model.
 
-    A business lead is a precursor to a contact and/or company existing in
-    Data Hub. Some leads will result in a company and/or contact being
-    created by the user further down the line (though many will not).
+    A business lead is early form of a contact and/or company. Some leads
+    will result in a company and/or contact being created by the user
+    further down the line (though many will not).
 
-    Initially, a business lead is created with a company name (if known)
-    and not linked to a company. It may then later be linked to a company
-    via the company foreign key.
+    Initially, a business lead is created with the name of a person or
+    company. It may then later be linked to a company via the company
+    foreign key.
     """
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
@@ -31,6 +31,7 @@ class BusinessLead(ArchivableModel, BaseModel):
                                     blank=True)
     company = models.ForeignKey('company.Company', null=True, blank=True,
                                 related_name='business_leads')
+    # This is the adviser that the lead belongs to
     advisor = models.ForeignKey('company.Advisor', null=True, blank=True,
                                 related_name='business_leads')
     telephone_number = models.CharField(max_length=MAX_LENGTH, null=True,

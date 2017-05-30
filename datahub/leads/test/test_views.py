@@ -32,8 +32,7 @@ class BusinessLeadViewsTestCase(LeelooTestCase):
 
     def test_get_success(self):
         """Tests that getting a single lead."""
-        lead = BusinessLeadFactory(advisor=self.user)  # this lead is attached
-        #  to another user
+        lead = BusinessLeadFactory(advisor=self.user)
         url = reverse('api-v3:business-leads:lead-item', kwargs={
             'pk': lead.pk
         })
