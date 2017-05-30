@@ -45,6 +45,7 @@ THIRD_PARTY_APPS = (
     'reversion',
     'oauth2_provider',
     'django_filters',
+    'mptt',
 )
 
 LOCAL_APPS = (

@@ -17,8 +17,6 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    replaces = [('company', '0001_initial'), ('company', '0002_auto_20161124_0920'), ('company', '0003_auto_20161125_0332'), ('company', '0004_auto_20161129_0423'), ('company', '0005_auto_20161129_0950'), ('company', '0006_auto_20161130_0507'), ('company', '0007_auto_20161201_0527'), ('company', '0004_auto_20161129_0556'), ('company', '0005_merge_20161129_0926'), ('company', '0008_merge_20161207_0414'), ('company', '0009_auto_20161214_0343'), ('company', '0010_auto_20170113_0610'), ('company', '0011_auto_20170113_1006'), ('company', '0012_auto_20170201_1458'), ('company', '0013_auto_20170201_1557'), ('company', '0014_auto_20170201_1601'), ('company', '0013_auto_20170203_1222'), ('company', '0015_merge_20170206_1630'), ('company', '0016_auto_20170216_1153'), ('company', '0017_auto_20170222_1028'), ('company', '0018_advisor_enabled'), ('company', '0019_auto_20170227_1647'), ('company', '0020_company_headquarter_type'), ('company', '0021_auto_20170308_1157'), ('company', '0022_auto_20170329_1049'), ('company', '0023_auto_20170418_1047'), ('company', '0024_auto_20170419_1314'), ('company', '0025_auto_20170502_1331'), ('company', '0025_auto_20170428_1421'), ('company', '0026_merge_20170503_0918'), ('company', '0026_auto_20170503_1410'), ('company', '0027_merge_20170509_1053'), ('company', '0028_auto_20170511_1242'), ('company', '0029_fix_created_on_modified_on'), ('company', '0029_auto_20170522_1619'), ('company', '0030_merge_20170523_1259')]
-
     dependencies = [
         ('metadata', '0001_squashed_0012_auto_20170523_0940'),
         ('auth', '0008_alter_user_username_max_length'),
