@@ -10,6 +10,8 @@ from django.db import models
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 
+from mptt.models import MPTTModel, TreeForeignKey
+
 from datahub.company.validators import RelaxedURLValidator
 from datahub.core import constants
 from datahub.core.models import ArchivableModel, BaseModel
@@ -48,7 +50,7 @@ class CompanyAbstract(BaseModel):
         super().save(*args, **kwargs)
 
 
-class Company(ArchivableModel, CompanyAbstract):
+class Company(MPTTModel, ArchivableModel, CompanyAbstract):
     """Representation of the company as per CDMS."""
 
     REQUIRED_TRADING_ADDRESS_FIELDS = (
@@ -93,11 +95,14 @@ class Company(ArchivableModel, CompanyAbstract):
     trading_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     headquarter_type = models.ForeignKey(metadata_models.HeadquarterType, blank=True, null=True)
     classification = models.ForeignKey(metadata_models.CompanyClassification, null=True)
-    parent = models.ForeignKey('self', null=True, related_name='subsidiaries')
+    parent = TreeForeignKey('self', null=True, related_name='subsidiaries')
     one_list_account_owner = models.ForeignKey('Advisor', null=True, related_name='one_list_owned_companies')
 
     class Meta:  # noqa: D101
         verbose_name_plural = 'companies'
+
+    class MPTTMeta:  # noqa: D101
+        order_insertion_by = ['name']
 
     @cached_property
     def uk_based(self):

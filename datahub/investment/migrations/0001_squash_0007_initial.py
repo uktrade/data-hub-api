@@ -12,8 +12,6 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    replaces = [('investment', '0001_initial'), ('investment', '0002_auto_20170502_1328'), ('investment', '0003_auto_20170510_1507'), ('investment', '0004_auto_20170512_1436'), ('investment', '0005_auto_20170515_1507'), ('investment', '0006_change_event_to_string'), ('investment', '0007_fix_created_on_modified_on')]
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('metadata', '0001_squashed_0012_auto_20170523_0940'),
