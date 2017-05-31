@@ -102,7 +102,8 @@ class IProjectAbstract(models.Model):
         """
         if self.cdms_project_code:
             return self.cdms_project_code
-        return 'DHP-{:08d}'.format(self.investmentprojectcode.id)
+        project_num = self.investmentprojectcode.id
+        return f'DHP-{project_num:08d}'
 
 
 class IProjectValueAbstract(models.Model):
@@ -214,8 +215,8 @@ class InvestmentProject(IProjectAbstract, IProjectValueAbstract,
 
     def __str__(self):
         """Human-readable name for admin section etc."""
-        return '{} – {}'.format(self.investor_company or 'No company',
-                                self.name)
+        company_name = self.investor_company or 'No company'
+        return f'{company_name} – {self.name}'
 
 
 class InvestmentProjectCode(models.Model):
