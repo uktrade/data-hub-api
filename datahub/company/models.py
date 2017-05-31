@@ -227,7 +227,7 @@ class Contact(ArchivableModel, BaseModel):
     @cached_property
     def name(self):
         """Need this for ES."""
-        return '{first_name} {last_name}'.format(first_name=self.first_name, last_name=self.last_name)
+        return f'{self.first_name} {self.last_name}'
 
     def __str__(self):
         """Admin displayed human readable name."""
@@ -348,7 +348,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     @cached_property
     def name(self):
         """Full name shorthand."""
-        return '{first_name} {last_name}'.format(first_name=self.first_name, last_name=self.last_name)
+        return f'{self.first_name} {self.last_name}'
 
     def __str__(self):
         """Admin displayed human readable name."""

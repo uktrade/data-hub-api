@@ -12,10 +12,10 @@ from datahub.company.test.factories import (
 class BusinessLeadFactory(factory.django.DjangoModelFactory):
     """Business lead factory."""
 
-    id = factory.Sequence(lambda x: '{0}'.format(uuid.uuid4()))
-    first_name = factory.Sequence(lambda x: 'name {0}'.format(x))
-    last_name = factory.Sequence(lambda x: 'surname {0}'.format(x))
-    company_name = factory.Sequence(lambda x: 'company name {0}'.format(x))
+    id = factory.Sequence(lambda _: str(uuid.uuid4()))
+    first_name = factory.Sequence(lambda n: 'name {n}')
+    last_name = factory.Sequence(lambda n: 'surname {n}')
+    company_name = factory.Sequence(lambda n: 'company name {n}')
     company = factory.SubFactory(CompanyFactory)
     email = 'foo@bar.com'
     telephone_number = '+44 123456789'

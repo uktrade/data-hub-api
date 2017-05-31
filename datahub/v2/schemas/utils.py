@@ -16,12 +16,13 @@ class RelationshipType(SchemaType):
             return null
         appstruct = dict(appstruct)
         if 'data' not in appstruct:
-            raise Invalid(node, '%r has no key data' % appstruct)
+            raise Invalid(node, f'{appstruct!r} has no key data')
         if 'type' not in appstruct['data']:
-            raise Invalid(node, '%r has no key type' % appstruct)
-        if appstruct['data']['type'] != self.typename:
-            raise Invalid(node, 'type %s should be %s' % (
-                appstruct['data']['type'], self.typename))
+            raise Invalid(node, f'{appstruct!r} has no key type')
+        appstruct_type = appstruct['data']['type']
+        if appstruct_type != self.typename:
+            raise Invalid(node, f'type {appstruct_type} should be '
+                                f'{self.typename}')
         return appstruct and 'true' or 'false'
 
     def deserialize(self, node, cstruct):
@@ -34,15 +35,16 @@ class RelationshipType(SchemaType):
             return null
         cstruct = dict(cstruct)
         if 'data' not in cstruct:
-            raise Invalid(node, '%r has no key data' % cstruct)
+            raise Invalid(node, f'{cstruct!r} has no key data')
         if cstruct['data']:
             if 'type' not in cstruct['data']:
-                raise Invalid(node, '%r has no key type' % cstruct)
+                raise Invalid(node, f'{cstruct!r} has no key type')
             if 'id' not in cstruct['data']:
-                raise Invalid(node, '%r has no key id' % cstruct)
-            if cstruct['data']['type'] != self.typename:
-                raise Invalid(node, 'type %s should be %s' % (
-                    cstruct['data']['type'], self.typename))
+                raise Invalid(node, f'{cstruct!r} has no key id')
+            cstruct_type = cstruct['data']['type']
+            if cstruct_type != self.typename:
+                raise Invalid(node, f'type {cstruct_type} should be '
+                                    f'{self.typename}')
             cstruct['data']['id'] = uuid.UUID(cstruct['data']['id'])
         return cstruct
 
@@ -57,4 +59,4 @@ class IsExactly:
     def __call__(self, node, value):
         """Take the actual value to be checked."""
         if not value == self.check_value:
-            raise Invalid(node, 'Value must be {value}'.format(value=self.check_value))
+            raise Invalid(node, f'Value must be {self.check_value}')
