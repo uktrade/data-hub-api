@@ -15,7 +15,7 @@ class OneOfValidator:
         """
         Initialises the validator.
 
-        :param fields:  Fields to force one-of validation on
+        :param fields:  Fields to perform one-of validation on
         :param message: Optional custom error message
         """
         self.fields = fields
@@ -34,7 +34,7 @@ class OneOfValidator:
         """
         Performs validation. Called by DRF.
 
-        :param attrs:   Data (post-field-validation/processing)
+        :param attrs:   Serializer data (post-field-validation/processing)
         """
         data_view = UpdatedDataView(self.serializer.instance, attrs)
         values = (data_view.get_value(field) for field in self.fields)
