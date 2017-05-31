@@ -1,6 +1,35 @@
+from types import SimpleNamespace
 from unittest.mock import MagicMock, Mock
 
-from datahub.core.validate_utils import UpdatedDataView
+import pytest
+from rest_framework.exceptions import ValidationError
+
+from datahub.core.validate_utils import OneOfValidator, UpdatedDataView
+
+
+def test_one_of_none():
+    """Tests that validation fails if no one-of fields provided."""
+    instance = SimpleNamespace(field_a=None, field_b=None)
+    validator = OneOfValidator('field_a', 'field_b')
+    validator.set_context(Mock(instance=instance))
+    with pytest.raises(ValidationError):
+        validator({})
+
+
+def test_one_of_some():
+    """Tests that validation passes if some one-of fields provided."""
+    instance = SimpleNamespace(field_a=None, field_b=None)
+    validator = OneOfValidator('field_a', 'field_b')
+    validator.set_context(Mock(instance=instance))
+    validator({'field_a': Mock()})
+
+
+def test_one_of_all():
+    """Tests that validation passes if all one-of fields provided."""
+    instance = SimpleNamespace(field_a=None, field_b=None)
+    validator = OneOfValidator('field_a', 'field_b')
+    validator.set_context(Mock(instance=instance))
+    validator({'field_a': Mock(), 'field_b': Mock()})
 
 
 def test_get_value_instance():

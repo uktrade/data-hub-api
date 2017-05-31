@@ -1,3 +1,54 @@
+from rest_framework.exceptions import ValidationError
+
+
+class OneOfValidator:
+    """
+    One-of validator for DRF serializer classes.
+
+    To be used at class-level only. For updates, values from the model
+    instance are used where the fields are not part of the update request.
+    """
+
+    message = 'One of {field_names} must be provided.'
+
+    def __init__(self, *fields, message=None):
+        """
+        Initialises the validator.
+
+        :param fields:  Fields to force one-of validation on
+        :param message: Optional custom error message
+        """
+        self.fields = fields
+        self.message = message or self.message
+        self.serializer = None
+
+    def set_context(self, serializer):
+        """
+        Saves a reference to the serializer object.
+
+        Called by DRF.
+        """
+        self.serializer = serializer
+
+    def __call__(self, attrs):
+        """
+        Performs validation. Called by DRF.
+
+        :param attrs:   Data (post-field-validation/processing)
+        """
+        data_view = UpdatedDataView(self.serializer.instance, attrs)
+        values = (data_view.get_value(field) for field in self.fields)
+        value_present = any(value for value in values if value is not None)
+        if not value_present:
+            field_names = ', '.join(self.fields)
+            message = self.message.format(field_names=field_names)
+            raise ValidationError(message, code='one_of')
+
+    def __repr__(self):
+        """Returns the string representation of this object."""
+        return f'{self.__class__.__name__}(fields={self.fields!r})'
+
+
 class UpdatedDataView:
     """
     Provides a view of a model instance and dict of new data.

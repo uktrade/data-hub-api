@@ -43,6 +43,12 @@ class Interaction(InteractionAbstract):
     """Interaction."""
 
     interaction_type = models.ForeignKey('metadata.InteractionType', null=True)
+    investment_project = models.ForeignKey(
+        'investment.InvestmentProject',
+        related_name="%(class)ss",  # noqa: Q000
+        null=True,
+        blank=True
+    )
 
 
 class ServiceOffer(models.Model):
