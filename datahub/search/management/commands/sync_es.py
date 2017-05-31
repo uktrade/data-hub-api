@@ -85,6 +85,7 @@ _ignored_fields = (
     'subsidiaries', 'servicedeliverys', 'investment_projects',
     'investor_investment_projects', 'intermediate_investment_projects',
     'investee_projects', 'recipient_investment_projects', 'teams',
+    'tree_id', 'lft', 'rght', 'business_leads',
 )
 
 

@@ -100,11 +100,7 @@ class SearchTestCase(LeelooTestCase):
         """Tests detailed company search."""
         term = 'abc defg'
 
-        url = '{}?offset={}&limit={}'.format(
-            reverse('api-v3:search:company'),
-            0,
-            100
-        )
+        url = f"{reverse('api-v3:search:company')}?offset=0&limit=100"
 
         response = self.api_client.post(url, {
             'original_query': term,
@@ -120,11 +116,7 @@ class SearchTestCase(LeelooTestCase):
         """Tests detailed contact search."""
         term = 'abc defg'
 
-        url = '{}?offset={}&limit={}'.format(
-            reverse('api-v3:search:contact'),
-            0,
-            100
-        )
+        url = f"{reverse('api-v3:search:contact')}?offset=0&limit=100"
 
         response = self.api_client.post(url, {
             'original_query': term,
