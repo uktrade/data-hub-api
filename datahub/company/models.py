@@ -97,7 +97,10 @@ class Company(MPTTModel, ArchivableModel, CompanyAbstract):
     headquarter_type = models.ForeignKey(metadata_models.HeadquarterType, blank=True, null=True)
     classification = models.ForeignKey(metadata_models.CompanyClassification, blank=True, null=True)
     parent = TreeForeignKey('self', blank=True, null=True, related_name='subsidiaries')
-    one_list_account_owner = models.ForeignKey('Advisor', blank=True, null=True, related_name='one_list_owned_companies')
+    one_list_account_owner = models.ForeignKey(
+        'Advisor', blank=True, null=True,
+        related_name='one_list_owned_companies'
+    )
 
     class Meta:  # noqa: D101
         verbose_name_plural = 'companies'
@@ -339,7 +342,10 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField('date joined', default=now)
-    enabled = models.BooleanField(default=False)
+    enabled = models.BooleanField(
+        default=False,
+        help_text='Whether CDMS authentication has been enabled for this user'
+    )
 
     objects = AdvisorManager()
 
