@@ -34,6 +34,6 @@ v2_urls = v2_urlpatterns
 v3_urls = [
     url(r'^', include((investment_urls, 'investment'), namespace='investment')),
     url(r'^', include((leads_urls, 'business-leads'), namespace='business-leads')),
-    url(r'^', include((company_urls.contact_urls_v3, 'contact'), namespace='contact'))
+    url(r'^', include((company_urls.contact_urls_v3, 'contact'), namespace='contact')),
     url(r'^', include((search_urls, 'search'), namespace='search'))
 ]

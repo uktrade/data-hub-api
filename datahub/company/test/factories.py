@@ -29,7 +29,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     registered_address_1 = factory.Sequence(lambda n: f'{n} Foo st.')
     registered_address_town = 'London'
     registered_address_country_id = constants.Country.united_kingdom.value.id
-    trading_address_1 = factory.Sequence(lambda x: '{0} Fake Lane'.format(x))
+    trading_address_1 = factory.Sequence(lambda x: f'{x} Fake Lane')
     trading_address_town = 'Woodside'
     trading_address_country_id = constants.Country.united_kingdom.value.id
     business_type_id = constants.BusinessType.private_limited_company.value.id
