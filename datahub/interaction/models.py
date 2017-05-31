@@ -14,22 +14,25 @@ class InteractionAbstract(BaseModel):
     company = models.ForeignKey(
         'company.Company',
         related_name="%(class)ss",  # noqa: Q000
+        blank=True,
         null=True,
     )
     contact = models.ForeignKey(
         'company.Contact',
         related_name="%(class)ss",  # noqa: Q000
+        blank=True,
         null=True,
     )
-    service = models.ForeignKey('metadata.Service', null=True)
+    service = models.ForeignKey('metadata.Service', blank=True, null=True)
     subject = models.TextField()
     dit_advisor = models.ForeignKey(
         'company.Advisor',
         related_name="%(class)ss",  # noqa: Q000
+        blank=True,
         null=True,
     )
     notes = models.TextField(max_length=4000)  # CDMS limit
-    dit_team = models.ForeignKey('metadata.Team', null=True)
+    dit_team = models.ForeignKey('metadata.Team', blank=True, null=True)
 
     class Meta:  # noqa: D101
         abstract = True
@@ -42,7 +45,9 @@ class InteractionAbstract(BaseModel):
 class Interaction(InteractionAbstract):
     """Interaction."""
 
-    interaction_type = models.ForeignKey('metadata.InteractionType', null=True)
+    interaction_type = models.ForeignKey(
+        'metadata.InteractionType', blank=True, null=True
+    )
     investment_project = models.ForeignKey(
         'investment.InvestmentProject',
         related_name="%(class)ss",  # noqa: Q000
@@ -56,8 +61,8 @@ class ServiceOffer(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     service = models.ForeignKey('metadata.Service')
-    dit_team = models.ForeignKey('metadata.Team', null=True)
-    event = models.ForeignKey('metadata.Event', null=True, blank=True)
+    dit_team = models.ForeignKey('metadata.Team', blank=True, null=True)
+    event = models.ForeignKey('metadata.Event', blank=True, null=True)
 
     @cached_property
     def name(self):
@@ -91,12 +96,12 @@ class ServiceDelivery(InteractionAbstract):
     }
 
     status = models.ForeignKey('metadata.ServiceDeliveryStatus')
-    service_offer = models.ForeignKey(ServiceOffer, null=True)
-    uk_region = models.ForeignKey('metadata.UKRegion', null=True)
-    sector = models.ForeignKey('metadata.Sector', null=True)
-    country_of_interest = models.ForeignKey('metadata.Country', null=True)
-    feedback = models.TextField(max_length=4000, null=True)  # CDMS limit
-    event = models.ForeignKey('metadata.Event', null=True)
+    service_offer = models.ForeignKey(ServiceOffer, blank=True, null=True)
+    uk_region = models.ForeignKey('metadata.UKRegion', blank=True, null=True)
+    sector = models.ForeignKey('metadata.Sector', blank=True, null=True)
+    country_of_interest = models.ForeignKey('metadata.Country', blank=True, null=True)
+    feedback = models.TextField(max_length=4000, blank=True, null=True)  # CDMS limit
+    event = models.ForeignKey('metadata.Event', blank=True, null=True)
 
     def clean(self):
         """Custom validation."""
