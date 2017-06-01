@@ -62,11 +62,11 @@ class Company(MPTTModel, ArchivableModel, CompanyAbstract):
     company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     alias = models.CharField(max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name')
-    business_type = models.ForeignKey(metadata_models.BusinessType, null=True)
-    sector = models.ForeignKey(metadata_models.Sector, null=True)
-    employee_range = models.ForeignKey(metadata_models.EmployeeRange, null=True)
-    turnover_range = models.ForeignKey(metadata_models.TurnoverRange, null=True)
-    account_manager = models.ForeignKey('Advisor', null=True, related_name='companies')
+    business_type = models.ForeignKey(metadata_models.BusinessType, blank=True, null=True)
+    sector = models.ForeignKey(metadata_models.Sector, blank=True, null=True)
+    employee_range = models.ForeignKey(metadata_models.EmployeeRange, blank=True, null=True)
+    turnover_range = models.ForeignKey(metadata_models.TurnoverRange, blank=True, null=True)
+    account_manager = models.ForeignKey('Advisor', blank=True, null=True, related_name='companies')
     export_to_countries = models.ManyToManyField(
         metadata_models.Country,
         blank=True,
@@ -80,7 +80,7 @@ class Company(MPTTModel, ArchivableModel, CompanyAbstract):
     lead = models.BooleanField(default=False)
     description = models.TextField(blank=True, null=True)
     website = models.CharField(max_length=MAX_LENGTH, validators=[RelaxedURLValidator], blank=True, null=True)
-    uk_region = models.ForeignKey(metadata_models.UKRegion, null=True)
+    uk_region = models.ForeignKey(metadata_models.UKRegion, blank=True, null=True)
     trading_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_3 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -89,14 +89,18 @@ class Company(MPTTModel, ArchivableModel, CompanyAbstract):
     trading_address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_country = models.ForeignKey(
         metadata_models.Country,
+        blank=True,
         null=True,
         related_name='company_trading_address_country'
     )
     trading_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     headquarter_type = models.ForeignKey(metadata_models.HeadquarterType, blank=True, null=True)
-    classification = models.ForeignKey(metadata_models.CompanyClassification, null=True)
-    parent = TreeForeignKey('self', null=True, related_name='subsidiaries')
-    one_list_account_owner = models.ForeignKey('Advisor', null=True, related_name='one_list_owned_companies')
+    classification = models.ForeignKey(metadata_models.CompanyClassification, blank=True, null=True)
+    parent = TreeForeignKey('self', blank=True, null=True, related_name='subsidiaries')
+    one_list_account_owner = models.ForeignKey(
+        'Advisor', blank=True, null=True,
+        related_name='one_list_owned_companies'
+    )
 
     class Meta:  # noqa: D101
         verbose_name_plural = 'companies'
@@ -323,7 +327,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     last_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     email = CICharField(max_length=MAX_LENGTH, unique=True)  # CDMS users may not have tld
-    dit_team = models.ForeignKey(metadata_models.Team, null=True)
+    dit_team = models.ForeignKey(metadata_models.Team, blank=True, null=True)
     is_staff = models.BooleanField(
         'staff status',
         default=False,
@@ -338,7 +342,10 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField('date joined', default=now)
-    enabled = models.BooleanField(default=False)
+    enabled = models.BooleanField(
+        default=False,
+        help_text='Whether CDMS authentication has been enabled for this user'
+    )
 
     objects = AdvisorManager()
 
