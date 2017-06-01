@@ -1,5 +1,6 @@
 import uuid
 
+from django.conf import settings
 from django.db import models
 from django.utils.functional import cached_property
 
@@ -31,7 +32,7 @@ class InteractionAbstract(BaseModel):
         blank=True,
         null=True,
     )
-    notes = models.TextField(max_length=4000)  # CDMS limit
+    notes = models.TextField(max_length=settings.CDMS_TEXT_MAX_LENGTH)  # CDMS limit
     dit_team = models.ForeignKey('metadata.Team', blank=True, null=True)
 
     class Meta:  # noqa: D101
@@ -100,7 +101,7 @@ class ServiceDelivery(InteractionAbstract):
     uk_region = models.ForeignKey('metadata.UKRegion', blank=True, null=True)
     sector = models.ForeignKey('metadata.Sector', blank=True, null=True)
     country_of_interest = models.ForeignKey('metadata.Country', blank=True, null=True)
-    feedback = models.TextField(max_length=4000, blank=True, null=True)  # CDMS limit
+    feedback = models.TextField(max_length=settings.CDMS_TEXT_MAX_LENGTH, blank=True, null=True)  # CDMS limit
     event = models.ForeignKey('metadata.Event', blank=True, null=True)
 
     def clean(self):
