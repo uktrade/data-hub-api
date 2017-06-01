@@ -1,5 +1,6 @@
 import uuid
 
+from django.conf import settings
 from django.db import models
 from django.utils.functional import cached_property
 
@@ -36,7 +37,7 @@ class InteractionAbstract(BaseModel):
         null=True,
         on_delete=models.SET_NULL
     )
-    notes = models.TextField(max_length=4000)  # CDMS limit
+    notes = models.TextField(max_length=settings.CDMS_TEXT_MAX_LENGTH)
     dit_team = models.ForeignKey(
         'metadata.Team', blank=True, null=True, on_delete=models.SET_NULL
     )
@@ -123,7 +124,9 @@ class ServiceDelivery(InteractionAbstract):
     country_of_interest = models.ForeignKey(
         'metadata.Country', blank=True, null=True, on_delete=models.SET_NULL
     )
-    feedback = models.TextField(max_length=4000, blank=True, null=True)  # CDMS limit
+    feedback = models.TextField(
+        max_length=settings.CDMS_TEXT_MAX_LENGTH, blank=True, null=True
+    )
     event = models.ForeignKey(
         'metadata.Event', blank=True, null=True, on_delete=models.SET_NULL
     )
