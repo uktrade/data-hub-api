@@ -66,6 +66,7 @@ _company_mappings = {
     'address_country': _id_name_dict,
     'contacts': lambda col: [_contact_dict(c) for c in col.all()],
     'id': str,
+    'uk_based': bool,
     'interactions': lambda col: [_id_type_dict(c) for c in col.all()],
     'export_to_countries': lambda col: [_id_name_dict(c) for c in col.all()],
     'future_interest_countries': lambda col: [_id_name_dict(c) for c in col.all()],
@@ -100,7 +101,7 @@ def get_dataset():
 def _model_to_dict(model, column_mapping):
     """Converts model instance to a dictionary suitable for ElasticSearch."""
     result = {col: fn(getattr(model, col)) for col, fn in column_mapping.items()
-              if getattr(model, col, None)}
+              if getattr(model, col, None) is not None}
 
     fields = [field for field in model._meta.get_fields() if field.name not in _ignored_fields]
 

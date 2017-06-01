@@ -60,6 +60,7 @@ class Company(DocType):
     trading_address_town = String()
     turnover_range = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
     uk_region = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
+    uk_based = Boolean()
     website = String()
     export_to_countries = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
     future_interest_countries = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})

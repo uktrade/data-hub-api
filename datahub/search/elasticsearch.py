@@ -53,10 +53,9 @@ def get_basic_search_query(term, entities=('company',), offset=0, limit=100):
 
 def get_search_by_entity_query(term=None, filters=None, entity=None, offset=0, limit=100):
     """Perform filtered search for given terms in given entity."""
-    query = (
-        Q('multi_match', query=term, fields=['name', '_all']),
-        Q('term', _type=entity),
-    )
+    query = [Q('term', _type=entity)]
+    if term != '':
+        query.append(Q('multi_match', query=term, fields=['name', '_all']))
 
     query_filter = []
 
@@ -91,16 +90,6 @@ def bulk(actions=None, chunk_size=None, **kwargs):
     return es_bulk(connections.get_connection(), actions=actions, chunk_size=chunk_size, **kwargs)
 
 
-def document_exists(client, doc_type, document_id):
-    """Check whether the document with a specific ID exists."""
-    return client.exists(
-        index=ES_INDEX,
-        doc_type=doc_type,
-        id=document_id,
-        realtime=True
-    )
-
-
 def remap_fields(filter):
     """Replaces fields to match Elasticsearch data model."""
     name_map = {
@@ -112,4 +101,7 @@ def remap_fields(filter):
         'trading_address_country': 'trading_address_country.id',
         'advisor': 'advisor.id',
     }
-    return {name_map.get(k, k): v for k, v in filter.items()}
+    value_map = {
+        'uk_based': lambda x: x.lower() == 'true'
+    }
+    return {name_map.get(k, k): value_map.get(k, str)(v) for k, v in filter.items()}
