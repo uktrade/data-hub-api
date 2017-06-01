@@ -47,10 +47,10 @@ class Migration(migrations.Migration):
                 ('contactable_by_email', models.BooleanField(default=False)),
                 ('contactable_by_phone', models.BooleanField(default=False)),
                 ('notes', models.TextField(blank=True, null=True)),
-                ('address_country', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='metadata.Country')),
+                ('address_country', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.Country')),
                 ('advisor', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='business_leads', to=settings.AUTH_USER_MODEL)),
-                ('archived_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('company', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='business_leads', to='company.Company')),
+                ('archived_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
+                ('company', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='business_leads', to='company.Company')),
             ],
             options={
                 'abstract': False,

@@ -29,11 +29,15 @@ class BusinessLead(ArchivableModel, BaseModel):
                                     blank=True)
     trading_name = models.CharField(max_length=MAX_LENGTH, null=True,
                                     blank=True)
-    company = models.ForeignKey('company.Company', null=True, blank=True,
-                                related_name='business_leads')
+    company = models.ForeignKey(
+        'company.Company', null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='business_leads'
+    )
     # This is the adviser that the lead belongs to
-    advisor = models.ForeignKey('company.Advisor', null=True, blank=True,
-                                related_name='business_leads')
+    advisor = models.ForeignKey(
+        'company.Advisor', null=True, blank=True, on_delete=models.CASCADE,
+        related_name='business_leads'
+    )
     telephone_number = models.CharField(max_length=MAX_LENGTH, null=True,
                                         blank=True)
     email = models.EmailField(null=True, blank=True)
@@ -44,7 +48,7 @@ class BusinessLead(ArchivableModel, BaseModel):
     address_county = models.CharField(max_length=MAX_LENGTH, blank=True,
                                       null=True)
     address_country = models.ForeignKey(metadata_models.Country, null=True,
-                                        blank=True)
+                                        blank=True, on_delete=models.SET_NULL)
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True,
                                         null=True)
     telephone_alternative = models.CharField(max_length=MAX_LENGTH,
