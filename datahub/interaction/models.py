@@ -17,23 +17,30 @@ class InteractionAbstract(BaseModel):
         related_name="%(class)ss",  # noqa: Q000
         blank=True,
         null=True,
+        on_delete=models.CASCADE
     )
     contact = models.ForeignKey(
         'company.Contact',
         related_name="%(class)ss",  # noqa: Q000
         blank=True,
         null=True,
+        on_delete=models.CASCADE
     )
-    service = models.ForeignKey('metadata.Service', blank=True, null=True)
+    service = models.ForeignKey(
+        'metadata.Service', blank=True, null=True, on_delete=models.SET_NULL
+    )
     subject = models.TextField()
     dit_advisor = models.ForeignKey(
         'company.Advisor',
         related_name="%(class)ss",  # noqa: Q000
         blank=True,
         null=True,
+        on_delete=models.SET_NULL
     )
-    notes = models.TextField(max_length=settings.CDMS_TEXT_MAX_LENGTH)  # CDMS limit
-    dit_team = models.ForeignKey('metadata.Team', blank=True, null=True)
+    notes = models.TextField(max_length=settings.CDMS_TEXT_MAX_LENGTH)
+    dit_team = models.ForeignKey(
+        'metadata.Team', blank=True, null=True, on_delete=models.SET_NULL
+    )
 
     class Meta:  # noqa: D101
         abstract = True
@@ -47,13 +54,15 @@ class Interaction(InteractionAbstract):
     """Interaction."""
 
     interaction_type = models.ForeignKey(
-        'metadata.InteractionType', blank=True, null=True
+        'metadata.InteractionType', blank=True, null=True,
+        on_delete=models.SET_NULL
     )
     investment_project = models.ForeignKey(
         'investment.InvestmentProject',
         related_name="%(class)ss",  # noqa: Q000
         null=True,
-        blank=True
+        blank=True,
+        on_delete=models.CASCADE
     )
 
 
@@ -61,9 +70,13 @@ class ServiceOffer(models.Model):
     """Service offer."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    service = models.ForeignKey('metadata.Service')
-    dit_team = models.ForeignKey('metadata.Team', blank=True, null=True)
-    event = models.ForeignKey('metadata.Event', blank=True, null=True)
+    service = models.ForeignKey('metadata.Service', on_delete=models.CASCADE)
+    dit_team = models.ForeignKey(
+        'metadata.Team', blank=True, null=True, on_delete=models.CASCADE
+    )
+    event = models.ForeignKey(
+        'metadata.Event', blank=True, null=True, on_delete=models.CASCADE
+    )
 
     @cached_property
     def name(self):
@@ -96,13 +109,27 @@ class ServiceDelivery(InteractionAbstract):
         ('event', 'Event')
     }
 
-    status = models.ForeignKey('metadata.ServiceDeliveryStatus')
-    service_offer = models.ForeignKey(ServiceOffer, blank=True, null=True)
-    uk_region = models.ForeignKey('metadata.UKRegion', blank=True, null=True)
-    sector = models.ForeignKey('metadata.Sector', blank=True, null=True)
-    country_of_interest = models.ForeignKey('metadata.Country', blank=True, null=True)
-    feedback = models.TextField(max_length=settings.CDMS_TEXT_MAX_LENGTH, blank=True, null=True)  # CDMS limit
-    event = models.ForeignKey('metadata.Event', blank=True, null=True)
+    status = models.ForeignKey(
+        'metadata.ServiceDeliveryStatus', on_delete=models.PROTECT
+    )
+    service_offer = models.ForeignKey(
+        ServiceOffer, blank=True, null=True, on_delete=models.SET_NULL
+    )
+    uk_region = models.ForeignKey(
+        'metadata.UKRegion', blank=True, null=True, on_delete=models.SET_NULL
+    )
+    sector = models.ForeignKey(
+        'metadata.Sector', blank=True, null=True, on_delete=models.SET_NULL
+    )
+    country_of_interest = models.ForeignKey(
+        'metadata.Country', blank=True, null=True, on_delete=models.SET_NULL
+    )
+    feedback = models.TextField(
+        max_length=settings.CDMS_TEXT_MAX_LENGTH, blank=True, null=True
+    )
+    event = models.ForeignKey(
+        'metadata.Event', blank=True, null=True, on_delete=models.SET_NULL
+    )
 
     def clean(self):
         """Custom validation."""

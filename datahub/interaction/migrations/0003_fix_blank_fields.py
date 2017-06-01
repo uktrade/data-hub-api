@@ -27,22 +27,22 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='interaction',
             name='dit_advisor',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='interactions', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='interactions', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AlterField(
             model_name='interaction',
             name='dit_team',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='metadata.Team'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.Team'),
         ),
         migrations.AlterField(
             model_name='interaction',
             name='interaction_type',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='metadata.InteractionType'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.InteractionType'),
         ),
         migrations.AlterField(
             model_name='interaction',
             name='service',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='metadata.Service'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.Service'),
         ),
         migrations.AlterField(
             model_name='servicedelivery',
@@ -57,22 +57,22 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='servicedelivery',
             name='country_of_interest',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='metadata.Country'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.Country'),
         ),
         migrations.AlterField(
             model_name='servicedelivery',
             name='dit_advisor',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='servicedeliverys', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='servicedeliverys', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AlterField(
             model_name='servicedelivery',
             name='dit_team',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='metadata.Team'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.Team'),
         ),
         migrations.AlterField(
             model_name='servicedelivery',
             name='event',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='metadata.Event'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.Event'),
         ),
         migrations.AlterField(
             model_name='servicedelivery',
@@ -82,22 +82,22 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='servicedelivery',
             name='sector',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='metadata.Sector'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.Sector'),
         ),
         migrations.AlterField(
             model_name='servicedelivery',
             name='service',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='metadata.Service'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.Service'),
         ),
         migrations.AlterField(
             model_name='servicedelivery',
             name='service_offer',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='interaction.ServiceOffer'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='interaction.ServiceOffer'),
         ),
         migrations.AlterField(
             model_name='servicedelivery',
             name='uk_region',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='metadata.UKRegion'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.UKRegion'),
         ),
         migrations.AlterField(
             model_name='serviceoffer',
