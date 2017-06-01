@@ -49,12 +49,12 @@ def test_search_by_entity_query():
         'query': {
             'bool': {
                 'must': [{
+                    'term': {
+                        '_type': 'company'
+                    }}, {
                     'multi_match': {
                         'query': 'test',
                         'fields': ['name', '_all']
-                    }}, {
-                    'term': {
-                        '_type': 'company'
                     }}]
             }
         },
@@ -109,6 +109,7 @@ def test_remap_fields():
         'trading_address_country': 'test',
         'advisor': 'test',
         'test': 'test',
+        'uk_based': 'false'
     }
 
     remapped = elasticsearch.remap_fields(filters)
@@ -121,3 +122,5 @@ def test_remap_fields():
     assert 'trading_address_country.id' in remapped
     assert 'advisor.id' in remapped
     assert 'test' in remapped
+    assert 'uk_based' in remapped
+    assert remapped['uk_based'] is False

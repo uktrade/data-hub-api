@@ -35,7 +35,8 @@ def setup_data(client):
         name='abc defg us ltd',
         trading_address_1='1 Fake Lane',
         trading_address_town='Downtown',
-        trading_address_country_id=country_us
+        trading_address_country_id=country_us,
+        registered_address_country_id=country_us
     ).save()
 
     sync_es.ES_INDEX = 'test'

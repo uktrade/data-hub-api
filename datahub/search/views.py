@@ -53,7 +53,7 @@ class SearchCompanyAPIView(APIView):
 
     COMPANY_FILTER_FIELDS = (
         'name', 'alias', 'sector', 'account_manager', 'export_to_country',
-        'future_interest_country', 'description', 'uk_region',
+        'future_interest_country', 'description', 'uk_region', 'uk_based',
         'trading_address_town', 'trading_address_country', 'trading_address_postcode',
     )
 
