@@ -57,7 +57,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='company',
             name='parent',
-            field=mptt.fields.TreeForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='subsidiaries', to='company.Company'),
+            field=mptt.fields.TreeForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='subsidiaries', to='company.Company'),
         ),
         migrations.RunPython(rebuild_category_mptt, noop_reverse),
     ]
