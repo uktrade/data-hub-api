@@ -1,3 +1,5 @@
+from functools import partial
+
 from django.conf import settings
 
 from rest_framework import serializers
@@ -130,6 +132,95 @@ class CompanySerializerWriteV1(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = Company
         fields = '__all__'
+
+
+NestedAdvisorField = partial(
+    NestedRelatedField, 'company.Advisor',
+    extra_fields=('first_name', 'last_time')
+)
+
+
+class CompanySerializerV3(serializers.ModelSerializer):
+    """Company read/write serializer V3."""
+
+    # TODO: Check registered address CH behaviour
+    account_manager = NestedAdvisorField()
+    archived_by = NestedAdvisorField()
+    business_type = NestedRelatedField('metadata.BusinessType')
+    children = NestedRelatedField('company.Company', many=True)
+    classification = NestedRelatedField('metadata.Classification')
+    # TODO: companies_house_data
+    contacts = NestedAdvisorField(many=True)
+    employee_range = NestedRelatedField('metadata.EmployeeRange')
+    export_to_countries = NestedRelatedField('metadata.ExportToCountries')
+    future_interest_countries = NestedRelatedField(
+        'metadata.FutureInterestCountries'
+    )
+    headquarter_type = NestedRelatedField('metadata.EmployeeRange')
+    one_list_account_owner = NestedAdvisorField()
+    parent = NestedRelatedField('company.Company')
+    sector = NestedRelatedField('metadata.Sector')
+    turnover_range = NestedRelatedField('metadata.TurnoverRange')
+    uk_region = NestedRelatedField('metadata.UKRegion')
+    investment_projects = NestedRelatedField(
+        'investment.InvestmentProject', extra_fields=('name', 'project_code')
+    )
+
+    class Meta:  # noqa: D101
+        model = Company
+        fields = (
+            'id',
+            'name',
+            'trading_name',
+            'uk_based',
+            'registered_address_1',
+            'registered_address_2',
+            'registered_address_3',
+            'registered_address_4',
+            'registered_address_town',
+            'registered_address_county',
+            'registered_address_postcode',
+            'registered_address_country',
+            'created_on',
+            'modified_on',
+            'archived',
+            'archived_on',
+            'archived_reason',
+            'archived_by',
+            'description',
+            'website',
+            'trading_address_1',
+            'trading_address_2',
+            'trading_address_3',
+            'trading_address_4',
+            'trading_address_town',
+            'trading_address_county',
+            'trading_address_postcode',
+            'trading_address_country',
+            'account_manager',
+            'business_type',
+            'children',
+            'classification',
+            'companies_house_data',
+            'contacts',
+            'employee_range',
+            'export_to_countries',
+            'future_interest_companies',
+            'headquarter_type',
+            'one_list_account_owner',
+            'parent',
+            'sector',
+            'turnover_range',
+            'uk_region',
+            'investment_projects'
+        )
+        extra_kwargs = {
+            'investment_projects': {'read_only': True},
+            'archived': {'read_only': True},
+            'archived_on': {'read_only': True},
+            'archived_reason': {'read_only': True},
+            'archived_by': {'read_only': True}
+        }
 
 
 class ContactSerializer(serializers.ModelSerializer):
