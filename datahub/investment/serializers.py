@@ -108,20 +108,16 @@ class IProjectSerializer(serializers.ModelSerializer):
 class IProjectAuditSerializer(serializers.Serializer):
     """Serializer for Investment Project audit log."""
 
-    @staticmethod
-    def _diff_versions(old, new):
-        sentinel = object()
-        changes = {}
+    def to_representation(self, instance):
+        """Overwrite serialization process completely to get the Versions."""
+        versions = Version.objects.get_for_object(instance)
+        version_pairs = [
+            (versions[n], versions[n + 1]) for n in range(len(versions) - 1)
+        ]
 
-        for field, value in new.items():
-            old_value = old.get(field, sentinel)
-            if old_value is sentinel or old_value != value:
-                changes[field] = [
-                    old_value if old_value is not sentinel else None,
-                    value,
-                ]
-
-        return changes
+        return {
+            'audit_log': self._construct_changelog(version_pairs),
+        }
 
     def _construct_changelog(self, version_pairs):
         changelog = []
@@ -138,16 +134,19 @@ class IProjectAuditSerializer(serializers.Serializer):
 
         return changelog
 
-    def to_representation(self, instance):
-        """Overwrite serialization process completely to get the Versions."""
-        versions = Version.objects.get_for_object(instance)
-        version_pairs = [
-            (versions[n], versions[n + 1]) for n in range(len(versions) - 1)
-        ]
+    @staticmethod
+    def _diff_versions(old_version, new_version):
+        changes = {}
 
-        return {
-            'audit_log': self._construct_changelog(version_pairs),
-        }
+        for field_name, new_value in new_version.items():
+            if field_name not in old_version:
+                changes[field_name] = [None, new_value]
+            else:
+                old_value = old_version[field_name]
+                if old_value != new_value:
+                    changes[field_name] = [old_value, new_value]
+
+        return changes
 
 
 class IProjectValueSerializer(serializers.ModelSerializer):
