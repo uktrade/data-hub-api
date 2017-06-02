@@ -29,9 +29,9 @@ def test_company_can_have_hierarchy():
     second_company = CompanyFactory()
 
     assert first_company.parent is None
-    assert first_company.subsidiaries.count() == 0
+    assert first_company.children.count() == 0
     assert second_company.parent is None
-    assert second_company.subsidiaries.count() == 0
+    assert second_company.children.count() == 0
 
     second_company.parent = first_company
     second_company.save()
@@ -40,4 +40,4 @@ def test_company_can_have_hierarchy():
     second_company.refresh_from_db()
 
     assert second_company.parent is first_company
-    assert second_company in first_company.subsidiaries.all()
+    assert second_company in first_company.children.all()
