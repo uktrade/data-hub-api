@@ -10,6 +10,8 @@ from django.db import models
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 
+from mptt.models import MPTTModel, TreeForeignKey
+
 from datahub.company.validators import RelaxedURLValidator
 from datahub.core import constants
 from datahub.core.models import ArchivableModel, BaseModel
@@ -32,6 +34,7 @@ class CompanyAbstract(BaseModel):
         metadata_models.Country,
         related_name="%(class)ss",  # noqa: Q000
         null=True,
+        on_delete=models.SET_NULL
     )
     registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
@@ -48,7 +51,7 @@ class CompanyAbstract(BaseModel):
         super().save(*args, **kwargs)
 
 
-class Company(ArchivableModel, CompanyAbstract):
+class Company(MPTTModel, ArchivableModel, CompanyAbstract):
     """Representation of the company as per CDMS."""
 
     REQUIRED_TRADING_ADDRESS_FIELDS = (
@@ -60,11 +63,26 @@ class Company(ArchivableModel, CompanyAbstract):
     company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     alias = models.CharField(max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name')
-    business_type = models.ForeignKey(metadata_models.BusinessType, null=True)
-    sector = models.ForeignKey(metadata_models.Sector, null=True)
-    employee_range = models.ForeignKey(metadata_models.EmployeeRange, null=True)
-    turnover_range = models.ForeignKey(metadata_models.TurnoverRange, null=True)
-    account_manager = models.ForeignKey('Advisor', null=True, related_name='companies')
+    business_type = models.ForeignKey(
+        metadata_models.BusinessType, blank=True, null=True,
+        on_delete=models.SET_NULL
+    )
+    sector = models.ForeignKey(
+        metadata_models.Sector, blank=True, null=True,
+        on_delete=models.SET_NULL
+    )
+    employee_range = models.ForeignKey(
+        metadata_models.EmployeeRange, blank=True, null=True,
+        on_delete=models.SET_NULL
+    )
+    turnover_range = models.ForeignKey(
+        metadata_models.TurnoverRange, blank=True, null=True,
+        on_delete=models.SET_NULL
+    )
+    account_manager = models.ForeignKey(
+        'Advisor', blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='companies'
+    )
     export_to_countries = models.ManyToManyField(
         metadata_models.Country,
         blank=True,
@@ -78,7 +96,10 @@ class Company(ArchivableModel, CompanyAbstract):
     lead = models.BooleanField(default=False)
     description = models.TextField(blank=True, null=True)
     website = models.CharField(max_length=MAX_LENGTH, validators=[RelaxedURLValidator], blank=True, null=True)
-    uk_region = models.ForeignKey(metadata_models.UKRegion, null=True)
+    uk_region = models.ForeignKey(
+        metadata_models.UKRegion, blank=True, null=True,
+        on_delete=models.SET_NULL
+    )
     trading_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_3 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -87,17 +108,34 @@ class Company(ArchivableModel, CompanyAbstract):
     trading_address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_country = models.ForeignKey(
         metadata_models.Country,
+        blank=True,
         null=True,
+        on_delete=models.SET_NULL,
         related_name='company_trading_address_country'
     )
     trading_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    headquarter_type = models.ForeignKey(metadata_models.HeadquarterType, blank=True, null=True)
-    classification = models.ForeignKey(metadata_models.CompanyClassification, null=True)
-    parent = models.ForeignKey('self', null=True, related_name='subsidiaries')
-    one_list_account_owner = models.ForeignKey('Advisor', null=True, related_name='one_list_owned_companies')
+    headquarter_type = models.ForeignKey(
+        metadata_models.HeadquarterType, blank=True, null=True,
+        on_delete=models.SET_NULL
+    )
+    classification = models.ForeignKey(
+        metadata_models.CompanyClassification, blank=True, null=True,
+        on_delete=models.SET_NULL
+    )
+    parent = TreeForeignKey(
+        'self', blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='subsidiaries'
+    )
+    one_list_account_owner = models.ForeignKey(
+        'Advisor', blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='one_list_owned_companies'
+    )
 
     class Meta:  # noqa: D101
         verbose_name_plural = 'companies'
+
+    class MPTTMeta:  # noqa: D101
+        order_insertion_by = ['name']
 
     @cached_property
     def uk_based(self):
@@ -192,12 +230,20 @@ class Contact(ArchivableModel, BaseModel):
     )
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
-    title = models.ForeignKey(metadata_models.Title, blank=True, null=True)
+    title = models.ForeignKey(
+        metadata_models.Title, blank=True, null=True, on_delete=models.SET_NULL
+    )
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
     job_title = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    company = models.ForeignKey('Company', related_name='contacts', null=True, blank=True)
-    advisor = models.ForeignKey('Advisor', related_name='contacts', null=True, blank=True)
+    company = models.ForeignKey(
+        'Company', related_name='contacts', null=True, blank=True,
+        on_delete=models.CASCADE
+    )
+    advisor = models.ForeignKey(
+        'Advisor', related_name='contacts', null=True, blank=True,
+        on_delete=models.SET_NULL
+    )
     primary = models.BooleanField()
     telephone_countrycode = models.CharField(max_length=MAX_LENGTH)
     telephone_number = models.CharField(max_length=MAX_LENGTH)
@@ -209,7 +255,10 @@ class Contact(ArchivableModel, BaseModel):
     address_4 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    address_country = models.ForeignKey(metadata_models.Country, null=True, blank=True)
+    address_country = models.ForeignKey(
+        metadata_models.Country, null=True, blank=True,
+        on_delete=models.SET_NULL
+    )
     address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     telephone_alternative = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     email_alternative = models.EmailField(null=True, blank=True)
@@ -222,7 +271,7 @@ class Contact(ArchivableModel, BaseModel):
     @cached_property
     def name(self):
         """Need this for ES."""
-        return '{first_name} {last_name}'.format(first_name=self.first_name, last_name=self.last_name)
+        return f'{self.first_name} {self.last_name}'
 
     def __str__(self):
         """Admin displayed human readable name."""
@@ -318,7 +367,9 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     last_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     email = CICharField(max_length=MAX_LENGTH, unique=True)  # CDMS users may not have tld
-    dit_team = models.ForeignKey(metadata_models.Team, null=True)
+    dit_team = models.ForeignKey(
+        metadata_models.Team, blank=True, null=True, on_delete=models.SET_NULL
+    )
     is_staff = models.BooleanField(
         'staff status',
         default=False,
@@ -333,7 +384,10 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField('date joined', default=now)
-    enabled = models.BooleanField(default=False)
+    enabled = models.BooleanField(
+        default=False,
+        help_text='Whether CDMS authentication has been enabled for this user'
+    )
 
     objects = AdvisorManager()
 
@@ -343,7 +397,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     @cached_property
     def name(self):
         """Full name shorthand."""
-        return '{first_name} {last_name}'.format(first_name=self.first_name, last_name=self.last_name)
+        return f'{self.first_name} {self.last_name}'
 
     def __str__(self):
         """Admin displayed human readable name."""

@@ -45,6 +45,7 @@ THIRD_PARTY_APPS = (
     'reversion',
     'oauth2_provider',
     'django_filters',
+    'mptt',
 )
 
 LOCAL_APPS = (
@@ -52,8 +53,9 @@ LOCAL_APPS = (
     'datahub.company',
     'datahub.interaction',
     'datahub.investment',
+    'datahub.leads',
     'datahub.metadata',
-    'datahub.search',
+    'datahub.search.apps.SearchConfig',
     'datahub.user',
     'datahub.korben',
 )
@@ -163,6 +165,7 @@ ES_PORT = env.int('ES_PORT')
 ES_INDEX = env('ES_INDEX')
 DATAHUB_SECRET = env('DATAHUB_SECRET')
 CDMS_AUTH_URL = env('CDMS_AUTH_URL')
+CDMS_TEXT_MAX_LENGTH = 4000
 CHAR_FIELD_MAX_LENGTH = 255
 HEROKU = False
 BULK_CREATE_BATCH_SIZE = env.int('BULK_CREATE_BATCH_SIZE', default=50000)
