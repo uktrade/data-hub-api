@@ -67,7 +67,6 @@ _company_mappings = {
     'contacts': lambda col: [_contact_dict(c) for c in col.all()],
     'id': str,
     'uk_based': bool,
-    'interactions': lambda col: [_id_type_dict(c) for c in col.all()],
     'export_to_countries': lambda col: [_id_name_dict(c) for c in col.all()],
     'future_interest_countries': lambda col: [_id_name_dict(c) for c in col.all()],
 }
@@ -78,7 +77,6 @@ _contact_mappings = {
     'address_country': _id_name_dict,
     'advisor': _id_name_dict,
     'company': _id_name_dict,
-    'interactions': lambda col: [_id_type_dict(c) for c in col.all()],
 }
 
 # there is no typo in 'servicedeliverys' :(
@@ -86,7 +84,7 @@ _ignored_fields = (
     'subsidiaries', 'servicedeliverys', 'investment_projects',
     'investor_investment_projects', 'intermediate_investment_projects',
     'investee_projects', 'recipient_investment_projects', 'teams',
-    'tree_id', 'lft', 'rght', 'business_leads',
+    'tree_id', 'lft', 'rght', 'business_leads', 'interactions',
 )
 
 
