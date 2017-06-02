@@ -116,7 +116,7 @@ class Migration(migrations.Migration):
                 ('future_interest_countries', models.ManyToManyField(blank=True, related_name='company_future_interest_countries', to='metadata.Country')),
                 ('headquarter_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.HeadquarterType')),
                 ('one_list_account_owner', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='one_list_owned_companies', to=settings.AUTH_USER_MODEL)),
-                ('parent', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='subsidiaries', to='company.Company')),
+                ('parent', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='children', to='company.Company')),
                 ('registered_address_country', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='companys', to='metadata.Country')),
                 ('sector', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.Sector')),
                 ('trading_address_country', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='company_trading_address_country', to='metadata.Country')),
