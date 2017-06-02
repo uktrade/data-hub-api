@@ -47,7 +47,7 @@ class AdvisorSerializer(serializers.ModelSerializer):
         depth = 1
 
 
-class CompanySerializerRead(serializers.ModelSerializer):
+class CompanySerializerReadV1(serializers.ModelSerializer):
     """Company serializer."""
 
     name = serializers.SerializerMethodField('get_registered_name')
@@ -122,7 +122,7 @@ class CompanySerializerRead(serializers.ModelSerializer):
         return self._address_partial(obj, 'registered_address_town')
 
 
-class CompanySerializerWrite(serializers.ModelSerializer):
+class CompanySerializerWriteV1(serializers.ModelSerializer):
     """Company serializer for writing operations."""
 
     classification = serializers.PrimaryKeyRelatedField(read_only=True)
