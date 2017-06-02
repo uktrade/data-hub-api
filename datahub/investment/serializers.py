@@ -1,9 +1,11 @@
 """Investment serialisers for views."""
 
 from rest_framework import serializers
+from reversion.models import Version
 
 import datahub.metadata.models as meta_models
 from datahub.company.models import Advisor, Company, Contact
+from datahub.company.serializers import AdvisorSerializer
 from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.serializers import NestedRelatedField
 from datahub.investment.models import InvestmentProject
@@ -101,6 +103,51 @@ class IProjectSerializer(serializers.ModelSerializer):
         # DRF defaults to required=False even though this field is
         # non-nullable
         extra_kwargs = {'nda_signed': {'required': True}}
+
+
+class IProjectAuditSerializer(serializers.Serializer):
+    """Serializer for Investment Project audit log."""
+
+    @staticmethod
+    def _diff_versions(old, new):
+        sentinel = object()
+        changes = {}
+
+        for field, value in new.items():
+            old_value = old.get(field, sentinel)
+            if old_value is sentinel or old_value != value:
+                changes[field] = [
+                    old_value if old_value is not sentinel else None,
+                    value,
+                ]
+
+        return changes
+
+    def _construct_changelog(self, version_pairs):
+        changelog = []
+
+        for v_new, v_old in version_pairs:
+            changelog.append({
+                'user': AdvisorSerializer(v_new.revision.user).data,
+                'timestamp': v_new.revision.date_created,
+                'comment': v_new.revision.comment or '',
+                'changes': self._diff_versions(
+                    v_old.field_dict, v_new.field_dict
+                ),
+            })
+
+        return changelog
+
+    def to_representation(self, instance):
+        """Overwrite serialization process completely to get the Versions."""
+        versions = Version.objects.get_for_object(instance)
+        version_pairs = [
+            (versions[n], versions[n + 1]) for n in range(len(versions) - 1)
+        ]
+
+        return {
+            'audit_log': self._construct_changelog(version_pairs),
+        }
 
 
 class IProjectValueSerializer(serializers.ModelSerializer):
