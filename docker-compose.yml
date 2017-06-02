@@ -18,9 +18,10 @@ services:
       DJANGO_SECRET_KEY: changeme
       DJANGO_SETTINGS_MODULE: config.settings.local
       COV_TOKEN: ${COV_TOKEN}
-      ES_INDEX: test
+      ES_INDEX: test_index
       ES_HOST: es
       ES_PORT: 9200
+      TEST_ES_SERVER: es
       CDMS_AUTH_URL: http://example.com
     depends_on:
       - postgres

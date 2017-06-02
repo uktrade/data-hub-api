@@ -86,7 +86,8 @@ def format_errors(data):
     errors = []
     for k, v in data.items():
         error = {}
-        key = '/data/{path}'.format(path=k.replace('.', '/'))
+        path = k.replace('.', '/')
+        key = f'/data/{path}'
         error['detail'] = v
         error['source'] = {'pointer': key}
         errors.append(error)
