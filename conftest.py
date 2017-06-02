@@ -1,7 +1,6 @@
 from pathlib import PurePath
 
 import pytest
-
 from django.core.management import call_command
 from pytest_django.lazy_django import skip_if_no_django
 
@@ -30,5 +29,4 @@ def api_client():
     skip_if_no_django()
 
     from rest_framework.test import APIClient
-
     return APIClient()
