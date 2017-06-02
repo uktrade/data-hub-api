@@ -107,7 +107,8 @@ class CompanySerializerReadV1(serializers.ModelSerializer):
         """Return CH address if present."""
         obj = obj.companies_house_data or obj
         if obj.registered_address_country:
-            return {'id': str(obj.registered_address_country.id), 'name': obj.registered_address_country.name}
+            return {'id': str(obj.registered_address_country.id),
+                    'name': obj.registered_address_country.name}
         else:
             return {}
 
@@ -152,9 +153,11 @@ class CompanySerializerV3(serializers.ModelSerializer):
     # TODO: companies_house_data
     contacts = NestedAdvisorField(many=True)
     employee_range = NestedRelatedField('metadata.EmployeeRange')
-    export_to_countries = NestedRelatedField('metadata.ExportToCountries')
+    export_to_countries = NestedRelatedField(
+        'metadata.ExportToCountries', many=True
+    )
     future_interest_countries = NestedRelatedField(
-        'metadata.FutureInterestCountries'
+        'metadata.FutureInterestCountries', many=True
     )
     headquarter_type = NestedRelatedField('metadata.EmployeeRange')
     one_list_account_owner = NestedAdvisorField()
@@ -162,8 +165,9 @@ class CompanySerializerV3(serializers.ModelSerializer):
     sector = NestedRelatedField('metadata.Sector')
     turnover_range = NestedRelatedField('metadata.TurnoverRange')
     uk_region = NestedRelatedField('metadata.UKRegion')
-    investment_projects = NestedRelatedField(
-        'investment.InvestmentProject', extra_fields=('name', 'project_code')
+    investor_investment_projects = NestedRelatedField(
+        'investment.InvestmentProject', many=True,
+        extra_fields=('name', 'project_code')
     )
 
     class Meta:  # noqa: D101
@@ -205,14 +209,14 @@ class CompanySerializerV3(serializers.ModelSerializer):
             'contacts',
             'employee_range',
             'export_to_countries',
-            'future_interest_companies',
+            'future_interest_countries',
             'headquarter_type',
             'one_list_account_owner',
             'parent',
             'sector',
             'turnover_range',
             'uk_region',
-            'investment_projects'
+            'investor_investment_projects'
         )
         extra_kwargs = {
             'investment_projects': {'read_only': True},
@@ -250,11 +254,17 @@ class ContactSerializer(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = Contact
         fields = (
-            'id', 'title', 'first_name', 'last_name', 'job_title', 'company', 'advisor',
+            'id', 'title', 'first_name', 'last_name', 'job_title', 'company',
+            'advisor',
             'primary', 'telephone_countrycode', 'telephone_number', 'email',
-            'address_same_as_company', 'address_1', 'address_2', 'address_3', 'address_4',
-            'address_town', 'address_county', 'address_country', 'address_postcode',
-            'telephone_alternative', 'email_alternative', 'notes', 'contactable_by_dit',
-            'contactable_by_dit_partners', 'contactable_by_email', 'contactable_by_phone',
-            'archived', 'archived_on', 'archived_reason', 'archived_by', 'created_on'
+            'address_same_as_company', 'address_1', 'address_2', 'address_3',
+            'address_4',
+            'address_town', 'address_county', 'address_country',
+            'address_postcode',
+            'telephone_alternative', 'email_alternative', 'notes',
+            'contactable_by_dit',
+            'contactable_by_dit_partners', 'contactable_by_email',
+            'contactable_by_phone',
+            'archived', 'archived_on', 'archived_reason', 'archived_by',
+            'created_on'
         )

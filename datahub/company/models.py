@@ -136,6 +136,16 @@ class Company(MPTTModel, ArchivableModel, CompanyAbstract):
     class MPTTMeta:  # noqa: D101
         order_insertion_by = ['name']
 
+    @property
+    def trading_name(self):
+        """Alternative name for alias."""
+        return self.alias
+
+    @trading_name.setter
+    def trading_name(self, value):
+        """Alternative name for alias."""
+        self.alias = value
+
     @cached_property
     def uk_based(self):
         """Whether a company is based in the UK or not."""

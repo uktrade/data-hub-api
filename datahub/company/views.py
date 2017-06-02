@@ -7,8 +7,9 @@ from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSetV1, CoreViewSetV3
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
 from .serializers import (
-    AdvisorSerializer, CompaniesHouseCompanySerializer, CompanySerializerReadV1,
-    CompanySerializerWriteV1, ContactSerializer
+    AdvisorSerializer, CompaniesHouseCompanySerializer,
+    CompanySerializerReadV1, CompanySerializerV3, CompanySerializerWriteV1,
+    ContactSerializer
 )
 
 
@@ -29,6 +30,34 @@ class CompanyViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
     ).prefetch_related(
         'contacts',
         'interactions',
+        'export_to_countries',
+        'future_interest_countries'
+    )
+
+
+class CompanyViewSetV3(ArchivableViewSetMixin, CoreViewSetV3):
+    """Company view set V3."""
+
+    read_serializer_class = CompanySerializerV3
+    write_serializer_class = CompanySerializerV3
+    queryset = Company.objects.select_related(
+        'archived_by',
+        'registered_address_country',
+        'trading_address_country',
+        'account_manager',
+        'business_type',
+        'classification',
+        'employee_range',
+        'headquarter_type',
+        'one_list_account_owner',
+        'parent',
+        'sector',
+        'turnover_range',
+        'uk_region',
+    ).prefetch_related(
+        'investor_investment_projects',
+        'children',
+        'contacts',
         'export_to_countries',
         'future_interest_countries'
     )
