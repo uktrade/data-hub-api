@@ -93,7 +93,6 @@ class Company(MPTTModel, ArchivableModel, CompanyAbstract):
         blank=True,
         related_name='company_future_interest_countries'
     )
-    lead = models.BooleanField(default=False)
     description = models.TextField(blank=True, null=True)
     website = models.CharField(max_length=MAX_LENGTH, validators=[RelaxedURLValidator], blank=True, null=True)
     uk_region = models.ForeignKey(
