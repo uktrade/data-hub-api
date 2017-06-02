@@ -7,16 +7,16 @@ from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSetV1, CoreViewSetV3
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
 from .serializers import (
-    AdvisorSerializer, CompaniesHouseCompanySerializer, CompanySerializerRead,
-    CompanySerializerWrite, ContactSerializer
+    AdvisorSerializer, CompaniesHouseCompanySerializer, CompanySerializerReadV1,
+    CompanySerializerWriteV1, ContactSerializer
 )
 
 
 class CompanyViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
     """Company ViewSet."""
 
-    read_serializer_class = CompanySerializerRead
-    write_serializer_class = CompanySerializerWrite
+    read_serializer_class = CompanySerializerReadV1
+    write_serializer_class = CompanySerializerWriteV1
     queryset = Company.objects.select_related(
         'business_type',
         'sector',
