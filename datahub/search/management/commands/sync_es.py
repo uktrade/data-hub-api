@@ -4,6 +4,7 @@ from logging import getLogger
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.paginator import Paginator
+from django.db import models
 
 from datahub.company.models import Company, Contact
 from datahub.search.elasticsearch import bulk
@@ -77,6 +78,7 @@ _contact_mappings = {
     'address_country': _id_name_dict,
     'advisor': _id_name_dict,
     'company': _id_name_dict,
+    'archived_by': _contact_dict,
 }
 
 # there is no typo in 'servicedeliverys' :(
@@ -139,22 +141,35 @@ def _batch_rows(qs, batch_size=100):
         yield paginator.page(page).object_list
 
 
-def sync_dataset(item, batch_size=1):
+def sync_dataset(item, batch_size=1, stdout=None):
     """Sends dataset to ElasticSearch in batches of batch_size."""
+    rows_processed = 0
+    total_rows = item.queryset.count() \
+        if isinstance(item.queryset, models.Model) else len(item.queryset)
+    batches_processed = 0
     batches = _batch_rows(item.queryset, batch_size=batch_size)
     for batch in batches:
         actions = list(_dict_to_es(item.es_model._doc_type.name,
                                    _models_to_dict(batch, item.mapping)
                                    ))
+        num_actions = len(actions)
         bulk(actions=actions,
-             chunk_size=len(actions),
+             chunk_size=num_actions,
              request_timeout=300,
              raise_on_error=True,
              raise_on_exception=True,
              )
 
+        rows_processed += num_actions
+        batches_processed += 1
+        if stdout and batches_processed % 100 == 0:
+            stdout.write(f'Rows processed: {rows_processed}/{total_rows} {rows_processed*100//total_rows}%')
 
-def sync_es(batch_size, dataset):
+    if stdout:
+        stdout.write(f'Rows processed: {rows_processed}/{total_rows} 100%. Done!')
+
+
+def sync_es(batch_size, dataset, stdout=None):
     """Sends data to Elasticsearch."""
     # Makes sure mappings exist in Elasticsearch.
     # Those calls are idempotent
@@ -162,7 +177,7 @@ def sync_es(batch_size, dataset):
     ESContact.init(index=ES_INDEX)
 
     for item in dataset:
-        sync_dataset(item, batch_size=batch_size)
+        sync_dataset(item, batch_size=batch_size, stdout=stdout)
 
 
 class Command(BaseCommand):
@@ -179,4 +194,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Handle."""
-        sync_es(batch_size=options['batch_size'], dataset=get_dataset())
+        sync_es(batch_size=options['batch_size'], dataset=get_dataset(), stdout=self.stdout)
