@@ -34,5 +34,6 @@ v3_urls = [
     url(r'^', include((investment_urls, 'investment'), namespace='investment')),
     url(r'^', include((leads_urls, 'business-leads'), namespace='business-leads')),
     url(r'^', include((company_urls.contact_urls, 'contact'), namespace='contact')),
+    url(r'^', include((company_urls.company_urls, 'company'), namespace='company')),
     url(r'^', include((search_urls, 'search'), namespace='search'))
 ]
