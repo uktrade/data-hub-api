@@ -90,7 +90,7 @@ def bulk(actions=None, chunk_size=None, **kwargs):
     return es_bulk(connections.get_connection(), actions=actions, chunk_size=chunk_size, **kwargs)
 
 
-def remap_fields(filter):
+def remap_fields(fields):
     """Replaces fields to match Elasticsearch data model."""
     name_map = {
         'sector': 'sector.id',
@@ -101,7 +101,4 @@ def remap_fields(filter):
         'trading_address_country': 'trading_address_country.id',
         'advisor': 'advisor.id',
     }
-    value_map = {
-        'uk_based': lambda x: x.lower() == 'true'
-    }
-    return {name_map.get(k, k): value_map.get(k, str)(v) for k, v in filter.items()}
+    return {name_map.get(k, k): v for k, v in fields.items()}

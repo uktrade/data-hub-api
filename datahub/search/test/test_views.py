@@ -114,13 +114,13 @@ class SearchTestCase(LeelooTestCase):
         assert response.data['results'][0]['trading_address_country']['id'] == constants.Country.united_states.value.id
 
     @mock.patch('datahub.search.views.elasticsearch.ES_INDEX', 'test')
-    def test_search_foreign_company(self):
+    def test_search_foreign_company_json(self):
         """Tests detailed company search."""
         url = f"{reverse('api-v3:search:company')}?offset=0&limit=100"
 
         response = self.api_client.post(url, {
             'uk_based': False,
-        })
+        }, format='json')
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
