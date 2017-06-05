@@ -1,3 +1,4 @@
+from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -159,3 +160,35 @@ class CompanyTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data['website'] == 'www.google.com'
+
+    def test_archive_company_no_reason(self):
+        """Test company archive."""
+        company = CompanyFactory()
+        url = reverse('api-v3:company:archive', kwargs={'pk': company.id})
+        response = self.api_client.post(url, format='json')
+
+        assert response.data['archived']
+        assert response.data['archived_reason'] == ''
+        assert response.data['id'] == str(company.id)
+
+    def test_archive_company_reason(self):
+        """Test company archive."""
+        company = CompanyFactory()
+        url = reverse('api-v3:company:archive', kwargs={'pk': company.id})
+        response = self.api_client.post(url, {'reason': 'foo'}, format='json')
+
+        assert response.data['archived']
+        assert response.data['archived_reason'] == 'foo'
+        assert response.data['id'] == str(company.id)
+
+    def test_unarchive_company(self):
+        """Unarchive a company."""
+        company = CompanyFactory(
+            archived=True, archived_on=now(), archived_reason='foo'
+        )
+        url = reverse('api-v3:company:unarchive', kwargs={'pk': company.id})
+        response = self.api_client.post(url)
+
+        assert not response.data['archived']
+        assert response.data['archived_reason'] == ''
+        assert response.data['id'] == str(company.id)
