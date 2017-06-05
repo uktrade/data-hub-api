@@ -1,4 +1,3 @@
-import json
 from unittest import mock
 
 import pytest
@@ -119,9 +118,9 @@ class SearchTestCase(LeelooTestCase):
         """Tests detailed company search."""
         url = f"{reverse('api-v3:search:company')}?offset=0&limit=100"
 
-        response = self.api_client.post(url, json.dumps({
+        response = self.api_client.post(url, {
             'uk_based': False,
-        }), content_type='application/json')
+        }, format='json')
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
