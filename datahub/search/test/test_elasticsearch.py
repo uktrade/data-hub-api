@@ -109,7 +109,7 @@ def test_remap_fields():
         'trading_address_country': 'test',
         'advisor': 'test',
         'test': 'test',
-        'uk_based': 'false'
+        'uk_based': False
     }
 
     remapped = elasticsearch.remap_fields(filters)

@@ -1,8 +1,10 @@
 """Tests for investment views."""
 
 import re
+from datetime import datetime
 
 import pytest
+import reversion
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -577,11 +579,50 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'team_complete': True
         }
 
+    def test_audit_log_view(self):
+        """Test retrieval of audit log."""
+        user = self.get_user()
+
+        initial_datetime = datetime.utcnow()
+        with reversion.create_revision():
+            iproject = InvestmentProjectFactory(
+                description='Initial desc',
+            )
+
+            reversion.set_comment('Initial')
+            reversion.set_date_created(initial_datetime)
+            reversion.set_user(user)
+
+        changed_datetime = datetime.utcnow()
+        with reversion.create_revision():
+            iproject.description = 'New desc'
+            iproject.save()
+
+            reversion.set_comment('Changed')
+            reversion.set_date_created(changed_datetime)
+            reversion.set_user(user)
+
+        url = reverse('api-v3:investment:audit-item',
+                      kwargs={'pk': iproject.pk})
+
+        response = self.api_client.get(url)
+        response_data = response.json()['results']
+
+        # No need to test the whole response
+        assert len(response_data) == 1, 'Only one entry in audit log'
+        entry = response_data[0]
+
+        assert entry['user']['name'] == user.name, 'Valid user captured'
+        assert entry['comment'] == 'Changed', 'Comments can be set manually'
+        assert entry['timestamp'] == changed_datetime.isoformat(), 'TS can be set manually'
+        assert entry['changes']['description'] == ['Initial desc', 'New desc'], 'Changes are reflected'
+
 
 @pytest.mark.parametrize('view_set', (views.IProjectTeamViewSet,
                                       views.IProjectRequirementsViewSet,
                                       views.IProjectViewSet,
-                                      views.IProjectValueViewSet))
+                                      views.IProjectValueViewSet,
+                                      views.IProjectAuditViewSet))
 def test_view_set_name(view_set):
     """Test that the view name is a string."""
     assert isinstance(view_set().get_view_name(), str)
