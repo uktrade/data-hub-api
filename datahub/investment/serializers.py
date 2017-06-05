@@ -1,6 +1,7 @@
 """Investment serialisers for views."""
 
 from rest_framework import serializers
+from reversion.models import Version
 
 import datahub.metadata.models as meta_models
 from datahub.company.models import Advisor, Company, Contact
@@ -101,6 +102,61 @@ class IProjectSerializer(serializers.ModelSerializer):
         # DRF defaults to required=False even though this field is
         # non-nullable
         extra_kwargs = {'nda_signed': {'required': True}}
+
+
+class IProjectAuditSerializer(serializers.Serializer):
+    """Serializer for Investment Project audit log."""
+
+    def to_representation(self, instance):
+        """Overwrite serialization process completely to get the Versions."""
+        versions = Version.objects.get_for_object(instance)
+        version_pairs = (
+            (versions[n], versions[n + 1]) for n in range(len(versions) - 1)
+        )
+
+        return {
+            'results': self._construct_changelog(version_pairs),
+        }
+
+    def _construct_changelog(self, version_pairs):
+        changelog = []
+
+        for v_new, v_old in version_pairs:
+            version_creator = v_new.revision.user
+            creator_repr = None
+            if version_creator:
+                creator_repr = {
+                    'id': str(version_creator.pk),
+                    'first_name': version_creator.first_name,
+                    'last_name': version_creator.last_name,
+                    'name': version_creator.name,
+                    'email': version_creator.email,
+                }
+
+            changelog.append({
+                'user': creator_repr,
+                'timestamp': v_new.revision.date_created,
+                'comment': v_new.revision.comment or '',
+                'changes': self._diff_versions(
+                    v_old.field_dict, v_new.field_dict
+                ),
+            })
+
+        return changelog
+
+    @staticmethod
+    def _diff_versions(old_version, new_version):
+        changes = {}
+
+        for field_name, new_value in new_version.items():
+            if field_name not in old_version:
+                changes[field_name] = [None, new_value]
+            else:
+                old_value = old_version[field_name]
+                if old_value != new_value:
+                    changes[field_name] = [old_value, new_value]
+
+        return changes
 
 
 class IProjectValueSerializer(serializers.ModelSerializer):
