@@ -50,6 +50,10 @@ class IProjectAuditViewSet(CoreViewSetV3):
     read_serializer_class = IProjectAuditSerializer
     queryset = InvestmentProject.objects.all()
 
+    def get_view_name(self):
+        """Returns the view set name for the DRF UI."""
+        return 'Investment project audit log'
+
 
 class IProjectValueViewSet(CoreViewSetV3):
     """Investment project value views.
