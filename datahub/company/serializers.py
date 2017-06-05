@@ -138,7 +138,7 @@ class CompanySerializerWriteV1(serializers.ModelSerializer):
 
 NestedAdvisorField = partial(
     NestedRelatedField, 'company.Advisor',
-    extra_fields=('first_name', 'last_time')
+    extra_fields=('first_name', 'last_name')
 )
 
 
