@@ -7,7 +7,6 @@ def test_audit_log_diff_algo():
         'old': {
             'field1': 'val1',
             'field2': 'val2',
-            'field3': None,
         },
         'new': {
             'field1': 'val1',

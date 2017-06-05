@@ -111,20 +111,31 @@ class IProjectAuditSerializer(serializers.Serializer):
     def to_representation(self, instance):
         """Overwrite serialization process completely to get the Versions."""
         versions = Version.objects.get_for_object(instance)
-        version_pairs = [
+        version_pairs = (
             (versions[n], versions[n + 1]) for n in range(len(versions) - 1)
-        ]
+        )
 
         return {
-            'audit_log': self._construct_changelog(version_pairs),
+            'results': self._construct_changelog(version_pairs),
         }
 
     def _construct_changelog(self, version_pairs):
         changelog = []
 
         for v_new, v_old in version_pairs:
+            version_creator = v_new.revision.user
+            creator_repr = None
+            if version_creator:
+                creator_repr = {
+                    'id': str(version_creator.pk),
+                    'first_name': version_creator.first_name,
+                    'last_name': version_creator.last_name,
+                    'name': version_creator.name,
+                    'email': version_creator.email,
+                }
+
             changelog.append({
-                'user': AdvisorSerializer(v_new.revision.user).data,
+                'user': creator_repr,
                 'timestamp': v_new.revision.date_created,
                 'comment': v_new.revision.comment or '',
                 'changes': self._diff_versions(

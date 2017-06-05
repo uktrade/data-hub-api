@@ -606,7 +606,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
                       kwargs={'pk': iproject.pk})
 
         response = self.api_client.get(url)
-        response_data = response.json()['audit_log']
+        response_data = response.json()['results']
 
         # No need to test the whole response
         assert len(response_data) == 1, 'Only one entry in audit log'
