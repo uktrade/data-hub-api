@@ -4,6 +4,7 @@ from django.conf import settings
 
 from rest_framework import serializers
 
+from datahub.company.models import Advisor, Company
 from datahub.core.serializers import NestedRelatedField
 from datahub.interaction.models import Interaction
 from datahub.metadata import models as meta_models
@@ -144,29 +145,53 @@ NestedAdvisorField = partial(
 class CompanySerializerV3(serializers.ModelSerializer):
     """Company read/write serializer V3."""
 
+    registered_address_country = NestedRelatedField(
+        meta_models.Country, required=False, allow_null=True
+    )
+    trading_address_country = NestedRelatedField(
+        meta_models.Country, required=False, allow_null=True
+    )
     # TODO: Check registered address CH behaviour
-    account_manager = NestedAdvisorField()
-    archived_by = NestedAdvisorField()
-    business_type = NestedRelatedField('metadata.BusinessType')
-    children = NestedRelatedField('company.Company', many=True)
-    classification = NestedRelatedField('metadata.Classification')
+    account_manager = NestedAdvisorField(required=False, allow_null=True)
+    archived_by = NestedAdvisorField(read_only=True)
+    business_type = NestedRelatedField(
+        meta_models.BusinessType, required=False, allow_null=True
+    )
+    children = NestedRelatedField('company.Company', many=True, required=False)
+    classification = NestedRelatedField(
+        meta_models.CompanyClassification, required=False, allow_null=True
+    )
     # TODO: companies_house_data
-    contacts = NestedAdvisorField(many=True)
-    employee_range = NestedRelatedField('metadata.EmployeeRange')
+    contacts = NestedAdvisorField(many=True, read_only=True)
+    employee_range = NestedRelatedField(
+        meta_models.EmployeeRange, required=False, allow_null=True
+    )
     export_to_countries = NestedRelatedField(
-        'metadata.ExportToCountries', many=True
+        meta_models.Country, many=True, required=False
     )
     future_interest_countries = NestedRelatedField(
-        'metadata.FutureInterestCountries', many=True
+        meta_models.Country, many=True, required=False
     )
-    headquarter_type = NestedRelatedField('metadata.EmployeeRange')
-    one_list_account_owner = NestedAdvisorField()
-    parent = NestedRelatedField('company.Company')
-    sector = NestedRelatedField('metadata.Sector')
-    turnover_range = NestedRelatedField('metadata.TurnoverRange')
-    uk_region = NestedRelatedField('metadata.UKRegion')
+    headquarter_type = NestedRelatedField(
+        meta_models.HeadquarterType, required=False, allow_null=True
+    )
+    one_list_account_owner = NestedAdvisorField(
+        required=False, allow_null=True
+    )
+    parent = NestedRelatedField(
+        'company.Company', required=False, allow_null=True
+    )
+    sector = NestedRelatedField(
+        meta_models.Sector, required=False, allow_null=True
+    )
+    turnover_range = NestedRelatedField(
+        meta_models.TurnoverRange, required=False, allow_null=True
+    )
+    uk_region = NestedRelatedField(
+        meta_models.UKRegion, required=False, allow_null=True
+    )
     investor_investment_projects = NestedRelatedField(
-        'investment.InvestmentProject', many=True,
+        'investment.InvestmentProject', many=True, read_only=True,
         extra_fields=('name', 'project_code')
     )
 
@@ -222,8 +247,7 @@ class CompanySerializerV3(serializers.ModelSerializer):
             'investment_projects': {'read_only': True},
             'archived': {'read_only': True},
             'archived_on': {'read_only': True},
-            'archived_reason': {'read_only': True},
-            'archived_by': {'read_only': True}
+            'archived_reason': {'read_only': True}
         }
 
 

@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from django.apps import apps
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 from rest_framework.fields import UUIDField
@@ -38,9 +39,13 @@ class NestedRelatedField(serializers.RelatedField):
                                 RelatedField.__init__()
         """
         super().__init__(**kwargs)
+
+        model_class = (apps.get_model(model) if isinstance(model, str) else
+                       model)
+
         self.pk_field = UUIDField()
         self._fields = extra_fields
-        self._model = model
+        self._model = model_class
 
     def get_queryset(self):
         """Returns the queryset corresponding to the model."""
