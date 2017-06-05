@@ -5,6 +5,7 @@ from pytest import fixture
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
+from datahub.search import models, elasticsearch
 from datahub.search.management.commands import sync_es
 
 
@@ -18,7 +19,13 @@ def client(request):
 
 @fixture(scope='session')
 def setup_data(client):
-    create_test_index(client, 'test')
+    client.indices.delete(elasticsearch.ES_INDEX)
+    
+    create_test_index(client, elasticsearch.ES_INDEX)
+
+    # Create models in the test index
+    models.Company.init(index=elasticsearch.ES_INDEX)
+    models.Contact.init(index=elasticsearch.ES_INDEX)
 
     ContactFactory(first_name='abc', last_name='defg').save()
     ContactFactory(first_name='first', last_name='last').save()
@@ -39,12 +46,11 @@ def setup_data(client):
         registered_address_country_id=country_us
     ).save()
 
-    sync_es.ES_INDEX = 'test'
     management.call_command(sync_es.Command())
     client.indices.refresh()
 
     yield client
-    client.indices.delete('test')
+    client.indices.delete(elasticsearch.ES_INDEX)
 
 
 def create_test_index(client, index):
