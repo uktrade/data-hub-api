@@ -204,7 +204,7 @@ class IProjectTeamAbstract(models.Model):
 
     @property
     def project_assurance_team(self):
-        """The DIT team associated with the project assurance advisor."""
+        """The DIT team associated with the project assurance adviser."""
         if self.project_assurance_adviser:
             return self.project_assurance_adviser.dit_team
         return None

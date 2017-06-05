@@ -99,7 +99,7 @@ def remap_fields(filter):
         'future_interest_country': 'future_interest_countries.id',
         'uk_region': 'uk_region.id',
         'trading_address_country': 'trading_address_country.id',
-        'advisor': 'advisor.id',
+        'adviser': 'adviser.id',
     }
     value_map = {
         'uk_based': lambda x: x.lower() == 'true'

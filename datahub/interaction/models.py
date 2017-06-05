@@ -99,7 +99,7 @@ class ServiceDelivery(InteractionAbstract):
         ('company', 'Company'),
         ('contact', 'Contact'),
         ('country_of_interest', 'Country'),
-        ('dit_adviser', 'Advisor'),
+        ('dit_adviser', 'Adviser'),
         ('dit_team', 'Team'),
         ('sector', 'Sector'),
         ('service', 'Service'),

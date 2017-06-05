@@ -36,8 +36,8 @@ class CompaniesHouseCompanySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class AdvisorSerializer(serializers.ModelSerializer):
-    """Advisor serializer."""
+class AdviserSerializer(serializers.ModelSerializer):
+    """Adviser serializer."""
 
     name = serializers.CharField()
 
@@ -58,7 +58,7 @@ class CompanySerializerRead(serializers.ModelSerializer):
     export_to_countries = NestedCountrySerializer(many=True)
     future_interest_countries = NestedCountrySerializer(many=True)
     uk_based = serializers.BooleanField()
-    account_manager = AdvisorSerializer()
+    account_manager = AdviserSerializer()
     registered_address_1 = serializers.SerializerMethodField()
     registered_address_2 = serializers.SerializerMethodField()
     registered_address_3 = serializers.SerializerMethodField()

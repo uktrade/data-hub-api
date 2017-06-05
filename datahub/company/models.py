@@ -361,7 +361,7 @@ class AdviserManager(BaseUserManager):
 
 
 class Advisor(AbstractBaseUser, PermissionsMixin):
-    """Advisor."""
+    """Adviser."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     first_name = models.CharField(max_length=MAX_LENGTH, blank=True)
@@ -416,3 +416,6 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Sends an email to this User."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
+
+    class Meta:  # noqa: D101
+        verbose_name = 'adviser'

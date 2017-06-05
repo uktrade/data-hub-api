@@ -1,7 +1,7 @@
 import factory
 from django.utils.timezone import now
 
-from datahub.company.test.factories import CompanyFactory, ContactFactory, AdvisorFactory
+from datahub.company.test.factories import CompanyFactory, ContactFactory, AdviserFactory
 from datahub.core import constants
 from datahub.metadata.test.factories import TeamFactory, ServiceFactory
 
@@ -24,7 +24,7 @@ class InteractionFactory(factory.django.DjangoModelFactory):
     subject = 'foo'
     date = now()
     notes = 'Bar'
-    dit_adviser = factory.SubFactory(AdvisorFactory)
+    dit_adviser = factory.SubFactory(AdviserFactory)
     service_id = constants.Service.trade_enquiry.value.id
     dit_team_id = constants.Team.healthcare_uk.value.id
     created_on = now()
@@ -42,7 +42,7 @@ class ServiceDeliveryFactory(factory.django.DjangoModelFactory):
     subject = 'foo'
     date = now()
     notes = 'Bar'
-    dit_adviser = factory.SubFactory(AdvisorFactory)
+    dit_adviser = factory.SubFactory(AdviserFactory)
     created_on = now()
     status_id = constants.ServiceDeliveryStatus.offered.value.id
     uk_region_id = constants.UKRegion.east_midlands.value.id

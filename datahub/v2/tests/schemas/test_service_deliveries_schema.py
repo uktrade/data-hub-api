@@ -191,7 +191,7 @@ def test_service_deliveries_valid_schema():
             },
             'dit_adviser': {
                 'data': {
-                    'type': 'Advisor',
+                    'type': 'Adviser',
                     'id': str(user.pk)
                 }
             }

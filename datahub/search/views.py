@@ -92,7 +92,7 @@ class SearchContactAPIView(APIView):
     """Filtered contact search view."""
 
     CONTACT_FILTER_FIELDS = (
-        'first_name', 'last_name', 'job_title', 'company', 'advisor', 'notes',
+        'first_name', 'last_name', 'job_title', 'company', 'adviser', 'notes',
     )
 
     http_method_names = ('post',)

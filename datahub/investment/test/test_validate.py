@@ -1,6 +1,6 @@
 import pytest
 
-from datahub.company.test.factories import (AdvisorFactory, ContactFactory)
+from datahub.company.test.factories import (AdviserFactory, ContactFactory)
 from datahub.core import constants
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.investment.validate import (
@@ -189,7 +189,7 @@ def test_validate_team_fail():
 
 def test_validate_team_instance_success():
     """Tests validating a complete team section using a model instance."""
-    adviser = AdvisorFactory()
+    adviser = AdviserFactory()
     project = InvestmentProjectFactory(
         project_manager=adviser,
         project_assurance_adviser=adviser
