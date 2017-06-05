@@ -101,7 +101,4 @@ def remap_fields(filter):
         'trading_address_country': 'trading_address_country.id',
         'advisor': 'advisor.id',
     }
-    value_map = {
-        'uk_based': lambda x: x.lower() == 'true'
-    }
-    return {name_map.get(k, k): value_map.get(k, str)(v) for k, v in filter.items()}
+    return {name_map.get(k, k): v for k, v in filter.items()}
