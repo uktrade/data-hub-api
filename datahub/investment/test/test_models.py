@@ -23,9 +23,8 @@ def test_project_code_datahub():
     """Tests that correct project codes are generated for Data Hub projects."""
     project = InvestmentProjectFactory()
     assert project.investmentprojectcode
-    assert project.project_code == 'DHP-{:08d}'.format(
-        project.investmentprojectcode.id
-    )
+    project_num = project.investmentprojectcode.id
+    assert project.project_code == f'DHP-{project_num:08d}'
 
 
 def test_project_manager_team_none():

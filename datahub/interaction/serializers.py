@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from datahub.company.serializers import AdvisorSerializer
+from datahub.core.validate_utils import OneOfValidator
 from .models import Interaction
 
 
@@ -21,3 +22,4 @@ class InteractionSerializerWrite(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = Interaction
         fields = '__all__'
+        validators = [OneOfValidator('company', 'investment_project')]

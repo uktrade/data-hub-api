@@ -27,8 +27,10 @@ class IProjectAbstract(models.Model):
     description = models.TextField()
     nda_signed = models.BooleanField()
     estimated_land_date = models.DateField()
-    investment_type = models.ForeignKey('metadata.InvestmentType',
-                                        related_name='investment_projects')
+    investment_type = models.ForeignKey(
+        'metadata.InvestmentType', on_delete=models.PROTECT,
+        related_name='investment_projects'
+    )
 
     cdms_project_code = models.CharField(max_length=MAX_LENGTH, blank=True,
                                          null=True)
@@ -36,57 +38,61 @@ class IProjectAbstract(models.Model):
     anonymous_description = models.TextField(blank=True, null=True)
     not_shareable_reason = models.TextField(blank=True, null=True)
 
-    phase = models.ForeignKey('metadata.InvestmentProjectPhase',
-                              related_name='investment_projects',
-                              default=InvestmentProjectPhase.prospect.value.id)
+    phase = models.ForeignKey(
+        'metadata.InvestmentProjectPhase', on_delete=models.PROTECT,
+        related_name='investment_projects',
+        default=InvestmentProjectPhase.prospect.value.id
+    )
     investor_company = models.ForeignKey(
         'company.Company', related_name='investor_investment_projects',
-        null=True, blank=True
+        null=True, blank=True, on_delete=models.CASCADE
     )
     intermediate_company = models.ForeignKey(
         'company.Company', related_name='intermediate_investment_projects',
-        null=True, blank=True
+        null=True, blank=True, on_delete=models.SET_NULL
     )
     investment_recipient_company = models.ForeignKey(
         'company.Company', related_name='recipient_investment_projects',
-        null=True, blank=True
+        null=True, blank=True, on_delete=models.SET_NULL
     )
     client_contacts = models.ManyToManyField(
         'company.Contact', related_name='investment_projects', blank=True
     )
     client_relationship_manager = models.ForeignKey(
         'company.Advisor', related_name='investment_projects', null=True,
-        blank=True
+        blank=True, on_delete=models.SET_NULL
     )
     referral_source_adviser = models.ForeignKey(
         'company.Advisor', related_name='referred_investment_projects',
-        null=True, blank=True
+        null=True, blank=True, on_delete=models.SET_NULL
     )
     referral_source_activity = models.ForeignKey(
         'metadata.ReferralSourceActivity', related_name='investment_projects',
-        null=True, blank=True
+        null=True, blank=True, on_delete=models.SET_NULL
     )
     referral_source_activity_website = models.ForeignKey(
         'metadata.ReferralSourceWebsite', related_name='investment_projects',
-        null=True, blank=True
+        null=True, blank=True, on_delete=models.SET_NULL
     )
     referral_source_activity_marketing = models.ForeignKey(
         'metadata.ReferralSourceMarketing', related_name='investment_projects',
-        null=True, blank=True
+        null=True, blank=True, on_delete=models.SET_NULL
     )
     referral_source_activity_event = models.CharField(
         max_length=MAX_LENGTH, null=True, blank=True
     )
     fdi_type = models.ForeignKey(
         'metadata.FDIType', related_name='investment_projects', null=True,
-        blank=True
+        blank=True, on_delete=models.SET_NULL
     )
     non_fdi_type = models.ForeignKey(
         'metadata.NonFDIType', related_name='investment_projects', null=True,
-        blank=True
+        blank=True, on_delete=models.SET_NULL
     )
-    sector = models.ForeignKey('metadata.Sector', related_name='+', null=True,
-                               blank=True)
+    sector = models.ForeignKey(
+        'metadata.Sector', related_name='+', null=True, blank=True,
+        on_delete=models.SET_NULL
+    )
     business_activities = models.ManyToManyField(
         'metadata.InvestmentBusinessActivity',
         related_name='+',
@@ -102,7 +108,8 @@ class IProjectAbstract(models.Model):
         """
         if self.cdms_project_code:
             return self.cdms_project_code
-        return 'DHP-{:08d}'.format(self.investmentprojectcode.id)
+        project_num = self.investmentprojectcode.id
+        return f'DHP-{project_num:08d}'
 
 
 class IProjectValueAbstract(models.Model):
@@ -121,7 +128,8 @@ class IProjectValueAbstract(models.Model):
     government_assistance = models.NullBooleanField()
     number_new_jobs = models.IntegerField(null=True, blank=True)
     average_salary = models.ForeignKey(
-        'metadata.SalaryRange', related_name='+', null=True, blank=True
+        'metadata.SalaryRange', related_name='+', null=True, blank=True,
+        on_delete=models.SET_NULL
     )
     number_safeguarded_jobs = models.IntegerField(null=True, blank=True)
     r_and_d_budget = models.NullBooleanField()
@@ -155,7 +163,7 @@ class IProjectRequirementsAbstract(models.Model):
 
     uk_company = models.ForeignKey(
         'company.Company', related_name='investee_projects',
-        null=True, blank=True
+        null=True, blank=True, on_delete=models.SET_NULL
     )
     competitor_countries = models.ManyToManyField('metadata.Country',
                                                   related_name='+', blank=True)
@@ -179,10 +187,12 @@ class IProjectTeamAbstract(models.Model):
         abstract = True
 
     project_manager = models.ForeignKey(
-        'company.Advisor', null=True, related_name='+', blank=True
+        'company.Advisor', null=True, related_name='+', blank=True,
+        on_delete=models.SET_NULL
     )
     project_assurance_adviser = models.ForeignKey(
-        'company.Advisor', null=True, related_name='+', blank=True
+        'company.Advisor', null=True, related_name='+', blank=True,
+        on_delete=models.SET_NULL
     )
 
     @property
@@ -214,8 +224,8 @@ class InvestmentProject(IProjectAbstract, IProjectValueAbstract,
 
     def __str__(self):
         """Human-readable name for admin section etc."""
-        return '{} – {}'.format(self.investor_company or 'No company',
-                                self.name)
+        company_name = self.investor_company or 'No company'
+        return f'{company_name} – {self.name}'
 
 
 class InvestmentProjectCode(models.Model):
@@ -229,7 +239,8 @@ class InvestmentProjectCode(models.Model):
     standard auto-incrementing integer (serial) as a primary key.
     """
 
-    project = models.OneToOneField(InvestmentProject)
+    project = models.OneToOneField(InvestmentProject,
+                                   on_delete=models.CASCADE)
 
 
 @receiver(post_save, sender=InvestmentProject)

@@ -9,11 +9,11 @@ from datahub.core import constants
 class AdvisorFactory(factory.django.DjangoModelFactory):
     """Advisor factory."""
 
-    id = factory.Sequence(lambda x: '{0}'.format(uuid.uuid4()))
-    first_name = factory.Sequence(lambda x: 'name {0}'.format(x))
-    last_name = factory.Sequence(lambda x: 'surname {0}'.format(x))
+    id = factory.Sequence(lambda _: str(uuid.uuid4()))
+    first_name = factory.Sequence(lambda n: f'name {n}')
+    last_name = factory.Sequence(lambda n: f'surname {n}')
     dit_team_id = constants.Team.healthcare_uk.value.id
-    email = factory.Sequence(lambda x: 'foo-{0}@bar.com'.format(x))
+    email = factory.Sequence(lambda n: f'foo-{n}@bar.com')
     date_joined = now()
 
     class Meta:
@@ -24,11 +24,14 @@ class AdvisorFactory(factory.django.DjangoModelFactory):
 class CompanyFactory(factory.django.DjangoModelFactory):
     """Company factory."""
 
-    id = factory.Sequence(lambda x: '{0}'.format(uuid.uuid4()))
-    name = factory.Sequence(lambda x: 'name{0}'.format(x))
-    registered_address_1 = factory.Sequence(lambda x: '{0} Foo st.'.format(x))
+    id = factory.Sequence(lambda _: str(uuid.uuid4()))
+    name = factory.Sequence(lambda n: f'name{n}')
+    registered_address_1 = factory.Sequence(lambda n: f'{n} Foo st.')
     registered_address_town = 'London'
     registered_address_country_id = constants.Country.united_kingdom.value.id
+    trading_address_1 = factory.Sequence(lambda x: f'{x} Fake Lane')
+    trading_address_town = 'Woodside'
+    trading_address_country_id = constants.Country.united_kingdom.value.id
     business_type_id = constants.BusinessType.private_limited_company.value.id
     sector_id = constants.Sector.aerospace_assembly_aircraft.value.id
     archived = False
@@ -42,9 +45,9 @@ class CompanyFactory(factory.django.DjangoModelFactory):
 class CompaniesHouseCompanyFactory(factory.django.DjangoModelFactory):
     """Companies house company factory."""
 
-    name = factory.Sequence(lambda x: 'name{0}'.format(x))
+    name = factory.Sequence(lambda n: f'name{n}')
     company_number = factory.Sequence(lambda x: x)
-    registered_address_1 = factory.Sequence(lambda x: '{0} Bar st.'.format(x))
+    registered_address_1 = factory.Sequence(lambda n: f'{n} Bar st.')
     registered_address_town = 'Rome'
     registered_address_country_id = constants.Country.italy.value.id
     incorporation_date = now()
@@ -57,10 +60,10 @@ class CompaniesHouseCompanyFactory(factory.django.DjangoModelFactory):
 class ContactFactory(factory.django.DjangoModelFactory):
     """Contact factory"""
 
-    id = factory.Sequence(lambda x: '{0}'.format(uuid.uuid4()))
+    id = factory.Sequence(lambda _: str(uuid.uuid4()))
     title_id = constants.Title.wing_commander.value.id
-    first_name = factory.Sequence(lambda x: 'name {0}'.format(x))
-    last_name = factory.Sequence(lambda x: 'surname {0}'.format(x))
+    first_name = factory.Sequence(lambda n: 'name {n}')
+    last_name = factory.Sequence(lambda n: 'surname {n}')
     company = factory.SubFactory(CompanyFactory)
     email = 'foo@bar.com'
     primary = True
