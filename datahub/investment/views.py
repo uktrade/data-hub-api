@@ -5,8 +5,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.investment.models import InvestmentProject
 from datahub.investment.serializers import (
-    IProjectRequirementsSerializer, IProjectSerializer, IProjectTeamSerializer,
-    IProjectValueSerializer
+    IProjectAuditSerializer, IProjectRequirementsSerializer, IProjectSerializer,
+    IProjectTeamSerializer, IProjectValueSerializer
 )
 
 
@@ -42,6 +42,17 @@ class IProjectViewSet(CoreViewSetV3):
     def get_view_name(self):
         """Returns the view set name for the DRF UI."""
         return 'Investment projects'
+
+
+class IProjectAuditViewSet(CoreViewSetV3):
+    """Investment Project audit views."""
+
+    read_serializer_class = IProjectAuditSerializer
+    queryset = InvestmentProject.objects.all()
+
+    def get_view_name(self):
+        """Returns the view set name for the DRF UI."""
+        return 'Investment project audit log'
 
 
 class IProjectValueViewSet(CoreViewSetV3):
