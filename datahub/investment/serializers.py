@@ -5,7 +5,6 @@ from reversion.models import Version
 
 import datahub.metadata.models as meta_models
 from datahub.company.models import Advisor, Company, Contact
-from datahub.company.serializers import AdvisorSerializer
 from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.serializers import NestedRelatedField
 from datahub.investment.models import InvestmentProject
