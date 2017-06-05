@@ -3,7 +3,7 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import AdvisorFactory, CompanyFactory, ContactFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
 from datahub.interaction.test.factories import InteractionFactory
@@ -30,7 +30,7 @@ class InteractionTestCase(LeelooTestCase):
             'interaction_type': constants.InteractionType.business_card.value.id,
             'subject': 'whatever',
             'date': now().isoformat(),
-            'dit_adviser': AdvisorFactory().pk,
+            'dit_adviser': AdviserFactory().pk,
             'notes': 'hello',
             'company': CompanyFactory().pk,
             'contact': ContactFactory().pk,
@@ -53,7 +53,7 @@ class InteractionTestCase(LeelooTestCase):
             'interaction_type': constants.InteractionType.business_card.value.id,
             'subject': 'whatever',
             'date': now().isoformat(),
-            'dit_advisor': AdvisorFactory().pk,
+            'dit_adviser': AdviserFactory().pk,
             'notes': 'hello',
             'investment_project': project.pk,
             'service': constants.Service.trade_enquiry.value.id,
@@ -62,7 +62,7 @@ class InteractionTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
-        assert response_data['dit_advisor'] == str(self.user.pk)
+        assert response_data['dit_adviser'] == str(self.user.pk)
         assert response_data['investment_project'] == str(project.pk)
         assert response_data['modified_on'] == '2017-04-18T13:25:30.986208'
         assert response_data['created_on'] == '2017-04-18T13:25:30.986208'
@@ -76,7 +76,7 @@ class InteractionTestCase(LeelooTestCase):
             'interaction_type': constants.InteractionType.business_card.value.id,
             'subject': 'whatever',
             'date': now().isoformat(),
-            'dit_advisor': AdvisorFactory().pk,
+            'dit_adviser': AdviserFactory().pk,
             'notes': 'hello',
             'service': constants.Service.trade_enquiry.value.id,
             'dit_team': constants.Team.healthcare_uk.value.id

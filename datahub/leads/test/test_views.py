@@ -20,7 +20,7 @@ class BusinessLeadViewsTestCase(LeelooTestCase):
 
         Ensures that only the user's leads are returned.
         """
-        lead_this_user = BusinessLeadFactory(advisor=self.user)
+        lead_this_user = BusinessLeadFactory(adviser=self.user)
         BusinessLeadFactory()  # this lead is attached to another user
         url = reverse('api-v3:business-leads:lead-collection')
         response = self.api_client.get(url)
@@ -32,7 +32,7 @@ class BusinessLeadViewsTestCase(LeelooTestCase):
 
     def test_get_success(self):
         """Tests that getting a single lead."""
-        lead = BusinessLeadFactory(advisor=self.user)
+        lead = BusinessLeadFactory(adviser=self.user)
         url = reverse('api-v3:business-leads:lead-item', kwargs={
             'pk': lead.pk
         })
@@ -47,7 +47,7 @@ class BusinessLeadViewsTestCase(LeelooTestCase):
             'address_county': None,
             'address_postcode': None,
             'address_town': None,
-            'advisor': {
+            'adviser': {
                 'first_name': self.user.first_name,
                 'id': str(self.user.pk),
                 'last_name': self.user.last_name
@@ -103,7 +103,7 @@ class BusinessLeadViewsTestCase(LeelooTestCase):
         assert response_data['last_name'] == request_data['last_name']
         assert (response_data['telephone_number'] == request_data[
             'telephone_number'])
-        assert response_data['advisor']['id'] == str(self.user.pk)
+        assert response_data['adviser']['id'] == str(self.user.pk)
 
     def test_create_lead_failure(self):
         """Tests creating a business lead without required fields."""
@@ -125,7 +125,7 @@ class BusinessLeadViewsTestCase(LeelooTestCase):
 
     def test_patch_success(self):
         """Tests updating a business lead."""
-        lead = BusinessLeadFactory(advisor=self.user)
+        lead = BusinessLeadFactory(adviser=self.user)
         url = reverse('api-v3:business-leads:lead-item', kwargs={
             'pk': lead.pk
         })
@@ -143,7 +143,7 @@ class BusinessLeadViewsTestCase(LeelooTestCase):
 
     def test_patch_failure(self):
         """Tests updating a business lead."""
-        lead = BusinessLeadFactory(advisor=self.user)
+        lead = BusinessLeadFactory(adviser=self.user)
         url = reverse('api-v3:business-leads:lead-item', kwargs={
             'pk': lead.pk
         })
@@ -167,7 +167,7 @@ class BusinessLeadViewsTestCase(LeelooTestCase):
     @freeze_time(FROZEN_TIME)
     def test_archive_success(self):
         """Tests archiving a business lead."""
-        lead = BusinessLeadFactory(advisor=self.user)
+        lead = BusinessLeadFactory(adviser=self.user)
         url = reverse('api-v3:business-leads:archive-lead-item', kwargs={
             'pk': lead.pk
         })
@@ -186,7 +186,7 @@ class BusinessLeadViewsTestCase(LeelooTestCase):
     def test_unarchive_success(self):
         """Tests unarchiving a business lead."""
         lead = BusinessLeadFactory(
-            advisor=self.user, archived=True, archived_by=self.user,
+            adviser=self.user, archived=True, archived_by=self.user,
             archived_reason='unarchive test', archived_on=datetime(2016, 1, 1)
         )
         url = reverse('api-v3:business-leads:unarchive-lead-item', kwargs={

@@ -17,7 +17,7 @@ class BusinessLeadSerializer(serializers.ModelSerializer):
     company = NestedRelatedField(
         Company, required=False, allow_null=True
     )
-    advisor = NestedRelatedField(
+    adviser = NestedRelatedField(
         Advisor, read_only=True,
         extra_fields=('first_name', 'last_name')
     )
@@ -71,7 +71,7 @@ class BusinessLeadSerializer(serializers.ModelSerializer):
         model = BusinessLead
         fields = (
             'id', 'first_name', 'last_name', 'job_title', 'company_name',
-            'trading_name', 'company', 'advisor', 'telephone_number', 'email',
+            'trading_name', 'company', 'adviser', 'telephone_number', 'email',
             'address_1', 'address_2', 'address_town', 'address_county',
             'address_country', 'address_postcode', 'telephone_alternative',
             'email_alternative', 'contactable_by_dit',
@@ -80,7 +80,7 @@ class BusinessLeadSerializer(serializers.ModelSerializer):
             'archived_reason', 'archived_by'
         )
         extra_kwargs = {
-            'advisor': {'read_only': True},
+            'adviser': {'read_only': True},
             'archived': {'read_only': True},
             'archived_on': {'read_only': True},
             'archived_reason': {'read_only': True},

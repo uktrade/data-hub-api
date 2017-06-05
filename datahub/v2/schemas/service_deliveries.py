@@ -30,7 +30,7 @@ class ServiceDeliveryRelationships(colander.MappingSchema):
     contact = colander.SchemaNode(RelationshipType(typename='Contact'))
     service = colander.SchemaNode(RelationshipType(typename='Service'))
     dit_team = colander.SchemaNode(RelationshipType(typename='Team'))
-    dit_adviser = colander.SchemaNode(RelationshipType(typename='Advisor'))
+    dit_adviser = colander.SchemaNode(RelationshipType(typename='Adviser'))
     sector = colander.SchemaNode(
         RelationshipType(typename='Sector'),
         missing=colander.null

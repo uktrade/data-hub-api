@@ -11,7 +11,7 @@ from datahub.core.constants import (
     InvestmentBusinessActivity, FDIType
 )
 from datahub.company.test.factories import (
-    AdvisorFactory, CompanyFactory
+    AdviserFactory, CompanyFactory
 )
 
 
@@ -29,8 +29,8 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     phase_id = InvestmentProjectPhase.prospect.value.id
     sector_id = Sector.aerospace_assembly_aircraft.value.id
     investor_company = factory.SubFactory(CompanyFactory)
-    client_relationship_manager = factory.SubFactory(AdvisorFactory)
-    referral_source_adviser = factory.SubFactory(AdvisorFactory)
+    client_relationship_manager = factory.SubFactory(AdviserFactory)
+    referral_source_adviser = factory.SubFactory(AdviserFactory)
     project_shareable = False
     business_activities = [InvestmentBusinessActivity.retail.value.id]
     created_on = now()

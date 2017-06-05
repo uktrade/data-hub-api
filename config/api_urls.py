@@ -18,7 +18,7 @@ router_v1 = routers.SimpleRouter()
 router_v1.register(r'company', company_views.CompanyViewSetV1)
 router_v1.register(r'ch-company', company_views.CompaniesHouseCompanyReadOnlyViewSetV1)
 router_v1.register(r'interaction', interaction_views.InteractionViewSetV1)
-router_v1.register(r'advisor', company_views.AdvisorReadOnlyViewSetV1)
+router_v1.register(r'adviser', company_views.AdviserReadOnlyViewSetV1)
 
 v1_urls = router_v1.urls
 

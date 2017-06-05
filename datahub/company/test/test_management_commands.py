@@ -3,7 +3,7 @@ from django.core import management
 from django.core.management import CommandError
 
 from datahub.company.management.commands import manageusers
-from datahub.company.test.factories import AdvisorFactory
+from datahub.company.test.factories import AdviserFactory
 
 
 pytestmark = pytest.mark.django_db
@@ -11,8 +11,8 @@ pytestmark = pytest.mark.django_db
 
 def test_no_flag_passed_to_command():
     """Check one flag needs to get passed."""
-    user1 = AdvisorFactory(enabled=False)
-    user2 = AdvisorFactory(enabled=False)
+    user1 = AdviserFactory(enabled=False)
+    user2 = AdviserFactory(enabled=False)
     with pytest.raises(CommandError) as exception:
         management.call_command(manageusers.Command(), user1.email, user2.email)
 
@@ -21,8 +21,8 @@ def test_no_flag_passed_to_command():
 
 def test_both_flags_passed_to_command():
     """Check only one flag needs to get passed."""
-    user1 = AdvisorFactory(enabled=False)
-    user2 = AdvisorFactory(enabled=False)
+    user1 = AdviserFactory(enabled=False)
+    user2 = AdviserFactory(enabled=False)
     with pytest.raises(CommandError) as exception:
         management.call_command(manageusers.Command(), user1.email, user2.email, '--enable', '--disable')
 
@@ -31,8 +31,8 @@ def test_both_flags_passed_to_command():
 
 def test_enable_users():
     """Check users get enabled."""
-    user1 = AdvisorFactory(enabled=False)
-    user2 = AdvisorFactory(enabled=False)
+    user1 = AdviserFactory(enabled=False)
+    user2 = AdviserFactory(enabled=False)
     management.call_command(manageusers.Command(), user1.email, user2.email, '--enable')
     user1.refresh_from_db()
     user2.refresh_from_db()
@@ -43,8 +43,8 @@ def test_enable_users():
 
 def test_disable_users():
     """Check users get disabled."""
-    user1 = AdvisorFactory(enabled=True)
-    user2 = AdvisorFactory(enabled=True)
+    user1 = AdviserFactory(enabled=True)
+    user2 = AdviserFactory(enabled=True)
     management.call_command(manageusers.Command(), user1.email, user2.email, '--disable')
     user1.refresh_from_db()
     user2.refresh_from_db()

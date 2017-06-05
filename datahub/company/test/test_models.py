@@ -1,7 +1,7 @@
 import pytest
 
 from datahub.company.models import Company
-from datahub.company.test.factories import AdvisorFactory, CompanyFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
@@ -10,7 +10,7 @@ pytestmark = pytest.mark.django_db
 def test_company_can_have_one_list_owner_assigned():
     """Test that company can have one list owner assigned."""
     company = CompanyFactory()
-    adviser = AdvisorFactory()
+    adviser = AdviserFactory()
 
     assert company.one_list_account_owner is None  # Test that it's nullable
 

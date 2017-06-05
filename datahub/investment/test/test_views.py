@@ -6,7 +6,7 @@ import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import (AdvisorFactory, CompanyFactory,
+from datahub.company.test.factories import (AdviserFactory, CompanyFactory,
                                             ContactFactory)
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
@@ -49,7 +49,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         investor_company = CompanyFactory()
         recipient_company = CompanyFactory()
         intermediate_company = CompanyFactory()
-        adviser = AdvisorFactory()
+        adviser = AdviserFactory()
         url = reverse('api-v3:investment:project')
         aerospace_id = constants.Sector.aerospace_assembly_aircraft.value.id
         new_site_id = (constants.FDIType.creation_of_new_site_or_activity
@@ -347,7 +347,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
 
     def test_change_phase_active_success(self):
         """Tests moving a complete project to the Active phase."""
-        adviser = AdvisorFactory()
+        adviser = AdviserFactory()
         strategic_drivers = [
             constants.InvestmentStrategicDriver.access_to_market.value.id
         ]
@@ -486,8 +486,8 @@ class InvestmentViewsTestCase(LeelooTestCase):
         """Test successfully getting a project requirements object."""
         crm_team = constants.Team.crm.value
         huk_team = constants.Team.healthcare_uk.value
-        pm_adviser = AdvisorFactory(dit_team_id=crm_team.id)
-        pa_adviser = AdvisorFactory(dit_team_id=huk_team.id)
+        pm_adviser = AdviserFactory(dit_team_id=crm_team.id)
+        pa_adviser = AdviserFactory(dit_team_id=huk_team.id)
         project = InvestmentProjectFactory(
             project_manager_id=pm_adviser.id,
             project_assurance_adviser_id=pa_adviser.id
@@ -539,8 +539,8 @@ class InvestmentViewsTestCase(LeelooTestCase):
         """Test successfully partially updating a requirements object."""
         crm_team = constants.Team.crm.value
         huk_team = constants.Team.healthcare_uk.value
-        adviser_1 = AdvisorFactory(dit_team_id=crm_team.id)
-        adviser_2 = AdvisorFactory(dit_team_id=huk_team.id)
+        adviser_1 = AdviserFactory(dit_team_id=crm_team.id)
+        adviser_2 = AdviserFactory(dit_team_id=huk_team.id)
         project = InvestmentProjectFactory(
             project_manager_id=adviser_1.id,
             project_assurance_adviser_id=adviser_2.id
