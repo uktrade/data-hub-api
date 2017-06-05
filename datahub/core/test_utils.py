@@ -56,7 +56,7 @@ class LeelooTestCase(TestCase):
         """
         client = APIClient()
         client.force_authenticate(user=self.user)
-        client.credentials(Authorization='Bearer {token}'.format(token=self.token))
+        client.credentials(Authorization=f'Bearer {self.token}')
         return client
 
     def get_token(self):

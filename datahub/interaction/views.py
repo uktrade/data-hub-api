@@ -1,3 +1,5 @@
+from django_filters.rest_framework import DjangoFilterBackend
+
 from datahub.core.viewsets import CoreViewSetV1
 from datahub.interaction.models import Interaction
 from datahub.interaction.serializers import (
@@ -17,6 +19,10 @@ class InteractionViewSetV1(CoreViewSetV1):
         'company',
         'contact'
     ).all()
+    filter_backends = (
+        DjangoFilterBackend,
+    )
+    filter_fields = ['contact_id', 'investment_project_id']
 
     def get_additional_data(self, create):
         """Set dit_advisor to the user on model instance creation."""

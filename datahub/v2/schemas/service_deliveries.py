@@ -1,6 +1,7 @@
 """Schemas."""
 
 import colander
+from django.conf import settings
 
 from .utils import IsExactly, RelationshipType
 
@@ -12,11 +13,11 @@ class ServiceDeliveryAttributes(colander.MappingSchema):
     date = colander.SchemaNode(colander.DateTime())
     notes = colander.SchemaNode(
         colander.String(),
-        validator=colander.Length(max=4000)
+        validator=colander.Length(max=settings.CDMS_TEXT_MAX_LENGTH)
     )
     feedback = colander.SchemaNode(
         colander.String(),
-        validator=colander.Length(max=4000),
+        validator=colander.Length(max=settings.CDMS_TEXT_MAX_LENGTH),
         missing=colander.null
     )
 

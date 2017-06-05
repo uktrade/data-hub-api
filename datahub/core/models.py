@@ -17,9 +17,12 @@ class ArchivableModel(models.Model):
     """Handle model archivation."""
 
     archived = models.BooleanField(default=False)
-    archived_on = models.DateTimeField(null=True)
+    archived_on = models.DateTimeField(blank=True, null=True)
     archived_reason = models.TextField(blank=True, null=True)
-    archived_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
+    archived_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, blank=True, null=True,
+        on_delete=models.SET_NULL
+    )
 
     class Meta:  # noqa: D101
         abstract = True
@@ -46,7 +49,6 @@ class BaseConstantModel(models.Model):
 
     id = models.UUIDField(primary_key=True)
     name = models.TextField(blank=True)
-    selectable = models.BooleanField(default=True)
 
     class Meta:  # noqa: D101
         abstract = True
