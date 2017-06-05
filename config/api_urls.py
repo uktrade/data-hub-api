@@ -17,7 +17,6 @@ from datahub.v2.urls import urlpatterns as v2_urlpatterns
 router_v1 = routers.SimpleRouter()
 router_v1.register(r'company', company_views.CompanyViewSetV1)
 router_v1.register(r'ch-company', company_views.CompaniesHouseCompanyReadOnlyViewSetV1)
-router_v1.register(r'contact', company_views.ContactViewSetV1)  # deprecated, use v3 instead
 router_v1.register(r'interaction', interaction_views.InteractionViewSetV1)
 router_v1.register(r'advisor', company_views.AdvisorReadOnlyViewSetV1)
 
@@ -34,6 +33,6 @@ v2_urls = v2_urlpatterns
 v3_urls = [
     url(r'^', include((investment_urls, 'investment'), namespace='investment')),
     url(r'^', include((leads_urls, 'business-leads'), namespace='business-leads')),
-    url(r'^', include((company_urls.contact_urls_v3, 'contact'), namespace='contact')),
+    url(r'^', include((company_urls.contact_urls, 'contact'), namespace='contact')),
     url(r'^', include((search_urls, 'search'), namespace='search'))
 ]
