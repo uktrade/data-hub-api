@@ -585,7 +585,9 @@ class InvestmentViewsTestCase(LeelooTestCase):
 
         initial_datetime = datetime.utcnow()
         with reversion.create_revision():
-            iproject = InvestmentProjectFactory()
+            iproject = InvestmentProjectFactory(
+                description='Initial desc',
+            )
 
             reversion.set_comment('Initial')
             reversion.set_date_created(initial_datetime)
@@ -613,7 +615,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert entry['user']['name'] == user.name, 'Valid user captured'
         assert entry['comment'] == 'Changed', 'Comments can be set manually'
         assert entry['timestamp'] == changed_datetime.isoformat(), 'TS can be set manually'
-        assert entry['changes']['description'] == ['desc 0', 'New desc'], 'Changes are reflected'
+        assert entry['changes']['description'] == ['Initial desc', 'New desc'], 'Changes are reflected'
 
 
 @pytest.mark.parametrize('view_set', (views.IProjectTeamViewSet,
