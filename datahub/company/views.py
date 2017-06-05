@@ -8,8 +8,7 @@ from datahub.core.viewsets import CoreViewSetV1, CoreViewSetV3
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
 from .serializers import (
     AdvisorSerializer, CompaniesHouseCompanySerializer, CompanySerializerRead,
-    CompanySerializerWrite, ContactSerializerV1Read, ContactSerializerV1Write,
-    ContactSerializerV3
+    CompanySerializerWrite, ContactSerializer
 )
 
 
@@ -44,32 +43,11 @@ class CompaniesHouseCompanyReadOnlyViewSetV1(
     lookup_field = 'company_number'
 
 
-class ContactViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
-    """Contact ViewSet."""
-
-    read_serializer_class = ContactSerializerV1Read
-    write_serializer_class = ContactSerializerV1Write
-    queryset = Contact.objects.select_related(
-        'title',
-        'company',
-        'address_country',
-    ).prefetch_related(
-        'interactions'
-    )
-
-    def get_additional_data(self, create):
-        """Set advisor to the user on model instance creation."""
-        data = {}
-        if create:
-            data['advisor'] = self.request.user
-        return data
-
-
-class ContactViewSetV3(ArchivableViewSetMixin, CoreViewSetV3):
+class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     """Contact ViewSet v3."""
 
-    read_serializer_class = ContactSerializerV3
-    write_serializer_class = ContactSerializerV3
+    read_serializer_class = ContactSerializer
+    write_serializer_class = ContactSerializer
     queryset = Contact.objects.select_related(
         'title',
         'company',
