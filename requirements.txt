@@ -38,6 +38,7 @@ ipdb==0.10.3
 factory-boy==2.8.1
 freezegun==0.3.9
 django-debug-toolbar==1.8
+werkzeug==0.12.2  # Required by runserver_plus - useful 4 local dev
 
 # Code static analysis
 pep8==1.7.0
