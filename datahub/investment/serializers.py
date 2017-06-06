@@ -37,7 +37,7 @@ class IProjectSerializer(serializers.ModelSerializer):
         Advisor, required=True, allow_null=False,
         extra_fields=('first_name', 'last_name')
     )
-    referral_source_advisor = NestedRelatedField(
+    referral_source_adviser = NestedRelatedField(
         Advisor, required=True, allow_null=False,
         extra_fields=('first_name', 'last_name')
     )
@@ -93,7 +93,7 @@ class IProjectSerializer(serializers.ModelSerializer):
             'investment_type', 'phase', 'investor_company',
             'intermediate_company', 'investment_recipient_company',
             'client_contacts', 'client_relationship_manager',
-            'referral_source_advisor', 'referral_source_activity',
+            'referral_source_adviser', 'referral_source_activity',
             'referral_source_activity_website',
             'referral_source_activity_marketing',
             'referral_source_activity_event', 'fdi_type', 'non_fdi_type',
@@ -213,7 +213,7 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
         Advisor, required=False, allow_null=True,
         extra_fields=('first_name', 'last_name')
     )
-    project_assurance_advisor = NestedRelatedField(
+    project_assurance_adviser = NestedRelatedField(
         Advisor, required=False, allow_null=True,
         extra_fields=('first_name', 'last_name')
     )
@@ -228,7 +228,7 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = InvestmentProject
         fields = (
-            'project_manager', 'project_assurance_advisor',
+            'project_manager', 'project_assurance_adviser',
             'project_manager_team', 'project_assurance_team',
             'team_complete'
         )

@@ -116,7 +116,7 @@ def get_incomplete_team_fields(instance=None, update_data=None):
 
     truthy_required_fields = [
         'project_manager',
-        'project_assurance_advisor'
+        'project_assurance_adviser'
     ]
 
     errors = _validate(data, truthy_required_fields)

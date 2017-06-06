@@ -36,8 +36,8 @@ class CompaniesHouseCompanySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class AdvisorSerializer(serializers.ModelSerializer):
-    """Advisor serializer."""
+class AdviserSerializer(serializers.ModelSerializer):
+    """Adviser serializer."""
 
     name = serializers.CharField()
 
@@ -58,7 +58,7 @@ class CompanySerializerRead(serializers.ModelSerializer):
     export_to_countries = NestedCountrySerializer(many=True)
     future_interest_countries = NestedCountrySerializer(many=True)
     uk_based = serializers.BooleanField()
-    account_manager = AdvisorSerializer()
+    account_manager = AdviserSerializer()
     registered_address_1 = serializers.SerializerMethodField()
     registered_address_2 = serializers.SerializerMethodField()
     registered_address_3 = serializers.SerializerMethodField()
@@ -141,7 +141,7 @@ class ContactSerializer(serializers.ModelSerializer):
     company = NestedRelatedField(
         Company, required=False, allow_null=True
     )
-    advisor = NestedRelatedField(
+    adviser = NestedRelatedField(
         Advisor, read_only=True,
         extra_fields=('first_name', 'last_name')
     )
@@ -159,7 +159,7 @@ class ContactSerializer(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = Contact
         fields = (
-            'id', 'title', 'first_name', 'last_name', 'job_title', 'company', 'advisor',
+            'id', 'title', 'first_name', 'last_name', 'job_title', 'company', 'adviser',
             'primary', 'telephone_countrycode', 'telephone_number', 'email',
             'address_same_as_company', 'address_1', 'address_2', 'address_3', 'address_4',
             'address_town', 'address_county', 'address_country', 'address_postcode',

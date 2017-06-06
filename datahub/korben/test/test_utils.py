@@ -26,8 +26,8 @@ def test_fkey_deps_raises_on_incomplete_modelset():
     assert "is a dependency of " in str(exc)
     assert "but is not being passed" in str(exc)
 
-def test_fkey_deps_success_advisor():
-    'The only dependency of Advisor is Team'
+def test_fkey_deps_success_adviser():
+    'The only dependency of Adviser is Team'
     result = dict(utils.fkey_deps(set([metadata.Team, company.Advisor])))
     assert result == {0: {metadata.Team}, 1: {company.Advisor}}
 

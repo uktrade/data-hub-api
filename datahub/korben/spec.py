@@ -162,7 +162,7 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
             ('Subject', 'subject'),
             ('optevia_Notes', 'notes'),
             ('optevia_InteractionCommunicationChannel.Id', 'interaction_type_id'),
-            ('optevia_Advisor.Id', 'dit_advisor_id'),
+            ('optevia_Advisor.Id', 'dit_adviser_id'),
             ('optevia_Contact.Id', 'contact_id'),
             ('optevia_Organisation.Id', 'company_id'),
             ('optevia_ServiceProvider.Id', 'dit_team_id'),
@@ -174,7 +174,7 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
         ToModel=interaction.ServiceDelivery,
         pk='optevia_servicedeliveryId',
         fields=(
-            ('optevia_Advisor.Id', 'dit_advisor_id'),
+            ('optevia_Advisor.Id', 'dit_adviser_id'),
             ('optevia_Contact.Id', 'contact_id'),
             ('optevia_Event.Id', 'event_id'),
             ('optevia_LeadCountry.Id', 'country_of_interest_id'),

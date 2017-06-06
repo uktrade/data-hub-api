@@ -2530,7 +2530,7 @@
   fields: {name: "DSO - RD 2D"}
 - model: metadata.team
   pk: ee17cfd4-8dad-e211-a646-e4115bead28a
-  fields: {name: "DSO - Senior Military Advisors"}
+  fields: {name: "DSO - Senior Military Advisers"}
 - model: metadata.team
   pk: f4390ff4-a0b0-e211-a646-e4115bead28a
   fields: {name: "Non Executive Board"}
@@ -2542,7 +2542,7 @@
   fields: {name: "IG - Global Intelligence Unit"}
 - model: metadata.team
   pk: 0242ce6a-d9be-e211-a646-e4115bead28a
-  fields: {name: "Inactive Advisor Service Provider"}
+  fields: {name: "Inactive Adviser Service Provider"}
 - model: metadata.team
   pk: 1f60c660-81c3-e211-a646-e4115bead28a
   fields: {name: "Marketing - Overseas Hub - USA"}
@@ -4450,7 +4450,7 @@
   fields: {name: "CBBC London"}
 - model: metadata.team
   pk: 484d24c2-9698-e211-a939-e4115bead28a
-  fields: {name: "CBBC China Business Advisors"}
+  fields: {name: "CBBC China Business Advisers"}
 - model: metadata.team
   pk: 4b4d24c2-9698-e211-a939-e4115bead28a
   fields: {name: "CBBC Leeds"}
@@ -5917,7 +5917,7 @@
   fields: {name: "SCG - Finance - DTI Administration Costs Team"}
 - model: metadata.team
   pk: 559ed722-9798-e211-a939-e4115bead28a
-  fields: {name: "Exporter Promoter Initiative/ Business Advisors"}
+  fields: {name: "Exporter Promoter Initiative/ Business Advisers"}
 - model: metadata.team
   pk: 589ed722-9798-e211-a939-e4115bead28a
   fields: {name: "Accountancy Support"}
