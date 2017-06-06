@@ -142,6 +142,49 @@ NestedAdvisorField = partial(
 )
 
 
+class ContactSerializer(serializers.ModelSerializer):
+    """Contact serializer for writing operations V3."""
+
+    title = NestedRelatedField(
+        meta_models.Title, required=False, allow_null=True
+    )
+    company = NestedRelatedField(
+        Company, required=False, allow_null=True
+    )
+    advisor = NestedRelatedField(
+        Advisor, read_only=True,
+        extra_fields=('first_name', 'last_name')
+    )
+    address_country = NestedRelatedField(
+        meta_models.Country, required=False, allow_null=True
+    )
+    archived = serializers.BooleanField(read_only=True)
+    archived_on = serializers.DateTimeField(read_only=True)
+    archived_reason = serializers.CharField(read_only=True)
+    archived_by = NestedRelatedField(
+        settings.AUTH_USER_MODEL, read_only=True,
+        extra_fields=('first_name', 'last_name')
+    )
+
+    class Meta:  # noqa: D101
+        model = Contact
+        fields = (
+            'id', 'title', 'first_name', 'last_name', 'job_title', 'company',
+            'advisor',
+            'primary', 'telephone_countrycode', 'telephone_number', 'email',
+            'address_same_as_company', 'address_1', 'address_2', 'address_3',
+            'address_4',
+            'address_town', 'address_county', 'address_country',
+            'address_postcode',
+            'telephone_alternative', 'email_alternative', 'notes',
+            'contactable_by_dit',
+            'contactable_by_dit_partners', 'contactable_by_email',
+            'contactable_by_phone',
+            'archived', 'archived_on', 'archived_reason', 'archived_by',
+            'created_on'
+        )
+
+
 class CompanySerializerV3(serializers.ModelSerializer):
     """Company read/write serializer V3."""
 
@@ -164,8 +207,8 @@ class CompanySerializerV3(serializers.ModelSerializer):
     classification = NestedRelatedField(
         meta_models.CompanyClassification, required=False, allow_null=True
     )
-    # TODO: companies_house_data
-    contacts = NestedAdvisorField(many=True, read_only=True)
+    companies_house_data = CompaniesHouseCompanySerializer(read_only=True)
+    contacts = ContactSerializer(many=True, read_only=True)
     employee_range = NestedRelatedField(
         meta_models.EmployeeRange, required=False, allow_null=True
     )
@@ -252,46 +295,3 @@ class CompanySerializerV3(serializers.ModelSerializer):
             'archived_on': {'read_only': True},
             'archived_reason': {'read_only': True}
         }
-
-
-class ContactSerializer(serializers.ModelSerializer):
-    """Contact serializer for writing operations V3."""
-
-    title = NestedRelatedField(
-        meta_models.Title, required=False, allow_null=True
-    )
-    company = NestedRelatedField(
-        Company, required=False, allow_null=True
-    )
-    advisor = NestedRelatedField(
-        Advisor, read_only=True,
-        extra_fields=('first_name', 'last_name')
-    )
-    address_country = NestedRelatedField(
-        meta_models.Country, required=False, allow_null=True
-    )
-    archived = serializers.BooleanField(read_only=True)
-    archived_on = serializers.DateTimeField(read_only=True)
-    archived_reason = serializers.CharField(read_only=True)
-    archived_by = NestedRelatedField(
-        settings.AUTH_USER_MODEL, read_only=True,
-        extra_fields=('first_name', 'last_name')
-    )
-
-    class Meta:  # noqa: D101
-        model = Contact
-        fields = (
-            'id', 'title', 'first_name', 'last_name', 'job_title', 'company',
-            'advisor',
-            'primary', 'telephone_countrycode', 'telephone_number', 'email',
-            'address_same_as_company', 'address_1', 'address_2', 'address_3',
-            'address_4',
-            'address_town', 'address_county', 'address_country',
-            'address_postcode',
-            'telephone_alternative', 'email_alternative', 'notes',
-            'contactable_by_dit',
-            'contactable_by_dit_partners', 'contactable_by_email',
-            'contactable_by_phone',
-            'archived', 'archived_on', 'archived_reason', 'archived_by',
-            'created_on'
-        )
