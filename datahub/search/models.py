@@ -210,7 +210,7 @@ class Contact(DocType, MapDBModelToDict):
         'id': str,
         'title': _id_name_dict,
         'address_country': _id_name_dict,
-        'advisor': _id_name_dict,
+        'adviser': _id_name_dict,
         'company': _id_name_dict,
         'archived_by': _contact_dict,
     }
