@@ -62,7 +62,7 @@ class IProjectAbstract(models.Model):
         'company.Advisor', related_name='investment_projects', null=True,
         blank=True, on_delete=models.SET_NULL
     )
-    referral_source_advisor = models.ForeignKey(
+    referral_source_adviser = models.ForeignKey(
         'company.Advisor', related_name='referred_investment_projects',
         null=True, blank=True, on_delete=models.SET_NULL
     )
@@ -190,7 +190,7 @@ class IProjectTeamAbstract(models.Model):
         'company.Advisor', null=True, related_name='+', blank=True,
         on_delete=models.SET_NULL
     )
-    project_assurance_advisor = models.ForeignKey(
+    project_assurance_adviser = models.ForeignKey(
         'company.Advisor', null=True, related_name='+', blank=True,
         on_delete=models.SET_NULL
     )
@@ -204,9 +204,9 @@ class IProjectTeamAbstract(models.Model):
 
     @property
     def project_assurance_team(self):
-        """The DIT team associated with the project assurance advisor."""
-        if self.project_assurance_advisor:
-            return self.project_assurance_advisor.dit_team
+        """The DIT team associated with the project assurance adviser."""
+        if self.project_assurance_adviser:
+            return self.project_assurance_adviser.dit_team
         return None
 
     @property

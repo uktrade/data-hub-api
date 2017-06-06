@@ -68,7 +68,7 @@ class AddContactTestCase(LeelooTestCase):
                 'id': company.pk,
                 'name': company.name
             },
-            'advisor': {
+            'adviser': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
                 'last_name': self.user.last_name
@@ -279,7 +279,7 @@ class EditContactTestCase(LeelooTestCase):
             email='foo@bar.com',
             email_alternative='foo2@bar.com',
             primary=True,
-            advisor=self.user,
+            adviser=self.user,
             telephone_countrycode='+44',
             telephone_number='123456789',
             telephone_alternative='987654321',
@@ -321,7 +321,7 @@ class EditContactTestCase(LeelooTestCase):
             'email': 'foo@bar.com',
             'email_alternative': 'foo2@bar.com',
             'primary': True,
-            'advisor': {
+            'adviser': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
                 'last_name': self.user.last_name
@@ -416,7 +416,7 @@ class ViewContactTestCase(LeelooTestCase):
             email='foo@bar.com',
             email_alternative='foo2@bar.com',
             primary=True,
-            advisor=self.user,
+            adviser=self.user,
             telephone_countrycode='+44',
             telephone_number='123456789',
             telephone_alternative='987654321',
@@ -452,7 +452,7 @@ class ViewContactTestCase(LeelooTestCase):
                 'id': company.pk,
                 'name': company.name
             },
-            'advisor': {
+            'adviser': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
                 'last_name': self.user.last_name

@@ -6,8 +6,8 @@ from django.utils.timezone import now
 from datahub.core import constants
 
 
-class AdvisorFactory(factory.django.DjangoModelFactory):
-    """Advisor factory."""
+class AdviserFactory(factory.django.DjangoModelFactory):
+    """Adviser factory."""
 
     id = factory.Sequence(lambda _: str(uuid.uuid4()))
     first_name = factory.Sequence(lambda n: f'name {n}')

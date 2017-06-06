@@ -8,7 +8,7 @@ import reversion
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import (AdvisorFactory, CompanyFactory,
+from datahub.company.test.factories import (AdviserFactory, CompanyFactory,
                                             ContactFactory)
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
@@ -51,7 +51,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         investor_company = CompanyFactory()
         recipient_company = CompanyFactory()
         intermediate_company = CompanyFactory()
-        advisor = AdvisorFactory()
+        adviser = AdviserFactory()
         url = reverse('api-v3:investment:project')
         aerospace_id = constants.Sector.aerospace_assembly_aircraft.value.id
         new_site_id = (constants.FDIType.creation_of_new_site_or_activity
@@ -79,7 +79,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
                 'id': str(contacts[1].id)
             }],
             'client_relationship_manager': {
-                'id': str(advisor.id)
+                'id': str(adviser.id)
             },
             'fdi_type': {
                 'id': new_site_id
@@ -96,8 +96,8 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'referral_source_activity': {
                 'id': constants.ReferralSourceActivity.cold_call.value.id
             },
-            'referral_source_advisor': {
-                'id': str(advisor.id)
+            'referral_source_adviser': {
+                'id': str(adviser.id)
             },
             'sector': {
                 'id': str(aerospace_id)
@@ -121,8 +121,8 @@ class InvestmentViewsTestCase(LeelooTestCase):
             recipient_company.id)
         assert response_data['intermediate_company']['id'] == str(
             intermediate_company.id)
-        assert response_data['referral_source_advisor']['id'] == str(
-            advisor.id)
+        assert response_data['referral_source_adviser']['id'] == str(
+            adviser.id)
         assert response_data['phase']['id'] == request_data['phase']['id']
         assert len(response_data['client_contacts']) == 2
         assert sorted(contact['id'] for contact in response_data[
@@ -150,7 +150,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'nda_signed': ['This field is required.'],
             'project_shareable': ['This field is required.'],
             'referral_source_activity': ['This field is required.'],
-            'referral_source_advisor': ['This field is required.'],
+            'referral_source_adviser': ['This field is required.'],
             'sector': ['This field is required.']
         }
 
@@ -169,7 +169,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'nda_signed': None,
             'project_shareable': None,
             'referral_source_activity': None,
-            'referral_source_advisor': None,
+            'referral_source_adviser': None,
             'sector': None
         }
         response = self.api_client.post(url, data=request_data, format='json')
@@ -187,7 +187,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'nda_signed': ['This field may not be null.'],
             'project_shareable': ['This field may not be null.'],
             'referral_source_activity': ['This field may not be null.'],
-            'referral_source_advisor': ['This field may not be null.'],
+            'referral_source_adviser': ['This field may not be null.'],
             'sector': ['This field may not be null.']
         }
 
@@ -343,13 +343,13 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'site_decided': ['This field is required.'],
             'strategic_drivers': ['This field is required.'],
             'uk_region_locations': ['This field is required.'],
-            'project_assurance_advisor': ['This field is required.'],
+            'project_assurance_adviser': ['This field is required.'],
             'project_manager': ['This field is required.'],
         }
 
     def test_change_phase_active_success(self):
         """Tests moving a complete project to the Active phase."""
-        advisor = AdvisorFactory()
+        adviser = AdviserFactory()
         strategic_drivers = [
             constants.InvestmentStrategicDriver.access_to_market.value.id
         ]
@@ -363,8 +363,8 @@ class InvestmentViewsTestCase(LeelooTestCase):
             site_decided=False,
             strategic_drivers=strategic_drivers,
             uk_region_locations=[constants.UKRegion.england.value.id],
-            project_assurance_advisor=advisor,
-            project_manager=advisor
+            project_assurance_adviser=adviser,
+            project_manager=adviser
         )
         url = reverse('api-v3:investment:project-item', kwargs={'pk': project.pk})
         request_data = {
@@ -488,11 +488,11 @@ class InvestmentViewsTestCase(LeelooTestCase):
         """Test successfully getting a project requirements object."""
         crm_team = constants.Team.crm.value
         huk_team = constants.Team.healthcare_uk.value
-        pm_advisor = AdvisorFactory(dit_team_id=crm_team.id)
-        pa_advisor = AdvisorFactory(dit_team_id=huk_team.id)
+        pm_adviser = AdviserFactory(dit_team_id=crm_team.id)
+        pa_adviser = AdviserFactory(dit_team_id=huk_team.id)
         project = InvestmentProjectFactory(
-            project_manager_id=pm_advisor.id,
-            project_assurance_advisor_id=pa_advisor.id
+            project_manager_id=pm_adviser.id,
+            project_assurance_adviser_id=pa_adviser.id
         )
         url = reverse('api-v3:investment:team-item',
                       kwargs={'pk': project.pk})
@@ -501,14 +501,14 @@ class InvestmentViewsTestCase(LeelooTestCase):
         response_data = response.json()
         assert response_data == {
             'project_manager': {
-                'id': str(pm_advisor.pk),
-                'first_name': pm_advisor.first_name,
-                'last_name': pm_advisor.last_name
+                'id': str(pm_adviser.pk),
+                'first_name': pm_adviser.first_name,
+                'last_name': pm_adviser.last_name
             },
-            'project_assurance_advisor': {
-                'id': str(pa_advisor.pk),
-                'first_name': pa_advisor.first_name,
-                'last_name': pa_advisor.last_name
+            'project_assurance_adviser': {
+                'id': str(pa_adviser.pk),
+                'first_name': pa_adviser.first_name,
+                'last_name': pa_adviser.last_name
             },
             'project_manager_team': {
                 'id': str(crm_team.id),
@@ -531,7 +531,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         response_data = response.json()
         assert response_data == {
             'project_manager': None,
-            'project_assurance_advisor': None,
+            'project_assurance_adviser': None,
             'project_manager_team': None,
             'project_assurance_team': None,
             'team_complete': False
@@ -541,17 +541,17 @@ class InvestmentViewsTestCase(LeelooTestCase):
         """Test successfully partially updating a requirements object."""
         crm_team = constants.Team.crm.value
         huk_team = constants.Team.healthcare_uk.value
-        advisor_1 = AdvisorFactory(dit_team_id=crm_team.id)
-        advisor_2 = AdvisorFactory(dit_team_id=huk_team.id)
+        adviser_1 = AdviserFactory(dit_team_id=crm_team.id)
+        adviser_2 = AdviserFactory(dit_team_id=huk_team.id)
         project = InvestmentProjectFactory(
-            project_manager_id=advisor_1.id,
-            project_assurance_advisor_id=advisor_2.id
+            project_manager_id=adviser_1.id,
+            project_assurance_adviser_id=adviser_2.id
         )
         url = reverse('api-v3:investment:team-item',
                       kwargs={'pk': project.pk})
         request_data = {
             'project_manager': {
-                'id': str(advisor_2.id)
+                'id': str(adviser_2.id)
             }
         }
         response = self.api_client.patch(url, data=request_data, format='json')
@@ -559,14 +559,14 @@ class InvestmentViewsTestCase(LeelooTestCase):
         response_data = response.json()
         assert response_data == {
             'project_manager': {
-                'id': str(advisor_2.pk),
-                'first_name': advisor_2.first_name,
-                'last_name': advisor_2.last_name
+                'id': str(adviser_2.pk),
+                'first_name': adviser_2.first_name,
+                'last_name': adviser_2.last_name
             },
-            'project_assurance_advisor': {
-                'id': str(advisor_2.pk),
-                'first_name': advisor_2.first_name,
-                'last_name': advisor_2.last_name
+            'project_assurance_adviser': {
+                'id': str(adviser_2.pk),
+                'first_name': adviser_2.first_name,
+                'last_name': adviser_2.last_name
             },
             'project_manager_team': {
                 'id': str(huk_team.id),
