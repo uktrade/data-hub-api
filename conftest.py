@@ -1,14 +1,15 @@
 from pathlib import PurePath
 
 import pytest
-from django.conf import settings
 from django.core.management import call_command
 from pytest_django.lazy_django import skip_if_no_django
 
 from datahub.search import elasticsearch
 
+
 def pytest_configure():
     elasticsearch.ES_INDEX = 'test'
+
 
 @pytest.fixture(scope='session')
 def django_db_setup(django_db_setup, django_db_blocker):
