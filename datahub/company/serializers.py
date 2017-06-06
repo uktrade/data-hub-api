@@ -145,6 +145,9 @@ NestedAdvisorField = partial(
 class CompanySerializerV3(serializers.ModelSerializer):
     """Company read/write serializer V3."""
 
+    trading_name = serializers.CharField(
+        source='alias', required=False, allow_null=True
+    )
     registered_address_country = NestedRelatedField(
         meta_models.Country, required=False, allow_null=True
     )
