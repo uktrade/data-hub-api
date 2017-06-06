@@ -45,7 +45,7 @@ class CompanyTestCase(LeelooTestCase):
         url = reverse('api-v3:company:collection')
         response = self.api_client.post(url, format='json', data={
             'name': 'Acme',
-            'alias': None,
+            'trading_name': 'Trading name',
             'business_type': {'id': BusinessType.company.value.id},
             'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
             'registered_address_country': {
@@ -60,13 +60,14 @@ class CompanyTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data['name'] == 'Acme'
+        assert response.data['trading_name'] == 'Trading name'
 
     def test_add_uk_company_without_uk_region(self):
         """Test add new UK without UK region company."""
         url = reverse('api-v3:company:collection')
         response = self.api_client.post(url, format='json', data={
             'name': 'Acme',
-            'alias': None,
+            'trading_name': None,
             'business_type': {'id': BusinessType.company.value.id},
             'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
             'registered_address_country': {
@@ -84,7 +85,7 @@ class CompanyTestCase(LeelooTestCase):
         url = reverse('api-v3:company:collection')
         response = self.api_client.post(url, format='json', data={
             'name': 'Acme',
-            'alias': None,
+            'trading_name': None,
             'business_type': {'id': BusinessType.company.value.id},
             'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
             'registered_address_country': {
