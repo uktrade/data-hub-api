@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from django.conf import settings
 
 from datahub.search import elasticsearch, models
 
@@ -15,9 +16,9 @@ class SearchConfig(AppConfig):
 
         # Makes sure mappings exist in Elasticsearch.
         # Those calls are idempotent
-        models.Company.init(index=elasticsearch.ES_INDEX)
-        models.Contact.init(index=elasticsearch.ES_INDEX)
+        models.Company.init(index=settings.ES_INDEX)
+        models.Contact.init(index=settings.ES_INDEX)
 
         # Let's import Company and Contact post_save signal handlers
         # So DB models can be synced with Elasticsearch on save
-        import datahub.search.signals # noqa
+        import datahub.search.signals  # noqa
