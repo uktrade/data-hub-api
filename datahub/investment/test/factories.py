@@ -11,16 +11,16 @@ from datahub.core.constants import (
     InvestmentBusinessActivity, FDIType
 )
 from datahub.company.test.factories import (
-    AdvisorFactory, CompanyFactory
+    AdviserFactory, CompanyFactory
 )
 
 
 class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     """Company factory."""
 
-    id = factory.Sequence(lambda x: '{0}'.format(uuid.uuid4()))
-    name = factory.Sequence(lambda x: 'name {0}'.format(x))
-    description = factory.Sequence(lambda x: 'desc {0}'.format(x))
+    id = factory.Sequence(lambda _: str(uuid.uuid4()))
+    name = factory.Sequence(lambda n: f'name {n}')
+    description = factory.Sequence(lambda n: f'desc {n}')
     nda_signed = False
     estimated_land_date = date(2020, 1, 1)
     investment_type_id = InvestmentType.commitment_to_invest.value.id
@@ -29,8 +29,8 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     phase_id = InvestmentProjectPhase.prospect.value.id
     sector_id = Sector.aerospace_assembly_aircraft.value.id
     investor_company = factory.SubFactory(CompanyFactory)
-    client_relationship_manager = factory.SubFactory(AdvisorFactory)
-    referral_source_advisor = factory.SubFactory(AdvisorFactory)
+    client_relationship_manager = factory.SubFactory(AdviserFactory)
+    referral_source_adviser = factory.SubFactory(AdviserFactory)
     project_shareable = False
     business_activities = [InvestmentBusinessActivity.retail.value.id]
     created_on = now()

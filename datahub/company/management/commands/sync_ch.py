@@ -34,7 +34,7 @@ def get_ch_latest_dump_file_list(url, selector='.omega a'):
         href = anchor.attrib['href']
         # Fix broken url
         if 'AsOneFile' not in href:
-            result.append('{0.scheme}://{0.hostname}/{1}'.format(url_base, href))
+            result.append(f'{url_base.scheme}://{url_base.hostname}/{href}')
     return result
 
 
@@ -112,7 +112,7 @@ def truncate_ch_companies_table():
     """
     cursor = connection.cursor()
     table_name = CompaniesHouseCompany._meta.db_table
-    query = 'truncate {table};'.format(table=table_name)
+    query = f'truncate {table_name};'
     cursor.execute(query)
 
 

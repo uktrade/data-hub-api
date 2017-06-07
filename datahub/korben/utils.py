@@ -39,8 +39,10 @@ def fkey_deps(models):
         for Model in remaining:
             model_deps = set(yield_fkeys(Model))
             if model_deps.difference(models):
-                msg = '{0} is a dependency of {1} but is not being passed'
-                raise Exception(msg.format(model_deps.pop(), Model))
+                model_dep = model_deps.pop()
+                msg = (f'{model_dep} is a dependency of {Model} but is not '
+                       f'being passed')
+                raise Exception(msg)
             # if deps are all added to previous (less deep) depths, we are deep
             # enough to add this model; do so
             lesser_deps = set()
@@ -70,7 +72,8 @@ def cdms_datetime_to_datetime(value):
         parsed_val = datetime.datetime.utcfromtimestamp(parsed_val / 1000)
         return parsed_val.replace(tzinfo=datetime.timezone.utc)
     else:
-        logger.warning('Unrecognized value for a datetime: {} returning `None` instead'.format(value))
+        logger.warning('Unrecognized value for a datetime: %s returning '
+                       '`None` instead', value)
         return None
 
 
@@ -85,12 +88,12 @@ def load_json_from_s3_bucket(bucket, key):  # noqa
 def iterate_over_cdms_entities_from_s3(bucket, entity_name):
     """Combine all entities from multiple cdms dump pages into single stream of JSON objects."""
     for key in get_cdms_entity_s3_keys(bucket, entity_name):
-        print('Processing: {}'.format(key))  # noqa: T003
+        print(f'Processing: {key}')  # noqa: T003
         json_data = load_json_from_s3_bucket(bucket, key)
         try:
             results = json_data['d']['results']
         except KeyError:
-            logger.error('Failed to load result page: {}'.format(key))
+            logger.error('Failed to load result page: %s', key)
             results = []
 
         for row in results:
