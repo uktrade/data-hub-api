@@ -2,6 +2,7 @@
 
 from django_filters.rest_framework import DjangoFilterBackend
 
+from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.investment.models import InvestmentProject
 from datahub.investment.serializers import (
@@ -10,7 +11,7 @@ from datahub.investment.serializers import (
 )
 
 
-class IProjectViewSet(CoreViewSetV3):
+class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     """Investment project views.
 
     This is a subset of the fields on an InvestmentProject object.
@@ -19,6 +20,7 @@ class IProjectViewSet(CoreViewSetV3):
     read_serializer_class = IProjectSerializer
     write_serializer_class = IProjectSerializer
     queryset = InvestmentProject.objects.select_related(
+        'archived_by',
         'investment_type',
         'phase',
         'investor_company',
