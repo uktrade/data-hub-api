@@ -1,15 +1,8 @@
 from pathlib import PurePath
 
-import django
 import pytest
-from django.conf import settings
 from django.core.management import call_command
 from pytest_django.lazy_django import skip_if_no_django
-
-
-def pytest_configure():
-    settings.ES_INDEX = 'test'
-    django.setup()
 
 
 @pytest.fixture(scope='session')
