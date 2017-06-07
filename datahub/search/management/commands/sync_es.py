@@ -92,9 +92,17 @@ _ignored_fields = (
 
 def get_dataset():
     """Returns dataset that will be synchronised with Elasticsearch."""
+    company_prefetch_fields = ('registered_address_country', 'business_type', 'sector', 'employee_range',
+                               'turnover_range', 'account_manager', 'export_to_countries', 'future_interest_countries',
+                               'trading_address_country', 'headquarter_type', 'classification',
+                               'one_list_account_owner',)
+
+    company_qs = Company.objects.prefetch_related(*company_prefetch_fields).all().order_by('pk')
+    contact_qs = Contact.objects.all().order_by('pk')
+
     return (
-        DataSet(Company.objects.all().order_by('pk'), ESCompany, _company_mappings),
-        DataSet(Contact.objects.all().order_by('pk'), ESContact, _contact_mappings),
+        DataSet(company_qs, ESCompany, _company_mappings),
+        DataSet(contact_qs, ESContact, _contact_mappings),
     )
 
 
@@ -145,7 +153,7 @@ def sync_dataset(item, batch_size=1, stdout=None):
     """Sends dataset to ElasticSearch in batches of batch_size."""
     rows_processed = 0
     total_rows = item.queryset.count() \
-        if isinstance(item.queryset, models.Model) else len(item.queryset)
+        if isinstance(item.queryset, models.query.QuerySet) else len(item.queryset)
     batches_processed = 0
     batches = _batch_rows(item.queryset, batch_size=batch_size)
     for batch in batches:
