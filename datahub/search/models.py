@@ -1,6 +1,5 @@
+from django.conf import settings
 from elasticsearch_dsl import Boolean, Date, DocType, Nested, String
-
-from datahub.search import elasticsearch
 
 
 def _id_name_dict(obj):
@@ -54,7 +53,7 @@ class MapDBModelToDict(object):
         source = cls.dbmodel_to_dict(dbmodel)
 
         return {
-            '_index': elasticsearch.ES_INDEX,
+            '_index': settings.ES_INDEX,
             '_type': cls._doc_type.name,
             '_id': source.get('id'),
             '_source': source,
@@ -166,7 +165,7 @@ class Company(DocType, MapDBModelToDict):
     class Meta:
         """Default document meta data."""
 
-        index = elasticsearch.ES_INDEX
+        index = settings.ES_INDEX
         doc_type = 'company'
 
 
@@ -218,5 +217,5 @@ class Contact(DocType, MapDBModelToDict):
     class Meta:
         """Default document meta data."""
 
-        index = elasticsearch.ES_INDEX
+        index = settings.ES_INDEX
         doc_type = 'contact'

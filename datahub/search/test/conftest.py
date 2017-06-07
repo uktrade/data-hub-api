@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core import management
 from elasticsearch.helpers.test import get_test_client
 from elasticsearch_dsl import Index
@@ -5,7 +6,7 @@ from pytest import fixture
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
-from datahub.search import models, elasticsearch
+from datahub.search import models
 from datahub.search.management.commands import sync_es
 
 
@@ -19,13 +20,13 @@ def client(request):
 
 @fixture(scope='session')
 def setup_data(client):
-    client.indices.delete(elasticsearch.ES_INDEX)
-    
-    create_test_index(client, elasticsearch.ES_INDEX)
+    index = settings.ES_INDEX
+
+    create_test_index(client, index)
 
     # Create models in the test index
-    models.Company.init(index=elasticsearch.ES_INDEX)
-    models.Contact.init(index=elasticsearch.ES_INDEX)
+    models.Company.init(index=index)
+    models.Contact.init(index=index)
 
     ContactFactory(first_name='abc', last_name='defg').save()
     ContactFactory(first_name='first', last_name='last').save()
@@ -50,10 +51,12 @@ def setup_data(client):
     client.indices.refresh()
 
     yield client
-    client.indices.delete(elasticsearch.ES_INDEX)
+    client.indices.delete(index)
 
 
 def create_test_index(client, index):
-    if not client.indices.exists(index=index):
-        index = Index(index)
-        index.create()
+    if client.indices.exists(index=index):
+        client.indices.delete(index)
+
+    index = Index(index)
+    index.create()
