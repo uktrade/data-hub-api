@@ -49,7 +49,6 @@ class InvestmentViewsTestCase(LeelooTestCase):
         """Test successfully creating a project."""
         contacts = [ContactFactory(), ContactFactory()]
         investor_company = CompanyFactory()
-        recipient_company = CompanyFactory()
         intermediate_company = CompanyFactory()
         adviser = AdviserFactory()
         url = reverse('api-v3:investment:project')
@@ -87,9 +86,6 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'investor_company': {
                 'id': str(investor_company.id)
             },
-            'investment_recipient_company': {
-                'id': str(recipient_company.id)
-            },
             'intermediate_company': {
                 'id': str(intermediate_company.id)
             },
@@ -117,8 +113,6 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'investment_type']['id'])
         assert response_data['investor_company']['id'] == str(
             investor_company.id)
-        assert response_data['investment_recipient_company']['id'] == str(
-            recipient_company.id)
         assert response_data['intermediate_company']['id'] == str(
             intermediate_company.id)
         assert response_data['referral_source_adviser']['id'] == str(

@@ -26,9 +26,6 @@ class IProjectSerializer(serializers.ModelSerializer):
     intermediate_company = NestedRelatedField(
         Company, required=False, allow_null=True
     )
-    investment_recipient_company = NestedRelatedField(
-        Company, required=False, allow_null=True
-    )
     client_contacts = NestedRelatedField(
         Contact, many=True, required=True, allow_null=False, allow_empty=False
     )
@@ -90,18 +87,36 @@ class IProjectSerializer(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = InvestmentProject
         fields = (
-            'id', 'name', 'project_code', 'description',
-            'nda_signed', 'estimated_land_date', 'project_shareable',
-            'anonymous_description', 'not_shareable_reason',
-            'investment_type', 'phase', 'investor_company',
-            'intermediate_company', 'investment_recipient_company',
-            'client_contacts', 'client_relationship_manager',
-            'referral_source_adviser', 'referral_source_activity',
+            'id',
+            'name',
+            'project_code',
+            'description',
+            'nda_signed',
+            'estimated_land_date',
+            'actual_land_date',
+            'project_shareable',
+            'not_shareable_reason',
+            'investment_type',
+            'phase',
+            'investor_company',
+            'intermediate_company',
+            'client_contacts',
+            'client_relationship_manager',
+            'referral_source_adviser',
+            'referral_source_activity',
             'referral_source_activity_website',
             'referral_source_activity_marketing',
-            'referral_source_activity_event', 'fdi_type', 'non_fdi_type',
-            'sector', 'business_activities', 'archived', 'archived_on',
-            'archived_reason', 'archived_by', 'created_on', 'modified_on'
+            'referral_source_activity_event',
+            'fdi_type',
+            'non_fdi_type',
+            'sector',
+            'business_activities',
+            'archived',
+            'archived_on',
+            'archived_reason',
+            'archived_by',
+            'created_on',
+            'modified_on'
         )
         # DRF defaults to required=False even though this field is
         # non-nullable
@@ -180,11 +195,18 @@ class IProjectValueSerializer(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = InvestmentProject
         fields = (
-            'total_investment', 'foreign_equity_investment',
-            'government_assistance', 'number_new_jobs', 'average_salary',
-            'number_safeguarded_jobs', 'r_and_d_budget',
-            'non_fdi_r_and_d_budget', 'new_tech_to_uk', 'export_revenue',
-            'value_complete', 'client_cannot_provide_total_investment',
+            'total_investment',
+            'foreign_equity_investment',
+            'government_assistance',
+            'number_new_jobs',
+            'average_salary',
+            'number_safeguarded_jobs',
+            'r_and_d_budget',
+            'non_fdi_r_and_d_budget',
+            'new_tech_to_uk',
+            'export_revenue',
+            'value_complete',
+            'client_cannot_provide_total_investment',
             'client_cannot_provide_foreign_investment'
         )
 
@@ -207,11 +229,18 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = InvestmentProject
         fields = (
-            'client_requirements', 'site_decided', 'address_line_1',
-            'address_line_2', 'address_line_3', 'address_line_postcode',
-            'competitor_countries', 'uk_region_locations',
-            'strategic_drivers', 'client_considering_other_countries',
-            'uk_company', 'requirements_complete'
+            'client_requirements',
+            'site_decided',
+            'address_line_1',
+            'address_line_2',
+            'address_line_3',
+            'address_line_postcode',
+            'competitor_countries',
+            'uk_region_locations',
+            'strategic_drivers',
+            'client_considering_other_countries',
+            'uk_company',
+            'requirements_complete'
         )
 
 
@@ -237,7 +266,9 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = InvestmentProject
         fields = (
-            'project_manager', 'project_assurance_adviser',
-            'project_manager_team', 'project_assurance_team',
+            'project_manager',
+            'project_assurance_adviser',
+            'project_manager_team',
+            'project_assurance_team',
             'team_complete'
         )
