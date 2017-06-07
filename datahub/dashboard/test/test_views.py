@@ -32,7 +32,7 @@ class DashboardTestCase(LeelooTestCase):
         }, format='json')
 
         assert api_response.status_code == status.HTTP_201_CREATED
-        interaction = InteractionFactory(dit_advisor=user)
+        interaction = InteractionFactory(dit_adviser=user)
 
         url = reverse('dashboard:intelligent-homepage')
         response = self.api_client.get(url, data={'days': 23})

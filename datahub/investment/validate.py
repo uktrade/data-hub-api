@@ -2,6 +2,7 @@ from datahub.core.constants import (
     InvestmentProjectPhase as Phase, InvestmentType,
     ReferralSourceActivity as Activity
 )
+from datahub.core.validate_utils import UpdatedDataView
 
 REQUIRED_MESSAGE = 'This field is required.'
 
@@ -26,7 +27,7 @@ def get_incomplete_project_fields(instance=None, update_data=None):
     :param update_data: Data being updated
     :return:            dict containing errors for incomplete fields
     """
-    data = _UpdatedDataView(instance, update_data)
+    data = UpdatedDataView(instance, update_data)
 
     truthy_required_fields = []
 
@@ -59,7 +60,7 @@ def get_incomplete_value_fields(instance=None, update_data=None):
     :param update_data: Data being updated
     :return:            dict containing errors for incomplete fields
     """
-    data = _UpdatedDataView(instance, update_data)
+    data = UpdatedDataView(instance, update_data)
 
     truthy_required_fields = []
     not_none_or_blank_fields = [
@@ -81,7 +82,7 @@ def get_incomplete_reqs_fields(instance=None, update_data=None):
     :param update_data: Data being updated
     :return:            dict containing errors for incomplete fields
     """
-    data = _UpdatedDataView(instance, update_data)
+    data = UpdatedDataView(instance, update_data)
 
     to_many_required_fields = [
         'strategic_drivers',
@@ -111,11 +112,11 @@ def get_incomplete_team_fields(instance=None, update_data=None):
     :param update_data: Data being updated
     :return:            dict containing errors for incomplete fields
     """
-    data = _UpdatedDataView(instance, update_data)
+    data = UpdatedDataView(instance, update_data)
 
     truthy_required_fields = [
         'project_manager',
-        'project_assurance_advisor'
+        'project_assurance_adviser'
     ]
 
     errors = _validate(data, truthy_required_fields)
@@ -150,34 +151,3 @@ def _validate_truthy(value, field_name, errors):
 def _validate_not_none_or_blank(value, field_name, errors):
     if value in (None, ''):
         errors[field_name] = REQUIRED_MESSAGE
-
-
-class _UpdatedDataView:
-    def __init__(self, instance, update_data):
-        if instance is None and update_data is None:
-            raise TypeError('One of instance and update_data must be provided '
-                            'and not None')
-
-        if update_data is None:
-            update_data = {}
-
-        self.instance = instance
-        self.data = update_data
-
-    def get_value(self, field_name):
-        if field_name in self.data:
-            return self.data[field_name]
-        if self.instance:
-            return getattr(self.instance, field_name)
-        return None
-
-    def get_value_to_many(self, field_name):
-        if field_name in self.data:
-            return self.data[field_name]
-        if self.instance:
-            return getattr(self.instance, field_name).all()
-        return None
-
-    def get_value_id(self, field_name):
-        value = self.get_value(field_name)
-        return str(value.id) if value else None

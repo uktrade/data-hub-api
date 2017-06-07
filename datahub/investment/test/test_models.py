@@ -4,7 +4,7 @@ import pytest
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from datahub.company.test.factories import AdvisorFactory
+from datahub.company.test.factories import AdviserFactory
 from datahub.core import constants
 from datahub.investment.test.factories import InvestmentProjectFactory
 
@@ -23,9 +23,8 @@ def test_project_code_datahub():
     """Tests that correct project codes are generated for Data Hub projects."""
     project = InvestmentProjectFactory()
     assert project.investmentprojectcode
-    assert project.project_code == 'DHP-{:08d}'.format(
-        project.investmentprojectcode.id
-    )
+    project_num = project.investmentprojectcode.id
+    assert project.project_code == f'DHP-{project_num:08d}'
 
 
 def test_project_manager_team_none():
@@ -37,20 +36,20 @@ def test_project_manager_team_none():
 def test_project_manager_team_valid():
     """Tests project_manager_team for a project with a project manager."""
     huk_team = constants.Team.healthcare_uk.value
-    advisor = AdvisorFactory(dit_team_id=huk_team.id)
-    project = InvestmentProjectFactory(project_manager_id=advisor.id)
+    adviser = AdviserFactory(dit_team_id=huk_team.id)
+    project = InvestmentProjectFactory(project_manager_id=adviser.id)
     assert str(project.project_manager_team.id) == huk_team.id
 
 
 def test_project_assurance_team_none():
-    """Tests project_assurance_team for a project w/o an assurance advisor."""
+    """Tests project_assurance_team for a project w/o an assurance adviser."""
     project = InvestmentProjectFactory()
     assert project.project_assurance_team is None
 
 
 def test_project_assurance_team_valid():
-    """Tests project_assurance_team for a project w/ an assurance advisor."""
+    """Tests project_assurance_team for a project w/ an assurance adviser."""
     huk_team = constants.Team.healthcare_uk.value
-    advisor = AdvisorFactory(dit_team_id=huk_team.id)
-    project = InvestmentProjectFactory(project_assurance_advisor_id=advisor.id)
+    adviser = AdviserFactory(dit_team_id=huk_team.id)
+    project = InvestmentProjectFactory(project_assurance_adviser_id=adviser.id)
     assert str(project.project_assurance_team.id) == huk_team.id

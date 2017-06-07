@@ -36,14 +36,14 @@ class CompaniesHouseCompanySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class AdvisorSerializer(serializers.ModelSerializer):
-    """Advisor serializer."""
+class AdviserSerializer(serializers.ModelSerializer):
+    """Adviser serializer."""
 
     name = serializers.CharField()
 
     class Meta:  # noqa: D101
         model = Advisor
-        exclude = ('is_staff', 'is_active', 'date_joined')
+        exclude = ('is_staff', 'is_active', 'date_joined', 'password')
         depth = 1
 
 
@@ -58,7 +58,7 @@ class CompanySerializerRead(serializers.ModelSerializer):
     export_to_countries = NestedCountrySerializer(many=True)
     future_interest_countries = NestedCountrySerializer(many=True)
     uk_based = serializers.BooleanField()
-    account_manager = AdvisorSerializer()
+    account_manager = AdviserSerializer()
     registered_address_1 = serializers.SerializerMethodField()
     registered_address_2 = serializers.SerializerMethodField()
     registered_address_3 = serializers.SerializerMethodField()
@@ -132,7 +132,7 @@ class CompanySerializerWrite(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ContactSerializerV3(serializers.ModelSerializer):
+class ContactSerializer(serializers.ModelSerializer):
     """Contact serializer for writing operations V3."""
 
     title = NestedRelatedField(
@@ -141,7 +141,7 @@ class ContactSerializerV3(serializers.ModelSerializer):
     company = NestedRelatedField(
         Company, required=False, allow_null=True
     )
-    advisor = NestedRelatedField(
+    adviser = NestedRelatedField(
         Advisor, read_only=True,
         extra_fields=('first_name', 'last_name')
     )
@@ -159,88 +159,11 @@ class ContactSerializerV3(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = Contact
         fields = (
-            'id', 'title', 'first_name', 'last_name', 'job_title', 'company', 'advisor',
+            'id', 'title', 'first_name', 'last_name', 'job_title', 'company', 'adviser',
             'primary', 'telephone_countrycode', 'telephone_number', 'email',
             'address_same_as_company', 'address_1', 'address_2', 'address_3', 'address_4',
             'address_town', 'address_county', 'address_country', 'address_postcode',
             'telephone_alternative', 'email_alternative', 'notes', 'contactable_by_dit',
             'contactable_by_dit_partners', 'contactable_by_email', 'contactable_by_phone',
-            'archived', 'archived_on', 'archived_reason', 'archived_by'
+            'archived', 'archived_on', 'archived_reason', 'archived_by', 'created_on'
         )
-
-
-class ContactSerializerV1Write(serializers.ModelSerializer):
-    """Contact serializer for writing operations."""
-
-    class Meta:  # noqa: D101
-        model = Contact
-        fields = '__all__'
-
-
-class ContactSerializerV1Read(serializers.ModelSerializer):
-    """Contact serializer."""
-
-    interactions = NestedInteractionSerializer(many=True)
-    name = serializers.CharField()
-    address_1 = serializers.SerializerMethodField()
-    address_2 = serializers.SerializerMethodField()
-    address_3 = serializers.SerializerMethodField()
-    address_4 = serializers.SerializerMethodField()
-    address_town = serializers.SerializerMethodField()
-    address_country = serializers.SerializerMethodField()
-    address_county = serializers.SerializerMethodField()
-    address_postcode = serializers.SerializerMethodField()
-
-    class Meta:  # noqa: D101
-        model = Contact
-        depth = 2
-        fields = '__all__'
-
-    @staticmethod
-    def get_address_1(obj):
-        """Handle address."""
-        return obj.company.trading_address_1 if obj.address_same_as_company else obj.address_1
-
-    @staticmethod
-    def get_address_2(obj):
-        """Handle address."""
-        return obj.company.trading_address_2 if obj.address_same_as_company else obj.address_2
-
-    @staticmethod
-    def get_address_3(obj):
-        """Handle address."""
-        return obj.company.trading_address_3 if obj.address_same_as_company else obj.address_3
-
-    @staticmethod
-    def get_address_4(obj):
-        """Handle address."""
-        return obj.company.trading_address_4 if obj.address_same_as_company else obj.address_4
-
-    @staticmethod
-    def get_address_town(obj):
-        """Handle address."""
-        return obj.company.trading_address_town if obj.address_same_as_company else obj.address_town
-
-    @staticmethod
-    def get_address_country(obj):
-        """Handle address."""
-        if obj.address_same_as_company:
-            if obj.company.trading_address_country:
-                return {
-                    'id': str(obj.company.trading_address_country.pk),
-                    'name': obj.company.trading_address_country.name
-                }
-            else:
-                return {}
-        else:
-            return {'id': str(obj.address_country.pk), 'name': obj.address_country.name} if obj.address_country else {}
-
-    @staticmethod
-    def get_address_county(obj):
-        """Handle address."""
-        return obj.company.trading_address_county if obj.address_same_as_company else obj.address_county
-
-    @staticmethod
-    def get_address_postcode(obj):
-        """Handle address."""
-        return obj.company.trading_address_postcode if obj.address_same_as_company else obj.address_postcode

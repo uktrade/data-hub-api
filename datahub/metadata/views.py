@@ -49,5 +49,5 @@ urls_args = []
 # programmatically generate metadata views
 for name, model in METADATA_MAPPING.items():
     fn = partial(metadata_view, model=model)
-    path = r'{0}/$'.format(name)
+    path = fr'^{name}/$'
     urls_args.append(((path, fn), {'name': name}))

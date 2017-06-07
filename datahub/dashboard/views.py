@@ -22,11 +22,11 @@ class IntelligentHomepageView(APIView):
         days_in_the_past = now() - timedelta(days=int(days))
 
         interactions = Interaction.objects.filter(
-            dit_advisor=user,
+            dit_adviser=user,
             created_on__gte=days_in_the_past
         ).order_by('-created_on')
         contacts = Contact.objects.filter(
-            advisor=user,
+            adviser=user,
             created_on__gte=days_in_the_past
         ).order_by('-created_on')
 

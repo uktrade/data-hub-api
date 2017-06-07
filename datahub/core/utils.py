@@ -15,7 +15,8 @@ def generate_enum_code_from_queryset(model_queryset):
     Paste the generated text into the constants file.
     """
     for q in model_queryset:
-        return "{} = Constant('{}', '{}')".format(q.name.replace(' ', '_').lower(), q.name, q.id)
+        var_name = q.name.replace(' ', '_').lower()
+        return f"{var_name} = Constant('{q.name}', '{q.id}')"
 
 
 @contextmanager

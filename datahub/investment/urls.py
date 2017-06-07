@@ -3,8 +3,8 @@
 from django.conf.urls import url
 
 from datahub.investment.views import (
-    IProjectRequirementsViewSet, IProjectTeamViewSet, IProjectValueViewSet,
-    IProjectViewSet
+    IProjectAuditViewSet, IProjectRequirementsViewSet, IProjectTeamViewSet,
+    IProjectValueViewSet, IProjectViewSet
 )
 
 project_collection = IProjectViewSet.as_view({
@@ -32,10 +32,15 @@ team_item = IProjectTeamViewSet.as_view({
     'patch': 'partial_update'
 })
 
+audit_item = IProjectAuditViewSet.as_view({
+    'get': 'retrieve',
+})
+
 urlpatterns = [
     url(r'^investment/project$', project_collection, name='project'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/project$', project_item, name='project-item'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/value$', value_item, name='value-item'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/requirements$', requirements_item, name='requirements-item'),
-    url(r'^investment/(?P<pk>[0-9a-z-]{36})/team$', team_item, name='team-item')
+    url(r'^investment/(?P<pk>[0-9a-z-]{36})/team$', team_item, name='team-item'),
+    url(r'^investment/(?P<pk>[0-9a-z-]{36})/audit$', audit_item, name='audit-item'),
 ]

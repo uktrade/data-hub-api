@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 
 from reversion.admin import VersionAdmin
 
-from . models import Advisor, CompaniesHouseCompany, Company, Contact
+from .models import Advisor, CompaniesHouseCompany, Company, Contact
 
 
 @admin.register(Company)
@@ -38,15 +38,39 @@ class CHCompany(admin.ModelAdmin):
 
 
 @admin.register(Advisor)
-class AdvisorAdmin(VersionAdmin, UserAdmin):
-    """Advisor admin."""
+class AdviserAdmin(VersionAdmin, UserAdmin):
+    """Adviser admin."""
 
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name')}),
-        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser',
-                                    'groups', 'user_permissions')}),
-        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+        (None, {
+            'fields': (
+                'email',
+                'password'
+            )
+        }),
+        ('Personal info', {
+            'fields': (
+                'first_name',
+                'last_name',
+                'dit_team'
+            )
+        }),
+        ('Permissions', {
+            'fields': (
+                'enabled',
+                'is_active',
+                'is_staff',
+                'is_superuser',
+                'groups',
+                'user_permissions'
+            )
+        }),
+        ('Important dates', {
+            'fields': (
+                'last_login',
+                'date_joined'
+            )
+        }),
     )
     add_fieldsets = (
         (None, {
@@ -57,20 +81,22 @@ class AdvisorAdmin(VersionAdmin, UserAdmin):
     list_display = ('email', 'first_name', 'last_name', 'is_staff', 'enabled')
     search_fields = ('first_name', 'last_name', 'email')
     ordering = ('email', 'enabled')
-    list_filter = ('enabled', )
+    list_filter = ('enabled',)
     actions = ['enable_users', 'disable_users']
 
     def reversion_register(self, model, **kwargs):
         """Exclude last login from reversion changesets."""
-        kwargs['exclude'] = ('last_login', )
+        kwargs['exclude'] = ('last_login',)
         super().reversion_register(model, **kwargs)
 
     def enable_users(self, request, queryset):
         """Enable users for login."""
         queryset.update(enabled=True)
+
     enable_users.short_description = 'Enable users'
 
     def disable_users(self, request, queryset):
         """Disable users for login."""
         queryset.update(enabled=False)
+
     disable_users.short_description = 'Disable users.'

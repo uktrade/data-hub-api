@@ -4,7 +4,6 @@ from django.contrib import admin
 from oauth2_provider.views import TokenView
 
 from datahub.ping.views import ping
-from datahub.search.views import Search
 from datahub.user.views import who_am_i
 
 from . import api_urls
@@ -13,7 +12,6 @@ from . import api_urls
 unversioned_urls = [
     url(r'^admin/', admin.site.urls),
     url(r'^ping.xml$', ping, name='ping'),
-    url(r'^search/$', Search.as_view(), name='search'),
     url(r'^metadata/', include('datahub.metadata.urls')),
     url(r'^token/$', TokenView.as_view(), name='token'),
     url(r'^whoami/$', who_am_i, name='who_am_i'),
