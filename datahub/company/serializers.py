@@ -184,19 +184,65 @@ class ContactSerializer(serializers.ModelSerializer):
         )
 
 
+class _CHPrefferedField(serializers.Field):
+    """TODO."""
+
+    def __init__(self, field_name, serializer_field=None, **kwargs):
+        """TODO."""
+        super().__init__(**kwargs)
+
+        self._serializer_field = serializer_field
+        self._field_name = field_name
+
+    def get_attribute(self, instance):
+        """TODO."""
+        return instance
+
+    def to_internal_value(self, data):
+        """TODO."""
+        if self._serializer_field:
+            return self._serializer_field.to_internal_value(data)
+        return data
+
+    def to_representation(self, instance):
+        """TODO."""
+        field_value = getattr(
+            instance.companies_house_data or instance, self._field_name
+        )
+        if self._serializer_field:
+            return self._serializer_field.to_representation(field_value)
+        return field_value
+
+
 class CompanySerializerV3(serializers.ModelSerializer):
     """Company read/write serializer V3."""
 
+    name = _CHPrefferedField('name', required=False, allow_null=True)
+    registered_address_1 = _CHPrefferedField(
+        'registered_address_1', required=False, allow_null=True
+    )
+    registered_address_2 = _CHPrefferedField(
+        'registered_address_2', required=False, allow_null=True
+    )
+    registered_address_town = _CHPrefferedField(
+        'registered_address_town', required=False, allow_null=True
+    )
+    registered_address_county = _CHPrefferedField(
+        'registered_address_county', required=False, allow_null=True
+    )
+    registered_address_postcode = _CHPrefferedField(
+        'registered_address_postcode', required=False, allow_null=True
+    )
+    registered_address_country = _CHPrefferedField(
+        'registered_address_country', required=False, allow_null=True,
+        serializer_field=NestedRelatedField(meta_models.Country)
+    )
     trading_name = serializers.CharField(
         source='alias', required=False, allow_null=True
-    )
-    registered_address_country = NestedRelatedField(
-        meta_models.Country, required=False, allow_null=True
     )
     trading_address_country = NestedRelatedField(
         meta_models.Country, required=False, allow_null=True
     )
-    # TODO: Check registered address CH behaviour
     account_manager = NestedAdviserField(required=False, allow_null=True)
     archived_by = NestedAdviserField(read_only=True)
     business_type = NestedRelatedField(
@@ -299,3 +345,8 @@ class CompanySerializerV3(serializers.ModelSerializer):
             'archived_on': {'read_only': True},
             'archived_reason': {'read_only': True}
         }
+
+
+def _get_ch_preffered_field(company_instance, attr_name):
+    return getattr(company_instance.companies_house_data or company_instance,
+                   attr_name)
