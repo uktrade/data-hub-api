@@ -6,7 +6,7 @@ from datahub.search import elasticsearch
 pytestmark = pytest.mark.django_db
 
 
-def test_company_auto_sync_to_es(setup_data):
+def test_company_auto_sync_to_es(setup_data, post_save_handlers):
     """Tests if company gets synced to Elasticsearch."""
     test_name = 'very_hard_to_find_company'
     company = CompanyFactory(
@@ -21,7 +21,7 @@ def test_company_auto_sync_to_es(setup_data):
     assert result.hits.total == 1
 
 
-def test_company_auto_updates_to_es(setup_data):
+def test_company_auto_updates_to_es(setup_data, post_save_handlers):
     """Tests if company gets updated in Elasticsearch."""
     test_name = 'very_hard_to_find_company_international'
     company = CompanyFactory(
@@ -40,7 +40,7 @@ def test_company_auto_updates_to_es(setup_data):
     assert result.hits[0].id == company.id
 
 
-def test_contact_auto_sync_to_es(setup_data):
+def test_contact_auto_sync_to_es(setup_data, post_save_handlers):
     """Tests if contact gets synced to Elasticsearch."""
     test_name = 'very_hard_to_find_contact'
     contact = ContactFactory(
@@ -54,7 +54,7 @@ def test_contact_auto_sync_to_es(setup_data):
     assert result.hits.total == 1
 
 
-def test_contact_auto_updates_to_es(setup_data):
+def test_contact_auto_updates_to_es(setup_data, post_save_handlers):
     """Tests if contact gets updated in Elasticsearch."""
     test_name = 'very_hard_to_find_contact_ii'
     contact = ContactFactory(
