@@ -99,6 +99,6 @@ def remap_fields(fields):
         'future_interest_country': 'future_interest_countries.id',
         'uk_region': 'uk_region.id',
         'trading_address_country': 'trading_address_country.id',
-        'advisor': 'advisor.id',
+        'adviser': 'adviser.id',
     }
     return {name_map.get(k, k): v for k, v in fields.items()}

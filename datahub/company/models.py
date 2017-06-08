@@ -239,7 +239,7 @@ class Contact(ArchivableModel, BaseModel):
         'Company', related_name='contacts', null=True, blank=True,
         on_delete=models.CASCADE
     )
-    advisor = models.ForeignKey(
+    adviser = models.ForeignKey(
         'Advisor', related_name='contacts', null=True, blank=True,
         on_delete=models.SET_NULL
     )
@@ -327,7 +327,7 @@ class Contact(ArchivableModel, BaseModel):
         super().save(*args, **kwargs)
 
 
-class AdvisorManager(BaseUserManager):
+class AdviserManager(BaseUserManager):
     """Django user manager made friendly to not having username field."""
 
     use_in_migrations = True
@@ -360,7 +360,7 @@ class AdvisorManager(BaseUserManager):
 
 
 class Advisor(AbstractBaseUser, PermissionsMixin):
-    """Advisor."""
+    """Adviser."""
 
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
     first_name = models.CharField(max_length=MAX_LENGTH, blank=True)
@@ -388,7 +388,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         help_text='Whether CDMS authentication has been enabled for this user'
     )
 
-    objects = AdvisorManager()
+    objects = AdviserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -415,3 +415,6 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Sends an email to this User."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
+
+    class Meta:  # noqa: D101
+        verbose_name = 'adviser'

@@ -107,7 +107,7 @@ def test_remap_fields():
         'future_interest_country': 'test',
         'uk_region': 'test',
         'trading_address_country': 'test',
-        'advisor': 'test',
+        'adviser': 'test',
         'test': 'test',
         'uk_based': False
     }
@@ -120,7 +120,7 @@ def test_remap_fields():
     assert 'future_interest_countries.id' in remapped
     assert 'uk_region.id' in remapped
     assert 'trading_address_country.id' in remapped
-    assert 'advisor.id' in remapped
+    assert 'adviser.id' in remapped
     assert 'test' in remapped
     assert 'uk_based' in remapped
     assert remapped['uk_based'] is False
