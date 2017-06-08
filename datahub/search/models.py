@@ -106,7 +106,7 @@ class Contact(DocType):
     contactable_by_email = Boolean()
     contactable_by_phone = Boolean()
     address_country = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
-    advisor = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
+    adviser = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
     archived_by = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
     company = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
 

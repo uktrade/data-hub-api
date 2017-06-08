@@ -29,16 +29,16 @@ class BusinessLeadViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         """
         return BusinessLead.objects.select_related(
             'company',
-            'advisor',
+            'adviser',
             'address_country',
             'archived_by'
         ).filter(
-            advisor=self.request.user
+            adviser=self.request.user
         )
 
     def get_additional_data(self, create):
-        """Set advisor to the user on model instance creation."""
+        """Set adviser to the user on model instance creation."""
         data = {}
         if create:
-            data['advisor'] = self.request.user
+            data['adviser'] = self.request.user
         return data

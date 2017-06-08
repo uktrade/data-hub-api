@@ -38,8 +38,8 @@ class CHCompany(admin.ModelAdmin):
 
 
 @admin.register(Advisor)
-class AdvisorAdmin(VersionAdmin, UserAdmin):
-    """Advisor admin."""
+class AdviserAdmin(VersionAdmin, UserAdmin):
+    """Adviser admin."""
 
     fieldsets = (
         (None, {

@@ -34,7 +34,7 @@ class BusinessLead(ArchivableModel, BaseModel):
         related_name='business_leads'
     )
     # This is the adviser that the lead belongs to
-    advisor = models.ForeignKey(
+    adviser = models.ForeignKey(
         'company.Advisor', null=True, blank=True, on_delete=models.CASCADE,
         related_name='business_leads'
     )

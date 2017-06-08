@@ -36,7 +36,7 @@ class ServiceDeliveryListViewV2(APIView):
 
         Objects are created and update through a POST request.
         """
-        data = self.inject_advisor(request)
+        data = self.inject_adviser(request)
         url_builder = functools.partial(
             reverse, viewname=self.detail_view_name, request=request)
         repo_config = {'url_builder': url_builder}
@@ -44,13 +44,13 @@ class ServiceDeliveryListViewV2(APIView):
         return Response(service_delivery)
 
     @staticmethod
-    def inject_advisor(request):
-        """Add the advisor id to the data."""
+    def inject_adviser(request):
+        """Add the adviser id to the data."""
         data = dict(request.data)
         data['relationships'].update({
-            'dit_advisor': {
+            'dit_adviser': {
                 'data': {
-                    'type': 'Advisor',
+                    'type': 'Adviser',
                     'id': encoding.force_text(request.user.pk)}
             }
         })

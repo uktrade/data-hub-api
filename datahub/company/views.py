@@ -7,7 +7,7 @@ from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSetV1, CoreViewSetV3
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
 from .serializers import (
-    AdvisorSerializer, CompaniesHouseCompanySerializer,
+    AdviserSerializer, CompaniesHouseCompanySerializer,
     CompanySerializerReadV1, CompanySerializerV3, CompanySerializerWriteV1,
     ContactSerializer
 )
@@ -80,7 +80,7 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     queryset = Contact.objects.select_related(
         'title',
         'company',
-        'advisor',
+        'adviser',
         'address_country',
         'archived_by'
     )
@@ -90,15 +90,15 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     filter_fields = ['company_id']
 
     def get_additional_data(self, create):
-        """Set advisor to the user on model instance creation."""
+        """Set adviser to the user on model instance creation."""
         data = {}
         if create:
-            data['advisor'] = self.request.user
+            data['adviser'] = self.request.user
         return data
 
 
-class AdvisorFilter(FilterSet):
-    """Advisor filter."""
+class AdviserFilter(FilterSet):
+    """Adviser filter."""
 
     class Meta:  # noqa: D101
         model = Advisor
@@ -109,13 +109,13 @@ class AdvisorFilter(FilterSet):
         )
 
 
-class AdvisorReadOnlyViewSetV1(
+class AdviserReadOnlyViewSetV1(
         mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
-    """Advisor GET only views."""
+    """Adviser GET only views."""
 
-    serializer_class = AdvisorSerializer
+    serializer_class = AdviserSerializer
     queryset = Advisor.objects.all()
     filter_backends = (
         DjangoFilterBackend,
     )
-    filter_class = AdvisorFilter
+    filter_class = AdviserFilter

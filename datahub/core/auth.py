@@ -13,7 +13,7 @@ class CDMSUserBackend(ModelBackend):
     """Model backend that authenticates against CDMS and checks for whitelisting."""
 
     def validate_cdms_credentials(self, username, password):
-        """Authenticate CDMS user/advisor using cdms login page."""
+        """Authenticate CDMS user/adviser using cdms login page."""
         try:
             return self._cdms_login(
                 url=settings.CDMS_AUTH_URL,
