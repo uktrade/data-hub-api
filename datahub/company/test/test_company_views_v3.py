@@ -2,8 +2,8 @@ from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core.constants import (BusinessType, CompanyClassification, 
-                                    Country,  HeadquarterType, Sector, 
+from datahub.core.constants import (BusinessType, CompanyClassification,
+                                    Country, HeadquarterType, Sector,
                                     UKRegion)
 from datahub.core.test_utils import LeelooTestCase
 from .factories import CompanyFactory

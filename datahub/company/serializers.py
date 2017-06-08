@@ -4,13 +4,13 @@ from django.conf import settings
 
 from rest_framework import serializers
 
-from datahub.company.models import Advisor, Company
+from datahub.company.models import (
+    Advisor, CompaniesHouseCompany, Company, Contact
+)
 from datahub.core.serializers import NestedRelatedField
 from datahub.interaction.models import Interaction
 from datahub.metadata import models as meta_models
 from datahub.metadata.serializers import NestedCountrySerializer
-
-from .models import Advisor, CompaniesHouseCompany, Company, Contact
 
 
 class NestedContactSerializer(serializers.ModelSerializer):
@@ -136,7 +136,7 @@ class CompanySerializerWriteV1(serializers.ModelSerializer):
         fields = '__all__'
 
 
-NestedAdvisorField = partial(
+NestedAdviserField = partial(
     NestedRelatedField, 'company.Advisor',
     extra_fields=('first_name', 'last_name')
 )
@@ -197,8 +197,8 @@ class CompanySerializerV3(serializers.ModelSerializer):
         meta_models.Country, required=False, allow_null=True
     )
     # TODO: Check registered address CH behaviour
-    account_manager = NestedAdvisorField(required=False, allow_null=True)
-    archived_by = NestedAdvisorField(read_only=True)
+    account_manager = NestedAdviserField(required=False, allow_null=True)
+    archived_by = NestedAdviserField(read_only=True)
     business_type = NestedRelatedField(
         meta_models.BusinessType, required=False, allow_null=True
     )
@@ -220,7 +220,7 @@ class CompanySerializerV3(serializers.ModelSerializer):
     headquarter_type = NestedRelatedField(
         meta_models.HeadquarterType, required=False, allow_null=True
     )
-    one_list_account_owner = NestedAdvisorField(
+    one_list_account_owner = NestedAdviserField(
         required=False, allow_null=True
     )
     parent = NestedRelatedField(
