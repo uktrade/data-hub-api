@@ -639,7 +639,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         response_data = response.json()
         assert response_data['archived'] is False
         assert response_data['archived_by'] is None
-        assert response_data['archived_reason'] is ''
+        assert response_data['archived_reason'] == ''
 
 
 @pytest.mark.parametrize('view_set', (views.IProjectTeamViewSet,
