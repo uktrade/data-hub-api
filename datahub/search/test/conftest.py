@@ -6,8 +6,10 @@ from pytest import fixture
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
+from datahub.company.models import Company, Contact
 from datahub.search import models
 from datahub.search.management.commands import sync_es
+from django.db.models.signals import post_save
 
 
 @fixture(scope='session')
@@ -60,3 +62,16 @@ def create_test_index(client, index):
 
     index = Index(index)
     index.create()
+
+
+@fixture
+def post_save_handlers():
+    from datahub.search.signals import company_sync_es, contact_sync_es
+
+    post_save.connect(company_sync_es, sender=Company, dispatch_uid='company_sync_es')
+    post_save.connect(contact_sync_es, sender=Contact, dispatch_uid='contact_sync_es')
+
+    yield (company_sync_es, contact_sync_es,)
+
+    post_save.disconnect(company_sync_es, sender=Company, dispatch_uid='company_sync_es')
+    post_save.disconnect(contact_sync_es, sender=Contact, dispatch_uid='contact_sync_es')
