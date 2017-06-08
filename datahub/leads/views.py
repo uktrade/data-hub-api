@@ -15,8 +15,7 @@ class BusinessLeadViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     Users can only view business leads that are associated with them.
     """
 
-    read_serializer_class = BusinessLeadSerializer
-    write_serializer_class = BusinessLeadSerializer
+    serializer_class = BusinessLeadSerializer
     filter_backends = (
         DjangoFilterBackend,
     )
