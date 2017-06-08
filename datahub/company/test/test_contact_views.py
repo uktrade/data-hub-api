@@ -205,7 +205,7 @@ class AddContactTestCase(LeelooTestCase):
         }, format='json')
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data['errors'] == {
+        assert response.data == {
             'address_same_as_company': ['Please select either address_same_as_company or enter an address manually.']
         }
 
@@ -226,7 +226,7 @@ class AddContactTestCase(LeelooTestCase):
         }, format='json')
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data['errors'] == {
+        assert response.data == {
             'address_country': ['This field may not be null.'],
             'address_town': ['This field may not be null.']
         }
@@ -250,7 +250,7 @@ class AddContactTestCase(LeelooTestCase):
         }, format='json')
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data['errors'] == {
+        assert response.data == {
             'contactable_by_email': [
                 'A contact should have at least one way of being contacted. '
                 'Please select either email or phone, or both'

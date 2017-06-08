@@ -12,7 +12,7 @@ class ArchivableViewSetMixin:
         reason = request.data.get('reason', '')
         obj = self.get_object()
         obj.archive(user=request.user, reason=reason)
-        serializer = self.read_serializer_class(obj)
+        serializer = self.get_serializer_class()(obj)
         return Response(data=serializer.data)
 
     @detail_route(methods=['get', 'post'])
@@ -20,5 +20,5 @@ class ArchivableViewSetMixin:
         """Unarchive the object."""
         obj = self.get_object()
         obj.unarchive()
-        serializer = self.read_serializer_class(obj)
+        serializer = self.get_serializer_class()(obj)
         return Response(data=serializer.data)
