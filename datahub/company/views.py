@@ -38,8 +38,7 @@ class CompanyViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
 class CompanyViewSetV3(ArchivableViewSetMixin, CoreViewSetV3):
     """Company view set V3."""
 
-    read_serializer_class = CompanySerializerV3
-    write_serializer_class = CompanySerializerV3
+    serializer_class = CompanySerializerV3
     queryset = Company.objects.select_related(
         'archived_by',
         'registered_address_country',

@@ -29,7 +29,7 @@ class CoreViewSetV1(mixins.CreateModelMixin,
         try:
             return super().create(request, *args, **kwargs)
         except ValidationError as e:
-            raise DRFValidationError(e.message_dict)
+            raise DRFValidationError({'errors': e.message_dict})
 
     def update(self, request, *args, **kwargs):
         """Override update to catch the validation errors coming from the models.
@@ -39,7 +39,7 @@ class CoreViewSetV1(mixins.CreateModelMixin,
         try:
             return super().update(request, *args, **kwargs)
         except ValidationError as e:
-            raise DRFValidationError(e.message_dict)
+            raise DRFValidationError({'errors': e.message_dict})
 
     def perform_create(self, serializer):
         """Custom logic for creating the model instance."""
