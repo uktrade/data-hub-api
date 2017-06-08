@@ -8,7 +8,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from datahub.core.constants import InvestmentProjectPhase
-from datahub.core.models import BaseModel
+from datahub.core.models import ArchivableModel, BaseModel
 from datahub.investment.validate import (
     get_incomplete_reqs_fields, get_incomplete_team_fields,
     get_incomplete_value_fields
@@ -215,8 +215,8 @@ class IProjectTeamAbstract(models.Model):
         return not get_incomplete_team_fields(instance=self)
 
 
-class InvestmentProject(IProjectAbstract, IProjectValueAbstract,
-                        IProjectRequirementsAbstract,
+class InvestmentProject(ArchivableModel, IProjectAbstract,
+                        IProjectValueAbstract, IProjectRequirementsAbstract,
                         IProjectTeamAbstract, BaseModel):
     """An investment project."""
 
