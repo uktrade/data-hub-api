@@ -235,9 +235,13 @@ class CompanySerializerV3(serializers.ModelSerializer):
     uk_region = NestedRelatedField(
         meta_models.UKRegion, required=False, allow_null=True
     )
-    investor_investment_projects = NestedRelatedField(
+    investment_projects_invested_in = NestedRelatedField(
         'investment.InvestmentProject', many=True, read_only=True,
-        extra_fields=('name', 'project_code')
+        extra_fields=('name', 'project_code'),
+        source='investor_investment_projects'
+    )
+    investment_projects_invested_in_count = serializers.IntegerField(
+        source='investor_investment_projects.count', read_only=True
     )
 
     class Meta:  # noqa: D101
@@ -286,7 +290,8 @@ class CompanySerializerV3(serializers.ModelSerializer):
             'sector',
             'turnover_range',
             'uk_region',
-            'investor_investment_projects'
+            'investment_projects_invested_in',
+            'investment_projects_invested_in_count'
         )
         extra_kwargs = {
             'investment_projects': {'read_only': True},
