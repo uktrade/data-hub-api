@@ -16,7 +16,7 @@ class CoreViewSetV1(mixins.CreateModelMixin,
 
     def get_serializer_class(self):
         """Return a different serializer class for reading or writing, if defined."""
-        if self.action in ('list', 'retrieve', 'archive'):
+        if self.action in ('list', 'retrieve', 'archive', 'unarchive'):
             return self.read_serializer_class
         elif self.action in ('create', 'update', 'partial_update'):
             return self.write_serializer_class
@@ -63,4 +63,46 @@ class CoreViewSetV1(mixins.CreateModelMixin,
         return {}
 
 
-CoreViewSetV3 = CoreViewSetV1
+class CoreViewSetV3(mixins.CreateModelMixin,
+                    mixins.RetrieveModelMixin,
+                    mixins.UpdateModelMixin,
+                    mixins.ListModelMixin,
+                    GenericViewSet):
+    """Base class for v3 view sets."""
+
+    def perform_create(self, serializer):
+        """Custom logic for creating the model instance.
+
+        At the moment some models are raising Django validation errors;
+        these are converted to DRF validation errors so a proper error
+        response is generated.
+        """
+        extra_data = self.get_additional_data(True)
+        try:
+            serializer.save(**extra_data)
+        except ValidationError as e:
+            raise DRFValidationError(e.message_dict)
+
+    def perform_update(self, serializer):
+        """Custom logic for updating the model instance.
+
+        At the moment some models are raising Django validation errors;
+        these are converted to DRF validation errors so a proper error
+        response is generated.
+        """
+        extra_data = self.get_additional_data(False)
+        try:
+            serializer.save(**extra_data)
+        except ValidationError as e:
+            raise DRFValidationError(e.message_dict)
+
+    def get_additional_data(self, create):
+        """Returns additional data to be saved in the model instance.
+
+        Intended to be overridden by subclasses.
+
+        :param create:  True for is a model instance is being created; False
+                        for updates
+        :return:        dict of additional data to be saved
+        """
+        return {}

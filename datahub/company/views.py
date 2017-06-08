@@ -75,8 +75,7 @@ class CompaniesHouseCompanyReadOnlyViewSetV1(
 class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     """Contact ViewSet v3."""
 
-    read_serializer_class = ContactSerializer
-    write_serializer_class = ContactSerializer
+    serializer_class = ContactSerializer
     queryset = Contact.objects.select_related(
         'title',
         'company',
