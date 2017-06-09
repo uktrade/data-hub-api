@@ -39,8 +39,6 @@ class AddContactTestCase(LeelooTestCase):
             'address_same_as_company': False,
             'address_1': 'Foo st.',
             'address_2': 'adr 2',
-            'address_3': 'adr 3',
-            'address_4': 'adr 4',
             'address_town': 'London',
             'address_county': 'London',
             'address_country': {
@@ -82,8 +80,6 @@ class AddContactTestCase(LeelooTestCase):
             'address_same_as_company': False,
             'address_1': 'Foo st.',
             'address_2': 'adr 2',
-            'address_3': 'adr 3',
-            'address_4': 'adr 4',
             'address_town': 'London',
             'address_county': 'London',
             'address_country': {
@@ -125,8 +121,6 @@ class AddContactTestCase(LeelooTestCase):
         assert response_data['address_same_as_company']
         assert not response_data['address_1']
         assert not response_data['address_2']
-        assert not response_data['address_3']
-        assert not response_data['address_4']
         assert not response_data['address_country']
         assert not response_data['address_county']
         assert not response_data['address_postcode']
@@ -156,8 +150,6 @@ class AddContactTestCase(LeelooTestCase):
         assert not response_data['email_alternative']
         assert not response_data['address_1']
         assert not response_data['address_2']
-        assert not response_data['address_3']
-        assert not response_data['address_4']
         assert not response_data['address_town']
         assert not response_data['address_county']
         assert not response_data['address_country']
@@ -286,8 +278,6 @@ class EditContactTestCase(LeelooTestCase):
             address_same_as_company=False,
             address_1='Foo st.',
             address_2='adr 2',
-            address_3='adr 3',
-            address_4='adr 4',
             address_town='London',
             address_county='London',
             address_country_id=constants.Country.united_kingdom.value.id,
@@ -332,8 +322,6 @@ class EditContactTestCase(LeelooTestCase):
             'address_same_as_company': False,
             'address_1': 'Foo st.',
             'address_2': 'adr 2',
-            'address_3': 'adr 3',
-            'address_4': 'adr 4',
             'address_town': 'London',
             'address_county': 'London',
             'address_country': {
@@ -423,8 +411,6 @@ class ViewContactTestCase(LeelooTestCase):
             address_same_as_company=False,
             address_1='Foo st.',
             address_2='adr 2',
-            address_3='adr 3',
-            address_4='adr 4',
             address_town='London',
             address_county='London',
             address_country_id=constants.Country.united_kingdom.value.id,
@@ -466,8 +452,6 @@ class ViewContactTestCase(LeelooTestCase):
             'address_same_as_company': False,
             'address_1': 'Foo st.',
             'address_2': 'adr 2',
-            'address_3': 'adr 3',
-            'address_4': 'adr 4',
             'address_town': 'London',
             'address_county': 'London',
             'address_country': {
