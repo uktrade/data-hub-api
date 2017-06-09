@@ -64,8 +64,6 @@ class CompanySerializerReadV1(serializers.ModelSerializer):
     account_manager = AdviserSerializer()
     registered_address_1 = serializers.SerializerMethodField()
     registered_address_2 = serializers.SerializerMethodField()
-    registered_address_3 = serializers.SerializerMethodField()
-    registered_address_4 = serializers.SerializerMethodField()
     registered_address_town = serializers.SerializerMethodField()
     registered_address_country = serializers.SerializerMethodField()
     registered_address_county = serializers.SerializerMethodField()
@@ -94,14 +92,6 @@ class CompanySerializerReadV1(serializers.ModelSerializer):
     def get_registered_address_2(self, obj):
         """Return CH address if present."""
         return self._address_partial(obj, 'registered_address_2')
-
-    def get_registered_address_3(self, obj):
-        """Return CH address if present."""
-        return self._address_partial(obj, 'registered_address_3')
-
-    def get_registered_address_4(self, obj):
-        """Return CH address if present."""
-        return self._address_partial(obj, 'registered_address_4')
 
     @staticmethod
     def get_registered_address_country(obj):
@@ -169,17 +159,35 @@ class ContactSerializer(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = Contact
         fields = (
-            'id', 'title', 'first_name', 'last_name', 'job_title', 'company', 'adviser',
-            'primary', 'telephone_countrycode', 'telephone_number', 'email',
-            'address_same_as_company', 'address_1', 'address_2', 'address_3',
-            'address_4',
-            'address_town', 'address_county', 'address_country',
+            'id',
+            'title',
+            'first_name',
+            'last_name',
+            'job_title',
+            'company',
+            'adviser',
+            'primary',
+            'telephone_countrycode',
+            'telephone_number',
+            'email',
+            'address_same_as_company',
+            'address_1',
+            'address_2',
+            'address_town',
+            'address_county',
+            'address_country',
             'address_postcode',
-            'telephone_alternative', 'email_alternative', 'notes',
+            'telephone_alternative',
+            'email_alternative',
+            'notes',
             'contactable_by_dit',
-            'contactable_by_dit_partners', 'contactable_by_email',
+            'contactable_by_dit_partners',
+            'contactable_by_email',
             'contactable_by_phone',
-            'archived', 'archived_on', 'archived_reason', 'archived_by',
+            'archived',
+            'archived_on',
+            'archived_reason',
+            'archived_by',
             'created_on'
         )
 
@@ -299,8 +307,6 @@ class CompanySerializerV3(serializers.ModelSerializer):
             'uk_based',
             'registered_address_1',
             'registered_address_2',
-            'registered_address_3',
-            'registered_address_4',
             'registered_address_town',
             'registered_address_county',
             'registered_address_postcode',
@@ -315,8 +321,6 @@ class CompanySerializerV3(serializers.ModelSerializer):
             'website',
             'trading_address_1',
             'trading_address_2',
-            'trading_address_3',
-            'trading_address_4',
             'trading_address_town',
             'trading_address_county',
             'trading_address_postcode',

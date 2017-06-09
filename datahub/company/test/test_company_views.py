@@ -50,8 +50,6 @@ class CompanyTestCase(LeelooTestCase):
         assert response.data['trading_name'] == company.alias
         assert response.data['registered_address_1'] == ch_company.registered_address_1
         assert response.data['registered_address_2'] is None
-        assert response.data['registered_address_3'] is None
-        assert response.data['registered_address_4'] is None
         assert response.data['registered_address_town'] == ch_company.registered_address_town
         assert response.data['registered_address_country'] == {
             'name': ch_company.registered_address_country.name,
@@ -83,8 +81,6 @@ class CompanyTestCase(LeelooTestCase):
         assert response.data['name'] == company.name
         assert response.data['registered_address_1'] == company.registered_address_1
         assert response.data['registered_address_2'] is None
-        assert response.data['registered_address_3'] is None
-        assert response.data['registered_address_4'] is None
         assert response.data['registered_address_town'] == company.registered_address_town
         assert response.data['registered_address_country'] == {
             'name': company.registered_address_country.name,
