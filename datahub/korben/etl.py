@@ -33,11 +33,9 @@ def transform(mapping, odata_dict):
             django_dict[right] = utils.cdms_datetime_to_datetime(value)
 
     # concat as required
-    for lefts, right in mapping.concat:
-        value = functools.reduce(
-            lambda acc, left: acc + (odata_dict.get(left) or ''), lefts, ''
-        )
-        django_dict[right] = value
+    for lefts, right, sep in mapping.concat:
+        values = (odata_dict.get(left) or '' for left in lefts)
+        django_dict[right] = sep.join(values)
 
     return django_dict
 
