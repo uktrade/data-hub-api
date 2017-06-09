@@ -38,6 +38,13 @@ class IProjectAbstract(models.Model):
     not_shareable_reason = models.TextField(blank=True, null=True)
     actual_land_date = models.DateField(blank=True, null=True)
 
+    approved_commitment_to_invest = models.NullBooleanField()
+    approved_fdi = models.NullBooleanField()
+    approved_good_value = models.NullBooleanField()
+    approved_high_value = models.NullBooleanField()
+    approved_landed = models.NullBooleanField()
+    approved_non_fdi = models.NullBooleanField()
+
     phase = models.ForeignKey(
         'metadata.InvestmentProjectPhase', on_delete=models.PROTECT,
         related_name='investment_projects',
