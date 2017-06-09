@@ -29,7 +29,7 @@ TIME_ZONE = 'Etc/UTC'
 
 # Application definition
 
-DJANGO_APPS = (
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -37,18 +37,18 @@ DJANGO_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.postgres',
-)
+]
 
-THIRD_PARTY_APPS = (
+THIRD_PARTY_APPS = [
     'rest_framework',
     'django_extensions',
     'reversion',
     'oauth2_provider',
     'django_filters',
     'mptt',
-)
+]
 
-LOCAL_APPS = (
+LOCAL_APPS = [
     'datahub.core',
     'datahub.company',
     'datahub.interaction',
@@ -58,7 +58,7 @@ LOCAL_APPS = (
     'datahub.search.apps.SearchConfig',
     'datahub.user',
     'datahub.korben',
-)
+]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
