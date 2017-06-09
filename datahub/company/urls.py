@@ -21,6 +21,7 @@ contact_archive = ContactViewSet.as_view({
 })
 
 contact_unarchive = ContactViewSet.as_view({
+    # GET will be removed when the FE is no longer using it
     'get': 'unarchive',
     'post': 'unarchive',
 })

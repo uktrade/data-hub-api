@@ -35,8 +35,15 @@ class IProjectAbstract(models.Model):
     cdms_project_code = models.CharField(max_length=MAX_LENGTH, blank=True,
                                          null=True)
     project_shareable = models.NullBooleanField()
-    anonymous_description = models.TextField(blank=True, null=True)
     not_shareable_reason = models.TextField(blank=True, null=True)
+    actual_land_date = models.DateField(blank=True, null=True)
+
+    approved_commitment_to_invest = models.NullBooleanField()
+    approved_fdi = models.NullBooleanField()
+    approved_good_value = models.NullBooleanField()
+    approved_high_value = models.NullBooleanField()
+    approved_landed = models.NullBooleanField()
+    approved_non_fdi = models.NullBooleanField()
 
     phase = models.ForeignKey(
         'metadata.InvestmentProjectPhase', on_delete=models.PROTECT,
@@ -49,10 +56,6 @@ class IProjectAbstract(models.Model):
     )
     intermediate_company = models.ForeignKey(
         'company.Company', related_name='intermediate_investment_projects',
-        null=True, blank=True, on_delete=models.SET_NULL
-    )
-    investment_recipient_company = models.ForeignKey(
-        'company.Company', related_name='recipient_investment_projects',
         null=True, blank=True, on_delete=models.SET_NULL
     )
     client_contacts = models.ManyToManyField(

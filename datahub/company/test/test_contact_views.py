@@ -387,11 +387,22 @@ class ArchiveContactTestCase(LeelooTestCase):
         assert response.data['archived_reason'] == 'foo'
         assert response.data['id'] == contact.pk
 
-    def test_unarchive(self):
-        """Test unarchive contact."""
+    def test_unarchive_get(self):
+        """Test unarchiving a contact using GET."""
         contact = ContactFactory(archived=True, archived_reason='foo')
         url = reverse('api-v3:contact:unarchive', kwargs={'pk': contact.pk})
         response = self.api_client.get(url)
+
+        assert not response.data['archived']
+        assert not response.data['archived_by']
+        assert response.data['archived_reason'] == ''
+        assert response.data['id'] == contact.pk
+
+    def test_unarchive_post(self):
+        """Test unarchiving a contact using POST."""
+        contact = ContactFactory(archived=True, archived_reason='foo')
+        url = reverse('api-v3:contact:unarchive', kwargs={'pk': contact.pk})
+        response = self.api_client.post(url)
 
         assert not response.data['archived']
         assert not response.data['archived_by']
