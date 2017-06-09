@@ -24,7 +24,6 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'phase',
         'investor_company',
         'intermediate_company',
-        'investment_recipient_company',
         'client_relationship_manager',
         'referral_source_adviser',
         'referral_source_activity',
