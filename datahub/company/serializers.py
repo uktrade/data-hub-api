@@ -3,6 +3,7 @@ from functools import partial
 from django.conf import settings
 
 from rest_framework import serializers
+from rest_framework import fields
 
 from datahub.company.models import (
     Advisor, CompaniesHouseCompany, Company, Contact
@@ -12,6 +13,8 @@ from datahub.interaction.models import Interaction
 from datahub.metadata import models as meta_models
 from datahub.metadata.serializers import NestedCountrySerializer
 
+
+MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 class NestedContactSerializer(serializers.ModelSerializer):
     """Nested Contact serializer."""
@@ -201,6 +204,15 @@ class _CHPrefferedField(serializers.Field):
 
         self._serializer_field = serializer_field
         self._field_name = field_name
+        if serializer_field:
+            self.validators += serializer_field.validators
+            # TODO: We need to unify these somehow
+            serializer_field.allow_null = self.allow_null
+            serializer_field.allow_blank = self.allow_null
+            serializer_field.required = self.required
+
+    def run_validation(self, data=fields.empty):
+        return self._serializer_field.run_validation(data)
 
     def get_attribute(self, instance):
         """TODO."""
@@ -208,16 +220,20 @@ class _CHPrefferedField(serializers.Field):
 
     def to_internal_value(self, data):
         """TODO."""
-        if self._serializer_field:
-            return self._serializer_field.to_internal_value(data)
-        return data
+        if not self._serializer_field:
+            raise NotImplementedError('Must provide a serializer field for '
+                                      'deserialization')
+        if data is None:
+            return None
+
+        return self._serializer_field.to_internal_value(data)
 
     def to_representation(self, instance):
         """TODO."""
         field_value = getattr(
             instance.companies_house_data or instance, self._field_name
         )
-        if self._serializer_field:
+        if self._serializer_field and field_value is not None:
             return self._serializer_field.to_representation(field_value)
         return field_value
 
@@ -225,21 +241,29 @@ class _CHPrefferedField(serializers.Field):
 class CompanySerializerV3(serializers.ModelSerializer):
     """Company read/write serializer V3."""
 
-    name = _CHPrefferedField('name', required=False, allow_null=True)
+    name = _CHPrefferedField(
+        'name', required=False, allow_null=True,
+        serializer_field=serializers.CharField(max_length=MAX_LENGTH)
+    )
     registered_address_1 = _CHPrefferedField(
-        'registered_address_1', required=False, allow_null=True
+        'registered_address_1', required=False, allow_null=True,
+        serializer_field=serializers.CharField(max_length=MAX_LENGTH)
     )
     registered_address_2 = _CHPrefferedField(
-        'registered_address_2', required=False, allow_null=True
+        'registered_address_2', required=False, allow_null=True,
+        serializer_field=serializers.CharField(max_length=MAX_LENGTH, required=False, allow_null=True)
     )
     registered_address_town = _CHPrefferedField(
-        'registered_address_town', required=False, allow_null=True
+        'registered_address_town', required=False, allow_null=True,
+        serializer_field=serializers.CharField(max_length=MAX_LENGTH)
     )
     registered_address_county = _CHPrefferedField(
-        'registered_address_county', required=False, allow_null=True
+        'registered_address_county', required=False, allow_null=True,
+        serializer_field=serializers.CharField(max_length=MAX_LENGTH)
     )
     registered_address_postcode = _CHPrefferedField(
-        'registered_address_postcode', required=False, allow_null=True
+        'registered_address_postcode', required=False, allow_null=True,
+        serializer_field=serializers.CharField(max_length=MAX_LENGTH)
     )
     registered_address_country = _CHPrefferedField(
         'registered_address_country', required=False, allow_null=True,
@@ -349,8 +373,3 @@ class CompanySerializerV3(serializers.ModelSerializer):
             'archived_on': {'read_only': True},
             'archived_reason': {'read_only': True}
         }
-
-
-def _get_ch_preffered_field(company_instance, attr_name):
-    return getattr(company_instance.companies_house_data or company_instance,
-                   attr_name)
