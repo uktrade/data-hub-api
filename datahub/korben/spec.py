@@ -99,9 +99,6 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
             ('optevia_Alias', 'alias'),
             ('optevia_CompaniesHouseNumber', 'company_number'),
             ('optevia_Address1', 'registered_address_1'),
-            ('optevia_Address2', 'registered_address_2'),
-            ('optevia_Address3', 'registered_address_3'),
-            ('optevia_Address4', 'registered_address_4'),
             ('optevia_TownCity', 'registered_address_town'),
             ('optevia_StateCounty', 'registered_address_county'),
             ('optevia_PostCode', 'registered_address_postcode'),
@@ -116,6 +113,9 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
             ('optevia_EmployeeRange.Id', 'employee_range_id'),
             ('optevia_TurnoverRange.Id', 'turnover_range_id'),
         ),
+        concat=(
+            (('optevia_Address2', 'optevia_Address3', 'optevia_Address4'), 'registered_address_2', ', '),
+        ),
     ),
     Mapping(
         from_entitytype='SystemUserSet',
@@ -126,7 +126,7 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
             ('DomainName', 'email'),
             ('BusinessUnitId.Id', 'dit_team_id'),
         ),
-        concat=((('FirstName', 'MiddleName'), 'first_name'),),
+        concat=((('FirstName', 'MiddleName'), 'first_name', ' '),),
     ),
     Mapping(
         from_entitytype='ContactSet',
@@ -139,9 +139,6 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
             ('optevia_CountryCode', 'telephone_countrycode'),
             ('EMailAddress1', 'email'),
             ('optevia_Address1', 'address_1'),
-            ('optevia_Address2', 'address_2'),
-            ('optevia_Address3', 'address_3'),
-            ('optevia_Address4', 'address_4'),
             ('optevia_TownCity', 'address_town'),
             ('optevia_StateCounty', 'address_county'),
             ('optevia_PostCode', 'address_postcode'),
@@ -150,8 +147,9 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
             ('optevia_Title.Id', 'title_id'),
         ),
         concat=(
-            (('optevia_AreaCode', 'optevia_TelephoneNumber'), 'telephone_number'),
-            (('FirstName', 'MiddleName'), 'first_name'),
+            (('optevia_AreaCode', 'optevia_TelephoneNumber'), 'telephone_number', ' '),
+            (('FirstName', 'MiddleName'), 'first_name', ' '),
+            (('optevia_Address2', 'optevia_Address3', 'optevia_Address4'), 'address_2', ', '),
         ),
     ),
     Mapping(
