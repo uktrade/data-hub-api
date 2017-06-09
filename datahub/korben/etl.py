@@ -4,7 +4,6 @@ ETL.
 Extract, transform and load functions for converting from CDMS JSON to Postgres
 rows via Django models according to specs.mappings.
 """
-import functools
 from logging import getLogger
 
 from django.db.models.fields import DateTimeField
