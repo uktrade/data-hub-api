@@ -17,8 +17,7 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     This is a subset of the fields on an InvestmentProject object.
     """
 
-    read_serializer_class = IProjectSerializer
-    write_serializer_class = IProjectSerializer
+    serializer_class = IProjectSerializer
     queryset = InvestmentProject.objects.select_related(
         'archived_by',
         'investment_type',
@@ -48,7 +47,7 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
 class IProjectAuditViewSet(CoreViewSetV3):
     """Investment Project audit views."""
 
-    read_serializer_class = IProjectAuditSerializer
+    serializer_class = IProjectAuditSerializer
     queryset = InvestmentProject.objects.all()
 
     def get_view_name(self):
@@ -62,8 +61,7 @@ class IProjectValueViewSet(CoreViewSetV3):
     This is a subset of the fields on an InvestmentProject object.
     """
 
-    read_serializer_class = IProjectValueSerializer
-    write_serializer_class = IProjectValueSerializer
+    serializer_class = IProjectValueSerializer
     queryset = InvestmentProject.objects.select_related('average_salary')
 
     def get_view_name(self):
@@ -77,8 +75,7 @@ class IProjectRequirementsViewSet(CoreViewSetV3):
     This is a subset of the fields on an InvestmentProject object.
     """
 
-    read_serializer_class = IProjectRequirementsSerializer
-    write_serializer_class = IProjectRequirementsSerializer
+    serializer_class = IProjectRequirementsSerializer
     queryset = InvestmentProject.objects.prefetch_related(
         'competitor_countries',
         'uk_region_locations',
@@ -96,8 +93,7 @@ class IProjectTeamViewSet(CoreViewSetV3):
     This is a subset of the fields on an InvestmentProject object.
     """
 
-    read_serializer_class = IProjectTeamSerializer
-    write_serializer_class = IProjectTeamSerializer
+    serializer_class = IProjectTeamSerializer
     queryset = InvestmentProject.objects.select_related(
         'project_manager',
         'project_manager__dit_team',
