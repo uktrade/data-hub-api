@@ -18,14 +18,20 @@ contact_item = ContactViewSet.as_view({
 })
 
 contact_archive = ContactViewSet.as_view({
-    'post': 'archive',
-    'get': 'unarchive'
+    'post': 'archive'
 })
 
+contact_unarchive = ContactViewSet.as_view({
+    # GET will be removed when the FE is no longer using it
+    'get': 'unarchive',
+    'post': 'unarchive',
+})
 
 contact_urls = [
     url(r'^contact$', contact_collection, name='list'),
     url(r'^contact/(?P<pk>[0-9a-z-]{36})$', contact_item, name='detail'),
-    url(r'^contact/(?P<pk>[0-9a-z-]{36})/archive$', contact_archive, name='archive'),
-    url(r'^contact/(?P<pk>[0-9a-z-]{36})/unarchive$', contact_archive, name='unarchive'),
+    url(r'^contact/(?P<pk>[0-9a-z-]{36})/archive$', contact_archive,
+        name='archive'),
+    url(r'^contact/(?P<pk>[0-9a-z-]{36})/unarchive$', contact_unarchive,
+        name='unarchive'),
 ]
