@@ -2,8 +2,9 @@
 
 from django.conf.urls import url
 
-from datahub.company.views import (CompanyViewSetV3, ContactViewSet,
-                                   CompaniesHouseCompanyReadOnlyViewSetV1)
+from datahub.company.views import (
+    CompaniesHouseCompanyReadOnlyViewSetV1, CompanyViewSetV3, ContactViewSet
+)
 
 # CONTACT
 
