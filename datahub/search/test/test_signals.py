@@ -1,6 +1,7 @@
 import pytest
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
+from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.search import elasticsearch
 
 pytestmark = pytest.mark.django_db
@@ -71,3 +72,43 @@ def test_contact_auto_updates_to_es(setup_data, post_save_handlers):
 
     assert result.hits.total == 1
     assert result.hits[0].id == contact.id
+
+
+def test_investment_project_auto_sync_to_es(setup_data, post_save_handlers):
+    """Tests if investment project gets synced to Elasticsearch."""
+    test_name = 'very_hard_to_find_project'
+    project = InvestmentProjectFactory(
+        name=test_name
+    )
+    project.save()
+    setup_data.indices.refresh()
+
+    result = elasticsearch.get_search_by_entity_query(
+        term='',
+        filters={'name': test_name},
+        entity='investment_project'
+    ).execute()
+
+    assert result.hits.total == 1
+
+
+def test_investment_project_auto_updates_to_es(setup_data, post_save_handlers):
+    """Tests if investment project gets synced to Elasticsearch."""
+    test_name = 'very_hard_to_find_project'
+    project = InvestmentProjectFactory(
+        name=test_name
+    )
+    project.save()
+
+    new_test_name = 'even_harder_to_find_investment_project'
+    project.name = new_test_name
+    project.save()
+    setup_data.indices.refresh()
+
+    result = elasticsearch.get_search_by_entity_query(
+        term='',
+        filters={'name': new_test_name},
+        entity='investment_project'
+    ).execute()
+
+    assert result.hits.total == 1
