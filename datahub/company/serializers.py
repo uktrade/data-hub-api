@@ -245,34 +245,34 @@ class CompanySerializerV3(serializers.ModelSerializer):
 
     name = _CHPreferredField(
         required=False, allow_null=True, max_length=MAX_LENGTH,
-        field_class=serializers.CharField
+        allow_blank=True, field_class=serializers.CharField
     )
     registered_address_1 = _CHPreferredField(
         required=False, allow_null=True, max_length=MAX_LENGTH,
-        field_class=serializers.CharField
+        allow_blank=True, field_class=serializers.CharField
     )
     registered_address_2 = _CHPreferredField(
         required=False, allow_null=True, max_length=MAX_LENGTH,
-        field_class=serializers.CharField
+        allow_blank=True, field_class=serializers.CharField
     )
     registered_address_town = _CHPreferredField(
         required=False, allow_null=True, max_length=MAX_LENGTH,
-        field_class=serializers.CharField
+        allow_blank=True, field_class=serializers.CharField
     )
     registered_address_county = _CHPreferredField(
         required=False, allow_null=True, max_length=MAX_LENGTH,
-        field_class=serializers.CharField
+        allow_blank=True, field_class=serializers.CharField
     )
     registered_address_postcode = _CHPreferredField(
         required=False, allow_null=True, max_length=MAX_LENGTH,
-        field_class=serializers.CharField
+        allow_blank=True, field_class=serializers.CharField
     )
     registered_address_country = _CHPreferredField(
         required=False, allow_null=True,
         model=meta_models.Country, field_class=NestedRelatedField
     )
     trading_name = serializers.CharField(
-        source='alias', required=False, allow_null=True
+        source='alias', required=False, allow_null=True, allow_blank=True
     )
     trading_address_country = NestedRelatedField(
         meta_models.Country, required=False, allow_null=True
