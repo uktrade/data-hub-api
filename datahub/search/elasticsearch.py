@@ -6,8 +6,6 @@ from elasticsearch_dsl import Search
 from elasticsearch_dsl.connections import connections
 from elasticsearch_dsl.query import Q
 
-ES_INDEX = settings.ES_INDEX
-
 
 def configure_connection():
     """Configure Elasticsearch default connection."""
@@ -39,7 +37,7 @@ def get_basic_search_query(term, entities=('company',), offset=0, limit=100):
     Also returns number of results in other entities.
     """
     query = Q('multi_match', query=term, fields=['name', '_all'])
-    s = Search(index=ES_INDEX).query(query)
+    s = Search(index=settings.ES_INDEX).query(query)
     s = s.post_filter(
         Q('bool', should=[Q('term', _type=entity) for entity in entities])
     )
@@ -69,7 +67,7 @@ def get_search_by_entity_query(term=None, filters=None, entity=None, offset=0, l
                 Q('nested', path=k.split('.')[0], query=term)
             )
 
-    s = Search(index=ES_INDEX).query('bool', must=query)
+    s = Search(index=settings.ES_INDEX).query('bool', must=query)
     s = s.post_filter('bool', must=query_filter)
 
     return s[offset:offset + limit]

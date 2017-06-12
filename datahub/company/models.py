@@ -9,7 +9,6 @@ from django.core.mail import send_mail
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.timezone import now
-
 from mptt.models import MPTTModel, TreeForeignKey
 
 from datahub.company.validators import RelaxedURLValidator
@@ -26,8 +25,6 @@ class CompanyAbstract(BaseModel):
     name = models.CharField(max_length=MAX_LENGTH)
     registered_address_1 = models.CharField(max_length=MAX_LENGTH)
     registered_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    registered_address_3 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    registered_address_4 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     registered_address_town = models.CharField(max_length=MAX_LENGTH)
     registered_address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     registered_address_country = models.ForeignKey(
@@ -93,7 +90,6 @@ class Company(MPTTModel, ArchivableModel, CompanyAbstract):
         blank=True,
         related_name='company_future_interest_countries'
     )
-    lead = models.BooleanField(default=False)
     description = models.TextField(blank=True, null=True)
     website = models.CharField(max_length=MAX_LENGTH, validators=[RelaxedURLValidator], blank=True, null=True)
     uk_region = models.ForeignKey(
@@ -102,8 +98,6 @@ class Company(MPTTModel, ArchivableModel, CompanyAbstract):
     )
     trading_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    trading_address_3 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    trading_address_4 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_country = models.ForeignKey(
@@ -162,8 +156,6 @@ class Company(MPTTModel, ArchivableModel, CompanyAbstract):
         any_trading_address_fields = any((
             self.trading_address_1,
             self.trading_address_2,
-            self.trading_address_3,
-            self.trading_address_4,
             self.trading_address_town,
             self.trading_address_county,
             self.trading_address_postcode,
@@ -251,8 +243,6 @@ class Contact(ArchivableModel, BaseModel):
     address_same_as_company = models.BooleanField(default=False)
     address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    address_3 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    address_4 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_country = models.ForeignKey(
@@ -298,8 +288,6 @@ class Contact(ArchivableModel, BaseModel):
         some_address_fields_existence = any((
             self.address_1,
             self.address_2,
-            self.address_3,
-            self.address_4,
             self.address_town,
             self.address_county,
             self.address_postcode,
