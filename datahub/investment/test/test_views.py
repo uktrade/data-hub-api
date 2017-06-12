@@ -49,7 +49,6 @@ class InvestmentViewsTestCase(LeelooTestCase):
         """Test successfully creating a project."""
         contacts = [ContactFactory(), ContactFactory()]
         investor_company = CompanyFactory()
-        recipient_company = CompanyFactory()
         intermediate_company = CompanyFactory()
         adviser = AdviserFactory()
         url = reverse('api-v3:investment:project')
@@ -87,9 +86,6 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'investor_company': {
                 'id': str(investor_company.id)
             },
-            'investment_recipient_company': {
-                'id': str(recipient_company.id)
-            },
             'intermediate_company': {
                 'id': str(intermediate_company.id)
             },
@@ -117,8 +113,6 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'investment_type']['id'])
         assert response_data['investor_company']['id'] == str(
             investor_company.id)
-        assert response_data['investment_recipient_company']['id'] == str(
-            recipient_company.id)
         assert response_data['intermediate_company']['id'] == str(
             intermediate_company.id)
         assert response_data['referral_source_adviser']['id'] == str(
@@ -616,6 +610,36 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert entry['comment'] == 'Changed', 'Comments can be set manually'
         assert entry['timestamp'] == changed_datetime.isoformat(), 'TS can be set manually'
         assert entry['changes']['description'] == ['Initial desc', 'New desc'], 'Changes are reflected'
+
+    def test_archive_project_success(self):
+        """Tests archiving a project."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:archive-item',
+                      kwargs={'pk': project.pk})
+        response = self.api_client.post(url, format='json', data={
+            'reason': 'archive reason'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['archived'] is True
+        assert response_data['archived_by']['id'] == str(self.user.pk)
+        assert response_data['archived_reason'] == 'archive reason'
+
+    def test_unarchive_project_success(self):
+        """Tests unarchiving a project."""
+        project = InvestmentProjectFactory(
+            archived=True, archived_reason='reason'
+        )
+        url = reverse('api-v3:investment:unarchive-item',
+                      kwargs={'pk': project.pk})
+        response = self.api_client.post(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['archived'] is False
+        assert response_data['archived_by'] is None
+        assert response_data['archived_reason'] == ''
 
 
 @pytest.mark.parametrize('view_set', (views.IProjectTeamViewSet,

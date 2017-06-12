@@ -1,7 +1,6 @@
 from collections import namedtuple
 from logging import getLogger
 
-from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.paginator import Paginator
 from django.db import models
@@ -12,126 +11,23 @@ from datahub.search.models import Company as ESCompany, Contact as ESContact
 
 logger = getLogger(__name__)
 
-ES_INDEX = settings.ES_INDEX
-
-DataSet = namedtuple('DataSet', ('queryset', 'es_model', 'mapping',))
-
-
-def _id_name_dict(obj):
-    """Creates dictionary with selected field from supplied object."""
-    return {
-        'id': str(obj.id),
-        'name': obj.name,
-    }
-
-
-def _id_type_dict(obj):
-    """Creates dictionary with selected field from supplied object."""
-    return {
-        'id': str(obj.id),
-        'type': obj.type
-    }
-
-
-def _contact_dict(obj):
-    """Creates dictionary with selected field from supplied object."""
-    return {
-        'id': str(obj.id),
-        'first_name': obj.first_name,
-        'last_name': obj.last_name,
-    }
-
-
-def _company_dict(obj):
-    return {
-        'id': str(obj.id),
-        'company_number': obj.company_number,
-    }
-
-
-_company_mappings = {
-    'companies_house_data': _company_dict,
-    'account_manager': _contact_dict,
-    'archived_by': _contact_dict,
-    'one_list_account_owner': _contact_dict,
-    'business_type': _id_name_dict,
-    'classification': _id_name_dict,
-    'employee_range': _id_name_dict,
-    'headquarter_type': _id_name_dict,
-    'parent': _id_name_dict,
-    'registered_address_country': _id_name_dict,
-    'sector': _id_name_dict,
-    'trading_address_country': _id_name_dict,
-    'turnover_range': _id_name_dict,
-    'uk_region': _id_name_dict,
-    'address_country': _id_name_dict,
-    'contacts': lambda col: [_contact_dict(c) for c in col.all()],
-    'id': str,
-    'uk_based': bool,
-    'export_to_countries': lambda col: [_id_name_dict(c) for c in col.all()],
-    'future_interest_countries': lambda col: [_id_name_dict(c) for c in col.all()],
-}
-
-_contact_mappings = {
-    'id': str,
-    'title': _id_name_dict,
-    'address_country': _id_name_dict,
-    'adviser': _id_name_dict,
-    'company': _id_name_dict,
-    'archived_by': _contact_dict,
-}
-
-# there is no typo in 'servicedeliverys' :(
-_ignored_fields = (
-    'subsidiaries', 'servicedeliverys', 'investment_projects',
-    'investor_investment_projects', 'intermediate_investment_projects',
-    'investee_projects', 'recipient_investment_projects', 'teams',
-    'tree_id', 'lft', 'rght', 'business_leads', 'interactions',
-)
+DataSet = namedtuple('DataSet', ('queryset', 'es_model',))
 
 
 def get_dataset():
     """Returns dataset that will be synchronised with Elasticsearch."""
+    company_prefetch_fields = ('registered_address_country', 'business_type', 'sector', 'employee_range',
+                               'turnover_range', 'account_manager', 'export_to_countries', 'future_interest_countries',
+                               'trading_address_country', 'headquarter_type', 'classification',
+                               'one_list_account_owner',)
+
+    company_qs = Company.objects.prefetch_related(*company_prefetch_fields).all().order_by('pk')
+    contact_qs = Contact.objects.all().order_by('pk')
+
     return (
-        DataSet(Company.objects.all().order_by('pk'), ESCompany, _company_mappings),
-        DataSet(Contact.objects.all().order_by('pk'), ESContact, _contact_mappings),
+        DataSet(company_qs, ESCompany),
+        DataSet(contact_qs, ESContact),
     )
-
-
-def _model_to_dict(model, column_mapping):
-    """Converts model instance to a dictionary suitable for ElasticSearch."""
-    result = {col: fn(getattr(model, col)) for col, fn in column_mapping.items()
-              if getattr(model, col, None) is not None}
-
-    fields = [field for field in model._meta.get_fields() if field.name not in _ignored_fields]
-
-    obj = {f.name: getattr(model, f.name) for f in fields if f.name not in result}
-
-    result.update(obj.items())
-
-    return result
-
-
-def _es_document(doc_type, source):
-    """Created Elasticsearch document."""
-    return {
-        '_index': ES_INDEX,
-        '_type': doc_type,
-        '_id': source.get('id'),
-        '_source': source,
-    }
-
-
-def _models_to_dict(models, mapping):
-    """Converts models to dicts."""
-    for row in models:
-        yield _model_to_dict(row, mapping)
-
-
-def _dict_to_es(doc_type, d):
-    """Converts dicts to ElasticSearch documents."""
-    for row in d:
-        yield _es_document(doc_type, row)
 
 
 def _batch_rows(qs, batch_size=100):
@@ -145,13 +41,11 @@ def sync_dataset(item, batch_size=1, stdout=None):
     """Sends dataset to ElasticSearch in batches of batch_size."""
     rows_processed = 0
     total_rows = item.queryset.count() \
-        if isinstance(item.queryset, models.Model) else len(item.queryset)
+        if isinstance(item.queryset, models.query.QuerySet) else len(item.queryset)
     batches_processed = 0
     batches = _batch_rows(item.queryset, batch_size=batch_size)
     for batch in batches:
-        actions = list(_dict_to_es(item.es_model._doc_type.name,
-                                   _models_to_dict(batch, item.mapping)
-                                   ))
+        actions = list(item.es_model.dbmodels_to_es_documents(batch))
         num_actions = len(actions)
         bulk(actions=actions,
              chunk_size=num_actions,
@@ -171,11 +65,6 @@ def sync_dataset(item, batch_size=1, stdout=None):
 
 def sync_es(batch_size, dataset, stdout=None):
     """Sends data to Elasticsearch."""
-    # Makes sure mappings exist in Elasticsearch.
-    # Those calls are idempotent
-    ESCompany.init(index=ES_INDEX)
-    ESContact.init(index=ES_INDEX)
-
     for item in dataset:
         sync_dataset(item, batch_size=batch_size, stdout=stdout)
 

@@ -9,7 +9,7 @@ services:
     volumes:
       - .:/app
     entrypoint: |
-        dockerize -wait tcp://postgres:5432 -timeout 60s
+        dockerize -wait tcp://postgres:5432 -wait tcp://es:9200 -timeout 60s
     environment:
       SECRET_KEY: foobar
       DATABASE_URL: postgresql://postgres@postgres/datahub
