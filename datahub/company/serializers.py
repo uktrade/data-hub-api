@@ -370,7 +370,6 @@ class CompanySerializerV3(serializers.ModelSerializer):
             'investment_projects_invested_in_count'
         )
         extra_kwargs = {
-            'investment_projects': {'read_only': True},
             'archived': {'read_only': True},
             'archived_on': {'read_only': True},
             'archived_reason': {'read_only': True}
