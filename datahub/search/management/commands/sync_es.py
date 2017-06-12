@@ -6,8 +6,11 @@ from django.core.paginator import Paginator
 from django.db import models
 
 from datahub.company.models import Company, Contact
+from datahub.investment.models import InvestmentProject
 from datahub.search.elasticsearch import bulk
-from datahub.search.models import Company as ESCompany, Contact as ESContact
+from datahub.search.models import Company as ESCompany, \
+    Contact as ESContact, \
+    InvestmentProject as ESInvestmentProject
 
 logger = getLogger(__name__)
 
@@ -23,10 +26,12 @@ def get_dataset():
 
     company_qs = Company.objects.prefetch_related(*company_prefetch_fields).all().order_by('pk')
     contact_qs = Contact.objects.all().order_by('pk')
+    investment_project_qs = InvestmentProject.objects.all().order_by('pk')
 
     return (
         DataSet(company_qs, ESCompany),
         DataSet(contact_qs, ESContact),
+        DataSet(investment_project_qs, ESInvestmentProject),
     )
 
 
