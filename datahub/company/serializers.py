@@ -331,6 +331,7 @@ class CompanySerializerV3(serializers.ModelSerializer):
             'name',
             'trading_name',
             'uk_based',
+            'company_number',
             'registered_address_1',
             'registered_address_2',
             'registered_address_town',
