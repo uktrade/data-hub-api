@@ -2,8 +2,7 @@ from functools import partial
 
 from django.conf import settings
 
-from rest_framework import serializers
-from rest_framework import fields
+from rest_framework import fields, serializers
 
 from datahub.company.models import (
     Advisor, CompaniesHouseCompany, Company, Contact
@@ -15,6 +14,7 @@ from datahub.metadata.serializers import NestedCountrySerializer
 
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
 
 class NestedContactSerializer(serializers.ModelSerializer):
     """Nested Contact serializer."""
@@ -195,79 +195,71 @@ class ContactSerializer(serializers.ModelSerializer):
         )
 
 
-class _CHPrefferedField(serializers.Field):
+class _CHPreferredField(serializers.Field):
     """TODO."""
 
-    def __init__(self, field_name, serializer_field=None, **kwargs):
+    def __init__(self, field_class=None, **kwargs):
         """TODO."""
-        super().__init__(**kwargs)
+        super().__init__()
+        self._serializer_field = field_class(**kwargs)
 
-        self._serializer_field = serializer_field
-        self._field_name = field_name
-        if serializer_field:
-            self.validators += serializer_field.validators
-            # TODO: We need to unify these somehow
-            serializer_field.allow_null = self.allow_null
-            serializer_field.allow_blank = self.allow_null
-            serializer_field.required = self.required
+    def bind(self, field_name, parent):
+        """TODO."""
+        super().bind(field_name, parent)
+        self._serializer_field.bind(field_name, parent)
 
     def run_validation(self, data=fields.empty):
+        """TODO."""
         return self._serializer_field.run_validation(data)
+
+    def get_value(self, dictionary):
+        """TODO."""
+        return self._serializer_field.get_value(dictionary)
 
     def get_attribute(self, instance):
         """TODO."""
-        return instance
+        used_instance = instance.companies_house_data or instance
+        return self._serializer_field.get_attribute(used_instance)
 
     def to_internal_value(self, data):
         """TODO."""
-        if not self._serializer_field:
-            raise NotImplementedError('Must provide a serializer field for '
-                                      'deserialization')
-        if data is None:
-            return None
-
         return self._serializer_field.to_internal_value(data)
 
-    def to_representation(self, instance):
+    def to_representation(self, value):
         """TODO."""
-        field_value = getattr(
-            instance.companies_house_data or instance, self._field_name
-        )
-        if self._serializer_field and field_value is not None:
-            return self._serializer_field.to_representation(field_value)
-        return field_value
+        return self._serializer_field.to_representation(value)
 
 
 class CompanySerializerV3(serializers.ModelSerializer):
     """Company read/write serializer V3."""
 
-    name = _CHPrefferedField(
-        'name', required=False, allow_null=True,
-        serializer_field=serializers.CharField(max_length=MAX_LENGTH)
+    name = _CHPreferredField(
+        required=False, allow_null=True, max_length=MAX_LENGTH,
+        field_class=serializers.CharField
     )
-    registered_address_1 = _CHPrefferedField(
-        'registered_address_1', required=False, allow_null=True,
-        serializer_field=serializers.CharField(max_length=MAX_LENGTH)
+    registered_address_1 = _CHPreferredField(
+        required=False, allow_null=True, max_length=MAX_LENGTH,
+        field_class=serializers.CharField
     )
-    registered_address_2 = _CHPrefferedField(
-        'registered_address_2', required=False, allow_null=True,
-        serializer_field=serializers.CharField(max_length=MAX_LENGTH, required=False, allow_null=True)
+    registered_address_2 = _CHPreferredField(
+        required=False, allow_null=True, max_length=MAX_LENGTH,
+        field_class=serializers.CharField
     )
-    registered_address_town = _CHPrefferedField(
-        'registered_address_town', required=False, allow_null=True,
-        serializer_field=serializers.CharField(max_length=MAX_LENGTH)
+    registered_address_town = _CHPreferredField(
+        required=False, allow_null=True, max_length=MAX_LENGTH,
+        field_class=serializers.CharField
     )
-    registered_address_county = _CHPrefferedField(
-        'registered_address_county', required=False, allow_null=True,
-        serializer_field=serializers.CharField(max_length=MAX_LENGTH)
+    registered_address_county = _CHPreferredField(
+        required=False, allow_null=True, max_length=MAX_LENGTH,
+        field_class=serializers.CharField
     )
-    registered_address_postcode = _CHPrefferedField(
-        'registered_address_postcode', required=False, allow_null=True,
-        serializer_field=serializers.CharField(max_length=MAX_LENGTH)
+    registered_address_postcode = _CHPreferredField(
+        required=False, allow_null=True, max_length=MAX_LENGTH,
+        field_class=serializers.CharField
     )
-    registered_address_country = _CHPrefferedField(
-        'registered_address_country', required=False, allow_null=True,
-        serializer_field=NestedRelatedField(meta_models.Country)
+    registered_address_country = _CHPreferredField(
+        required=False, allow_null=True,
+        model=meta_models.Country, field_class=NestedRelatedField
     )
     trading_name = serializers.CharField(
         source='alias', required=False, allow_null=True
