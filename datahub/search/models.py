@@ -39,7 +39,7 @@ class MapDBModelToDict(object):
 
     # there is no typo in 'servicedeliverys' :(
     IGNORED_FIELDS = (
-        'subsidiaries', 'servicedeliverys', 'investment_projects',
+        'children', 'servicedeliverys', 'investment_projects',
         'investor_investment_projects', 'intermediate_investment_projects',
         'investee_projects', 'recipient_investment_projects', 'teams',
         'tree_id', 'lft', 'rght', 'business_leads', 'interactions',
