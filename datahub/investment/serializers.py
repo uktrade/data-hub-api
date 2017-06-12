@@ -7,7 +7,7 @@ import datahub.metadata.models as meta_models
 from datahub.company.models import Advisor, Company, Contact
 from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.serializers import NestedRelatedField
-from datahub.investment.models import InvestmentProject
+from datahub.investment.models import InvestmentProject, IProjectDocument
 from datahub.investment.validate import get_validators
 
 
@@ -83,6 +83,19 @@ class IProjectSerializer(serializers.ModelSerializer):
         if errors:
             raise serializers.ValidationError(errors)
         return data
+
+    def to_representation(self, instance):
+        """Serialize instance to JSON."""
+        serialized = super().to_representation(instance)
+
+        for doc_type, _ in IProjectDocument.DOC_TYPES:
+            serialized[doc_type] = []
+
+        for document in instance.documents.all():
+            serialized[document.doc_type].append({
+                'id': document.id,
+                'uri': document.filename,
+            })
 
     class Meta:  # noqa: D101
         model = InvestmentProject

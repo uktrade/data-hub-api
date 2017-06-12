@@ -246,6 +246,58 @@ class InvestmentProjectCode(models.Model):
                                    on_delete=models.CASCADE)
 
 
+class IProjectDocument(ArchivableModel):
+    """Investment Project Document."""
+
+    TYPE_ACTUAL_LAND_DATE = 'actual-land-date'
+    TYPE_FDI_TYPE = 'fdi-type'
+    TYPE_OPERATIONS_COMMENCED = 'operations-commenced'
+    TYPE_TOTAL_INVESTMENT = 'total-investment'
+    TYPE_FOREIGN_EQUITY_INVESTMENT = 'foreign-equity-investment'
+    TYPE_NUMBER_NEW_JOBS = 'number-new-jobs'
+    TYPE_NUMBER_SAFEGUARDED_JOBS = 'number-safeguarded-jobs'
+    TYPE_R_AND_D_BUDGET = 'r-and-d-budget'
+    TYPE_NEW_TECH_TO_UK = 'new-tech-to-uk'
+    TYPE_EXPORT_REVENUE = 'export-revenue'
+    TYPE_AVERAGE_SALARY = 'average-salary'
+
+    DOC_TYPES = (
+        (TYPE_ACTUAL_LAND_DATE, 'Actual land date'),
+        (TYPE_FDI_TYPE, 'Fdi type'),
+        (TYPE_OPERATIONS_COMMENCED, 'Operations commenced'),
+        (TYPE_TOTAL_INVESTMENT, 'Total investment'),
+        (TYPE_FOREIGN_EQUITY_INVESTMENT, 'Foreign equity investment'),
+        (TYPE_NUMBER_NEW_JOBS, 'Number new jobs'),
+        (TYPE_NUMBER_SAFEGUARDED_JOBS, 'Number safeguarded jobs'),
+        (TYPE_R_AND_D_BUDGET, 'R and d budget'),
+        (TYPE_NEW_TECH_TO_UK, 'New tech to uk'),
+        (TYPE_EXPORT_REVENUE, 'Export revenue'),
+        (TYPE_AVERAGE_SALARY, 'Average salary'),
+    )
+
+    id = models.UUIDField(primary_key=True)
+    project = models.ForeignKey(
+        InvestmentProject,
+        related_name='documents',
+    )
+    doc_type = models.CharField(
+        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+        choices=DOC_TYPES,
+    )
+    filename = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
+
+    def full_path(self):
+        """Generate full path to the file in S3, to be signed."""
+        return f'{self.project.id}/{self.doc_type}/{self.filename}'
+
+    class Meta:  # noqa: D101
+        verbose_name = 'Investment Project Document'
+        verbose_name_plural = 'Investment Project Documents'
+        unique_together = (
+            ('project', 'doc_type', 'filename'),
+        )
+
+
 @receiver(post_save, sender=InvestmentProject)
 def project_post_save(sender, **kwargs):
     """Creates a project code for investment projects on creation.
