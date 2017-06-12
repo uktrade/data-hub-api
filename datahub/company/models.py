@@ -9,7 +9,6 @@ from django.core.mail import send_mail
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.timezone import now
-
 from mptt.models import MPTTModel, TreeForeignKey
 
 from datahub.company.validators import RelaxedURLValidator

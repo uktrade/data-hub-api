@@ -7,6 +7,7 @@ omit =
     *manage.py
     *__init__.py
     *models.py
+    *apps.py
     *core/auth.py
     *datahub/core/management/commands/distributed_migrate.py
     *loading_scripts/etl/*
