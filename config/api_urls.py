@@ -35,5 +35,6 @@ v3_urls = [
     url(r'^', include((leads_urls, 'business-leads'), namespace='business-leads')),
     url(r'^', include((company_urls.contact_urls, 'contact'), namespace='contact')),
     url(r'^', include((company_urls.company_urls, 'company'), namespace='company')),
+    url(r'^', include((company_urls.ch_company_urls, 'ch-company'), namespace='ch-company')),
     url(r'^', include((search_urls, 'search'), namespace='search'))
 ]
