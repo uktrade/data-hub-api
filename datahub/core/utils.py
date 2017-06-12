@@ -4,7 +4,9 @@ from itertools import zip_longest
 from logging import getLogger
 from urllib.parse import urlparse
 
+import boto3
 import requests
+from django.conf import settings
 
 logger = getLogger(__name__)
 
@@ -57,3 +59,22 @@ def slice_iterable_into_chunks(iterable, size):
     """
     args = [iter(iterable)] * size
     return zip_longest(*args, fillvalue=None)
+
+
+def sign_s3_url(bucket_name, path, expires=3600):
+    """Sign s3 url using global config, and given expiry in seconds."""
+    s3 = boto3.client(
+        's3',
+        region_name='eu-west-2',
+        aws_access_key_id=settings.AWS_ACCESS['KEY_ID'],
+        aws_secret_access_key=settings.AWS_ACCESS['KEY_SECRET'],
+    )
+
+    return s3.generate_presigned_url(
+        ClientMethod='get_object',
+        Params={
+            'Bucket': bucket_name,
+            'Key': path,
+        },
+        ExpiresIn=expires,
+    )

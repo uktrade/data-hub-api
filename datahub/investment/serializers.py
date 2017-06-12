@@ -1,5 +1,6 @@
 """Investment serialisers for views."""
 
+from django.conf import settings
 from rest_framework import serializers
 from reversion.models import Version
 
@@ -7,6 +8,7 @@ import datahub.metadata.models as meta_models
 from datahub.company.models import Advisor, Company, Contact
 from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.serializers import NestedRelatedField
+from datahub.core.utils import sign_s3_url
 from datahub.investment.models import InvestmentProject, IProjectDocument
 from datahub.investment.validate import get_validators
 
@@ -94,7 +96,10 @@ class IProjectSerializer(serializers.ModelSerializer):
         for document in instance.documents.all():
             serialized[document.doc_type].append({
                 'id': document.id,
-                'uri': document.filename,
+                'uri': sign_s3_url(
+                    settings.INVESTMENT_DOCUMENTS_BUCKET,
+                    document.full_path,
+                ),
             })
 
     class Meta:  # noqa: D101
