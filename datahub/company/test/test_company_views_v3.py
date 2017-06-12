@@ -7,9 +7,10 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import (
     CompaniesHouseCompanyFactory, CompanyFactory
 )
-from datahub.core.constants import (BusinessType, CompanyClassification,
-                                    Country, HeadquarterType, Sector,
-                                    UKRegion)
+from datahub.core.constants import (
+    BusinessType, CompanyClassification, Country, HeadquarterType, Sector,
+    UKRegion
+)
 from datahub.core.test_utils import LeelooTestCase
 from datahub.investment.test.factories import InvestmentProjectFactory
 
