@@ -2,7 +2,85 @@ from django.conf import settings
 from elasticsearch_dsl import Boolean, Date, DocType, Nested, String
 
 
-class Company(DocType):
+def _id_name_dict(obj):
+    """Creates dictionary with selected field from supplied object."""
+    return {
+        'id': str(obj.id),
+        'name': obj.name,
+    }
+
+
+def _id_type_dict(obj):
+    """Creates dictionary with selected field from supplied object."""
+    return {
+        'id': str(obj.id),
+        'type': obj.type
+    }
+
+
+def _contact_dict(obj):
+    """Creates dictionary with selected field from supplied object."""
+    return {
+        'id': str(obj.id),
+        'first_name': obj.first_name,
+        'last_name': obj.last_name,
+    }
+
+
+def _company_dict(obj):
+    return {
+        'id': str(obj.id),
+        'company_number': obj.company_number,
+    }
+
+
+class MapDBModelToDict(object):
+    """Helps convert Django models to dictionaries."""
+
+    # there is no typo in 'servicedeliverys' :(
+    IGNORED_FIELDS = (
+        'subsidiaries', 'servicedeliverys', 'investment_projects',
+        'investor_investment_projects', 'intermediate_investment_projects',
+        'investee_projects', 'recipient_investment_projects', 'teams',
+        'tree_id', 'lft', 'rght', 'business_leads', 'interactions',
+    )
+
+    MAPPINGS = {}
+
+    @classmethod
+    def es_document(cls, dbmodel):
+        """Creates Elasticsearch document."""
+        source = cls.dbmodel_to_dict(dbmodel)
+
+        return {
+            '_index': settings.ES_INDEX,
+            '_type': cls._doc_type.name,
+            '_id': source.get('id'),
+            '_source': source,
+        }
+
+    @classmethod
+    def dbmodel_to_dict(cls, dbmodel):
+        """Converts dbmodel instance to a dictionary suitable for ElasticSearch."""
+        result = {col: fn(getattr(dbmodel, col)) for col, fn in cls.MAPPINGS.items()
+                  if getattr(dbmodel, col, None) is not None}
+
+        fields = [field for field in dbmodel._meta.get_fields() if field.name not in cls.IGNORED_FIELDS]
+
+        obj = {f.name: getattr(dbmodel, f.name) for f in fields if f.name not in result}
+
+        result.update(obj.items())
+
+        return result
+
+    @classmethod
+    def dbmodels_to_es_documents(cls, dbmodels):
+        """Converts db models to Elasticsearch documents."""
+        for dbmodel in dbmodels:
+            yield cls.es_document(dbmodel)
+
+
+class Company(DocType, MapDBModelToDict):
     """Elasticsearch representation of Company model."""
 
     account_manager = Nested(properties={'id': String(index='not_analyzed'),
@@ -61,6 +139,29 @@ class Company(DocType):
     export_to_countries = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
     future_interest_countries = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
 
+    MAPPINGS = {
+        'companies_house_data': _company_dict,
+        'account_manager': _contact_dict,
+        'archived_by': _contact_dict,
+        'one_list_account_owner': _contact_dict,
+        'business_type': _id_name_dict,
+        'classification': _id_name_dict,
+        'employee_range': _id_name_dict,
+        'headquarter_type': _id_name_dict,
+        'parent': _id_name_dict,
+        'registered_address_country': _id_name_dict,
+        'sector': _id_name_dict,
+        'trading_address_country': _id_name_dict,
+        'turnover_range': _id_name_dict,
+        'uk_region': _id_name_dict,
+        'address_country': _id_name_dict,
+        'contacts': lambda col: [_contact_dict(c) for c in col.all()],
+        'id': str,
+        'uk_based': bool,
+        'export_to_countries': lambda col: [_id_name_dict(c) for c in col.all()],
+        'future_interest_countries': lambda col: [_id_name_dict(c) for c in col.all()],
+    }
+
     class Meta:
         """Default document meta data."""
 
@@ -68,7 +169,7 @@ class Company(DocType):
         doc_type = 'company'
 
 
-class Contact(DocType):
+class Contact(DocType, MapDBModelToDict):
     """Elasticsearch representation of Contact model."""
 
     archived = Boolean()
@@ -103,6 +204,15 @@ class Contact(DocType):
     adviser = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
     archived_by = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
     company = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
+
+    MAPPINGS = {
+        'id': str,
+        'title': _id_name_dict,
+        'address_country': _id_name_dict,
+        'adviser': _id_name_dict,
+        'company': _id_name_dict,
+        'archived_by': _contact_dict,
+    }
 
     class Meta:
         """Default document meta data."""
