@@ -286,6 +286,7 @@ class IProjectDocument(ArchivableModel):
     )
     filename = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
 
+    @property
     def full_path(self):
         """Generate full path to the file in S3, to be signed."""
         return f'{self.project.id}/{self.doc_type}/{self.filename}'
