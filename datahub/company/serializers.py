@@ -196,37 +196,47 @@ class ContactSerializer(serializers.ModelSerializer):
 
 
 class _CHPreferredField(serializers.Field):
-    """TODO."""
+    """Serializer field that returns values from Companies House data when
+    present instead of the model itself.
+
+    The serializer field works by acting as a proxy to another serializer
+    field. Writes still occur directly to the model (and not to the
+    Companies House data).
+    """
 
     def __init__(self, field_class=None, **kwargs):
-        """TODO."""
+        """Initialises the field, and creates the underlying field."""
         super().__init__()
         self._serializer_field = field_class(**kwargs)
 
     def bind(self, field_name, parent):
-        """TODO."""
+        """Sets the field name and parent."""
         super().bind(field_name, parent)
         self._serializer_field.bind(field_name, parent)
 
     def run_validation(self, data=fields.empty):
-        """TODO."""
+        """Validates user-provided data, returning the deserialized value."""
         return self._serializer_field.run_validation(data)
 
     def get_value(self, dictionary):
-        """TODO."""
+        """Gets the value for this field from serialized data."""
         return self._serializer_field.get_value(dictionary)
 
     def get_attribute(self, instance):
-        """TODO."""
+        """Gets the value from this field from a model instance.
+
+        This is used in the serialized representation. Data from Companies
+        House is used if Companies House data is present.
+        """
         used_instance = instance.companies_house_data or instance
         return self._serializer_field.get_attribute(used_instance)
 
     def to_internal_value(self, data):
-        """TODO."""
+        """Deserializes the a user-provided value."""
         return self._serializer_field.to_internal_value(data)
 
     def to_representation(self, value):
-        """TODO."""
+        """Returns the serialized representation of this value."""
         return self._serializer_field.to_representation(value)
 
 
