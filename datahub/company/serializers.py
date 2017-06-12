@@ -196,8 +196,8 @@ class ContactSerializer(serializers.ModelSerializer):
 
 
 class _CHPreferredField(serializers.Field):
-    """Serializer field that returns values from Companies House data when
-    present instead of the model itself.
+    """Serializer field that returns values from Companies House data in
+    preference to the the model instance itself.
 
     The serializer field works by acting as a proxy to another serializer
     field. Writes still occur directly to the model (and not to the
