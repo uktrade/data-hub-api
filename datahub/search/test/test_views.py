@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -104,6 +106,13 @@ class SearchTestCase(LeelooTestCase):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['trading_address_country']['id'] == constants.Country.united_states.value.id
 
+    def test_search_company_no_filters(self):
+        """Tests case where there is no filters provided."""
+        url = f"{reverse('api-v3:search:company')}?offset=0&limit=100"
+        response = self.api_client.post(url, {})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
     def test_search_foreign_company_json(self):
         """Tests detailed company search."""
         url = f"{reverse('api-v3:search:company')}?offset=0&limit=100"
@@ -132,3 +141,52 @@ class SearchTestCase(LeelooTestCase):
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['last_name'] == 'defg'
+
+    def test_search_contact_no_filters(self):
+        """Tests case where there is no filters provided."""
+        url = f"{reverse('api-v3:search:contact')}?offset=0&limit=100"
+        response = self.api_client.post(url, {})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_search_investment_project_json(self):
+        """Tests detailed investment project search."""
+        url = f"{reverse('api-v3:search:investment_project')}?offset=0&limit=100"
+
+        response = self.api_client.post(url, {
+            'description': 'investmentproject1',
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['description'] == 'investmentproject1'
+
+    def test_search_investment_project_date_json(self):
+        """Tests detailed investment project search."""
+        url = f"{reverse('api-v3:search:investment_project')}?offset=0&limit=100"
+
+        response = self.api_client.post(url, {
+            'estimated_land_date_before': datetime.datetime(2017, 6, 13, 9, 44, 31, 62870),
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+
+    def test_search_investment_project_invalid_date_json(self):
+        """Tests detailed investment project search."""
+        url = f"{reverse('api-v3:search:investment_project')}?offset=0&limit=100"
+
+        response = self.api_client.post(url, {
+            'estimated_land_date_before': 'this is definitely not a valid date',
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_search_investment_project_no_filters(self):
+        """Tests case where there is no filters provided."""
+        url = f"{reverse('api-v3:search:investment_project')}?offset=0&limit=100"
+        response = self.api_client.post(url, {})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST

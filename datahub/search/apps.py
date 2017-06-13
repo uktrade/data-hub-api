@@ -18,6 +18,7 @@ class SearchConfig(AppConfig):
         # Those calls are idempotent
         models.Company.init(index=settings.ES_INDEX)
         models.Contact.init(index=settings.ES_INDEX)
+        models.InvestmentProject.init(index=settings.ES_INDEX)
 
         # Let's import Company and Contact post_save signal handlers
         # So DB models can be synced with Elasticsearch on save

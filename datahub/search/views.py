@@ -51,7 +51,7 @@ class SearchBasicAPIView(APIView):
 class SearchCompanyAPIView(APIView):
     """Filtered company search view."""
 
-    COMPANY_FILTER_FIELDS = (
+    FILTER_FIELDS = (
         'name', 'alias', 'sector', 'account_manager', 'export_to_country',
         'future_interest_country', 'description', 'uk_region', 'uk_based',
         'trading_address_town', 'trading_address_country', 'trading_address_postcode',
@@ -62,7 +62,7 @@ class SearchCompanyAPIView(APIView):
     def post(self, request, format=None):
         """Performs filtered company search."""
         filters = {field: request.data[field]
-                   for field in self.COMPANY_FILTER_FIELDS if field in request.data}
+                   for field in self.FILTER_FIELDS if field in request.data}
         filters = elasticsearch.remap_fields(filters)
 
         if len(filters.keys()) == 0:
@@ -91,7 +91,7 @@ class SearchCompanyAPIView(APIView):
 class SearchContactAPIView(APIView):
     """Filtered contact search view."""
 
-    CONTACT_FILTER_FIELDS = (
+    FILTER_FIELDS = (
         'first_name', 'last_name', 'job_title', 'company', 'adviser', 'notes',
     )
 
@@ -100,7 +100,7 @@ class SearchContactAPIView(APIView):
     def post(self, request, format=None):
         """Performs filtered contact search."""
         filters = {field: request.data[field]
-                   for field in self.CONTACT_FILTER_FIELDS if field in request.data}
+                   for field in self.FILTER_FIELDS if field in request.data}
 
         filters = elasticsearch.remap_fields(filters)
 
@@ -115,6 +115,50 @@ class SearchContactAPIView(APIView):
         results = elasticsearch.get_search_contact_query(
             term=original_query,
             filters=filters,
+            offset=offset,
+            limit=limit,
+        ).execute()
+
+        response = {
+            'count': results.hits.total,
+            'results': [x.to_dict() for x in results.hits],
+        }
+
+        return Response(data=response)
+
+
+class SearchInvestmentProjectAPIView(APIView):
+    """Filtered investment project search view."""
+
+    FILTER_FIELDS = (
+        'client_relationship_manager', 'description', 'estimated_land_date_after',
+        'estimated_land_date_before', 'investor_company', 'investment_type',
+        'phase', 'sector'
+    )
+
+    http_method_names = ('post',)
+
+    def post(self, request, format=None):
+        """Performs filtered contact search."""
+        filters = {field: request.data[field]
+                   for field in self.FILTER_FIELDS if field in request.data}
+
+        filters = elasticsearch.remap_fields(filters)
+        if len(filters.keys()) == 0:
+            raise ValidationError('Missing required at least one filter.')
+
+        try:
+            filters, ranges = elasticsearch.date_range_fields(filters)
+        except ValueError:
+            raise ValidationError('Date(s) in incorrect format.')
+
+        offset = int(request.data.get('offset', 0))
+        limit = int(request.data.get('limit', 100))
+
+        results = elasticsearch.get_search_investment_project_query(
+            term='',
+            filters=filters,
+            ranges=ranges,
             offset=offset,
             limit=limit,
         ).execute()
