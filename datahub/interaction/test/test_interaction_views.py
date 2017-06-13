@@ -25,12 +25,13 @@ class InteractionTestCase(LeelooTestCase):
     @freeze_time('2017-04-18 13:25:30.986208+00:00')
     def test_add_interaction(self):
         """Test add new interaction."""
+        adviser = AdviserFactory()
         url = reverse('api-v1:interaction-list')
         response = self.api_client.post(url, {
             'interaction_type': constants.InteractionType.business_card.value.id,
             'subject': 'whatever',
             'date': now().isoformat(),
-            'dit_adviser': AdviserFactory().pk,
+            'dit_adviser': adviser.pk,
             'notes': 'hello',
             'company': CompanyFactory().pk,
             'contact': ContactFactory().pk,
@@ -40,7 +41,7 @@ class InteractionTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
-        assert response_data['dit_adviser'] == str(self.user.pk)
+        assert response_data['dit_adviser'] == str(adviser.pk)
         assert response_data['modified_on'] == '2017-04-18T13:25:30.986208'
         assert response_data['created_on'] == '2017-04-18T13:25:30.986208'
 
@@ -48,12 +49,13 @@ class InteractionTestCase(LeelooTestCase):
     def test_add_interaction_project(self):
         """Test add new interaction for an investment project."""
         project = InvestmentProjectFactory()
+        adviser = AdviserFactory()
         url = reverse('api-v1:interaction-list')
         response = self.api_client.post(url, {
             'interaction_type': constants.InteractionType.business_card.value.id,
             'subject': 'whatever',
             'date': now().isoformat(),
-            'dit_adviser': AdviserFactory().pk,
+            'dit_adviser': adviser.pk,
             'notes': 'hello',
             'investment_project': project.pk,
             'service': constants.Service.trade_enquiry.value.id,
@@ -62,7 +64,7 @@ class InteractionTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
-        assert response_data['dit_adviser'] == str(self.user.pk)
+        assert response_data['dit_adviser'] == str(adviser.pk)
         assert response_data['investment_project'] == str(project.pk)
         assert response_data['modified_on'] == '2017-04-18T13:25:30.986208'
         assert response_data['created_on'] == '2017-04-18T13:25:30.986208'
