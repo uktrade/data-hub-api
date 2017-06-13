@@ -118,7 +118,7 @@ class Company(MPTTModel, ArchivableModel, CompanyAbstract):
     )
     parent = TreeForeignKey(
         'self', blank=True, null=True, on_delete=models.SET_NULL,
-        related_name='subsidiaries'
+        related_name='children'
     )
     one_list_account_owner = models.ForeignKey(
         'Advisor', blank=True, null=True, on_delete=models.SET_NULL,
