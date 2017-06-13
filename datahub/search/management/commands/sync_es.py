@@ -8,9 +8,9 @@ from django.db import models
 from datahub.company.models import Company, Contact
 from datahub.investment.models import InvestmentProject
 from datahub.search.elasticsearch import bulk
-from datahub.search.models import Company as ESCompany, \
-    Contact as ESContact, \
-    InvestmentProject as ESInvestmentProject
+from datahub.search.models import (Company as ESCompany,
+                                   Contact as ESContact,
+                                   InvestmentProject as ESInvestmentProject)
 
 logger = getLogger(__name__)
 

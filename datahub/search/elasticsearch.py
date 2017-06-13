@@ -1,4 +1,5 @@
 import re
+from collections import defaultdict
 
 import dateutil.parser
 from django.conf import settings
@@ -121,25 +122,20 @@ def remap_fields(fields):
 
 def date_range_fields(fields):
     """Finds and format range fields."""
-    result = {}
-    ranges = {}
-    range_keys = set()
+    filters = {}
+    ranges = defaultdict(dict)
 
     for k, v in fields.items():
         if k.endswith('_before') or k.endswith('_after'):
-            range_keys.add(k[:k.rindex('_')])
+            range_key = k[:k.rindex('_')]
+
+            if k.endswith('_before'):
+                ranges[range_key]['lte'] = dateutil.parser.parse(fields.get(k))
+            if k.endswith('_after'):
+                ranges[range_key]['gte'] = dateutil.parser.parse(fields.get(k))
+
             continue
 
-        result.update({k: v})
+        filters.update({k: v})
 
-    for r in range_keys:
-        ranges[r] = {}
-        before_key = f'{r}_before'
-        after_key = f'{r}_after'
-
-        if after_key in fields:
-            ranges[r]['gte'] = dateutil.parser.parse(fields.get(after_key))
-        if before_key in fields:
-            ranges[r]['lte'] = dateutil.parser.parse(fields.get(before_key))
-
-    return result, ranges
+    return filters, ranges
