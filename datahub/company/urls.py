@@ -2,8 +2,9 @@
 
 from django.conf.urls import url
 
-from .views import ContactViewSet
-
+from datahub.company.views import (
+    CompaniesHouseCompanyReadOnlyViewSetV1, CompanyViewSetV3, ContactViewSet
+)
 
 # CONTACT
 
@@ -34,4 +35,48 @@ contact_urls = [
         name='archive'),
     url(r'^contact/(?P<pk>[0-9a-z-]{36})/unarchive$', contact_unarchive,
         name='unarchive'),
+]
+
+# COMPANY
+
+company_collection = CompanyViewSetV3.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+
+company_item = CompanyViewSetV3.as_view({
+    'get': 'retrieve',
+    'patch': 'partial_update'
+})
+
+company_archive = CompanyViewSetV3.as_view({
+    'post': 'archive'
+})
+
+company_unarchive = CompanyViewSetV3.as_view({
+    'post': 'unarchive',
+})
+
+ch_company_list = CompaniesHouseCompanyReadOnlyViewSetV1.as_view({
+    'get': 'list'
+})
+
+ch_company_item = CompaniesHouseCompanyReadOnlyViewSetV1.as_view({
+    'get': 'retrieve'
+})
+
+company_urls = [
+    url(r'^company$', company_collection, name='collection'),
+    url(r'^company/(?P<pk>[0-9a-z-]{36})$', company_item, name='item'),
+    url(r'^company/(?P<pk>[0-9a-z-]{36})/archive$', company_archive,
+        name='archive'),
+    url(r'^company/(?P<pk>[0-9a-z-]{36})/unarchive$', company_unarchive,
+        name='unarchive'),
+]
+
+ch_company_urls = [
+    url(r'^ch-company$', ch_company_list,
+        name='collection'),
+    url(r'^ch-company/(?P<pk>[0-9]+)$', ch_company_item,
+        name='item'),
 ]

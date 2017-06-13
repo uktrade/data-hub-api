@@ -7,16 +7,17 @@ from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSetV1, CoreViewSetV3
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
 from .serializers import (
-    AdviserSerializer, CompaniesHouseCompanySerializer, CompanySerializerRead,
-    CompanySerializerWrite, ContactSerializer
+    AdviserSerializer, CompaniesHouseCompanySerializer,
+    CompanySerializerReadV1, CompanySerializerV3, CompanySerializerWriteV1,
+    ContactSerializer
 )
 
 
 class CompanyViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
     """Company ViewSet."""
 
-    read_serializer_class = CompanySerializerRead
-    write_serializer_class = CompanySerializerWrite
+    read_serializer_class = CompanySerializerReadV1
+    write_serializer_class = CompanySerializerWriteV1
     queryset = Company.objects.select_related(
         'business_type',
         'sector',
@@ -29,6 +30,33 @@ class CompanyViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
     ).prefetch_related(
         'contacts',
         'interactions',
+        'export_to_countries',
+        'future_interest_countries'
+    )
+
+
+class CompanyViewSetV3(ArchivableViewSetMixin, CoreViewSetV3):
+    """Company view set V3."""
+
+    serializer_class = CompanySerializerV3
+    queryset = Company.objects.select_related(
+        'archived_by',
+        'registered_address_country',
+        'trading_address_country',
+        'account_manager',
+        'business_type',
+        'classification',
+        'employee_range',
+        'headquarter_type',
+        'one_list_account_owner',
+        'parent',
+        'sector',
+        'turnover_range',
+        'uk_region',
+    ).prefetch_related(
+        'investor_investment_projects',
+        'children',
+        'contacts',
         'export_to_countries',
         'future_interest_countries'
     )
