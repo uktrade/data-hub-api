@@ -1,15 +1,19 @@
+import datetime
+
 from django.conf import settings
 from django.core import management
+from django.db.models.signals import post_save
 from elasticsearch.helpers.test import get_test_client
 from elasticsearch_dsl import Index
 from pytest import fixture
 
+from datahub.company.models import Company, Contact
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
-from datahub.company.models import Company, Contact
+from datahub.investment.models import InvestmentProject
+from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.search import models
 from datahub.search.management.commands import sync_es
-from django.db.models.signals import post_save
 
 
 @fixture(scope='session')
@@ -29,9 +33,18 @@ def setup_data(client):
     # Create models in the test index
     models.Company.init(index=index)
     models.Contact.init(index=index)
+    models.InvestmentProject.init(index=index)
 
     ContactFactory(first_name='abc', last_name='defg').save()
     ContactFactory(first_name='first', last_name='last').save()
+    InvestmentProjectFactory(
+        description='investmentproject1',
+        estimated_land_date=datetime.datetime(2011, 6, 13, 9, 44, 31, 62870)
+    ).save()
+    InvestmentProjectFactory(
+        description='investmentproject2',
+        estimated_land_date=datetime.datetime(2057, 6, 13, 9, 44, 31, 62870)
+    ).save()
 
     country_uk = constants.Country.united_kingdom.value.id
     country_us = constants.Country.united_states.value.id
@@ -66,12 +79,15 @@ def create_test_index(client, index):
 
 @fixture
 def post_save_handlers():
-    from datahub.search.signals import company_sync_es, contact_sync_es
+    from datahub.search.signals import company_sync_es, contact_sync_es, investment_project_sync_es
 
     post_save.connect(company_sync_es, sender=Company, dispatch_uid='company_sync_es')
     post_save.connect(contact_sync_es, sender=Contact, dispatch_uid='contact_sync_es')
+    post_save.connect(investment_project_sync_es, sender=InvestmentProject, dispatch_uid='investment_project_sync_es')
 
-    yield (company_sync_es, contact_sync_es,)
+    yield (company_sync_es, contact_sync_es, investment_project_sync_es,)
 
     post_save.disconnect(company_sync_es, sender=Company, dispatch_uid='company_sync_es')
     post_save.disconnect(contact_sync_es, sender=Contact, dispatch_uid='contact_sync_es')
+    post_save.disconnect(investment_project_sync_es, sender=InvestmentProject,
+                         dispatch_uid='investment_project_sync_es')
