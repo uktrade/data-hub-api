@@ -63,7 +63,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='company',
             name='parent',
-            field=mptt.fields.TreeForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='subsidiaries', to='company.Company'),
+            field=mptt.fields.TreeForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='children', to='company.Company'),
         ),
         migrations.AlterField(
             model_name='company',
