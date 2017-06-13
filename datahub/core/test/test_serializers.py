@@ -8,12 +8,21 @@ from rest_framework.exceptions import ValidationError
 from datahub.core.serializers import NestedRelatedField
 
 
-def test_nested_rel_field_to_internal():
+def test_nested_rel_field_to_internal_dict():
     """Tests that model instances are returned for a dict with an 'id' key."""
     model = MagicMock()
     field = NestedRelatedField(model)
     uuid_ = uuid4()
-    assert field.to_internal_value({'id': uuid_})
+    assert field.to_internal_value({'id': str(uuid_)})
+    assert model.objects.all().get.call_args_list == [call(pk=uuid_)]
+
+
+def test_nested_rel_field_to_internal_str():
+    """Tests that model instances are returned for a dict with an 'id' key."""
+    model = MagicMock()
+    field = NestedRelatedField(model)
+    uuid_ = uuid4()
+    assert field.to_internal_value(str(uuid_))
     assert model.objects.all().get.call_args_list == [call(pk=uuid_)]
 
 
@@ -85,10 +94,8 @@ def test_nested_rel_field_to_choices():
     instance.name = 'instance name'
     model.objects.all.return_value = [instance] * 2
     field = NestedRelatedField(model)
-    assert list(field.get_choices().items()) == [({
-        'id': str(instance.id),
-        'name': instance.name
-    }, str(instance))] * 2
+    assert (list(field.get_choices().items()) == [(str(instance.id),
+                                                   str(instance))] * 2)
 
 
 def test_nested_rel_field_to_choices_limit():
@@ -99,7 +106,5 @@ def test_nested_rel_field_to_choices_limit():
     instance.name = 'instance name'
     model.objects.all.return_value = [instance] * 2
     field = NestedRelatedField(model)
-    assert list(field.get_choices(1).items()) == [({
-        'id': str(instance.id),
-        'name': instance.name
-    }, str(instance))]
+    assert (list(field.get_choices(1).items()) == [(str(instance.id),
+                                                    str(instance))])
