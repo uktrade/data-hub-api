@@ -174,6 +174,16 @@ class SearchTestCase(LeelooTestCase):
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
 
+    def test_search_investment_project_invalid_date_json(self):
+        """Tests detailed investment project search."""
+        url = f"{reverse('api-v3:search:investment_project')}?offset=0&limit=100"
+
+        response = self.api_client.post(url, {
+            'estimated_land_date_before': 'this is definitely not a valid date',
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
     def test_search_investment_project_no_filters(self):
         """Tests case where there is no filters provided."""
         url = f"{reverse('api-v3:search:investment_project')}?offset=0&limit=100"
