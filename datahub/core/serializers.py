@@ -54,7 +54,11 @@ class NestedRelatedField(serializers.RelatedField):
     def to_internal_value(self, data):
         """Converts a user-provided value to a model instance."""
         try:
-            data = self.pk_field.to_internal_value(data['id'])
+            if isinstance(data, str):
+                id_repr = data
+            else:
+                id_repr = data['id']
+            data = self.pk_field.to_internal_value(id_repr)
             return self.get_queryset().get(pk=data)
         except ObjectDoesNotExist:
             self.fail('does_not_exist', pk_value=data)
@@ -87,7 +91,7 @@ class NestedRelatedField(serializers.RelatedField):
 
         return _Choices(
             (
-                self.to_representation(item),
+                self.pk_field.to_representation(item.pk),
                 self.display_value(item)
             )
             for item in queryset
