@@ -130,9 +130,9 @@ def date_range_fields(fields):
             range_key = k[:k.rindex('_')]
 
             if k.endswith('_before'):
-                ranges[range_key]['lte'] = dateutil.parser.parse(fields.get(k))
+                ranges[range_key]['lte'] = dateutil.parser.parse(fields[k])
             if k.endswith('_after'):
-                ranges[range_key]['gte'] = dateutil.parser.parse(fields.get(k))
+                ranges[range_key]['gte'] = dateutil.parser.parse(fields[k])
 
             continue
 

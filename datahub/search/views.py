@@ -147,7 +147,10 @@ class SearchInvestmentProjectAPIView(APIView):
         if len(filters.keys()) == 0:
             raise ValidationError('Missing required at least one filter.')
 
-        filters, ranges = elasticsearch.date_range_fields(filters)
+        try:
+            filters, ranges = elasticsearch.date_range_fields(filters)
+        except ValueError:
+            raise ValidationError('Date(s) in incorrect format.')
 
         offset = int(request.data.get('offset', 0))
         limit = int(request.data.get('limit', 100))
