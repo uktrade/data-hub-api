@@ -164,10 +164,9 @@ class Company(DocType, MapDBModelToDict):
     }
 
     IGNORED_FIELDS = (
-        'subsidiaries', 'servicedeliverys', 'investor_investment_projects',
+        'children', 'servicedeliverys', 'investor_investment_projects',
         'intermediate_investment_projects', 'investee_projects',
         'tree_id', 'lft', 'rght', 'business_leads', 'interactions',
-        'children',
     )
 
     class Meta:
