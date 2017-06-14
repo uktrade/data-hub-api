@@ -198,8 +198,8 @@ Load metadata::
 
 Dependencies
 ------------
-Direct dependencies are specified in ``requirements.in``. ``requirements.txt`` is a lock file generated using pip-compile
-(from pip-tools) and should not be manually edited.
+Direct dependencies are specified in ``requirements.in``. ``requirements.txt`` is a lock file generated using `pip-compile
+(from pip-tools)<https://github.com/jazzband/pip-tools>`_ and should not be manually edited.
 
 To update the lock file and indirect dependencies, run::
 
