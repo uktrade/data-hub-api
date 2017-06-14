@@ -1,6 +1,7 @@
 import pytest
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
+from datahub.core import constants
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.search import elasticsearch
 
@@ -96,9 +97,13 @@ def test_investment_project_auto_updates_to_es(setup_data, post_save_handlers):
     """Tests if investment project gets synced to Elasticsearch."""
     test_name = 'very_hard_to_find_project'
     project = InvestmentProjectFactory(
-        name=test_name
+        name=test_name,
+        total_investment=999,
+        number_new_jobs=100,
+        average_salary_id=constants.SalaryRange.below_25000.value.id
     )
     project.save()
+    project = InvestmentProjectFactory()
 
     new_test_name = 'even_harder_to_find_investment_project'
     project.name = new_test_name
