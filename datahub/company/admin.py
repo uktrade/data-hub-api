@@ -57,7 +57,7 @@ class AdviserAdmin(VersionAdmin, UserAdmin):
         }),
         ('Permissions', {
             'fields': (
-                'enabled',
+                'use_cdms_auth',
                 'is_active',
                 'is_staff',
                 'is_superuser',
@@ -78,10 +78,10 @@ class AdviserAdmin(VersionAdmin, UserAdmin):
             'fields': ('email', 'password1', 'password2'),
         }),
     )
-    list_display = ('email', 'first_name', 'last_name', 'is_staff', 'enabled')
+    list_display = ('email', 'first_name', 'last_name', 'is_staff', 'use_cdms_auth')
     search_fields = ('first_name', 'last_name', 'email')
-    ordering = ('email', 'enabled')
-    list_filter = ('enabled',)
+    ordering = ('email', 'use_cdms_auth')
+    list_filter = ('use_cdms_auth',)
     actions = ['enable_users', 'disable_users']
 
     def reversion_register(self, model, **kwargs):
@@ -91,12 +91,12 @@ class AdviserAdmin(VersionAdmin, UserAdmin):
 
     def enable_users(self, request, queryset):
         """Enable users for login."""
-        queryset.update(enabled=True)
+        queryset.update(use_cdms_auth=True)
 
     enable_users.short_description = 'Enable users'
 
     def disable_users(self, request, queryset):
         """Disable users for login."""
-        queryset.update(enabled=False)
+        queryset.update(use_cdms_auth=False)
 
     disable_users.short_description = 'Disable users.'
