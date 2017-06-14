@@ -203,7 +203,7 @@ Direct dependencies are specified in ``requirements.in``. ``requirements.txt`` i
 
 To update the lock file and indirect dependencies, run::
 
-    pip-compile --generate-hashes --upgrade --output-file requirements.txt requirements.in
+    pip-compile --upgrade --output-file requirements.txt requirements.in
 
 This must be run whenever ``requirements.in`` is edited.
 
