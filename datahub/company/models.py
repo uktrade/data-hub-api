@@ -134,6 +134,8 @@ class Company(MPTTModel, ArchivableModel, CompanyAbstract):
     @cached_property
     def uk_based(self):
         """Whether a company is based in the UK or not."""
+        if not self.registered_address_country:
+            return None
         return self.registered_address_country.name == constants.Country.united_kingdom.value.name
 
     @cached_property
