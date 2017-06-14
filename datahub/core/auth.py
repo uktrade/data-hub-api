@@ -60,7 +60,7 @@ class CDMSUserBackend(ModelBackend):
 
     def user_can_authenticate(self, user):
         """Reject users that are not whitelisted."""
-        return user.enabled
+        return user.use_cdms_auth
 
     def _cdms_login(self, url, username, password, user_agent=None):
         """

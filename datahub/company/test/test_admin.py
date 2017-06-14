@@ -18,8 +18,8 @@ def test_enable_users_action():
     client = Client()
     client.login(username=admin_user.email, password=password)
     url = reverse('admin:company_advisor_changelist')
-    user1 = AdviserFactory(enabled=False)
-    user2 = AdviserFactory(enabled=False)
+    user1 = AdviserFactory(use_cdms_auth=False)
+    user2 = AdviserFactory(use_cdms_auth=False)
     data = {
         'action': 'enable_users',
         ACTION_CHECKBOX_NAME: [user1.pk, user2.pk]
@@ -28,8 +28,8 @@ def test_enable_users_action():
     assert response.status_code == status.HTTP_200_OK
     user1.refresh_from_db()
     user2.refresh_from_db()
-    assert user1.enabled
-    assert user2.enabled
+    assert user1.use_cdms_auth
+    assert user2.use_cdms_auth
 
 
 def test_disable_users_action():
@@ -40,8 +40,8 @@ def test_disable_users_action():
     client = Client()
     client.login(username=admin_user.email, password=password)
     url = reverse('admin:company_advisor_changelist')
-    user1 = AdviserFactory(enabled=True)
-    user2 = AdviserFactory(enabled=True)
+    user1 = AdviserFactory(use_cdms_auth=True)
+    user2 = AdviserFactory(use_cdms_auth=True)
     data = {
         'action': 'disable_users',
         ACTION_CHECKBOX_NAME: [user1.pk, user2.pk]
@@ -50,5 +50,5 @@ def test_disable_users_action():
     assert response.status_code == status.HTTP_200_OK
     user1.refresh_from_db()
     user2.refresh_from_db()
-    assert user1.enabled is False
-    assert user2.enabled is False
+    assert user1.use_cdms_auth is False
+    assert user2.use_cdms_auth is False

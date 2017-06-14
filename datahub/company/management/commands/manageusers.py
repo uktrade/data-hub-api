@@ -39,4 +39,4 @@ class Command(BaseCommand):
             enabled = True
         else:
             enabled = False
-        user_model.objects.filter(email__in=options['users']).update(enabled=enabled)
+        user_model.objects.filter(email__in=options['users']).update(use_cdms_auth=enabled)
