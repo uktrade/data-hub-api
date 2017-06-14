@@ -1,5 +1,3 @@
-pip==9.0.1
-
 # For CH Sync
 lxml==3.8.0
 cssselect==1.0.1

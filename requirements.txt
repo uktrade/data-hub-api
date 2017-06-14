@@ -280,8 +280,3 @@ werkzeug==0.12.2 \
 whitenoise==3.3.0 \
     --hash=sha256:1d62a003a0ab747de96da45c831cbb512dcb7f69c1ef0bd20b1cd4ae45d8a0c4 \
     --hash=sha256:d098327276de6fd189398a7bcb95789d1bb2d41b3e011eeae4562f6b1a107dd4
-
-# The following packages are considered to be unsafe in a requirements file:
-pip==9.0.1 \
-    --hash=sha256:09f243e1a7b461f654c26a725fa373211bb7ff17a9300058b205c61658ca940d \
-    --hash=sha256:690b762c0a8460c303c089d5d0be034fb15a5ea2b75bdf565f40421f542fefb0
