@@ -11,12 +11,11 @@ LOGGING = {
     'disable_existing_loggers': False,
     'root': {
         'level': 'INFO',
-        'handlers': ['sentry'],
+        'handlers': ['sentry', 'console'],
     },
     'formatters': {
         'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s '
-                      '%(process)d %(thread)d %(message)s'
+            'format': '%(asctime)s [%(levelname)s] [%(name)s] %(message)s'
         },
     },
     'handlers': {
