@@ -352,6 +352,10 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'id': String(index='not_analyzed'),
         'name': String()
     })  # Sector
+    average_salary = Nested(properties={
+        'id': String(index='not_analyzed'),
+        'name': String()
+    })  # AverageSalary
 
     MAPPINGS = {
         'id': str,
@@ -374,6 +378,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'referral_source_adviser': _contact_dict,
         'sector': _id_name_dict,
         'project_code': str,
+        'average_salary': _id_name_dict,
     }
 
     IGNORED_FIELDS = (
