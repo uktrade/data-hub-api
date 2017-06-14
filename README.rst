@@ -195,3 +195,12 @@ Load metadata::
 
     docker-compose run leeloo python manage.py loaddata /app/fixtures/metadata.yaml
     docker-compose run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml
+
+Dependencies
+------------
+Direct dependencies are specified in `requirements.in`. `requirements.txt` is a lock file generated using pip-compile
+(from pip-tools) and should not be manually edited.
+
+To update the lock file and indirect dependencies, run:
+
+    pip-compile --generate-hashes --upgrade --output-file requirements.txt requirements.in
