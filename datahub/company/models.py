@@ -372,7 +372,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField('date joined', default=now)
-    enabled = models.BooleanField(
+    use_cdms_auth = models.BooleanField(
         default=False,
         help_text='Whether CDMS authentication has been enabled for this user'
     )
