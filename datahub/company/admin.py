@@ -11,6 +11,7 @@ class CompanyAdmin(VersionAdmin):
     """Company admin."""
 
     search_fields = ['name', 'id', 'company_number']
+    raw_id_fields = ('parent', 'one_list_account_owner', 'archived_by')
 
 
 @admin.register(Contact)
@@ -18,6 +19,7 @@ class ContactAdmin(VersionAdmin):
     """Contact admin."""
 
     search_fields = ['first_name', 'last_name', 'company__name']
+    raw_id_fields = ('company', 'adviser', 'archived_by')
 
 
 @admin.register(CompaniesHouseCompany)
