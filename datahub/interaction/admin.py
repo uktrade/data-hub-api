@@ -10,6 +10,7 @@ class InteractionAdmin(VersionAdmin):
     """Interaction admin."""
 
     search_fields = ['id', 'company__company_number', 'company__company_name', 'contact_email']
+    raw_id_fields = ('company', 'dit_adviser', 'investment_project', 'contact')
 
 
 @admin.register(ServiceDelivery)
@@ -17,10 +18,11 @@ class ServiceDeliveryAdmin(VersionAdmin):
     """Service Delivery admin."""
 
     search_fields = ['id', 'company__company_number', 'company__company_name', 'contact_email']
+    raw_id_fields = ('company', 'dit_adviser', 'contact', 'event')
 
 
 @admin.register(ServiceOffer)
-class ServiceOdfferAdmin(VersionAdmin):
+class ServiceOfferAdmin(VersionAdmin):
     """Service Offer admin."""
 
-    pass
+    raw_id_fields = ('event',)

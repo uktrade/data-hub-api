@@ -41,11 +41,11 @@ def get_or_create_user(email, last_name, first_name, password=None):
             last_name=last_name,
             email=email,
             date_joined=now(),
-            enabled=True
+            use_cdms_auth=True
         )
         if password:
             user.set_password(password)
-            user.enabled = False
+            user.use_cdms_auth = False
         else:
             user.set_unusable_password()
         user.save()
@@ -243,7 +243,7 @@ def test_valid_cdms_credentials_user_not_whitelisted(auth_mock, live_server):
     """Test login valid cdms credentials, but user not whitelisted."""
     auth_mock.return_value = True
     cdms_user = get_cdms_user()
-    cdms_user.enabled = False
+    cdms_user.use_cdms_auth = False
     cdms_user.save()
     application, _ = Application.objects.get_or_create(
         user=cdms_user,
