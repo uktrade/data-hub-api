@@ -11,6 +11,7 @@ django-filter==1.0.4
 django-reversion==2.0.8
 django-pglocks==1.0.2
 django-mptt==0.8.7
+django-model-utils==3.0.0
 
 django-oauth-toolkit==1.0.0
 whitenoise==3.3.0
