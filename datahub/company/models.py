@@ -134,6 +134,8 @@ class Company(MPTTModel, ArchivableModel, CompanyAbstract):
     @cached_property
     def uk_based(self):
         """Whether a company is based in the UK or not."""
+        if not self.registered_address_country:
+            return None
         return self.registered_address_country.name == constants.Country.united_kingdom.value.name
 
     @cached_property
@@ -372,7 +374,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField('date joined', default=now)
-    enabled = models.BooleanField(
+    use_cdms_auth = models.BooleanField(
         default=False,
         help_text='Whether CDMS authentication has been enabled for this user'
     )

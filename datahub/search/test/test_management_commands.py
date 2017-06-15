@@ -6,6 +6,7 @@ import pytest
 from django.core import management
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
+from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.search.management.commands import create_alias, delete_alias, get_alias, sync_es
 
 pytestmark = pytest.mark.django_db
@@ -29,11 +30,12 @@ def test_sync_dataset(get_dataset, bulk):
     get_dataset.return_value = (
         sync_es.DataSet([CompanyFactory(), CompanyFactory()], sync_es.ESCompany),
         sync_es.DataSet([ContactFactory()], sync_es.ESContact),
+        sync_es.DataSet([InvestmentProjectFactory()], sync_es.ESInvestmentProject)
     )
 
     management.call_command(sync_es.Command(), batch_size=1)
 
-    assert bulk.call_count == 3
+    assert bulk.call_count == 4
 
 
 @mock.patch('datahub.search.management.commands.create_alias.connections.get_connection')
