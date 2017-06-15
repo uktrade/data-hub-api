@@ -22,4 +22,4 @@ class InteractionViewSetV1(CoreViewSetV1):
     filter_backends = (
         DjangoFilterBackend,
     )
-    filter_fields = ['contact_id', 'investment_project_id']
+    filter_fields = ['company_id', 'contact_id', 'investment_project_id']
