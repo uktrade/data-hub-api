@@ -6,6 +6,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from model_utils import Choices
 
 from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.models import ArchivableModel, BaseModel
@@ -249,30 +250,18 @@ class InvestmentProjectCode(models.Model):
 class IProjectDocument(ArchivableModel):
     """Investment Project Document."""
 
-    TYPE_ACTUAL_LAND_DATE = 'actual-land-date'
-    TYPE_FDI_TYPE = 'fdi-type'
-    TYPE_OPERATIONS_COMMENCED = 'operations-commenced'
-    TYPE_TOTAL_INVESTMENT = 'total-investment'
-    TYPE_FOREIGN_EQUITY_INVESTMENT = 'foreign-equity-investment'
-    TYPE_NUMBER_NEW_JOBS = 'number-new-jobs'
-    TYPE_NUMBER_SAFEGUARDED_JOBS = 'number-safeguarded-jobs'
-    TYPE_R_AND_D_BUDGET = 'r-and-d-budget'
-    TYPE_NEW_TECH_TO_UK = 'new-tech-to-uk'
-    TYPE_EXPORT_REVENUE = 'export-revenue'
-    TYPE_AVERAGE_SALARY = 'average-salary'
-
-    DOC_TYPES = (
-        (TYPE_ACTUAL_LAND_DATE, 'Actual land date'),
-        (TYPE_FDI_TYPE, 'Fdi type'),
-        (TYPE_OPERATIONS_COMMENCED, 'Operations commenced'),
-        (TYPE_TOTAL_INVESTMENT, 'Total investment'),
-        (TYPE_FOREIGN_EQUITY_INVESTMENT, 'Foreign equity investment'),
-        (TYPE_NUMBER_NEW_JOBS, 'Number new jobs'),
-        (TYPE_NUMBER_SAFEGUARDED_JOBS, 'Number safeguarded jobs'),
-        (TYPE_R_AND_D_BUDGET, 'R and d budget'),
-        (TYPE_NEW_TECH_TO_UK, 'New tech to uk'),
-        (TYPE_EXPORT_REVENUE, 'Export revenue'),
-        (TYPE_AVERAGE_SALARY, 'Average salary'),
+    DOC_TYPES = Choices(
+        ('actual_land_date', 'Actual land date'),
+        ('fdi_type', 'Fdi type'),
+        ('operations_commenced', 'Operations commenced'),
+        ('total_investment', 'Total investment'),
+        ('foreign_equity_investment', 'Foreign equity investment'),
+        ('number_new_jobs', 'Number new jobs'),
+        ('number_safeguarded jobs', 'Number safeguarded jobs'),
+        ('r_and_d_budget', 'R and D budget'),
+        ('new_tech_to_uk', 'New tech to uk'),
+        ('export_revenue', 'Export revenue'),
+        ('average_salary', 'Average salary'),
     )
 
     id = models.UUIDField(primary_key=True)
