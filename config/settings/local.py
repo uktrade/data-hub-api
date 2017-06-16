@@ -1,4 +1,3 @@
-import logging.config
 import socket
 import environ
 
