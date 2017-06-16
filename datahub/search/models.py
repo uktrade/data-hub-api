@@ -274,6 +274,11 @@ class InvestmentProject(DocType, MapDBModelToDict):
     )  # Adviser
     archived = Boolean()
     archived_reason = String()
+    archived_by = Nested(properties={'id': String(index='not_analyzed'),
+                                     'first_name': String(copy_to='archived_by.name'),
+                                     'last_name': String(copy_to='archived_by.name'),
+                                     'name': String(),
+                                     })
     created_on = Date()
     modified_on = Date()
     description = String()
