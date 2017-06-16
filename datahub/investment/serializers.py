@@ -298,5 +298,24 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
         )
 
 
-class IProjectDocumentSerializer:
-    pass
+class IProjectDocumentSerializer(serializers.ModelSerializer):
+    """Serializer for Investment Project Documents."""
+
+    project = NestedRelatedField(
+        InvestmentProject,
+    )
+    document = NestedRelatedField(
+        IProjectDocument,
+    )
+
+    class Meta:  # noqa: D101
+        model = IProjectDocument
+        fields = (
+            'id',
+            'project',
+            'doc_type',
+            'filename',
+        )
+
+    def create(self, validated_data):
+        return super().create(validated_data)
