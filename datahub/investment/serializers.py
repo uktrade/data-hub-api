@@ -296,3 +296,7 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
             'project_assurance_team',
             'team_complete'
         )
+
+
+class IProjectDocumentSerializer:
+    pass

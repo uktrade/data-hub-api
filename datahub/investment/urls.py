@@ -17,6 +17,10 @@ project_item = IProjectViewSet.as_view({
     'patch': 'partial_update'
 })
 
+project_document_item = IProjectViewSet.as_view({
+    'post': 'document',
+})
+
 value_item = IProjectValueViewSet.as_view({
     'get': 'retrieve',
     'patch': 'partial_update'
@@ -48,6 +52,8 @@ urlpatterns = [
     url(r'^investment/project$', project_collection, name='project'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/archive', archive_item,
         name='archive-item'),
+    url(r'^investment/(?P<pk>[0-9a-z-]{36})/document', project_document_item,
+        name='project-document-item'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/unarchive', unarchive_item,
         name='unarchive-item'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/project$', project_item,

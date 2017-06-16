@@ -3,13 +3,14 @@
 import uuid
 
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from model_utils import Choices
 
 from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.models import ArchivableModel, BaseModel
+from datahub.documents.models import Document
 from datahub.investment.validate import (
     get_incomplete_reqs_fields, get_incomplete_team_fields,
     get_incomplete_value_fields
@@ -247,9 +248,10 @@ class InvestmentProjectCode(models.Model):
                                    on_delete=models.CASCADE)
 
 
-class IProjectDocument(ArchivableModel):
+class IProjectDocument(BaseModel, ArchivableModel):
     """Investment Project Document."""
 
+    BUCKET_PREFIX = 'investment-documents'
     DOC_TYPES = Choices(
         ('actual_land_date', 'Actual land date'),
         ('fdi_type', 'Fdi type'),
@@ -264,28 +266,37 @@ class IProjectDocument(ArchivableModel):
         ('average_salary', 'Average salary'),
     )
 
-    id = models.UUIDField(primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     project = models.ForeignKey(
         InvestmentProject,
         related_name='documents',
+        on_delete=models.CASCADE,
     )
     doc_type = models.CharField(
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
         choices=DOC_TYPES,
     )
-    filename = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
-
-    @property
-    def full_path(self):
-        """Generate full path to the file in S3, to be signed."""
-        return f'{self.project.id}/{self.doc_type}/{self.filename}'
+    document = models.OneToOneField(Document, on_delete=models.PROTECT)
 
     class Meta:  # noqa: D101
         verbose_name = 'Investment Project Document'
         verbose_name_plural = 'Investment Project Documents'
-        unique_together = (
-            ('project', 'doc_type', 'filename'),
-        )
+
+    @classmethod
+    def create_from_declaration_request(cls, project, field, filename):
+        with transaction.atomic():
+            doc = Document(
+                path=f'{cls.BUCKET_PREFIX}/{project.id}/{field}/{filename}',
+            )
+            doc.save()
+            investemnt_doc = cls(
+                project=project,
+                doc_type=field,
+                document=doc,
+            )
+            investemnt_doc.save()
+
+        return investemnt_doc
 
 
 @receiver(post_save, sender=InvestmentProject)
