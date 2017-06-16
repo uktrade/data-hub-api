@@ -16,7 +16,7 @@ from lxml import etree
 from raven.contrib.django.raven_compat.models import client
 
 from datahub.company.models import CompaniesHouseCompany
-from datahub.core.utils import log_and_ignore_exceptions, slice_iterable_into_chunks, stream_to_file_pointer
+from datahub.core.utils import slice_iterable_into_chunks, stream_to_file_pointer
 
 logger = getLogger(__name__)
 
@@ -73,6 +73,7 @@ def open_ch_zipped_csv(fp):
 
 def iter_ch_csv_from_url(url, tmp_file_creator):
     """Fetch & cache CH zipped CSV, and then iterate though contents."""
+    logger.info('Loading CSV from URL: %s', url)
     with tmp_file_creator() as tf:
         stream_to_file_pointer(url, tf)
         tf.seek(0, 0)
@@ -90,8 +91,11 @@ def sync_ch(tmp_file_creator, endpoint=None, truncate_first=False):
     https://github.com/django/django/blob/master/django/db/models/query.py#L420
     this would create a list with millions of objects, that will try to be saved in batches in a single transaction
     """
+    logger.info('Starting CH load...')
+    count = 0
     endpoint = endpoint or settings.CH_DOWNLOAD_URL
     ch_csv_urls = get_ch_latest_dump_file_list(endpoint)
+    logger.info('Found the following Companies House CSV URLs: %s', ch_csv_urls)
     if truncate_first:
         truncate_ch_companies_table()
     for csv_url in ch_csv_urls:
@@ -102,6 +106,9 @@ def sync_ch(tmp_file_creator, endpoint=None, truncate_first=False):
                 objs=objects,
                 batch_size=settings.BULK_CREATE_BATCH_SIZE
             )
+            count += len(objects)
+            logger.info('%d Companies House records loaded...', count)
+    logger.info('Companies House load complete, %s records loaded', count)
 
 
 @transaction.atomic
@@ -112,6 +119,7 @@ def truncate_ch_companies_table():
     """
     cursor = connection.cursor()
     table_name = CompaniesHouseCompany._meta.db_table
+    logger.info('Truncating the %s table', table_name)
     query = f'truncate {table_name};'
     cursor.execute(query)
 
@@ -123,9 +131,6 @@ class Command(BaseCommand):
         """Handle."""
         try:
             sync_ch(tmp_file_creator=tempfile.TemporaryFile, truncate_first=True)
-        except Exception as e:
-            with log_and_ignore_exceptions():
-                client.captureException()
-
-            logger.exception('Failed to sync from ES')
-            self.stderr.write(e)
+        except Exception:
+            client.captureException()
+            raise
