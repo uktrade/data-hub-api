@@ -28,7 +28,7 @@ class InvestmentProjectAdmin(VersionAdmin):
 @admin.register(IProjectDocument)
 class IProjectDocumentAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'doc_type', 'document'
+        'id', 'doc_type', 'filename'
     )
     list_filter = (
         'doc_type',

@@ -276,11 +276,17 @@ class IProjectDocument(BaseModel, ArchivableModel):
         max_length=settings.CHAR_FIELD_MAX_LENGTH,
         choices=DOC_TYPES,
     )
+    filename = models.CharField(
+        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+    )
     document = models.OneToOneField(Document, on_delete=models.PROTECT)
 
     class Meta:  # noqa: D101
         verbose_name = 'Investment Project Document'
         verbose_name_plural = 'Investment Project Documents'
+        unique_together = (
+            ('project', 'doc_type', 'filename'),
+        )
 
     @classmethod
     def create_from_declaration_request(cls, project, field, filename):
@@ -289,14 +295,15 @@ class IProjectDocument(BaseModel, ArchivableModel):
                 path=f'{cls.BUCKET_PREFIX}/{project.id}/{field}/{filename}',
             )
             doc.save()
-            investemnt_doc = cls(
+            investment_doc = cls(
                 project=project,
                 doc_type=field,
+                filename=filename,
                 document=doc,
             )
-            investemnt_doc.save()
+            investment_doc.save()
 
-        return investemnt_doc
+        return investment_doc
 
 
 @receiver(post_save, sender=InvestmentProject)
