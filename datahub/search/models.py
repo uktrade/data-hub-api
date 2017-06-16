@@ -379,6 +379,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'sector': _id_name_dict,
         'project_code': str,
         'average_salary': _id_name_dict,
+        'archived_by': _contact_dict,
     }
 
     IGNORED_FIELDS = (
