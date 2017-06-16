@@ -5,7 +5,6 @@ import tempfile
 import zipfile
 from contextlib import contextmanager
 from datetime import datetime
-from itertools import islice
 from logging import getLogger
 from urllib.parse import urlparse
 
@@ -17,7 +16,7 @@ from lxml import etree
 from raven.contrib.django.raven_compat.models import client
 
 from datahub.company.models import CompaniesHouseCompany
-from datahub.core.utils import stream_to_file_pointer
+from datahub.core.utils import slice_iterable_into_chunks, stream_to_file_pointer
 
 logger = getLogger(__name__)
 
@@ -102,7 +101,10 @@ def sync_ch(tmp_file_creator, endpoint=None, truncate_first=False):
     for csv_url in ch_csv_urls:
         ch_company_rows = iter_ch_csv_from_url(csv_url, tmp_file_creator)
 
-        for batch in _batcher(ch_company_rows):
+        batch_iter = slice_iterable_into_chunks(
+            ch_company_rows, settings.BULK_CREATE_BATCH_SIZE, _create_ch_company
+        )
+        for batch in batch_iter:
             CompaniesHouseCompany.objects.bulk_create(
                 objs=batch,
                 batch_size=settings.BULK_CREATE_BATCH_SIZE
@@ -130,13 +132,8 @@ def truncate_ch_companies_table():
     cursor.execute(query)
 
 
-def _batcher(generator):
-    while True:
-        batch_iter = islice(generator, settings.BULK_CREATE_BATCH_SIZE)
-        objects = [CompaniesHouseCompany(**row) for row in batch_iter]
-        if not objects:
-            break
-        yield objects
+def _create_ch_company(row_dict):
+    return CompaniesHouseCompany(**row_dict)
 
 
 class Command(BaseCommand):
