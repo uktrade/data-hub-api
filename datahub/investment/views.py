@@ -1,10 +1,12 @@
 """Investment views."""
 
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.response import Response
+from rest_framework.decorators import detail_route
 
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSetV3
-from datahub.investment.models import InvestmentProject
+from datahub.investment.models import InvestmentProject, IProjectDocument
 from datahub.investment.serializers import (
     IProjectAuditSerializer, IProjectRequirementsSerializer, IProjectSerializer,
     IProjectTeamSerializer, IProjectValueSerializer
@@ -42,6 +44,16 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     def get_view_name(self):
         """Returns the view set name for the DRF UI."""
         return 'Investment projects'
+
+    @detail_route(methods=['post'])
+    def document(self, request, *args, **kwargs):
+        project = self.get_object()
+        doc = IProjectDocument.create_from_declaration_request(
+            project, request.data['field'], request.data['filename'],
+        )
+        return Response({
+            'created': True,
+        })
 
 
 class IProjectAuditViewSet(CoreViewSetV3):

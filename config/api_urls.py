@@ -5,6 +5,7 @@ from rest_framework import routers
 
 from datahub.company import views as company_views
 from datahub.company import urls as company_urls
+from datahub.documents import urls as docuemtn_urls
 from datahub.investment import urls as investment_urls
 from datahub.interaction import views as interaction_views
 from datahub.leads import urls as leads_urls
@@ -36,5 +37,6 @@ v3_urls = [
     url(r'^', include((company_urls.contact_urls, 'contact'), namespace='contact')),
     url(r'^', include((company_urls.company_urls, 'company'), namespace='company')),
     url(r'^', include((company_urls.ch_company_urls, 'ch-company'), namespace='ch-company')),
+    url(r'^', include((docuemtn_urls, 'document'), namespace='docuemnt')),
     url(r'^', include((search_urls, 'search'), namespace='search'))
 ]

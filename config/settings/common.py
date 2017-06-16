@@ -51,6 +51,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'datahub.core',
     'datahub.company',
+    'datahub.documents',
     'datahub.interaction',
     'datahub.investment',
     'datahub.leads',
@@ -170,8 +171,8 @@ CHAR_FIELD_MAX_LENGTH = 255
 HEROKU = False
 BULK_CREATE_BATCH_SIZE = env.int('BULK_CREATE_BATCH_SIZE', default=50000)
 
-AWS_ACCESS = {
-    'KEY_ID': env('AWS_KEY_ID'),
-    'KEY_SECRET': env('AWS_KEY_SECRET'),
-}
-INVESTMENT_DOCUMENTS_BUCKET = env('INVESTMENT_DOC_BUCKET')
+# AWS_ACCESS = {
+#     'KEY_ID': env('AWS_KEY_ID'),
+#     'KEY_SECRET': env('AWS_KEY_SECRET'),
+# }
+# INVESTMENT_DOCUMENTS_BUCKET = env('INVESTMENT_DOC_BUCKET')
