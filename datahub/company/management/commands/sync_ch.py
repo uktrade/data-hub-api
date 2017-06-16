@@ -5,6 +5,7 @@ import tempfile
 import zipfile
 from contextlib import contextmanager
 from datetime import datetime
+from itertools import islice
 from logging import getLogger
 from urllib.parse import urlparse
 
@@ -16,7 +17,7 @@ from lxml import etree
 from raven.contrib.django.raven_compat.models import client
 
 from datahub.company.models import CompaniesHouseCompany
-from datahub.core.utils import slice_iterable_into_chunks, stream_to_file_pointer
+from datahub.core.utils import stream_to_file_pointer
 
 logger = getLogger(__name__)
 
@@ -100,14 +101,15 @@ def sync_ch(tmp_file_creator, endpoint=None, truncate_first=False):
         truncate_ch_companies_table()
     for csv_url in ch_csv_urls:
         ch_company_rows = iter_ch_csv_from_url(csv_url, tmp_file_creator)
-        for batchiter in slice_iterable_into_chunks(ch_company_rows, settings.BULK_CREATE_BATCH_SIZE):
-            objects = [CompaniesHouseCompany(**ch_company_row) for ch_company_row in batchiter if ch_company_row]
+
+        for batch in _batcher(ch_company_rows):
             CompaniesHouseCompany.objects.bulk_create(
-                objs=objects,
+                objs=batch,
                 batch_size=settings.BULK_CREATE_BATCH_SIZE
             )
-            count += len(objects)
+            count += len(batch)
             logger.info('%d Companies House records loaded...', count)
+
     logger.info('Companies House load complete, %s records loaded', count)
 
 
@@ -122,6 +124,15 @@ def truncate_ch_companies_table():
     logger.info('Truncating the %s table', table_name)
     query = f'truncate {table_name};'
     cursor.execute(query)
+
+
+def _batcher(generator):
+    while True:
+        batch_iter = islice(generator, settings.BULK_CREATE_BATCH_SIZE)
+        objects = [CompaniesHouseCompany(**row) for row in batch_iter]
+        if not objects:
+            break
+        yield objects
 
 
 class Command(BaseCommand):
