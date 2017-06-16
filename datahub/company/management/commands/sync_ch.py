@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 import requests
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.db import connection, transaction
+from django.db import connection, reset_queries, transaction
 from lxml import etree
 from raven.contrib.django.raven_compat.models import client
 
@@ -109,6 +109,10 @@ def sync_ch(tmp_file_creator, endpoint=None, truncate_first=False):
             )
             count += len(batch)
             logger.info('%d Companies House records loaded...', count)
+            # In debug mode, Django keeps track of SQL statements executed which
+            # eventually leads to memory exhaustion.
+            # This clears that history.
+            reset_queries()
 
     logger.info('Companies House load complete, %s records loaded', count)
 
