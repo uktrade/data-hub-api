@@ -13,7 +13,6 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import connection, reset_queries, transaction
 from lxml import etree
-from raven.contrib.django.raven_compat.models import client
 
 from datahub.company.models import CompaniesHouseCompany
 from datahub.core.utils import slice_iterable_into_chunks, stream_to_file_pointer
@@ -141,8 +140,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Handle."""
-        try:
-            sync_ch(tmp_file_creator=tempfile.TemporaryFile, truncate_first=True)
-        except Exception:
-            client.captureException()
-            raise
+        sync_ch(tmp_file_creator=tempfile.TemporaryFile, truncate_first=True)
