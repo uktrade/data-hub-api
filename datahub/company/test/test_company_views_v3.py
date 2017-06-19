@@ -316,9 +316,10 @@ class CompanyTestCase(LeelooTestCase):
         url = reverse('api-v3:company:archive', kwargs={'pk': company.id})
         response = self.api_client.post(url, format='json')
 
-        assert response.data['archived']
-        assert response.data['archived_reason'] == ''
-        assert response.data['id'] == str(company.id)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'reason': ['This field is required.']
+        }
 
     def test_archive_company_reason(self):
         """Test company archive."""
