@@ -23,6 +23,9 @@ services:
       ES_PORT: 9200
       TEST_ES_SERVER: es
       CDMS_AUTH_URL: http://example.com
+      AWS_KEY_ID: foo
+      AWS_KEY_SECRET: bar
+      DOC_BUCKET: baz
     depends_on:
       - postgres
       - es
