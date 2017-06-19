@@ -351,14 +351,10 @@ class ArchiveContactTestCase(LeelooTestCase):
         url = reverse('api-v3:contact:archive', kwargs={'pk': contact.pk})
         response = self.api_client.post(url)
 
-        assert response.data['archived']
-        assert response.data['archived_by'] == {
-            'id': str(self.user.pk),
-            'first_name': self.user.first_name,
-            'last_name': self.user.last_name
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'reason': ['This field is required.']
         }
-        assert response.data['archived_reason'] == ''
-        assert response.data['id'] == contact.pk
 
     def test_archive_with_reason(self):
         """Test archive contact providing a reason."""

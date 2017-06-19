@@ -627,6 +627,46 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert response_data['archived_by']['id'] == str(self.user.pk)
         assert response_data['archived_reason'] == 'archive reason'
 
+    def test_archive_fail_no_reason(self):
+        """Test archive a project without providing a reason."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:archive-item',
+                      kwargs={'pk': project.pk})
+        response = self.api_client.post(url, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'reason': ['This field is required.']
+        }
+
+    def test_archive_fail_blank_reason(self):
+        """Test archive a project without providing a reason."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:archive-item',
+                      kwargs={'pk': project.pk})
+        response = self.api_client.post(url, format='json', data={
+            'reason': ''
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'reason': ['This field may not be blank.']
+        }
+
+    def test_archive_fail_null_reason(self):
+        """Test archive a project with a null reason."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:archive-item',
+                      kwargs={'pk': project.pk})
+        response = self.api_client.post(url, format='json', data={
+            'reason': None
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'reason': ['This field may not be null.']
+        }
+
     def test_unarchive_project_success(self):
         """Tests unarchiving a project."""
         project = InvestmentProjectFactory(
