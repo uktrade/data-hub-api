@@ -113,6 +113,9 @@ class IProjectDocumentViewSet(CoreViewSetV3):
     serializer_class = IProjectDocumentSerializer
     queryset = IProjectDocument.objects.all()
 
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('doc_type',)
+
     def list(self, request, *args, **kwargs):
         """Custom pre-filtered list."""
         queryset = self.filter_queryset(self.get_queryset().filter(project_id=self.kwargs['project_pk']))
