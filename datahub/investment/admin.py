@@ -27,6 +27,8 @@ class InvestmentProjectAdmin(VersionAdmin):
 
 @admin.register(IProjectDocument)
 class IProjectDocumentAdmin(admin.ModelAdmin):
+    """Investment project document admin."""
+
     list_display = (
         'id', 'doc_type', 'filename'
     )

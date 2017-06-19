@@ -22,7 +22,14 @@ class Document(BaseModel, ArchivableModel):
 
     @property
     def filename(self):
+        """Shortcut for getting a filename."""
         return path.basename(self.path)
 
+    @property
+    def name(self):
+        """Model name."""
+        return self.path
+
     def __str__(self):
+        """String repr."""
         return f'Document(filename="{self.filename}", av_clean={self.av_clean})'
