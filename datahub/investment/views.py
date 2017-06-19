@@ -128,6 +128,15 @@ class IProjectDocumentViewSet(CoreViewSetV3):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    def create(self, request, *args, **kwargs):
+        """Create and one-time upload URL generation."""
+        response = super().create(request, *args, **kwargs)
+        document = IProjectDocument.objects.get(pk=response.data['id'])
+
+        response.data['upload_url'] = document.upload_url
+
+        return response
+
     def get_object(self):
         """Ensures that object lookup honors the project pk."""
         queryset = self.get_queryset().filter(project__id=self.kwargs['project_pk'])

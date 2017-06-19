@@ -684,6 +684,26 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert doc.filename == 'test.txt'
         assert doc.doc_type == 'fdi_type'
         assert str(doc.project.pk) == str(project.pk)
+        assert 'upload_url' in response.data
+
+    def test_document_retrieval(self):
+        """Tests retrieval of individual document."""
+        project = InvestmentProjectFactory()
+        doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
+
+        url = reverse('api-v3:investment:document-item',
+                      kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
+
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['id'] == str(doc.pk)
+        assert response.data['project'] == {
+            'id': str(project.pk),
+            'name': project.name,
+        }
+        assert response.data['doc_type'] == 'fdi_type'
+        assert response.data['filename'] == 'test.txt'
+        assert 'url' in response.data
 
 
 @pytest.mark.parametrize('view_set', (views.IProjectTeamViewSet,

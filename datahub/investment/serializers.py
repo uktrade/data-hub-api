@@ -294,7 +294,9 @@ class IProjectDocumentSerializer(serializers.ModelSerializer):
             'project',
             'doc_type',
             'filename',
+            'url',
         )
+        read_only_fields = ('url', )
 
     def create(self, validated_data):
         """Create investment document."""
