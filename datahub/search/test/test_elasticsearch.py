@@ -10,21 +10,56 @@ def test_get_basic_search_query():
 
     assert query.to_dict() == {
         'query': {
-            'multi_match': {
-                'query': 'test',
-                'fields': ['name', '_all']
+            'bool': {
+                'should': [
+                    {
+                        'match_phrase': {
+                            'name': {
+                                'query': 'test',
+                                'boost': 2
+                            }
+                        }
+                    }, {
+                        'match_phrase': {
+                            '_all': {
+                                'query': 'test',
+                                'boost': 1.5
+                            }
+                        }
+                    }, {
+                        'match': {
+                            'name': {
+                                'query': 'test',
+                                'boost': 1.0
+                            }
+                        }
+                    }, {
+                        'match': {
+                            '_all': {
+                                'query': 'test',
+                                'boost': 0.5
+                            }
+                        }
+                    }
+                ]
             }
         },
         'post_filter': {
             'bool': {
                 'should': [
-                    {'term': {'_type': 'contact'}}
+                    {
+                        'term': {
+                            '_type': 'contact'
+                        }
+                    }
                 ]
             }
         },
         'aggs': {
             'count_by_type': {
-                'terms': {'field': '_type'}
+                'terms': {
+                    'field': '_type'
+                }
             }
         },
         'from': 5,
