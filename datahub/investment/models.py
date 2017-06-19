@@ -290,6 +290,7 @@ class IProjectDocument(BaseModel, ArchivableModel):
 
     @classmethod
     def create_from_declaration_request(cls, project, field, filename):
+        """Create investment document along with correct Document creation."""
         with transaction.atomic():
             doc = Document(
                 path=f'{cls.BUCKET_PREFIX}/{project.id}/{field}/{filename}',

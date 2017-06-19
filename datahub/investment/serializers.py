@@ -304,9 +304,6 @@ class IProjectDocumentSerializer(serializers.ModelSerializer):
     project = NestedRelatedField(
         InvestmentProject,
     )
-    document = NestedRelatedField(
-        IProjectDocument,
-    )
 
     class Meta:  # noqa: D101
         model = IProjectDocument
@@ -318,4 +315,9 @@ class IProjectDocumentSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        return super().create(validated_data)
+        """Create investment document."""
+        return IProjectDocument.create_from_declaration_request(
+            project=validated_data['project'],
+            field=validated_data['doc_type'],
+            filename=validated_data['filename'],
+        )

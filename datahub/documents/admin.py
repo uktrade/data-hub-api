@@ -5,6 +5,8 @@ from datahub.documents import models
 
 @admin.register(models.Document)
 class DocumentsAdmin(admin.ModelAdmin):
+    """Documents admin."""
+
     list_display = (
         'id', 'path', 'uploaded_on', 'av_clean',
     )
