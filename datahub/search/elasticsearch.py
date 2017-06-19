@@ -6,7 +6,7 @@ from django.conf import settings
 from elasticsearch.helpers import bulk as es_bulk
 from elasticsearch_dsl import Search
 from elasticsearch_dsl.connections import connections
-from elasticsearch_dsl.query import Q
+from elasticsearch_dsl.query import Match, MatchPhrase, Q
 
 
 def configure_connection():
@@ -38,7 +38,12 @@ def get_basic_search_query(term, entities=('company',), offset=0, limit=100):
 
     Also returns number of results in other entities.
     """
-    query = Q('multi_match', query=term, fields=['name', '_all'])
+    query = Q('bool', should=[
+        MatchPhrase(name={'query': term, 'boost': 2}),
+        MatchPhrase(_all={'query': term, 'boost': 1.5}),
+        Match(name={'query': term, 'boost': 1.0}),
+        Match(_all={'query': term, 'boost': 0.5}),
+    ])
     s = Search(index=settings.ES_INDEX).query(query)
     s = s.post_filter(
         Q('bool', should=[Q('term', _type=entity) for entity in entities])
