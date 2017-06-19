@@ -5,6 +5,7 @@ from django.conf import settings
 from django.db import models
 
 from datahub.core.models import ArchivableModel, BaseModel
+from datahub.core.utils import sign_s3_url
 
 
 class Document(BaseModel, ArchivableModel):
@@ -29,6 +30,16 @@ class Document(BaseModel, ArchivableModel):
     def name(self):
         """Model name."""
         return self.path
+
+    @property
+    def url(self):
+        """Generate pre-signed download URL."""
+        return sign_s3_url(settings.DOCUMENTS_BUCKET, self.path)
+
+    @property
+    def upload_url(self):
+        """Generate pre-signed upload URL."""
+        return sign_s3_url(settings.DOCUMENTS_BUCKET, self.path, method='put_object')
 
     def __str__(self):
         """String repr."""
