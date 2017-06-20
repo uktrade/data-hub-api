@@ -4,8 +4,9 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
+appnope==0.1.0            # via ipython
 boto3==1.4.4
-botocore==1.5.67          # via boto3, s3transfer
+botocore==1.5.71          # via boto3, s3transfer
 certifi==2017.4.17        # via requests
 chardet==3.0.4            # via requests
 click==6.7                # via pip-tools
@@ -18,7 +19,6 @@ django-debug-toolbar==1.8
 django-environ==0.4.3
 django-extensions==1.7.9
 django-filter==1.0.4
-django-mptt==0.8.7
 django-oauth-toolkit==1.0.0
 django-pglocks==1.0.2
 django-reversion==2.0.8
