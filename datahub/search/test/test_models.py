@@ -101,7 +101,7 @@ def test_company_dbmodel_to_dict():
             'trading_address_2', 'trading_address_town',
             'trading_address_county', 'trading_address_postcode',
             'headquarter_type', 'classification', 'parent',
-            'one_list_account_owner', 'level'}
+            'one_list_account_owner'}
 
     assert set(result.keys()) == keys
 
