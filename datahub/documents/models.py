@@ -25,7 +25,7 @@ class Document(BaseModel, ArchivableModel):
     scanned_on = models.DateTimeField(
         null=True, blank=True,
     )
-    av_clean = models.NullBooleanField()
+    av_clean = models.NullBooleanField(db_index=True)
 
     @property
     def filename(self):

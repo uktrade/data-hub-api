@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                 ('uploaded_on', models.DateTimeField(blank=True, null=True)),
                 ('scan_initiated_on', models.DateTimeField(blank=True, null=True)),
                 ('scanned_on', models.DateTimeField(blank=True, null=True)),
-                ('av_clean', models.NullBooleanField()),
+                ('av_clean', models.NullBooleanField(db_index=True)),
                 ('archived_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
             ],
             options={
