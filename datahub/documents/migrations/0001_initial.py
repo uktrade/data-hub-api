@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('path', models.CharField(max_length=255, unique=True)),
                 ('uploaded_on', models.DateTimeField(blank=True, null=True)),
-                ('av_clean', models.BooleanField(default=False)),
+                ('av_clean', models.NullBooleanField()),
                 ('archived_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
             ],
             options={

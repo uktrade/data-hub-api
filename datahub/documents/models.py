@@ -19,7 +19,7 @@ class Document(BaseModel, ArchivableModel):
     uploaded_on = models.DateTimeField(
         null=True, blank=True
     )
-    av_clean = models.BooleanField(default=False)
+    av_clean = models.NullBooleanField()
 
     @property
     def filename(self):

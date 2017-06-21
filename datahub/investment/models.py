@@ -292,8 +292,8 @@ class IProjectDocument(BaseModel, ArchivableModel):
         return self.document.upload_url
 
     class Meta:  # noqa: D101
-        verbose_name = 'Investment Project Document'
-        verbose_name_plural = 'Investment Project Documents'
+        verbose_name = 'investment project document'
+        verbose_name_plural = 'investment project documents'
         unique_together = (
             ('project', 'doc_type', 'filename'),
         )
