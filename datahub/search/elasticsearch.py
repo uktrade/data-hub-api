@@ -6,7 +6,7 @@ from django.conf import settings
 from elasticsearch.helpers import bulk as es_bulk
 from elasticsearch_dsl import Search
 from elasticsearch_dsl.connections import connections
-from elasticsearch_dsl.query import Q
+from elasticsearch_dsl.query import Match, MatchPhrase, Q
 
 
 def configure_connection():
@@ -33,12 +33,22 @@ def configure_connection():
         )
 
 
+def get_search_term_query(term):
+    """Returns search term query."""
+    return Q('bool', should=[
+        MatchPhrase(name={'query': term, 'boost': 2}),
+        MatchPhrase(_all={'query': term, 'boost': 1.5}),
+        Match(name={'query': term, 'boost': 1.0}),
+        Match(_all={'query': term, 'boost': 0.5}),
+    ])
+
+
 def get_basic_search_query(term, entities=('company',), offset=0, limit=100):
     """Performs basic search looking for name and then _all in entity.
 
     Also returns number of results in other entities.
     """
-    query = Q('multi_match', query=term, fields=['name', '_all'])
+    query = get_search_term_query(term)
     s = Search(index=settings.ES_INDEX).query(query)
     s = s.post_filter(
         Q('bool', should=[Q('term', _type=entity) for entity in entities])
@@ -55,7 +65,7 @@ def get_search_by_entity_query(term=None, filters=None, entity=None, ranges=None
     """Perform filtered search for given terms in given entity."""
     query = [Q('term', _type=entity)]
     if term != '':
-        query.append(Q('multi_match', query=term, fields=['name', '_all']))
+        query.append(get_search_term_query(term))
 
     query_filter = []
 
