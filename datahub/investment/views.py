@@ -108,7 +108,7 @@ class IProjectTeamViewSet(CoreViewSetV3):
 
 
 class IProjectDocumentViewSet(CoreViewSetV3):
-    """Investment Project Serializer."""
+    """Investment Project Documents ViewSet."""
 
     serializer_class = IProjectDocumentSerializer
     queryset = IProjectDocument.objects.all()

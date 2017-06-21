@@ -61,19 +61,18 @@ def slice_iterable_into_chunks(iterable, size):
     return zip_longest(*args, fillvalue=None)
 
 
+def get_s3_client():
+    """Get S3 client singleton."""
+    s3 = getattr(get_s3_client, 's3_instance', None)
+    if not s3:
+        get_s3_client.s3_instance = s3 = boto3.client('s3')
+
+    return s3
+
+
 def sign_s3_url(bucket_name, path, method='get_object', expires=3600):
     """Sign s3 url using global config, and given expiry in seconds."""
-    s3 = getattr(sign_s3_url, 's3_instance', None)
-    if not s3:
-        s3 = boto3.client(
-            's3',
-            region_name='eu-west-2',
-            aws_access_key_id=settings.AWS_ACCESS['KEY_ID'],
-            aws_secret_access_key=settings.AWS_ACCESS['KEY_SECRET'],
-        )
-        sign_s3_url.s3_instance = s3
-
-    return s3.generate_presigned_url(
+    return get_s3_client().generate_presigned_url(
         ClientMethod=method,
         Params={
             'Bucket': bucket_name,

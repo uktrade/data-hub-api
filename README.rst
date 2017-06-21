@@ -165,6 +165,9 @@ Leeloo can run on any Heroku style platform. These environment variables MUST be
 - ES_HOST
 - ES_PORT
 - ES_INDEX
+- AWS_ACCESS_KEY_ID
+- AWS_SECRET_ACCESS_KEY
+- DOCUMENTS_BUCKET
 
 
 Management commands
