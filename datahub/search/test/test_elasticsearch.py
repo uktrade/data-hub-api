@@ -4,27 +4,103 @@ from unittest import mock
 from datahub.search import elasticsearch
 
 
+def test_get_search_term_query():
+    """Tests search term query."""
+    query = elasticsearch.get_search_term_query('hello')
+
+    assert query.to_dict() == {
+        'bool': {
+            'should': [
+                {
+                    'match_phrase': {
+                        'name': {
+                            'query': 'hello',
+                            'boost': 2
+                        }
+                    }
+                }, {
+                    'match_phrase': {
+                        '_all': {
+                            'query': 'hello',
+                            'boost': 1.5
+                        }
+                    }
+                }, {
+                    'match': {
+                        'name': {
+                            'query': 'hello',
+                            'boost': 1.0
+                        }
+                    }
+                }, {
+                    'match': {
+                        '_all': {
+                            'query': 'hello',
+                            'boost': 0.5
+                        }
+                    }
+                }
+            ]
+        }
+    }
+
+
 def test_get_basic_search_query():
     """Tests basic search query."""
     query = elasticsearch.get_basic_search_query('test', entities=('contact',), offset=5, limit=5)
 
     assert query.to_dict() == {
         'query': {
-            'multi_match': {
-                'query': 'test',
-                'fields': ['name', '_all']
+            'bool': {
+                'should': [
+                    {
+                        'match_phrase': {
+                            'name': {
+                                'query': 'test',
+                                'boost': 2
+                            }
+                        }
+                    }, {
+                        'match_phrase': {
+                            '_all': {
+                                'query': 'test',
+                                'boost': 1.5
+                            }
+                        }
+                    }, {
+                        'match': {
+                            'name': {
+                                'query': 'test',
+                                'boost': 1.0
+                            }
+                        }
+                    }, {
+                        'match': {
+                            '_all': {
+                                'query': 'test',
+                                'boost': 0.5
+                            }
+                        }
+                    }
+                ]
             }
         },
         'post_filter': {
             'bool': {
                 'should': [
-                    {'term': {'_type': 'contact'}}
+                    {
+                        'term': {
+                            '_type': 'contact'
+                        }
+                    }
                 ]
             }
         },
         'aggs': {
             'count_by_type': {
-                'terms': {'field': '_type'}
+                'terms': {
+                    'field': '_type'
+                }
             }
         },
         'from': 5,
@@ -57,37 +133,73 @@ def test_search_by_entity_query():
     assert query.to_dict() == {
         'query': {
             'bool': {
-                'must': [{
-                    'term': {
-                        '_type': 'company'
-                    }}, {
-                    'multi_match': {
-                        'query': 'test',
-                        'fields': ['name', '_all']
-                    }}]
+                'must': [
+                    {
+                        'term': {
+                            '_type': 'company'
+                        }
+                    }, {
+                        'bool': {
+                            'should': [
+                                {
+                                    'match_phrase': {
+                                        'name': {
+                                            'query': 'test',
+                                            'boost': 2
+                                        }
+                                    }
+                                }, {
+                                    'match_phrase': {
+                                        '_all': {
+                                            'query': 'test',
+                                            'boost': 1.5
+                                        }
+                                    }
+                                }, {
+                                    'match': {
+                                        'name': {
+                                            'query': 'test',
+                                            'boost': 1.0
+                                        }
+                                    }
+                                }, {
+                                    'match': {
+                                        '_all': {
+                                            'query': 'test',
+                                            'boost': 0.5
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
             }
         },
         'post_filter': {
             'bool': {
-                'must': [{
-                    'term': {
-                        'address_town': 'Woodside'
-                    }}, {
-                    'nested': {
-                        'path': 'trading_address_country',
-                        'query': {
-                            'term': {
-                                'trading_address_country.id':
-                                    '80756b9a-5d95-e211-a939-e4115bead28a'
+                'must': [
+                    {
+                        'term': {
+                            'address_town': 'Woodside'
+                        }
+                    }, {
+                        'nested': {
+                            'path': 'trading_address_country',
+                            'query': {
+                                'term': {
+                                    'trading_address_country.id': '80756b9a-5d95-e211-a939-e4115bead28a'
+                                }
                             }
                         }
-                    }}, {
-                    'range': {
-                        'estimated_land_date': {
-                            'gte': '2017-06-13T09:44:31.062870',
-                            'lte': '2017-06-13T09:44:31.062870'
+                    }, {
+                        'range': {
+                            'estimated_land_date': {
+                                'gte': '2017-06-13T09:44:31.062870',
+                                'lte': '2017-06-13T09:44:31.062870'
+                            }
                         }
-                    }}
+                    }
                 ]
             }
         },

@@ -1,16 +1,18 @@
 import datetime
 
 import pytest
+from elasticsearch_dsl.connections import connections
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
 
 pytestmark = pytest.mark.django_db
 
 
-@pytest.mark.usefixtures('setup_data')
+@pytest.mark.usefixtures('setup_data', 'post_save_handlers')
 class SearchTestCase(LeelooTestCase):
     """Tests search views."""
 
@@ -190,3 +192,26 @@ class SearchTestCase(LeelooTestCase):
         response = self.api_client.post(url, {})
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_search_results_quality(self):
+        """Tests quality of results."""
+        CompanyFactory(name='The Risk Advisory Group').save()
+        CompanyFactory(name='The Advisory Group').save()
+        CompanyFactory(name='The Advisory').save()
+        CompanyFactory(name='The Advisories').save()
+
+        connections.get_connection().indices.refresh()
+
+        term = 'The Advisory'
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'company'
+        })
+
+        assert response.data['count'] == 4
+        assert ['The Advisory',
+                'The Advisory Group',
+                'The Risk Advisory Group',
+                'The Advisories'] == [company['name'] for company in response.data['companies']]
