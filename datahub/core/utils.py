@@ -6,7 +6,6 @@ from urllib.parse import urlparse
 
 import boto3
 import requests
-from django.conf import settings
 
 logger = getLogger(__name__)
 
