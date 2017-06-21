@@ -282,14 +282,14 @@ class IProjectDocument(BaseModel, ArchivableModel):
     document = models.OneToOneField(Document, on_delete=models.PROTECT)
 
     @property
-    def url(self):
+    def signed_url(self):
         """Generate pre-signed download URL."""
-        return self.document.url
+        return self.document.generate_signed_url()
 
     @property
-    def upload_url(self):
+    def signed_upload_url(self):
         """Generate pre-signed upload URL."""
-        return self.document.upload_url
+        return self.document.generate_signed_upload_url()
 
     class Meta:  # noqa: D101
         verbose_name = 'investment project document'

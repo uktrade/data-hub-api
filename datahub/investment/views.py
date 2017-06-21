@@ -133,7 +133,7 @@ class IProjectDocumentViewSet(CoreViewSetV3):
         response = super().create(request, *args, **kwargs)
         document = IProjectDocument.objects.get(pk=response.data['id'])
 
-        response.data['upload_url'] = document.upload_url
+        response.data['signed_upload_url'] = document.signed_upload_url
 
         return response
 
