@@ -724,7 +724,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert doc.filename == 'test.txt'
         assert doc.doc_type == 'fdi_type'
         assert str(doc.project.pk) == str(project.pk)
-        assert 'upload_url' in response.data
+        assert 'signed_upload_url' in response.data
 
     def test_document_retrieval(self):
         """Tests retrieval of individual document."""
@@ -743,7 +743,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         }
         assert response.data['doc_type'] == 'fdi_type'
         assert response.data['filename'] == 'test.txt'
-        assert 'url' in response.data
+        assert 'signed_url' in response.data
 
 
 @pytest.mark.parametrize('view_set', (views.IProjectTeamViewSet,

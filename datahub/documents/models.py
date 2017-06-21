@@ -31,13 +31,11 @@ class Document(BaseModel, ArchivableModel):
         """Model name."""
         return self.path
 
-    @property
-    def url(self):
+    def generate_signed_url(self):
         """Generate pre-signed download URL."""
         return sign_s3_url(settings.DOCUMENTS_BUCKET, self.path)
 
-    @property
-    def upload_url(self):
+    def generate_signed_upload_url(self):
         """Generate pre-signed upload URL."""
         return sign_s3_url(settings.DOCUMENTS_BUCKET, self.path, method='put_object')
 
