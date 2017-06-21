@@ -19,6 +19,9 @@ class Document(BaseModel, ArchivableModel):
     uploaded_on = models.DateTimeField(
         null=True, blank=True
     )
+    scanned_on = models.DateTimeField(
+        null=True, blank=True,
+    )
     av_clean = models.NullBooleanField()
 
     @property
