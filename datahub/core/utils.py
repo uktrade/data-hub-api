@@ -1,6 +1,5 @@
-from contextlib import contextmanager
 from hashlib import sha256
-from itertools import zip_longest
+from itertools import islice
 from logging import getLogger
 from urllib.parse import urlparse
 
@@ -17,15 +16,6 @@ def generate_enum_code_from_queryset(model_queryset):
     for q in model_queryset:
         var_name = q.name.replace(' ', '_').lower()
         return f"{var_name} = Constant('{q.name}', '{q.id}')"
-
-
-@contextmanager
-def log_and_ignore_exceptions():
-    """Write non-fatal exceptions to the log and ignore them afterwards."""
-    try:
-        yield
-    except Exception:
-        logger.exception('Silently ignoring non-fatal exception')
 
 
 def stream_to_file_pointer(url, fp):
@@ -50,10 +40,12 @@ def generate_signature(path, body, salt):
     return sha256(message).hexdigest()
 
 
-def slice_iterable_into_chunks(iterable, size):
-    """Collect data into fixed-length chunks or blocks.
-
-    https://docs.python.org/3/library/itertools.html#itertools-recipes
-    """
-    args = [iter(iterable)] * size
-    return zip_longest(*args, fillvalue=None)
+def slice_iterable_into_chunks(iterable, batch_size, obj_creator):
+    """Collect data into fixed-length chunks or blocks."""
+    iterator = iter(iterable)
+    while True:
+        batch_iter = islice(iterator, batch_size)
+        objects = [obj_creator(row) for row in batch_iter]
+        if not objects:
+            break
+        yield objects
