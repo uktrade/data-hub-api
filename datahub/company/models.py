@@ -9,7 +9,6 @@ from django.core.mail import send_mail
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.timezone import now
-from mptt.models import MPTTModel, TreeForeignKey
 
 from datahub.company.validators import RelaxedURLValidator
 from datahub.core import constants
@@ -48,7 +47,7 @@ class CompanyAbstract(BaseModel):
         super().save(*args, **kwargs)
 
 
-class Company(MPTTModel, ArchivableModel, CompanyAbstract):
+class Company(ArchivableModel, CompanyAbstract):
     """Representation of the company as per CDMS."""
 
     REQUIRED_TRADING_ADDRESS_FIELDS = (
@@ -116,7 +115,7 @@ class Company(MPTTModel, ArchivableModel, CompanyAbstract):
         metadata_models.CompanyClassification, blank=True, null=True,
         on_delete=models.SET_NULL
     )
-    parent = TreeForeignKey(
+    parent = models.ForeignKey(
         'self', blank=True, null=True, on_delete=models.SET_NULL,
         related_name='children'
     )
