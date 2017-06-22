@@ -13,6 +13,7 @@ from datahub.company.test.factories import (AdviserFactory, CompanyFactory,
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
 from datahub.investment import views
+from datahub.investment.models import IProjectDocument
 from datahub.investment.test.factories import InvestmentProjectFactory
 
 
@@ -1238,6 +1239,69 @@ class ArchiveViewsTestCase(LeelooTestCase):
         assert response_data['archived'] is False
         assert response_data['archived_by'] is None
         assert response_data['archived_reason'] == ''
+
+    def test_documents_list_is_filtered_by_project(self):
+        """Tests viewset filtering."""
+        project1 = InvestmentProjectFactory()
+        project2 = InvestmentProjectFactory()
+
+        IProjectDocument.create_from_declaration_request(project1, 'fdi_type', 'test.txt')
+        doc2 = IProjectDocument.create_from_declaration_request(project2, 'fdi_type', 'test.txt')
+
+        url = reverse('api-v3:investment:document-collection',
+                      kwargs={'project_pk': project2.pk})
+
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.data
+        assert response_data['count'] == 1
+        assert len(response_data['results']) == 1
+        assert response_data['results'][0]['id'] == str(doc2.pk)
+
+    def test_document_creation(self):
+        """Test document creation can omit project PK (Will be inferred from URL)."""
+        project = InvestmentProjectFactory()
+
+        url = reverse('api-v3:investment:document-collection',
+                      kwargs={'project_pk': project.pk})
+
+        response = self.api_client.post(url, format='json', data={
+            'filename': 'test.txt',
+            'doc_type': 'fdi_type',
+            'project': str(project.pk),
+        })
+
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.data
+        assert response_data['doc_type'] == 'fdi_type'
+        assert response_data['filename'] == 'test.txt'
+        assert response_data['project']['id'] == str(project.pk)
+
+        doc = IProjectDocument.objects.get(pk=response_data['id'])
+        assert doc.filename == 'test.txt'
+        assert doc.doc_type == 'fdi_type'
+        assert str(doc.project.pk) == str(project.pk)
+        assert 'signed_upload_url' in response.data
+
+    def test_document_retrieval(self):
+        """Tests retrieval of individual document."""
+        project = InvestmentProjectFactory()
+        doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
+
+        url = reverse('api-v3:investment:document-item',
+                      kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
+
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['id'] == str(doc.pk)
+        assert response.data['project'] == {
+            'id': str(project.pk),
+            'name': project.name,
+        }
+        assert response.data['doc_type'] == 'fdi_type'
+        assert response.data['filename'] == 'test.txt'
+        assert 'signed_url' in response.data
 
 
 @pytest.mark.parametrize('view_set', (views.IProjectTeamViewSet,

@@ -7,7 +7,7 @@ import datahub.metadata.models as meta_models
 from datahub.company.models import Advisor, Company, Contact
 from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.serializers import NestedRelatedField
-from datahub.investment.models import InvestmentProject
+from datahub.investment.models import InvestmentProject, IProjectDocument
 from datahub.investment.validate import get_validators
 
 
@@ -293,3 +293,30 @@ class IProjectUnifiedSerializer(IProjectSerializer, IProjectValueSerializer,
             IProjectTeamSerializer.Meta.fields
         )
         extra_kwargs = IProjectSerializer.Meta.extra_kwargs
+
+
+class IProjectDocumentSerializer(serializers.ModelSerializer):
+    """Serializer for Investment Project Documents."""
+
+    project = NestedRelatedField(
+        InvestmentProject,
+    )
+
+    class Meta:  # noqa: D101
+        model = IProjectDocument
+        fields = (
+            'id',
+            'project',
+            'doc_type',
+            'filename',
+            'signed_url',
+        )
+        read_only_fields = ('signed_url', )
+
+    def create(self, validated_data):
+        """Create investment document."""
+        return IProjectDocument.create_from_declaration_request(
+            project=validated_data['project'],
+            field=validated_data['doc_type'],
+            filename=validated_data['filename'],
+        )

@@ -391,7 +391,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'investmentprojectcode', 'competitor_countries',
         'uk_region_locations', 'strategic_drivers',
         'client_considering_other_countries', 'cdms_project_code',
-        'interactions',
+        'interactions', 'documents'
     )
 
     class Meta:
