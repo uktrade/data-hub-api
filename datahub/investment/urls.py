@@ -4,7 +4,7 @@ from django.conf.urls import url
 
 from datahub.investment.views import (
     IProjectAuditViewSet, IProjectRequirementsViewSet, IProjectTeamViewSet,
-    IProjectValueViewSet, IProjectViewSet
+    IProjectUnifiedViewSet, IProjectValueViewSet, IProjectViewSet
 )
 
 project_collection = IProjectViewSet.as_view({
@@ -13,6 +13,16 @@ project_collection = IProjectViewSet.as_view({
 })
 
 project_item = IProjectViewSet.as_view({
+    'get': 'retrieve',
+    'patch': 'partial_update'
+})
+
+unified_project_collection = IProjectUnifiedViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+
+unified_project_item = IProjectUnifiedViewSet.as_view({
     'get': 'retrieve',
     'patch': 'partial_update'
 })
@@ -45,6 +55,9 @@ unarchive_item = IProjectViewSet.as_view({
 })
 
 urlpatterns = [
+    url(r'^investment$', unified_project_collection, name='investment'),
+    url(r'^investment/(?P<pk>[0-9a-z-]{36})$', unified_project_item,
+        name='investment-item'),
     url(r'^investment/project$', project_collection, name='project'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/archive', archive_item,
         name='archive-item'),
