@@ -199,9 +199,9 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'business_activities', 'client_contacts'
         }
         assert response_data['business_activities'] == [
-            'This list may not be ''empty.']
+            'This list may not be empty.']
         assert response_data['client_contacts'] == [
-            'This list may not be ''empty.']
+            'This list may not be empty.']
 
     def test_get_project_success(self):
         """Test successfully getting a project."""
@@ -756,10 +756,8 @@ class UnifiedViewsTestCase(LeelooTestCase):
         assert response_data.keys() >= {
             'business_activities', 'client_contacts'
         }
-        assert response_data['business_activities'] == [
-            'This list may not be ''empty.']
-        assert response_data['client_contacts'] == [
-            'This list may not be ''empty.']
+        assert response_data['business_activities'] == ['This list may not be empty.']
+        assert response_data['client_contacts'] == ['This list may not be empty.']
 
     def test_get_project_success(self):
         """Test successfully getting a project."""
