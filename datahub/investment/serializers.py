@@ -278,3 +278,18 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
             'project_assurance_team',
             'team_complete'
         )
+
+
+class IProjectUnifiedSerializer(IProjectSerializer, IProjectValueSerializer,
+                                IProjectRequirementsSerializer, IProjectTeamSerializer):
+    """Serialiser for investment projects, used with the new unified investment endpoint."""
+
+    class Meta:  # noqa: D101
+        model = InvestmentProject
+        fields = (
+            IProjectSerializer.Meta.fields +
+            IProjectValueSerializer.Meta.fields +
+            IProjectRequirementsSerializer.Meta.fields +
+            IProjectTeamSerializer.Meta.fields
+        )
+        extra_kwargs = IProjectSerializer.Meta.extra_kwargs
