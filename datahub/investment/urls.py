@@ -3,8 +3,8 @@
 from django.conf.urls import url
 
 from datahub.investment.views import (
-    IProjectAuditViewSet, IProjectRequirementsViewSet, IProjectTeamViewSet,
-    IProjectUnifiedViewSet, IProjectValueViewSet, IProjectViewSet
+    IProjectAuditViewSet, IProjectDocumentViewSet, IProjectRequirementsViewSet,
+    IProjectTeamViewSet, IProjectUnifiedViewSet, IProjectValueViewSet, IProjectViewSet
 )
 
 project_collection = IProjectViewSet.as_view({
@@ -54,6 +54,15 @@ unarchive_item = IProjectViewSet.as_view({
     'post': 'unarchive',
 })
 
+project_document_collection = IProjectDocumentViewSet.as_view({
+    'get': 'list',
+    'post': 'create',
+})
+
+project_document_item = IProjectDocumentViewSet.as_view({
+    'get': 'retrieve',
+})
+
 urlpatterns = [
     url(r'^investment$', unified_project_collection, name='investment-collection'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})$', unified_project_item,
@@ -61,6 +70,10 @@ urlpatterns = [
     url(r'^investment/project$', project_collection, name='project'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/archive', archive_item,
         name='archive-item'),
+    url(r'^investment/(?P<project_pk>[0-9a-z-]{36})/document$', project_document_collection,
+        name='document-collection'),
+    url(r'^investment/(?P<project_pk>[0-9a-z-]{36})/document/(?P<doc_pk>[0-9a-z-]{36})',
+        project_document_item, name='document-item'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/unarchive', unarchive_item,
         name='unarchive-item'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/project$', project_item,

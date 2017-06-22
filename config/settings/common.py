@@ -51,6 +51,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'datahub.core',
     'datahub.company',
+    'datahub.documents',
     'datahub.interaction',
     'datahub.investment',
     'datahub.leads',
@@ -169,3 +170,4 @@ CDMS_TEXT_MAX_LENGTH = 4000
 CHAR_FIELD_MAX_LENGTH = 255
 HEROKU = False
 BULK_CREATE_BATCH_SIZE = env.int('BULK_CREATE_BATCH_SIZE', default=5000)
+DOCUMENTS_BUCKET = env('DOCUMENTS_BUCKET')

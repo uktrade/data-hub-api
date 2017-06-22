@@ -189,7 +189,7 @@ class Company(ArchivableModel, CompanyAbstract):
             raise ValidationError(
                 {'uk_region': ['UK region is required for UK companies.']}
             )
-        super(Company, self).clean()
+        super().clean()
 
 
 class CompaniesHouseCompany(CompanyAbstract):
@@ -309,7 +309,7 @@ class Contact(ArchivableModel, BaseModel):
         """Custom validation."""
         self.validate_address()
         self.validate_contact_preferences()
-        super(Contact, self).clean()
+        super().clean()
 
     def save(self, *args, **kwargs):
         """Override the Django save implementation to hook the custom validation."""
