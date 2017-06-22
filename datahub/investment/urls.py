@@ -55,7 +55,7 @@ unarchive_item = IProjectViewSet.as_view({
 })
 
 urlpatterns = [
-    url(r'^investment$', unified_project_collection, name='investment'),
+    url(r'^investment$', unified_project_collection, name='investment-collection'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})$', unified_project_item,
         name='investment-item'),
     url(r'^investment/project$', project_collection, name='project'),
