@@ -22,11 +22,4 @@ class InteractionViewSetV1(CoreViewSetV1):
     filter_backends = (
         DjangoFilterBackend,
     )
-    filter_fields = ['contact_id', 'investment_project_id']
-
-    def get_additional_data(self, create):
-        """Set dit_adviser to the user on model instance creation."""
-        data = {}
-        if create:
-            data['dit_adviser'] = self.request.user
-        return data
+    filter_fields = ['company_id', 'contact_id', 'investment_project_id']

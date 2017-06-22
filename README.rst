@@ -161,10 +161,13 @@ Leeloo can run on any Heroku style platform. These environment variables MUST be
 - DJANGO_SECRET_KEY
 - DJANGO_SENTRY_DSN
 - DJANGO_SETTINGS_MODULE
-- BULK_CREATE_BATCH_SIZE (default=50000)
+- BULK_CREATE_BATCH_SIZE (default=5000)
 - ES_HOST
 - ES_PORT
 - ES_INDEX
+- AWS_ACCESS_KEY_ID
+- AWS_SECRET_ACCESS_KEY
+- DOCUMENTS_BUCKET
 
 
 Management commands
@@ -195,3 +198,16 @@ Load metadata::
 
     docker-compose run leeloo python manage.py loaddata /app/fixtures/metadata.yaml
     docker-compose run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml
+
+Dependencies
+------------
+Direct dependencies are specified in ``requirements.in``. ``requirements.txt`` is a lock file generated using `pip-compile
+(from pip-tools) <https://github.com/jazzband/pip-tools>`_ and should not be manually edited.
+
+To update the lock file and indirect dependencies, run::
+
+    pip-compile --upgrade --output-file requirements.txt requirements.in
+
+This must be run whenever ``requirements.in`` is edited.
+
+Dependencies should still be installed using ``requirements.txt``.

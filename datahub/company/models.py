@@ -9,7 +9,6 @@ from django.core.mail import send_mail
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.timezone import now
-from mptt.models import MPTTModel, TreeForeignKey
 
 from datahub.company.validators import RelaxedURLValidator
 from datahub.core import constants
@@ -48,7 +47,7 @@ class CompanyAbstract(BaseModel):
         super().save(*args, **kwargs)
 
 
-class Company(MPTTModel, ArchivableModel, CompanyAbstract):
+class Company(ArchivableModel, CompanyAbstract):
     """Representation of the company as per CDMS."""
 
     REQUIRED_TRADING_ADDRESS_FIELDS = (
@@ -116,9 +115,9 @@ class Company(MPTTModel, ArchivableModel, CompanyAbstract):
         metadata_models.CompanyClassification, blank=True, null=True,
         on_delete=models.SET_NULL
     )
-    parent = TreeForeignKey(
+    parent = models.ForeignKey(
         'self', blank=True, null=True, on_delete=models.SET_NULL,
-        related_name='subsidiaries'
+        related_name='children'
     )
     one_list_account_owner = models.ForeignKey(
         'Advisor', blank=True, null=True, on_delete=models.SET_NULL,
@@ -134,6 +133,8 @@ class Company(MPTTModel, ArchivableModel, CompanyAbstract):
     @cached_property
     def uk_based(self):
         """Whether a company is based in the UK or not."""
+        if not self.registered_address_country:
+            return None
         return self.registered_address_country.name == constants.Country.united_kingdom.value.name
 
     @cached_property
@@ -188,7 +189,7 @@ class Company(MPTTModel, ArchivableModel, CompanyAbstract):
             raise ValidationError(
                 {'uk_region': ['UK region is required for UK companies.']}
             )
-        super(Company, self).clean()
+        super().clean()
 
 
 class CompaniesHouseCompany(CompanyAbstract):
@@ -308,7 +309,7 @@ class Contact(ArchivableModel, BaseModel):
         """Custom validation."""
         self.validate_address()
         self.validate_contact_preferences()
-        super(Contact, self).clean()
+        super().clean()
 
     def save(self, *args, **kwargs):
         """Override the Django save implementation to hook the custom validation."""
@@ -372,7 +373,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField('date joined', default=now)
-    enabled = models.BooleanField(
+    use_cdms_auth = models.BooleanField(
         default=False,
         help_text='Whether CDMS authentication has been enabled for this user'
     )
