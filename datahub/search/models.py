@@ -1,5 +1,5 @@
 from django.conf import settings
-from elasticsearch_dsl import Boolean, Date, DocType, Nested, String
+from elasticsearch_dsl import Boolean, Date, DocType, Double, Integer, Nested, String
 
 
 def _id_name_dict(obj):
@@ -15,6 +15,14 @@ def _id_type_dict(obj):
     return {
         'id': str(obj.id),
         'type': obj.type
+    }
+
+
+def _id_uri_dict(obj):
+    """Creates dictionary with selected field from supplied object."""
+    return {
+        'id': str(obj.id),
+        'uri': obj.uri
     }
 
 
@@ -37,13 +45,7 @@ def _company_dict(obj):
 class MapDBModelToDict(object):
     """Helps convert Django models to dictionaries."""
 
-    # there is no typo in 'servicedeliverys' :(
-    IGNORED_FIELDS = (
-        'subsidiaries', 'servicedeliverys', 'investment_projects',
-        'investor_investment_projects', 'intermediate_investment_projects',
-        'investee_projects', 'recipient_investment_projects', 'teams',
-        'tree_id', 'lft', 'rght', 'business_leads', 'interactions',
-    )
+    IGNORED_FIELDS = ()
 
     MAPPINGS = {}
 
@@ -68,7 +70,6 @@ class MapDBModelToDict(object):
         fields = [field for field in dbmodel._meta.get_fields() if field.name not in cls.IGNORED_FIELDS]
 
         obj = {f.name: getattr(dbmodel, f.name) for f in fields if f.name not in result}
-
         result.update(obj.items())
 
         return result
@@ -162,6 +163,12 @@ class Company(DocType, MapDBModelToDict):
         'future_interest_countries': lambda col: [_id_name_dict(c) for c in col.all()],
     }
 
+    IGNORED_FIELDS = (
+        'children', 'servicedeliverys', 'investor_investment_projects',
+        'intermediate_investment_projects', 'investee_projects',
+        'tree_id', 'lft', 'rght', 'business_leads', 'interactions',
+    )
+
     class Meta:
         """Default document meta data."""
 
@@ -201,21 +208,194 @@ class Contact(DocType, MapDBModelToDict):
     contactable_by_email = Boolean()
     contactable_by_phone = Boolean()
     address_country = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
-    adviser = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
-    archived_by = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
+    adviser = Nested(properties={'id': String(index='not_analyzed'),
+                                 'first_name': String(copy_to='adviser.name'),
+                                 'last_name': String(copy_to='adviser.name'),
+                                 'name': String(),
+                                 })  # Adviser
+    archived_by = Nested(properties={'id': String(index='not_analyzed'),
+                                     'first_name': String(copy_to='archived_by.name'),
+                                     'last_name': String(copy_to='archived_by.name'),
+                                     'name': String(),
+                                     })
     company = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
 
     MAPPINGS = {
         'id': str,
         'title': _id_name_dict,
         'address_country': _id_name_dict,
-        'adviser': _id_name_dict,
+        'adviser': _contact_dict,
         'company': _id_name_dict,
         'archived_by': _contact_dict,
     }
+
+    IGNORED_FIELDS = (
+        'interactions', 'servicedeliverys', 'investment_projects',
+    )
 
     class Meta:
         """Default document meta data."""
 
         index = settings.ES_INDEX
         doc_type = 'contact'
+
+
+class InvestmentProject(DocType, MapDBModelToDict):
+    """Elasticsearch representation of InvestmentProject."""
+
+    id = String(index='not_analyzed')
+    approved_commitment_to_invest = Boolean()
+    approved_fdi = Boolean()
+    approved_good_value = Boolean()
+    approved_high_value = Boolean()
+    approved_landed = Boolean()
+    approved_non_fdi = Boolean()
+    actual_land_date = Date()
+    actual_land_date_documents = Nested(properties={
+        'id': String(index='not_analyzed'),
+        'uri': String(index='not_analyzed')
+    })  # Documents
+    business_activities = Nested(properties={
+        'id': String(index='not_analyzed'),
+        'name': String()
+    })  # BusinessActivities
+    client_contacts = Nested(properties={'id': String(index='not_analyzed'),
+                                         'first_name': String(copy_to='client_contacts.name'),
+                                         'last_name': String(copy_to='client_contacts.name'),
+                                         'name': String(),
+                                         })  # ContactArray
+    client_relationship_manager = Nested(properties={
+        'id': String(index='not_analyzed'),
+        'name': String()}
+    )  # Adviser
+    project_manager = Nested(properties={
+        'id': String(index='not_analyzed'),
+        'name': String()}
+    )  # Adviser
+    archived = Boolean()
+    archived_reason = String()
+    archived_by = Nested(properties={'id': String(index='not_analyzed'),
+                                     'first_name': String(copy_to='archived_by.name'),
+                                     'last_name': String(copy_to='archived_by.name'),
+                                     'name': String(),
+                                     })
+    created_on = Date()
+    modified_on = Date()
+    description = String()
+    estimated_land_date = Date()
+    fdi_type = Nested(properties={
+        'id': String(index='not_analyzed'),
+        'name': String()
+    })  # FDIType
+    fdi_type_documents = Nested(properties={
+        'id': String(index='not_analyzed'),
+        'uri': String(index='not_analyzed')
+    })  # Documents
+    intermediate_company = Nested(properties={
+        'id': String(index='not_analyzed'),
+        'name': String()
+    })  # CompanySlim
+    uk_company = Nested(properties={
+        'id': String(index='not_analyzed'),
+        'name': String()
+    })  # CompanySlim
+    investor_company = Nested(properties={
+        'id': String(index='not_analyzed'),
+        'name': String()
+    })  # CompanySlim
+    investment_type = Nested(properties={
+        'id': String(index='not_analyzed'),
+        'name': String()
+    })  # InvestmentType
+    name = String()
+    description = String()
+    r_and_d_budget = Boolean()
+    non_fdi_r_and_d_budget = Boolean()
+    new_tech_to_uk = Boolean()
+    export_revenue = Boolean()
+    site_decided = Boolean()
+    nda_signed = Boolean()
+    government_assistance = Boolean()
+    client_cannot_provide_total_investment = Boolean()
+    total_investment = Double()
+    foreign_equity_investment = Double()
+    number_new_jobs = Integer()
+    non_fdi_type = Nested(properties={
+        'id': String(index='not_analyzed'),
+        'name': String()
+    })  # NonFDIType
+    not_shareable_reason = String()
+    operations_commenced_documents = Nested(properties={
+        'id': String(index='not_analyzed'),
+        'uri': String(index='not_analyzed')
+    })  # Documents
+    phase = Nested(properties={
+        'id': String(index='not_analyzed'),
+        'name': String()
+    })  # Phase
+    project_code = String(index='not_analyzed')
+    project_shareable = Boolean()
+    referral_source_activity = Nested(properties={
+        'id': String(index='not_analyzed'),
+        'name': String()
+    })  # ReferralSourceActivity
+    referral_source_activity_marketing = Nested(properties={
+        'id': String(index='not_analyzed'),
+        'name': String()
+    })  # ReferralSourceActivityMarketing
+    referral_source_activity_website = Nested(properties={
+        'id': String(index='not_analyzed'),
+        'name': String()
+    })  # ReferralSourceActivityWebsite
+    referral_source_activity_event = String()
+    referral_source_advisor = Nested(properties={'id': String(index='not_analyzed'),
+                                                 'first_name': String(copy_to='referral_source_advisor.name'),
+                                                 'last_name': String(copy_to='referral_source_advisor.name'),
+                                                 'name': String(),
+                                                 })  # Adviser
+    sector = Nested(properties={
+        'id': String(index='not_analyzed'),
+        'name': String()
+    })  # Sector
+    average_salary = Nested(properties={
+        'id': String(index='not_analyzed'),
+        'name': String()
+    })  # AverageSalary
+
+    MAPPINGS = {
+        'id': str,
+        'actual_land_date_documents': lambda col: [_id_uri_dict(c) for c in col.all()],
+        'business_activities': lambda col: [_id_name_dict(c) for c in col.all()],
+        'client_contacts': lambda col: [_contact_dict(c) for c in col.all()],
+        'client_relationship_manager': _id_name_dict,
+        'fdi_type': _id_name_dict,
+        'fdi_type_documents': lambda col: [_id_uri_dict(c) for c in col.all()],
+        'intermediate_company': _id_name_dict,
+        'investor_company': _id_name_dict,
+        'uk_company': _id_name_dict,
+        'investment_type': _id_name_dict,
+        'non_fdi_type': _id_name_dict,
+        'operations_commenced_documents': lambda col: [_id_uri_dict(c) for c in col.all()],
+        'phase': _id_name_dict,
+        'referral_source_activity': _id_name_dict,
+        'referral_source_activity_marketing': _id_name_dict,
+        'referral_source_activity_website': _id_name_dict,
+        'referral_source_adviser': _contact_dict,
+        'sector': _id_name_dict,
+        'project_code': str,
+        'average_salary': _id_name_dict,
+        'archived_by': _contact_dict,
+    }
+
+    IGNORED_FIELDS = (
+        'investmentprojectcode', 'competitor_countries',
+        'uk_region_locations', 'strategic_drivers',
+        'client_considering_other_countries', 'cdms_project_code',
+        'interactions', 'documents'
+    )
+
+    class Meta:
+        """Default document meta data."""
+
+        index = settings.ES_INDEX
+        doc_type = 'investment_project'

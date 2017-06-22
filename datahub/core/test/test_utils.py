@@ -2,20 +2,10 @@ from hashlib import sha256
 
 import pytest
 
-from datahub.core.utils import generate_signature, log_and_ignore_exceptions, slice_iterable_into_chunks, \
-    string_to_bytes
+from datahub.core.utils import generate_signature, slice_iterable_into_chunks, string_to_bytes
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
-
-
-def test_log_and_ignore_exceptions():
-    """Ensure that exception does not bubble up."""
-    try:
-        with log_and_ignore_exceptions():
-            raise Exception('test')
-    except:  # noqa: B901;
-        pytest.fail('Should not happen!')
 
 
 data = (
@@ -49,5 +39,5 @@ def test_slice_iterable_into_chunks():
     """Test slice iterable into chunks."""
     size = 10
     iterable = range(100)
-    chunks = list(slice_iterable_into_chunks(iterable, size))
+    chunks = list(slice_iterable_into_chunks(iterable, size, lambda x: x))
     assert len(chunks) == 10

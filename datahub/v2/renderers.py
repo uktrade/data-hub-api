@@ -23,7 +23,7 @@ class JSONRenderer(renderers.JSONRenderer):
 
     def render_errors(self, data, accepted_media_type=None, renderer_context=None):
         """Handle the errors rendering."""
-        return super(JSONRenderer, self).render(
+        return super().render(
             data, accepted_media_type, renderer_context
         )
 
@@ -45,7 +45,7 @@ class JSONRenderer(renderers.JSONRenderer):
             render_data['links'] = data.links
         if data.status:  # 201
             response.status_code = data.status
-        return super(JSONRenderer, self).render(
+        return super().render(
             render_data, accepted_media_type, renderer_context
         )
 

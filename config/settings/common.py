@@ -51,6 +51,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'datahub.core',
     'datahub.company',
+    'datahub.documents',
     'datahub.interaction',
     'datahub.investment',
     'datahub.leads',
@@ -149,7 +150,7 @@ REST_FRAMEWORK = {
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
-    'DEFAULT_AUTHENTICATION_CLASSES': ['oauth2_provider.ext.rest_framework.OAuth2Authentication'],
+    'DEFAULT_AUTHENTICATION_CLASSES': ['oauth2_provider.contrib.rest_framework.OAuth2Authentication'],
     'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],
 }
 
@@ -168,4 +169,5 @@ CDMS_AUTH_URL = env('CDMS_AUTH_URL')
 CDMS_TEXT_MAX_LENGTH = 4000
 CHAR_FIELD_MAX_LENGTH = 255
 HEROKU = False
-BULK_CREATE_BATCH_SIZE = env.int('BULK_CREATE_BATCH_SIZE', default=50000)
+BULK_CREATE_BATCH_SIZE = env.int('BULK_CREATE_BATCH_SIZE', default=5000)
+DOCUMENTS_BUCKET = env('DOCUMENTS_BUCKET')
