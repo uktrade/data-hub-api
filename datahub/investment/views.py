@@ -46,47 +46,6 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         return 'Investment projects'
 
 
-class IProjectUnifiedViewSet(ArchivableViewSetMixin, CoreViewSetV3):
-    """Unified investment project views.
-
-    This replaces the previous project, value, team and requirements endpoints.
-    """
-
-    serializer_class = IProjectUnifiedSerializer
-    queryset = InvestmentProject.objects.select_related(
-        'archived_by',
-        'investment_type',
-        'phase',
-        'investor_company',
-        'intermediate_company',
-        'client_relationship_manager',
-        'referral_source_adviser',
-        'referral_source_activity',
-        'referral_source_activity_website',
-        'referral_source_activity_marketing',
-        'fdi_type',
-        'non_fdi_type',
-        'sector',
-        'average_salary',
-        'project_manager',
-        'project_manager__dit_team',
-        'project_assurance_adviser',
-        'project_assurance_adviser__dit_team'
-    ).prefetch_related(
-        'client_contacts',
-        'business_activities',
-        'competitor_countries',
-        'uk_region_locations',
-        'strategic_drivers',
-    )
-    filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('investor_company_id',)
-
-    def get_view_name(self):
-        """Returns the view set name for the DRF UI."""
-        return 'Investment projects'
-
-
 class IProjectAuditViewSet(CoreViewSetV3):
     """Investment Project audit views."""
 
@@ -153,3 +112,44 @@ class IProjectTeamViewSet(CoreViewSetV3):
     def get_view_name(self):
         """Returns the view set name for the DRF UI."""
         return 'Investment project teams'
+
+
+class IProjectUnifiedViewSet(ArchivableViewSetMixin, CoreViewSetV3):
+    """Unified investment project views.
+
+    This replaces the previous project, value, team and requirements endpoints.
+    """
+
+    serializer_class = IProjectUnifiedSerializer
+    queryset = InvestmentProject.objects.select_related(
+        'archived_by',
+        'investment_type',
+        'phase',
+        'investor_company',
+        'intermediate_company',
+        'client_relationship_manager',
+        'referral_source_adviser',
+        'referral_source_activity',
+        'referral_source_activity_website',
+        'referral_source_activity_marketing',
+        'fdi_type',
+        'non_fdi_type',
+        'sector',
+        'average_salary',
+        'project_manager',
+        'project_manager__dit_team',
+        'project_assurance_adviser',
+        'project_assurance_adviser__dit_team'
+    ).prefetch_related(
+        'client_contacts',
+        'business_activities',
+        'competitor_countries',
+        'uk_region_locations',
+        'strategic_drivers',
+    )
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('investor_company_id',)
+
+    def get_view_name(self):
+        """Returns the view set name for the DRF UI."""
+        return 'Investment projects'
