@@ -4,7 +4,7 @@ from django.contrib import admin
 
 from reversion.admin import VersionAdmin
 
-from datahub.investment.models import (InvestmentProject)
+from datahub.investment.models import (InvestmentProject, IProjectDocument)
 
 
 @admin.register(InvestmentProject)
@@ -23,3 +23,21 @@ class InvestmentProjectAdmin(VersionAdmin):
         'project_assurance_adviser',
         'uk_company'
     )
+
+
+@admin.register(IProjectDocument)
+class IProjectDocumentAdmin(admin.ModelAdmin):
+    """Investment project document admin."""
+
+    list_display = (
+        'id', 'doc_type', 'filename'
+    )
+    list_filter = (
+        'doc_type',
+    )
+    raw_id_fields = (
+        'archived_by',
+        'project',
+        'document',
+    )
+    date_hierarchy = 'created_on'

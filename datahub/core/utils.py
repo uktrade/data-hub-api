@@ -3,6 +3,7 @@ from itertools import islice
 from logging import getLogger
 from urllib.parse import urlparse
 
+import boto3
 import requests
 
 logger = getLogger(__name__)
@@ -49,3 +50,24 @@ def slice_iterable_into_chunks(iterable, batch_size, obj_creator):
         if not objects:
             break
         yield objects
+
+
+def get_s3_client():
+    """Get S3 client singleton."""
+    s3 = getattr(get_s3_client, 's3_instance', None)
+    if not s3:
+        get_s3_client.s3_instance = s3 = boto3.client('s3')
+
+    return s3
+
+
+def sign_s3_url(bucket_name, path, method='get_object', expires=3600):
+    """Sign s3 url using global config, and given expiry in seconds."""
+    return get_s3_client().generate_presigned_url(
+        ClientMethod=method,
+        Params={
+            'Bucket': bucket_name,
+            'Key': path,
+        },
+        ExpiresIn=expires,
+    )
