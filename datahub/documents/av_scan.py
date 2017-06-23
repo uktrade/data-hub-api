@@ -69,3 +69,8 @@ def init_document_av_scan(doc_pk: str):
         doc.scanned_on = now()
         doc.av_clean = response.content == 'OK'
         doc.save()
+    else:
+        logger.error(
+            f'Unexpected response form AV Service status={response.status_code}'
+            f' content={response.content}'
+        )
