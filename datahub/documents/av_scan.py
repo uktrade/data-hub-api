@@ -1,8 +1,8 @@
 import requests
 from django.conf import settings
 from django.utils.timezone import now
-from rest_framework import status
 from requests_toolbelt.multipart.encoder import MultipartEncoder
+from rest_framework import status
 
 from datahub.documents.models import Document
 
@@ -58,7 +58,7 @@ def init_document_av_scan(doc_pk: str):
 
     if response.status_code == status.HTTP_200_OK:
         doc.scanned_on = now()
-        doc.av_clean = response.content == "OK"
+        doc.av_clean = response.content == 'OK'
         doc.save()
 
     return response
