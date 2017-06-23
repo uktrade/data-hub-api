@@ -29,8 +29,7 @@ class ArchivableViewSetMixin:
         serializer = self.get_serializer_class()(obj)
         return Response(data=serializer.data)
 
-    # TODO: Remove GET method from this route
-    @detail_route(methods=['get', 'post'])
+    @detail_route(methods=['post'])
     def unarchive(self, request, pk):
         """Unarchive the object."""
         obj = self.get_object()
