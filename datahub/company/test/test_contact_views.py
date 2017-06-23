@@ -362,6 +362,7 @@ class ArchiveContactTestCase(LeelooTestCase):
         url = reverse('api-v3:contact:archive', kwargs={'pk': contact.pk})
         response = self.api_client.post(url, {'reason': 'foo'})
 
+        assert response.status_code == status.HTTP_200_OK
         assert response.data['archived']
         assert response.data['archived_by'] == {
             'id': str(self.user.pk),
@@ -377,10 +378,19 @@ class ArchiveContactTestCase(LeelooTestCase):
         url = reverse('api-v3:contact:unarchive', kwargs={'pk': contact.pk})
         response = self.api_client.post(url)
 
+        assert response.status_code == status.HTTP_200_OK
         assert not response.data['archived']
         assert not response.data['archived_by']
         assert response.data['archived_reason'] == ''
         assert response.data['id'] == contact.pk
+
+    def test_unarchive_wrong_method(self):
+        """Tests that GET requests to the unarchive endpoint fail."""
+        contact = ContactFactory(archived=True, archived_reason='foo')
+        url = reverse('api-v3:contact:unarchive', kwargs={'pk': contact.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
 class ViewContactTestCase(LeelooTestCase):

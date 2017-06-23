@@ -270,6 +270,14 @@ class CompanyTestCase(LeelooTestCase):
         assert response.data['archived_reason'] == ''
         assert response.data['id'] == str(company.id)
 
+    def test_unarchive_wrong_method(self):
+        """Tests that GET requests to the unarchive endpoint fail."""
+        company = CompanyFactory(archived=True, archived_on=now(), archived_reason='foo')
+        url = reverse('api-v1:company-unarchive', kwargs={'pk': company.id})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
 
 class CHCompanyTestCase(LeelooTestCase):
     """Companies house company test case."""
