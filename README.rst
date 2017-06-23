@@ -162,8 +162,7 @@ Leeloo can run on any Heroku style platform. These environment variables MUST be
 - DJANGO_SENTRY_DSN
 - DJANGO_SETTINGS_MODULE
 - BULK_CREATE_BATCH_SIZE (default=5000)
-- ES_HOST
-- ES_PORT
+- ES_URL
 - ES_INDEX
 - AWS_ACCESS_KEY_ID
 - AWS_SECRET_ACCESS_KEY
