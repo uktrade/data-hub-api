@@ -11,24 +11,11 @@ from elasticsearch_dsl.query import Match, MatchPhrase, Q
 
 def configure_connection():
     """Configure Elasticsearch default connection."""
-    if settings.HEROKU:
-        url_parts: ParseResult = urlparse(settings.ES_HOST)
-
-        connections.configure(
-            default={
-                'host': url_parts.hostname,
-                'port': settings.ES_PORT,
-                'use_ssl': True,
-                'http_auth': (url_parts.username, url_parts.password)
-            }
-        )
-    else:
-        connections.configure(
-            default={
-                'host': settings.ES_HOST,
-                'port': settings.ES_PORT
-            }
-        )
+    connections.configure(
+        default={
+            'hosts': [settings.ES_URL]
+        }
+    )
 
 
 def get_search_term_query(term):
