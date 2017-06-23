@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 from hashlib import sha256
 from itertools import islice
 from logging import getLogger
@@ -6,6 +7,7 @@ from urllib.parse import urlparse
 import boto3
 import requests
 
+executor = ThreadPoolExecutor()
 logger = getLogger(__name__)
 
 

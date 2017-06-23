@@ -1,10 +1,13 @@
 """Investment views."""
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status
 from rest_framework.response import Response
 
 from datahub.core.mixins import ArchivableViewSetMixin
+from datahub.core.utils import executor
 from datahub.core.viewsets import CoreViewSetV3
+from datahub.documents.av_scan import init_document_av_scan
 from datahub.investment.models import InvestmentProject, IProjectDocument
 from datahub.investment.serializers import (
     IProjectAuditSerializer, IProjectDocumentSerializer, IProjectRequirementsSerializer,
@@ -136,6 +139,22 @@ class IProjectDocumentViewSet(CoreViewSetV3):
         response.data['signed_upload_url'] = document.signed_upload_url
 
         return response
+
+    def upload_complete_callback(self, request, *args, **kwargs):
+        """File upload done callback."""
+        doc = self.get_object()
+        if request.data.get('status', None) != 'success':
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        executor.submit(init_document_av_scan, str(doc.pk))
+
+        return Response(
+            status=status.HTTP_200_OK,
+            content_type='application/json',
+            data={
+                'status': 'accepted',
+            },
+        )
 
     def get_object(self):
         """Ensures that object lookup honors the project pk."""
