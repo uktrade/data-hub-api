@@ -8,7 +8,7 @@ djangorestframework==3.6.3
 django-environ==0.4.3
 django-extensions==1.7.9
 django-filter==1.0.4
-django-reversion==2.0.8
+django-reversion==2.0.9
 django-pglocks==1.0.2
 django-model-utils==3.0.0
 django-mptt==0.8.7  # Remove after squashing migrations
@@ -56,4 +56,4 @@ pydocstyle==2.0.0
 
 gunicorn==19.7.1
 raven==6.1.0
-requests==2.17.3
+requests==2.18.1
