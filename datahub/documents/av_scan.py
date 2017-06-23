@@ -1,3 +1,5 @@
+from logging import getLogger
+
 import requests
 from django.conf import settings
 from django.utils.timezone import now
@@ -5,6 +7,8 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 from rest_framework import status
 
 from datahub.documents.models import Document
+
+logger = getLogger(__name__)
 
 
 class S3StreamingBodyWrapper:
@@ -30,6 +34,11 @@ class S3StreamingBodyWrapper:
 
 def init_document_av_scan(doc_pk: str):
     """Stream file to the AV service."""
+    if not settings.AV_SERVICE_URL:
+        logger.warning(f'Ignoring AV scan of file=UUID={doc_pk}; '
+                       'No AV service URL configured')
+        return
+
     doc = Document.objects.get(pk=doc_pk)
     doc.scan_initiated_on = now()
     doc.save()
@@ -60,5 +69,3 @@ def init_document_av_scan(doc_pk: str):
         doc.scanned_on = now()
         doc.av_clean = response.content == 'OK'
         doc.save()
-
-    return response
