@@ -1,5 +1,5 @@
-import re
 from collections import defaultdict
+from urllib.parse import ParseResult, urlparse  # noqa: F401
 
 import dateutil.parser
 from django.conf import settings
@@ -12,16 +12,14 @@ from elasticsearch_dsl.query import Match, MatchPhrase, Q
 def configure_connection():
     """Configure Elasticsearch default connection."""
     if settings.HEROKU:
-        bonsai = settings.ES_HOST
-        auth = re.search('https\:\/\/(.*)\@', bonsai).group(1).split(':')
-        host = bonsai.replace('https://%s:%s@' % (auth[0], auth[1]), '')
+        url_parts: ParseResult = urlparse(settings.ES_HOST)
 
         connections.configure(
             default={
-                'host': host,
+                'host': url_parts.hostname,
                 'port': settings.ES_PORT,
                 'use_ssl': True,
-                'http_auth': (auth[0], auth[1])
+                'http_auth': (url_parts.username, url_parts.password)
             }
         )
     else:
