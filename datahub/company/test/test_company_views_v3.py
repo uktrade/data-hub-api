@@ -327,6 +327,7 @@ class CompanyTestCase(LeelooTestCase):
         url = reverse('api-v3:company:archive', kwargs={'pk': company.id})
         response = self.api_client.post(url, {'reason': 'foo'}, format='json')
 
+        assert response.status_code == status.HTTP_200_OK
         assert response.data['archived']
         assert response.data['archived_reason'] == 'foo'
         assert response.data['id'] == str(company.id)
@@ -339,6 +340,7 @@ class CompanyTestCase(LeelooTestCase):
         url = reverse('api-v3:company:unarchive', kwargs={'pk': company.id})
         response = self.api_client.post(url)
 
+        assert response.status_code == status.HTTP_200_OK
         assert not response.data['archived']
         assert response.data['archived_reason'] == ''
         assert response.data['id'] == str(company.id)
