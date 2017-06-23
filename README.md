@@ -13,27 +13,37 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
 
 1.  Clone the repository:
 
-        git clone https://github.com/uktrade/data-hub-leeloo
-        cd data-hub-leeloo
+    ```shell
+    git clone https://github.com/uktrade/data-hub-leeloo
+    cd data-hub-leeloo
+    ```
 
 2.  Build and run the necessary containers for the required environment:
 
-        docker-compose build
+    ```shell
+    docker-compose build
+    ```
 
 3.  Populate the db:
 
-        docker-compose run leeloo python manage.py migrate
-        docker-compose run leeloo python manage.py loaddata /app/fixtures/metadata.yaml
-        docker-compose run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml
-        docker-compose run leeloo python manage.py createinitialrevisions
+    ```shell
+    docker-compose run leeloo python manage.py migrate
+    docker-compose run leeloo python manage.py loaddata /app/fixtures/metadata.yaml
+    docker-compose run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml
+    docker-compose run leeloo python manage.py createinitialrevisions
+    ```
 
 4.  Create a superuser:
 
-        docker-compose run leeloo python manage.py createsuperuser
+    ```shell
+    docker-compose run leeloo python manage.py createsuperuser
+    ```
 
 5.  Run the services:
 
-        docker-compose up
+    ```shell
+    docker-compose up
+    ```
 
 6.  To set up the [data hub frontend app](https://github.com/uktrade/data-hub-fe-beta2), log into the [django admin](http://localhost:8000/admin/oauth2_provider/application/) and add a new oauth application with:
 
@@ -47,12 +57,16 @@ Local development with Docker
 
 To run the tests:
 
-    docker-compose run leeloo bash tests.sh
-    docker-compose run leeloo bash tests-auth.sh
+```shell
+docker-compose run leeloo bash tests.sh
+docker-compose run leeloo bash tests-auth.sh
+```
 
 To run the linter:
 
-    docker-compose run leeloo flake8
+```shell
+docker-compose run leeloo flake8
+```
 
 Native installation (without Docker)
 ====================================
@@ -64,45 +78,61 @@ Dependencies:
 
 1.  Clone the repository:
 
-        git clone https://github.com/uktrade/data-hub-leeloo
-        cd data-hub-leeloo
+    ```shell
+    git clone https://github.com/uktrade/data-hub-leeloo
+    cd data-hub-leeloo
+    ```
 
 2.  Install `virtualenv` if you don’t have it already:
 
-        pip install virtualenv
+    ```shell
+    pip install virtualenv
+    ```
 
 3.  Create and activate the virtualenv:
 
-        virtualenv --python=python3 env
-        source env/bin/activate
-        pip install -U pip
+    ```shell
+    virtualenv --python=python3 env
+    source env/bin/activate
+    pip install -U pip
+    ```
 
 4.  Install the dependencies:
 
-        pip install -r requirements.txt
+    ```shell
+    pip install -r requirements.txt
+    ```
 
 5.  Create an `.env` settings file (it’s gitignored by default):
 
-        cp config/settings/sample.env config/settings/.env
+    ```shell
+    cp config/settings/sample.env config/settings/.env
+    ```
 
 6.  Set `DOCKER_DEV=False` in `.env`
 7.  Create the db. By default, the dev version uses postgres:
 
-        psql -p5432
-        create database datahub;
+    ```shell
+    psql -p5432
+    create database datahub;
+    ```
 
 8.  Configure and populate the db:
 
-        ./manage.py migrate
-        ./manage.py createsuperuser
-
-        ./manage.py loaddata fixtures/metadata.yaml
-        ./manage.py loaddata fixtures/datahub_businesstypes.yaml
-        ./manage.py createinitialrevisions
+    ```shell
+    ./manage.py migrate
+    ./manage.py createsuperuser
+    
+    ./manage.py loaddata fixtures/metadata.yaml
+    ./manage.py loaddata fixtures/datahub_businesstypes.yaml
+    ./manage.py createinitialrevisions
+    ```
 
 9.  Start the server:
 
-        ./manage.py runserver
+    ```shell
+    ./manage.py runserver
+    ```
 
 10. To set up the [data hub frontend app](https://github.com/uktrade/data-hub-fe-beta2), log into the [django admin](http://localhost:8000/admin/oauth2_provider/application/) and add a new oauth application with:
 
@@ -116,12 +146,16 @@ Local development (without Docker)
 
 To run the tests:
 
-    bash tests.sh
-    bash tests-auth.sh
+```shell
+bash tests.sh
+bash tests-auth.sh
+```
 
 To run the linter:
 
-    flake8
+```shell
+flake8
+```
 
 Heroku
 ======
@@ -147,24 +181,34 @@ Management commands
 
 Enable users to login:
 
-    docker-compose run leeloo python manage.py manageusers test@bar.com foo@bar.com --enable
+```shell
+docker-compose run leeloo python manage.py manageusers test@bar.com foo@bar.com --enable
+```
 
 Disable users to login:
 
-    docker-compose run leeloo python manage.py manageusers test@bar.com foo@bar.com --disable
+```shell
+docker-compose run leeloo python manage.py manageusers test@bar.com foo@bar.com --disable
+```
 
 Apply migrations:
 
-    docker-compose run leeloo python manage.py migrate
+```shell
+docker-compose run leeloo python manage.py migrate
+```
 
 If the database is freshly built or a new versioned model is added run:
 
-    docker-compose run leeloo python manage.py createinitialrevisions
+```shell
+docker-compose run leeloo python manage.py createinitialrevisions
+```
 
 Load metadata:
 
-    docker-compose run leeloo python manage.py loaddata /app/fixtures/metadata.yaml
-    docker-compose run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml
+```shell
+docker-compose run leeloo python manage.py loaddata /app/fixtures/metadata.yaml
+docker-compose run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml
+```
 
 Dependencies
 ============
@@ -173,7 +217,9 @@ Direct dependencies are specified in `requirements.in`. `requirements.txt` is a 
 
 To update the lock file and indirect dependencies, run:
 
-    pip-compile --upgrade --output-file requirements.txt requirements.in
+```shell
+pip-compile --upgrade --output-file requirements.txt requirements.in
+```
 
 This must be run whenever `requirements.in` is edited.
 
