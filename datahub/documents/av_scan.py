@@ -35,21 +35,28 @@ class S3StreamingBodyWrapper:
         return self._remaining_bytes
 
 
-def init_document_av_scan(doc_pk: str):
-    """Stream file to the AV service."""
+def virus_scan_document(document_pk: str):
+    """Virus scans an uploaded document.
+
+    This is intended to be run in the thread pool executor. The file is streamed from S3 to the
+    anti-virus service.
+
+    Any errors are logged and sent to Sentry.
+    """
     try:
-        _process_document(doc_pk)
+        _process_document(document_pk)
     except Exception:
         logger.exception('Error virus scanning document')
         client.captureException()
 
 
-def _process_document(doc_pk: str):
+def _process_document(document_pk: str):
+    """Virus scans an uploaded document."""
     if not settings.AV_SERVICE_URL:
-        raise VirusScanException(f'Cannot scan document with ID {doc_pk}; AV service URL not'
+        raise VirusScanException(f'Cannot scan document with ID {document_pk}; AV service URL not'
                                  f'configured')
 
-    doc = Document.objects.get(pk=doc_pk)
+    doc = Document.objects.get(pk=document_pk)
     doc.scan_initiated_on = now()
     doc.save()
 
@@ -61,6 +68,7 @@ def _process_document(doc_pk: str):
 
 
 def _scan_s3_object(original_filename, bucket, key):
+    """Virus scans a file stored in S3."""
     s3_client = get_s3_client()
     response = s3_client.get_object(Bucket=bucket, Key=key)
     with closing(response['Body']):
@@ -70,6 +78,7 @@ def _scan_s3_object(original_filename, bucket, key):
 
 
 def _scan_raw_file(filename, file_object, content_type):
+    """Virus scans a file-like object."""
     multipart_fields = {
         'file': (
             filename,
