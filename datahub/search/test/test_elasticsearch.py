@@ -304,34 +304,13 @@ def test_bulk(connections, es_bulk):
 @mock.patch('datahub.search.elasticsearch.settings')
 @mock.patch('datahub.search.elasticsearch.connections')
 def test_configure_connection(connections, settings):
-    """Tests if connection is configured."""
-    settings.HEROKU = False
-    settings.ES_HOST = 'test'
-    settings.ES_PORT = 1234
-    connections.configure.return_value = {}
-
-    elasticsearch.configure_connection()
-
-    connections.configure.assert_called_with(default={
-        'host': settings.ES_HOST,
-        'port': settings.ES_PORT,
-    })
-
-
-@mock.patch('datahub.search.elasticsearch.settings')
-@mock.patch('datahub.search.elasticsearch.connections')
-def test_configure_connection_with_heroku(connections, settings):
     """Tests if Heroku connection is configured."""
     settings.HEROKU = True
-    settings.ES_HOST = 'https://login:password@test'
-    settings.ES_PORT = 1234
+    settings.ES_URL = 'https://login:password@test:1234'
     connections.configure.return_value = {}
 
     elasticsearch.configure_connection()
 
     connections.configure.assert_called_with(default={
-        'host': 'test',
-        'port': settings.ES_PORT,
-        'use_ssl': True,
-        'http_auth': ('login', 'password')
+        'hosts': [settings.ES_URL]
     })
