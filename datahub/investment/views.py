@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.utils import executor
 from datahub.core.viewsets import CoreViewSetV3
-from datahub.documents.av_scan import init_document_av_scan
+from datahub.documents.av_scan import virus_scan_document
 from datahub.investment.models import InvestmentProject, IProjectDocument
 from datahub.investment.serializers import (
     IProjectAuditSerializer, IProjectDocumentSerializer, IProjectRequirementsSerializer,
@@ -195,7 +195,7 @@ class IProjectDocumentViewSet(CoreViewSetV3):
         if request.data.get('status', None) != 'success':
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        executor.submit(init_document_av_scan, str(doc.pk))
+        executor.submit(virus_scan_document, str(doc.pk))
 
         return Response(
             status=status.HTTP_200_OK,
