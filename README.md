@@ -4,7 +4,7 @@
 [![Code Health](https://landscape.io/github/uktrade/data-hub-leeloo/master/landscape.svg?style=flat)](https://landscape.io/github/uktrade/data-hub-leeloo/master)
 [![Updates](https://pyup.io/repos/github/uktrade/data-hub-leeloo/shield.svg)](https://pyup.io/repos/github/uktrade/data-hub-leeloo/)
 
-Leeloo provides an API into Datahub for Datahub clients. Using Leeloo you can search for entities and manage companies, contacts and interactions.
+Leeloo provides an API into Data Hub for Data Hub clients. Using Leeloo you can search for entities and manage companies, contacts and interactions.
 
 Installation with Docker
 ========================
@@ -178,13 +178,13 @@ Leeloo can run on any Heroku style platform. These environment variables MUST be
 Management commands
 ===================
 
-Enable users to login:
+Enable CDMS login for users (use this to let a CDMS user log in):
 
 ```shell
 docker-compose run leeloo python manage.py manageusers test@bar.com foo@bar.com --enable
 ```
 
-Disable users to login:
+Disable CDMS login for users:
 
 ```shell
 docker-compose run leeloo python manage.py manageusers test@bar.com foo@bar.com --disable
