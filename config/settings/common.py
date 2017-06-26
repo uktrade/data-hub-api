@@ -161,8 +161,7 @@ REST_FRAMEWORK = {
 APPEND_SLASH = False
 
 # Leeloo stuff
-ES_HOST = env('ES_HOST')
-ES_PORT = env.int('ES_PORT')
+ES_URL = env('ES_URL')
 ES_INDEX = env('ES_INDEX')
 DATAHUB_SECRET = env('DATAHUB_SECRET')
 CDMS_AUTH_URL = env('CDMS_AUTH_URL')
