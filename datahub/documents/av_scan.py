@@ -1,3 +1,4 @@
+from contextlib import closing
 from logging import getLogger
 
 import requests
@@ -44,17 +45,17 @@ def init_document_av_scan(doc_pk: str):
     doc.save()
 
     s3_obj = doc.get_s3_object()
-    encoder = MultipartEncoder(
-        fields={
-            'file': (
-                doc.filename,
-                S3StreamingBodyWrapper(s3_obj),
-                s3_obj['ContentType'],
-            )
-        }
-    )
+    with closing(s3_obj['Body']):
+        encoder = MultipartEncoder(
+            fields={
+                'file': (
+                    doc.filename,
+                    S3StreamingBodyWrapper(s3_obj),
+                    s3_obj['ContentType'],
+                )
+            }
+        )
 
-    try:
         response = requests.post(
             # Assumes HTTP Basic auth in URL
             # see: https://github.com/uktrade/dit-clamav-rest
@@ -62,8 +63,6 @@ def init_document_av_scan(doc_pk: str):
             data=encoder,
             headers={'Content-Type': encoder.content_type},
         )
-    finally:
-        s3_obj['Body'].close()
 
     if response.status_code == status.HTTP_200_OK:
         doc.scanned_on = now()
