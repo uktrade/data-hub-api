@@ -21,10 +21,10 @@ def configure_connection():
 def get_search_term_query(term):
     """Returns search term query."""
     return Q('bool', should=[
-        MatchPhrase(name={'query': term, 'boost': 2}),
-        MatchPhrase(_all={'query': term, 'boost': 1.5}),
-        Match(name={'query': term, 'boost': 1.0}),
-        Match(_all={'query': term, 'boost': 0.5}),
+        MatchPhrase(name={'query': term, 'slop': 200}),
+        Match(name={'query': term}),
+        MatchPhrase(_all={'query': term}),
+        Match(_all={'query': term}),
     ])
 
 
