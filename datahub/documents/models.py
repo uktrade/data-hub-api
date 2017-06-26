@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db import models
 
 from datahub.core.models import ArchivableModel, BaseModel
-from datahub.core.utils import get_s3_client, sign_s3_url
+from datahub.core.utils import sign_s3_url
 
 
 class Document(BaseModel, ArchivableModel):
@@ -48,12 +48,15 @@ class Document(BaseModel, ArchivableModel):
             settings.DOCUMENTS_BUCKET, self.path, method='put_object',
         )
 
-    def get_s3_object(self):
-        """Return S3 object representing this document."""
-        return get_s3_client().get_object(
-            Bucket=settings.DOCUMENTS_BUCKET,
-            Key=self.path,
-        )
+    @property
+    def s3_bucket(self):
+        """The S3 bucket where this document is stored."""
+        return settings.DOCUMENTS_BUCKET
+
+    @property
+    def s3_key(self):
+        """The S3 key corresponding to this bucket."""
+        return self.path
 
     def __str__(self):
         """String repr."""
