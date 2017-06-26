@@ -7,6 +7,7 @@ from django.utils.timezone import now
 from raven.contrib.django.raven_compat.models import client
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
+from datahub.core.exceptions import DataHubException
 from datahub.core.utils import get_s3_client
 from datahub.documents.models import Document
 
@@ -45,9 +46,8 @@ def init_document_av_scan(doc_pk: str):
 
 def _process_document(doc_pk: str):
     if not settings.AV_SERVICE_URL:
-        logger.warning(f'Ignoring AV scan of file=UUID={doc_pk}; '
-                       'No AV service URL configured')
-        return
+        raise VirusScanException(f'Cannot scan document with ID {doc_pk}; AV service URL not'
+                                 f'configured')
 
     doc = Document.objects.get(pk=doc_pk)
     doc.scan_initiated_on = now()
@@ -88,5 +88,9 @@ def _scan_raw_file(filename, file_object, content_type):
     )
     response.raise_for_status()
     if response.text not in ('OK', 'NOTOK'):
-        raise ValueError(f'Unexpected response from AV service: {response.content}')
+        raise VirusScanException(f'Unexpected response from AV service: {response.content}')
     return response.text == 'OK'
+
+
+class VirusScanException(DataHubException):
+    """Exceptions raised when scanning documents for viruses."""
