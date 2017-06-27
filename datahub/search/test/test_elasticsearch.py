@@ -15,28 +15,25 @@ def test_get_search_term_query():
                     'match_phrase': {
                         'name': {
                             'query': 'hello',
-                            'boost': 2
-                        }
-                    }
-                }, {
-                    'match_phrase': {
-                        '_all': {
-                            'query': 'hello',
-                            'boost': 1.5
+                            'slop': 200
                         }
                     }
                 }, {
                     'match': {
                         'name': {
                             'query': 'hello',
-                            'boost': 1.0
+                        }
+                    }
+                }, {
+                    'match_phrase': {
+                        '_all': {
+                            'query': 'hello',
                         }
                     }
                 }, {
                     'match': {
                         '_all': {
                             'query': 'hello',
-                            'boost': 0.5
                         }
                     }
                 }
@@ -57,28 +54,25 @@ def test_get_basic_search_query():
                         'match_phrase': {
                             'name': {
                                 'query': 'test',
-                                'boost': 2
-                            }
-                        }
-                    }, {
-                        'match_phrase': {
-                            '_all': {
-                                'query': 'test',
-                                'boost': 1.5
+                                'slop': 200
                             }
                         }
                     }, {
                         'match': {
                             'name': {
                                 'query': 'test',
-                                'boost': 1.0
+                            }
+                        }
+                    }, {
+                        'match_phrase': {
+                            '_all': {
+                                'query': 'test',
                             }
                         }
                     }, {
                         'match': {
                             '_all': {
                                 'query': 'test',
-                                'boost': 0.5
                             }
                         }
                     }
@@ -145,28 +139,25 @@ def test_search_by_entity_query():
                                     'match_phrase': {
                                         'name': {
                                             'query': 'test',
-                                            'boost': 2
-                                        }
-                                    }
-                                }, {
-                                    'match_phrase': {
-                                        '_all': {
-                                            'query': 'test',
-                                            'boost': 1.5
+                                            'slop': 200
                                         }
                                     }
                                 }, {
                                     'match': {
                                         'name': {
                                             'query': 'test',
-                                            'boost': 1.0
+                                        }
+                                    }
+                                }, {
+                                    'match_phrase': {
+                                        '_all': {
+                                            'query': 'test',
                                         }
                                     }
                                 }, {
                                     'match': {
                                         '_all': {
                                             'query': 'test',
-                                            'boost': 0.5
                                         }
                                     }
                                 }
