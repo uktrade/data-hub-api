@@ -32,7 +32,11 @@ class S3StreamingBodyWrapper:
         return content
 
     def __len__(self):
-        """Return remaining bytes, that have not been read yet."""
+        """Return remaining bytes, that have not been read yet.
+
+        requests-toolbelt expects this to return the number of unread bytes (rather than
+        the total length of the stream).
+        """
         return self._remaining_bytes
 
 
