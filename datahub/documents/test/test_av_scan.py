@@ -42,3 +42,21 @@ def test_virus_scan_document_clean(s3_stubber, requests_stubber):
     av_scan.virus_scan_document(str(document.id))
     document.refresh_from_db()
     assert document.av_clean is True
+
+
+def test_virus_scan_document_infected(s3_stubber, requests_stubber):
+    """Tests virus scanning a clean file."""
+    s3_response = {
+        'Body': BytesIO(b'123456'),
+        'ContentLength': 6,
+        'ContentType': 'text/plain'
+    }
+    document = DocumentFactory()
+    s3_stubber.add_response('get_object', s3_response, expected_params={
+        'Bucket': document.s3_bucket, 'Key': document.s3_key
+    })
+    requests_stubber.post('http://av-service/', text='NOTOK')
+
+    av_scan.virus_scan_document(str(document.id))
+    document.refresh_from_db()
+    assert document.av_clean is False
