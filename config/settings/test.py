@@ -10,3 +10,5 @@ INSTALLED_APPS.remove('datahub.search.apps.SearchConfig')
 INSTALLED_APPS.append('datahub.search')
 
 ES_INDEX = 'test'
+DOCUMENT_BUCKET='test-bucket'
+AV_SERVICE_URL='http://av-service/'
