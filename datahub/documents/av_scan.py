@@ -4,6 +4,7 @@ from logging import getLogger
 import requests
 from django.conf import settings
 from django.utils.timezone import now
+from django_pglocks import advisory_lock
 from raven.contrib.django.raven_compat.models import client
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
@@ -44,7 +45,8 @@ def virus_scan_document(document_pk: str):
     Any errors are logged and sent to Sentry.
     """
     try:
-        _process_document(document_pk)
+        with advisory_lock(f'av-scan-{document_pk}'):
+            _process_document(document_pk)
     except Exception:
         logger.exception('Error virus scanning document')
         client.captureException()
@@ -57,6 +59,12 @@ def _process_document(document_pk: str):
                                  f'configured')
 
     doc = Document.objects.get(pk=document_pk)
+    if doc.scan_initiated_on is not None:
+        warn_msg = f'Skipping scan of doc:{document_pk}, scan already initiated'
+        logger.warning(warn_msg)
+        client.captureMessage(warn_msg)
+        return
+
     doc.scan_initiated_on = now()
     doc.save()
 
