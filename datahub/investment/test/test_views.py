@@ -2,6 +2,7 @@
 
 import re
 from datetime import datetime
+from unittest.mock import patch
 
 import pytest
 import reversion
@@ -12,6 +13,8 @@ from datahub.company.test.factories import (AdviserFactory, CompanyFactory,
                                             ContactFactory)
 from datahub.core import constants
 from datahub.core.test_utils import LeelooTestCase
+from datahub.core.utils import executor
+from datahub.documents.av_scan import virus_scan_document
 from datahub.investment import views
 from datahub.investment.models import IProjectDocument
 from datahub.investment.test.factories import InvestmentProjectFactory
@@ -1302,6 +1305,38 @@ class ArchiveViewsTestCase(LeelooTestCase):
         assert response.data['doc_type'] == 'fdi_type'
         assert response.data['filename'] == 'test.txt'
         assert 'signed_url' in response.data
+
+    @patch.object(executor, 'submit')
+    def test_document_upload_status(self, mock_submit):
+        """Tests setting of document upload status to complete.
+
+        Checks that a virus scan of the document was scheduled. Virus scanning is
+        tested separately in the documents app.
+        """
+        project = InvestmentProjectFactory()
+        doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
+
+        url = reverse('api-v3:investment:document-item-callback',
+                      kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
+
+        response = self.api_client.post(url, format='json', data={
+            'status': 'success'
+        })
+        assert response.status_code == status.HTTP_200_OK
+        mock_submit.assert_called_once_with(virus_scan_document, str(doc.pk))
+
+    def test_document_upload_status_bad_request(self):
+        """Tests request validation in the document status endpoint."""
+        project = InvestmentProjectFactory()
+        doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
+
+        url = reverse('api-v3:investment:document-item-callback',
+                      kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
+
+        response = self.api_client.post(url, format='json', data={
+            'status': '123456'
+        })
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.parametrize('view_set', (views.IProjectTeamViewSet,
