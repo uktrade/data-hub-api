@@ -52,7 +52,7 @@ def virus_scan_document(document_pk: str):
         with advisory_lock(f'av-scan-{document_pk}'):
             _process_document(document_pk)
     except Exception:
-        logger.exception('Error virus scanning document')
+        logger.exception('Error scanning document for viruses')
         client.captureException()
 
 
