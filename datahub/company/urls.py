@@ -75,6 +75,6 @@ company_urls = [
 ch_company_urls = [
     url(r'^ch-company$', ch_company_list,
         name='collection'),
-    url(r'^ch-company/(?P<pk>[0-9]+)$', ch_company_item,
+    url(r'^ch-company/(?P<company_number>[0-9]+)$', ch_company_item,
         name='item'),
 ]
