@@ -199,7 +199,6 @@ class IProjectDocumentViewSet(CoreViewSetV3):
 
         return Response(
             status=status.HTTP_200_OK,
-            content_type='application/json',
             data={
                 'status': 'accepted',
             },
