@@ -344,3 +344,19 @@ class CompanyTestCase(LeelooTestCase):
         assert not response.data['archived']
         assert response.data['archived_reason'] == ''
         assert response.data['id'] == str(company.id)
+
+
+class CHCompanyTestCase(LeelooTestCase):
+    """CH company tests."""
+
+    def test_get_ch_company(self):
+        """Test retrieving a single CH company."""
+        ch_company = CompaniesHouseCompanyFactory()
+        url = reverse(
+            'api-v3:ch-company:item', kwargs={'company_number': ch_company.company_number}
+        )
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['company_number'] == ch_company.company_number
