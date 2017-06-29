@@ -46,7 +46,7 @@ class CompaniesHouseCompanyFactory(factory.django.DjangoModelFactory):
     """Companies house company factory."""
 
     name = factory.Sequence(lambda n: f'name{n}')
-    company_number = factory.Sequence(lambda x: x)
+    company_number = factory.Sequence(str)
     registered_address_1 = factory.Sequence(lambda n: f'{n} Bar st.')
     registered_address_town = 'Rome'
     registered_address_country_id = constants.Country.italy.value.id
