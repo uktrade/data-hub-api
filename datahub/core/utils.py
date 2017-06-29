@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 from hashlib import sha256
 from itertools import islice
 from logging import getLogger
@@ -6,6 +7,7 @@ from urllib.parse import urlparse
 import boto3
 import requests
 
+executor = ThreadPoolExecutor()
 logger = getLogger(__name__)
 
 
@@ -50,6 +52,12 @@ def slice_iterable_into_chunks(iterable, batch_size, obj_creator):
         if not objects:
             break
         yield objects
+
+
+def shut_down_thread_pool():
+    """Shuts down the thread pool."""
+    logger.info('Shutting down thread pool...')
+    executor.shutdown()
 
 
 def get_s3_client():
