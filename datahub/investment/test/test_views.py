@@ -1325,7 +1325,7 @@ class ArchiveViewsTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_200_OK
         mock_submit.assert_called_once_with(virus_scan_document, str(doc.pk))
 
-    def test_document_upload_status_bad_request(self):
+    def test_document_upload_status_wrong_status(self):
         """Tests request validation in the document status endpoint."""
         project = InvestmentProjectFactory()
         doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
@@ -1337,6 +1337,19 @@ class ArchiveViewsTestCase(LeelooTestCase):
             'status': '123456'
         })
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert 'status' in response.json()
+
+    def test_document_upload_status_no_status(self):
+        """Tests request validation in the document status endpoint."""
+        project = InvestmentProjectFactory()
+        doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
+
+        url = reverse('api-v3:investment:document-item-callback',
+                      kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
+
+        response = self.api_client.post(url, format='json', data={})
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert 'status' in response.json()
 
 
 @pytest.mark.parametrize('view_set', (views.IProjectTeamViewSet,

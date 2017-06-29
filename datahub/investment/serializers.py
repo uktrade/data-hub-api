@@ -320,3 +320,9 @@ class IProjectDocumentSerializer(serializers.ModelSerializer):
             field=validated_data['doc_type'],
             filename=validated_data['filename'],
         )
+
+
+class UploadStatusSerializer(serializers.Serializer):
+    """Serializer for upload status endpoints."""
+
+    status = serializers.ChoiceField(choices=('success',))
