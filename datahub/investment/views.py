@@ -11,7 +11,8 @@ from datahub.documents.av_scan import virus_scan_document
 from datahub.investment.models import InvestmentProject, IProjectDocument
 from datahub.investment.serializers import (
     IProjectAuditSerializer, IProjectDocumentSerializer, IProjectRequirementsSerializer,
-    IProjectSerializer, IProjectTeamSerializer, IProjectUnifiedSerializer, IProjectValueSerializer
+    IProjectSerializer, IProjectTeamSerializer, IProjectUnifiedSerializer, IProjectValueSerializer,
+    UploadStatusSerializer
 )
 
 
@@ -192,8 +193,8 @@ class IProjectDocumentViewSet(CoreViewSetV3):
     def upload_complete_callback(self, request, *args, **kwargs):
         """File upload done callback."""
         doc = self.get_object()
-        if request.data.get('status', None) != 'success':
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializer = UploadStatusSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
         executor.submit(virus_scan_document, str(doc.pk))
 
