@@ -1,71 +1,167 @@
 - model: company.company
   pk: a73efeba-8499-11e6-ae22-56b6b6499611
-  fields: {
-    company_number: 99919,
-    name: "Mercury ltd",
-    business_type: 98d14e94-5d95-e211-a939-e4115bead28a,
-    employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a,
-    turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a,
-    export_to_countries: [35afd8d0-5d95-e211-a939-e4115bead28a, 36afd8d0-5d95-e211-a939-e4115bead28a],
-    future_interest_countries: [37afd8d0-5d95-e211-a939-e4115bead28a],
-    sector: 355f977b-8ac3-e211-a646-e4115bead28a,
-    registered_address_1: 82 Ramsgate Rd,
-    registered_address_town: Willington,
-    registered_address_postcode: NE28 5JB,
-    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a,
+  fields:
+    company_number: 99919
+    name: "Mercury Ltd"
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
+    turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
+    export_to_countries:
+    - 35afd8d0-5d95-e211-a939-e4115bead28a
+    - 36afd8d0-5d95-e211-a939-e4115bead28a
+    future_interest_countries:
+    - 37afd8d0-5d95-e211-a939-e4115bead28a
+    sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    registered_address_1: 82 Ramsgate Rd
+    registered_address_town: Willington
+    registered_address_postcode: NE28 5JB
+    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
     uk_region: 824cd12a-6095-e211-a939-e4115bead28a
-  }
+    description: 'QA company'
 
 - model: company.company
   pk: 0f5216e0-849f-11e6-ae22-56b6b6499611
-  fields: {
-    company_number: 456,
-    name: "Venus ltd",
-    business_type: 98d14e94-5d95-e211-a939-e4115bead28a,
-    sector: 355f977b-8ac3-e211-a646-e4115bead28a,
-    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a,
-    registered_address_1: 66 Marcham Road,
-    registered_address_town: Bordley,
-    registered_address_postcode: BD23 8RZ,
+  fields:
+    name: "Venus Ltd"
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    registered_address_1: 66 Marcham Road
+    registered_address_town: Bordley
+    registered_address_postcode: BD23 8RZ
+    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
     uk_region: 824cd12a-6095-e211-a939-e4115bead28a
-  }
+    description: QA company
+
+- model: company.company
+  pk: 731bdcc1-f685-4c8e-bd66-b356b2c16995
+  fields:
+    name: "Mars Components Ltd"
+    business_type: 9ad14e94-5d95-e211-a939-e4115bead28a  # Partnership
+    employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
+    turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
+    export_to_countries:
+      - 35afd8d0-5d95-e211-a939-e4115bead28a
+      - 36afd8d0-5d95-e211-a939-e4115bead28a
+    future_interest_countries:
+      - 37afd8d0-5d95-e211-a939-e4115bead28a
+    sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    registered_address_1: 12 Alpha Street
+    registered_address_town: Volcanus
+    registered_address_postcode: NE28 5AQ
+    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
+    uk_region: 824cd12a-6095-e211-a939-e4115bead28a
+    description: QA company
+
+- model: company.company
+  pk: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
+  fields:
+    name: "Mars Exports Ltd"
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
+    turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
+    export_to_countries:
+      - 82756b9a-5d95-e211-a939-e4115bead28a
+      - 83756b9a-5d95-e211-a939-e4115bead28a
+    future_interest_countries:
+      - 37afd8d0-5d95-e211-a939-e4115bead28a
+    sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    registered_address_1: 12 First Street
+    registered_address_town: New York
+    registered_address_postcode: 765413
+    registered_address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
+    description: QA company
 
 - model: company.companieshousecompany
-  id: 1,
-  fields: {
-    company_number: 99919,
-    name: "Mercury trading",
-    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a,
-    registered_address_1: 64 Ermin Street,
-    registered_address_town: Y Ffor,
-    registered_address_postcode: LL53 5RN,
+  fields:
+    name: "Mercury Trading Ltd"
+    company_number: 99919
+    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a
+    registered_address_1: 64 Ermin Street
+    registered_address_town: Y Ffor
+    registered_address_postcode: LL53 5RN
     incorporation_date: 2000-12-14
-  }
 
 - model: company.advisor
   pk: e83a608e-84a4-11e6-ae22-56b6b6499611
-  fields: {
-    email: Puck.Head@example.com,
-    first_name: Puck,
-    last_name: Head,
-    dit_team: 602b971d-5df6-e511-888e-e4115bead28a,
-  }
+  fields:
+    email: Puck.Head@example.com
+    first_name: Puck
+    last_name: Head
+    dit_team: 602b971d-5df6-e511-888e-e4115bead28a
+
+- model: company.advisor
+  pk: 7bad8082-4978-4fe8-a018-740257f01637
+  fields:
+    email: John.Rogers@example.com
+    first_name: John
+    last_name: Rogers
+    dit_team: 7648318c-9698-e211-a939-e4115bead28a
 
 - model: company.contact
   pk: 9b1138ab-ec7b-497f-b8c3-27fed21694ef
-  fields: {
-    title:  a26cb21e-6095-e211-a939-e4115bead28a,
-    first_name: Johnny,
-    last_name: Cakeman,
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611,
-    primary: True,
-    telephone_countrycode: +44,
-    telephone_number: 67890123432,
-    email: johnny@cakeman.com,
-    address_1: 82 Ramsgate Rd,
-    address_town: Willington,
-    address_postcode: NE28 5JB,
-    address_country: 80756b9a-5d95-e211-a939-e4115bead28a,
-    contactable_by_dit: True,
-    contactable_by_dit_partners: True
-  }
+  fields:
+    first_name: Johnny
+    last_name: Cakeman
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    primary: false
+    telephone_countrycode: +44
+    telephone_number: 67890123432
+    email: johnny@cakeman.com
+    address_1: 82 Ramsgate Rd
+    address_town: Willington
+    address_postcode: NE28 5JB
+    address_country: 80756b9a-5d95-e211-a939-e4115bead28a
+    contactable_by_dit: false
+    contactable_by_dit_partners: false
+    contactable_by_email: false
+    contactable_by_phone: false
+    notes: 'QA contact'
+
+- model: company.contact
+  pk: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+  fields:
+    first_name: Jenny
+    last_name: Cakeman
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    primary: true
+    telephone_countrycode: +44
+    telephone_number: 67890123432
+    email: jenny@cakeman.com
+    address_same_as_company: true
+    contactable_by_dit: true
+    contactable_by_dit_partners: true
+    contactable_by_email: true
+    contactable_by_phone: false
+    notes: 'QA contact'
+
+- model: interaction.interaction
+  pk: 236b656c-ae26-43ca-bb51-c72d553383f3
+  fields:
+    date: 2017-06-01
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    service: 46cd2e66-dc21-e311-a78e-e4115bead28a
+    subject: 'Provided alpha service'
+    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
+    notes: 'QA interaction'
+    interaction_type: 70c226d7-5d95-e211-a939-e4115bead28a
+
+- model: interaction.servicedelivery
+  pk: cbd85bc2-d17a-4c7c-9bfe-622d6e77201a
+  fields:
+    date: 2017-06-01
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    service: f56eb92b-3499-e211-a939-e4115bead28a
+    subject: Provided beta service
+    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
+    notes: QA service delivery
+    service_offer: f6576bae-efb6-4ffc-8d50-80cfaee3be40
+    dit_team: 7648318c-9698-e211-a939-e4115bead28a
+    status: 47329c18-6095-e211-a939-e4115bead28a
+
+- model: interaction.serviceoffer
+  pk: f6576bae-efb6-4ffc-8d50-80cfaee3be40
+  fields:
+    service: f56eb92b-3499-e211-a939-e4115bead28a
+    dit_team: 7648318c-9698-e211-a939-e4115bead28a
