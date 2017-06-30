@@ -17,7 +17,7 @@
     registered_address_postcode: NE28 5JB
     registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
     uk_region: 824cd12a-6095-e211-a939-e4115bead28a
-    description: 'QA company'
+    description: This is a dummy company for testing
 
 - model: company.company
   pk: 0f5216e0-849f-11e6-ae22-56b6b6499611
@@ -30,7 +30,7 @@
     registered_address_postcode: BD23 8RZ
     registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
     uk_region: 824cd12a-6095-e211-a939-e4115bead28a
-    description: QA company
+    description: This is a dummy company for testing
 
 - model: company.company
   pk: 731bdcc1-f685-4c8e-bd66-b356b2c16995
@@ -50,7 +50,7 @@
     registered_address_postcode: NE28 5AQ
     registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
     uk_region: 824cd12a-6095-e211-a939-e4115bead28a
-    description: QA company
+    description: This is a dummy company for testing
 
 - model: company.company
   pk: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
@@ -69,7 +69,7 @@
     registered_address_town: New York
     registered_address_postcode: 765413
     registered_address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
-    description: QA company
+    description: This is a dummy company for testing
 
 - model: company.companieshousecompany
   fields:
@@ -115,7 +115,7 @@
     contactable_by_dit_partners: false
     contactable_by_email: false
     contactable_by_phone: false
-    notes: 'QA contact'
+    notes: This is a dummy contact for testing
 
 - model: company.contact
   pk: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -132,7 +132,7 @@
     contactable_by_dit_partners: true
     contactable_by_email: true
     contactable_by_phone: false
-    notes: 'QA contact'
+    notes: This is a dummy contact for testing
 
 - model: interaction.interaction
   pk: 236b656c-ae26-43ca-bb51-c72d553383f3
@@ -143,7 +143,7 @@
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
     subject: 'Provided alpha service'
     dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
-    notes: 'QA interaction'
+    notes: This is a dummy interaction for testing
     interaction_type: 70c226d7-5d95-e211-a939-e4115bead28a
 
 - model: interaction.servicedelivery
@@ -155,7 +155,7 @@
     service: f56eb92b-3499-e211-a939-e4115bead28a
     subject: Provided beta service
     dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
-    notes: QA service delivery
+    notes: This is a dummy service delivery for testing
     service_offer: f6576bae-efb6-4ffc-8d50-80cfaee3be40
     dit_team: 7648318c-9698-e211-a939-e4115bead28a
     status: 47329c18-6095-e211-a939-e4115bead28a
@@ -165,3 +165,45 @@
   fields:
     service: f56eb92b-3499-e211-a939-e4115bead28a
     dit_team: 7648318c-9698-e211-a939-e4115bead28a
+
+- model: investment.investmentproject
+  pk: 721e2a04-21c3-4172-a321-4368463a4b2d
+  fields:
+    name: New hotel (FDI)
+    description: This is a dummy investment project for testing
+    nda_signed: false
+    estimated_land_date: 2020-01-01
+    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
+    project_shareable: false
+    not_shareable_reason: Commercially sensitive
+    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    client_contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_adviser: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_activity: aba8f653-264f-48d8-950e-07f9c418c7b0
+    fdi_type: f8447013-cfdc-4f35-a146-6619665388b3
+    sector: 034be3be-5329-e511-b6bc-e4115bead28a
+    business_activities:
+      - a2dbd807-ae52-421c-8d1d-88adfc7a506b
+
+- model: investment.investmentproject
+  pk: c4c0f5c2-42f1-4c2d-9dfa-bdbb99a0aea1
+  fields:
+    name: New hotel (Non-FDI)
+    description: This is a dummy investment project for testing
+    nda_signed: false
+    estimated_land_date: 2020-01-01
+    investment_type: 9c364e64-2b28-401b-b2df-50e08b0bca44  # FDI
+    project_shareable: false
+    not_shareable_reason: Commercially sensitive
+    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    client_contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_adviser: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_activity: aba8f653-264f-48d8-950e-07f9c418c7b0
+    non_fdi_type: 2eba3d6a-b1ef-4075-a053-9d70813f7447
+    sector: 034be3be-5329-e511-b6bc-e4115bead28a
+    business_activities:
+      - a2dbd807-ae52-421c-8d1d-88adfc7a506b
