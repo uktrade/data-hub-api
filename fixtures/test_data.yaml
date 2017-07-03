@@ -141,7 +141,7 @@
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
-    subject: 'Provided alpha service'
+    subject: Provided alpha service
     dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
     notes: This is a dummy interaction for testing
     interaction_type: 70c226d7-5d95-e211-a939-e4115bead28a
@@ -207,3 +207,48 @@
     sector: 034be3be-5329-e511-b6bc-e4115bead28a
     business_activities:
       - a2dbd807-ae52-421c-8d1d-88adfc7a506b
+
+- model: investment.investmentproject
+  pk: fb5b5006-56af-40e0-8615-7aba53e0e4bf
+  fields:
+    name: New hotel (commitment to invest)
+    description: This is a dummy investment project for testing
+    nda_signed: false
+    estimated_land_date: 2020-01-01
+    investment_type: 031269ab-b7ec-40e9-8a4e-7371404f0622  # Commitment to invest
+    project_shareable: false
+    not_shareable_reason: Commercially sensitive
+    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    client_contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_adviser: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_activity: aba8f653-264f-48d8-950e-07f9c418c7b0
+    fdi_type: f8447013-cfdc-4f35-a146-6619665388b3
+    sector: 034be3be-5329-e511-b6bc-e4115bead28a
+    business_activities:
+      - a2dbd807-ae52-421c-8d1d-88adfc7a506b
+
+- model: interaction.interaction
+  pk: 94d03877-fceb-44a0-8813-17b727d2e7f6
+  fields:
+    date: 2017-06-03
+    investment_project: 721e2a04-21c3-4172-a321-4368463a4b2d
+    contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    service: 46cd2e66-dc21-e311-a78e-e4115bead28a
+    subject: Discussed site details
+    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
+    notes: This is a dummy interaction for testing
+    interaction_type: 72c226d7-5d95-e211-a939-e4115bead28a
+
+- model: interaction.interaction
+  pk: 0dcb3748-c097-4f20-b84f-0114bbb1a8e0
+  fields:
+    date: 2017-06-05
+    investment_project: 721e2a04-21c3-4172-a321-4368463a4b2d
+    contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    service: 46cd2e66-dc21-e311-a78e-e4115bead28a
+    subject: Provided funding information
+    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
+    notes: This is a dummy interaction for testing
+    interaction_type: 70c226d7-5d95-e211-a939-e4115bead28a
