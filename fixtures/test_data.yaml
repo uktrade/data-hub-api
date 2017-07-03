@@ -143,6 +143,7 @@
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
     subject: Provided alpha service
     dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
+    dit_team: 7648318c-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
     interaction_type: 70c226d7-5d95-e211-a939-e4115bead28a
 
@@ -238,6 +239,7 @@
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
     subject: Discussed site details
     dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
+    dit_team: 7648318c-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
     interaction_type: 72c226d7-5d95-e211-a939-e4115bead28a
 
@@ -250,5 +252,6 @@
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
     subject: Provided funding information
     dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
+    dit_team: 7648318c-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
     interaction_type: 70c226d7-5d95-e211-a939-e4115bead28a
