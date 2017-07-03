@@ -71,16 +71,6 @@
     registered_address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
     description: This is a dummy company for testing
 
-- model: company.companieshousecompany
-  fields:
-    name: "Mercury Trading Ltd"
-    company_number: 99919
-    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a
-    registered_address_1: 64 Ermin Street
-    registered_address_town: Y Ffor
-    registered_address_postcode: LL53 5RN
-    incorporation_date: 2000-12-14
-
 - model: company.advisor
   pk: e83a608e-84a4-11e6-ae22-56b6b6499611
   fields:
