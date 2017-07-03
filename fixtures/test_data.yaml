@@ -2,7 +2,7 @@
   pk: a73efeba-8499-11e6-ae22-56b6b6499611
   fields:
     company_number: 99919
-    name: "Mercury Ltd"
+    name: Mercury Ltd
     business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
@@ -22,7 +22,7 @@
 - model: company.company
   pk: 0f5216e0-849f-11e6-ae22-56b6b6499611
   fields:
-    name: "Venus Ltd"
+    name: Venus Ltd
     business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
     sector: 355f977b-8ac3-e211-a646-e4115bead28a
     registered_address_1: 66 Marcham Road
@@ -35,7 +35,7 @@
 - model: company.company
   pk: 731bdcc1-f685-4c8e-bd66-b356b2c16995
   fields:
-    name: "Mars Components Ltd"
+    name: Mars Components Ltd
     business_type: 9ad14e94-5d95-e211-a939-e4115bead28a  # Partnership
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
@@ -55,7 +55,7 @@
 - model: company.company
   pk: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
   fields:
-    name: "Mars Exports Ltd"
+    name: Mars Exports Ltd
     business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
