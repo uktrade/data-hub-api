@@ -123,23 +123,18 @@ def get_incomplete_team_fields(instance=None, update_data=None):
     return errors
 
 
-def _validate(data, truthy_fields=None, not_none_or_blank_fields=None,
-              to_many_fields=None):
+def _validate(data, truthy_fields=None, not_none_or_blank_fields=None, to_many_fields=None):
     errors = {}
 
-    if truthy_fields:
-        for field_name in truthy_fields:
-            _validate_truthy(data.get_value(field_name), field_name, errors)
+    for field_name in truthy_fields or ():
+        _validate_truthy(data.get_value(field_name), field_name, errors)
 
-    if not_none_or_blank_fields:
-        for field_name in not_none_or_blank_fields:
-            _validate_not_none_or_blank(data.get_value(field_name), field_name,
-                                        errors)
+    for field_name in not_none_or_blank_fields or ():
+        _validate_not_none_or_blank(data.get_value(field_name), field_name, errors)
 
-    if to_many_fields:
-        for field_name in to_many_fields:
-            _validate_truthy(data.get_value_to_many(field_name), field_name,
-                             errors)
+    for field_name in to_many_fields or ():
+        _validate_truthy(data.get_value_to_many(field_name), field_name, errors)
+
     return errors
 
 
