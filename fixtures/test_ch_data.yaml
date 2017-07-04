@@ -4,6 +4,7 @@
 #
 # Hence, existing records with the same company number must be cleared
 # before reloading this fixture.
+
 - model: company.companieshousecompany
   fields:
     name: "Mercury Trading Ltd"
