@@ -8,7 +8,9 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
-from datahub.core.test_utils import LeelooTestCase, synchronous_executor_submit
+from datahub.core.test_utils import (
+    LeelooTestCase, synchronous_executor_submit, synchronous_transaction_on_commit,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -195,6 +197,7 @@ class SearchTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_results_quality(self):
         """Tests quality of results."""
         CompanyFactory(name='The Risk Advisory Group').save()

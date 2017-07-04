@@ -4,7 +4,7 @@ import pytest
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
-from datahub.core.test_utils import synchronous_executor_submit
+from datahub.core.test_utils import synchronous_executor_submit, synchronous_transaction_on_commit
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.search import elasticsearch
 
@@ -12,6 +12,7 @@ pytestmark = pytest.mark.django_db
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
 def test_company_auto_sync_to_es(setup_data, post_save_handlers):
     """Tests if company gets synced to Elasticsearch."""
     test_name = 'very_hard_to_find_company'
@@ -28,6 +29,7 @@ def test_company_auto_sync_to_es(setup_data, post_save_handlers):
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
 def test_company_auto_updates_to_es(setup_data, post_save_handlers):
     """Tests if company gets updated in Elasticsearch."""
     test_name = 'very_hard_to_find_company_international'
@@ -48,6 +50,7 @@ def test_company_auto_updates_to_es(setup_data, post_save_handlers):
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
 def test_contact_auto_sync_to_es(setup_data, post_save_handlers):
     """Tests if contact gets synced to Elasticsearch."""
     test_name = 'very_hard_to_find_contact'
@@ -63,6 +66,7 @@ def test_contact_auto_sync_to_es(setup_data, post_save_handlers):
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
 def test_contact_auto_updates_to_es(setup_data, post_save_handlers):
     """Tests if contact gets updated in Elasticsearch."""
     test_name = 'very_hard_to_find_contact_ii'
@@ -83,6 +87,7 @@ def test_contact_auto_updates_to_es(setup_data, post_save_handlers):
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
 def test_investment_project_auto_sync_to_es(setup_data, post_save_handlers):
     """Tests if investment project gets synced to Elasticsearch."""
     test_name = 'very_hard_to_find_project'
@@ -102,6 +107,7 @@ def test_investment_project_auto_sync_to_es(setup_data, post_save_handlers):
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
 def test_investment_project_auto_updates_to_es(setup_data, post_save_handlers):
     """Tests if investment project gets synced to Elasticsearch."""
     test_name = 'very_hard_to_find_project'
