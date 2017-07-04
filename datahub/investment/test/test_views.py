@@ -521,7 +521,9 @@ class InvestmentViewsTestCase(LeelooTestCase):
 
     def test_get_team_empty(self):
         """Test successfully getting an empty project requirements object."""
-        project = InvestmentProjectFactory()
+        project = InvestmentProjectFactory(
+            phase_id=constants.InvestmentProjectPhase.assign_pm.value.id
+        )
         url = reverse('api-v3:investment:team-item',
                       kwargs={'pk': project.pk})
         response = self.api_client.get(url)
@@ -1074,7 +1076,9 @@ class UnifiedViewsTestCase(LeelooTestCase):
 
     def test_get_team_empty(self):
         """Test successfully getting an empty project requirements object."""
-        project = InvestmentProjectFactory()
+        project = InvestmentProjectFactory(
+            phase_id=constants.InvestmentProjectPhase.assign_pm.value.id
+        )
         url = reverse('api-v3:investment:investment-item',
                       kwargs={'pk': project.pk})
         response = self.api_client.get(url)

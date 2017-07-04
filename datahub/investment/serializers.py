@@ -5,10 +5,9 @@ from reversion.models import Version
 
 import datahub.metadata.models as meta_models
 from datahub.company.models import Advisor, Company, Contact
-from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.serializers import NestedRelatedField
 from datahub.investment.models import InvestmentProject, IProjectDocument
-from datahub.investment.validate import get_validators
+from datahub.investment.validate import validate
 
 
 class IProjectSerializer(serializers.ModelSerializer):
@@ -69,16 +68,7 @@ class IProjectSerializer(serializers.ModelSerializer):
 
         Performs phase-dependent validation of the different sections.
         """
-        previous_phase = (self.instance.phase if self.instance else
-                          InvestmentProjectPhase.prospect.value)
-        desired_phase = data.get('phase', previous_phase)
-        errors = {}
-
-        for phase, validator in get_validators():
-            if desired_phase.order >= phase.order:
-                errors.update(validator(
-                    instance=self.instance, update_data=data
-                ))
+        errors = validate(self.instance, data)
 
         if errors:
             raise serializers.ValidationError(errors)
@@ -196,7 +186,13 @@ class IProjectValueSerializer(serializers.ModelSerializer):
         meta_models.SalaryRange, required=False,
         allow_null=True
     )
-    value_complete = serializers.BooleanField(read_only=True)
+    value_complete = serializers.SerializerMethodField()
+
+    def get_value_complete(self, instance):
+        """Whether the value section is complete."""
+        return not validate(
+            instance=instance, fields=IProjectValueSerializer.Meta.fields, next_phase=True
+        )
 
     class Meta:  # noqa: D101
         model = InvestmentProject
@@ -229,8 +225,14 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
     strategic_drivers = NestedRelatedField(
         meta_models.InvestmentStrategicDriver, many=True, required=False
     )
-    requirements_complete = serializers.BooleanField(read_only=True)
     uk_company = NestedRelatedField(Company, required=False, allow_null=True)
+    requirements_complete = serializers.SerializerMethodField()
+
+    def get_requirements_complete(self, instance):
+        """Whether the requirements section is complete."""
+        return not validate(
+            instance=instance, fields=IProjectRequirementsSerializer.Meta.fields, next_phase=True
+        )
 
     class Meta:  # noqa: D101
         model = InvestmentProject
@@ -267,7 +269,13 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
     project_assurance_team = NestedRelatedField(
         meta_models.Team, read_only=True
     )
-    team_complete = serializers.BooleanField(read_only=True)
+    team_complete = serializers.SerializerMethodField()
+
+    def get_team_complete(self, instance):
+        """Whether the team section is complete."""
+        return not validate(
+            instance=instance, fields=IProjectTeamSerializer.Meta.fields, next_phase=True
+        )
 
     class Meta:  # noqa: D101
         model = InvestmentProject
