@@ -90,3 +90,8 @@ class LeelooTestCase(TestCase):
 def synchronous_executor_submit(fn, *args, **kwargs):
     """Run everything submitted to thread pools executor in sync."""
     fn(*args, **kwargs)
+
+
+def synchronous_transaction_on_commit(fn):
+    """During a test run a transaction is never committed, so we have to improvise."""
+    fn()

@@ -20,7 +20,7 @@ def sync_es(search_model, db_model, pk):
         instance = db_model.objects.get(pk=pk)
         doc = search_model.es_document(instance)
         elasticsearch.bulk(actions=(doc, ), chunk_size=1)
-    except:
+    except:  # noqa: B901
         logger.exception('Error while saving entity to ES')
         client.captureException()
         raise
