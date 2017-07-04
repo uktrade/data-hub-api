@@ -20,9 +20,10 @@ def sync_es(search_model, db_model, pk):
         instance = db_model.objects.get(pk=pk)
         doc = search_model.es_document(instance)
         elasticsearch.bulk(actions=(doc, ), chunk_size=1)
-    except Exception:
+    except:
         logger.exception('Error while saving entity to ES')
         client.captureException()
+        raise
 
 
 @receiver(post_save, sender=DBCompany, dispatch_uid='company_sync_es')
