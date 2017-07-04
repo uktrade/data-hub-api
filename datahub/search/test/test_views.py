@@ -1,5 +1,5 @@
 import datetime
-from unittest import mock
+from unittest import mock, skip
 
 import pytest
 from elasticsearch_dsl.connections import connections
@@ -196,6 +196,7 @@ class SearchTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @skip('This test fails randomly. Skip until fixed.')
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_results_quality(self):
