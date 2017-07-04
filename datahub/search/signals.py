@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -18,21 +19,27 @@ def sync_es(search_model, db_model, pk):
 @receiver(post_save, sender=DBCompany, dispatch_uid='company_sync_es')
 def company_sync_es(sender, instance, **kwargs):
     """Sync company to the Elasticsearch."""
-    executor.submit(sync_es, search_models.Company, DBCompany, str(instance.pk))
+    transaction.on_commit(
+        lambda: executor.submit(sync_es, search_models.Company, DBCompany, str(instance.pk))
+    )
 
 
 @receiver(post_save, sender=DBContact, dispatch_uid='contact_sync_es')
 def contact_sync_es(sender, instance, **kwargs):
     """Sync contact to the Elasticsearch."""
-    executor.submit(sync_es, search_models.Contact, DBContact, str(instance.pk))
+    transaction.on_commit(
+        lambda: executor.submit(sync_es, search_models.Contact, DBContact, str(instance.pk))
+    )
 
 
 @receiver(post_save, sender=DBInvestmentProject, dispatch_uid='investment_project_sync_es')
 def investment_project_sync_es(sender, instance, **kwargs):
     """Sync investment project to the Elasticsearch."""
-    executor.submit(
-        sync_es,
-        search_models.InvestmentProject,
-        DBInvestmentProject,
-        str(instance.pk),
+    transaction.on_commit(
+        lambda: executor.submit(
+            sync_es,
+            search_models.InvestmentProject,
+            DBInvestmentProject,
+            str(instance.pk),
+        )
     )
