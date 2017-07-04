@@ -13,14 +13,14 @@ def get_validators():
     Returned as a tuple of (phase, callable) pairs.
     """
     return (
-        (Phase.prospect.value, get_incomplete_project_fields),
-        (Phase.assign_pm.value, get_incomplete_value_fields),
-        (Phase.assign_pm.value, get_incomplete_reqs_fields),
-        (Phase.active.value, get_incomplete_team_fields)
+        (Phase.prospect.value, get_incomplete_prospect_project_fields),
+        (Phase.assign_pm.value, get_incomplete_assign_pm_value_fields),
+        (Phase.assign_pm.value, get_incomplete_assign_pm_reqs_fields),
+        (Phase.active.value, get_incomplete_active_team_fields)
     )
 
 
-def get_incomplete_project_fields(instance=None, update_data=None):
+def get_incomplete_prospect_project_fields(instance=None, update_data=None):
     """Checks whether the project section is complete.
 
     :param instance:    Model instance (for update operations only)
@@ -31,16 +31,13 @@ def get_incomplete_project_fields(instance=None, update_data=None):
 
     truthy_required_fields = []
 
-    if (data.get_value_id('referral_source_activity') ==
-            Activity.event.value.id):
+    if (data.get_value_id('referral_source_activity') == Activity.event.value.id):
         truthy_required_fields.append('referral_source_activity_event')
 
-    if (data.get_value_id('referral_source_activity') ==
-            Activity.marketing.value.id):
+    if (data.get_value_id('referral_source_activity') == Activity.marketing.value.id):
         truthy_required_fields.append('referral_source_activity_marketing')
 
-    if (data.get_value_id('referral_source_activity') ==
-            Activity.website.value.id):
+    if (data.get_value_id('referral_source_activity') == Activity.website.value.id):
         truthy_required_fields.append('referral_source_activity_website')
 
     if data.get_value_id('investment_type') == InvestmentType.fdi.value.id:
@@ -53,7 +50,7 @@ def get_incomplete_project_fields(instance=None, update_data=None):
     return errors
 
 
-def get_incomplete_value_fields(instance=None, update_data=None):
+def get_incomplete_assign_pm_value_fields(instance=None, update_data=None):
     """Checks whether the value section is complete.
 
     :param instance:    Model instance (for update operations only)
@@ -75,7 +72,7 @@ def get_incomplete_value_fields(instance=None, update_data=None):
     return errors
 
 
-def get_incomplete_reqs_fields(instance=None, update_data=None):
+def get_incomplete_assign_pm_reqs_fields(instance=None, update_data=None):
     """Checks whether the requirements section is complete.
 
     :param instance:    Model instance (for update operations only)
@@ -105,7 +102,7 @@ def get_incomplete_reqs_fields(instance=None, update_data=None):
     return errors
 
 
-def get_incomplete_team_fields(instance=None, update_data=None):
+def get_incomplete_active_team_fields(instance=None, update_data=None):
     """Checks whether the team section is complete.
 
     :param instance:    Model instance (for update operations only)

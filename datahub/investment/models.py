@@ -12,8 +12,8 @@ from datahub.core.constants import InvestmentProjectPhase
 from datahub.core.models import ArchivableModel, BaseModel
 from datahub.documents.models import Document
 from datahub.investment.validate import (
-    get_incomplete_reqs_fields, get_incomplete_team_fields,
-    get_incomplete_value_fields
+    get_incomplete_active_team_fields, get_incomplete_assign_pm_reqs_fields,
+    get_incomplete_assign_pm_value_fields
 )
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -145,7 +145,7 @@ class IProjectValueAbstract(models.Model):
     @property
     def value_complete(self):
         """Whether the value section is complete."""
-        return not get_incomplete_value_fields(instance=self)
+        return not get_incomplete_assign_pm_value_fields(instance=self)
 
 
 class IProjectRequirementsAbstract(models.Model):
@@ -182,7 +182,7 @@ class IProjectRequirementsAbstract(models.Model):
     @property
     def requirements_complete(self):
         """Whether the requirements section is complete."""
-        return not get_incomplete_reqs_fields(instance=self)
+        return not get_incomplete_assign_pm_reqs_fields(instance=self)
 
 
 class IProjectTeamAbstract(models.Model):
@@ -217,7 +217,7 @@ class IProjectTeamAbstract(models.Model):
     @property
     def team_complete(self):
         """Whether the team section is complete."""
-        return not get_incomplete_team_fields(instance=self)
+        return not get_incomplete_active_team_fields(instance=self)
 
 
 class InvestmentProject(ArchivableModel, IProjectAbstract,
