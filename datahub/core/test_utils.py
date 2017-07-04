@@ -85,3 +85,8 @@ class LeelooTestCase(TestCase):
             name='Test client'
         )
         return application
+
+
+def synchronous_executor_submit(fn, *args, **kwargs):
+    """Run everything submitted to thread pools executor in sync."""
+    fn(*args, **kwargs)
