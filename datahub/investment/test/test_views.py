@@ -931,6 +931,85 @@ class UnifiedViewsTestCase(LeelooTestCase):
         response = self.api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
 
+    def test_change_phase_verify_win_failure(self):
+        """Tests moving a partially complete project to the 'Verify win' phase."""
+        adviser = AdviserFactory()
+        strategic_drivers = [
+            constants.InvestmentStrategicDriver.access_to_market.value.id
+        ]
+        project = InvestmentProjectFactory(
+            client_contacts=[ContactFactory().id, ContactFactory().id],
+            client_cannot_provide_total_investment=False,
+            total_investment=100,
+            number_new_jobs=10,
+            client_considering_other_countries=False,
+            client_requirements='client reqs',
+            site_decided=False,
+            strategic_drivers=strategic_drivers,
+            uk_region_locations=[constants.UKRegion.england.value.id],
+            project_assurance_adviser=adviser,
+            project_manager=adviser
+        )
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'phase': {
+                'id': constants.InvestmentProjectPhase.verify_win.value.id
+            }
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'government_assistance': ['This field is required.'],
+            'number_safeguarded_jobs': ['This field is required.'],
+            'r_and_d_budget': ['This field is required.'],
+            'non_fdi_r_and_d_budget': ['This field is required.'],
+            'new_tech_to_uk': ['This field is required.'],
+            'export_revenue': ['This field is required.'],
+            'address_line_1': ['This field is required.'],
+            'address_line_2': ['This field is required.'],
+            'address_line_postcode': ['This field is required.'],
+            'average_salary': ['This field is required.']
+        }
+
+    def test_change_phase_verify_win_success(self):
+        """Tests moving a complete project to the 'Verify win' phase."""
+        adviser = AdviserFactory()
+        strategic_drivers = [
+            constants.InvestmentStrategicDriver.access_to_market.value.id
+        ]
+        project = InvestmentProjectFactory(
+            client_contacts=[ContactFactory().id, ContactFactory().id],
+            client_cannot_provide_total_investment=False,
+            total_investment=100,
+            number_new_jobs=10,
+            client_considering_other_countries=False,
+            client_requirements='client reqs',
+            site_decided=False,
+            strategic_drivers=strategic_drivers,
+            uk_region_locations=[constants.UKRegion.england.value.id],
+            project_assurance_adviser=adviser,
+            project_manager=adviser,
+            government_assistance=False,
+            number_safeguarded_jobs=0,
+            r_and_d_budget=True,
+            non_fdi_r_and_d_budget=True,
+            new_tech_to_uk=True,
+            export_revenue=True,
+            address_line_1='12 London Road',
+            address_line_2='London',
+            address_line_postcode='SW1A 2AA',
+            average_salary_id=constants.SalaryRange.below_25000.value.id
+        )
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'phase': {
+                'id': constants.InvestmentProjectPhase.verify_win.value.id
+            }
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
     def test_get_value_success(self):
         """Test successfully getting a project value object."""
         project = InvestmentProjectFactory(
