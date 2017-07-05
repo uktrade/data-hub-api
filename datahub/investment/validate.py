@@ -23,7 +23,7 @@ VALIDATION_MAPPING = {
     'site_decided': Phase.assign_pm.value,
     'project_manager': Phase.active.value,
     'project_assurance_adviser': Phase.active.value,
-    'total_investment': Phase.verify_win.value,
+    'client_cannot_provide_foreign_investment': Phase.verify_win.value,
     'government_assistance': Phase.verify_win.value,
     'number_safeguarded_jobs': Phase.verify_win.value,
     'r_and_d_budget': Phase.verify_win.value,
@@ -52,6 +52,8 @@ CONDITIONAL_VALIDATION_MAPPING = {
         CondValRule('client_cannot_provide_total_investment', is_falsey, Phase.assign_pm.value),
     'competitor_countries':
         CondValRule('client_considering_other_countries', True, Phase.assign_pm.value),
+    'foreign_equity_investment':
+        CondValRule('client_cannot_provide_foreign_investment', is_falsey, Phase.verify_win.value),
     'average_salary':
         CondValRule('number_new_jobs', bool, Phase.verify_win.value),
 }

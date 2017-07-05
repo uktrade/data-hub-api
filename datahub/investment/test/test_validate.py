@@ -212,8 +212,8 @@ def test_validate_team_instance_success():
     assert not errors
 
 
-def test_validate_verify_win_instance_success():
-    """Tests validating a complete team section using a model instance."""
+def test_validate_verify_win_instance_failure():
+    """Tests validating an incomplete team section using a model instance."""
     adviser = AdviserFactory()
     strategic_drivers = [
         constants.InvestmentStrategicDriver.access_to_market.value.id
@@ -243,5 +243,7 @@ def test_validate_verify_win_instance_success():
         'address_line_1': 'This field is required.',
         'address_line_2': 'This field is required.',
         'address_line_postcode': 'This field is required.',
-        'average_salary': 'This field is required.'
+        'average_salary': 'This field is required.',
+        'client_cannot_provide_foreign_investment': 'This field is required.',
+        'foreign_equity_investment': 'This field is required.',
     }
