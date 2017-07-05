@@ -189,7 +189,7 @@ class IProjectValueSerializer(serializers.ModelSerializer):
     value_complete = serializers.SerializerMethodField()
 
     def get_value_complete(self, instance):
-        """Whether the value section is complete."""
+        """Whether the value fields required to move to the next phase are complete."""
         return not validate(
             instance=instance, fields=IProjectValueSerializer.Meta.fields, next_phase=True
         )
@@ -229,7 +229,7 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
     requirements_complete = serializers.SerializerMethodField()
 
     def get_requirements_complete(self, instance):
-        """Whether the requirements section is complete."""
+        """Whether the requirements fields required to move to the next phase are complete."""
         return not validate(
             instance=instance, fields=IProjectRequirementsSerializer.Meta.fields, next_phase=True
         )
@@ -272,7 +272,7 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
     team_complete = serializers.SerializerMethodField()
 
     def get_team_complete(self, instance):
-        """Whether the team section is complete."""
+        """Whether the team fields required to move to the next phase are complete."""
         return not validate(
             instance=instance, fields=IProjectTeamSerializer.Meta.fields, next_phase=True
         )

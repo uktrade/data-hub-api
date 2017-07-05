@@ -213,7 +213,7 @@ def test_validate_team_instance_success():
 
 
 def test_validate_verify_win_instance_failure():
-    """Tests validation for the verify win stage for an incomplete project."""
+    """Tests validation for the verify win stage for an incomplete project instance."""
     adviser = AdviserFactory()
     strategic_drivers = [
         constants.InvestmentStrategicDriver.access_to_market.value.id
@@ -264,7 +264,7 @@ def test_validate_verify_win_instance_cond_validation():
 
 
 def test_validate_verify_win_instance_success():
-    """Tests validation for the verify win stage for a complete project."""
+    """Tests validation for the verify win stage for a complete project instance."""
     adviser = AdviserFactory()
     strategic_drivers = [
         constants.InvestmentStrategicDriver.access_to_market.value.id
