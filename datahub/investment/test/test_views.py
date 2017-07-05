@@ -969,7 +969,9 @@ class UnifiedViewsTestCase(LeelooTestCase):
             'address_line_1': ['This field is required.'],
             'address_line_2': ['This field is required.'],
             'address_line_postcode': ['This field is required.'],
-            'average_salary': ['This field is required.']
+            'average_salary': ['This field is required.'],
+            'client_cannot_provide_foreign_investment': ['This field is required.'],
+            'foreign_equity_investment': ['This field is required.'],
         }
 
     def test_change_phase_verify_win_success(self):
@@ -982,6 +984,8 @@ class UnifiedViewsTestCase(LeelooTestCase):
             client_contacts=[ContactFactory().id, ContactFactory().id],
             client_cannot_provide_total_investment=False,
             total_investment=100,
+            client_cannot_provide_foreign_investment=False,
+            foreign_equity_investment=200,
             number_new_jobs=10,
             client_considering_other_countries=False,
             client_requirements='client reqs',
