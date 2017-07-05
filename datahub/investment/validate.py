@@ -28,6 +28,16 @@ VALIDATION_MAPPING = {
     'site_decided': Phase.assign_pm.value,
     'project_manager': Phase.active.value,
     'project_assurance_adviser': Phase.active.value,
+    'total_investment': Phase.verify_win.value,
+    'government_assistance': Phase.verify_win.value,
+    'number_safeguarded_jobs': Phase.verify_win.value,
+    'r_and_d_budget': Phase.verify_win.value,
+    'non_fdi_r_and_d_budget': Phase.verify_win.value,
+    'new_tech_to_uk': Phase.verify_win.value,
+    'export_revenue': Phase.verify_win.value,
+    'address_line_1': Phase.verify_win.value,
+    'address_line_2': Phase.verify_win.value,
+    'address_line_postcode': Phase.verify_win.value,
 }
 
 CondValRule = namedtuple('CondValRule', ('field', 'value', 'phase'))
@@ -46,7 +56,9 @@ CONDITIONAL_VALIDATION_MAPPING = {
     'total_investment':
         CondValRule('client_cannot_provide_total_investment', is_falsey, Phase.assign_pm.value),
     'competitor_countries':
-        CondValRule('client_considering_other_countries', True, Phase.assign_pm.value)
+        CondValRule('client_considering_other_countries', True, Phase.assign_pm.value),
+    'average_salary':
+        CondValRule('number_new_jobs', bool, Phase.verify_win.value),
 }
 
 

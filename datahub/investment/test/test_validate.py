@@ -210,3 +210,38 @@ def test_validate_team_instance_success():
     )
     errors = validate(instance=project, fields=IProjectTeamSerializer.Meta.fields)
     assert not errors
+
+
+def test_validate_verify_win_instance_success():
+    """Tests validating a complete team section using a model instance."""
+    adviser = AdviserFactory()
+    strategic_drivers = [
+        constants.InvestmentStrategicDriver.access_to_market.value.id
+    ]
+    project = InvestmentProjectFactory(
+        phase_id=constants.InvestmentProjectPhase.verify_win.value.id,
+        client_contacts=[ContactFactory().id, ContactFactory().id],
+        client_cannot_provide_total_investment=False,
+        total_investment=100,
+        number_new_jobs=10,
+        client_considering_other_countries=False,
+        client_requirements='client reqs',
+        site_decided=False,
+        strategic_drivers=strategic_drivers,
+        uk_region_locations=[constants.UKRegion.england.value.id],
+        project_assurance_adviser=adviser,
+        project_manager=adviser
+    )
+    errors = validate(instance=project)
+    assert errors == {
+        'government_assistance': 'This field is required.',
+        'number_safeguarded_jobs': 'This field is required.',
+        'r_and_d_budget': 'This field is required.',
+        'non_fdi_r_and_d_budget': 'This field is required.',
+        'new_tech_to_uk': 'This field is required.',
+        'export_revenue': 'This field is required.',
+        'address_line_1': 'This field is required.',
+        'address_line_2': 'This field is required.',
+        'address_line_postcode': 'This field is required.',
+        'average_salary': 'This field is required.'
+    }
