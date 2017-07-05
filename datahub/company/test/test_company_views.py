@@ -254,6 +254,7 @@ class CompanyTestCase(LeelooTestCase):
         url = reverse('api-v1:company-archive', kwargs={'pk': company.id})
         response = self.api_client.post(url, {'reason': 'foo'}, format='json')
 
+        assert response.status_code == status.HTTP_200_OK
         assert response.data['archived']
         assert response.data['archived_reason'] == 'foo'
         assert response.data['id'] == str(company.id)
@@ -262,11 +263,20 @@ class CompanyTestCase(LeelooTestCase):
         """Unarchive a company."""
         company = CompanyFactory(archived=True, archived_on=now(), archived_reason='foo')
         url = reverse('api-v1:company-unarchive', kwargs={'pk': company.id})
-        response = self.api_client.get(url)
+        response = self.api_client.post(url)
 
+        assert response.status_code == status.HTTP_200_OK
         assert not response.data['archived']
         assert response.data['archived_reason'] == ''
         assert response.data['id'] == str(company.id)
+
+    def test_unarchive_wrong_method(self):
+        """Tests that GET requests to the unarchive endpoint fail."""
+        company = CompanyFactory(archived=True, archived_on=now(), archived_reason='foo')
+        url = reverse('api-v1:company-unarchive', kwargs={'pk': company.id})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
 class CHCompanyTestCase(LeelooTestCase):

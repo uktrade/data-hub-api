@@ -1,71 +1,292 @@
 - model: company.company
   pk: a73efeba-8499-11e6-ae22-56b6b6499611
-  fields: {
-    company_number: 99919,
-    name: "Mercury ltd",
-    business_type: 98d14e94-5d95-e211-a939-e4115bead28a,
-    employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a,
-    turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a,
-    export_to_countries: [35afd8d0-5d95-e211-a939-e4115bead28a, 36afd8d0-5d95-e211-a939-e4115bead28a],
-    future_interest_countries: [37afd8d0-5d95-e211-a939-e4115bead28a],
-    sector: 355f977b-8ac3-e211-a646-e4115bead28a,
-    registered_address_1: 82 Ramsgate Rd,
-    registered_address_town: Willington,
-    registered_address_postcode: NE28 5JB,
-    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a,
+  fields:
+    company_number: 99919
+    name: Mercury Ltd
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
+    turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
+    export_to_countries:
+    - 35afd8d0-5d95-e211-a939-e4115bead28a
+    - 36afd8d0-5d95-e211-a939-e4115bead28a
+    future_interest_countries:
+    - 37afd8d0-5d95-e211-a939-e4115bead28a
+    sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    registered_address_1: 82 Ramsgate Rd
+    registered_address_town: Willington
+    registered_address_postcode: NE28 5JB
+    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
     uk_region: 824cd12a-6095-e211-a939-e4115bead28a
-  }
+    description: This is a dummy company for testing
 
 - model: company.company
   pk: 0f5216e0-849f-11e6-ae22-56b6b6499611
-  fields: {
-    company_number: 456,
-    name: "Venus ltd",
-    business_type: 98d14e94-5d95-e211-a939-e4115bead28a,
-    sector: 355f977b-8ac3-e211-a646-e4115bead28a,
-    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a,
-    registered_address_1: 66 Marcham Road,
-    registered_address_town: Bordley,
-    registered_address_postcode: BD23 8RZ,
+  fields:
+    name: Venus Ltd
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    registered_address_1: 66 Marcham Road
+    registered_address_town: Bordley
+    registered_address_postcode: BD23 8RZ
+    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
     uk_region: 824cd12a-6095-e211-a939-e4115bead28a
-  }
+    description: This is a dummy company for testing
 
-- model: company.companieshousecompany
-  id: 1,
-  fields: {
-    company_number: 99919,
-    name: "Mercury trading",
-    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a,
-    registered_address_1: 64 Ermin Street,
-    registered_address_town: Y Ffor,
-    registered_address_postcode: LL53 5RN,
-    incorporation_date: 2000-12-14
-  }
+- model: company.company
+  pk: 731bdcc1-f685-4c8e-bd66-b356b2c16995
+  fields:
+    name: Mars Components Ltd
+    business_type: 9ad14e94-5d95-e211-a939-e4115bead28a  # Partnership
+    employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
+    turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
+    export_to_countries:
+      - 35afd8d0-5d95-e211-a939-e4115bead28a
+      - 36afd8d0-5d95-e211-a939-e4115bead28a
+    future_interest_countries:
+      - 37afd8d0-5d95-e211-a939-e4115bead28a
+    sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    registered_address_1: 12 Alpha Street
+    registered_address_town: Volcanus
+    registered_address_postcode: NE28 5AQ
+    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
+    uk_region: 824cd12a-6095-e211-a939-e4115bead28a
+    description: This is a dummy company for testing
+
+- model: company.company
+  pk: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
+  fields:
+    name: Mars Exports Ltd
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
+    turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
+    export_to_countries:
+      - 82756b9a-5d95-e211-a939-e4115bead28a
+      - 83756b9a-5d95-e211-a939-e4115bead28a
+    future_interest_countries:
+      - 37afd8d0-5d95-e211-a939-e4115bead28a
+    sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    registered_address_1: 12 First Street
+    registered_address_town: New York
+    registered_address_postcode: 765413
+    registered_address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
+    description: This is a dummy company for testing
+
+- model: company.company
+  pk: 0fb3379c-341c-4da4-b825-bf8d47b26baa
+  fields:
+    name: Lambda plc
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
+    turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
+    export_to_countries:
+      - 82756b9a-5d95-e211-a939-e4115bead28a
+      - 83756b9a-5d95-e211-a939-e4115bead28a
+    future_interest_countries:
+      - 37afd8d0-5d95-e211-a939-e4115bead28a
+    sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    registered_address_1: 12 St George's Road
+    registered_address_town: Paris
+    registered_address_postcode: 75001
+    registered_address_country: 82756b9a-5d95-e211-a939-e4115bead28a  # France
+    description: This is a dummy company for testing
 
 - model: company.advisor
   pk: e83a608e-84a4-11e6-ae22-56b6b6499611
-  fields: {
-    email: Puck.Head@example.com,
-    first_name: Puck,
-    last_name: Head,
-    dit_team: 602b971d-5df6-e511-888e-e4115bead28a,
-  }
+  fields:
+    email: Puck.Head@example.com
+    first_name: Puck
+    last_name: Head
+    dit_team: 602b971d-5df6-e511-888e-e4115bead28a
+
+- model: company.advisor
+  pk: 7bad8082-4978-4fe8-a018-740257f01637
+  fields:
+    email: John.Rogers@example.com
+    first_name: John
+    last_name: Rogers
+    dit_team: 7648318c-9698-e211-a939-e4115bead28a
 
 - model: company.contact
   pk: 9b1138ab-ec7b-497f-b8c3-27fed21694ef
-  fields: {
-    title:  a26cb21e-6095-e211-a939-e4115bead28a,
-    first_name: Johnny,
-    last_name: Cakeman,
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611,
-    primary: True,
-    telephone_countrycode: +44,
-    telephone_number: 67890123432,
-    email: johnny@cakeman.com,
-    address_1: 82 Ramsgate Rd,
-    address_town: Willington,
-    address_postcode: NE28 5JB,
-    address_country: 80756b9a-5d95-e211-a939-e4115bead28a,
-    contactable_by_dit: True,
-    contactable_by_dit_partners: True
-  }
+  fields:
+    first_name: Johnny
+    last_name: Cakeman
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    primary: false
+    telephone_countrycode: +44
+    telephone_number: 67890123432
+    email: johnny@cakeman.com
+    address_1: 82 Ramsgate Rd
+    address_town: Willington
+    address_postcode: NE28 5JB
+    address_country: 80756b9a-5d95-e211-a939-e4115bead28a
+    contactable_by_dit: false
+    contactable_by_dit_partners: false
+    contactable_by_email: false
+    contactable_by_phone: false
+    notes: This is a dummy contact for testing
+
+- model: company.contact
+  pk: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+  fields:
+    first_name: Jenny
+    last_name: Cakeman
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    primary: true
+    telephone_countrycode: +44
+    telephone_number: 67890123432
+    email: jenny@cakeman.com
+    address_same_as_company: true
+    contactable_by_dit: true
+    contactable_by_dit_partners: true
+    contactable_by_email: true
+    contactable_by_phone: false
+    notes: This is a dummy contact for testing
+
+- model: interaction.interaction
+  pk: 236b656c-ae26-43ca-bb51-c72d553383f3
+  fields:
+    subject: Provided alpha service
+    date: 2017-06-01
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    service: 46cd2e66-dc21-e311-a78e-e4115bead28a
+    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
+    dit_team: 7648318c-9698-e211-a939-e4115bead28a
+    notes: This is a dummy interaction for testing
+    interaction_type: 70c226d7-5d95-e211-a939-e4115bead28a
+
+- model: interaction.interaction
+  pk: 6015dbf3-d777-4947-a254-afd5f0d0499c
+  fields:
+    subject: Discussed exports event
+    date: 2017-06-03
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    service: 46cd2e66-dc21-e311-a78e-e4115bead28a
+    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
+    dit_team: 7648318c-9698-e211-a939-e4115bead28a
+    notes: This is a dummy interaction for testing
+    interaction_type: a5d71fdd-5d95-e211-a939-e4115bead28a
+
+- model: interaction.servicedelivery
+  pk: cbd85bc2-d17a-4c7c-9bfe-622d6e77201a
+  fields:
+    subject: Provided beta service
+    date: 2017-06-05
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    service: f56eb92b-3499-e211-a939-e4115bead28a
+    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
+    notes: This is a dummy service delivery for testing
+    service_offer: f6576bae-efb6-4ffc-8d50-80cfaee3be40
+    dit_team: 7648318c-9698-e211-a939-e4115bead28a
+    status: 47329c18-6095-e211-a939-e4115bead28a
+
+- model: interaction.serviceoffer
+  pk: f6576bae-efb6-4ffc-8d50-80cfaee3be40
+  fields:
+    service: f56eb92b-3499-e211-a939-e4115bead28a
+    dit_team: 7648318c-9698-e211-a939-e4115bead28a
+
+- model: investment.investmentproject
+  pk: 721e2a04-21c3-4172-a321-4368463a4b2d
+  fields:
+    name: New hotel (FDI)
+    description: This is a dummy investment project for testing
+    nda_signed: false
+    estimated_land_date: 2020-01-01
+    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
+    project_shareable: false
+    not_shareable_reason: Commercially sensitive
+    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    client_contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_adviser: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_activity: aba8f653-264f-48d8-950e-07f9c418c7b0
+    fdi_type: f8447013-cfdc-4f35-a146-6619665388b3
+    sector: 034be3be-5329-e511-b6bc-e4115bead28a
+    business_activities:
+      - a2dbd807-ae52-421c-8d1d-88adfc7a506b
+    phase: c9864359-fb1a-4646-a4c1-97d10189fc03
+    total_investment: 1000000.0
+    foreign_equity_investment: 200000.0
+    government_assistance: true
+    number_new_jobs: 20
+    average_salary: 2943bf3d-32dd-43be-8ad4-969b006dee7b
+    site_decided: false
+    client_considering_other_countries: false
+    uk_region_locations:
+      - 814cd12a-6095-e211-a939-e4115bead28a
+    client_requirements: Anywhere
+    strategic_drivers:
+      - 382aa6d1-a362-4166-a09d-f579d9f3be75
+
+- model: investment.investmentproject
+  pk: c4c0f5c2-42f1-4c2d-9dfa-bdbb99a0aea1
+  fields:
+    name: New hotel (Non-FDI)
+    description: This is a dummy investment project for testing
+    nda_signed: false
+    estimated_land_date: 2020-01-01
+    investment_type: 9c364e64-2b28-401b-b2df-50e08b0bca44  # FDI
+    project_shareable: true
+    not_shareable_reason: ''
+    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    client_contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_adviser: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_activity: aba8f653-264f-48d8-950e-07f9c418c7b0
+    non_fdi_type: 2eba3d6a-b1ef-4075-a053-9d70813f7447
+    sector: 034be3be-5329-e511-b6bc-e4115bead28a
+    business_activities:
+      - a2dbd807-ae52-421c-8d1d-88adfc7a506b
+
+- model: investment.investmentproject
+  pk: fb5b5006-56af-40e0-8615-7aba53e0e4bf
+  fields:
+    name: New hotel (commitment to invest)
+    description: This is a dummy investment project for testing
+    nda_signed: false
+    estimated_land_date: 2020-01-01
+    investment_type: 031269ab-b7ec-40e9-8a4e-7371404f0622  # Commitment to invest
+    project_shareable: false
+    not_shareable_reason: Commercially sensitive
+    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    client_contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_adviser: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_activity: aba8f653-264f-48d8-950e-07f9c418c7b0
+    fdi_type: f8447013-cfdc-4f35-a146-6619665388b3
+    sector: 034be3be-5329-e511-b6bc-e4115bead28a
+    business_activities:
+      - a2dbd807-ae52-421c-8d1d-88adfc7a506b
+
+- model: interaction.interaction
+  pk: 94d03877-fceb-44a0-8813-17b727d2e7f6
+  fields:
+    date: 2017-06-03
+    investment_project: 721e2a04-21c3-4172-a321-4368463a4b2d
+    contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    service: 46cd2e66-dc21-e311-a78e-e4115bead28a
+    subject: Discussed site details
+    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
+    dit_team: 7648318c-9698-e211-a939-e4115bead28a
+    notes: This is a dummy interaction for testing
+    interaction_type: 72c226d7-5d95-e211-a939-e4115bead28a
+
+- model: interaction.interaction
+  pk: 0dcb3748-c097-4f20-b84f-0114bbb1a8e0
+  fields:
+    date: 2017-06-05
+    investment_project: 721e2a04-21c3-4172-a321-4368463a4b2d
+    contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    service: 46cd2e66-dc21-e311-a78e-e4115bead28a
+    subject: Provided funding information
+    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
+    dit_team: 7648318c-9698-e211-a939-e4115bead28a
+    notes: This is a dummy interaction for testing
+    interaction_type: 70c226d7-5d95-e211-a939-e4115bead28a

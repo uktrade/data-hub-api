@@ -1,5 +1,5 @@
-import re
 from collections import defaultdict
+from urllib.parse import ParseResult, urlparse  # noqa: F401
 
 import dateutil.parser
 from django.conf import settings
@@ -11,35 +11,20 @@ from elasticsearch_dsl.query import Match, MatchPhrase, Q
 
 def configure_connection():
     """Configure Elasticsearch default connection."""
-    if settings.HEROKU:
-        bonsai = settings.ES_HOST
-        auth = re.search('https\:\/\/(.*)\@', bonsai).group(1).split(':')
-        host = bonsai.replace('https://%s:%s@' % (auth[0], auth[1]), '')
-
-        connections.configure(
-            default={
-                'host': host,
-                'port': settings.ES_PORT,
-                'use_ssl': True,
-                'http_auth': (auth[0], auth[1])
-            }
-        )
-    else:
-        connections.configure(
-            default={
-                'host': settings.ES_HOST,
-                'port': settings.ES_PORT
-            }
-        )
+    connections.configure(
+        default={
+            'hosts': [settings.ES_URL]
+        }
+    )
 
 
 def get_search_term_query(term):
     """Returns search term query."""
     return Q('bool', should=[
-        MatchPhrase(name={'query': term, 'boost': 2}),
-        MatchPhrase(_all={'query': term, 'boost': 1.5}),
-        Match(name={'query': term, 'boost': 1.0}),
-        Match(_all={'query': term, 'boost': 0.5}),
+        MatchPhrase(name={'query': term, 'slop': 200}),
+        Match(name={'query': term}),
+        MatchPhrase(_all={'query': term}),
+        Match(_all={'query': term}),
     ])
 
 

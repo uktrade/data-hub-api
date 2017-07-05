@@ -1,14 +1,18 @@
 """Investment views."""
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status
 from rest_framework.response import Response
 
 from datahub.core.mixins import ArchivableViewSetMixin
+from datahub.core.utils import executor
 from datahub.core.viewsets import CoreViewSetV3
+from datahub.documents.av_scan import virus_scan_document
 from datahub.investment.models import InvestmentProject, IProjectDocument
 from datahub.investment.serializers import (
     IProjectAuditSerializer, IProjectDocumentSerializer, IProjectRequirementsSerializer,
-    IProjectSerializer, IProjectTeamSerializer, IProjectValueSerializer
+    IProjectSerializer, IProjectTeamSerializer, IProjectUnifiedSerializer, IProjectValueSerializer,
+    UploadStatusSerializer
 )
 
 
@@ -16,6 +20,8 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     """Investment project views.
 
     This is a subset of the fields on an InvestmentProject object.
+
+    Deprecated.
     """
 
     serializer_class = IProjectSerializer
@@ -60,6 +66,8 @@ class IProjectValueViewSet(CoreViewSetV3):
     """Investment project value views.
 
     This is a subset of the fields on an InvestmentProject object.
+
+    Deprecated.
     """
 
     serializer_class = IProjectValueSerializer
@@ -74,6 +82,8 @@ class IProjectRequirementsViewSet(CoreViewSetV3):
     """Investment project requirements views.
 
     This is a subset of the fields on an InvestmentProject object.
+
+    Deprecated.
     """
 
     serializer_class = IProjectRequirementsSerializer
@@ -92,6 +102,8 @@ class IProjectTeamViewSet(CoreViewSetV3):
     """Investment project team views.
 
     This is a subset of the fields on an InvestmentProject object.
+
+    Deprecated.
     """
 
     serializer_class = IProjectTeamSerializer
@@ -105,6 +117,47 @@ class IProjectTeamViewSet(CoreViewSetV3):
     def get_view_name(self):
         """Returns the view set name for the DRF UI."""
         return 'Investment project teams'
+
+
+class IProjectUnifiedViewSet(ArchivableViewSetMixin, CoreViewSetV3):
+    """Unified investment project views.
+
+    This replaces the previous project, value, team and requirements endpoints.
+    """
+
+    serializer_class = IProjectUnifiedSerializer
+    queryset = InvestmentProject.objects.select_related(
+        'archived_by',
+        'investment_type',
+        'phase',
+        'investor_company',
+        'intermediate_company',
+        'client_relationship_manager',
+        'referral_source_adviser',
+        'referral_source_activity',
+        'referral_source_activity_website',
+        'referral_source_activity_marketing',
+        'fdi_type',
+        'non_fdi_type',
+        'sector',
+        'average_salary',
+        'project_manager',
+        'project_manager__dit_team',
+        'project_assurance_adviser',
+        'project_assurance_adviser__dit_team'
+    ).prefetch_related(
+        'client_contacts',
+        'business_activities',
+        'competitor_countries',
+        'uk_region_locations',
+        'strategic_drivers',
+    )
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('investor_company_id',)
+
+    def get_view_name(self):
+        """Returns the view set name for the DRF UI."""
+        return 'Investment projects'
 
 
 class IProjectDocumentViewSet(CoreViewSetV3):
@@ -136,6 +189,21 @@ class IProjectDocumentViewSet(CoreViewSetV3):
         response.data['signed_upload_url'] = document.signed_upload_url
 
         return response
+
+    def upload_complete_callback(self, request, *args, **kwargs):
+        """File upload done callback."""
+        doc = self.get_object()
+        serializer = UploadStatusSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        executor.submit(virus_scan_document, str(doc.pk))
+
+        return Response(
+            status=status.HTTP_200_OK,
+            data={
+                'status': 'accepted',
+            },
+        )
 
     def get_object(self):
         """Ensures that object lookup honors the project pk."""
