@@ -7,9 +7,9 @@ import factory
 from django.utils.timezone import now
 
 from datahub.core.constants import (
-    InvestmentType, ReferralSourceActivity, InvestmentProjectPhase, Sector,
-    InvestmentBusinessActivity, FDIType
+    InvestmentType, ReferralSourceActivity, InvestmentProjectPhase, Sector
 )
+from datahub.core.test.factories import to_many_field
 from datahub.company.test.factories import (
     AdviserFactory, CompanyFactory
 )
@@ -32,8 +32,27 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     client_relationship_manager = factory.SubFactory(AdviserFactory)
     referral_source_adviser = factory.SubFactory(AdviserFactory)
     project_shareable = False
-    business_activities = [InvestmentBusinessActivity.retail.value.id]
     created_on = now()
+
+    @to_many_field
+    def business_activities(self):
+        pass
+
+    @to_many_field
+    def client_contacts(self):
+        pass
+
+    @to_many_field
+    def competitor_countries(self):
+        pass
+
+    @to_many_field
+    def strategic_drivers(self):
+        pass
+
+    @to_many_field
+    def uk_region_locations(self):
+        pass
 
     class Meta:
         model = 'investment.InvestmentProject'

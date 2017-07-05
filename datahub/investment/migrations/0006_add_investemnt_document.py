@@ -33,8 +33,8 @@ class Migration(migrations.Migration):
                 ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='documents', to='investment.InvestmentProject')),
             ],
             options={
-                'verbose_name': 'Investment Project Document',
-                'verbose_name_plural': 'Investment Project Documents',
+                'verbose_name': 'investment project document',
+                'verbose_name_plural': 'investment project documents'
             },
         ),
         migrations.AlterUniqueTogether(

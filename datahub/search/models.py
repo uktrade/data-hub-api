@@ -42,7 +42,7 @@ def _company_dict(obj):
     }
 
 
-class MapDBModelToDict(object):
+class MapDBModelToDict:
     """Helps convert Django models to dictionaries."""
 
     IGNORED_FIELDS = ()

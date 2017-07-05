@@ -38,12 +38,25 @@ class Document(BaseModel, ArchivableModel):
         return self.path
 
     def generate_signed_url(self):
-        """Generate pre-signed download URL."""
-        return sign_s3_url(settings.DOCUMENTS_BUCKET, self.path)
+        """Generate pre-signed download URL, but only if doc is AV clean."""
+        if self.av_clean:
+            return sign_s3_url(settings.DOCUMENTS_BUCKET, self.path)
 
     def generate_signed_upload_url(self):
         """Generate pre-signed upload URL."""
-        return sign_s3_url(settings.DOCUMENTS_BUCKET, self.path, method='put_object')
+        return sign_s3_url(
+            settings.DOCUMENTS_BUCKET, self.path, method='put_object',
+        )
+
+    @property
+    def s3_bucket(self):
+        """The S3 bucket where this document is stored."""
+        return settings.DOCUMENTS_BUCKET
+
+    @property
+    def s3_key(self):
+        """The S3 key corresponding to this bucket."""
+        return self.path
 
     def __str__(self):
         """String repr."""

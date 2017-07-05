@@ -4,7 +4,7 @@ from django.conf.urls import url
 
 from datahub.investment.views import (
     IProjectAuditViewSet, IProjectDocumentViewSet, IProjectRequirementsViewSet,
-    IProjectTeamViewSet, IProjectValueViewSet, IProjectViewSet,
+    IProjectTeamViewSet, IProjectUnifiedViewSet, IProjectValueViewSet, IProjectViewSet
 )
 
 project_collection = IProjectViewSet.as_view({
@@ -13,6 +13,16 @@ project_collection = IProjectViewSet.as_view({
 })
 
 project_item = IProjectViewSet.as_view({
+    'get': 'retrieve',
+    'patch': 'partial_update'
+})
+
+unified_project_collection = IProjectUnifiedViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+
+unified_project_item = IProjectUnifiedViewSet.as_view({
     'get': 'retrieve',
     'patch': 'partial_update'
 })
@@ -53,15 +63,24 @@ project_document_item = IProjectDocumentViewSet.as_view({
     'get': 'retrieve',
 })
 
+project_document_callback = IProjectDocumentViewSet.as_view({
+    'post': 'upload_complete_callback',
+})
+
 urlpatterns = [
+    url(r'^investment$', unified_project_collection, name='investment-collection'),
+    url(r'^investment/(?P<pk>[0-9a-z-]{36})$', unified_project_item,
+        name='investment-item'),
     url(r'^investment/project$', project_collection, name='project'),
-    url(r'^investment/(?P<pk>[0-9a-z-]{36})/archive', archive_item,
+    url(r'^investment/(?P<pk>[0-9a-z-]{36})/archive$', archive_item,
         name='archive-item'),
     url(r'^investment/(?P<project_pk>[0-9a-z-]{36})/document$', project_document_collection,
         name='document-collection'),
-    url(r'^investment/(?P<project_pk>[0-9a-z-]{36})/document/(?P<doc_pk>[0-9a-z-]{36})',
+    url(r'^investment/(?P<project_pk>[0-9a-z-]{36})/document/(?P<doc_pk>[0-9a-z-]{36})$',
         project_document_item, name='document-item'),
-    url(r'^investment/(?P<pk>[0-9a-z-]{36})/unarchive', unarchive_item,
+    url(r'^investment/(?P<project_pk>[0-9a-z-]{36})/document/(?P<doc_pk>[0-9a-z-]{36})/upload-callback$',
+        project_document_callback, name='document-item-callback'),
+    url(r'^investment/(?P<pk>[0-9a-z-]{36})/unarchive$', unarchive_item,
         name='unarchive-item'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/project$', project_item,
         name='project-item'),

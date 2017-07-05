@@ -23,8 +23,6 @@ contact_archive = ContactViewSet.as_view({
 })
 
 contact_unarchive = ContactViewSet.as_view({
-    # GET will be removed when the FE is no longer using it
-    'get': 'unarchive',
     'post': 'unarchive',
 })
 
@@ -77,6 +75,6 @@ company_urls = [
 ch_company_urls = [
     url(r'^ch-company$', ch_company_list,
         name='collection'),
-    url(r'^ch-company/(?P<pk>[0-9]+)$', ch_company_item,
+    url(r'^ch-company/(?P<company_number>[0-9]+)$', ch_company_item,
         name='item'),
 ]
