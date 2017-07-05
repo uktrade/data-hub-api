@@ -76,26 +76,26 @@ def validate(instance=None, update_data=None, fields=None, next_phase=False):
     errors = {}
 
     for field, req_phase in VALIDATION_MAPPING.items():
-        if fields is not None and field not in fields:
-            continue
-
-        if desired_phase_order < req_phase.order:
+        if _should_skip_rule(field, fields, desired_phase_order, req_phase.order):
             continue
 
         if _field_incomplete(info, data, field):
             errors[field] = REQUIRED_MESSAGE
 
     for field, rule in CONDITIONAL_VALIDATION_MAPPING.items():
-        if fields is not None and field not in fields:
-            continue
-
-        if desired_phase_order < rule.phase.order:
+        if _should_skip_rule(field, fields, desired_phase_order, rule.phase.order):
             continue
 
         if _compare_value(info, data, rule) and _field_incomplete(info, data, field):
             errors[field] = REQUIRED_MESSAGE
 
     return errors
+
+
+def _should_skip_rule(field, validate_fields, desired_phase_order, req_phase_order):
+    skip_field = validate_fields is not None and field not in validate_fields
+
+    return skip_field or desired_phase_order < req_phase_order
 
 
 def _field_incomplete(field_info, data_view, field):
