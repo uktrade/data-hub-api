@@ -213,7 +213,7 @@ def test_validate_team_instance_success():
 
 
 def test_validate_verify_win_instance_failure():
-    """Tests validating an incomplete team section using a model instance."""
+    """Tests validation for the verify win stage for an incomplete project."""
     adviser = AdviserFactory()
     strategic_drivers = [
         constants.InvestmentStrategicDriver.access_to_market.value.id
@@ -247,3 +247,53 @@ def test_validate_verify_win_instance_failure():
         'client_cannot_provide_foreign_investment': 'This field is required.',
         'foreign_equity_investment': 'This field is required.',
     }
+
+
+def test_validate_verify_win_instance_cond_validation():
+    """Tests conditional validation for the verify win stage."""
+    project = InvestmentProjectFactory(
+        phase_id=constants.InvestmentProjectPhase.verify_win.value.id,
+        client_cannot_provide_total_investment=True,
+        client_cannot_provide_foreign_investment=True,
+        number_new_jobs=0
+    )
+    errors = validate(instance=project)
+    assert 'total_investment' not in errors
+    assert 'foreign_equity_investment' not in errors
+    assert 'average_salary' not in errors
+
+
+def test_validate_verify_win_instance_success():
+    """Tests validation for the verify win stage for a complete project."""
+    adviser = AdviserFactory()
+    strategic_drivers = [
+        constants.InvestmentStrategicDriver.access_to_market.value.id
+    ]
+    project = InvestmentProjectFactory(
+        phase_id=constants.InvestmentProjectPhase.verify_win.value.id,
+        client_contacts=[ContactFactory().id, ContactFactory().id],
+        client_cannot_provide_total_investment=False,
+        total_investment=100,
+        client_cannot_provide_foreign_investment=False,
+        foreign_equity_investment=200,
+        number_new_jobs=10,
+        client_considering_other_countries=False,
+        client_requirements='client reqs',
+        site_decided=False,
+        strategic_drivers=strategic_drivers,
+        uk_region_locations=[constants.UKRegion.england.value.id],
+        project_assurance_adviser=adviser,
+        project_manager=adviser,
+        government_assistance=False,
+        number_safeguarded_jobs=0,
+        r_and_d_budget=True,
+        non_fdi_r_and_d_budget=True,
+        new_tech_to_uk=True,
+        export_revenue=True,
+        address_line_1='12 London Road',
+        address_line_2='London',
+        address_line_postcode='SW1A 2AA',
+        average_salary_id=constants.SalaryRange.below_25000.value.id
+    )
+    errors = validate(instance=project)
+    assert not errors
