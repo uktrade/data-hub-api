@@ -2,18 +2,13 @@ from collections import namedtuple
 
 from rest_framework.utils import model_meta
 
-
 from datahub.core.constants import (
     InvestmentProjectPhase as Phase, InvestmentType,
     ReferralSourceActivity as Activity
 )
+from datahub.core.utils import is_falsey
 from datahub.core.validate_utils import UpdatedDataView
 from datahub.investment.models import InvestmentProject
-
-
-def is_falsey(val):
-    """Returns True if val if bool(val) is False"""
-    return not val
 
 
 REQUIRED_MESSAGE = 'This field is required.'
