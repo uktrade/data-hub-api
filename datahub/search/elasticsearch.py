@@ -110,7 +110,7 @@ def remap_fields(fields):
         'client_relationship_manager': 'client_relationship_manager.id',
         'investor_company': 'investor_company.id',
         'investment_type': 'investment_type.id',
-        'phase': 'phase.id',
+        'stage': 'stage.id',
     }
     return {name_map.get(k, k): v for k, v in fields.items()}
 

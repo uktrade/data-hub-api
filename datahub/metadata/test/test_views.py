@@ -37,6 +37,7 @@ metadata_view_names = (
     'investment-strategic-driver',
     'salary-range',
     'investment-project-phase',
+    'investment-project-stage',
 )
 
 metadata_views_ids = (
@@ -65,6 +66,7 @@ metadata_views_ids = (
     'investment strategic driver view',
     'salary range view',
     'investment project phase view',
+    'investment project stage view',
 )
 
 
@@ -144,6 +146,13 @@ ordered_metadata_view_params = (
         'Verify win',
         'Won'
     ]),
+    ('investment-project-stage', [
+        'Prospect',
+        'Assign PM',
+        'Active',
+        'Verify win',
+        'Won'
+    ]),
 )
 
 ordered_metadata_view_test_ids = (
@@ -151,6 +160,7 @@ ordered_metadata_view_test_ids = (
     'employee-range',
     'salary-range',
     'investment-project-phase',
+    'investment-project-stage',
 )
 
 

@@ -209,7 +209,7 @@
     sector: 034be3be-5329-e511-b6bc-e4115bead28a
     business_activities:
       - a2dbd807-ae52-421c-8d1d-88adfc7a506b
-    phase: c9864359-fb1a-4646-a4c1-97d10189fc03
+    stage: c9864359-fb1a-4646-a4c1-97d10189fc03
     total_investment: 1000000.0
     foreign_equity_investment: 200000.0
     government_assistance: true

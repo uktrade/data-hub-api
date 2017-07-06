@@ -16,7 +16,7 @@ class IProjectSerializer(serializers.ModelSerializer):
     project_code = serializers.CharField(read_only=True)
 
     investment_type = NestedRelatedField(meta_models.InvestmentType)
-    phase = NestedRelatedField(meta_models.InvestmentProjectPhase,
+    stage = NestedRelatedField(meta_models.InvestmentProjectStage,
                                required=False)
     project_shareable = serializers.BooleanField(required=True)
     investor_company = NestedRelatedField(
@@ -66,7 +66,7 @@ class IProjectSerializer(serializers.ModelSerializer):
     def validate(self, data):
         """Validates the object after individual fields have been validated.
 
-        Performs phase-dependent validation of the different sections.
+        Performs stage-dependent validation of the different sections.
         """
         errors = validate(self.instance, data)
 
@@ -93,7 +93,7 @@ class IProjectSerializer(serializers.ModelSerializer):
             'approved_landed',
             'approved_non_fdi',
             'investment_type',
-            'phase',
+            'stage',
             'investor_company',
             'intermediate_company',
             'client_contacts',
@@ -189,9 +189,9 @@ class IProjectValueSerializer(serializers.ModelSerializer):
     value_complete = serializers.SerializerMethodField()
 
     def get_value_complete(self, instance):
-        """Whether the value fields required to move to the next phase are complete."""
+        """Whether the value fields required to move to the next stage are complete."""
         return not validate(
-            instance=instance, fields=IProjectValueSerializer.Meta.fields, next_phase=True
+            instance=instance, fields=IProjectValueSerializer.Meta.fields, next_stage=True
         )
 
     class Meta:  # noqa: D101
@@ -229,9 +229,9 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
     requirements_complete = serializers.SerializerMethodField()
 
     def get_requirements_complete(self, instance):
-        """Whether the requirements fields required to move to the next phase are complete."""
+        """Whether the requirements fields required to move to the next stage are complete."""
         return not validate(
-            instance=instance, fields=IProjectRequirementsSerializer.Meta.fields, next_phase=True
+            instance=instance, fields=IProjectRequirementsSerializer.Meta.fields, next_stage=True
         )
 
     class Meta:  # noqa: D101
@@ -272,9 +272,9 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
     team_complete = serializers.SerializerMethodField()
 
     def get_team_complete(self, instance):
-        """Whether the team fields required to move to the next phase are complete."""
+        """Whether the team fields required to move to the next stage are complete."""
         return not validate(
-            instance=instance, fields=IProjectTeamSerializer.Meta.fields, next_phase=True
+            instance=instance, fields=IProjectTeamSerializer.Meta.fields, next_stage=True
         )
 
     class Meta:  # noqa: D101

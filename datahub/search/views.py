@@ -135,7 +135,7 @@ class SearchInvestmentProjectAPIView(APIView):
     FILTER_FIELDS = (
         'client_relationship_manager', 'description', 'estimated_land_date_after',
         'estimated_land_date_before', 'investor_company', 'investment_type',
-        'phase', 'sector'
+        'stage', 'sector'
     )
 
     http_method_names = ('post',)
