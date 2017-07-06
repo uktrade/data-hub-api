@@ -240,7 +240,7 @@ class IProjectDocument(BaseModel, ArchivableModel):
         ('total_investment', 'Total investment'),
         ('foreign_equity_investment', 'Foreign equity investment'),
         ('number_new_jobs', 'Number new jobs'),
-        ('number_safeguarded jobs', 'Number safeguarded jobs'),
+        ('number_safeguarded_jobs', 'Number safeguarded jobs'),
         ('r_and_d_budget', 'R and D budget'),
         ('new_tech_to_uk', 'New tech to uk'),
         ('export_revenue', 'Export revenue'),
