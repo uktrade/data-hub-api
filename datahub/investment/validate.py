@@ -1,5 +1,6 @@
 """Performs phase-dependent validation on investment projects."""
 from collections import namedtuple
+from operator import not_
 
 from rest_framework.utils import model_meta
 
@@ -7,7 +8,6 @@ from datahub.core.constants import (
     InvestmentProjectPhase as Phase, InvestmentType,
     ReferralSourceActivity as Activity
 )
-from datahub.core.utils import is_falsey
 from datahub.core.validate_utils import UpdatedDataView
 from datahub.investment.models import InvestmentProject
 
@@ -52,11 +52,11 @@ CONDITIONAL_VALIDATION_MAPPING = {
     'non_fdi_type':
         CondValRule('investment_type', InvestmentType.non_fdi.value.id, Phase.prospect.value),
     'total_investment':
-        CondValRule('client_cannot_provide_total_investment', is_falsey, Phase.assign_pm.value),
+        CondValRule('client_cannot_provide_total_investment', not_, Phase.assign_pm.value),
     'competitor_countries':
         CondValRule('client_considering_other_countries', True, Phase.assign_pm.value),
     'foreign_equity_investment':
-        CondValRule('client_cannot_provide_foreign_investment', is_falsey, Phase.verify_win.value),
+        CondValRule('client_cannot_provide_foreign_investment', not_, Phase.verify_win.value),
     'average_salary':
         CondValRule('number_new_jobs', bool, Phase.verify_win.value),
 }
