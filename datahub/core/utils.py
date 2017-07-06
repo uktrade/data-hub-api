@@ -11,11 +11,6 @@ executor = ThreadPoolExecutor()
 logger = getLogger(__name__)
 
 
-def is_falsey(val):
-    """Returns True if bool(val) is False"""
-    return not val
-
-
 def generate_enum_code_from_queryset(model_queryset):
     """Generate the Enum code for a given constant model queryset.
 
