@@ -152,7 +152,7 @@ def test_investment_project_to_dict():
 
     keys = {'id', 'business_activities', 'client_contacts',
             'client_relationship_manager', 'investor_company',
-            'investment_type', 'phase', 'referral_source_activity',
+            'investment_type', 'stage', 'referral_source_activity',
             'referral_source_adviser', 'sector', 'project_code',
             'created_on', 'modified_on', 'archived', 'archived_on',
             'archived_reason', 'archived_by', 'name', 'description',
