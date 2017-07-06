@@ -38,6 +38,7 @@ def setup_data(client):
     ContactFactory(first_name='abc', last_name='defg').save()
     ContactFactory(first_name='first', last_name='last').save()
     InvestmentProjectFactory(
+        name='abc defg',
         description='investmentproject1',
         estimated_land_date=datetime.datetime(2011, 6, 13, 9, 44, 31, 62870)
     ).save()
