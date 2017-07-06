@@ -113,7 +113,7 @@ def _field_incomplete(field_info, data_view, field):
 
 def _check_rule(field_info, data_view, rule):
     """Checks a conditional validation rule."""
-    if rule.field in field_info.relations:
+    if rule.field in field_info.relations and not field_info.relations[rule.field].to_many:
         actual_value = data_view.get_value_id(rule.field)
     else:
         actual_value = data_view.get_value(rule.field)
