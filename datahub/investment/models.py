@@ -8,7 +8,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from model_utils import Choices
 
-from datahub.core.constants import InvestmentProjectPhase
+from datahub.core.constants import InvestmentProjectStage
 from datahub.core.models import ArchivableModel, BaseModel
 from datahub.documents.models import Document
 
@@ -43,10 +43,10 @@ class IProjectAbstract(models.Model):
     approved_landed = models.NullBooleanField()
     approved_non_fdi = models.NullBooleanField()
 
-    phase = models.ForeignKey(
-        'metadata.InvestmentProjectPhase', on_delete=models.PROTECT,
+    stage = models.ForeignKey(
+        'metadata.InvestmentProjectStage', on_delete=models.PROTECT,
         related_name='investment_projects',
-        default=InvestmentProjectPhase.prospect.value.id
+        default=InvestmentProjectStage.prospect.value.id
     )
     investor_company = models.ForeignKey(
         'company.Company', related_name='investor_investment_projects',

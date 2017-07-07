@@ -28,7 +28,7 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     queryset = InvestmentProject.objects.select_related(
         'archived_by',
         'investment_type',
-        'phase',
+        'stage',
         'investor_company',
         'intermediate_company',
         'client_relationship_manager',
@@ -129,7 +129,7 @@ class IProjectUnifiedViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     queryset = InvestmentProject.objects.select_related(
         'archived_by',
         'investment_type',
-        'phase',
+        'stage',
         'investor_company',
         'intermediate_company',
         'client_relationship_manager',
