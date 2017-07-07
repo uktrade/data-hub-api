@@ -516,6 +516,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
                 'id': str(huk_team.id),
                 'name': huk_team.name
             },
+            'team_members': [],
             'team_complete': True
         }
 
@@ -534,7 +535,8 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'project_assurance_adviser': None,
             'project_manager_team': None,
             'project_assurance_team': None,
-            'team_complete': False
+            'team_complete': False,
+            'team_members': []
         }
 
     def test_patch_team_success(self):
@@ -576,6 +578,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
                 'id': str(huk_team.id),
                 'name': huk_team.name
             },
+            'team_members': [],
             'team_complete': True
         }
 
@@ -1155,6 +1158,7 @@ class UnifiedViewsTestCase(LeelooTestCase):
             'id': str(huk_team.id),
             'name': huk_team.name
         }
+        assert response_data['team_members'] == []
         assert response_data['team_complete'] is True
 
     def test_get_team_empty(self):
@@ -1171,6 +1175,7 @@ class UnifiedViewsTestCase(LeelooTestCase):
         assert response_data['project_assurance_adviser'] is None
         assert response_data['project_manager_team'] is None
         assert response_data['project_assurance_team'] is None
+        assert response_data['team_members'] == []
         assert response_data['team_complete'] is False
 
     def test_patch_team_success(self):
@@ -1212,6 +1217,7 @@ class UnifiedViewsTestCase(LeelooTestCase):
             'id': str(huk_team.id),
             'name': huk_team.name
         }
+        assert response_data['team_members'] == []
         assert response_data['team_complete'] is True
 
     def test_get_phase_backwards_compatibility(self):

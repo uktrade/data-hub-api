@@ -5,8 +5,10 @@ from reversion.models import Version
 
 import datahub.metadata.models as meta_models
 from datahub.company.models import Advisor, Company, Contact
+from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
-from datahub.investment.models import InvestmentProject, IProjectDocument
+from datahub.investment.models import (InvestmentProject, InvestmentProjectTeamMember,
+                                       IProjectDocument)
 from datahub.investment.validate import validate
 
 
@@ -256,6 +258,16 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
         )
 
 
+class IProjectTeamMemberSerializer(serializers.ModelSerializer):
+    """Serialiser for investment project team members."""
+
+    adviser = NestedAdviserField()
+
+    class Meta:  # noqa: D101
+        model = InvestmentProjectTeamMember
+        fields = ('adviser', 'role')
+
+
 class IProjectTeamSerializer(serializers.ModelSerializer):
     """Serialiser for investment project team objects."""
 
@@ -273,6 +285,7 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
     project_assurance_team = NestedRelatedField(
         meta_models.Team, read_only=True
     )
+    team_members = IProjectTeamMemberSerializer(many=True, read_only=True)
     team_complete = serializers.SerializerMethodField()
 
     def get_team_complete(self, instance):
@@ -288,7 +301,8 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
             'project_assurance_adviser',
             'project_manager_team',
             'project_assurance_team',
-            'team_complete'
+            'team_complete',
+            'team_members'
         )
 
 
