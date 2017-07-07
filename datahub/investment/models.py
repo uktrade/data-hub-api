@@ -185,7 +185,6 @@ class IProjectTeamAbstract(models.Model):
         'company.Advisor', null=True, related_name='+', blank=True,
         on_delete=models.SET_NULL
     )
-    team_members = models.ManyToManyField('company.Advisor', through='InvestmentProjectTeamMember')
 
     @property
     def project_manager_team(self):
@@ -218,9 +217,14 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
 class InvestmentProjectTeamMember(models.Model):
     """Intermediary M2M model for investment project team members."""
 
-    investment_project = models.ForeignKey(InvestmentProject, on_delete=models.CASCADE)
-    adviser = models.ForeignKey('company.Advisor', on_delete=models.CASCADE)
+    investment_project = models.ForeignKey(
+        InvestmentProject, on_delete=models.CASCADE, related_name='team_members'
+    )
+    adviser = models.ForeignKey('company.Advisor', on_delete=models.CASCADE, related_name='+')
     role = models.CharField(max_length=MAX_LENGTH)
+
+    class Meta:  # noqa: D101
+        unique_together = (('investment_project', 'adviser'),)
 
 
 class InvestmentProjectCode(models.Model):
