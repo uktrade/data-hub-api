@@ -110,7 +110,7 @@ def test_validate_project_update_data():
 def test_validate_value_fail():
     """Tests validating an incomplete value section."""
     project = InvestmentProjectFactory(
-        sector_id=None, phase_id=constants.InvestmentProjectPhase.assign_pm.value.id
+        sector_id=None, stage_id=constants.InvestmentProjectStage.assign_pm.value.id
     )
     errors = validate(instance=project, fields=IProjectValueSerializer.Meta.fields)
     assert errors == {
@@ -123,7 +123,7 @@ def test_validate_value_fail():
 def test_validate_value_instance_success():
     """Tests validating a complete value section using a model instance."""
     project = InvestmentProjectFactory(
-        phase_id=constants.InvestmentProjectPhase.assign_pm.value.id,
+        stage_id=constants.InvestmentProjectStage.assign_pm.value.id,
         client_cannot_provide_total_investment=False,
         total_investment=100,
         number_new_jobs=0
@@ -135,7 +135,7 @@ def test_validate_value_instance_success():
 def test_validate_reqs_fail():
     """Tests validating an incomplete reqs section."""
     project = InvestmentProjectFactory(
-        phase_id=constants.InvestmentProjectPhase.assign_pm.value.id,
+        stage_id=constants.InvestmentProjectStage.assign_pm.value.id,
         sector_id=None
     )
     errors = validate(instance=project, fields=IProjectRequirementsSerializer.Meta.fields)
@@ -155,7 +155,7 @@ def test_validate_reqs_instance_success():
     ]
     uk_region_locations = [constants.UKRegion.england.value.id]
     project = InvestmentProjectFactory(
-        phase_id=constants.InvestmentProjectPhase.assign_pm.value.id,
+        stage_id=constants.InvestmentProjectStage.assign_pm.value.id,
         client_considering_other_countries=False,
         client_requirements='client reqs',
         site_decided=False,
@@ -169,7 +169,7 @@ def test_validate_reqs_instance_success():
 def test_validate_reqs_competitor_countries_missing():
     """Tests missing competitor countries conditional validation."""
     project = InvestmentProjectFactory(
-        phase_id=constants.InvestmentProjectPhase.assign_pm.value.id,
+        stage_id=constants.InvestmentProjectStage.assign_pm.value.id,
         client_considering_other_countries=True
     )
     errors = validate(instance=project, fields=IProjectRequirementsSerializer.Meta.fields)
@@ -179,7 +179,7 @@ def test_validate_reqs_competitor_countries_missing():
 def test_validate_reqs_competitor_countries_present():
     """Tests required competitor countries conditional validation."""
     project = InvestmentProjectFactory(
-        phase_id=constants.InvestmentProjectPhase.assign_pm.value.id,
+        stage_id=constants.InvestmentProjectStage.assign_pm.value.id,
         client_considering_other_countries=True,
         competitor_countries=[constants.Country.united_states.value.id]
     )
@@ -190,7 +190,7 @@ def test_validate_reqs_competitor_countries_present():
 def test_validate_team_fail():
     """Tests validating an incomplete team section."""
     project = InvestmentProjectFactory(
-        phase_id=constants.InvestmentProjectPhase.active.value.id,
+        stage_id=constants.InvestmentProjectStage.active.value.id,
         sector_id=None
     )
     errors = validate(instance=project, fields=IProjectTeamSerializer.Meta.fields)
@@ -204,7 +204,7 @@ def test_validate_team_instance_success():
     """Tests validating a complete team section using a model instance."""
     adviser = AdviserFactory()
     project = InvestmentProjectFactory(
-        phase_id=constants.InvestmentProjectPhase.active.value.id,
+        stage_id=constants.InvestmentProjectStage.active.value.id,
         project_manager=adviser,
         project_assurance_adviser=adviser
     )
@@ -219,7 +219,7 @@ def test_validate_verify_win_instance_failure():
         constants.InvestmentStrategicDriver.access_to_market.value.id
     ]
     project = InvestmentProjectFactory(
-        phase_id=constants.InvestmentProjectPhase.verify_win.value.id,
+        stage_id=constants.InvestmentProjectStage.verify_win.value.id,
         client_contacts=[ContactFactory().id, ContactFactory().id],
         client_cannot_provide_total_investment=False,
         total_investment=100,
@@ -252,7 +252,7 @@ def test_validate_verify_win_instance_failure():
 def test_validate_verify_win_instance_cond_validation():
     """Tests conditional validation for the verify win stage."""
     project = InvestmentProjectFactory(
-        phase_id=constants.InvestmentProjectPhase.verify_win.value.id,
+        stage_id=constants.InvestmentProjectStage.verify_win.value.id,
         client_cannot_provide_total_investment=True,
         client_cannot_provide_foreign_investment=True,
         number_new_jobs=0
@@ -270,7 +270,7 @@ def test_validate_verify_win_instance_success():
         constants.InvestmentStrategicDriver.access_to_market.value.id
     ]
     project = InvestmentProjectFactory(
-        phase_id=constants.InvestmentProjectPhase.verify_win.value.id,
+        stage_id=constants.InvestmentProjectStage.verify_win.value.id,
         client_contacts=[ContactFactory().id, ContactFactory().id],
         client_cannot_provide_total_investment=False,
         total_investment=100,

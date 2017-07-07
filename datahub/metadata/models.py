@@ -93,8 +93,8 @@ class CompanyClassification(BaseConstantModel):
     pass
 
 
-class InvestmentProjectPhase(BaseOrderedConstantModel):
-    """Investment project phase."""
+class InvestmentProjectStage(BaseOrderedConstantModel):
+    """Investment project stage."""
 
 
 class InvestmentType(BaseConstantModel):

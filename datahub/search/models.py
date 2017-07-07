@@ -329,10 +329,10 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'id': String(index='not_analyzed'),
         'uri': String(index='not_analyzed')
     })  # Documents
-    phase = Nested(properties={
+    stage = Nested(properties={
         'id': String(index='not_analyzed'),
         'name': String()
-    })  # Phase
+    })  # Stage
     project_code = String(index='not_analyzed')
     project_shareable = Boolean()
     referral_source_activity = Nested(properties={
@@ -376,7 +376,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'investment_type': _id_name_dict,
         'non_fdi_type': _id_name_dict,
         'operations_commenced_documents': lambda col: [_id_uri_dict(c) for c in col.all()],
-        'phase': _id_name_dict,
+        'stage': _id_name_dict,
         'referral_source_activity': _id_name_dict,
         'referral_source_activity_marketing': _id_name_dict,
         'referral_source_activity_website': _id_name_dict,
