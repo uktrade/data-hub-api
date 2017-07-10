@@ -16,7 +16,7 @@ from datahub.core.test_utils import LeelooTestCase
 from datahub.core.utils import executor
 from datahub.documents.av_scan import virus_scan_document
 from datahub.investment import views
-from datahub.investment.models import IProjectDocument
+from datahub.investment.models import InvestmentProjectTeamMember, IProjectDocument
 from datahub.investment.test.factories import (
     InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
 )
@@ -1302,6 +1302,23 @@ class TeamMemberViewsTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['role'] == team_member.role
+
+    def test_delete_team_member_success(self):
+        """Tests deleting a project team member."""
+        project = InvestmentProjectFactory()
+        team_members = InvestmentProjectTeamMemberFactory.create_batch(
+            2, investment_project=project
+        )
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': team_members[0].investment_project.pk,
+            'adviser_pk': team_members[0].adviser.pk
+        })
+        response = self.api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        new_team_members = InvestmentProjectTeamMember.objects.filter(investment_project=project)
+        assert new_team_members.count() == 1
+        assert str(new_team_members[0].adviser.pk) == team_members[1].adviser.pk
 
 
 class AuditLogViewTestCase(LeelooTestCase):
