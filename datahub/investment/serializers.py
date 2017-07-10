@@ -264,11 +264,12 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
 class IProjectTeamMemberSerializer(serializers.ModelSerializer):
     """Serialiser for investment project team members."""
 
+    investment_project = NestedRelatedField(InvestmentProject)
     adviser = NestedAdviserField()
 
     class Meta:  # noqa: D101
         model = InvestmentProjectTeamMember
-        fields = ('adviser', 'role')
+        fields = ('investment_project', 'adviser', 'role')
 
 
 class IProjectTeamSerializer(serializers.ModelSerializer):

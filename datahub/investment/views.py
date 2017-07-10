@@ -176,6 +176,16 @@ class IProjectTeamMembersViewSet(mixins.DestroyModelMixin, CoreViewSetV3):
         project = get_object_or_404(InvestmentProject, pk=self.kwargs['project_pk'])
         return project.team_members.select_related('adviser').all()
 
+    def get_serializer(self, *args, **kwargs):
+        """Gets a serializer instance.
+
+        Adds the investment_project_id from the URL path to the user-provided data.
+        """
+        data = kwargs.get('data')
+        if data is not None:
+            data['investment_project'] = self.kwargs['project_pk']
+        return super().get_serializer(*args, **kwargs)
+
     def create(self, request, *args, **kwargs):
         """Creates a team member instance.
 
@@ -184,16 +194,6 @@ class IProjectTeamMembersViewSet(mixins.DestroyModelMixin, CoreViewSetV3):
         if not InvestmentProject.objects.filter(pk=self.kwargs['project_pk']).exists():
             raise Http404('Specified investment project does not exist')
         return super().create(request, *args, **kwargs)
-
-    def get_additional_data(self, create):
-        """Gets additional data for model instance creations and updates.
-
-        Adds the investment_project_id from the URL for creations.
-        """
-        data = {}
-        if create:
-            data['investment_project_id'] = self.kwargs['project_pk']
-        return data
 
     def destroy_all(self, request, *args, **kwargs):
         """Removes all team members from the specified project."""
