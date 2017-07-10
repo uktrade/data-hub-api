@@ -172,7 +172,8 @@ def test_investment_project_to_dict():
             'non_fdi_r_and_d_budget', 'new_tech_to_uk', 'export_revenue',
             'client_requirements', 'site_decided', 'address_line_1',
             'address_line_2', 'address_line_3', 'address_line_postcode',
-            'uk_company', 'project_manager', 'project_assurance_adviser'}
+            'uk_company', 'project_manager', 'project_assurance_adviser',
+            'likelihood_of_landing', 'priority'}
 
     assert set(result.keys()) == keys
 
