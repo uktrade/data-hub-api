@@ -1337,6 +1337,26 @@ class TeamMemberViewsTestCase(LeelooTestCase):
         assert response_data['adviser']['id'] == str(adviser.pk)
         assert response_data['role'] == 'Sector adviser'
 
+    def test_add_duplicate_team_member(self):
+        """Tests adding a duplicate team member to a project."""
+        team_member = InvestmentProjectTeamMemberFactory()
+        url = reverse('api-v3:investment:team-member-collection', kwargs={
+            'project_pk': team_member.investment_project.pk,
+        })
+        request_data = {
+            'adviser': {
+                'id': str(team_member.adviser.pk)
+            },
+            'role': 'Sector adviser'
+        }
+        response = self.api_client.post(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'non_field_errors': ['The fields investment_project, adviser must make a unique set.']
+        }
+
     def test_get_team_member_success(self):
         """Tests getting a project team member."""
         team_member = InvestmentProjectTeamMemberFactory()
