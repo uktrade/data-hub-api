@@ -32,6 +32,7 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     client_relationship_manager = factory.SubFactory(AdviserFactory)
     referral_source_adviser = factory.SubFactory(AdviserFactory)
     project_shareable = False
+    likelihood_of_landing = 90
     created_on = now()
 
     @to_many_field
