@@ -1266,6 +1266,29 @@ class UnifiedViewsTestCase(LeelooTestCase):
         assert response_data['phase'] == response_data['stage']
 
 
+class TeamMemberViewsTestCase(LeelooTestCase):
+    """Tests for the team member views."""
+
+    def test_add_team_member_success(self):
+        """Tests adding a team member to a project."""
+        project = InvestmentProjectFactory()
+        adviser = AdviserFactory()
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        request_data = {
+            'adviser': {
+                'id': str(adviser.pk)
+            },
+            'role': 'Sector adviser'
+        }
+        response = self.api_client.post(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data['adviser']['id'] == str(adviser.pk)
+        assert response_data['role'] == 'Sector adviser'
+
+
 class AuditLogViewTestCase(LeelooTestCase):
     """Tests for the audit log view."""
 
