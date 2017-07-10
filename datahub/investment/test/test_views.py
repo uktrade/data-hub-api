@@ -632,6 +632,8 @@ class UnifiedViewsTestCase(LeelooTestCase):
             'nda_signed': False,
             'estimated_land_date': '2020-12-12',
             'project_shareable': False,
+            'likelihood_of_landing': 60,
+            'priority': '1_low',
             'investment_type': {
                 'id': constants.InvestmentType.fdi.value.id
             },
@@ -676,6 +678,8 @@ class UnifiedViewsTestCase(LeelooTestCase):
         assert response_data['nda_signed'] == request_data['nda_signed']
         assert (response_data['estimated_land_date'] == request_data[
             'estimated_land_date'])
+        assert (response_data['likelihood_of_landing'] == request_data['likelihood_of_landing'])
+        assert response_data['priority'] == request_data['priority']
         assert re.match('^DHP-\d+$', response_data['project_code'])
 
         assert (response_data['investment_type']['id'] == request_data[
@@ -781,6 +785,7 @@ class UnifiedViewsTestCase(LeelooTestCase):
         assert response_data['id'] == str(project.id)
         assert response_data['name'] == project.name
         assert response_data['description'] == project.description
+        assert response_data['likelihood_of_landing'] == project.likelihood_of_landing
         assert response_data['nda_signed'] == project.nda_signed
         assert response_data['project_code'] == project.project_code
         assert (response_data['estimated_land_date'] ==
@@ -807,6 +812,48 @@ class UnifiedViewsTestCase(LeelooTestCase):
         response_data = response.json()
         assert response_data == {
             'fdi_type': ['This field is required.']
+        }
+
+    def test_patch_likelihood_of_landing_too_low(self):
+        """Test updating a project with a likelihood_of_landing below 0."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'likelihood_of_landing': -10
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'likelihood_of_landing': ['Ensure this value is greater than or equal to 0.']
+        }
+
+    def test_patch_likelihood_of_landing_too_high(self):
+        """Test updating a project with a likelihood_of_landing above 100."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'likelihood_of_landing': 110
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'likelihood_of_landing': ['Ensure this value is less than or equal to 100.']
+        }
+
+    def test_patch_priority_invalid_value(self):
+        """Test updating a project with an invalid priority."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'priority': '6_extremely_urgent'
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'priority': ['"6_extremely_urgent" is not a valid choice.']
         }
 
     def test_patch_project_success(self):

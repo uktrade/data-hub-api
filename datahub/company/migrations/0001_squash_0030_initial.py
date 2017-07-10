@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
                 'abstract': False,
             },
             managers=[
-                ('objects', datahub.company.models.AdviserManager()),
+                ('objects', datahub.company.models.adviser.AdviserManager()),
             ],
         ),
         migrations.CreateModel(
