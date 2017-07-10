@@ -14,18 +14,18 @@ from datahub.documents.models import Document
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
-PRIORITIES = Choices(
-    ('1_low', 'low', 'Low'),
-    ('2_medium', 'medium', 'Medium'),
-    ('3_high', 'high', 'High'),
-)
-
 
 class IProjectAbstract(models.Model):
     """The core part of an investment project."""
 
     class Meta:  # noqa: D101
         abstract = True
+
+    PRIORITIES = Choices(
+        ('1_low', 'low', 'Low'),
+        ('2_medium', 'medium', 'Medium'),
+        ('3_high', 'high', 'High'),
+    )
 
     name = models.CharField(max_length=MAX_LENGTH)
     description = models.TextField()
