@@ -107,5 +107,4 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
     class Meta:  # noqa: D101
-        verbose_name = 'advisor'
-        verbose_name_plural = 'advisors'
+        verbose_name = 'adviser'
