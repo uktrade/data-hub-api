@@ -1,18 +1,20 @@
 """Investment views."""
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_list_or_404, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status
+from rest_framework import mixins, status
 from rest_framework.response import Response
 
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.utils import executor
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.documents.av_scan import virus_scan_document
-from datahub.investment.models import InvestmentProject, IProjectDocument
+from datahub.investment.models import (
+    InvestmentProject, InvestmentProjectTeamMember, IProjectDocument
+)
 from datahub.investment.serializers import (
     IProjectAuditSerializer, IProjectDocumentSerializer, IProjectRequirementsSerializer,
-    IProjectSerializer, IProjectTeamSerializer, IProjectUnifiedSerializer, IProjectValueSerializer,
-    UploadStatusSerializer
+    IProjectSerializer, IProjectTeamMemberSerializer, IProjectTeamSerializer,
+    IProjectUnifiedSerializer, IProjectValueSerializer, UploadStatusSerializer
 )
 
 
@@ -158,6 +160,37 @@ class IProjectUnifiedViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     def get_view_name(self):
         """Returns the view set name for the DRF UI."""
         return 'Investment projects'
+
+
+class IProjectTeamMembersViewSet(mixins.DestroyModelMixin, CoreViewSetV3):
+    """Unified investment project views.
+
+    This replaces the previous project, value, team and requirements endpoints.
+    """
+
+    serializer_class = IProjectTeamMemberSerializer
+    queryset = InvestmentProjectTeamMember.objects.select_related(
+        'adviser',
+    )
+    lookup_field = 'adviser_id'
+    lookup_url_kwarg = 'adviser_pk'
+
+    def destroy_all(self, request, *args, **kwargs):
+        """Removes all team members from the specified project."""
+        queryset = self.get_queryset()
+        queryset.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def get_queryset(self):
+        """Filters the query set to the specified project."""
+        queryset = get_list_or_404(
+            self.queryset, investment_project_id=self.kwargs['project_pk']
+        )
+        return queryset.all()
+
+    def get_view_name(self):
+        """Returns the view set name for the DRF UI."""
+        return 'Investment project team members'
 
 
 class IProjectDocumentViewSet(CoreViewSetV3):
