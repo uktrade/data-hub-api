@@ -14,6 +14,12 @@ from datahub.documents.models import Document
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
+PRIORITIES = Choices(
+    ('1_low', 'low', 'Low'),
+    ('2_medium', 'medium', 'Medium'),
+    ('3_high', 'high', 'High'),
+)
+
 
 class IProjectAbstract(models.Model):
     """The core part of an investment project."""
@@ -35,6 +41,8 @@ class IProjectAbstract(models.Model):
     project_shareable = models.NullBooleanField()
     not_shareable_reason = models.TextField(blank=True, null=True)
     actual_land_date = models.DateField(blank=True, null=True)
+    likelihood_of_landing = models.IntegerField(blank=True, null=True)
+    priority = models.CharField(max_length=MAX_LENGTH, choices=PRIORITIES, blank=True, null=True)
 
     approved_commitment_to_invest = models.NullBooleanField()
     approved_fdi = models.NullBooleanField()
