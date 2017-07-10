@@ -810,7 +810,7 @@ class UnifiedViewsTestCase(LeelooTestCase):
         }
 
     def test_patch_likelihood_of_landing_too_low(self):
-        """Test updating a project a likelihood_of_landing above 100."""
+        """Test updating a project with a likelihood_of_landing below 0."""
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
@@ -824,7 +824,7 @@ class UnifiedViewsTestCase(LeelooTestCase):
         }
 
     def test_patch_likelihood_of_landing_too_high(self):
-        """Test updating a project a likelihood_of_landing above 100."""
+        """Test updating a project with a likelihood_of_landing above 100."""
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
@@ -838,7 +838,7 @@ class UnifiedViewsTestCase(LeelooTestCase):
         }
 
     def test_patch_priority_invalid_value(self):
-        """Test updating a project a likelihood_of_landing above 100."""
+        """Test updating a project with an invalid priority."""
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
