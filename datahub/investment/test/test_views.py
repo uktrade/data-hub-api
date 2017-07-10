@@ -17,7 +17,9 @@ from datahub.core.utils import executor
 from datahub.documents.av_scan import virus_scan_document
 from datahub.investment import views
 from datahub.investment.models import IProjectDocument
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.test.factories import (
+    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
+)
 
 
 class InvestmentViewsTestCase(LeelooTestCase):
@@ -1287,6 +1289,19 @@ class TeamMemberViewsTestCase(LeelooTestCase):
         response_data = response.json()
         assert response_data['adviser']['id'] == str(adviser.pk)
         assert response_data['role'] == 'Sector adviser'
+
+    def test_get_team_member_success(self):
+        """Tests getting a project team member."""
+        team_member = InvestmentProjectTeamMemberFactory()
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': team_member.investment_project.pk,
+            'adviser_pk': team_member.adviser.pk
+        })
+        response = self.api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['role'] == team_member.role
 
 
 class AuditLogViewTestCase(LeelooTestCase):

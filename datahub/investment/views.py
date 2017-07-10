@@ -174,7 +174,7 @@ class IProjectTeamMembersViewSet(mixins.DestroyModelMixin, CoreViewSetV3):
     def get_queryset(self):
         """Filters the query set to the specified project."""
         project = get_object_or_404(InvestmentProject, pk=self.kwargs['project_pk'])
-        return project.select_related('adviser').all()
+        return project.team_members.select_related('adviser').all()
 
     def create(self, request, *args, **kwargs):
         """Creates a team member instance.
