@@ -312,7 +312,6 @@ class InvestmentProject(DocType, MapDBModelToDict):
     })  # InvestmentType
     name = String(copy_to='name_keyword')
     name_keyword = String(analyzer='lowercase_keyword_analyzer')
-    description = String()
     r_and_d_budget = Boolean()
     non_fdi_r_and_d_budget = Boolean()
     new_tech_to_uk = Boolean()
