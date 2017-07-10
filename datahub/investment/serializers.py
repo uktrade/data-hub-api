@@ -89,6 +89,8 @@ class IProjectSerializer(serializers.ModelSerializer):
             'actual_land_date',
             'project_shareable',
             'not_shareable_reason',
+            'likelihood_of_landing',
+            'priority',
             'approved_commitment_to_invest',
             'approved_fdi',
             'approved_good_value',
@@ -122,6 +124,7 @@ class IProjectSerializer(serializers.ModelSerializer):
         # non-nullable
         extra_kwargs = {
             'nda_signed': {'required': True},
+            'likelihood_of_landing': {'min_value': 0, 'max_value': 100},
             'archived': {'read_only': True},
             'archived_on': {'read_only': True},
             'archived_reason': {'read_only': True}
