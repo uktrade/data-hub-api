@@ -1381,6 +1381,10 @@ class ArchiveViewsTestCase(LeelooTestCase):
         assert response_data['archived_by'] is None
         assert response_data['archived_reason'] == ''
 
+
+class DocumentViewsTestCase(LeelooTestCase):
+    """Tests for the document views."""
+
     def test_documents_list_is_filtered_by_project(self):
         """Tests viewset filtering."""
         project1 = InvestmentProjectFactory()
