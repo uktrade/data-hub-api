@@ -4,7 +4,6 @@ from django.conf import settings
 from django.core import management
 from django.db.models.signals import post_save
 from elasticsearch.helpers.test import get_test_client
-from elasticsearch_dsl import Index
 from pytest import fixture
 
 from datahub.company.models import Company, Contact
@@ -12,7 +11,7 @@ from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.investment.models import InvestmentProject
 from datahub.investment.test.factories import InvestmentProjectFactory
-from datahub.search import models
+from datahub.search import models, elasticsearch
 from datahub.search.management.commands import sync_es
 
 
@@ -74,9 +73,10 @@ def create_test_index(client, index):
     if client.indices.exists(index=index):
         client.indices.delete(index)
 
-    index = Index(index)
-    index.create()
-
+    elasticsearch.configure_index(index, {
+        'number_of_shards': 1,
+        'number_of_replicas': 0,
+    })
 
 @fixture
 def post_save_handlers():
