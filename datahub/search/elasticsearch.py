@@ -25,11 +25,13 @@ def configure_connection():
 
 def configure_index(index_name, settings=None):
     """Configures Elasticsearch index."""
-    index = Index(index_name)
-    index.analyzer(lowercase_keyword_analyzer)
-    if settings:
-        index.settings(**settings)
-    index.create()
+    client = connections.get_connection()
+    if not client.indices.exists(index=index_name):
+        index = Index(index_name)
+        index.analyzer(lowercase_keyword_analyzer)
+        if settings:
+            index.settings(**settings)
+        index.create()
 
 
 def get_search_term_query(term):
