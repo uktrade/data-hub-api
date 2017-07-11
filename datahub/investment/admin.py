@@ -28,7 +28,7 @@ class InvestmentProjectAdmin(VersionAdmin):
 
 @admin.register(InvestmentProjectTeamMember)
 class InvestmentProjectTeamMemberAdmin(VersionAdmin):
-    """Investment project admin."""
+    """Investment project team member admin."""
 
     raw_id_fields = (
         'investment_project',
