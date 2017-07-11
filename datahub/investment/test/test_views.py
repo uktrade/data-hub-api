@@ -1357,6 +1357,22 @@ class TeamMemberViewsTestCase(LeelooTestCase):
             'non_field_errors': ['The fields investment_project, adviser must make a unique set.']
         }
 
+    def test_delete_all_team_members_success(self):
+        """Tests removing all team members from a project."""
+        project = InvestmentProjectFactory()
+        team_members = InvestmentProjectTeamMemberFactory.create_batch(
+            2, investment_project=project
+        )
+        InvestmentProjectTeamMemberFactory()
+        url = reverse('api-v3:investment:team-member-collection', kwargs={
+            'project_pk': team_members[0].investment_project.pk
+        })
+        response = self.api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert not InvestmentProjectTeamMember.objects.filter(investment_project=project).exists()
+        assert InvestmentProjectTeamMember.objects.all().exists()
+
     def test_get_team_member_success(self):
         """Tests getting a project team member."""
         team_member = InvestmentProjectTeamMemberFactory()
@@ -1387,7 +1403,7 @@ class TeamMemberViewsTestCase(LeelooTestCase):
         assert response_data['role'] == request_data['role']
 
     def test_delete_team_member_success(self):
-        """Tests deleting a project team member."""
+        """Tests removing a team member from a project."""
         project = InvestmentProjectFactory()
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
             2, investment_project=project
