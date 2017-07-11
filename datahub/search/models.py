@@ -266,6 +266,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
     client_relationship_manager = _id_name_mapping()
     project_manager = _contact_mapping('project_manager')
     project_assurance_adviser = _contact_mapping('project_assurance_adviser')
+    team_members = _contact_mapping('team_members')
     archived = Boolean()
     archived_reason = String()
     archived_by = _contact_mapping('archived_by')
@@ -312,6 +313,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'business_activities': lambda col: [_id_name_dict(c) for c in col.all()],
         'client_contacts': lambda col: [_contact_dict(c) for c in col.all()],
         'client_relationship_manager': _id_name_dict,
+        'team_members': lambda col: [_contact_dict(c) for c in col.all()],
         'fdi_type': _id_name_dict,
         'fdi_type_documents': lambda col: [_id_uri_dict(c) for c in col.all()],
         'intermediate_company': _id_name_dict,
