@@ -223,7 +223,12 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
 
 
 class InvestmentProjectTeamMember(models.Model):
-    """Intermediary M2M model for investment project team members."""
+    """Intermediary M2M model for investment project team members.
+
+    ManyToManyField with through is not used in the InvestmentProject model, because
+    it makes working with DRF serialisers difficult (as it would return advisers rather than
+    instances of this model).
+    """
 
     investment_project = models.ForeignKey(
         InvestmentProject, on_delete=models.CASCADE, related_name='team_members'
