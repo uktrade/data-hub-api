@@ -19,6 +19,19 @@ pytestmark = pytest.mark.django_db
 class SearchTestCase(LeelooTestCase):
     """Tests search views."""
 
+    def test_basic_search_all_companies(self):
+        """Tests basic aggregate companies query."""
+        term = ''
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'company'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] > 0
+
     def test_basic_search_companies(self):
         """Tests basic aggregate companies query."""
         term = 'abc defg'
