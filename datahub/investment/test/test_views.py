@@ -1,6 +1,7 @@
 """Tests for investment views."""
 
 import re
+import uuid
 from datetime import datetime
 from unittest.mock import patch
 
@@ -1318,6 +1319,14 @@ class UnifiedViewsTestCase(LeelooTestCase):
 class TeamMemberViewsTestCase(LeelooTestCase):
     """Tests for the team member views."""
 
+    def test_add_team_member_nonexistent_project(self):
+        """Tests adding a team member to a non-existent project."""
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': uuid.uuid4()})
+        response = self.api_client.post(url, format='json', data={})
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
     def test_add_team_member_missing_data(self):
         """Tests adding a team member to a project without specifying an adviser and role."""
         project = InvestmentProjectFactory()
@@ -1433,6 +1442,28 @@ class TeamMemberViewsTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['role'] == team_member.role
+
+    def test_get_team_member_nonexistent_adviser(self):
+        """Tests getting a non-existent project team member."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': project.pk,
+            'adviser_pk': uuid.uuid4()
+        })
+        response = self.api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_get_team_member_nonexistent_project(self):
+        """Tests getting a project team member for a non-existent project."""
+        adviser = AdviserFactory()
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': uuid.uuid4(),
+            'adviser_pk': adviser.pk
+        })
+        response = self.api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_patch_team_member_success(self):
         """Tests updating a project team member's role."""
