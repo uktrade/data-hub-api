@@ -7,7 +7,7 @@ from elasticsearch.helpers.test import get_test_client
 from pytest import fixture
 
 from datahub.company.models import Company, Contact
-from datahub.company.test.factories import CompanyFactory, ContactFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.investment.models import InvestmentProject
 from datahub.investment.test.factories import InvestmentProjectFactory
@@ -43,7 +43,9 @@ def setup_data(client):
     ).save()
     InvestmentProjectFactory(
         description='investmentproject2',
-        estimated_land_date=datetime.datetime(2057, 6, 13, 9, 44, 31, 62870)
+        estimated_land_date=datetime.datetime(2057, 6, 13, 9, 44, 31, 62870),
+        project_manager=AdviserFactory(),
+        project_assurance_adviser=AdviserFactory(),
     ).save()
 
     country_uk = constants.Country.united_kingdom.value.id

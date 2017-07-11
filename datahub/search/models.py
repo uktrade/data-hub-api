@@ -271,10 +271,16 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'id': String(index='not_analyzed'),
         'name': String()}
     )  # Adviser
-    project_manager = Nested(properties={
-        'id': String(index='not_analyzed'),
-        'name': String()}
-    )  # Adviser
+    project_manager = Nested(properties={'id': String(index='not_analyzed'),
+                                         'first_name': String(copy_to='project_manager.name'),
+                                         'last_name': String(copy_to='project_manager.name'),
+                                         'name': String(),
+                                         })  # Adviser
+    project_assurance_adviser = Nested(properties={'id': String(index='not_analyzed'),
+                                                   'first_name': String(copy_to='project_assurance_adviser.name'),
+                                                   'last_name': String(copy_to='project_assurance_adviser.name'),
+                                                   'name': String(),
+                                                   })  # Adviser
     archived = Boolean()
     archived_reason = String()
     archived_by = Nested(properties={'id': String(index='not_analyzed'),
@@ -388,6 +394,8 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'project_code': str,
         'average_salary': _id_name_dict,
         'archived_by': _contact_dict,
+        'project_manager': _contact_dict,
+        'project_assurance_adviser': _contact_dict,
     }
 
     IGNORED_FIELDS = (
