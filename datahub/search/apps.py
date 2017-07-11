@@ -13,7 +13,7 @@ class SearchConfig(AppConfig):
     def ready(self):
         """Configures Elasticsearch default connection."""
         elasticsearch.configure_connection()
-        elasticsearch.configure_index(index=settings.ES_INDEX)
+        elasticsearch.configure_index(settings.ES_INDEX)
 
         # Makes sure mappings exist in Elasticsearch.
         # Those calls are idempotent
