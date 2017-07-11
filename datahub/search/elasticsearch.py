@@ -34,6 +34,9 @@ def configure_index(index_name, settings=None):
 
 def get_search_term_query(term):
     """Returns search term query."""
+    if term == '':
+        return Q('match_all')
+
     return Q('bool', should=[
         MatchPhrase(name_keyword={'query': term, 'boost': 2}),
         Match(name={'query': term}),
