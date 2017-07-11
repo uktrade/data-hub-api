@@ -43,6 +43,36 @@ def _company_dict(obj):
     }
 
 
+def _contact_mapping(field):
+    """Mapping for Adviser/Contact fields."""
+    return Nested(properties={'id': String(index='not_analyzed'),
+                              'first_name': String(copy_to=f'{field}.name'),
+                              'last_name': String(copy_to=f'{field}.name'),
+                              'name': String(),
+                              })
+
+
+def _id_name_mapping():
+    """Mapping for id name fields."""
+    return Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
+
+
+def _id_uri_mapping():
+    """Mapping for id uri fields."""
+    return Nested(properties={
+        'id': String(index='not_analyzed'),
+        'uri': String(index='not_analyzed')
+    })
+
+
+def _company_mapping():
+    """Mapping for id company_number fields."""
+    return Nested(properties={
+        'id': String(index='not_analyzed'),
+        'company_number': String()
+    })
+
+
 class MapDBModelToDict:
     """Helps convert Django models to dictionaries."""
 
@@ -85,62 +115,46 @@ class MapDBModelToDict:
 class Company(DocType, MapDBModelToDict):
     """Elasticsearch representation of Company model."""
 
-    account_manager = Nested(properties={'id': String(index='not_analyzed'),
-                                         'first_name': String(copy_to='account_manager.name'),
-                                         'last_name': String(copy_to='account_manager.name'),
-                                         'name': String(),
-                                         })
+    account_manager = _contact_mapping('account_manager')
     alias = String()
     archived = Boolean()
-    archived_by = Nested(properties={'id': String(index='not_analyzed'),
-                                     'first_name': String(copy_to='archived_by.name'),
-                                     'last_name': String(copy_to='archived_by.name'),
-                                     'name': String(),
-                                     })
-    contacts = Nested(properties={'id': String(index='not_analyzed'),
-                                  'first_name': String(copy_to='contacts.name'),
-                                  'last_name': String(copy_to='contacts.name'),
-                                  'name': String(),
-                                  })
+    archived_by = _contact_mapping('archived_by')
+    contacts = _contact_mapping('contacts')
     archived_on = Date()
     archived_reason = String()
-    business_type = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
-    classification = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
+    business_type = _id_name_mapping()
+    classification = _id_name_mapping()
     company_number = String()
-    companies_house_data = Nested(properties={'id': String(index='not_analyzed'), 'company_number': String()})
+    companies_house_data = _company_mapping()
     created_on = Date()
     description = String()
-    employee_range = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
-    headquarter_type = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
+    employee_range = _id_name_mapping()
+    headquarter_type = _id_name_mapping()
     id = String(index='not_analyzed')
     modified_on = Date()
     name = String(copy_to='name_keyword')
     name_keyword = String(analyzer='lowercase_keyword_analyzer')
-    one_list_account_owner = Nested(properties={'id': String(index='not_analyzed'),
-                                                'first_name': String(copy_to='one_list_account_owner.name'),
-                                                'last_name': String(copy_to='one_list_account_owner.name'),
-                                                'name': String(),
-                                                })
-    parent = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
+    one_list_account_owner = _contact_mapping('one_list_account_owner')
+    parent = _id_name_mapping()
     registered_address_1 = String()
     registered_address_2 = String()
-    registered_address_country = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
+    registered_address_country = _id_name_mapping()
     registered_address_county = String()
     registered_address_postcode = String()
     registered_address_town = String()
-    sector = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
+    sector = _id_name_mapping()
     trading_address_1 = String()
     trading_address_2 = String()
-    trading_address_country = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
+    trading_address_country = _id_name_mapping()
     trading_address_county = String()
     trading_address_postcode = String()
     trading_address_town = String()
-    turnover_range = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
-    uk_region = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
+    turnover_range = _id_name_mapping()
+    uk_region = _id_name_mapping()
     uk_based = Boolean()
     website = String()
-    export_to_countries = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
-    future_interest_countries = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
+    export_to_countries = _id_name_mapping()
+    future_interest_countries = _id_name_mapping()
 
     MAPPINGS = {
         'companies_house_data': _company_dict,
@@ -189,7 +203,7 @@ class Contact(DocType, MapDBModelToDict):
     id = String(index='not_analyzed')
     name = String(copy_to='name_keyword')
     name_keyword = String(analyzer='lowercase_keyword_analyzer')
-    title = Nested(properties={'id': String(index='not_analyzed'), 'name': String(copy_to='name')})
+    title = _id_name_mapping()
     first_name = String(copy_to='name')
     last_name = String(copy_to='name')
     primary = Boolean()
@@ -210,18 +224,10 @@ class Contact(DocType, MapDBModelToDict):
     contactable_by_dit_partners = Boolean()
     contactable_by_email = Boolean()
     contactable_by_phone = Boolean()
-    address_country = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
-    adviser = Nested(properties={'id': String(index='not_analyzed'),
-                                 'first_name': String(copy_to='adviser.name'),
-                                 'last_name': String(copy_to='adviser.name'),
-                                 'name': String(),
-                                 })  # Adviser
-    archived_by = Nested(properties={'id': String(index='not_analyzed'),
-                                     'first_name': String(copy_to='archived_by.name'),
-                                     'last_name': String(copy_to='archived_by.name'),
-                                     'name': String(),
-                                     })
-    company = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
+    address_country = _id_name_mapping()
+    adviser = _contact_mapping('adviser')
+    archived_by = _contact_mapping('archived_by')
+    company = _id_name_mapping()
 
     MAPPINGS = {
         'id': str,
@@ -254,68 +260,25 @@ class InvestmentProject(DocType, MapDBModelToDict):
     approved_landed = Boolean()
     approved_non_fdi = Boolean()
     actual_land_date = Date()
-    actual_land_date_documents = Nested(properties={
-        'id': String(index='not_analyzed'),
-        'uri': String(index='not_analyzed')
-    })  # Documents
-    business_activities = Nested(properties={
-        'id': String(index='not_analyzed'),
-        'name': String()
-    })  # BusinessActivities
-    client_contacts = Nested(properties={'id': String(index='not_analyzed'),
-                                         'first_name': String(copy_to='client_contacts.name'),
-                                         'last_name': String(copy_to='client_contacts.name'),
-                                         'name': String(),
-                                         })  # ContactArray
-    client_relationship_manager = Nested(properties={
-        'id': String(index='not_analyzed'),
-        'name': String()}
-    )  # Adviser
-    project_manager = Nested(properties={'id': String(index='not_analyzed'),
-                                         'first_name': String(copy_to='project_manager.name'),
-                                         'last_name': String(copy_to='project_manager.name'),
-                                         'name': String(),
-                                         })  # Adviser
-    project_assurance_adviser = Nested(properties={'id': String(index='not_analyzed'),
-                                                   'first_name': String(copy_to='project_assurance_adviser.name'),
-                                                   'last_name': String(copy_to='project_assurance_adviser.name'),
-                                                   'name': String(),
-                                                   })  # Adviser
+    actual_land_date_documents = _id_uri_mapping()
+    business_activities = _id_name_mapping()
+    client_contacts = _contact_mapping('client_contacts')
+    client_relationship_manager = _id_name_mapping()
+    project_manager = _contact_mapping('project_manager')
+    project_assurance_adviser = _contact_mapping('project_assurance_adviser')
     archived = Boolean()
     archived_reason = String()
-    archived_by = Nested(properties={'id': String(index='not_analyzed'),
-                                     'first_name': String(copy_to='archived_by.name'),
-                                     'last_name': String(copy_to='archived_by.name'),
-                                     'name': String(),
-                                     })
+    archived_by = _contact_mapping('archived_by')
     created_on = Date()
     modified_on = Date()
     description = String()
     estimated_land_date = Date()
-    fdi_type = Nested(properties={
-        'id': String(index='not_analyzed'),
-        'name': String()
-    })  # FDIType
-    fdi_type_documents = Nested(properties={
-        'id': String(index='not_analyzed'),
-        'uri': String(index='not_analyzed')
-    })  # Documents
-    intermediate_company = Nested(properties={
-        'id': String(index='not_analyzed'),
-        'name': String()
-    })  # CompanySlim
-    uk_company = Nested(properties={
-        'id': String(index='not_analyzed'),
-        'name': String()
-    })  # CompanySlim
-    investor_company = Nested(properties={
-        'id': String(index='not_analyzed'),
-        'name': String()
-    })  # CompanySlim
-    investment_type = Nested(properties={
-        'id': String(index='not_analyzed'),
-        'name': String()
-    })  # InvestmentType
+    fdi_type = _id_name_mapping()
+    fdi_type_documents = _id_uri_mapping()
+    intermediate_company = _id_name_mapping()
+    uk_company = _id_name_mapping()
+    investor_company = _id_name_mapping()
+    investment_type = _id_name_mapping()
     name = String(copy_to='name_keyword')
     name_keyword = String(analyzer='lowercase_keyword_analyzer')
     r_and_d_budget = Boolean()
@@ -329,47 +292,19 @@ class InvestmentProject(DocType, MapDBModelToDict):
     total_investment = Double()
     foreign_equity_investment = Double()
     number_new_jobs = Integer()
-    non_fdi_type = Nested(properties={
-        'id': String(index='not_analyzed'),
-        'name': String()
-    })  # NonFDIType
+    non_fdi_type = _id_name_mapping()
     not_shareable_reason = String()
-    operations_commenced_documents = Nested(properties={
-        'id': String(index='not_analyzed'),
-        'uri': String(index='not_analyzed')
-    })  # Documents
-    stage = Nested(properties={
-        'id': String(index='not_analyzed'),
-        'name': String()
-    })  # Stage
+    operations_commenced_documents = _id_uri_mapping()
+    stage = _id_name_mapping()
     project_code = String(index='not_analyzed')
     project_shareable = Boolean()
-    referral_source_activity = Nested(properties={
-        'id': String(index='not_analyzed'),
-        'name': String()
-    })  # ReferralSourceActivity
-    referral_source_activity_marketing = Nested(properties={
-        'id': String(index='not_analyzed'),
-        'name': String()
-    })  # ReferralSourceActivityMarketing
-    referral_source_activity_website = Nested(properties={
-        'id': String(index='not_analyzed'),
-        'name': String()
-    })  # ReferralSourceActivityWebsite
+    referral_source_activity = _id_name_mapping()
+    referral_source_activity_marketing = _id_name_mapping()
+    referral_source_activity_website = _id_name_mapping()
     referral_source_activity_event = String()
-    referral_source_advisor = Nested(properties={'id': String(index='not_analyzed'),
-                                                 'first_name': String(copy_to='referral_source_advisor.name'),
-                                                 'last_name': String(copy_to='referral_source_advisor.name'),
-                                                 'name': String(),
-                                                 })  # Adviser
-    sector = Nested(properties={
-        'id': String(index='not_analyzed'),
-        'name': String()
-    })  # Sector
-    average_salary = Nested(properties={
-        'id': String(index='not_analyzed'),
-        'name': String()
-    })  # AverageSalary
+    referral_source_advisor = _contact_mapping('referral_source_advisor')
+    sector = _id_name_mapping()
+    average_salary = _id_name_mapping()
 
     MAPPINGS = {
         'id': str,
