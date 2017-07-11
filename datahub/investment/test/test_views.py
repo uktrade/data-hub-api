@@ -1318,6 +1318,54 @@ class UnifiedViewsTestCase(LeelooTestCase):
 class TeamMemberViewsTestCase(LeelooTestCase):
     """Tests for the team member views."""
 
+    def test_add_team_member_missing_data(self):
+        """Tests adding a team member to a project without specifying an adviser and role."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        response = self.api_client.post(url, format='json', data={})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'adviser': ['This field is required.'],
+            'role': ['This field is required.']
+        }
+
+    def test_add_team_member_null_data(self):
+        """Tests adding a team member to a project specifying a null adviser and role."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        response = self.api_client.post(url, format='json', data={
+            'adviser': None,
+            'role': None
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'adviser': ['This field may not be null.'],
+            'role': ['This field may not be null.']
+        }
+
+    def test_add_team_member_blank_role(self):
+        """Tests adding a team member to a project specifying a blank role."""
+        project = InvestmentProjectFactory()
+        adviser = AdviserFactory()
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        response = self.api_client.post(url, format='json', data={
+            'adviser': {'id': str(adviser.pk)},
+            'role': ''
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'role': ['This field may not be blank.']
+        }
+
     def test_add_team_member_success(self):
         """Tests adding a team member to a project."""
         project = InvestmentProjectFactory()
