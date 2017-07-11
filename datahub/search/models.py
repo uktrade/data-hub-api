@@ -1,5 +1,6 @@
 from django.conf import settings
-from elasticsearch_dsl import Boolean, Date, DocType, Double, Integer, Nested, String
+from elasticsearch_dsl import (Boolean, Date, DocType, Double,
+                               Integer, Nested, String)
 
 
 def _id_name_dict(obj):
@@ -113,7 +114,8 @@ class Company(DocType, MapDBModelToDict):
     headquarter_type = Nested(properties={'id': String(index='not_analyzed'), 'name': String()})
     id = String(index='not_analyzed')
     modified_on = Date()
-    name = String()
+    name = String(copy_to='name_keyword')
+    name_keyword = String(analyzer='lowercase_keyword_analyzer')
     one_list_account_owner = Nested(properties={'id': String(index='not_analyzed'),
                                                 'first_name': String(copy_to='one_list_account_owner.name'),
                                                 'last_name': String(copy_to='one_list_account_owner.name'),
@@ -185,7 +187,8 @@ class Contact(DocType, MapDBModelToDict):
     created_on = Date()
     modified_on = Date()
     id = String(index='not_analyzed')
-    name = String()
+    name = String(copy_to='name_keyword')
+    name_keyword = String(analyzer='lowercase_keyword_analyzer')
     title = Nested(properties={'id': String(index='not_analyzed'), 'name': String(copy_to='name')})
     first_name = String(copy_to='name')
     last_name = String(copy_to='name')
@@ -307,8 +310,8 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'id': String(index='not_analyzed'),
         'name': String()
     })  # InvestmentType
-    name = String()
-    description = String()
+    name = String(copy_to='name_keyword')
+    name_keyword = String(analyzer='lowercase_keyword_analyzer')
     r_and_d_budget = Boolean()
     non_fdi_r_and_d_budget = Boolean()
     new_tech_to_uk = Boolean()
