@@ -20,7 +20,7 @@ class SearchTestCase(LeelooTestCase):
     """Tests search views."""
 
     def test_basic_search_all_companies(self):
-        """Tests basic aggregate companies query."""
+        """Tests basic aggregate all companies query."""
         term = ''
 
         url = reverse('api-v3:search:basic')
