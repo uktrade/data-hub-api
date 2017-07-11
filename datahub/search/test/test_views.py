@@ -1,5 +1,5 @@
 import datetime
-from unittest import mock, skip
+from unittest import mock
 
 import pytest
 from elasticsearch_dsl.connections import connections
@@ -18,6 +18,19 @@ pytestmark = pytest.mark.django_db
 @pytest.mark.usefixtures('setup_data', 'post_save_handlers')
 class SearchTestCase(LeelooTestCase):
     """Tests search views."""
+
+    def test_basic_search_all_companies(self):
+        """Tests basic aggregate all companies query."""
+        term = ''
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'company'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] > 0
 
     def test_basic_search_companies(self):
         """Tests basic aggregate companies query."""
@@ -217,7 +230,6 @@ class SearchTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    @skip('This test fails randomly. Skip until fixed.')
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_results_quality(self):

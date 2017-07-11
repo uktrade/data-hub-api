@@ -13,20 +13,14 @@ def test_get_search_term_query():
             'should': [
                 {
                     'match_phrase': {
-                        'name': {
+                        'name_keyword': {
                             'query': 'hello',
-                            'slop': 200
+                            'boost': 2
                         }
                     }
                 }, {
                     'match': {
                         'name': {
-                            'query': 'hello',
-                        }
-                    }
-                }, {
-                    'match_phrase': {
-                        '_all': {
                             'query': 'hello',
                         }
                     }
@@ -52,20 +46,14 @@ def test_get_basic_search_query():
                 'should': [
                     {
                         'match_phrase': {
-                            'name': {
+                            'name_keyword': {
                                 'query': 'test',
-                                'slop': 200
+                                'boost': 2
                             }
                         }
                     }, {
                         'match': {
                             'name': {
-                                'query': 'test',
-                            }
-                        }
-                    }, {
-                        'match_phrase': {
-                            '_all': {
                                 'query': 'test',
                             }
                         }
@@ -137,20 +125,14 @@ def test_search_by_entity_query():
                             'should': [
                                 {
                                     'match_phrase': {
-                                        'name': {
+                                        'name_keyword': {
                                             'query': 'test',
-                                            'slop': 200
+                                            'boost': 2
                                         }
                                     }
                                 }, {
                                     'match': {
                                         'name': {
-                                            'query': 'test',
-                                        }
-                                    }
-                                }, {
-                                    'match_phrase': {
-                                        '_all': {
                                             'query': 'test',
                                         }
                                     }
