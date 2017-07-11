@@ -1370,6 +1370,22 @@ class TeamMemberViewsTestCase(LeelooTestCase):
         response_data = response.json()
         assert response_data['role'] == team_member.role
 
+    def test_patch_team_member_success(self):
+        """Tests updating a project team member's role."""
+        team_member = InvestmentProjectTeamMemberFactory()
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': team_member.investment_project.pk,
+            'adviser_pk': team_member.adviser.pk
+        })
+        request_data = {
+            'role': 'updated role'
+        }
+        response = self.api_client.patch(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['role'] == request_data['role']
+
     def test_delete_team_member_success(self):
         """Tests deleting a project team member."""
         project = InvestmentProjectFactory()
