@@ -164,10 +164,7 @@ class IProjectUnifiedViewSet(ArchivableViewSetMixin, CoreViewSetV3):
 
 
 class IProjectTeamMembersViewSet(mixins.DestroyModelMixin, CoreViewSetV3):
-    """Unified investment project views.
-
-    This replaces the previous project, value, team and requirements endpoints.
-    """
+    """Investment project team member views."""
 
     serializer_class = IProjectTeamMemberSerializer
     lookup_field = 'adviser_id'
