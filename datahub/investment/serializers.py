@@ -4,9 +4,11 @@ from rest_framework import serializers
 from reversion.models import Version
 
 import datahub.metadata.models as meta_models
-from datahub.company.models import Advisor, Company, Contact
+from datahub.company.models import Company, Contact
+from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
-from datahub.investment.models import InvestmentProject, IProjectDocument
+from datahub.investment.models import (InvestmentProject, InvestmentProjectTeamMember,
+                                       IProjectDocument)
 from datahub.investment.validate import validate
 
 
@@ -32,14 +34,8 @@ class IProjectSerializer(serializers.ModelSerializer):
         Contact, many=True, required=True, allow_null=False, allow_empty=False
     )
 
-    client_relationship_manager = NestedRelatedField(
-        Advisor, required=True, allow_null=False,
-        extra_fields=('first_name', 'last_name')
-    )
-    referral_source_adviser = NestedRelatedField(
-        Advisor, required=True, allow_null=False,
-        extra_fields=('first_name', 'last_name')
-    )
+    client_relationship_manager = NestedAdviserField(required=True, allow_null=False)
+    referral_source_adviser = NestedAdviserField(required=True, allow_null=False)
     referral_source_activity = NestedRelatedField(
         meta_models.ReferralSourceActivity, required=True, allow_null=False
     )
@@ -62,9 +58,7 @@ class IProjectSerializer(serializers.ModelSerializer):
         meta_models.InvestmentBusinessActivity, many=True, required=True,
         allow_null=False, allow_empty=False
     )
-    archived_by = NestedRelatedField(
-        Advisor, read_only=True, extra_fields=('first_name', 'last_name')
-    )
+    archived_by = NestedAdviserField(read_only=True)
 
     def validate(self, data):
         """Validates the object after individual fields have been validated.
@@ -259,23 +253,29 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
         )
 
 
+class IProjectTeamMemberSerializer(serializers.ModelSerializer):
+    """Serialiser for investment project team members."""
+
+    investment_project = NestedRelatedField(InvestmentProject)
+    adviser = NestedAdviserField()
+
+    class Meta:  # noqa: D101
+        model = InvestmentProjectTeamMember
+        fields = ('investment_project', 'adviser', 'role')
+
+
 class IProjectTeamSerializer(serializers.ModelSerializer):
     """Serialiser for investment project team objects."""
 
-    project_manager = NestedRelatedField(
-        Advisor, required=False, allow_null=True,
-        extra_fields=('first_name', 'last_name')
-    )
-    project_assurance_adviser = NestedRelatedField(
-        Advisor, required=False, allow_null=True,
-        extra_fields=('first_name', 'last_name')
-    )
+    project_manager = NestedAdviserField(required=False, allow_null=True)
+    project_assurance_adviser = NestedAdviserField(required=False, allow_null=True)
     project_manager_team = NestedRelatedField(
         meta_models.Team, read_only=True
     )
     project_assurance_team = NestedRelatedField(
         meta_models.Team, read_only=True
     )
+    team_members = IProjectTeamMemberSerializer(many=True, read_only=True)
     team_complete = serializers.SerializerMethodField()
 
     def get_team_complete(self, instance):
@@ -291,7 +291,8 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
             'project_assurance_adviser',
             'project_manager_team',
             'project_assurance_team',
-            'team_complete'
+            'team_complete',
+            'team_members'
         )
 
 

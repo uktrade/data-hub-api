@@ -16,7 +16,7 @@ from datahub.company.test.factories import (
 
 
 class InvestmentProjectFactory(factory.django.DjangoModelFactory):
-    """Company factory."""
+    """Investment project factory."""
 
     id = factory.Sequence(lambda _: str(uuid.uuid4()))
     name = factory.Sequence(lambda n: f'name {n}')
@@ -57,3 +57,15 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'investment.InvestmentProject'
+
+
+class InvestmentProjectTeamMemberFactory(factory.django.DjangoModelFactory):
+    """Investment project team member factory."""
+
+    investment_project = factory.SubFactory(InvestmentProjectFactory)
+    adviser = factory.SubFactory(AdviserFactory)
+    role = factory.Sequence(lambda n: f'role {n}')
+
+    class Meta:
+        model = 'investment.InvestmentProjectTeamMember'
+

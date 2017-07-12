@@ -1,6 +1,7 @@
 """Tests for investment views."""
 
 import re
+import uuid
 from datetime import datetime
 from unittest.mock import patch
 
@@ -16,8 +17,10 @@ from datahub.core.test_utils import LeelooTestCase
 from datahub.core.utils import executor
 from datahub.documents.av_scan import virus_scan_document
 from datahub.investment import views
-from datahub.investment.models import IProjectDocument
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.models import InvestmentProjectTeamMember, IProjectDocument
+from datahub.investment.test.factories import (
+    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
+)
 
 
 class InvestmentViewsTestCase(LeelooTestCase):
@@ -516,6 +519,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
                 'id': str(huk_team.id),
                 'name': huk_team.name
             },
+            'team_members': [],
             'team_complete': True
         }
 
@@ -534,7 +538,8 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'project_assurance_adviser': None,
             'project_manager_team': None,
             'project_assurance_team': None,
-            'team_complete': False
+            'team_complete': False,
+            'team_members': []
         }
 
     def test_patch_team_success(self):
@@ -576,6 +581,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
                 'id': str(huk_team.id),
                 'name': huk_team.name
             },
+            'team_members': [],
             'team_complete': True
         }
 
@@ -1202,6 +1208,7 @@ class UnifiedViewsTestCase(LeelooTestCase):
             'id': str(huk_team.id),
             'name': huk_team.name
         }
+        assert response_data['team_members'] == []
         assert response_data['team_complete'] is True
 
     def test_get_team_empty(self):
@@ -1218,6 +1225,7 @@ class UnifiedViewsTestCase(LeelooTestCase):
         assert response_data['project_assurance_adviser'] is None
         assert response_data['project_manager_team'] is None
         assert response_data['project_assurance_team'] is None
+        assert response_data['team_members'] == []
         assert response_data['team_complete'] is False
 
     def test_patch_team_success(self):
@@ -1259,6 +1267,7 @@ class UnifiedViewsTestCase(LeelooTestCase):
             'id': str(huk_team.id),
             'name': huk_team.name
         }
+        assert response_data['team_members'] == []
         assert response_data['team_complete'] is True
 
     def test_get_phase_backwards_compatibility(self):
@@ -1305,6 +1314,189 @@ class UnifiedViewsTestCase(LeelooTestCase):
             'name': constants.InvestmentProjectStage.assign_pm.value.name
         }
         assert response_data['phase'] == response_data['stage']
+
+
+class TeamMemberViewsTestCase(LeelooTestCase):
+    """Tests for the team member views."""
+
+    def test_add_team_member_nonexistent_project(self):
+        """Tests adding a team member to a non-existent project."""
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': uuid.uuid4()})
+        response = self.api_client.post(url, format='json', data={})
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_add_team_member_missing_data(self):
+        """Tests adding a team member to a project without specifying an adviser and role."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        response = self.api_client.post(url, format='json', data={})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'adviser': ['This field is required.'],
+            'role': ['This field is required.']
+        }
+
+    def test_add_team_member_null_data(self):
+        """Tests adding a team member to a project specifying a null adviser and role."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        response = self.api_client.post(url, format='json', data={
+            'adviser': None,
+            'role': None
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'adviser': ['This field may not be null.'],
+            'role': ['This field may not be null.']
+        }
+
+    def test_add_team_member_blank_role(self):
+        """Tests adding a team member to a project specifying a blank role."""
+        project = InvestmentProjectFactory()
+        adviser = AdviserFactory()
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        response = self.api_client.post(url, format='json', data={
+            'adviser': {'id': str(adviser.pk)},
+            'role': ''
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'role': ['This field may not be blank.']
+        }
+
+    def test_add_team_member_success(self):
+        """Tests adding a team member to a project."""
+        project = InvestmentProjectFactory()
+        adviser = AdviserFactory()
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        request_data = {
+            'adviser': {
+                'id': str(adviser.pk)
+            },
+            'role': 'Sector adviser'
+        }
+        response = self.api_client.post(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data['adviser']['id'] == str(adviser.pk)
+        assert response_data['role'] == 'Sector adviser'
+
+    def test_add_duplicate_team_member(self):
+        """Tests adding a duplicate team member to a project."""
+        team_member = InvestmentProjectTeamMemberFactory()
+        url = reverse('api-v3:investment:team-member-collection', kwargs={
+            'project_pk': team_member.investment_project.pk,
+        })
+        request_data = {
+            'adviser': {
+                'id': str(team_member.adviser.pk)
+            },
+            'role': 'Sector adviser'
+        }
+        response = self.api_client.post(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'non_field_errors': ['The fields investment_project, adviser must make a unique set.']
+        }
+
+    def test_delete_all_team_members_success(self):
+        """Tests removing all team members from a project."""
+        project = InvestmentProjectFactory()
+        team_members = InvestmentProjectTeamMemberFactory.create_batch(
+            2, investment_project=project
+        )
+        InvestmentProjectTeamMemberFactory()
+        url = reverse('api-v3:investment:team-member-collection', kwargs={
+            'project_pk': team_members[0].investment_project.pk
+        })
+        response = self.api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert not InvestmentProjectTeamMember.objects.filter(investment_project=project).exists()
+        assert InvestmentProjectTeamMember.objects.all().exists()
+
+    def test_get_team_member_success(self):
+        """Tests getting a project team member."""
+        team_member = InvestmentProjectTeamMemberFactory()
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': team_member.investment_project.pk,
+            'adviser_pk': team_member.adviser.pk
+        })
+        response = self.api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['role'] == team_member.role
+
+    def test_get_team_member_nonexistent_adviser(self):
+        """Tests getting a non-existent project team member."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': project.pk,
+            'adviser_pk': uuid.uuid4()
+        })
+        response = self.api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_get_team_member_nonexistent_project(self):
+        """Tests getting a project team member for a non-existent project."""
+        adviser = AdviserFactory()
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': uuid.uuid4(),
+            'adviser_pk': adviser.pk
+        })
+        response = self.api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_patch_team_member_success(self):
+        """Tests updating a project team member's role."""
+        team_member = InvestmentProjectTeamMemberFactory()
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': team_member.investment_project.pk,
+            'adviser_pk': team_member.adviser.pk
+        })
+        request_data = {
+            'role': 'updated role'
+        }
+        response = self.api_client.patch(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['role'] == request_data['role']
+
+    def test_delete_team_member_success(self):
+        """Tests removing a team member from a project."""
+        project = InvestmentProjectFactory()
+        team_members = InvestmentProjectTeamMemberFactory.create_batch(
+            2, investment_project=project
+        )
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': team_members[0].investment_project.pk,
+            'adviser_pk': team_members[0].adviser.pk
+        })
+        response = self.api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        new_team_members = InvestmentProjectTeamMember.objects.filter(investment_project=project)
+        assert new_team_members.count() == 1
+        assert str(new_team_members[0].adviser.pk) == team_members[1].adviser.pk
 
 
 class AuditLogViewTestCase(LeelooTestCase):
@@ -1421,6 +1613,10 @@ class ArchiveViewsTestCase(LeelooTestCase):
         assert response_data['archived'] is False
         assert response_data['archived_by'] is None
         assert response_data['archived_reason'] == ''
+
+
+class DocumentViewsTestCase(LeelooTestCase):
+    """Tests for the document views."""
 
     def test_documents_list_is_filtered_by_project(self):
         """Tests viewset filtering."""
