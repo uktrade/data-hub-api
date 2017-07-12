@@ -1,18 +1,21 @@
 """Investment views."""
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status
+from rest_framework import mixins, status
 from rest_framework.response import Response
 
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.utils import executor
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.documents.av_scan import virus_scan_document
-from datahub.investment.models import InvestmentProject, IProjectDocument
+from datahub.investment.models import (
+    InvestmentProject, InvestmentProjectTeamMember, IProjectDocument
+)
 from datahub.investment.serializers import (
     IProjectAuditSerializer, IProjectDocumentSerializer, IProjectRequirementsSerializer,
-    IProjectSerializer, IProjectTeamSerializer, IProjectUnifiedSerializer, IProjectValueSerializer,
-    UploadStatusSerializer
+    IProjectSerializer, IProjectTeamMemberSerializer, IProjectTeamSerializer,
+    IProjectUnifiedSerializer, IProjectValueSerializer, UploadStatusSerializer
 )
 
 
@@ -158,6 +161,54 @@ class IProjectUnifiedViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     def get_view_name(self):
         """Returns the view set name for the DRF UI."""
         return 'Investment projects'
+
+
+class IProjectTeamMembersViewSet(mixins.DestroyModelMixin, CoreViewSetV3):
+    """Investment project team member views."""
+
+    serializer_class = IProjectTeamMemberSerializer
+    lookup_field = 'adviser_id'
+    lookup_url_kwarg = 'adviser_pk'
+    queryset = InvestmentProjectTeamMember.objects.select_related('adviser')
+
+    def get_queryset(self):
+        """Filters the query set to the specified project."""
+        self._check_project_exists()
+        return self.queryset.filter(
+            investment_project_id=self.kwargs['project_pk']
+        ).all()
+
+    def get_serializer(self, *args, **kwargs):
+        """Gets a serializer instance.
+
+        Adds the investment_project_id from the URL path to the user-provided data.
+        """
+        data = kwargs.get('data')
+        if data is not None:
+            data['investment_project'] = self.kwargs['project_pk']
+        return super().get_serializer(*args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        """Creates a team member instance.
+
+        Ensures a 404 is returned if the specified project does not exist.
+        """
+        self._check_project_exists()
+        return super().create(request, *args, **kwargs)
+
+    def destroy_all(self, request, *args, **kwargs):
+        """Removes all team members from the specified project."""
+        queryset = self.get_queryset()
+        queryset.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def get_view_name(self):
+        """Returns the view set name for the DRF UI."""
+        return 'Investment project team members'
+
+    def _check_project_exists(self):
+        if not InvestmentProject.objects.filter(pk=self.kwargs['project_pk']).exists():
+            raise Http404('Specified investment project does not exist')
 
 
 class IProjectDocumentViewSet(CoreViewSetV3):

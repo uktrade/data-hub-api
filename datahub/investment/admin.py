@@ -4,7 +4,8 @@ from django.contrib import admin
 
 from reversion.admin import VersionAdmin
 
-from datahub.investment.models import (InvestmentProject, IProjectDocument)
+from datahub.investment.models import (InvestmentProject, InvestmentProjectTeamMember,
+                                       IProjectDocument)
 
 
 @admin.register(InvestmentProject)
@@ -22,6 +23,16 @@ class InvestmentProjectAdmin(VersionAdmin):
         'project_manager',
         'project_assurance_adviser',
         'uk_company'
+    )
+
+
+@admin.register(InvestmentProjectTeamMember)
+class InvestmentProjectTeamMemberAdmin(VersionAdmin):
+    """Investment project team member admin."""
+
+    raw_id_fields = (
+        'investment_project',
+        'adviser',
     )
 
 
