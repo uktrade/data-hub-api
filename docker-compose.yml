@@ -11,7 +11,6 @@ services:
     entrypoint: |
         dockerize -wait tcp://postgres:5432 -wait tcp://es:9200 -timeout 60s
     environment:
-      SECRET_KEY: foobar
       DATABASE_URL: postgresql://postgres@postgres/datahub
       DATAHUB_SECRET: secret
       DEBUG: 'True'
@@ -20,7 +19,6 @@ services:
       COV_TOKEN: ${COV_TOKEN}
       ES_INDEX: test_index
       ES_URL: http://es:9200
-      TEST_ES_SERVER: es
       CDMS_AUTH_URL: http://example.com
       AWS_DEFAULT_REGION: eu-west-2
       AWS_ACCESS_KEY_ID: foo
