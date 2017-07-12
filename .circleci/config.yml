@@ -1,0 +1,67 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: python:3.6
+
+      - image: elasticsearch:2.3
+
+      - image: postgres:9.5
+        environment:
+          POSTGRES_DB=datahub
+
+    environment:
+      SECRET_KEY: foobar
+      DATABASE_URL: postgresql://postgres@localhost/datahub
+      DATAHUB_SECRET: secret
+      DEBUG: 'True'
+      DJANGO_SECRET_KEY: changeme
+      DJANGO_SETTINGS_MODULE: config.settings.local
+      ES_INDEX: test_index
+      ES_URL: http://es:9200
+      TEST_ES_SERVER: localhost
+      CDMS_AUTH_URL: http://example.com
+      AWS_DEFAULT_REGION: eu-west-2
+      AWS_ACCESS_KEY_ID: foo
+      AWS_SECRET_ACCESS_KEY: bar
+      DOCUMENTS_BUCKET: baz
+
+    working_directory: ~/app
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          name: Restore pip cache
+          keys:
+            - v1-leeloo-{{ checksum "requirements.txt" }}
+            - v1-leeloo-
+          paths:
+            - ~/cache/pip
+
+      - run:
+          name: Install dependencies
+          command: pip install --cache-dir ~/cache/pip -r requirements.txt
+
+      - save_cache:
+          name: Save pip cache
+          key: v1-leeloo-{{ checksum "requirements.txt" }}
+          paths:
+            - ~/cache/pip
+      - run:
+          name: Run Flake8
+          command: flake8
+
+      - run:
+          name: Run tests
+          command: |
+            set -xu
+            ./tests-auth.sh
+            ./tests.sh
+
+      - run:
+          name: Publish coverage
+          command: |
+            set -xu
+            wget -O codecov.sh https://codecov.io/bash
+            bash ./codecov.sh -t ${COV_TOKEN}
