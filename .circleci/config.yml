@@ -11,7 +11,6 @@ jobs:
           POSTGRES_DB=datahub
 
     environment:
-      SECRET_KEY: foobar
       DATABASE_URL: postgresql://postgres@localhost/datahub
       DATAHUB_SECRET: secret
       DEBUG: 'True'
