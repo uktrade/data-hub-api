@@ -3,4 +3,4 @@
 # For some obscure reason all the tests that run after the auth ones get stuck into using this different thread process
 # which doesn't have any access to the testing db hence there are no fixtures and the tests fail.
 # The solution is to run the auth tests independently.
-pytest --cov -k "not liveserver" -s && wget -O codecov.sh https://codecov.io/bash && bash codecov.sh -t ${COV_TOKEN}
+pytest --cov -k "not liveserver" -s
