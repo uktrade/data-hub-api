@@ -18,7 +18,7 @@ whitenoise==3.3.0
 pyyaml==3.12
 colander==1.3.3
 pyquery==1.2.17
-python-dateutil==2.6.0
+python-dateutil==2.6.1
 
 # Persistency layer
 psycopg2==2.7.1

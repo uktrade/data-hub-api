@@ -70,7 +70,7 @@ pytest-cov==2.5.1
 pytest-django==3.1.2
 pytest-sugar==0.8.0
 pytest==3.1.3             # via pytest-cov, pytest-django, pytest-sugar
-python-dateutil==2.6.0
+python-dateutil==2.6.1
 pytz==2017.2              # via django
 pyyaml==3.12
 raven==6.1.0
