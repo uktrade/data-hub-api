@@ -4,15 +4,15 @@ from django.conf.urls import url
 
 from datahub.investment.views import (
     IProjectAuditViewSet, IProjectDocumentViewSet, IProjectTeamMembersViewSet,
-    IProjectUnifiedViewSet
+    IProjectViewSet
 )
 
-unified_project_collection = IProjectUnifiedViewSet.as_view({
+project_collection = IProjectViewSet.as_view({
     'get': 'list',
     'post': 'create'
 })
 
-unified_project_item = IProjectUnifiedViewSet.as_view({
+project_item = IProjectViewSet.as_view({
     'get': 'retrieve',
     'patch': 'partial_update'
 })
@@ -32,11 +32,11 @@ audit_item = IProjectAuditViewSet.as_view({
     'get': 'retrieve',
 })
 
-archive_item = IProjectUnifiedViewSet.as_view({
+archive_item = IProjectViewSet.as_view({
     'post': 'archive',
 })
 
-unarchive_item = IProjectUnifiedViewSet.as_view({
+unarchive_item = IProjectViewSet.as_view({
     'post': 'unarchive',
 })
 
@@ -54,8 +54,8 @@ project_document_callback = IProjectDocumentViewSet.as_view({
 })
 
 urlpatterns = [
-    url(r'^investment$', unified_project_collection, name='investment-collection'),
-    url(r'^investment/(?P<pk>[0-9a-z-]{36})$', unified_project_item,
+    url(r'^investment$', project_collection, name='investment-collection'),
+    url(r'^investment/(?P<pk>[0-9a-z-]{36})$', project_item,
         name='investment-item'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/archive$', archive_item,
         name='archive-item'),
