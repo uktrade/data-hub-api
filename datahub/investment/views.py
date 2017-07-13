@@ -13,8 +13,8 @@ from datahub.investment.models import (
     InvestmentProject, InvestmentProjectTeamMember, IProjectDocument
 )
 from datahub.investment.serializers import (
-    IProjectAuditSerializer, IProjectDocumentSerializer, IProjectTeamMemberSerializer,
-    IProjectUnifiedSerializer, UploadStatusSerializer
+    IProjectAuditSerializer, IProjectDocumentSerializer, IProjectSerializer,
+    IProjectTeamMemberSerializer, UploadStatusSerializer
 )
 
 
@@ -29,13 +29,13 @@ class IProjectAuditViewSet(CoreViewSetV3):
         return 'Investment project audit log'
 
 
-class IProjectUnifiedViewSet(ArchivableViewSetMixin, CoreViewSetV3):
+class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     """Unified investment project views.
 
     This replaces the previous project, value, team and requirements endpoints.
     """
 
-    serializer_class = IProjectUnifiedSerializer
+    serializer_class = IProjectSerializer
     queryset = InvestmentProject.objects.select_related(
         'archived_by',
         'investment_type',
