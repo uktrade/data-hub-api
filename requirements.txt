@@ -16,7 +16,7 @@ cssselect==1.0.1
 decorator==4.0.11         # via ipython, traitlets
 django-debug-toolbar==1.8
 django-environ==0.4.3
-django-extensions==1.7.9
+django-extensions==1.8.1
 django-filter==1.0.4
 django-model-utils==3.0.0
 django-mptt==0.8.7
