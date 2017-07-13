@@ -1,5 +1,5 @@
 import datetime
-from unittest import mock, skip
+from unittest import mock
 
 import pytest
 from elasticsearch_dsl.connections import connections
@@ -19,6 +19,19 @@ pytestmark = pytest.mark.django_db
 class SearchTestCase(LeelooTestCase):
     """Tests search views."""
 
+    def test_basic_search_all_companies(self):
+        """Tests basic aggregate all companies query."""
+        term = ''
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'company'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] > 0
+
     def test_basic_search_companies(self):
         """Tests basic aggregate companies query."""
         term = 'abc defg'
@@ -29,10 +42,12 @@ class SearchTestCase(LeelooTestCase):
             'entity': 'company'
         })
 
+        assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 3
         assert response.data['companies'][0]['name'].startswith(term)
         assert [{'count': 3, 'entity': 'company'},
-                {'count': 1, 'entity': 'contact'}] == response.data['aggregations']
+                {'count': 1, 'entity': 'contact'},
+                {'count': 1, 'entity': 'investment_project'}] == response.data['aggregations']
 
     def test_basic_search_contacts(self):
         """Tests basic aggregate contacts query."""
@@ -44,11 +59,30 @@ class SearchTestCase(LeelooTestCase):
             'entity': 'contact'
         })
 
+        assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
         assert response.data['contacts'][0]['first_name'] in term
         assert response.data['contacts'][0]['last_name'] in term
         assert [{'count': 3, 'entity': 'company'},
-                {'count': 1, 'entity': 'contact'}] == response.data['aggregations']
+                {'count': 1, 'entity': 'contact'},
+                {'count': 1, 'entity': 'investment_project'}] == response.data['aggregations']
+
+    def test_basic_search_investment_projects(self):
+        """Tests basic aggregate investment project query."""
+        term = 'abc defg'
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'investment_project'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert response.data['investment_projects'][0]['name'] == term
+        assert [{'count': 3, 'entity': 'company'},
+                {'count': 1, 'entity': 'contact'},
+                {'count': 1, 'entity': 'investment_project'}] == response.data['aggregations']
 
     def test_basic_search_companies_no_results(self):
         """Tests case where there should be no results."""
@@ -196,7 +230,6 @@ class SearchTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    @skip('This test fails randomly. Skip until fixed.')
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_results_quality(self):

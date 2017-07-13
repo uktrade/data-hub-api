@@ -8,13 +8,9 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from model_utils import Choices
 
-from datahub.core.constants import InvestmentProjectPhase
+from datahub.core.constants import InvestmentProjectStage
 from datahub.core.models import ArchivableModel, BaseModel
 from datahub.documents.models import Document
-from datahub.investment.validate import (
-    get_incomplete_reqs_fields, get_incomplete_team_fields,
-    get_incomplete_value_fields
-)
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -24,6 +20,12 @@ class IProjectAbstract(models.Model):
 
     class Meta:  # noqa: D101
         abstract = True
+
+    PRIORITIES = Choices(
+        ('1_low', 'low', 'Low'),
+        ('2_medium', 'medium', 'Medium'),
+        ('3_high', 'high', 'High'),
+    )
 
     name = models.CharField(max_length=MAX_LENGTH)
     description = models.TextField()
@@ -39,6 +41,8 @@ class IProjectAbstract(models.Model):
     project_shareable = models.NullBooleanField()
     not_shareable_reason = models.TextField(blank=True, null=True)
     actual_land_date = models.DateField(blank=True, null=True)
+    likelihood_of_landing = models.IntegerField(blank=True, null=True)
+    priority = models.CharField(max_length=MAX_LENGTH, choices=PRIORITIES, blank=True, null=True)
 
     approved_commitment_to_invest = models.NullBooleanField()
     approved_fdi = models.NullBooleanField()
@@ -47,10 +51,10 @@ class IProjectAbstract(models.Model):
     approved_landed = models.NullBooleanField()
     approved_non_fdi = models.NullBooleanField()
 
-    phase = models.ForeignKey(
-        'metadata.InvestmentProjectPhase', on_delete=models.PROTECT,
+    stage = models.ForeignKey(
+        'metadata.InvestmentProjectStage', on_delete=models.PROTECT,
         related_name='investment_projects',
-        default=InvestmentProjectPhase.prospect.value.id
+        default=InvestmentProjectStage.prospect.value.id
     )
     investor_company = models.ForeignKey(
         'company.Company', related_name='investor_investment_projects',
@@ -142,11 +146,6 @@ class IProjectValueAbstract(models.Model):
     new_tech_to_uk = models.NullBooleanField()
     export_revenue = models.NullBooleanField()
 
-    @property
-    def value_complete(self):
-        """Whether the value section is complete."""
-        return not get_incomplete_value_fields(instance=self)
-
 
 class IProjectRequirementsAbstract(models.Model):
     """The requirements part of an investment project."""
@@ -179,11 +178,6 @@ class IProjectRequirementsAbstract(models.Model):
         related_name='investment_projects', blank=True
     )
 
-    @property
-    def requirements_complete(self):
-        """Whether the requirements section is complete."""
-        return not get_incomplete_reqs_fields(instance=self)
-
 
 class IProjectTeamAbstract(models.Model):
     """The team part of an investment project."""
@@ -214,11 +208,6 @@ class IProjectTeamAbstract(models.Model):
             return self.project_assurance_adviser.dit_team
         return None
 
-    @property
-    def team_complete(self):
-        """Whether the team section is complete."""
-        return not get_incomplete_team_fields(instance=self)
-
 
 class InvestmentProject(ArchivableModel, IProjectAbstract,
                         IProjectValueAbstract, IProjectRequirementsAbstract,
@@ -231,6 +220,24 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
         """Human-readable name for admin section etc."""
         company_name = self.investor_company or 'No company'
         return f'{company_name} – {self.name}'
+
+
+class InvestmentProjectTeamMember(models.Model):
+    """Intermediary M2M model for investment project team members.
+
+    ManyToManyField with through is not used in the InvestmentProject model, because
+    it makes working with DRF serialisers difficult (as it would return advisers rather than
+    instances of this model).
+    """
+
+    investment_project = models.ForeignKey(
+        InvestmentProject, on_delete=models.CASCADE, related_name='team_members'
+    )
+    adviser = models.ForeignKey('company.Advisor', on_delete=models.CASCADE, related_name='+')
+    role = models.CharField(max_length=MAX_LENGTH)
+
+    class Meta:  # noqa: D101
+        unique_together = (('investment_project', 'adviser'),)
 
 
 class InvestmentProjectCode(models.Model):
@@ -259,7 +266,7 @@ class IProjectDocument(BaseModel, ArchivableModel):
         ('total_investment', 'Total investment'),
         ('foreign_equity_investment', 'Foreign equity investment'),
         ('number_new_jobs', 'Number new jobs'),
-        ('number_safeguarded jobs', 'Number safeguarded jobs'),
+        ('number_safeguarded_jobs', 'Number safeguarded jobs'),
         ('r_and_d_budget', 'R and D budget'),
         ('new_tech_to_uk', 'New tech to uk'),
         ('export_revenue', 'Export revenue'),

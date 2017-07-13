@@ -28,7 +28,7 @@ MODELS_TO_REGISTER_WITH_ORDER = (
     models.EmployeeRange,
     models.TurnoverRange,
     models.SalaryRange,
-    models.InvestmentProjectPhase
+    models.InvestmentProjectStage
 )
 
 

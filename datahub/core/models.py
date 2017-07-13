@@ -21,7 +21,7 @@ class ArchivableModel(models.Model):
     archived_reason = models.TextField(blank=True, null=True)
     archived_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, blank=True, null=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL, related_name='+'
     )
 
     class Meta:  # noqa: D101

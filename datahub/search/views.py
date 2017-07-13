@@ -19,8 +19,8 @@ class SearchBasicAPIView(APIView):
         term = request.query_params['term']
 
         entity = request.query_params.get('entity', 'company')
-        if entity not in ('company', 'contact',):
-            raise ValidationError('Entity is neither "company" nor "contact".')
+        if entity not in ('company', 'contact', 'investment_project'):
+            raise ValidationError('Entity is not one of "company", "contact" or "investment_project".')
 
         offset = int(request.query_params.get('offset', 0))
         limit = int(request.query_params.get('limit', 100))
@@ -44,6 +44,8 @@ class SearchBasicAPIView(APIView):
             response['companies'] = hits
         elif entity == 'contact':
             response['contacts'] = hits
+        elif entity == 'investment_project':
+            response['investment_projects'] = hits
 
         return Response(data=response)
 
@@ -133,7 +135,7 @@ class SearchInvestmentProjectAPIView(APIView):
     FILTER_FIELDS = (
         'client_relationship_manager', 'description', 'estimated_land_date_after',
         'estimated_land_date_before', 'investor_company', 'investment_type',
-        'phase', 'sector'
+        'stage', 'sector'
     )
 
     http_method_names = ('post',)
