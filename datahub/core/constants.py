@@ -442,8 +442,8 @@ class CompanyClassification(Enum):
     tier_dg = Constant('Tier D - POST Identified/Managed', '572dfefe-cd1d-e611-9bdc-e4115bead28a')
 
 
-class InvestmentProjectPhase(Enum):
-    """Investment project phase constants."""
+class InvestmentProjectStage(Enum):
+    """Investment project stage constants."""
 
     prospect = OrderedConstant(
         'Prospect', '8a320cc9-ae2e-443e-9d26-2f36452c2ced', 200.0

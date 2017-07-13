@@ -1,6 +1,7 @@
 """Tests for investment views."""
 
 import re
+import uuid
 from datetime import datetime
 from unittest.mock import patch
 
@@ -16,8 +17,10 @@ from datahub.core.test_utils import LeelooTestCase
 from datahub.core.utils import executor
 from datahub.documents.av_scan import virus_scan_document
 from datahub.investment import views
-from datahub.investment.models import IProjectDocument
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.models import InvestmentProjectTeamMember, IProjectDocument
+from datahub.investment.test.factories import (
+    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
+)
 
 
 class InvestmentViewsTestCase(LeelooTestCase):
@@ -70,8 +73,8 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'investment_type': {
                 'id': constants.InvestmentType.fdi.value.id
             },
-            'phase': {
-                'id': constants.InvestmentProjectPhase.prospect.value.id
+            'stage': {
+                'id': constants.InvestmentProjectStage.prospect.value.id
             },
             'business_activities': [{
                 'id': business_activity_id
@@ -121,7 +124,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
             intermediate_company.id)
         assert response_data['referral_source_adviser']['id'] == str(
             adviser.id)
-        assert response_data['phase']['id'] == request_data['phase']['id']
+        assert response_data['stage']['id'] == request_data['stage']['id']
         assert len(response_data['client_contacts']) == 2
         assert sorted(contact['id'] for contact in response_data[
             'client_contacts']) == sorted(contact.id for contact in contacts)
@@ -224,7 +227,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
                 str(project.estimated_land_date))
         assert (response_data['investment_type']['id'] ==
                 str(project.investment_type.id))
-        assert (response_data['phase']['id'] == str(project.phase.id))
+        assert (response_data['stage']['id'] == str(project.stage.id))
         assert sorted(contact['id'] for contact in response_data[
             'client_contacts']) == sorted(contacts)
 
@@ -268,13 +271,13 @@ class InvestmentViewsTestCase(LeelooTestCase):
         assert len(response_data['client_contacts']) == 1
         assert response_data['client_contacts'][0]['id'] == str(new_contact.id)
 
-    def test_change_phase_assign_pm_failure(self):
-        """Tests moving an incomplete project to the Assign PM phase."""
+    def test_change_stage_assign_pm_failure(self):
+        """Tests moving an incomplete project to the Assign PM stage."""
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:project-item', kwargs={'pk': project.pk})
         request_data = {
-            'phase': {
-                'id': constants.InvestmentProjectPhase.assign_pm.value.id
+            'stage': {
+                'id': constants.InvestmentProjectStage.assign_pm.value.id
             }
         }
         response = self.api_client.patch(url, data=request_data, format='json')
@@ -292,8 +295,8 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'uk_region_locations': ['This field is required.'],
         }
 
-    def test_change_phase_assign_pm_success(self):
-        """Tests moving a complete project to the Assign PM phase."""
+    def test_change_stage_assign_pm_success(self):
+        """Tests moving a complete project to the Assign PM stage."""
         strategic_drivers = [
             constants.InvestmentStrategicDriver.access_to_market.value.id
         ]
@@ -310,22 +313,22 @@ class InvestmentViewsTestCase(LeelooTestCase):
         )
         url = reverse('api-v3:investment:project-item', kwargs={'pk': project.pk})
         request_data = {
-            'phase': {
-                'id': constants.InvestmentProjectPhase.assign_pm.value.id
+            'stage': {
+                'id': constants.InvestmentProjectStage.assign_pm.value.id
             }
         }
         response = self.api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
 
-    def test_change_phase_active_failure(self):
-        """Tests moving an incomplete project to the Active phase."""
+    def test_change_stage_active_failure(self):
+        """Tests moving an incomplete project to the Active stage."""
         project = InvestmentProjectFactory(
             client_contacts=[ContactFactory().id, ContactFactory().id]
         )
         url = reverse('api-v3:investment:project-item', kwargs={'pk': project.pk})
         request_data = {
-            'phase': {
-                'id': constants.InvestmentProjectPhase.active.value.id
+            'stage': {
+                'id': constants.InvestmentProjectStage.active.value.id
             }
         }
         response = self.api_client.patch(url, data=request_data, format='json')
@@ -345,8 +348,8 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'project_manager': ['This field is required.'],
         }
 
-    def test_change_phase_active_success(self):
-        """Tests moving a complete project to the Active phase."""
+    def test_change_stage_active_success(self):
+        """Tests moving a complete project to the Active stage."""
         adviser = AdviserFactory()
         strategic_drivers = [
             constants.InvestmentStrategicDriver.access_to_market.value.id
@@ -366,8 +369,8 @@ class InvestmentViewsTestCase(LeelooTestCase):
         )
         url = reverse('api-v3:investment:project-item', kwargs={'pk': project.pk})
         request_data = {
-            'phase': {
-                'id': constants.InvestmentProjectPhase.active.value.id
+            'stage': {
+                'id': constants.InvestmentProjectStage.active.value.id
             }
         }
         response = self.api_client.patch(url, data=request_data, format='json')
@@ -516,12 +519,15 @@ class InvestmentViewsTestCase(LeelooTestCase):
                 'id': str(huk_team.id),
                 'name': huk_team.name
             },
+            'team_members': [],
             'team_complete': True
         }
 
     def test_get_team_empty(self):
         """Test successfully getting an empty project requirements object."""
-        project = InvestmentProjectFactory()
+        project = InvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.assign_pm.value.id
+        )
         url = reverse('api-v3:investment:team-item',
                       kwargs={'pk': project.pk})
         response = self.api_client.get(url)
@@ -532,7 +538,8 @@ class InvestmentViewsTestCase(LeelooTestCase):
             'project_assurance_adviser': None,
             'project_manager_team': None,
             'project_assurance_team': None,
-            'team_complete': False
+            'team_complete': False,
+            'team_members': []
         }
 
     def test_patch_team_success(self):
@@ -574,6 +581,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
                 'id': str(huk_team.id),
                 'name': huk_team.name
             },
+            'team_members': [],
             'team_complete': True
         }
 
@@ -625,11 +633,13 @@ class UnifiedViewsTestCase(LeelooTestCase):
             'nda_signed': False,
             'estimated_land_date': '2020-12-12',
             'project_shareable': False,
+            'likelihood_of_landing': 60,
+            'priority': '1_low',
             'investment_type': {
                 'id': constants.InvestmentType.fdi.value.id
             },
-            'phase': {
-                'id': constants.InvestmentProjectPhase.prospect.value.id
+            'stage': {
+                'id': constants.InvestmentProjectStage.prospect.value.id
             },
             'business_activities': [{
                 'id': business_activity_id
@@ -669,6 +679,8 @@ class UnifiedViewsTestCase(LeelooTestCase):
         assert response_data['nda_signed'] == request_data['nda_signed']
         assert (response_data['estimated_land_date'] == request_data[
             'estimated_land_date'])
+        assert (response_data['likelihood_of_landing'] == request_data['likelihood_of_landing'])
+        assert response_data['priority'] == request_data['priority']
         assert re.match('^DHP-\d+$', response_data['project_code'])
 
         assert (response_data['investment_type']['id'] == request_data[
@@ -679,7 +691,7 @@ class UnifiedViewsTestCase(LeelooTestCase):
             intermediate_company.id)
         assert response_data['referral_source_adviser']['id'] == str(
             adviser.id)
-        assert response_data['phase']['id'] == request_data['phase']['id']
+        assert response_data['stage']['id'] == request_data['stage']['id']
         assert len(response_data['client_contacts']) == 2
         assert sorted(contact['id'] for contact in response_data[
             'client_contacts']) == sorted(contact.id for contact in contacts)
@@ -774,13 +786,14 @@ class UnifiedViewsTestCase(LeelooTestCase):
         assert response_data['id'] == str(project.id)
         assert response_data['name'] == project.name
         assert response_data['description'] == project.description
+        assert response_data['likelihood_of_landing'] == project.likelihood_of_landing
         assert response_data['nda_signed'] == project.nda_signed
         assert response_data['project_code'] == project.project_code
         assert (response_data['estimated_land_date'] ==
                 str(project.estimated_land_date))
         assert (response_data['investment_type']['id'] ==
                 str(project.investment_type.id))
-        assert (response_data['phase']['id'] == str(project.phase.id))
+        assert (response_data['stage']['id'] == str(project.stage.id))
         assert sorted(contact['id'] for contact in response_data[
             'client_contacts']) == sorted(contacts)
 
@@ -800,6 +813,48 @@ class UnifiedViewsTestCase(LeelooTestCase):
         response_data = response.json()
         assert response_data == {
             'fdi_type': ['This field is required.']
+        }
+
+    def test_patch_likelihood_of_landing_too_low(self):
+        """Test updating a project with a likelihood_of_landing below 0."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'likelihood_of_landing': -10
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'likelihood_of_landing': ['Ensure this value is greater than or equal to 0.']
+        }
+
+    def test_patch_likelihood_of_landing_too_high(self):
+        """Test updating a project with a likelihood_of_landing above 100."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'likelihood_of_landing': 110
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'likelihood_of_landing': ['Ensure this value is less than or equal to 100.']
+        }
+
+    def test_patch_priority_invalid_value(self):
+        """Test updating a project with an invalid priority."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'priority': '6_extremely_urgent'
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'priority': ['"6_extremely_urgent" is not a valid choice.']
         }
 
     def test_patch_project_success(self):
@@ -824,13 +879,13 @@ class UnifiedViewsTestCase(LeelooTestCase):
         assert len(response_data['client_contacts']) == 1
         assert response_data['client_contacts'][0]['id'] == str(new_contact.id)
 
-    def test_change_phase_assign_pm_failure(self):
-        """Tests moving an incomplete project to the Assign PM phase."""
+    def test_change_stage_assign_pm_failure(self):
+        """Tests moving an incomplete project to the Assign PM stage."""
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
-            'phase': {
-                'id': constants.InvestmentProjectPhase.assign_pm.value.id
+            'stage': {
+                'id': constants.InvestmentProjectStage.assign_pm.value.id
             }
         }
         response = self.api_client.patch(url, data=request_data, format='json')
@@ -848,8 +903,8 @@ class UnifiedViewsTestCase(LeelooTestCase):
             'uk_region_locations': ['This field is required.'],
         }
 
-    def test_change_phase_assign_pm_success(self):
-        """Tests moving a complete project to the Assign PM phase."""
+    def test_change_stage_assign_pm_success(self):
+        """Tests moving a complete project to the Assign PM stage."""
         strategic_drivers = [
             constants.InvestmentStrategicDriver.access_to_market.value.id
         ]
@@ -866,22 +921,22 @@ class UnifiedViewsTestCase(LeelooTestCase):
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
-            'phase': {
-                'id': constants.InvestmentProjectPhase.assign_pm.value.id
+            'stage': {
+                'id': constants.InvestmentProjectStage.assign_pm.value.id
             }
         }
         response = self.api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
 
-    def test_change_phase_active_failure(self):
-        """Tests moving an incomplete project to the Active phase."""
+    def test_change_stage_active_failure(self):
+        """Tests moving an incomplete project to the Active stage."""
         project = InvestmentProjectFactory(
             client_contacts=[ContactFactory().id, ContactFactory().id]
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
-            'phase': {
-                'id': constants.InvestmentProjectPhase.active.value.id
+            'stage': {
+                'id': constants.InvestmentProjectStage.active.value.id
             }
         }
         response = self.api_client.patch(url, data=request_data, format='json')
@@ -901,8 +956,8 @@ class UnifiedViewsTestCase(LeelooTestCase):
             'project_manager': ['This field is required.'],
         }
 
-    def test_change_phase_active_success(self):
-        """Tests moving a complete project to the Active phase."""
+    def test_change_stage_active_success(self):
+        """Tests moving a complete project to the Active stage."""
         adviser = AdviserFactory()
         strategic_drivers = [
             constants.InvestmentStrategicDriver.access_to_market.value.id
@@ -922,8 +977,91 @@ class UnifiedViewsTestCase(LeelooTestCase):
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
-            'phase': {
-                'id': constants.InvestmentProjectPhase.active.value.id
+            'stage': {
+                'id': constants.InvestmentProjectStage.active.value.id
+            }
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_change_stage_verify_win_failure(self):
+        """Tests moving a partially complete project to the 'Verify win' stage."""
+        adviser = AdviserFactory()
+        strategic_drivers = [
+            constants.InvestmentStrategicDriver.access_to_market.value.id
+        ]
+        project = InvestmentProjectFactory(
+            client_contacts=[ContactFactory().id, ContactFactory().id],
+            client_cannot_provide_total_investment=False,
+            total_investment=100,
+            number_new_jobs=10,
+            client_considering_other_countries=False,
+            client_requirements='client reqs',
+            site_decided=False,
+            strategic_drivers=strategic_drivers,
+            uk_region_locations=[constants.UKRegion.england.value.id],
+            project_assurance_adviser=adviser,
+            project_manager=adviser
+        )
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.verify_win.value.id
+            }
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'government_assistance': ['This field is required.'],
+            'number_safeguarded_jobs': ['This field is required.'],
+            'r_and_d_budget': ['This field is required.'],
+            'non_fdi_r_and_d_budget': ['This field is required.'],
+            'new_tech_to_uk': ['This field is required.'],
+            'export_revenue': ['This field is required.'],
+            'address_line_1': ['This field is required.'],
+            'address_line_2': ['This field is required.'],
+            'address_line_postcode': ['This field is required.'],
+            'average_salary': ['This field is required.'],
+            'client_cannot_provide_foreign_investment': ['This field is required.'],
+            'foreign_equity_investment': ['This field is required.'],
+        }
+
+    def test_change_stage_verify_win_success(self):
+        """Tests moving a complete project to the 'Verify win' stage."""
+        adviser = AdviserFactory()
+        strategic_drivers = [
+            constants.InvestmentStrategicDriver.access_to_market.value.id
+        ]
+        project = InvestmentProjectFactory(
+            client_contacts=[ContactFactory().id, ContactFactory().id],
+            client_cannot_provide_total_investment=False,
+            total_investment=100,
+            client_cannot_provide_foreign_investment=False,
+            foreign_equity_investment=200,
+            number_new_jobs=10,
+            client_considering_other_countries=False,
+            client_requirements='client reqs',
+            site_decided=False,
+            strategic_drivers=strategic_drivers,
+            uk_region_locations=[constants.UKRegion.england.value.id],
+            project_assurance_adviser=adviser,
+            project_manager=adviser,
+            government_assistance=False,
+            number_safeguarded_jobs=0,
+            r_and_d_budget=True,
+            non_fdi_r_and_d_budget=True,
+            new_tech_to_uk=True,
+            export_revenue=True,
+            address_line_1='12 London Road',
+            address_line_2='London',
+            address_line_postcode='SW1A 2AA',
+            average_salary_id=constants.SalaryRange.below_25000.value.id
+        )
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.verify_win.value.id
             }
         }
         response = self.api_client.patch(url, data=request_data, format='json')
@@ -1070,11 +1208,14 @@ class UnifiedViewsTestCase(LeelooTestCase):
             'id': str(huk_team.id),
             'name': huk_team.name
         }
+        assert response_data['team_members'] == []
         assert response_data['team_complete'] is True
 
     def test_get_team_empty(self):
         """Test successfully getting an empty project requirements object."""
-        project = InvestmentProjectFactory()
+        project = InvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.assign_pm.value.id
+        )
         url = reverse('api-v3:investment:investment-item',
                       kwargs={'pk': project.pk})
         response = self.api_client.get(url)
@@ -1084,6 +1225,7 @@ class UnifiedViewsTestCase(LeelooTestCase):
         assert response_data['project_assurance_adviser'] is None
         assert response_data['project_manager_team'] is None
         assert response_data['project_assurance_team'] is None
+        assert response_data['team_members'] == []
         assert response_data['team_complete'] is False
 
     def test_patch_team_success(self):
@@ -1125,7 +1267,236 @@ class UnifiedViewsTestCase(LeelooTestCase):
             'id': str(huk_team.id),
             'name': huk_team.name
         }
+        assert response_data['team_members'] == []
         assert response_data['team_complete'] is True
+
+    def test_get_phase_backwards_compatibility(self):
+        """Tests that phase works as an alias for stage with GET."""
+        project = InvestmentProjectFactory(
+        )
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['phase'] == {
+            'id': constants.InvestmentProjectStage.prospect.value.id,
+            'name': constants.InvestmentProjectStage.prospect.value.name
+        }
+        assert response_data['phase'] == response_data['stage']
+
+    def test_patch_phase_backwards_compatibility(self):
+        """Tests that phase works as an alias for stage with PATCH."""
+        strategic_drivers = [
+            constants.InvestmentStrategicDriver.access_to_market.value.id
+        ]
+        project = InvestmentProjectFactory(
+            client_contacts=[ContactFactory().id, ContactFactory().id],
+            client_cannot_provide_total_investment=False,
+            total_investment=100,
+            number_new_jobs=0,
+            client_considering_other_countries=False,
+            client_requirements='client reqs',
+            site_decided=False,
+            strategic_drivers=strategic_drivers,
+            uk_region_locations=[constants.UKRegion.england.value.id]
+        )
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'phase': {
+                'id': constants.InvestmentProjectStage.assign_pm.value.id
+            }
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['phase'] == {
+            'id': constants.InvestmentProjectStage.assign_pm.value.id,
+            'name': constants.InvestmentProjectStage.assign_pm.value.name
+        }
+        assert response_data['phase'] == response_data['stage']
+
+
+class TeamMemberViewsTestCase(LeelooTestCase):
+    """Tests for the team member views."""
+
+    def test_add_team_member_nonexistent_project(self):
+        """Tests adding a team member to a non-existent project."""
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': uuid.uuid4()})
+        response = self.api_client.post(url, format='json', data={})
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_add_team_member_missing_data(self):
+        """Tests adding a team member to a project without specifying an adviser and role."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        response = self.api_client.post(url, format='json', data={})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'adviser': ['This field is required.'],
+            'role': ['This field is required.']
+        }
+
+    def test_add_team_member_null_data(self):
+        """Tests adding a team member to a project specifying a null adviser and role."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        response = self.api_client.post(url, format='json', data={
+            'adviser': None,
+            'role': None
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'adviser': ['This field may not be null.'],
+            'role': ['This field may not be null.']
+        }
+
+    def test_add_team_member_blank_role(self):
+        """Tests adding a team member to a project specifying a blank role."""
+        project = InvestmentProjectFactory()
+        adviser = AdviserFactory()
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        response = self.api_client.post(url, format='json', data={
+            'adviser': {'id': str(adviser.pk)},
+            'role': ''
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'role': ['This field may not be blank.']
+        }
+
+    def test_add_team_member_success(self):
+        """Tests adding a team member to a project."""
+        project = InvestmentProjectFactory()
+        adviser = AdviserFactory()
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        request_data = {
+            'adviser': {
+                'id': str(adviser.pk)
+            },
+            'role': 'Sector adviser'
+        }
+        response = self.api_client.post(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data['adviser']['id'] == str(adviser.pk)
+        assert response_data['role'] == 'Sector adviser'
+
+    def test_add_duplicate_team_member(self):
+        """Tests adding a duplicate team member to a project."""
+        team_member = InvestmentProjectTeamMemberFactory()
+        url = reverse('api-v3:investment:team-member-collection', kwargs={
+            'project_pk': team_member.investment_project.pk,
+        })
+        request_data = {
+            'adviser': {
+                'id': str(team_member.adviser.pk)
+            },
+            'role': 'Sector adviser'
+        }
+        response = self.api_client.post(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'non_field_errors': ['The fields investment_project, adviser must make a unique set.']
+        }
+
+    def test_delete_all_team_members_success(self):
+        """Tests removing all team members from a project."""
+        project = InvestmentProjectFactory()
+        team_members = InvestmentProjectTeamMemberFactory.create_batch(
+            2, investment_project=project
+        )
+        InvestmentProjectTeamMemberFactory()
+        url = reverse('api-v3:investment:team-member-collection', kwargs={
+            'project_pk': team_members[0].investment_project.pk
+        })
+        response = self.api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert not InvestmentProjectTeamMember.objects.filter(investment_project=project).exists()
+        assert InvestmentProjectTeamMember.objects.all().exists()
+
+    def test_get_team_member_success(self):
+        """Tests getting a project team member."""
+        team_member = InvestmentProjectTeamMemberFactory()
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': team_member.investment_project.pk,
+            'adviser_pk': team_member.adviser.pk
+        })
+        response = self.api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['role'] == team_member.role
+
+    def test_get_team_member_nonexistent_adviser(self):
+        """Tests getting a non-existent project team member."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': project.pk,
+            'adviser_pk': uuid.uuid4()
+        })
+        response = self.api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_get_team_member_nonexistent_project(self):
+        """Tests getting a project team member for a non-existent project."""
+        adviser = AdviserFactory()
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': uuid.uuid4(),
+            'adviser_pk': adviser.pk
+        })
+        response = self.api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_patch_team_member_success(self):
+        """Tests updating a project team member's role."""
+        team_member = InvestmentProjectTeamMemberFactory()
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': team_member.investment_project.pk,
+            'adviser_pk': team_member.adviser.pk
+        })
+        request_data = {
+            'role': 'updated role'
+        }
+        response = self.api_client.patch(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['role'] == request_data['role']
+
+    def test_delete_team_member_success(self):
+        """Tests removing a team member from a project."""
+        project = InvestmentProjectFactory()
+        team_members = InvestmentProjectTeamMemberFactory.create_batch(
+            2, investment_project=project
+        )
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': team_members[0].investment_project.pk,
+            'adviser_pk': team_members[0].adviser.pk
+        })
+        response = self.api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        new_team_members = InvestmentProjectTeamMember.objects.filter(investment_project=project)
+        assert new_team_members.count() == 1
+        assert str(new_team_members[0].adviser.pk) == team_members[1].adviser.pk
 
 
 class AuditLogViewTestCase(LeelooTestCase):
@@ -1242,6 +1613,10 @@ class ArchiveViewsTestCase(LeelooTestCase):
         assert response_data['archived'] is False
         assert response_data['archived_by'] is None
         assert response_data['archived_reason'] == ''
+
+
+class DocumentViewsTestCase(LeelooTestCase):
+    """Tests for the document views."""
 
     def test_documents_list_is_filtered_by_project(self):
         """Tests viewset filtering."""

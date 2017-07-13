@@ -7106,16 +7106,16 @@
   fields: {id: "49329c18-6095-e211-a939-e4115bead28a", name: "On Hold"}
 
 
-# InvestmentProjectPhase
-- model: metadata.investmentprojectphase
+# Investmentprojectstage
+- model: metadata.investmentprojectstage
   fields: {id: 8a320cc9-ae2e-443e-9d26-2f36452c2ced, name: "Prospect", order: 200.0}
-- model: metadata.investmentprojectphase
+- model: metadata.investmentprojectstage
   fields: {id: c9864359-fb1a-4646-a4c1-97d10189fc03, name: "Assign PM", order: 300.0}
-- model: metadata.investmentprojectphase
+- model: metadata.investmentprojectstage
   fields: {id: 7606cc19-20da-4b74-aba1-2cec0d753ad8, name: "Active", order: 400.0}
-- model: metadata.investmentprojectphase
+- model: metadata.investmentprojectstage
   fields: {id: 49b8f6f3-0c50-4150-a965-2c974f3149e3, name: "Verify win", order: 500.0}
-- model: metadata.investmentprojectphase
+- model: metadata.investmentprojectstage
   fields: {id: 945ea6d1-eee3-4f5b-9144-84a75b71b8e6, name: "Won", order: 600.0}
 
 

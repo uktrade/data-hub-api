@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('doc_type', models.CharField(choices=[('actual_land_date', 'Actual land date'), ('fdi_type', 'Fdi type'), ('operations_commenced', 'Operations commenced'), ('total_investment', 'Total investment'), ('foreign_equity_investment', 'Foreign equity investment'), ('number_new_jobs', 'Number new jobs'), ('number_safeguarded jobs', 'Number safeguarded jobs'), ('r_and_d_budget', 'R and D budget'), ('new_tech_to_uk', 'New tech to uk'), ('export_revenue', 'Export revenue'), ('average_salary', 'Average salary')], max_length=255)),
                 ('filename', models.CharField(max_length=255)),
-                ('archived_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
+                ('archived_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
                 ('document', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, to='documents.Document')),
                 ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='documents', to='investment.InvestmentProject')),
             ],

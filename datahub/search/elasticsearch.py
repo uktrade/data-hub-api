@@ -1,12 +1,17 @@
 from collections import defaultdict
-from urllib.parse import ParseResult, urlparse  # noqa: F401
 
 import dateutil.parser
 from django.conf import settings
 from elasticsearch.helpers import bulk as es_bulk
-from elasticsearch_dsl import Search
+from elasticsearch_dsl import analysis, Index, Search
 from elasticsearch_dsl.connections import connections
 from elasticsearch_dsl.query import Match, MatchPhrase, Q
+
+lowercase_keyword_analyzer = analysis.CustomAnalyzer(
+    'lowercase_keyword_analyzer',
+    tokenizer='keyword',
+    filter=['lowercase']
+)
 
 
 def configure_connection():
@@ -18,12 +23,25 @@ def configure_connection():
     )
 
 
+def configure_index(index_name, settings=None):
+    """Configures Elasticsearch index."""
+    client = connections.get_connection()
+    if not client.indices.exists(index=index_name):
+        index = Index(index_name)
+        index.analyzer(lowercase_keyword_analyzer)
+        if settings:
+            index.settings(**settings)
+        index.create()
+
+
 def get_search_term_query(term):
     """Returns search term query."""
+    if term == '':
+        return Q('match_all')
+
     return Q('bool', should=[
-        MatchPhrase(name={'query': term, 'slop': 200}),
+        MatchPhrase(name_keyword={'query': term, 'boost': 2}),
         Match(name={'query': term}),
-        MatchPhrase(_all={'query': term}),
         Match(_all={'query': term}),
     ])
 
@@ -110,7 +128,7 @@ def remap_fields(fields):
         'client_relationship_manager': 'client_relationship_manager.id',
         'investor_company': 'investor_company.id',
         'investment_type': 'investment_type.id',
-        'phase': 'phase.id',
+        'stage': 'stage.id',
     }
     return {name_map.get(k, k): v for k, v in fields.items()}
 

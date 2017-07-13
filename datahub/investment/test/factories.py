@@ -7,7 +7,7 @@ import factory
 from django.utils.timezone import now
 
 from datahub.core.constants import (
-    InvestmentType, ReferralSourceActivity, InvestmentProjectPhase, Sector
+    InvestmentType, ReferralSourceActivity, InvestmentProjectStage, Sector
 )
 from datahub.core.test.factories import to_many_field
 from datahub.company.test.factories import (
@@ -16,7 +16,7 @@ from datahub.company.test.factories import (
 
 
 class InvestmentProjectFactory(factory.django.DjangoModelFactory):
-    """Company factory."""
+    """Investment project factory."""
 
     id = factory.Sequence(lambda _: str(uuid.uuid4()))
     name = factory.Sequence(lambda n: f'name {n}')
@@ -26,12 +26,13 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     investment_type_id = InvestmentType.commitment_to_invest.value.id
     referral_source_activity_id = ReferralSourceActivity.cold_call.value.id
 
-    phase_id = InvestmentProjectPhase.prospect.value.id
+    stage_id = InvestmentProjectStage.prospect.value.id
     sector_id = Sector.aerospace_assembly_aircraft.value.id
     investor_company = factory.SubFactory(CompanyFactory)
     client_relationship_manager = factory.SubFactory(AdviserFactory)
     referral_source_adviser = factory.SubFactory(AdviserFactory)
     project_shareable = False
+    likelihood_of_landing = 90
     created_on = now()
 
     @to_many_field
@@ -56,3 +57,15 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'investment.InvestmentProject'
+
+
+class InvestmentProjectTeamMemberFactory(factory.django.DjangoModelFactory):
+    """Investment project team member factory."""
+
+    investment_project = factory.SubFactory(InvestmentProjectFactory)
+    adviser = factory.SubFactory(AdviserFactory)
+    role = factory.Sequence(lambda n: f'role {n}')
+
+    class Meta:
+        model = 'investment.InvestmentProjectTeamMember'
+
