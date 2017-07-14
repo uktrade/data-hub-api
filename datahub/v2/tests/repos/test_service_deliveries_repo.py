@@ -1,7 +1,6 @@
 import uuid
 
 import pytest
-from django.test import TestCase
 from django.utils.timezone import now
 from freezegun import freeze_time
 
@@ -18,7 +17,7 @@ pytestmark = pytest.mark.django_db
 DUMMY_CONFIG = config = {'url_builder': lambda kwargs: None}
 
 
-class ServiceDeliveriesRepoTestCase(TestCase):
+class TestServiceDeliveriesRepo:
     """Service delivery repo test case."""
 
     def test_get(self):
