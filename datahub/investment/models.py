@@ -329,9 +329,12 @@ def project_post_save(sender, **kwargs):
     """Creates a project code for investment projects on creation.
 
     Projects with a CDMS project code do not get a new project code.
+
+    This generates project codes for fixtures loaded via manage.py loaddata
+    (i.e. when kwargs['raw'] is True), though that may need to change if
+    fixed project codes are required for that fixtures.
     """
     instance = kwargs['instance']
     created = kwargs['created']
-    raw = kwargs['raw']
-    if created and not raw and not instance.cdms_project_code:
+    if created and not instance.cdms_project_code:
         InvestmentProjectCode.objects.create(project=instance)
