@@ -22,12 +22,14 @@ class SearchBasicAPIView(APIView):
         if entity not in ('company', 'contact', 'investment_project'):
             raise ValidationError('Entity is not one of "company", "contact" or "investment_project".')
 
+        sortby = request.query_params.get('sortby')
         offset = int(request.query_params.get('offset', 0))
         limit = int(request.query_params.get('limit', 100))
 
         results = elasticsearch.get_basic_search_query(
             term=term,
             entities=entity.split(','),
+            field_order=sortby,
             offset=offset,
             limit=limit
         ).execute()
@@ -69,12 +71,14 @@ class SearchCompanyAPIView(APIView):
 
         original_query = request.data.get('original_query', '')
 
+        sortby = request.query_params.get('sortby')
         offset = int(request.query_params.get('offset', 0))
         limit = int(request.query_params.get('limit', 100))
 
         results = elasticsearch.get_search_company_query(
             term=original_query,
             filters=filters,
+            field_order=sortby,
             offset=offset,
             limit=limit,
         ).execute()
@@ -105,12 +109,14 @@ class SearchContactAPIView(APIView):
 
         original_query = request.data.get('original_query', '')
 
+        sortby = request.query_params.get('sortby')
         offset = int(request.data.get('offset', 0))
         limit = int(request.data.get('limit', 100))
 
         results = elasticsearch.get_search_contact_query(
             term=original_query,
             filters=filters,
+            field_order=sortby,
             offset=offset,
             limit=limit,
         ).execute()
@@ -145,6 +151,7 @@ class SearchInvestmentProjectAPIView(APIView):
         except ValueError:
             raise ValidationError('Date(s) in incorrect format.')
 
+        sortby = request.query_params.get('sortby')
         offset = int(request.data.get('offset', 0))
         limit = int(request.data.get('limit', 100))
 
@@ -152,6 +159,7 @@ class SearchInvestmentProjectAPIView(APIView):
             term='',
             filters=filters,
             ranges=ranges,
+            field_order=sortby,
             offset=offset,
             limit=limit,
         ).execute()

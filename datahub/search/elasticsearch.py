@@ -46,7 +46,28 @@ def get_search_term_query(term):
     ])
 
 
-def get_basic_search_query(term, entities=('company',), offset=0, limit=100):
+def remap_sort_field(field):
+    """Replaces fields to aliases suitable for sorting."""
+    name_map = {
+        'name': 'name_keyword',
+    }
+    return name_map.get(field, field)
+
+
+def get_sort_query(qs, field_order=None):
+    """Attaches sort query."""
+    if field_order is None:
+        return qs
+
+    tokens = field_order.split(':')
+    order = tokens[1] if len(tokens) > 1 else 'asc'
+
+    return qs.sort({
+        remap_sort_field(tokens[0]): {'order': order}
+    })
+
+
+def get_basic_search_query(term, entities=('company',), field_order=None, offset=0, limit=100):
     """Performs basic search looking for name and then _all in entity.
 
     Also returns number of results in other entities.
@@ -56,6 +77,7 @@ def get_basic_search_query(term, entities=('company',), offset=0, limit=100):
     s = s.post_filter(
         Q('bool', should=[Q('term', _type=entity) for entity in entities])
     )
+    s = get_sort_query(s, field_order=field_order)
 
     s.aggs.bucket(
         'count_by_type', 'terms', field='_type'
@@ -64,7 +86,13 @@ def get_basic_search_query(term, entities=('company',), offset=0, limit=100):
     return s[offset:offset + limit]
 
 
-def get_search_by_entity_query(term=None, filters=None, entity=None, ranges=None, offset=0, limit=100):
+def get_search_by_entity_query(term=None,
+                               filters=None,
+                               entity=None,
+                               ranges=None,
+                               field_order=None,
+                               offset=0,
+                               limit=100):
     """Perform filtered search for given terms in given entity."""
     query = [Q('term', _type=entity)]
     if term != '':
@@ -90,6 +118,7 @@ def get_search_by_entity_query(term=None, filters=None, entity=None, ranges=None
             )
 
     s = Search(index=settings.ES_INDEX).query('bool', must=query)
+    s = get_sort_query(s, field_order)
     s = s.post_filter('bool', must=query_filter)
 
     return s[offset:offset + limit]
