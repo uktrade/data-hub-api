@@ -257,3 +257,29 @@ class TestSearch(APITestMixin):
                 'The Advisory Group',
                 'The Risk Advisory Group',
                 'The Advisories'] == [company['name'] for company in response.data['companies']]
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_sort(self):
+        """Tests quality of results."""
+        CompanyFactory(name='Water 1').save()
+        CompanyFactory(name='water 2').save()
+        CompanyFactory(name='water 3').save()
+        CompanyFactory(name='Water 4').save()
+
+        connections.get_connection().indices.refresh()
+
+        term = 'Water'
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'sortby': 'name:desc',
+            'entity': 'company'
+        })
+
+        assert response.data['count'] == 4
+        assert ['Water 4',
+                'water 3',
+                'water 2',
+                'Water 1'] == [company['name'] for company in response.data['companies']]
