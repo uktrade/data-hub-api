@@ -122,6 +122,22 @@
     last_name: Churing
     dit_team: 7648318c-9698-e211-a939-e4115bead28a
 
+- model: company.advisor
+  pk: a80ff5fd-8904-4940-bf96-fe8047e34be5
+  fields:
+    email: barry.oling@example.com
+    first_name: Barry
+    last_name: Oling
+    dit_team: b85bf640-9798-e211-a939-e4115bead28a
+
+- model: company.advisor
+  pk: f1eb4363-0a37-4344-bd96-e90abeaf483e
+  fields:
+    email: jenny.carey@example.com
+    first_name: Jenny
+    last_name: Carey
+    dit_team: 4672f846-9798-e211-a939-e4115bead28a
+
 - model: company.contact
   pk: 9b1138ab-ec7b-497f-b8c3-27fed21694ef
   fields:
@@ -226,6 +242,7 @@
     sector: 034be3be-5329-e511-b6bc-e4115bead28a
     business_activities:
       - a2dbd807-ae52-421c-8d1d-88adfc7a506b
+    client_cannot_provide_total_investment: false
     total_investment: 1000000.0
     foreign_equity_investment: 200000.0
     government_assistance: true
@@ -304,7 +321,9 @@
     sector: 034be3be-5329-e511-b6bc-e4115bead28a
     business_activities:
       - a2dbd807-ae52-421c-8d1d-88adfc7a506b
+    client_cannot_provide_total_investment: false
     total_investment: 1000000.0
+    client_cannot_provide_foreign_investment: false
     foreign_equity_investment: 200000.0
     government_assistance: true
     number_new_jobs: 20
@@ -318,7 +337,20 @@
       - 382aa6d1-a362-4166-a09d-f579d9f3be75
     project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
     project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
-    # team_members:  # TODO
+
+- model: investment.investmentprojectteammember
+  pk: 1
+  fields:
+    investment_project: 18750b26-a8c3-41b2-8d3a-fb0b930c2270
+    adviser: a80ff5fd-8904-4940-bf96-fe8047e34be5
+    role: Sector adviser
+
+- model: investment.investmentprojectteammember
+  pk: 2
+  fields:
+    investment_project: 18750b26-a8c3-41b2-8d3a-fb0b930c2270
+    adviser: f1eb4363-0a37-4344-bd96-e90abeaf483e
+    role: Finance adviser
 
 - model: investment.investmentproject
   pk: ea3a03ba-b239-4956-b2fb-f35c91109674
@@ -341,7 +373,9 @@
     sector: 034be3be-5329-e511-b6bc-e4115bead28a
     business_activities:
       - a2dbd807-ae52-421c-8d1d-88adfc7a506b
+    client_cannot_provide_total_investment: false
     total_investment: 1000000.0
+    client_cannot_provide_foreign_investment: false
     foreign_equity_investment: 200000.0
     government_assistance: true
     number_new_jobs: 20
@@ -360,9 +394,58 @@
       - 382aa6d1-a362-4166-a09d-f579d9f3be75
     project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
     project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
-    # team_members:  # TODO
     uk_company: a73efeba-8499-11e6-ae22-56b6b6499611
+    address_line_1: 10 Eastings Road
+    address_line_2: London
+    address_line_postcode: W1 2AA
 
+
+- model: investment.investmentproject
+  pk: 5d341b34-1fc8-4638-b4b1-a0922ebf401e
+  fields:
+    name: New airport
+    description: This is a dummy investment project for testing
+    stage: 945ea6d1-eee3-4f5b-9144-84a75b71b8e6  # Won
+    nda_signed: false
+    estimated_land_date: 2020-01-01
+    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
+    project_shareable: false
+    not_shareable_reason: Commercially sensitive
+    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    client_contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_adviser: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_activity: aba8f653-264f-48d8-950e-07f9c418c7b0
+    fdi_type: f8447013-cfdc-4f35-a146-6619665388b3
+    sector: 034be3be-5329-e511-b6bc-e4115bead28a
+    business_activities:
+      - a2dbd807-ae52-421c-8d1d-88adfc7a506b
+    client_cannot_provide_total_investment: false
+    total_investment: 1000000.0
+    client_cannot_provide_foreign_investment: false
+    foreign_equity_investment: 200000.0
+    government_assistance: true
+    number_new_jobs: 20
+    average_salary: 2943bf3d-32dd-43be-8ad4-969b006dee7b
+    site_decided: false
+    number_safeguarded_jobs: 1
+    r_and_d_budget: false
+    non_fdi_r_and_d_budget: true
+    new_tech_to_uk: true
+    export_revenue: true
+    client_considering_other_countries: false
+    uk_region_locations:
+      - 814cd12a-6095-e211-a939-e4115bead28a
+    client_requirements: Anywhere
+    strategic_drivers:
+      - 382aa6d1-a362-4166-a09d-f579d9f3be75
+    project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
+    project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
+    uk_company: a73efeba-8499-11e6-ae22-56b6b6499611
+    address_line_1: 10 Eastings Road
+    address_line_2: London
+    address_line_postcode: W1 2AA
 
 - model: interaction.interaction
   pk: 94d03877-fceb-44a0-8813-17b727d2e7f6
