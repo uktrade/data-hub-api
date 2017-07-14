@@ -3,11 +3,11 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
-from datahub.core.test_utils import get_test_user, LeelooTestCase
+from datahub.core.test_utils import APITestMixin, get_test_user
 from datahub.interaction.test.factories import InteractionFactory
 
 
-class DashboardTestCase(LeelooTestCase):
+class TestDashboard(APITestMixin):
     """Dashboard test case."""
 
     def test_intelligent_homepage(self):
