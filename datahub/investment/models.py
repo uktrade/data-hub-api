@@ -324,7 +324,7 @@ class IProjectDocument(BaseModel, ArchivableModel):
         return investment_doc
 
 
-@receiver(post_save, sender=InvestmentProject)
+@receiver(post_save, sender=InvestmentProject, dispatch_uid='project_post_save')
 def project_post_save(sender, **kwargs):
     """Creates a project code for investment projects on creation.
 
