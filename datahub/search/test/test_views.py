@@ -150,7 +150,8 @@ class SearchTestCase(LeelooTestCase):
         url = f"{reverse('api-v3:search:company')}?offset=0&limit=100"
         response = self.api_client.post(url, {})
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data['results']) > 0
 
     def test_search_foreign_company_json(self):
         """Tests detailed company search."""
@@ -186,7 +187,8 @@ class SearchTestCase(LeelooTestCase):
         url = f"{reverse('api-v3:search:contact')}?offset=0&limit=100"
         response = self.api_client.post(url, {})
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data['results']) > 0
 
     def test_search_investment_project_json(self):
         """Tests detailed investment project search."""
@@ -228,8 +230,9 @@ class SearchTestCase(LeelooTestCase):
         url = f"{reverse('api-v3:search:investment_project')}?offset=0&limit=100"
         response = self.api_client.post(url, {})
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data['results']) > 0
+        
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_results_quality(self):
