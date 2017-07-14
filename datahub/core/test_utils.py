@@ -2,7 +2,6 @@ import datetime
 
 import pytest
 from django.contrib.auth import get_user_model
-from django.test import TestCase
 from django.utils.timezone import now
 from oauth2_provider.models import AccessToken, Application
 from rest_framework.test import APIClient
@@ -25,28 +24,33 @@ def get_test_user():
     return test_user
 
 
-class LeelooTestCase(TestCase):
+class APITestMixin:
     """All the tests using the DB and accessing end points behind auth should use this class."""
 
     pytestmark = pytest.mark.django_db  # use db
 
-    def setUp(self):
-        """Set ups some utils."""
-        self._user = None
-        self._application = None
-        self._token = None
-        self.user = self.get_user()
-        self.application = self.get_application()
-        self.token = self.get_token()
-        self.api_client = self.get_logged_in_api_client()
-
-    def get_user(self):
+    @property
+    def user(self):
         """Return the user."""
-        if self._user:
-            return self._user
-        return get_test_user()
+        if not hasattr(self, '_user'):
+            self._user = get_test_user()
+        return self._user
 
-    def get_logged_in_api_client(self):
+    @property
+    def token(self):
+        """Get access token for user test."""
+        if not hasattr(self, '_token'):
+            self._token = AccessToken(
+                user=self.user,
+                application=self.application,
+                token='123456789',  # unsafe token, just for testing
+                expires=datetime.datetime.now() + datetime.timedelta(hours=1),
+                scope='write read'
+            )
+        return self._token.token
+
+    @property
+    def api_client(self):
         """
         Login using the OAuth2 authentication.
 
@@ -59,32 +63,17 @@ class LeelooTestCase(TestCase):
         client.credentials(Authorization=f'Bearer {self.token}')
         return client
 
-    def get_token(self):
-        """Get access token for user test."""
-        if self._token:
-            return self._token
-
-        token = AccessToken(
-            user=self.user,
-            application=self.application,
-            token='123456789',  # unsafe token, just for testing
-            expires=datetime.datetime.now() + datetime.timedelta(hours=1),
-            scope='write read'
-        )
-        return token.token
-
-    def get_application(self):
+    @property
+    def application(self):
         """Return the test application."""
-        if self._application:
-            return self._application
-
-        application, _ = Application.objects.get_or_create(
-            user=get_test_user(),
-            client_type=Application.CLIENT_CONFIDENTIAL,
-            authorization_grant_type=Application.GRANT_PASSWORD,
-            name='Test client'
-        )
-        return application
+        if not hasattr(self, '_application'):
+            self._application, _ = Application.objects.get_or_create(
+                user=self.user,
+                client_type=Application.CLIENT_CONFIDENTIAL,
+                authorization_grant_type=Application.GRANT_PASSWORD,
+                name='Test client'
+            )
+        return self._application
 
 
 def synchronous_executor_submit(fn, *args, **kwargs):

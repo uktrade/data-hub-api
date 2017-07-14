@@ -9,14 +9,14 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
 from datahub.core.test_utils import (
-    LeelooTestCase, synchronous_executor_submit, synchronous_transaction_on_commit,
+    APITestMixin, synchronous_executor_submit, synchronous_transaction_on_commit,
 )
 
 pytestmark = pytest.mark.django_db
 
 
 @pytest.mark.usefixtures('setup_data', 'post_save_handlers')
-class SearchTestCase(LeelooTestCase):
+class TestSearch(APITestMixin):
     """Tests search views."""
 
     def test_basic_search_all_companies(self):
@@ -150,7 +150,8 @@ class SearchTestCase(LeelooTestCase):
         url = f"{reverse('api-v3:search:company')}?offset=0&limit=100"
         response = self.api_client.post(url, {})
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data['results']) > 0
 
     def test_search_foreign_company_json(self):
         """Tests detailed company search."""
@@ -186,7 +187,8 @@ class SearchTestCase(LeelooTestCase):
         url = f"{reverse('api-v3:search:contact')}?offset=0&limit=100"
         response = self.api_client.post(url, {})
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data['results']) > 0
 
     def test_search_investment_project_json(self):
         """Tests detailed investment project search."""
@@ -228,7 +230,8 @@ class SearchTestCase(LeelooTestCase):
         url = f"{reverse('api-v3:search:investment_project')}?offset=0&limit=100"
         response = self.api_client.post(url, {})
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data['results']) > 0
 
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)

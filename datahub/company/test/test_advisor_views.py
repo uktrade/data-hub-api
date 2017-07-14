@@ -1,11 +1,11 @@
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core.test_utils import LeelooTestCase
+from datahub.core.test_utils import APITestMixin
 from .factories import AdviserFactory
 
 
-class AdviserTestCase(LeelooTestCase):
+class TestAdviser(APITestMixin):
     """Adviser test case."""
 
     def test_adviser_list_view(self):
