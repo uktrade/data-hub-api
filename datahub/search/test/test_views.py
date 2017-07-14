@@ -232,7 +232,7 @@ class SearchTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data['results']) > 0
-        
+
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_results_quality(self):
