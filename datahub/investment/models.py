@@ -234,6 +234,10 @@ class InvestmentProjectTeamMember(models.Model):
     adviser = models.ForeignKey('company.Advisor', on_delete=models.CASCADE, related_name='+')
     role = models.CharField(max_length=MAX_LENGTH)
 
+    def __str__(self):
+        """Human-readable representation."""
+        return f'{self.investment_project} – {self.adviser} – {self.role}'
+
     class Meta:  # noqa: D101
         unique_together = (('investment_project', 'adviser'),)
 
