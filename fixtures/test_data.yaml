@@ -210,6 +210,7 @@
   fields:
     name: New hotel (FDI)
     description: This is a dummy investment project for testing
+    stage: c9864359-fb1a-4646-a4c1-97d10189fc03  # Assign PM
     nda_signed: false
     estimated_land_date: 2020-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
@@ -225,7 +226,6 @@
     sector: 034be3be-5329-e511-b6bc-e4115bead28a
     business_activities:
       - a2dbd807-ae52-421c-8d1d-88adfc7a506b
-    stage: c9864359-fb1a-4646-a4c1-97d10189fc03
     total_investment: 1000000.0
     foreign_equity_investment: 200000.0
     government_assistance: true
@@ -244,9 +244,10 @@
   fields:
     name: New hotel (Non-FDI)
     description: This is a dummy investment project for testing
+    stage: 8a320cc9-ae2e-443e-9d26-2f36452c2ced  # Prospect
     nda_signed: false
     estimated_land_date: 2020-01-01
-    investment_type: 9c364e64-2b28-401b-b2df-50e08b0bca44  # FDI
+    investment_type: 9c364e64-2b28-401b-b2df-50e08b0bca44  # Non-FDI
     project_shareable: true
     not_shareable_reason: ''
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
@@ -265,6 +266,7 @@
   fields:
     name: New hotel (commitment to invest)
     description: This is a dummy investment project for testing
+    stage: 8a320cc9-ae2e-443e-9d26-2f36452c2ced  # Prospect
     nda_signed: false
     estimated_land_date: 2020-01-01
     investment_type: 031269ab-b7ec-40e9-8a4e-7371404f0622  # Commitment to invest
