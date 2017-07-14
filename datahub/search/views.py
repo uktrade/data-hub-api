@@ -67,9 +67,6 @@ class SearchCompanyAPIView(APIView):
                    for field in self.FILTER_FIELDS if field in request.data}
         filters = elasticsearch.remap_fields(filters)
 
-        if len(filters.keys()) == 0:
-            raise ValidationError('Missing required at least one filter.')
-
         original_query = request.data.get('original_query', '')
 
         offset = int(request.query_params.get('offset', 0))
@@ -106,9 +103,6 @@ class SearchContactAPIView(APIView):
 
         filters = elasticsearch.remap_fields(filters)
 
-        if len(filters.keys()) == 0:
-            raise ValidationError('Missing required at least one filter.')
-
         original_query = request.data.get('original_query', '')
 
         offset = int(request.data.get('offset', 0))
@@ -144,10 +138,6 @@ class SearchInvestmentProjectAPIView(APIView):
         """Performs filtered contact search."""
         filters = {field: request.data[field]
                    for field in self.FILTER_FIELDS if field in request.data}
-
-        filters = elasticsearch.remap_fields(filters)
-        if len(filters.keys()) == 0:
-            raise ValidationError('Missing required at least one filter.')
 
         try:
             filters, ranges = elasticsearch.date_range_fields(filters)
