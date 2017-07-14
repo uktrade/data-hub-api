@@ -9,14 +9,14 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
 from datahub.core.test_utils import (
-    LeelooTestCase, synchronous_executor_submit, synchronous_transaction_on_commit,
+    APITestMixin, synchronous_executor_submit, synchronous_transaction_on_commit,
 )
 
 pytestmark = pytest.mark.django_db
 
 
 @pytest.mark.usefixtures('setup_data', 'post_save_handlers')
-class SearchTestCase(LeelooTestCase):
+class TestSearch(APITestMixin):
     """Tests search views."""
 
     def test_basic_search_all_companies(self):
