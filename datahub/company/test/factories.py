@@ -62,8 +62,8 @@ class ContactFactory(factory.django.DjangoModelFactory):
 
     id = factory.Sequence(lambda _: str(uuid.uuid4()))
     title_id = constants.Title.wing_commander.value.id
-    first_name = factory.Sequence(lambda n: 'name {n}')
-    last_name = factory.Sequence(lambda n: 'surname {n}')
+    first_name = factory.Sequence(lambda n: f'name {n}')
+    last_name = factory.Sequence(lambda n: f'surname {n}')
     company = factory.SubFactory(CompanyFactory)
     email = 'foo@bar.com'
     primary = True
