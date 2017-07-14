@@ -3,6 +3,7 @@
 import uuid
 
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, transaction
 from model_utils import Choices
 
@@ -115,8 +116,11 @@ class IProjectAbstract(models.Model):
         """
         if self.cdms_project_code:
             return self.cdms_project_code
-        project_num = self.investmentprojectcode.id
-        return f'DHP-{project_num:08d}'
+        try:
+            project_num = self.investmentprojectcode.id
+            return f'DHP-{project_num:08d}'
+        except ObjectDoesNotExist:
+            return None
 
 
 class IProjectValueAbstract(models.Model):
