@@ -138,6 +138,7 @@ class SearchInvestmentProjectAPIView(APIView):
         """Performs filtered contact search."""
         filters = {field: request.data[field]
                    for field in self.FILTER_FIELDS if field in request.data}
+        filters = elasticsearch.remap_fields(filters)
 
         try:
             filters, ranges = elasticsearch.date_range_fields(filters)
