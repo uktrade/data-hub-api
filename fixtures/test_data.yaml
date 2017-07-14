@@ -106,6 +106,22 @@
     last_name: Rogers
     dit_team: 7648318c-9698-e211-a939-e4115bead28a
 
+- model: company.advisor
+  pk: d7493b4e-5d7b-4834-98d9-28b78a74052a
+  fields:
+    email: michael.wining@example.com
+    first_name: Michael
+    last_name: Wining
+    dit_team: 7648318c-9698-e211-a939-e4115bead28a
+
+- model: company.advisor
+  pk: 5a644146-5298-4741-91f3-d5d7558adf47
+  fields:
+    email: paula.churing@example.com
+    first_name: Paula
+    last_name: Churing
+    dit_team: 7648318c-9698-e211-a939-e4115bead28a
+
 - model: company.contact
   pk: 9b1138ab-ec7b-497f-b8c3-27fed21694ef
   fields:
