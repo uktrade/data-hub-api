@@ -1,10 +1,10 @@
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core.test_utils import get_test_user, LeelooTestCase
+from datahub.core.test_utils import APITestMixin, get_test_user
 
 
-class UserViewTestCase(LeelooTestCase):
+class TestUserView(APITestMixin):
     """User view test case."""
 
     def test_who_am_i_authenticated(self):

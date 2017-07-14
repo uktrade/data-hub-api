@@ -4,14 +4,14 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.core import constants
-from datahub.core.test_utils import LeelooTestCase
+from datahub.core.test_utils import APITestMixin
 from .factories import CompanyFactory, ContactFactory
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
 
 
-class AddContactTestCase(LeelooTestCase):
+class TestAddContact(APITestMixin):
     """Add contact test case."""
 
     @freeze_time('2017-04-18 13:25:30.986208+00:00')
@@ -254,7 +254,7 @@ class AddContactTestCase(LeelooTestCase):
         }
 
 
-class EditContactTestCase(LeelooTestCase):
+class TestEditContact(APITestMixin):
     """Edit contact test case."""
 
     @freeze_time('2017-04-18 13:25:30.986208+00:00')
@@ -342,7 +342,7 @@ class EditContactTestCase(LeelooTestCase):
         }
 
 
-class ArchiveContactTestCase(LeelooTestCase):
+class TestArchiveContact(APITestMixin):
     """Archive/unarchive contact test case."""
 
     def test_archive_without_reason(self):
@@ -393,7 +393,7 @@ class ArchiveContactTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
-class ViewContactTestCase(LeelooTestCase):
+class TestViewContact(APITestMixin):
     """View contact test case."""
 
     @freeze_time('2017-04-18 13:25:30.986208+00:00')
@@ -478,7 +478,7 @@ class ViewContactTestCase(LeelooTestCase):
         }
 
 
-class ContactListTestCase(LeelooTestCase):
+class TestContactList(APITestMixin):
     """List/filter contacts test case."""
 
     def test_all(self):
