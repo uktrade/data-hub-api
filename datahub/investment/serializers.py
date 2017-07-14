@@ -12,7 +12,7 @@ from datahub.investment.models import (InvestmentProject, InvestmentProjectTeamM
 from datahub.investment.validate import validate
 
 
-class IProjectSerializer(serializers.ModelSerializer):
+class IProjectSummarySerializer(serializers.ModelSerializer):
     """Serialiser for investment project endpoints."""
 
     project_code = serializers.CharField(read_only=True)
@@ -296,19 +296,19 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
         )
 
 
-class IProjectUnifiedSerializer(IProjectSerializer, IProjectValueSerializer,
-                                IProjectRequirementsSerializer, IProjectTeamSerializer):
+class IProjectSerializer(IProjectSummarySerializer, IProjectValueSerializer,
+                         IProjectRequirementsSerializer, IProjectTeamSerializer):
     """Serialiser for investment projects, used with the new unified investment endpoint."""
 
     class Meta:  # noqa: D101
         model = InvestmentProject
         fields = (
-            IProjectSerializer.Meta.fields +
+            IProjectSummarySerializer.Meta.fields +
             IProjectValueSerializer.Meta.fields +
             IProjectRequirementsSerializer.Meta.fields +
             IProjectTeamSerializer.Meta.fields
         )
-        extra_kwargs = IProjectSerializer.Meta.extra_kwargs
+        extra_kwargs = IProjectSummarySerializer.Meta.extra_kwargs
 
 
 class IProjectDocumentSerializer(serializers.ModelSerializer):
