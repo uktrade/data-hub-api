@@ -13,7 +13,7 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import (AdviserFactory, CompanyFactory,
                                             ContactFactory)
 from datahub.core import constants
-from datahub.core.test_utils import LeelooTestCase
+from datahub.core.test_utils import APITestMixin
 from datahub.core.utils import executor
 from datahub.documents.av_scan import virus_scan_document
 from datahub.investment import views
@@ -23,7 +23,7 @@ from datahub.investment.test.factories import (
 )
 
 
-class InvestmentViewsTestCase(LeelooTestCase):
+class TestInvestmentViews(APITestMixin):
     """Tests for the deprecated project, value, team and requirements views."""
 
     def test_list_projects_success(self):
@@ -586,7 +586,7 @@ class InvestmentViewsTestCase(LeelooTestCase):
         }
 
 
-class UnifiedViewsTestCase(LeelooTestCase):
+class TestUnifiedViews(APITestMixin):
     """Tests for the unified investment views."""
 
     def test_list_projects_success(self):
@@ -1316,7 +1316,7 @@ class UnifiedViewsTestCase(LeelooTestCase):
         assert response_data['phase'] == response_data['stage']
 
 
-class TeamMemberViewsTestCase(LeelooTestCase):
+class TestTeamMemberViews(APITestMixin):
     """Tests for the team member views."""
 
     def test_add_team_member_nonexistent_project(self):
@@ -1499,13 +1499,11 @@ class TeamMemberViewsTestCase(LeelooTestCase):
         assert str(new_team_members[0].adviser.pk) == team_members[1].adviser.pk
 
 
-class AuditLogViewTestCase(LeelooTestCase):
+class TestAuditLogView(APITestMixin):
     """Tests for the audit log view."""
 
     def test_audit_log_view(self):
         """Test retrieval of audit log."""
-        user = self.get_user()
-
         initial_datetime = datetime.utcnow()
         with reversion.create_revision():
             iproject = InvestmentProjectFactory(
@@ -1514,7 +1512,7 @@ class AuditLogViewTestCase(LeelooTestCase):
 
             reversion.set_comment('Initial')
             reversion.set_date_created(initial_datetime)
-            reversion.set_user(user)
+            reversion.set_user(self.user)
 
         changed_datetime = datetime.utcnow()
         with reversion.create_revision():
@@ -1523,7 +1521,7 @@ class AuditLogViewTestCase(LeelooTestCase):
 
             reversion.set_comment('Changed')
             reversion.set_date_created(changed_datetime)
-            reversion.set_user(user)
+            reversion.set_user(self.user)
 
         url = reverse('api-v3:investment:audit-item',
                       kwargs={'pk': iproject.pk})
@@ -1535,13 +1533,13 @@ class AuditLogViewTestCase(LeelooTestCase):
         assert len(response_data) == 1, 'Only one entry in audit log'
         entry = response_data[0]
 
-        assert entry['user']['name'] == user.name, 'Valid user captured'
+        assert entry['user']['name'] == self.user.name, 'Valid user captured'
         assert entry['comment'] == 'Changed', 'Comments can be set manually'
         assert entry['timestamp'] == changed_datetime.isoformat(), 'TS can be set manually'
         assert entry['changes']['description'] == ['Initial desc', 'New desc'], 'Changes are reflected'
 
 
-class ArchiveViewsTestCase(LeelooTestCase):
+class TestArchiveViews(APITestMixin):
     """Tests for the archive and unarchive views."""
 
     def test_archive_project_success(self):
@@ -1615,7 +1613,7 @@ class ArchiveViewsTestCase(LeelooTestCase):
         assert response_data['archived_reason'] == ''
 
 
-class DocumentViewsTestCase(LeelooTestCase):
+class TestDocumentViews(APITestMixin):
     """Tests for the document views."""
 
     def test_documents_list_is_filtered_by_project(self):

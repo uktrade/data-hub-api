@@ -4,11 +4,11 @@ from rest_framework.reverse import reverse
 
 from datahub.company import models
 from datahub.core import constants
-from datahub.core.test_utils import LeelooTestCase
+from datahub.core.test_utils import APITestMixin
 from .factories import CompaniesHouseCompanyFactory, CompanyFactory
 
 
-class CompanyTestCase(LeelooTestCase):
+class TestCompany(APITestMixin):
     """Company test case."""
 
     def test_list_companies(self):
@@ -279,7 +279,7 @@ class CompanyTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
-class CHCompanyTestCase(LeelooTestCase):
+class TestCHCompany(APITestMixin):
     """Companies house company test case."""
 
     def test_list_ch_companies(self):

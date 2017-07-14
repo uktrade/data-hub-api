@@ -11,11 +11,11 @@ from datahub.core.constants import (
     BusinessType, CompanyClassification, Country, HeadquarterType, Sector,
     UKRegion
 )
-from datahub.core.test_utils import LeelooTestCase
+from datahub.core.test_utils import APITestMixin
 from datahub.investment.test.factories import InvestmentProjectFactory
 
 
-class CompanyTestCase(LeelooTestCase):
+class TestCompany(APITestMixin):
     """Company test case."""
 
     def test_list_companies(self):
@@ -346,7 +346,7 @@ class CompanyTestCase(LeelooTestCase):
         assert response.data['id'] == str(company.id)
 
 
-class CHCompanyTestCase(LeelooTestCase):
+class TestCHCompany(APITestMixin):
     """CH company tests."""
 
     def test_get_ch_company(self):

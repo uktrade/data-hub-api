@@ -7,13 +7,13 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
-from datahub.core.test_utils import LeelooTestCase
+from datahub.core.test_utils import APITestMixin
 
 from datahub.interaction.test.factories import ServiceDeliveryFactory, ServiceOfferFactory
 from datahub.metadata.test.factories import EventFactory
 
 
-class ServiceDeliveryViewTestCase(LeelooTestCase):
+class TestServiceDeliveryView(APITestMixin):
     """Service Delivery view test case."""
 
     def test_service_delivery_detail_view(self):
