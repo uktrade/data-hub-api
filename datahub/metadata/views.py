@@ -31,8 +31,6 @@ METADATA_MAPPING = {
     'investment-business-activity': models.InvestmentBusinessActivity,
     'investment-strategic-driver': models.InvestmentStrategicDriver,
     'salary-range': models.SalaryRange,
-    # deprecated alias for investment-project-stage
-    'investment-project-phase': models.InvestmentProjectStage,
     'investment-project-stage': models.InvestmentProjectStage,
 }
 

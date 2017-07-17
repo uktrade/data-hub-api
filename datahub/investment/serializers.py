@@ -20,9 +20,6 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
     investment_type = NestedRelatedField(meta_models.InvestmentType)
     stage = NestedRelatedField(meta_models.InvestmentProjectStage,
                                required=False)
-    # phase is deprecated – remove once front end is using stage
-    phase = NestedRelatedField(meta_models.InvestmentProjectStage,
-                               required=False, source='stage')
     project_shareable = serializers.BooleanField(required=True)
     investor_company = NestedRelatedField(
         Company, required=True, allow_null=False
@@ -93,7 +90,6 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
             'approved_non_fdi',
             'investment_type',
             'stage',
-            'phase',  # For backwards compatibility
             'investor_company',
             'intermediate_company',
             'client_contacts',
