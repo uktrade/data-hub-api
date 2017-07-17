@@ -7,13 +7,14 @@ from unittest.mock import patch
 
 import pytest
 import reversion
+from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import (AdviserFactory, CompanyFactory,
                                             ContactFactory)
 from datahub.core import constants
-from datahub.core.test_utils import LeelooTestCase
+from datahub.core.test_utils import LeelooTestCase, synchronous_executor_submit, synchronous_transaction_on_commit
 from datahub.core.utils import executor
 from datahub.documents.av_scan import virus_scan_document
 from datahub.investment import views
@@ -1699,6 +1700,41 @@ class DocumentViewsTestCase(LeelooTestCase):
         })
         assert response.status_code == status.HTTP_200_OK
         mock_submit.assert_called_once_with(virus_scan_document, str(doc.pk))
+
+    @patch.object(executor, 'submit')
+    @patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_document_delete_of_not_uploaded_doc_does_not_trigger_s3_delete(self, mock_submit):
+        """Tests document deletion."""
+        project = InvestmentProjectFactory()
+        doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
+
+        url = reverse('api-v3:investment:document-item',
+                      kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
+
+        response = self.api_client.delete(url)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert mock_submit.called is False
+
+    @patch('datahub.core.utils.get_s3_client')
+    @patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_document_delete(self, mock_s3):
+        """Tests document deletion."""
+        project = InvestmentProjectFactory()
+        doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
+        doc.document.uploaded_on = now()
+        doc.document.save()
+
+        url = reverse('api-v3:investment:document-item',
+                      kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
+
+        response = self.api_client.delete(url)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        mock_s3().delete_object.assert_called_with(
+            Bucket=doc.document.s3_bucket,
+            Key=doc.document.s3_key,
+        )
 
     def test_document_upload_status_wrong_status(self):
         """Tests request validation in the document status endpoint."""
