@@ -707,51 +707,6 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['team_members'] == []
         assert response_data['team_complete'] is True
 
-    def test_get_phase_backwards_compatibility(self):
-        """Tests that phase works as an alias for stage with GET."""
-        project = InvestmentProjectFactory(
-        )
-        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
-        response = self.api_client.get(url)
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['phase'] == {
-            'id': constants.InvestmentProjectStage.prospect.value.id,
-            'name': constants.InvestmentProjectStage.prospect.value.name
-        }
-        assert response_data['phase'] == response_data['stage']
-
-    def test_patch_phase_backwards_compatibility(self):
-        """Tests that phase works as an alias for stage with PATCH."""
-        strategic_drivers = [
-            constants.InvestmentStrategicDriver.access_to_market.value.id
-        ]
-        project = InvestmentProjectFactory(
-            client_contacts=[ContactFactory().id, ContactFactory().id],
-            client_cannot_provide_total_investment=False,
-            total_investment=100,
-            number_new_jobs=0,
-            client_considering_other_countries=False,
-            client_requirements='client reqs',
-            site_decided=False,
-            strategic_drivers=strategic_drivers,
-            uk_region_locations=[constants.UKRegion.england.value.id]
-        )
-        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
-        request_data = {
-            'phase': {
-                'id': constants.InvestmentProjectStage.assign_pm.value.id
-            }
-        }
-        response = self.api_client.patch(url, data=request_data, format='json')
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['phase'] == {
-            'id': constants.InvestmentProjectStage.assign_pm.value.id,
-            'name': constants.InvestmentProjectStage.assign_pm.value.name
-        }
-        assert response_data['phase'] == response_data['stage']
-
 
 class TestTeamMemberViews(APITestMixin):
     """Tests for the team member views."""
