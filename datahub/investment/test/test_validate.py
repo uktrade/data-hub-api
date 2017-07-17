@@ -3,7 +3,7 @@ import pytest
 from datahub.company.test.factories import AdviserFactory, ContactFactory
 from datahub.core import constants
 from datahub.investment.serializers import (
-    IProjectRequirementsSerializer, IProjectSerializer, IProjectTeamSerializer,
+    IProjectRequirementsSerializer, IProjectSummarySerializer, IProjectTeamSerializer,
     IProjectValueSerializer
 )
 from datahub.investment.test.factories import InvestmentProjectFactory
@@ -19,7 +19,7 @@ def test_validate_project_fail():
         investment_type_id=constants.InvestmentType.fdi.value.id,
         fdi_type_id=None
     )
-    errors = validate(instance=project, fields=IProjectSerializer.Meta.fields)
+    errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
     assert errors == {
         'fdi_type': 'This field is required.'
     }
@@ -30,7 +30,7 @@ def test_validate_project_instance_success():
     project = InvestmentProjectFactory(
         client_contacts=[ContactFactory().id, ContactFactory().id]
     )
-    errors = validate(instance=project, fields=IProjectSerializer.Meta.fields)
+    errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
     assert not errors
 
 
@@ -40,7 +40,7 @@ def test_validate_non_fdi_type():
     project = InvestmentProjectFactory(
         investment_type_id=investment_type_id
     )
-    errors = validate(instance=project, fields=IProjectSerializer.Meta.fields)
+    errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
     assert 'non_fdi_type' in errors
     assert 'fdi_type' not in errors
 
@@ -51,7 +51,7 @@ def test_validate_fdi_type():
     project = InvestmentProjectFactory(
         investment_type_id=investment_type_id
     )
-    errors = validate(instance=project, fields=IProjectSerializer.Meta.fields)
+    errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
     assert 'fdi_type' in errors
     assert 'non_fdi_type' not in errors
 
@@ -62,7 +62,7 @@ def test_validate_project_referral_website():
     project = InvestmentProjectFactory(
         referral_source_activity_id=referral_source_id
     )
-    errors = validate(instance=project, fields=IProjectSerializer.Meta.fields)
+    errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
     assert 'referral_source_activity_website' in errors
     assert 'referral_source_activity_event' not in errors
     assert 'referral_source_activity_marketing' not in errors
@@ -74,7 +74,7 @@ def test_validate_project_referral_event():
     project = InvestmentProjectFactory(
         referral_source_activity_id=referral_source_id
     )
-    errors = validate(instance=project, fields=IProjectSerializer.Meta.fields)
+    errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
     assert 'referral_source_activity_event' in errors
     assert 'referral_source_activity_website' not in errors
     assert 'referral_source_activity_marketing' not in errors
@@ -86,7 +86,7 @@ def test_validate_project_referral_marketing():
     project = InvestmentProjectFactory(
         referral_source_activity_id=referral_source_id
     )
-    errors = validate(instance=project, fields=IProjectSerializer.Meta.fields)
+    errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
     assert 'referral_source_activity_marketing' in errors
     assert 'referral_source_activity_website' not in errors
     assert 'referral_source_activity_event' not in errors
@@ -101,7 +101,7 @@ def test_validate_project_update_data():
         'referral_source_activity': referral_source
     }
     errors = validate(instance=project, update_data=update_data,
-                      fields=IProjectSerializer.Meta.fields)
+                      fields=IProjectSummarySerializer.Meta.fields)
     assert 'referral_source_activity_marketing' in errors
     assert 'referral_source_activity_website' not in errors
     assert 'referral_source_activity_event' not in errors

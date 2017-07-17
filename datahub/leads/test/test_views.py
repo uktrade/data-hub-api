@@ -6,13 +6,13 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core.test_utils import LeelooTestCase
+from datahub.core.test_utils import APITestMixin
 from datahub.leads.test.factories import BusinessLeadFactory
 
 FROZEN_TIME = '2017-04-18T13:25:30.986208'
 
 
-class BusinessLeadViewsTestCase(LeelooTestCase):
+class TestBusinessLeadViews(APITestMixin):
     """Business lead views test case."""
 
     def test_list_leads_success(self):
