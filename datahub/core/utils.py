@@ -79,3 +79,14 @@ def sign_s3_url(bucket_name, path, method='get_object', expires=3600):
         },
         ExpiresIn=expires,
     )
+
+
+def delete_s3_obj(bucket, key):
+    """Remove object from S3 Bucket."""
+    s3_client = get_s3_client()
+    response = s3_client.delete_object(
+        Bucket=bucket,
+        Key=key,
+    )
+
+    return response['DeleteMarker'] is True

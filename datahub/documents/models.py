@@ -2,10 +2,12 @@ import uuid
 from os import path
 
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 from datahub.core.models import ArchivableModel, BaseModel
-from datahub.core.utils import sign_s3_url
+from datahub.core.utils import delete_s3_obj, executor, sign_s3_url
 
 
 class Document(BaseModel, ArchivableModel):
@@ -61,3 +63,15 @@ class Document(BaseModel, ArchivableModel):
     def __str__(self):
         """String repr."""
         return f'Document(filename="{self.filename}", av_clean={self.av_clean})'
+
+
+@receiver(post_delete, sender=Document)
+def document_post_delete(sender, **kwargs):
+    """Handle document delete."""
+    instance = kwargs['instance']
+    if instance.uploaded_on is None:
+        return
+
+    transaction.on_commit(
+        lambda: executor.submit(delete_s3_obj, instance.s3_bucket, instance.s3_key)
+    )
