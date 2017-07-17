@@ -3,9 +3,8 @@
 import uuid
 
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, transaction
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from model_utils import Choices
 
 from datahub.core.constants import InvestmentProjectStage
@@ -117,8 +116,11 @@ class IProjectAbstract(models.Model):
         """
         if self.cdms_project_code:
             return self.cdms_project_code
-        project_num = self.investmentprojectcode.id
-        return f'DHP-{project_num:08d}'
+        try:
+            project_num = self.investmentprojectcode.id
+            return f'DHP-{project_num:08d}'
+        except ObjectDoesNotExist:
+            return None
 
 
 class IProjectValueAbstract(models.Model):
@@ -236,6 +238,10 @@ class InvestmentProjectTeamMember(models.Model):
     adviser = models.ForeignKey('company.Advisor', on_delete=models.CASCADE, related_name='+')
     role = models.CharField(max_length=MAX_LENGTH)
 
+    def __str__(self):
+        """Human-readable representation."""
+        return f'{self.investment_project} – {self.adviser} – {self.role}'
+
     class Meta:  # noqa: D101
         unique_together = (('investment_project', 'adviser'),)
 
@@ -322,16 +328,3 @@ class IProjectDocument(BaseModel, ArchivableModel):
             investment_doc.save()
 
         return investment_doc
-
-
-@receiver(post_save, sender=InvestmentProject)
-def project_post_save(sender, **kwargs):
-    """Creates a project code for investment projects on creation.
-
-    Projects with a CDMS project code do not get a new project code.
-    """
-    instance = kwargs['instance']
-    created = kwargs['created']
-    raw = kwargs['raw']
-    if created and not raw and not instance.cdms_project_code:
-        InvestmentProjectCode.objects.create(project=instance)
