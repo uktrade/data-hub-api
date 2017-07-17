@@ -72,6 +72,10 @@ def document_post_delete(sender, **kwargs):
     if instance.uploaded_on is None:
         return
 
+    # grabs only needed vars for closure, so instance goes out-of-scope
+    bucket = instance.s3_bucket
+    key = instance.s3_key
+
     transaction.on_commit(
-        lambda: executor.submit(delete_s3_obj, instance.s3_bucket, instance.s3_key)
+        lambda: executor.submit(delete_s3_obj, bucket, key)
     )
