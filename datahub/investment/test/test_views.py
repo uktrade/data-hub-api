@@ -243,7 +243,8 @@ class TestUnifiedViews(APITestMixin):
         request_data = {
             'investment_type': {
                 'id': str(constants.InvestmentType.fdi.value.id)
-            }
+            },
+            'fdi_type': None
         }
         response = self.api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -503,6 +504,29 @@ class TestUnifiedViews(APITestMixin):
         }
         response = self.api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
+
+    def test_invalid_state_validation(self):
+        """Tests validation when a project that is in an invalid state.
+
+        An invalid state means that fields that are required for the current stage have
+        not been completed. Generally, this should be impossible as those fields should've
+        been completed before moving to the current stage. Only the fields being modified
+        should be validated in this state (unless the stage is being modified).
+        """
+        project = InvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.active.value.id,
+            project_manager=None
+        )
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'project_manager': None
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'project_manager': ['This field is required.'],
+        }
 
     def test_get_value_success(self):
         """Test successfully getting a project value object."""
