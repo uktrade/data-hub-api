@@ -12,7 +12,7 @@ from datahub.investment.models import (InvestmentProject, InvestmentProjectTeamM
 from datahub.investment.validate import validate
 
 
-class IProjectSerializer(serializers.ModelSerializer):
+class IProjectSummarySerializer(serializers.ModelSerializer):
     """Serialiser for investment project endpoints."""
 
     project_code = serializers.CharField(read_only=True)
@@ -20,9 +20,6 @@ class IProjectSerializer(serializers.ModelSerializer):
     investment_type = NestedRelatedField(meta_models.InvestmentType)
     stage = NestedRelatedField(meta_models.InvestmentProjectStage,
                                required=False)
-    # phase is deprecated – remove once front end is using stage
-    phase = NestedRelatedField(meta_models.InvestmentProjectStage,
-                               required=False, source='stage')
     project_shareable = serializers.BooleanField(required=True)
     investor_company = NestedRelatedField(
         Company, required=True, allow_null=False
@@ -93,7 +90,6 @@ class IProjectSerializer(serializers.ModelSerializer):
             'approved_non_fdi',
             'investment_type',
             'stage',
-            'phase',  # For backwards compatibility
             'investor_company',
             'intermediate_company',
             'client_contacts',
@@ -296,19 +292,19 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
         )
 
 
-class IProjectUnifiedSerializer(IProjectSerializer, IProjectValueSerializer,
-                                IProjectRequirementsSerializer, IProjectTeamSerializer):
+class IProjectSerializer(IProjectSummarySerializer, IProjectValueSerializer,
+                         IProjectRequirementsSerializer, IProjectTeamSerializer):
     """Serialiser for investment projects, used with the new unified investment endpoint."""
 
     class Meta:  # noqa: D101
         model = InvestmentProject
         fields = (
-            IProjectSerializer.Meta.fields +
+            IProjectSummarySerializer.Meta.fields +
             IProjectValueSerializer.Meta.fields +
             IProjectRequirementsSerializer.Meta.fields +
             IProjectTeamSerializer.Meta.fields
         )
-        extra_kwargs = IProjectSerializer.Meta.extra_kwargs
+        extra_kwargs = IProjectSummarySerializer.Meta.extra_kwargs
 
 
 class IProjectDocumentSerializer(serializers.ModelSerializer):

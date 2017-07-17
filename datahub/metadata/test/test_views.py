@@ -36,7 +36,6 @@ metadata_view_names = (
     'investment-business-activity',
     'investment-strategic-driver',
     'salary-range',
-    'investment-project-phase',
     'investment-project-stage',
 )
 
@@ -65,7 +64,6 @@ metadata_views_ids = (
     'investment business activity view',
     'investment strategic driver view',
     'salary range view',
-    'investment project phase view',
     'investment project stage view',
 )
 
@@ -139,13 +137,6 @@ ordered_metadata_view_params = (
         '£30,000 – £34,000',
         '£35,000 and above'
     ]),
-    ('investment-project-phase', [
-        'Prospect',
-        'Assign PM',
-        'Active',
-        'Verify win',
-        'Won'
-    ]),
     ('investment-project-stage', [
         'Prospect',
         'Assign PM',
@@ -159,7 +150,6 @@ ordered_metadata_view_test_ids = (
     'turnover',
     'employee-range',
     'salary-range',
-    'investment-project-phase',
     'investment-project-stage',
 )
 
