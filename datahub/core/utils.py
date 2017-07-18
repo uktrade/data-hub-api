@@ -69,9 +69,12 @@ def get_s3_client():
     return s3
 
 
-def sign_s3_url(bucket_name, path, method='get_object', expires=3600):
+def sign_s3_url(bucket_name, path, method='get_object', expires=3600, client=None):
     """Sign s3 url using global config, and given expiry in seconds."""
-    return get_s3_client().generate_presigned_url(
+    if client is None:
+        client = get_s3_client()
+
+    return client.generate_presigned_url(
         ClientMethod=method,
         Params={
             'Bucket': bucket_name,
@@ -81,10 +84,12 @@ def sign_s3_url(bucket_name, path, method='get_object', expires=3600):
     )
 
 
-def delete_s3_obj(bucket, key):
+def delete_s3_obj(bucket, key, client=None):
     """Remove object from S3 Bucket."""
-    s3_client = get_s3_client()
-    response = s3_client.delete_object(
+    if client is None:
+        client = get_s3_client()
+
+    response = client.delete_object(
         Bucket=bucket,
         Key=key,
     )
