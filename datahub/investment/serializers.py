@@ -61,8 +61,16 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
         """Validates the object after individual fields have been validated.
 
         Performs stage-dependent validation of the different sections.
+
+        When transitioning stage, all fields required for the new stage are
+        validated. In other cases, only the fields being modified are validated.
+        If a project ends up in an invalid state, this avoids the user being
+        unable to rectify the situation.
         """
-        errors = validate(self.instance, data)
+        fields = None
+        if self.partial and 'stage' not in data:
+            fields = data.keys()
+        errors = validate(self.instance, data, fields=fields)
 
         if errors:
             raise serializers.ValidationError(errors)
