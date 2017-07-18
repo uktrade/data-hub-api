@@ -234,6 +234,61 @@ class TestUnifiedViews(APITestMixin):
         assert sorted(contact['id'] for contact in response_data[
             'client_contacts']) == sorted(contacts)
 
+    def test_create_project_conditional_failure(self):
+        """Test creating a project w/ missing conditionally required value."""
+        contacts = [ContactFactory(), ContactFactory()]
+        investor_company = CompanyFactory()
+        intermediate_company = CompanyFactory()
+        adviser = AdviserFactory()
+        url = reverse('api-v3:investment:investment-collection')
+        aerospace_id = constants.Sector.aerospace_assembly_aircraft.value.id
+        retail_business_activity_id = constants.InvestmentBusinessActivity.retail.value.id
+        request_data = {
+            'name': 'project name',
+            'description': 'project description',
+            'nda_signed': False,
+            'estimated_land_date': '2020-12-12',
+            'project_shareable': False,
+            'investment_type': {
+                'id': constants.InvestmentType.fdi.value.id
+            },
+            'stage': {
+                'id': constants.InvestmentProjectStage.prospect.value.id
+            },
+            'business_activities': [{
+                'id': retail_business_activity_id
+            }],
+            'client_contacts': [{
+                'id': str(contacts[0].id)
+            }, {
+                'id': str(contacts[1].id)
+            }],
+            'client_relationship_manager': {
+                'id': str(adviser.id)
+            },
+            'investor_company': {
+                'id': str(investor_company.id)
+            },
+            'intermediate_company': {
+                'id': str(intermediate_company.id)
+            },
+            'referral_source_activity': {
+                'id': constants.ReferralSourceActivity.cold_call.value.id
+            },
+            'referral_source_adviser': {
+                'id': str(adviser.id)
+            },
+            'sector': {
+                'id': str(aerospace_id)
+            }
+        }
+        response = self.api_client.post(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'fdi_type': ['This field is required.']
+        }
+
     def test_patch_project_conditional_failure(self):
         """Test updating a project w/ missing conditionally required value."""
         project = InvestmentProjectFactory(

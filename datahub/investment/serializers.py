@@ -68,7 +68,7 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
         unable to rectify the situation.
         """
         fields = None
-        if 'stage' not in data:
+        if self.partial and 'stage' not in data:
             fields = data.keys()
         errors = validate(self.instance, data, fields=fields)
 
