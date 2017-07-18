@@ -62,9 +62,10 @@ def get_sort_query(qs, field_order=None):
     tokens = field_order.rsplit(':', maxsplit=1)
     order = tokens[1] if len(tokens) > 1 else 'asc'
 
-    return qs.sort({
+    qs = qs.sort({
         remap_sort_field(tokens[0]): {'order': order}
     })
+    return qs
 
 
 def get_basic_search_query(term, entities=('company',), field_order=None, offset=0, limit=100):
@@ -118,7 +119,8 @@ def get_search_by_entity_query(term=None,
             )
 
     s = Search(index=settings.ES_INDEX).query('bool', must=query)
-    s = get_sort_query(s, field_order)
+    s = get_sort_query(s, field_order=field_order)
+
     s = s.post_filter('bool', must=query_filter)
 
     return s[offset:offset + limit]
