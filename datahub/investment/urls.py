@@ -47,6 +47,7 @@ project_document_collection = IProjectDocumentViewSet.as_view({
 
 project_document_item = IProjectDocumentViewSet.as_view({
     'get': 'retrieve',
+    'delete': 'destroy',
 })
 
 project_document_callback = IProjectDocumentViewSet.as_view({
