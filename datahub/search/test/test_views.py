@@ -261,7 +261,7 @@ class TestSearch(APITestMixin):
 
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
-    def test_search_sort(self):
+    def test_search_sort_desc(self):
         """Tests quality of results."""
         CompanyFactory(name='Water 1').save()
         CompanyFactory(name='water 2').save()
@@ -288,7 +288,7 @@ class TestSearch(APITestMixin):
 
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
-    def test_search_sort(self):
+    def test_search_sort_asc(self):
         """Tests quality of results."""
         CompanyFactory(name='Fire 4').save()
         CompanyFactory(name='fire 3').save()
