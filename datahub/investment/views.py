@@ -1,8 +1,10 @@
 """Investment views."""
+from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, status
+from rest_framework.mixins import DestroyModelMixin
 from rest_framework.response import Response
 
 from datahub.core.mixins import ArchivableViewSetMixin
@@ -118,7 +120,7 @@ class IProjectTeamMembersViewSet(mixins.DestroyModelMixin, CoreViewSetV3):
             raise Http404('Specified investment project does not exist')
 
 
-class IProjectDocumentViewSet(CoreViewSetV3):
+class IProjectDocumentViewSet(CoreViewSetV3, DestroyModelMixin):
     """Investment Project Documents ViewSet."""
 
     serializer_class = IProjectDocumentSerializer
@@ -162,6 +164,11 @@ class IProjectDocumentViewSet(CoreViewSetV3):
                 'status': 'accepted',
             },
         )
+
+    def perform_destroy(self, instance):
+        """Perform destroy in transaction/savepoint mode."""
+        with transaction.atomic():
+            return super().perform_destroy(instance)
 
     def get_object(self):
         """Ensures that object lookup honors the project pk."""

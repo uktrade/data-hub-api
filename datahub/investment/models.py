@@ -311,6 +311,12 @@ class IProjectDocument(BaseModel, ArchivableModel):
             ('project', 'doc_type', 'filename'),
         )
 
+    def delete(self, using=None, keep_parents=False):
+        """Ensure document is removed when parent is being deleted."""
+        result = super().delete(using, keep_parents)
+        self.document.delete(using, keep_parents)
+        return result
+
     @classmethod
     def create_from_declaration_request(cls, project, field, filename):
         """Create investment document along with correct Document creation."""
