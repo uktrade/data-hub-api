@@ -59,7 +59,7 @@ def get_sort_query(qs, field_order=None):
     if field_order is None:
         return qs
 
-    tokens = field_order.split(':')
+    tokens = field_order.rsplit(':', maxsplit=1)
     order = tokens[1] if len(tokens) > 1 else 'asc'
 
     return qs.sort({
