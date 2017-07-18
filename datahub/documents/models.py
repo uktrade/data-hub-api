@@ -1,13 +1,17 @@
 import uuid
+from logging import getLogger
 from os import path
 
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from raven.contrib.django.raven_compat.models import client
 
 from datahub.core.models import ArchivableModel, BaseModel
 from datahub.core.utils import delete_s3_obj, executor, sign_s3_url
+
+logger = getLogger(__name__)
 
 
 class Document(BaseModel, ArchivableModel):
@@ -72,10 +76,18 @@ def document_post_delete(sender, **kwargs):
     if instance.uploaded_on is None:
         return
 
-    # grabs only needed vars for closure, so instance goes out-of-scope
+    # grab only needed vars for closure, so instance can go out-of-scope
     bucket = instance.s3_bucket
     key = instance.s3_key
 
+    def delete_document():
+        try:
+            delete_s3_obj(bucket, key)
+        except Exception:
+            msg = 'Exception during s3 object removal.'
+            logger.exception(msg)
+            client.captureException(msg)
+
     transaction.on_commit(
-        lambda: executor.submit(delete_s3_obj, bucket, key)
+        lambda: executor.submit(delete_document)
     )

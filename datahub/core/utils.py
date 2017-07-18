@@ -89,4 +89,4 @@ def delete_s3_obj(bucket, key):
         Key=key,
     )
 
-    return response['DeleteMarker'] is True
+    assert response['ResponseMetadata']['HTTPStatusCode'] == 204
