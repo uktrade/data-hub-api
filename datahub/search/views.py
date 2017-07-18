@@ -12,6 +12,10 @@ class SearchBasicAPIView(APIView):
 
     http_method_names = ('get',)
 
+    SORT_BY_FIELDS = (
+        'name', 'created_on',
+    )
+
     def get(self, request, format=None):
         """Performs basic search."""
         if 'term' not in request.query_params:
@@ -23,6 +27,11 @@ class SearchBasicAPIView(APIView):
             raise ValidationError('Entity is not one of "company", "contact" or "investment_project".')
 
         sortby = request.query_params.get('sortby')
+        if sortby:
+            field = sortby.rsplit(':')[0]
+            if field not in self.SORT_BY_FIELDS:
+                raise ValidationError(f'"sortby" field is not one of {self.SORT_BY_FIELDS}.')
+
         offset = int(request.query_params.get('offset', 0))
         limit = int(request.query_params.get('limit', 100))
 
@@ -55,6 +64,16 @@ class SearchBasicAPIView(APIView):
 class SearchCompanyAPIView(APIView):
     """Filtered company search view."""
 
+    SORT_BY_FIELDS = (
+        'account_manager.name', 'alias', 'archived', 'archived_by',
+        'contacts.name', 'business_type.name',
+        'classification.name', 'company_number', 'companies_house_data.company_number',
+        'created_on', 'employee_range.name', 'headquarter_type.name', 'id', 'modified_on',
+        'name', 'registered_address_town', 'sector.name', 'trading_address_town',
+        'turnover_range.name', 'uk_region.name', 'uk_based',
+        'export_to_countries.name', 'future_interest_countries.name',
+    )
+
     FILTER_FIELDS = (
         'name', 'alias', 'sector', 'account_manager', 'export_to_country',
         'future_interest_country', 'description', 'uk_region', 'uk_based',
@@ -71,7 +90,12 @@ class SearchCompanyAPIView(APIView):
 
         original_query = request.data.get('original_query', '')
 
-        sortby = request.query_params.get('sortby')
+        sortby = request.data.get('sortby')
+        if sortby:
+            field = sortby.rsplit(':')[0]
+            if field not in self.SORT_BY_FIELDS:
+                raise ValidationError(f'"sortby" field is not one of {self.SORT_BY_FIELDS}.')
+
         offset = int(request.query_params.get('offset', 0))
         limit = int(request.query_params.get('limit', 100))
 
@@ -94,6 +118,15 @@ class SearchCompanyAPIView(APIView):
 class SearchContactAPIView(APIView):
     """Filtered contact search view."""
 
+    SORT_BY_FIELDS = (
+        'archived', 'archived', 'created_on',
+        'modified_on', 'id', 'name', 'title.name', 'primary',
+        'telephone_countrycode', 'telephone_number',
+        'email', 'address_same_as_company', 'address_town', 'address_county',
+        'job_title', 'contactable_by_dit', 'contactable_by_dit_partners', 'contactable_by_email',
+        'contactable_by_phone', 'address_country.name', 'adviser.name', 'archived_by.name', 'company.name',
+    )
+
     FILTER_FIELDS = (
         'first_name', 'last_name', 'job_title', 'company', 'adviser', 'notes',
     )
@@ -109,7 +142,12 @@ class SearchContactAPIView(APIView):
 
         original_query = request.data.get('original_query', '')
 
-        sortby = request.query_params.get('sortby')
+        sortby = request.data.get('sortby')
+        if sortby:
+            field = sortby.rsplit(':')[0]
+            if field not in self.SORT_BY_FIELDS:
+                raise ValidationError(f'"sortby" field is not one of {self.SORT_BY_FIELDS}.')
+
         offset = int(request.data.get('offset', 0))
         limit = int(request.data.get('limit', 100))
 
@@ -132,6 +170,27 @@ class SearchContactAPIView(APIView):
 class SearchInvestmentProjectAPIView(APIView):
     """Filtered investment project search view."""
 
+    SORT_BY_FIELDS = (
+        'id', 'approved_commitment_to_invest',
+        'approved_fdi', 'approved_good_value',
+        'approved_high_value', 'approved_landed',
+        'approved_non_fdi', 'actual_land_date',
+        'business_activities.name', 'client_contacts.name',
+        'client_relationship_manager.name', 'project_manager.name',
+        'project_assurance_adviser.name', 'team_members.name',
+        'archived', 'archived_by.name', 'created_on', 'modified_on',
+        'estimated_land_date', 'fdi_type.name', 'intermediate_company.name',
+        'uk_company.name', 'investor_company.name', 'investment_type.name', 'name',
+        'r_and_d_budget', 'non_fdi_r_and_d_budget', 'new_tech_to_uk', 'export_revenue',
+        'site_decided', 'nda_signed', 'government_assistance',
+        'client_cannot_provide_total_investment', 'total_investment',
+        'foreign_equity_investment', 'number_new_jobs', 'non_fdi_type.name',
+        'stage.name', 'project_code', 'project_shareable',
+        'referral_source_activity.name', 'referral_source_activity_marketing.name',
+        'referral_source_activity_website.name', 'referral_source_activity_event',
+        'referral_source_advisor.name', 'sector.name', 'average_salary.name',
+    )
+
     FILTER_FIELDS = (
         'client_relationship_manager', 'description', 'estimated_land_date_after',
         'estimated_land_date_before', 'investor_company', 'investment_type',
@@ -151,7 +210,12 @@ class SearchInvestmentProjectAPIView(APIView):
         except ValueError:
             raise ValidationError('Date(s) in incorrect format.')
 
-        sortby = request.query_params.get('sortby')
+        sortby = request.data.get('sortby')
+        if sortby:
+            field = sortby.rsplit(':')[0]
+            if field not in self.SORT_BY_FIELDS:
+                raise ValidationError(f'"sortby" field is not one of {self.SORT_BY_FIELDS}.')
+
         offset = int(request.data.get('offset', 0))
         limit = int(request.data.get('limit', 100))
 
