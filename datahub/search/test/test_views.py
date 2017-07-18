@@ -252,6 +252,7 @@ class TestSearch(APITestMixin):
             'entity': 'company'
         })
 
+        assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 4
         assert ['The Advisory',
                 'The Advisory Group',
@@ -278,8 +279,36 @@ class TestSearch(APITestMixin):
             'entity': 'company'
         })
 
+        assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 4
         assert ['Water 4',
                 'water 3',
                 'water 2',
                 'Water 1'] == [company['name'] for company in response.data['companies']]
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_sort(self):
+        """Tests quality of results."""
+        CompanyFactory(name='Fire 4').save()
+        CompanyFactory(name='fire 3').save()
+        CompanyFactory(name='fire 2').save()
+        CompanyFactory(name='Fire 1').save()
+
+        connections.get_connection().indices.refresh()
+
+        term = 'Fire'
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'sortby': 'name:asc',
+            'entity': 'company'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 4
+        assert ['Fire 1',
+                'fire 2',
+                'fire 3',
+                'Fire 4'] == [company['name'] for company in response.data['companies']]
