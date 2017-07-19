@@ -3,15 +3,17 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
-from .factories import CompanyFactory, ContactFactory
+
+from .factories import OrderFactory
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
 
 
-class AddOrderTestCase(APITestMixin):
+class TestAddOrder(APITestMixin):
     """Add Order test case."""
 
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
@@ -93,3 +95,39 @@ class AddOrderTestCase(APITestMixin):
             'contact': ['This field is required.'],
             'primary_market': ['This field is required.']
         }
+
+
+class TestViewOrder(APITestMixin):
+    """View order test case."""
+
+    def test_get(self):
+        """Test getting an existing order."""
+        order = OrderFactory()
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'id': order.id,
+            'reference': order.reference,
+            'company': {
+                'id': str(order.company.id),
+                'name': order.company.name
+            },
+            'contact': {
+                'id': str(order.contact.id),
+                'name': order.contact.name
+            },
+            'primary_market': {
+                'id': str(order.primary_market.id),
+                'name': order.primary_market.name
+            }
+        }
+
+    def test_not_found(self):
+        """Test 404 when getting a non-existing order"""
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': '00000000-0000-0000-0000-000000000000'})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
