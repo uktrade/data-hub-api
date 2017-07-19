@@ -103,6 +103,13 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         return data
 
 
+class ContactAuditViewSet(CoreViewSetV3):
+    """Contact audit views."""
+
+    serializer_class = AuditSerializer
+    queryset = Contact.objects.all()
+
+
 class AdviserFilter(FilterSet):
     """Adviser filter."""
 
