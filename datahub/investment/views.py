@@ -3,8 +3,7 @@ from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins, status
-from rest_framework.mixins import DestroyModelMixin
+from rest_framework import status
 from rest_framework.response import Response
 
 from datahub.core.mixins import ArchivableViewSetMixin
@@ -73,7 +72,7 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         return 'Investment projects'
 
 
-class IProjectTeamMembersViewSet(mixins.DestroyModelMixin, CoreViewSetV3):
+class IProjectTeamMembersViewSet(CoreViewSetV3):
     """Investment project team member views."""
 
     serializer_class = IProjectTeamMemberSerializer
@@ -121,7 +120,7 @@ class IProjectTeamMembersViewSet(mixins.DestroyModelMixin, CoreViewSetV3):
             raise Http404('Specified investment project does not exist')
 
 
-class IProjectDocumentViewSet(CoreViewSetV3, DestroyModelMixin):
+class IProjectDocumentViewSet(CoreViewSetV3):
     """Investment Project Documents ViewSet."""
 
     serializer_class = IProjectDocumentSerializer
