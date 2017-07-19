@@ -239,6 +239,16 @@ def test_remap_fields():
     assert remapped['uk_based'] is False
 
 
+def test_remap_sort_field():
+    """Test sort fields remapping."""
+    fields = {
+        'name': 'name_keyword'
+    }
+
+    for key, value in fields.items():
+        assert elasticsearch.remap_sort_field(key) == value
+
+
 def test_date_range_fields():
     """Tests date range fields."""
     now = '2017-06-13T09:44:31.062870'

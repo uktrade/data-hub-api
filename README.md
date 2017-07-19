@@ -32,25 +32,32 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
     docker-compose run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml
     docker-compose run leeloo python manage.py createinitialrevisions
     ```
+4. Optionally, you can load some test data and update elasticsearch:
 
-4.  Create a superuser:
+    ```shell
+    docker-compose run leeloo python manage.py loaddata /app/fixtures/test_data.yaml
+
+    docker-compose run leeloo python manage.py sync_es
+    ```
+
+5.  Create a superuser:
 
     ```shell
     docker-compose run leeloo python manage.py createsuperuser
     ```
 
-5.  Run the services:
+6.  Run the services:
 
     ```shell
     docker-compose up
     ```
 
-6.  To set up the [data hub frontend app](https://github.com/uktrade/data-hub-fe-beta2), log into the [django admin](http://localhost:8000/admin/oauth2_provider/application/) and add a new oauth application with:
+7.  To set up the [data hub frontend app](https://github.com/uktrade/data-hub-frontend), log into the [django admin](http://localhost:8000/admin/oauth2_provider/application/) and add a new oauth application with:
 
         - Client type: Confidential
         - Authorization grant type: Resource owner password-based
 
-7.  Add the client id / client secret to the frontend .env file
+8.  Add the client id / client secret to the frontend .env file
 
 Local development with Docker
 -----------------------------
@@ -117,7 +124,13 @@ Dependencies:
     create database datahub;
     ```
 
-8.  Configure and populate the db:
+8. Make sure you have elasticsearch running locally. If you don't, you can run one in docker:
+
+    ```shell
+    docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" elasticsearch:2.3
+    ```
+
+9.  Configure and populate the db:
 
     ```shell
     ./manage.py migrate
@@ -128,18 +141,26 @@ Dependencies:
     ./manage.py createinitialrevisions
     ```
 
-9.  Start the server:
+10. Optionally, you can load some test data and update elasticsearch:
+
+    ```shell
+    ./manage.py loaddata /app/fixtures/test_data.yaml
+
+    ./manage.py sync_es
+    ```
+
+11.  Start the server:
 
     ```shell
     ./manage.py runserver
     ```
 
-10. To set up the [data hub frontend app](https://github.com/uktrade/data-hub-fe-beta2), log into the [django admin](http://localhost:8000/admin/oauth2_provider/application/) and add a new oauth application with:
+12. To set up the [data hub frontend app](https://github.com/uktrade/data-hub-frontend), log into the [django admin](http://localhost:8000/admin/oauth2_provider/application/) and add a new oauth application with:
 
         - Client type: Confidential
         - Authorization grant type: Resource owner password-based
 
-11. Add the client id / client secret to the frontend .env file
+13. Add the client id / client secret to the frontend .env file
 
 Local development (without Docker)
 ----------------------------------
@@ -207,6 +228,12 @@ Load metadata:
 ```shell
 docker-compose run leeloo python manage.py loaddata /app/fixtures/metadata.yaml
 docker-compose run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml
+```
+
+Update Elasticsearch:
+
+```shell
+docker-compose run leeloo python manage.py sync_es
 ```
 
 Dependencies
