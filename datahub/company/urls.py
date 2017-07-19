@@ -3,7 +3,7 @@
 from django.conf.urls import url
 
 from datahub.company.views import (
-    CompaniesHouseCompanyReadOnlyViewSetV1, CompanyViewSetV3, ContactViewSet
+    CompaniesHouseCompanyReadOnlyViewSetV1, CompanyAuditViewSet, CompanyViewSetV3, ContactViewSet
 )
 
 # CONTACT
@@ -47,6 +47,10 @@ company_item = CompanyViewSetV3.as_view({
     'patch': 'partial_update'
 })
 
+company_audit = CompanyAuditViewSet.as_view({
+    'get': 'retrieve',
+})
+
 company_archive = CompanyViewSetV3.as_view({
     'post': 'archive'
 })
@@ -70,6 +74,8 @@ company_urls = [
         name='archive'),
     url(r'^company/(?P<pk>[0-9a-z-]{36})/unarchive$', company_unarchive,
         name='unarchive'),
+    url(r'^company/(?P<pk>[0-9a-z-]{36})/audit$', company_audit,
+        name='audit-item'),
 ]
 
 ch_company_urls = [

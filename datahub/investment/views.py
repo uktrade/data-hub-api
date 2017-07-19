@@ -8,6 +8,7 @@ from rest_framework.mixins import DestroyModelMixin
 from rest_framework.response import Response
 
 from datahub.core.mixins import ArchivableViewSetMixin
+from datahub.core.serializers import AuditSerializer
 from datahub.core.utils import executor
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.documents.av_scan import virus_scan_document
@@ -15,15 +16,15 @@ from datahub.investment.models import (
     InvestmentProject, InvestmentProjectTeamMember, IProjectDocument
 )
 from datahub.investment.serializers import (
-    IProjectAuditSerializer, IProjectDocumentSerializer, IProjectSerializer,
-    IProjectTeamMemberSerializer, UploadStatusSerializer
+    IProjectDocumentSerializer, IProjectSerializer, IProjectTeamMemberSerializer,
+    UploadStatusSerializer
 )
 
 
 class IProjectAuditViewSet(CoreViewSetV3):
     """Investment Project audit views."""
 
-    serializer_class = IProjectAuditSerializer
+    serializer_class = AuditSerializer
     queryset = InvestmentProject.objects.all()
 
     def get_view_name(self):

@@ -4,6 +4,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, viewsets
 
 from datahub.core.mixins import ArchivableViewSetMixin
+from datahub.core.serializers import AuditSerializer
 from datahub.core.viewsets import CoreViewSetV1, CoreViewSetV3
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
 from .serializers import (
@@ -60,6 +61,13 @@ class CompanyViewSetV3(ArchivableViewSetMixin, CoreViewSetV3):
         'export_to_countries',
         'future_interest_countries'
     )
+
+
+class CompanyAuditViewSet(CoreViewSetV3):
+    """Company audit views."""
+
+    serializer_class = AuditSerializer
+    queryset = Company.objects.all()
 
 
 class CompaniesHouseCompanyReadOnlyViewSetV1(
