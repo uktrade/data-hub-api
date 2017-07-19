@@ -90,8 +90,8 @@ class ServiceDeliveryDatabaseRepo:
         )
         if not service_offer_id:
             raise RepoDataValidationError(
-                detail={'relationships.service': 'This combination of service and service provider'
-                                                 ' does not exist.'}
+                detail={'relationships.service': 'This combination of service and service '
+                                                 'provider does not exist.'}
             )
         else:
             data['relationships'].update({
