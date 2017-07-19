@@ -41,7 +41,9 @@ class ServiceDeliveryDatabaseRepo:
             entity = self.model_class.objects.get(id=object_id)
         except self.model_class.DoesNotExist:
             raise DoesNotExistException()
-        data = utils.model_to_json_api_data(entity, self.schema_class(), url_builder=self.url_builder)
+        data = utils.model_to_json_api_data(
+            entity, self.schema_class(), url_builder=self.url_builder
+        )
         return utils.build_repo_response(data=data)
 
     def filter(self, company_id=utils.DEFAULT, contact_id=utils.DEFAULT, offset=0, limit=100):
@@ -54,7 +56,8 @@ class ServiceDeliveryDatabaseRepo:
         start, end = offset, offset + limit
         queryset = self.model_class.objects.filter(**filters)
         entities = list(queryset[start:end])
-        data = [utils.model_to_json_api_data(entity, self.schema_class(), self.url_builder) for entity in entities]
+        data = [utils.model_to_json_api_data(entity, self.schema_class(), self.url_builder)
+                for entity in entities]
         return utils.build_repo_response(data=data)
 
     def upsert(self, data):
@@ -87,7 +90,8 @@ class ServiceDeliveryDatabaseRepo:
         )
         if not service_offer_id:
             raise RepoDataValidationError(
-                detail={'relationships.service': 'This combination of service and service provider does not exist.'}
+                detail={'relationships.service': 'This combination of service and service provider'
+                                                 ' does not exist.'}
             )
         else:
             data['relationships'].update({

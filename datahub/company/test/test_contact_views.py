@@ -198,7 +198,9 @@ class TestAddContact(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
-            'address_same_as_company': ['Please select either address_same_as_company or enter an address manually.']
+            'address_same_as_company': [
+                'Please select either address_same_as_company or enter an address manually.'
+            ]
         }
 
     def test_fails_with_only_partial_manual_address(self):
@@ -504,4 +506,5 @@ class TestContactList(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
-        assert {contact['id'] for contact in response.data['results']} == {contact.id for contact in contacts}
+        expected_contacts = {contact.id for contact in contacts}
+        assert {contact['id'] for contact in response.data['results']} == expected_contacts

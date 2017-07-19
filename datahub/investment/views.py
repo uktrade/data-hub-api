@@ -131,7 +131,9 @@ class IProjectDocumentViewSet(CoreViewSetV3):
 
     def list(self, request, *args, **kwargs):
         """Custom pre-filtered list."""
-        queryset = self.filter_queryset(self.get_queryset().filter(project_id=self.kwargs['project_pk']))
+        queryset = self.filter_queryset(self.get_queryset().filter(
+            project_id=self.kwargs['project_pk'])
+        )
 
         page = self.paginate_queryset(queryset)
         if page is not None:

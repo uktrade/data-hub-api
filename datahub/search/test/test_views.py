@@ -139,11 +139,12 @@ class TestSearch(APITestMixin):
             'original_query': term,
             'trading_address_country': constants.Country.united_states.value.id,
         })
+        united_states_id = constants.Country.united_states.value.id
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
-        assert response.data['results'][0]['trading_address_country']['id'] == constants.Country.united_states.value.id
+        assert response.data['results'][0]['trading_address_country']['id'] == united_states_id
 
     def test_search_company_no_filters(self):
         """Tests case where there is no filters provided."""

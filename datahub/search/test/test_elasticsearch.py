@@ -161,7 +161,8 @@ def test_search_by_entity_query():
                             'path': 'trading_address_country',
                             'query': {
                                 'term': {
-                                    'trading_address_country.id': '80756b9a-5d95-e211-a939-e4115bead28a'
+                                    'trading_address_country.id':
+                                        '80756b9a-5d95-e211-a939-e4115bead28a'
                                 }
                             }
                         }

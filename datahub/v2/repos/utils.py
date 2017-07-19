@@ -172,8 +172,10 @@ def extract_id_for_relationship_from_data(data, relationship_name):
 def replace_colander_null(data):
     """Replace colander.null with None in deserialized data."""
     cleaned_data = {
-        'attributes': {k: None if v is colander.null else v for k, v in data['attributes'].items()},
-        'relationships': {k: None if v is colander.null else v for k, v in data['relationships'].items()}
+        'attributes': {k: None if v is colander.null else v
+                       for k, v in data['attributes'].items()},
+        'relationships': {k: None if v is colander.null else v
+                          for k, v in data['relationships'].items()}
     }
     data.update(cleaned_data)
     return data

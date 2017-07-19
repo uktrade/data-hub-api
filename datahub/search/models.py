@@ -54,7 +54,10 @@ def _contact_mapping(field):
 
 def _id_name_mapping():
     """Mapping for id name fields."""
-    return Nested(properties={'id': String(index='not_analyzed'), 'name': String(index='not_analyzed')})
+    return Nested(properties={
+        'id': String(index='not_analyzed'),
+        'name': String(index='not_analyzed')
+    })
 
 
 def _id_uri_mapping():
@@ -98,7 +101,8 @@ class MapDBModelToDict:
         result = {col: fn(getattr(dbmodel, col)) for col, fn in cls.MAPPINGS.items()
                   if getattr(dbmodel, col, None) is not None}
 
-        fields = [field for field in dbmodel._meta.get_fields() if field.name not in cls.IGNORED_FIELDS]
+        fields = [field for field in dbmodel._meta.get_fields()
+                  if field.name not in cls.IGNORED_FIELDS]
 
         obj = {f.name: getattr(dbmodel, f.name) for f in fields if f.name not in result}
         result.update(obj.items())

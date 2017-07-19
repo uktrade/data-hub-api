@@ -19,10 +19,12 @@ DataSet = namedtuple('DataSet', ('queryset', 'es_model',))
 
 def get_dataset():
     """Returns dataset that will be synchronised with Elasticsearch."""
-    company_prefetch_fields = ('registered_address_country', 'business_type', 'sector', 'employee_range',
-                               'turnover_range', 'account_manager', 'export_to_countries', 'future_interest_countries',
-                               'trading_address_country', 'headquarter_type', 'classification',
-                               'one_list_account_owner',)
+    company_prefetch_fields = (
+        'registered_address_country', 'business_type', 'sector', 'employee_range',
+        'turnover_range', 'account_manager', 'export_to_countries', 'future_interest_countries',
+        'trading_address_country', 'headquarter_type', 'classification',
+        'one_list_account_owner',
+    )
 
     company_qs = Company.objects.prefetch_related(*company_prefetch_fields).all().order_by('pk')
     contact_qs = Contact.objects.all().order_by('pk')
@@ -62,7 +64,8 @@ def sync_dataset(item, batch_size=1, stdout=None):
         rows_processed += num_actions
         batches_processed += 1
         if stdout and batches_processed % 100 == 0:
-            stdout.write(f'Rows processed: {rows_processed}/{total_rows} {rows_processed*100//total_rows}%')
+            stdout.write(f'Rows processed: {rows_processed}/{total_rows} '
+                         f'{rows_processed*100//total_rows}%')
 
     if stdout:
         stdout.write(f'Rows processed: {rows_processed}/{total_rows} 100%. Done!')

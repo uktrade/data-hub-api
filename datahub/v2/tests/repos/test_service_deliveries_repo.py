@@ -32,13 +32,16 @@ class TestServiceDeliveriesRepo:
         assert isinstance(result, RepoResponse)
         expected_relationships = {
             'contact': {'data': {'id': str(service_delivery.contact.pk), 'type': 'Contact'}},
-            'status': {'data': {'id': str(service_delivery.status.pk), 'type': 'ServiceDeliveryStatus'}},
             'company': {'data': {'id': str(service_delivery.company.pk), 'type': 'Company'}},
             'service': {'data': {'id': str(service_delivery.service.pk), 'type': 'Service'}},
             'dit_team': {'data': {'id': str(service_delivery.dit_team.pk), 'type': 'Team'}},
             'uk_region': {'data': {'id': str(service_delivery.uk_region.pk), 'type': 'UKRegion'}},
-            'dit_adviser': {'data': {'id': str(
-                service_delivery.dit_adviser.pk), 'type': 'Adviser'}}
+            'status': {
+                'data': {'id': str(service_delivery.status.pk), 'type': 'ServiceDeliveryStatus'}
+            },
+            'dit_adviser': {
+                'data': {'id': str(service_delivery.dit_adviser.pk), 'type': 'Adviser'}
+            }
         }
         assert data['relationships'] == expected_relationships
         assert data['relationships']['company']['data']['type'] == 'Company'
@@ -58,6 +61,7 @@ class TestServiceDeliveriesRepo:
         user = get_test_user()
         company = factories.CompanyFactory()
         contact = factories.ContactFactory()
+        offered_id = constants.ServiceDeliveryStatus.offered.value.id
         data = {
             'type': 'ServiceDelivery',
             'attributes': {
@@ -69,7 +73,7 @@ class TestServiceDeliveriesRepo:
                 'status': {
                     'data': {
                         'type': 'ServiceDeliveryStatus',
-                        'id': constants.ServiceDeliveryStatus.offered.value.id
+                        'id': offered_id
                     }
                 },
                 'company': {
@@ -118,7 +122,7 @@ class TestServiceDeliveriesRepo:
         expected_relationships = {
             'dit_adviser': {'data': {'type': 'Adviser', 'id': str(user.pk)}},
             'status': {'data': {
-                'type': 'ServiceDeliveryStatus', 'id': constants.ServiceDeliveryStatus.offered.value.id}
+                'type': 'ServiceDeliveryStatus', 'id': offered_id}
             },
             'contact': {'data': {'type': 'Contact', 'id': str(contact.pk)}},
             'dit_team': {'data': {'type': 'Team', 'id': str(service_offer.dit_team.pk)}},
@@ -185,7 +189,9 @@ class TestServiceDeliveriesRepo:
             dit_team=service_offer.dit_team,
             company=company
         )
-        result = ServiceDeliveryDatabaseRepo(config=DUMMY_CONFIG).filter(company_id=str(company.pk))
+        result = ServiceDeliveryDatabaseRepo(config=DUMMY_CONFIG).filter(
+            company_id=str(company.pk)
+        )
         data = result.data
         assert isinstance(result, RepoResponse)
         assert len(data) == 1
@@ -204,7 +210,9 @@ class TestServiceDeliveriesRepo:
             dit_team=service_offer.dit_team,
             contact=contact
         )
-        result = ServiceDeliveryDatabaseRepo(config=DUMMY_CONFIG).filter(contact_id=str(contact.pk))
+        result = ServiceDeliveryDatabaseRepo(config=DUMMY_CONFIG).filter(
+            contact_id=str(contact.pk)
+        )
         data = result.data
         assert isinstance(result, RepoResponse)
         assert len(data) == 1

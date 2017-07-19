@@ -41,8 +41,10 @@ class CDMSUserBackend(ModelBackend):
                 auth_result = self.validate_cdms_credentials(username, password)
                 if auth_result is True:
                     # user authenticated via CDMS
-                    user.set_password(password)  # cache passwd hash for backup auth
-                    user.is_active = True  # ensure user can use django backend to auth, in case CDMS fails
+                    # cache passwd hash for backup auth
+                    user.set_password(password)
+                    # ensure user can use django backend to auth, in case CDMS fails
+                    user.is_active = True
                     user.save()
 
                     return user
