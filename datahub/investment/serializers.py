@@ -14,8 +14,8 @@ from datahub.investment.validate import validate
 class IProjectSummarySerializer(serializers.ModelSerializer):
     """Serialiser for investment project endpoints."""
 
+    incomplete_fields = serializers.SerializerMethodField()
     project_code = serializers.CharField(read_only=True)
-
     investment_type = NestedRelatedField(meta_models.InvestmentType)
     stage = NestedRelatedField(meta_models.InvestmentProjectStage,
                                required=False)
@@ -56,6 +56,12 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
     )
     archived_by = NestedAdviserField(read_only=True)
 
+    def get_incomplete_fields(self, instance):
+        """Returns the names of the fields that still need to be completed in order to
+        move to the next stage.
+        """
+        return tuple(validate(instance=instance, next_stage=True))
+
     def validate(self, data):
         """Validates the object after individual fields have been validated.
 
@@ -79,6 +85,7 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
         model = InvestmentProject
         fields = (
             'id',
+            'incomplete_fields',
             'name',
             'project_code',
             'description',
