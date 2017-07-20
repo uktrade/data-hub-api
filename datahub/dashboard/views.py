@@ -30,5 +30,8 @@ class IntelligentHomepageView(APIView):
             created_on__gte=days_in_the_past
         ).order_by('-created_on')
 
-        serializer = IntelligentHomepageSerializer({'interactions': interactions, 'contacts': contacts})
+        serializer = IntelligentHomepageSerializer({
+            'interactions': interactions,
+            'contacts': contacts
+        })
         return Response(data=serializer.data)

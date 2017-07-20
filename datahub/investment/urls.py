@@ -68,8 +68,8 @@ urlpatterns = [
         name='document-collection'),
     url(r'^investment/(?P<project_pk>[0-9a-z-]{36})/document/(?P<doc_pk>[0-9a-z-]{36})$',
         project_document_item, name='document-item'),
-    url(r'^investment/(?P<project_pk>[0-9a-z-]{36})/document/(?P<doc_pk>[0-9a-z-]{36})/upload-callback$',
-        project_document_callback, name='document-item-callback'),
+    url(r'^investment/(?P<project_pk>[0-9a-z-]{36})/document/(?P<doc_pk>[0-9a-z-]{36})/'
+        r'upload-callback$', project_document_callback, name='document-item-callback'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/unarchive$', unarchive_item,
         name='unarchive-item'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/audit$', audit_item,

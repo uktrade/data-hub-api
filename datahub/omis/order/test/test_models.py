@@ -53,7 +53,8 @@ class TestOrder:
     @mock.patch('datahub.omis.order.models.get_random_string')
     def test_cannot_generate_reference(self, mock_get_random_string):
         """
-        Test that if there are more than 10 collisions, the generator algorithm raises a RuntimeError.
+        Test that if there are more than 10 collisions, the generator algorithm raises a
+        RuntimeError.
         """
         max_retries = 10
         OrderFactory(reference='ABC123/17')

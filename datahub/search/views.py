@@ -24,7 +24,8 @@ class SearchBasicAPIView(APIView):
 
         entity = request.query_params.get('entity', 'company')
         if entity not in ('company', 'contact', 'investment_project'):
-            raise ValidationError('Entity is not one of "company", "contact" or "investment_project".')
+            raise ValidationError('Entity is not one of "company", "contact" or '
+                                  '"investment_project".')
 
         sortby = request.query_params.get('sortby')
         if sortby:
@@ -124,7 +125,8 @@ class SearchContactAPIView(APIView):
         'telephone_countrycode', 'telephone_number',
         'email', 'address_same_as_company', 'address_town', 'address_county',
         'job_title', 'contactable_by_dit', 'contactable_by_dit_partners', 'contactable_by_email',
-        'contactable_by_phone', 'address_country.name', 'adviser.name', 'archived_by.name', 'company.name',
+        'contactable_by_phone', 'address_country.name', 'adviser.name', 'archived_by.name',
+        'company.name',
     )
 
     FILTER_FIELDS = (
