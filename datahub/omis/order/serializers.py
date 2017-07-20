@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
-from datahub.company.models import Company, Contact
+from datahub.company.models import Advisor, Company, Contact
 from datahub.core.serializers import NestedRelatedField
-from datahub.metadata.models import Country
+from datahub.metadata.models import Country, Team
 
 from .models import Order
 
@@ -36,3 +36,25 @@ class OrderSerializer(serializers.ModelSerializer):
             })
 
         return data
+
+
+def existing_adviser(adviser_id):
+    """
+    DRF Validator. It raises a ValidationError if adviser_id is not a valid adviser id.
+    """
+    try:
+        Advisor.objects.get(id=adviser_id)
+    except Advisor.DoesNotExist:
+        raise serializers.ValidationError(f'{adviser_id} is not a valid adviser')
+    return adviser_id
+
+
+class SubscribedAdviserSerializer(serializers.Serializer):
+    """
+    DRF serializer for an adviser subscribed to an order.
+    """
+
+    id = serializers.UUIDField(validators=[existing_adviser])
+    first_name = serializers.CharField(read_only=True)
+    last_name = serializers.CharField(read_only=True)
+    dit_team = NestedRelatedField(Team, read_only=True)
