@@ -2,6 +2,7 @@
 from django_filters import FilterSet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, viewsets
+from rest_framework.filters import OrderingFilter
 
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.serializers import AuditSerializer
@@ -130,5 +131,8 @@ class AdviserReadOnlyViewSetV1(
     queryset = Advisor.objects.all()
     filter_backends = (
         DjangoFilterBackend,
+        OrderingFilter,
     )
     filter_class = AdviserFilter
+    ordering_fields = ('first_name', 'last_name')
+    ordering = ('first_name', 'last_name')
