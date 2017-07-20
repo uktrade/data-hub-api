@@ -137,3 +137,7 @@ class InvestmentStrategicDriver(BaseConstantModel):
 
 class SalaryRange(BaseOrderedConstantModel):
     """Salary ranges (used for investment projects)."""
+
+
+class FDIValue(BaseOrderedConstantModel):
+    """FDI value category (used for investment projects)."""

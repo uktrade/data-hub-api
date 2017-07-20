@@ -281,6 +281,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
     estimated_land_date = Date()
     fdi_type = _id_name_mapping()
     fdi_type_documents = _id_uri_mapping()
+    fdi_value = _id_name_mapping()
     intermediate_company = _id_name_mapping()
     uk_company = _id_name_mapping()
     investor_company = _id_name_mapping()
