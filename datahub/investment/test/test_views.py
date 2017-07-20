@@ -2,6 +2,7 @@
 
 import re
 import uuid
+from collections import Counter
 from datetime import datetime
 from unittest.mock import patch
 
@@ -374,6 +375,24 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['description'] == request_data['description']
         assert len(response_data['client_contacts']) == 1
         assert response_data['client_contacts'][0]['id'] == str(new_contact.id)
+
+    def test_incomplete_fields_prospect(self):
+        """Tests moving an incomplete project to the Assign PM stage."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert Counter(response_data['incomplete_fields']) == Counter((
+            'client_cannot_provide_total_investment',
+            'number_new_jobs',
+            'total_investment',
+            'client_considering_other_countries',
+            'client_requirements',
+            'site_decided',
+            'strategic_drivers',
+            'uk_region_locations',
+        ))
 
     def test_change_stage_assign_pm_failure(self):
         """Tests moving an incomplete project to the Assign PM stage."""
