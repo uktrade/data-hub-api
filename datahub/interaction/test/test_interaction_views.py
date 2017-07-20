@@ -5,12 +5,12 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
-from datahub.core.test_utils import LeelooTestCase
+from datahub.core.test_utils import APITestMixin
 from datahub.interaction.test.factories import InteractionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
 
 
-class InteractionTestCase(LeelooTestCase):
+class TestInteraction(APITestMixin):
     """Interaction test case."""
 
     def test_interaction_detail_view(self):

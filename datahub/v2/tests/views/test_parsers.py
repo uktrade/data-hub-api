@@ -2,10 +2,10 @@ import json
 
 from rest_framework.reverse import reverse
 
-from datahub.core.test_utils import LeelooTestCase
+from datahub.core.test_utils import APITestMixin
 
 
-class JSONParserTestCase(LeelooTestCase):
+class TestJSONParser(APITestMixin):
     """Test generic parser error through a v2 view."""
 
     def test_data_key_not_in_post_body(self):
@@ -65,8 +65,8 @@ class JSONParserTestCase(LeelooTestCase):
         )
         content = json.loads(response.content.decode('utf-8'))
         expected_content = {'errors': [
-            {'detail': 'The resource object\'s type (whatever) is not the type that constitute the collection '
-                       'represented by the endpoint (ServiceDelivery).',
+            {'detail': 'The resource object\'s type (whatever) is not the type that constitute '
+                       'the collection represented by the endpoint (ServiceDelivery).',
              'source': {'pointer': '/data/detail'}
              }]
         }

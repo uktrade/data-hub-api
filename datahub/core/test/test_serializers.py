@@ -5,7 +5,29 @@ import pytest
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.exceptions import ValidationError
 
-from datahub.core.serializers import NestedRelatedField
+from datahub.core.serializers import AuditSerializer, NestedRelatedField
+
+
+def test_audit_log_diff_algo():
+    """Test simple diff algorithm."""
+    given = {
+        'old': {
+            'field1': 'val1',
+            'field2': 'val2',
+        },
+        'new': {
+            'field1': 'val1',
+            'field2': 'new-val',
+            'field3': 'added',
+        },
+    }
+
+    expected = {
+        'field2': ['val2', 'new-val'],
+        'field3': [None, 'added'],
+    }
+
+    assert AuditSerializer._diff_versions(given['old'], given['new']) == expected
 
 
 def test_nested_rel_field_to_internal_dict():

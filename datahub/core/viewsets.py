@@ -66,6 +66,7 @@ class CoreViewSetV1(mixins.CreateModelMixin,
 class CoreViewSetV3(mixins.CreateModelMixin,
                     mixins.RetrieveModelMixin,
                     mixins.UpdateModelMixin,
+                    mixins.DestroyModelMixin,
                     mixins.ListModelMixin,
                     GenericViewSet):
     """Base class for v3 view sets."""

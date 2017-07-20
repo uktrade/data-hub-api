@@ -1,5 +1,6 @@
 from operator import itemgetter
 
+import reversion
 from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -11,11 +12,11 @@ from datahub.core.constants import (
     BusinessType, CompanyClassification, Country, HeadquarterType, Sector,
     UKRegion
 )
-from datahub.core.test_utils import LeelooTestCase
+from datahub.core.test_utils import APITestMixin
 from datahub.investment.test.factories import InvestmentProjectFactory
 
 
-class CompanyTestCase(LeelooTestCase):
+class TestCompany(APITestMixin):
     """Company test case."""
 
     def test_list_companies(self):
@@ -346,7 +347,46 @@ class CompanyTestCase(LeelooTestCase):
         assert response.data['id'] == str(company.id)
 
 
-class CHCompanyTestCase(LeelooTestCase):
+class TestAuditLogView(APITestMixin):
+    """Tests for the audit log view."""
+
+    def test_audit_log_view(self):
+        """Test retrieval of audit log."""
+        initial_datetime = now()
+        with reversion.create_revision():
+            company = CompanyFactory(
+                description='Initial desc',
+            )
+
+            reversion.set_comment('Initial')
+            reversion.set_date_created(initial_datetime)
+            reversion.set_user(self.user)
+
+        changed_datetime = now()
+        with reversion.create_revision():
+            company.description = 'New desc'
+            company.save()
+
+            reversion.set_comment('Changed')
+            reversion.set_date_created(changed_datetime)
+            reversion.set_user(self.user)
+
+        url = reverse('api-v3:company:audit-item', kwargs={'pk': company.pk})
+
+        response = self.api_client.get(url)
+        response_data = response.json()['results']
+
+        # No need to test the whole response
+        assert len(response_data) == 1
+        entry = response_data[0]
+
+        assert entry['user']['name'] == self.user.name
+        assert entry['comment'] == 'Changed'
+        assert entry['timestamp'] == changed_datetime.isoformat()
+        assert entry['changes']['description'] == ['Initial desc', 'New desc']
+
+
+class TestCHCompany(APITestMixin):
     """CH company tests."""
 
     def test_get_ch_company(self):

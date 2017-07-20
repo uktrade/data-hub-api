@@ -1,7 +1,6 @@
 """Investment serialisers for views."""
 
 from rest_framework import serializers
-from reversion.models import Version
 
 import datahub.metadata.models as meta_models
 from datahub.company.models import Company, Contact
@@ -12,17 +11,14 @@ from datahub.investment.models import (InvestmentProject, InvestmentProjectTeamM
 from datahub.investment.validate import validate
 
 
-class IProjectSerializer(serializers.ModelSerializer):
+class IProjectSummarySerializer(serializers.ModelSerializer):
     """Serialiser for investment project endpoints."""
 
+    incomplete_fields = serializers.SerializerMethodField()
     project_code = serializers.CharField(read_only=True)
-
     investment_type = NestedRelatedField(meta_models.InvestmentType)
     stage = NestedRelatedField(meta_models.InvestmentProjectStage,
                                required=False)
-    # phase is deprecated – remove once front end is using stage
-    phase = NestedRelatedField(meta_models.InvestmentProjectStage,
-                               required=False, source='stage')
     project_shareable = serializers.BooleanField(required=True)
     investor_company = NestedRelatedField(
         Company, required=True, allow_null=False
@@ -60,12 +56,26 @@ class IProjectSerializer(serializers.ModelSerializer):
     )
     archived_by = NestedAdviserField(read_only=True)
 
+    def get_incomplete_fields(self, instance):
+        """Returns the names of the fields that still need to be completed in order to
+        move to the next stage.
+        """
+        return tuple(validate(instance=instance, next_stage=True))
+
     def validate(self, data):
         """Validates the object after individual fields have been validated.
 
         Performs stage-dependent validation of the different sections.
+
+        When transitioning stage, all fields required for the new stage are
+        validated. In other cases, only the fields being modified are validated.
+        If a project ends up in an invalid state, this avoids the user being
+        unable to rectify the situation.
         """
-        errors = validate(self.instance, data)
+        fields = None
+        if self.partial and 'stage' not in data:
+            fields = data.keys()
+        errors = validate(self.instance, data, fields=fields)
 
         if errors:
             raise serializers.ValidationError(errors)
@@ -75,6 +85,7 @@ class IProjectSerializer(serializers.ModelSerializer):
         model = InvestmentProject
         fields = (
             'id',
+            'incomplete_fields',
             'name',
             'project_code',
             'description',
@@ -93,7 +104,6 @@ class IProjectSerializer(serializers.ModelSerializer):
             'approved_non_fdi',
             'investment_type',
             'stage',
-            'phase',  # For backwards compatibility
             'investor_company',
             'intermediate_company',
             'client_contacts',
@@ -123,61 +133,6 @@ class IProjectSerializer(serializers.ModelSerializer):
             'archived_on': {'read_only': True},
             'archived_reason': {'read_only': True}
         }
-
-
-class IProjectAuditSerializer(serializers.Serializer):
-    """Serializer for Investment Project audit log."""
-
-    def to_representation(self, instance):
-        """Overwrite serialization process completely to get the Versions."""
-        versions = Version.objects.get_for_object(instance)
-        version_pairs = (
-            (versions[n], versions[n + 1]) for n in range(len(versions) - 1)
-        )
-
-        return {
-            'results': self._construct_changelog(version_pairs),
-        }
-
-    def _construct_changelog(self, version_pairs):
-        changelog = []
-
-        for v_new, v_old in version_pairs:
-            version_creator = v_new.revision.user
-            creator_repr = None
-            if version_creator:
-                creator_repr = {
-                    'id': str(version_creator.pk),
-                    'first_name': version_creator.first_name,
-                    'last_name': version_creator.last_name,
-                    'name': version_creator.name,
-                    'email': version_creator.email,
-                }
-
-            changelog.append({
-                'user': creator_repr,
-                'timestamp': v_new.revision.date_created,
-                'comment': v_new.revision.comment or '',
-                'changes': self._diff_versions(
-                    v_old.field_dict, v_new.field_dict
-                ),
-            })
-
-        return changelog
-
-    @staticmethod
-    def _diff_versions(old_version, new_version):
-        changes = {}
-
-        for field_name, new_value in new_version.items():
-            if field_name not in old_version:
-                changes[field_name] = [None, new_value]
-            else:
-                old_value = old_version[field_name]
-                if old_value != new_value:
-                    changes[field_name] = [old_value, new_value]
-
-        return changes
 
 
 class IProjectValueSerializer(serializers.ModelSerializer):
@@ -296,19 +251,19 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
         )
 
 
-class IProjectUnifiedSerializer(IProjectSerializer, IProjectValueSerializer,
-                                IProjectRequirementsSerializer, IProjectTeamSerializer):
+class IProjectSerializer(IProjectSummarySerializer, IProjectValueSerializer,
+                         IProjectRequirementsSerializer, IProjectTeamSerializer):
     """Serialiser for investment projects, used with the new unified investment endpoint."""
 
     class Meta:  # noqa: D101
         model = InvestmentProject
         fields = (
-            IProjectSerializer.Meta.fields +
+            IProjectSummarySerializer.Meta.fields +
             IProjectValueSerializer.Meta.fields +
             IProjectRequirementsSerializer.Meta.fields +
             IProjectTeamSerializer.Meta.fields
         )
-        extra_kwargs = IProjectSerializer.Meta.extra_kwargs
+        extra_kwargs = IProjectSummarySerializer.Meta.extra_kwargs
 
 
 class IProjectDocumentSerializer(serializers.ModelSerializer):

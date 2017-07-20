@@ -14,8 +14,12 @@ class BusinessType(Enum):
     intermediary = Constant('Intermediary', '9bd14e94-5d95-e211-a939-e4115bead28a')
     partnership = Constant('Partnership', '8b6eaf7e-03e7-e611-bca1-e4115bead28a')
     sole_trader = Constant('Sole Trader', '99d14e94-5d95-e211-a939-e4115bead28a')
-    private_limited_company = Constant('Private limited company', '6f75408b-03e7-e611-bca1-e4115bead28a')
-    public_limited_company = Constant('Public limited company', 'dac8c591-03e7-e611-bca1-e4115bead28a')
+    private_limited_company = Constant(
+        'Private limited company', '6f75408b-03e7-e611-bca1-e4115bead28a'
+    )
+    public_limited_company = Constant(
+        'Public limited company', 'dac8c591-03e7-e611-bca1-e4115bead28a'
+    )
 
 
 class Country(Enum):
@@ -49,12 +53,18 @@ class Country(Enum):
     bhutan = Constant('Bhutan', 'ab5f66a0-5d95-e211-a939-e4115bead28a')
     blank = Constant('BLANK', '98c8d93d-5d06-e311-a78e-e4115bead28a')
     bolivia = Constant('Bolivia', 'ac5f66a0-5d95-e211-a939-e4115bead28a')
-    bosnia_and_herzegovina = Constant('Bosnia and Herzegovina', 'ad5f66a0-5d95-e211-a939-e4115bead28a')
+    bosnia_and_herzegovina = Constant(
+        'Bosnia and Herzegovina', 'ad5f66a0-5d95-e211-a939-e4115bead28a'
+    )
     botswana = Constant('Botswana', 'ae5f66a0-5d95-e211-a939-e4115bead28a')
     bouvet_island = Constant('Bouvet Island', 'af5f66a0-5d95-e211-a939-e4115bead28a')
     brazil = Constant('Brazil', 'b05f66a0-5d95-e211-a939-e4115bead28a')
-    british_indian_ocean_territory = Constant('British Indian Ocean Territory', 'b15f66a0-5d95-e211-a939-e4115bead28a')
-    british_virgin_islands = Constant('British Virgin Islands', 'b25f66a0-5d95-e211-a939-e4115bead28a')
+    british_indian_ocean_territory = Constant(
+        'British Indian Ocean Territory', 'b15f66a0-5d95-e211-a939-e4115bead28a'
+    )
+    british_virgin_islands = Constant(
+        'British Virgin Islands', 'b25f66a0-5d95-e211-a939-e4115bead28a'
+    )
     brunei = Constant('Brunei', '56af72a6-5d95-e211-a939-e4115bead28a')
     bulgaria = Constant('Bulgaria', '57af72a6-5d95-e211-a939-e4115bead28a')
     burkina = Constant('Burkina', '58af72a6-5d95-e211-a939-e4115bead28a')
@@ -65,16 +75,22 @@ class Country(Enum):
     canada = Constant('Canada', '5daf72a6-5d95-e211-a939-e4115bead28a')
     cape_verde = Constant('Cape Verde', '5eaf72a6-5d95-e211-a939-e4115bead28a')
     cayman_islands = Constant('Cayman Islands', '5faf72a6-5d95-e211-a939-e4115bead28a')
-    central_african_republic = Constant('Central African Republic', '60af72a6-5d95-e211-a939-e4115bead28a')
+    central_african_republic = Constant(
+        'Central African Republic', '60af72a6-5d95-e211-a939-e4115bead28a'
+    )
     chad = Constant('Chad', '61af72a6-5d95-e211-a939-e4115bead28a')
     chile = Constant('Chile', '62af72a6-5d95-e211-a939-e4115bead28a')
     china = Constant('China', '63af72a6-5d95-e211-a939-e4115bead28a')
     christmas_island = Constant('Christmas Island', '64af72a6-5d95-e211-a939-e4115bead28a')
-    cocos_keeling_islands = Constant('Cocos (Keeling) Islands', '65af72a6-5d95-e211-a939-e4115bead28a')
+    cocos_keeling_islands = Constant(
+        'Cocos (Keeling) Islands', '65af72a6-5d95-e211-a939-e4115bead28a'
+    )
     colombia = Constant('Colombia', '66af72a6-5d95-e211-a939-e4115bead28a')
     comoros = Constant('Comoros', '67af72a6-5d95-e211-a939-e4115bead28a')
     congo = Constant('Congo', '69af72a6-5d95-e211-a939-e4115bead28a')
-    congo_democratic_republic = Constant('Congo (Democratic Republic)', '68af72a6-5d95-e211-a939-e4115bead28a')
+    congo_democratic_republic = Constant(
+        'Congo (Democratic Republic)', '68af72a6-5d95-e211-a939-e4115bead28a'
+    )
     cook_islands = Constant('Cook Islands', '6aaf72a6-5d95-e211-a939-e4115bead28a')
     costa_rica = Constant('Costa Rica', '6baf72a6-5d95-e211-a939-e4115bead28a')
     croatia = Constant('Croatia', '6caf72a6-5d95-e211-a939-e4115bead28a')
@@ -100,7 +116,9 @@ class Country(Enum):
     france = Constant('France', '82756b9a-5d95-e211-a939-e4115bead28a')
     french_guiana = Constant('French Guiana', 'dbf682ac-5d95-e211-a939-e4115bead28a')
     french_polynesia = Constant('French Polynesia', 'dcf682ac-5d95-e211-a939-e4115bead28a')
-    french_southern_territories = Constant('French Southern Territories', 'ddf682ac-5d95-e211-a939-e4115bead28a')
+    french_southern_territories = Constant(
+        'French Southern Territories', 'ddf682ac-5d95-e211-a939-e4115bead28a'
+    )
     gabon = Constant('Gabon', 'def682ac-5d95-e211-a939-e4115bead28a')
     gambia, _the = Constant('Gambia, The', 'dff682ac-5d95-e211-a939-e4115bead28a')
     georgia = Constant('Georgia', 'e0f682ac-5d95-e211-a939-e4115bead28a')
@@ -188,7 +206,9 @@ class Country(Enum):
     nigeria = Constant('Nigeria', '4561b8be-5d95-e211-a939-e4115bead28a')
     niue = Constant('Niue', '4661b8be-5d95-e211-a939-e4115bead28a')
     norfolk_island = Constant('Norfolk Island', '4761b8be-5d95-e211-a939-e4115bead28a')
-    northern_mariana_islands = Constant('Northern Mariana Islands', '4861b8be-5d95-e211-a939-e4115bead28a')
+    northern_mariana_islands = Constant(
+        'Northern Mariana Islands', '4861b8be-5d95-e211-a939-e4115bead28a'
+    )
     norway = Constant('Norway', '4961b8be-5d95-e211-a939-e4115bead28a')
     occupied_palestinian_territories = Constant('Occupied Palestinian Territories',
                                                 '35afd8d0-5d95-e211-a939-e4115bead28a')
@@ -200,8 +220,9 @@ class Country(Enum):
     paraguay = Constant('Paraguay', '4f61b8be-5d95-e211-a939-e4115bead28a')
     peru = Constant('Peru', '5061b8be-5d95-e211-a939-e4115bead28a')
     philippines = Constant('Philippines', '5161b8be-5d95-e211-a939-e4115bead28a')
-    pitcairn_henderson_ducie_and_oeno_islands = Constant('Pitcairn, Henderson, Ducie and Oeno Islands',
-                                                         '5261b8be-5d95-e211-a939-e4115bead28a')
+    pitcairn_henderson_ducie_and_oeno_islands = Constant(
+        'Pitcairn, Henderson, Ducie and Oeno Islands', '5261b8be-5d95-e211-a939-e4115bead28a'
+    )
     poland = Constant('Poland', '5361b8be-5d95-e211-a939-e4115bead28a')
     portugal = Constant('Portugal', '5461b8be-5d95-e211-a939-e4115bead28a')
     puerto_rico = Constant('Puerto Rico', '5561b8be-5d95-e211-a939-e4115bead28a')
@@ -212,7 +233,9 @@ class Country(Enum):
     rwanda = Constant('Rwanda', '5a61b8be-5d95-e211-a939-e4115bead28a')
     samoa = Constant('Samoa', '5b61b8be-5d95-e211-a939-e4115bead28a')
     san_marino = Constant('San Marino', '5c61b8be-5d95-e211-a939-e4115bead28a')
-    sao_tome_and_principe = Constant('Sao Tome and Principe', '5d61b8be-5d95-e211-a939-e4115bead28a')
+    sao_tome_and_principe = Constant(
+        'Sao Tome and Principe', '5d61b8be-5d95-e211-a939-e4115bead28a'
+    )
     saudi_arabia = Constant('Saudi Arabia', '1a0be5c4-5d95-e211-a939-e4115bead28a')
     senegal = Constant('Senegal', '1b0be5c4-5d95-e211-a939-e4115bead28a')
     serbia = Constant('Serbia', '1c0be5c4-5d95-e211-a939-e4115bead28a')
@@ -233,12 +256,16 @@ class Country(Enum):
     st_kitts_and_nevis = Constant('St Kitts and Nevis', '280be5c4-5d95-e211-a939-e4115bead28a')
     st_lucia = Constant('St Lucia', '290be5c4-5d95-e211-a939-e4115bead28a')
     st_martin = Constant('St Martin', '7c756b9a-5d95-e211-a939-e4115bead28a')
-    st_pierre_and_miquelon = Constant('St Pierre and Miquelon', '2a0be5c4-5d95-e211-a939-e4115bead28a')
+    st_pierre_and_miquelon = Constant(
+        'St Pierre and Miquelon', '2a0be5c4-5d95-e211-a939-e4115bead28a'
+    )
     st_vincent = Constant('St Vincent', '2b0be5c4-5d95-e211-a939-e4115bead28a')
     sudan = Constant('Sudan', '2c0be5c4-5d95-e211-a939-e4115bead28a')
     sudan_south = Constant('Sudan, South', '7e756b9a-5d95-e211-a939-e4115bead28a')
     surinam = Constant('Surinam', '2d0be5c4-5d95-e211-a939-e4115bead28a')
-    svalbard_and_jan_mayen_islands = Constant('Svalbard and Jan Mayen Islands', '2e0be5c4-5d95-e211-a939-e4115bead28a')
+    svalbard_and_jan_mayen_islands = Constant(
+        'Svalbard and Jan Mayen Islands', '2e0be5c4-5d95-e211-a939-e4115bead28a'
+    )
     swaziland = Constant('Swaziland', '2f0be5c4-5d95-e211-a939-e4115bead28a')
     sweden = Constant('Sweden', '300be5c4-5d95-e211-a939-e4115bead28a')
     switzerland = Constant('Switzerland', '310be5c4-5d95-e211-a939-e4115bead28a')
@@ -255,7 +282,9 @@ class Country(Enum):
     tunisia = Constant('Tunisia', 'ad6ee1ca-5d95-e211-a939-e4115bead28a')
     turkey = Constant('Turkey', 'ae6ee1ca-5d95-e211-a939-e4115bead28a')
     turkmenistan = Constant('Turkmenistan', 'af6ee1ca-5d95-e211-a939-e4115bead28a')
-    turks_and_caicos_islands = Constant('Turks and Caicos Islands', 'b06ee1ca-5d95-e211-a939-e4115bead28a')
+    turks_and_caicos_islands = Constant(
+        'Turks and Caicos Islands', 'b06ee1ca-5d95-e211-a939-e4115bead28a'
+    )
     tuvalu = Constant('Tuvalu', 'b16ee1ca-5d95-e211-a939-e4115bead28a')
     uganda = Constant('Uganda', 'b26ee1ca-5d95-e211-a939-e4115bead28a')
     ukraine = Constant('Ukraine', 'b36ee1ca-5d95-e211-a939-e4115bead28a')
@@ -396,7 +425,9 @@ class UKRegion(Enum):
     ukti_dubai_hub = Constant('UKTI Dubai Hub', 'e1dd40e9-3dfd-e311-8a2b-e4115bead28a')
     wales = Constant('Wales', '8d4cd12a-6095-e211-a939-e4115bead28a')
     west_midlands = Constant('West Midlands', '854cd12a-6095-e211-a939-e4115bead28a')
-    yorkshire_and_the_humber = Constant('Yorkshire and The Humber', '834cd12a-6095-e211-a939-e4115bead28a')
+    yorkshire_and_the_humber = Constant(
+        'Yorkshire and The Humber', '834cd12a-6095-e211-a939-e4115bead28a'
+    )
 
 
 class Service(Enum):
@@ -437,8 +468,12 @@ class CompanyClassification(Enum):
     tier_a1 = Constant("Tier A1 – Tomorrow's Champions", '2b55bb11-9518-e411-985c-e4115bead28a')
     tier_a2 = Constant('Tier A2 -Global Partners', '7e0c261a-d447-e411-985c-e4115bead28a')
     tier_b = Constant('Tier B - Global Accounts', 'bb1bf800-8d53-e311-aef3-441ea13961e2')
-    tier_c = Constant('Tier C - Local Accounts (UKTI Managed)', 'bd1bf800-8d53-e311-aef3-441ea13961e2')
-    tier_dl = Constant('Tier D - LEP Managed Branch (not IST)', '12798372-8eb4-e511-88b6-e4115bead28a')
+    tier_c = Constant(
+        'Tier C - Local Accounts (UKTI Managed)', 'bd1bf800-8d53-e311-aef3-441ea13961e2'
+    )
+    tier_dl = Constant(
+        'Tier D - LEP Managed Branch (not IST)', '12798372-8eb4-e511-88b6-e4115bead28a'
+    )
     tier_dg = Constant('Tier D - POST Identified/Managed', '572dfefe-cd1d-e611-9bdc-e4115bead28a')
 
 

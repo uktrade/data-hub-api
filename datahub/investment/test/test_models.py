@@ -27,6 +27,15 @@ def test_project_code_datahub():
     assert project.project_code == f'DHP-{project_num:08d}'
 
 
+def test_no_project_code():
+    """Tests that None is returned when a project code is not set."""
+    # cdms_project_code is set and removed to avoid a DH project code
+    # being generated
+    project = InvestmentProjectFactory(cdms_project_code='P-79661656')
+    project.cdms_project_code = None
+    assert project.project_code is None
+
+
 def test_project_manager_team_none():
     """Tests project_manager_team for a project without a project manager."""
     project = InvestmentProjectFactory()
