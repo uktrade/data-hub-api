@@ -24,7 +24,9 @@ def test_both_flags_passed_to_command():
     user1 = AdviserFactory(use_cdms_auth=False)
     user2 = AdviserFactory(use_cdms_auth=False)
     with pytest.raises(CommandError) as exception:
-        management.call_command(manageusers.Command(), user1.email, user2.email, '--enable', '--disable')
+        management.call_command(
+            manageusers.Command(), user1.email, user2.email, '--enable', '--disable'
+        )
 
     assert 'Pass either --enable or --disable not both' in str(exception.value)
 

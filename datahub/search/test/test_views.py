@@ -9,14 +9,14 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
 from datahub.core.test_utils import (
-    LeelooTestCase, synchronous_executor_submit, synchronous_transaction_on_commit,
+    APITestMixin, synchronous_executor_submit, synchronous_transaction_on_commit,
 )
 
 pytestmark = pytest.mark.django_db
 
 
 @pytest.mark.usefixtures('setup_data', 'post_save_handlers')
-class SearchTestCase(LeelooTestCase):
+class TestSearch(APITestMixin):
     """Tests search views."""
 
     def test_basic_search_all_companies(self):
@@ -134,23 +134,25 @@ class SearchTestCase(LeelooTestCase):
         term = 'abc defg'
 
         url = f"{reverse('api-v3:search:company')}?offset=0&limit=100"
+        united_states_id = constants.Country.united_states.value.id
 
         response = self.api_client.post(url, {
             'original_query': term,
-            'trading_address_country': constants.Country.united_states.value.id,
+            'trading_address_country': united_states_id,
         })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
-        assert response.data['results'][0]['trading_address_country']['id'] == constants.Country.united_states.value.id
+        assert response.data['results'][0]['trading_address_country']['id'] == united_states_id
 
     def test_search_company_no_filters(self):
         """Tests case where there is no filters provided."""
         url = f"{reverse('api-v3:search:company')}?offset=0&limit=100"
         response = self.api_client.post(url, {})
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data['results']) > 0
 
     def test_search_foreign_company_json(self):
         """Tests detailed company search."""
@@ -186,7 +188,8 @@ class SearchTestCase(LeelooTestCase):
         url = f"{reverse('api-v3:search:contact')}?offset=0&limit=100"
         response = self.api_client.post(url, {})
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data['results']) > 0
 
     def test_search_investment_project_json(self):
         """Tests detailed investment project search."""
@@ -228,7 +231,8 @@ class SearchTestCase(LeelooTestCase):
         url = f"{reverse('api-v3:search:investment_project')}?offset=0&limit=100"
         response = self.api_client.post(url, {})
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data['results']) > 0
 
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
@@ -249,8 +253,83 @@ class SearchTestCase(LeelooTestCase):
             'entity': 'company'
         })
 
+        assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 4
         assert ['The Advisory',
                 'The Advisory Group',
                 'The Risk Advisory Group',
                 'The Advisories'] == [company['name'] for company in response.data['companies']]
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_sort_desc(self):
+        """Tests quality of results."""
+        CompanyFactory(name='Water 1').save()
+        CompanyFactory(name='water 2').save()
+        CompanyFactory(name='water 3').save()
+        CompanyFactory(name='Water 4').save()
+
+        connections.get_connection().indices.refresh()
+
+        term = 'Water'
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'sortby': 'name:desc',
+            'entity': 'company'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 4
+        assert ['Water 4',
+                'water 3',
+                'water 2',
+                'Water 1'] == [company['name'] for company in response.data['companies']]
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_sort_asc(self):
+        """Tests quality of results."""
+        CompanyFactory(name='Fire 4').save()
+        CompanyFactory(name='fire 3').save()
+        CompanyFactory(name='fire 2').save()
+        CompanyFactory(name='Fire 1').save()
+
+        connections.get_connection().indices.refresh()
+
+        term = 'Fire'
+
+        url = reverse('api-v3:search:company')
+        response = self.api_client.post(url, {
+            'original_query': term,
+            'sortby': 'name:asc'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 4
+        assert ['Fire 1',
+                'fire 2',
+                'fire 3',
+                'Fire 4'] == [company['name'] for company in response.data['results']]
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_sort_invalid(self):
+        """Tests quality of results."""
+        CompanyFactory(name='Fire 4').save()
+        CompanyFactory(name='fire 3').save()
+        CompanyFactory(name='fire 2').save()
+        CompanyFactory(name='Fire 1').save()
+
+        connections.get_connection().indices.refresh()
+
+        term = 'Fire'
+
+        url = reverse('api-v3:search:company')
+        response = self.api_client.post(url, {
+            'original_query': term,
+            'sortby': 'some_field_that_doesnt_exist:asc'
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST

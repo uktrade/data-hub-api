@@ -7,13 +7,13 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
-from datahub.core.test_utils import LeelooTestCase
+from datahub.core.test_utils import APITestMixin
 
 from datahub.interaction.test.factories import ServiceDeliveryFactory, ServiceOfferFactory
 from datahub.metadata.test.factories import EventFactory
 
 
-class ServiceDeliveryViewTestCase(LeelooTestCase):
+class TestServiceDeliveryView(APITestMixin):
     """Service Delivery view test case."""
 
     def test_service_delivery_detail_view(self):
@@ -37,7 +37,12 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
         response = self.api_client.get(url)
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_404_NOT_FOUND
-        expected_content = {'errors': [{'source': {'pointer': '/data/detail'}, 'detail': 'Not found.'}]}
+        expected_content = {
+            'errors': [{
+                'source': {'pointer': '/data/detail'},
+                'detail': 'Not found.'
+            }]
+        }
         assert content == expected_content
 
     def test_service_delivery_list_view(self):
@@ -284,7 +289,8 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
         response = self.api_client.get(url, data={'company_id': company.pk})
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_200_OK
-        assert {element['id'] for element in content['data']} == {str(servicedelivery.pk), str(servicedelivery2.pk)}
+        expected_ids = {str(servicedelivery.pk), str(servicedelivery2.pk)}
+        assert {element['id'] for element in content['data']} == expected_ids
 
     def test_filter_service_deliveries_by_contact(self):
         """Filter by contact."""
@@ -308,7 +314,8 @@ class ServiceDeliveryViewTestCase(LeelooTestCase):
         response = self.api_client.get(url, data={'contact_id': contact.pk})
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status.HTTP_200_OK
-        assert {element['id'] for element in content['data']} == {str(servicedelivery.pk), str(servicedelivery2.pk)}
+        expected_ids = {str(servicedelivery.pk), str(servicedelivery2.pk)}
+        assert {element['id'] for element in content['data']} == expected_ids
 
     def test_add_service_delivery_incorrect_service_team_event_combination(self):
         """Test add new service delivery with invalid service/team/even combination."""

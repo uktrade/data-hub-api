@@ -1,17 +1,19 @@
 import pytest
+import reversion
+from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.core import constants
-from datahub.core.test_utils import LeelooTestCase
+from datahub.core.test_utils import APITestMixin
 from .factories import CompanyFactory, ContactFactory
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
 
 
-class AddContactTestCase(LeelooTestCase):
+class TestAddContact(APITestMixin):
     """Add contact test case."""
 
     @freeze_time('2017-04-18 13:25:30.986208+00:00')
@@ -198,7 +200,9 @@ class AddContactTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
-            'address_same_as_company': ['Please select either address_same_as_company or enter an address manually.']
+            'address_same_as_company': [
+                'Please select either address_same_as_company or enter an address manually.'
+            ]
         }
 
     def test_fails_with_only_partial_manual_address(self):
@@ -254,7 +258,7 @@ class AddContactTestCase(LeelooTestCase):
         }
 
 
-class EditContactTestCase(LeelooTestCase):
+class TestEditContact(APITestMixin):
     """Edit contact test case."""
 
     @freeze_time('2017-04-18 13:25:30.986208+00:00')
@@ -342,7 +346,7 @@ class EditContactTestCase(LeelooTestCase):
         }
 
 
-class ArchiveContactTestCase(LeelooTestCase):
+class TestArchiveContact(APITestMixin):
     """Archive/unarchive contact test case."""
 
     def test_archive_without_reason(self):
@@ -393,7 +397,7 @@ class ArchiveContactTestCase(LeelooTestCase):
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
-class ViewContactTestCase(LeelooTestCase):
+class TestViewContact(APITestMixin):
     """View contact test case."""
 
     @freeze_time('2017-04-18 13:25:30.986208+00:00')
@@ -478,7 +482,7 @@ class ViewContactTestCase(LeelooTestCase):
         }
 
 
-class ContactListTestCase(LeelooTestCase):
+class TestContactList(APITestMixin):
     """List/filter contacts test case."""
 
     def test_all(self):
@@ -504,4 +508,44 @@ class ContactListTestCase(LeelooTestCase):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
-        assert {contact['id'] for contact in response.data['results']} == {contact.id for contact in contacts}
+        expected_contacts = {contact.id for contact in contacts}
+        assert {contact['id'] for contact in response.data['results']} == expected_contacts
+
+
+class TestAuditLogView(APITestMixin):
+    """Tests for the audit log view."""
+
+    def test_audit_log_view(self):
+        """Test retrieval of audit log."""
+        initial_datetime = now()
+        with reversion.create_revision():
+            contact = ContactFactory(
+                notes='Initial notes',
+            )
+
+            reversion.set_comment('Initial')
+            reversion.set_date_created(initial_datetime)
+            reversion.set_user(self.user)
+
+        changed_datetime = now()
+        with reversion.create_revision():
+            contact.notes = 'New notes'
+            contact.save()
+
+            reversion.set_comment('Changed')
+            reversion.set_date_created(changed_datetime)
+            reversion.set_user(self.user)
+
+        url = reverse('api-v3:contact:audit-item', kwargs={'pk': contact.pk})
+
+        response = self.api_client.get(url)
+        response_data = response.json()['results']
+
+        # No need to test the whole response
+        assert len(response_data) == 1
+        entry = response_data[0]
+
+        assert entry['user']['name'] == self.user.name
+        assert entry['comment'] == 'Changed'
+        assert entry['timestamp'] == changed_datetime.isoformat()
+        assert entry['changes']['notes'] == ['Initial notes', 'New notes']

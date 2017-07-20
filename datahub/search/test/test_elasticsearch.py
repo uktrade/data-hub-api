@@ -161,7 +161,8 @@ def test_search_by_entity_query():
                             'path': 'trading_address_country',
                             'query': {
                                 'term': {
-                                    'trading_address_country.id': '80756b9a-5d95-e211-a939-e4115bead28a'
+                                    'trading_address_country.id':
+                                        '80756b9a-5d95-e211-a939-e4115bead28a'
                                 }
                             }
                         }
@@ -237,6 +238,16 @@ def test_remap_fields():
     assert 'test' in remapped
     assert 'uk_based' in remapped
     assert remapped['uk_based'] is False
+
+
+def test_remap_sort_field():
+    """Test sort fields remapping."""
+    fields = {
+        'name': 'name_keyword'
+    }
+
+    for key, value in fields.items():
+        assert elasticsearch.remap_sort_field(key) == value
 
 
 def test_date_range_fields():
