@@ -54,7 +54,9 @@ class Company(ArchivableModel, CompanyAbstract):
 
     company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
-    alias = models.CharField(max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name')
+    alias = models.CharField(
+        max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name'
+    )
     business_type = models.ForeignKey(
         metadata_models.BusinessType, blank=True, null=True,
         on_delete=models.SET_NULL
@@ -86,7 +88,9 @@ class Company(ArchivableModel, CompanyAbstract):
         related_name='company_future_interest_countries'
     )
     description = models.TextField(blank=True, null=True)
-    website = models.CharField(max_length=MAX_LENGTH, validators=[RelaxedURLValidator], blank=True, null=True)
+    website = models.CharField(
+        max_length=MAX_LENGTH, validators=[RelaxedURLValidator], blank=True, null=True
+    )
     uk_region = models.ForeignKey(
         metadata_models.UKRegion, blank=True, null=True,
         on_delete=models.SET_NULL
@@ -158,15 +162,17 @@ class Company(ArchivableModel, CompanyAbstract):
             self.trading_address_postcode,
             self.trading_address_country
         ))
-        all_required_trading_address_fields = all(getattr(self, field)
-                                                  for field in self.REQUIRED_TRADING_ADDRESS_FIELDS)
+        all_required_trading_address_fields = all(
+            getattr(self, field) for field in self.REQUIRED_TRADING_ADDRESS_FIELDS
+        )
         if any_trading_address_fields and not all_required_trading_address_fields:
             return False
         return True
 
     def _generate_trading_address_errors(self):
         """Generate per field error."""
-        empty_fields = [field for field in self.REQUIRED_TRADING_ADDRESS_FIELDS if not getattr(self, field)]
+        empty_fields = [field for field in self.REQUIRED_TRADING_ADDRESS_FIELDS
+                        if not getattr(self, field)]
         return {field: ['This field may not be null.'] for field in empty_fields}
 
     def _validate_uk_region(self):

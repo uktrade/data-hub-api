@@ -65,8 +65,8 @@ class TestJSONParser(APITestMixin):
         )
         content = json.loads(response.content.decode('utf-8'))
         expected_content = {'errors': [
-            {'detail': 'The resource object\'s type (whatever) is not the type that constitute the collection '
-                       'represented by the endpoint (ServiceDelivery).',
+            {'detail': 'The resource object\'s type (whatever) is not the type that constitute '
+                       'the collection represented by the endpoint (ServiceDelivery).',
              'source': {'pointer': '/data/detail'}
              }]
         }
