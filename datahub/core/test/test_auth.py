@@ -87,7 +87,11 @@ def test_invalid_cdms_credentials(auth_mock, settings, live_server):
     auth = requests.auth.HTTPBasicAuth(application.client_id, application.client_secret)
     response = requests.post(
         url,
-        data={'grant_type': 'password', 'username': cdms_user.email, 'password': cdms_user.password},
+        data={
+            'grant_type': 'password',
+            'username': cdms_user.email,
+            'password': cdms_user.password
+        },
         auth=auth
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -110,7 +114,11 @@ def test_cdms_returns_500(mocked_login, live_server):
     auth = requests.auth.HTTPBasicAuth(application.client_id, application.client_secret)
     response = requests.post(
         url,
-        data={'grant_type': 'password', 'username': cdms_user.email, 'password': cdms_user.password},
+        data={
+            'grant_type': 'password',
+            'username': cdms_user.email,
+            'password': cdms_user.password
+        },
         auth=auth
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -255,7 +263,11 @@ def test_valid_cdms_credentials_user_not_whitelisted(auth_mock, live_server):
     auth = requests.auth.HTTPBasicAuth(application.client_id, application.client_secret)
     response = requests.post(
         url,
-        data={'grant_type': 'password', 'username': cdms_user.email, 'password': cdms_user.password},
+        data={
+            'grant_type': 'password',
+            'username': cdms_user.email,
+            'password': cdms_user.password
+        },
         auth=auth
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -278,7 +290,11 @@ def test_valid_django_user(auth_mock, live_server):
     auth = requests.auth.HTTPBasicAuth(application.client_id, application.client_secret)
     response = requests.post(
         url,
-        data={'grant_type': 'password', 'username': django_user.email, 'password': DJANGO_USER_PASSWORD},
+        data={
+            'grant_type': 'password',
+            'username': django_user.email,
+            'password': DJANGO_USER_PASSWORD
+        },
         auth=auth
     )
     assert response.status_code == status.HTTP_200_OK

@@ -127,7 +127,9 @@ class TestViewOrder(APITestMixin):
 
     def test_not_found(self):
         """Test 404 when getting a non-existing order"""
-        url = reverse('api-v3:omis:order:detail', kwargs={'pk': '00000000-0000-0000-0000-000000000000'})
+        url = reverse('api-v3:omis:order:detail', kwargs={
+            'pk': '00000000-0000-0000-0000-000000000000'
+        })
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND

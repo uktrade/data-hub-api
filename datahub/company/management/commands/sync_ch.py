@@ -59,7 +59,8 @@ def filter_irrelevant_ch_columns(row):
 
 @contextmanager
 def open_ch_zipped_csv(fp):
-    """Enclose all the complicated logic of on-the-fly unzip->csv read in a nice context manager."""
+    """Enclose all the complicated logic of on-the-fly unzip->csv read in a nice context manager.
+    """
     with zipfile.ZipFile(fp) as zf:
         # get the first file from zip, assuming it's the only one from CH
         csv_name = zf.filelist[0].filename
@@ -86,9 +87,12 @@ def iter_ch_csv_from_url(url, tmp_file_creator):
 def sync_ch(tmp_file_creator, endpoint=None, truncate_first=False):
     """Do the sync.
 
-    We are batching the records instead of letting bulk_create doing it because Django casts the objects into a list
+    We are batching the records instead of letting bulk_create doing it because Django casts
+    the objects into a list:
     https://github.com/django/django/blob/master/django/db/models/query.py#L420
-    this would create a list with millions of objects, that will try to be saved in batches in a single transaction
+
+    This would create a list with millions of objects, that will try to be saved in batches
+    in a single transaction.
     """
     logger.info('Starting CH load...')
     count = 0

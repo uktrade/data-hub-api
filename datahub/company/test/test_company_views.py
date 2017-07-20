@@ -3,7 +3,9 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company import models
-from datahub.core import constants
+from datahub.core.constants import (
+    BusinessType, CompanyClassification, Country, HeadquarterType, Sector, UKRegion
+)
 from datahub.core.test_utils import APITestMixin
 from .factories import CompaniesHouseCompanyFactory, CompanyFactory
 
@@ -31,7 +33,7 @@ class TestCompany(APITestMixin):
             name='Foo ltd.',
             registered_address_1='Hello st.',
             registered_address_town='Fooland',
-            registered_address_country_id=constants.Country.united_states.value.id
+            registered_address_country_id=Country.united_states.value.id
         )
         company = CompanyFactory(
             company_number=123,
@@ -67,9 +69,9 @@ class TestCompany(APITestMixin):
             name='Foo ltd.',
             registered_address_1='Hello st.',
             registered_address_town='Fooland',
-            registered_address_country_id=constants.Country.united_states.value.id,
-            headquarter_type_id=constants.HeadquarterType.ukhq.value.id,
-            classification_id=constants.CompanyClassification.tier_a.value.id,
+            registered_address_country_id=Country.united_states.value.id,
+            headquarter_type_id=HeadquarterType.ukhq.value.id,
+            classification_id=CompanyClassification.tier_a.value.id,
         )
 
         url = reverse('api-v1:company-detail', kwargs={'pk': company.id})
@@ -88,8 +90,8 @@ class TestCompany(APITestMixin):
         }
         assert response.data['registered_address_county'] is None
         assert response.data['registered_address_postcode'] is None
-        assert response.data['headquarter_type']['name'] == constants.HeadquarterType.ukhq.value.name
-        assert response.data['classification']['name'] == constants.CompanyClassification.tier_a.value.name
+        assert response.data['headquarter_type']['name'] == HeadquarterType.ukhq.value.name
+        assert response.data['classification']['name'] == CompanyClassification.tier_a.value.name
 
     def test_update_company(self):
         """Test company update."""
@@ -97,7 +99,7 @@ class TestCompany(APITestMixin):
             name='Foo ltd.',
             registered_address_1='Hello st.',
             registered_address_town='Fooland',
-            registered_address_country_id=constants.Country.united_states.value.id
+            registered_address_country_id=Country.united_states.value.id
         )
 
         # now update it
@@ -115,18 +117,18 @@ class TestCompany(APITestMixin):
             name='Foo ltd.',
             registered_address_1='Hello st.',
             registered_address_town='Fooland',
-            registered_address_country_id=constants.Country.united_states.value.id,
-            classification_id=constants.CompanyClassification.tier_a.value.id,
+            registered_address_country_id=Country.united_states.value.id,
+            classification_id=CompanyClassification.tier_a.value.id,
         )
 
         url = reverse('api-v1:company-detail', kwargs={'pk': company.pk})
         response = self.api_client.patch(url, {
-            'classification': constants.CompanyClassification.tier_b.value.id,
+            'classification': CompanyClassification.tier_b.value.id,
         })
 
         assert response.status_code == 200  # testing that this should be silently ignored error
         company.refresh_from_db()
-        assert str(company.classification_id) == constants.CompanyClassification.tier_a.value.id
+        assert str(company.classification_id) == CompanyClassification.tier_a.value.id
 
     def test_add_uk_company(self):
         """Test add new UK company."""
@@ -134,14 +136,14 @@ class TestCompany(APITestMixin):
         response = self.api_client.post(url, {
             'name': 'Acme',
             'alias': None,
-            'business_type': constants.BusinessType.company.value.id,
-            'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
-            'registered_address_country': constants.Country.united_kingdom.value.id,
+            'business_type': BusinessType.company.value.id,
+            'sector': Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_country': Country.united_kingdom.value.id,
             'registered_address_1': '75 Stramford Road',
             'registered_address_town': 'London',
-            'uk_region': constants.UKRegion.england.value.id,
-            'headquarter_type': constants.HeadquarterType.ghq.value.id,
-            'classification': constants.CompanyClassification.tier_a.value.id,
+            'uk_region': UKRegion.england.value.id,
+            'headquarter_type': HeadquarterType.ghq.value.id,
+            'classification': CompanyClassification.tier_a.value.id,
         })
 
         assert response.status_code == status.HTTP_201_CREATED
@@ -153,15 +155,17 @@ class TestCompany(APITestMixin):
         response = self.api_client.post(url, {
             'name': 'Acme',
             'alias': None,
-            'business_type': constants.BusinessType.company.value.id,
-            'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
-            'registered_address_country': constants.Country.united_kingdom.value.id,
+            'business_type': BusinessType.company.value.id,
+            'sector': Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_country': Country.united_kingdom.value.id,
             'registered_address_1': '75 Stramford Road',
             'registered_address_town': 'London',
         })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data['errors'] == {'uk_region': ['UK region is required for UK companies.']}
+        assert response.data['errors'] == {
+            'uk_region': ['UK region is required for UK companies.']
+        }
 
     def test_add_not_uk_company(self):
         """Test add new not UK company."""
@@ -169,9 +173,9 @@ class TestCompany(APITestMixin):
         response = self.api_client.post(url, {
             'name': 'Acme',
             'alias': None,
-            'business_type': constants.BusinessType.company.value.id,
-            'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
-            'registered_address_country': constants.Country.united_states.value.id,
+            'business_type': BusinessType.company.value.id,
+            'sector': Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_country': Country.united_states.value.id,
             'registered_address_1': '75 Stramford Road',
             'registered_address_town': 'London',
         })
@@ -184,13 +188,13 @@ class TestCompany(APITestMixin):
         url = reverse('api-v1:company-list')
         response = self.api_client.post(url, {
             'name': 'Acme',
-            'business_type': constants.BusinessType.company.value.id,
-            'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
-            'registered_address_country': constants.Country.united_kingdom.value.id,
+            'business_type': BusinessType.company.value.id,
+            'sector': Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_country': Country.united_kingdom.value.id,
             'registered_address_1': '75 Stramford Road',
             'registered_address_town': 'London',
             'trading_address_1': 'test',
-            'uk_region': constants.UKRegion.england.value.id
+            'uk_region': UKRegion.england.value.id
         })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -204,15 +208,15 @@ class TestCompany(APITestMixin):
         url = reverse('api-v1:company-list')
         response = self.api_client.post(url, {
             'name': 'Acme',
-            'business_type': constants.BusinessType.company.value.id,
-            'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
-            'registered_address_country': constants.Country.united_kingdom.value.id,
+            'business_type': BusinessType.company.value.id,
+            'sector': Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_country': Country.united_kingdom.value.id,
             'registered_address_1': '75 Stramford Road',
             'registered_address_town': 'London',
-            'trading_address_country': constants.Country.ireland.value.id,
+            'trading_address_country': Country.ireland.value.id,
             'trading_address_1': '1 Hello st.',
             'trading_address_town': 'Dublin',
-            'uk_region': constants.UKRegion.england.value.id
+            'uk_region': UKRegion.england.value.id
         })
 
         assert response.status_code == status.HTTP_201_CREATED
@@ -222,15 +226,15 @@ class TestCompany(APITestMixin):
         url = reverse('api-v1:company-list')
         response = self.api_client.post(url, {
             'name': 'Acme',
-            'business_type': constants.BusinessType.company.value.id,
-            'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
-            'registered_address_country': constants.Country.united_kingdom.value.id,
+            'business_type': BusinessType.company.value.id,
+            'sector': Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_country': Country.united_kingdom.value.id,
             'registered_address_1': '75 Stramford Road',
             'registered_address_town': 'London',
-            'trading_address_country': constants.Country.ireland.value.id,
+            'trading_address_country': Country.ireland.value.id,
             'trading_address_1': '1 Hello st.',
             'trading_address_town': 'Dublin',
-            'uk_region': constants.UKRegion.england.value.id,
+            'uk_region': UKRegion.england.value.id,
             'website': 'www.google.com',
         })
 
@@ -297,7 +301,9 @@ class TestCHCompany(APITestMixin):
         """Test companies house company detail."""
         ch_company = CompaniesHouseCompanyFactory(company_number=123)
 
-        url = reverse('api-v1:companieshousecompany-detail', kwargs={'company_number': ch_company.company_number})
+        url = reverse('api-v1:companieshousecompany-detail', kwargs={
+            'company_number': ch_company.company_number
+        })
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -319,15 +325,15 @@ class TestCHCompany(APITestMixin):
         response = self.api_client.post(url, {
             'name': 'Acme',
             'company_number': 1234567890,
-            'business_type': constants.BusinessType.company.value.id,
-            'sector': constants.Sector.aerospace_assembly_aircraft.value.id,
-            'registered_address_country': constants.Country.united_kingdom.value.id,
+            'business_type': BusinessType.company.value.id,
+            'sector': Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_country': Country.united_kingdom.value.id,
             'registered_address_1': '75 Stramford Road',
             'registered_address_town': 'London',
-            'trading_address_country': constants.Country.ireland.value.id,
+            'trading_address_country': Country.ireland.value.id,
             'trading_address_1': '1 Hello st.',
             'trading_address_town': 'Dublin',
-            'uk_region': constants.UKRegion.england.value.id
+            'uk_region': UKRegion.england.value.id
         })
 
         assert response.status_code == status.HTTP_201_CREATED

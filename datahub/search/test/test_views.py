@@ -134,16 +134,17 @@ class TestSearch(APITestMixin):
         term = 'abc defg'
 
         url = f"{reverse('api-v3:search:company')}?offset=0&limit=100"
+        united_states_id = constants.Country.united_states.value.id
 
         response = self.api_client.post(url, {
             'original_query': term,
-            'trading_address_country': constants.Country.united_states.value.id,
+            'trading_address_country': united_states_id,
         })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
-        assert response.data['results'][0]['trading_address_country']['id'] == constants.Country.united_states.value.id
+        assert response.data['results'][0]['trading_address_country']['id'] == united_states_id
 
     def test_search_company_no_filters(self):
         """Tests case where there is no filters provided."""

@@ -114,7 +114,9 @@ mappings = tuple(itertools.starmap(MetadataMapping, metadata_specs)) + (
             ('optevia_TurnoverRange.Id', 'turnover_range_id'),
         ),
         concat=(
-            (('optevia_Address2', 'optevia_Address3', 'optevia_Address4'), 'registered_address_2', ', '),
+            (('optevia_Address2', 'optevia_Address3', 'optevia_Address4'),
+             'registered_address_2',
+             ', '),
         ),
     ),
     Mapping(

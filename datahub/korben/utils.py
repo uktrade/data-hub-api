@@ -59,7 +59,9 @@ def fkey_deps(models):
 
 
 def cdms_datetime_to_datetime(value):
-    """Parses a cdms datetime as string and returns the equivalent datetime value. Dates in CDMS are always UTC."""
+    """Parses a cdms datetime as string and returns the equivalent datetime value.
+    Dates in CDMS are always UTC.
+    """
     if not value:
         return None
 
