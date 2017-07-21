@@ -21,7 +21,7 @@ class BusinessLead(ArchivableModel, BaseModel):
     foreign key.
     """
 
-    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     first_name = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
     last_name = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
     job_title = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
