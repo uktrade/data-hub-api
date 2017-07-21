@@ -16,8 +16,21 @@ from datahub.metadata.serializers import NestedCountrySerializer
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
+class AdviserSerializer(serializers.ModelSerializer):
+    """Adviser serializer."""
+
+    name = serializers.CharField()
+
+    class Meta:  # noqa: D101
+        model = Advisor
+        fields = ('id', 'name', 'last_login', 'first_name', 'last_name', 'email', 'dit_team')
+        depth = 1
+
+
 class NestedContactSerializer(serializers.ModelSerializer):
     """Nested Contact serializer."""
+
+    adviser = AdviserSerializer()
 
     class Meta:  # noqa: D101
         model = Contact
@@ -27,6 +40,8 @@ class NestedContactSerializer(serializers.ModelSerializer):
 
 class NestedInteractionSerializer(serializers.ModelSerializer):
     """Nested Interaction Serializer."""
+
+    dit_adviser = AdviserSerializer()
 
     class Meta:  # noqa: D101
         model = Interaction
@@ -40,17 +55,6 @@ class CompaniesHouseCompanySerializer(serializers.ModelSerializer):
         model = CompaniesHouseCompany
         depth = 1
         fields = '__all__'
-
-
-class AdviserSerializer(serializers.ModelSerializer):
-    """Adviser serializer."""
-
-    name = serializers.CharField()
-
-    class Meta:  # noqa: D101
-        model = Advisor
-        fields = ('id', 'name', 'last_login', 'first_name', 'last_name', 'email', 'dit_team')
-        depth = 1
 
 
 class CompanySerializerReadV1(serializers.ModelSerializer):

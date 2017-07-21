@@ -1,4 +1,5 @@
 """Company and related resources view sets."""
+from django.db.models import Prefetch
 from django_filters import FilterSet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, viewsets
@@ -7,7 +8,9 @@ from rest_framework.filters import OrderingFilter
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.serializers import AuditSerializer
 from datahub.core.viewsets import CoreViewSetV1, CoreViewSetV3
+from datahub.investment.queryset import get_slim_investment_project_queryset
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
+from .queryset import get_contact_queryset
 from .serializers import (
     AdviserSerializer, CompaniesHouseCompanySerializer,
     CompanySerializerReadV1, CompanySerializerV3, CompanySerializerWriteV1,
@@ -42,25 +45,25 @@ class CompanyViewSetV3(ArchivableViewSetMixin, CoreViewSetV3):
 
     serializer_class = CompanySerializerV3
     queryset = Company.objects.select_related(
-        'archived_by',
-        'registered_address_country',
-        'trading_address_country',
         'account_manager',
+        'archived_by',
         'business_type',
         'classification',
         'employee_range',
         'headquarter_type',
         'one_list_account_owner',
         'parent',
+        'registered_address_country',
         'sector',
+        'trading_address_country',
         'turnover_range',
         'uk_region',
     ).prefetch_related(
-        'investor_investment_projects',
+        Prefetch('contacts', queryset=get_contact_queryset()),
+        Prefetch('investor_investment_projects', queryset=get_slim_investment_project_queryset()),
         'children',
-        'contacts',
         'export_to_countries',
-        'future_interest_countries'
+        'future_interest_countries',
     )
 
 
@@ -84,13 +87,7 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     """Contact ViewSet v3."""
 
     serializer_class = ContactSerializer
-    queryset = Contact.objects.select_related(
-        'title',
-        'company',
-        'adviser',
-        'address_country',
-        'archived_by'
-    )
+    queryset = get_contact_queryset()
     filter_backends = (
         DjangoFilterBackend,
     )
