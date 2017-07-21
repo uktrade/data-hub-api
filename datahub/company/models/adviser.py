@@ -52,7 +52,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     Advisor is a legacy name mistakenly used, but hard to change now.
     """
 
-    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     first_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     last_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     email = CICharField(max_length=MAX_LENGTH, unique=True)  # CDMS users may not have tld
@@ -107,4 +107,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
     class Meta:  # noqa: D101
+        indexes = [
+            models.Index(fields=['first_name', 'last_name']),
+        ]
         verbose_name = 'adviser'

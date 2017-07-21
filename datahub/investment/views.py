@@ -1,5 +1,6 @@
 """Investment views."""
 from django.db import transaction
+from django.db.models import Prefetch
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -18,6 +19,9 @@ from datahub.investment.serializers import (
     IProjectDocumentSerializer, IProjectSerializer, IProjectTeamMemberSerializer,
     UploadStatusSerializer
 )
+
+
+_team_member_queryset = InvestmentProjectTeamMember.objects.select_related('adviser')
 
 
 class IProjectAuditViewSet(CoreViewSetV3):
@@ -44,6 +48,8 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'stage',
         'investor_company',
         'intermediate_company',
+        'uk_company',
+        'investmentprojectcode',
         'client_relationship_manager',
         'referral_source_adviser',
         'referral_source_activity',
@@ -63,6 +69,7 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'competitor_countries',
         'uk_region_locations',
         'strategic_drivers',
+        Prefetch('team_members', queryset=_team_member_queryset),
     )
     filter_backends = (DjangoFilterBackend,)
     filter_fields = ('investor_company_id',)
@@ -78,7 +85,7 @@ class IProjectTeamMembersViewSet(CoreViewSetV3):
     serializer_class = IProjectTeamMemberSerializer
     lookup_field = 'adviser_id'
     lookup_url_kwarg = 'adviser_pk'
-    queryset = InvestmentProjectTeamMember.objects.select_related('adviser')
+    queryset = _team_member_queryset
 
     def get_queryset(self):
         """Filters the query set to the specified project."""

@@ -221,6 +221,20 @@ class IProjectTeamMemberSerializer(serializers.ModelSerializer):
         fields = ('investment_project', 'adviser', 'role')
 
 
+class NestedIProjectTeamMemberSerializer(serializers.ModelSerializer):
+    """Serialiser for investment project team members when nested in the main investment
+    project object.
+
+    Used to exclude the investment project from the serialised representation.
+    """
+
+    adviser = NestedAdviserField()
+
+    class Meta:  # noqa: D101
+        model = InvestmentProjectTeamMember
+        fields = ('adviser', 'role')
+
+
 class IProjectTeamSerializer(serializers.ModelSerializer):
     """Serialiser for investment project team objects."""
 
@@ -232,7 +246,7 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
     project_assurance_team = NestedRelatedField(
         meta_models.Team, read_only=True
     )
-    team_members = IProjectTeamMemberSerializer(many=True, read_only=True)
+    team_members = NestedIProjectTeamMemberSerializer(many=True, read_only=True)
     team_complete = serializers.SerializerMethodField()
 
     def get_team_complete(self, instance):

@@ -212,6 +212,8 @@ class SearchInvestmentProjectAPIView(APIView):
         except ValueError:
             raise ValidationError('Date(s) in incorrect format.')
 
+        original_query = request.data.get('original_query', '')
+
         sortby = request.data.get('sortby')
         if sortby:
             field = sortby.rsplit(':')[0]
@@ -222,7 +224,7 @@ class SearchInvestmentProjectAPIView(APIView):
         limit = int(request.data.get('limit', 100))
 
         results = elasticsearch.get_search_investment_project_query(
-            term='',
+            term=original_query,
             filters=filters,
             ranges=ranges,
             field_order=sortby,
