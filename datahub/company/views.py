@@ -8,29 +8,14 @@ from rest_framework.filters import OrderingFilter
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.serializers import AuditSerializer
 from datahub.core.viewsets import CoreViewSetV1, CoreViewSetV3
-from datahub.investment.models import InvestmentProject
+from datahub.investment.queryset import get_slim_investment_project_queryset
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
+from .queryset import get_contact_queryset
 from .serializers import (
     AdviserSerializer, CompaniesHouseCompanySerializer,
     CompanySerializerReadV1, CompanySerializerV3, CompanySerializerWriteV1,
     ContactSerializer
 )
-
-
-def _get_contact_queryset():
-    return Contact.objects.select_related(
-        'title',
-        'company',
-        'adviser',
-        'address_country',
-        'archived_by'
-    )
-
-
-def _get_slim_investment_project_queryset():
-    return InvestmentProject.objects.select_related(
-        'investmentprojectcode',
-    )
 
 
 class CompanyViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
@@ -74,9 +59,8 @@ class CompanyViewSetV3(ArchivableViewSetMixin, CoreViewSetV3):
         'turnover_range',
         'uk_region',
     ).prefetch_related(
-        Prefetch('contacts', queryset=_get_contact_queryset()),
-        Prefetch('investor_investment_projects',
-                 queryset=InvestmentProject.objects.select_related('investmentprojectcode')),
+        Prefetch('contacts', queryset=get_contact_queryset()),
+        Prefetch('investor_investment_projects', queryset=get_slim_investment_project_queryset()),
         'children',
         'export_to_countries',
         'future_interest_countries',
@@ -103,7 +87,7 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     """Contact ViewSet v3."""
 
     serializer_class = ContactSerializer
-    queryset = _get_contact_queryset()
+    queryset = get_contact_queryset()
     filter_backends = (
         DjangoFilterBackend,
     )
