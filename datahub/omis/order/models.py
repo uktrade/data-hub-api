@@ -15,7 +15,7 @@ class Order(BaseModel):
     Details regarding an OMIS Order.
     """
 
-    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     reference = models.CharField(max_length=100)
 
     company = models.ForeignKey(
