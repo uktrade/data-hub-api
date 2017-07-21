@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
                 ('address_line_3', models.CharField(blank=True, max_length=255, null=True)),
                 ('address_line_postcode', models.CharField(blank=True, max_length=255, null=True)),
                 ('client_considering_other_countries', models.NullBooleanField()),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, primary_key=True, serialize=False)),
+                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('average_salary', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='metadata.SalaryRange')),
                 ('business_activities', models.ManyToManyField(blank=True, related_name='_investmentproject_business_activities_+', to='metadata.InvestmentBusinessActivity')),
                 ('client_contacts', models.ManyToManyField(blank=True, related_name='investment_projects', to='company.Contact')),

@@ -53,7 +53,7 @@ class Company(ArchivableModel, CompanyAbstract):
     )
 
     company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     alias = models.CharField(
         max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name'
     )

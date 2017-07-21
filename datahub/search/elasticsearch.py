@@ -63,7 +63,9 @@ def get_sort_query(qs, field_order=None):
     order = tokens[1] if len(tokens) > 1 else 'asc'
 
     qs = qs.sort({
-        remap_sort_field(tokens[0]): {'order': order}
+        remap_sort_field(tokens[0]): {'order': order,
+                                      'missing': '_first' if order == 'asc' else '_last'
+                                      }
     })
     return qs
 
