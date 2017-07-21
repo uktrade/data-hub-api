@@ -13,12 +13,18 @@ class InteractionViewSetV1(CoreViewSetV1):
 
     read_serializer_class = InteractionSerializerRead
     write_serializer_class = InteractionSerializerWrite
+    # It's difficult to include everything in select_related() and prefetch_related()
+    # because of the excessive nesting in this v1 endpoint.
     queryset = Interaction.objects.select_related(
-        'interaction_type',
-        'dit_adviser',
         'company',
-        'contact'
-    ).all()
+        'contact',
+        'dit_adviser',
+        'dit_team',
+        'interaction_type',
+        'service',
+        'contact__company',
+        'investment_project__investor_company',
+    )
     filter_backends = (
         DjangoFilterBackend,
     )
