@@ -79,7 +79,7 @@ class OrderSubscriber(BaseModel):
     A subscribed adviser receives notifications when new changes happen to an Order.
     """
 
-    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     order = models.ForeignKey(
         Order, on_delete=models.CASCADE, related_name='subscribers'
     )
