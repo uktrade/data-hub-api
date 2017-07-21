@@ -214,10 +214,10 @@ class TestChangeSubscriberList(APITestMixin):
     def test_change_existing_list(self):
         """
         Test that calling PUT with a different list of advisers completely changes
-        the subscriber list.
-        It keeps the advisers passed in that were already on the list.
-        It removes the advisers what were on the list but not any more.
-        It adds new advisers.
+        the subscriber list:
+        - advisers not in the list will be removed
+        - new advisers will be added
+        - existing advisers will be kept
         """
         previous_advisers = AdviserFactory.create_batch(2)
         order = OrderFactory()
