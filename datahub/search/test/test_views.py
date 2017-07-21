@@ -11,6 +11,7 @@ from datahub.core import constants
 from datahub.core.test_utils import (
     APITestMixin, synchronous_executor_submit, synchronous_transaction_on_commit,
 )
+from datahub.investment.test.factories import InvestmentProjectFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -333,3 +334,49 @@ class TestSearch(APITestMixin):
         })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_sort_asc_with_null_values(self):
+        """Tests quality of results."""
+        InvestmentProjectFactory(name='Earth 1', total_investment=1000).save()
+        InvestmentProjectFactory(name='Earth 2').save()
+
+        connections.get_connection().indices.refresh()
+
+        term = 'Earth'
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(url, {
+            'original_query': term,
+            'sortby': 'total_investment:asc'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert [('Earth 2', None),
+                ('Earth 1', 1000)] == [(investment['name'], investment['total_investment'],)
+                                       for investment in response.data['results']]
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_sort_desc_with_null_values(self):
+        """Tests quality of results."""
+        InvestmentProjectFactory(name='Ether 1', total_investment=1000).save()
+        InvestmentProjectFactory(name='Ether 2').save()
+
+        connections.get_connection().indices.refresh()
+
+        term = 'Ether'
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(url, {
+            'original_query': term,
+            'sortby': 'total_investment:desc'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert [('Ether 1', 1000),
+                ('Ether 2', None)] == [(investment['name'], investment['total_investment'],)
+                                       for investment in response.data['results']]
