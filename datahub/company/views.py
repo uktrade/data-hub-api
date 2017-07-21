@@ -128,7 +128,9 @@ class AdviserReadOnlyViewSetV1(
     """Adviser GET only views."""
 
     serializer_class = AdviserSerializer
-    queryset = Advisor.objects.all()
+    queryset = Advisor.objects.select_related(
+        'dit_team',
+    )
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
