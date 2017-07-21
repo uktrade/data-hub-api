@@ -107,4 +107,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
     class Meta:  # noqa: D101
+        indexes = [
+            models.Index(fields=['first_name', 'last_name']),
+        ]
         verbose_name = 'adviser'
