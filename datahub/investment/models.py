@@ -216,7 +216,7 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
                         IProjectTeamAbstract, BaseModel):
     """An investment project."""
 
-    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
     def __str__(self):
         """Human-readable name for admin section etc."""

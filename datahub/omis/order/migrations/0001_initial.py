@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('created_on', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modified_on', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, primary_key=True, serialize=False)),
+                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('reference', models.CharField(max_length=100)),
                 ('company', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='orders', to='company.Company')),
                 ('contact', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='orders', to='company.Contact')),

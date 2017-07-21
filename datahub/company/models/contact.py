@@ -20,7 +20,7 @@ class Contact(ArchivableModel, BaseModel):
         'address_town'
     )
 
-    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     title = models.ForeignKey(
         metadata_models.Title, blank=True, null=True, on_delete=models.SET_NULL
     )
