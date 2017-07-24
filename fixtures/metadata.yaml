@@ -7077,238 +7077,340 @@
 
 # Service delivery status
 - model: metadata.servicedeliverystatus
-  fields: {id: "42099351-5224-e311-a78e-e4115bead28a", name: "UKEF - Application Approved"}
+  pk: 42099351-5224-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - Application Approved"}
 - model: metadata.servicedeliverystatus
-  fields: {id: "10cc8460-5224-e311-a78e-e4115bead28a", name: "UKEF - Application Denied"}
+  pk: 10cc8460-5224-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - Application Denied"}
 - model: metadata.servicedeliverystatus
-  fields: {id: "8843926e-5224-e311-a78e-e4115bead28a", name: "UKEF - Application Received"}
+  pk: 8843926e-5224-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - Application Received"}
 - model: metadata.servicedeliverystatus
-  fields: {id: "08a96e7d-5224-e311-a78e-e4115bead28a", name: "UKEF - Closed"}
+  pk: 08a96e7d-5224-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - Closed"}
 - model: metadata.servicedeliverystatus
-  fields: {id: "1c981688-5224-e311-a78e-e4115bead28a", name: "UKEF - Deal Not Proceeding to Application"}
+  pk: 1c981688-5224-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - Deal Not Proceeding to Application"}
 - model: metadata.servicedeliverystatus
-  fields: {id: "10c59b97-5224-e311-a78e-e4115bead28a", name: "UKEF - In Discussion - Awaiting Financials"}
+  pk: 10c59b97-5224-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - In Discussion - Awaiting Financials"}
 - model: metadata.servicedeliverystatus
-  fields: {id: "53fa1da6-5224-e311-a78e-e4115bead28a", name: "UKEF - In Discussion - Application Likely"}
+  pk: 53fa1da6-5224-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - In Discussion - Application Likely"}
 - model: metadata.servicedeliverystatus
-  fields: {id: "5e9401b1-5224-e311-a78e-e4115bead28a", name: "UKEF - In Discussion - Early Stage"}
+  pk: 5e9401b1-5224-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - In Discussion - Early Stage"}
 - model: metadata.servicedeliverystatus
-  fields: {id: "0ad733bd-5224-e311-a78e-e4115bead28a", name: "UKEF - In Discussion - RAU Reviewed"}
+  pk: 0ad733bd-5224-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - In Discussion - RAU Reviewed"}
 - model: metadata.servicedeliverystatus
-  fields: {id: "45329c18-6095-e211-a939-e4115bead28a", name: "Offered"}
+  pk: 45329c18-6095-e211-a939-e4115bead28a
+  fields: {name: "Offered"}
 - model: metadata.servicedeliverystatus
-  fields: {id: "46329c18-6095-e211-a939-e4115bead28a", name: "Current"}
+  pk: 46329c18-6095-e211-a939-e4115bead28a
+  fields: {name: "Current"}
 - model: metadata.servicedeliverystatus
-  fields: {id: "47329c18-6095-e211-a939-e4115bead28a", name: "Completed"}
+  pk: 47329c18-6095-e211-a939-e4115bead28a
+  fields: {name: "Completed"}
 - model: metadata.servicedeliverystatus
-  fields: {id: "48329c18-6095-e211-a939-e4115bead28a", name: "Withdrawn"}
+  pk: 48329c18-6095-e211-a939-e4115bead28a
+  fields: {name: "Withdrawn"}
 - model: metadata.servicedeliverystatus
-  fields: {id: "49329c18-6095-e211-a939-e4115bead28a", name: "On Hold"}
+  pk: 49329c18-6095-e211-a939-e4115bead28a
+  fields: {name: "On Hold"}
 
 
 # Investmentprojectstage
 - model: metadata.investmentprojectstage
-  fields: {id: 8a320cc9-ae2e-443e-9d26-2f36452c2ced, name: "Prospect", order: 200.0}
+  pk: 8a320cc9-ae2e-443e-9d26-2f36452c2ced
+  fields: {name: "Prospect", order: 200.0}
 - model: metadata.investmentprojectstage
-  fields: {id: c9864359-fb1a-4646-a4c1-97d10189fc03, name: "Assign PM", order: 300.0}
+  pk: c9864359-fb1a-4646-a4c1-97d10189fc03
+  fields: {name: "Assign PM", order: 300.0}
 - model: metadata.investmentprojectstage
-  fields: {id: 7606cc19-20da-4b74-aba1-2cec0d753ad8, name: "Active", order: 400.0}
+  pk: 7606cc19-20da-4b74-aba1-2cec0d753ad8
+  fields: {name: "Active", order: 400.0}
 - model: metadata.investmentprojectstage
-  fields: {id: 49b8f6f3-0c50-4150-a965-2c974f3149e3, name: "Verify win", order: 500.0}
+  pk: 49b8f6f3-0c50-4150-a965-2c974f3149e3
+  fields: {name: "Verify win", order: 500.0}
 - model: metadata.investmentprojectstage
-  fields: {id: 945ea6d1-eee3-4f5b-9144-84a75b71b8e6, name: "Won", order: 600.0}
+  pk: 945ea6d1-eee3-4f5b-9144-84a75b71b8e6
+  fields: {name: "Won", order: 600.0}
 
 
 # InvestmentType
 - model: metadata.investmenttype
-  fields: {id: 3e143372-496c-4d1e-8278-6fdd3da9b48b, name: "FDI"}
+  pk: 3e143372-496c-4d1e-8278-6fdd3da9b48b
+  fields: {name: "FDI"}
 - model: metadata.investmenttype
-  fields: {id: 9c364e64-2b28-401b-b2df-50e08b0bca44, name: "Non-FDI"}
+  pk: 9c364e64-2b28-401b-b2df-50e08b0bca44
+  fields: {name: "Non-FDI"}
 - model: metadata.investmenttype
-  fields: {id: 031269ab-b7ec-40e9-8a4e-7371404f0622, name: "Commitment to invest"}
+  pk: 031269ab-b7ec-40e9-8a4e-7371404f0622
+  fields: {name: "Commitment to invest"}
 
 
 # FDIType
 - model: metadata.fditype
-  fields: {id: f8447013-cfdc-4f35-a146-6619665388b3, name: "Creation of new site or activity"}
+  pk: f8447013-cfdc-4f35-a146-6619665388b3
+  fields: {name: "Creation of new site or activity"}
 - model: metadata.fditype
-  fields: {id: d08a2f07-c366-4133-9a7e-35b6c88a3270, name: "Expansion of existing site or activity"}
+  pk: d08a2f07-c366-4133-9a7e-35b6c88a3270
+  fields: {name: "Expansion of existing site or activity"}
 - model: metadata.fditype
-  fields: {id: 32018db0-fd2d-4b8c-aee4-a931bde3abe8, name: "Merger"}
+  pk: 32018db0-fd2d-4b8c-aee4-a931bde3abe8
+  fields: {name: "Merger"}
 - model: metadata.fditype
-  fields: {id: ac035522-ad0b-4eeb-87f4-0ce964e4b104, name: "Acquisition"}
+  pk: ac035522-ad0b-4eeb-87f4-0ce964e4b104
+  fields: {name: "Acquisition"}
 - model: metadata.fditype
-  fields: {id: a7dbf6b3-9c04-43a7-9be9-d3072f138fab, name: "Joint venture"}
+  pk: a7dbf6b3-9c04-43a7-9be9-d3072f138fab
+  fields: {name: "Joint venture"}
 - model: metadata.fditype
-  fields: {id: 0657168e-8a58-4f37-914f-ec541556fc28, name: "Retention"}
+  pk: 0657168e-8a58-4f37-914f-ec541556fc28
+  fields: {name: "Retention"}
 - model: metadata.fditype
-  fields: {id: 840f62c1-bbcb-44e4-b6d4-a258d2ffa07d, name: "Capital only"}
+  pk: 840f62c1-bbcb-44e4-b6d4-a258d2ffa07d
+  fields: {name: "Capital only"}
 
 
 # NonFDIType
 - model: metadata.nonfditype
-  fields: {id: 2eba3d6a-b1ef-4075-a053-9d70813f7447, name: "Advanced Engineering Supply Chain"}
+  pk: 2eba3d6a-b1ef-4075-a053-9d70813f7447
+  fields: {name: "Advanced Engineering Supply Chain"}
 - model: metadata.nonfditype
-  fields: {id: de91ac0e-85ab-4a31-aac5-533b0844793e, name: "Business Partnership"}
+  pk: de91ac0e-85ab-4a31-aac5-533b0844793e
+  fields: {name: "Business Partnership"}
 - model: metadata.nonfditype
-  fields: {id: 96d3520f-b3b8-4c7e-bf26-baf1442e09c2, name: "Contract Research"}
+  pk: 96d3520f-b3b8-4c7e-bf26-baf1442e09c2
+  fields: {name: "Contract Research"}
 - model: metadata.nonfditype
-  fields: {id: 2b304a8f-40a2-4a0b-b095-3094a411a6e1, name: "Global Entrepreneur Programme"}
+  pk: 2b304a8f-40a2-4a0b-b095-3094a411a6e1
+  fields: {name: "Global Entrepreneur Programme"}
 - model: metadata.nonfditype
-  fields: {id: bf9313fe-fb8e-44dd-a4ae-566d7701311f, name: "Graduate Entrepreneur Programme"}
+  pk: bf9313fe-fb8e-44dd-a4ae-566d7701311f
+  fields: {name: "Graduate Entrepreneur Programme"}
 - model: metadata.nonfditype
-  fields: {id: 5f1f798c-8db7-49cd-9945-82b823f96cac, name: "GREAT Investors Programme"}
+  pk: 5f1f798c-8db7-49cd-9945-82b823f96cac
+  fields: {name: "GREAT Investors Programme"}
 - model: metadata.nonfditype
-  fields: {id: ed4223da-27f7-47bf-bca5-78725119c2c0, name: "HQ-UK"}
+  pk: ed4223da-27f7-47bf-bca5-78725119c2c0
+  fields: {name: "HQ-UK"}
 - model: metadata.nonfditype
-  fields: {id: 992f4f01-e915-4f81-89bb-ca2c8fab3c3f, name: "Institutional Investment & Infrastructure"}
+  pk: 992f4f01-e915-4f81-89bb-ca2c8fab3c3f
+  fields: {name: "Institutional Investment & Infrastructure"}
 - model: metadata.nonfditype
-  fields: {id: 58bdb479-4dc7-42e2-8ab2-76895c51ce60, name: "Innovation Gateway"}
+  pk: 58bdb479-4dc7-42e2-8ab2-76895c51ce60
+  fields: {name: "Innovation Gateway"}
 - model: metadata.nonfditype
-  fields: {id: ab6317c2-31a3-4b67-88e1-2bdf7444ddfd, name: "Infrastructure Investment"}
+  pk: ab6317c2-31a3-4b67-88e1-2bdf7444ddfd
+  fields: {name: "Infrastructure Investment"}
 - model: metadata.nonfditype
-  fields: {id: b5e55e20-c97a-47f3-bf8c-8d443e7c716c, name: "Invest in GREAT Britain"}
+  pk: b5e55e20-c97a-47f3-bf8c-8d443e7c716c
+  fields: {name: "Invest in GREAT Britain"}
 - model: metadata.nonfditype
-  fields: {id: 7783ae75-a044-44ec-811f-438f8688df7a, name: "Regeneration Investment Organisation"}
+  pk: 7783ae75-a044-44ec-811f-438f8688df7a
+  fields: {name: "Regeneration Investment Organisation"}
 - model: metadata.nonfditype
-  fields: {id: c0d832c5-2659-4c4b-bef4-0083da71fb26, name: "R&D Collaboration"}
+  pk: c0d832c5-2659-4c4b-bef4-0083da71fb26
+  fields: {name: "R&D Collaboration"}
 - model: metadata.nonfditype
-  fields: {id: 00874a34-fae9-4a4a-b708-3147ee5e3d20, name: "R&D Partnership"}
+  pk: 00874a34-fae9-4a4a-b708-3147ee5e3d20
+  fields: {name: "R&D Partnership"}
 - model: metadata.nonfditype
-  fields: {id: c02a04e1-a07d-41a6-a7bd-2dbaf52c21cd, name: "Screen Production Investment"}
+  pk: c02a04e1-a07d-41a6-a7bd-2dbaf52c21cd
+  fields: {name: "Screen Production Investment"}
 - model: metadata.nonfditype
-  fields: {id: b4235c74-6d57-492f-94ed-bbef41f41bfe, name: "Sirius (Graduate Entrepreneurs)"}
+  pk: b4235c74-6d57-492f-94ed-bbef41f41bfe
+  fields: {name: "Sirius (Graduate Entrepreneurs)"}
 - model: metadata.nonfditype
-  fields: {id: abdbf5f5-9a1a-41f2-ab8c-78e7da6cba29, name: "Space"}
+  pk: abdbf5f5-9a1a-41f2-ab8c-78e7da6cba29
+  fields: {name: "Space"}
 - model: metadata.nonfditype
-  fields: {id: 0c69910e-470d-4a7e-a5c7-4656799eb034, name: "SRM Programme"}
+  pk: 0c69910e-470d-4a7e-a5c7-4656799eb034
+  fields: {name: "SRM Programme"}
 - model: metadata.nonfditype
-  fields: {id: 113a32f1-fc40-4b05-ad89-3ab48f66c6f9, name: "University Collaboration"}
+  pk: 113a32f1-fc40-4b05-ad89-3ab48f66c6f9
+  fields: {name: "University Collaboration"}
 - model: metadata.nonfditype
-  fields: {id: c5035b66-9ee8-44f3-b6dc-2897da9625e9, name: "Venture/Equity Capital"}
+  pk: c5035b66-9ee8-44f3-b6dc-2897da9625e9
+  fields: {name: "Venture/Equity Capital"}
 
 
 # ReferralSourceActivity
 - model: metadata.referralsourceactivity
-  fields: {id: 0c4f8e74-d34f-4aca-b764-a44cdc2d0087, name: "Cold call"}
+  pk: 0c4f8e74-d34f-4aca-b764-a44cdc2d0087
+  fields: {name: "Cold call"}
 - model: metadata.referralsourceactivity
-  fields: {id: 7d98f3a6-3e3f-40ac-a6f3-3f0c251ec1d2, name: "Direct enquiry"}
+  pk: 7d98f3a6-3e3f-40ac-a6f3-3f0c251ec1d2
+  fields: {name: "Direct enquiry"}
 - model: metadata.referralsourceactivity
-  fields: {id: 3816a95b-6a76-4ad0-8ae9-b0d7e7d2b79c, name: "Event"}
+  pk: 3816a95b-6a76-4ad0-8ae9-b0d7e7d2b79c
+  fields: {name: "Event"}
 - model: metadata.referralsourceactivity
-  fields: {id: 0acf0e68-e09e-4e5d-92b6-e72e5a5c7ea4, name: "Marketing"}
+  pk: 0acf0e68-e09e-4e5d-92b6-e72e5a5c7ea4
+  fields: {name: "Marketing"}
 - model: metadata.referralsourceactivity
-  fields: {id: e95cddb3-9407-4c8a-b5a6-2616117b0aae, name: "Multiplier"}
+  pk: e95cddb3-9407-4c8a-b5a6-2616117b0aae
+  fields: {name: "Multiplier"}
 - model: metadata.referralsourceactivity
-  fields: {id: aba8f653-264f-48d8-950e-07f9c418c7b0, name: "None"}
+  pk: aba8f653-264f-48d8-950e-07f9c418c7b0
+  fields: {name: "None"}
 - model: metadata.referralsourceactivity
-  fields: {id: 318e6e9e-2a0e-4e4b-a495-c48aeee4b996, name: "Other"}
+  pk: 318e6e9e-2a0e-4e4b-a495-c48aeee4b996
+  fields: {name: "Other"}
 - model: metadata.referralsourceactivity
-  fields: {id: 668e999c-a669-4d9b-bfbf-6275ceed86da, name: "Relationship management activity"}
+  pk: 668e999c-a669-4d9b-bfbf-6275ceed86da
+  fields: {name: "Relationship management activity"}
 - model: metadata.referralsourceactivity
-  fields: {id: c03c4043-18b4-4463-a36b-a1af1b35f95d, name: "Personal reference"}
+  pk: c03c4043-18b4-4463-a36b-a1af1b35f95d
+  fields: {name: "Personal reference"}
 - model: metadata.referralsourceactivity
-  fields: {id: 812b2f62-fe62-4cc8-b69c-58f3e2ebac17, name: "Website"}
+  pk: 812b2f62-fe62-4cc8-b69c-58f3e2ebac17
+  fields: {name: "Website"}
 
 
 # ReferralSourceWebsite
 - model: metadata.referralsourcewebsite
-  fields: {id: b5b26c78-8e97-47b4-9014-6d4a3e40b257, name: "Exporting is Great - Campaign"}
+  pk: b5b26c78-8e97-47b4-9014-6d4a3e40b257
+  fields: {name: "Exporting is Great - Campaign"}
 - model: metadata.referralsourcewebsite
-  fields: {id: afefa334-d96f-4a80-acb8-abf537bd3ae7, name: "Invest in GREAT Britain"}
+  pk: afefa334-d96f-4a80-acb8-abf537bd3ae7
+  fields: {name: "Invest in GREAT Britain"}
 - model: metadata.referralsourcewebsite
-  fields: {id: cbde665e-9121-46d5-ba54-24e1e6c4aa77, name: "DIT Global Website"}
+  pk: cbde665e-9121-46d5-ba54-24e1e6c4aa77
+  fields: {name: "DIT Global Website"}
 - model: metadata.referralsourcewebsite
-  fields: {id: 7524c091-2d60-4a52-90e3-cc647c92b140, name: "DIT Regional Website"}
+  pk: 7524c091-2d60-4a52-90e3-cc647c92b140
+  fields: {name: "DIT Regional Website"}
 - model: metadata.referralsourcewebsite
-  fields: {id: 072241d4-22d0-4657-8d8e-1848a0519b0a, name: "Other website"}
+  pk: 072241d4-22d0-4657-8d8e-1848a0519b0a
+  fields: {name: "Other website"}
 
 
 # ReferralSourceMarketing
 - model: metadata.referralsourcemarketing
-  fields: {id: 3be91b40-6c5a-466c-a217-01b028701c08, name: "Email"}
+  pk: 3be91b40-6c5a-466c-a217-01b028701c08
+  fields: {name: "Email"}
 - model: metadata.referralsourcemarketing
-  fields: {id: 36c51095-5b4e-49a7-ab1a-3df086988384, name: "Magazine"}
+  pk: 36c51095-5b4e-49a7-ab1a-3df086988384
+  fields: {name: "Magazine"}
 - model: metadata.referralsourcemarketing
-  fields: {id: 9227c6c2-2cb1-4284-8ce5-bc77d5cb1430, name: "Mail shot"}
+  pk: 9227c6c2-2cb1-4284-8ce5-bc77d5cb1430
+  fields: {name: "Mail shot"}
 - model: metadata.referralsourcemarketing
-  fields: {id: 0d46127c-7ef8-4e8f-a6b7-db66e1dfcd1d, name: "Press advertisement"}
+  pk: 0d46127c-7ef8-4e8f-a6b7-db66e1dfcd1d
+  fields: {name: "Press advertisement"}
 - model: metadata.referralsourcemarketing
-  fields: {id: 38e278fe-c049-4573-b773-8993db0e0bcd, name: "Press article"}
+  pk: 38e278fe-c049-4573-b773-8993db0e0bcd
+  fields: {name: "Press article"}
 - model: metadata.referralsourcemarketing
-  fields: {id: 305dd66b-e416-4cac-981b-bca32e18bd49, name: "Telemarketing"}
+  pk: 305dd66b-e416-4cac-981b-bca32e18bd49
+  fields: {name: "Telemarketing"}
 - model: metadata.referralsourcemarketing
-  fields: {id: c28d95c6-f094-4f97-b372-38815829a0f0, name: "Television/radio"}
+  pk: c28d95c6-f094-4f97-b372-38815829a0f0
+  fields: {name: "Television/radio"}
 
 
 # InvestmentBusinessActivity
 - model: metadata.investmentbusinessactivity
-  fields: {id: a2dbd807-ae52-421c-8d1d-88adfc7a506b, name: "Retail"}
+  pk: a2dbd807-ae52-421c-8d1d-88adfc7a506b
+  fields: {name: "Retail"}
 - model: metadata.investmentbusinessactivity
-  fields: {id: 42b8d11b-dbe7-45b8-985e-c9222c459287, name: "Assembly"}
+  pk: 42b8d11b-dbe7-45b8-985e-c9222c459287
+  fields: {name: "Assembly"}
 - model: metadata.investmentbusinessactivity
-  fields: {id: 410da69e-0247-48cf-9f72-fbc10ed7a4fc, name: "Call centre"}
+  pk: 410da69e-0247-48cf-9f72-fbc10ed7a4fc
+  fields: {name: "Call centre"}
 - model: metadata.investmentbusinessactivity
-  fields: {id: 7e7fbced-143a-43ac-822b-a8411e7400b4, name: "Distribution"}
+  pk: 7e7fbced-143a-43ac-822b-a8411e7400b4
+  fields: {name: "Distribution"}
 - model: metadata.investmentbusinessactivity
-  fields: {id: 2527f728-cc5f-4481-ba42-13957d249b3b, name: "E-commerce"}
+  pk: 2527f728-cc5f-4481-ba42-13957d249b3b
+  fields: {name: "E-commerce"}
 - model: metadata.investmentbusinessactivity
-  fields: {id: fc68d540-a00a-40f8-8b39-05e12fcb856f, name: "European headquarters"}
+  pk: fc68d540-a00a-40f8-8b39-05e12fcb856f
+  fields: {name: "European headquarters"}
 - model: metadata.investmentbusinessactivity
-  fields: {id: 77be20b3-05bf-4e06-a517-6989f8b9b922, name: "Manufacturing"}
+  pk: 77be20b3-05bf-4e06-a517-6989f8b9b922
+  fields: {name: "Manufacturing"}
 - model: metadata.investmentbusinessactivity
-  fields: {id: c40e4af0-382e-44a7-b756-97f180230096, name: "Research & development (R&D)"}
+  pk: c40e4af0-382e-44a7-b756-97f180230096
+  fields: {name: "Research & development (R&D)"}
 - model: metadata.investmentbusinessactivity
-  fields: {id: 257f720f-42df-4f85-8e43-c83e4e03dc79, name: "Headquarters"}
+  pk: 257f720f-42df-4f85-8e43-c83e4e03dc79
+  fields: {name: "Headquarters"}
 - model: metadata.investmentbusinessactivity
-  fields: {id: 30348f9d-a82e-4215-ba3f-85cbbd14763a, name: "Knowledge centre"}
+  pk: 30348f9d-a82e-4215-ba3f-85cbbd14763a
+  fields: {name: "Knowledge centre"}
 - model: metadata.investmentbusinessactivity
-  fields: {id: 71946309-c92c-4c5b-9c42-8502cc74c72e, name: "Sales"}
+  pk: 71946309-c92c-4c5b-9c42-8502cc74c72e
+  fields: {name: "Sales"}
 - model: metadata.investmentbusinessactivity
-  fields: {id: 2f51ea6a-ca2f-466a-87fd-5f79ebfec125, name: "Services"}
+  pk: 2f51ea6a-ca2f-466a-87fd-5f79ebfec125
+  fields: {name: "Services"}
 - model: metadata.investmentbusinessactivity
-  fields: {id: 93959cec-7250-4c0a-9466-af4ebaf4a676, name: "Shared service centre"}
+  pk: 93959cec-7250-4c0a-9466-af4ebaf4a676
+  fields: {name: "Shared service centre"}
 - model: metadata.investmentbusinessactivity
-  fields: {id: befab707-5abd-4f47-8477-57f091e6dac9, name: "Other"}
+  pk: befab707-5abd-4f47-8477-57f091e6dac9
+  fields: {name: "Other"}
 
 # InvestmentStrategicDriver
 - model: metadata.investmentstrategicdriver
-  fields: {id: 382aa6d1-a362-4166-a09d-f579d9f3be75, name: "Access to market"}
+  pk: 382aa6d1-a362-4166-a09d-f579d9f3be75
+  fields: {name: "Access to market"}
 - model: metadata.investmentstrategicdriver
-  fields: {id: 03593ab6-b583-4620-b7dc-c5d194d16943, name: "Access to resources"}
+  pk: 03593ab6-b583-4620-b7dc-c5d194d16943
+  fields: {name: "Access to resources"}
 - model: metadata.investmentstrategicdriver
-  fields: {id: a2cef09f-cdbb-4eae-b191-0391260af9ad, name: "Access to clients"}
+  pk: a2cef09f-cdbb-4eae-b191-0391260af9ad
+  fields: {name: "Access to clients"}
 - model: metadata.investmentstrategicdriver
-  fields: {id: e6ebf75c-56a6-4cf3-ba67-9b479217d733, name: "Technology seeking"}
+  pk: e6ebf75c-56a6-4cf3-ba67-9b479217d733
+  fields: {name: "Technology seeking"}
 - model: metadata.investmentstrategicdriver
-  fields: {id: 7cc42486-30bb-46d5-813d-6ad1c918ef08, name: "Skills seeking"}
+  pk: 7cc42486-30bb-46d5-813d-6ad1c918ef08
+  fields: {name: "Skills seeking"}
 - model: metadata.investmentstrategicdriver
-  fields: {id: 8d0fbd93-e39c-4e55-8d80-955257906de9, name: "Proximity to supplier"}
+  pk: 8d0fbd93-e39c-4e55-8d80-955257906de9
+  fields: {name: "Proximity to supplier"}
 - model: metadata.investmentstrategicdriver
-  fields: {id: 15a69447-3802-4089-8dd1-b1175ab210fe, name: "Incentive driven"}
+  pk: 15a69447-3802-4089-8dd1-b1175ab210fe
+  fields: {name: "Incentive driven"}
 - model: metadata.investmentstrategicdriver
-  fields: {id: 7b80f131-90f7-49e3-80d2-6b31baabf227, name: "Regulatory driven"}
+  pk: 7b80f131-90f7-49e3-80d2-6b31baabf227
+  fields: {name: "Regulatory driven"}
 - model: metadata.investmentstrategicdriver
-  fields: {id: 1be97a9e-2e65-49ee-a420-ab8928d296e5, name: "Cost reduction"}
+  pk: 1be97a9e-2e65-49ee-a420-ab8928d296e5
+  fields: {name: "Cost reduction"}
 - model: metadata.investmentstrategicdriver
-  fields: {id: 611a661c-08fe-4924-8847-f3b1fb021313, name: "Other"}
+  pk: 611a661c-08fe-4924-8847-f3b1fb021313
+  fields: {name: "Other"}
 
 
 # SalaryRange
 - model: metadata.salaryrange
-  fields: {id: 2943bf3d-32dd-43be-8ad4-969b006dee7b, name: "Below £25,000", order: 100.0}
+  pk: 2943bf3d-32dd-43be-8ad4-969b006dee7b
+  fields: {name: "Below £25,000", order: 100.0}
 - model: metadata.salaryrange
-  fields: {id: 7e54d92f-d816-4918-8fdf-9553189d13d5, name: "£25,000 – £29,000", order: 200.0}
+  pk: 7e54d92f-d816-4918-8fdf-9553189d13d5
+  fields: {name: "£25,000 – £29,000", order: 200.0}
 - model: metadata.salaryrange
-  fields: {id: 90049e2b-e70c-4f20-ba0e-f98772d631e7, name: "£30,000 – £34,000", order: 300.0}
+  pk: 90049e2b-e70c-4f20-ba0e-f98772d631e7
+  fields: {name: "£30,000 – £34,000", order: 300.0}
 - model: metadata.salaryrange
-  fields: {id: f41e3603-90f7-46b8-b201-5b4eecb4bea5, name: "£35,000 and above", order: 400.0}
+  pk: f41e3603-90f7-46b8-b201-5b4eecb4bea5
+  fields: {name: "£35,000 and above", order: 400.0}
 
 
 # FDIValue
 - model: metadata.fdivalue
-  fields: {id: 38e36c77-61ad-4186-a7a8-ac6a1a1104c6, name: "Higher", order: 100.0}
+  pk: 38e36c77-61ad-4186-a7a8-ac6a1a1104c6
+  fields: {name: "Higher", order: 100.0}
 - model: metadata.fdivalue
-  fields: {id: 002c18d9-f5c7-4f3c-b061-aee09fce8416, name: "Good", order: 200.0}
+  pk: 002c18d9-f5c7-4f3c-b061-aee09fce8416
+  fields: {name: "Good", order: 200.0}
 - model: metadata.fdivalue
-  fields: {id: 2bacde8d-128f-4d0a-849b-645ceafe4cf9, name: "Standard", order: 300.0}
+  pk: 2bacde8d-128f-4d0a-849b-645ceafe4cf9
+  fields: {name: "Standard", order: 300.0}
