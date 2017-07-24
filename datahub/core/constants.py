@@ -555,6 +555,14 @@ class FDIType(Enum):
     )
 
 
+class FDIValue(Enum):
+    """Investment FDI value constants."""
+
+    higher = Constant(
+        'Higher', '38e36c77-61ad-4186-a7a8-ac6a1a1104c6'
+    )
+
+
 class SalaryRange(Enum):
     """Average salary constants."""
 

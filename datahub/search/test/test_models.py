@@ -163,7 +163,7 @@ def test_investment_project_to_dict():
             'approved_landed', 'approved_non_fdi', 'intermediate_company',
             'referral_source_activity_website',
             'referral_source_activity_marketing',
-            'referral_source_activity_event', 'fdi_type', 'non_fdi_type',
+            'referral_source_activity_event', 'fdi_type', 'fdi_value', 'non_fdi_type',
             'client_cannot_provide_total_investment', 'total_investment',
             'client_cannot_provide_foreign_investment',
             'foreign_equity_investment', 'government_assistance',

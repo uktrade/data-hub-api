@@ -7402,3 +7402,15 @@
 - model: metadata.salaryrange
   pk: f41e3603-90f7-46b8-b201-5b4eecb4bea5
   fields: {name: "£35,000 and above", order: 400.0}
+
+
+# FDIValue
+- model: metadata.fdivalue
+  pk: 38e36c77-61ad-4186-a7a8-ac6a1a1104c6
+  fields: {name: "Higher", order: 100.0}
+- model: metadata.fdivalue
+  pk: 002c18d9-f5c7-4f3c-b061-aee09fce8416
+  fields: {name: "Good", order: 200.0}
+- model: metadata.fdivalue
+  pk: 2bacde8d-128f-4d0a-849b-645ceafe4cf9
+  fields: {name: "Standard", order: 300.0}
