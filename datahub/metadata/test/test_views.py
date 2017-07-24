@@ -37,6 +37,7 @@ metadata_view_names = (
     'investment-strategic-driver',
     'salary-range',
     'investment-project-stage',
+    'fdi-value',
 )
 
 metadata_views_ids = (
@@ -65,6 +66,7 @@ metadata_views_ids = (
     'investment strategic driver view',
     'salary range view',
     'investment project stage view',
+    'fdi value view',
 )
 
 
@@ -144,6 +146,11 @@ ordered_metadata_view_params = (
         'Verify win',
         'Won'
     ]),
+    ('fdi-value', [
+        'Higher',
+        'Good',
+        'Standard',
+    ]),
 )
 
 ordered_metadata_view_test_ids = (
@@ -151,6 +158,7 @@ ordered_metadata_view_test_ids = (
     'employee-range',
     'salary-range',
     'investment-project-stage',
+    'fdi-value',
 )
 
 

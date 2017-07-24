@@ -129,6 +129,10 @@ class IProjectValueAbstract(models.Model):
     class Meta:  # noqa: D101
         abstract = True
 
+    fdi_value = models.ForeignKey(
+        'metadata.FDIValue', related_name='investment_projects', null=True, blank=True,
+        on_delete=models.SET_NULL
+    )
     client_cannot_provide_total_investment = models.NullBooleanField()
     total_investment = models.DecimalField(null=True, max_digits=19,
                                            decimal_places=0, blank=True)
