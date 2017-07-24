@@ -607,7 +607,9 @@ class TestUnifiedViews(APITestMixin):
 
     def test_get_value_success(self):
         """Test successfully getting a project value object."""
+        higher_value = constants.FDIValue.higher.value
         project = InvestmentProjectFactory(
+            fdi_value_id=higher_value.id,
             client_cannot_provide_foreign_investment=False,
             client_cannot_provide_total_investment=False,
             total_investment=100,
@@ -624,6 +626,7 @@ class TestUnifiedViews(APITestMixin):
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
+        assert response_data['fdi_value']['id'] == higher_value.id
         assert response_data['client_cannot_provide_foreign_investment'] is False
         assert response_data['client_cannot_provide_total_investment'] is False
         assert response_data['total_investment'] == '100'

@@ -7303,3 +7303,12 @@
   fields: {id: 90049e2b-e70c-4f20-ba0e-f98772d631e7, name: "£30,000 – £34,000", order: 300.0}
 - model: metadata.salaryrange
   fields: {id: f41e3603-90f7-46b8-b201-5b4eecb4bea5, name: "£35,000 and above", order: 400.0}
+
+
+# FDIValue
+- model: metadata.fdivalue
+  fields: {id: 38e36c77-61ad-4186-a7a8-ac6a1a1104c6, name: "Higher", order: 100.0}
+- model: metadata.fdivalue
+  fields: {id: 002c18d9-f5c7-4f3c-b061-aee09fce8416, name: "Good", order: 200.0}
+- model: metadata.fdivalue
+  fields: {id: 2bacde8d-128f-4d0a-849b-645ceafe4cf9, name: "Standard", order: 300.0}
