@@ -13,6 +13,7 @@ from datahub.core.test_utils import (
 )
 from datahub.investment.test.factories import InvestmentProjectFactory
 
+
 pytestmark = pytest.mark.django_db
 
 
@@ -134,7 +135,7 @@ class TestSearch(APITestMixin):
         """Tests detailed company search."""
         term = 'abc defg'
 
-        url = f"{reverse('api-v3:search:company')}?offset=0&limit=100"
+        url = reverse('api-v3:search:company')
         united_states_id = constants.Country.united_states.value.id
 
         response = self.api_client.post(url, {
@@ -149,7 +150,7 @@ class TestSearch(APITestMixin):
 
     def test_search_company_no_filters(self):
         """Tests case where there is no filters provided."""
-        url = f"{reverse('api-v3:search:company')}?offset=0&limit=100"
+        url = f"{reverse('api-v3:search:company')}"
         response = self.api_client.post(url, {})
 
         assert response.status_code == status.HTTP_200_OK
@@ -157,7 +158,7 @@ class TestSearch(APITestMixin):
 
     def test_search_foreign_company_json(self):
         """Tests detailed company search."""
-        url = f"{reverse('api-v3:search:company')}?offset=0&limit=100"
+        url = reverse('api-v3:search:company')
 
         response = self.api_client.post(url, {
             'uk_based': False,
@@ -172,7 +173,7 @@ class TestSearch(APITestMixin):
         """Tests detailed contact search."""
         term = 'abc defg'
 
-        url = f"{reverse('api-v3:search:contact')}?offset=0&limit=100"
+        url = reverse('api-v3:search:contact')
 
         response = self.api_client.post(url, {
             'original_query': term,
@@ -186,7 +187,7 @@ class TestSearch(APITestMixin):
 
     def test_search_contact_no_filters(self):
         """Tests case where there is no filters provided."""
-        url = f"{reverse('api-v3:search:contact')}?offset=0&limit=100"
+        url = reverse('api-v3:search:contact')
         response = self.api_client.post(url, {})
 
         assert response.status_code == status.HTTP_200_OK
@@ -194,7 +195,7 @@ class TestSearch(APITestMixin):
 
     def test_search_investment_project_json(self):
         """Tests detailed investment project search."""
-        url = f"{reverse('api-v3:search:investment_project')}?offset=0&limit=100"
+        url = reverse('api-v3:search:investment_project')
 
         response = self.api_client.post(url, {
             'description': 'investmentproject1',
@@ -207,7 +208,7 @@ class TestSearch(APITestMixin):
 
     def test_search_investment_project_date_json(self):
         """Tests detailed investment project search."""
-        url = f"{reverse('api-v3:search:investment_project')}?offset=0&limit=100"
+        url = reverse('api-v3:search:investment_project')
 
         response = self.api_client.post(url, {
             'estimated_land_date_before': datetime.datetime(2017, 6, 13, 9, 44, 31, 62870),
@@ -219,7 +220,7 @@ class TestSearch(APITestMixin):
 
     def test_search_investment_project_invalid_date_json(self):
         """Tests detailed investment project search."""
-        url = f"{reverse('api-v3:search:investment_project')}?offset=0&limit=100"
+        url = reverse('api-v3:search:investment_project')
 
         response = self.api_client.post(url, {
             'estimated_land_date_before': 'this is definitely not a valid date',
@@ -229,7 +230,7 @@ class TestSearch(APITestMixin):
 
     def test_search_investment_project_no_filters(self):
         """Tests case where there is no filters provided."""
-        url = f"{reverse('api-v3:search:investment_project')}?offset=0&limit=100"
+        url = reverse('api-v3:search:investment_project')
         response = self.api_client.post(url, {})
 
         assert response.status_code == status.HTTP_200_OK
@@ -380,3 +381,39 @@ class TestSearch(APITestMixin):
         assert [('Ether 1', 1000),
                 ('Ether 2', None)] == [(investment['name'], investment['total_investment'],)
                                        for investment in response.data['results']]
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_investment_project_multiple_filters(self):
+        """Tests detailed investment project search."""
+        url = reverse('api-v3:search:investment_project')
+
+        InvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.active.value.id
+        ).save()
+        InvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.prospect.value.id
+        ).save()
+        InvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.won.value.id
+        ).save()
+
+        connections.get_connection().indices.refresh()
+
+        response = self.api_client.post(url, {
+            'stage': [
+                constants.InvestmentProjectStage.won.value.id,
+                constants.InvestmentProjectStage.active.value.id,
+            ],
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert len(response.data['results']) == 2
+
+        stages = set([investment_project['stage']['id']
+                      for investment_project in response.data['results']])
+
+        assert constants.InvestmentProjectStage.active.value.id in stages
+        assert constants.InvestmentProjectStage.prospect.value.id not in stages
+        assert constants.InvestmentProjectStage.won.value.id in stages
