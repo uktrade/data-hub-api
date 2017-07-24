@@ -94,8 +94,8 @@ def test_search_by_entity_query():
     """Tests search by entity."""
     date = '2017-06-13T09:44:31.062870'
     filters = {
-        'address_town': 'Woodside',
-        'trading_address_country.id': '80756b9a-5d95-e211-a939-e4115bead28a',
+        'address_town': ['Woodside'],
+        'trading_address_country.id': ['80756b9a-5d95-e211-a939-e4115bead28a'],
     }
     ranges = {
         'estimated_land_date': {
@@ -133,13 +133,13 @@ def test_search_by_entity_query():
                                 }, {
                                     'match': {
                                         'name': {
-                                            'query': 'test',
+                                            'query': 'test'
                                         }
                                     }
                                 }, {
                                     'match': {
                                         '_all': {
-                                            'query': 'test',
+                                            'query': 'test'
                                         }
                                     }
                                 }
@@ -151,7 +151,7 @@ def test_search_by_entity_query():
         },
         'post_filter': {
             'bool': {
-                'must': [
+                'should': [
                     {
                         'term': {
                             'address_town': 'Woodside'
@@ -174,7 +174,8 @@ def test_search_by_entity_query():
                             }
                         }
                     }
-                ]
+                ],
+                'minimum_should_match': 1
             }
         },
         'from': 5,
@@ -223,7 +224,8 @@ def test_remap_fields():
         'trading_address_country': 'test',
         'adviser': 'test',
         'test': 'test',
-        'uk_based': False
+        'stage': ['a', 'b'],
+        'uk_based': [False]
     }
 
     remapped = elasticsearch.remap_fields(fields)
@@ -237,7 +239,8 @@ def test_remap_fields():
     assert 'adviser.id' in remapped
     assert 'test' in remapped
     assert 'uk_based' in remapped
-    assert remapped['uk_based'] is False
+    assert remapped['stage.id'] == ['a', 'b']
+    assert remapped['uk_based'] == [False]
 
 
 def test_remap_sort_field():

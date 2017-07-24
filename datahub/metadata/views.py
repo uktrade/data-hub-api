@@ -32,6 +32,7 @@ METADATA_MAPPING = {
     'investment-strategic-driver': models.InvestmentStrategicDriver,
     'salary-range': models.SalaryRange,
     'investment-project-stage': models.InvestmentProjectStage,
+    'fdi-value': models.FDIValue,
 }
 
 
