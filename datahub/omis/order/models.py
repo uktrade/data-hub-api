@@ -72,3 +72,26 @@ class Order(BaseModel):
         if not self.reference:
             self.reference = self._calculate_reference()
         return super().save(*args, **kwargs)
+
+
+class OrderSubscriber(BaseModel):
+    """
+    A subscribed adviser receives notifications when new changes happen to an Order.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name='subscribers'
+    )
+    adviser = models.ForeignKey(
+        'company.Advisor', on_delete=models.CASCADE, related_name='+'
+    )
+
+    def __str__(self):
+        """Human-readable representation"""
+        return f'{self.order} – {self.adviser}'
+
+    class Meta:  # noqa: D101
+        unique_together = (
+            ('order', 'adviser'),
+        )
