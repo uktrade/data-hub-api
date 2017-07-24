@@ -41,8 +41,6 @@ class NestedContactSerializer(serializers.ModelSerializer):
 class NestedInteractionSerializer(serializers.ModelSerializer):
     """Nested Interaction Serializer."""
 
-    dit_adviser = AdviserSerializer()
-
     class Meta:  # noqa: D101
         model = Interaction
         fields = '__all__'
