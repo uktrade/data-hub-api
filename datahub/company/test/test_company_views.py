@@ -7,6 +7,7 @@ from datahub.core.constants import (
     BusinessType, CompanyClassification, Country, HeadquarterType, Sector, UKRegion
 )
 from datahub.core.test_utils import APITestMixin
+from datahub.interaction.test.factories import InteractionFactory
 from .factories import CompaniesHouseCompanyFactory, CompanyFactory
 
 
@@ -92,6 +93,28 @@ class TestCompany(APITestMixin):
         assert response.data['registered_address_postcode'] is None
         assert response.data['headquarter_type']['name'] == HeadquarterType.ukhq.value.name
         assert response.data['classification']['name'] == CompanyClassification.tier_a.value.name
+
+    def test_detail_company_adviser_not_expanded(self):
+        """Tests that advisers are not expanded in the interactions list.
+
+        Avoids repeating a regression where it was accidentally amended to be expanded.
+        """
+        company = CompanyFactory(
+            name='Foo ltd.',
+            registered_address_1='Hello st.',
+            registered_address_town='Fooland',
+            registered_address_country_id=Country.united_states.value.id,
+            headquarter_type_id=HeadquarterType.ukhq.value.id,
+            classification_id=CompanyClassification.tier_a.value.id,
+        )
+        interaction = InteractionFactory(company=company)
+
+        url = reverse('api-v1:company-detail', kwargs={'pk': company.id})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['interactions'][0]['dit_adviser'] == str(interaction.dit_adviser.pk)
 
     def test_update_company(self):
         """Test company update."""
