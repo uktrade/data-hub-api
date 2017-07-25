@@ -110,25 +110,26 @@ def get_search_by_entity_query(term=None,
     if term != '':
         query.append(get_search_term_query(term))
 
-    query_filter = []
+    should_filter = []
+    must_filter = []
 
     if filters:
         for k, v in filters.items():
             if isinstance(v, list):
-                query_filter += [get_term_query(k, value) for value in v]
+                should_filter += [get_term_query(k, value) for value in v]
             else:
-                query_filter.append(get_term_query(k, v))
+                must_filter.append(get_term_query(k, v))
 
     if ranges:
         for k, v in ranges.items():
-            query_filter.append(
+            must_filter.append(
                 Q('range', **{k: v})
             )
 
     s = Search(index=settings.ES_INDEX).query('bool', must=query)
     s = get_sort_query(s, field_order=field_order)
 
-    s = s.post_filter('bool', should=query_filter, minimum_should_match=1)
+    s = s.post_filter('bool', must=must_filter, should=should_filter, minimum_should_match=1)
 
     return s[offset:offset + limit]
 
