@@ -228,13 +228,27 @@ class SearchInvestmentProjectAPIView(APIView):
             filters=filters,
             ranges=ranges,
             field_order=sortby,
+            aggs=self.FILTER_FIELDS,
             offset=offset,
             limit=limit,
         ).execute()
 
+        aggregations = {}
+        for field in self.FILTER_FIELDS:
+            r_field = elasticsearch.remap_field(field)
+
+            if r_field in results.aggregations:
+                if '.' in r_field:
+                    buckets = results.aggregations[r_field][r_field]['buckets']
+                else:
+                    buckets = results.aggregations[r_field]['buckets']
+
+                aggregations[field] = [bucket.to_dict() for bucket in buckets]
+
         response = {
             'count': results.hits.total,
             'results': [x.to_dict() for x in results.hits],
+            'aggregations': aggregations,
         }
 
         return Response(data=response)
