@@ -1,0 +1,73 @@
+# ReferralSourceActivity
+- model: metadata.referralsourceactivity
+  pk: 0c4f8e74-d34f-4aca-b764-a44cdc2d0087
+  fields: {name: "Cold call"}
+- model: metadata.referralsourceactivity
+  pk: 7d98f3a6-3e3f-40ac-a6f3-3f0c251ec1d2
+  fields: {name: "Direct enquiry"}
+- model: metadata.referralsourceactivity
+  pk: 3816a95b-6a76-4ad0-8ae9-b0d7e7d2b79c
+  fields: {name: "Event"}
+- model: metadata.referralsourceactivity
+  pk: 0acf0e68-e09e-4e5d-92b6-e72e5a5c7ea4
+  fields: {name: "Marketing"}
+- model: metadata.referralsourceactivity
+  pk: e95cddb3-9407-4c8a-b5a6-2616117b0aae
+  fields: {name: "Multiplier"}
+- model: metadata.referralsourceactivity
+  pk: aba8f653-264f-48d8-950e-07f9c418c7b0
+  fields: {name: "None"}
+- model: metadata.referralsourceactivity
+  pk: 318e6e9e-2a0e-4e4b-a495-c48aeee4b996
+  fields: {name: "Other"}
+- model: metadata.referralsourceactivity
+  pk: 668e999c-a669-4d9b-bfbf-6275ceed86da
+  fields: {name: "Relationship management activity"}
+- model: metadata.referralsourceactivity
+  pk: c03c4043-18b4-4463-a36b-a1af1b35f95d
+  fields: {name: "Personal reference"}
+- model: metadata.referralsourceactivity
+  pk: 812b2f62-fe62-4cc8-b69c-58f3e2ebac17
+  fields: {name: "Website"}
+
+
+# ReferralSourceWebsite
+- model: metadata.referralsourcewebsite
+  pk: b5b26c78-8e97-47b4-9014-6d4a3e40b257
+  fields: {name: "Exporting is Great - Campaign"}
+- model: metadata.referralsourcewebsite
+  pk: afefa334-d96f-4a80-acb8-abf537bd3ae7
+  fields: {name: "Invest in GREAT Britain"}
+- model: metadata.referralsourcewebsite
+  pk: cbde665e-9121-46d5-ba54-24e1e6c4aa77
+  fields: {name: "DIT Global Website"}
+- model: metadata.referralsourcewebsite
+  pk: 7524c091-2d60-4a52-90e3-cc647c92b140
+  fields: {name: "DIT Regional Website"}
+- model: metadata.referralsourcewebsite
+  pk: 072241d4-22d0-4657-8d8e-1848a0519b0a
+  fields: {name: "Other website"}
+
+
+# ReferralSourceMarketing
+- model: metadata.referralsourcemarketing
+  pk: 3be91b40-6c5a-466c-a217-01b028701c08
+  fields: {name: "Email"}
+- model: metadata.referralsourcemarketing
+  pk: 36c51095-5b4e-49a7-ab1a-3df086988384
+  fields: {name: "Magazine"}
+- model: metadata.referralsourcemarketing
+  pk: 9227c6c2-2cb1-4284-8ce5-bc77d5cb1430
+  fields: {name: "Mail shot"}
+- model: metadata.referralsourcemarketing
+  pk: 0d46127c-7ef8-4e8f-a6b7-db66e1dfcd1d
+  fields: {name: "Press advertisement"}
+- model: metadata.referralsourcemarketing
+  pk: 38e278fe-c049-4573-b773-8993db0e0bcd
+  fields: {name: "Press article"}
+- model: metadata.referralsourcemarketing
+  pk: 305dd66b-e416-4cac-981b-bca32e18bd49
+  fields: {name: "Telemarketing"}
+- model: metadata.referralsourcemarketing
+  pk: c28d95c6-f094-4f97-b372-38815829a0f0
+  fields: {name: "Television/radio"}

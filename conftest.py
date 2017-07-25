@@ -1,5 +1,3 @@
-from pathlib import PurePath
-
 import pytest
 from django.core.management import call_command
 from pytest_django.lazy_django import skip_if_no_django
@@ -7,10 +5,8 @@ from pytest_django.lazy_django import skip_if_no_django
 
 @pytest.fixture(scope='session')
 def django_db_setup(django_db_setup, django_db_blocker):
-    fixtures_dir = PurePath(__file__).parent / 'fixtures'
     with django_db_blocker.unblock():
-        call_command('loaddata', fixtures_dir / 'metadata.yaml')
-        call_command('loaddata', fixtures_dir / 'datahub_businesstypes.yaml')
+        call_command('loadmetadata')
 
 
 @pytest.fixture

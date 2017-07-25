@@ -1,0 +1,378 @@
+# services DIT offer
+- model: metadata.service
+  pk: d03cce05-f9f7-e511-888e-e4115bead28a
+  fields: {name: "Investment - IST Client Proposal (IST use only)"}
+- model: metadata.service
+  pk: 88efd448-f9f7-e511-888e-e4115bead28a
+  fields: {name: "Investment - IST Commercial Partner Introduction (IST use only)"}
+- model: metadata.service
+  pk: ade9836c-f9f7-e511-888e-e4115bead28a
+  fields: {name: "Investment - IST Specialist Introduction (IST use only)"}
+- model: metadata.service
+  pk: 42c71892-f9f7-e511-888e-e4115bead28a
+  fields: {name: "Investment - IST Visit (IST use only)"}
+- model: metadata.service
+  pk: 21f2c8c2-f9f7-e511-888e-e4115bead28a
+  fields: {name: "Investment - IST Research Request (IST use only)"}
+- model: metadata.service
+  pk: bd3d1be3-f9f7-e511-888e-e4115bead28a
+  fields: {name: "Investment - IST Aftercare (IST use only)"}
+- model: metadata.service
+  pk: ad7a7746-2ad5-e311-8a2b-e4115bead28a
+  fields: {name: "Trade - ECR Web Action Plan"}
+- model: metadata.service
+  pk: 0b94cd30-e5eb-e311-8a2b-e4115bead28a
+  fields: {name: "OBN Chargeable Services"}
+- model: metadata.service
+  pk: 44345a68-49fd-e311-8a2b-e4115bead28a
+  fields: {name: "Postgraduates for Interrnational Business - Referral"}
+- model: metadata.service
+  pk: 3b848e75-49fd-e311-8a2b-e4115bead28a
+  fields: {name: "Postgraduates for Interrnational Business - Placement"}
+- model: metadata.service
+  pk: 4d74b1e4-8d16-e611-9bdc-e4115bead28a
+  fields: {name: "Investment – IST Business Development Multiplier (IST use only)"}
+- model: metadata.service
+  pk: 8c8fbb61-9a25-e611-9bdc-e4115bead28a
+  fields: {name: "Investment - IST Business Development Target (IST use only)"}
+- model: metadata.service
+  pk: 5befb468-3173-e511-9d3c-e4115bead28a
+  fields: {name: "First Time Exporters - Export Insight Visits"}
+- model: metadata.service
+  pk: 510a4016-4bb9-e211-a646-e4115bead28a
+  fields: {name: "Events - Webinars"}
+- model: metadata.service
+  pk: 496f0ce8-dcc9-e211-a646-e4115bead28a
+  fields: {name: "TPU - Opportunity"}
+- model: metadata.service
+  pk: 4840b339-ddc9-e211-a646-e4115bead28a
+  fields: {name: "TPU - Opportunity Interest"}
+- model: metadata.service
+  pk: 1f7de16b-b7ce-e211-a646-e4115bead28a
+  fields: {name: "TPU - Opportunity Status"}
+- model: metadata.service
+  pk: be8b6c03-83cf-e211-a646-e4115bead28a
+  fields: {name: "Events - Open to Export Webinars"}
+- model: metadata.service
+  pk: 561c6040-db21-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - Bond Support Scheme"}
+- model: metadata.service
+  pk: c7dc4f0b-dc21-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - Export Working Capital Scheme"}
+- model: metadata.service
+  pk: 1632b942-dc21-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - Export Insurance Policy"}
+- model: metadata.service
+  pk: 46cd2e66-dc21-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - EFA Advice"}
+- model: metadata.service
+  pk: f1ed6742-5c9a-e411-a839-e4115bead28a
+  fields: {name: "Trade - G3 (01) - Offer Letter"}
+- model: metadata.service
+  pk: 60986f5c-5c9a-e411-a839-e4115bead28a
+  fields: {name: "Trade - G3 (05) - Combined 2 & 3"}
+- model: metadata.service
+  pk: be3d8979-5c9a-e411-a839-e4115bead28a
+  fields: {name: "Trade - G3 (06) - 2, 3 & 4"}
+- model: metadata.service
+  pk: 1ec5548f-5c9a-e411-a839-e4115bead28a
+  fields: {name: "Trade - G3 (07) - Revised Action Plans"}
+- model: metadata.service
+  pk: 6e3db1a1-5c9a-e411-a839-e4115bead28a
+  fields: {name: "Trade - G3 (08) - Evaluation Form"}
+- model: metadata.service
+  pk: 1ec4e4b9-5c9a-e411-a839-e4115bead28a
+  fields: {name: "Trade - G3 (09) - Exit Letter"}
+- model: metadata.service
+  pk: d6d19f54-5d9a-e411-a839-e4115bead28a
+  fields: {name: "Trade - P2E (01) - Offer Letter"}
+- model: metadata.service
+  pk: 5e7ca186-5d9a-e411-a839-e4115bead28a
+  fields: {name: "Trade - P2E (05) - Combined 2 & 3"}
+- model: metadata.service
+  pk: c24f53ed-5d9a-e411-a839-e4115bead28a
+  fields: {name: "Trade - P2E (06) - Combined 2, 3  & 4"}
+- model: metadata.service
+  pk: ce7de007-5e9a-e411-a839-e4115bead28a
+  fields: {name: "Trade - P2E (07) - Revised Action Plans"}
+- model: metadata.service
+  pk: 9e8a641f-5e9a-e411-a839-e4115bead28a
+  fields: {name: "Trade - P2E (08) - Evaluation Form"}
+- model: metadata.service
+  pk: 1e36073d-5e9a-e411-a839-e4115bead28a
+  fields: {name: "Trade - P2E (09) - Exit Letter"}
+- model: metadata.service
+  pk: a222c657-5e9a-e411-a839-e4115bead28a
+  fields: {name: "Trade - P2E (10) - Other"}
+- model: metadata.service
+  pk: 952a72f3-5f9a-e411-a839-e4115bead28a
+  fields: {name: "Trade - ECR Web Offer Letter"}
+- model: metadata.service
+  pk: 3ef6d80b-609a-e411-a839-e4115bead28a
+  fields: {name: "Trade - ECR Web Exit Letter"}
+- model: metadata.service
+  pk: 9384b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Investment - Business Proposition"}
+- model: metadata.service
+  pk: 9484b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Account Management"}
+- model: metadata.service
+  pk: 9584b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Events - UK Based"}
+- model: metadata.service
+  pk: 9684b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Market Selection Service (MSS)"}
+- model: metadata.service
+  pk: 9784b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Trade - G3 (10) - Other"}
+- model: metadata.service
+  pk: 9884b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Account Management : High Growth"}
+- model: metadata.service
+  pk: 9984b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Inbound Referral"}
+- model: metadata.service
+  pk: 9a84b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "UK Region Local"}
+- model: metadata.service
+  pk: 9b84b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "UK Trade and Investment Website"}
+- model: metadata.service
+  pk: 9c84b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Post Local"}
+- model: metadata.service
+  pk: 9d84b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Trade - G3 (04) - Action Plan"}
+- model: metadata.service
+  pk: c3f9b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Researching Export Markets Training (REMs) "}
+- model: metadata.service
+  pk: c4f9b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Onward Referral"}
+- model: metadata.service
+  pk: c5f9b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Events - E-Delivery"}
+- model: metadata.service
+  pk: c6f9b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Business Visitor"}
+- model: metadata.service
+  pk: c7f9b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Trade - Passport to Export - Other"}
+- model: metadata.service
+  pk: c8f9b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "BERR - Enquiry"}
+- model: metadata.service
+  pk: c9f9b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Passport to Export"}
+- model: metadata.service
+  pk: caf9b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Export Market Research Scheme (EMRS)"}
+- model: metadata.service
+  pk: cbf9b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Export Insight Visit"}
+- model: metadata.service
+  pk: ccf9b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Events - Overseas"}
+- model: metadata.service
+  pk: cdf9b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Trade - P2E (02) - Stage 1"}
+- model: metadata.service
+  pk: cef9b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Trade - P2E (03) - ITR"}
+- model: metadata.service
+  pk: cff9b82b-3499-e211-a939-e4115bead28a
+  fields: {name: "Trade - P2E - Actions Record"}
+- model: metadata.service
+  pk: d320b92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Investment - Company Visit"}
+- model: metadata.service
+  pk: d420b92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Investment - Regional Tour"}
+- model: metadata.service
+  pk: d520b92b-3499-e211-a939-e4115bead28a
+  fields: {name: "UKTI Website - Business Opportunity"}
+- model: metadata.service
+  pk: d620b92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Trade - Open to Export"}
+- model: metadata.service
+  pk: d720b92b-3499-e211-a939-e4115bead28a
+  fields: {name: "FDI Target"}
+- model: metadata.service
+  pk: d820b92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Significant Assistance Development Aid (PIMS)"}
+- model: metadata.service
+  pk: d920b92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Passport to Export R & D"}
+- model: metadata.service
+  pk: da20b92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Export Communication Review Scheme (ECR)"}
+- model: metadata.service
+  pk: db20b92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Global Partnerships"}
+- model: metadata.service
+  pk: dc20b92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Support for New Inward Investors"}
+- model: metadata.service
+  pk: dd20b92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Trade - G3 (02) - Stage 1 Information"}
+- model: metadata.service
+  pk: f36eb92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Trade - Services (Other)"}
+- model: metadata.service
+  pk: f46eb92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Tradeshow Access Programme (TAP) Non Funded"}
+- model: metadata.service
+  pk: f56eb92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Significant Assistance (PIMS)"}
+- model: metadata.service
+  pk: f66eb92b-3499-e211-a939-e4115bead28a
+  fields: {name: "FTSE 100 Programme"}
+- model: metadata.service
+  pk: f76eb92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Trade - Tradeshow Access Programme (TAP)"}
+- model: metadata.service
+  pk: f86eb92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Entrepreneurial Inward Investment"}
+- model: metadata.service
+  pk: f96eb92b-3499-e211-a939-e4115bead28a
+  fields: {name: "BR Proactive Management"}
+- model: metadata.service
+  pk: fa6eb92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Tradeshow Access Programme (TAP) - Solo"}
+- model: metadata.service
+  pk: fb6eb92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Support for Current Inward Investors"}
+- model: metadata.service
+  pk: 0396b92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Gateway to Global Growth"}
+- model: metadata.service
+  pk: 0496b92b-3499-e211-a939-e4115bead28a
+  fields: {name: "SG Special Reports"}
+- model: metadata.service
+  pk: 0596b92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Investment - Services"}
+- model: metadata.service
+  pk: 0696b92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Outward Missions"}
+- model: metadata.service
+  pk: 0796b92b-3499-e211-a939-e4115bead28a
+  fields: {name: "DSO Interaction"}
+- model: metadata.service
+  pk: 0896b92b-3499-e211-a939-e4115bead28a
+  fields: {name: "New Products from Britain (NPFB)"}
+- model: metadata.service
+  pk: 0996b92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Trade - P2E (04) - Action Plan"}
+- model: metadata.service
+  pk: 0a96b92b-3499-e211-a939-e4115bead28a
+  fields: {name: "Trade - G3 (03) - ITR"}
+- model: metadata.service
+  pk: 330bba2b-3499-e211-a939-e4115bead28a
+  fields: {name: "Trade - Enquiry"}
+- model: metadata.service
+  pk: 340bba2b-3499-e211-a939-e4115bead28a
+  fields: {name: "Market Visit Support (MVS)"}
+- model: metadata.service
+  pk: 350bba2b-3499-e211-a939-e4115bead28a
+  fields: {name: "Business Win"}
+- model: metadata.service
+  pk: 360bba2b-3499-e211-a939-e4115bead28a
+  fields: {name: "Overseas Market Introduction Service (OMIS)"}
+- model: metadata.service
+  pk: 370bba2b-3499-e211-a939-e4115bead28a
+  fields: {name: "Inward Missions"}
+- model: metadata.service
+  pk: 380bba2b-3499-e211-a939-e4115bead28a
+  fields: {name: "Tradeshow Access Programme (TAP)"}
+- model: metadata.service
+  pk: 390bba2b-3499-e211-a939-e4115bead28a
+  fields: {name: "Trade - G3 - Actions Record"}
+- model: metadata.service
+  pk: 3a0bba2b-3499-e211-a939-e4115bead28a
+  fields: {name: "Investment - Enquiry"}
+- model: metadata.service
+  pk: 5359ba2b-3499-e211-a939-e4115bead28a
+  fields: {name: "Exhibitions (Not TAP)"}
+- model: metadata.service
+  pk: 5459ba2b-3499-e211-a939-e4115bead28a
+  fields: {name: "Passport Aftercare"}
+- model: metadata.service
+  pk: 5559ba2b-3499-e211-a939-e4115bead28a
+  fields: {name: "Open to Export Assist (OtE)"}
+- model: metadata.service
+  pk: 5659ba2b-3499-e211-a939-e4115bead28a
+  fields: {name: "BIS Interaction"}
+- model: metadata.service
+  pk: 5759ba2b-3499-e211-a939-e4115bead28a
+  fields: {name: "XXX"}
+- model: metadata.service
+  pk: 5859ba2b-3499-e211-a939-e4115bead28a
+  fields: {name: "Trade - OMIS/MSS"}
+- model: metadata.service
+  pk: 5959ba2b-3499-e211-a939-e4115bead28a
+  fields: {name: "Investment - Aftercare Company Visit"}
+- model: metadata.service
+  pk: fe09d0f5-61ee-e411-bbc1-e4115bead28a
+  fields: {name: "First Time Exporters – Export Savvy"}
+- model: metadata.service
+  pk: 3a812c0a-62ee-e411-bbc1-e4115bead28a
+  fields: {name: "First Time Exporters – Other"}
+- model: metadata.service
+  pk: e96a775a-1ff3-e411-bcbe-e4115bead28a
+  fields: {name: "Language and Culture Advisers One-to-One"}
+- model: metadata.service
+  pk: 56c42f6d-1ff3-e411-bcbe-e4115bead28a
+  fields: {name: "Digital Trade Advisers One-to-One"}
+- model: metadata.service
+  pk: 12907483-1ff3-e411-bcbe-e4115bead28a
+  fields: {name: "Overseas Business Network Advisers One-to-One"}
+- model: metadata.service
+  pk: e7b4bd5a-b78f-e611-8c55-e4115bed50dc
+  fields: {name: "Data Hub placeholder"}
+- model: metadata.service
+  pk: 1783ae93-b78f-e611-8c55-e4115bed50dc
+  fields: {name: "A"}
+
+# Service delivery status
+- model: metadata.servicedeliverystatus
+  pk: 42099351-5224-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - Application Approved"}
+- model: metadata.servicedeliverystatus
+  pk: 10cc8460-5224-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - Application Denied"}
+- model: metadata.servicedeliverystatus
+  pk: 8843926e-5224-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - Application Received"}
+- model: metadata.servicedeliverystatus
+  pk: 08a96e7d-5224-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - Closed"}
+- model: metadata.servicedeliverystatus
+  pk: 1c981688-5224-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - Deal Not Proceeding to Application"}
+- model: metadata.servicedeliverystatus
+  pk: 10c59b97-5224-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - In Discussion - Awaiting Financials"}
+- model: metadata.servicedeliverystatus
+  pk: 53fa1da6-5224-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - In Discussion - Application Likely"}
+- model: metadata.servicedeliverystatus
+  pk: 5e9401b1-5224-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - In Discussion - Early Stage"}
+- model: metadata.servicedeliverystatus
+  pk: 0ad733bd-5224-e311-a78e-e4115bead28a
+  fields: {name: "UKEF - In Discussion - RAU Reviewed"}
+- model: metadata.servicedeliverystatus
+  pk: 45329c18-6095-e211-a939-e4115bead28a
+  fields: {name: "Offered"}
+- model: metadata.servicedeliverystatus
+  pk: 46329c18-6095-e211-a939-e4115bead28a
+  fields: {name: "Current"}
+- model: metadata.servicedeliverystatus
+  pk: 47329c18-6095-e211-a939-e4115bead28a
+  fields: {name: "Completed"}
+- model: metadata.servicedeliverystatus
+  pk: 48329c18-6095-e211-a939-e4115bead28a
+  fields: {name: "Withdrawn"}
+- model: metadata.servicedeliverystatus
+  pk: 49329c18-6095-e211-a939-e4115bead28a
+  fields: {name: "On Hold"}
