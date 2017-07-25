@@ -22,7 +22,6 @@ VALIDATION_MAPPING = {
     'uk_region_locations': Stage.assign_pm.value,
     'client_requirements': Stage.assign_pm.value,
     'client_considering_other_countries': Stage.assign_pm.value,
-    'site_decided': Stage.assign_pm.value,
     'project_manager': Stage.active.value,
     'project_assurance_adviser': Stage.active.value,
     'client_cannot_provide_foreign_investment': Stage.verify_win.value,

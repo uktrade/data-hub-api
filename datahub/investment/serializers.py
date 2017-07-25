@@ -196,7 +196,7 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
         model = InvestmentProject
         fields = (
             'client_requirements',
-            'site_decided',
+            'site_decided',  # deprecated; will be removed
             'address_line_1',
             'address_line_2',
             'address_line_3',
