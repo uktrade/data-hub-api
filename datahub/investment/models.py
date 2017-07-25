@@ -160,6 +160,7 @@ class IProjectRequirementsAbstract(models.Model):
         abstract = True
 
     client_requirements = models.TextField(blank=True, null=True)
+    # site_decided is deprecated; will be removed
     site_decided = models.NullBooleanField()
     address_line_1 = models.CharField(blank=True, null=True,
                                       max_length=MAX_LENGTH)
