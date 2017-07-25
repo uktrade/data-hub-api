@@ -388,11 +388,22 @@ class TestSearch(APITestMixin):
         """Tests detailed investment project search."""
         url = reverse('api-v3:search:investment_project')
 
+        company_a = CompanyFactory(
+            name='companyA'
+        )
+        company_b = CompanyFactory(
+            name='companyB'
+        )
+
         InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            investor_company=company_a,
+            sector_id=constants.Sector.aerospace_assembly_aircraft.value.id,
             stage_id=constants.InvestmentProjectStage.active.value.id
         ).save()
         InvestmentProjectFactory(
-            stage_id=constants.InvestmentProjectStage.prospect.value.id
+            investor_company=company_b,
+            stage_id=constants.InvestmentProjectStage.prospect.value.id,
         ).save()
         InvestmentProjectFactory(
             stage_id=constants.InvestmentProjectStage.won.value.id
@@ -401,6 +412,11 @@ class TestSearch(APITestMixin):
         connections.get_connection().indices.refresh()
 
         response = self.api_client.post(url, {
+            'investment_type': constants.InvestmentType.fdi.value.id,
+            'investor_company': [
+                company_a.pk,
+                company_b.pk,
+            ],
             'stage': [
                 constants.InvestmentProjectStage.won.value.id,
                 constants.InvestmentProjectStage.active.value.id,
@@ -408,12 +424,12 @@ class TestSearch(APITestMixin):
         }, format='json')
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 2
-        assert len(response.data['results']) == 2
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
 
         stages = set([investment_project['stage']['id']
                       for investment_project in response.data['results']])
 
         assert constants.InvestmentProjectStage.active.value.id in stages
         assert constants.InvestmentProjectStage.prospect.value.id not in stages
-        assert constants.InvestmentProjectStage.won.value.id in stages
+        assert constants.InvestmentProjectStage.won.value.id not in stages
