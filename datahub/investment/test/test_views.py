@@ -389,7 +389,6 @@ class TestUnifiedViews(APITestMixin):
             'total_investment',
             'client_considering_other_countries',
             'client_requirements',
-            'site_decided',
             'strategic_drivers',
             'uk_region_locations',
         ))
@@ -413,7 +412,6 @@ class TestUnifiedViews(APITestMixin):
             'total_investment': ['This field is required.'],
             'client_considering_other_countries': ['This field is required.'],
             'client_requirements': ['This field is required.'],
-            'site_decided': ['This field is required.'],
             'strategic_drivers': ['This field is required.'],
             'uk_region_locations': ['This field is required.'],
         }
@@ -464,7 +462,6 @@ class TestUnifiedViews(APITestMixin):
             'total_investment': ['This field is required.'],
             'client_considering_other_countries': ['This field is required.'],
             'client_requirements': ['This field is required.'],
-            'site_decided': ['This field is required.'],
             'strategic_drivers': ['This field is required.'],
             'uk_region_locations': ['This field is required.'],
             'project_assurance_adviser': ['This field is required.'],
