@@ -142,7 +142,6 @@ def test_validate_reqs_fail():
     assert errors == {
         'client_considering_other_countries': 'This field is required.',
         'client_requirements': 'This field is required.',
-        'site_decided': 'This field is required.',
         'strategic_drivers': 'This field is required.',
         'uk_region_locations': 'This field is required.'
     }
