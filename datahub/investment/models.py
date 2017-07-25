@@ -141,7 +141,9 @@ class IProjectValueAbstract(models.Model):
         null=True, max_digits=19, decimal_places=0, blank=True
     )
     government_assistance = models.NullBooleanField()
+    some_new_jobs = models.NullBooleanField()
     number_new_jobs = models.IntegerField(null=True, blank=True)
+    will_new_jobs_last_two_years = models.NullBooleanField()
     average_salary = models.ForeignKey(
         'metadata.SalaryRange', related_name='+', null=True, blank=True,
         on_delete=models.SET_NULL
@@ -172,6 +174,7 @@ class IProjectRequirementsAbstract(models.Model):
                                              max_length=MAX_LENGTH)
     client_considering_other_countries = models.NullBooleanField()
 
+    uk_company_decided = models.NullBooleanField()
     uk_company = models.ForeignKey(
         'company.Company', related_name='investee_projects',
         null=True, blank=True, on_delete=models.SET_NULL
