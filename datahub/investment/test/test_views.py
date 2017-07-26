@@ -74,6 +74,7 @@ class TestUnifiedViews(APITestMixin):
             'nda_signed': False,
             'estimated_land_date': '2020-12-12',
             'project_shareable': False,
+            'quotable_as_public_case_study': True,
             'likelihood_of_landing': 60,
             'priority': '1_low',
             'investment_type': {
@@ -120,7 +121,11 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['nda_signed'] == request_data['nda_signed']
         assert (response_data['estimated_land_date'] == request_data[
             'estimated_land_date'])
-        assert (response_data['likelihood_of_landing'] == request_data['likelihood_of_landing'])
+        assert (response_data['project_shareable'] == request_data[
+            'project_shareable'])
+        assert (response_data['quotable_as_public_case_study'] ==
+                request_data['quotable_as_public_case_study'])
+        assert response_data['likelihood_of_landing'] == request_data['likelihood_of_landing']
         assert response_data['priority'] == request_data['priority']
         assert re.match('^DHP-\d+$', response_data['project_code'])
 
