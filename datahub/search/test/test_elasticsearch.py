@@ -151,6 +151,16 @@ def test_search_by_entity_query():
         },
         'post_filter': {
             'bool': {
+                'must': [
+                    {
+                        'range': {
+                            'estimated_land_date': {
+                                'gte': '2017-06-13T09:44:31.062870',
+                                'lte': '2017-06-13T09:44:31.062870'
+                            }
+                        }
+                    }
+                ],
                 'should': [
                     {
                         'term': {
@@ -164,13 +174,6 @@ def test_search_by_entity_query():
                                     'trading_address_country.id':
                                         '80756b9a-5d95-e211-a939-e4115bead28a'
                                 }
-                            }
-                        }
-                    }, {
-                        'range': {
-                            'estimated_land_date': {
-                                'gte': '2017-06-13T09:44:31.062870',
-                                'lte': '2017-06-13T09:44:31.062870'
                             }
                         }
                     }
