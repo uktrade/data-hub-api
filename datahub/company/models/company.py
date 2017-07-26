@@ -126,6 +126,9 @@ class Company(ArchivableModel, CompanyAbstract):
 
     class Meta:  # noqa: D101
         verbose_name_plural = 'companies'
+        permissions = (
+            ('view_company', 'Can View Company'),
+        )
 
     class MPTTMeta:  # noqa: D101
         order_insertion_by = ['name']
@@ -213,3 +216,6 @@ class CompaniesHouseCompany(CompanyAbstract):
 
     class Meta:  # noqa: D101
         verbose_name_plural = 'Companies House companies'
+        permissions = (
+            ('view_companieshousecompany', 'Can View Companies House Company'),
+        )
