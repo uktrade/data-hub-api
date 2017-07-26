@@ -612,7 +612,9 @@ class TestUnifiedViews(APITestMixin):
             total_investment=100,
             foreign_equity_investment=100,
             government_assistance=True,
+            some_new_jobs=False,
             number_new_jobs=0,
+            will_new_jobs_last_two_years=False,
             number_safeguarded_jobs=10,
             r_and_d_budget=False,
             non_fdi_r_and_d_budget=False,
@@ -630,7 +632,9 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['foreign_equity_investment'] == '100'
         assert response_data['government_assistance'] is True
         assert response_data['total_investment'] == '100'
+        assert response_data['some_new_jobs'] is False
         assert response_data['number_new_jobs'] == 0
+        assert response_data['will_new_jobs_last_two_years'] is False
         assert response_data['number_safeguarded_jobs'] == 10
         assert response_data['r_and_d_budget'] is False
         assert response_data['non_fdi_r_and_d_budget'] is False
@@ -675,6 +679,7 @@ class TestUnifiedViews(APITestMixin):
             client_considering_other_countries=True,
             competitor_countries=countries,
             strategic_drivers=strategic_drivers,
+            uk_company_decided=False,
             uk_region_locations=uk_region_locations
         )
         url = reverse('api-v3:investment:investment-item',
@@ -686,6 +691,7 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['site_decided'] is True
         assert response_data['client_considering_other_countries'] is True
         assert response_data['requirements_complete'] is True
+        assert response_data['uk_company_decided'] is False
         assert response_data['address_line_1'] == 'address 1'
         assert sorted(country['id'] for country in response_data[
             'competitor_countries']) == sorted(countries)
