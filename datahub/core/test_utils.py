@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.utils.timezone import now
 from oauth2_provider.models import AccessToken, Application
 from rest_framework.test import APIClient
@@ -20,6 +21,10 @@ def get_test_user():
             date_joined=now(),
         )
         test_user.set_password('password')
+        custom_perms = Permission.objects.filter(
+            content_type__app_label__in=['company', 'investment', 'interaction']
+        ).values_list('id', flat=True)
+        test_user.user_permissions.set(custom_perms)
         test_user.save()
     return test_user
 
