@@ -110,7 +110,10 @@ def get_search_by_entity_query(term=None,
     if term != '':
         query.append(get_search_term_query(term))
 
+    # document should match at least one filter in the list (or)
     should_filter = []
+
+    # document must match all filters in the list (and)
     must_filter = []
 
     if filters:
