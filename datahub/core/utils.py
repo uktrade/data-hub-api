@@ -6,7 +6,6 @@ from urllib.parse import urlparse
 
 import boto3
 import requests
-from rest_framework.compat import is_authenticated
 from rest_framework.permissions import DjangoModelPermissions
 
 executor = ThreadPoolExecutor()

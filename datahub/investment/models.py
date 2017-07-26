@@ -331,6 +331,9 @@ class IProjectDocument(BaseModel, ArchivableModel):
         unique_together = (
             ('project', 'doc_type', 'filename'),
         )
+        permissions = (
+            ('view_iprojectdocument', 'Can View Investment Project Document'),
+        )
 
     def delete(self, using=None, keep_parents=False):
         """Ensure document is removed when parent is being deleted."""
@@ -355,8 +358,3 @@ class IProjectDocument(BaseModel, ArchivableModel):
             investment_doc.save()
 
         return investment_doc
-
-    class Meta:  # noqa: D101
-        permissions = (
-            ('view_iprojectdocument', 'Can View Investment Project Document'),
-        )
