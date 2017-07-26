@@ -158,7 +158,9 @@ class IProjectValueSerializer(serializers.ModelSerializer):
             'total_investment',
             'foreign_equity_investment',
             'government_assistance',
+            'some_new_jobs',
             'number_new_jobs',
+            'will_new_jobs_last_two_years',
             'average_salary',
             'number_safeguarded_jobs',
             'r_and_d_budget',
@@ -205,6 +207,7 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
             'uk_region_locations',
             'strategic_drivers',
             'client_considering_other_countries',
+            'uk_company_decided',
             'uk_company',
             'requirements_complete'
         )
