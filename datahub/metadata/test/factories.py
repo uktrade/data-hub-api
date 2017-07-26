@@ -9,7 +9,7 @@ class EventFactory(factory.django.DjangoModelFactory):
     id = factory.Sequence(lambda _: str(uuid.uuid4()))
     name = factory.Sequence(lambda n: f'name {n}')
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = 'metadata.Event'
 
 
@@ -19,7 +19,7 @@ class ServiceFactory(factory.django.DjangoModelFactory):
     id = factory.Sequence(lambda _: str(uuid.uuid4()))
     name = factory.Sequence(lambda n: f'name {n}')
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = 'metadata.Service'
 
 
@@ -29,5 +29,5 @@ class TeamFactory(factory.django.DjangoModelFactory):
     id = factory.Sequence(lambda _: str(uuid.uuid4()))
     name = factory.Sequence(lambda n: 'name {n}')
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = 'metadata.Team'
