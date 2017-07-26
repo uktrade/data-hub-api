@@ -443,7 +443,7 @@ class Team(Enum):
         'Healthcare UK', '3ff47a07-002c-e311-a78e-e4115bead28a'
     )
     crm = Constant(
-        'CRM', '5e8be8a8-3e95-e211-a939-e4115bead28a'
+        'crm', 'a7f924aa-9698-e211-a939-e4115bead28a'
     )
 
 

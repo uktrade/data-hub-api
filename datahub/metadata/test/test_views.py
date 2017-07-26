@@ -22,6 +22,7 @@ metadata_view_names = (
     'title',
     'turnover',
     'uk-region',
+    'team-role',
     'team',
     'service-delivery-status',
     'event',
@@ -51,6 +52,7 @@ metadata_views_ids = (
     'titles view',
     'turnover view',
     'UK regions view',
+    'teams role view',
     'teams view',
     'service delivery status view',
     'event view',
@@ -176,3 +178,26 @@ def test_ordered_metadata_order_view(view_name, expected_names, api_client):
     assert response.status_code == status.HTTP_200_OK
     response_names = [value['name'] for value in response.json()]
     assert response_names == expected_names
+
+
+def test_team_view(api_client):
+    """
+    Test that the team view returns role, uk_region and country as well.
+    """
+    url = reverse(viewname='team')
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()[0] == {
+        'id': 'cff02898-9698-e211-a939-e4115bead28a',
+        'name': 'Aberdeen City Council',
+        'role': {
+            'name': 'ATO',
+            'id': '846cb21e-6095-e211-a939-e4115bead28a'
+        },
+        'uk_region': None,
+        'country': {
+            'name': 'United Kingdom',
+            'id': '80756b9a-5d95-e211-a939-e4115bead28a'
+        }
+    }
