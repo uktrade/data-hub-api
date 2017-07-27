@@ -46,7 +46,13 @@ CondValRule = namedtuple('CondValRule', ('field', 'condition', 'stage'))
 def _contains_id(id_, instances):
     if not isinstance(id_, UUID):
         id_ = UUID(id_)
-    return any(instance.id == id_ for instance in instances)
+    return any(_get_to_many_id(instance) == id_ for instance in instances)
+
+
+def _get_to_many_id(instance):
+    if isinstance(instance, str):
+        return UUID(instance)
+    return instance.id
 
 
 # Conditional validation rules. Mapping from field names to validation rules.
