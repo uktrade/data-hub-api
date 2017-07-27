@@ -37,6 +37,7 @@ class IProjectAbstract(models.Model):
 
     cdms_project_code = models.CharField(max_length=MAX_LENGTH, blank=True,
                                          null=True)
+    quotable_as_public_case_study = models.NullBooleanField()
     project_shareable = models.NullBooleanField()
     not_shareable_reason = models.TextField(blank=True, null=True)
     actual_land_date = models.DateField(blank=True, null=True)

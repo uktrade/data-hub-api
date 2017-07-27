@@ -138,7 +138,7 @@
   fields: {name: "Research & development (R&D)"}
 - model: metadata.investmentbusinessactivity
   pk: 257f720f-42df-4f85-8e43-c83e4e03dc79
-  fields: {name: "Headquarters"}
+  fields: {name: "Global headquarters"}
 - model: metadata.investmentbusinessactivity
   pk: 30348f9d-a82e-4215-ba3f-85cbbd14763a
   fields: {name: "Knowledge centre"}
