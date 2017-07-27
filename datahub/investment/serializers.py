@@ -94,6 +94,7 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
             'actual_land_date',
             'project_shareable',
             'not_shareable_reason',
+            'quotable_as_public_case_study',
             'likelihood_of_landing',
             'priority',
             'approved_commitment_to_invest',
