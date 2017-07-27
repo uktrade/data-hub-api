@@ -11,12 +11,13 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.core import constants
 from datahub.investment.models import InvestmentProject
 from datahub.investment.test.factories import InvestmentProjectFactory
-from datahub.search import models, elasticsearch
+from datahub.search import elasticsearch, models
 from datahub.search.management.commands import sync_es
 
 
 @fixture(scope='session')
 def client(request):
+    """Makes the ES test helper client available."""
     from elasticsearch_dsl.connections import connections
     client = get_test_client(nowait=False)
     connections.add_connection('default', client)
@@ -25,6 +26,7 @@ def client(request):
 
 @fixture(scope='session')
 def setup_data(client):
+    """Sets up the data and makes the ES client available."""
     index = settings.ES_INDEX
 
     create_test_index(client, index)
@@ -72,6 +74,7 @@ def setup_data(client):
 
 
 def create_test_index(client, index):
+    """Creates/configures the test index."""
     if client.indices.exists(index=index):
         client.indices.delete(index)
 
@@ -80,17 +83,26 @@ def create_test_index(client, index):
         'number_of_replicas': 0,
     })
 
+
 @fixture
 def post_save_handlers():
+    """Registeres signals handlers to trigger ES logic."""
     from datahub.search.signals import company_sync_es, contact_sync_es, investment_project_sync_es
 
     post_save.connect(company_sync_es, sender=Company, dispatch_uid='company_sync_es')
     post_save.connect(contact_sync_es, sender=Contact, dispatch_uid='contact_sync_es')
-    post_save.connect(investment_project_sync_es, sender=InvestmentProject, dispatch_uid='investment_project_sync_es')
+    post_save.connect(
+        investment_project_sync_es,
+        sender=InvestmentProject,
+        dispatch_uid='investment_project_sync_es'
+    )
 
     yield (company_sync_es, contact_sync_es, investment_project_sync_es,)
 
     post_save.disconnect(company_sync_es, sender=Company, dispatch_uid='company_sync_es')
     post_save.disconnect(contact_sync_es, sender=Contact, dispatch_uid='contact_sync_es')
-    post_save.disconnect(investment_project_sync_es, sender=InvestmentProject,
-                         dispatch_uid='investment_project_sync_es')
+    post_save.disconnect(
+        investment_project_sync_es,
+        sender=InvestmentProject,
+        dispatch_uid='investment_project_sync_es'
+    )

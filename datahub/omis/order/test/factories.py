@@ -4,7 +4,7 @@ import uuid
 
 import factory
 
-from datahub.company.test.factories import CompanyFactory, ContactFactory, AdviserFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import Country
 
 
@@ -16,7 +16,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
     contact = factory.SubFactory(ContactFactory)
     primary_market_id = Country.france.value.id
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = 'order.Order'
 
 
@@ -27,5 +27,5 @@ class OrderSubscriberFactory(factory.django.DjangoModelFactory):
     order = factory.SubFactory(OrderFactory)
     adviser = factory.SubFactory(AdviserFactory)
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = 'order.OrderSubscriber'
