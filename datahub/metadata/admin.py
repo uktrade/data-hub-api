@@ -10,7 +10,7 @@ MODELS_TO_REGISTER = (
     models.Country,
     models.Title,
     models.Role,
-    models.Team,
+    models.TeamRole,
     models.Service,
     models.ServiceDeliveryStatus,
     models.Event,
@@ -49,4 +49,14 @@ class OrderedMetadataAdmin(admin.ModelAdmin):
     fields = ('name', 'order', )
     list_display = ('name', 'order', )
     readonly_fields = ('id',)
+    search_fields = ('name', 'pk')
+
+
+@admin.register(models.Team)
+class TeamAdmin(MetadataAdmin):
+    """Team Admin."""
+
+    fields = ('name', 'country', 'uk_region', 'role')
+    list_display = ('name', 'role')
+    list_select_related = ('role', )
     search_fields = ('name', 'pk')
