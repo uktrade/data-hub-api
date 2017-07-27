@@ -28,7 +28,7 @@ class TestInteraction(APITestMixin):
         adviser = AdviserFactory()
         url = reverse('api-v1:interaction-list')
         response = self.api_client.post(url, {
-            'interaction_type': constants.InteractionType.business_card.value.id,
+            'interaction_type': constants.InteractionType.face_to_face.value.id,
             'subject': 'whatever',
             'date': now().isoformat(),
             'dit_adviser': adviser.pk,
@@ -52,7 +52,7 @@ class TestInteraction(APITestMixin):
         adviser = AdviserFactory()
         url = reverse('api-v1:interaction-list')
         response = self.api_client.post(url, {
-            'interaction_type': constants.InteractionType.business_card.value.id,
+            'interaction_type': constants.InteractionType.face_to_face.value.id,
             'subject': 'whatever',
             'date': now().isoformat(),
             'dit_adviser': adviser.pk,
@@ -75,7 +75,7 @@ class TestInteraction(APITestMixin):
         """
         url = reverse('api-v1:interaction-list')
         response = self.api_client.post(url, {
-            'interaction_type': constants.InteractionType.business_card.value.id,
+            'interaction_type': constants.InteractionType.face_to_face.value.id,
             'subject': 'whatever',
             'date': now().isoformat(),
             'dit_adviser': AdviserFactory().pk,

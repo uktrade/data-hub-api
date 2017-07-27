@@ -300,8 +300,14 @@
   pk: 7d363000-6095-e211-a939-e4115bead28a
   fields: {name: 'Food and Drink : Bakery Products'}
 - model: metadata.sector
+  pk: 7dbb9fc6-5f95-e211-a939-e4115bead28a
+  fields: {name: Defence}
+- model: metadata.sector
   pk: 7e363000-6095-e211-a939-e4115bead28a
   fields: {name: 'Food and Drink : Ready Meals'}
+- model: metadata.sector
+  pk: 7ebb9fc6-5f95-e211-a939-e4115bead28a
+  fields: {name: Renewable Energy}
 - model: metadata.sector
   pk: 7f363000-6095-e211-a939-e4115bead28a
   fields: {name: 'Food and Drink : Meat Products'}
@@ -340,11 +346,17 @@
   fields: {name: 'Creative and Media : Creative and Media Retail : Books, Newspapers
       and Stationery'}
 - model: metadata.sector
+  pk: 9538cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: Aerospace}
+- model: metadata.sector
   pk: 95e61afa-5f95-e211-a939-e4115bead28a
   fields: {name: 'Environment : Waste Management : Sewage Collection and Treatment'}
 - model: metadata.sector
   pk: 961a72f1-5f95-e211-a939-e4115bead28a
   fields: {name: 'Creative and Media : Creative and Media Retail : Art'}
+- model: metadata.sector
+  pk: 9638cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: 'Agriculture, Horticulture and Fisheries'}
 - model: metadata.sector
   pk: 96e61afa-5f95-e211-a939-e4115bead28a
   fields: {name: 'Environment : Waste Management : Non-Metal Waste and Scrap Recycling'}
@@ -352,11 +364,17 @@
   pk: 971a72f1-5f95-e211-a939-e4115bead28a
   fields: {name: 'Creative and Media : Creative and Media Retail : Antiques and Antiquities'}
 - model: metadata.sector
+  pk: 9738cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: Airports}
+- model: metadata.sector
   pk: 97e61afa-5f95-e211-a939-e4115bead28a
   fields: {name: 'Environment : Waste to Energy'}
 - model: metadata.sector
   pk: 981a72f1-5f95-e211-a939-e4115bead28a
   fields: {name: 'Electronics and IT Hardware : Electronics and IT Technologies'}
+- model: metadata.sector
+  pk: 9838cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: Automotive}
 - model: metadata.sector
   pk: 98e61afa-5f95-e211-a939-e4115bead28a
   fields: {name: 'Environment : Fuel Cells'}
@@ -365,6 +383,9 @@
   fields: {name: 'Electronics and IT Hardware : Electronics and IT Technologies :
       Network Technologies'}
 - model: metadata.sector
+  pk: 9938cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: Biotechnology and Pharmaceuticals}
+- model: metadata.sector
   pk: 99e61afa-5f95-e211-a939-e4115bead28a
   fields: {name: 'Financial Services (including Professional Services) : Asset Management'}
 - model: metadata.sector
@@ -372,12 +393,18 @@
   fields: {name: 'Electronics and IT Hardware : Electronics and IT Technologies :
       Display Technologies'}
 - model: metadata.sector
+  pk: 9a38cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: Business (and Consumer) Services}
+- model: metadata.sector
   pk: 9ae61afa-5f95-e211-a939-e4115bead28a
   fields: {name: 'Financial Services (including Professional Services) : Banking'}
 - model: metadata.sector
   pk: 9b1a72f1-5f95-e211-a939-e4115bead28a
   fields: {name: 'Electronics and IT Hardware : Electronics and IT Technologies :
       Component Technologies'}
+- model: metadata.sector
+  pk: 9b38cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: Chemicals}
 - model: metadata.sector
   pk: 9be61afa-5f95-e211-a939-e4115bead28a
   fields: {name: 'Financial Services (including Professional Services) : Banking :
@@ -398,6 +425,9 @@
   fields: {name: 'Electronics and IT Hardware : Electronics and IT Technologies :
       Broadcasting'}
 - model: metadata.sector
+  pk: 9d38cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: Communications}
+- model: metadata.sector
   pk: 9de61afa-5f95-e211-a939-e4115bead28a
   fields: {name: 'Financial Services (including Professional Services) : Banking :
       Commercial Banking'}
@@ -406,6 +436,9 @@
   fields: {name: 'Electronics and IT Hardware : Electronics and IT Technologies :
       Computing'}
 - model: metadata.sector
+  pk: 9e38cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: Construction}
+- model: metadata.sector
   pk: 9ee61afa-5f95-e211-a939-e4115bead28a
   fields: {name: 'Financial Services (including Professional Services) : Banking :
       Investment Banking'}
@@ -413,11 +446,17 @@
   pk: 9f1a72f1-5f95-e211-a939-e4115bead28a
   fields: {name: 'Electronics and IT Hardware : Electronic Instruments'}
 - model: metadata.sector
+  pk: 9f38cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: Creative and Media}
+- model: metadata.sector
   pk: 9fe61afa-5f95-e211-a939-e4115bead28a
   fields: {name: 'Financial Services (including Professional Services) : Capital Markets'}
 - model: metadata.sector
   pk: a01a72f1-5f95-e211-a939-e4115bead28a
   fields: {name: 'Environment : Air Pollution and Noise Control'}
+- model: metadata.sector
+  pk: a038cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: Education and Training}
 - model: metadata.sector
   pk: a0e61afa-5f95-e211-a939-e4115bead28a
   fields: {name: 'Financial Services (including Professional Services) : Capital Markets
@@ -426,12 +465,18 @@
   pk: a11a72f1-5f95-e211-a939-e4115bead28a
   fields: {name: 'Environment : Marine Pollution Control'}
 - model: metadata.sector
+  pk: a138cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: Electronics and IT Hardware}
+- model: metadata.sector
   pk: a1e61afa-5f95-e211-a939-e4115bead28a
   fields: {name: 'Financial Services (including Professional Services) : Capital Markets
       : Venture Capital'}
 - model: metadata.sector
   pk: a21a72f1-5f95-e211-a939-e4115bead28a
   fields: {name: 'Environment : Sanitation and Remediation'}
+- model: metadata.sector
+  pk: a238cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: Environment}
 - model: metadata.sector
   pk: a2e61afa-5f95-e211-a939-e4115bead28a
   fields: {name: 'Financial Services (including Professional Services) : Capital Markets
@@ -440,11 +485,20 @@
   pk: a31a72f1-5f95-e211-a939-e4115bead28a
   fields: {name: 'Environment : Environmental Monitoring'}
 - model: metadata.sector
+  pk: a338cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: Financial Services (including Professional Services)}
+- model: metadata.sector
   pk: a3e61afa-5f95-e211-a939-e4115bead28a
   fields: {name: 'Financial Services (including Professional Services) : Foreign Exchange'}
 - model: metadata.sector
   pk: a41a72f1-5f95-e211-a939-e4115bead28a
   fields: {name: 'Environment : Water Management'}
+- model: metadata.sector
+  pk: a422c9d2-5f95-e211-a939-e4115bead28a
+  fields: {name: Metallurgical Process Plant}
+- model: metadata.sector
+  pk: a438cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: Security}
 - model: metadata.sector
   pk: a4959812-6095-e211-a939-e4115bead28a
   fields: {name: 'Renewable Energy : Wind'}
@@ -461,6 +515,9 @@
   pk: a522c9d2-5f95-e211-a939-e4115bead28a
   fields: {name: 'Metals, Minerals and Materials'}
 - model: metadata.sector
+  pk: a538cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: Food and Drink}
+- model: metadata.sector
   pk: a5959812-6095-e211-a939-e4115bead28a
   fields: {name: 'Software and Computer Services Business to Business (B2B) : Industry
       Applications'}
@@ -471,6 +528,12 @@
 - model: metadata.sector
   pk: a5ee00d9-5f95-e211-a939-e4115bead28a
   fields: {name: 'Automotive : Component Manufacturing : Tyres'}
+- model: metadata.sector
+  pk: a622c9d2-5f95-e211-a939-e4115bead28a
+  fields: {name: Mining}
+- model: metadata.sector
+  pk: a638cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: 'Giftware, Jewellery and Tableware'}
 - model: metadata.sector
   pk: a6959812-6095-e211-a939-e4115bead28a
   fields: {name: 'Software and Computer Services Business to Business (B2B) : Financial
@@ -483,12 +546,24 @@
   pk: a6ee00d9-5f95-e211-a939-e4115bead28a
   fields: {name: 'Automotive : Manufacturing and Assembly : Cars'}
 - model: metadata.sector
+  pk: a722c9d2-5f95-e211-a939-e4115bead28a
+  fields: {name: Oil and Gas}
+- model: metadata.sector
+  pk: a738cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: Healthcare and Medical}
+- model: metadata.sector
   pk: a7959812-6095-e211-a939-e4115bead28a
   fields: {name: 'Software and Computer Services Business to Business (B2B) : Healthcare
       Applications'}
 - model: metadata.sector
   pk: a7ee00d9-5f95-e211-a939-e4115bead28a
   fields: {name: 'Automotive : Manufacturing and Assembly : Vans'}
+- model: metadata.sector
+  pk: a822c9d2-5f95-e211-a939-e4115bead28a
+  fields: {name: Ports and Logistics}
+- model: metadata.sector
+  pk: a838cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: 'Household Goods, Furniture and Furnishings'}
 - model: metadata.sector
   pk: a8959812-6095-e211-a939-e4115bead28a
   fields: {name: 'Software and Computer Services Business to Business (B2B) : Security
@@ -497,11 +572,23 @@
   pk: a8ee00d9-5f95-e211-a939-e4115bead28a
   fields: {name: 'Automotive : Manufacturing and Assembly : Lorries'}
 - model: metadata.sector
+  pk: a922c9d2-5f95-e211-a939-e4115bead28a
+  fields: {name: Power}
+- model: metadata.sector
+  pk: a938cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: Leisure and Tourism}
+- model: metadata.sector
   pk: a9959812-6095-e211-a939-e4115bead28a
   fields: {name: 'Software and Computer Services Business to Business (B2B) : Biometrics'}
 - model: metadata.sector
   pk: a9ee00d9-5f95-e211-a939-e4115bead28a
   fields: {name: 'Automotive : Manufacturing and Assembly : Caravans'}
+- model: metadata.sector
+  pk: aa22c9d2-5f95-e211-a939-e4115bead28a
+  fields: {name: Railways}
+- model: metadata.sector
+  pk: aa38cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: Marine}
 - model: metadata.sector
   pk: aa959812-6095-e211-a939-e4115bead28a
   fields: {name: 'Software and Computer Services Business to Business (B2B) : Online
@@ -513,11 +600,17 @@
   pk: ab22c9d2-5f95-e211-a939-e4115bead28a
   fields: {name: Software and Computer Services Business to Business (B2B)}
 - model: metadata.sector
+  pk: ab38cecc-5f95-e211-a939-e4115bead28a
+  fields: {name: Mechanical Electrical and Process Engineering}
+- model: metadata.sector
   pk: ab959812-6095-e211-a939-e4115bead28a
   fields: {name: 'Software and Computer Services Business to Business (B2B) : E-Procurement'}
 - model: metadata.sector
   pk: abee00d9-5f95-e211-a939-e4115bead28a
   fields: {name: 'Automotive : Manufacturing and Assembly : Containers'}
+- model: metadata.sector
+  pk: ac22c9d2-5f95-e211-a939-e4115bead28a
+  fields: {name: Global Sports Projects}
 - model: metadata.sector
   pk: ac959812-6095-e211-a939-e4115bead28a
   fields: {name: 'Software and Computer Services Business to Business (B2B) : Support
@@ -526,6 +619,9 @@
   pk: acee00d9-5f95-e211-a939-e4115bead28a
   fields: {name: 'Automotive : Manufacturing and Assembly : Motorcycles'}
 - model: metadata.sector
+  pk: ad22c9d2-5f95-e211-a939-e4115bead28a
+  fields: {name: 'Textiles, Interior Textiles and Carpets'}
+- model: metadata.sector
   pk: ad959812-6095-e211-a939-e4115bead28a
   fields: {name: 'Software and Computer Services Business to Business (B2B) : Support
       Services : Equipment Maintenance and Repair'}
@@ -533,12 +629,18 @@
   pk: adee00d9-5f95-e211-a939-e4115bead28a
   fields: {name: 'Automotive : Manufacturing and Assembly : Bicycles'}
 - model: metadata.sector
+  pk: ae22c9d2-5f95-e211-a939-e4115bead28a
+  fields: {name: Water}
+- model: metadata.sector
   pk: ae959812-6095-e211-a939-e4115bead28a
   fields: {name: 'Software and Computer Services Business to Business (B2B) : Support
       Services : Internet Service Providers'}
 - model: metadata.sector
   pk: aeee00d9-5f95-e211-a939-e4115bead28a
   fields: {name: 'Automotive : Manufacturing and Assembly : Invalid Carriages'}
+- model: metadata.sector
+  pk: af22c9d2-5f95-e211-a939-e4115bead28a
+  fields: {name: 'Aerospace : Aircraft Design'}
 - model: metadata.sector
   pk: af959812-6095-e211-a939-e4115bead28a
   fields: {name: Advanced Engineering}
@@ -563,6 +665,9 @@
 - model: metadata.sector
   pk: b1ee00d9-5f95-e211-a939-e4115bead28a
   fields: {name: 'Automotive : Automotive Maintenance'}
+- model: metadata.sector
+  pk: b222c9d2-5f95-e211-a939-e4115bead28a
+  fields: {name: 'Automotive : Manufacturing and Assembly'}
 - model: metadata.sector
   pk: b2959812-6095-e211-a939-e4115bead28a
   fields: {name: Environment and Water}
@@ -609,6 +714,9 @@
 - model: metadata.sector
   pk: b7ee00d9-5f95-e211-a939-e4115bead28a
   fields: {name: 'Biotechnology and Pharmaceuticals : Biotechnology'}
+- model: metadata.sector
+  pk: b822c9d2-5f95-e211-a939-e4115bead28a
+  fields: {name: 'Automotive : Design Engineering'}
 - model: metadata.sector
   pk: b8ee00d9-5f95-e211-a939-e4115bead28a
   fields: {name: 'Biotechnology and Pharmaceuticals : Biotechnology : Biodiagnostics'}
