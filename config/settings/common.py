@@ -58,7 +58,6 @@ LOCAL_APPS = [
     'datahub.metadata',
     'datahub.search.apps.SearchConfig',
     'datahub.user',
-    'datahub.korben',
     'datahub.omis.order'
 ]
 
