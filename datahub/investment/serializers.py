@@ -118,6 +118,7 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
             'non_fdi_type',
             'sector',
             'business_activities',
+            'other_business_activity',
             'archived',
             'archived_on',
             'archived_reason',

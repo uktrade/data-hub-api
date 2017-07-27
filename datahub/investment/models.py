@@ -107,6 +107,9 @@ class IProjectAbstract(models.Model):
         related_name='+',
         blank=True
     )
+    other_business_activity = models.CharField(
+        max_length=MAX_LENGTH, null=True, blank=True
+    )
 
     @property
     def project_code(self):

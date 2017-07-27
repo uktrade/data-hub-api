@@ -1,11 +1,15 @@
 """Performs stage-dependent validation on investment projects."""
 from collections import namedtuple
+from functools import partial
 from operator import not_
+from uuid import UUID
 
 from rest_framework.utils import model_meta
 
 from datahub.core.constants import (
-    InvestmentProjectStage as Stage, InvestmentType,
+    InvestmentBusinessActivity as BusinessActivity,
+    InvestmentProjectStage as Stage,
+    InvestmentType,
     ReferralSourceActivity as Activity
 )
 from datahub.core.validate_utils import UpdatedDataView
@@ -38,10 +42,20 @@ VALIDATION_MAPPING = {
 
 CondValRule = namedtuple('CondValRule', ('field', 'condition', 'stage'))
 
+
+def _contains_id(id_, instances):
+    if not isinstance(id_, UUID):
+        id_ = UUID(id_)
+    return any(instance.id == id_ for instance in instances)
+
+
 # Conditional validation rules. Mapping from field names to validation rules.
 CONDITIONAL_VALIDATION_MAPPING = {
     'referral_source_activity_event':
         CondValRule('referral_source_activity', Activity.event.value.id, Stage.prospect.value),
+    'other_business_activity':
+        CondValRule('business_activities', partial(_contains_id, BusinessActivity.other.value.id),
+                    Stage.prospect.value),
     'referral_source_activity_marketing':
         CondValRule('referral_source_activity', Activity.marketing.value.id, Stage.prospect.value),
     'referral_source_activity_website':
@@ -112,8 +126,11 @@ def _field_incomplete(field_info, data_view, field):
 
 def _check_rule(field_info, data_view, rule):
     """Checks a conditional validation rule."""
-    if rule.field in field_info.relations and not field_info.relations[rule.field].to_many:
-        actual_value = data_view.get_value_id(rule.field)
+    if rule.field in field_info.relations:
+        if field_info.relations[rule.field].to_many:
+            actual_value = data_view.get_value_to_many(rule.field)
+        else:
+            actual_value = data_view.get_value_id(rule.field)
     else:
         actual_value = data_view.get_value(rule.field)
     if callable(rule.condition):
