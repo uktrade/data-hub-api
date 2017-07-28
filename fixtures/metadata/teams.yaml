@@ -3445,3 +3445,9 @@
 - model: metadata.team
   pk: aadb4cda-9698-e211-a939-e4115bead28a
   fields: {name: "British Embassy Mexico City Mexico", uk_region_id: null, country_id: 0e50bdb8-5d95-e211-a939-e4115bead28a, role_id: 62329c18-6095-e211-a939-e4115bead28a}
+- model: metadata.team
+  pk: 3def1649-8854-e611-af02-e4115bead28a
+  fields: {name: "Invest North East England (North East Combined Authority)", uk_region_id: 814cd12a-6095-e211-a939-e4115bead28a, country_id: 80756b9a-5d95-e211-a939-e4115bead28a, role_id: b4fb1b54-5925-e511-b6bc-e4115bead28a}
+- model: metadata.team
+  pk: 6032ee57-f14d-e611-af02-e4115bead28a
+  fields: {name: "Regenerate Pennine Lancashire", uk_region_id: 824cd12a-6095-e211-a939-e4115bead28a, country_id: 80756b9a-5d95-e211-a939-e4115bead28a, role_id: b4fb1b54-5925-e511-b6bc-e4115bead28a}
