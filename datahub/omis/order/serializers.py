@@ -30,10 +30,29 @@ class OrderSerializer(serializers.ModelSerializer):
         """
         Extra check that a contact works at the given company.
         """
-        if data['contact'].company != data['company']:
+        # get the data from `data` or fallback to the instance data in case of PATCH
+        data_to_validate = dict(data)
+        if self.partial:
+            for field in self.get_fields().keys() - data.keys():
+                data_to_validate[field] = getattr(self.instance, field)
+
+        # check that contact works at company
+        if data_to_validate['contact'].company != data_to_validate['company']:
             raise serializers.ValidationError({
                 'contact': 'The contact does not work at the given company.'
             })
+
+        # company and primary_market cannot be changed after creation
+        if self.instance:
+            if data_to_validate['company'] != self.instance.company:
+                raise serializers.ValidationError({
+                    'company': 'The company cannot be changed after creation.'
+                })
+
+            if data_to_validate['primary_market'] != self.instance.primary_market:
+                raise serializers.ValidationError({
+                    'primary_market': 'The primary market cannot be changed after creation.'
+                })
 
         return data
 
