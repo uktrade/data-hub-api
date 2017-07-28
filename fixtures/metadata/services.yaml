@@ -376,3 +376,9 @@
 - model: metadata.servicedeliverystatus
   pk: 49329c18-6095-e211-a939-e4115bead28a
   fields: {name: "On Hold"}
+- model: metadata.service
+  pk: 632b8708-28b6-e611-984a-e4115bead28a
+  fields: {name: "Bank Referral"}
+- model: metadata.service
+  pk: a4a733b6-eb95-e611-be23-e4115bead28a
+  fields: {name: "Account Managment: Northern Powerhouse"}
