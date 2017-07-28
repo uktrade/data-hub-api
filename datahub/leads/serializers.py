@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from datahub.company.models import Advisor, Company
 from datahub.core.serializers import NestedRelatedField
-from datahub.core.validate_utils import UpdatedDataView
+from datahub.core.validate_utils import DataCombiner
 from datahub.leads.models import BusinessLead
 from datahub.metadata import models as meta_models
 
@@ -41,14 +41,14 @@ class BusinessLeadSerializer(serializers.ModelSerializer):
         as well as an email address or phone number.
         """
         errors = {}
-        data_view = UpdatedDataView(self.instance, data)
-        company_name = data_view.get_value('company_name')
-        trading_name = data_view.get_value('trading_name')
-        company = data_view.get_value('company')
-        first_name = data_view.get_value('first_name')
-        last_name = data_view.get_value('last_name')
-        telephone_number = data_view.get_value('telephone_number')
-        email = data_view.get_value('email')
+        data_combiner = DataCombiner(self.instance, data)
+        company_name = data_combiner.get_value('company_name')
+        trading_name = data_combiner.get_value('trading_name')
+        company = data_combiner.get_value('company')
+        first_name = data_combiner.get_value('first_name')
+        last_name = data_combiner.get_value('last_name')
+        telephone_number = data_combiner.get_value('telephone_number')
+        email = data_combiner.get_value('email')
 
         has_company_name = any((company_name, company, trading_name))
         has_contact_name = first_name and last_name
