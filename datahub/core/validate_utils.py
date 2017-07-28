@@ -1,21 +1,24 @@
 from rest_framework.exceptions import ValidationError
 
 
-class OneOfValidator:
+class AnyOfValidator:
     """
-    One-of validator for DRF serializer classes.
+    Any-of validator for DRF serializer classes.
+
+    Checks that at least one of the specified fields has a value that is
+    not None.
 
     To be used at class-level only. For updates, values from the model
     instance are used where the fields are not part of the update request.
     """
 
-    message = 'One of {field_names} must be provided.'
+    message = 'One or more of {field_names} must be provided.'
 
     def __init__(self, *fields, message=None):
         """
         Initialises the validator.
 
-        :param fields:  Fields to perform one-of validation on
+        :param fields:  Fields to perform any-of validation on
         :param message: Optional custom error message
         """
         self.fields = fields
@@ -42,7 +45,7 @@ class OneOfValidator:
         if not value_present:
             field_names = ', '.join(self.fields)
             message = self.message.format(field_names=field_names)
-            raise ValidationError(message, code='one_of')
+            raise ValidationError(message, code='any_of')
 
     def __repr__(self):
         """Returns the string representation of this object."""

@@ -88,7 +88,7 @@ class TestInteraction(APITestMixin):
         response_data = response.json()
         assert response_data == {
             'non_field_errors': [
-                'One of company, investment_project must be provided.'
+                'One or more of company, investment_project must be provided.'
             ]
         }
 
