@@ -310,16 +310,11 @@ class Country(Enum):
 class InteractionType(Enum):
     """Interaction types."""
 
-    business_card = Constant('Business Card', 'a6d71fdd-5d95-e211-a939-e4115bead28a')
     email_website = Constant('Email/Website', '70c226d7-5d95-e211-a939-e4115bead28a')
     face_to_face = Constant('Face to Face', 'a5d71fdd-5d95-e211-a939-e4115bead28a')
-    fax = Constant('Fax', '71c226d7-5d95-e211-a939-e4115bead28a')
     letter_fax = Constant('Letter/Fax', '74c226d7-5d95-e211-a939-e4115bead28a')
-    sms = Constant('SMS', 'a4d71fdd-5d95-e211-a939-e4115bead28a')
     social_media = Constant('Social Media', 'a8d71fdd-5d95-e211-a939-e4115bead28a')
     telephone = Constant('Telephone', '72c226d7-5d95-e211-a939-e4115bead28a')
-    telex = Constant('Telex', '73c226d7-5d95-e211-a939-e4115bead28a')
-    ukti_website = Constant('UKTI Website', '75c226d7-5d95-e211-a939-e4115bead28a')
     video_teleconf = Constant('Video/Teleconf.', 'a7d71fdd-5d95-e211-a939-e4115bead28a')
 
 
