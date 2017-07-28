@@ -13,7 +13,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
 
     id = factory.LazyFunction(lambda: str(uuid.uuid4()))
     company = factory.SubFactory(CompanyFactory)
-    contact = factory.SubFactory(ContactFactory)
+    contact = factory.LazyAttribute(lambda o: ContactFactory(company=o.company))
     primary_market_id = Country.france.value.id
 
     class Meta:  # noqa: D101
