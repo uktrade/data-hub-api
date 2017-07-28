@@ -8,7 +8,7 @@ from datahub.core.constants import (
     InvestmentProjectStage as Stage, InvestmentType,
     ReferralSourceActivity as Activity
 )
-from datahub.core.validate_utils import UpdatedDataView
+from datahub.core.validate_utils import DataCombiner
 from datahub.investment.models import InvestmentProject
 
 
@@ -70,7 +70,7 @@ def validate(instance=None, update_data=None, fields=None, next_stage=False):
     :param next_stage:  Perform validation for the next stage (rather than the current stage)
     :return:            dict containing errors for incomplete fields
     """
-    data = UpdatedDataView(instance, update_data)
+    data = DataCombiner(instance, update_data)
     info = model_meta.get_field_info(InvestmentProject)
     desired_stage = data.get_value('stage') or Stage.prospect.value
     desired_stage_order = desired_stage.order

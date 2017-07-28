@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from datahub.company.models import Advisor, Company, Contact
 from datahub.core.serializers import NestedRelatedField
-from datahub.core.validate_utils import UpdatedDataView
+from datahub.core.validate_utils import DataCombiner
 from datahub.metadata.models import Country, Team
 
 from .models import Order
@@ -29,9 +29,9 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """Extra checks."""
-        data_view = UpdatedDataView(self.instance, data)
-        company = data_view.get_value('company')
-        contact = data_view.get_value('contact')
+        data_combiner = DataCombiner(self.instance, data)
+        company = data_combiner.get_value('company')
+        contact = data_combiner.get_value('contact')
 
         # check that contact works at company
         if contact.company != company:
@@ -46,7 +46,7 @@ class OrderSerializer(serializers.ModelSerializer):
                     'company': 'The company cannot be changed after creation.'
                 })
 
-            if data_view.get_value('primary_market') != self.instance.primary_market:
+            if data_combiner.get_value('primary_market') != self.instance.primary_market:
                 raise serializers.ValidationError({
                     'primary_market': 'The primary market cannot be changed after creation.'
                 })
