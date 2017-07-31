@@ -342,6 +342,10 @@ class Sector(Enum):
         'Aerospace : Manufacturing and Assembly : Aircraft',
         'b422c9d2-5f95-e211-a939-e4115bead28a'
     )
+    renewable_energy_wind = Constant(
+        'Renewable Energy : Wind',
+        'a4959812-6095-e211-a939-e4115bead28a'
+    )
 
 
 class Title(Enum):
