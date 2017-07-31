@@ -1,21 +1,24 @@
 from rest_framework.exceptions import ValidationError
 
 
-class OneOfValidator:
+class AnyOfValidator:
     """
-    One-of validator for DRF serializer classes.
+    Any-of validator for DRF serializer classes.
+
+    Checks that at least one of the specified fields has a value that is
+    not None.
 
     To be used at class-level only. For updates, values from the model
     instance are used where the fields are not part of the update request.
     """
 
-    message = 'One of {field_names} must be provided.'
+    message = 'One or more of {field_names} must be provided.'
 
     def __init__(self, *fields, message=None):
         """
         Initialises the validator.
 
-        :param fields:  Fields to perform one-of validation on
+        :param fields:  Fields to perform any-of validation on
         :param message: Optional custom error message
         """
         self.fields = fields
@@ -36,29 +39,30 @@ class OneOfValidator:
 
         :param attrs:   Serializer data (post-field-validation/processing)
         """
-        data_view = UpdatedDataView(self.serializer.instance, attrs)
-        values = (data_view.get_value(field) for field in self.fields)
+        data_combiner = DataCombiner(self.serializer.instance, attrs)
+        values = (data_combiner.get_value(field) for field in self.fields)
         value_present = any(value for value in values if value is not None)
         if not value_present:
             field_names = ', '.join(self.fields)
             message = self.message.format(field_names=field_names)
-            raise ValidationError(message, code='one_of')
+            raise ValidationError(message, code='any_of')
 
     def __repr__(self):
         """Returns the string representation of this object."""
         return f'{self.__class__.__name__}(fields={self.fields!r})'
 
 
-class UpdatedDataView:
+class DataCombiner:
     """
-    Provides a view of a model instance and dict of new data.
+    Combines values from the dict of updated data and the model instance fields.
+    Its methods return the first value found in the chain (update_data, instance).
 
     Used for cross-field validation of v3 endpoints (because PATCH requests
     will only contain data for fields being updated).
     """
 
     def __init__(self, instance, update_data):
-        """Initialises the view."""
+        """Initialises the combiner."""
         if instance is None and update_data is None:
             raise TypeError('One of instance and update_data must be provided '
                             'and not None')
