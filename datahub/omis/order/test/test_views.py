@@ -64,6 +64,7 @@ class TestAddOrderDetails(APITestMixin):
                 'id': sector.id,
                 'name': sector.name
             },
+            'created_on': '2017-04-18T13:00:00',
         }
 
     def test_fails_if_contact_not_from_company(self):
@@ -112,6 +113,7 @@ class TestAddOrderDetails(APITestMixin):
 class TestChangeOrderDetails(APITestMixin):
     """Change Order details test case."""
 
+    @freeze_time('2017-04-18 13:00:00.000000+00:00')
     def test_success(self):
         """Test changing an existing order."""
         order = OrderFactory()
@@ -152,6 +154,7 @@ class TestChangeOrderDetails(APITestMixin):
                 'id': new_sector.id,
                 'name': new_sector.name
             },
+            'created_on': '2017-04-18T13:00:00',
         }
 
     def test_fails_if_contact_not_from_company(self):
@@ -275,6 +278,7 @@ class TestViewOrderDetails(APITestMixin):
                 'id': str(order.sector.id),
                 'name': order.sector.name
             },
+            'created_on': order.created_on.isoformat(),
         }
 
     def test_not_found(self):
