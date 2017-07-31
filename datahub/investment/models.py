@@ -279,7 +279,8 @@ class IProjectDocument(BaseModel, ArchivableModel):
     BUCKET_PREFIX = 'investment-documents'
     DOC_TYPES = Choices(
         ('actual_land_date', 'Actual land date'),
-        ('fdi_type', 'Fdi type'),
+        ('hq', 'Global/European HQ evidence'),
+        ('foreign_ownership', 'Foreign ownership evidence'),
         ('operations_commenced', 'Operations commenced'),
         ('total_investment', 'Total investment'),
         ('foreign_equity_investment', 'Foreign equity investment'),
