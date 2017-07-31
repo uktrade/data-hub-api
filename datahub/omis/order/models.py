@@ -35,6 +35,12 @@ class Order(BaseModel):
         null=True,
         on_delete=models.SET_NULL
     )
+    sector = models.ForeignKey(
+        'metadata.Sector',
+        related_name='+',
+        null=True, blank=True,
+        on_delete=models.SET_NULL
+    )
 
     def __str__(self):
         """Human-readable representation"""
