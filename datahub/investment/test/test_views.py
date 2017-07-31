@@ -1130,8 +1130,10 @@ class TestDocumentViews(APITestMixin):
         project1 = InvestmentProjectFactory()
         project2 = InvestmentProjectFactory()
 
-        IProjectDocument.create_from_declaration_request(project1, 'fdi_type', 'test.txt')
-        doc2 = IProjectDocument.create_from_declaration_request(project2, 'fdi_type', 'test.txt')
+        IProjectDocument.create_from_declaration_request(project1, 'total_investment', 'test.txt')
+        doc2 = IProjectDocument.create_from_declaration_request(
+            project2, 'total_investment', 'test.txt'
+        )
 
         url = reverse('api-v3:investment:document-collection',
                       kwargs={'project_pk': project2.pk})
@@ -1153,26 +1155,28 @@ class TestDocumentViews(APITestMixin):
 
         response = self.api_client.post(url, format='json', data={
             'filename': 'test.txt',
-            'doc_type': 'fdi_type',
+            'doc_type': 'total_investment',
             'project': str(project.pk),
         })
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.data
-        assert response_data['doc_type'] == 'fdi_type'
+        assert response_data['doc_type'] == 'total_investment'
         assert response_data['filename'] == 'test.txt'
         assert response_data['project']['id'] == str(project.pk)
 
         doc = IProjectDocument.objects.get(pk=response_data['id'])
         assert doc.filename == 'test.txt'
-        assert doc.doc_type == 'fdi_type'
+        assert doc.doc_type == 'total_investment'
         assert str(doc.project.pk) == str(project.pk)
         assert 'signed_upload_url' in response.data
 
     def test_document_retrieval(self):
         """Tests retrieval of individual document."""
         project = InvestmentProjectFactory()
-        doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
+        doc = IProjectDocument.create_from_declaration_request(
+            project, 'total_investment', 'test.txt'
+        )
 
         url = reverse('api-v3:investment:document-item',
                       kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
@@ -1184,7 +1188,7 @@ class TestDocumentViews(APITestMixin):
             'id': str(project.pk),
             'name': project.name,
         }
-        assert response.data['doc_type'] == 'fdi_type'
+        assert response.data['doc_type'] == 'total_investment'
         assert response.data['filename'] == 'test.txt'
         assert 'signed_url' in response.data
 
@@ -1196,7 +1200,9 @@ class TestDocumentViews(APITestMixin):
         tested separately in the documents app.
         """
         project = InvestmentProjectFactory()
-        doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
+        doc = IProjectDocument.create_from_declaration_request(
+            project, 'total_investment', 'test.txt'
+        )
 
         url = reverse('api-v3:investment:document-item-callback',
                       kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
@@ -1213,7 +1219,9 @@ class TestDocumentViews(APITestMixin):
     def test_document_delete_of_not_uploaded_doc_does_not_trigger_s3_delete(self, mock_submit):
         """Tests document deletion."""
         project = InvestmentProjectFactory()
-        doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
+        doc = IProjectDocument.create_from_declaration_request(
+            project, 'total_investment', 'test.txt'
+        )
 
         url = reverse('api-v3:investment:document-item',
                       kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
@@ -1228,7 +1236,9 @@ class TestDocumentViews(APITestMixin):
     def test_document_delete(self, mock_s3):
         """Tests document deletion."""
         project = InvestmentProjectFactory()
-        doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
+        doc = IProjectDocument.create_from_declaration_request(
+            project, 'total_investment', 'test.txt'
+        )
         doc.document.uploaded_on = now()
         doc.document.save()
 
@@ -1245,7 +1255,9 @@ class TestDocumentViews(APITestMixin):
     def test_document_upload_status_wrong_status(self):
         """Tests request validation in the document status endpoint."""
         project = InvestmentProjectFactory()
-        doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
+        doc = IProjectDocument.create_from_declaration_request(
+            project, 'total_investment', 'test.txt'
+        )
 
         url = reverse('api-v3:investment:document-item-callback',
                       kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
@@ -1259,7 +1271,9 @@ class TestDocumentViews(APITestMixin):
     def test_document_upload_status_no_status(self):
         """Tests request validation in the document status endpoint."""
         project = InvestmentProjectFactory()
-        doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
+        doc = IProjectDocument.create_from_declaration_request(
+            project, 'total_investment', 'test.txt'
+        )
 
         url = reverse('api-v3:investment:document-item-callback',
                       kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
