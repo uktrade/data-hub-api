@@ -70,7 +70,7 @@ def get_sort_query(qs, field_order=None):
     # check if we sort by field in nested document (example: 'stage.name')
     if '.' in tokens[0]:
         # extract and add path to nested document (example: 'stage')
-        sort_params['nested_path'] = tokens[0].split('.')[0]
+        sort_params['nested_path'] = tokens[0].split('.', 1)[0]
 
     qs = qs.sort({
         remap_sort_field(tokens[0]): sort_params
