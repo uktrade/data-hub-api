@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
-from datahub.core import constants
+from datahub.core.constants import Country, Sector
 from datahub.core.test_utils import APITestMixin
 
 from .factories import OrderFactory, OrderSubscriberFactory
@@ -21,7 +21,8 @@ class TestAddOrderDetails(APITestMixin):
         """Test a successful call to create an Order."""
         company = CompanyFactory()
         contact = ContactFactory(company=company)
-        country = constants.Country.france.value
+        country = Country.france.value
+        sector = Sector.aerospace_assembly_aircraft.value
 
         url = reverse('api-v3:omis:order:list')
         response = self.api_client.post(
@@ -35,6 +36,9 @@ class TestAddOrderDetails(APITestMixin):
                 },
                 'primary_market': {
                     'id': country.id
+                },
+                'sector': {
+                    'id': sector.id
                 },
             },
             format='json'
@@ -54,8 +58,12 @@ class TestAddOrderDetails(APITestMixin):
             },
             'primary_market': {
                 'id': country.id,
-                'name': country.name,
-            }
+                'name': country.name
+            },
+            'sector': {
+                'id': sector.id,
+                'name': sector.name
+            },
         }
 
     def test_fails_if_contact_not_from_company(self):
@@ -64,7 +72,7 @@ class TestAddOrderDetails(APITestMixin):
         """
         company = CompanyFactory()
         contact = ContactFactory()  # doesn't work at `company`
-        country = constants.Country.france.value
+        country = Country.france.value
 
         url = reverse('api-v3:omis:order:list')
         response = self.api_client.post(
@@ -78,14 +86,14 @@ class TestAddOrderDetails(APITestMixin):
                 },
                 'primary_market': {
                     'id': country.id
-                }
+                },
             },
             format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            'contact': ['The contact does not work at the given company.']
+            'contact': ['The contact does not work at the given company.'],
         }
 
     def test_general_validation(self):
@@ -97,7 +105,7 @@ class TestAddOrderDetails(APITestMixin):
         assert response.json() == {
             'company': ['This field is required.'],
             'contact': ['This field is required.'],
-            'primary_market': ['This field is required.']
+            'primary_market': ['This field is required.'],
         }
 
 
@@ -108,13 +116,21 @@ class TestChangeOrderDetails(APITestMixin):
         """Test changing an existing order."""
         order = OrderFactory()
         new_contact = ContactFactory(company=order.company)
+        new_sector = Sector.renewable_energy_wind.value
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(url, {
-            'contact': {
-                'id': new_contact.id
-            }
-        }, format='json')
+        response = self.api_client.patch(
+            url,
+            {
+                'contact': {
+                    'id': new_contact.id
+                },
+                'sector': {
+                    'id': new_sector.id
+                },
+            },
+            format='json'
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
@@ -131,7 +147,11 @@ class TestChangeOrderDetails(APITestMixin):
             'primary_market': {
                 'id': str(order.primary_market.id),
                 'name': order.primary_market.name
-            }
+            },
+            'sector': {
+                'id': new_sector.id,
+                'name': new_sector.name
+            },
         }
 
     def test_fails_if_contact_not_from_company(self):
@@ -142,15 +162,19 @@ class TestChangeOrderDetails(APITestMixin):
         other_contact = ContactFactory()  # doesn't work at `order.company`
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(url, {
-            'contact': {
-                'id': other_contact.id
-            }
-        }, format='json')
+        response = self.api_client.patch(
+            url,
+            {
+                'contact': {
+                    'id': other_contact.id
+                },
+            },
+            format='json'
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            'contact': ['The contact does not work at the given company.']
+            'contact': ['The contact does not work at the given company.'],
         }
 
     def test_cannot_change_company(self):
@@ -160,18 +184,22 @@ class TestChangeOrderDetails(APITestMixin):
         contact = ContactFactory(company=company)
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(url, {
-            'company': {
-                'id': company.id
+        response = self.api_client.patch(
+            url,
+            {
+                'company': {
+                    'id': company.id
+                },
+                'contact': {
+                    'id': contact.id
+                },
             },
-            'contact': {
-                'id': contact.id
-            }
-        }, format='json')
+            format='json'
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            'company': ['The company cannot be changed after creation.']
+            'company': ['The company cannot be changed after creation.'],
         }
 
     def test_cannot_change_primary_market(self):
@@ -179,15 +207,19 @@ class TestChangeOrderDetails(APITestMixin):
         order = OrderFactory()
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(url, {
-            'primary_market': {
-                'id': constants.Country.greece.value.id
-            }
-        }, format='json')
+        response = self.api_client.patch(
+            url,
+            {
+                'primary_market': {
+                    'id': Country.greece.value.id
+                },
+            },
+            format='json'
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            'primary_market': ['The primary market cannot be changed after creation.']
+            'primary_market': ['The primary market cannot be changed after creation.'],
         }
 
     def test_general_validation(self):
@@ -195,17 +227,21 @@ class TestChangeOrderDetails(APITestMixin):
         order = OrderFactory()
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(url, {
-            'contact': {
-                'id': '00000000-0000-0000-0000-000000000000'
+        response = self.api_client.patch(
+            url,
+            {
+                'contact': {
+                    'id': '00000000-0000-0000-0000-000000000000'
+                },
             },
-        }, format='json')
+            format='json'
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
             'contact': [
                 'Invalid pk "00000000-0000-0000-0000-000000000000" - object does not exist.'
-            ]
+            ],
         }
 
 
@@ -234,14 +270,21 @@ class TestViewOrderDetails(APITestMixin):
             'primary_market': {
                 'id': str(order.primary_market.id),
                 'name': order.primary_market.name
-            }
+            },
+            'sector': {
+                'id': str(order.sector.id),
+                'name': order.sector.name
+            },
         }
 
     def test_not_found(self):
         """Test 404 when getting a non-existing order"""
-        url = reverse('api-v3:omis:order:detail', kwargs={
-            'pk': '00000000-0000-0000-0000-000000000000'
-        })
+        url = reverse(
+            'api-v3:omis:order:detail',
+            kwargs={
+                'pk': '00000000-0000-0000-0000-000000000000'
+            }
+        )
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -394,5 +437,5 @@ class TestChangeSubscriberList(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == [
-            {}, {}, {'id': ['00000000-0000-0000-0000-000000000000 is not a valid adviser']}
+            {}, {}, {'id': ['00000000-0000-0000-0000-000000000000 is not a valid adviser']},
         ]
