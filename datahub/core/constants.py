@@ -543,6 +543,7 @@ class InvestmentBusinessActivity(Enum):
     """Investment business activity constants."""
 
     retail = Constant('Retail', 'a2dbd807-ae52-421c-8d1d-88adfc7a506b')
+    other = Constant('Other', 'befab707-5abd-4f47-8477-57f091e6dac9')
 
 
 class FDIType(Enum):
