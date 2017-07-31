@@ -66,8 +66,13 @@ class TestUnifiedViews(APITestMixin):
         aerospace_id = constants.Sector.aerospace_assembly_aircraft.value.id
         new_site_id = (constants.FDIType.creation_of_new_site_or_activity
                        .value.id)
-        retail_business_activity = constants.InvestmentBusinessActivity.retail
-        business_activity_id = retail_business_activity.value.id
+        retail_business_activity_id = constants.InvestmentBusinessActivity.retail.value.id
+        other_business_activity_id = constants.InvestmentBusinessActivity.other.value.id
+        activities = [{
+            'id': retail_business_activity_id
+        }, {
+            'id': other_business_activity_id
+        }]
         request_data = {
             'name': 'project name',
             'description': 'project description',
@@ -83,9 +88,8 @@ class TestUnifiedViews(APITestMixin):
             'stage': {
                 'id': constants.InvestmentProjectStage.prospect.value.id
             },
-            'business_activities': [{
-                'id': business_activity_id
-            }],
+            'business_activities': activities,
+            'other_business_activity': 'New innovation centre',
             'client_contacts': [{
                 'id': str(contacts[0].id)
             }, {
@@ -139,11 +143,11 @@ class TestUnifiedViews(APITestMixin):
             adviser.id)
         assert response_data['stage']['id'] == request_data['stage']['id']
         assert len(response_data['client_contacts']) == 2
-        assert sorted(contact['id'] for contact in response_data[
-            'client_contacts']) == sorted(contact.id for contact in contacts)
-        assert len(response_data['business_activities']) == 1
-        assert (response_data['business_activities'][0]['id'] ==
-                business_activity_id)
+        assert Counter(contact['id'] for contact in response_data[
+            'client_contacts']) == Counter(contact.id for contact in contacts)
+        assert Counter(activity['id'] for activity in response_data[
+            'business_activities']) == Counter(activity['id'] for activity in activities)
+        assert response_data['other_business_activity'] == request_data['other_business_activity']
 
     def test_create_project_fail(self):
         """Test creating a project with missing required values."""

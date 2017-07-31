@@ -10,7 +10,8 @@ order_collection = OrderViewSet.as_view({
 })
 
 order_item = OrderViewSet.as_view({
-    'get': 'retrieve'
+    'get': 'retrieve',
+    'patch': 'partial_update'
 })
 
 

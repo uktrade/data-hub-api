@@ -2,7 +2,8 @@ from rest_framework import serializers
 
 from datahub.company.models import Advisor, Company, Contact
 from datahub.core.serializers import NestedRelatedField
-from datahub.metadata.models import Country, Team
+from datahub.core.validate_utils import DataCombiner
+from datahub.metadata.models import Country, Sector, Team
 
 from .models import Order
 
@@ -15,6 +16,7 @@ class OrderSerializer(serializers.ModelSerializer):
     company = NestedRelatedField(Company)
     contact = NestedRelatedField(Contact)
     primary_market = NestedRelatedField(Country)
+    sector = NestedRelatedField(Sector, required=False, allow_null=True)
 
     class Meta:  # noqa: D101
         model = Order
@@ -23,17 +25,33 @@ class OrderSerializer(serializers.ModelSerializer):
             'reference',
             'company',
             'contact',
-            'primary_market'
+            'primary_market',
+            'sector',
         ]
 
     def validate(self, data):
-        """
-        Extra check that a contact works at the given company.
-        """
-        if data['contact'].company != data['company']:
+        """Extra checks."""
+        data_combiner = DataCombiner(self.instance, data)
+        company = data_combiner.get_value('company')
+        contact = data_combiner.get_value('contact')
+
+        # check that contact works at company
+        if contact.company != company:
             raise serializers.ValidationError({
                 'contact': 'The contact does not work at the given company.'
             })
+
+        # company and primary_market cannot be changed after creation
+        if self.instance:
+            if company != self.instance.company:
+                raise serializers.ValidationError({
+                    'company': 'The company cannot be changed after creation.'
+                })
+
+            if data_combiner.get_value('primary_market') != self.instance.primary_market:
+                raise serializers.ValidationError({
+                    'primary_market': 'The primary market cannot be changed after creation.'
+                })
 
         return data
 

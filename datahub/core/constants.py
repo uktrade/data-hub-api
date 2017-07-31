@@ -310,16 +310,11 @@ class Country(Enum):
 class InteractionType(Enum):
     """Interaction types."""
 
-    business_card = Constant('Business Card', 'a6d71fdd-5d95-e211-a939-e4115bead28a')
     email_website = Constant('Email/Website', '70c226d7-5d95-e211-a939-e4115bead28a')
     face_to_face = Constant('Face to Face', 'a5d71fdd-5d95-e211-a939-e4115bead28a')
-    fax = Constant('Fax', '71c226d7-5d95-e211-a939-e4115bead28a')
     letter_fax = Constant('Letter/Fax', '74c226d7-5d95-e211-a939-e4115bead28a')
-    sms = Constant('SMS', 'a4d71fdd-5d95-e211-a939-e4115bead28a')
     social_media = Constant('Social Media', 'a8d71fdd-5d95-e211-a939-e4115bead28a')
     telephone = Constant('Telephone', '72c226d7-5d95-e211-a939-e4115bead28a')
-    telex = Constant('Telex', '73c226d7-5d95-e211-a939-e4115bead28a')
-    ukti_website = Constant('UKTI Website', '75c226d7-5d95-e211-a939-e4115bead28a')
     video_teleconf = Constant('Video/Teleconf.', 'a7d71fdd-5d95-e211-a939-e4115bead28a')
 
 
@@ -346,6 +341,10 @@ class Sector(Enum):
     aerospace_assembly_aircraft = Constant(
         'Aerospace : Manufacturing and Assembly : Aircraft',
         'b422c9d2-5f95-e211-a939-e4115bead28a'
+    )
+    renewable_energy_wind = Constant(
+        'Renewable Energy : Wind',
+        'a4959812-6095-e211-a939-e4115bead28a'
     )
 
 
@@ -544,6 +543,7 @@ class InvestmentBusinessActivity(Enum):
     """Investment business activity constants."""
 
     retail = Constant('Retail', 'a2dbd807-ae52-421c-8d1d-88adfc7a506b')
+    other = Constant('Other', 'befab707-5abd-4f47-8477-57f091e6dac9')
 
 
 class FDIType(Enum):
