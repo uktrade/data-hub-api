@@ -44,12 +44,14 @@ CondValRule = namedtuple('CondValRule', ('field', 'condition', 'stage'))
 
 
 def _contains_id(id_, instances):
+    # For updates the UUID is still a string
     if not isinstance(id_, UUID):
         id_ = UUID(id_)
     return any(_get_to_many_id(instance) == id_ for instance in instances)
 
 
 def _get_to_many_id(instance):
+    # For updates the UUID is still a string
     if isinstance(instance, str):
         return UUID(instance)
     return instance.id
