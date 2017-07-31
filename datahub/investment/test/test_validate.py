@@ -57,7 +57,7 @@ def test_validate_fdi_type():
 
 
 def test_validate_business_activity_other_instance():
-    """Tests other_business_activity conditional validation."""
+    """Tests other_business_activity conditional validation for a model instance."""
     project = InvestmentProjectFactory(
         business_activities=[constants.InvestmentBusinessActivity.other.value.id]
     )
@@ -68,7 +68,7 @@ def test_validate_business_activity_other_instance():
 
 
 def test_validate_business_activity_other_update_data():
-    """Tests other_business_activity conditional validation."""
+    """Tests other_business_activity conditional validation for update data."""
     project = InvestmentProjectFactory()
     data = {
         'business_activities': [constants.InvestmentBusinessActivity.other.value.id]
