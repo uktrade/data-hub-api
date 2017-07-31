@@ -19,6 +19,19 @@ class OrderViewSet(CoreViewSetV3):
         'primary_market',
     )
 
+    def get_additional_data(self, create):
+        """
+        Populates the created(modified)_by fields.
+        """
+        additional_data = {
+            'modified_by': self.request.user
+        }
+
+        if create:
+            additional_data['created_by'] = self.request.user
+
+        return additional_data
+
 
 class SubscriberListView(APIView):
     """API View for advisers subscribed to an order."""

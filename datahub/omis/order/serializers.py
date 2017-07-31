@@ -13,8 +13,15 @@ class OrderSerializer(serializers.ModelSerializer):
 
     id = serializers.UUIDField(read_only=True)
     reference = serializers.CharField(read_only=True)
+
+    created_on = serializers.DateTimeField(read_only=True)
+    created_by = NestedRelatedField(Company, read_only=True)
+    modified_on = serializers.DateTimeField(read_only=True)
+    modified_by = NestedRelatedField(Company, read_only=True)
+
     company = NestedRelatedField(Company)
     contact = NestedRelatedField(Contact)
+
     primary_market = NestedRelatedField(Country)
     sector = NestedRelatedField(Sector, required=False, allow_null=True)
 
@@ -23,6 +30,10 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'reference',
+            'created_on',
+            'created_by',
+            'modified_on',
+            'modified_by',
             'company',
             'contact',
             'primary_market',
