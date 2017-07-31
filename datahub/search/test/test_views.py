@@ -13,7 +13,6 @@ from datahub.core.test_utils import (
 )
 from datahub.investment.test.factories import InvestmentProjectFactory
 
-
 pytestmark = pytest.mark.django_db
 
 
@@ -240,10 +239,10 @@ class TestSearch(APITestMixin):
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_results_quality(self):
         """Tests quality of results."""
-        CompanyFactory(name='The Risk Advisory Group').save()
-        CompanyFactory(name='The Advisory Group').save()
-        CompanyFactory(name='The Advisory').save()
-        CompanyFactory(name='The Advisories').save()
+        CompanyFactory(name='The Risk Advisory Group')
+        CompanyFactory(name='The Advisory Group')
+        CompanyFactory(name='The Advisory')
+        CompanyFactory(name='The Advisories')
 
         connections.get_connection().indices.refresh()
 
@@ -265,11 +264,11 @@ class TestSearch(APITestMixin):
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_sort_desc(self):
-        """Tests quality of results."""
-        CompanyFactory(name='Water 1').save()
-        CompanyFactory(name='water 2').save()
-        CompanyFactory(name='water 3').save()
-        CompanyFactory(name='Water 4').save()
+        """Tests sorting in descending order."""
+        CompanyFactory(name='Water 1')
+        CompanyFactory(name='water 2')
+        CompanyFactory(name='water 3')
+        CompanyFactory(name='Water 4')
 
         connections.get_connection().indices.refresh()
 
@@ -292,11 +291,11 @@ class TestSearch(APITestMixin):
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_sort_asc(self):
-        """Tests quality of results."""
-        CompanyFactory(name='Fire 4').save()
-        CompanyFactory(name='fire 3').save()
-        CompanyFactory(name='fire 2').save()
-        CompanyFactory(name='Fire 1').save()
+        """Tests sorting in ascending order."""
+        CompanyFactory(name='Fire 4')
+        CompanyFactory(name='fire 3')
+        CompanyFactory(name='fire 2')
+        CompanyFactory(name='Fire 1')
 
         connections.get_connection().indices.refresh()
 
@@ -317,12 +316,51 @@ class TestSearch(APITestMixin):
 
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_sort_nested_desc(self):
+        """Tests sorting by nested field."""
+        InvestmentProjectFactory(
+            name='Potato 1',
+            stage_id=constants.InvestmentProjectStage.active.value.id,
+        )
+        InvestmentProjectFactory(
+            name='Potato 2',
+            stage_id=constants.InvestmentProjectStage.prospect.value.id,
+        )
+        InvestmentProjectFactory(
+            name='potato 3',
+            stage_id=constants.InvestmentProjectStage.won.value.id,
+        )
+        InvestmentProjectFactory(
+            name='Potato 4',
+            stage_id=constants.InvestmentProjectStage.won.value.id,
+        )
+
+        connections.get_connection().indices.refresh()
+
+        term = 'Potato'
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(url, {
+            'original_query': term,
+            'sortby': 'stage.name:desc',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 4
+        assert ['Won',
+                'Won',
+                'Prospect',
+                'Active'] == [investment_project['stage']['name']
+                              for investment_project in response.data['results']]
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_sort_invalid(self):
-        """Tests quality of results."""
-        CompanyFactory(name='Fire 4').save()
-        CompanyFactory(name='fire 3').save()
-        CompanyFactory(name='fire 2').save()
-        CompanyFactory(name='Fire 1').save()
+        """Tests attempt to sort by non existent field."""
+        CompanyFactory(name='Fire 4')
+        CompanyFactory(name='fire 3')
+        CompanyFactory(name='fire 2')
+        CompanyFactory(name='Fire 1')
 
         connections.get_connection().indices.refresh()
 
@@ -339,9 +377,9 @@ class TestSearch(APITestMixin):
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_sort_asc_with_null_values(self):
-        """Tests quality of results."""
-        InvestmentProjectFactory(name='Earth 1', total_investment=1000).save()
-        InvestmentProjectFactory(name='Earth 2').save()
+        """Tests placement of null values in sorted results when order is ascending."""
+        InvestmentProjectFactory(name='Earth 1', total_investment=1000)
+        InvestmentProjectFactory(name='Earth 2')
 
         connections.get_connection().indices.refresh()
 
@@ -362,9 +400,9 @@ class TestSearch(APITestMixin):
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_sort_desc_with_null_values(self):
-        """Tests quality of results."""
-        InvestmentProjectFactory(name='Ether 1', total_investment=1000).save()
-        InvestmentProjectFactory(name='Ether 2').save()
+        """Tests placement of null values in sorted results when order is descending."""
+        InvestmentProjectFactory(name='Ether 1', total_investment=1000)
+        InvestmentProjectFactory(name='Ether 2')
 
         connections.get_connection().indices.refresh()
 
@@ -400,14 +438,14 @@ class TestSearch(APITestMixin):
             investor_company=company_a,
             sector_id=constants.Sector.aerospace_assembly_aircraft.value.id,
             stage_id=constants.InvestmentProjectStage.active.value.id
-        ).save()
+        )
         InvestmentProjectFactory(
             investor_company=company_b,
             stage_id=constants.InvestmentProjectStage.prospect.value.id,
-        ).save()
+        )
         InvestmentProjectFactory(
             stage_id=constants.InvestmentProjectStage.won.value.id
-        ).save()
+        )
 
         connections.get_connection().indices.refresh()
 

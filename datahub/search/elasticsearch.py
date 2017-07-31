@@ -62,10 +62,18 @@ def get_sort_query(qs, field_order=None):
     tokens = field_order.rsplit(':', maxsplit=1)
     order = tokens[1] if len(tokens) > 1 else 'asc'
 
+    sort_params = {
+        'order': order,
+        'missing': '_first' if order == 'asc' else '_last'
+    }
+
+    # check if we sort by field in nested document (example: 'stage.name')
+    if '.' in tokens[0]:
+        # extract and add path to nested document (example: 'stage')
+        sort_params['nested_path'] = tokens[0].split('.', 1)[0]
+
     qs = qs.sort({
-        remap_sort_field(tokens[0]): {'order': order,
-                                      'missing': '_first' if order == 'asc' else '_last'
-                                      }
+        remap_sort_field(tokens[0]): sort_params
     })
     return qs
 
