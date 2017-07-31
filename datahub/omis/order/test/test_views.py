@@ -48,6 +48,16 @@ class TestAddOrderDetails(APITestMixin):
         assert response.json() == {
             'id': response.json()['id'],
             'reference': response.json()['reference'],
+            'created_on': '2017-04-18T13:00:00',
+            'created_by': {
+                'id': str(self.user.id),
+                'name': self.user.name
+            },
+            'modified_on': '2017-04-18T13:00:00',
+            'modified_by': {
+                'id': str(self.user.id),
+                'name': self.user.name
+            },
             'company': {
                 'id': company.pk,
                 'name': company.name
@@ -64,7 +74,6 @@ class TestAddOrderDetails(APITestMixin):
                 'id': sector.id,
                 'name': sector.name
             },
-            'created_on': '2017-04-18T13:00:00',
         }
 
     def test_fails_if_contact_not_from_company(self):
@@ -138,6 +147,16 @@ class TestChangeOrderDetails(APITestMixin):
         assert response.json() == {
             'id': order.id,
             'reference': order.reference,
+            'created_on': '2017-04-18T13:00:00',
+            'created_by': {
+                'id': str(order.created_by.id),
+                'name': order.created_by.name
+            },
+            'modified_on': '2017-04-18T13:00:00',
+            'modified_by': {
+                'id': str(self.user.id),
+                'name': self.user.name
+            },
             'company': {
                 'id': str(order.company.id),
                 'name': order.company.name
@@ -154,7 +173,6 @@ class TestChangeOrderDetails(APITestMixin):
                 'id': new_sector.id,
                 'name': new_sector.name
             },
-            'created_on': '2017-04-18T13:00:00',
         }
 
     def test_fails_if_contact_not_from_company(self):
@@ -262,6 +280,16 @@ class TestViewOrderDetails(APITestMixin):
         assert response.json() == {
             'id': order.id,
             'reference': order.reference,
+            'created_on': order.created_on.isoformat(),
+            'created_by': {
+                'id': str(order.created_by.id),
+                'name': order.created_by.name
+            },
+            'modified_on': order.modified_on.isoformat(),
+            'modified_by': {
+                'id': str(order.modified_by.id),
+                'name': order.modified_by.name
+            },
             'company': {
                 'id': str(order.company.id),
                 'name': order.company.name
@@ -278,7 +306,6 @@ class TestViewOrderDetails(APITestMixin):
                 'id': str(order.sector.id),
                 'name': order.sector.name
             },
-            'created_on': order.created_on.isoformat(),
         }
 
     def test_not_found(self):
