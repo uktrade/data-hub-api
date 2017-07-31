@@ -56,6 +56,30 @@ def test_validate_fdi_type():
     assert 'non_fdi_type' not in errors
 
 
+def test_validate_business_activity_other_instance():
+    """Tests other_business_activity conditional validation for a model instance."""
+    project = InvestmentProjectFactory(
+        business_activities=[constants.InvestmentBusinessActivity.other.value.id]
+    )
+    errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
+    assert errors == {
+        'other_business_activity': 'This field is required.'
+    }
+
+
+def test_validate_business_activity_other_update_data():
+    """Tests other_business_activity conditional validation for update data."""
+    project = InvestmentProjectFactory()
+    data = {
+        'business_activities': [constants.InvestmentBusinessActivity.other.value.id]
+    }
+    errors = validate(instance=project, update_data=data,
+                      fields=IProjectSummarySerializer.Meta.fields)
+    assert errors == {
+        'other_business_activity': 'This field is required.'
+    }
+
+
 def test_validate_project_referral_website():
     """Tests referral_source_activity_website conditional validation."""
     referral_source_id = constants.ReferralSourceActivity.website.value.id
