@@ -143,10 +143,10 @@ class TestUnifiedViews(APITestMixin):
             adviser.id)
         assert response_data['stage']['id'] == request_data['stage']['id']
         assert len(response_data['client_contacts']) == 2
-        assert sorted(contact['id'] for contact in response_data[
-            'client_contacts']) == sorted(contact.id for contact in contacts)
-        assert sorted(activity['id'] for activity in response_data[
-            'business_activities']) == sorted(activity['id'] for activity in activities)
+        assert Counter(contact['id'] for contact in response_data[
+            'client_contacts']) == Counter(contact.id for contact in contacts)
+        assert Counter(activity['id'] for activity in response_data[
+            'business_activities']) == Counter(activity['id'] for activity in activities)
         assert response_data['other_business_activity'] == request_data['other_business_activity']
 
     def test_create_project_fail(self):
