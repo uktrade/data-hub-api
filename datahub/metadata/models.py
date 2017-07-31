@@ -1,3 +1,5 @@
+from django.db import models
+
 from datahub.core.models import BaseConstantModel, BaseOrderedConstantModel
 
 
@@ -56,10 +58,33 @@ class Role(BaseConstantModel):
     pass
 
 
+class TeamRole(BaseConstantModel):
+    """Team role."""
+
+    pass
+
+
 class Team(BaseConstantModel):
     """Team."""
 
-    pass
+    role = models.ForeignKey(
+        TeamRole,
+        null=True, blank=True,
+        related_name="%(class)ss",  # noqa: Q000
+        on_delete=models.PROTECT,
+    )
+    uk_region = models.ForeignKey(
+        UKRegion,
+        null=True, blank=True,
+        related_name="%(class)ss",  # noqa: Q000
+        on_delete=models.PROTECT,
+    )
+    country = models.ForeignKey(
+        Country,
+        null=True, blank=True,
+        related_name="%(class)ss",  # noqa: Q000
+        on_delete=models.PROTECT,
+    )
 
 
 class Service(BaseConstantModel):

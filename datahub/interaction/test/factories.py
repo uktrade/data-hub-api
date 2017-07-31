@@ -1,9 +1,9 @@
 import factory
 from django.utils.timezone import now
 
-from datahub.company.test.factories import CompanyFactory, ContactFactory, AdviserFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
-from datahub.metadata.test.factories import TeamFactory, ServiceFactory
+from datahub.metadata.test.factories import ServiceFactory, TeamFactory
 
 
 class ServiceOfferFactory(factory.django.DjangoModelFactory):
@@ -12,7 +12,7 @@ class ServiceOfferFactory(factory.django.DjangoModelFactory):
     service = factory.SubFactory(ServiceFactory)
     dit_team = factory.SubFactory(TeamFactory)
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = 'interaction.ServiceOffer'
 
 
@@ -30,7 +30,7 @@ class InteractionFactory(factory.django.DjangoModelFactory):
     created_on = now()
     interaction_type_id = constants.InteractionType.face_to_face.value.id
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = 'interaction.Interaction'
 
 
@@ -48,5 +48,5 @@ class ServiceDeliveryFactory(factory.django.DjangoModelFactory):
     uk_region_id = constants.UKRegion.east_midlands.value.id
     feedback = 'foobar'
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = 'interaction.ServiceDelivery'

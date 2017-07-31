@@ -22,5 +22,5 @@ class BusinessLeadFactory(factory.django.DjangoModelFactory):
     contactable_by_email = True
     adviser = factory.SubFactory(AdviserFactory)
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = 'leads.BusinessLead'

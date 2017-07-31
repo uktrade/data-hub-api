@@ -37,6 +37,7 @@ class IProjectAbstract(models.Model):
 
     cdms_project_code = models.CharField(max_length=MAX_LENGTH, blank=True,
                                          null=True)
+    quotable_as_public_case_study = models.NullBooleanField()
     project_shareable = models.NullBooleanField()
     not_shareable_reason = models.TextField(blank=True, null=True)
     actual_land_date = models.DateField(blank=True, null=True)
@@ -105,6 +106,9 @@ class IProjectAbstract(models.Model):
         'metadata.InvestmentBusinessActivity',
         related_name='+',
         blank=True
+    )
+    other_business_activity = models.CharField(
+        max_length=MAX_LENGTH, null=True, blank=True
     )
 
     @property
@@ -288,7 +292,8 @@ class IProjectDocument(BaseModel, ArchivableModel):
     BUCKET_PREFIX = 'investment-documents'
     DOC_TYPES = Choices(
         ('actual_land_date', 'Actual land date'),
-        ('fdi_type', 'Fdi type'),
+        ('hq', 'Global/European HQ evidence'),
+        ('foreign_ownership', 'Foreign ownership evidence'),
         ('operations_commenced', 'Operations commenced'),
         ('total_investment', 'Total investment'),
         ('foreign_equity_investment', 'Foreign equity investment'),

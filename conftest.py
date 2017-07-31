@@ -5,6 +5,7 @@ from pytest_django.lazy_django import skip_if_no_django
 
 @pytest.fixture(scope='session')
 def django_db_setup(django_db_setup, django_db_blocker):
+    """Fixture for DB setup."""
     with django_db_blocker.unblock():
         call_command('loadmetadata')
 
