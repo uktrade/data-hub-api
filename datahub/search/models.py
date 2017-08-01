@@ -119,8 +119,6 @@ class MapDBModelToDict:
 class Company(DocType, MapDBModelToDict):
     """Elasticsearch representation of Company model."""
 
-    created_by = _contact_mapping('created_by')
-    modified_by = _contact_mapping('modified_by')
     account_manager = _contact_mapping('account_manager')
     alias = String()
     archived = Boolean()
@@ -163,8 +161,6 @@ class Company(DocType, MapDBModelToDict):
     future_interest_countries = _id_name_mapping()
 
     MAPPINGS = {
-        'created_by': _contact_dict,
-        'modified_by': _contact_dict,
         'companies_house_data': _company_dict,
         'account_manager': _contact_dict,
         'archived_by': _contact_dict,
@@ -191,7 +187,7 @@ class Company(DocType, MapDBModelToDict):
         'children', 'servicedeliverys', 'investor_investment_projects',
         'intermediate_investment_projects', 'investee_projects',
         'tree_id', 'lft', 'rght', 'business_leads', 'interactions',
-        'orders'
+        'orders', 'created_by', 'modified_by'
     )
 
     class Meta:
@@ -204,8 +200,6 @@ class Company(DocType, MapDBModelToDict):
 class Contact(DocType, MapDBModelToDict):
     """Elasticsearch representation of Contact model."""
 
-    created_by = _contact_mapping('created_by')
-    modified_by = _contact_mapping('modified_by')
     archived = Boolean()
     archived_on = Date()
     archived_reason = String()
@@ -242,8 +236,6 @@ class Contact(DocType, MapDBModelToDict):
 
     MAPPINGS = {
         'id': str,
-        'created_by': _contact_dict,
-        'modified_by': _contact_dict,
         'title': _id_name_dict,
         'address_country': _id_name_dict,
         'adviser': _contact_dict,
@@ -252,7 +244,8 @@ class Contact(DocType, MapDBModelToDict):
     }
 
     IGNORED_FIELDS = (
-        'interactions', 'servicedeliverys', 'investment_projects', 'orders'
+        'interactions', 'servicedeliverys', 'investment_projects', 'orders',
+        'created_by', 'modified_by'
     )
 
     class Meta:
@@ -266,8 +259,6 @@ class InvestmentProject(DocType, MapDBModelToDict):
     """Elasticsearch representation of InvestmentProject."""
 
     id = String(index='not_analyzed')
-    created_by = _contact_mapping('created_by')
-    modified_by = _contact_mapping('modified_by')
     approved_commitment_to_invest = Boolean()
     approved_fdi = Boolean()
     approved_good_value = Boolean()
@@ -325,8 +316,6 @@ class InvestmentProject(DocType, MapDBModelToDict):
 
     MAPPINGS = {
         'id': str,
-        'created_by': _contact_dict,
-        'modified_by': _contact_dict,
         'actual_land_date_documents': lambda col: [_id_uri_dict(c) for c in col.all()],
         'business_activities': lambda col: [_id_name_dict(c) for c in col.all()],
         'client_contacts': lambda col: [_contact_dict(c) for c in col.all()],
@@ -357,7 +346,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'investmentprojectcode', 'competitor_countries',
         'uk_region_locations', 'strategic_drivers',
         'client_considering_other_countries', 'cdms_project_code',
-        'interactions', 'documents'
+        'interactions', 'documents', 'created_by', 'modified_by'
     )
 
     class Meta:
