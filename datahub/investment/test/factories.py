@@ -17,6 +17,8 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     """Investment project factory."""
 
     id = factory.LazyFunction(lambda: str(uuid.uuid4()))
+    created_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SubFactory(AdviserFactory)
     name = factory.Sequence(lambda n: f'name {n}')
     description = factory.Sequence(lambda n: f'desc {n}')
     nda_signed = False

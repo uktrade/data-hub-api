@@ -58,7 +58,7 @@ LOCAL_APPS = [
     'datahub.metadata',
     'datahub.search.apps.SearchConfig',
     'datahub.user',
-    'datahub.omis.order'
+    'datahub.omis.order',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

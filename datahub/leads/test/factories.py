@@ -13,6 +13,8 @@ class BusinessLeadFactory(factory.django.DjangoModelFactory):
     """Business lead factory."""
 
     id = factory.Sequence(lambda _: str(uuid.uuid4()))
+    created_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SubFactory(AdviserFactory)
     first_name = factory.Sequence(lambda n: 'name {n}')
     last_name = factory.Sequence(lambda n: 'surname {n}')
     company_name = factory.Sequence(lambda n: 'company name {n}')
