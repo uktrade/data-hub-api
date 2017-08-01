@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='iprojectdocument',
             name='doc_type',
-            field=models.CharField(choices=[('actual_land_date', 'Actual land date'), ('fdi_type', 'Fdi type'), ('operations_commenced', 'Operations commenced'), ('total_investment', 'Total investment'), ('foreign_equity_investment', 'Foreign equity investment'), ('number_new_jobs', 'Number new jobs'), ('number_safeguarded_jobs', 'Number safeguarded jobs'), ('r_and_d_budget', 'R and D budget'), ('new_tech_to_uk', 'New tech to uk'), ('export_revenue', 'Export revenue'), ('average_salary', 'Average salary')], max_length=255),
+            field=models.CharField(choices=[('actual_land_date', 'Actual land date'), ('hq', 'Global/European HQ evidence'), ('foreign_ownership', 'Foreign ownership evidence'), ('operations_commenced', 'Operations commenced'), ('total_investment', 'Total investment'), ('foreign_equity_investment', 'Foreign equity investment'), ('number_new_jobs', 'Number new jobs'), ('number_safeguarded_jobs', 'Number safeguarded jobs'), ('r_and_d_budget', 'R and D budget'), ('new_tech_to_uk', 'New tech to uk'), ('export_revenue', 'Export revenue'), ('average_salary', 'Average salary')], max_length=255),
         ),
         migrations.RunSQL(
             sql=(
