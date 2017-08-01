@@ -5,15 +5,15 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 boto3==1.4.4
-botocore==1.5.81          # via boto3, s3transfer
-certifi==2017.4.17        # via requests
+botocore==1.5.90          # via boto3, s3transfer
+certifi==2017.7.27.1      # via requests
 chardet==3.0.4            # via requests
 click==6.7                # via pip-tools
 colander==1.3.3
 contextlib2==0.5.5        # via raven
 coverage==4.4.1           # via pytest-cov
 cssselect==1.0.1
-decorator==4.0.11         # via ipython, traitlets
+decorator==4.1.2          # via ipython, traitlets
 django-debug-toolbar==1.8
 django-environ==0.4.3
 django-extensions==1.8.1
@@ -28,25 +28,25 @@ djangorestframework==3.6.3
 docutils==0.13.1          # via botocore
 elasticsearch-dsl==2.2.0
 elasticsearch==2.4.1
-factory-boy==2.8.1
-faker==0.7.17             # via factory-boy
+factory-boy==2.9.0
+faker==0.7.18             # via factory-boy
 first==2.0.1              # via pip-tools
 flake8-blind-except==0.1.1
 flake8-debugger==1.4.0
 flake8-docstrings==1.1.0
-flake8-import-order==0.12
+flake8-import-order==0.13
 flake8-polyfill==1.0.1    # via flake8-docstrings
 flake8-print==2.0.2
 flake8-quotes==0.9.0
 flake8-string-format==0.2.3
-flake8==3.3.0
+flake8==3.4.1
 freezegun==0.3.9
 gunicorn==19.7.1
 idna==2.5                 # via requests
 ipdb==0.10.3
 ipython-genutils==0.2.0   # via traitlets
 ipython==6.1.0
-iso8601==0.1.11           # via colander
+iso8601==0.1.11
 jedi==0.10.2              # via ipython
 jmespath==0.9.3           # via boto3, botocore
 lxml==3.8.0
@@ -57,8 +57,8 @@ pep8==1.7.0
 pexpect==4.2.1            # via ipython
 pickleshare==0.7.4        # via ipython
 pip-tools==1.9.0
-prompt-toolkit==1.0.14    # via ipython
-psycopg2==2.7.1
+prompt-toolkit==1.0.15    # via ipython
+psycopg2==2.7.3
 ptyprocess==0.5.2         # via pexpect
 py==1.4.34                # via pytest
 pycodestyle==2.3.1        # via flake8, flake8-import-order
@@ -75,7 +75,7 @@ pytz==2017.2              # via django
 pyyaml==3.12
 raven==6.1.0
 requests-mock==1.3.0
-requests==2.18.1
+requests==2.18.2
 requests_toolbelt==0.8.0
 s3transfer==0.1.10        # via boto3
 simplegeneric==0.8.1      # via ipython
@@ -85,7 +85,7 @@ sqlparse==0.2.3           # via django-debug-toolbar
 termcolor==1.1.0          # via pytest-sugar
 traitlets==4.3.2          # via ipython
 translationstring==1.3    # via colander
-urllib3==1.21.1           # via elasticsearch, requests
+urllib3==1.22             # via elasticsearch, requests
 wcwidth==0.1.7            # via prompt-toolkit
 werkzeug==0.12.2
 whitenoise==3.3.0
