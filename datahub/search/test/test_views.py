@@ -513,4 +513,4 @@ class TestSearch(APITestMixin):
         stages = [{'key': constants.InvestmentProjectStage.prospect.value.id, 'doc_count': 2},
                   {'key': constants.InvestmentProjectStage.active.value.id, 'doc_count': 1},
                   {'key': constants.InvestmentProjectStage.won.value.id, 'doc_count': 1}]
-        assert all([stage in response.data['aggregations']['stage'] for stage in stages])
+        assert all(stage in response.data['aggregations']['stage'] for stage in stages)
