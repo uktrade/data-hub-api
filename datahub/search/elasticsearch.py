@@ -109,22 +109,20 @@ def get_term_query(field, value):
 def apply_aggs_query(search, aggs):
     """Applies aggregates query to the search."""
     for agg in aggs:
-        if any([x in agg for x in ('_before', '_after')]):
+        # skip range filters as we can't aggregate them
+        if any(agg.endswith(x) for x in ('_before', '_after')):
             continue
-
         agg = remap_field(agg)
+
+        search_aggs = search.aggs
         if '.' in agg:
-            search.aggs.bucket(
+            search_aggs = search_aggs.bucket(
                 agg,
                 'nested',
                 path=agg.split('.', 1)[0]
-            ).bucket(
-                agg,
-                'terms',
-                field=agg
             )
-        else:
-            search.aggs.bucket(agg, 'terms', field=agg)
+
+        search_aggs.bucket(agg, 'terms', field=agg)
 
 
 def get_search_by_entity_query(term=None,
