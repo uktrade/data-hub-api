@@ -207,11 +207,6 @@ FILTER_NAME_MAP = {
 REVERSE_FILTER_NAME_MAP = {y: x for x, y in FILTER_NAME_MAP.items()}
 
 
-def remap_fields(fields):
-    """Replaces fields to match Elasticsearch data model."""
-    return {remap_field(k): v for k, v in fields.items()}
-
-
 def reverse_remap_field(field):
     """Maps elasticsearch field to api field."""
     return REVERSE_FILTER_NAME_MAP.get(field, field)
