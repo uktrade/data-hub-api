@@ -85,9 +85,8 @@ class SearchCompanyAPIView(APIView):
 
     def post(self, request, format=None):
         """Performs filtered company search."""
-        filters = {field: request.data[field]
+        filters = {elasticsearch.remap_field(field): request.data[field]
                    for field in self.FILTER_FIELDS if field in request.data}
-        filters = elasticsearch.remap_fields(filters)
 
         original_query = request.data.get('original_query', '')
 
@@ -137,10 +136,8 @@ class SearchContactAPIView(APIView):
 
     def post(self, request, format=None):
         """Performs filtered contact search."""
-        filters = {field: request.data[field]
+        filters = {elasticsearch.remap_field(field): request.data[field]
                    for field in self.FILTER_FIELDS if field in request.data}
-
-        filters = elasticsearch.remap_fields(filters)
 
         original_query = request.data.get('original_query', '')
 
@@ -203,10 +200,8 @@ class SearchInvestmentProjectAPIView(APIView):
 
     def post(self, request, format=None):
         """Performs filtered contact search."""
-        filters = {field: request.data[field]
+        filters = {elasticsearch.remap_field(field): request.data[field]
                    for field in self.FILTER_FIELDS if field in request.data}
-        filters = elasticsearch.remap_fields(filters)
-
         try:
             filters, ranges = elasticsearch.date_range_fields(filters)
         except ValueError:
@@ -235,15 +230,13 @@ class SearchInvestmentProjectAPIView(APIView):
 
         aggregations = {}
         for field in self.FILTER_FIELDS:
-            r_field = elasticsearch.remap_field(field)
+            es_field = elasticsearch.remap_field(field)
+            if es_field in results.aggregations:
+                aggregation = results.aggregations[es_field]
+                if '.' in es_field:
+                    aggregation = aggregation[es_field]
 
-            if r_field in results.aggregations:
-                if '.' in r_field:
-                    buckets = results.aggregations[r_field][r_field]['buckets']
-                else:
-                    buckets = results.aggregations[r_field]['buckets']
-
-                aggregations[field] = [bucket.to_dict() for bucket in buckets]
+                aggregations[field] = [bucket.to_dict() for bucket in aggregation['buckets']]
 
         response = {
             'count': results.hits.total,

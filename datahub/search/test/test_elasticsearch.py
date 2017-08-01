@@ -231,7 +231,7 @@ def test_remap_fields():
         'uk_based': [False]
     }
 
-    remapped = elasticsearch.remap_fields(fields)
+    remapped = {elasticsearch.remap_field(field): value for field, value in fields.items()}
 
     assert 'sector.id' in remapped
     assert 'account_manager.id' in remapped
