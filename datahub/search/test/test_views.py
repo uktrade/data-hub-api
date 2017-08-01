@@ -239,7 +239,7 @@ class TestSearch(APITestMixin):
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_results_quality(self):
         """Tests quality of results."""
-        CompanyFactory(name='The Very Risk Advisory Group')
+        CompanyFactory(name='The Risk Advisory Group')
         CompanyFactory(name='The Advisory Group')
         CompanyFactory(name='The Advisory')
         CompanyFactory(name='The Advisories')
@@ -260,7 +260,7 @@ class TestSearch(APITestMixin):
         assert [
             'The Advisory',
             'The Advisory Group',
-            'The Very Risk Advisory Group',
+            'The Risk Advisory Group',
             'The Advisories'
         ] == [company['name'] for company in response.data['companies']]
 

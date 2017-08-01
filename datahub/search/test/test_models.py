@@ -101,7 +101,7 @@ def test_company_dbmodel_to_dict():
             'trading_address_2', 'trading_address_town',
             'trading_address_county', 'trading_address_postcode',
             'headquarter_type', 'classification', 'parent',
-            'one_list_account_owner', 'created_by', 'modified_by'}
+            'one_list_account_owner'}
 
     assert set(result.keys()) == keys
 
@@ -131,7 +131,7 @@ def test_contact_dbmodel_to_dict():
             'address_country', 'address_postcode', 'telephone_alternative',
             'email_alternative', 'notes', 'contactable_by_dit',
             'contactable_by_dit_partners', 'contactable_by_email',
-            'contactable_by_phone', 'created_by', 'modified_by'}
+            'contactable_by_phone'}
 
     assert set(result.keys()) == keys
 
@@ -174,8 +174,7 @@ def test_investment_project_to_dict():
             'address_line_2', 'address_line_3', 'address_line_postcode',
             'uk_company_decided', 'uk_company', 'project_manager',
             'project_assurance_adviser', 'team_members', 'likelihood_of_landing',
-            'priority', 'quotable_as_public_case_study', 'other_business_activity',
-            'created_by', 'modified_by'}
+            'priority', 'quotable_as_public_case_study', 'other_business_activity'}
 
     assert set(result.keys()) == keys
 
