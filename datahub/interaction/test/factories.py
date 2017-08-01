@@ -19,6 +19,8 @@ class ServiceOfferFactory(factory.django.DjangoModelFactory):
 class InteractionFactory(factory.django.DjangoModelFactory):
     """Interaction factory."""
 
+    created_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SubFactory(AdviserFactory)
     company = factory.SubFactory(CompanyFactory)
     contact = factory.SubFactory(ContactFactory)
     subject = 'foo'
@@ -37,6 +39,8 @@ class InteractionFactory(factory.django.DjangoModelFactory):
 class ServiceDeliveryFactory(factory.django.DjangoModelFactory):
     """Service delivery factory."""
 
+    created_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SubFactory(AdviserFactory)
     company = factory.SubFactory(CompanyFactory)
     contact = factory.SubFactory(ContactFactory)
     subject = 'foo'
