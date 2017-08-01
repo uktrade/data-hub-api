@@ -202,13 +202,6 @@ FILTER_NAME_MAP = {
     'stage': 'stage.id',
 }
 
-REVERSE_FILTER_NAME_MAP = {y: x for x, y in FILTER_NAME_MAP.items()}
-
-
-def reverse_remap_field(field):
-    """Maps elasticsearch field to api field."""
-    return REVERSE_FILTER_NAME_MAP.get(field, field)
-
 
 def remap_field(field):
     """Maps api field to elasticsearch field."""
