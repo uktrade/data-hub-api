@@ -4,10 +4,10 @@ from django.db import models
 from django.utils.crypto import get_random_string
 from django.utils.timezone import now
 
-from datahub.company.models import Company, Contact
+from datahub.company.models import Advisor, Company, Contact
 from datahub.core.models import BaseModel
 
-from datahub.metadata.models import Country
+from datahub.metadata.models import Country, Sector
 
 
 class Order(BaseModel):
@@ -36,7 +36,7 @@ class Order(BaseModel):
         on_delete=models.SET_NULL
     )
     sector = models.ForeignKey(
-        'metadata.Sector',
+        Sector,
         related_name='+',
         null=True, blank=True,
         on_delete=models.SET_NULL
@@ -90,7 +90,7 @@ class OrderSubscriber(BaseModel):
         Order, on_delete=models.CASCADE, related_name='subscribers'
     )
     adviser = models.ForeignKey(
-        'company.Advisor', on_delete=models.CASCADE, related_name='+'
+        Advisor, on_delete=models.CASCADE, related_name='+'
     )
 
     def __str__(self):
