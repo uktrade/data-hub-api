@@ -15,7 +15,9 @@ class OrderSerializer(serializers.ModelSerializer):
     reference = serializers.CharField(read_only=True)
 
     created_on = serializers.DateTimeField(read_only=True)
+    created_by = NestedRelatedField(Advisor, read_only=True)
     modified_on = serializers.DateTimeField(read_only=True)
+    modified_by = NestedRelatedField(Advisor, read_only=True)
 
     company = NestedRelatedField(Company)
     contact = NestedRelatedField(Contact)
@@ -28,7 +30,9 @@ class OrderSerializer(serializers.ModelSerializer):
             'id',
             'reference',
             'created_on',
+            'created_by',
             'modified_on',
+            'modified_by',
             'company',
             'contact',
             'primary_market',

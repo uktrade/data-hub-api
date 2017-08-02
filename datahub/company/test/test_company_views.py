@@ -47,6 +47,8 @@ class TestCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['id'] == str(company.pk)
+        assert response.data['created_by']['id'] == str(company.created_by.id)
+        assert response.data['modified_by']['id'] == str(company.modified_by.id)
         assert response.data['companies_house_data']
         assert response.data['companies_house_data']['id'] == ch_company.id
         assert response.data['name'] == ch_company.name
@@ -80,6 +82,8 @@ class TestCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['id'] == str(company.pk)
+        assert response.data['created_by']['id'] == str(company.created_by.id)
+        assert response.data['modified_by']['id'] == str(company.modified_by.id)
         assert response.data['companies_house_data'] is None
         assert response.data['name'] == company.name
         assert response.data['registered_address_1'] == company.registered_address_1
@@ -133,6 +137,7 @@ class TestCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['name'] == 'Acme'
+        assert response.data['modified_by'] == self.user.id
 
     def test_classification_is_ro(self):
         """Test that classification is fail-safe & read-only."""

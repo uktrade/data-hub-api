@@ -256,10 +256,13 @@ class TestSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 4
-        assert ['The Advisory',
-                'The Advisory Group',
-                'The Risk Advisory Group',
-                'The Advisories'] == [company['name'] for company in response.data['companies']]
+        # no sortby specified so no ordering applied
+        assert [
+            'The Advisory',
+            'The Advisory Group',
+            'The Risk Advisory Group',
+            'The Advisories'
+        ] == [company['name'] for company in response.data['companies']]
 
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
