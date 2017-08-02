@@ -6,19 +6,19 @@ from datetime import date
 import factory
 from django.utils.timezone import now
 
+from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.constants import (
-    InvestmentType, ReferralSourceActivity, InvestmentProjectStage, Sector
+    InvestmentProjectStage, InvestmentType, ReferralSourceActivity, Sector
 )
 from datahub.core.test.factories import to_many_field
-from datahub.company.test.factories import (
-    AdviserFactory, CompanyFactory
-)
 
 
 class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     """Investment project factory."""
 
-    id = factory.Sequence(lambda _: str(uuid.uuid4()))
+    id = factory.LazyFunction(lambda: str(uuid.uuid4()))
+    created_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SubFactory(AdviserFactory)
     name = factory.Sequence(lambda n: f'name {n}')
     description = factory.Sequence(lambda n: f'desc {n}')
     nda_signed = False
@@ -37,25 +37,25 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
 
     @to_many_field
     def business_activities(self):
-        pass
+        """Add support for setting business_activities."""
 
     @to_many_field
     def client_contacts(self):
-        pass
+        """Add support for setting client_contacts."""
 
     @to_many_field
     def competitor_countries(self):
-        pass
+        """Add support for setting competitor_countries."""
 
     @to_many_field
     def strategic_drivers(self):
-        pass
+        """Add support for setting strategic_drivers."""
 
     @to_many_field
     def uk_region_locations(self):
-        pass
+        """Add support for setting uk_region_locations."""
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = 'investment.InvestmentProject'
 
 
@@ -66,6 +66,5 @@ class InvestmentProjectTeamMemberFactory(factory.django.DjangoModelFactory):
     adviser = factory.SubFactory(AdviserFactory)
     role = factory.Sequence(lambda n: f'role {n}')
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = 'investment.InvestmentProjectTeamMember'
-

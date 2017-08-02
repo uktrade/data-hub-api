@@ -58,8 +58,7 @@ LOCAL_APPS = [
     'datahub.metadata',
     'datahub.search.apps.SearchConfig',
     'datahub.user',
-    'datahub.korben',
-    'datahub.omis.order'
+    'datahub.omis.order',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -153,6 +152,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 100,
     'DEFAULT_AUTHENTICATION_CLASSES': ['oauth2_provider.contrib.rest_framework.OAuth2Authentication'],
     'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],
+    'ORDERING_PARAM': 'sortby'
 }
 
 # Simplified static file serving.

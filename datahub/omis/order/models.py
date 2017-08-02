@@ -4,10 +4,10 @@ from django.db import models
 from django.utils.crypto import get_random_string
 from django.utils.timezone import now
 
-from datahub.company.models import Company, Contact
+from datahub.company.models import Advisor, Company, Contact
 from datahub.core.models import BaseModel
 
-from datahub.metadata.models import Country
+from datahub.metadata.models import Country, Sector
 
 
 class Order(BaseModel):
@@ -15,7 +15,7 @@ class Order(BaseModel):
     Details regarding an OMIS Order.
     """
 
-    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     reference = models.CharField(max_length=100)
 
     company = models.ForeignKey(
@@ -33,6 +33,12 @@ class Order(BaseModel):
         Country,
         related_name="%(class)ss",  # noqa: Q000
         null=True,
+        on_delete=models.SET_NULL
+    )
+    sector = models.ForeignKey(
+        Sector,
+        related_name='+',
+        null=True, blank=True,
         on_delete=models.SET_NULL
     )
 
@@ -72,3 +78,26 @@ class Order(BaseModel):
         if not self.reference:
             self.reference = self._calculate_reference()
         return super().save(*args, **kwargs)
+
+
+class OrderSubscriber(BaseModel):
+    """
+    A subscribed adviser receives notifications when new changes happen to an Order.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name='subscribers'
+    )
+    adviser = models.ForeignKey(
+        Advisor, on_delete=models.CASCADE, related_name='+'
+    )
+
+    def __str__(self):
+        """Human-readable representation"""
+        return f'{self.order} – {self.adviser}'
+
+    class Meta:  # noqa: D101
+        unique_together = (
+            ('order', 'adviser'),
+        )

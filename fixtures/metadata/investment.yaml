@@ -1,0 +1,213 @@
+# Investmentprojectstage
+- model: metadata.investmentprojectstage
+  pk: 8a320cc9-ae2e-443e-9d26-2f36452c2ced
+  fields: {name: "Prospect", order: 200.0}
+- model: metadata.investmentprojectstage
+  pk: c9864359-fb1a-4646-a4c1-97d10189fc03
+  fields: {name: "Assign PM", order: 300.0}
+- model: metadata.investmentprojectstage
+  pk: 7606cc19-20da-4b74-aba1-2cec0d753ad8
+  fields: {name: "Active", order: 400.0}
+- model: metadata.investmentprojectstage
+  pk: 49b8f6f3-0c50-4150-a965-2c974f3149e3
+  fields: {name: "Verify win", order: 500.0}
+- model: metadata.investmentprojectstage
+  pk: 945ea6d1-eee3-4f5b-9144-84a75b71b8e6
+  fields: {name: "Won", order: 600.0}
+
+# InvestmentType
+- model: metadata.investmenttype
+  pk: 3e143372-496c-4d1e-8278-6fdd3da9b48b
+  fields: {name: "FDI"}
+- model: metadata.investmenttype
+  pk: 9c364e64-2b28-401b-b2df-50e08b0bca44
+  fields: {name: "Non-FDI"}
+- model: metadata.investmenttype
+  pk: 031269ab-b7ec-40e9-8a4e-7371404f0622
+  fields: {name: "Commitment to invest"}
+
+# FDIType
+- model: metadata.fditype
+  pk: f8447013-cfdc-4f35-a146-6619665388b3
+  fields: {name: "Creation of new site or activity"}
+- model: metadata.fditype
+  pk: d08a2f07-c366-4133-9a7e-35b6c88a3270
+  fields: {name: "Expansion of existing site or activity"}
+- model: metadata.fditype
+  pk: 32018db0-fd2d-4b8c-aee4-a931bde3abe8
+  fields: {name: "Merger"}
+- model: metadata.fditype
+  pk: ac035522-ad0b-4eeb-87f4-0ce964e4b104
+  fields: {name: "Acquisition"}
+- model: metadata.fditype
+  pk: a7dbf6b3-9c04-43a7-9be9-d3072f138fab
+  fields: {name: "Joint venture"}
+- model: metadata.fditype
+  pk: 0657168e-8a58-4f37-914f-ec541556fc28
+  fields: {name: "Retention"}
+- model: metadata.fditype
+  pk: 840f62c1-bbcb-44e4-b6d4-a258d2ffa07d
+  fields: {name: "Capital only"}
+
+# NonFDIType
+- model: metadata.nonfditype
+  pk: 2eba3d6a-b1ef-4075-a053-9d70813f7447
+  fields: {name: "Advanced Engineering Supply Chain"}
+- model: metadata.nonfditype
+  pk: de91ac0e-85ab-4a31-aac5-533b0844793e
+  fields: {name: "Business Partnership"}
+- model: metadata.nonfditype
+  pk: 96d3520f-b3b8-4c7e-bf26-baf1442e09c2
+  fields: {name: "Contract Research"}
+- model: metadata.nonfditype
+  pk: 2b304a8f-40a2-4a0b-b095-3094a411a6e1
+  fields: {name: "Global Entrepreneur Programme"}
+- model: metadata.nonfditype
+  pk: bf9313fe-fb8e-44dd-a4ae-566d7701311f
+  fields: {name: "Graduate Entrepreneur Programme"}
+- model: metadata.nonfditype
+  pk: 5f1f798c-8db7-49cd-9945-82b823f96cac
+  fields: {name: "GREAT Investors Programme"}
+- model: metadata.nonfditype
+  pk: ed4223da-27f7-47bf-bca5-78725119c2c0
+  fields: {name: "HQ-UK"}
+- model: metadata.nonfditype
+  pk: 992f4f01-e915-4f81-89bb-ca2c8fab3c3f
+  fields: {name: "Institutional Investment & Infrastructure"}
+- model: metadata.nonfditype
+  pk: 58bdb479-4dc7-42e2-8ab2-76895c51ce60
+  fields: {name: "Innovation Gateway"}
+- model: metadata.nonfditype
+  pk: ab6317c2-31a3-4b67-88e1-2bdf7444ddfd
+  fields: {name: "Infrastructure Investment"}
+- model: metadata.nonfditype
+  pk: b5e55e20-c97a-47f3-bf8c-8d443e7c716c
+  fields: {name: "Invest in GREAT Britain"}
+- model: metadata.nonfditype
+  pk: 7783ae75-a044-44ec-811f-438f8688df7a
+  fields: {name: "Regeneration Investment Organisation"}
+- model: metadata.nonfditype
+  pk: c0d832c5-2659-4c4b-bef4-0083da71fb26
+  fields: {name: "R&D Collaboration"}
+- model: metadata.nonfditype
+  pk: 00874a34-fae9-4a4a-b708-3147ee5e3d20
+  fields: {name: "R&D Partnership"}
+- model: metadata.nonfditype
+  pk: c02a04e1-a07d-41a6-a7bd-2dbaf52c21cd
+  fields: {name: "Screen Production Investment"}
+- model: metadata.nonfditype
+  pk: b4235c74-6d57-492f-94ed-bbef41f41bfe
+  fields: {name: "Sirius (Graduate Entrepreneurs)"}
+- model: metadata.nonfditype
+  pk: abdbf5f5-9a1a-41f2-ab8c-78e7da6cba29
+  fields: {name: "Space"}
+- model: metadata.nonfditype
+  pk: 0c69910e-470d-4a7e-a5c7-4656799eb034
+  fields: {name: "SRM Programme"}
+- model: metadata.nonfditype
+  pk: 113a32f1-fc40-4b05-ad89-3ab48f66c6f9
+  fields: {name: "University Collaboration"}
+- model: metadata.nonfditype
+  pk: c5035b66-9ee8-44f3-b6dc-2897da9625e9
+  fields: {name: "Venture/Equity Capital"}
+
+# InvestmentBusinessActivity
+- model: metadata.investmentbusinessactivity
+  pk: a2dbd807-ae52-421c-8d1d-88adfc7a506b
+  fields: {name: "Retail"}
+- model: metadata.investmentbusinessactivity
+  pk: 42b8d11b-dbe7-45b8-985e-c9222c459287
+  fields: {name: "Assembly"}
+- model: metadata.investmentbusinessactivity
+  pk: 410da69e-0247-48cf-9f72-fbc10ed7a4fc
+  fields: {name: "Call centre"}
+- model: metadata.investmentbusinessactivity
+  pk: 7e7fbced-143a-43ac-822b-a8411e7400b4
+  fields: {name: "Distribution"}
+- model: metadata.investmentbusinessactivity
+  pk: 2527f728-cc5f-4481-ba42-13957d249b3b
+  fields: {name: "E-commerce"}
+- model: metadata.investmentbusinessactivity
+  pk: fc68d540-a00a-40f8-8b39-05e12fcb856f
+  fields: {name: "European headquarters"}
+- model: metadata.investmentbusinessactivity
+  pk: 77be20b3-05bf-4e06-a517-6989f8b9b922
+  fields: {name: "Manufacturing"}
+- model: metadata.investmentbusinessactivity
+  pk: c40e4af0-382e-44a7-b756-97f180230096
+  fields: {name: "Research & development (R&D)"}
+- model: metadata.investmentbusinessactivity
+  pk: 257f720f-42df-4f85-8e43-c83e4e03dc79
+  fields: {name: "Global headquarters"}
+- model: metadata.investmentbusinessactivity
+  pk: 30348f9d-a82e-4215-ba3f-85cbbd14763a
+  fields: {name: "Knowledge centre"}
+- model: metadata.investmentbusinessactivity
+  pk: 71946309-c92c-4c5b-9c42-8502cc74c72e
+  fields: {name: "Sales"}
+- model: metadata.investmentbusinessactivity
+  pk: 2f51ea6a-ca2f-466a-87fd-5f79ebfec125
+  fields: {name: "Services"}
+- model: metadata.investmentbusinessactivity
+  pk: 93959cec-7250-4c0a-9466-af4ebaf4a676
+  fields: {name: "Shared service centre"}
+- model: metadata.investmentbusinessactivity
+  pk: befab707-5abd-4f47-8477-57f091e6dac9
+  fields: {name: "Other"}
+
+# InvestmentStrategicDriver
+- model: metadata.investmentstrategicdriver
+  pk: 382aa6d1-a362-4166-a09d-f579d9f3be75
+  fields: {name: "Access to market"}
+- model: metadata.investmentstrategicdriver
+  pk: 03593ab6-b583-4620-b7dc-c5d194d16943
+  fields: {name: "Access to resources"}
+- model: metadata.investmentstrategicdriver
+  pk: a2cef09f-cdbb-4eae-b191-0391260af9ad
+  fields: {name: "Access to clients"}
+- model: metadata.investmentstrategicdriver
+  pk: e6ebf75c-56a6-4cf3-ba67-9b479217d733
+  fields: {name: "Technology seeking"}
+- model: metadata.investmentstrategicdriver
+  pk: 7cc42486-30bb-46d5-813d-6ad1c918ef08
+  fields: {name: "Skills seeking"}
+- model: metadata.investmentstrategicdriver
+  pk: 8d0fbd93-e39c-4e55-8d80-955257906de9
+  fields: {name: "Proximity to supplier"}
+- model: metadata.investmentstrategicdriver
+  pk: 15a69447-3802-4089-8dd1-b1175ab210fe
+  fields: {name: "Incentive driven"}
+- model: metadata.investmentstrategicdriver
+  pk: 7b80f131-90f7-49e3-80d2-6b31baabf227
+  fields: {name: "Regulatory driven"}
+- model: metadata.investmentstrategicdriver
+  pk: 1be97a9e-2e65-49ee-a420-ab8928d296e5
+  fields: {name: "Cost reduction"}
+- model: metadata.investmentstrategicdriver
+  pk: 611a661c-08fe-4924-8847-f3b1fb021313
+  fields: {name: "Other"}
+
+# FDIValue
+- model: metadata.fdivalue
+  pk: 38e36c77-61ad-4186-a7a8-ac6a1a1104c6
+  fields: {name: "Higher", order: 100.0}
+- model: metadata.fdivalue
+  pk: 002c18d9-f5c7-4f3c-b061-aee09fce8416
+  fields: {name: "Good", order: 200.0}
+- model: metadata.fdivalue
+  pk: 2bacde8d-128f-4d0a-849b-645ceafe4cf9
+  fields: {name: "Standard", order: 300.0}
+
+# SalaryRange
+- model: metadata.salaryrange
+  pk: 2943bf3d-32dd-43be-8ad4-969b006dee7b
+  fields: {name: "Below £25,000", order: 100.0}
+- model: metadata.salaryrange
+  pk: 7e54d92f-d816-4918-8fdf-9553189d13d5
+  fields: {name: "£25,000 – £29,000", order: 200.0}
+- model: metadata.salaryrange
+  pk: 90049e2b-e70c-4f20-ba0e-f98772d631e7
+  fields: {name: "£30,000 – £34,000", order: 300.0}
+- model: metadata.salaryrange
+  pk: f41e3603-90f7-46b8-b201-5b4eecb4bea5
+  fields: {name: "£35,000 and above", order: 400.0}

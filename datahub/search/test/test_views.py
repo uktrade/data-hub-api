@@ -11,6 +11,7 @@ from datahub.core import constants
 from datahub.core.test_utils import (
     APITestMixin, synchronous_executor_submit, synchronous_transaction_on_commit,
 )
+from datahub.investment.test.factories import InvestmentProjectFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -133,7 +134,7 @@ class TestSearch(APITestMixin):
         """Tests detailed company search."""
         term = 'abc defg'
 
-        url = f"{reverse('api-v3:search:company')}?offset=0&limit=100"
+        url = reverse('api-v3:search:company')
         united_states_id = constants.Country.united_states.value.id
 
         response = self.api_client.post(url, {
@@ -148,7 +149,7 @@ class TestSearch(APITestMixin):
 
     def test_search_company_no_filters(self):
         """Tests case where there is no filters provided."""
-        url = f"{reverse('api-v3:search:company')}?offset=0&limit=100"
+        url = f"{reverse('api-v3:search:company')}"
         response = self.api_client.post(url, {})
 
         assert response.status_code == status.HTTP_200_OK
@@ -156,7 +157,7 @@ class TestSearch(APITestMixin):
 
     def test_search_foreign_company_json(self):
         """Tests detailed company search."""
-        url = f"{reverse('api-v3:search:company')}?offset=0&limit=100"
+        url = reverse('api-v3:search:company')
 
         response = self.api_client.post(url, {
             'uk_based': False,
@@ -171,7 +172,7 @@ class TestSearch(APITestMixin):
         """Tests detailed contact search."""
         term = 'abc defg'
 
-        url = f"{reverse('api-v3:search:contact')}?offset=0&limit=100"
+        url = reverse('api-v3:search:contact')
 
         response = self.api_client.post(url, {
             'original_query': term,
@@ -185,7 +186,7 @@ class TestSearch(APITestMixin):
 
     def test_search_contact_no_filters(self):
         """Tests case where there is no filters provided."""
-        url = f"{reverse('api-v3:search:contact')}?offset=0&limit=100"
+        url = reverse('api-v3:search:contact')
         response = self.api_client.post(url, {})
 
         assert response.status_code == status.HTTP_200_OK
@@ -193,20 +194,20 @@ class TestSearch(APITestMixin):
 
     def test_search_investment_project_json(self):
         """Tests detailed investment project search."""
-        url = f"{reverse('api-v3:search:investment_project')}?offset=0&limit=100"
+        url = reverse('api-v3:search:investment_project')
 
         response = self.api_client.post(url, {
-            'description': 'investmentproject1',
+            'original_query': 'abc defg',
         }, format='json')
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
-        assert response.data['results'][0]['description'] == 'investmentproject1'
+        assert response.data['results'][0]['name'] == 'abc defg'
 
     def test_search_investment_project_date_json(self):
         """Tests detailed investment project search."""
-        url = f"{reverse('api-v3:search:investment_project')}?offset=0&limit=100"
+        url = reverse('api-v3:search:investment_project')
 
         response = self.api_client.post(url, {
             'estimated_land_date_before': datetime.datetime(2017, 6, 13, 9, 44, 31, 62870),
@@ -218,7 +219,7 @@ class TestSearch(APITestMixin):
 
     def test_search_investment_project_invalid_date_json(self):
         """Tests detailed investment project search."""
-        url = f"{reverse('api-v3:search:investment_project')}?offset=0&limit=100"
+        url = reverse('api-v3:search:investment_project')
 
         response = self.api_client.post(url, {
             'estimated_land_date_before': 'this is definitely not a valid date',
@@ -228,7 +229,7 @@ class TestSearch(APITestMixin):
 
     def test_search_investment_project_no_filters(self):
         """Tests case where there is no filters provided."""
-        url = f"{reverse('api-v3:search:investment_project')}?offset=0&limit=100"
+        url = reverse('api-v3:search:investment_project')
         response = self.api_client.post(url, {})
 
         assert response.status_code == status.HTTP_200_OK
@@ -238,10 +239,10 @@ class TestSearch(APITestMixin):
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_results_quality(self):
         """Tests quality of results."""
-        CompanyFactory(name='The Risk Advisory Group').save()
-        CompanyFactory(name='The Advisory Group').save()
-        CompanyFactory(name='The Advisory').save()
-        CompanyFactory(name='The Advisories').save()
+        CompanyFactory(name='The Risk Advisory Group')
+        CompanyFactory(name='The Advisory Group')
+        CompanyFactory(name='The Advisory')
+        CompanyFactory(name='The Advisories')
 
         connections.get_connection().indices.refresh()
 
@@ -255,19 +256,22 @@ class TestSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 4
-        assert ['The Advisory',
-                'The Advisory Group',
-                'The Risk Advisory Group',
-                'The Advisories'] == [company['name'] for company in response.data['companies']]
+        # no sortby specified so no ordering applied
+        assert [
+            'The Advisory',
+            'The Advisory Group',
+            'The Risk Advisory Group',
+            'The Advisories'
+        ] == [company['name'] for company in response.data['companies']]
 
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_sort_desc(self):
-        """Tests quality of results."""
-        CompanyFactory(name='Water 1').save()
-        CompanyFactory(name='water 2').save()
-        CompanyFactory(name='water 3').save()
-        CompanyFactory(name='Water 4').save()
+        """Tests sorting in descending order."""
+        CompanyFactory(name='Water 1')
+        CompanyFactory(name='water 2')
+        CompanyFactory(name='water 3')
+        CompanyFactory(name='Water 4')
 
         connections.get_connection().indices.refresh()
 
@@ -290,11 +294,11 @@ class TestSearch(APITestMixin):
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_sort_asc(self):
-        """Tests quality of results."""
-        CompanyFactory(name='Fire 4').save()
-        CompanyFactory(name='fire 3').save()
-        CompanyFactory(name='fire 2').save()
-        CompanyFactory(name='Fire 1').save()
+        """Tests sorting in ascending order."""
+        CompanyFactory(name='Fire 4')
+        CompanyFactory(name='fire 3')
+        CompanyFactory(name='fire 2')
+        CompanyFactory(name='Fire 1')
 
         connections.get_connection().indices.refresh()
 
@@ -315,12 +319,51 @@ class TestSearch(APITestMixin):
 
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_sort_nested_desc(self):
+        """Tests sorting by nested field."""
+        InvestmentProjectFactory(
+            name='Potato 1',
+            stage_id=constants.InvestmentProjectStage.active.value.id,
+        )
+        InvestmentProjectFactory(
+            name='Potato 2',
+            stage_id=constants.InvestmentProjectStage.prospect.value.id,
+        )
+        InvestmentProjectFactory(
+            name='potato 3',
+            stage_id=constants.InvestmentProjectStage.won.value.id,
+        )
+        InvestmentProjectFactory(
+            name='Potato 4',
+            stage_id=constants.InvestmentProjectStage.won.value.id,
+        )
+
+        connections.get_connection().indices.refresh()
+
+        term = 'Potato'
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(url, {
+            'original_query': term,
+            'sortby': 'stage.name:desc',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 4
+        assert ['Won',
+                'Won',
+                'Prospect',
+                'Active'] == [investment_project['stage']['name']
+                              for investment_project in response.data['results']]
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_sort_invalid(self):
-        """Tests quality of results."""
-        CompanyFactory(name='Fire 4').save()
-        CompanyFactory(name='fire 3').save()
-        CompanyFactory(name='fire 2').save()
-        CompanyFactory(name='Fire 1').save()
+        """Tests attempt to sort by non existent field."""
+        CompanyFactory(name='Fire 4')
+        CompanyFactory(name='fire 3')
+        CompanyFactory(name='fire 2')
+        CompanyFactory(name='Fire 1')
 
         connections.get_connection().indices.refresh()
 
@@ -333,3 +376,144 @@ class TestSearch(APITestMixin):
         })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_sort_asc_with_null_values(self):
+        """Tests placement of null values in sorted results when order is ascending."""
+        InvestmentProjectFactory(name='Earth 1', total_investment=1000)
+        InvestmentProjectFactory(name='Earth 2')
+
+        connections.get_connection().indices.refresh()
+
+        term = 'Earth'
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(url, {
+            'original_query': term,
+            'sortby': 'total_investment:asc'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert [('Earth 2', None),
+                ('Earth 1', 1000)] == [(investment['name'], investment['total_investment'],)
+                                       for investment in response.data['results']]
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_sort_desc_with_null_values(self):
+        """Tests placement of null values in sorted results when order is descending."""
+        InvestmentProjectFactory(name='Ether 1', total_investment=1000)
+        InvestmentProjectFactory(name='Ether 2')
+
+        connections.get_connection().indices.refresh()
+
+        term = 'Ether'
+
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.post(url, {
+            'original_query': term,
+            'sortby': 'total_investment:desc'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert [('Ether 1', 1000),
+                ('Ether 2', None)] == [(investment['name'], investment['total_investment'],)
+                                       for investment in response.data['results']]
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_investment_project_multiple_filters(self):
+        """Tests detailed investment project search."""
+        url = reverse('api-v3:search:investment_project')
+
+        company_a = CompanyFactory(
+            name='companyA'
+        )
+        company_b = CompanyFactory(
+            name='companyB'
+        )
+
+        InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            investor_company=company_a,
+            sector_id=constants.Sector.aerospace_assembly_aircraft.value.id,
+            stage_id=constants.InvestmentProjectStage.active.value.id
+        )
+        InvestmentProjectFactory(
+            investor_company=company_b,
+            stage_id=constants.InvestmentProjectStage.prospect.value.id,
+        )
+        InvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.won.value.id
+        )
+
+        connections.get_connection().indices.refresh()
+
+        response = self.api_client.post(url, {
+            'investment_type': constants.InvestmentType.fdi.value.id,
+            'investor_company': [
+                company_a.pk,
+                company_b.pk,
+            ],
+            'stage': [
+                constants.InvestmentProjectStage.won.value.id,
+                constants.InvestmentProjectStage.active.value.id,
+            ],
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+
+        stages = set([investment_project['stage']['id']
+                      for investment_project in response.data['results']])
+
+        assert constants.InvestmentProjectStage.active.value.id in stages
+        assert constants.InvestmentProjectStage.prospect.value.id not in stages
+        assert constants.InvestmentProjectStage.won.value.id not in stages
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_investment_project_aggregates(self):
+        """Tests aggregates in investment project search."""
+        url = reverse('api-v3:search:investment_project')
+
+        InvestmentProjectFactory(
+            name='Pear 1',
+            stage_id=constants.InvestmentProjectStage.active.value.id
+        )
+        InvestmentProjectFactory(
+            name='Pear 2',
+            stage_id=constants.InvestmentProjectStage.prospect.value.id,
+        )
+        InvestmentProjectFactory(
+            name='Pear 3',
+            stage_id=constants.InvestmentProjectStage.prospect.value.id
+        )
+        InvestmentProjectFactory(
+            name='Pear 4',
+            stage_id=constants.InvestmentProjectStage.won.value.id
+        )
+
+        connections.get_connection().indices.refresh()
+
+        response = self.api_client.post(url, {
+            'original_query': 'Pear',
+            'stage': [
+                constants.InvestmentProjectStage.prospect.value.id,
+                constants.InvestmentProjectStage.active.value.id,
+            ],
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 3
+        assert len(response.data['results']) == 3
+        assert 'aggregations' in response.data
+
+        stages = [{'key': constants.InvestmentProjectStage.prospect.value.id, 'doc_count': 2},
+                  {'key': constants.InvestmentProjectStage.active.value.id, 'doc_count': 1},
+                  {'key': constants.InvestmentProjectStage.won.value.id, 'doc_count': 1}]
+        assert all(stage in response.data['aggregations']['stage'] for stage in stages)

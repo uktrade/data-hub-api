@@ -1,14 +1,18 @@
 """Performs stage-dependent validation on investment projects."""
 from collections import namedtuple
+from functools import partial
 from operator import not_
+from uuid import UUID
 
 from rest_framework.utils import model_meta
 
 from datahub.core.constants import (
-    InvestmentProjectStage as Stage, InvestmentType,
+    InvestmentBusinessActivity as BusinessActivity,
+    InvestmentProjectStage as Stage,
+    InvestmentType,
     ReferralSourceActivity as Activity
 )
-from datahub.core.validate_utils import UpdatedDataView
+from datahub.core.validate_utils import DataCombiner
 from datahub.investment.models import InvestmentProject
 
 
@@ -22,7 +26,6 @@ VALIDATION_MAPPING = {
     'uk_region_locations': Stage.assign_pm.value,
     'client_requirements': Stage.assign_pm.value,
     'client_considering_other_countries': Stage.assign_pm.value,
-    'site_decided': Stage.assign_pm.value,
     'project_manager': Stage.active.value,
     'project_assurance_adviser': Stage.active.value,
     'client_cannot_provide_foreign_investment': Stage.verify_win.value,
@@ -39,10 +42,28 @@ VALIDATION_MAPPING = {
 
 CondValRule = namedtuple('CondValRule', ('field', 'condition', 'stage'))
 
+
+def _contains_id(id_, instances):
+    # For updates the UUID is still a string
+    if not isinstance(id_, UUID):
+        id_ = UUID(id_)
+    return any(_get_to_many_id(instance) == id_ for instance in instances)
+
+
+def _get_to_many_id(instance):
+    # For updates the UUID is still a string
+    if isinstance(instance, str):
+        return UUID(instance)
+    return instance.id
+
+
 # Conditional validation rules. Mapping from field names to validation rules.
 CONDITIONAL_VALIDATION_MAPPING = {
     'referral_source_activity_event':
         CondValRule('referral_source_activity', Activity.event.value.id, Stage.prospect.value),
+    'other_business_activity':
+        CondValRule('business_activities', partial(_contains_id, BusinessActivity.other.value.id),
+                    Stage.prospect.value),
     'referral_source_activity_marketing':
         CondValRule('referral_source_activity', Activity.marketing.value.id, Stage.prospect.value),
     'referral_source_activity_website':
@@ -71,7 +92,7 @@ def validate(instance=None, update_data=None, fields=None, next_stage=False):
     :param next_stage:  Perform validation for the next stage (rather than the current stage)
     :return:            dict containing errors for incomplete fields
     """
-    data = UpdatedDataView(instance, update_data)
+    data = DataCombiner(instance, update_data)
     info = model_meta.get_field_info(InvestmentProject)
     desired_stage = data.get_value('stage') or Stage.prospect.value
     desired_stage_order = desired_stage.order
@@ -113,8 +134,11 @@ def _field_incomplete(field_info, data_view, field):
 
 def _check_rule(field_info, data_view, rule):
     """Checks a conditional validation rule."""
-    if rule.field in field_info.relations and not field_info.relations[rule.field].to_many:
-        actual_value = data_view.get_value_id(rule.field)
+    if rule.field in field_info.relations:
+        if field_info.relations[rule.field].to_many:
+            actual_value = data_view.get_value_to_many(rule.field)
+        else:
+            actual_value = data_view.get_value_id(rule.field)
     else:
         actual_value = data_view.get_value(rule.field)
     if callable(rule.condition):

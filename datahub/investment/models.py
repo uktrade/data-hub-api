@@ -37,6 +37,7 @@ class IProjectAbstract(models.Model):
 
     cdms_project_code = models.CharField(max_length=MAX_LENGTH, blank=True,
                                          null=True)
+    quotable_as_public_case_study = models.NullBooleanField()
     project_shareable = models.NullBooleanField()
     not_shareable_reason = models.TextField(blank=True, null=True)
     actual_land_date = models.DateField(blank=True, null=True)
@@ -106,6 +107,9 @@ class IProjectAbstract(models.Model):
         related_name='+',
         blank=True
     )
+    other_business_activity = models.CharField(
+        max_length=MAX_LENGTH, null=True, blank=True
+    )
 
     @property
     def project_code(self):
@@ -129,6 +133,10 @@ class IProjectValueAbstract(models.Model):
     class Meta:  # noqa: D101
         abstract = True
 
+    fdi_value = models.ForeignKey(
+        'metadata.FDIValue', related_name='investment_projects', null=True, blank=True,
+        on_delete=models.SET_NULL
+    )
     client_cannot_provide_total_investment = models.NullBooleanField()
     total_investment = models.DecimalField(null=True, max_digits=19,
                                            decimal_places=0, blank=True)
@@ -137,7 +145,9 @@ class IProjectValueAbstract(models.Model):
         null=True, max_digits=19, decimal_places=0, blank=True
     )
     government_assistance = models.NullBooleanField()
+    some_new_jobs = models.NullBooleanField()
     number_new_jobs = models.IntegerField(null=True, blank=True)
+    will_new_jobs_last_two_years = models.NullBooleanField()
     average_salary = models.ForeignKey(
         'metadata.SalaryRange', related_name='+', null=True, blank=True,
         on_delete=models.SET_NULL
@@ -156,6 +166,7 @@ class IProjectRequirementsAbstract(models.Model):
         abstract = True
 
     client_requirements = models.TextField(blank=True, null=True)
+    # site_decided is deprecated; will be removed
     site_decided = models.NullBooleanField()
     address_line_1 = models.CharField(blank=True, null=True,
                                       max_length=MAX_LENGTH)
@@ -167,6 +178,7 @@ class IProjectRequirementsAbstract(models.Model):
                                              max_length=MAX_LENGTH)
     client_considering_other_countries = models.NullBooleanField()
 
+    uk_company_decided = models.NullBooleanField()
     uk_company = models.ForeignKey(
         'company.Company', related_name='investee_projects',
         null=True, blank=True, on_delete=models.SET_NULL
@@ -216,7 +228,7 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
                         IProjectTeamAbstract, BaseModel):
     """An investment project."""
 
-    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
     def __str__(self):
         """Human-readable name for admin section etc."""
@@ -267,7 +279,8 @@ class IProjectDocument(BaseModel, ArchivableModel):
     BUCKET_PREFIX = 'investment-documents'
     DOC_TYPES = Choices(
         ('actual_land_date', 'Actual land date'),
-        ('fdi_type', 'Fdi type'),
+        ('hq', 'Global/European HQ evidence'),
+        ('foreign_ownership', 'Foreign ownership evidence'),
         ('operations_commenced', 'Operations commenced'),
         ('total_investment', 'Total investment'),
         ('foreign_equity_investment', 'Foreign equity investment'),

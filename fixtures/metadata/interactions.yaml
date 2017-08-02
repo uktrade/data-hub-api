@@ -1,0 +1,19 @@
+# Interaction type
+- model: metadata.interactiontype
+  pk: 70c226d7-5d95-e211-a939-e4115bead28a
+  fields: {name: Email/Website}
+- model: metadata.interactiontype
+  pk: 72c226d7-5d95-e211-a939-e4115bead28a
+  fields: {name: Telephone}
+- model: metadata.interactiontype
+  pk: 74c226d7-5d95-e211-a939-e4115bead28a
+  fields: {name: Letter/Fax}
+- model: metadata.interactiontype
+  pk: a5d71fdd-5d95-e211-a939-e4115bead28a
+  fields: {name: Face to Face}
+- model: metadata.interactiontype
+  pk: a7d71fdd-5d95-e211-a939-e4115bead28a
+  fields: {name: Video/Teleconf.}
+- model: metadata.interactiontype
+  pk: a8d71fdd-5d95-e211-a939-e4115bead28a
+  fields: {name: Social Media}

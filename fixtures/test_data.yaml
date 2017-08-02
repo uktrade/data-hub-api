@@ -104,7 +104,7 @@
     email: John.Rogers@example.com
     first_name: John
     last_name: Rogers
-    dit_team: 7648318c-9698-e211-a939-e4115bead28a
+    dit_team: 8248318c-9698-e211-a939-e4115bead28a
 
 - model: company.advisor
   pk: d7493b4e-5d7b-4834-98d9-28b78a74052a
@@ -112,7 +112,7 @@
     email: michael.wining@example.com
     first_name: Michael
     last_name: Wining
-    dit_team: 7648318c-9698-e211-a939-e4115bead28a
+    dit_team: 8248318c-9698-e211-a939-e4115bead28a
 
 - model: company.advisor
   pk: 5a644146-5298-4741-91f3-d5d7558adf47
@@ -120,7 +120,7 @@
     email: paula.churing@example.com
     first_name: Paula
     last_name: Churing
-    dit_team: 7648318c-9698-e211-a939-e4115bead28a
+    dit_team: 8248318c-9698-e211-a939-e4115bead28a
 
 - model: company.advisor
   pk: a80ff5fd-8904-4940-bf96-fe8047e34be5
@@ -128,7 +128,7 @@
     email: barry.oling@example.com
     first_name: Barry
     last_name: Oling
-    dit_team: b85bf640-9798-e211-a939-e4115bead28a
+    dit_team: a4f924aa-9698-e211-a939-e4115bead28a
 
 - model: company.advisor
   pk: f1eb4363-0a37-4344-bd96-e90abeaf483e
@@ -136,7 +136,7 @@
     email: jenny.carey@example.com
     first_name: Jenny
     last_name: Carey
-    dit_team: 4672f846-9798-e211-a939-e4115bead28a
+    dit_team: c833d869-2f50-e311-a56a-e4115bead28a
 
 - model: company.contact
   pk: 9b1138ab-ec7b-497f-b8c3-27fed21694ef
@@ -456,7 +456,7 @@
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
     subject: Discussed site details
     dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
-    dit_team: 7648318c-9698-e211-a939-e4115bead28a
+    dit_team: 197c51d4-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
     interaction_type: 72c226d7-5d95-e211-a939-e4115bead28a
 
@@ -469,6 +469,6 @@
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
     subject: Provided funding information
     dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
-    dit_team: 7648318c-9698-e211-a939-e4115bead28a
+    dit_team: 197c51d4-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
     interaction_type: 70c226d7-5d95-e211-a939-e4115bead28a

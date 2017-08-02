@@ -28,8 +28,7 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
 
     ```shell
     docker-compose run leeloo python manage.py migrate
-    docker-compose run leeloo python manage.py loaddata /app/fixtures/metadata.yaml
-    docker-compose run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml
+    docker-compose run leeloo python manage.py loadmetadata
     docker-compose run leeloo python manage.py createinitialrevisions
     ```
 4. Optionally, you can load some test data and update elasticsearch:
@@ -135,9 +134,8 @@ Dependencies:
     ```shell
     ./manage.py migrate
     ./manage.py createsuperuser
-    
-    ./manage.py loaddata fixtures/metadata.yaml
-    ./manage.py loaddata fixtures/datahub_businesstypes.yaml
+
+    ./manage.py loadmetadata
     ./manage.py createinitialrevisions
     ```
 
@@ -226,8 +224,7 @@ docker-compose run leeloo python manage.py createinitialrevisions
 Load metadata:
 
 ```shell
-docker-compose run leeloo python manage.py loaddata /app/fixtures/metadata.yaml
-docker-compose run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml
+docker-compose run leeloo python manage.py loadmetadata
 ```
 
 Update Elasticsearch:
