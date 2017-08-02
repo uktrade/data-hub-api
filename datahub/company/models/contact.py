@@ -35,7 +35,7 @@ class Contact(ArchivableModel, BaseModel):
         'Advisor', related_name='contacts', null=True, blank=True,
         on_delete=models.SET_NULL
     )
-    primary = models.BooleanField()
+    primary = models.NullBooleanField()
     telephone_countrycode = models.CharField(max_length=MAX_LENGTH)
     telephone_number = models.CharField(max_length=MAX_LENGTH)
     email = models.EmailField()
