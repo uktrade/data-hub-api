@@ -163,17 +163,18 @@ def test_investment_project_to_dict():
             'approved_landed', 'approved_non_fdi', 'intermediate_company',
             'referral_source_activity_website',
             'referral_source_activity_marketing',
-            'referral_source_activity_event', 'fdi_type', 'non_fdi_type',
+            'referral_source_activity_event', 'fdi_type', 'fdi_value', 'non_fdi_type',
             'client_cannot_provide_total_investment', 'total_investment',
             'client_cannot_provide_foreign_investment',
             'foreign_equity_investment', 'government_assistance',
-            'number_new_jobs', 'average_salary',
-            'number_safeguarded_jobs', 'r_and_d_budget',
+            'some_new_jobs', 'number_new_jobs', 'will_new_jobs_last_two_years',
+            'average_salary', 'number_safeguarded_jobs', 'r_and_d_budget',
             'non_fdi_r_and_d_budget', 'new_tech_to_uk', 'export_revenue',
             'client_requirements', 'site_decided', 'address_line_1',
             'address_line_2', 'address_line_3', 'address_line_postcode',
-            'uk_company', 'project_manager', 'project_assurance_adviser',
-            'team_members', 'likelihood_of_landing', 'priority'}
+            'uk_company_decided', 'uk_company', 'project_manager',
+            'project_assurance_adviser', 'team_members', 'likelihood_of_landing',
+            'priority', 'quotable_as_public_case_study', 'other_business_activity'}
 
     assert set(result.keys()) == keys
 

@@ -14,7 +14,7 @@ from datahub.metadata import models as metadata_models
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-class CompanyAbstract(BaseModel):
+class CompanyAbstract(models.Model):
     """Share as much as possible in the company representation."""
 
     name = models.CharField(max_length=MAX_LENGTH)
@@ -43,7 +43,7 @@ class CompanyAbstract(BaseModel):
         super().save(*args, **kwargs)
 
 
-class Company(ArchivableModel, CompanyAbstract):
+class Company(ArchivableModel, BaseModel, CompanyAbstract):
     """Representation of the company as per CDMS."""
 
     REQUIRED_TRADING_ADDRESS_FIELDS = (
@@ -53,7 +53,7 @@ class Company(ArchivableModel, CompanyAbstract):
     )
 
     company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    id = models.UUIDField(primary_key=True, db_index=True, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     alias = models.CharField(
         max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name'
     )

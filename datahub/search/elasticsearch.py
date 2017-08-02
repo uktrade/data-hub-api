@@ -62,8 +62,18 @@ def get_sort_query(qs, field_order=None):
     tokens = field_order.rsplit(':', maxsplit=1)
     order = tokens[1] if len(tokens) > 1 else 'asc'
 
+    sort_params = {
+        'order': order,
+        'missing': '_first' if order == 'asc' else '_last'
+    }
+
+    # check if we sort by field in nested document (example: 'stage.name')
+    if '.' in tokens[0]:
+        # extract and add path to nested document (example: 'stage')
+        sort_params['nested_path'] = tokens[0].split('.', 1)[0]
+
     qs = qs.sort({
-        remap_sort_field(tokens[0]): {'order': order}
+        remap_sort_field(tokens[0]): sort_params
     })
     return qs
 
@@ -87,11 +97,40 @@ def get_basic_search_query(term, entities=('company',), field_order=None, offset
     return s[offset:offset + limit]
 
 
+def get_term_query(field, value):
+    """Gets term query."""
+    term = Q('term', **{field: value})
+    if '.' not in field:
+        return term
+
+    return Q('nested', path=field.split('.')[0], query=term)
+
+
+def apply_aggs_query(search, aggs):
+    """Applies aggregates query to the search."""
+    for agg in aggs:
+        # skip range filters as we can't aggregate them
+        if any(agg.endswith(x) for x in ('_before', '_after')):
+            continue
+        agg = remap_field(agg)
+
+        search_aggs = search.aggs
+        if '.' in agg:
+            search_aggs = search_aggs.bucket(
+                agg,
+                'nested',
+                path=agg.split('.', 1)[0]
+            )
+
+        search_aggs.bucket(agg, 'terms', field=agg)
+
+
 def get_search_by_entity_query(term=None,
                                filters=None,
                                entity=None,
                                ranges=None,
                                field_order=None,
+                               aggs=None,
                                offset=0,
                                limit=100):
     """Perform filtered search for given terms in given entity."""
@@ -99,29 +138,32 @@ def get_search_by_entity_query(term=None,
     if term != '':
         query.append(get_search_term_query(term))
 
-    query_filter = []
+    # document should match at least one filter in the list (or)
+    should_filter = []
+
+    # document must match all filters in the list (and)
+    must_filter = []
 
     if filters:
         for k, v in filters.items():
-            term = Q('term', **{k: v})
-            if '.' not in k:
-                query_filter.append(term)
+            if isinstance(v, list):
+                should_filter += [get_term_query(k, value) for value in v]
             else:
-                # query nested fields
-                query_filter.append(
-                    Q('nested', path=k.split('.')[0], query=term)
-                )
+                must_filter.append(get_term_query(k, v))
 
     if ranges:
         for k, v in ranges.items():
-            query_filter.append(
+            must_filter.append(
                 Q('range', **{k: v})
             )
 
     s = Search(index=settings.ES_INDEX).query('bool', must=query)
     s = get_sort_query(s, field_order=field_order)
 
-    s = s.post_filter('bool', must=query_filter)
+    s = s.post_filter('bool', must=must_filter, should=should_filter, minimum_should_match=1)
+
+    if aggs:
+        apply_aggs_query(s, aggs)
 
     return s[offset:offset + limit]
 
@@ -146,22 +188,24 @@ def bulk(actions=None, chunk_size=None, **kwargs):
     return es_bulk(connections.get_connection(), actions=actions, chunk_size=chunk_size, **kwargs)
 
 
-def remap_fields(fields):
-    """Replaces fields to match Elasticsearch data model."""
-    name_map = {
-        'sector': 'sector.id',
-        'account_manager': 'account_manager.id',
-        'export_to_country': 'export_to_countries.id',
-        'future_interest_country': 'future_interest_countries.id',
-        'uk_region': 'uk_region.id',
-        'trading_address_country': 'trading_address_country.id',
-        'adviser': 'adviser.id',
-        'client_relationship_manager': 'client_relationship_manager.id',
-        'investor_company': 'investor_company.id',
-        'investment_type': 'investment_type.id',
-        'stage': 'stage.id',
-    }
-    return {name_map.get(k, k): v for k, v in fields.items()}
+FILTER_NAME_MAP = {
+    'sector': 'sector.id',
+    'account_manager': 'account_manager.id',
+    'export_to_country': 'export_to_countries.id',
+    'future_interest_country': 'future_interest_countries.id',
+    'uk_region': 'uk_region.id',
+    'trading_address_country': 'trading_address_country.id',
+    'adviser': 'adviser.id',
+    'client_relationship_manager': 'client_relationship_manager.id',
+    'investor_company': 'investor_company.id',
+    'investment_type': 'investment_type.id',
+    'stage': 'stage.id',
+}
+
+
+def remap_field(field):
+    """Maps api field to elasticsearch field."""
+    return FILTER_NAME_MAP.get(field, field)
 
 
 def date_range_fields(fields):

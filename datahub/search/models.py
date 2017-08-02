@@ -187,7 +187,7 @@ class Company(DocType, MapDBModelToDict):
         'children', 'servicedeliverys', 'investor_investment_projects',
         'intermediate_investment_projects', 'investee_projects',
         'tree_id', 'lft', 'rght', 'business_leads', 'interactions',
-        'orders'
+        'orders', 'created_by', 'modified_by'
     )
 
     class Meta:
@@ -244,7 +244,8 @@ class Contact(DocType, MapDBModelToDict):
     }
 
     IGNORED_FIELDS = (
-        'interactions', 'servicedeliverys', 'investment_projects', 'orders'
+        'interactions', 'servicedeliverys', 'investment_projects', 'orders',
+        'created_by', 'modified_by'
     )
 
     class Meta:
@@ -281,6 +282,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
     estimated_land_date = Date()
     fdi_type = _id_name_mapping()
     fdi_type_documents = _id_uri_mapping()
+    fdi_value = _id_name_mapping()
     intermediate_company = _id_name_mapping()
     uk_company = _id_name_mapping()
     investor_company = _id_name_mapping()
@@ -344,7 +346,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'investmentprojectcode', 'competitor_countries',
         'uk_region_locations', 'strategic_drivers',
         'client_considering_other_countries', 'cdms_project_code',
-        'interactions', 'documents'
+        'interactions', 'documents', 'created_by', 'modified_by'
     )
 
     class Meta:

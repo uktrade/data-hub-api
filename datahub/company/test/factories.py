@@ -16,7 +16,7 @@ class AdviserFactory(factory.django.DjangoModelFactory):
     email = factory.Sequence(lambda n: f'foo-{n}@bar.com')
     date_joined = now()
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = 'company.Advisor'
         django_get_or_create = ('email', )
 
@@ -25,6 +25,8 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     """Company factory."""
 
     id = factory.Sequence(lambda _: str(uuid.uuid4()))
+    created_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SubFactory(AdviserFactory)
     name = factory.Sequence(lambda n: f'name{n}')
     registered_address_1 = factory.Sequence(lambda n: f'{n} Foo st.')
     registered_address_town = 'London'
@@ -38,7 +40,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     uk_region_id = constants.UKRegion.england.value.id
     created_on = now()
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = 'company.Company'
 
 
@@ -52,7 +54,7 @@ class CompaniesHouseCompanyFactory(factory.django.DjangoModelFactory):
     registered_address_country_id = constants.Country.italy.value.id
     incorporation_date = now()
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = 'company.CompaniesHouseCompany'
         django_get_or_create = ('company_number', )
 
@@ -61,6 +63,8 @@ class ContactFactory(factory.django.DjangoModelFactory):
     """Contact factory"""
 
     id = factory.Sequence(lambda _: str(uuid.uuid4()))
+    created_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SubFactory(AdviserFactory)
     title_id = constants.Title.wing_commander.value.id
     first_name = factory.Sequence(lambda n: f'name {n}')
     last_name = factory.Sequence(lambda n: f'surname {n}')
@@ -73,5 +77,5 @@ class ContactFactory(factory.django.DjangoModelFactory):
     created_on = now()
     contactable_by_email = True
 
-    class Meta:
+    class Meta:  # noqa: D101
         model = 'company.Contact'

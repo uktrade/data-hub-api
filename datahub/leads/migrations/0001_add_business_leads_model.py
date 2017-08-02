@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('archived', models.BooleanField(default=False)),
                 ('archived_on', models.DateTimeField(null=True)),
                 ('archived_reason', models.TextField(blank=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, primary_key=True, serialize=False)),
+                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('first_name', models.CharField(blank=True, max_length=255, null=True)),
                 ('last_name', models.CharField(blank=True, max_length=255, null=True)),
                 ('job_title', models.CharField(blank=True, max_length=255, null=True)),

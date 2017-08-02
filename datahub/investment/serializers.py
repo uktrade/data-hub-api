@@ -94,6 +94,7 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
             'actual_land_date',
             'project_shareable',
             'not_shareable_reason',
+            'quotable_as_public_case_study',
             'likelihood_of_landing',
             'priority',
             'approved_commitment_to_invest',
@@ -117,6 +118,7 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
             'non_fdi_type',
             'sector',
             'business_activities',
+            'other_business_activity',
             'archived',
             'archived_on',
             'archived_reason',
@@ -138,6 +140,7 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
 class IProjectValueSerializer(serializers.ModelSerializer):
     """Serialiser for investment project value objects."""
 
+    fdi_value = NestedRelatedField(meta_models.FDIValue, required=False, allow_null=True)
     average_salary = NestedRelatedField(
         meta_models.SalaryRange, required=False,
         allow_null=True
@@ -153,10 +156,13 @@ class IProjectValueSerializer(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = InvestmentProject
         fields = (
+            'fdi_value',
             'total_investment',
             'foreign_equity_investment',
             'government_assistance',
+            'some_new_jobs',
             'number_new_jobs',
+            'will_new_jobs_last_two_years',
             'average_salary',
             'number_safeguarded_jobs',
             'r_and_d_budget',
@@ -194,7 +200,7 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
         model = InvestmentProject
         fields = (
             'client_requirements',
-            'site_decided',
+            'site_decided',  # deprecated; will be removed
             'address_line_1',
             'address_line_2',
             'address_line_3',
@@ -203,6 +209,7 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
             'uk_region_locations',
             'strategic_drivers',
             'client_considering_other_countries',
+            'uk_company_decided',
             'uk_company',
             'requirements_complete'
         )
@@ -219,6 +226,20 @@ class IProjectTeamMemberSerializer(serializers.ModelSerializer):
         fields = ('investment_project', 'adviser', 'role')
 
 
+class NestedIProjectTeamMemberSerializer(serializers.ModelSerializer):
+    """Serialiser for investment project team members when nested in the main investment
+    project object.
+
+    Used to exclude the investment project from the serialised representation.
+    """
+
+    adviser = NestedAdviserField()
+
+    class Meta:  # noqa: D101
+        model = InvestmentProjectTeamMember
+        fields = ('adviser', 'role')
+
+
 class IProjectTeamSerializer(serializers.ModelSerializer):
     """Serialiser for investment project team objects."""
 
@@ -230,7 +251,7 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
     project_assurance_team = NestedRelatedField(
         meta_models.Team, read_only=True
     )
-    team_members = IProjectTeamMemberSerializer(many=True, read_only=True)
+    team_members = NestedIProjectTeamMemberSerializer(many=True, read_only=True)
     team_complete = serializers.SerializerMethodField()
 
     def get_team_complete(self, instance):

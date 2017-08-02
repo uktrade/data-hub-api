@@ -1,8 +1,9 @@
 from rest_framework import serializers
 
-from datahub.company.models import Company, Contact
+from datahub.company.models import Advisor, Company, Contact
 from datahub.core.serializers import NestedRelatedField
-from datahub.metadata.models import Country
+from datahub.core.validate_utils import DataCombiner
+from datahub.metadata.models import Country, Sector, Team
 
 from .models import Order
 
@@ -12,27 +13,76 @@ class OrderSerializer(serializers.ModelSerializer):
 
     id = serializers.UUIDField(read_only=True)
     reference = serializers.CharField(read_only=True)
+
+    created_on = serializers.DateTimeField(read_only=True)
+    created_by = NestedRelatedField(Advisor, read_only=True)
+    modified_on = serializers.DateTimeField(read_only=True)
+    modified_by = NestedRelatedField(Advisor, read_only=True)
+
     company = NestedRelatedField(Company)
     contact = NestedRelatedField(Contact)
     primary_market = NestedRelatedField(Country)
+    sector = NestedRelatedField(Sector, required=False, allow_null=True)
 
     class Meta:  # noqa: D101
         model = Order
         fields = [
             'id',
             'reference',
+            'created_on',
+            'created_by',
+            'modified_on',
+            'modified_by',
             'company',
             'contact',
-            'primary_market'
+            'primary_market',
+            'sector',
         ]
 
     def validate(self, data):
-        """
-        Extra check that a contact works at the given company.
-        """
-        if data['contact'].company != data['company']:
+        """Extra checks."""
+        data_combiner = DataCombiner(self.instance, data)
+        company = data_combiner.get_value('company')
+        contact = data_combiner.get_value('contact')
+
+        # check that contact works at company
+        if contact.company != company:
             raise serializers.ValidationError({
                 'contact': 'The contact does not work at the given company.'
             })
 
+        # company and primary_market cannot be changed after creation
+        if self.instance:
+            if company != self.instance.company:
+                raise serializers.ValidationError({
+                    'company': 'The company cannot be changed after creation.'
+                })
+
+            if data_combiner.get_value('primary_market') != self.instance.primary_market:
+                raise serializers.ValidationError({
+                    'primary_market': 'The primary market cannot be changed after creation.'
+                })
+
         return data
+
+
+def existing_adviser(adviser_id):
+    """
+    DRF Validator. It raises a ValidationError if adviser_id is not a valid adviser id.
+    """
+    try:
+        Advisor.objects.get(id=adviser_id)
+    except Advisor.DoesNotExist:
+        raise serializers.ValidationError(f'{adviser_id} is not a valid adviser')
+    return adviser_id
+
+
+class SubscribedAdviserSerializer(serializers.Serializer):
+    """
+    DRF serializer for an adviser subscribed to an order.
+    """
+
+    id = serializers.UUIDField(validators=[existing_adviser])
+    first_name = serializers.CharField(read_only=True)
+    last_name = serializers.CharField(read_only=True)
+    dit_team = NestedRelatedField(Team, read_only=True)

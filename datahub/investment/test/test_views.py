@@ -66,14 +66,20 @@ class TestUnifiedViews(APITestMixin):
         aerospace_id = constants.Sector.aerospace_assembly_aircraft.value.id
         new_site_id = (constants.FDIType.creation_of_new_site_or_activity
                        .value.id)
-        retail_business_activity = constants.InvestmentBusinessActivity.retail
-        business_activity_id = retail_business_activity.value.id
+        retail_business_activity_id = constants.InvestmentBusinessActivity.retail.value.id
+        other_business_activity_id = constants.InvestmentBusinessActivity.other.value.id
+        activities = [{
+            'id': retail_business_activity_id
+        }, {
+            'id': other_business_activity_id
+        }]
         request_data = {
             'name': 'project name',
             'description': 'project description',
             'nda_signed': False,
             'estimated_land_date': '2020-12-12',
             'project_shareable': False,
+            'quotable_as_public_case_study': True,
             'likelihood_of_landing': 60,
             'priority': '1_low',
             'investment_type': {
@@ -82,9 +88,8 @@ class TestUnifiedViews(APITestMixin):
             'stage': {
                 'id': constants.InvestmentProjectStage.prospect.value.id
             },
-            'business_activities': [{
-                'id': business_activity_id
-            }],
+            'business_activities': activities,
+            'other_business_activity': 'New innovation centre',
             'client_contacts': [{
                 'id': str(contacts[0].id)
             }, {
@@ -120,7 +125,11 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['nda_signed'] == request_data['nda_signed']
         assert (response_data['estimated_land_date'] == request_data[
             'estimated_land_date'])
-        assert (response_data['likelihood_of_landing'] == request_data['likelihood_of_landing'])
+        assert (response_data['project_shareable'] == request_data[
+            'project_shareable'])
+        assert (response_data['quotable_as_public_case_study'] ==
+                request_data['quotable_as_public_case_study'])
+        assert response_data['likelihood_of_landing'] == request_data['likelihood_of_landing']
         assert response_data['priority'] == request_data['priority']
         assert re.match('^DHP-\d+$', response_data['project_code'])
 
@@ -134,11 +143,11 @@ class TestUnifiedViews(APITestMixin):
             adviser.id)
         assert response_data['stage']['id'] == request_data['stage']['id']
         assert len(response_data['client_contacts']) == 2
-        assert sorted(contact['id'] for contact in response_data[
-            'client_contacts']) == sorted(contact.id for contact in contacts)
-        assert len(response_data['business_activities']) == 1
-        assert (response_data['business_activities'][0]['id'] ==
-                business_activity_id)
+        assert Counter(contact['id'] for contact in response_data[
+            'client_contacts']) == Counter(contact.id for contact in contacts)
+        assert Counter(activity['id'] for activity in response_data[
+            'business_activities']) == Counter(activity['id'] for activity in activities)
+        assert response_data['other_business_activity'] == request_data['other_business_activity']
 
     def test_create_project_fail(self):
         """Test creating a project with missing required values."""
@@ -389,7 +398,6 @@ class TestUnifiedViews(APITestMixin):
             'total_investment',
             'client_considering_other_countries',
             'client_requirements',
-            'site_decided',
             'strategic_drivers',
             'uk_region_locations',
         ))
@@ -413,7 +421,6 @@ class TestUnifiedViews(APITestMixin):
             'total_investment': ['This field is required.'],
             'client_considering_other_countries': ['This field is required.'],
             'client_requirements': ['This field is required.'],
-            'site_decided': ['This field is required.'],
             'strategic_drivers': ['This field is required.'],
             'uk_region_locations': ['This field is required.'],
         }
@@ -464,7 +471,6 @@ class TestUnifiedViews(APITestMixin):
             'total_investment': ['This field is required.'],
             'client_considering_other_countries': ['This field is required.'],
             'client_requirements': ['This field is required.'],
-            'site_decided': ['This field is required.'],
             'strategic_drivers': ['This field is required.'],
             'uk_region_locations': ['This field is required.'],
             'project_assurance_adviser': ['This field is required.'],
@@ -607,13 +613,17 @@ class TestUnifiedViews(APITestMixin):
 
     def test_get_value_success(self):
         """Test successfully getting a project value object."""
+        higher_value = constants.FDIValue.higher.value
         project = InvestmentProjectFactory(
+            fdi_value_id=higher_value.id,
             client_cannot_provide_foreign_investment=False,
             client_cannot_provide_total_investment=False,
             total_investment=100,
             foreign_equity_investment=100,
             government_assistance=True,
+            some_new_jobs=False,
             number_new_jobs=0,
+            will_new_jobs_last_two_years=False,
             number_safeguarded_jobs=10,
             r_and_d_budget=False,
             non_fdi_r_and_d_budget=False,
@@ -624,13 +634,16 @@ class TestUnifiedViews(APITestMixin):
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
+        assert response_data['fdi_value']['id'] == higher_value.id
         assert response_data['client_cannot_provide_foreign_investment'] is False
         assert response_data['client_cannot_provide_total_investment'] is False
         assert response_data['total_investment'] == '100'
         assert response_data['foreign_equity_investment'] == '100'
         assert response_data['government_assistance'] is True
         assert response_data['total_investment'] == '100'
+        assert response_data['some_new_jobs'] is False
         assert response_data['number_new_jobs'] == 0
+        assert response_data['will_new_jobs_last_two_years'] is False
         assert response_data['number_safeguarded_jobs'] == 10
         assert response_data['r_and_d_budget'] is False
         assert response_data['non_fdi_r_and_d_budget'] is False
@@ -675,6 +688,7 @@ class TestUnifiedViews(APITestMixin):
             client_considering_other_countries=True,
             competitor_countries=countries,
             strategic_drivers=strategic_drivers,
+            uk_company_decided=False,
             uk_region_locations=uk_region_locations
         )
         url = reverse('api-v3:investment:investment-item',
@@ -686,6 +700,7 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['site_decided'] is True
         assert response_data['client_considering_other_countries'] is True
         assert response_data['requirements_complete'] is True
+        assert response_data['uk_company_decided'] is False
         assert response_data['address_line_1'] == 'address 1'
         assert sorted(country['id'] for country in response_data[
             'competitor_countries']) == sorted(countries)
@@ -1115,8 +1130,10 @@ class TestDocumentViews(APITestMixin):
         project1 = InvestmentProjectFactory()
         project2 = InvestmentProjectFactory()
 
-        IProjectDocument.create_from_declaration_request(project1, 'fdi_type', 'test.txt')
-        doc2 = IProjectDocument.create_from_declaration_request(project2, 'fdi_type', 'test.txt')
+        IProjectDocument.create_from_declaration_request(project1, 'total_investment', 'test.txt')
+        doc2 = IProjectDocument.create_from_declaration_request(
+            project2, 'total_investment', 'test.txt'
+        )
 
         url = reverse('api-v3:investment:document-collection',
                       kwargs={'project_pk': project2.pk})
@@ -1138,26 +1155,28 @@ class TestDocumentViews(APITestMixin):
 
         response = self.api_client.post(url, format='json', data={
             'filename': 'test.txt',
-            'doc_type': 'fdi_type',
+            'doc_type': 'total_investment',
             'project': str(project.pk),
         })
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.data
-        assert response_data['doc_type'] == 'fdi_type'
+        assert response_data['doc_type'] == 'total_investment'
         assert response_data['filename'] == 'test.txt'
         assert response_data['project']['id'] == str(project.pk)
 
         doc = IProjectDocument.objects.get(pk=response_data['id'])
         assert doc.filename == 'test.txt'
-        assert doc.doc_type == 'fdi_type'
+        assert doc.doc_type == 'total_investment'
         assert str(doc.project.pk) == str(project.pk)
         assert 'signed_upload_url' in response.data
 
     def test_document_retrieval(self):
         """Tests retrieval of individual document."""
         project = InvestmentProjectFactory()
-        doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
+        doc = IProjectDocument.create_from_declaration_request(
+            project, 'total_investment', 'test.txt'
+        )
 
         url = reverse('api-v3:investment:document-item',
                       kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
@@ -1169,7 +1188,7 @@ class TestDocumentViews(APITestMixin):
             'id': str(project.pk),
             'name': project.name,
         }
-        assert response.data['doc_type'] == 'fdi_type'
+        assert response.data['doc_type'] == 'total_investment'
         assert response.data['filename'] == 'test.txt'
         assert 'signed_url' in response.data
 
@@ -1181,7 +1200,9 @@ class TestDocumentViews(APITestMixin):
         tested separately in the documents app.
         """
         project = InvestmentProjectFactory()
-        doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
+        doc = IProjectDocument.create_from_declaration_request(
+            project, 'total_investment', 'test.txt'
+        )
 
         url = reverse('api-v3:investment:document-item-callback',
                       kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
@@ -1198,7 +1219,9 @@ class TestDocumentViews(APITestMixin):
     def test_document_delete_of_not_uploaded_doc_does_not_trigger_s3_delete(self, mock_submit):
         """Tests document deletion."""
         project = InvestmentProjectFactory()
-        doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
+        doc = IProjectDocument.create_from_declaration_request(
+            project, 'total_investment', 'test.txt'
+        )
 
         url = reverse('api-v3:investment:document-item',
                       kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
@@ -1213,7 +1236,9 @@ class TestDocumentViews(APITestMixin):
     def test_document_delete(self, mock_s3):
         """Tests document deletion."""
         project = InvestmentProjectFactory()
-        doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
+        doc = IProjectDocument.create_from_declaration_request(
+            project, 'total_investment', 'test.txt'
+        )
         doc.document.uploaded_on = now()
         doc.document.save()
 
@@ -1230,7 +1255,9 @@ class TestDocumentViews(APITestMixin):
     def test_document_upload_status_wrong_status(self):
         """Tests request validation in the document status endpoint."""
         project = InvestmentProjectFactory()
-        doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
+        doc = IProjectDocument.create_from_declaration_request(
+            project, 'total_investment', 'test.txt'
+        )
 
         url = reverse('api-v3:investment:document-item-callback',
                       kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
@@ -1244,7 +1271,9 @@ class TestDocumentViews(APITestMixin):
     def test_document_upload_status_no_status(self):
         """Tests request validation in the document status endpoint."""
         project = InvestmentProjectFactory()
-        doc = IProjectDocument.create_from_declaration_request(project, 'fdi_type', 'test.txt')
+        doc = IProjectDocument.create_from_declaration_request(
+            project, 'total_investment', 'test.txt'
+        )
 
         url = reverse('api-v3:investment:document-item-callback',
                       kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})

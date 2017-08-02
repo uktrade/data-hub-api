@@ -24,3 +24,22 @@ class TestAdviser(APITestMixin):
         result = response.json()
         assert len(result['results']) == 1
         assert result['results'][0]['last_name'] == 'UNIQUE'
+
+    def test_adviser_list_view_default_sort_order(self):
+        """Test default sorting."""
+        AdviserFactory(first_name='a', last_name='sorted adviser')
+        AdviserFactory(first_name='z', last_name='sorted adviser')
+        AdviserFactory(first_name='f', last_name='sorted adviser')
+        url = reverse('api-v1:advisor-list')
+        response = self.api_client.get(url, data={
+            'last_name__icontains': 'sorted'
+        })
+        assert response.status_code == status.HTTP_200_OK
+        result = response.json()
+        assert len(result['results']) == 3
+        results = result['results']
+        assert [res['name'] for res in results] == [
+            'a sorted adviser',
+            'f sorted adviser',
+            'z sorted adviser',
+        ]

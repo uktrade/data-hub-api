@@ -23,9 +23,4 @@ shellplus:
 	docker-compose run leeloo python manage.py shell_plus --ipython
 
 load-metadata:
-	docker-compose run leeloo python manage.py loaddata /app/fixtures/metadata.yaml
-
-load-businesstypes:
-	docker-compose run leeloo python manage.py loaddata /app/fixtures/datahub_businesstypes.yaml
-
-load-all-metadata:	load-metadata load-businesstypes
+	docker-compose run leeloo python manage.py loadmetadata

@@ -1,7 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 
 from datahub.core.viewsets import CoreViewSetV1
-from datahub.interaction.models import Interaction
+from datahub.interaction.queryset import get_interaction_queryset
 from datahub.interaction.serializers import (
     InteractionSerializerRead,
     InteractionSerializerWrite,
@@ -13,12 +13,9 @@ class InteractionViewSetV1(CoreViewSetV1):
 
     read_serializer_class = InteractionSerializerRead
     write_serializer_class = InteractionSerializerWrite
-    queryset = Interaction.objects.select_related(
-        'interaction_type',
-        'dit_adviser',
-        'company',
-        'contact'
-    ).all()
+    # It's difficult to include everything in select_related() and prefetch_related()
+    # because of the excessive nesting in this v1 endpoint.
+    queryset = get_interaction_queryset()
     filter_backends = (
         DjangoFilterBackend,
     )

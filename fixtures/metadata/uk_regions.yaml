@@ -1,0 +1,66 @@
+- model: metadata.ukregion
+  pk: 1718e330-6095-e211-a939-e4115bead28a
+  fields: {name: All}
+- model: metadata.ukregion
+  pk: 804cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: FDI Hub}
+- model: metadata.ukregion
+  pk: 814cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: North East}
+- model: metadata.ukregion
+  pk: 824cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: North West}
+- model: metadata.ukregion
+  pk: 834cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: Yorkshire and The Humber}
+- model: metadata.ukregion
+  pk: 844cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: East Midlands}
+- model: metadata.ukregion
+  pk: 854cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: West Midlands}
+- model: metadata.ukregion
+  pk: 864cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: East of England}
+- model: metadata.ukregion
+  pk: 874cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: London}
+- model: metadata.ukregion
+  pk: 884cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: South East}
+- model: metadata.ukregion
+  pk: 894cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: South West}
+- model: metadata.ukregion
+  pk: 8a4cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: England}
+- model: metadata.ukregion
+  pk: 8b4cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: Channel Islands}
+- model: metadata.ukregion
+  pk: 8c4cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: Scotland}
+- model: metadata.ukregion
+  pk: 8d4cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: Wales}
+- model: metadata.ukregion
+  pk: 8e4cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: Northern Ireland}
+- model: metadata.ukregion
+  pk: 8f4cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: Isle of Man}
+- model: metadata.ukregion
+  pk: 904cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: Guernsey}
+- model: metadata.ukregion
+  pk: 914cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: Sark}
+- model: metadata.ukregion
+  pk: 924cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: Jersey}
+- model: metadata.ukregion
+  pk: 934cd12a-6095-e211-a939-e4115bead28a
+  fields: {name: Alderney}
+- model: metadata.ukregion
+  pk: e1dd40e9-3dfd-e311-8a2b-e4115bead28a
+  fields: {name: UKTI Dubai Hub}
