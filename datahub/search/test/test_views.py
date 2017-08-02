@@ -197,13 +197,13 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:investment_project')
 
         response = self.api_client.post(url, {
-            'description': 'investmentproject1',
+            'original_query': 'abc defg',
         }, format='json')
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
-        assert response.data['results'][0]['description'] == 'investmentproject1'
+        assert response.data['results'][0]['name'] == 'abc defg'
 
     def test_search_investment_project_date_json(self):
         """Tests detailed investment project search."""
