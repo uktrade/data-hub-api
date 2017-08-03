@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('investment', '0013_add_quotable_as_case_study'),
+        ('investment', '0001_squashed_0013_add_quotable_as_case_study'),
     ]
 
     operations = [
