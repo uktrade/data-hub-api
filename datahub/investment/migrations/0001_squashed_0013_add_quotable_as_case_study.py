@@ -10,8 +10,6 @@ import uuid
 
 class Migration(migrations.Migration):
 
-    replaces = [('investment', '0001_squash_0007_initial'), ('investment', '0002_rename_advsor_fkeys_to_adviser'), ('investment', '0003_add_investment_archiving'), ('investment', '0004_investment_tidy_up'), ('investment', '0005_add_evaluation_fields'), ('investment', '0006_add_investemnt_document'), ('investment', '0007_rename_phase_to_stage'), ('investment', '0007_fix_doc_type'), ('investment', '0008_merge_20170707_0824'), ('investment', '0009_add_likelihood_priority'), ('investment', '0010_add_team_members'), ('investment', '0011_add_fdi_value'), ('investment', '0012_add_additional_fields'), ('investment', '0013_add_quotable_as_case_study')]
-
     initial = True
 
     dependencies = [
