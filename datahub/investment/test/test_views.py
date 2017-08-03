@@ -3,7 +3,7 @@
 import re
 import uuid
 from collections import Counter
-from datetime import datetime
+from datetime import date, datetime
 from unittest.mock import patch
 
 import pytest
@@ -21,7 +21,9 @@ from datahub.core.test_utils import (
 from datahub.core.utils import executor
 from datahub.documents.av_scan import virus_scan_document
 from datahub.investment import views
-from datahub.investment.models import InvestmentProjectTeamMember, IProjectDocument
+from datahub.investment.models import (
+    InvestmentProject, InvestmentProjectTeamMember, IProjectDocument
+)
 from datahub.investment.test.factories import (
     InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
 )
@@ -142,6 +144,7 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['referral_source_adviser']['id'] == str(
             adviser.id)
         assert response_data['stage']['id'] == request_data['stage']['id']
+        assert response_data['status'] == 'ongoing'  # default status
         assert len(response_data['client_contacts']) == 2
         assert Counter(contact['id'] for contact in response_data[
             'client_contacts']) == Counter(contact.id for contact in contacts)
@@ -246,6 +249,32 @@ class TestUnifiedViews(APITestMixin):
         assert (response_data['stage']['id'] == str(project.stage.id))
         assert sorted(contact['id'] for contact in response_data[
             'client_contacts']) == sorted(contacts)
+
+    def test_get_project_status(self):
+        """Test getting project status fields."""
+        contacts = [ContactFactory().id, ContactFactory().id]
+        project = InvestmentProjectFactory(
+            client_contacts=contacts,
+            status=InvestmentProject.STATUSES.lost,
+            reason_delayed='Problems getting planning permission.',
+            date_abandoned=date(2019, 1, 1),
+            reason_abandoned='No longer viable.',
+            reason_lost='Lower set-up costs.',
+            date_lost=date(2018, 1, 1),
+            country_lost_to_id=constants.Country.japan.value.id,
+        )
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['id'] == str(project.id)
+        assert response_data['status'] == project.status
+        assert response_data['reason_delayed'] == project.reason_delayed
+        assert response_data['date_abandoned'] == project.date_abandoned.isoformat()
+        assert response_data['reason_abandoned'] == project.reason_abandoned
+        assert response_data['reason_lost'] == project.reason_lost
+        assert response_data['date_lost'] == project.date_lost.isoformat()
+        assert response_data['country_lost_to']['id'] == constants.Country.japan.value.id
 
     def test_create_project_conditional_failure(self):
         """Test creating a project w/ missing conditionally required value."""
