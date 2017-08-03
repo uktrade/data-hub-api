@@ -9,7 +9,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('investment', '0001_squash_0007_initial'),
+        ('investment', '0001_squashed_0013_add_quotable_as_case_study'),
         ('interaction', '0001_squash_0008_initial'),
     ]
 
