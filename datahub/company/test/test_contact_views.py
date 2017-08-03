@@ -258,7 +258,7 @@ class TestAddContact(APITestMixin):
         }
 
     def test_fails_without_primary_specified(self):
-        """Test that fails if the email address is invalid."""
+        """Test that fails if primary is not specified."""
         url = reverse('api-v3:contact:list')
         response = self.api_client.post(url, {
             'first_name': 'Oratio',
@@ -276,6 +276,7 @@ class TestAddContact(APITestMixin):
         assert response.data == {
             'primary': ['This field is required.']
         }
+
 
 class TestEditContact(APITestMixin):
     """Edit contact test case."""
