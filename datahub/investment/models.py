@@ -35,8 +35,7 @@ class IProjectAbstract(models.Model):
         related_name='investment_projects'
     )
 
-    cdms_project_code = models.CharField(max_length=MAX_LENGTH, blank=True,
-                                         null=True)
+    cdms_project_code = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     quotable_as_public_case_study = models.NullBooleanField()
     project_shareable = models.NullBooleanField()
     not_shareable_reason = models.TextField(blank=True, null=True)
@@ -56,6 +55,7 @@ class IProjectAbstract(models.Model):
         related_name='investment_projects',
         default=InvestmentProjectStage.prospect.value.id
     )
+
     investor_company = models.ForeignKey(
         'company.Company', related_name='investor_investment_projects',
         null=True, blank=True, on_delete=models.CASCADE
@@ -87,9 +87,7 @@ class IProjectAbstract(models.Model):
         'metadata.ReferralSourceMarketing', related_name='investment_projects',
         null=True, blank=True, on_delete=models.SET_NULL
     )
-    referral_source_activity_event = models.CharField(
-        max_length=MAX_LENGTH, null=True, blank=True
-    )
+    referral_source_activity_event = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
     fdi_type = models.ForeignKey(
         'metadata.FDIType', related_name='investment_projects', null=True,
         blank=True, on_delete=models.SET_NULL
@@ -115,8 +113,8 @@ class IProjectAbstract(models.Model):
     def project_code(self):
         """A user-friendly project code.
 
-        If a CDMS project code is held, that is returned. Otherwise a Data
-        Hub project code beginning with DHP- is returned.
+        If a CDMS project code is held, that is returned. Otherwise a Data Hub project code
+        beginning with DHP- is returned.
         """
         if self.cdms_project_code:
             return self.cdms_project_code
@@ -168,14 +166,10 @@ class IProjectRequirementsAbstract(models.Model):
     client_requirements = models.TextField(blank=True, null=True)
     # site_decided is deprecated; will be removed
     site_decided = models.NullBooleanField()
-    address_line_1 = models.CharField(blank=True, null=True,
-                                      max_length=MAX_LENGTH)
-    address_line_2 = models.CharField(blank=True, null=True,
-                                      max_length=MAX_LENGTH)
-    address_line_3 = models.CharField(blank=True, null=True,
-                                      max_length=MAX_LENGTH)
-    address_line_postcode = models.CharField(blank=True, null=True,
-                                             max_length=MAX_LENGTH)
+    address_line_1 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
+    address_line_2 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
+    address_line_3 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
+    address_line_postcode = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
     client_considering_other_countries = models.NullBooleanField()
 
     uk_company_decided = models.NullBooleanField()
@@ -183,10 +177,8 @@ class IProjectRequirementsAbstract(models.Model):
         'company.Company', related_name='investee_projects',
         null=True, blank=True, on_delete=models.SET_NULL
     )
-    competitor_countries = models.ManyToManyField('metadata.Country',
-                                                  related_name='+', blank=True)
-    uk_region_locations = models.ManyToManyField('metadata.UKRegion',
-                                                 related_name='+', blank=True)
+    competitor_countries = models.ManyToManyField('metadata.Country', related_name='+', blank=True)
+    uk_region_locations = models.ManyToManyField('metadata.UKRegion', related_name='+', blank=True)
     strategic_drivers = models.ManyToManyField(
         'metadata.InvestmentStrategicDriver',
         related_name='investment_projects', blank=True
@@ -200,12 +192,10 @@ class IProjectTeamAbstract(models.Model):
         abstract = True
 
     project_manager = models.ForeignKey(
-        'company.Advisor', null=True, related_name='+', blank=True,
-        on_delete=models.SET_NULL
+        'company.Advisor', null=True, related_name='+', blank=True, on_delete=models.SET_NULL
     )
     project_assurance_adviser = models.ForeignKey(
-        'company.Advisor', null=True, related_name='+', blank=True,
-        on_delete=models.SET_NULL
+        'company.Advisor', null=True, related_name='+', blank=True, on_delete=models.SET_NULL
     )
 
     @property
@@ -261,16 +251,14 @@ class InvestmentProjectTeamMember(models.Model):
 class InvestmentProjectCode(models.Model):
     """An investment project number used for project codes.
 
-    These are generated for new projects (but not for projects migrated
-    from CDMS).
+    These are generated for new projects (but not for projects migrated from CDMS).
 
-    This is required because Django does not allow AutoFields that are not
-    primary keys, and we use UUIDs for primary keys. This model has a
-    standard auto-incrementing integer (serial) as a primary key.
+    This is required because Django does not allow AutoFields that are not primary keys,
+    and we use UUIDs for primary keys. This model has a standard auto-incrementing integer
+    (serial) as a primary key.
     """
 
-    project = models.OneToOneField(InvestmentProject,
-                                   on_delete=models.CASCADE)
+    project = models.OneToOneField(InvestmentProject, on_delete=models.CASCADE)
 
 
 class IProjectDocument(BaseModel, ArchivableModel):
@@ -298,13 +286,8 @@ class IProjectDocument(BaseModel, ArchivableModel):
         related_name='documents',
         on_delete=models.CASCADE,
     )
-    doc_type = models.CharField(
-        max_length=settings.CHAR_FIELD_MAX_LENGTH,
-        choices=DOC_TYPES,
-    )
-    filename = models.CharField(
-        max_length=settings.CHAR_FIELD_MAX_LENGTH,
-    )
+    doc_type = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH, choices=DOC_TYPES)
+    filename = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
     document = models.OneToOneField(Document, on_delete=models.PROTECT)
 
     @property
