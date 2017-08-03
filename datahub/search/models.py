@@ -340,6 +340,9 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'archived_by': _contact_dict,
         'project_manager': _contact_dict,
         'project_assurance_adviser': _contact_dict,
+        'date_lost': Date(),
+        'date_abandoned': Date(),
+        'country_lost_to': _id_name_dict,
     }
 
     IGNORED_FIELDS = (

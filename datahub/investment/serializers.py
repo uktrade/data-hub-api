@@ -17,8 +17,8 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
     incomplete_fields = serializers.SerializerMethodField()
     project_code = serializers.CharField(read_only=True)
     investment_type = NestedRelatedField(meta_models.InvestmentType)
-    stage = NestedRelatedField(meta_models.InvestmentProjectStage,
-                               required=False)
+    stage = NestedRelatedField(meta_models.InvestmentProjectStage, required=False)
+    country_lost_to = NestedRelatedField(meta_models.Country, required=False)
     project_shareable = serializers.BooleanField(required=True)
     investor_company = NestedRelatedField(
         Company, required=True, allow_null=False
@@ -105,6 +105,13 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
             'approved_non_fdi',
             'investment_type',
             'stage',
+            'status',
+            'reason_delayed',
+            'reason_abandoned',
+            'date_abandoned',
+            'reason_lost',
+            'date_lost',
+            'country_lost_to',
             'investor_company',
             'intermediate_company',
             'client_contacts',
