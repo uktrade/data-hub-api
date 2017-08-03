@@ -444,6 +444,7 @@
     description: This is a dummy investment project for testing
     stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8  # Active
     status: lost
+    date_lost: 2018-01-01
     reason_lost: Low demand.
     country_lost_to: 0950bdb8-5d95-e211-a939-e4115bead28a
     nda_signed: false
