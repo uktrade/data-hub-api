@@ -160,6 +160,7 @@ class ContactSerializer(serializers.ModelSerializer):
         settings.AUTH_USER_MODEL, read_only=True,
         extra_fields=('first_name', 'last_name')
     )
+    primary = serializers.BooleanField()
 
     class Meta:  # noqa: D101
         model = Contact
