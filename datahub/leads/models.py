@@ -33,11 +33,6 @@ class BusinessLead(ArchivableModel, BaseModel):
         'company.Company', null=True, blank=True, on_delete=models.SET_NULL,
         related_name='business_leads'
     )
-    # This is the adviser that the lead belongs to
-    adviser = models.ForeignKey(
-        'company.Advisor', null=True, blank=True, on_delete=models.CASCADE,
-        related_name='business_leads'
-    )
     telephone_number = models.CharField(max_length=MAX_LENGTH, null=True,
                                         blank=True)
     email = models.EmailField(null=True, blank=True)
