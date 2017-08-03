@@ -257,6 +257,25 @@ class TestAddContact(APITestMixin):
             ]
         }
 
+    def test_fails_without_primary_specified(self):
+        """Test that fails if the email address is invalid."""
+        url = reverse('api-v3:contact:list')
+        response = self.api_client.post(url, {
+            'first_name': 'Oratio',
+            'last_name': 'Nelson',
+            'company': {
+                'id': CompanyFactory().pk
+            },
+            'email': 'foo@bar.com',
+            'telephone_countrycode': '+44',
+            'telephone_number': '123456789',
+            'address_same_as_company': True,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'primary': ['This field is required.']
+        }
 
 class TestEditContact(APITestMixin):
     """Edit contact test case."""
