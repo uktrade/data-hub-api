@@ -12,8 +12,7 @@ from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import (AdviserFactory, CompanyFactory,
-                                            ContactFactory)
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import (
     APITestMixin, synchronous_executor_submit, synchronous_transaction_on_commit
@@ -64,8 +63,7 @@ class TestUnifiedViews(APITestMixin):
         adviser = AdviserFactory()
         url = reverse('api-v3:investment:investment-collection')
         aerospace_id = constants.Sector.aerospace_assembly_aircraft.value.id
-        new_site_id = (constants.FDIType.creation_of_new_site_or_activity
-                       .value.id)
+        new_site_id = constants.FDIType.creation_of_new_site_or_activity.value.id
         retail_business_activity_id = constants.InvestmentBusinessActivity.retail.value.id
         other_business_activity_id = constants.InvestmentBusinessActivity.other.value.id
         activities = [{
@@ -123,24 +121,18 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['name'] == request_data['name']
         assert response_data['description'] == request_data['description']
         assert response_data['nda_signed'] == request_data['nda_signed']
-        assert (response_data['estimated_land_date'] == request_data[
-            'estimated_land_date'])
-        assert (response_data['project_shareable'] == request_data[
-            'project_shareable'])
+        assert response_data['estimated_land_date'] == request_data['estimated_land_date']
+        assert response_data['project_shareable'] == request_data['project_shareable']
         assert (response_data['quotable_as_public_case_study'] ==
                 request_data['quotable_as_public_case_study'])
         assert response_data['likelihood_of_landing'] == request_data['likelihood_of_landing']
         assert response_data['priority'] == request_data['priority']
         assert re.match('^DHP-\d+$', response_data['project_code'])
 
-        assert (response_data['investment_type']['id'] == request_data[
-            'investment_type']['id'])
-        assert response_data['investor_company']['id'] == str(
-            investor_company.id)
-        assert response_data['intermediate_company']['id'] == str(
-            intermediate_company.id)
-        assert response_data['referral_source_adviser']['id'] == str(
-            adviser.id)
+        assert response_data['investment_type']['id'] == request_data['investment_type']['id']
+        assert response_data['investor_company']['id'] == str(investor_company.id)
+        assert response_data['intermediate_company']['id'] == str(intermediate_company.id)
+        assert response_data['referral_source_adviser']['id'] == str(adviser.id)
         assert response_data['stage']['id'] == request_data['stage']['id']
         assert len(response_data['client_contacts']) == 2
         assert Counter(contact['id'] for contact in response_data[
@@ -239,10 +231,8 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['likelihood_of_landing'] == project.likelihood_of_landing
         assert response_data['nda_signed'] == project.nda_signed
         assert response_data['project_code'] == project.project_code
-        assert (response_data['estimated_land_date'] ==
-                str(project.estimated_land_date))
-        assert (response_data['investment_type']['id'] ==
-                str(project.investment_type.id))
+        assert response_data['estimated_land_date'] == str(project.estimated_land_date)
+        assert response_data['investment_type']['id'] == str(project.investment_type.id)
         assert (response_data['stage']['id'] == str(project.stage.id))
         assert sorted(contact['id'] for contact in response_data[
             'client_contacts']) == sorted(contacts)
