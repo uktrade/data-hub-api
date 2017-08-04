@@ -227,7 +227,7 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
 
     class Meta:  # noqa: D101
         permissions = (
-            ('view_investmentproject', 'Can View Investment Project'),
+            ('view_investmentproject', 'Can view investment project'),
         )
 
 
@@ -252,7 +252,7 @@ class InvestmentProjectTeamMember(models.Model):
     class Meta:  # noqa: D101
         unique_together = (('investment_project', 'adviser'),)
         permissions = (
-            ('view_investmentprojectteammember', 'Can View Investment Project Team Member'),
+            ('view_investmentprojectteammember', 'Can view investment project team member'),
         )
 
 
@@ -270,7 +270,7 @@ class InvestmentProjectCode(models.Model):
 
     class Meta:  # noqa: D101
         permissions = (
-            ('view_investmentprojectcode', 'Can View Investment Project Code'),
+            ('view_investmentprojectcode', 'Can view investment project code'),
         )
 
 
@@ -320,7 +320,7 @@ class IProjectDocument(BaseModel, ArchivableModel):
             ('project', 'doc_type', 'filename'),
         )
         permissions = (
-            ('view_iprojectdocument', 'Can View Investment Project Document'),
+            ('view_iprojectdocument', 'Can view investment project document'),
         )
 
     def delete(self, using=None, keep_parents=False):

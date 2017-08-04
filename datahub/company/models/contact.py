@@ -59,7 +59,7 @@ class Contact(ArchivableModel, BaseModel):
 
     class Meta:  # noqa: D101
         permissions = (
-            ('view_contact', 'Can View Contact'),
+            ('view_contact', 'Can view contact'),
         )
 
     @cached_property

@@ -67,7 +67,7 @@ class Interaction(InteractionAbstract):
 
     class Meta:  # noqa: D101
         permissions = (
-            ('view_interaction', 'Can View Interaction'),
+            ('view_interaction', 'Can view interaction'),
         )
 
 
@@ -97,7 +97,7 @@ class ServiceOffer(models.Model):
 
     class Meta:  # noqa: D101
         permissions = (
-            ('view_serviceoffer', 'Can View Service Offer'),
+            ('view_serviceoffer', 'Can view service offer'),
         )
 
 
@@ -150,5 +150,5 @@ class ServiceDelivery(InteractionAbstract):
     class Meta(InteractionAbstract.Meta):  # noqa: D101
         verbose_name_plural = 'service deliveries'
         permissions = (
-            ('view_servicedelivery', 'Can View Service Delivery'),
+            ('view_servicedelivery', 'Can view service delivery'),
         )

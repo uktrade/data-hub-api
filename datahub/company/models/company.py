@@ -127,7 +127,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     class Meta:  # noqa: D101
         verbose_name_plural = 'companies'
         permissions = (
-            ('view_company', 'Can View Company'),
+            ('view_company', 'Can view company'),
         )
 
     class MPTTMeta:  # noqa: D101
@@ -215,7 +215,8 @@ class CompaniesHouseCompany(CompanyAbstract):
         return self.name
 
     class Meta:  # noqa: D101
+        verbose_name = 'Companies House company'
         verbose_name_plural = 'Companies House companies'
         permissions = (
-            ('view_companieshousecompany', 'Can View Companies House Company'),
+            ('view_companieshousecompany', 'Can view companies house company'),
         )

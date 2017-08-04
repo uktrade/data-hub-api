@@ -112,5 +112,5 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         ]
         verbose_name = 'adviser'
         permissions = (
-            ('view_advisor', 'Can View Adviser'),  # permission codename must match model name
+            ('view_advisor', 'Can view adviser'),  # permission codename must match model name
         )
