@@ -19,7 +19,7 @@ class BusinessLeadViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     filter_backends = (
         DjangoFilterBackend,
     )
-    filter_fields = ['company_id']
+    filter_fields = ['company_id', 'created_by_id']
 
     def get_queryset(self):
         """
@@ -28,16 +28,8 @@ class BusinessLeadViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         """
         return BusinessLead.objects.select_related(
             'company',
-            'adviser',
             'address_country',
-            'archived_by'
-        ).filter(
-            adviser=self.request.user
+            'archived_by',
+            'created_by',
+            'modified_by',
         )
-
-    def get_additional_data(self, create):
-        """Set adviser to the user on model instance creation."""
-        data = {}
-        if create:
-            data['adviser'] = self.request.user
-        return data

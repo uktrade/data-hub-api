@@ -1,7 +1,19 @@
-from django.core.exceptions import ValidationError
+from django.core.exceptions import FieldDoesNotExist, ValidationError
 from rest_framework import mixins
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.viewsets import GenericViewSet
+
+
+def has_fields(model, *fields):
+    """Returns True if model has all the fields, False otherwise."""
+    meta = model._meta
+
+    try:
+        for field in fields:
+            meta.get_field(field)
+    except FieldDoesNotExist:
+        return False
+    return True
 
 
 class CoreViewSetV1(mixins.CreateModelMixin,
@@ -60,7 +72,14 @@ class CoreViewSetV1(mixins.CreateModelMixin,
                         for updates
         :return:        dict of additional data to be saved
         """
-        return {}
+        additional_data = {}
+        if has_fields(self.get_queryset().model, 'created_by', 'modified_by'):
+            additional_data['modified_by'] = self.request.user
+
+            if create:
+                additional_data['created_by'] = self.request.user
+
+        return additional_data
 
 
 class CoreViewSetV3(mixins.CreateModelMixin,
@@ -106,4 +125,11 @@ class CoreViewSetV3(mixins.CreateModelMixin,
                         for updates
         :return:        dict of additional data to be saved
         """
-        return {}
+        additional_data = {}
+        if has_fields(self.get_queryset().model, 'created_by', 'modified_by'):
+            additional_data['modified_by'] = self.request.user
+
+            if create:
+                additional_data['created_by'] = self.request.user
+
+        return additional_data

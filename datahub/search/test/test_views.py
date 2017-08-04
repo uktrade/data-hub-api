@@ -197,13 +197,13 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:investment_project')
 
         response = self.api_client.post(url, {
-            'description': 'investmentproject1',
+            'original_query': 'abc defg',
         }, format='json')
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
-        assert response.data['results'][0]['description'] == 'investmentproject1'
+        assert response.data['results'][0]['name'] == 'abc defg'
 
     def test_search_investment_project_date_json(self):
         """Tests detailed investment project search."""
@@ -256,10 +256,13 @@ class TestSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 4
-        assert ['The Advisory',
-                'The Advisory Group',
-                'The Risk Advisory Group',
-                'The Advisories'] == [company['name'] for company in response.data['companies']]
+        # no sortby specified so no ordering applied
+        assert [
+            'The Advisory',
+            'The Advisory Group',
+            'The Risk Advisory Group',
+            'The Advisories'
+        ] == [company['name'] for company in response.data['companies']]
 
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
@@ -471,3 +474,46 @@ class TestSearch(APITestMixin):
         assert constants.InvestmentProjectStage.active.value.id in stages
         assert constants.InvestmentProjectStage.prospect.value.id not in stages
         assert constants.InvestmentProjectStage.won.value.id not in stages
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_investment_project_aggregates(self):
+        """Tests aggregates in investment project search."""
+        url = reverse('api-v3:search:investment_project')
+
+        InvestmentProjectFactory(
+            name='Pear 1',
+            stage_id=constants.InvestmentProjectStage.active.value.id
+        )
+        InvestmentProjectFactory(
+            name='Pear 2',
+            stage_id=constants.InvestmentProjectStage.prospect.value.id,
+        )
+        InvestmentProjectFactory(
+            name='Pear 3',
+            stage_id=constants.InvestmentProjectStage.prospect.value.id
+        )
+        InvestmentProjectFactory(
+            name='Pear 4',
+            stage_id=constants.InvestmentProjectStage.won.value.id
+        )
+
+        connections.get_connection().indices.refresh()
+
+        response = self.api_client.post(url, {
+            'original_query': 'Pear',
+            'stage': [
+                constants.InvestmentProjectStage.prospect.value.id,
+                constants.InvestmentProjectStage.active.value.id,
+            ],
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 3
+        assert len(response.data['results']) == 3
+        assert 'aggregations' in response.data
+
+        stages = [{'key': constants.InvestmentProjectStage.prospect.value.id, 'doc_count': 2},
+                  {'key': constants.InvestmentProjectStage.active.value.id, 'doc_count': 1},
+                  {'key': constants.InvestmentProjectStage.won.value.id, 'doc_count': 1}]
+        assert all(stage in response.data['aggregations']['stage'] for stage in stages)

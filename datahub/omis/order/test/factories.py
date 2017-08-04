@@ -12,6 +12,8 @@ class OrderFactory(factory.django.DjangoModelFactory):
     """Order factory."""
 
     id = factory.LazyFunction(lambda: str(uuid.uuid4()))
+    created_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SubFactory(AdviserFactory)
     company = factory.SubFactory(CompanyFactory)
     contact = factory.LazyAttribute(lambda o: ContactFactory(company=o.company))
     primary_market_id = Country.france.value.id

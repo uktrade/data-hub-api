@@ -101,7 +101,7 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
 
     def get_additional_data(self, create):
         """Set adviser to the user on model instance creation."""
-        data = {}
+        data = super().get_additional_data(create)
         if create:
             data['adviser'] = self.request.user
         return data

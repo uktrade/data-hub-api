@@ -1,8 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
-from hashlib import sha256
 from itertools import islice
 from logging import getLogger
-from urllib.parse import urlparse
 
 import boto3
 import requests
@@ -27,21 +25,6 @@ def stream_to_file_pointer(url, fp):
     response = requests.get(url, stream=True)
     for chunk in response.iter_content(chunk_size=4096):
         fp.write(chunk)
-
-
-def string_to_bytes(obj):
-    """Cast string to bytes."""
-    if type(obj) is str:
-        return bytes(obj, 'utf-8')
-    return obj
-
-
-def generate_signature(path, body, salt):
-    """Generate the signature to be passed into the header."""
-    # make sure it's a path
-    url_object = urlparse(path)
-    message = string_to_bytes(url_object.path) + string_to_bytes(body) + string_to_bytes(salt)
-    return sha256(message).hexdigest()
 
 
 def slice_iterable_into_chunks(iterable, batch_size, obj_creator):

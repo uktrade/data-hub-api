@@ -106,11 +106,31 @@ def get_term_query(field, value):
     return Q('nested', path=field.split('.')[0], query=term)
 
 
+def apply_aggs_query(search, aggs):
+    """Applies aggregates query to the search."""
+    for agg in aggs:
+        # skip range filters as we can't aggregate them
+        if any(agg.endswith(x) for x in ('_before', '_after')):
+            continue
+        agg = remap_field(agg)
+
+        search_aggs = search.aggs
+        if '.' in agg:
+            search_aggs = search_aggs.bucket(
+                agg,
+                'nested',
+                path=agg.split('.', 1)[0]
+            )
+
+        search_aggs.bucket(agg, 'terms', field=agg)
+
+
 def get_search_by_entity_query(term=None,
                                filters=None,
                                entity=None,
                                ranges=None,
                                field_order=None,
+                               aggs=None,
                                offset=0,
                                limit=100):
     """Perform filtered search for given terms in given entity."""
@@ -142,6 +162,9 @@ def get_search_by_entity_query(term=None,
 
     s = s.post_filter('bool', must=must_filter, should=should_filter, minimum_should_match=1)
 
+    if aggs:
+        apply_aggs_query(s, aggs)
+
     return s[offset:offset + limit]
 
 
@@ -165,22 +188,24 @@ def bulk(actions=None, chunk_size=None, **kwargs):
     return es_bulk(connections.get_connection(), actions=actions, chunk_size=chunk_size, **kwargs)
 
 
-def remap_fields(fields):
-    """Replaces fields to match Elasticsearch data model."""
-    name_map = {
-        'sector': 'sector.id',
-        'account_manager': 'account_manager.id',
-        'export_to_country': 'export_to_countries.id',
-        'future_interest_country': 'future_interest_countries.id',
-        'uk_region': 'uk_region.id',
-        'trading_address_country': 'trading_address_country.id',
-        'adviser': 'adviser.id',
-        'client_relationship_manager': 'client_relationship_manager.id',
-        'investor_company': 'investor_company.id',
-        'investment_type': 'investment_type.id',
-        'stage': 'stage.id',
-    }
-    return {name_map.get(k, k): v for k, v in fields.items()}
+FILTER_NAME_MAP = {
+    'sector': 'sector.id',
+    'account_manager': 'account_manager.id',
+    'export_to_country': 'export_to_countries.id',
+    'future_interest_country': 'future_interest_countries.id',
+    'uk_region': 'uk_region.id',
+    'trading_address_country': 'trading_address_country.id',
+    'adviser': 'adviser.id',
+    'client_relationship_manager': 'client_relationship_manager.id',
+    'investor_company': 'investor_company.id',
+    'investment_type': 'investment_type.id',
+    'stage': 'stage.id',
+}
+
+
+def remap_field(field):
+    """Maps api field to elasticsearch field."""
+    return FILTER_NAME_MAP.get(field, field)
 
 
 def date_range_fields(fields):

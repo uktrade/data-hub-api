@@ -13,6 +13,8 @@ class BusinessLeadFactory(factory.django.DjangoModelFactory):
     """Business lead factory."""
 
     id = factory.Sequence(lambda _: str(uuid.uuid4()))
+    created_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SubFactory(AdviserFactory)
     first_name = factory.Sequence(lambda n: 'name {n}')
     last_name = factory.Sequence(lambda n: 'surname {n}')
     company_name = factory.Sequence(lambda n: 'company name {n}')
@@ -20,7 +22,6 @@ class BusinessLeadFactory(factory.django.DjangoModelFactory):
     email = 'foo@bar.com'
     telephone_number = '+44 123456789'
     contactable_by_email = True
-    adviser = factory.SubFactory(AdviserFactory)
 
     class Meta:  # noqa: D101
         model = 'leads.BusinessLead'

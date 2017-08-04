@@ -68,6 +68,11 @@ class SubscriberListView(APIView):
 
         order.subscribers.filter(adviser__in=to_delete).delete()
         for adviser_id in to_add:
-            OrderSubscriber.objects.create(order=order, adviser_id=adviser_id)
+            OrderSubscriber.objects.create(
+                order=order,
+                adviser_id=adviser_id,
+                created_by=self.request.user,
+                modified_by=self.request.user
+            )
 
         return self.get_subscriber_list_response(order)
