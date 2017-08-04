@@ -130,7 +130,8 @@ class CompanySerializerWriteV1(serializers.ModelSerializer):
         model = Company
         fields = '__all__'
         extra_kwargs = {
-            'registered_address_country': {'required': True, 'allow_null': False}
+            'registered_address_country': {'required': True, 'allow_null': False},
+            'sector': {'required': True, 'allow_null': False},
         }
 
 
@@ -308,9 +309,7 @@ class CompanySerializerV3(serializers.ModelSerializer):
     parent = NestedRelatedField(
         'company.Company', required=False, allow_null=True
     )
-    sector = NestedRelatedField(
-        meta_models.Sector, required=False, allow_null=True
-    )
+    sector = NestedRelatedField(meta_models.Sector)
     turnover_range = NestedRelatedField(
         meta_models.TurnoverRange, required=False, allow_null=True
     )
