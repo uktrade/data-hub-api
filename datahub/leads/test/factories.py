@@ -22,7 +22,6 @@ class BusinessLeadFactory(factory.django.DjangoModelFactory):
     email = 'foo@bar.com'
     telephone_number = '+44 123456789'
     contactable_by_email = True
-    adviser = factory.SubFactory(AdviserFactory)
 
     class Meta:  # noqa: D101
         model = 'leads.BusinessLead'
