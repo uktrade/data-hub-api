@@ -279,10 +279,10 @@ class IProjectSerializer(IProjectSummarySerializer, IProjectValueSerializer,
     class Meta:  # noqa: D101
         model = InvestmentProject
         fields = (
-            IProjectSummarySerializer.Meta.fields +
-            IProjectValueSerializer.Meta.fields +
-            IProjectRequirementsSerializer.Meta.fields +
-            IProjectTeamSerializer.Meta.fields
+            IProjectSummarySerializer.Meta.fields
+            + IProjectValueSerializer.Meta.fields
+            + IProjectRequirementsSerializer.Meta.fields
+            + IProjectTeamSerializer.Meta.fields
         )
         extra_kwargs = IProjectSummarySerializer.Meta.extra_kwargs
 
