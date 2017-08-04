@@ -249,6 +249,63 @@ class TestCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_201_CREATED
 
+    def test_add_company_without_address(self):
+        """Tests adding a company without a country."""
+        url = reverse('api-v1:company-list')
+        response = self.api_client.post(url, {
+            'name': 'Acme',
+            'alias': None,
+            'business_type': BusinessType.company.value.id,
+            'sector': Sector.aerospace_assembly_aircraft.value.id,
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'registered_address_1': ['This field is required.'],
+            'registered_address_town': ['This field is required.'],
+            'registered_address_country': ['This field is required.']
+        }
+
+    def test_add_company_with_null_address(self):
+        """Tests adding a company without a country."""
+        url = reverse('api-v1:company-list')
+        response = self.api_client.post(url, {
+            'name': 'Acme',
+            'alias': None,
+            'business_type': BusinessType.company.value.id,
+            'sector': Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_1': None,
+            'registered_address_town': None,
+            'registered_address_country': None,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'registered_address_1': ['This field may not be null.'],
+            'registered_address_town': ['This field may not be null.'],
+            'registered_address_country': ['This field may not be null.']
+        }
+
+    def test_add_company_with_blank_address(self):
+        """Tests adding a company without a country."""
+        url = reverse('api-v1:company-list')
+        response = self.api_client.post(url, {
+            'name': 'Acme',
+            'alias': None,
+            'business_type': BusinessType.company.value.id,
+            'sector': Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_1': '',
+            'registered_address_town': '',
+            'registered_address_country': None,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'registered_address_1': ['This field may not be blank.'],
+            'registered_address_town': ['This field may not be blank.'],
+            'registered_address_country': ['This field may not be null.']
+        }
+
     def test_add_company_with_website_without_scheme(self):
         """Test add new company with trading_address."""
         url = reverse('api-v1:company-list')

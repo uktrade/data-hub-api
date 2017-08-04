@@ -129,6 +129,9 @@ class CompanySerializerWriteV1(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = Company
         fields = '__all__'
+        extra_kwargs = {
+            'registered_address_country': {'required': True, 'allow_null': False}
+        }
 
 
 NestedAdviserField = partial(
@@ -247,20 +250,17 @@ class CompanySerializerV3(serializers.ModelSerializer):
     """Company read/write serializer V3."""
 
     name = _CHPreferredField(
-        required=False, allow_null=True, max_length=MAX_LENGTH,
-        allow_blank=True, field_class=serializers.CharField
+        max_length=MAX_LENGTH, allow_blank=True, field_class=serializers.CharField
     )
     registered_address_1 = _CHPreferredField(
-        required=False, allow_null=True, max_length=MAX_LENGTH,
-        allow_blank=True, field_class=serializers.CharField
+        max_length=MAX_LENGTH, field_class=serializers.CharField
     )
     registered_address_2 = _CHPreferredField(
         required=False, allow_null=True, max_length=MAX_LENGTH,
         allow_blank=True, field_class=serializers.CharField
     )
     registered_address_town = _CHPreferredField(
-        required=False, allow_null=True, max_length=MAX_LENGTH,
-        allow_blank=True, field_class=serializers.CharField
+        max_length=MAX_LENGTH, field_class=serializers.CharField
     )
     registered_address_county = _CHPreferredField(
         required=False, allow_null=True, max_length=MAX_LENGTH,
@@ -271,7 +271,6 @@ class CompanySerializerV3(serializers.ModelSerializer):
         allow_blank=True, field_class=serializers.CharField
     )
     registered_address_country = _CHPreferredField(
-        required=False, allow_null=True,
         model=meta_models.Country, field_class=NestedRelatedField
     )
     trading_name = serializers.CharField(
