@@ -10,9 +10,9 @@ def project_post_save(sender, **kwargs):
 
     Projects with a CDMS project code do not get a new project code.
 
-    This generates project codes for fixtures loaded via manage.py loaddata
-    (i.e. when kwargs['raw'] is True), though that may need to change if
-    fixed project codes are required for that fixtures.
+    This generates project codes for fixtures loaded via manage.py loaddata (i.e. when
+    kwargs['raw'] is True), though that may need to change if fixed project codes are
+    required for that fixtures.
     """
     instance = kwargs['instance']
     created = kwargs['created']

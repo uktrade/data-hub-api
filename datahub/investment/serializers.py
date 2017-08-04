@@ -20,12 +20,8 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
     stage = NestedRelatedField(meta_models.InvestmentProjectStage, required=False)
     country_lost_to = NestedRelatedField(meta_models.Country, required=False)
     project_shareable = serializers.BooleanField(required=True)
-    investor_company = NestedRelatedField(
-        Company, required=True, allow_null=False
-    )
-    intermediate_company = NestedRelatedField(
-        Company, required=False, allow_null=True
-    )
+    investor_company = NestedRelatedField(Company, required=True, allow_null=False)
+    intermediate_company = NestedRelatedField(Company, required=False, allow_null=True)
     client_contacts = NestedRelatedField(
         Contact, many=True, required=True, allow_null=False, allow_empty=False
     )
@@ -41,15 +37,9 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
     referral_source_activity_marketing = NestedRelatedField(
         meta_models.ReferralSourceMarketing, required=False, allow_null=True
     )
-    fdi_type = NestedRelatedField(
-        meta_models.FDIType, required=False, allow_null=True
-    )
-    non_fdi_type = NestedRelatedField(
-        meta_models.NonFDIType, required=False, allow_null=True
-    )
-    sector = NestedRelatedField(
-        meta_models.Sector, required=True, allow_null=False
-    )
+    fdi_type = NestedRelatedField(meta_models.FDIType, required=False, allow_null=True)
+    non_fdi_type = NestedRelatedField(meta_models.NonFDIType, required=False, allow_null=True)
+    sector = NestedRelatedField(meta_models.Sector, required=True, allow_null=False)
     business_activities = NestedRelatedField(
         meta_models.InvestmentBusinessActivity, many=True, required=True,
         allow_null=False, allow_empty=False
@@ -67,10 +57,9 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
 
         Performs stage-dependent validation of the different sections.
 
-        When transitioning stage, all fields required for the new stage are
-        validated. In other cases, only the fields being modified are validated.
-        If a project ends up in an invalid state, this avoids the user being
-        unable to rectify the situation.
+        When transitioning stage, all fields required for the new stage are validated. In other
+        cases, only the fields being modified are validated.  If a project ends up in an
+        invalid state, this avoids the user being unable to rectify the situation.
         """
         fields = None
         if self.partial and 'stage' not in data:
@@ -185,12 +174,8 @@ class IProjectValueSerializer(serializers.ModelSerializer):
 class IProjectRequirementsSerializer(serializers.ModelSerializer):
     """Serialiser for investment project requirements objects."""
 
-    competitor_countries = NestedRelatedField(
-        meta_models.Country, many=True, required=False
-    )
-    uk_region_locations = NestedRelatedField(
-        meta_models.UKRegion, many=True, required=False
-    )
+    competitor_countries = NestedRelatedField(meta_models.Country, many=True, required=False)
+    uk_region_locations = NestedRelatedField(meta_models.UKRegion, many=True, required=False)
     strategic_drivers = NestedRelatedField(
         meta_models.InvestmentStrategicDriver, many=True, required=False
     )
@@ -252,12 +237,8 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
 
     project_manager = NestedAdviserField(required=False, allow_null=True)
     project_assurance_adviser = NestedAdviserField(required=False, allow_null=True)
-    project_manager_team = NestedRelatedField(
-        meta_models.Team, read_only=True
-    )
-    project_assurance_team = NestedRelatedField(
-        meta_models.Team, read_only=True
-    )
+    project_manager_team = NestedRelatedField(meta_models.Team, read_only=True)
+    project_assurance_team = NestedRelatedField(meta_models.Team, read_only=True)
     team_members = NestedIProjectTeamMemberSerializer(many=True, read_only=True)
     team_complete = serializers.SerializerMethodField()
 
@@ -286,10 +267,10 @@ class IProjectSerializer(IProjectSummarySerializer, IProjectValueSerializer,
     class Meta:  # noqa: D101
         model = InvestmentProject
         fields = (
-            IProjectSummarySerializer.Meta.fields +
-            IProjectValueSerializer.Meta.fields +
-            IProjectRequirementsSerializer.Meta.fields +
-            IProjectTeamSerializer.Meta.fields
+            IProjectSummarySerializer.Meta.fields
+            + IProjectValueSerializer.Meta.fields
+            + IProjectRequirementsSerializer.Meta.fields
+            + IProjectTeamSerializer.Meta.fields
         )
         extra_kwargs = IProjectSummarySerializer.Meta.extra_kwargs
 
