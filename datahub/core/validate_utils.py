@@ -93,7 +93,7 @@ class RequiredUnlessAlreadyBlank:
 
     def set_context(self, serializer):
         """
-        Saves a reference to the serializer object.
+        Saves a reference to the model instance and whether this is a partial update.
 
         Called by DRF.
         """
