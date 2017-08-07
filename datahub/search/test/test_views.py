@@ -44,9 +44,9 @@ class TestSearch(APITestMixin):
         })
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 3
+        assert response.data['count'] == 2
         assert response.data['companies'][0]['name'].startswith(term)
-        assert [{'count': 3, 'entity': 'company'},
+        assert [{'count': 2, 'entity': 'company'},
                 {'count': 1, 'entity': 'contact'},
                 {'count': 1, 'entity': 'investment_project'}] == response.data['aggregations']
 
@@ -64,7 +64,7 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 1
         assert response.data['contacts'][0]['first_name'] in term
         assert response.data['contacts'][0]['last_name'] in term
-        assert [{'count': 3, 'entity': 'company'},
+        assert [{'count': 2, 'entity': 'company'},
                 {'count': 1, 'entity': 'contact'},
                 {'count': 1, 'entity': 'investment_project'}] == response.data['aggregations']
 
@@ -81,7 +81,7 @@ class TestSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
         assert response.data['investment_projects'][0]['name'] == term
-        assert [{'count': 3, 'entity': 'company'},
+        assert [{'count': 2, 'entity': 'company'},
                 {'count': 1, 'entity': 'contact'},
                 {'count': 1, 'entity': 'investment_project'}] == response.data['aggregations']
 
@@ -127,7 +127,7 @@ class TestSearch(APITestMixin):
         })
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 3
+        assert response.data['count'] == 2
         assert len(response.data['companies']) == 1
 
     def test_search_company(self):
