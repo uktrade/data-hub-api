@@ -28,7 +28,7 @@ class ServiceFactory(factory.django.DjangoModelFactory):
 class TeamRoleFactory(factory.django.DjangoModelFactory):
     """TeamRole factory."""
 
-    id = factory.LazyFunction(lambda: uuid.uuid4())
+    id = factory.LazyFunction(uuid.uuid4)
     name = factory.Sequence(lambda n: f'name {n}')
 
     class Meta:  # noqa: D101
@@ -38,7 +38,7 @@ class TeamRoleFactory(factory.django.DjangoModelFactory):
 class TeamFactory(factory.django.DjangoModelFactory):
     """Team factory."""
 
-    id = factory.LazyFunction(lambda: uuid.uuid4())
+    id = factory.LazyFunction(uuid.uuid4)
     name = factory.Sequence(lambda n: f'name {n}')
     role = factory.SubFactory(TeamRoleFactory)
     uk_region_id = constants.UKRegion.east_midlands.value.id

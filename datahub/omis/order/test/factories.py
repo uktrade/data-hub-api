@@ -11,7 +11,7 @@ from datahub.core.constants import Country, Sector
 class OrderFactory(factory.django.DjangoModelFactory):
     """Order factory."""
 
-    id = factory.LazyFunction(lambda: uuid.uuid4())
+    id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SubFactory(AdviserFactory)
     company = factory.SubFactory(CompanyFactory)
@@ -26,7 +26,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
 class OrderSubscriberFactory(factory.django.DjangoModelFactory):
     """Order Subscriber factory."""
 
-    id = factory.LazyFunction(lambda: uuid.uuid4())
+    id = factory.LazyFunction(uuid.uuid4)
     order = factory.SubFactory(OrderFactory)
     adviser = factory.SubFactory(AdviserFactory)
 
@@ -37,7 +37,7 @@ class OrderSubscriberFactory(factory.django.DjangoModelFactory):
 class OrderAssigneeFactory(factory.django.DjangoModelFactory):
     """Order Assignee factory."""
 
-    id = factory.LazyFunction(lambda: uuid.uuid4())
+    id = factory.LazyFunction(uuid.uuid4)
     order = factory.SubFactory(OrderFactory)
     adviser = factory.SubFactory(AdviserFactory)
     estimated_time = 120
