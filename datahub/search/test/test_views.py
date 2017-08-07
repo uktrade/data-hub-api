@@ -430,6 +430,12 @@ class TestSearch(APITestMixin):
 
         We make sure that out of provided investment projects, we will
         receive only those that match our filter.
+
+        We are testing following filter:
+
+        investment_type = fdi
+        AND (investor_company = compA OR investor_company = compB)
+        AND (stage = won OR stage = active)
         """
         url = reverse('api-v3:search:investment_project')
 
@@ -469,12 +475,30 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 2
 
         # checks if we only have investment projects with stages we filtered
-        stages = set([investment_project['stage']['id']
-                      for investment_project in response.data['results']])
+        assert {
+            constants.InvestmentProjectStage.active.value.id,
+            constants.InvestmentProjectStage.won.value.id
+        } == {
+            investment_project['stage']['id']
+            for investment_project in response.data['results']
+        }
 
-        assert constants.InvestmentProjectStage.active.value.id in stages
-        assert constants.InvestmentProjectStage.prospect.value.id not in stages
-        assert constants.InvestmentProjectStage.won.value.id in stages
+        # checks if we only have investment projects with investor companies we filtered
+        assert {
+            investment_project1.investor_company.pk,
+            investment_project2.investor_company.pk
+        } == {
+            investment_project['investor_company']['id']
+            for investment_project in response.data['results']
+        }
+
+        # checks if we only have investment projects with fdi investment type
+        assert {
+            constants.InvestmentType.fdi.value.id
+        } == {
+            investment_project['investment_type']['id']
+            for investment_project in response.data['results']
+        }
 
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
