@@ -10,7 +10,19 @@ from elasticsearch_dsl.query import Match, MatchPhrase, Q
 lowercase_keyword_analyzer = analysis.CustomAnalyzer(
     'lowercase_keyword_analyzer',
     tokenizer='keyword',
-    filter=['lowercase']
+    filter=('lowercase',)
+)
+
+# Trigram tokenizer enables us to support partial matching
+trigram = analysis.tokenizer('trigram', 'nGram', min_gram=3, max_gram=3)
+
+# Filters out "-" so that t-shirt and tshirt can be matched
+special_chars = analysis.char_filter('special_chars', 'mapping', mappings=('-=>',))
+trigram_analyzer = analysis.CustomAnalyzer(
+    'trigram_analyzer',
+    tokenizer=trigram,
+    char_filter=special_chars,
+    filter=('lowercase',),
 )
 
 
@@ -29,6 +41,7 @@ def configure_index(index_name, settings=None):
     if not client.indices.exists(index=index_name):
         index = Index(index_name)
         index.analyzer(lowercase_keyword_analyzer)
+        index.analyzer(trigram_analyzer)
         if settings:
             index.settings(**settings)
         index.create()
@@ -40,9 +53,16 @@ def get_search_term_query(term):
         return Q('match_all')
 
     return Q('bool', should=[
+        # Promote exact name match
         MatchPhrase(name_keyword={'query': term, 'boost': 2}),
+        # Exact match by id
+        MatchPhrase(id={'query': term}),
+        # Match similar name
         Match(name={'query': term}),
-        Match(_all={'query': term}),
+        # Partial match name
+        MatchPhrase(name_trigram={'query': term}),
+        # Match in filter fields
+        Match(_combined_fields={'query': term}),
     ])
 
 

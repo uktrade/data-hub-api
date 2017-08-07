@@ -256,13 +256,97 @@ class TestSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 4
-        # no sortby specified so no ordering applied
+
+        # results are in order of relevance if sortby is not applied
         assert [
             'The Advisory',
             'The Advisory Group',
             'The Risk Advisory Group',
             'The Advisories'
         ] == [company['name'] for company in response.data['companies']]
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_partial_match(self):
+        """Tests quality of results."""
+        CompanyFactory(name='Veryuniquename1')
+        CompanyFactory(name='Veryuniquename2')
+        CompanyFactory(name='Veryuniquename3')
+        CompanyFactory(name='Veryuniquename4')
+
+        connections.get_connection().indices.refresh()
+
+        term = 'Veryuniquenam'
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'company'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 4
+
+        # particular order is not important here, we just need all that partially match
+        assert {
+            'Veryuniquename1',
+            'Veryuniquename2',
+            'Veryuniquename3',
+            'Veryuniquename4'
+        } == {company['name'] for company in response.data['companies']}
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_hyphen_match(self):
+        """Tests quality of results."""
+        CompanyFactory(name='t-shirt')
+        CompanyFactory(name='tshirt')
+        CompanyFactory(name='electronic shirt')
+        CompanyFactory(name='t and e and a')
+
+        connections.get_connection().indices.refresh()
+
+        term = 't-shirt'
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'company'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 4
+
+        # order of relevance
+        assert [
+            't-shirt',
+            'tshirt',
+            'electronic shirt',
+            't and e and a'
+        ] == [company['name'] for company in response.data['companies']]
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_id_match(self):
+        """Tests quality of results."""
+        CompanyFactory(id='0fb3379c-341c-4dc4-b125-bf8d47b26baa')
+        CompanyFactory(id='0fb2379c-341c-4dc4-b225-bf8d47b26baa')
+        CompanyFactory(id='0fb4379c-341c-4dc4-b325-bf8d47b26baa')
+        CompanyFactory(id='0fb5379c-341c-4dc4-b425-bf8d47b26baa')
+
+        connections.get_connection().indices.refresh()
+
+        term = '0fb4379c-341c-4dc4-b325-bf8d47b26baa'
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'company'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert '0fb4379c-341c-4dc4-b325-bf8d47b26baa' == response.data['companies'][0]['id']
 
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
