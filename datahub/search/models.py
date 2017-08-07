@@ -46,8 +46,8 @@ def _company_dict(obj):
 def _contact_mapping(field):
     """Mapping for Adviser/Contact fields."""
     return Nested(properties={'id': String(index='not_analyzed'),
-                              'first_name': String(copy_to=[f'{field}.name', '_combined_fields']),
-                              'last_name': String(copy_to=[f'{field}.name', '_combined_fields']),
+                              'first_name': String(copy_to=f'{field}.name'),
+                              'last_name': String(copy_to=f'{field}.name'),
                               'name': String(index='not_analyzed'),
                               })
 
@@ -56,7 +56,7 @@ def _id_name_mapping():
     """Mapping for id name fields."""
     return Nested(properties={
         'id': String(index='not_analyzed'),
-        'name': String(index='not_analyzed', copy_to='_combined_fields')
+        'name': String(index='not_analyzed')
     })
 
 
@@ -64,7 +64,7 @@ def _id_uri_mapping():
     """Mapping for id uri fields."""
     return Nested(properties={
         'id': String(index='not_analyzed'),
-        'uri': String(index='not_analyzed', copy_to='_combined_fields')
+        'uri': String(index='not_analyzed')
     })
 
 
@@ -72,7 +72,7 @@ def _company_mapping():
     """Mapping for id company_number fields."""
     return Nested(properties={
         'id': String(index='not_analyzed'),
-        'company_number': String(copy_to='_combined_fields')
+        'company_number': String()
     })
 
 
@@ -82,6 +82,8 @@ class MapDBModelToDict:
     IGNORED_FIELDS = ()
 
     MAPPINGS = {}
+
+    SEARCH_FIELDS = ()
 
     @classmethod
     def es_document(cls, dbmodel):
@@ -191,6 +193,10 @@ class Company(DocType, MapDBModelToDict):
         'orders', 'created_by', 'modified_by'
     )
 
+    SEARCH_FIELDS = (
+        'trading_address_country.name', 'uk_region.name', 'website',
+    )
+
     class Meta:
         """Default document meta data."""
 
@@ -248,6 +254,10 @@ class Contact(DocType, MapDBModelToDict):
     IGNORED_FIELDS = (
         'interactions', 'servicedeliverys', 'investment_projects', 'orders',
         'created_by', 'modified_by'
+    )
+
+    SEARCH_FIELDS = (
+        'address_country.name', 'email', 'notes',
     )
 
     class Meta:
@@ -353,6 +363,11 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'uk_region_locations', 'strategic_drivers',
         'client_considering_other_countries', 'cdms_project_code',
         'interactions', 'documents', 'created_by', 'modified_by'
+    )
+
+    SEARCH_FIELDS = (
+        'investor_company.name', 'business_activities.name', 'sector.name',
+        'intermediate_company.name', 'sector.name',
     )
 
     class Meta:
