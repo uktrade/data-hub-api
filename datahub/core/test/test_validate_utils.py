@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, Mock
 import pytest
 from rest_framework.exceptions import ValidationError
 
-from datahub.core.validate_utils import AnyOfValidator, DataCombiner
+from datahub.core.validate_utils import AnyOfValidator, DataCombiner, RequiredUnlessAlreadyBlank
 
 
 def test_any_of_none():
@@ -80,3 +80,49 @@ class TestDataCombiner:
         instance = Mock(field1=subinstance)
         data_combiner = DataCombiner(instance, {'field1': new_subinstance})
         assert data_combiner.get_value_id('field1') == str(new_subinstance.id)
+
+
+class TestRequiredUnlessAlreadyBlank:
+    """RequiredUnlessAlreadyBlank tests."""
+
+    @pytest.mark.parametrize('create_data,update_data,partial,should_raise', (
+        ({'field1': None}, {'field1': None}, False, False),
+        ({'field1': None}, {'field1': None}, True, False),
+        ({'field1': None}, {'field1': 'blah'}, False, False),
+        ({'field1': None}, {'field1': 'blah'}, True, False),
+        ({'field1': 'blah'}, {'field1': None}, False, True),
+        ({'field1': 'blah'}, {'field1': None}, True, True),
+        ({'field1': 'blah'}, {'field1': 'blah'}, False, False),
+        ({'field1': 'blah'}, {'field1': 'blah'}, True, False),
+        ({'field1': 'blah'}, {}, False, True),
+        ({'field1': 'blah'}, {}, True, False),
+    ))
+    def test_update(self, create_data, update_data, partial, should_raise):
+        """Tests validation during updates."""
+        instance = Mock(**create_data)
+        serializer = Mock(instance=instance, partial=partial)
+        validator = RequiredUnlessAlreadyBlank('field1')
+        validator.set_context(serializer)
+        if should_raise:
+            with pytest.raises(ValidationError) as excinfo:
+                validator(update_data)
+            assert excinfo.value.detail['field1'] == validator.required_message
+        else:
+            validator(update_data)
+
+    @pytest.mark.parametrize('create_data,should_raise', (
+        ({}, True),
+        ({'field1': None}, True),
+        ({'field1': 'blah'}, False),
+    ))
+    def test_create(self, create_data, should_raise):
+        """Tests validation during instance creation."""
+        serializer = Mock(instance=None, partial=False)
+        validator = RequiredUnlessAlreadyBlank('field1')
+        validator.set_context(serializer)
+        if should_raise:
+            with pytest.raises(ValidationError) as excinfo:
+                validator(create_data)
+            assert excinfo.value.detail['field1'] == validator.required_message
+        else:
+            validator(create_data)

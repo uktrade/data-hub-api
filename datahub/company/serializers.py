@@ -8,6 +8,7 @@ from datahub.company.models import (
     Advisor, CompaniesHouseCompany, Company, Contact
 )
 from datahub.core.serializers import NestedRelatedField
+from datahub.core.validate_utils import RequiredUnlessAlreadyBlank
 from datahub.interaction.models import Interaction
 from datahub.metadata import models as meta_models
 from datahub.metadata.serializers import NestedCountrySerializer
@@ -131,8 +132,8 @@ class CompanySerializerWriteV1(serializers.ModelSerializer):
         fields = '__all__'
         extra_kwargs = {
             'registered_address_country': {'required': True, 'allow_null': False},
-            'sector': {'required': True, 'allow_null': False},
         }
+        validators = [RequiredUnlessAlreadyBlank('sector')]
 
 
 NestedAdviserField = partial(
@@ -309,7 +310,7 @@ class CompanySerializerV3(serializers.ModelSerializer):
     parent = NestedRelatedField(
         'company.Company', required=False, allow_null=True
     )
-    sector = NestedRelatedField(meta_models.Sector)
+    sector = NestedRelatedField(meta_models.Sector, required=False, allow_null=True)
     turnover_range = NestedRelatedField(
         meta_models.TurnoverRange, required=False, allow_null=True
     )
@@ -376,3 +377,4 @@ class CompanySerializerV3(serializers.ModelSerializer):
             'archived_on': {'read_only': True},
             'archived_reason': {'read_only': True}
         }
+        validators = [RequiredUnlessAlreadyBlank('sector')]
