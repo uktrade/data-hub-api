@@ -485,8 +485,8 @@ class TestSearch(APITestMixin):
 
         # checks if we only have investment projects with investor companies we filtered
         assert {
-            investment_project1.investor_company.pk,
-            investment_project2.investor_company.pk
+            str(investment_project1.investor_company.pk),
+            str(investment_project2.investor_company.pk)
         } == {
             investment_project['investor_company']['id']
             for investment_project in response.data['results']
