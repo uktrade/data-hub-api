@@ -268,7 +268,7 @@ class TestSearch(APITestMixin):
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_partial_match(self):
-        """Tests quality of results."""
+        """Tests partial matching."""
         CompanyFactory(name='Veryuniquename1')
         CompanyFactory(name='Veryuniquename2')
         CompanyFactory(name='Veryuniquename3')
@@ -298,7 +298,7 @@ class TestSearch(APITestMixin):
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_hyphen_match(self):
-        """Tests quality of results."""
+        """Tests hyphen query."""
         CompanyFactory(name='t-shirt')
         CompanyFactory(name='tshirt')
         CompanyFactory(name='electronic shirt')
@@ -328,7 +328,7 @@ class TestSearch(APITestMixin):
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_id_match(self):
-        """Tests quality of results."""
+        """Tests exact id matching."""
         CompanyFactory(id='0fb3379c-341c-4dc4-b125-bf8d47b26baa')
         CompanyFactory(id='0fb2379c-341c-4dc4-b225-bf8d47b26baa')
         CompanyFactory(id='0fb4379c-341c-4dc4-b325-bf8d47b26baa')
