@@ -2,7 +2,7 @@
 
 from django.conf.urls import url
 
-from .views import OrderViewSet, SubscriberListView
+from .views import AssigneeView, OrderViewSet, SubscriberListView
 
 
 order_collection = OrderViewSet.as_view({
@@ -23,5 +23,11 @@ urlpatterns = [
         r'^order/(?P<order_pk>[0-9a-z-]{36})/subscriber-list$',
         SubscriberListView.as_view(),
         name='subscriber-list'
+    ),
+
+    url(
+        r'^order/(?P<order_pk>[0-9a-z-]{36})/assignee$',
+        AssigneeView.as_view(),
+        name='assignee'
     ),
 ]
