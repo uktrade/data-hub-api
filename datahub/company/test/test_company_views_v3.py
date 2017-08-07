@@ -157,15 +157,15 @@ class TestCompany(APITestMixin):
             key=itemgetter('id')
         )
         expected_projects = sorted(({
-            'id': projects[0].id,
+            'id': str(projects[0].id),
             'name': projects[0].name,
             'project_code': projects[0].project_code
         }, {
-            'id': projects[1].id,
+            'id': str(projects[1].id),
             'name': projects[1].name,
             'project_code': projects[1].project_code
         }, {
-            'id': projects[2].id,
+            'id': str(projects[2].id),
             'name': projects[2].name,
             'project_code': projects[2].project_code
         }), key=itemgetter('id'))
