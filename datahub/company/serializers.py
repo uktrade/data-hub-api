@@ -8,6 +8,7 @@ from datahub.company.models import (
     Advisor, CompaniesHouseCompany, Company, Contact
 )
 from datahub.core.serializers import NestedRelatedField
+from datahub.core.validate_utils import RequiredUnlessAlreadyBlank
 from datahub.interaction.models import Interaction
 from datahub.metadata import models as meta_models
 from datahub.metadata.serializers import NestedCountrySerializer
@@ -129,6 +130,10 @@ class CompanySerializerWriteV1(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = Company
         fields = '__all__'
+        extra_kwargs = {
+            'registered_address_country': {'required': True, 'allow_null': False},
+        }
+        validators = [RequiredUnlessAlreadyBlank('sector')]
 
 
 NestedAdviserField = partial(
@@ -247,20 +252,17 @@ class CompanySerializerV3(serializers.ModelSerializer):
     """Company read/write serializer V3."""
 
     name = _CHPreferredField(
-        required=False, allow_null=True, max_length=MAX_LENGTH,
-        allow_blank=True, field_class=serializers.CharField
+        max_length=MAX_LENGTH, allow_blank=True, field_class=serializers.CharField
     )
     registered_address_1 = _CHPreferredField(
-        required=False, allow_null=True, max_length=MAX_LENGTH,
-        allow_blank=True, field_class=serializers.CharField
+        max_length=MAX_LENGTH, field_class=serializers.CharField
     )
     registered_address_2 = _CHPreferredField(
         required=False, allow_null=True, max_length=MAX_LENGTH,
         allow_blank=True, field_class=serializers.CharField
     )
     registered_address_town = _CHPreferredField(
-        required=False, allow_null=True, max_length=MAX_LENGTH,
-        allow_blank=True, field_class=serializers.CharField
+        max_length=MAX_LENGTH, field_class=serializers.CharField
     )
     registered_address_county = _CHPreferredField(
         required=False, allow_null=True, max_length=MAX_LENGTH,
@@ -271,7 +273,6 @@ class CompanySerializerV3(serializers.ModelSerializer):
         allow_blank=True, field_class=serializers.CharField
     )
     registered_address_country = _CHPreferredField(
-        required=False, allow_null=True,
         model=meta_models.Country, field_class=NestedRelatedField
     )
     trading_name = serializers.CharField(
@@ -309,9 +310,7 @@ class CompanySerializerV3(serializers.ModelSerializer):
     parent = NestedRelatedField(
         'company.Company', required=False, allow_null=True
     )
-    sector = NestedRelatedField(
-        meta_models.Sector, required=False, allow_null=True
-    )
+    sector = NestedRelatedField(meta_models.Sector, required=False, allow_null=True)
     turnover_range = NestedRelatedField(
         meta_models.TurnoverRange, required=False, allow_null=True
     )
@@ -378,3 +377,4 @@ class CompanySerializerV3(serializers.ModelSerializer):
             'archived_on': {'read_only': True},
             'archived_reason': {'read_only': True}
         }
+        validators = [RequiredUnlessAlreadyBlank('sector')]

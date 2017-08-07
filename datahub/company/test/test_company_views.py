@@ -1,3 +1,4 @@
+import pytest
 from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -248,6 +249,133 @@ class TestCompany(APITestMixin):
         })
 
         assert response.status_code == status.HTTP_201_CREATED
+
+    def test_add_company_without_address(self):
+        """Tests adding a company without a country."""
+        url = reverse('api-v1:company-list')
+        response = self.api_client.post(url, {
+            'name': 'Acme',
+            'alias': None,
+            'business_type': BusinessType.company.value.id,
+            'sector': Sector.aerospace_assembly_aircraft.value.id,
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'registered_address_1': ['This field is required.'],
+            'registered_address_town': ['This field is required.'],
+            'registered_address_country': ['This field is required.']
+        }
+
+    def test_add_company_with_null_address(self):
+        """Tests adding a company without a country."""
+        url = reverse('api-v1:company-list')
+        response = self.api_client.post(url, {
+            'name': 'Acme',
+            'alias': None,
+            'business_type': BusinessType.company.value.id,
+            'sector': Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_1': None,
+            'registered_address_town': None,
+            'registered_address_country': None,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'registered_address_1': ['This field may not be null.'],
+            'registered_address_town': ['This field may not be null.'],
+            'registered_address_country': ['This field may not be null.']
+        }
+
+    def test_add_company_with_blank_address(self):
+        """Tests adding a company without a country."""
+        url = reverse('api-v1:company-list')
+        response = self.api_client.post(url, {
+            'name': 'Acme',
+            'alias': None,
+            'business_type': BusinessType.company.value.id,
+            'sector': Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_1': '',
+            'registered_address_town': '',
+            'registered_address_country': None,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'registered_address_1': ['This field may not be blank.'],
+            'registered_address_town': ['This field may not be blank.'],
+            'registered_address_country': ['This field may not be null.']
+        }
+
+    @pytest.mark.parametrize('field', ('sector',))
+    def test_add_company_without_required_field(self, field):
+        """
+        Tests adding a company without required fields that are allowed to be null (during
+        updates) when already null.
+        """
+        url = reverse('api-v1:company-list')
+        response = self.api_client.post(url, {
+            'name': 'Acme',
+            'alias': None,
+            'business_type': BusinessType.company.value.id,
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'registered_address_country': Country.united_kingdom.value.id,
+            'uk_region': UKRegion.england.value.id,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json()[field] == ['This field is required.']
+
+    @pytest.mark.parametrize('field,value', (
+        ('sector', Sector.aerospace_assembly_aircraft.value.id),
+    ))
+    def test_update_non_null_field_to_null(self, field, value):
+        """
+        Tests setting fields to null that are currently non-null, and are allowed to be null
+        when already null.
+        """
+        creation_data = {
+            'name': 'Foo ltd.',
+            'registered_address_1': 'Hello st.',
+            'registered_address_town': 'Fooland',
+            'registered_address_country_id': Country.united_states.value.id,
+            f'{field}_id': value
+        }
+        company = CompanyFactory(**creation_data)
+
+        url = reverse('api-v1:company-detail', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, {
+            field: None,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            field: ['This field is required.'],
+        }
+
+    @pytest.mark.parametrize('field', ('sector',))
+    def test_update_null_field_to_null(self, field):
+        """
+        Tests setting fields to null that are current null, and are allowed to be null
+        when already null.
+        """
+        creation_data = {
+            'name': 'Foo ltd.',
+            'registered_address_1': 'Hello st.',
+            'registered_address_town': 'Fooland',
+            'registered_address_country_id': Country.united_states.value.id,
+            f'{field}_id': None
+        }
+        company = CompanyFactory(**creation_data)
+
+        url = reverse('api-v1:company-detail', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, {
+            field: None,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()[field] is None
 
     def test_add_company_with_website_without_scheme(self):
         """Test add new company with trading_address."""
