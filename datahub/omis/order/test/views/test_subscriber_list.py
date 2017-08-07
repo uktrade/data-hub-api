@@ -47,7 +47,7 @@ class TestGetSubscriberList(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [
             {
-                'id': adviser.id,
+                'id': str(adviser.id),
                 'first_name': adviser.first_name,
                 'last_name': adviser.last_name,
                 'dit_team': {
@@ -81,7 +81,7 @@ class TestChangeSubscriberList(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert {adv['id'] for adv in response.json()} == {adv.id for adv in advisers}
+        assert {adv['id'] for adv in response.json()} == {str(adv.id) for adv in advisers}
 
     def test_change_existing_list(self):
         """
@@ -114,7 +114,7 @@ class TestChangeSubscriberList(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert {adv['id'] for adv in response.json()} == {adv.id for adv in final_advisers}
+        assert {adv['id'] for adv in response.json()} == {str(adv.id) for adv in final_advisers}
 
         # check that the id of the existing subscription didn't change
         assert order.subscribers.filter(id=subscriptions[1].id).exists()

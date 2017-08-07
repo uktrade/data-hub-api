@@ -8,7 +8,7 @@ from datahub.core import constants
 class EventFactory(factory.django.DjangoModelFactory):
     """Event factory."""
 
-    id = factory.LazyFunction(lambda: str(uuid.uuid4()))
+    id = factory.LazyFunction(uuid.uuid4)
     name = factory.Sequence(lambda n: f'name {n}')
 
     class Meta:  # noqa: D101
@@ -18,7 +18,7 @@ class EventFactory(factory.django.DjangoModelFactory):
 class ServiceFactory(factory.django.DjangoModelFactory):
     """Service factory."""
 
-    id = factory.LazyFunction(lambda: str(uuid.uuid4()))
+    id = factory.LazyFunction(uuid.uuid4)
     name = factory.Sequence(lambda n: f'name {n}')
 
     class Meta:  # noqa: D101

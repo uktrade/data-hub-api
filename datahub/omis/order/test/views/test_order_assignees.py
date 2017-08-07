@@ -51,7 +51,7 @@ class TestGetOrderAssignees(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [
             {
-                'adviser_id': adviser.id,
+                'adviser_id': str(adviser.id),
                 'first_name': adviser.first_name,
                 'last_name': adviser.last_name,
                 'estimated_time': (120 * i),
@@ -145,21 +145,21 @@ class TestChangeOrderAssignees(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [
             {
-                'adviser_id': adviser1.id,
+                'adviser_id': str(adviser1.id),
                 'first_name': adviser1.first_name,
                 'last_name': adviser1.last_name,
                 'estimated_time': 200,
                 'is_lead': False
             },
             {
-                'adviser_id': adviser2.id,
+                'adviser_id': str(adviser2.id),
                 'first_name': adviser2.first_name,
                 'last_name': adviser2.last_name,
                 'estimated_time': assignee2.estimated_time,
                 'is_lead': False
             },
             {
-                'adviser_id': adviser3.id,
+                'adviser_id': str(adviser3.id),
                 'first_name': adviser3.first_name,
                 'last_name': adviser3.last_name,
                 'estimated_time': 250,
@@ -168,7 +168,6 @@ class TestChangeOrderAssignees(APITestMixin):
         ]
 
         # check created_by / modified_by
-        created_by.refresh_from_db()
         assignee1.refresh_from_db()
         assignee2.refresh_from_db()
         assignee3 = OrderAssignee.objects.get(order=order, adviser=adviser3)
@@ -316,7 +315,6 @@ class TestChangeOrderAssignees(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_200_OK
-        created_by.refresh_from_db()
         assignee1.refresh_from_db()
 
         assert assignee1.created_by == created_by
