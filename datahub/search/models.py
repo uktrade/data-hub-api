@@ -46,8 +46,8 @@ def _company_dict(obj):
 def _contact_mapping(field):
     """Mapping for Adviser/Contact fields."""
     return Nested(properties={'id': String(index='not_analyzed'),
-                              'first_name': String(copy_to=f'{field}.name'),
-                              'last_name': String(copy_to=f'{field}.name'),
+                              'first_name': String(copy_to=[f'{field}.name', '_combined_fields']),
+                              'last_name': String(copy_to=[f'{field}.name', '_combined_fields']),
                               'name': String(index='not_analyzed'),
                               })
 
@@ -56,7 +56,7 @@ def _id_name_mapping():
     """Mapping for id name fields."""
     return Nested(properties={
         'id': String(index='not_analyzed'),
-        'name': String(index='not_analyzed')
+        'name': String(index='not_analyzed', copy_to='_combined_fields')
     })
 
 
@@ -64,7 +64,7 @@ def _id_uri_mapping():
     """Mapping for id uri fields."""
     return Nested(properties={
         'id': String(index='not_analyzed'),
-        'uri': String(index='not_analyzed')
+        'uri': String(index='not_analyzed', copy_to='_combined_fields')
     })
 
 
@@ -72,7 +72,7 @@ def _company_mapping():
     """Mapping for id company_number fields."""
     return Nested(properties={
         'id': String(index='not_analyzed'),
-        'company_number': String()
+        'company_number': String(copy_to='_combined_fields')
     })
 
 
@@ -136,8 +136,9 @@ class Company(DocType, MapDBModelToDict):
     headquarter_type = _id_name_mapping()
     id = String(index='not_analyzed')
     modified_on = Date()
-    name = String(copy_to='name_keyword')
+    name = String(copy_to=['name_keyword', 'name_trigram'])
     name_keyword = String(analyzer='lowercase_keyword_analyzer')
+    name_trigram = String(analyzer='trigram_analyzer')
     one_list_account_owner = _contact_mapping('one_list_account_owner')
     parent = _id_name_mapping()
     registered_address_1 = String()
@@ -206,8 +207,9 @@ class Contact(DocType, MapDBModelToDict):
     created_on = Date()
     modified_on = Date()
     id = String(index='not_analyzed')
-    name = String(copy_to='name_keyword')
+    name = String(copy_to=['name_keyword', 'name_trigram'])
     name_keyword = String(analyzer='lowercase_keyword_analyzer')
+    name_trigram = String(analyzer='trigram_analyzer')
     title = _id_name_mapping()
     first_name = String(copy_to='name')
     last_name = String(copy_to='name')
@@ -287,8 +289,9 @@ class InvestmentProject(DocType, MapDBModelToDict):
     uk_company = _id_name_mapping()
     investor_company = _id_name_mapping()
     investment_type = _id_name_mapping()
-    name = String(copy_to='name_keyword')
+    name = String(copy_to=['name_keyword', 'name_trigram'])
     name_keyword = String(analyzer='lowercase_keyword_analyzer')
+    name_trigram = String(analyzer='trigram_analyzer')
     r_and_d_budget = Boolean()
     non_fdi_r_and_d_budget = Boolean()
     new_tech_to_uk = Boolean()

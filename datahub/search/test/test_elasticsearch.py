@@ -19,15 +19,27 @@ def test_get_search_term_query():
                         }
                     }
                 }, {
-                    'match': {
-                        'name': {
-                            'query': 'hello',
+                    'match_phrase': {
+                        'id': {
+                            'query': 'hello'
                         }
                     }
                 }, {
                     'match': {
-                        '_all': {
-                            'query': 'hello',
+                        'name': {
+                            'query': 'hello'
+                        }
+                    }
+                }, {
+                    'match_phrase': {
+                        'name_trigram': {
+                            'query': 'hello'
+                        }
+                    }
+                }, {
+                    'match': {
+                        '_combined_fields': {
+                            'query': 'hello'
                         }
                     }
                 }
@@ -52,22 +64,33 @@ def test_get_basic_search_query():
                             }
                         }
                     }, {
-                        'match': {
-                            'name': {
-                                'query': 'test',
+                        'match_phrase': {
+                            'id': {
+                                'query': 'test'
                             }
                         }
                     }, {
                         'match': {
-                            '_all': {
-                                'query': 'test',
+                            'name': {
+                                'query': 'test'
+                            }
+                        }
+                    }, {
+                        'match_phrase': {
+                            'name_trigram': {
+                                'query': 'test'
+                            }
+                        }
+                    }, {
+                        'match': {
+                            '_combined_fields': {
+                                'query': 'test'
                             }
                         }
                     }
                 ]
             }
-        },
-        'post_filter': {
+        }, 'post_filter': {
             'bool': {
                 'should': [
                     {
@@ -77,8 +100,7 @@ def test_get_basic_search_query():
                     }
                 ]
             }
-        },
-        'aggs': {
+        }, 'aggs': {
             'count_by_type': {
                 'terms': {
                     'field': '_type'
@@ -130,14 +152,26 @@ def test_search_by_entity_query():
                                         }
                                     }
                                 }, {
+                                    'match_phrase': {
+                                        'id': {
+                                            'query': 'test'
+                                        }
+                                    }
+                                }, {
                                     'match': {
                                         'name': {
                                             'query': 'test'
                                         }
                                     }
                                 }, {
+                                    'match_phrase': {
+                                        'name_trigram': {
+                                            'query': 'test'
+                                        }
+                                    }
+                                }, {
                                     'match': {
-                                        '_all': {
+                                        '_combined_fields': {
                                             'query': 'test'
                                         }
                                     }
@@ -186,7 +220,24 @@ def test_search_by_entity_query():
                             }
                         }
                     }
-                ]
+                ], 'should': [
+                    {
+                        'term': {
+                            'address_town': 'Woodside'
+                        }
+                    }, {
+                        'nested': {
+                            'path': 'trading_address_country',
+                            'query': {
+                                'term': {
+                                    'trading_address_country.id':
+                                        '80756b9a-5d95-e211-a939-e4115bead28a'
+                                }
+                            }
+                        }
+                    }
+                ],
+                'minimum_should_match': 1
             }
         },
         'from': 5,
