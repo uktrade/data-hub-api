@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 
 from datahub.core.viewsets import CoreViewSetV3
 
-from .models import Order, OrderSubscriber
+from .models import Order
 from .serializers import OrderAssigneeSerializer, OrderSerializer, SubscribedAdviserSerializer
 
 
@@ -33,7 +33,7 @@ class SubscriberListView(APIView):
         except Order.DoesNotExist:
             raise Http404
 
-    def get_subscriber_list_response(self, order):
+    def get_list_response(self, order):
         """
         Returns a Response object with the serialised list of advisers subscribed to
         the order.
@@ -48,7 +48,7 @@ class SubscriberListView(APIView):
         Returns a serialised list of advisers subscribed to the order.
         """
         order = self.get_order(order_pk)
-        return self.get_subscriber_list_response(order)
+        return self.get_list_response(order)
 
     def put(self, request, order_pk, format=None):
         """
@@ -57,25 +57,18 @@ class SubscriberListView(APIView):
         """
         order = self.get_order(order_pk)
 
-        serializer = SubscribedAdviserSerializer(data=request.data, many=True)
+        serializer = SubscribedAdviserSerializer(
+            data=request.data,
+            many=True,
+            context={
+                'order': order,
+                'modified_by': self.request.user,
+            }
+        )
         serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-        current_list = set(order.subscribers.values_list('adviser_id', flat=True))
-        final_list = {data['id'] for data in serializer.validated_data}
-
-        to_delete = current_list - final_list
-        to_add = final_list - current_list
-
-        order.subscribers.filter(adviser__in=to_delete).delete()
-        for adviser_id in to_add:
-            OrderSubscriber.objects.create(
-                order=order,
-                adviser_id=adviser_id,
-                created_by=self.request.user,
-                modified_by=self.request.user
-            )
-
-        return self.get_subscriber_list_response(order)
+        return self.get_list_response(order)
 
 
 class AssigneeView(APIView):
