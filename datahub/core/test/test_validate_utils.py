@@ -4,7 +4,9 @@ from unittest.mock import MagicMock, Mock
 import pytest
 from rest_framework.exceptions import ValidationError
 
-from datahub.core.validate_utils import AnyOfValidator, DataCombiner, RequiredUnlessAlreadyBlank
+from datahub.core.validate_utils import (
+    AnyOfValidator, DataCombiner, is_blank, RequiredUnlessAlreadyBlank
+)
 
 
 def test_any_of_none():
@@ -30,6 +32,20 @@ def test_any_of_all():
     validator = AnyOfValidator('field_a', 'field_b')
     validator.set_context(Mock(instance=instance))
     validator({'field_a': Mock(), 'field_b': Mock()})
+
+
+@pytest.mark.parametrize('value,blank', (
+    (None, True),
+    ('', True),
+    ([], True),
+    (0, False),
+    (2323, False),
+    ('dfdf', False),
+    ([1234], False),
+))
+def test_is_blank(value, blank):
+    """Tests is_blank() for various values."""
+    assert is_blank(value) == blank
 
 
 class TestDataCombiner:
