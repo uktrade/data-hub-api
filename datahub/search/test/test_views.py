@@ -447,6 +447,10 @@ class TestSearch(APITestMixin):
             stage_id=constants.InvestmentProjectStage.prospect.value.id,
         )
         InvestmentProjectFactory(
+            investor_company=CompanyFactory(),
+            stage_id=constants.InvestmentProjectStage.won.value.id,
+        )
+        InvestmentProjectFactory(
             stage_id=constants.InvestmentProjectStage.won.value.id
         )
 

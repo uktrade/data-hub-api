@@ -138,16 +138,19 @@ def get_search_by_entity_query(term=None,
     if term != '':
         query.append(get_search_term_query(term))
 
-    # document should match at least one filter in the list (or)
-    should_filter = []
-
     # document must match all filters in the list (and)
     must_filter = []
 
     if filters:
         for k, v in filters.items():
             if isinstance(v, list):
-                should_filter += [get_term_query(k, value) for value in v]
+                # perform "or" query
+                must_filter.append(
+                    Q('bool',
+                      should=[get_term_query(k, value) for value in v],
+                      minimum_should_match=1
+                      )
+                )
             else:
                 must_filter.append(get_term_query(k, v))
 
@@ -160,7 +163,7 @@ def get_search_by_entity_query(term=None,
     s = Search(index=settings.ES_INDEX).query('bool', must=query)
     s = get_sort_query(s, field_order=field_order)
 
-    s = s.post_filter('bool', must=must_filter, should=should_filter, minimum_should_match=1)
+    s = s.post_filter('bool', must=must_filter)
 
     if aggs:
         apply_aggs_query(s, aggs)
