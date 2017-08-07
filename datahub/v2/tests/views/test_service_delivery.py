@@ -106,7 +106,7 @@ class TestServiceDeliveryView(APITestMixin):
                 'dit_team': {
                     'data': {
                         'type': 'Team',
-                        'id': service_offer.dit_team.id
+                        'id': str(service_offer.dit_team.id)
                     }
                 }
             }
@@ -163,7 +163,7 @@ class TestServiceDeliveryView(APITestMixin):
                 'dit_team': {
                     'data': {
                         'type': 'Team',
-                        'id': service_offer.dit_team.id
+                        'id': str(service_offer.dit_team.id)
                     }
                 }
             }
