@@ -126,8 +126,7 @@ def test_search_by_entity_query():
                                 {
                                     'match_phrase': {
                                         'name_keyword': {
-                                            'query': 'test',
-                                            'boost': 2
+                                            'query': 'test', 'boost': 2
                                         }
                                     }
                                 }, {
@@ -148,11 +147,38 @@ def test_search_by_entity_query():
                     }
                 ]
             }
-        },
-        'post_filter': {
+        }, 'post_filter': {
             'bool': {
                 'must': [
                     {
+                        'bool': {
+                            'should': [
+                                {
+                                    'term': {
+                                        'address_town': 'Woodside'
+                                    }
+                                }
+                            ],
+                            'minimum_should_match': 1
+                        }
+                    }, {
+                        'bool': {
+                            'should': [
+                                {
+                                    'nested': {
+                                        'path': 'trading_address_country',
+                                        'query': {
+                                            'term': {
+                                                'trading_address_country.id':
+                                                    '80756b9a-5d95-e211-a939-e4115bead28a'
+                                            }
+                                        }
+                                    }
+                                }
+                            ],
+                            'minimum_should_match': 1
+                        }
+                    }, {
                         'range': {
                             'estimated_land_date': {
                                 'gte': '2017-06-13T09:44:31.062870',
@@ -160,25 +186,7 @@ def test_search_by_entity_query():
                             }
                         }
                     }
-                ],
-                'should': [
-                    {
-                        'term': {
-                            'address_town': 'Woodside'
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'trading_address_country',
-                            'query': {
-                                'term': {
-                                    'trading_address_country.id':
-                                        '80756b9a-5d95-e211-a939-e4115bead28a'
-                                }
-                            }
-                        }
-                    }
-                ],
-                'minimum_should_match': 1
+                ]
             }
         },
         'from': 5,

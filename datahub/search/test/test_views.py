@@ -426,28 +426,34 @@ class TestSearch(APITestMixin):
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_search_investment_project_multiple_filters(self):
-        """Tests detailed investment project search."""
+        """Tests multiple filters in investment project search.
+
+        We make sure that out of provided investment projects, we will
+        receive only those that match our filter.
+
+        We are testing following filter:
+
+        investment_type = fdi
+        AND (investor_company = compA OR investor_company = compB)
+        AND (stage = won OR stage = active)
+        """
         url = reverse('api-v3:search:investment_project')
 
-        company_a = CompanyFactory(
-            name='companyA'
+        investment_project1 = InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            stage_id=constants.InvestmentProjectStage.active.value.id
         )
-        company_b = CompanyFactory(
-            name='companyB'
+        investment_project2 = InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            stage_id=constants.InvestmentProjectStage.won.value.id,
         )
 
         InvestmentProjectFactory(
-            investment_type_id=constants.InvestmentType.fdi.value.id,
-            investor_company=company_a,
-            sector_id=constants.Sector.aerospace_assembly_aircraft.value.id,
-            stage_id=constants.InvestmentProjectStage.active.value.id
-        )
-        InvestmentProjectFactory(
-            investor_company=company_b,
-            stage_id=constants.InvestmentProjectStage.prospect.value.id,
-        )
-        InvestmentProjectFactory(
             stage_id=constants.InvestmentProjectStage.won.value.id
+        )
+        InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            stage_id=constants.InvestmentProjectStage.prospect.value.id,
         )
 
         connections.get_connection().indices.refresh()
@@ -455,8 +461,8 @@ class TestSearch(APITestMixin):
         response = self.api_client.post(url, {
             'investment_type': constants.InvestmentType.fdi.value.id,
             'investor_company': [
-                company_a.pk,
-                company_b.pk,
+                investment_project1.investor_company.pk,
+                investment_project2.investor_company.pk,
             ],
             'stage': [
                 constants.InvestmentProjectStage.won.value.id,
@@ -465,15 +471,34 @@ class TestSearch(APITestMixin):
         }, format='json')
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-        assert len(response.data['results']) == 1
+        assert response.data['count'] == 2
+        assert len(response.data['results']) == 2
 
-        stages = set([investment_project['stage']['id']
-                      for investment_project in response.data['results']])
+        # checks if we only have investment projects with stages we filtered
+        assert {
+            constants.InvestmentProjectStage.active.value.id,
+            constants.InvestmentProjectStage.won.value.id
+        } == {
+            investment_project['stage']['id']
+            for investment_project in response.data['results']
+        }
 
-        assert constants.InvestmentProjectStage.active.value.id in stages
-        assert constants.InvestmentProjectStage.prospect.value.id not in stages
-        assert constants.InvestmentProjectStage.won.value.id not in stages
+        # checks if we only have investment projects with investor companies we filtered
+        assert {
+            str(investment_project1.investor_company.pk),
+            str(investment_project2.investor_company.pk)
+        } == {
+            investment_project['investor_company']['id']
+            for investment_project in response.data['results']
+        }
+
+        # checks if we only have investment projects with fdi investment type
+        assert {
+            constants.InvestmentType.fdi.value.id
+        } == {
+            investment_project['investment_type']['id']
+            for investment_project in response.data['results']
+        }
 
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
