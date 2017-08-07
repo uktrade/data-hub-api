@@ -151,7 +151,7 @@ class TestServiceDeliveriesRepo:
                 'contact': {
                     'data': {
                         'type': 'Contact',
-                        'id': contact.pk
+                        'id': str(contact.pk)
                     }
                 }
             }

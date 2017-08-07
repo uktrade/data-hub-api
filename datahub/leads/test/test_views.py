@@ -61,7 +61,7 @@ class TestBusinessLeadViews(APITestMixin):
             'archived_reason': None,
             'company': {
                 'id': str(lead.company.pk),
-                'name': str(lead.company.name)
+                'name': lead.company.name
             },
             'company_name': lead.company_name,
             'contactable_by_dit': False,
