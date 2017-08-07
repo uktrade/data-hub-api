@@ -88,19 +88,19 @@ class TestServiceDeliveryView(APITestMixin):
                 'company': {
                     'data': {
                         'type': 'Company',
-                        'id': CompanyFactory().pk
+                        'id': str(CompanyFactory().pk)
                     }
                 },
                 'contact': {
                     'data': {
                         'type': 'Contact',
-                        'id': ContactFactory().pk
+                        'id': str(ContactFactory().pk)
                     }
                 },
                 'service': {
                     'data': {
                         'type': 'Service',
-                        'id': service_offer.service.id
+                        'id': str(service_offer.service.id)
                     }
                 },
                 'dit_team': {
@@ -145,19 +145,19 @@ class TestServiceDeliveryView(APITestMixin):
                 'company': {
                     'data': {
                         'type': 'Company',
-                        'id': CompanyFactory().pk
+                        'id': str(CompanyFactory().pk)
                     }
                 },
                 'contact': {
                     'data': {
                         'type': 'Contact',
-                        'id': ContactFactory().pk
+                        'id': str(ContactFactory().pk)
                     }
                 },
                 'service': {
                     'data': {
                         'type': 'Service',
-                        'id': service_offer.service.id
+                        'id': str(service_offer.service.id)
                     }
                 },
                 'dit_team': {
@@ -195,13 +195,13 @@ class TestServiceDeliveryView(APITestMixin):
                 'company': {
                     'data': {
                         'type': 'Company',
-                        'id': CompanyFactory().pk
+                        'id': str(CompanyFactory().pk)
                     }
                 },
                 'contact': {
                     'data': {
                         'type': 'Contact',
-                        'id': ContactFactory().pk
+                        'id': str(ContactFactory().pk)
                     }
                 },
                 'service': {
@@ -337,13 +337,13 @@ class TestServiceDeliveryView(APITestMixin):
                 'company': {
                     'data': {
                         'type': 'Company',
-                        'id': CompanyFactory().pk
+                        'id': str(CompanyFactory().pk)
                     }
                 },
                 'contact': {
                     'data': {
                         'type': 'Contact',
-                        'id': ContactFactory().pk
+                        'id': str(ContactFactory().pk)
                     }
                 },
                 'service': {

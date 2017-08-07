@@ -12,7 +12,7 @@ from datahub.company.test.factories import (
 class BusinessLeadFactory(factory.django.DjangoModelFactory):
     """Business lead factory."""
 
-    id = factory.Sequence(lambda _: str(uuid.uuid4()))
+    id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SubFactory(AdviserFactory)
     first_name = factory.Sequence(lambda n: 'name {n}')

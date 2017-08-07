@@ -30,7 +30,7 @@ class TestAddContact(APITestMixin):
             'last_name': 'Nelson',
             'job_title': constants.Role.owner.value.name,
             'company': {
-                'id': company.pk
+                'id': str(company.pk)
             },
             'email': 'foo@bar.com',
             'email_alternative': 'foo2@bar.com',
@@ -65,7 +65,7 @@ class TestAddContact(APITestMixin):
             'last_name': 'Nelson',
             'job_title': constants.Role.owner.value.name,
             'company': {
-                'id': company.pk,
+                'id': str(company.pk),
                 'name': company.name
             },
             'adviser': {
@@ -329,7 +329,7 @@ class TestEditContact(APITestMixin):
             'last_name': 'Nelson',
             'job_title': constants.Role.owner.value.name,
             'company': {
-                'id': company.pk,
+                'id': str(company.pk),
                 'name': company.name
             },
             'email': 'foo@bar.com',
@@ -394,7 +394,7 @@ class TestArchiveContact(APITestMixin):
             'last_name': self.user.last_name
         }
         assert response.data['archived_reason'] == 'foo'
-        assert response.data['id'] == contact.pk
+        assert response.data['id'] == str(contact.pk)
 
     def test_unarchive(self):
         """Test unarchiving a contact."""
@@ -406,7 +406,7 @@ class TestArchiveContact(APITestMixin):
         assert not response.data['archived']
         assert not response.data['archived_by']
         assert response.data['archived_reason'] == ''
-        assert response.data['id'] == contact.pk
+        assert response.data['id'] == str(contact.pk)
 
     def test_unarchive_wrong_method(self):
         """Tests that GET requests to the unarchive endpoint fail."""
@@ -465,7 +465,7 @@ class TestViewContact(APITestMixin):
             'last_name': 'Nelson',
             'job_title': constants.Role.owner.value.name,
             'company': {
-                'id': company.pk,
+                'id': str(company.pk),
                 'name': company.name
             },
             'adviser': {
@@ -528,7 +528,7 @@ class TestContactList(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
-        expected_contacts = {contact.id for contact in contacts}
+        expected_contacts = {str(contact.id) for contact in contacts}
         assert {contact['id'] for contact in response.data['results']} == expected_contacts
 
 

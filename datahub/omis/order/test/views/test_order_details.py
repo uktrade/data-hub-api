@@ -59,15 +59,15 @@ class TestAddOrderDetails(APITestMixin):
                 'name': self.user.name
             },
             'company': {
-                'id': company.pk,
+                'id': str(company.pk),
                 'name': company.name
             },
             'contact': {
-                'id': contact.pk,
+                'id': str(contact.pk),
                 'name': contact.name
             },
             'primary_market': {
-                'id': country.id,
+                'id': str(country.id),
                 'name': country.name
             },
             'sector': {
