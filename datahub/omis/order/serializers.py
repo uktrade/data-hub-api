@@ -6,7 +6,7 @@ from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import DataCombiner
 from datahub.metadata.models import Country, Sector, Team
 
-from .models import Order, OrderAssignee
+from .models import Order, OrderAssignee, OrderSubscriber
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -78,6 +78,44 @@ def existing_adviser(adviser_id):
     return adviser_id
 
 
+class SubscribedAdviserListSerializer(serializers.ListSerializer):
+    """DRF List serializer for OrderSubscriber(s)."""
+
+    def save(self, **kwargs):
+        """
+        Overrides save as the logic is not the standard DRF one.
+
+        1. if a subscriber is still in the list, don't do anything
+        2. if a subscriber was not in the list, add it
+        3. if a subscriber is not in the list any more, remove it
+        """
+        assert hasattr(self, '_errors'), (
+            'You must call `.is_valid()` before calling `.save()`.'
+        )
+
+        assert not self.errors, (
+            'You cannot call `.save()` on a serializer with invalid data.'
+        )
+
+        order = self.context['order']
+        modified_by = self.context['modified_by']
+
+        current_list = set(order.subscribers.values_list('adviser_id', flat=True))
+        final_list = {data['id'] for data in self.validated_data}
+
+        to_delete = current_list - final_list
+        to_add = final_list - current_list
+
+        order.subscribers.filter(adviser__in=to_delete).delete()
+        for adviser_id in to_add:
+            OrderSubscriber.objects.create(
+                order=order,
+                adviser_id=adviser_id,
+                created_by=modified_by,
+                modified_by=modified_by
+            )
+
+
 class SubscribedAdviserSerializer(serializers.Serializer):
     """
     DRF serializer for an adviser subscribed to an order.
@@ -87,6 +125,9 @@ class SubscribedAdviserSerializer(serializers.Serializer):
     first_name = serializers.CharField(read_only=True)
     last_name = serializers.CharField(read_only=True)
     dit_team = NestedRelatedField(Team, read_only=True)
+
+    class Meta:  # noqa: D101
+        list_serializer_class = SubscribedAdviserListSerializer
 
 
 class OrderAssigneeListSerializer(serializers.ListSerializer):
