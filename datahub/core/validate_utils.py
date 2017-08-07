@@ -79,13 +79,13 @@ class RequiredUnlessAlreadyBlank:
         """Performs validation (called by DRF)."""
         errors = {}
         for field in self.fields:
-            if self.instance and _is_blank(getattr(self.instance, field)):
+            if self.instance and is_blank(getattr(self.instance, field)):
                 continue
 
             if self.partial and field not in attrs:
                 continue
 
-            if _is_blank(attrs.get(field)):
+            if is_blank(attrs.get(field)):
                 errors[field] = self.required_message
 
         if errors:
@@ -148,5 +148,6 @@ class DataCombiner:
         return str(value.id) if value else None
 
 
-def _is_blank(value):
+def is_blank(value):
+    """Returns True if a value is considered empty or blank."""
     return value in (None, '') or (isinstance(value, Sequence) and len(value) == 0)
