@@ -139,7 +139,7 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['status'] == 'ongoing'  # default status
         assert len(response_data['client_contacts']) == 2
         assert Counter(contact['id'] for contact in response_data[
-            'client_contacts']) == Counter(contact.id for contact in contacts)
+            'client_contacts']) == Counter(str(contact.id) for contact in contacts)
         assert Counter(activity['id'] for activity in response_data[
             'business_activities']) == Counter(activity['id'] for activity in activities)
         assert response_data['other_business_activity'] == request_data['other_business_activity']
@@ -222,7 +222,7 @@ class TestUnifiedViews(APITestMixin):
 
     def test_get_project_success(self):
         """Test successfully getting a project."""
-        contacts = [ContactFactory().id, ContactFactory().id]
+        contacts = [str(ContactFactory().id), str(ContactFactory().id)]
         project = InvestmentProjectFactory(client_contacts=contacts)
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         response = self.api_client.get(url)
@@ -1023,7 +1023,7 @@ class TestTeamMemberViews(APITestMixin):
         assert response.status_code == status.HTTP_204_NO_CONTENT
         new_team_members = InvestmentProjectTeamMember.objects.filter(investment_project=project)
         assert new_team_members.count() == 1
-        assert str(new_team_members[0].adviser.pk) == team_members[1].adviser.pk
+        assert new_team_members[0].adviser.pk == team_members[1].adviser.pk
 
 
 class TestAuditLogView(APITestMixin):
@@ -1187,7 +1187,7 @@ class TestDocumentViews(APITestMixin):
         doc = IProjectDocument.objects.get(pk=response_data['id'])
         assert doc.filename == 'test.txt'
         assert doc.doc_type == 'total_investment'
-        assert str(doc.project.pk) == str(project.pk)
+        assert doc.project.pk == project.pk
         assert 'signed_upload_url' in response.data
 
     def test_document_retrieval(self):

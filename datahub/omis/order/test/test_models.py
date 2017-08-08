@@ -3,7 +3,10 @@ from unittest import mock
 import pytest
 from freezegun import freeze_time
 
-from datahub.omis.order.test.factories import OrderFactory
+from datahub.company.test.factories import AdviserFactory
+from datahub.core import constants
+from datahub.metadata.test.factories import TeamFactory
+from datahub.omis.order.test.factories import OrderAssigneeFactory, OrderFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -64,3 +67,65 @@ class TestOrder:
         with pytest.raises(RuntimeError):
             for index in range(max_retries):
                 OrderFactory()
+
+
+class TestOrderAssignee:
+    """Tests for the OrderAssignee model."""
+
+    def test_set_team_country_on_create(self):
+        """
+        Tests that when creating a new OrderAssignee, the `team` and `country`
+        properties get populated automatically.
+        """
+        # adviser belonging to a team with a country
+        team = TeamFactory(country_id=constants.Country.france.value.id)
+        adviser = AdviserFactory(dit_team=team)
+        assignee = OrderAssigneeFactory(adviser=adviser)
+
+        assert assignee.team == team
+        assert str(assignee.country_id) == constants.Country.france.value.id
+
+        # adviser belonging to a team without country
+        team = TeamFactory(country=None)
+        adviser = AdviserFactory(dit_team=team)
+        assignee = OrderAssigneeFactory(adviser=adviser)
+
+        assert assignee.team == team
+        assert not assignee.country
+
+        # adviser not belonging to any team
+        adviser = AdviserFactory(dit_team=None)
+        assignee = OrderAssigneeFactory(adviser=adviser)
+
+        assert not assignee.team
+        assert not assignee.country
+
+    def test_team_country_dont_change_after_creation(self):
+        """
+        Tests that after creating an OrderAssignee, the `team` and `country`
+        properties don't change with further updates.
+        """
+        team_france = TeamFactory(country_id=constants.Country.france.value.id)
+        adviser = AdviserFactory(dit_team=team_france)
+        assignee = OrderAssigneeFactory(adviser=adviser)
+
+        # the adviser moves to another team
+        adviser.dit_team = TeamFactory(country_id=constants.Country.italy.value.id)
+        adviser.save()
+
+        assignee.estimated_time = 1000
+        assignee.save()
+        assignee.refresh_from_db()
+
+        # the assignee is still linking to the original team and country
+        assert assignee.team == team_france
+        assert str(assignee.country_id) == constants.Country.france.value.id
+
+    def test_cannot_change_adviser_after_creation(self):
+        """After creating an OrderAssignee, the related adviser cannot be changed."""
+        adviser = AdviserFactory()
+        assignee = OrderAssigneeFactory(adviser=adviser)
+
+        with pytest.raises(ValueError):
+            assignee.adviser = AdviserFactory()
+            assignee.save()
