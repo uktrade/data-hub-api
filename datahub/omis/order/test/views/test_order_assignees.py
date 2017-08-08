@@ -51,9 +51,11 @@ class TestGetOrderAssignees(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [
             {
-                'adviser_id': str(adviser.id),
-                'first_name': adviser.first_name,
-                'last_name': adviser.last_name,
+                'adviser': {
+                    'id': str(adviser.id),
+                    'first_name': adviser.first_name,
+                    'last_name': adviser.last_name,
+                },
                 'estimated_time': (120 * i),
                 'is_lead': False
             }
@@ -70,16 +72,20 @@ class TestChangeOrderAssignees(APITestMixin):
         Given an order with the following assignees:
             [
                 {
-                    "adviser_id": 1,
-                    "first_name": "Joe",
-                    "last_name": "Doe",
+                    "adviser": {
+                        "id": 1,
+                        "first_name": "Joe",
+                        "last_name": "Doe"
+                    },
                     "estimated_time": 100,
                     "is_lead": true
                 },
                 {
-                    "adviser_id": 2,
-                    "first_name": "Rebecca",
-                    "last_name": "Bah",
+                    "adviser": {
+                        "id": 2,
+                        "first_name": "Rebecca",
+                        "last_name": "Bah"
+                    },
                     "estimated_time": 250,
                     "is_lead": false
                 },
@@ -88,12 +94,16 @@ class TestChangeOrderAssignees(APITestMixin):
         if I pass the following data:
             [
                 {
-                    "adviser_id": 1,
+                    "adviser": {
+                        "id": 1
+                    },
                     "estimated_time": 200,
                     "is_lead": false
                 },
                 {
-                    "adviser_id": 3,
+                    "adviser": {
+                        "id": 3
+                    },
                     "estimated_time": 250,
                     "is_lead": true
                 },
@@ -129,12 +139,16 @@ class TestChangeOrderAssignees(APITestMixin):
             url,
             [
                 {
-                    'adviser_id': adviser1.id,
+                    'adviser': {
+                        'id': adviser1.id,
+                    },
                     'estimated_time': 200,
                     'is_lead': False
                 },
                 {
-                    'adviser_id': adviser3.id,
+                    'adviser': {
+                        'id': adviser3.id,
+                    },
                     'estimated_time': 250,
                     'is_lead': True
                 }
@@ -145,23 +159,29 @@ class TestChangeOrderAssignees(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [
             {
-                'adviser_id': str(adviser1.id),
-                'first_name': adviser1.first_name,
-                'last_name': adviser1.last_name,
+                'adviser': {
+                    'id': str(adviser1.id),
+                    'first_name': adviser1.first_name,
+                    'last_name': adviser1.last_name,
+                },
                 'estimated_time': 200,
                 'is_lead': False
             },
             {
-                'adviser_id': str(adviser2.id),
-                'first_name': adviser2.first_name,
-                'last_name': adviser2.last_name,
+                'adviser': {
+                    'id': str(adviser2.id),
+                    'first_name': adviser2.first_name,
+                    'last_name': adviser2.last_name,
+                },
                 'estimated_time': assignee2.estimated_time,
                 'is_lead': False
             },
             {
-                'adviser_id': str(adviser3.id),
-                'first_name': adviser3.first_name,
-                'last_name': adviser3.last_name,
+                'adviser': {
+                    'id': str(adviser3.id),
+                    'first_name': adviser3.first_name,
+                    'last_name': adviser3.last_name,
+                },
                 'estimated_time': 250,
                 'is_lead': True
             },
@@ -190,16 +210,20 @@ class TestChangeOrderAssignees(APITestMixin):
         Given an order with the following assignees:
             [
                 {
-                    "adviser_id": 1,
-                    "first_name": "Joe",
-                    "last_name": "Doe",
+                    "adviser": {
+                        "id": 1,
+                        "first_name": "Joe",
+                        "last_name": "Doe"
+                    },
                     "estimated_time": 100,
                     "is_lead": true
                 },
                 {
-                    "adviser_id": 2,
-                    "first_name": "Rebecca",
-                    "last_name": "Bah",
+                    "adviser": {
+                        "id": 2,
+                        "first_name": "Rebecca",
+                        "last_name": "Bah"
+                    },
                     "estimated_time": 250,
                     "is_lead": false
                 },
@@ -208,11 +232,15 @@ class TestChangeOrderAssignees(APITestMixin):
         if I pass the following data:
             [
                 {
-                    "adviser_id": 1,
+                    "adviser": {
+                        "id": 1
+                    },
                     "estimated_time": 200
                 },
                 {
-                    "adviser_id": 3,
+                    "adviser": {
+                        "id": 3
+                    },
                     "estimated_time": 250
                 },
             ]
@@ -236,11 +264,15 @@ class TestChangeOrderAssignees(APITestMixin):
             f'{url}?{AssigneeView.FORCE_DELETE_PARAM}=1',
             [
                 {
-                    'adviser_id': adviser1.id,
+                    'adviser': {
+                        'id': adviser1.id,
+                    },
                     'estimated_time': 200
                 },
                 {
-                    'adviser_id': adviser3.id,
+                    'adviser': {
+                        'id': adviser3.id,
+                    },
                     'estimated_time': 250
                 }
             ],
@@ -248,7 +280,7 @@ class TestChangeOrderAssignees(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_200_OK
-        returned_advisers = {item['adviser_id'] for item in response.json()}
+        returned_advisers = {item['adviser']['id'] for item in response.json()}
         assert returned_advisers == {str(adviser1.id), str(adviser3.id)}
 
     def test_without_changing_any_values(self):
@@ -258,16 +290,20 @@ class TestChangeOrderAssignees(APITestMixin):
         Given an order with the following assignees:
             [
                 {
-                    "adviser_id": 1,
-                    "first_name": "Joe",
-                    "last_name": "Doe",
+                    "adviser": {
+                        "id": 1,
+                        "first_name": "Joe",
+                        "last_name": "Doe"
+                    },
                     "estimated_time": 100,
                     "is_lead": true
                 },
                 {
-                    "adviser_id": 2,
-                    "first_name": "Rebecca",
-                    "last_name": "Bah",
+                    "adviser": {
+                        "id": 2,
+                        "first_name": "Rebecca",
+                        "last_name": "Bah"
+                    },
                     "estimated_time": 250,
                     "is_lead": false
                 },
@@ -276,9 +312,11 @@ class TestChangeOrderAssignees(APITestMixin):
         if I pass the following data:
             [
                 {
-                    "adviser_id": 1,
-                    "first_name": "Joe",
-                    "last_name": "Doe",
+                    "adviser": {
+                        "id": 1,
+                        "first_name": "Joe",
+                        "last_name": "Doe",
+                    },
                     "estimated_time": 100,
                     "is_lead": true
                 },
@@ -306,7 +344,9 @@ class TestChangeOrderAssignees(APITestMixin):
             url,
             [
                 {
-                    'adviser_id': adviser1.id,
+                    'adviser': {
+                        'id': adviser1.id,
+                    },
                     'estimated_time': assignee1.estimated_time,
                     'is_lead': assignee1.is_lead
                 }
@@ -326,16 +366,20 @@ class TestChangeOrderAssignees(APITestMixin):
         Given an order with the following assignees:
             [
                 {
-                    "adviser_id": 1,
-                    "first_name": "Joe",
-                    "last_name": "Doe",
+                    "adviser": {
+                        "id": 1,
+                        "first_name": "Joe",
+                        "last_name": "Doe"
+                    },
                     "estimated_time": 100,
                     "is_lead": true
                 },
                 {
-                    "adviser_id": 2,
-                    "first_name": "Rebecca",
-                    "last_name": "Bah",
+                    "adviser": {
+                        "id": 2,
+                        "first_name": "Rebecca",
+                        "last_name": "Bah"
+                    },
                     "estimated_time": 250,
                     "is_lead": false
                 },
@@ -344,15 +388,21 @@ class TestChangeOrderAssignees(APITestMixin):
         if I pass the following data:
             [
                 {
-                    "adviser_id": 1,
+                    "adviser": {
+                        "id": 1
+                    },
                     "estimated_time": 200
                 },
                 {
-                    "adviser_id": 3,
+                    "adviser": {
+                        "id": 3
+                    },
                     "estimated_time": 250
                 },
                 {
-                    "adviser_id": non-existent,
+                    "adviser": {
+                        "id": non-existent
+                    },
                     "estimated_time": 250
                 },
             ]
@@ -378,17 +428,23 @@ class TestChangeOrderAssignees(APITestMixin):
             url,
             [
                 {
-                    'adviser_id': adviser1.id,
+                    'adviser': {
+                        'id': adviser1.id,
+                    },
                     'estimated_time': 200,
                     'is_lead': False
                 },
                 {
-                    'adviser_id': adviser3.id,
+                    'adviser': {
+                        'id': adviser3.id,
+                    },
                     'estimated_time': 250,
                     'is_lead': True
                 },
                 {
-                    'adviser_id': '00000000-0000-0000-0000-000000000000',
+                    'adviser': {
+                        'id': '00000000-0000-0000-0000-000000000000',
+                    },
                     'estimated_time': 300
                 },
             ],
@@ -396,10 +452,14 @@ class TestChangeOrderAssignees(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        response.json() == [
+        assert response.json() == [
             {},
             {},
-            {'adviser_id': ['00000000-0000-0000-0000-000000000000 is not a valid adviser']}
+            {
+                'adviser': [
+                    'Invalid pk "00000000-0000-0000-0000-000000000000" - object does not exist.'
+                ]
+            }
         ]
 
         # check db consistency
@@ -422,17 +482,23 @@ class TestChangeOrderAssignees(APITestMixin):
         Given an order with the following assignees:
             [
                 {
-                    "adviser_id": 1,
+                    "adviser": {
+                        "id": 1
+                    },
                     ...
                     "is_lead": true
                 },
                 {
-                    "adviser_id": 2,
+                    "adviser": {
+                        "id": 2
+                    },
                     ...
                     "is_lead": false
                 },
                 {
-                    "adviser_id": 3,
+                    "adviser": {
+                        "id": 3
+                    },
                     ...
                     "is_lead": false
                 },
@@ -441,15 +507,21 @@ class TestChangeOrderAssignees(APITestMixin):
         if I pass the following data:
             [
                 {
-                    "adviser_id": 2,
+                    "adviser": {
+                        "id": 2
+                    },
                     "is_lead": true
                 },
                 {
-                    "adviser_id": 3,
+                    "adviser": {
+                        "id": 3
+                    },
                     "estimated_time": 0
                 },
                 {
-                    "adviser_id": 4,
+                    "adviser": {
+                        "id": 4
+                    },
                     "estimated_time": 0
                 },
             ]
@@ -475,15 +547,21 @@ class TestChangeOrderAssignees(APITestMixin):
             url,
             [
                 {
-                    'adviser_id': adviser2.id,
+                    'adviser': {
+                        'id': adviser2.id,
+                    },
                     'is_lead': True
                 },
                 {
-                    'adviser_id': adviser3.id,
+                    'adviser': {
+                        'id': adviser3.id,
+                    },
                     'estimated_time': 0
                 },
                 {
-                    'adviser_id': adviser4.id,
+                    'adviser': {
+                        'id': adviser4.id,
+                    },
                     'estimated_time': 0
                 },
             ],
