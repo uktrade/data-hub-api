@@ -397,7 +397,7 @@ class TestCompany(APITestMixin):
     @pytest.mark.parametrize('field', ('sector',))
     def test_update_null_field_to_null(self, field):
         """
-        Tests setting fields to null that are current null, and are allowed to be null
+        Tests setting fields to null that are currently null, and are allowed to be null
         when already null.
         """
         creation_data = {
