@@ -55,6 +55,7 @@ class TestGetOrderAssignees(APITestMixin):
                     'id': str(adviser.id),
                     'first_name': adviser.first_name,
                     'last_name': adviser.last_name,
+                    'name': adviser.name
                 },
                 'estimated_time': (120 * i),
                 'is_lead': False
@@ -163,6 +164,7 @@ class TestChangeOrderAssignees(APITestMixin):
                     'id': str(adviser1.id),
                     'first_name': adviser1.first_name,
                     'last_name': adviser1.last_name,
+                    'name': adviser1.name,
                 },
                 'estimated_time': 200,
                 'is_lead': False
@@ -172,6 +174,7 @@ class TestChangeOrderAssignees(APITestMixin):
                     'id': str(adviser2.id),
                     'first_name': adviser2.first_name,
                     'last_name': adviser2.last_name,
+                    'name': adviser2.name,
                 },
                 'estimated_time': assignee2.estimated_time,
                 'is_lead': False
@@ -181,6 +184,7 @@ class TestChangeOrderAssignees(APITestMixin):
                     'id': str(adviser3.id),
                     'first_name': adviser3.first_name,
                     'last_name': adviser3.last_name,
+                    'name': adviser3.name,
                 },
                 'estimated_time': 250,
                 'is_lead': True

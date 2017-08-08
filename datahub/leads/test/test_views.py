@@ -48,12 +48,14 @@ class TestBusinessLeadViews(APITestMixin):
             'created_by': {
                 'first_name': self.user.first_name,
                 'id': str(self.user.pk),
-                'last_name': self.user.last_name
+                'last_name': self.user.last_name,
+                'name': self.user.name
             },
             'modified_by': {
                 'first_name': lead.modified_by.first_name,
                 'id': str(lead.modified_by.pk),
-                'last_name': lead.modified_by.last_name
+                'last_name': lead.modified_by.last_name,
+                'name': lead.modified_by.name
             },
             'archived': False,
             'archived_by': None,
