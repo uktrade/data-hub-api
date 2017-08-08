@@ -133,7 +133,7 @@ class CompanySerializerWriteV1(serializers.ModelSerializer):
         extra_kwargs = {
             'registered_address_country': {'required': True, 'allow_null': False},
         }
-        validators = [RequiredUnlessAlreadyBlank('sector')]
+        validators = [RequiredUnlessAlreadyBlank('sector', 'business_type')]
 
 
 NestedAdviserField = partial(
@@ -377,4 +377,4 @@ class CompanySerializerV3(serializers.ModelSerializer):
             'archived_on': {'read_only': True},
             'archived_reason': {'read_only': True}
         }
-        validators = [RequiredUnlessAlreadyBlank('sector')]
+        validators = [RequiredUnlessAlreadyBlank('sector', 'business_type')]
