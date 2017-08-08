@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from datahub.company.models import Advisor, Company, Contact
+from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import DataCombiner
 from datahub.metadata.models import Country, Sector, Team
@@ -147,7 +148,7 @@ class OrderAssigneeListSerializer(serializers.ListSerializer):
 
         leads = []
         for assignee_data in data:
-            adviser_id = assignee_data['adviser_id']
+            adviser_id = assignee_data['adviser'].id
 
             try:
                 is_lead = assignee_data['is_lead']
@@ -194,7 +195,7 @@ class OrderAssigneeListSerializer(serializers.ListSerializer):
         modified_by = self.context['modified_by']
         force_delete = self.context['force_delete']
 
-        validated_data_dict = {data['adviser_id']: data for data in self.validated_data}
+        validated_data_dict = {data['adviser'].id: data for data in self.validated_data}
         for assignee in order.assignees.all():
             assignee_adviser_id = assignee.adviser.id
 
@@ -234,9 +235,7 @@ class OrderAssigneeListSerializer(serializers.ListSerializer):
 class OrderAssigneeSerializer(serializers.ModelSerializer):
     """DRF serializer for an adviser assigned to an order."""
 
-    adviser_id = serializers.UUIDField(validators=[existing_adviser])
-    first_name = serializers.CharField(read_only=True, source='adviser.first_name')
-    last_name = serializers.CharField(read_only=True, source='adviser.last_name')
+    adviser = NestedAdviserField(required=True, allow_null=False)
     estimated_time = serializers.IntegerField(required=False)
     is_lead = serializers.BooleanField(required=False)
 
@@ -244,9 +243,7 @@ class OrderAssigneeSerializer(serializers.ModelSerializer):
         list_serializer_class = OrderAssigneeListSerializer
         model = OrderAssignee
         fields = [
-            'adviser_id',
-            'first_name',
-            'last_name',
+            'adviser',
             'estimated_time',
             'is_lead',
         ]
