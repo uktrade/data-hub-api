@@ -7,7 +7,7 @@ from django.utils.timezone import now
 from datahub.company.models import Advisor, Company, Contact
 from datahub.core.models import BaseModel
 
-from datahub.metadata.models import Country, Sector
+from datahub.metadata.models import Country, Sector, Team
 
 
 class Order(BaseModel):
@@ -98,6 +98,62 @@ class OrderSubscriber(BaseModel):
         return f'{self.order} – {self.adviser}'
 
     class Meta:  # noqa: D101
+        ordering = ['created_on']
         unique_together = (
             ('order', 'adviser'),
         )
+
+
+class OrderAssignee(BaseModel):
+    """
+    An adviser assigned to an Order and responsible for deliverying the final report(s).
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='assignees')
+    adviser = models.ForeignKey(Advisor, on_delete=models.PROTECT, related_name='+')
+    team = models.ForeignKey(Team, blank=True, null=True, on_delete=models.SET_NULL)
+    country = models.ForeignKey(Country, blank=True, null=True, on_delete=models.SET_NULL)
+
+    estimated_time = models.IntegerField(default=0, help_text='Estimated time in minutes.')
+    is_lead = models.BooleanField(default=False)
+
+    class Meta:  # noqa: D101
+        ordering = ['created_on']
+        unique_together = (
+            ('order', 'adviser'),
+        )
+
+    def __init__(self, *args, **kwargs):
+        """
+        Keep the original adviser value so that we can see if it changes when saving.
+        """
+        super().__init__(*args, **kwargs)
+        self.__adviser = self.adviser
+
+    def __str__(self):
+        """Human-readable representation"""
+        return (
+            f'{"" if self.is_lead else "Not "}Lead Assignee '
+            f'{self.adviser} for order {self.order}'
+        )
+
+    def save(self, *args, **kwargs):
+        """
+        Makes sure that the adviser cannot be changed after creation.
+        When creating a new instance, it also denormalises `team` and `country` for
+        future-proofing reasons, that is, if an adviser moves to another team in the future
+        we don't want to change history.
+        """
+        if not self._state.adding and self.__adviser != self.adviser:
+            raise ValueError('Updating the value of adviser isn\'t allowed.')
+
+        if self._state.adding:
+            self.team = self.adviser.dit_team
+            if self.team:
+                self.country = self.team.country
+
+        super().save(*args, **kwargs)
+
+        self.__adviser = self.adviser

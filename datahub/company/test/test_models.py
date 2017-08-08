@@ -20,7 +20,7 @@ def test_company_can_have_one_list_owner_assigned():
     # re-fetch object for completeness
     company_refetch = Company.objects.get(pk=str(company.pk))
 
-    assert str(company_refetch.one_list_account_owner_id) == str(adviser.pk)
+    assert company_refetch.one_list_account_owner_id == adviser.pk
 
 
 def test_company_can_have_hierarchy():

@@ -16,7 +16,7 @@ from datahub.core.test.factories import to_many_field
 class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     """Investment project factory."""
 
-    id = factory.LazyFunction(lambda: str(uuid.uuid4()))
+    id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SubFactory(AdviserFactory)
     name = factory.Sequence(lambda n: f'name {n}')
