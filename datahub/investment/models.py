@@ -26,6 +26,13 @@ class IProjectAbstract(models.Model):
         ('3_high', 'high', 'High'),
     )
 
+    STATUSES = Choices(
+        ('ongoing', 'Ongoing'),
+        ('delayed', 'Delayed'),
+        ('lost', 'Lost'),
+        ('abandoned', 'Abandoned'),
+    )
+
     name = models.CharField(max_length=MAX_LENGTH)
     description = models.TextField()
     nda_signed = models.BooleanField()
@@ -54,6 +61,17 @@ class IProjectAbstract(models.Model):
         'metadata.InvestmentProjectStage', on_delete=models.PROTECT,
         related_name='investment_projects',
         default=InvestmentProjectStage.prospect.value.id
+    )
+    status = models.CharField(
+        max_length=MAX_LENGTH, choices=STATUSES, default=STATUSES.ongoing
+    )
+    reason_delayed = models.TextField(blank=True, null=True)
+    reason_abandoned = models.TextField(blank=True, null=True)
+    date_abandoned = models.DateField(blank=True, null=True)
+    reason_lost = models.TextField(blank=True, null=True)
+    date_lost = models.DateField(blank=True, null=True)
+    country_lost_to = models.ForeignKey(
+        'metadata.Country', related_name='+', null=True, blank=True, on_delete=models.SET_NULL
     )
 
     investor_company = models.ForeignKey(
