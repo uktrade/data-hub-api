@@ -5,9 +5,18 @@ from django.utils.crypto import get_random_string
 from django.utils.timezone import now
 
 from datahub.company.models import Advisor, Company, Contact
-from datahub.core.models import BaseModel
+from datahub.core.models import BaseModel, BaseOrderedConstantModel
 
 from datahub.metadata.models import Country, Sector, Team
+
+
+class ServiceType(BaseOrderedConstantModel):
+    """
+    Order service type.
+    E.g. 'Validated contacts', 'Event', 'Market Research'
+    """
+
+    disabled_on = models.DateTimeField(blank=True, null=True)
 
 
 class Order(BaseModel):
