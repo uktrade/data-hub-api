@@ -1,3 +1,4 @@
+import pytest
 from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status
@@ -45,6 +46,23 @@ class TestInteraction(APITestMixin):
         assert response_data['modified_on'] == '2017-04-18T13:25:30.986208'
         assert response_data['created_on'] == '2017-04-18T13:25:30.986208'
 
+    def test_add_interaction_project_missing_fields(self):
+        """Tests add new interaction without RequiredUnlessAlreadyBlank fields."""
+        url = reverse('api-v1:interaction-list')
+        response = self.api_client.post(url, {
+            'subject': 'whatever',
+            'date': now().isoformat(),
+            'notes': 'hello',
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'dit_team': ['This field is required.'],
+            'interaction_type': ['This field is required.'],
+            'service': ['This field is required.']
+        }
+
     @freeze_time('2017-04-18 13:25:30.986208+00:00')
     def test_add_interaction_project(self):
         """Test add new interaction for an investment project."""
@@ -91,6 +109,58 @@ class TestInteraction(APITestMixin):
                 'One or more of company, investment_project must be provided.'
             ]
         }
+
+    @pytest.mark.parametrize('field,value', (
+        ('dit_team', constants.Team.crm.value.id),
+        ('interaction_type', constants.InteractionType.email_website.value.id),
+        ('service', constants.Service.trade_enquiry.value.id)
+    ))
+    def test_update_non_null_field_to_null(self, field, value):
+        """
+        Tests setting fields to null that are currently non-null, and are allowed to be null
+        when already null.
+        """
+        creation_data = {
+            'subject': 'whatever',
+            'date': now().isoformat(),
+            'dit_adviser_id': AdviserFactory().pk,
+            'notes': 'hello',
+            f'{field}_id': value
+        }
+        interaction = InteractionFactory(**creation_data)
+
+        url = reverse('api-v1:interaction-detail', kwargs={'pk': interaction.pk})
+        response = self.api_client.patch(url, {
+            field: None,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            field: ['This field is required.'],
+        }
+
+    @pytest.mark.parametrize('field', ('dit_team', 'interaction_type', 'service',))
+    def test_update_null_field_to_null(self, field):
+        """
+        Tests setting fields to null that are currently null, and are allowed to be null
+        when already null.
+        """
+        creation_data = {
+            'subject': 'whatever',
+            'date': now().isoformat(),
+            'dit_adviser_id': AdviserFactory().pk,
+            'notes': 'hello',
+            f'{field}_id': None
+        }
+        interaction = InteractionFactory(**creation_data)
+
+        url = reverse('api-v1:interaction-detail', kwargs={'pk': interaction.pk})
+        response = self.api_client.patch(url, {
+            field: None,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()[field] is None
 
     def test_modify_interaction(self):
         """Modify an existing interaction."""

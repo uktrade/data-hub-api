@@ -307,7 +307,7 @@ class TestCompany(APITestMixin):
             'registered_address_country': ['This field may not be null.']
         }
 
-    @pytest.mark.parametrize('field', ('sector',))
+    @pytest.mark.parametrize('field', ('sector', 'business_type'))
     def test_add_company_without_required_field(self, field):
         """
         Tests adding a company without required fields that are allowed to be null (during
@@ -317,7 +317,6 @@ class TestCompany(APITestMixin):
         response = self.api_client.post(url, {
             'name': 'Acme',
             'alias': None,
-            'business_type': BusinessType.company.value.id,
             'registered_address_1': '75 Stramford Road',
             'registered_address_town': 'London',
             'registered_address_country': Country.united_kingdom.value.id,
@@ -329,6 +328,7 @@ class TestCompany(APITestMixin):
 
     @pytest.mark.parametrize('field,value', (
         ('sector', Sector.aerospace_assembly_aircraft.value.id),
+        ('business_type', BusinessType.government_dept.value.id),
     ))
     def test_update_non_null_field_to_null(self, field, value):
         """
@@ -354,10 +354,10 @@ class TestCompany(APITestMixin):
             field: ['This field is required.'],
         }
 
-    @pytest.mark.parametrize('field', ('sector',))
+    @pytest.mark.parametrize('field', ('sector', 'business_type'))
     def test_update_null_field_to_null(self, field):
         """
-        Tests setting fields to null that are current null, and are allowed to be null
+        Tests setting fields to null that are currently null, and are allowed to be null
         when already null.
         """
         creation_data = {
