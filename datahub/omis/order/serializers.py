@@ -3,11 +3,17 @@ from rest_framework.exceptions import ValidationError
 
 from datahub.company.models import Advisor, Company, Contact
 from datahub.company.serializers import NestedAdviserField
-from datahub.core.serializers import NestedRelatedField
+from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
 from datahub.core.validate_utils import DataCombiner
 from datahub.metadata.models import Country, Sector, Team
 
 from .models import Order, OrderAssignee, OrderSubscriber
+
+
+class ServiceTypeSerializer(ConstantModelSerializer):
+    """Service Type DRF serializer"""
+
+    disabled_on = serializers.ReadOnlyField()
 
 
 class OrderSerializer(serializers.ModelSerializer):
