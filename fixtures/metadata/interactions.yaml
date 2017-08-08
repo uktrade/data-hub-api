@@ -17,3 +17,18 @@
 - model: metadata.interactiontype
   pk: a8d71fdd-5d95-e211-a939-e4115bead28a
   fields: {name: Social Media}
+- model: metadata.interactiontype
+  pk: 71c226d7-5d95-e211-a939-e4115bead28a
+  fields: {name: Fax}
+- model: metadata.interactiontype
+  pk: 73c226d7-5d95-e211-a939-e4115bead28a
+  fields: {name: Telex}
+- model: metadata.interactiontype
+  pk: 75c226d7-5d95-e211-a939-e4115bead28a
+  fields: {name: UKTI Website}
+- model: metadata.interactiontype
+  pk: a4d71fdd-5d95-e211-a939-e4115bead28a
+  fields: {name: SMS}
+- model: metadata.interactiontype
+  pk: a6d71fdd-5d95-e211-a939-e4115bead28a
+  fields: {name: Business Card}
