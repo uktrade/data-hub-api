@@ -18,7 +18,7 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
     project_code = serializers.CharField(read_only=True)
     investment_type = NestedRelatedField(meta_models.InvestmentType)
     stage = NestedRelatedField(meta_models.InvestmentProjectStage, required=False)
-    country_lost_to = NestedRelatedField(meta_models.Country, required=False)
+    country_lost_to = NestedRelatedField(meta_models.Country, required=False, allow_null=True)
     project_shareable = serializers.BooleanField(required=True)
     investor_company = NestedRelatedField(Company, required=True, allow_null=False)
     intermediate_company = NestedRelatedField(Company, required=False, allow_null=True)
