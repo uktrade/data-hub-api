@@ -65,6 +65,11 @@ class Interaction(InteractionAbstract):
         on_delete=models.CASCADE
     )
 
+    class Meta:  # noqa: D101
+        permissions = (
+            ('view_interaction', 'Can view interaction'),
+        )
+
 
 class ServiceOffer(models.Model):
     """Service offer."""
@@ -89,6 +94,11 @@ class ServiceOffer(models.Model):
     def __str__(self):
         """Human readable object name."""
         return self.name
+
+    class Meta:  # noqa: D101
+        permissions = (
+            ('view_serviceoffer', 'Can view service offer'),
+        )
 
 
 class ServiceDelivery(InteractionAbstract):
@@ -139,3 +149,6 @@ class ServiceDelivery(InteractionAbstract):
 
     class Meta(InteractionAbstract.Meta):  # noqa: D101
         verbose_name_plural = 'service deliveries'
+        permissions = (
+            ('view_servicedelivery', 'Can view service delivery'),
+        )

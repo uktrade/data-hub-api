@@ -57,6 +57,11 @@ class Contact(ArchivableModel, BaseModel):
     contactable_by_email = models.BooleanField(default=True)
     contactable_by_phone = models.BooleanField(default=True)
 
+    class Meta:  # noqa: D101
+        permissions = (
+            ('view_contact', 'Can view contact'),
+        )
+
     @cached_property
     def name(self):
         """Need this for ES."""

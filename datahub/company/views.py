@@ -7,6 +7,7 @@ from rest_framework.filters import OrderingFilter
 
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.serializers import AuditSerializer
+from datahub.core.utils import DjangoModelPermissionsWithView
 from datahub.core.viewsets import CoreViewSetV1, CoreViewSetV3
 from datahub.investment.queryset import get_slim_investment_project_queryset
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
@@ -38,6 +39,7 @@ class CompanyViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
         'export_to_countries',
         'future_interest_countries'
     )
+    permission_classes = (DjangoModelPermissionsWithView, )
 
 
 class CompanyViewSetV3(ArchivableViewSetMixin, CoreViewSetV3):
@@ -65,6 +67,7 @@ class CompanyViewSetV3(ArchivableViewSetMixin, CoreViewSetV3):
         'export_to_countries',
         'future_interest_countries',
     )
+    permission_classes = (DjangoModelPermissionsWithView, )
 
 
 class CompanyAuditViewSet(CoreViewSetV3):
@@ -72,6 +75,7 @@ class CompanyAuditViewSet(CoreViewSetV3):
 
     serializer_class = AuditSerializer
     queryset = Company.objects.all()
+    permission_classes = (DjangoModelPermissionsWithView, )
 
 
 class CompaniesHouseCompanyReadOnlyViewSetV1(
@@ -81,6 +85,7 @@ class CompaniesHouseCompanyReadOnlyViewSetV1(
     serializer_class = CompaniesHouseCompanySerializer
     queryset = CompaniesHouseCompany.objects.select_related('registered_address_country').all()
     lookup_field = 'company_number'
+    permission_classes = (DjangoModelPermissionsWithView, )
 
 
 class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
@@ -92,6 +97,7 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         DjangoFilterBackend,
     )
     filter_fields = ['company_id']
+    permission_classes = (DjangoModelPermissionsWithView, )
 
     def get_additional_data(self, create):
         """Set adviser to the user on model instance creation."""
@@ -106,6 +112,7 @@ class ContactAuditViewSet(CoreViewSetV3):
 
     serializer_class = AuditSerializer
     queryset = Contact.objects.all()
+    permission_classes = (DjangoModelPermissionsWithView, )
 
 
 class AdviserFilter(FilterSet):
@@ -135,3 +142,4 @@ class AdviserReadOnlyViewSetV1(
     filter_class = AdviserFilter
     ordering_fields = ('first_name', 'last_name')
     ordering = ('first_name', 'last_name')
+    permission_classes = (DjangoModelPermissionsWithView, )

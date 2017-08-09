@@ -243,6 +243,11 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
         company_name = self.investor_company or 'No company'
         return f'{company_name} – {self.name}'
 
+    class Meta:  # noqa: D101
+        permissions = (
+            ('view_investmentproject', 'Can view investment project'),
+        )
+
 
 class InvestmentProjectTeamMember(models.Model):
     """Intermediary M2M model for investment project team members.
@@ -264,6 +269,9 @@ class InvestmentProjectTeamMember(models.Model):
 
     class Meta:  # noqa: D101
         unique_together = (('investment_project', 'adviser'),)
+        permissions = (
+            ('view_investmentprojectteammember', 'Can view investment project team member'),
+        )
 
 
 class InvestmentProjectCode(models.Model):
@@ -277,6 +285,11 @@ class InvestmentProjectCode(models.Model):
     """
 
     project = models.OneToOneField(InvestmentProject, on_delete=models.CASCADE)
+
+    class Meta:  # noqa: D101
+        permissions = (
+            ('view_investmentprojectcode', 'Can view investment project code'),
+        )
 
 
 class IProjectDocument(BaseModel, ArchivableModel):
@@ -323,6 +336,9 @@ class IProjectDocument(BaseModel, ArchivableModel):
         verbose_name_plural = 'investment project documents'
         unique_together = (
             ('project', 'doc_type', 'filename'),
+        )
+        permissions = (
+            ('view_iprojectdocument', 'Can view investment project document'),
         )
 
     def delete(self, using=None, keep_parents=False):
