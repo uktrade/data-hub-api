@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from datahub.company.serializers import AdviserSerializer
-from datahub.core.validate_utils import AnyOfValidator
+from datahub.core.validate_utils import AnyOfValidator, RequiredUnlessAlreadyBlank
 from .models import Interaction
 
 
@@ -22,4 +22,7 @@ class InteractionSerializerWrite(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = Interaction
         fields = '__all__'
-        validators = [AnyOfValidator('company', 'investment_project')]
+        validators = [
+            AnyOfValidator('company', 'investment_project'),
+            RequiredUnlessAlreadyBlank('dit_team', 'interaction_type', 'service')
+        ]

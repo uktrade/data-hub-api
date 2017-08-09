@@ -9,7 +9,7 @@ from datahub.core import constants
 class AdviserFactory(factory.django.DjangoModelFactory):
     """Adviser factory."""
 
-    id = factory.Sequence(lambda _: str(uuid.uuid4()))
+    id = factory.LazyFunction(uuid.uuid4)
     first_name = factory.Sequence(lambda n: f'name {n}')
     last_name = factory.Sequence(lambda n: f'surname {n}')
     dit_team_id = constants.Team.healthcare_uk.value.id
@@ -24,7 +24,7 @@ class AdviserFactory(factory.django.DjangoModelFactory):
 class CompanyFactory(factory.django.DjangoModelFactory):
     """Company factory."""
 
-    id = factory.Sequence(lambda _: str(uuid.uuid4()))
+    id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SubFactory(AdviserFactory)
     name = factory.Sequence(lambda n: f'name{n}')
@@ -62,7 +62,7 @@ class CompaniesHouseCompanyFactory(factory.django.DjangoModelFactory):
 class ContactFactory(factory.django.DjangoModelFactory):
     """Contact factory"""
 
-    id = factory.Sequence(lambda _: str(uuid.uuid4()))
+    id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SubFactory(AdviserFactory)
     title_id = constants.Title.wing_commander.value.id

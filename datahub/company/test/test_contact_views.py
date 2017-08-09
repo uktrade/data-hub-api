@@ -30,7 +30,7 @@ class TestAddContact(APITestMixin):
             'last_name': 'Nelson',
             'job_title': constants.Role.owner.value.name,
             'company': {
-                'id': company.pk
+                'id': str(company.pk)
             },
             'email': 'foo@bar.com',
             'email_alternative': 'foo2@bar.com',
@@ -65,13 +65,14 @@ class TestAddContact(APITestMixin):
             'last_name': 'Nelson',
             'job_title': constants.Role.owner.value.name,
             'company': {
-                'id': company.pk,
+                'id': str(company.pk),
                 'name': company.name
             },
             'adviser': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
-                'last_name': self.user.last_name
+                'last_name': self.user.last_name,
+                'name': self.user.name
             },
             'email': 'foo@bar.com',
             'email_alternative': 'foo2@bar.com',
@@ -257,6 +258,26 @@ class TestAddContact(APITestMixin):
             ]
         }
 
+    def test_fails_without_primary_specified(self):
+        """Test that fails if primary is not specified."""
+        url = reverse('api-v3:contact:list')
+        response = self.api_client.post(url, {
+            'first_name': 'Oratio',
+            'last_name': 'Nelson',
+            'company': {
+                'id': CompanyFactory().pk
+            },
+            'email': 'foo@bar.com',
+            'telephone_countrycode': '+44',
+            'telephone_number': '123456789',
+            'address_same_as_company': True,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'primary': ['This field is required.']
+        }
+
 
 class TestEditContact(APITestMixin):
     """Edit contact test case."""
@@ -309,7 +330,7 @@ class TestEditContact(APITestMixin):
             'last_name': 'Nelson',
             'job_title': constants.Role.owner.value.name,
             'company': {
-                'id': company.pk,
+                'id': str(company.pk),
                 'name': company.name
             },
             'email': 'foo@bar.com',
@@ -318,7 +339,8 @@ class TestEditContact(APITestMixin):
             'adviser': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
-                'last_name': self.user.last_name
+                'last_name': self.user.last_name,
+                'name': self.user.name
             },
             'telephone_countrycode': '+44',
             'telephone_number': '123456789',
@@ -371,10 +393,11 @@ class TestArchiveContact(APITestMixin):
         assert response.data['archived_by'] == {
             'id': str(self.user.pk),
             'first_name': self.user.first_name,
-            'last_name': self.user.last_name
+            'last_name': self.user.last_name,
+            'name': self.user.name
         }
         assert response.data['archived_reason'] == 'foo'
-        assert response.data['id'] == contact.pk
+        assert response.data['id'] == str(contact.pk)
 
     def test_unarchive(self):
         """Test unarchiving a contact."""
@@ -386,7 +409,7 @@ class TestArchiveContact(APITestMixin):
         assert not response.data['archived']
         assert not response.data['archived_by']
         assert response.data['archived_reason'] == ''
-        assert response.data['id'] == contact.pk
+        assert response.data['id'] == str(contact.pk)
 
     def test_unarchive_wrong_method(self):
         """Tests that GET requests to the unarchive endpoint fail."""
@@ -445,13 +468,14 @@ class TestViewContact(APITestMixin):
             'last_name': 'Nelson',
             'job_title': constants.Role.owner.value.name,
             'company': {
-                'id': company.pk,
+                'id': str(company.pk),
                 'name': company.name
             },
             'adviser': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
-                'last_name': self.user.last_name
+                'last_name': self.user.last_name,
+                'name': self.user.name
             },
             'email': 'foo@bar.com',
             'email_alternative': 'foo2@bar.com',
@@ -508,7 +532,7 @@ class TestContactList(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
-        expected_contacts = {contact.id for contact in contacts}
+        expected_contacts = {str(contact.id) for contact in contacts}
         assert {contact['id'] for contact in response.data['results']} == expected_contacts
 
 

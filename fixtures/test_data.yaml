@@ -227,6 +227,7 @@
     name: New hotel (FDI)
     description: This is a dummy investment project for testing
     stage: c9864359-fb1a-4646-a4c1-97d10189fc03  # Assign PM
+    status: ongoing
     nda_signed: false
     estimated_land_date: 2020-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
@@ -262,6 +263,7 @@
     name: New hotel (Non-FDI)
     description: This is a dummy investment project for testing
     stage: 8a320cc9-ae2e-443e-9d26-2f36452c2ced  # Prospect
+    status: ongoing
     nda_signed: false
     estimated_land_date: 2020-01-01
     investment_type: 9c364e64-2b28-401b-b2df-50e08b0bca44  # Non-FDI
@@ -284,6 +286,7 @@
     name: New hotel (commitment to invest)
     description: This is a dummy investment project for testing
     stage: 8a320cc9-ae2e-443e-9d26-2f36452c2ced  # Prospect
+    status: ongoing
     nda_signed: false
     estimated_land_date: 2020-01-01
     investment_type: 031269ab-b7ec-40e9-8a4e-7371404f0622  # Commitment to invest
@@ -306,6 +309,7 @@
     name: New restaurant
     description: This is a dummy investment project for testing
     stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8  # Active
+    status: ongoing
     nda_signed: false
     estimated_land_date: 2020-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
@@ -353,11 +357,135 @@
     role: Finance adviser
 
 - model: investment.investmentproject
+  pk: 0e686ea4-b8a2-4337-aec4-114d92ad4588
+  fields:
+    name: New rollercoaster
+    description: This is a dummy investment project for testing
+    stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8  # Active
+    status: delayed
+    reason_delayed: Waiting on materials.
+    nda_signed: false
+    estimated_land_date: 2020-01-01
+    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
+    project_shareable: false
+    not_shareable_reason: Commercially sensitive
+    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    client_contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_adviser: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_activity: aba8f653-264f-48d8-950e-07f9c418c7b0
+    fdi_type: f8447013-cfdc-4f35-a146-6619665388b3
+    sector: 034be3be-5329-e511-b6bc-e4115bead28a
+    business_activities:
+      - a2dbd807-ae52-421c-8d1d-88adfc7a506b
+    client_cannot_provide_total_investment: false
+    total_investment: 1000000.0
+    client_cannot_provide_foreign_investment: false
+    foreign_equity_investment: 200000.0
+    government_assistance: true
+    number_new_jobs: 20
+    average_salary: 2943bf3d-32dd-43be-8ad4-969b006dee7b
+    site_decided: false
+    client_considering_other_countries: false
+    uk_region_locations:
+      - 814cd12a-6095-e211-a939-e4115bead28a
+    client_requirements: Anywhere
+    strategic_drivers:
+      - 382aa6d1-a362-4166-a09d-f579d9f3be75
+    project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
+    project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
+
+- model: investment.investmentproject
+  pk: addca042-5a00-412c-9d7c-acc04552756c
+  fields:
+    name: Green tea plantation
+    description: This is a dummy investment project for testing
+    stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8  # Active
+    status: abandoned
+    reason_abandoned: Not economically viable
+    date_abandoned: 2018-01-01
+    nda_signed: false
+    estimated_land_date: 2020-01-01
+    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
+    project_shareable: false
+    not_shareable_reason: Commercially sensitive
+    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    client_contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_adviser: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_activity: aba8f653-264f-48d8-950e-07f9c418c7b0
+    fdi_type: f8447013-cfdc-4f35-a146-6619665388b3
+    sector: 034be3be-5329-e511-b6bc-e4115bead28a
+    business_activities:
+      - a2dbd807-ae52-421c-8d1d-88adfc7a506b
+    client_cannot_provide_total_investment: false
+    total_investment: 1000000.0
+    client_cannot_provide_foreign_investment: false
+    foreign_equity_investment: 200000.0
+    government_assistance: true
+    number_new_jobs: 20
+    average_salary: 2943bf3d-32dd-43be-8ad4-969b006dee7b
+    site_decided: false
+    client_considering_other_countries: false
+    uk_region_locations:
+      - 814cd12a-6095-e211-a939-e4115bead28a
+    client_requirements: Anywhere
+    strategic_drivers:
+      - 382aa6d1-a362-4166-a09d-f579d9f3be75
+    project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
+    project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
+
+- model: investment.investmentproject
+  pk: 3520b973-0e77-46cf-be75-3585f2f6691e
+  fields:
+    name: Wig factory
+    description: This is a dummy investment project for testing
+    stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8  # Active
+    status: lost
+    date_lost: 2018-01-01
+    reason_lost: Low demand.
+    country_lost_to: 0950bdb8-5d95-e211-a939-e4115bead28a
+    nda_signed: false
+    estimated_land_date: 2020-01-01
+    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
+    project_shareable: false
+    not_shareable_reason: Commercially sensitive
+    investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    client_contacts:
+      - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    client_relationship_manager: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_adviser: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_activity: aba8f653-264f-48d8-950e-07f9c418c7b0
+    fdi_type: f8447013-cfdc-4f35-a146-6619665388b3
+    sector: 034be3be-5329-e511-b6bc-e4115bead28a
+    business_activities:
+      - a2dbd807-ae52-421c-8d1d-88adfc7a506b
+    client_cannot_provide_total_investment: false
+    total_investment: 1000000.0
+    client_cannot_provide_foreign_investment: false
+    foreign_equity_investment: 200000.0
+    government_assistance: true
+    number_new_jobs: 20
+    average_salary: 2943bf3d-32dd-43be-8ad4-969b006dee7b
+    site_decided: false
+    client_considering_other_countries: false
+    uk_region_locations:
+      - 814cd12a-6095-e211-a939-e4115bead28a
+    client_requirements: Anywhere
+    strategic_drivers:
+      - 382aa6d1-a362-4166-a09d-f579d9f3be75
+    project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
+    project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
+
+- model: investment.investmentproject
   pk: ea3a03ba-b239-4956-b2fb-f35c91109674
   fields:
     name: New fruit machine
     description: This is a dummy investment project for testing
     stage: 49b8f6f3-0c50-4150-a965-2c974f3149e3  # Verify win
+    status: ongoing
     nda_signed: false
     estimated_land_date: 2020-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
@@ -406,6 +534,7 @@
     name: New airport
     description: This is a dummy investment project for testing
     stage: 945ea6d1-eee3-4f5b-9144-84a75b71b8e6  # Won
+    status: ongoing
     nda_signed: false
     estimated_land_date: 2020-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI

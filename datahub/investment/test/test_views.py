@@ -3,7 +3,7 @@
 import re
 import uuid
 from collections import Counter
-from datetime import datetime
+from datetime import date, datetime
 from unittest.mock import patch
 
 import pytest
@@ -12,8 +12,7 @@ from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import (AdviserFactory, CompanyFactory,
-                                            ContactFactory)
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import (
     APITestMixin, synchronous_executor_submit, synchronous_transaction_on_commit
@@ -21,7 +20,9 @@ from datahub.core.test_utils import (
 from datahub.core.utils import executor
 from datahub.documents.av_scan import virus_scan_document
 from datahub.investment import views
-from datahub.investment.models import InvestmentProjectTeamMember, IProjectDocument
+from datahub.investment.models import (
+    InvestmentProject, InvestmentProjectTeamMember, IProjectDocument
+)
 from datahub.investment.test.factories import (
     InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
 )
@@ -64,8 +65,7 @@ class TestUnifiedViews(APITestMixin):
         adviser = AdviserFactory()
         url = reverse('api-v3:investment:investment-collection')
         aerospace_id = constants.Sector.aerospace_assembly_aircraft.value.id
-        new_site_id = (constants.FDIType.creation_of_new_site_or_activity
-                       .value.id)
+        new_site_id = constants.FDIType.creation_of_new_site_or_activity.value.id
         retail_business_activity_id = constants.InvestmentBusinessActivity.retail.value.id
         other_business_activity_id = constants.InvestmentBusinessActivity.other.value.id
         activities = [{
@@ -123,28 +123,23 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['name'] == request_data['name']
         assert response_data['description'] == request_data['description']
         assert response_data['nda_signed'] == request_data['nda_signed']
-        assert (response_data['estimated_land_date'] == request_data[
-            'estimated_land_date'])
-        assert (response_data['project_shareable'] == request_data[
-            'project_shareable'])
+        assert response_data['estimated_land_date'] == request_data['estimated_land_date']
+        assert response_data['project_shareable'] == request_data['project_shareable']
         assert (response_data['quotable_as_public_case_study'] ==
                 request_data['quotable_as_public_case_study'])
         assert response_data['likelihood_of_landing'] == request_data['likelihood_of_landing']
         assert response_data['priority'] == request_data['priority']
         assert re.match('^DHP-\d+$', response_data['project_code'])
 
-        assert (response_data['investment_type']['id'] == request_data[
-            'investment_type']['id'])
-        assert response_data['investor_company']['id'] == str(
-            investor_company.id)
-        assert response_data['intermediate_company']['id'] == str(
-            intermediate_company.id)
-        assert response_data['referral_source_adviser']['id'] == str(
-            adviser.id)
+        assert response_data['investment_type']['id'] == request_data['investment_type']['id']
+        assert response_data['investor_company']['id'] == str(investor_company.id)
+        assert response_data['intermediate_company']['id'] == str(intermediate_company.id)
+        assert response_data['referral_source_adviser']['id'] == str(adviser.id)
         assert response_data['stage']['id'] == request_data['stage']['id']
+        assert response_data['status'] == 'ongoing'  # default status
         assert len(response_data['client_contacts']) == 2
         assert Counter(contact['id'] for contact in response_data[
-            'client_contacts']) == Counter(contact.id for contact in contacts)
+            'client_contacts']) == Counter(str(contact.id) for contact in contacts)
         assert Counter(activity['id'] for activity in response_data[
             'business_activities']) == Counter(activity['id'] for activity in activities)
         assert response_data['other_business_activity'] == request_data['other_business_activity']
@@ -227,7 +222,7 @@ class TestUnifiedViews(APITestMixin):
 
     def test_get_project_success(self):
         """Test successfully getting a project."""
-        contacts = [ContactFactory().id, ContactFactory().id]
+        contacts = [str(ContactFactory().id), str(ContactFactory().id)]
         project = InvestmentProjectFactory(client_contacts=contacts)
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         response = self.api_client.get(url)
@@ -239,13 +234,37 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['likelihood_of_landing'] == project.likelihood_of_landing
         assert response_data['nda_signed'] == project.nda_signed
         assert response_data['project_code'] == project.project_code
-        assert (response_data['estimated_land_date'] ==
-                str(project.estimated_land_date))
-        assert (response_data['investment_type']['id'] ==
-                str(project.investment_type.id))
+        assert response_data['estimated_land_date'] == str(project.estimated_land_date)
+        assert response_data['investment_type']['id'] == str(project.investment_type.id)
         assert (response_data['stage']['id'] == str(project.stage.id))
         assert sorted(contact['id'] for contact in response_data[
             'client_contacts']) == sorted(contacts)
+
+    def test_get_project_status(self):
+        """Test getting project status fields."""
+        contacts = [ContactFactory().id, ContactFactory().id]
+        project = InvestmentProjectFactory(
+            client_contacts=contacts,
+            status=InvestmentProject.STATUSES.lost,
+            reason_delayed='Problems getting planning permission.',
+            date_abandoned=date(2019, 1, 1),
+            reason_abandoned='No longer viable.',
+            reason_lost='Lower set-up costs.',
+            date_lost=date(2018, 1, 1),
+            country_lost_to_id=constants.Country.japan.value.id,
+        )
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['id'] == str(project.id)
+        assert response_data['status'] == project.status
+        assert response_data['reason_delayed'] == project.reason_delayed
+        assert response_data['date_abandoned'] == project.date_abandoned.isoformat()
+        assert response_data['reason_abandoned'] == project.reason_abandoned
+        assert response_data['reason_lost'] == project.reason_lost
+        assert response_data['date_lost'] == project.date_lost.isoformat()
+        assert response_data['country_lost_to']['id'] == constants.Country.japan.value.id
 
     def test_create_project_conditional_failure(self):
         """Test creating a project w/ missing conditionally required value."""
@@ -746,12 +765,14 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['project_manager'] == {
             'id': str(pm_adviser.pk),
             'first_name': pm_adviser.first_name,
-            'last_name': pm_adviser.last_name
+            'last_name': pm_adviser.last_name,
+            'name': pm_adviser.name
         }
         assert response_data['project_assurance_adviser'] == {
             'id': str(pa_adviser.pk),
             'first_name': pa_adviser.first_name,
-            'last_name': pa_adviser.last_name
+            'last_name': pa_adviser.last_name,
+            'name': pa_adviser.name,
         }
         assert response_data['project_manager_team'] == {
             'id': str(crm_team.id),
@@ -805,12 +826,14 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['project_manager'] == {
             'id': str(adviser_2.pk),
             'first_name': adviser_2.first_name,
-            'last_name': adviser_2.last_name
+            'last_name': adviser_2.last_name,
+            'name': adviser_2.name
         }
         assert response_data['project_assurance_adviser'] == {
             'id': str(adviser_2.pk),
             'first_name': adviser_2.first_name,
-            'last_name': adviser_2.last_name
+            'last_name': adviser_2.last_name,
+            'name': adviser_2.name
         }
         assert response_data['project_manager_team'] == {
             'id': str(huk_team.id),
@@ -1004,7 +1027,7 @@ class TestTeamMemberViews(APITestMixin):
         assert response.status_code == status.HTTP_204_NO_CONTENT
         new_team_members = InvestmentProjectTeamMember.objects.filter(investment_project=project)
         assert new_team_members.count() == 1
-        assert str(new_team_members[0].adviser.pk) == team_members[1].adviser.pk
+        assert new_team_members[0].adviser.pk == team_members[1].adviser.pk
 
 
 class TestAuditLogView(APITestMixin):
@@ -1168,7 +1191,7 @@ class TestDocumentViews(APITestMixin):
         doc = IProjectDocument.objects.get(pk=response_data['id'])
         assert doc.filename == 'test.txt'
         assert doc.doc_type == 'total_investment'
-        assert str(doc.project.pk) == str(project.pk)
+        assert doc.project.pk == project.pk
         assert 'signed_upload_url' in response.data
 
     def test_document_retrieval(self):

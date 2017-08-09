@@ -1,7 +1,7 @@
-from django.conf import settings
 from rest_framework import serializers
 
-from datahub.company.models import Advisor, Company
+from datahub.company.models import Company
+from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import DataCombiner
 from datahub.leads.models import BusinessLead
@@ -17,20 +17,15 @@ class BusinessLeadSerializer(serializers.ModelSerializer):
     company = NestedRelatedField(
         Company, required=False, allow_null=True
     )
-    adviser = NestedRelatedField(
-        Advisor, read_only=True,
-        extra_fields=('first_name', 'last_name')
-    )
     address_country = NestedRelatedField(
         meta_models.Country, required=False, allow_null=True
     )
     archived = serializers.BooleanField(read_only=True)
     archived_on = serializers.DateTimeField(read_only=True)
     archived_reason = serializers.CharField(read_only=True)
-    archived_by = NestedRelatedField(
-        settings.AUTH_USER_MODEL, read_only=True,
-        extra_fields=('first_name', 'last_name')
-    )
+    archived_by = NestedAdviserField(read_only=True)
+    created_by = NestedAdviserField(read_only=True)
+    modified_by = NestedAdviserField(read_only=True)
 
     def validate(self, data):
         """
@@ -70,17 +65,36 @@ class BusinessLeadSerializer(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = BusinessLead
         fields = (
-            'id', 'first_name', 'last_name', 'job_title', 'company_name',
-            'trading_name', 'company', 'adviser', 'telephone_number', 'email',
-            'address_1', 'address_2', 'address_town', 'address_county',
-            'address_country', 'address_postcode', 'telephone_alternative',
-            'email_alternative', 'contactable_by_dit',
-            'contactable_by_dit_partners', 'contactable_by_email',
-            'contactable_by_phone', 'notes', 'archived', 'archived_on',
-            'archived_reason', 'archived_by'
+            'id',
+            'first_name',
+            'last_name',
+            'job_title',
+            'company_name',
+            'trading_name',
+            'company',
+            'telephone_number',
+            'email',
+            'address_1',
+            'address_2',
+            'address_town',
+            'address_county',
+            'address_country',
+            'address_postcode',
+            'telephone_alternative',
+            'email_alternative',
+            'contactable_by_dit',
+            'contactable_by_dit_partners',
+            'contactable_by_email',
+            'contactable_by_phone',
+            'notes',
+            'archived',
+            'archived_on',
+            'archived_reason',
+            'archived_by',
+            'created_by',
+            'modified_by',
         )
         extra_kwargs = {
-            'adviser': {'read_only': True},
             'archived': {'read_only': True},
             'archived_on': {'read_only': True},
             'archived_reason': {'read_only': True},
