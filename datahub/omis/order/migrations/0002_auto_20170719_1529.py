@@ -30,4 +30,8 @@ class Migration(migrations.Migration):
             name='ordersubscriber',
             unique_together=set([('order', 'adviser')]),
         ),
+        migrations.AlterModelOptions(
+            name='ordersubscriber',
+            options={'ordering': ['created_on']},
+        ),
     ]

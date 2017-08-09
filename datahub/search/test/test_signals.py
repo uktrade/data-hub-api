@@ -46,7 +46,7 @@ def test_company_auto_updates_to_es(setup_data, post_save_handlers):
     result = elasticsearch.get_basic_search_query(new_test_name, entities=('company',)).execute()
 
     assert result.hits.total == 1
-    assert result.hits[0].id == company.id
+    assert result.hits[0].id == str(company.id)
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
@@ -83,7 +83,7 @@ def test_contact_auto_updates_to_es(setup_data, post_save_handlers):
     result = elasticsearch.get_basic_search_query(new_test_name, entities=('contact',)).execute()
 
     assert result.hits.total == 1
-    assert result.hits[0].id == contact.id
+    assert result.hits[0].id == str(contact.id)
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
