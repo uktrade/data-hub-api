@@ -42,13 +42,13 @@ def setup_data(client):
         name='abc defg',
         description='investmentproject1',
         estimated_land_date=datetime.datetime(2011, 6, 13, 9, 44, 31, 62870)
-    ).save()
+    )
     InvestmentProjectFactory(
         description='investmentproject2',
         estimated_land_date=datetime.datetime(2057, 6, 13, 9, 44, 31, 62870),
         project_manager=AdviserFactory(),
         project_assurance_adviser=AdviserFactory(),
-    ).save()
+    )
 
     country_uk = constants.Country.united_kingdom.value.id
     country_us = constants.Country.united_states.value.id
@@ -57,14 +57,14 @@ def setup_data(client):
         trading_address_1='1 Fake Lane',
         trading_address_town='Downtown',
         trading_address_country_id=country_uk
-    ).save()
+    )
     CompanyFactory(
         name='abc defg us ltd',
         trading_address_1='1 Fake Lane',
         trading_address_town='Downtown',
         trading_address_country_id=country_us,
         registered_address_country_id=country_us
-    ).save()
+    )
 
     management.call_command(sync_es.Command())
     client.indices.refresh()
