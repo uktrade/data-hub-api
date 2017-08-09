@@ -18,6 +18,15 @@ class ServiceType(BaseOrderedConstantModel):
 
     disabled_on = models.DateTimeField(blank=True, null=True)
 
+    def was_disabled_on(self, date_on):
+        """
+        Returns True if this service type was disabled at time `date_on`,
+        False otherwise.
+        """
+        if not self.disabled_on:
+            return False
+        return self.disabled_on <= date_on
+
 
 class Order(BaseModel):
     """
@@ -49,6 +58,12 @@ class Order(BaseModel):
         related_name='+',
         null=True, blank=True,
         on_delete=models.SET_NULL
+    )
+
+    service_types = models.ManyToManyField(
+        ServiceType,
+        related_name="%(class)ss",  # noqa: Q000
+        blank=True
     )
 
     def __str__(self):
