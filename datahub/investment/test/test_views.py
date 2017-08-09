@@ -765,12 +765,14 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['project_manager'] == {
             'id': str(pm_adviser.pk),
             'first_name': pm_adviser.first_name,
-            'last_name': pm_adviser.last_name
+            'last_name': pm_adviser.last_name,
+            'name': pm_adviser.name
         }
         assert response_data['project_assurance_adviser'] == {
             'id': str(pa_adviser.pk),
             'first_name': pa_adviser.first_name,
-            'last_name': pa_adviser.last_name
+            'last_name': pa_adviser.last_name,
+            'name': pa_adviser.name,
         }
         assert response_data['project_manager_team'] == {
             'id': str(crm_team.id),
@@ -824,12 +826,14 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['project_manager'] == {
             'id': str(adviser_2.pk),
             'first_name': adviser_2.first_name,
-            'last_name': adviser_2.last_name
+            'last_name': adviser_2.last_name,
+            'name': adviser_2.name
         }
         assert response_data['project_assurance_adviser'] == {
             'id': str(adviser_2.pk),
             'first_name': adviser_2.first_name,
-            'last_name': adviser_2.last_name
+            'last_name': adviser_2.last_name,
+            'name': adviser_2.name
         }
         assert response_data['project_manager_team'] == {
             'id': str(huk_team.id),

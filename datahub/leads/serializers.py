@@ -1,4 +1,3 @@
-from django.conf import settings
 from rest_framework import serializers
 
 from datahub.company.models import Company
@@ -24,10 +23,7 @@ class BusinessLeadSerializer(serializers.ModelSerializer):
     archived = serializers.BooleanField(read_only=True)
     archived_on = serializers.DateTimeField(read_only=True)
     archived_reason = serializers.CharField(read_only=True)
-    archived_by = NestedRelatedField(
-        settings.AUTH_USER_MODEL, read_only=True,
-        extra_fields=('first_name', 'last_name')
-    )
+    archived_by = NestedAdviserField(read_only=True)
     created_by = NestedAdviserField(read_only=True)
     modified_by = NestedAdviserField(read_only=True)
 

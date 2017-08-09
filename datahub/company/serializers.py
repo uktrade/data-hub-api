@@ -138,7 +138,7 @@ class CompanySerializerWriteV1(serializers.ModelSerializer):
 
 NestedAdviserField = partial(
     NestedRelatedField, 'company.Advisor',
-    extra_fields=('first_name', 'last_name')
+    extra_fields=('first_name', 'last_name', 'name')
 )
 
 
@@ -151,20 +151,14 @@ class ContactSerializer(serializers.ModelSerializer):
     company = NestedRelatedField(
         Company, required=False, allow_null=True
     )
-    adviser = NestedRelatedField(
-        Advisor, read_only=True,
-        extra_fields=('first_name', 'last_name')
-    )
+    adviser = NestedAdviserField(read_only=True)
     address_country = NestedRelatedField(
         meta_models.Country, required=False, allow_null=True
     )
     archived = serializers.BooleanField(read_only=True)
     archived_on = serializers.DateTimeField(read_only=True)
     archived_reason = serializers.CharField(read_only=True)
-    archived_by = NestedRelatedField(
-        settings.AUTH_USER_MODEL, read_only=True,
-        extra_fields=('first_name', 'last_name')
-    )
+    archived_by = NestedAdviserField(read_only=True)
     primary = serializers.BooleanField()
 
     class Meta:  # noqa: D101
