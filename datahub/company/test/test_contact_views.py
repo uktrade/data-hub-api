@@ -71,7 +71,8 @@ class TestAddContact(APITestMixin):
             'adviser': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
-                'last_name': self.user.last_name
+                'last_name': self.user.last_name,
+                'name': self.user.name
             },
             'email': 'foo@bar.com',
             'email_alternative': 'foo2@bar.com',
@@ -338,7 +339,8 @@ class TestEditContact(APITestMixin):
             'adviser': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
-                'last_name': self.user.last_name
+                'last_name': self.user.last_name,
+                'name': self.user.name
             },
             'telephone_countrycode': '+44',
             'telephone_number': '123456789',
@@ -391,7 +393,8 @@ class TestArchiveContact(APITestMixin):
         assert response.data['archived_by'] == {
             'id': str(self.user.pk),
             'first_name': self.user.first_name,
-            'last_name': self.user.last_name
+            'last_name': self.user.last_name,
+            'name': self.user.name
         }
         assert response.data['archived_reason'] == 'foo'
         assert response.data['id'] == str(contact.pk)
@@ -471,7 +474,8 @@ class TestViewContact(APITestMixin):
             'adviser': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
-                'last_name': self.user.last_name
+                'last_name': self.user.last_name,
+                'name': self.user.name
             },
             'email': 'foo@bar.com',
             'email_alternative': 'foo2@bar.com',
