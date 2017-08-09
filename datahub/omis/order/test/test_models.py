@@ -1,6 +1,7 @@
 from unittest import mock
 
 import pytest
+from dateutil.parser import parse as dateutil_parse
 from freezegun import freeze_time
 
 from datahub.company.test.factories import AdviserFactory
@@ -8,7 +9,39 @@ from datahub.core import constants
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.order.test.factories import OrderAssigneeFactory, OrderFactory
 
+from ..models import ServiceType
+
+
 pytestmark = pytest.mark.django_db
+
+
+class TestServiceType:
+    """
+    Tests for the ServiceType model.
+    """
+
+    def test_wasnt_disabled_if_disabled_on_is_none(self):
+        """If disabled_on is None, return False."""
+        date_on = dateutil_parse('2017-01-01 13:00:00')
+
+        service_type = ServiceType(disabled_on=None)
+        assert not service_type.was_disabled_on(date_on)
+
+    def test_was_disabled(self):
+        """If disabled_on < date_on, return True."""
+        disabled_on = dateutil_parse('2017-01-01 12:00:00')
+        date_on = dateutil_parse('2017-01-01 13:00:00')
+
+        service_type = ServiceType(disabled_on=disabled_on)
+        assert service_type.was_disabled_on(date_on)
+
+    def test_wasnt_disabled(self):
+        """If disabled_on > date_on, return False."""
+        disabled_on = dateutil_parse('2017-01-01 14:00:00')
+        date_on = dateutil_parse('2017-01-01 13:00:00')
+
+        service_type = ServiceType(disabled_on=disabled_on)
+        assert not service_type.was_disabled_on(date_on)
 
 
 class TestOrder:

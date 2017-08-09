@@ -17,8 +17,21 @@ def to_many_field(wrapped_func):
         RemovedInDjango20Warning: Direct assignment to the reverse side of a related set is
         deprecated due to the implicit save() that happens. Use xxx.set() instead.
 
-    This decorator doesn't call the decorated function; the decorated function is only used
-    for its name.
+    This decorator only calls the decorated function to get the default value if none has been
+    explicitly provided.
+
+    Example:
+
+        class MyFactory(factory.django.DjangoModelFactory):
+            ...
+            @to_many_field
+            def my_m2m_field(self):
+                # return any default value
+                return [ob1, obj2]
+
+        Usage:
+            fac = MyFactory(my_m2m_field=[obj3])  # creates an object with my_m2m_field == [obj3]
+            fac = MyFactory()  # creates an object with my_m2m_field == [obj1, obj2]
     """
     @factory.post_generation
     @wraps(wrapped_func)
@@ -28,8 +41,13 @@ def to_many_field(wrapped_func):
             # should not be set
             return
 
-        if extracted:
-            field = getattr(self, wrapped_func.__name__)
+        field = getattr(self, wrapped_func.__name__)
+        if extracted is not None:
             field.set(extracted)
+        else:
+            # if the wrapped func returns a value, it's treated as a default value.
+            value = wrapped_func(self)
+            if value is not None:
+                field.set(value)
 
     return wrapping_func
