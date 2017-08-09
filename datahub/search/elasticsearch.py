@@ -64,10 +64,7 @@ def get_search_term_query(term, fields=None):
     ]
 
     if fields:
-        for field in fields:
-            should_query.append(
-                get_match_query(field, term)
-            )
+        should_query.extend([get_match_query(field, term) for field in fields])
 
     return Q('bool', should=should_query)
 
@@ -192,10 +189,7 @@ def get_search_by_entity_query(term=None,
                 must_filter.append(get_term_query(k, v))
 
     if ranges:
-        for k, v in ranges.items():
-            must_filter.append(
-                Q('range', **{k: v})
-            )
+        must_filter.extend([Q('range', **{k: v}) for k, v in ranges.items()])
 
     s = Search(index=settings.ES_INDEX).query('bool', must=query)
     s = get_sort_query(s, field_order=field_order)
