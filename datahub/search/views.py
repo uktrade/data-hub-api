@@ -4,6 +4,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from datahub.search.models import Company, Contact, InvestmentProject
 from . import elasticsearch
 
 
@@ -15,6 +16,12 @@ class SearchBasicAPIView(APIView):
     SORT_BY_FIELDS = (
         'name', 'created_on',
     )
+
+    ENTITY_BY_NAME = {
+        'company': Company,
+        'contact': Contact,
+        'investment_project': InvestmentProject,
+    }
 
     def get(self, request, format=None):
         """Performs basic search."""
@@ -38,7 +45,7 @@ class SearchBasicAPIView(APIView):
 
         results = elasticsearch.get_basic_search_query(
             term=term,
-            entities=entity.split(','),
+            entities=(self.ENTITY_BY_NAME[entity],),
             field_order=sortby,
             offset=offset,
             limit=limit
@@ -85,7 +92,7 @@ class SearchCompanyAPIView(APIView):
 
     def post(self, request, format=None):
         """Performs filtered company search."""
-        filters = {elasticsearch.remap_field(field): request.data[field]
+        filters = {elasticsearch.remap_filter_id_field(field): request.data[field]
                    for field in self.FILTER_FIELDS if field in request.data}
 
         original_query = request.data.get('original_query', '')
@@ -99,7 +106,8 @@ class SearchCompanyAPIView(APIView):
         offset = int(request.query_params.get('offset', 0))
         limit = int(request.query_params.get('limit', 100))
 
-        results = elasticsearch.get_search_company_query(
+        results = elasticsearch.get_search_by_entity_query(
+            entity=Company,
             term=original_query,
             filters=filters,
             field_order=sortby,
@@ -136,7 +144,7 @@ class SearchContactAPIView(APIView):
 
     def post(self, request, format=None):
         """Performs filtered contact search."""
-        filters = {elasticsearch.remap_field(field): request.data[field]
+        filters = {elasticsearch.remap_filter_id_field(field): request.data[field]
                    for field in self.FILTER_FIELDS if field in request.data}
 
         original_query = request.data.get('original_query', '')
@@ -150,7 +158,8 @@ class SearchContactAPIView(APIView):
         offset = int(request.data.get('offset', 0))
         limit = int(request.data.get('limit', 100))
 
-        results = elasticsearch.get_search_contact_query(
+        results = elasticsearch.get_search_by_entity_query(
+            entity=Contact,
             term=original_query,
             filters=filters,
             field_order=sortby,
@@ -200,7 +209,7 @@ class SearchInvestmentProjectAPIView(APIView):
 
     def post(self, request, format=None):
         """Performs filtered contact search."""
-        filters = {elasticsearch.remap_field(field): request.data[field]
+        filters = {elasticsearch.remap_filter_id_field(field): request.data[field]
                    for field in self.FILTER_FIELDS if field in request.data}
         try:
             filters, ranges = elasticsearch.date_range_fields(filters)
@@ -218,7 +227,8 @@ class SearchInvestmentProjectAPIView(APIView):
         offset = int(request.data.get('offset', 0))
         limit = int(request.data.get('limit', 100))
 
-        results = elasticsearch.get_search_investment_project_query(
+        results = elasticsearch.get_search_by_entity_query(
+            entity=InvestmentProject,
             term=original_query,
             filters=filters,
             ranges=ranges,
@@ -230,7 +240,7 @@ class SearchInvestmentProjectAPIView(APIView):
 
         aggregations = {}
         for field in self.FILTER_FIELDS:
-            es_field = elasticsearch.remap_field(field)
+            es_field = elasticsearch.remap_filter_id_field(field)
             if es_field in results.aggregations:
                 aggregation = results.aggregations[es_field]
                 if '.' in es_field:

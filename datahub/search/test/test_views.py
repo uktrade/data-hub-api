@@ -44,9 +44,9 @@ class TestSearch(APITestMixin):
         })
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 3
+        assert response.data['count'] == 2
         assert response.data['companies'][0]['name'].startswith(term)
-        assert [{'count': 3, 'entity': 'company'},
+        assert [{'count': 2, 'entity': 'company'},
                 {'count': 1, 'entity': 'contact'},
                 {'count': 1, 'entity': 'investment_project'}] == response.data['aggregations']
 
@@ -64,7 +64,7 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 1
         assert response.data['contacts'][0]['first_name'] in term
         assert response.data['contacts'][0]['last_name'] in term
-        assert [{'count': 3, 'entity': 'company'},
+        assert [{'count': 2, 'entity': 'company'},
                 {'count': 1, 'entity': 'contact'},
                 {'count': 1, 'entity': 'investment_project'}] == response.data['aggregations']
 
@@ -81,7 +81,7 @@ class TestSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
         assert response.data['investment_projects'][0]['name'] == term
-        assert [{'count': 3, 'entity': 'company'},
+        assert [{'count': 2, 'entity': 'company'},
                 {'count': 1, 'entity': 'contact'},
                 {'count': 1, 'entity': 'investment_project'}] == response.data['aggregations']
 
@@ -127,7 +127,7 @@ class TestSearch(APITestMixin):
         })
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 3
+        assert response.data['count'] == 2
         assert len(response.data['companies']) == 1
 
     def test_search_company(self):
@@ -256,13 +256,97 @@ class TestSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 4
-        # no sortby specified so no ordering applied
+
+        # results are in order of relevance if sortby is not applied
         assert [
             'The Advisory',
             'The Advisory Group',
             'The Risk Advisory Group',
             'The Advisories'
         ] == [company['name'] for company in response.data['companies']]
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_partial_match(self):
+        """Tests partial matching."""
+        CompanyFactory(name='Veryuniquename1')
+        CompanyFactory(name='Veryuniquename2')
+        CompanyFactory(name='Veryuniquename3')
+        CompanyFactory(name='Veryuniquename4')
+
+        connections.get_connection().indices.refresh()
+
+        term = 'Veryuniquenam'
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'company'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 4
+
+        # particular order is not important here, we just need all that partially match
+        assert {
+            'Veryuniquename1',
+            'Veryuniquename2',
+            'Veryuniquename3',
+            'Veryuniquename4'
+        } == {company['name'] for company in response.data['companies']}
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_hyphen_match(self):
+        """Tests hyphen query."""
+        CompanyFactory(name='t-shirt')
+        CompanyFactory(name='tshirt')
+        CompanyFactory(name='electronic shirt')
+        CompanyFactory(name='t and e and a')
+
+        connections.get_connection().indices.refresh()
+
+        term = 't-shirt'
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'company'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 4
+
+        # order of relevance
+        assert [
+            't-shirt',
+            'tshirt',
+            'electronic shirt',
+            't and e and a'
+        ] == [company['name'] for company in response.data['companies']]
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_id_match(self):
+        """Tests exact id matching."""
+        CompanyFactory(id='0fb3379c-341c-4dc4-b125-bf8d47b26baa')
+        CompanyFactory(id='0fb2379c-341c-4dc4-b225-bf8d47b26baa')
+        CompanyFactory(id='0fb4379c-341c-4dc4-b325-bf8d47b26baa')
+        CompanyFactory(id='0fb5379c-341c-4dc4-b425-bf8d47b26baa')
+
+        connections.get_connection().indices.refresh()
+
+        term = '0fb4379c-341c-4dc4-b325-bf8d47b26baa'
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'company'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert '0fb4379c-341c-4dc4-b325-bf8d47b26baa' == response.data['companies'][0]['id']
 
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)

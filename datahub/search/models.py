@@ -83,6 +83,8 @@ class MapDBModelToDict:
 
     MAPPINGS = {}
 
+    SEARCH_FIELDS = ()
+
     @classmethod
     def es_document(cls, dbmodel):
         """Creates Elasticsearch document."""
@@ -136,8 +138,9 @@ class Company(DocType, MapDBModelToDict):
     headquarter_type = _id_name_mapping()
     id = String(index='not_analyzed')
     modified_on = Date()
-    name = String(copy_to='name_keyword')
+    name = String(copy_to=['name_keyword', 'name_trigram'])
     name_keyword = String(analyzer='lowercase_keyword_analyzer')
+    name_trigram = String(analyzer='trigram_analyzer')
     one_list_account_owner = _contact_mapping('one_list_account_owner')
     parent = _id_name_mapping()
     registered_address_1 = String()
@@ -190,6 +193,10 @@ class Company(DocType, MapDBModelToDict):
         'orders', 'created_by', 'modified_by'
     )
 
+    SEARCH_FIELDS = (
+        'trading_address_country.name', 'uk_region.name', 'website',
+    )
+
     class Meta:
         """Default document meta data."""
 
@@ -206,8 +213,9 @@ class Contact(DocType, MapDBModelToDict):
     created_on = Date()
     modified_on = Date()
     id = String(index='not_analyzed')
-    name = String(copy_to='name_keyword')
+    name = String(copy_to=['name_keyword', 'name_trigram'])
     name_keyword = String(analyzer='lowercase_keyword_analyzer')
+    name_trigram = String(analyzer='trigram_analyzer')
     title = _id_name_mapping()
     first_name = String(copy_to='name')
     last_name = String(copy_to='name')
@@ -246,6 +254,10 @@ class Contact(DocType, MapDBModelToDict):
     IGNORED_FIELDS = (
         'interactions', 'servicedeliverys', 'investment_projects', 'orders',
         'created_by', 'modified_by'
+    )
+
+    SEARCH_FIELDS = (
+        'address_country.name', 'email', 'notes',
     )
 
     class Meta:
@@ -287,8 +299,9 @@ class InvestmentProject(DocType, MapDBModelToDict):
     uk_company = _id_name_mapping()
     investor_company = _id_name_mapping()
     investment_type = _id_name_mapping()
-    name = String(copy_to='name_keyword')
+    name = String(copy_to=['name_keyword', 'name_trigram'])
     name_keyword = String(analyzer='lowercase_keyword_analyzer')
+    name_trigram = String(analyzer='trigram_analyzer')
     r_and_d_budget = Boolean()
     non_fdi_r_and_d_budget = Boolean()
     new_tech_to_uk = Boolean()
@@ -350,6 +363,11 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'uk_region_locations', 'strategic_drivers',
         'client_considering_other_countries', 'cdms_project_code',
         'interactions', 'documents', 'created_by', 'modified_by'
+    )
+
+    SEARCH_FIELDS = (
+        'investor_company.name', 'business_activities.name', 'sector.name',
+        'intermediate_company.name', 'sector.name',
     )
 
     class Meta:
