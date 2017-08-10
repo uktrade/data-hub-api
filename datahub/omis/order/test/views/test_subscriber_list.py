@@ -58,6 +58,16 @@ class TestGetSubscriberList(APITestMixin):
             for adviser in advisers[:2]
         ]
 
+    def test_invalid_order(self):
+        """Test that calling GET on an invalid order returns 404."""
+        url = reverse(
+            'api-v3:omis:order:subscriber-list',
+            kwargs={'order_pk': '00000000-0000-0000-0000-000000000000'}
+        )
+        response = self.api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
 
 class TestChangeSubscriberList(APITestMixin):
     """Change subscriber list test case."""

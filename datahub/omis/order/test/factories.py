@@ -6,6 +6,9 @@ import factory
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import Country, Sector
+from datahub.core.test.factories import to_many_field
+
+from ..models import ServiceType
 
 
 class OrderFactory(factory.django.DjangoModelFactory):
@@ -18,6 +21,15 @@ class OrderFactory(factory.django.DjangoModelFactory):
     contact = factory.LazyAttribute(lambda o: ContactFactory(company=o.company))
     primary_market_id = Country.france.value.id
     sector_id = Sector.aerospace_assembly_aircraft.value.id
+
+    @to_many_field
+    def service_types(self):
+        """
+        Add support for setting service_types.
+        If nothing specified when instantiating the object, the value returned by
+        this method will be used by default.
+        """
+        return ServiceType.objects.filter(disabled_on__isnull=True).order_by('?')[:2]
 
     class Meta:  # noqa: D101
         model = 'order.Order'
