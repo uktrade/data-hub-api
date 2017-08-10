@@ -68,33 +68,6 @@ class TestSearch(APITestMixin):
                 {'count': 1, 'entity': 'contact'},
                 {'count': 1, 'entity': 'investment_project'}] == response.data['aggregations']
 
-    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
-    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
-    def test_basic_search_contact_by_country(self):
-        """Tests basic aggregate contacts query."""
-        ContactFactory(
-            first_name='john',
-            last_name='doe',
-            address_same_as_company=False,
-            address_1='first line',
-            address_town='test town',
-            address_country_id=constants.Country.united_states.value.id
-        )
-
-        connections.get_connection().indices.refresh()
-
-        term = 'United States'
-
-        url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': term,
-            'entity': 'contact'
-        })
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-        assert response.data['contacts'][0]['address_country']['name'] in term
-
     def test_basic_search_investment_projects(self):
         """Tests basic aggregate investment project query."""
         term = 'abc defg'
