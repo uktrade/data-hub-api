@@ -1,4 +1,5 @@
 from collections import defaultdict
+from itertools import chain
 
 import dateutil.parser
 from django.conf import settings
@@ -106,15 +107,17 @@ def get_basic_search_query(term, entities=None, field_order=None, offset=0, limi
 
     Also returns number of results in other entities.
     """
-    fields = set()
-    map(fields.update, [entity.SEARCH_FIELDS for entity in entities])
+    fields = set(chain.from_iterable([entity.SEARCH_FIELDS for entity in entities]))
+    # we need alphabetical order of fields preserved, so the query is deterministic
+    fields = sorted(fields)
+
     query = get_search_term_query(term, fields=fields)
     s = Search(index=settings.ES_INDEX).query(query)
     s = s.post_filter(
         Q('bool', should=[Q('term', _type=entity._doc_type.name) for entity in entities])
     )
-    s = get_sort_query(s, field_order=field_order)
 
+    s = get_sort_query(s, field_order=field_order)
     s.aggs.bucket(
         'count_by_type', 'terms', field='_type'
     )

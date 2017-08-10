@@ -127,9 +127,9 @@ class SearchContactAPIView(APIView):
     """Filtered contact search view."""
 
     SORT_BY_FIELDS = (
-        'archived', 'archived', 'created_on',
-        'modified_on', 'id', 'name', 'title.name', 'primary',
-        'telephone_countrycode', 'telephone_number',
+        'archived', 'created_on',
+        'modified_on', 'id', 'name', 'first_name', 'last_name',
+        'title.name', 'primary', 'telephone_countrycode', 'telephone_number',
         'email', 'address_same_as_company', 'address_town', 'address_county',
         'job_title', 'contactable_by_dit', 'contactable_by_dit_partners', 'contactable_by_email',
         'contactable_by_phone', 'address_country.name', 'adviser.name', 'archived_by.name',

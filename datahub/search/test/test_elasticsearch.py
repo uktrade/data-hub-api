@@ -15,8 +15,7 @@ def test_get_search_term_query():
                 {
                     'match_phrase': {
                         'name_keyword': {
-                            'query': 'hello',
-                            'boost': 2
+                            'query': 'hello', 'boost': 2
                         }
                     }
                 }, {
@@ -94,6 +93,29 @@ def test_get_basic_search_query():
                             'name_trigram': {
                                 'query': 'test'
                             }
+                        }
+                    }, {
+                        'nested': {
+                            'path': 'address_country',
+                            'query': {
+                                'bool': {
+                                    'must': [
+                                        {
+                                            'match': {
+                                                'address_country.name': 'test'
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }, {
+                        'match': {
+                            'email': 'test'
+                        }
+                    }, {
+                        'match': {
+                            'notes': 'test'
                         }
                     }
                 ]

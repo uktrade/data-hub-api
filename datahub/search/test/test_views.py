@@ -6,7 +6,7 @@ from elasticsearch_dsl.connections import connections
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import CompanyFactory
+from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import (
     APITestMixin, synchronous_executor_submit, synchronous_transaction_on_commit,
@@ -67,6 +67,33 @@ class TestSearch(APITestMixin):
         assert [{'count': 2, 'entity': 'company'},
                 {'count': 1, 'entity': 'contact'},
                 {'count': 1, 'entity': 'investment_project'}] == response.data['aggregations']
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_basic_search_contact_by_country(self):
+        """Tests basic aggregate contacts query."""
+        ContactFactory(
+            first_name='john',
+            last_name='doe',
+            address_same_as_company=False,
+            address_1='first line',
+            address_town='test town',
+            address_country_id=constants.Country.united_states.value.id
+        )
+
+        connections.get_connection().indices.refresh()
+
+        term = 'United States'
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'contact'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert response.data['contacts'][0]['address_country']['name'] in term
 
     def test_basic_search_investment_projects(self):
         """Tests basic aggregate investment project query."""
@@ -374,6 +401,32 @@ class TestSearch(APITestMixin):
                 'water 3',
                 'water 2',
                 'Water 1'] == [company['name'] for company in response.data['companies']]
+
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_contact_sort_by_last_name_desc(self):
+        """Tests sorting in descending order."""
+        ContactFactory(first_name='test_name', last_name='abcdef')
+        ContactFactory(first_name='test_name', last_name='bcdefg')
+        ContactFactory(first_name='test_name', last_name='cdefgh')
+        ContactFactory(first_name='test_name', last_name='defghi')
+
+        connections.get_connection().indices.refresh()
+
+        term = 'test_name'
+
+        url = reverse('api-v3:search:contact')
+        response = self.api_client.post(url, {
+            'original_query': term,
+            'sortby': 'last_name:desc',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 4
+        assert ['defghi',
+                'cdefgh',
+                'bcdefg',
+                'abcdef'] == [contact['last_name'] for contact in response.data['results']]
 
     @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
     @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
