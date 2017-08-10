@@ -65,6 +65,11 @@ class Interaction(InteractionAbstract):
         on_delete=models.CASCADE
     )
 
+    class Meta(InteractionAbstract.Meta):  # noqa: D101
+        indexes = [
+            models.Index(fields=['-date', '-created_on']),
+        ]
+
 
 class ServiceOffer(models.Model):
     """Service offer."""
