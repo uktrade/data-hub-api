@@ -1,4 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import OrderingFilter
 
 from datahub.core.viewsets import CoreViewSetV1
 from datahub.interaction.queryset import get_interaction_queryset
@@ -18,5 +19,8 @@ class InteractionViewSetV1(CoreViewSetV1):
     queryset = get_interaction_queryset()
     filter_backends = (
         DjangoFilterBackend,
+        OrderingFilter,
     )
     filter_fields = ['company_id', 'contact_id', 'investment_project_id']
+    ordering_fields = ('date', 'created_on')
+    ordering = ('-date', '-created_on')
