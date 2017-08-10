@@ -1,3 +1,5 @@
+from django.utils.timezone import now
+
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -7,7 +9,7 @@ from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
 from datahub.core.validate_utils import DataCombiner
 from datahub.metadata.models import Country, Sector, Team
 
-from .models import Order, OrderAssignee, OrderSubscriber
+from .models import Order, OrderAssignee, OrderSubscriber, ServiceType
 
 
 class ServiceTypeSerializer(ConstantModelSerializer):
@@ -32,6 +34,8 @@ class OrderSerializer(serializers.ModelSerializer):
     primary_market = NestedRelatedField(Country)
     sector = NestedRelatedField(Sector, required=False, allow_null=True)
 
+    service_types = NestedRelatedField(ServiceType, many=True, required=False)
+
     class Meta:  # noqa: D101
         model = Order
         fields = [
@@ -45,6 +49,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'contact',
             'primary_market',
             'sector',
+            'service_types'
         ]
 
     def validate(self, data):
@@ -69,6 +74,24 @@ class OrderSerializer(serializers.ModelSerializer):
             if data_combiner.get_value('primary_market') != self.instance.primary_market:
                 raise serializers.ValidationError({
                     'primary_market': 'The primary market cannot be changed after creation.'
+                })
+
+        # cannot use a disabled service types
+        if 'service_types' in data:
+            if self.instance:
+                created_on = self.instance.created_on
+            else:
+                created_on = now()
+
+            disabled_service_types = [
+                service_type.name
+                for service_type in data['service_types']
+                if service_type.was_disabled_on(created_on)
+            ]
+
+            if disabled_service_types:
+                raise serializers.ValidationError({
+                    'service_types': f'"{", ".join(disabled_service_types)}" disabled.'
                 })
 
         return data
