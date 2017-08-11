@@ -36,6 +36,15 @@ class OrderSerializer(serializers.ModelSerializer):
 
     service_types = NestedRelatedField(ServiceType, many=True, required=False)
 
+    description = serializers.CharField(allow_blank=True, required=False)
+    contacts_not_to_approach = serializers.CharField(allow_blank=True, required=False)
+
+    # legacy fields
+    product_info = serializers.CharField(read_only=True)
+    further_info = serializers.CharField(read_only=True)
+    existing_agents = serializers.CharField(read_only=True)
+    permission_to_approach_contacts = serializers.CharField(read_only=True)
+
     class Meta:  # noqa: D101
         model = Order
         fields = [
@@ -49,7 +58,13 @@ class OrderSerializer(serializers.ModelSerializer):
             'contact',
             'primary_market',
             'sector',
-            'service_types'
+            'service_types',
+            'description',
+            'contacts_not_to_approach',
+            'product_info',
+            'further_info',
+            'existing_agents',
+            'permission_to_approach_contacts',
         ]
 
     def validate(self, data):
