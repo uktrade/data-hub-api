@@ -107,7 +107,7 @@ def get_basic_search_query(term, entities=None, field_order=None, offset=0, limi
 
     Also returns number of results in other entities.
     """
-    fields = set(chain.from_iterable((entity.SEARCH_FIELDS for entity in entities)))
+    fields = set(chain.from_iterable(entity.SEARCH_FIELDS for entity in entities))
     # we need alphabetical order of fields preserved, so the query is deterministic
     fields = sorted(fields)
 
