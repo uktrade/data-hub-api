@@ -21,6 +21,12 @@ class OrderFactory(factory.django.DjangoModelFactory):
     contact = factory.LazyAttribute(lambda o: ContactFactory(company=o.company))
     primary_market_id = Country.france.value.id
     sector_id = Sector.aerospace_assembly_aircraft.value.id
+    description = factory.Faker('text')
+    contacts_not_to_approach = factory.Faker('text')
+    product_info = factory.Faker('text')
+    further_info = factory.Faker('text')
+    existing_agents = factory.Faker('text')
+    permission_to_approach_contacts = factory.Faker('text')
 
     @to_many_field
     def service_types(self):
