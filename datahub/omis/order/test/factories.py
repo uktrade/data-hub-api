@@ -27,6 +27,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
     further_info = factory.Faker('text')
     existing_agents = factory.Faker('text')
     permission_to_approach_contacts = factory.Faker('text')
+    delivery_date = factory.Faker('future_date')
 
     @to_many_field
     def service_types(self):

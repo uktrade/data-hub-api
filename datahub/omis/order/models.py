@@ -74,6 +74,8 @@ class Order(BaseModel):
         help_text='Are there contacts that DIT should not approach?'
     )
 
+    delivery_date = models.DateField(blank=True, null=True)
+
     # legacy fields, only meant to be used in readonly mode as reference
     product_info = models.TextField(
         blank=True, editable=False,
