@@ -39,6 +39,8 @@ class OrderSerializer(serializers.ModelSerializer):
     description = serializers.CharField(allow_blank=True, required=False)
     contacts_not_to_approach = serializers.CharField(allow_blank=True, required=False)
 
+    delivery_date = serializers.DateField(required=False, allow_null=True)
+
     # legacy fields
     product_info = serializers.CharField(read_only=True)
     further_info = serializers.CharField(read_only=True)
@@ -65,6 +67,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'further_info',
             'existing_agents',
             'permission_to_approach_contacts',
+            'delivery_date',
         ]
 
     def validate(self, data):

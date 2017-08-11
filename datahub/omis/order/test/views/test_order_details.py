@@ -44,6 +44,7 @@ class TestAddOrderDetails(APITestMixin):
                 ],
                 'description': 'Description test',
                 'contacts_not_to_approach': 'Contacts not to approach details',
+                'delivery_date': '2017-04-20',
             },
             format='json'
         )
@@ -90,6 +91,7 @@ class TestAddOrderDetails(APITestMixin):
             'further_info': '',
             'existing_agents': '',
             'permission_to_approach_contacts': '',
+            'delivery_date': '2017-04-20',
         }
 
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
@@ -115,6 +117,7 @@ class TestAddOrderDetails(APITestMixin):
         assert response.json()['service_types'] == []
         assert response.json()['description'] == ''
         assert response.json()['contacts_not_to_approach'] == ''
+        assert response.json()['delivery_date'] is None
 
     def test_fails_if_contact_not_from_company(self):
         """
@@ -227,6 +230,7 @@ class TestChangeOrderDetails(APITestMixin):
                 ],
                 'description': 'Updated description',
                 'contacts_not_to_approach': 'Updated contacts not to approach',
+                'delivery_date': '2017-04-21',
             },
             format='json'
         )
@@ -273,6 +277,7 @@ class TestChangeOrderDetails(APITestMixin):
             'further_info': order.further_info,
             'existing_agents': order.existing_agents,
             'permission_to_approach_contacts': order.permission_to_approach_contacts,
+            'delivery_date': '2017-04-21',
         }
 
     def test_fails_if_contact_not_from_company(self):
@@ -494,6 +499,7 @@ class TestViewOrderDetails(APITestMixin):
             'further_info': order.further_info,
             'existing_agents': order.existing_agents,
             'permission_to_approach_contacts': order.permission_to_approach_contacts,
+            'delivery_date': order.delivery_date.isoformat()
         }
 
     def test_not_found(self):
