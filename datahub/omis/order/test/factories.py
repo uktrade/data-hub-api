@@ -3,7 +3,6 @@
 import uuid
 
 import factory
-import factory.fuzzy
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import Country, Sector
@@ -22,12 +21,12 @@ class OrderFactory(factory.django.DjangoModelFactory):
     contact = factory.LazyAttribute(lambda o: ContactFactory(company=o.company))
     primary_market_id = Country.france.value.id
     sector_id = Sector.aerospace_assembly_aircraft.value.id
-    description = factory.fuzzy.FuzzyText()
-    contacts_not_to_approach = factory.fuzzy.FuzzyText()
-    product_info = factory.fuzzy.FuzzyText()
-    further_info = factory.fuzzy.FuzzyText()
-    existing_agents = factory.fuzzy.FuzzyText()
-    permission_to_approach_contacts = factory.fuzzy.FuzzyText()
+    description = factory.Faker('text')
+    contacts_not_to_approach = factory.Faker('text')
+    product_info = factory.Faker('text')
+    further_info = factory.Faker('text')
+    existing_agents = factory.Faker('text')
+    permission_to_approach_contacts = factory.Faker('text')
 
     @to_many_field
     def service_types(self):
