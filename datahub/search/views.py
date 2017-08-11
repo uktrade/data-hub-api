@@ -14,7 +14,8 @@ class SearchBasicAPIView(APIView):
     http_method_names = ('get',)
 
     SORT_BY_FIELDS = (
-        'name', 'created_on',
+        'created_on',
+        'name',
     )
 
     ENTITY_BY_NAME = {
@@ -73,19 +74,44 @@ class SearchCompanyAPIView(APIView):
     """Filtered company search view."""
 
     SORT_BY_FIELDS = (
-        'account_manager.name', 'alias', 'archived', 'archived_by',
-        'contacts.name', 'business_type.name',
-        'classification.name', 'company_number', 'companies_house_data.company_number',
-        'created_on', 'employee_range.name', 'headquarter_type.name', 'id', 'modified_on',
-        'name', 'registered_address_town', 'sector.name', 'trading_address_town',
-        'turnover_range.name', 'uk_region.name', 'uk_based',
-        'export_to_countries.name', 'future_interest_countries.name',
+        'account_manager.name',
+        'alias',
+        'archived',
+        'archived_by',
+        'business_type.name',
+        'classification.name',
+        'companies_house_data.company_number',
+        'company_number',
+        'contacts.name',
+        'created_on',
+        'employee_range.name',
+        'export_to_countries.name',
+        'future_interest_countries.name',
+        'headquarter_type.name',
+        'id',
+        'modified_on',
+        'name',
+        'registered_address_town',
+        'sector.name',
+        'trading_address_town',
+        'turnover_range.name',
+        'uk_based',
+        'uk_region.name'
     )
 
     FILTER_FIELDS = (
-        'name', 'alias', 'sector', 'account_manager', 'export_to_country',
-        'future_interest_country', 'description', 'uk_region', 'uk_based',
-        'trading_address_town', 'trading_address_country', 'trading_address_postcode',
+        'account_manager',
+        'alias',
+        'description',
+        'export_to_country',
+        'future_interest_country',
+        'name',
+        'sector',
+        'trading_address_country',
+        'trading_address_postcode',
+        'trading_address_town',
+        'uk_based',
+        'uk_region'
     )
 
     http_method_names = ('post',)
@@ -127,17 +153,39 @@ class SearchContactAPIView(APIView):
     """Filtered contact search view."""
 
     SORT_BY_FIELDS = (
-        'archived', 'archived', 'created_on',
-        'modified_on', 'id', 'name', 'title.name', 'primary',
-        'telephone_countrycode', 'telephone_number',
-        'email', 'address_same_as_company', 'address_town', 'address_county',
-        'job_title', 'contactable_by_dit', 'contactable_by_dit_partners', 'contactable_by_email',
-        'contactable_by_phone', 'address_country.name', 'adviser.name', 'archived_by.name',
+        'address_country.name',
+        'address_county',
+        'address_same_as_company',
+        'address_town',
+        'adviser.name',
+        'archived',
+        'archived_by.name',
         'company.name',
+        'contactable_by_dit',
+        'contactable_by_dit_partners',
+        'contactable_by_email',
+        'contactable_by_phone',
+        'created_on',
+        'email',
+        'first_name',
+        'id',
+        'job_title',
+        'last_name',
+        'modified_on',
+        'name',
+        'primary',
+        'telephone_countrycode',
+        'telephone_number',
+        'title.name'
     )
 
     FILTER_FIELDS = (
-        'first_name', 'last_name', 'job_title', 'company', 'adviser', 'notes',
+        'adviser',
+        'company',
+        'first_name',
+        'job_title',
+        'last_name',
+        'notes'
     )
 
     http_method_names = ('post',)
@@ -179,30 +227,63 @@ class SearchInvestmentProjectAPIView(APIView):
     """Filtered investment project search view."""
 
     SORT_BY_FIELDS = (
-        'id', 'approved_commitment_to_invest',
-        'approved_fdi', 'approved_good_value',
-        'approved_high_value', 'approved_landed',
-        'approved_non_fdi', 'actual_land_date',
-        'business_activities.name', 'client_contacts.name',
-        'client_relationship_manager.name', 'project_manager.name',
-        'project_assurance_adviser.name', 'team_members.name',
-        'archived', 'archived_by.name', 'created_on', 'modified_on',
-        'estimated_land_date', 'fdi_type.name', 'intermediate_company.name',
-        'uk_company.name', 'investor_company.name', 'investment_type.name', 'name',
-        'r_and_d_budget', 'non_fdi_r_and_d_budget', 'new_tech_to_uk', 'export_revenue',
-        'site_decided', 'nda_signed', 'government_assistance',
-        'client_cannot_provide_total_investment', 'total_investment',
-        'foreign_equity_investment', 'number_new_jobs', 'non_fdi_type.name',
-        'stage.name', 'project_code', 'project_shareable',
-        'referral_source_activity.name', 'referral_source_activity_marketing.name',
-        'referral_source_activity_website.name', 'referral_source_activity_event',
-        'referral_source_advisor.name', 'sector.name', 'average_salary.name',
+        'actual_land_date',
+        'approved_commitment_to_invest',
+        'approved_fdi',
+        'approved_good_value',
+        'approved_high_value',
+        'approved_landed',
+        'approved_non_fdi',
+        'archived',
+        'archived_by.name',
+        'average_salary.name',
+        'business_activities.name',
+        'client_cannot_provide_total_investment',
+        'client_contacts.name',
+        'client_relationship_manager.name',
+        'created_on',
+        'estimated_land_date',
+        'export_revenue',
+        'fdi_type.name',
+        'foreign_equity_investment',
+        'government_assistance',
+        'id',
+        'intermediate_company.name',
+        'investment_type.name',
+        'investor_company.name',
+        'modified_on',
+        'name',
+        'nda_signed',
+        'new_tech_to_uk',
+        'non_fdi_r_and_d_budget',
+        'non_fdi_type.name',
+        'number_new_jobs',
+        'project_assurance_adviser.name',
+        'project_code',
+        'project_manager.name',
+        'project_shareable',
+        'r_and_d_budget',
+        'referral_source_activity.name',
+        'referral_source_activity_event',
+        'referral_source_activity_marketing.name',
+        'referral_source_activity_website.name',
+        'referral_source_advisor.name',
+        'sector.name',
+        'site_decided',
+        'stage.name',
+        'team_members.name',
+        'total_investment',
+        'uk_company.name'
     )
 
     FILTER_FIELDS = (
-        'client_relationship_manager', 'estimated_land_date_after',
-        'estimated_land_date_before', 'investor_company', 'investment_type',
-        'stage', 'sector'
+        'client_relationship_manager',
+        'estimated_land_date_after',
+        'estimated_land_date_before',
+        'investment_type',
+        'investor_company',
+        'sector',
+        'stage'
     )
 
     http_method_names = ('post',)
