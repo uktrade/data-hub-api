@@ -65,6 +65,32 @@ class Order(BaseModel):
         related_name="%(class)ss",  # noqa: Q000
         blank=True
     )
+    description = models.TextField(
+        blank=True,
+        help_text='Description of the work needed.'
+    )
+    contacts_not_to_approach = models.TextField(
+        blank=True,
+        help_text='Are there contacts that DIT should not approach?'
+    )
+
+    # legacy fields, only meant to be used in readonly mode as reference
+    product_info = models.TextField(
+        blank=True, editable=False,
+        help_text='Legacy field. What is the product?'
+    )
+    further_info = models.TextField(
+        blank=True, editable=False,
+        help_text='Legacy field. Further information.'
+    )
+    existing_agents = models.TextField(
+        blank=True, editable=False,
+        help_text='Legacy field. Details of any existing agents.'
+    )
+    permission_to_approach_contacts = models.TextField(
+        blank=True, editable=False,
+        help_text='Legacy field. Can DIT speak to the contacts?'
+    )
 
     def __str__(self):
         """Human-readable representation"""

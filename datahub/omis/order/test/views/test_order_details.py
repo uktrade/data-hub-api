@@ -23,8 +23,8 @@ class TestAddOrderDetails(APITestMixin):
     """Add Order details test case."""
 
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
-    def test_success(self):
-        """Test a successful call to create an Order."""
+    def test_success_complete(self):
+        """Test a successful call to create an Order with all possible fields."""
         company = CompanyFactory()
         contact = ContactFactory(company=company)
         country = Country.france.value
@@ -35,23 +35,15 @@ class TestAddOrderDetails(APITestMixin):
         response = self.api_client.post(
             url,
             {
-                'company': {
-                    'id': company.pk
-                },
-                'contact': {
-                    'id': contact.pk
-                },
-                'primary_market': {
-                    'id': country.id
-                },
-                'sector': {
-                    'id': sector.id
-                },
+                'company': {'id': company.pk},
+                'contact': {'id': contact.pk},
+                'primary_market': {'id': country.id},
+                'sector': {'id': sector.id},
                 'service_types': [
-                    {
-                        'id': service_type.id
-                    },
+                    {'id': service_type.pk},
                 ],
+                'description': 'Description test',
+                'contacts_not_to_approach': 'Contacts not to approach details',
             },
             format='json'
         )
@@ -62,12 +54,12 @@ class TestAddOrderDetails(APITestMixin):
             'reference': response.json()['reference'],
             'created_on': '2017-04-18T13:00:00',
             'created_by': {
-                'id': str(self.user.id),
+                'id': str(self.user.pk),
                 'name': self.user.name
             },
             'modified_on': '2017-04-18T13:00:00',
             'modified_by': {
-                'id': str(self.user.id),
+                'id': str(self.user.pk),
                 'name': self.user.name
             },
             'company': {
@@ -88,10 +80,16 @@ class TestAddOrderDetails(APITestMixin):
             },
             'service_types': [
                 {
-                    'id': str(service_type.id),
+                    'id': str(service_type.pk),
                     'name': service_type.name
                 }
             ],
+            'description': 'Description test',
+            'contacts_not_to_approach': 'Contacts not to approach details',
+            'product_info': '',
+            'further_info': '',
+            'existing_agents': '',
+            'permission_to_approach_contacts': '',
         }
 
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
@@ -105,15 +103,9 @@ class TestAddOrderDetails(APITestMixin):
         response = self.api_client.post(
             url,
             {
-                'company': {
-                    'id': company.pk
-                },
-                'contact': {
-                    'id': contact.pk
-                },
-                'primary_market': {
-                    'id': country.id
-                },
+                'company': {'id': company.pk},
+                'contact': {'id': contact.pk},
+                'primary_market': {'id': country.id},
             },
             format='json'
         )
@@ -121,6 +113,8 @@ class TestAddOrderDetails(APITestMixin):
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json()['sector'] is None
         assert response.json()['service_types'] == []
+        assert response.json()['description'] == ''
+        assert response.json()['contacts_not_to_approach'] == ''
 
     def test_fails_if_contact_not_from_company(self):
         """
@@ -134,15 +128,9 @@ class TestAddOrderDetails(APITestMixin):
         response = self.api_client.post(
             url,
             {
-                'company': {
-                    'id': company.pk
-                },
-                'contact': {
-                    'id': contact.pk
-                },
-                'primary_market': {
-                    'id': country.id
-                },
+                'company': {'id': company.pk},
+                'contact': {'id': contact.pk},
+                'primary_market': {'id': country.id},
             },
             format='json'
         )
@@ -174,19 +162,11 @@ class TestAddOrderDetails(APITestMixin):
         response = self.api_client.post(
             url,
             {
-                'company': {
-                    'id': company.pk
-                },
-                'contact': {
-                    'id': ContactFactory(company=company).pk
-                },
-                'primary_market': {
-                    'id': Country.france.value.id
-                },
+                'company': {'id': company.pk},
+                'contact': {'id': ContactFactory(company=company).pk},
+                'primary_market': {'id': Country.france.value.id},
                 'service_types': [
-                    {
-                        'id': disabled_service_type.id
-                    },
+                    {'id': disabled_service_type.pk},
                 ],
             },
             format='json'
@@ -196,6 +176,33 @@ class TestAddOrderDetails(APITestMixin):
         assert response.json() == {
             'service_types': [f'"{disabled_service_type.name}" disabled.']
         }
+
+    def test_cannot_post_legacy_fields(self):
+        """Test that if legacy fields are passed in when creating an order, they get ignored."""
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
+        country = Country.france.value
+
+        url = reverse('api-v3:omis:order:list')
+        response = self.api_client.post(
+            url,
+            {
+                'company': {'id': company.pk},
+                'contact': {'id': contact.pk},
+                'primary_market': {'id': country.id},
+                'product_info': 'lorem ipsum',
+                'further_info': 'lorem ipsum',
+                'existing_agents': 'lorem ipsum',
+                'permission_to_approach_contacts': 'lorem ipsum',
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.json()['product_info'] == ''
+        assert response.json()['further_info'] == ''
+        assert response.json()['existing_agents'] == ''
+        assert response.json()['permission_to_approach_contacts'] == ''
 
 
 class TestChangeOrderDetails(APITestMixin):
@@ -213,45 +220,41 @@ class TestChangeOrderDetails(APITestMixin):
         response = self.api_client.patch(
             url,
             {
-                'contact': {
-                    'id': new_contact.id
-                },
-                'sector': {
-                    'id': new_sector.id
-                },
+                'contact': {'id': new_contact.pk},
+                'sector': {'id': new_sector.id},
                 'service_types': [
-                    {
-                        'id': str(new_service_type.id)
-                    }
+                    {'id': str(new_service_type.pk)},
                 ],
+                'description': 'Updated description',
+                'contacts_not_to_approach': 'Updated contacts not to approach',
             },
             format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
-            'id': str(order.id),
+            'id': str(order.pk),
             'reference': order.reference,
             'created_on': '2017-04-18T13:00:00',
             'created_by': {
-                'id': str(order.created_by.id),
+                'id': str(order.created_by.pk),
                 'name': order.created_by.name
             },
             'modified_on': '2017-04-18T13:00:00',
             'modified_by': {
-                'id': str(self.user.id),
+                'id': str(self.user.pk),
                 'name': self.user.name
             },
             'company': {
-                'id': str(order.company.id),
+                'id': str(order.company.pk),
                 'name': order.company.name
             },
             'contact': {
-                'id': str(new_contact.id),
+                'id': str(new_contact.pk),
                 'name': new_contact.name
             },
             'primary_market': {
-                'id': str(order.primary_market.id),
+                'id': str(order.primary_market.pk),
                 'name': order.primary_market.name
             },
             'sector': {
@@ -260,10 +263,16 @@ class TestChangeOrderDetails(APITestMixin):
             },
             'service_types': [
                 {
-                    'id': str(new_service_type.id),
+                    'id': str(new_service_type.pk),
                     'name': new_service_type.name
                 }
-            ]
+            ],
+            'description': 'Updated description',
+            'contacts_not_to_approach': 'Updated contacts not to approach',
+            'product_info': order.product_info,
+            'further_info': order.further_info,
+            'existing_agents': order.existing_agents,
+            'permission_to_approach_contacts': order.permission_to_approach_contacts,
         }
 
     def test_fails_if_contact_not_from_company(self):
@@ -277,9 +286,7 @@ class TestChangeOrderDetails(APITestMixin):
         response = self.api_client.patch(
             url,
             {
-                'contact': {
-                    'id': other_contact.id
-                },
+                'contact': {'id': other_contact.pk},
             },
             format='json'
         )
@@ -299,12 +306,8 @@ class TestChangeOrderDetails(APITestMixin):
         response = self.api_client.patch(
             url,
             {
-                'company': {
-                    'id': company.id
-                },
-                'contact': {
-                    'id': contact.id
-                },
+                'company': {'id': company.pk},
+                'contact': {'id': contact.pk},
             },
             format='json'
         )
@@ -322,9 +325,7 @@ class TestChangeOrderDetails(APITestMixin):
         response = self.api_client.patch(
             url,
             {
-                'primary_market': {
-                    'id': Country.greece.value.id
-                },
+                'primary_market': {'id': Country.greece.value.id},
             },
             format='json'
         )
@@ -342,9 +343,7 @@ class TestChangeOrderDetails(APITestMixin):
         response = self.api_client.patch(
             url,
             {
-                'contact': {
-                    'id': '00000000-0000-0000-0000-000000000000'
-                },
+                'contact': {'id': '00000000-0000-0000-0000-000000000000'},
             },
             format='json'
         )
@@ -367,9 +366,7 @@ class TestChangeOrderDetails(APITestMixin):
             url,
             {
                 'service_types': [
-                    {
-                        'id': disabled_service_type.id
-                    },
+                    {'id': disabled_service_type.pk},
                 ]
             },
             format='json'
@@ -407,9 +404,7 @@ class TestChangeOrderDetails(APITestMixin):
             url,
             {
                 'service_types': [
-                    {
-                        'id': disabled_in_feb.id
-                    },
+                    {'id': disabled_in_feb.pk},
                 ]
             },
             format='json'
@@ -418,10 +413,33 @@ class TestChangeOrderDetails(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['service_types'] == [
             {
-                'id': str(disabled_in_feb.id),
+                'id': str(disabled_in_feb.pk),
                 'name': disabled_in_feb.name
             }
         ]
+
+    def test_cannot_change_legacy_fields(self):
+        """Test that if legacy fields are passed in when updating an order, they get ignored."""
+        order = OrderFactory()
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(
+            url,
+            {
+                'product_info': 'Updated product info',
+                'further_info': 'Updated further info',
+                'existing_agents': 'Updated existing agents',
+                'permission_to_approach_contacts': 'Updated permission to approach contacts',
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['product_info'] == order.product_info
+        assert response.json()['further_info'] == order.further_info
+        assert response.json()['existing_agents'] == order.existing_agents
+        assert response.json()['permission_to_approach_contacts'] == \
+            order.permission_to_approach_contacts
 
 
 class TestViewOrderDetails(APITestMixin):
@@ -436,28 +454,28 @@ class TestViewOrderDetails(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
-            'id': str(order.id),
+            'id': str(order.pk),
             'reference': order.reference,
             'created_on': order.created_on.isoformat(),
             'created_by': {
-                'id': str(order.created_by.id),
+                'id': str(order.created_by.pk),
                 'name': order.created_by.name
             },
             'modified_on': order.modified_on.isoformat(),
             'modified_by': {
-                'id': str(order.modified_by.id),
+                'id': str(order.modified_by.pk),
                 'name': order.modified_by.name
             },
             'company': {
-                'id': str(order.company.id),
+                'id': str(order.company.pk),
                 'name': order.company.name
             },
             'contact': {
-                'id': str(order.contact.id),
+                'id': str(order.contact.pk),
                 'name': order.contact.name
             },
             'primary_market': {
-                'id': str(order.primary_market.id),
+                'id': str(order.primary_market.pk),
                 'name': order.primary_market.name
             },
             'sector': {
@@ -466,19 +484,23 @@ class TestViewOrderDetails(APITestMixin):
             },
             'service_types': [
                 {
-                    'id': str(service_type.id),
+                    'id': str(service_type.pk),
                     'name': service_type.name
                 } for service_type in order.service_types.all()
-            ]
+            ],
+            'description': order.description,
+            'contacts_not_to_approach': order.contacts_not_to_approach,
+            'product_info': order.product_info,
+            'further_info': order.further_info,
+            'existing_agents': order.existing_agents,
+            'permission_to_approach_contacts': order.permission_to_approach_contacts,
         }
 
     def test_not_found(self):
         """Test 404 when getting a non-existing order"""
         url = reverse(
             'api-v3:omis:order:detail',
-            kwargs={
-                'pk': '00000000-0000-0000-0000-000000000000'
-            }
+            kwargs={'pk': '00000000-0000-0000-0000-000000000000'}
         )
         response = self.api_client.get(url)
 
