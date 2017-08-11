@@ -187,14 +187,25 @@ class Company(DocType, MapDBModelToDict):
     }
 
     IGNORED_FIELDS = (
-        'children', 'servicedeliverys', 'investor_investment_projects',
-        'intermediate_investment_projects', 'investee_projects',
-        'tree_id', 'lft', 'rght', 'business_leads', 'interactions',
-        'orders', 'created_by', 'modified_by'
+        'business_leads',
+        'children',
+        'created_by',
+        'interactions',
+        'intermediate_investment_projects',
+        'investee_projects',
+        'investor_investment_projects',
+        'lft',
+        'modified_by',
+        'orders',
+        'rght',
+        'servicedeliverys',
+        'tree_id'
     )
 
     SEARCH_FIELDS = (
-        'trading_address_country.name', 'uk_region.name', 'website',
+        'trading_address_country.name',
+        'uk_region.name',
+        'website',
     )
 
     class Meta:
@@ -213,12 +224,12 @@ class Contact(DocType, MapDBModelToDict):
     created_on = Date()
     modified_on = Date()
     id = String(index='not_analyzed')
-    name = String(copy_to=['name_keyword', 'name_trigram'])
+    name = String()
     name_keyword = String(analyzer='lowercase_keyword_analyzer')
     name_trigram = String(analyzer='trigram_analyzer')
     title = _id_name_mapping()
-    first_name = String(copy_to='name')
-    last_name = String(copy_to='name')
+    first_name = String(copy_to=['name', 'name_keyword', 'name_trigram'])
+    last_name = String(copy_to=['name', 'name_keyword', 'name_trigram'])
     primary = Boolean()
     telephone_countrycode = String(index='not_analyzed')
     telephone_number = String(index='not_analyzed')
@@ -252,12 +263,18 @@ class Contact(DocType, MapDBModelToDict):
     }
 
     IGNORED_FIELDS = (
-        'interactions', 'servicedeliverys', 'investment_projects', 'orders',
-        'created_by', 'modified_by'
+        'created_by',
+        'interactions',
+        'investment_projects',
+        'modified_by',
+        'orders',
+        'servicedeliverys'
     )
 
     SEARCH_FIELDS = (
-        'address_country.name', 'email', 'notes',
+        'address_country.name',
+        'email',
+        'notes',
     )
 
     class Meta:
@@ -359,15 +376,23 @@ class InvestmentProject(DocType, MapDBModelToDict):
     }
 
     IGNORED_FIELDS = (
-        'investmentprojectcode', 'competitor_countries',
-        'uk_region_locations', 'strategic_drivers',
-        'client_considering_other_countries', 'cdms_project_code',
-        'interactions', 'documents', 'created_by', 'modified_by'
+        'cdms_project_code',
+        'client_considering_other_countries',
+        'competitor_countries',
+        'created_by',
+        'documents',
+        'interactions',
+        'investmentprojectcode',
+        'modified_by',
+        'strategic_drivers',
+        'uk_region_locations'
     )
 
     SEARCH_FIELDS = (
-        'investor_company.name', 'business_activities.name', 'sector.name',
-        'intermediate_company.name', 'sector.name',
+        'business_activities.name',
+        'intermediate_company.name',
+        'investor_company.name',
+        'sector.name',
     )
 
     class Meta:
