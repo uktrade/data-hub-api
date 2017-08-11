@@ -169,6 +169,7 @@ class SubscribedAdviserSerializer(serializers.Serializer):
     id = serializers.UUIDField(validators=[existing_adviser])
     first_name = serializers.CharField(read_only=True)
     last_name = serializers.CharField(read_only=True)
+    name = serializers.CharField(read_only=True)
     dit_team = NestedRelatedField(Team, read_only=True)
 
     class Meta:  # noqa: D101
