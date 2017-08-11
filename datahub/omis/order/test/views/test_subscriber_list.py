@@ -50,6 +50,7 @@ class TestGetSubscriberList(APITestMixin):
                 'id': str(adviser.id),
                 'first_name': adviser.first_name,
                 'last_name': adviser.last_name,
+                'name': adviser.name,
                 'dit_team': {
                     'id': str(adviser.dit_team.id),
                     'name': adviser.dit_team.name
