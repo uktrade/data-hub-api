@@ -84,7 +84,9 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'uk_company': dict_utils._id_name_dict,
         'investment_type': dict_utils._id_name_dict,
         'non_fdi_type': dict_utils._id_name_dict,
-        'operations_commenced_documents': lambda col: [dict_utils._id_uri_dict(c) for c in col.all()],
+        'operations_commenced_documents': lambda col: [
+            dict_utils._id_uri_dict(c) for c in col.all()
+        ],
         'stage': dict_utils._id_name_dict,
         'referral_source_activity': dict_utils._id_name_dict,
         'referral_source_activity_marketing': dict_utils._id_name_dict,
