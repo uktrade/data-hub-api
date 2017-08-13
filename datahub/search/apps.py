@@ -1,3 +1,4 @@
+from functools import lru_cache
 from importlib import import_module
 
 from django.apps import AppConfig
@@ -17,12 +18,15 @@ class SearchApp:
     """Used to configure ES search modules to be used within Data Hub."""
 
     name = None
+    plural_name = None
     ESModel = None
 
     def __init__(self, mod):
-        """Initialise all ES components needed for the search."""
+        """Create this search app without initialising any ES config."""
         self.mod = mod
 
+    def init_all(self):
+        """Initialise all ES configs."""
         self.init_es()
         self.init_signals()
 
@@ -41,6 +45,22 @@ class SearchApp:
         import_module(f'{self.mod}.signals')
 
 
+@lru_cache(maxsize=None)
+def get_search_apps():
+    """Registers all search apps specified in `SEARCH_APPS`."""
+    search_apps = []
+
+    for search_mod in SEARCH_APPS:
+        mod_path, _, cls_name = search_mod.rpartition('.')
+        mod = import_module(mod_path)
+        SearchClass = getattr(mod, cls_name)  # noqa: N806
+
+        app = SearchClass(mod_path)
+        search_apps.append(app)
+
+    return search_apps
+
+
 class SearchConfig(AppConfig):
     """Configures Elasticsearch connection when ready."""
 
@@ -52,19 +72,10 @@ class SearchConfig(AppConfig):
         super().__init__(*args, **kwargs)
         self.search_apps = {}
 
-    def _register_search_apps(self):
-        """Registers all search apps specified in `SEARCH_APPS`."""
-        for search_mod in SEARCH_APPS:
-            mod_path, _, cls_name = search_mod.rpartition('.')
-            mod = import_module(mod_path)
-            SearchClass = getattr(mod, cls_name)  # noqa: N806
-
-            app = SearchClass(mod_path)
-            self.search_apps[app.name] = app
-
     def ready(self):
         """Configures Elasticsearch default connection."""
         elasticsearch.configure_connection()
         elasticsearch.configure_index(settings.ES_INDEX)
 
-        self._register_search_apps()
+        for search_app in get_search_apps():
+            search_app.init_all()
