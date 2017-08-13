@@ -20,6 +20,7 @@ class SearchApp:
     name = None
     plural_name = None
     ESModel = None
+    view = None
 
     def __init__(self, mod):
         """Create this search app without initialising any ES config."""
