@@ -1,13 +1,14 @@
 from logging import getLogger
 
 from raven.contrib.django.raven_compat.models import client
+from datahub.core.utils import executor
 
 from datahub.search import elasticsearch
 
 logger = getLogger(__name__)
 
 
-def sync_es(search_model, db_model, pk):
+def _sync_es(search_model, db_model, pk):
     """Sync to ES by instance pk and type."""
     try:
         instance = db_model.objects.get(pk=pk)
@@ -17,3 +18,8 @@ def sync_es(search_model, db_model, pk):
         logger.exception('Error while saving entity to ES')
         client.captureException()
         raise
+
+
+def sync_es(search_model, db_model, pk):
+    """Sync to ES by instance pk and type."""
+    return executor.submit(_sync_es, search_model, db_model, pk)

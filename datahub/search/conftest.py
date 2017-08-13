@@ -1,0 +1,51 @@
+from unittest import mock
+
+from django.conf import settings
+from elasticsearch.helpers.test import get_test_client
+from pytest import fixture
+
+from datahub.core.test_utils import synchronous_executor_submit, synchronous_transaction_on_commit
+from datahub.search import elasticsearch
+
+from .apps import get_search_apps
+
+
+@fixture(scope='session')
+def client(request):
+    """Makes the ES test helper client available."""
+    from elasticsearch_dsl.connections import connections
+    client = get_test_client(nowait=False)
+    connections.add_connection('default', client)
+    return client
+
+
+@fixture
+def setup_es(client):
+    """Sets up ES and makes the client available."""
+    create_test_index(client, settings.ES_INDEX)
+
+    # Create models in the test index
+    for search_app in get_search_apps():
+        search_app.init_es()
+        search_app.connect_signals()
+
+    with mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit), \
+            mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit):
+
+        yield client
+
+    client.indices.delete(settings.ES_INDEX)
+
+    for search_app in get_search_apps():
+        search_app.disconnect_signals()
+
+
+def create_test_index(client, index):
+    """Creates/configures the test index."""
+    if client.indices.exists(index=index):
+        client.indices.delete(index)
+
+    elasticsearch.configure_index(index, {
+        'number_of_shards': 1,
+        'number_of_replicas': 0,
+    })
