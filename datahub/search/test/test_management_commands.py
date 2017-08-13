@@ -10,10 +10,10 @@ from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.search.management.commands import create_alias, delete_alias, get_alias, sync_es
 
-from ..models import DataSet
 from ..company.models import Company as ESCompany
 from ..contact.models import Contact as ESContact
 from ..investment.models import InvestmentProject as ESInvestmentProject
+from ..models import DataSet
 
 pytestmark = pytest.mark.django_db
 
