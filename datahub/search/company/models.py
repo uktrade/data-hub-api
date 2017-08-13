@@ -1,11 +1,9 @@
 from django.conf import settings
 from elasticsearch_dsl import Boolean, Date, DocType, String
 
-from datahub.company.models import Company as DBCompany
-
 from .. import dict_utils
 from .. import dsl_utils
-from ..models import DataSet, MapDBModelToDict
+from ..models import MapDBModelToDict
 
 
 class Company(DocType, MapDBModelToDict):
@@ -110,17 +108,3 @@ class Company(DocType, MapDBModelToDict):
 
         index = settings.ES_INDEX
         doc_type = 'company'
-
-
-def get_dataset():
-    """Returns dataset that will be synchronised with Elasticsearch."""
-    prefetch_fields = (
-        'registered_address_country', 'business_type', 'sector', 'employee_range',
-        'turnover_range', 'account_manager', 'export_to_countries', 'future_interest_countries',
-        'trading_address_country', 'headquarter_type', 'classification',
-        'one_list_account_owner',
-    )
-
-    qs = DBCompany.objects.prefetch_related(*prefetch_fields).all().order_by('pk')
-
-    return DataSet(qs, Company)

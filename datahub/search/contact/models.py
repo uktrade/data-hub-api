@@ -1,11 +1,9 @@
 from django.conf import settings
 from elasticsearch_dsl import Boolean, Date, DocType, String
 
-from datahub.company.models import Contact as DBContact
-
 from .. import dict_utils
 from .. import dsl_utils
-from ..models import DataSet, MapDBModelToDict
+from ..models import MapDBModelToDict
 
 
 class Contact(DocType, MapDBModelToDict):
@@ -80,10 +78,3 @@ class Contact(DocType, MapDBModelToDict):
 
         index = settings.ES_INDEX
         doc_type = 'contact'
-
-
-def get_dataset():
-    """Returns dataset that will be synchronised with Elasticsearch."""
-    qs = DBContact.objects.all().order_by('pk')
-
-    return DataSet(qs, Contact)

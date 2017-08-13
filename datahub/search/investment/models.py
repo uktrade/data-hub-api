@@ -1,11 +1,9 @@
 from django.conf import settings
 from elasticsearch_dsl import Boolean, Date, DocType, Double, Integer, String
 
-from datahub.investment.models import InvestmentProject as DBInvestmentProject
-
 from .. import dict_utils
 from .. import dsl_utils
-from ..models import DataSet, MapDBModelToDict
+from ..models import MapDBModelToDict
 
 
 class InvestmentProject(DocType, MapDBModelToDict):
@@ -127,10 +125,3 @@ class InvestmentProject(DocType, MapDBModelToDict):
 
         index = settings.ES_INDEX
         doc_type = 'investment_project'
-
-
-def get_dataset():
-    """Returns dataset that will be synchronised with Elasticsearch."""
-    qs = DBInvestmentProject.objects.all().order_by('pk')
-
-    return DataSet(qs, InvestmentProject)
