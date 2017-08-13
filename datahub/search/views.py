@@ -1,17 +1,19 @@
 """Search views."""
+from collections import namedtuple
 
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from . import elasticsearch
-from .company.models import Company
-from .contact.models import Contact
-from .investment.models import InvestmentProject
+from .apps import get_search_apps
+
+
+EntitySearch = namedtuple('EntitySearch', ['model', 'name', 'plural_name'])
 
 
 class SearchBasicAPIView(APIView):
-    """Aggregate company and contact search view."""
+    """Aggregate all entities search view."""
 
     http_method_names = ('get',)
 
@@ -20,11 +22,20 @@ class SearchBasicAPIView(APIView):
         'name',
     )
 
-    ENTITY_BY_NAME = {
-        'company': Company,
-        'contact': Contact,
-        'investment_project': InvestmentProject,
-    }
+    DEFAULT_ENTITY = 'company'
+
+    def __init__(self, *args, **kwargs):
+        """Initialises self.entity_by_name dynamically."""
+        super().__init__(*args, **kwargs)
+
+        self.entity_by_name = {
+            search_app.name: EntitySearch(
+                search_app.ESModel,
+                search_app.name,
+                search_app.plural_name
+            )
+            for search_app in get_search_apps()
+        }
 
     def get(self, request, format=None):
         """Performs basic search."""
@@ -32,10 +43,11 @@ class SearchBasicAPIView(APIView):
             raise ValidationError('Missing required "term" field.')
         term = request.query_params['term']
 
-        entity = request.query_params.get('entity', 'company')
-        if entity not in ('company', 'contact', 'investment_project'):
-            raise ValidationError('Entity is not one of "company", "contact" or '
-                                  '"investment_project".')
+        entity = request.query_params.get('entity', self.DEFAULT_ENTITY)
+        if entity not in (self.entity_by_name):
+            raise ValidationError(
+                f'Entity is not one of {", ".join(self.entity_by_name)}'
+            )
 
         sortby = request.query_params.get('sortby')
         if sortby:
@@ -48,7 +60,7 @@ class SearchBasicAPIView(APIView):
 
         results = elasticsearch.get_basic_search_query(
             term=term,
-            entities=(self.ENTITY_BY_NAME[entity],),
+            entities=(self.entity_by_name[entity].model,),
             field_order=sortby,
             offset=offset,
             limit=limit
@@ -62,11 +74,5 @@ class SearchBasicAPIView(APIView):
 
         hits = [x.to_dict() for x in results.hits]
 
-        if entity == 'company':
-            response['companies'] = hits
-        elif entity == 'contact':
-            response['contacts'] = hits
-        elif entity == 'investment_project':
-            response['investment_projects'] = hits
-
+        response[self.entity_by_name[entity].plural_name] = hits
         return Response(data=response)

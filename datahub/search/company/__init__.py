@@ -7,4 +7,5 @@ class CompanySearchApp(SearchApp):
     """SearchApp for company"""
 
     name = 'company'
+    plural_name = 'companies'
     ESModel = Company
