@@ -1,3 +1,5 @@
+from datahub.company.models import Contact as DBContact
+
 from .models import Contact
 from .views import SearchContactAPIView
 
@@ -10,4 +12,5 @@ class ContactSearchApp(SearchApp):
     name = 'contact'
     plural_name = 'contacts'
     ESModel = Contact
+    DBModel = DBContact
     view = SearchContactAPIView

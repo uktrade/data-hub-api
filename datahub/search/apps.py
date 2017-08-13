@@ -6,6 +6,8 @@ from django.conf import settings
 
 from datahub.search import elasticsearch
 
+from .models import DataSet
+
 
 SEARCH_APPS = [
     'datahub.search.company.CompanySearchApp',
@@ -44,6 +46,12 @@ class SearchApp:
         so DB models can be synced with Elasticsearch on save.
         """
         import_module(f'{self.mod}.signals')
+
+    def get_dataset(self):
+        """Returns dataset that will be synchronised with Elasticsearch."""
+        qs = self.DBModel.objects.all().order_by('pk')
+
+        return DataSet(qs, self.ESModel)
 
 
 @lru_cache(maxsize=None)

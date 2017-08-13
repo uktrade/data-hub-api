@@ -6,20 +6,17 @@ from django.db import models
 
 from datahub.search.elasticsearch import bulk
 
-from ...company.models import get_dataset as get_company_dataset
-from ...contact.models import get_dataset as get_contact_dataset
-from ...investment.models import get_dataset as get_investment_dataset
+from ...apps import get_search_apps
 
 logger = getLogger(__name__)
 
 
-def get_dataset():
-    """Returns dataset that will be synchronised with Elasticsearch."""
-    return (
-        get_company_dataset(),
-        get_contact_dataset(),
-        get_investment_dataset()
-    )
+def get_datasets():
+    """Returns datasets that will be synchronised with Elasticsearch."""
+    return [
+        search_app.get_dataset()
+        for search_app in get_search_apps()
+    ]
 
 
 def _batch_rows(qs, batch_size=100):
@@ -56,9 +53,9 @@ def sync_dataset(item, batch_size=1, stdout=None):
         stdout.write(f'Rows processed: {rows_processed}/{total_rows} 100%. Done!')
 
 
-def sync_es(batch_size, dataset, stdout=None):
+def sync_es(batch_size, datasets, stdout=None):
     """Sends data to Elasticsearch."""
-    for item in dataset:
+    for item in datasets:
         sync_dataset(item, batch_size=batch_size, stdout=stdout)
 
 
@@ -76,4 +73,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Handle."""
-        sync_es(batch_size=options['batch_size'], dataset=get_dataset(), stdout=self.stdout)
+        sync_es(batch_size=options['batch_size'], datasets=get_datasets(), stdout=self.stdout)
