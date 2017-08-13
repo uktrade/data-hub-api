@@ -1,39 +1,24 @@
-from collections import namedtuple
 from logging import getLogger
 
 from django.core.management.base import BaseCommand
 from django.core.paginator import Paginator
 from django.db import models
 
-from datahub.company.models import Company, Contact
-from datahub.investment.models import InvestmentProject
 from datahub.search.elasticsearch import bulk
-from datahub.search.models import (Company as ESCompany,
-                                   Contact as ESContact,
-                                   InvestmentProject as ESInvestmentProject)
+
+from ...company.models import get_dataset as get_company_dataset
+from ...contact.models import get_dataset as get_contact_dataset
+from ...investment.models import get_dataset as get_investment_dataset
 
 logger = getLogger(__name__)
-
-DataSet = namedtuple('DataSet', ('queryset', 'es_model',))
 
 
 def get_dataset():
     """Returns dataset that will be synchronised with Elasticsearch."""
-    company_prefetch_fields = (
-        'registered_address_country', 'business_type', 'sector', 'employee_range',
-        'turnover_range', 'account_manager', 'export_to_countries', 'future_interest_countries',
-        'trading_address_country', 'headquarter_type', 'classification',
-        'one_list_account_owner',
-    )
-
-    company_qs = Company.objects.prefetch_related(*company_prefetch_fields).all().order_by('pk')
-    contact_qs = Contact.objects.all().order_by('pk')
-    investment_project_qs = InvestmentProject.objects.all().order_by('pk')
-
     return (
-        DataSet(company_qs, ESCompany),
-        DataSet(contact_qs, ESContact),
-        DataSet(investment_project_qs, ESInvestmentProject),
+        get_company_dataset(),
+        get_contact_dataset(),
+        get_investment_dataset()
     )
 
 

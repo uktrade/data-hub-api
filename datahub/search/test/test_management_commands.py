@@ -5,9 +5,15 @@ from unittest import mock
 import pytest
 from django.core import management
 
+
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.search.management.commands import create_alias, delete_alias, get_alias, sync_es
+
+from ..models import DataSet
+from ..company.models import Company as ESCompany
+from ..contact.models import Contact as ESContact
+from ..investment.models import InvestmentProject as ESInvestmentProject
 
 pytestmark = pytest.mark.django_db
 
@@ -28,9 +34,9 @@ def test_batch_rows():
 def test_sync_dataset(get_dataset, bulk):
     """Tests syncing dataset up to Elasticsearch."""
     get_dataset.return_value = (
-        sync_es.DataSet([CompanyFactory(), CompanyFactory()], sync_es.ESCompany),
-        sync_es.DataSet([ContactFactory()], sync_es.ESContact),
-        sync_es.DataSet([InvestmentProjectFactory()], sync_es.ESInvestmentProject)
+        DataSet([CompanyFactory(), CompanyFactory()], ESCompany),
+        DataSet([ContactFactory()], ESContact),
+        DataSet([InvestmentProjectFactory()], ESInvestmentProject)
     )
 
     management.call_command(sync_es.Command(), batch_size=1)

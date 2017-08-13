@@ -1,8 +1,9 @@
 import datetime
 from unittest import mock
 
-from datahub.search import elasticsearch
-from datahub.search.models import Company, Contact
+from .. import elasticsearch
+from ..company.models import Company
+from ..contact.models import Contact
 
 
 def test_get_search_term_query():

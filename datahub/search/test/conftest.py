@@ -11,8 +11,12 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.core import constants
 from datahub.investment.models import InvestmentProject
 from datahub.investment.test.factories import InvestmentProjectFactory
-from datahub.search import elasticsearch, models
+from datahub.search import elasticsearch
 from datahub.search.management.commands import sync_es
+
+from ..company.models import Company as ESCompany
+from ..contact.models import Contact as ESContact
+from ..investment.models import InvestmentProject as ESInvestmentProject
 
 
 @fixture(scope='session')
@@ -32,9 +36,9 @@ def setup_data(client):
     create_test_index(client, index)
 
     # Create models in the test index
-    models.Company.init(index=index)
-    models.Contact.init(index=index)
-    models.InvestmentProject.init(index=index)
+    ESCompany.init(index=index)
+    ESContact.init(index=index)
+    ESInvestmentProject.init(index=index)
 
     ContactFactory(first_name='abc', last_name='defg').save()
     ContactFactory(first_name='first', last_name='last').save()
@@ -87,7 +91,9 @@ def create_test_index(client, index):
 @fixture
 def post_save_handlers():
     """Registeres signals handlers to trigger ES logic."""
-    from datahub.search.signals import company_sync_es, contact_sync_es, investment_project_sync_es
+    from datahub.search.company.signals import company_sync_es
+    from datahub.search.contact.signals import contact_sync_es
+    from datahub.search.investment.signals import investment_project_sync_es
 
     post_save.connect(company_sync_es, sender=Company, dispatch_uid='company_sync_es')
     post_save.connect(contact_sync_es, sender=Contact, dispatch_uid='contact_sync_es')
