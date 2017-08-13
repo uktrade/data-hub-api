@@ -27,11 +27,12 @@ class SearchApp:
     def __init__(self, mod):
         """Create this search app without initialising any ES config."""
         self.mod = mod
+        self.mod_signals = f'{self.mod}.signals'
 
     def init_all(self):
         """Initialise all ES configs."""
         self.init_es()
-        self.init_signals()
+        self.connect_signals()
 
     def init_es(self):
         """
@@ -40,12 +41,17 @@ class SearchApp:
         """
         self.ESModel.init(index=settings.ES_INDEX)
 
-    def init_signals(self):
+    def connect_signals(self):
         """
-        Imports all post_save signal handlers
-        so DB models can be synced with Elasticsearch on save.
+        Connects all signal handlers so DB models can be synced with Elasticsearch on save.
         """
-        import_module(f'{self.mod}.signals')
+        signals_mod = import_module(self.mod_signals)
+        getattr(signals_mod, 'connect_signals')()
+
+    def disconnect_signals(self):
+        """Disconnects all signal handlers."""
+        signals_mod = import_module(self.mod_signals)
+        getattr(signals_mod, 'disconnect_signals')()
 
     def get_dataset(self):
         """Returns dataset that will be synchronised with Elasticsearch."""
