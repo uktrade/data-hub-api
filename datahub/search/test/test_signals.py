@@ -6,7 +6,10 @@ from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.test_utils import synchronous_executor_submit, synchronous_transaction_on_commit
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.search import elasticsearch
-from datahub.search.models import Company, Contact, InvestmentProject
+
+from ..company.models import Company
+from ..contact.models import Contact
+from ..investment.models import InvestmentProject
 
 pytestmark = pytest.mark.django_db
 

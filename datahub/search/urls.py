@@ -2,10 +2,11 @@
 
 from django.conf.urls import url
 
-from datahub.search.views import (
-    SearchBasicAPIView, SearchCompanyAPIView, SearchContactAPIView,
-    SearchInvestmentProjectAPIView
-)
+from .company.views import SearchCompanyAPIView
+from .contact.views import SearchContactAPIView
+from .investment.views import SearchInvestmentProjectAPIView
+from .views import SearchBasicAPIView
+
 
 urlpatterns = [
     url(r'^search$', SearchBasicAPIView.as_view(), name='basic'),

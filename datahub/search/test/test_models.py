@@ -1,91 +1,20 @@
-from unittest import mock
-
 import pytest
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
-from datahub.search import models
+
+from ..company.models import Company as ESCompany
+from ..contact.models import Contact as ESContact
+from ..investment.models import InvestmentProject as ESInvestmentProject
 
 pytestmark = pytest.mark.django_db
-
-
-def test_id_name_dict():
-    """Tests _id_name_dict."""
-    obj = mock.Mock()
-    obj.id = 123
-    obj.name = 'test'
-
-    res = models._id_name_dict(obj)
-
-    assert res == {
-        'id': str(obj.id),
-        'name': obj.name,
-    }
-
-
-def test_id_type_dict():
-    """Tests _id_type_dict."""
-    obj = mock.Mock()
-    obj.id = 123
-    obj.type = 'test'
-
-    res = models._id_type_dict(obj)
-
-    assert res == {
-        'id': str(obj.id),
-        'type': obj.type,
-    }
-
-
-def test_id_uri_dict():
-    """Tests _id_type_dict."""
-    obj = mock.Mock()
-    obj.id = 123
-    obj.uri = 'test'
-
-    res = models._id_uri_dict(obj)
-
-    assert res == {
-        'id': str(obj.id),
-        'uri': obj.uri,
-    }
-
-
-def test_contact_dict():
-    """Tests contact_dict."""
-    obj = mock.Mock()
-    obj.id = 123
-    obj.first_name = 'First'
-    obj.last_name = 'Last'
-
-    res = models._contact_dict(obj)
-
-    assert res == {
-        'id': str(obj.id),
-        'first_name': obj.first_name,
-        'last_name': obj.last_name,
-    }
-
-
-def test_company_dict():
-    """Tests company_dict."""
-    obj = mock.Mock()
-    obj.id = 123
-    obj.company_number = '01234567'
-
-    res = models._company_dict(obj)
-
-    assert res == {
-        'id': str(obj.id),
-        'company_number': obj.company_number,
-    }
 
 
 def test_company_dbmodel_to_dict():
     """Tests conversion of db model to dict."""
     company = CompanyFactory()
 
-    result = models.Company.dbmodel_to_dict(company)
+    result = ESCompany.dbmodel_to_dict(company)
 
     keys = {'business_type', 'registered_address_country',
             'sector', 'trading_address_country', 'uk_region',
@@ -110,7 +39,7 @@ def test_company_dbmodels_to_es_documents():
     """Tests conversion of db models to Elasticsearch documents."""
     companies = (CompanyFactory(), CompanyFactory(),)
 
-    result = models.Company.dbmodels_to_es_documents(companies)
+    result = ESCompany.dbmodels_to_es_documents(companies)
 
     assert len(list(result)) == len(companies)
 
@@ -119,7 +48,7 @@ def test_contact_dbmodel_to_dict():
     """Tests conversion of db model to dict."""
     contact = ContactFactory()
 
-    result = models.Contact.dbmodel_to_dict(contact)
+    result = ESContact.dbmodel_to_dict(contact)
 
     keys = {'id', 'title', 'company', 'created_on',
             'modified_on', 'archived', 'archived_on',
@@ -140,7 +69,7 @@ def test_contact_dbmodels_to_es_documents():
     """Tests conversion of db models to Elasticsearch documents."""
     contacts = (ContactFactory(), ContactFactory(),)
 
-    result = models.Contact.dbmodels_to_es_documents(contacts)
+    result = ESContact.dbmodels_to_es_documents(contacts)
 
     assert len(list(result)) == len(contacts)
 
@@ -148,7 +77,7 @@ def test_contact_dbmodels_to_es_documents():
 def test_investment_project_to_dict():
     """Tests conversion of db model to dict."""
     project = InvestmentProjectFactory()
-    result = models.InvestmentProject.dbmodel_to_dict(project)
+    result = ESInvestmentProject.dbmodel_to_dict(project)
 
     keys = {'id', 'business_activities', 'client_contacts',
             'client_relationship_manager', 'investor_company',
@@ -185,6 +114,6 @@ def test_investment_project_dbmodels_to_es_documents():
     """Tests conversion of db models to Elasticsearch documents."""
     projects = (InvestmentProjectFactory(), InvestmentProjectFactory(),)
 
-    result = models.InvestmentProject.dbmodels_to_es_documents(projects)
+    result = ESInvestmentProject.dbmodels_to_es_documents(projects)
 
     assert len(list(result)) == len(projects)
