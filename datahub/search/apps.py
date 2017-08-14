@@ -4,8 +4,6 @@ from importlib import import_module
 from django.apps import AppConfig
 from django.conf import settings
 
-from datahub.search import elasticsearch
-
 from .models import DataSet
 
 
@@ -89,6 +87,8 @@ class SearchConfig(AppConfig):
 
     def ready(self):
         """Configures Elasticsearch default connection."""
+        from datahub.search import elasticsearch
+
         elasticsearch.configure_connection()
         elasticsearch.configure_index(settings.ES_INDEX)
 
