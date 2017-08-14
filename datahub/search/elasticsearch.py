@@ -8,6 +8,14 @@ from elasticsearch_dsl import analysis, Index, Search
 from elasticsearch_dsl.connections import connections
 from elasticsearch_dsl.query import Match, MatchPhrase, Q
 
+from .models import Company, Contact, InvestmentProject
+
+ALL_MODELS = (
+    Company,
+    Contact,
+    InvestmentProject,
+)
+
 lowercase_keyword_analyzer = analysis.CustomAnalyzer(
     'lowercase_keyword_analyzer',
     tokenizer='keyword',
@@ -107,7 +115,7 @@ def get_basic_search_query(term, entities=None, field_order=None, offset=0, limi
 
     Also returns number of results in other entities.
     """
-    fields = set(chain.from_iterable(entity.SEARCH_FIELDS for entity in entities))
+    fields = set(chain.from_iterable(entity.SEARCH_FIELDS for entity in ALL_MODELS))
     # Sort the fields so that this function is deterministic
     # and the same query is always generated with the same inputs
     fields = sorted(fields)
