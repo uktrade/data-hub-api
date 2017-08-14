@@ -202,7 +202,7 @@ class Company(DocType, MapDBModelToDict):
         'tree_id'
     )
 
-    SEARCH_FIELDS = (
+    SEARCH_FIELDS = [
         'classification.name',
         'export_to_countries.name',
         'future_interest_countries.name',
@@ -213,7 +213,7 @@ class Company(DocType, MapDBModelToDict):
         'trading_address_town',
         'uk_region.name',
         'website'
-    )
+    ]
 
     class Meta:
         """Default document meta data."""
@@ -278,7 +278,7 @@ class Contact(DocType, MapDBModelToDict):
         'servicedeliverys'
     )
 
-    SEARCH_FIELDS = (
+    SEARCH_FIELDS = [
         'address_1',
         'address_2',
         'address_country.name',
@@ -286,7 +286,7 @@ class Contact(DocType, MapDBModelToDict):
         'address_town',
         'email',
         'notes'
-    )
+    ]
 
     class Meta:
         """Default document meta data."""
@@ -399,13 +399,13 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'uk_region_locations'
     )
 
-    SEARCH_FIELDS = (
+    SEARCH_FIELDS = [
         'business_activities.name',
         'intermediate_company.name',
         'investor_company.name',
         'sector.name',
         'uk_company.name',
-    )
+    ]
 
     class Meta:
         """Default document meta data."""
