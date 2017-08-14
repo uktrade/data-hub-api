@@ -184,6 +184,35 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['last_name'] == 'defg'
 
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_search_contact_by_country_case_insensitive(self):
+        """Tests detailed contact search."""
+        ContactFactory(
+            first_name='John',
+            last_name='Doe',
+            address_same_as_company=False,
+            address_1='Happy Lane',
+            address_town='Happy Town',
+            address_country_id=constants.Country.united_states.value.id,
+        )
+
+        connections.get_connection().indices.refresh()
+
+        term = 'united states'
+
+        url = reverse('api-v3:search:basic')
+
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'contact',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['contacts']) == 1
+        assert response.data['contacts'][0]['address_country']['name'] == 'United States'
+
     def test_search_contact_no_filters(self):
         """Tests case where there is no filters provided."""
         url = reverse('api-v3:search:contact')
