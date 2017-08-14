@@ -71,3 +71,25 @@ class TestSearch(APITestMixin):
                 'cdefgh',
                 'bcdefg',
                 'abcdef'] == [contact['last_name'] for contact in response.data['results']]
+
+
+class TestBasicSearch(APITestMixin):
+    """Tests basic search view."""
+
+    def test_basic_search_contacts(self, setup_es, setup_data):
+        """Tests basic aggregate contacts query."""
+        setup_es.indices.refresh()
+
+        term = 'abc defg'
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'contact'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert response.data['contacts'][0]['first_name'] in term
+        assert response.data['contacts'][0]['last_name'] in term
+        assert [{'count': 1, 'entity': 'contact'}] == response.data['aggregations']

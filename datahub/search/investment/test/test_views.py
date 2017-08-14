@@ -196,3 +196,24 @@ class TestSearch(APITestMixin):
                   {'key': constants.InvestmentProjectStage.active.value.id, 'doc_count': 1},
                   {'key': constants.InvestmentProjectStage.won.value.id, 'doc_count': 1}]
         assert all(stage in response.data['aggregations']['stage'] for stage in stages)
+
+
+class TestBasicSearch(APITestMixin):
+    """Tests basic search view."""
+
+    def test_investment_projects(self, setup_es, setup_data):
+        """Tests basic aggregate investment project query."""
+        setup_es.indices.refresh()
+
+        term = 'abc defg'
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'investment_project'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert response.data['investment_projects'][0]['name'] == term
+        assert [{'count': 1, 'entity': 'investment_project'}] == response.data['aggregations']
