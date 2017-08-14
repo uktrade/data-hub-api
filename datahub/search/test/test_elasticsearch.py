@@ -15,7 +15,8 @@ def test_get_search_term_query():
                 {
                     'match_phrase': {
                         'name_keyword': {
-                            'query': 'hello', 'boost': 2
+                            'query': 'hello',
+                            'boost': 2
                         }
                     }
                 }, {
@@ -68,54 +69,159 @@ def test_get_basic_search_query():
     assert query.to_dict() == {
         'query': {
             'bool': {
-                'should': [
+                'must': [
                     {
-                        'match_phrase': {
-                            'name_keyword': {
-                                'query': 'test',
-                                'boost': 2
-                            }
+                        'term': {
+                            '_type': 'company'
                         }
                     }, {
-                        'match_phrase': {
-                            'id': {
-                                'query': 'test'
-                            }
-                        }
-                    }, {
-                        'match': {
-                            'name': {
-                                'query': 'test'
-                            }
-                        }
-                    }, {
-                        'match_phrase': {
-                            'name_trigram': {
-                                'query': 'test'
-                            }
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'address_country',
-                            'query': {
-                                'bool': {
-                                    'must': [
-                                        {
-                                            'match': {
-                                                'address_country.name': 'test'
+                        'bool': {
+                            'should': [
+                                {
+                                    'match_phrase': {
+                                        'name_keyword': {
+                                            'query': 'test',
+                                            'boost': 2
+                                        }
+                                    }
+                                }, {
+                                    'match_phrase': {
+                                        'id': {
+                                            'query': 'test'
+                                        }
+                                    }
+                                }, {
+                                    'match': {
+                                        'name': {
+                                            'query': 'test'
+                                        }
+                                    }
+                                }, {
+                                    'match_phrase': {
+                                        'name_trigram': {
+                                            'query': 'test'
+                                        }
+                                    }
+                                }, {
+                                    'nested': {
+                                        'path': 'classification',
+                                        'query': {
+                                            'bool': {
+                                                'must': [
+                                                    {
+                                                        'match': {
+                                                            'classification.name': 'test'
+                                                        }
+                                                    }
+                                                ]
                                             }
                                         }
-                                    ]
+                                    }
+                                }, {
+                                    'nested': {
+                                        'path': 'export_to_countries',
+                                        'query': {
+                                            'bool': {
+                                                'must': [
+                                                    {'match': {
+                                                        'export_to_countries.name': 'test'
+                                                    }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }, {
+                                    'nested': {
+                                        'path': 'future_interest_countries',
+                                        'query': {
+                                            'bool': {
+                                                'must': [
+                                                    {
+                                                        'match': {
+                                                            'future_interest_countries.name':
+                                                                'test'
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }, {
+                                    'nested': {
+                                        'path': 'registered_address_country',
+                                        'query': {
+                                            'bool': {
+                                                'must': [
+                                                    {
+                                                        'match': {
+                                                            'registered_address_country.name':
+                                                                'test'
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }, {
+                                    'match': {
+                                        'registered_address_town': 'test'
+                                    }
+                                }, {
+                                    'nested': {
+                                        'path': 'sector',
+                                        'query': {
+                                            'bool': {
+                                                'must': [
+                                                    {
+                                                        'match': {
+                                                            'sector.name': 'test'
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }, {
+                                    'nested': {
+                                        'path': 'trading_address_country',
+                                        'query': {
+                                            'bool': {
+                                                'must': [
+                                                    {
+                                                        'match': {
+                                                            'trading_address_country.name': 'test'
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }, {
+                                    'match': {
+                                        'trading_address_town': 'test'
+                                    }
+                                }, {
+                                    'nested': {
+                                        'path': 'uk_region',
+                                        'query': {
+                                            'bool': {
+                                                'must': [
+                                                    {
+                                                        'match': {
+                                                            'uk_region.name': 'test'
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }, {
+                                    'match': {
+                                        'website': 'test'
+                                    }
                                 }
-                            }
-                        }
-                    }, {
-                        'match': {
-                            'email': 'test'
-                        }
-                    }, {
-                        'match': {
-                            'notes': 'test'
+                            ]
                         }
                     }
                 ]
@@ -123,20 +229,44 @@ def test_get_basic_search_query():
         },
         'post_filter': {
             'bool': {
-                'should': [
+                'must': [
                     {
-                        'term': {
-                            '_type': 'contact'
+                        'bool': {
+                            'should': [
+                                {
+                                    'term': {
+                                        'address_town': 'Woodside'
+                                    }
+                                }
+                            ],
+                            'minimum_should_match': 1
+                        }
+                    }, {
+                        'bool': {
+                            'should': [
+                                {
+                                    'nested': {
+                                        'path': 'trading_address_country',
+                                        'query': {
+                                            'term': {
+                                                'trading_address_country.id':
+                                                    '80756b9a-5d95-e211-a939-e4115bead28a'
+                                            }
+                                        }
+                                    }
+                                }
+                            ],
+                            'minimum_should_match': 1
+                        }
+                    }, {
+                        'range': {
+                            'estimated_land_date': {
+                                'gte': '2017-06-13T09:44:31.062870',
+                                'lte': '2017-06-13T09:44:31.062870'
+                            }
                         }
                     }
                 ]
-            }
-        },
-        'aggs': {
-            'count_by_type': {
-                'terms': {
-                    'field': '_type'
-                }
             }
         },
         'from': 5,
