@@ -290,6 +290,7 @@ class Contact(DocType, MapDBModelToDict):
         'address_country.name',
         'address_county',
         'address_town',
+        'company.name',
         'email',
         'notes'
     ]

@@ -127,6 +127,21 @@ def test_get_basic_search_query():
                             'address_town': 'test'
                         }
                     }, {
+                        'nested': {
+                            'path': 'company',
+                            'query': {
+                                'bool': {
+                                    'must': [
+                                        {
+                                            'match': {
+                                                'company.name': 'test'
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }, {
                         'match': {
                             'email': 'test'
                         }
