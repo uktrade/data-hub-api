@@ -49,139 +49,6 @@ def setup_data():
 class TestSearch(APITestMixin):
     """Tests search views."""
 
-    def test_basic_search_all_companies(self, setup_es, setup_data):
-        """Tests basic aggregate all companies query."""
-        setup_es.indices.refresh()
-
-        term = ''
-
-        url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': term,
-            'entity': 'company'
-        })
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] > 0
-
-    def test_basic_search_companies(self, setup_es, setup_data):
-        """Tests basic aggregate companies query."""
-        setup_es.indices.refresh()
-
-        term = 'abc defg'
-
-        url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': term,
-            'entity': 'company'
-        })
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 2
-        assert response.data['companies'][0]['name'].startswith(term)
-        assert [{'count': 2, 'entity': 'company'},
-                {'count': 1, 'entity': 'contact'},
-                {'count': 1, 'entity': 'investment_project'}] == response.data['aggregations']
-
-    def test_basic_search_contacts(self, setup_es, setup_data):
-        """Tests basic aggregate contacts query."""
-        setup_es.indices.refresh()
-
-        term = 'abc defg'
-
-        url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': term,
-            'entity': 'contact'
-        })
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-        assert response.data['contacts'][0]['first_name'] in term
-        assert response.data['contacts'][0]['last_name'] in term
-        assert [{'count': 2, 'entity': 'company'},
-                {'count': 1, 'entity': 'contact'},
-                {'count': 1, 'entity': 'investment_project'}] == response.data['aggregations']
-
-    def test_basic_search_aggregations(self, setup_es, setup_data):
-        """Tests basic aggregate query."""
-        company = CompanyFactory(name='very_unique_company')
-        ContactFactory(company=company)
-        InvestmentProjectFactory(investor_company=company)
-
-        setup_es.indices.refresh()
-
-        term = 'very_unique_company'
-
-        url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': term,
-            'entity': 'company'
-        })
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-        assert response.data['companies'][0]['name'] == 'very_unique_company'
-
-        aggregations = [{'count': 1, 'entity': 'company'},
-                        {'count': 1, 'entity': 'contact'},
-                        {'count': 1, 'entity': 'investment_project'}]
-        assert all(aggregation in response.data['aggregations'] for aggregation in aggregations)
-
-    def test_basic_search_investment_projects(self, setup_es, setup_data):
-        """Tests basic aggregate investment project query."""
-        setup_es.indices.refresh()
-
-        term = 'abc defg'
-
-        url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': term,
-            'entity': 'investment_project'
-        })
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-        assert response.data['investment_projects'][0]['name'] == term
-        assert [{'count': 2, 'entity': 'company'},
-                {'count': 1, 'entity': 'contact'},
-                {'count': 1, 'entity': 'investment_project'}] == response.data['aggregations']
-
-    def test_basic_search_companies_no_results(self, setup_es, setup_data):
-        """Tests case where there should be no results."""
-        setup_es.indices.refresh()
-
-        term = 'there-should-be-no-match'
-
-        url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': term,
-            'entity': 'company'
-        })
-
-        assert response.data['count'] == 0
-
-    def test_basic_search_companies_no_term(self, setup_es, setup_data):
-        """Tests case where there is not term provided."""
-        setup_es.indices.refresh()
-
-        url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {})
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-
-    def test_basic_search_companies_invalid_entity(self, setup_es, setup_data):
-        """Tests case where provided entity is invalid."""
-        setup_es.indices.refresh()
-
-        url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': 'test',
-            'entity': 'sloths',
-        })
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-
     def test_basic_search_paging(self, setup_es, setup_data):
         """Tests pagination of results."""
         setup_es.indices.refresh()
@@ -199,6 +66,18 @@ class TestSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
         assert len(response.data['companies']) == 1
+
+    def test_invalid_entity(self, setup_es, setup_data):
+        """Tests case where provided entity is invalid."""
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': 'test',
+            'entity': 'sloths',
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_search_results_quality(self, setup_es, setup_data):
         """Tests quality of results."""
@@ -478,3 +357,28 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 1
         assert len(response.data['contacts']) == 1
         assert response.data['contacts'][0]['address_country']['name'] == 'United States'
+
+    def test_basic_search_aggregations(self, setup_es, setup_data):
+        """Tests basic aggregate query."""
+        company = CompanyFactory(name='very_unique_company')
+        ContactFactory(company=company)
+        InvestmentProjectFactory(investor_company=company)
+
+        setup_es.indices.refresh()
+
+        term = 'very_unique_company'
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'company'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert response.data['companies'][0]['name'] == 'very_unique_company'
+
+        aggregations = [{'count': 1, 'entity': 'company'},
+                        {'count': 1, 'entity': 'contact'},
+                        {'count': 1, 'entity': 'investment_project'}]
+        assert all(aggregation in response.data['aggregations'] for aggregation in aggregations)

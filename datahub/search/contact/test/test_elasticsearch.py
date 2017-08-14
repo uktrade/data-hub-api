@@ -471,4 +471,3 @@ def test_get_search_by_entity_query():
         'from': 5,
         'size': 5
     }
-

@@ -77,3 +77,62 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['uk_based'] is False
+
+
+class TestBasicSearch(APITestMixin):
+    """Tests basic search view."""
+
+    def test_all_companies(self, setup_es, setup_data):
+        """Tests basic aggregate all companies query."""
+        setup_es.indices.refresh()
+
+        term = ''
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'company'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] > 0
+
+    def test_companies(self, setup_es, setup_data):
+        """Tests basic aggregate companies query."""
+        setup_es.indices.refresh()
+
+        term = 'abc defg'
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'company'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert response.data['companies'][0]['name'].startswith(term)
+        assert [{'count': 2, 'entity': 'company'}] == response.data['aggregations']
+
+    def test_no_results(self, setup_es, setup_data):
+        """Tests case where there should be no results."""
+        setup_es.indices.refresh()
+
+        term = 'there-should-be-no-match'
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'company'
+        })
+
+        assert response.data['count'] == 0
+
+    def test_companies_no_term(self, setup_es, setup_data):
+        """Tests case where there is not term provided."""
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
