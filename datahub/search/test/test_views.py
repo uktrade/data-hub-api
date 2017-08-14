@@ -68,6 +68,33 @@ class TestSearch(APITestMixin):
                 {'count': 1, 'entity': 'contact'},
                 {'count': 1, 'entity': 'investment_project'}] == response.data['aggregations']
 
+    @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    def test_basic_search_aggregations(self):
+        """Tests basic aggregate query."""
+        company = CompanyFactory(name='very_unique_company')
+        ContactFactory(company=company)
+        InvestmentProjectFactory(investor_company=company)
+
+        connections.get_connection().indices.refresh()
+
+        term = 'very_unique_company'
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'company'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert response.data['companies'][0]['name'] == 'very_unique_company'
+
+        aggregations = [{'count': 1, 'entity': 'company'},
+                        {'count': 1, 'entity': 'contact'},
+                        {'count': 1, 'entity': 'investment_project'}]
+        assert all(aggregation in response.data['aggregations'] for aggregation in aggregations)
+
     def test_basic_search_investment_projects(self):
         """Tests basic aggregate investment project query."""
         term = 'abc defg'
