@@ -15,7 +15,8 @@ def test_get_search_term_query():
                 {
                     'match_phrase': {
                         'name_keyword': {
-                            'query': 'hello', 'boost': 2
+                            'query': 'hello',
+                            'boost': 2
                         }
                     }
                 }, {
@@ -95,6 +96,14 @@ def test_get_basic_search_query():
                             }
                         }
                     }, {
+                        'match': {
+                            'address_1': 'test'
+                        }
+                    }, {
+                        'match': {
+                            'address_2': 'test'
+                        }
+                    }, {
                         'nested': {
                             'path': 'address_country',
                             'query': {
@@ -103,6 +112,29 @@ def test_get_basic_search_query():
                                         {
                                             'match': {
                                                 'address_country.name': 'test'
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }, {
+                        'match': {
+                            'address_county': 'test'
+                        }
+                    }, {
+                        'match': {
+                            'address_town': 'test'
+                        }
+                    }, {
+                        'nested': {
+                            'path': 'company',
+                            'query': {
+                                'bool': {
+                                    'must': [
+                                        {
+                                            'match': {
+                                                'company.name': 'test'
                                             }
                                         }
                                     ]
@@ -180,8 +212,7 @@ def test_search_by_entity_query():
                                 {
                                     'match_phrase': {
                                         'name_keyword': {
-                                            'query': 'test',
-                                            'boost': 2
+                                            'query': 'test', 'boost': 2
                                         }
                                     }
                                 }, {
@@ -204,6 +235,87 @@ def test_search_by_entity_query():
                                     }
                                 }, {
                                     'nested': {
+                                        'path': 'classification',
+                                        'query': {
+                                            'bool': {
+                                                'must': [
+                                                    {
+                                                        'match': {
+                                                            'classification.name': 'test'
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }, {
+                                    'nested': {
+                                        'path': 'export_to_countries',
+                                        'query': {
+                                            'bool': {
+                                                'must': [
+                                                    {
+                                                        'match': {
+                                                            'export_to_countries.name': 'test'
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }, {
+                                    'nested': {
+                                        'path': 'future_interest_countries',
+                                        'query': {
+                                            'bool': {
+                                                'must': [
+                                                    {
+                                                        'match': {
+                                                            'future_interest_countries.name':
+                                                                'test'
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }, {
+                                    'nested': {
+                                        'path': 'registered_address_country',
+                                        'query': {
+                                            'bool': {
+                                                'must': [
+                                                    {
+                                                        'match': {
+                                                            'registered_address_country.name':
+                                                                'test'
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }, {
+                                    'match': {
+                                        'registered_address_town': 'test'
+                                    }
+                                }, {
+                                    'nested': {
+                                        'path': 'sector',
+                                        'query': {
+                                            'bool': {
+                                                'must': [
+                                                    {
+                                                        'match': {
+                                                            'sector.name': 'test'
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }, {
+                                    'nested': {
                                         'path': 'trading_address_country',
                                         'query': {
                                             'bool': {
@@ -216,6 +328,10 @@ def test_search_by_entity_query():
                                                 ]
                                             }
                                         }
+                                    }
+                                }, {
+                                    'match': {
+                                        'trading_address_town': 'test'
                                     }
                                 }, {
                                     'nested': {
