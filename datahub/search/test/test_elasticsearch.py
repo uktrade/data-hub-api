@@ -128,6 +128,36 @@ def test_get_basic_search_query():
                         }
                     }, {
                         'nested': {
+                            'path': 'business_activities',
+                            'query': {
+                                'bool': {
+                                    'must': [
+                                        {
+                                            'match': {
+                                                'business_activities.name': 'test'
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }, {
+                        'nested': {
+                            'path': 'classification',
+                            'query': {
+                                'bool': {
+                                    'must': [
+                                        {
+                                            'match': {
+                                                'classification.name': 'test'
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }, {
+                        'nested': {
                             'path': 'company',
                             'query': {
                                 'bool': {
@@ -146,8 +176,155 @@ def test_get_basic_search_query():
                             'email': 'test'
                         }
                     }, {
+                        'nested': {
+                            'path': 'export_to_countries',
+                            'query': {
+                                'bool': {
+                                    'must': [
+                                        {
+                                            'match': {
+                                                'export_to_countries.name': 'test'
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }, {
+                        'nested': {
+                            'path': 'future_interest_countries',
+                            'query': {
+                                'bool': {
+                                    'must': [
+                                        {
+                                            'match': {
+                                                'future_interest_countries.name': 'test'
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }, {
+                        'nested': {
+                            'path': 'intermediate_company',
+                            'query': {
+                                'bool': {
+                                    'must': [
+                                        {
+                                            'match': {
+                                                'intermediate_company.name': 'test'
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }, {
+                        'nested': {
+                            'path': 'investor_company',
+                            'query': {
+                                'bool': {
+                                    'must': [
+                                        {
+                                            'match': {
+                                                'investor_company.name': 'test'
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }, {
                         'match': {
                             'notes': 'test'
+                        }
+                    }, {
+                        'nested': {
+                            'path': 'registered_address_country',
+                            'query': {
+                                'bool': {
+                                    'must': [
+                                        {
+                                            'match': {
+                                                'registered_address_country.name': 'test'
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }, {
+                        'match': {
+                            'registered_address_town': 'test'
+                        }
+                    }, {
+                        'nested': {
+                            'path': 'sector',
+                            'query': {
+                                'bool': {
+                                    'must': [
+                                        {
+                                            'match': {
+                                                'sector.name': 'test'
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }, {
+                        'nested': {
+                            'path': 'trading_address_country',
+                            'query': {
+                                'bool': {
+                                    'must': [
+                                        {
+                                            'match': {
+                                                'trading_address_country.name': 'test'
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }, {
+                        'match': {
+                            'trading_address_town': 'test'
+                        }
+                    }, {
+                        'nested': {
+                            'path': 'uk_company',
+                            'query': {
+                                'bool': {
+                                    'must': [
+                                        {
+                                            'match': {
+                                                'uk_company.name': 'test'
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }, {
+                        'nested': {
+                            'path': 'uk_region',
+                            'query': {
+                                'bool': {
+                                    'must': [
+                                        {
+                                            'match': {
+                                                'uk_region.name': 'test'
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }, {
+                        'match': {
+                            'website': 'test'
                         }
                     }
                 ]
