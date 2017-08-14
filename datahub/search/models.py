@@ -48,7 +48,7 @@ def _contact_mapping(field):
     return Nested(properties={'id': String(index='not_analyzed'),
                               'first_name': String(copy_to=f'{field}.name'),
                               'last_name': String(copy_to=f'{field}.name'),
-                              'name': String(index='not_analyzed'),
+                              'name': String(analyzer='lowercase_keyword_analyzer'),
                               })
 
 
@@ -56,7 +56,7 @@ def _id_name_mapping():
     """Mapping for id name fields."""
     return Nested(properties={
         'id': String(index='not_analyzed'),
-        'name': String(index='not_analyzed')
+        'name': String(analyzer='lowercase_keyword_analyzer')
     })
 
 
@@ -64,7 +64,7 @@ def _id_uri_mapping():
     """Mapping for id uri fields."""
     return Nested(properties={
         'id': String(index='not_analyzed'),
-        'uri': String(index='not_analyzed')
+        'uri': String(analyzer='lowercase_keyword_analyzer')
     })
 
 
@@ -72,7 +72,7 @@ def _company_mapping():
     """Mapping for id company_number fields."""
     return Nested(properties={
         'id': String(index='not_analyzed'),
-        'company_number': String()
+        'company_number': String(analyzer='lowercase_keyword_analyzer')
     })
 
 
@@ -130,7 +130,7 @@ class Company(DocType, MapDBModelToDict):
     archived_reason = String()
     business_type = _id_name_mapping()
     classification = _id_name_mapping()
-    company_number = String(index='not_analyzed')
+    company_number = String(analyzer='lowercase_keyword_analyzer')
     companies_house_data = _company_mapping()
     created_on = Date()
     description = String()
@@ -148,14 +148,14 @@ class Company(DocType, MapDBModelToDict):
     registered_address_country = _id_name_mapping()
     registered_address_county = String()
     registered_address_postcode = String()
-    registered_address_town = String(index='not_analyzed')
+    registered_address_town = String(analyzer='lowercase_keyword_analyzer')
     sector = _id_name_mapping()
     trading_address_1 = String()
     trading_address_2 = String()
     trading_address_country = _id_name_mapping()
     trading_address_county = String()
     trading_address_postcode = String()
-    trading_address_town = String(index='not_analyzed')
+    trading_address_town = String(analyzer='lowercase_keyword_analyzer')
     turnover_range = _id_name_mapping()
     uk_region = _id_name_mapping()
     uk_based = Boolean()
@@ -203,9 +203,16 @@ class Company(DocType, MapDBModelToDict):
     )
 
     SEARCH_FIELDS = (
+        'classification.name',
+        'export_to_countries.name',
+        'future_interest_countries.name',
+        'registered_address_country.name',
+        'registered_address_town',
+        'sector.name',
         'trading_address_country.name',
+        'trading_address_town',
         'uk_region.name',
-        'website',
+        'website'
     )
 
     class Meta:
@@ -233,17 +240,17 @@ class Contact(DocType, MapDBModelToDict):
     primary = Boolean()
     telephone_countrycode = String(index='not_analyzed')
     telephone_number = String(index='not_analyzed')
-    email = String(index='not_analyzed')
+    email = String(analyzer='lowercase_keyword_analyzer')
     address_same_as_company = Boolean()
     address_1 = String()
     address_2 = String()
-    address_town = String(index='not_analyzed')
-    address_county = String(index='not_analyzed')
+    address_town = String(analyzer='lowercase_keyword_analyzer')
+    address_county = String(analyzer='lowercase_keyword_analyzer')
     address_postcode = String()
     telephone_alternative = String()
     email_alternative = String()
     notes = String()
-    job_title = String(index='not_analyzed')
+    job_title = String(analyzer='lowercase_keyword_analyzer')
     contactable_by_dit = Boolean()
     contactable_by_dit_partners = Boolean()
     contactable_by_email = Boolean()
@@ -272,9 +279,13 @@ class Contact(DocType, MapDBModelToDict):
     )
 
     SEARCH_FIELDS = (
+        'address_1',
+        'address_2',
         'address_country.name',
+        'address_county',
+        'address_town',
         'email',
-        'notes',
+        'notes'
     )
 
     class Meta:
@@ -334,12 +345,12 @@ class InvestmentProject(DocType, MapDBModelToDict):
     not_shareable_reason = String()
     operations_commenced_documents = _id_uri_mapping()
     stage = _id_name_mapping()
-    project_code = String(index='not_analyzed')
+    project_code = String(analyzer='lowercase_keyword_analyzer')
     project_shareable = Boolean()
     referral_source_activity = _id_name_mapping()
     referral_source_activity_marketing = _id_name_mapping()
     referral_source_activity_website = _id_name_mapping()
-    referral_source_activity_event = String(index='not_analyzed')
+    referral_source_activity_event = String(analyzer='lowercase_keyword_analyzer')
     referral_source_advisor = _contact_mapping('referral_source_advisor')
     sector = _id_name_mapping()
     average_salary = _id_name_mapping()
@@ -393,6 +404,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'intermediate_company.name',
         'investor_company.name',
         'sector.name',
+        'uk_company.name',
     )
 
     class Meta:
