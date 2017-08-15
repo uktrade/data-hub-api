@@ -46,15 +46,11 @@ def test_mapping(setup_es):
                             'type': 'string'
                         },
                         'first_name': {
-                            'copy_to': [
-                                'contact.name'
-                            ],
+                            'analyzer': 'lowercase_keyword_analyzer',
                             'type': 'string'
                         },
                         'last_name': {
-                            'copy_to': [
-                                'contact.name'
-                            ],
+                            'analyzer': 'lowercase_keyword_analyzer',
                             'type': 'string'
                         },
                         'name': {
@@ -71,15 +67,11 @@ def test_mapping(setup_es):
                             'type': 'string'
                         },
                         'first_name': {
-                            'copy_to': [
-                                'created_by.name'
-                            ],
+                            'analyzer': 'lowercase_keyword_analyzer',
                             'type': 'string'
                         },
                         'last_name': {
-                            'copy_to': [
-                                'created_by.name'
-                            ],
+                            'analyzer': 'lowercase_keyword_analyzer',
                             'type': 'string'
                         },
                         'name': {
