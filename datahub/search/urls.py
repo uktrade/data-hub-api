@@ -10,6 +10,9 @@ urlpatterns = [
 ]
 
 for search_app in get_search_apps():
+    if not search_app.view:
+        continue
+
     urlpatterns.append(
         url(rf'^search/{search_app.name}$', search_app.view.as_view(), name=search_app.name),
     )
