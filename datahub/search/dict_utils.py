@@ -28,6 +28,7 @@ def _contact_dict(obj):
         'id': str(obj.id),
         'first_name': obj.first_name,
         'last_name': obj.last_name,
+        'name': obj.name,
     }
 
 

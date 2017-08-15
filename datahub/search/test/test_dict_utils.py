@@ -51,6 +51,7 @@ def test_contact_dict():
     obj.id = 123
     obj.first_name = 'First'
     obj.last_name = 'Last'
+    obj.name = 'First Last'
 
     res = dict_utils._contact_dict(obj)
 
@@ -58,6 +59,7 @@ def test_contact_dict():
         'id': str(obj.id),
         'first_name': obj.first_name,
         'last_name': obj.last_name,
+        'name': obj.name,
     }
 
 
