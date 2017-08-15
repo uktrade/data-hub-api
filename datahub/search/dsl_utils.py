@@ -10,8 +10,8 @@ TrigramString = partial(String, analyzer='trigram_analyzer')
 def _contact_mapping(field):
     """Mapping for Adviser/Contact fields."""
     return Nested(properties={'id': KeywordString(),
-                              'first_name': String(copy_to=f'{field}.name'),
-                              'last_name': String(copy_to=f'{field}.name'),
+                              'first_name': CaseInsensitiveKeywordString(),
+                              'last_name': CaseInsensitiveKeywordString(),
                               'name': CaseInsensitiveKeywordString(),
                               })
 
