@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.reverse import reverse
 
+from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
 from datahub.omis.order.test.factories import OrderFactory
 
@@ -19,10 +20,16 @@ pytestmark = pytest.mark.django_db
 def setup_data():
     """Sets up data for the tests."""
     with freeze_time('2017-01-01 13:00:00'):
-        OrderFactory(reference='ref1')
+        OrderFactory(
+            reference='ref1',
+            primary_market_id=constants.Country.japan.value.id
+        )
 
     with freeze_time('2017-02-01 13:00:00'):
-        OrderFactory(reference='ref2')
+        OrderFactory(
+            reference='ref2',
+            primary_market_id=constants.Country.france.value.id
+        )
 
 
 class TestSearchOrder(APITestMixin):
@@ -46,7 +53,7 @@ class TestSearchOrder(APITestMixin):
         ] == ['ref2', 'ref1']
 
     def test_pagination(self, setup_es, setup_data):
-        """Tests that the pagination works when speficied as param."""
+        """Test that the pagination works when speficied as param."""
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:order')
@@ -60,6 +67,35 @@ class TestSearchOrder(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()['results']) == 1
         assert response.json()['results'][0]['reference'] == 'ref1'
+
+    def test_filter_by_primary_market(self, setup_es, setup_data):
+        """Test that results can be filtered by primary market."""
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:order')
+
+        response = self.api_client.post(url, {
+            'primary_market': constants.Country.france.value.id
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()['results']) == 1
+        assert response.json()['results'][0]['reference'] == 'ref2'
+
+    def test_no_result_with_invalid_primary_market(self, setup_es, setup_data):
+        """
+        Test that if an invalid primary market is specified, the search returns 0 results.
+        """
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:order')
+
+        response = self.api_client.post(url, {
+            'primary_market': 'invalid'
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()['results']) == 0
 
 
 class TestPaginatedAPIMixin:
