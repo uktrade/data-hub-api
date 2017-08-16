@@ -38,11 +38,13 @@ class InteractionSerializerV3(serializers.ModelSerializer):
     company = NestedRelatedField(Company, required=False, allow_null=True)
     contact = NestedRelatedField(Contact, required=False, allow_null=True)
     dit_adviser = NestedAdviserField()
+    created_by = NestedAdviserField(read_only=True)
     dit_team = NestedRelatedField(Team)
     interaction_type = NestedRelatedField(InteractionType)
     investment_project = NestedRelatedField(
         InvestmentProject, required=False, allow_null=True, extra_fields=('name', 'project_code')
     )
+    modified_by = NestedAdviserField(read_only=True)
     service = NestedRelatedField(Service)
 
     class Meta:  # noqa: D101
