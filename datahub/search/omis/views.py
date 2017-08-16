@@ -57,13 +57,30 @@ class SearchOrderAPIView(PaginatedAPIMixin, APIView):
     http_method_names = ('post',)
     DEFAULT_ORDERING = 'created_on:desc'
 
+    FILTER_FIELDS = {
+        # search param: es search property
+        'primary_market': 'primary_market.id',
+    }
+
+    def get_filtering_data(self, request):
+        """Return (filters, date ranges) to be used to query ES."""
+        filters = {
+            self.FILTER_FIELDS[field]: request.data[field]
+            for field in self.FILTER_FIELDS
+            if field in request.data
+        }
+        return filters, None
+
     def post(self, request, format=None):
         """Perform filtered order search."""
         limit, offset = self.get_pagination_values(request)
+        filters, ranges = self.get_filtering_data(request)
 
         results = elasticsearch.get_search_by_entity_query(
             entity=Order,
             term='',
+            filters=filters,
+            ranges=ranges,
             field_order=self.DEFAULT_ORDERING,
             offset=offset,
             limit=limit,
