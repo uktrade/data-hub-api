@@ -49,8 +49,9 @@ class InteractionSerializerV3(serializers.ModelSerializer):
         model = Interaction
         extra_kwargs = {
             # Date is a datetime in the model, but only the date component is used
-            # (at present). This effectively makes it behave like a date field without
-            # changing the schema and breaking the v1 API.
+            # (at present). Setting the formats as below effectively makes the field
+            # behave like a date field without changing the schema and breaking the
+            # v1 API.
             'date': {'format': '%Y-%m-%d', 'input_formats': ['%Y-%m-%d']}
         }
         fields = (
