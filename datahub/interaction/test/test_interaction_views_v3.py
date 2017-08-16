@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
-from datahub.core import constants
+from datahub.core.constants import InteractionType, Service, Team
 from datahub.core.test_utils import APITestMixin
 from datahub.interaction.test.factories import InteractionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
@@ -26,24 +26,71 @@ class TestInteractionV3(APITestMixin):
     def test_add_interaction(self):
         """Test add new interaction."""
         adviser = AdviserFactory()
+        company = CompanyFactory()
+        contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
-        response = self.api_client.post(url, {
-            'interaction_type': constants.InteractionType.face_to_face.value.id,
+        request_data = {
+            'interaction_type': InteractionType.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
             'notes': 'hello',
-            'company': CompanyFactory().pk,
-            'contact': ContactFactory().pk,
-            'service': constants.Service.trade_enquiry.value.id,
-            'dit_team': constants.Team.healthcare_uk.value.id
-        }, format='json')
+            'company': company.pk,
+            'contact': contact.pk,
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id
+        }
+        response = self.api_client.post(url, request_data, format='json')
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
-        assert response_data['dit_adviser']['id'] == str(adviser.pk)
-        assert response_data['modified_on'] == '2017-04-18T13:25:30.986208'
-        assert response_data['created_on'] == '2017-04-18T13:25:30.986208'
+        assert response_data == {
+            'id': response_data['id'],
+            'interaction_type': {
+                'id': InteractionType.face_to_face.value.id,
+                'name': InteractionType.face_to_face.value.name
+            },
+            'subject': 'whatever',
+            'date': request_data['date'],
+            'dit_adviser': {
+                'id': str(adviser.pk),
+                'first_name': adviser.first_name,
+                'last_name': adviser.last_name,
+                'name': adviser.name
+            },
+            'notes': 'hello',
+            'company': {
+                'id': str(company.pk),
+                'name': company.name
+            },
+            'contact': {
+                'id': str(contact.pk),
+                'name': contact.name
+            },
+            'service': {
+                'id': str(Service.trade_enquiry.value.id),
+                'name': Service.trade_enquiry.value.name,
+            },
+            'dit_team': {
+                'id': str(Team.healthcare_uk.value.id),
+                'name': Team.healthcare_uk.value.name,
+            },
+            'investment_project': None,
+            'created_by': {
+                'id': str(self.user.pk),
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'name': self.user.name
+            },
+            'modified_by': {
+                'id': str(self.user.pk),
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'name': self.user.name
+            },
+            'created_on': '2017-04-18T13:25:30.986208',
+            'modified_on': '2017-04-18T13:25:30.986208'
+        }
 
     def test_add_interaction_project_missing_fields(self):
         """Test validation of missing fields."""
@@ -69,14 +116,14 @@ class TestInteractionV3(APITestMixin):
         adviser = AdviserFactory()
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.post(url, {
-            'interaction_type': constants.InteractionType.face_to_face.value.id,
+            'interaction_type': InteractionType.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
             'notes': 'hello',
             'investment_project': project.pk,
-            'service': constants.Service.trade_enquiry.value.id,
-            'dit_team': constants.Team.healthcare_uk.value.id
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id
         }, format='json')
 
         assert response.status_code == status.HTTP_201_CREATED
@@ -92,13 +139,13 @@ class TestInteractionV3(APITestMixin):
         """
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.post(url, {
-            'interaction_type': constants.InteractionType.face_to_face.value.id,
+            'interaction_type': InteractionType.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': AdviserFactory().pk,
             'notes': 'hello',
-            'service': constants.Service.trade_enquiry.value.id,
-            'dit_team': constants.Team.healthcare_uk.value.id
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id
         }, format='json')
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
