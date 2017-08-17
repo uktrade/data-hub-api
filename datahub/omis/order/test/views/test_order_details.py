@@ -92,6 +92,8 @@ class TestAddOrderDetails(APITestMixin):
             'existing_agents': '',
             'permission_to_approach_contacts': '',
             'delivery_date': '2017-04-20',
+            'contact_email': '',
+            'contact_phone': '',
         }
 
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
@@ -278,6 +280,8 @@ class TestChangeOrderDetails(APITestMixin):
             'existing_agents': order.existing_agents,
             'permission_to_approach_contacts': order.permission_to_approach_contacts,
             'delivery_date': '2017-04-21',
+            'contact_email': order.contact_email,
+            'contact_phone': order.contact_phone,
         }
 
     def test_fails_if_contact_not_from_company(self):
@@ -423,8 +427,8 @@ class TestChangeOrderDetails(APITestMixin):
             }
         ]
 
-    def test_cannot_change_legacy_fields(self):
-        """Test that if legacy fields are passed in when updating an order, they get ignored."""
+    def test_cannot_change_readonly_fields(self):
+        """Test that if readonly fields are passed in when updating an order, they get ignored."""
         order = OrderFactory()
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
@@ -435,16 +439,20 @@ class TestChangeOrderDetails(APITestMixin):
                 'further_info': 'Updated further info',
                 'existing_agents': 'Updated existing agents',
                 'permission_to_approach_contacts': 'Updated permission to approach contacts',
+                'contact_email': 'updated-email@email.com',
+                'contact_phone': '1234'
             },
             format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['product_info'] == order.product_info
-        assert response.json()['further_info'] == order.further_info
-        assert response.json()['existing_agents'] == order.existing_agents
-        assert response.json()['permission_to_approach_contacts'] == \
-            order.permission_to_approach_contacts
+        assert response.json()['product_info'] != 'Updated product info'
+        assert response.json()['further_info'] != 'Updated further info'
+        assert response.json()['existing_agents'] != 'Updated existing agents'
+        assert response.json()['permission_to_approach_contacts'] != \
+            'Updated permission to approach contacts'
+        assert response.json()['contact_email'] != 'updated-email@email.com'
+        assert response.json()['contact_phone'] != '1234'
 
 
 class TestViewOrderDetails(APITestMixin):
@@ -499,7 +507,9 @@ class TestViewOrderDetails(APITestMixin):
             'further_info': order.further_info,
             'existing_agents': order.existing_agents,
             'permission_to_approach_contacts': order.permission_to_approach_contacts,
-            'delivery_date': order.delivery_date.isoformat()
+            'delivery_date': order.delivery_date.isoformat(),
+            'contact_email': order.contact_email,
+            'contact_phone': order.contact_phone,
         }
 
     def test_not_found(self):

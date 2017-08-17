@@ -21,6 +21,8 @@ class Order(DocType, MapDBModelToDict):
     contacts_not_to_approach = String()
     delivery_date = Date()
     service_types = dsl_utils._id_name_mapping()
+    contact_email = dsl_utils.CaseInsensitiveKeywordString()
+    contact_phone = dsl_utils.KeywordString()
 
     MAPPINGS = {
         'id': str,
