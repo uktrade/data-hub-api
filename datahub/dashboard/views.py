@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from datahub.company.queryset import get_contact_queryset
-from datahub.interaction.queryset import get_interaction_queryset
+from datahub.interaction.queryset import get_interaction_queryset_v1
 
 from .serializers import IntelligentHomepageSerializer
 
@@ -21,7 +21,7 @@ class IntelligentHomepageView(APIView):
         days = request.GET.get('days', 15)
         days_in_the_past = now() - timedelta(days=int(days))
 
-        interactions = get_interaction_queryset().filter(
+        interactions = get_interaction_queryset_v1().filter(
             dit_adviser=user,
             created_on__gte=days_in_the_past
         ).order_by('-created_on')
