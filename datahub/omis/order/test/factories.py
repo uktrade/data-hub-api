@@ -28,6 +28,8 @@ class OrderFactory(factory.django.DjangoModelFactory):
     existing_agents = factory.Faker('text')
     permission_to_approach_contacts = factory.Faker('text')
     delivery_date = factory.Faker('future_date')
+    contact_email = factory.Faker('email')
+    contact_phone = '+44 (0)7123 123456'
 
     @to_many_field
     def service_types(self):
