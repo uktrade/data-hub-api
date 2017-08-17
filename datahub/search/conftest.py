@@ -45,7 +45,4 @@ def create_test_index(client, index):
     if client.indices.exists(index=index):
         client.indices.delete(index)
 
-    elasticsearch.configure_index(index, {
-        'number_of_shards': 1,
-        'number_of_replicas': 0,
-    })
+    elasticsearch.configure_index(index, settings.ES_INDEX_SETTINGS)
