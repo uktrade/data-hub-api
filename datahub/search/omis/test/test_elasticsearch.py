@@ -133,7 +133,15 @@ def test_mapping(setup_es):
                         }
                     },
                     'type': 'nested'
-                }
+                },
+                'contact_email': {
+                    'analyzer': 'lowercase_keyword_analyzer',
+                    'type': 'string'
+                },
+                'contact_phone': {
+                    'index': 'not_analyzed',
+                    'type': 'string'
+                },
             }
         }
     }
@@ -197,6 +205,8 @@ def test_indexed_doc(setup_es):
             'reference': order.reference,
             'description': order.description,
             'contacts_not_to_approach': order.contacts_not_to_approach,
-            'delivery_date': order.delivery_date.isoformat()
+            'delivery_date': order.delivery_date.isoformat(),
+            'contact_email': order.contact_email,
+            'contact_phone': order.contact_phone,
         }
     }

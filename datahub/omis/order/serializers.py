@@ -41,6 +41,9 @@ class OrderSerializer(serializers.ModelSerializer):
 
     delivery_date = serializers.DateField(required=False, allow_null=True)
 
+    contact_email = serializers.CharField(read_only=True)
+    contact_phone = serializers.CharField(read_only=True)
+
     # legacy fields
     product_info = serializers.CharField(read_only=True)
     further_info = serializers.CharField(read_only=True)
@@ -63,6 +66,8 @@ class OrderSerializer(serializers.ModelSerializer):
             'service_types',
             'description',
             'contacts_not_to_approach',
+            'contact_email',
+            'contact_phone',
             'product_info',
             'further_info',
             'existing_agents',

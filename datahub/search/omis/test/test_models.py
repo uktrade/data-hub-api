@@ -50,6 +50,8 @@ def test_order_to_dict():
         'description': order.description,
         'contacts_not_to_approach': order.contacts_not_to_approach,
         'delivery_date': order.delivery_date,
+        'contact_email': order.contact_email,
+        'contact_phone': order.contact_phone,
     }
 
 

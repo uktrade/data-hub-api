@@ -76,6 +76,9 @@ class Order(BaseModel):
 
     delivery_date = models.DateField(blank=True, null=True)
 
+    contact_email = models.EmailField(blank=True)
+    contact_phone = models.CharField(max_length=254, blank=True)
+
     # legacy fields, only meant to be used in readonly mode as reference
     product_info = models.TextField(
         blank=True, editable=False,
