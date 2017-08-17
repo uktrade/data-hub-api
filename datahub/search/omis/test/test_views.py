@@ -97,6 +97,62 @@ class TestSearchOrder(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()['results']) == 0
 
+    def test_filter_by_created_on_range(self, setup_es, setup_data):
+        """Test that results can be filtered by a range of date for created_on."""
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:order')
+
+        response = self.api_client.post(url, {
+            'created_on_before': '2017-02-02',
+            'created_on_after': '2017-02-01'
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()['results']) == 1
+        assert response.json()['results'][0]['reference'] == 'ref2'
+
+    def test_filter_by_created_on_before_only(self, setup_es, setup_data):
+        """Test that results can be filtered by created_on_before."""
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:order')
+
+        response = self.api_client.post(url, {
+            'created_on_before': '2017-01-15',
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()['results']) == 1
+        assert response.json()['results'][0]['reference'] == 'ref1'
+
+    def test_filter_by_created_on_after_only(self, setup_es, setup_data):
+        """Test that results can be filtered by created_on_after."""
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:order')
+
+        response = self.api_client.post(url, {
+            'created_on_after': '2017-01-15',
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()['results']) == 1
+        assert response.json()['results'][0]['reference'] == 'ref2'
+
+    def test_incorrect_dates_raise_validation_error(self, setup_es, setup_data):
+        """Test that if the dates are not in a valid format, the API return a validation error."""
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:order')
+
+        response = self.api_client.post(url, {
+            'created_on_before': 'invalid',
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {'non_field_errors': 'Date(s) in incorrect format.'}
+
 
 class TestPaginatedAPIMixin:
     """Tests related to the paginated API mixin."""
