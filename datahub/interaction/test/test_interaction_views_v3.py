@@ -51,7 +51,7 @@ class TestInteractionV3(APITestMixin):
                 'name': InteractionType.face_to_face.value.name
             },
             'subject': 'whatever',
-            'date': request_data['date'],
+            'date': '2017-04-18',
             'dit_adviser': {
                 'id': str(adviser.pk),
                 'first_name': adviser.first_name,
