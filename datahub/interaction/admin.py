@@ -1,12 +1,11 @@
 from django.contrib import admin
 
-from reversion.admin import VersionAdmin
-
+from datahub.core.admin import BaseModelVersionAdmin
 from .models import Interaction, ServiceDelivery, ServiceOffer
 
 
 @admin.register(Interaction)
-class InteractionAdmin(VersionAdmin):
+class InteractionAdmin(BaseModelVersionAdmin):
     """Interaction admin."""
 
     search_fields = ['id', 'company__company_number', 'company__company_name', 'contact_email']
@@ -14,7 +13,7 @@ class InteractionAdmin(VersionAdmin):
 
 
 @admin.register(ServiceDelivery)
-class ServiceDeliveryAdmin(VersionAdmin):
+class ServiceDeliveryAdmin(BaseModelVersionAdmin):
     """Service Delivery admin."""
 
     search_fields = ['id', 'company__company_number', 'company__company_name', 'contact_email']
@@ -22,7 +21,7 @@ class ServiceDeliveryAdmin(VersionAdmin):
 
 
 @admin.register(ServiceOffer)
-class ServiceOfferAdmin(VersionAdmin):
+class ServiceOfferAdmin(BaseModelVersionAdmin):
     """Service Offer admin."""
 
     raw_id_fields = ('event',)

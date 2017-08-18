@@ -573,3 +573,5 @@ class TestAuditLogView(APITestMixin):
         assert entry['comment'] == 'Changed'
         assert entry['timestamp'] == changed_datetime.isoformat()
         assert entry['changes']['notes'] == ['Initial notes', 'New notes']
+        assert not {'created_on', 'created_by', 'modified_on', 'modified_by'} & entry[
+            'changes'].keys()

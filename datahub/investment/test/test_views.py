@@ -1069,6 +1069,8 @@ class TestAuditLogView(APITestMixin):
         assert entry['timestamp'] == changed_datetime.isoformat(), 'TS can be set manually'
         assert entry['changes']['description'] == ['Initial desc', 'New desc'], \
             'Changes are reflected'
+        assert not {'created_on', 'created_by', 'modified_on', 'modified_by'} & entry[
+            'changes'].keys()
 
 
 class TestArchiveViews(APITestMixin):
