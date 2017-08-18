@@ -43,6 +43,7 @@ class Contact(DocType, MapDBModelToDict):
     adviser = dsl_utils._contact_mapping('adviser')
     archived_by = dsl_utils._contact_mapping('archived_by')
     company = dsl_utils._id_name_mapping()
+    company_sector = dsl_utils._id_name_mapping()
 
     MAPPINGS = {
         'id': str,
@@ -51,6 +52,10 @@ class Contact(DocType, MapDBModelToDict):
         'adviser': dict_utils._contact_dict,
         'company': dict_utils._id_name_dict,
         'archived_by': dict_utils._contact_dict,
+    }
+
+    COMPUTED_MAPPINGS = {
+        'company_sector': dict_utils._nested_id_name_dict('company.sector'),
     }
 
     IGNORED_FIELDS = (

@@ -39,6 +39,26 @@ def _contact_dict(obj, include_dit_team=False):
     return data
 
 
+def _nested_id_name_dict(nested_field):
+    """Creates dictionary with selected fields from nested_field."""
+    def id_name_dict(obj):
+        fields = nested_field.split('.', maxsplit=1)
+        if len(fields) != 2:
+            raise ValueError("nested_field must be in 'nested_object.nested_field' format.")
+
+        related_object = getattr(obj, fields[0], None)
+        if related_object is None:
+            return None
+
+        field = getattr(related_object, fields[1], None)
+        if field is None:
+            return None
+
+        return _id_name_dict(field)
+
+    return id_name_dict
+
+
 def _company_dict(obj):
     return {
         'id': str(obj.id),
