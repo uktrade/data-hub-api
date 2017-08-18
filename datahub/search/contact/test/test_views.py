@@ -94,7 +94,7 @@ class TestBasicSearch(APITestMixin):
         assert [{'count': 1, 'entity': 'contact'}] == response.data['aggregations']
 
     def test_search_contact_has_sector(self, setup_es, setup_data):
-        """Tests sorting in descending order."""
+        """Tests if contact has a sector."""
         ContactFactory(first_name='sector_testing')
 
         setup_es.indices.refresh()
