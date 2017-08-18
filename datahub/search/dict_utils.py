@@ -32,7 +32,10 @@ def _contact_dict(obj, include_dit_team=False):
     }
 
     if include_dit_team:
-        data['dit_team'] = _id_name_dict(obj.dit_team)
+        if obj.dit_team:
+            data['dit_team'] = _id_name_dict(obj.dit_team)
+        else:
+            data['dit_team'] = {}
     return data
 
 

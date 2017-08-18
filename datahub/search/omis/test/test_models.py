@@ -1,7 +1,8 @@
 import pytest
 
-from datahub.omis.order.test.factories import OrderAssigneeFactory, OrderFactory, \
-    OrderSubscriberFactory
+from datahub.omis.order.test.factories import (
+    OrderAssigneeFactory, OrderFactory, OrderSubscriberFactory
+)
 
 from ..models import Order as ESOrder
 
