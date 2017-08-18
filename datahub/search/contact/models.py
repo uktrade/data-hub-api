@@ -55,7 +55,7 @@ class Contact(DocType, MapDBModelToDict):
     }
 
     COMPUTED_MAPPINGS = {
-        'company_sector': dict_utils._nested_id_name_dict('company.sector'),
+        'company_sector': dict_utils._computed_nested_id_name_dict('company.sector'),
     }
 
     IGNORED_FIELDS = (

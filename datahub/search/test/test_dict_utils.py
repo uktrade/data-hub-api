@@ -128,7 +128,7 @@ def test_nested_id_name_dict():
     obj.company.sector.id = 123
     obj.company.sector.name = 'Cats'
 
-    res = dict_utils._nested_id_name_dict('company.sector')(obj)
+    res = dict_utils._computed_nested_id_name_dict('company.sector')(obj)
 
     assert res == {
         'id': str(obj.company.sector.id),
@@ -141,12 +141,14 @@ def test_nested_id_name_dict_raises_exception_on_invalid_argument():
     obj = mock.Mock()
 
     with raises(ValueError):
-        dict_utils._nested_id_name_dict('company')(obj)
+        dict_utils._computed_nested_id_name_dict('company')(obj)
 
 
 def test_nested_id_name_dict_returns_none_on_invalid_path():
-    """Tests nested id name dict raises exception on invalid path."""
-    obj = {}
+    """Tests nested id name dict raises exception on invalid path.
+    We assume that first part of path exists.
+    """
+    obj = mock.Mock(company=None)
 
-    res = dict_utils._nested_id_name_dict('company.sector')(obj)
+    res = dict_utils._computed_nested_id_name_dict('company.sector')(obj)
     assert res is None
