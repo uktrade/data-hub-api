@@ -1,16 +1,3 @@
-from datahub.omis.order.models import Order as DBOrder
+from .apps import OrderSearchApp
 
-from .models import Order
-from .views import SearchOrderAPIView
-
-from ..apps import SearchApp
-
-
-class OrderSearchApp(SearchApp):
-    """SearchApp for order"""
-
-    name = 'order'
-    plural_name = 'orders'
-    ESModel = Order
-    DBModel = DBOrder
-    view = SearchOrderAPIView
+__all__ = ('OrderSearchApp',)
