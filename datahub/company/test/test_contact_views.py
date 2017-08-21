@@ -99,7 +99,8 @@ class TestAddContact(APITestMixin):
             'archived_by': None,
             'archived_on': None,
             'archived_reason': None,
-            'created_on': '2017-04-18T13:25:30.986208'
+            'created_on': '2017-04-18T13:25:30.986208',
+            'modified_on': '2017-04-18T13:25:30.986208',
         }
 
     def test_with_address_same_as_company(self):
@@ -282,42 +283,43 @@ class TestAddContact(APITestMixin):
 class TestEditContact(APITestMixin):
     """Edit contact test case."""
 
-    @freeze_time('2017-04-18 13:25:30.986208+00:00')
     def test_patch(self):
         """Test that it successfully patch an existing contact."""
-        company = CompanyFactory()
+        with freeze_time('2017-04-18 13:25:30.986208+00:00'):
+            company = CompanyFactory()
 
-        contact = ContactFactory(
-            title_id=constants.Title.admiral_of_the_fleet.value.id,
-            first_name='Oratio',
-            last_name='Nelson',
-            job_title=constants.Role.owner.value.name,
-            company=company,
-            email='foo@bar.com',
-            email_alternative='foo2@bar.com',
-            primary=True,
-            adviser=self.user,
-            telephone_countrycode='+44',
-            telephone_number='123456789',
-            telephone_alternative='987654321',
-            address_same_as_company=False,
-            address_1='Foo st.',
-            address_2='adr 2',
-            address_town='London',
-            address_county='London',
-            address_country_id=constants.Country.united_kingdom.value.id,
-            address_postcode='SW1A1AA',
-            notes='lorem ipsum',
-            contactable_by_dit=False,
-            contactable_by_dit_partners=False,
-            contactable_by_email=True,
-            contactable_by_phone=True
-        )
+            contact = ContactFactory(
+                title_id=constants.Title.admiral_of_the_fleet.value.id,
+                first_name='Oratio',
+                last_name='Nelson',
+                job_title=constants.Role.owner.value.name,
+                company=company,
+                email='foo@bar.com',
+                email_alternative='foo2@bar.com',
+                primary=True,
+                adviser=self.user,
+                telephone_countrycode='+44',
+                telephone_number='123456789',
+                telephone_alternative='987654321',
+                address_same_as_company=False,
+                address_1='Foo st.',
+                address_2='adr 2',
+                address_town='London',
+                address_county='London',
+                address_country_id=constants.Country.united_kingdom.value.id,
+                address_postcode='SW1A1AA',
+                notes='lorem ipsum',
+                contactable_by_dit=False,
+                contactable_by_dit_partners=False,
+                contactable_by_email=True,
+                contactable_by_phone=True
+            )
 
         url = reverse('api-v3:contact:detail', kwargs={'pk': contact.pk})
-        response = self.api_client.patch(url, {
-            'first_name': 'New Oratio',
-        }, format='json')
+        with freeze_time('2017-04-19 13:25:30.986208+00:00'):
+            response = self.api_client.patch(url, {
+                'first_name': 'New Oratio',
+            }, format='json')
 
         assert response.status_code == status.HTTP_200_OK, response.data
         assert response.json() == {
@@ -364,7 +366,8 @@ class TestEditContact(APITestMixin):
             'archived_by': None,
             'archived_on': None,
             'archived_reason': None,
-            'created_on': '2017-04-18T13:25:30.986208'
+            'created_on': '2017-04-18T13:25:30.986208',
+            'modified_on': '2017-04-19T13:25:30.986208',
         }
 
 
@@ -502,7 +505,8 @@ class TestViewContact(APITestMixin):
             'archived_by': None,
             'archived_on': None,
             'archived_reason': None,
-            'created_on': '2017-04-18T13:25:30.986208'
+            'created_on': '2017-04-18T13:25:30.986208',
+            'modified_on': '2017-04-18T13:25:30.986208',
         }
 
 
