@@ -1,13 +1,12 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from reversion.admin import VersionAdmin
-
+from datahub.core.admin import BaseModelVersionAdmin
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
 
 
 @admin.register(Company)
-class CompanyAdmin(VersionAdmin):
+class CompanyAdmin(BaseModelVersionAdmin):
     """Company admin."""
 
     search_fields = ['name', 'id', 'company_number']
@@ -15,7 +14,7 @@ class CompanyAdmin(VersionAdmin):
 
 
 @admin.register(Contact)
-class ContactAdmin(VersionAdmin):
+class ContactAdmin(BaseModelVersionAdmin):
     """Contact admin."""
 
     search_fields = ['first_name', 'last_name', 'company__name']
@@ -40,7 +39,7 @@ class CHCompany(admin.ModelAdmin):
 
 
 @admin.register(Advisor)
-class AdviserAdmin(VersionAdmin, UserAdmin):
+class AdviserAdmin(BaseModelVersionAdmin, UserAdmin):
     """Adviser admin."""
 
     fieldsets = (
