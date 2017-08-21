@@ -12,6 +12,8 @@ class MapDBModelToDict:
 
     MAPPINGS = {}
 
+    COMPUTED_MAPPINGS = {}
+
     SEARCH_FIELDS = ()
 
     @classmethod
@@ -32,6 +34,10 @@ class MapDBModelToDict:
         """Converts dbmodel instance to a dictionary suitable for ElasticSearch."""
         result = {col: fn(getattr(dbmodel, col)) for col, fn in cls.MAPPINGS.items()
                   if getattr(dbmodel, col, None) is not None}
+
+        result.update({
+            col: fn(dbmodel) for col, fn in cls.COMPUTED_MAPPINGS.items()
+        })
 
         fields = [field for field in dbmodel._meta.get_fields()
                   if field.name not in cls.IGNORED_FIELDS]

@@ -23,7 +23,7 @@ def test_contact_dbmodel_to_dict():
             'address_country', 'address_postcode', 'telephone_alternative',
             'email_alternative', 'notes', 'contactable_by_dit',
             'contactable_by_dit_partners', 'contactable_by_email',
-            'contactable_by_phone'}
+            'contactable_by_phone', 'company_sector'}
 
     assert set(result.keys()) == keys
 
