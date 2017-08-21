@@ -1,4 +1,5 @@
 from unittest import mock
+from pytest import raises
 
 from .. import dict_utils
 
@@ -119,3 +120,35 @@ def test_company_dict():
         'id': str(obj.id),
         'company_number': obj.company_number,
     }
+
+
+def test_nested_id_name_dict():
+    """Tests nested id name dict."""
+    obj = mock.Mock()
+    obj.company.sector.id = 123
+    obj.company.sector.name = 'Cats'
+
+    res = dict_utils._computed_nested_id_name_dict('company.sector')(obj)
+
+    assert res == {
+        'id': str(obj.company.sector.id),
+        'name': obj.company.sector.name,
+    }
+
+
+def test_nested_id_name_dict_raises_exception_on_invalid_argument():
+    """Tests nested id name dict raises exception on invalid argument."""
+    obj = mock.Mock()
+
+    with raises(ValueError):
+        dict_utils._computed_nested_id_name_dict('company')(obj)
+
+
+def test_nested_id_name_dict_returns_none_on_invalid_path():
+    """Tests nested id name dict raises exception on invalid path.
+    We assume that first part of path exists.
+    """
+    obj = mock.Mock(company=None)
+
+    res = dict_utils._computed_nested_id_name_dict('company.sector')(obj)
+    assert res is None
