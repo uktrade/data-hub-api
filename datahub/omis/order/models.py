@@ -5,9 +5,27 @@ from django.utils.crypto import get_random_string
 from django.utils.timezone import now
 
 from datahub.company.models import Advisor, Company, Contact
-from datahub.core.models import BaseModel
+from datahub.core.models import BaseModel, BaseOrderedConstantModel
 
 from datahub.metadata.models import Country, Sector, Team
+
+
+class ServiceType(BaseOrderedConstantModel):
+    """
+    Order service type.
+    E.g. 'Validated contacts', 'Event', 'Market Research'
+    """
+
+    disabled_on = models.DateTimeField(blank=True, null=True)
+
+    def was_disabled_on(self, date_on):
+        """
+        Returns True if this service type was disabled at time `date_on`,
+        False otherwise.
+        """
+        if not self.disabled_on:
+            return False
+        return self.disabled_on <= date_on
 
 
 class Order(BaseModel):
@@ -40,6 +58,43 @@ class Order(BaseModel):
         related_name='+',
         null=True, blank=True,
         on_delete=models.SET_NULL
+    )
+
+    service_types = models.ManyToManyField(
+        ServiceType,
+        related_name="%(class)ss",  # noqa: Q000
+        blank=True
+    )
+    description = models.TextField(
+        blank=True,
+        help_text='Description of the work needed.'
+    )
+    contacts_not_to_approach = models.TextField(
+        blank=True,
+        help_text='Are there contacts that DIT should not approach?'
+    )
+
+    delivery_date = models.DateField(blank=True, null=True)
+
+    contact_email = models.EmailField(blank=True)
+    contact_phone = models.CharField(max_length=254, blank=True)
+
+    # legacy fields, only meant to be used in readonly mode as reference
+    product_info = models.TextField(
+        blank=True, editable=False,
+        help_text='Legacy field. What is the product?'
+    )
+    further_info = models.TextField(
+        blank=True, editable=False,
+        help_text='Legacy field. Further information.'
+    )
+    existing_agents = models.TextField(
+        blank=True, editable=False,
+        help_text='Legacy field. Details of any existing agents.'
+    )
+    permission_to_approach_contacts = models.TextField(
+        blank=True, editable=False,
+        help_text='Legacy field. Can DIT speak to the contacts?'
     )
 
     def __str__(self):

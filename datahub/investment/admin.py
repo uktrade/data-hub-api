@@ -2,14 +2,13 @@
 
 from django.contrib import admin
 
-from reversion.admin import VersionAdmin
-
+from datahub.core.admin import BaseModelVersionAdmin
 from datahub.investment.models import (InvestmentProject, InvestmentProjectTeamMember,
                                        IProjectDocument)
 
 
 @admin.register(InvestmentProject)
-class InvestmentProjectAdmin(VersionAdmin):
+class InvestmentProjectAdmin(BaseModelVersionAdmin):
     """Investment project admin."""
 
     search_fields = ['name']
@@ -27,7 +26,7 @@ class InvestmentProjectAdmin(VersionAdmin):
 
 
 @admin.register(InvestmentProjectTeamMember)
-class InvestmentProjectTeamMemberAdmin(VersionAdmin):
+class InvestmentProjectTeamMemberAdmin(BaseModelVersionAdmin):
     """Investment project team member admin."""
 
     raw_id_fields = (

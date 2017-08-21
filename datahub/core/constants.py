@@ -438,12 +438,13 @@ class Service(Enum):
 class Team(Enum):
     """Team."""
 
-    healthcare_uk = Constant(
-        'Healthcare UK', '3ff47a07-002c-e311-a78e-e4115bead28a'
+    healthcare_uk = Constant('Healthcare UK', '3ff47a07-002c-e311-a78e-e4115bead28a')
+    tees_valley_lep = Constant('Tees Valley LEP', 'a889ef76-8925-e511-b6bc-e4115bead28a')
+    td_events_healthcare = Constant(
+        'TD - Events - Healthcare', 'daf924aa-9698-e211-a939-e4115bead28a'
     )
-    crm = Constant(
-        'crm', 'a7f924aa-9698-e211-a939-e4115bead28a'
-    )
+    food_from_britain = Constant('Food From Britain', '8cf924aa-9698-e211-a939-e4115bead28a')
+    crm = Constant('crm', 'a7f924aa-9698-e211-a939-e4115bead28a')
 
 
 class ServiceDeliveryStatus(Enum):
