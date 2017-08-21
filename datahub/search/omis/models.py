@@ -23,6 +23,8 @@ class Order(DocType, MapDBModelToDict):
     service_types = dsl_utils._id_name_mapping()
     contact_email = dsl_utils.CaseInsensitiveKeywordString()
     contact_phone = dsl_utils.KeywordString()
+    subscribers = dsl_utils._contact_mapping('subscribers', include_dit_team=True)
+    assignees = dsl_utils._contact_mapping('assignees', include_dit_team=True)
 
     MAPPINGS = {
         'id': str,
@@ -32,12 +34,16 @@ class Order(DocType, MapDBModelToDict):
         'primary_market': dict_utils._id_name_dict,
         'sector': dict_utils._id_name_dict,
         'service_types': lambda col: [dict_utils._id_name_dict(c) for c in col.all()],
+        'subscribers': lambda col: [
+            dict_utils._contact_dict(c.adviser, include_dit_team=True) for c in col.all()
+        ],
+        'assignees': lambda col: [
+            dict_utils._contact_dict(c.adviser, include_dit_team=True) for c in col.all()
+        ],
     }
 
     IGNORED_FIELDS = (
         'modified_by',
-        'subscribers',
-        'assignees',
         'modified_on',
         'product_info',
         'further_info',
