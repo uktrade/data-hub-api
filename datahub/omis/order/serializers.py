@@ -1,13 +1,21 @@
+from django.utils.timezone import now
+
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from datahub.company.models import Advisor, Company, Contact
 from datahub.company.serializers import NestedAdviserField
-from datahub.core.serializers import NestedRelatedField
+from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
 from datahub.core.validate_utils import DataCombiner
 from datahub.metadata.models import Country, Sector, Team
 
-from .models import Order, OrderAssignee, OrderSubscriber
+from .models import Order, OrderAssignee, OrderSubscriber, ServiceType
+
+
+class ServiceTypeSerializer(ConstantModelSerializer):
+    """Service Type DRF serializer"""
+
+    disabled_on = serializers.ReadOnlyField()
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -26,6 +34,22 @@ class OrderSerializer(serializers.ModelSerializer):
     primary_market = NestedRelatedField(Country)
     sector = NestedRelatedField(Sector, required=False, allow_null=True)
 
+    service_types = NestedRelatedField(ServiceType, many=True, required=False)
+
+    description = serializers.CharField(allow_blank=True, required=False)
+    contacts_not_to_approach = serializers.CharField(allow_blank=True, required=False)
+
+    delivery_date = serializers.DateField(required=False, allow_null=True)
+
+    contact_email = serializers.CharField(read_only=True)
+    contact_phone = serializers.CharField(read_only=True)
+
+    # legacy fields
+    product_info = serializers.CharField(read_only=True)
+    further_info = serializers.CharField(read_only=True)
+    existing_agents = serializers.CharField(read_only=True)
+    permission_to_approach_contacts = serializers.CharField(read_only=True)
+
     class Meta:  # noqa: D101
         model = Order
         fields = [
@@ -39,6 +63,16 @@ class OrderSerializer(serializers.ModelSerializer):
             'contact',
             'primary_market',
             'sector',
+            'service_types',
+            'description',
+            'contacts_not_to_approach',
+            'contact_email',
+            'contact_phone',
+            'product_info',
+            'further_info',
+            'existing_agents',
+            'permission_to_approach_contacts',
+            'delivery_date',
         ]
 
     def validate(self, data):
@@ -63,6 +97,24 @@ class OrderSerializer(serializers.ModelSerializer):
             if data_combiner.get_value('primary_market') != self.instance.primary_market:
                 raise serializers.ValidationError({
                     'primary_market': 'The primary market cannot be changed after creation.'
+                })
+
+        # cannot use a disabled service types
+        if 'service_types' in data:
+            if self.instance:
+                created_on = self.instance.created_on
+            else:
+                created_on = now()
+
+            disabled_service_types = [
+                service_type.name
+                for service_type in data['service_types']
+                if service_type.was_disabled_on(created_on)
+            ]
+
+            if disabled_service_types:
+                raise serializers.ValidationError({
+                    'service_types': f'"{", ".join(disabled_service_types)}" disabled.'
                 })
 
         return data
@@ -125,6 +177,7 @@ class SubscribedAdviserSerializer(serializers.Serializer):
     id = serializers.UUIDField(validators=[existing_adviser])
     first_name = serializers.CharField(read_only=True)
     last_name = serializers.CharField(read_only=True)
+    name = serializers.CharField(read_only=True)
     dit_team = NestedRelatedField(Team, read_only=True)
 
     class Meta:  # noqa: D101

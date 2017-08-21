@@ -164,6 +164,9 @@ APPEND_SLASH = False
 # Leeloo stuff
 ES_URL = env('ES_URL')
 ES_INDEX = env('ES_INDEX')
+ES_INDEX_SETTINGS = {
+    'index.mapping.nested_fields.limit': 100
+}
 DATAHUB_SECRET = env('DATAHUB_SECRET')
 CDMS_AUTH_URL = env('CDMS_AUTH_URL')
 CDMS_TEXT_MAX_LENGTH = 4000

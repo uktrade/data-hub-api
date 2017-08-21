@@ -3,8 +3,6 @@ from config.settings.common import *
 MIDDLEWARE.append('raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware')
 INSTALLED_APPS.append('raven.contrib.django.raven_compat')
 
-SENTRY_DSN = env('DJANGO_SENTRY_DSN')
-
 # Logging
 LOGGING = {
     'version': 1,
@@ -48,7 +46,7 @@ LOGGING = {
     },
 }
 
-
 RAVEN_CONFIG = {
-    'DSN': SENTRY_DSN,
+    'dsn': env('DJANGO_SENTRY_DSN'),
+    'include_paths': ['datahub']
 }

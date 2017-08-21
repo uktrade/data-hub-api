@@ -6,6 +6,7 @@ from rest_framework import routers
 from datahub.company import urls as company_urls
 from datahub.company import views as company_views
 from datahub.interaction import views as interaction_views
+from datahub.interaction import urls as interaction_urls
 from datahub.investment import urls as investment_urls
 from datahub.leads import urls as leads_urls
 from datahub.omis import urls as omis_urls
@@ -32,11 +33,12 @@ v2_urls = v2_urlpatterns
 # API V3
 
 v3_urls = [
-    url(r'^', include((investment_urls, 'investment'), namespace='investment')),
-    url(r'^', include((leads_urls, 'business-leads'), namespace='business-leads')),
     url(r'^', include((company_urls.contact_urls, 'contact'), namespace='contact')),
     url(r'^', include((company_urls.company_urls, 'company'), namespace='company')),
     url(r'^', include((company_urls.ch_company_urls, 'ch-company'), namespace='ch-company')),
+    url(r'^', include((interaction_urls, 'interaction'), namespace='interaction')),
+    url(r'^', include((investment_urls, 'investment'), namespace='investment')),
+    url(r'^', include((leads_urls, 'business-leads'), namespace='business-leads')),
     url(r'^', include((search_urls, 'search'), namespace='search')),
     url(r'^omis/', include((omis_urls, 'omis'), namespace='omis'))
 ]

@@ -13,5 +13,10 @@ INSTALLED_APPS += [
 ]
 
 ES_INDEX = 'test'
+ES_INDEX_SETTINGS = {
+    'index.mapping.nested_fields.limit': 100,
+    'number_of_shards': 1,
+    'number_of_replicas': 0,
+}
 DOCUMENT_BUCKET='test-bucket'
 AV_SERVICE_URL='http://av-service/'
