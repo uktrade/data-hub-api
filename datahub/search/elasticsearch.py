@@ -137,7 +137,7 @@ def get_term_query(field, value):
     if '.' not in field:
         return term
 
-    return Q('nested', path=field.split('.', maxsplit=1)[0], query=term)
+    return Q('nested', path=field.rsplit('.', maxsplit=1)[0], query=term)
 
 
 def get_match_query(field, value):

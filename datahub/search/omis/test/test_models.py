@@ -1,6 +1,8 @@
 import pytest
 
-from datahub.omis.order.test.factories import OrderFactory
+from datahub.omis.order.test.factories import (
+    OrderAssigneeFactory, OrderFactory, OrderSubscriberFactory
+)
 
 from ..models import Order as ESOrder
 
@@ -10,6 +12,9 @@ pytestmark = pytest.mark.django_db
 def test_order_to_dict():
     """Test converting an order to dict."""
     order = OrderFactory()
+    OrderSubscriberFactory.create_batch(2, order=order)
+    OrderAssigneeFactory.create_batch(2, order=order)
+
     result = ESOrder.dbmodel_to_dict(order)
 
     assert result == {
@@ -52,6 +57,32 @@ def test_order_to_dict():
         'delivery_date': order.delivery_date,
         'contact_email': order.contact_email,
         'contact_phone': order.contact_phone,
+        'subscribers': [
+            {
+                'id': str(subscriber.adviser.pk),
+                'first_name': subscriber.adviser.first_name,
+                'last_name': subscriber.adviser.last_name,
+                'name': str(subscriber.adviser.name),
+                'dit_team': {
+                    'id': str(subscriber.adviser.dit_team.pk),
+                    'name': str(subscriber.adviser.dit_team.name),
+                }
+            }
+            for subscriber in order.subscribers.all()
+        ],
+        'assignees': [
+            {
+                'id': str(assignee.adviser.pk),
+                'first_name': assignee.adviser.first_name,
+                'last_name': assignee.adviser.last_name,
+                'name': str(assignee.adviser.name),
+                'dit_team': {
+                    'id': str(assignee.adviser.dit_team.pk),
+                    'name': str(assignee.adviser.dit_team.name),
+                }
+            }
+            for assignee in order.assignees.all()
+        ],
     }
 
 

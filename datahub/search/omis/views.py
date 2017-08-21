@@ -62,11 +62,15 @@ class SearchOrderAPIView(PaginatedAPIMixin, APIView):
     FILTER_FIELDS = [
         'primary_market',
         'created_on_before',
-        'created_on_after'
+        'created_on_after',
+        'assigned_to_adviser',
+        'assigned_to_team',
     ]
 
     REMAP_FIELDS = {
-        'primary_market': 'primary_market.id'
+        'primary_market': 'primary_market.id',
+        'assigned_to_adviser': 'assignees.id',
+        'assigned_to_team': 'assignees.dit_team.id',
     }
 
     def get_filtering_data(self, request):

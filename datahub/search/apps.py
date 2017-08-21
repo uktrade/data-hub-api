@@ -91,7 +91,7 @@ class SearchConfig(AppConfig):
         from datahub.search import elasticsearch
 
         elasticsearch.configure_connection()
-        elasticsearch.configure_index(settings.ES_INDEX)
+        elasticsearch.configure_index(settings.ES_INDEX, settings.ES_INDEX_SETTINGS)
 
         for search_app in get_search_apps():
             search_app.init_all()
