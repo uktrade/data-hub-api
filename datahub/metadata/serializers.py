@@ -24,3 +24,14 @@ class TeamSerializer(serializers.Serializer):
 
     class Meta:  # noqa: D101
         fields = '__all__'
+
+
+class CountrySerializer(serializers.Serializer):
+    """Country serializer."""
+
+    id = serializers.ReadOnlyField()
+    name = serializers.ReadOnlyField()
+    omis_disabled_on = serializers.ReadOnlyField()
+
+    class Meta:  # noqa: D101
+        fields = '__all__'
