@@ -193,7 +193,8 @@ class ContactSerializer(serializers.ModelSerializer):
             'archived_on',
             'archived_reason',
             'archived_by',
-            'created_on'
+            'created_on',
+            'modified_on'
         )
 
 
