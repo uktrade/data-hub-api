@@ -19,10 +19,18 @@ class CompanySearchApp(SearchApp):
     def get_dataset(self):
         """Returns dataset that will be synchronised with Elasticsearch."""
         prefetch_fields = (
-            'registered_address_country', 'business_type', 'sector', 'employee_range',
-            'turnover_range', 'account_manager', 'export_to_countries',
-            'future_interest_countries', 'trading_address_country', 'headquarter_type',
-            'classification', 'one_list_account_owner',
+            'registered_address_country',
+            'business_type',
+            'sector',
+            'employee_range',
+            'turnover_range',
+            'account_manager',
+            'export_to_countries',
+            'future_interest_countries',
+            'trading_address_country',
+            'headquarter_type',
+            'classification',
+            'one_list_account_owner',
         )
 
         qs = self.DBModel.objects.prefetch_related(*prefetch_fields).all().order_by('pk')
