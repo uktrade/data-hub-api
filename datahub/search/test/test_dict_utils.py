@@ -63,6 +63,50 @@ def test_contact_dict():
     }
 
 
+def test_contact_dict_include_dit_team():
+    """Tests contact_dict including its team."""
+    obj = mock.Mock()
+    obj.id = 123
+    obj.first_name = 'First'
+    obj.last_name = 'Last'
+    obj.name = 'First Last'
+    obj.dit_team.id = 321
+    obj.dit_team.name = 'team name'
+
+    res = dict_utils._contact_dict(obj, include_dit_team=True)
+
+    assert res == {
+        'id': str(obj.id),
+        'first_name': obj.first_name,
+        'last_name': obj.last_name,
+        'name': obj.name,
+        'dit_team': {
+            'id': '321',
+            'name': 'team name'
+        }
+    }
+
+
+def test_contact_dict_none_dit_team():
+    """Tests contact_dict including its team when dit_team is None."""
+    obj = mock.Mock()
+    obj.id = 123
+    obj.first_name = 'First'
+    obj.last_name = 'Last'
+    obj.name = 'First Last'
+    obj.dit_team = None
+
+    res = dict_utils._contact_dict(obj, include_dit_team=True)
+
+    assert res == {
+        'id': str(obj.id),
+        'first_name': obj.first_name,
+        'last_name': obj.last_name,
+        'name': obj.name,
+        'dit_team': {}
+    }
+
+
 def test_company_dict():
     """Tests company_dict."""
     obj = mock.Mock()
