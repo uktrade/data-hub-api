@@ -3,9 +3,8 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import ContactFactory
-
+from datahub.core.constants import Sector
 from datahub.core.test_utils import APITestMixin
-
 
 pytestmark = pytest.mark.django_db
 
@@ -93,3 +92,22 @@ class TestBasicSearch(APITestMixin):
         assert response.data['contacts'][0]['first_name'] in term
         assert response.data['contacts'][0]['last_name'] in term
         assert [{'count': 1, 'entity': 'contact'}] == response.data['aggregations']
+
+    def test_search_contact_has_sector(self, setup_es, setup_data):
+        """Tests if contact has a sector."""
+        ContactFactory(first_name='sector_testing')
+
+        setup_es.indices.refresh()
+
+        term = 'sector_testing'
+
+        url = reverse('api-v3:search:contact')
+        response = self.api_client.post(url, {
+            'original_query': term,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+
+        sector_name = Sector.aerospace_assembly_aircraft.value.name
+        assert sector_name == response.data['results'][0]['company_sector']['name']
