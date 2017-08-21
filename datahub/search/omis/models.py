@@ -11,34 +11,34 @@ class Order(DocType, MapDBModelToDict):
 
     id = String(index='not_analyzed')
     reference = String(analyzer='lowercase_keyword_analyzer')
-    company = dsl_utils._id_name_mapping()
-    contact = dsl_utils._contact_mapping('contact')
-    created_by = dsl_utils._contact_mapping('created_by')
+    company = dsl_utils.id_name_mapping()
+    contact = dsl_utils.contact_mapping('contact')
+    created_by = dsl_utils.contact_mapping('created_by')
     created_on = Date()
-    primary_market = dsl_utils._id_name_mapping()
-    sector = dsl_utils._id_name_mapping()
+    primary_market = dsl_utils.id_name_mapping()
+    sector = dsl_utils.id_name_mapping()
     description = String()
     contacts_not_to_approach = String()
     delivery_date = Date()
-    service_types = dsl_utils._id_name_mapping()
+    service_types = dsl_utils.id_name_mapping()
     contact_email = dsl_utils.CaseInsensitiveKeywordString()
     contact_phone = dsl_utils.KeywordString()
-    subscribers = dsl_utils._contact_mapping('subscribers', include_dit_team=True)
-    assignees = dsl_utils._contact_mapping('assignees', include_dit_team=True)
+    subscribers = dsl_utils.contact_mapping('subscribers', include_dit_team=True)
+    assignees = dsl_utils.contact_mapping('assignees', include_dit_team=True)
 
     MAPPINGS = {
         'id': str,
-        'company': dict_utils._id_name_dict,
-        'contact': dict_utils._contact_dict,
-        'created_by': dict_utils._contact_dict,
-        'primary_market': dict_utils._id_name_dict,
-        'sector': dict_utils._id_name_dict,
-        'service_types': lambda col: [dict_utils._id_name_dict(c) for c in col.all()],
+        'company': dict_utils.id_name_dict,
+        'contact': dict_utils.contact_or_adviser_dict,
+        'created_by': dict_utils.contact_or_adviser_dict,
+        'primary_market': dict_utils.id_name_dict,
+        'sector': dict_utils.id_name_dict,
+        'service_types': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
         'subscribers': lambda col: [
-            dict_utils._contact_dict(c.adviser, include_dit_team=True) for c in col.all()
+            dict_utils.contact_or_adviser_dict(c.adviser, include_dit_team=True) for c in col.all()
         ],
         'assignees': lambda col: [
-            dict_utils._contact_dict(c.adviser, include_dit_team=True) for c in col.all()
+            dict_utils.contact_or_adviser_dict(c.adviser, include_dit_team=True) for c in col.all()
         ],
     }
 

@@ -1,4 +1,4 @@
-def _id_name_dict(obj):
+def id_name_dict(obj):
     """Creates dictionary with selected field from supplied object."""
     return {
         'id': str(obj.id),
@@ -6,7 +6,7 @@ def _id_name_dict(obj):
     }
 
 
-def _id_type_dict(obj):
+def id_type_dict(obj):
     """Creates dictionary with selected field from supplied object."""
     return {
         'id': str(obj.id),
@@ -14,7 +14,7 @@ def _id_type_dict(obj):
     }
 
 
-def _id_uri_dict(obj):
+def id_uri_dict(obj):
     """Creates dictionary with selected field from supplied object."""
     return {
         'id': str(obj.id),
@@ -22,7 +22,7 @@ def _id_uri_dict(obj):
     }
 
 
-def _contact_dict(obj, include_dit_team=False):
+def contact_or_adviser_dict(obj, include_dit_team=False):
     """Creates dictionary with selected field from supplied object."""
     data = {
         'id': str(obj.id),
@@ -33,13 +33,13 @@ def _contact_dict(obj, include_dit_team=False):
 
     if include_dit_team:
         if obj.dit_team:
-            data['dit_team'] = _id_name_dict(obj.dit_team)
+            data['dit_team'] = id_name_dict(obj.dit_team)
         else:
             data['dit_team'] = {}
     return data
 
 
-def _computed_nested_id_name_dict(nested_field):
+def computed_nested_id_name_dict(nested_field):
     """Creates dictionary with selected fields from nested_field."""
     def get_dict(obj):
         fields = nested_field.split('.', maxsplit=1)
@@ -54,12 +54,13 @@ def _computed_nested_id_name_dict(nested_field):
         if field is None:
             return None
 
-        return _id_name_dict(field)
+        return id_name_dict(field)
 
     return get_dict
 
 
-def _company_dict(obj):
+def company_dict(obj):
+    """Creates dictionary from a company with id and company_number keys."""
     return {
         'id': str(obj.id),
         'company_number': obj.company_number,
