@@ -7,7 +7,7 @@ CaseInsensitiveKeywordString = partial(String, analyzer='lowercase_keyword_analy
 TrigramString = partial(String, analyzer='trigram_analyzer')
 
 
-def _contact_mapping(field, include_dit_team=False):
+def contact_mapping(field, include_dit_team=False):
     """Mapping for Adviser/Contact fields."""
     props = {
         'id': KeywordString(),
@@ -17,11 +17,11 @@ def _contact_mapping(field, include_dit_team=False):
     }
 
     if include_dit_team:
-        props['dit_team'] = _id_name_mapping()
+        props['dit_team'] = id_name_mapping()
     return Nested(properties=props)
 
 
-def _id_name_mapping():
+def id_name_mapping():
     """Mapping for id name fields."""
     return Nested(properties={
         'id': KeywordString(),
@@ -29,7 +29,7 @@ def _id_name_mapping():
     })
 
 
-def _id_uri_mapping():
+def id_uri_mapping():
     """Mapping for id uri fields."""
     return Nested(properties={
         'id': KeywordString(),
@@ -37,7 +37,7 @@ def _id_uri_mapping():
     })
 
 
-def _company_mapping():
+def company_mapping():
     """Mapping for id company_number fields."""
     return Nested(properties={
         'id': KeywordString(),

@@ -18,7 +18,7 @@ class Contact(DocType, MapDBModelToDict):
     name = String()
     name_keyword = dsl_utils.CaseInsensitiveKeywordString()
     name_trigram = dsl_utils.TrigramString()
-    title = dsl_utils._id_name_mapping()
+    title = dsl_utils.id_name_mapping()
     first_name = String(copy_to=['name', 'name_keyword', 'name_trigram'])
     last_name = String(copy_to=['name', 'name_keyword', 'name_trigram'])
     primary = Boolean()
@@ -39,23 +39,23 @@ class Contact(DocType, MapDBModelToDict):
     contactable_by_dit_partners = Boolean()
     contactable_by_email = Boolean()
     contactable_by_phone = Boolean()
-    address_country = dsl_utils._id_name_mapping()
-    adviser = dsl_utils._contact_mapping('adviser')
-    archived_by = dsl_utils._contact_mapping('archived_by')
-    company = dsl_utils._id_name_mapping()
-    company_sector = dsl_utils._id_name_mapping()
+    address_country = dsl_utils.id_name_mapping()
+    adviser = dsl_utils.contact_mapping('adviser')
+    archived_by = dsl_utils.contact_mapping('archived_by')
+    company = dsl_utils.id_name_mapping()
+    company_sector = dsl_utils.id_name_mapping()
 
     MAPPINGS = {
         'id': str,
-        'title': dict_utils._id_name_dict,
-        'address_country': dict_utils._id_name_dict,
-        'adviser': dict_utils._contact_dict,
-        'company': dict_utils._id_name_dict,
-        'archived_by': dict_utils._contact_dict,
+        'title': dict_utils.id_name_dict,
+        'address_country': dict_utils.id_name_dict,
+        'adviser': dict_utils.contact_or_adviser_dict,
+        'company': dict_utils.id_name_dict,
+        'archived_by': dict_utils.contact_or_adviser_dict,
     }
 
     COMPUTED_MAPPINGS = {
-        'company_sector': dict_utils._computed_nested_id_name_dict('company.sector'),
+        'company_sector': dict_utils.computed_nested_id_name_dict('company.sector'),
     }
 
     IGNORED_FIELDS = (
