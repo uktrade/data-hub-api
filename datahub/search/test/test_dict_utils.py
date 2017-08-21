@@ -10,7 +10,7 @@ def test_id_name_dict():
     obj.id = 123
     obj.name = 'test'
 
-    res = dict_utils._id_name_dict(obj)
+    res = dict_utils.id_name_dict(obj)
 
     assert res == {
         'id': str(obj.id),
@@ -24,7 +24,7 @@ def test_id_type_dict():
     obj.id = 123
     obj.type = 'test'
 
-    res = dict_utils._id_type_dict(obj)
+    res = dict_utils.id_type_dict(obj)
 
     assert res == {
         'id': str(obj.id),
@@ -38,7 +38,7 @@ def test_id_uri_dict():
     obj.id = 123
     obj.uri = 'test'
 
-    res = dict_utils._id_uri_dict(obj)
+    res = dict_utils.id_uri_dict(obj)
 
     assert res == {
         'id': str(obj.id),
@@ -46,15 +46,15 @@ def test_id_uri_dict():
     }
 
 
-def test_contact_dict():
-    """Tests contact_dict."""
+def test_contact_or_adviser_dict():
+    """Tests contact_or_adviser_dict."""
     obj = mock.Mock()
     obj.id = 123
     obj.first_name = 'First'
     obj.last_name = 'Last'
     obj.name = 'First Last'
 
-    res = dict_utils._contact_dict(obj)
+    res = dict_utils.contact_or_adviser_dict(obj)
 
     assert res == {
         'id': str(obj.id),
@@ -64,8 +64,8 @@ def test_contact_dict():
     }
 
 
-def test_contact_dict_include_dit_team():
-    """Tests contact_dict including its team."""
+def test_contact_or_adviser_dict_include_dit_team():
+    """Tests contact_or_adviser_dict including its team."""
     obj = mock.Mock()
     obj.id = 123
     obj.first_name = 'First'
@@ -74,7 +74,7 @@ def test_contact_dict_include_dit_team():
     obj.dit_team.id = 321
     obj.dit_team.name = 'team name'
 
-    res = dict_utils._contact_dict(obj, include_dit_team=True)
+    res = dict_utils.contact_or_adviser_dict(obj, include_dit_team=True)
 
     assert res == {
         'id': str(obj.id),
@@ -88,8 +88,8 @@ def test_contact_dict_include_dit_team():
     }
 
 
-def test_contact_dict_none_dit_team():
-    """Tests contact_dict including its team when dit_team is None."""
+def test_contact_or_adviser_dict_none_dit_team():
+    """Tests contact_or_adviser_dict including its team when dit_team is None."""
     obj = mock.Mock()
     obj.id = 123
     obj.first_name = 'First'
@@ -97,7 +97,7 @@ def test_contact_dict_none_dit_team():
     obj.name = 'First Last'
     obj.dit_team = None
 
-    res = dict_utils._contact_dict(obj, include_dit_team=True)
+    res = dict_utils.contact_or_adviser_dict(obj, include_dit_team=True)
 
     assert res == {
         'id': str(obj.id),
@@ -114,7 +114,7 @@ def test_company_dict():
     obj.id = 123
     obj.company_number = '01234567'
 
-    res = dict_utils._company_dict(obj)
+    res = dict_utils.company_dict(obj)
 
     assert res == {
         'id': str(obj.id),
@@ -128,7 +128,7 @@ def test_nested_id_name_dict():
     obj.company.sector.id = 123
     obj.company.sector.name = 'Cats'
 
-    res = dict_utils._computed_nested_id_name_dict('company.sector')(obj)
+    res = dict_utils.computed_nested_id_name_dict('company.sector')(obj)
 
     assert res == {
         'id': str(obj.company.sector.id),
@@ -141,7 +141,7 @@ def test_nested_id_name_dict_raises_exception_on_invalid_argument():
     obj = mock.Mock()
 
     with raises(ValueError):
-        dict_utils._computed_nested_id_name_dict('company')(obj)
+        dict_utils.computed_nested_id_name_dict('company')(obj)
 
 
 def test_nested_id_name_dict_returns_none_on_invalid_path():
@@ -150,5 +150,5 @@ def test_nested_id_name_dict_returns_none_on_invalid_path():
     """
     obj = mock.Mock(company=None)
 
-    res = dict_utils._computed_nested_id_name_dict('company.sector')(obj)
+    res = dict_utils.computed_nested_id_name_dict('company.sector')(obj)
     assert res is None
