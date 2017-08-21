@@ -142,6 +142,74 @@ def test_mapping(setup_es):
                     'index': 'not_analyzed',
                     'type': 'string'
                 },
+                'subscribers': {
+                    'properties': {
+                        'id': {
+                            'index': 'not_analyzed',
+                            'type': 'string'
+                        },
+                        'first_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'type': 'string'
+                        },
+                        'last_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'type': 'string'
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'type': 'string'
+                        },
+                        'dit_team': {
+                            'properties': {
+                                'id': {
+                                    'index': 'not_analyzed',
+                                    'type': 'string'
+                                },
+                                'name': {
+                                    'analyzer': 'lowercase_keyword_analyzer',
+                                    'type': 'string'
+                                }
+                            },
+                            'type': 'nested'
+                        }
+                    },
+                    'type': 'nested'
+                },
+                'assignees': {
+                    'properties': {
+                        'id': {
+                            'index': 'not_analyzed',
+                            'type': 'string'
+                        },
+                        'first_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'type': 'string'
+                        },
+                        'last_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'type': 'string'
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'type': 'string'
+                        },
+                        'dit_team': {
+                            'properties': {
+                                'id': {
+                                    'index': 'not_analyzed',
+                                    'type': 'string'
+                                },
+                                'name': {
+                                    'analyzer': 'lowercase_keyword_analyzer',
+                                    'type': 'string'
+                                }
+                            },
+                            'type': 'nested'
+                        }
+                    },
+                    'type': 'nested'
+                },
             }
         }
     }
@@ -208,5 +276,19 @@ def test_indexed_doc(setup_es):
             'delivery_date': order.delivery_date.isoformat(),
             'contact_email': order.contact_email,
             'contact_phone': order.contact_phone,
+            'subscribers': [
+                {
+                    'id': str(subscriber.adviser.pk),
+                    'name': str(subscriber.adviser.name),
+                }
+                for subscriber in order.subscribers.all()
+            ],
+            'assignees': [
+                {
+                    'id': str(subscriber.adviser.pk),
+                    'name': str(subscriber.adviser.name),
+                }
+                for subscriber in order.assignees.all()
+            ],
         }
     }

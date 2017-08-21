@@ -6,9 +6,12 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.reverse import reverse
 
+from datahub.company.test.factories import AdviserFactory
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
-from datahub.omis.order.test.factories import OrderFactory
+from datahub.omis.order.models import Order
+from datahub.omis.order.test.factories import OrderAssigneeFactory, OrderFactory, \
+    OrderSubscriberFactory
 
 from ..views import PaginatedAPIMixin
 
@@ -20,15 +23,31 @@ pytestmark = pytest.mark.django_db
 def setup_data():
     """Sets up data for the tests."""
     with freeze_time('2017-01-01 13:00:00'):
-        OrderFactory(
+        order = OrderFactory(
             reference='ref1',
             primary_market_id=constants.Country.japan.value.id
         )
+        OrderSubscriberFactory(
+            order=order,
+            adviser=AdviserFactory(dit_team_id=constants.Team.healthcare_uk.value.id)
+        )
+        OrderAssigneeFactory(
+            order=order,
+            adviser=AdviserFactory(dit_team_id=constants.Team.tees_valley_lep.value.id)
+        )
 
     with freeze_time('2017-02-01 13:00:00'):
-        OrderFactory(
+        order = OrderFactory(
             reference='ref2',
             primary_market_id=constants.Country.france.value.id
+        )
+        OrderSubscriberFactory(
+            order=order,
+            adviser=AdviserFactory(dit_team_id=constants.Team.td_events_healthcare.value.id)
+        )
+        OrderAssigneeFactory(
+            order=order,
+            adviser=AdviserFactory(dit_team_id=constants.Team.food_from_britain.value.id)
         )
 
 
@@ -152,6 +171,38 @@ class TestSearchOrder(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {'non_field_errors': 'Date(s) in incorrect format.'}
+
+    def test_filter_by_assigned_to_assignee_adviser(self, setup_es, setup_data):
+        """Test that results can be filtered by assignee."""
+        setup_es.indices.refresh()
+
+        assignee = Order.objects.get(reference='ref2').assignees.first()
+
+        url = reverse('api-v3:search:order')
+
+        response = self.api_client.post(url, {
+            'assigned_to_adviser': assignee.adviser.pk
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()['results']) == 1
+        assert response.json()['results'][0]['reference'] == 'ref2'
+
+    def test_filter_by_assigned_to_assignee_adviser_team(self, setup_es, setup_data):
+        """Test that results can be filtered by the assignee's team."""
+        setup_es.indices.refresh()
+
+        assignee = Order.objects.get(reference='ref2').assignees.first()
+
+        url = reverse('api-v3:search:order')
+
+        response = self.api_client.post(url, {
+            'assigned_to_team': assignee.adviser.dit_team.pk
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()['results']) == 1
+        assert response.json()['results'][0]['reference'] == 'ref2'
 
 
 class TestPaginatedAPIMixin:
