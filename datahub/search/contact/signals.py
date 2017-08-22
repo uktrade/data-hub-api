@@ -37,4 +37,14 @@ def connect_signals():
 
 def disconnect_signals():
     """Disconnect signals from ES sync."""
-    post_save.disconnect(contact_sync_es, sender=DBContact, dispatch_uid='contact_sync_es')
+    post_save.disconnect(
+        contact_sync_es,
+        sender=DBContact,
+        dispatch_uid='contact_sync_es'
+    )
+
+    post_save.disconnect(
+        related_contact_sync_es,
+        sender=DBCompany,
+        dispatch_uid='related_contact_sync_es'
+    )
