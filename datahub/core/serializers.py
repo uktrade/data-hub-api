@@ -47,6 +47,7 @@ class AuditSerializer(serializers.Serializer):
                 }
 
             changelog.append({
+                'id': v_new.id,
                 'user': creator_repr,
                 'timestamp': v_new.revision.date_created,
                 'comment': v_new.revision.comment or '',
