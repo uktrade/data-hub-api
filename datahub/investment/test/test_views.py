@@ -11,6 +11,7 @@ import reversion
 from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.reverse import reverse
+from reversion.models import Version
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
@@ -1054,6 +1055,8 @@ class TestAuditLogView(APITestMixin):
             reversion.set_date_created(changed_datetime)
             reversion.set_user(self.user)
 
+        versions = Version.objects.get_for_object(iproject)
+        version_id = versions[0].id
         url = reverse('api-v3:investment:audit-item',
                       kwargs={'pk': iproject.pk})
 
@@ -1064,6 +1067,7 @@ class TestAuditLogView(APITestMixin):
         assert len(response_data) == 1, 'Only one entry in audit log'
         entry = response_data[0]
 
+        assert entry['id'] == version_id
         assert entry['user']['name'] == self.user.name, 'Valid user captured'
         assert entry['comment'] == 'Changed', 'Comments can be set manually'
         assert entry['timestamp'] == changed_datetime.isoformat(), 'TS can be set manually'
