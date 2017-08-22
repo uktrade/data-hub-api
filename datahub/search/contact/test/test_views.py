@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import ContactFactory
-from datahub.core.constants import Sector
+from datahub.core.constants import Country, Sector
 from datahub.core.test_utils import APITestMixin
 
 pytestmark = pytest.mark.django_db
@@ -142,8 +142,16 @@ class TestBasicSearch(APITestMixin):
             address_same_as_company=True
         )
 
+        address = {
+            'address_1': '1 Own Street',
+            'address_2': '',
+            'address_town': 'Super Town',
+        }
+
         company = contact.company
-        company.trading_address_1 = 'Updated Street'
+        for k, v in address.items():
+            setattr(company, f'trading_{k}', v)
+        company.trading_address_country.id = Country.united_kingdom.value.id
         company.save()
 
         setup_es.indices.refresh()
@@ -156,4 +164,41 @@ class TestBasicSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
 
-        assert 'Updated Street' == response.data['results'][0]['address_1']
+        result = response.data['results'][0]
+
+        for k, v in address.items():
+            assert v == result[k]
+
+        country = contact.company.trading_address_country.name
+        assert country == result['address_country']['name']
+
+    def test_search_contact_has_own_address(self, setup_es, setup_data):
+        """Tests if contact can have its own address."""
+        address = {
+            'address_same_as_company': False,
+            'address_1': 'Own Street',
+            'address_2': '',
+            'address_town': 'Super Town',
+        }
+
+        contact = ContactFactory(
+            address_country_id=Country.united_kingdom.value.id,
+            **address
+        )
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:contact')
+        response = self.api_client.post(url, {
+            'original_query': contact.id,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+
+        result = response.data['results'][0]
+
+        for k, v in address.items():
+            assert v == result[k]
+
+        assert contact.address_country.name == result['address_country']['name']
