@@ -4,6 +4,7 @@ from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
+from reversion.models import Version
 
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
@@ -564,6 +565,8 @@ class TestAuditLogView(APITestMixin):
             reversion.set_date_created(changed_datetime)
             reversion.set_user(self.user)
 
+        versions = Version.objects.get_for_object(contact)
+        version_id = versions[0].id
         url = reverse('api-v3:contact:audit-item', kwargs={'pk': contact.pk})
 
         response = self.api_client.get(url)
@@ -573,6 +576,7 @@ class TestAuditLogView(APITestMixin):
         assert len(response_data) == 1
         entry = response_data[0]
 
+        assert entry['id'] == version_id
         assert entry['user']['name'] == self.user.name
         assert entry['comment'] == 'Changed'
         assert entry['timestamp'] == changed_datetime.isoformat()
