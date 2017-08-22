@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('country', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False, to='metadata.Country')),
                 ('manager_email', models.EmailField(blank=True, max_length=254)),
-                ('disabled_on', models.DateTimeField(blank=True, help_text='Empty means enabled for OMIS.', null=True)),
+                ('disabled_on', models.DateTimeField(blank=True, null=True)),
             ],
             options={
                 'verbose_name': 'OMIS Market',
