@@ -5,27 +5,16 @@ from django.utils.crypto import get_random_string
 from django.utils.timezone import now
 
 from datahub.company.models import Advisor, Company, Contact
-from datahub.core.models import BaseModel, BaseOrderedConstantModel
+from datahub.core.models import BaseModel, BaseOrderedConstantModel, DisableableModel
 
 from datahub.metadata.models import Country, Sector, Team
 
 
-class ServiceType(BaseOrderedConstantModel):
+class ServiceType(BaseOrderedConstantModel, DisableableModel):
     """
     Order service type.
     E.g. 'Validated contacts', 'Event', 'Market Research'
     """
-
-    disabled_on = models.DateTimeField(blank=True, null=True)
-
-    def was_disabled_on(self, date_on):
-        """
-        Returns True if this service type was disabled at time `date_on`,
-        False otherwise.
-        """
-        if not self.disabled_on:
-            return False
-        return self.disabled_on <= date_on
 
 
 class Order(BaseModel):
