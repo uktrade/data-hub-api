@@ -148,6 +148,13 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
             except CompaniesHouseCompany.DoesNotExist:
                 return None
 
+    @cached_property
+    def has_all_required_trading_address_fields(self):
+        """Tells if Company has all required trading address fields defined."""
+        return all(
+            getattr(self, field) for field in self.REQUIRED_TRADING_ADDRESS_FIELDS
+        )
+
     def _validate_trading_address(self):
         """Trading address fields are not mandatory in the model definition.
 
@@ -162,10 +169,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
             self.trading_address_postcode,
             self.trading_address_country
         ))
-        all_required_trading_address_fields = all(
-            getattr(self, field) for field in self.REQUIRED_TRADING_ADDRESS_FIELDS
-        )
-        if any_trading_address_fields and not all_required_trading_address_fields:
+        if any_trading_address_fields and not self.has_all_required_trading_address_fields:
             return False
         return True
 
@@ -192,6 +196,21 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
                 {'uk_region': ['UK region is required for UK companies.']}
             )
         super().clean()
+
+    def refresh_from_db(self, using=None, fields=None, **kwargs):
+        """Clears cached properties on reload from database."""
+        super(Company, self).refresh_from_db(using, fields, **kwargs)
+
+        cached_properties = (
+            'companies_house_data',
+            'has_all_required_trading_address_fields',
+            'uk_based',
+        )
+        for key in cached_properties:
+            try:
+                del self.__dict__[key]
+            except KeyError:
+                pass
 
 
 class CompaniesHouseCompany(CompanyAbstract):
