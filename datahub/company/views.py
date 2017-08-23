@@ -5,8 +5,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, viewsets
 from rest_framework.filters import OrderingFilter
 
+from datahub.core.audit import AuditSerializer
 from datahub.core.mixins import ArchivableViewSetMixin
-from datahub.core.serializers import AuditSerializer
 from datahub.core.viewsets import CoreViewSetV1, CoreViewSetV3
 from datahub.investment.queryset import get_slim_investment_project_queryset
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
