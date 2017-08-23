@@ -2,7 +2,7 @@ import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import ContactFactory
+from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.constants import Country, Sector, UKRegion
 from datahub.core.test_utils import APITestMixin
 
@@ -41,13 +41,16 @@ class TestSearch(APITestMixin):
 
     def test_filter_contact(self, setup_es, setup_data):
         """Tests matching contact using multiple filters."""
-        contact = ContactFactory(address_same_as_company=True)
-        company = contact.company
-        company.name = 'SlothsCats'
-        company.trading_address_country_id = Country.united_kingdom.value.id
-        company.uk_region_id = UKRegion.east_of_england.value.id
-        company.sector_id = Sector.renewable_energy_wind.value.id
-        company.save()
+        company = CompanyFactory(
+            name='SlothsCats',
+            trading_address_country_id=Country.united_kingdom.value.id,
+            uk_region_id=UKRegion.east_of_england.value.id,
+            sector_id=Sector.renewable_energy_wind.value.id
+        )
+        ContactFactory(
+            address_same_as_company=True,
+            company=company
+        )
 
         setup_es.indices.refresh()
 
