@@ -130,12 +130,14 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     class MPTTMeta:  # noqa: D101
         order_insertion_by = ['name']
 
-    @cached_property
+    @property
     def uk_based(self):
         """Whether a company is based in the UK or not."""
         if not self.registered_address_country:
             return None
-        return self.registered_address_country.name == constants.Country.united_kingdom.value.name
+
+        united_kingdom_id = uuid.UUID(constants.Country.united_kingdom.value.id)
+        return self.registered_address_country.id == united_kingdom_id
 
     @cached_property
     def companies_house_data(self):
@@ -148,8 +150,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
             except CompaniesHouseCompany.DoesNotExist:
                 return None
 
-    @cached_property
-    def has_all_required_trading_address_fields(self):
+    def has_valid_trading_address(self):
         """Tells if Company has all required trading address fields defined."""
         return all(
             getattr(self, field) for field in self.REQUIRED_TRADING_ADDRESS_FIELDS
@@ -169,7 +170,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
             self.trading_address_postcode,
             self.trading_address_country
         ))
-        if any_trading_address_fields and not self.has_all_required_trading_address_fields:
+        if any_trading_address_fields and not self.has_valid_trading_address():
             return False
         return True
 
@@ -196,21 +197,6 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
                 {'uk_region': ['UK region is required for UK companies.']}
             )
         super().clean()
-
-    def refresh_from_db(self, using=None, fields=None, **kwargs):
-        """Clears cached properties on reload from database."""
-        super(Company, self).refresh_from_db(using, fields, **kwargs)
-
-        cached_properties = (
-            'companies_house_data',
-            'has_all_required_trading_address_fields',
-            'uk_based',
-        )
-        for key in cached_properties:
-            try:
-                del self.__dict__[key]
-            except KeyError:
-                pass
 
 
 class CompaniesHouseCompany(CompanyAbstract):

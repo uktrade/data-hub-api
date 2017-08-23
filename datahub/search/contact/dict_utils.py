@@ -6,7 +6,7 @@ def computed_address_field(field):
     def get_field(contact):
         if contact.address_same_as_company:
             company = contact.company
-            if company.has_all_required_trading_address_fields:
+            if company.has_valid_trading_address():
                 return getattr(company, f'trading_{field}')
 
             return getattr(company, f'registered_{field}')
