@@ -37,12 +37,10 @@ class SearchContactAPIView(APIView):
     )
 
     FILTER_FIELDS = (
-        'adviser',
-        'company',
-        'first_name',
-        'job_title',
-        'last_name',
         'company_name',
+        'company_sector',
+        'company_uk_region',
+        'address_country',
     )
 
     http_method_names = ('post',)
