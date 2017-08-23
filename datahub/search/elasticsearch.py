@@ -228,6 +228,8 @@ FILTER_MAP = {
     'investment_type': 'investment_type.id',
     'stage': 'stage.id',
     'company_name': 'company.name_trigram',
+    'company_sector': 'company_sector.id',
+    'company_uk_region': 'company_uk_region.id',
 }
 
 
