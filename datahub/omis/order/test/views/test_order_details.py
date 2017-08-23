@@ -9,6 +9,7 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.constants import Country, Sector
 from datahub.core.test_utils import APITestMixin
+from datahub.omis.market.models import Market
 
 from ..factories import OrderFactory
 
@@ -180,6 +181,56 @@ class TestAddOrderDetails(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
             'service_types': [f'"{disabled_service_type.name}" disabled.']
+        }
+
+    def test_fails_if_primary_market_disabled(self):
+        """Test that if the primary market is disabled, the creation fails."""
+        company = CompanyFactory()
+        disabled_country = Market.objects.filter(disabled_on__lte=now()).first().country
+
+        url = reverse('api-v3:omis:order:list')
+        response = self.api_client.post(
+            url,
+            {
+                'company': {'id': company.pk},
+                'contact': {'id': ContactFactory(company=company).pk},
+                'primary_market': {'id': disabled_country.pk}
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'primary_market': [f'"{disabled_country.name}" disabled.']
+        }
+
+    def test_fails_if_primary_market_doesnt_exist(self):
+        """
+        Test that if the primary market does not have an OMIS market record defined,
+        the creation fails.
+        """
+        company = CompanyFactory()
+        market = Market.objects.first()
+        non_market_country = market.country
+
+        market.delete()
+
+        url = reverse('api-v3:omis:order:list')
+        response = self.api_client.post(
+            url,
+            {
+                'company': {'id': company.pk},
+                'contact': {'id': ContactFactory(company=company).pk},
+                'primary_market': {'id': non_market_country.pk}
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'primary_market': [
+                f'The OMIS market for country "{non_market_country}" doesn\'t exist.'
+            ]
         }
 
     def test_cannot_post_legacy_fields(self):
@@ -426,6 +477,33 @@ class TestChangeOrderDetails(APITestMixin):
                 'name': disabled_in_feb.name
             }
         ]
+
+    def test_can_save_with_primary_market_disabled(self):
+        """
+        Test that if the primary market was not disabled at the creation time
+        but it became later on, the record can still be saved without any
+        validation error.
+        """
+        market = Market.objects.filter(disabled_on__isnull=True).first()
+        country = market.country
+
+        with freeze_time('2017-01-01'):
+            order = OrderFactory(primary_market_id=country.pk)
+
+        market.disabled_on = dateutil_parse('2017-02-01')
+        market.save()
+
+        with freeze_time('2017-03-01'):
+            url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+            response = self.api_client.patch(
+                url,
+                {
+                    'primary_market': country.pk
+                },
+                format='json'
+            )
+
+            assert response.status_code == status.HTTP_200_OK
 
     def test_cannot_change_readonly_fields(self):
         """Test that if readonly fields are passed in when updating an order, they get ignored."""
