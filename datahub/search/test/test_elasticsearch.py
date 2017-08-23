@@ -40,14 +40,8 @@ def test_get_search_term_query():
                     'nested': {
                         'path': 'country',
                         'query': {
-                            'bool': {
-                                'must': [
-                                    {
-                                        'match': {
-                                            'country.id': 'hello'
-                                        }
-                                    }
-                                ]
+                            'match': {
+                                'country.id': 'hello'
                             }
                         }
                     }

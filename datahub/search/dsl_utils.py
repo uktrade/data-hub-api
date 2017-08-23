@@ -25,7 +25,16 @@ def id_name_mapping():
     """Mapping for id name fields."""
     return Nested(properties={
         'id': KeywordString(),
-        'name': CaseInsensitiveKeywordString()
+        'name': CaseInsensitiveKeywordString(),
+    })
+
+
+def id_name_partial_mapping(field):
+    """Mapping for id name fields."""
+    return Nested(properties={
+        'id': KeywordString(),
+        'name': CaseInsensitiveKeywordString(copy_to=f'{field}.name_trigram'),
+        'name_trigram': TrigramString(),
     })
 
 

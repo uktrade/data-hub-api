@@ -37,6 +37,29 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['last_name'] == 'defg'
 
+    def test_search_contact_by_partial_company_name(self, setup_es, setup_data):
+        """Tests filtering by partially matching company name."""
+        contact = ContactFactory()
+        company = contact.company
+        company.name = 'Verylongcompanyname'
+        company.save()
+
+        setup_es.indices.refresh()
+
+        term = ''
+
+        url = reverse('api-v3:search:contact')
+
+        response = self.api_client.post(url, {
+            'original_query': term,
+            'company_name': 'verylong',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['company']['name'] == company.name
+
     def test_search_contact_no_filters(self, setup_es, setup_data):
         """Tests case where there is no filters provided."""
         setup_es.indices.refresh()
