@@ -120,7 +120,7 @@ class Country(Enum):
         'French Southern Territories', 'ddf682ac-5d95-e211-a939-e4115bead28a'
     )
     gabon = Constant('Gabon', 'def682ac-5d95-e211-a939-e4115bead28a')
-    gambia, _the = Constant('Gambia, The', 'dff682ac-5d95-e211-a939-e4115bead28a')
+    gambia = Constant('Gambia, The', 'dff682ac-5d95-e211-a939-e4115bead28a')
     georgia = Constant('Georgia', 'e0f682ac-5d95-e211-a939-e4115bead28a')
     germany = Constant('Germany', '83756b9a-5d95-e211-a939-e4115bead28a')
     ghana = Constant('Ghana', 'e1f682ac-5d95-e211-a939-e4115bead28a')
