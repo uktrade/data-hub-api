@@ -7,8 +7,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.response import Response
 
+from datahub.core.audit import AuditSerializer
 from datahub.core.mixins import ArchivableViewSetMixin
-from datahub.core.serializers import AuditSerializer
 from datahub.core.utils import executor
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.documents.av_scan import virus_scan_document
