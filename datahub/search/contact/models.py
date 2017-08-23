@@ -1,6 +1,6 @@
 from django.conf import settings
 from elasticsearch_dsl import Boolean, Date, DocType, String
-
+from . import dict_utils as contact_dict_utils
 from .. import dict_utils
 from .. import dsl_utils
 from ..models import MapDBModelToDict
@@ -48,7 +48,6 @@ class Contact(DocType, MapDBModelToDict):
     MAPPINGS = {
         'id': str,
         'title': dict_utils.id_name_dict,
-        'address_country': dict_utils.id_name_dict,
         'adviser': dict_utils.contact_or_adviser_dict,
         'company': dict_utils.id_name_dict,
         'archived_by': dict_utils.contact_or_adviser_dict,
@@ -56,6 +55,12 @@ class Contact(DocType, MapDBModelToDict):
 
     COMPUTED_MAPPINGS = {
         'company_sector': dict_utils.computed_nested_id_name_dict('company.sector'),
+        'address_1': contact_dict_utils.computed_address_field('address_1'),
+        'address_2': contact_dict_utils.computed_address_field('address_2'),
+        'address_town': contact_dict_utils.computed_address_field('address_town'),
+        'address_county': contact_dict_utils.computed_address_field('address_county'),
+        'address_postcode': contact_dict_utils.computed_address_field('address_postcode'),
+        'address_country': contact_dict_utils.computed_address_field('address_country'),
     }
 
     IGNORED_FIELDS = (
