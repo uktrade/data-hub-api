@@ -4,7 +4,7 @@ from urllib.parse import parse_qs, urlparse
 import pytest
 from reversion.models import Version
 
-from datahub.core.audit import AuditSerializer
+from datahub.core.audit import AuditViewSet
 
 
 def test_audit_log_diff_algo():
@@ -26,7 +26,7 @@ def test_audit_log_diff_algo():
         'field3': [None, 'added'],
     }
 
-    assert AuditSerializer._diff_versions(given['old'], given['new']) == expected
+    assert AuditViewSet._diff_versions(given['old'], given['new']) == expected
 
 
 @pytest.mark.parametrize('num_versions,offset,limit,exp_results,exp_next,exp_previous', (
@@ -48,17 +48,14 @@ def test_audit_log_pagination(num_versions, offset, limit, exp_results, exp_next
             'offset': offset,
             'limit': limit
         })
-    context = {
-        'request': request
-    }
-    serializer = AuditSerializer(context=context)
-    response_data = serializer.to_representation(instance)
-    results = response_data['results']
+    serializer = AuditViewSet(request=request)
+    response = serializer.create_response(instance)
+    results = response.data['results']
 
-    assert response_data['count'] == max(num_versions - 1, 0)
-    assert _create_canonical_url_object(response_data['next']) == _create_canonical_url_object(
+    assert response.data['count'] == max(num_versions - 1, 0)
+    assert _create_canonical_url_object(response.data['next']) == _create_canonical_url_object(
         exp_next)
-    assert _create_canonical_url_object(response_data['previous']) == _create_canonical_url_object(
+    assert _create_canonical_url_object(response.data['previous']) == _create_canonical_url_object(
         exp_previous)
     assert [result['id'] for result in results] == list(exp_results)
 

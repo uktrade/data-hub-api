@@ -29,7 +29,7 @@ project_team_member_item = IProjectTeamMembersViewSet.as_view({
 })
 
 audit_item = IProjectAuditViewSet.as_view({
-    'get': 'retrieve',
+    'get': 'list',
 })
 
 archive_item = IProjectViewSet.as_view({

@@ -1,9 +1,9 @@
-from rest_framework import serializers
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.viewsets import GenericViewSet
 from reversion.models import Version
 
 
-class VersionQuerySetProxy:
+class _VersionQuerySetProxy:
     """
     Proxies a VersionQuerySet, modifying slicing behaviour to return an extra item.
 
@@ -39,28 +39,36 @@ class VersionQuerySetProxy:
         return max(self.queryset.count() - 1, 0)
 
 
-class AuditSerializer(serializers.Serializer):
-    """Generic serializer for audit logs."""
+class AuditViewSet(GenericViewSet):
+    """Generic view set for audit logs.
 
-    def to_representation(self, instance):
-        """Override serialization process completely to get the Versions."""
-        request = self.context['request']
-        paginator = LimitOffsetPagination()
+    Subclasses must set the queryset class attribute.
 
+    Only the LimitOffsetPagination paginator is supported, and so this is set explicitly.
+    """
+
+    queryset = None
+    pagination_class = LimitOffsetPagination
+
+    def list(self, request, *args, **kwargs):
+        """Lists audit log entries (paginated)."""
+        instance = self.get_object()
+        return self.create_response(instance)
+
+    def create_response(self, instance):
+        """Creates an audit log response."""
         versions = Version.objects.get_for_object(instance)
-        versions_subset = paginator.paginate_queryset(VersionQuerySetProxy(versions), request)
+        proxied_versions = _VersionQuerySetProxy(versions)
+        versions_subset = self.paginator.paginate_queryset(proxied_versions, self.request)
 
         version_pairs = (
             (versions_subset[n], versions_subset[n + 1]) for n in range(len(versions_subset) - 1)
         )
-        return {
-            'results': self._construct_changelog(version_pairs),
-            'count': paginator.count,
-            'next': paginator.get_next_link(),
-            'previous': paginator.get_previous_link()
-        }
+        results = self._construct_changelog(version_pairs)
+        return self.paginator.get_paginated_response(results)
 
-    def _construct_changelog(self, version_pairs):
+    @classmethod
+    def _construct_changelog(cls, version_pairs):
         changelog = []
         for v_new, v_old in version_pairs:
             version_creator = v_new.revision.user
@@ -79,7 +87,7 @@ class AuditSerializer(serializers.Serializer):
                 'user': creator_repr,
                 'timestamp': v_new.revision.date_created,
                 'comment': v_new.revision.comment or '',
-                'changes': self._diff_versions(
+                'changes': cls._diff_versions(
                     v_old.field_dict, v_new.field_dict
                 ),
             })
