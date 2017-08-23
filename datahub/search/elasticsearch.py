@@ -68,7 +68,7 @@ def get_search_term_query(term, fields=None):
     ]
 
     if fields:
-        should_query.extend([get_match_query(field, term) for field in fields])
+        should_query.extend([get_field_query('match', field, term) for field in fields])
 
     return Q('bool', should=should_query)
 
@@ -131,22 +131,20 @@ def get_basic_search_query(term, entities=None, field_order=None, offset=0, limi
     return s[offset:offset + limit]
 
 
-def get_term_query(field, value):
-    """Gets term query."""
-    term = Q('term', **{field: value})
-    if '.' not in field:
-        return term
+def get_term_or_match_query(field, value):
+    """Gets term or match query."""
+    kind = 'match' if field.endswith('_trigram') else 'term'
 
-    return Q('nested', path=field.rsplit('.', maxsplit=1)[0], query=term)
+    return get_field_query(kind, field, value)
 
 
-def get_match_query(field, value):
+def get_field_query(kind, field, value):
     """Gets match query."""
-    match = Q('match', **{field: value})
+    match = Q(kind, **{field: value})
     if '.' not in field:
         return match
 
-    return Q('nested', path=field.split('.', maxsplit=1)[0], query=Q('bool', must=match))
+    return Q('nested', path=field.rsplit('.', maxsplit=1)[0], query=match)
 
 
 def apply_aggs_query(search, aggs):
@@ -190,12 +188,12 @@ def get_search_by_entity_query(term=None,
                 # perform "or" query
                 must_filter.append(
                     Q('bool',
-                      should=[get_term_query(k, value) for value in v],
+                      should=[get_term_or_match_query(k, value) for value in v],
                       minimum_should_match=1
                       )
                 )
             else:
-                must_filter.append(get_term_query(k, v))
+                must_filter.append(get_term_or_match_query(k, v))
 
     if ranges:
         must_filter.extend([Q('range', **{k: v}) for k, v in ranges.items()])
@@ -216,7 +214,7 @@ def bulk(actions=None, chunk_size=None, **kwargs):
     return es_bulk(connections.get_connection(), actions=actions, chunk_size=chunk_size, **kwargs)
 
 
-FILTER_ID_MAP = {
+FILTER_MAP = {
     'sector': 'sector.id',
     'account_manager': 'account_manager.id',
     'export_to_country': 'export_to_countries.id',
@@ -229,12 +227,13 @@ FILTER_ID_MAP = {
     'investor_company': 'investor_company.id',
     'investment_type': 'investment_type.id',
     'stage': 'stage.id',
+    'company_name': 'company.name_trigram',
 }
 
 
 def remap_filter_id_field(field):
     """Maps api field to elasticsearch field."""
-    return FILTER_ID_MAP.get(field, field)
+    return FILTER_MAP.get(field, field)
 
 
 def date_range_fields(fields):
