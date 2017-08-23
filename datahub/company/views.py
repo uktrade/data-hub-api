@@ -5,7 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, viewsets
 from rest_framework.filters import OrderingFilter
 
-from datahub.core.audit import AuditSerializer
+from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSetV1, CoreViewSetV3
 from datahub.investment.queryset import get_slim_investment_project_queryset
@@ -67,10 +67,9 @@ class CompanyViewSetV3(ArchivableViewSetMixin, CoreViewSetV3):
     )
 
 
-class CompanyAuditViewSet(CoreViewSetV3):
+class CompanyAuditViewSet(AuditViewSet):
     """Company audit views."""
 
-    serializer_class = AuditSerializer
     queryset = Company.objects.all()
 
 
@@ -101,10 +100,9 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         return data
 
 
-class ContactAuditViewSet(CoreViewSetV3):
+class ContactAuditViewSet(AuditViewSet):
     """Contact audit views."""
 
-    serializer_class = AuditSerializer
     queryset = Contact.objects.all()
 
 
