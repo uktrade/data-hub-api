@@ -86,7 +86,7 @@ class _VersionQuerySetProxy:
         self.queryset = queryset
 
     def __getitem__(self, item):
-        """Handles instance[item], forwards calls to underlying query set.
+        """Handles self[item], forwarding calls to underlying query set.
 
         Where item is a slice, 1 is added to item.stop.
         """
