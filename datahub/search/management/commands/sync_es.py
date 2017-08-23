@@ -1,4 +1,4 @@
-from logging import getLogger
+from logging import getLogger, WARNING
 
 from django.core.management.base import BaseCommand
 from django.core.paginator import Paginator
@@ -7,8 +7,6 @@ from django.db import models
 from datahub.search.elasticsearch import bulk
 
 from ...apps import get_search_apps
-
-logger = getLogger(__name__)
 
 
 def get_datasets():
@@ -73,4 +71,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Handle."""
+        root_logger = getLogger()
+        root_logger.setLevel(WARNING)
+
         sync_es(batch_size=options['batch_size'], datasets=get_datasets(), stdout=self.stdout)
