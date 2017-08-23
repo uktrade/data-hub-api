@@ -3,42 +3,6 @@ from rest_framework.viewsets import GenericViewSet
 from reversion.models import Version
 
 
-class _VersionQuerySetProxy:
-    """
-    Proxies a VersionQuerySet, modifying slicing behaviour to return an extra item.
-
-    This is allow the AuditSerializer to use the LimitOffsetPagination class
-    as N+1 versions are required to produce N audit log entries.
-    """
-
-    def __init__(self, queryset):
-        """Initialises the instance, saving a reference to the underlying query set."""
-        self.queryset = queryset
-
-    def __getitem__(self, item):
-        """Handles instance[item], forwards calls to underlying query set.
-
-        Where item is a slice, 1 is added to item.stop.
-        """
-        if isinstance(item, slice):
-            if item.step is not None:
-                raise TypeError('Slicing with step not supported')
-
-            stop = item.stop + 1 if item.stop is not None else None
-            return self.queryset[item.start:stop]
-
-        return self.queryset[item]
-
-    def count(self):
-        """
-        Gets the count of the query set, minus 1. This is due to N audit log entries
-        being generated from N+1 query set results.
-
-        The return value is always non-negative.
-        """
-        return max(self.queryset.count() - 1, 0)
-
-
 class AuditViewSet(GenericViewSet):
     """Generic view set for audit logs.
 
@@ -107,3 +71,39 @@ class AuditViewSet(GenericViewSet):
                     changes[field_name] = [old_value, new_value]
 
         return changes
+
+
+class _VersionQuerySetProxy:
+    """
+    Proxies a VersionQuerySet, modifying slicing behaviour to return an extra item.
+
+    This is allow the AuditSerializer to use the LimitOffsetPagination class
+    as N+1 versions are required to produce N audit log entries.
+    """
+
+    def __init__(self, queryset):
+        """Initialises the instance, saving a reference to the underlying query set."""
+        self.queryset = queryset
+
+    def __getitem__(self, item):
+        """Handles instance[item], forwards calls to underlying query set.
+
+        Where item is a slice, 1 is added to item.stop.
+        """
+        if isinstance(item, slice):
+            if item.step is not None:
+                raise TypeError('Slicing with step not supported')
+
+            stop = item.stop + 1 if item.stop is not None else None
+            return self.queryset[item.start:stop]
+
+        return self.queryset[item]
+
+    def count(self):
+        """
+        Gets the count of the query set, minus 1. This is due to N audit log entries
+        being generated from N+1 query set results.
+
+        The return value is always non-negative.
+        """
+        return max(self.queryset.count() - 1, 0)
