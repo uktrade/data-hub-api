@@ -95,41 +95,40 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def validate_service_types(self, service_types):
         """Validates that service types are not disabled."""
-        if service_types is not None:
-            if self.instance:
-                created_on = self.instance.created_on
-            else:
-                created_on = now()
+        if self.instance:
+            created_on = self.instance.created_on
+        else:
+            created_on = now()
 
-            disabled_service_types = [
-                service_type.name
-                for service_type in service_types
-                if service_type.was_disabled_on(created_on)
-            ]
+        disabled_service_types = [
+            service_type.name
+            for service_type in service_types
+            if service_type.was_disabled_on(created_on)
+        ]
 
-            if disabled_service_types:
-                raise serializers.ValidationError(
-                    f'"{", ".join(disabled_service_types)}" disabled.'
-                )
+        if disabled_service_types:
+            raise serializers.ValidationError(
+                f'"{", ".join(disabled_service_types)}" disabled.'
+            )
+
         return service_types
 
     def validate_primary_market(self, country):
         """Validates that the primary market is not disabled."""
-        if country is not None:
-            if self.instance:
-                created_on = self.instance.created_on
-            else:
-                created_on = now()
+        if self.instance:
+            created_on = self.instance.created_on
+        else:
+            created_on = now()
 
-            try:
-                market = Market.objects.get(pk=country)
-            except Market.DoesNotExist:
-                raise serializers.ValidationError(
-                    f'The OMIS market for country "{country}" doesn\'t exist.'
-                )
-            else:
-                if market.was_disabled_on(created_on):
-                    raise serializers.ValidationError(f'"{country}" disabled.')
+        try:
+            market = Market.objects.get(pk=country)
+        except Market.DoesNotExist:
+            raise serializers.ValidationError(
+                f'The OMIS market for country "{country}" doesn\'t exist.'
+            )
+        else:
+            if market.was_disabled_on(created_on):
+                raise serializers.ValidationError(f'"{country}" disabled.')
 
         return country
 
