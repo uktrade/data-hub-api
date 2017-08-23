@@ -38,7 +38,7 @@ class TestSearch(APITestMixin):
         assert response.data['results'][0]['last_name'] == 'defg'
 
     def test_search_contact_by_partial_company_name(self, setup_es, setup_data):
-        """Tests detailed contact search."""
+        """Tests filtering by partially matching company name."""
         contact = ContactFactory()
         company = contact.company
         company.name = 'Verylongcompanyname'
