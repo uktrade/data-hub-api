@@ -9,6 +9,7 @@ from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
 from datahub.core.validate_utils import DataCombiner
 from datahub.metadata.models import Country, Sector, Team
 
+from datahub.omis.market.models import Market
 from .models import Order, OrderAssignee, OrderSubscriber, ServiceType
 
 
@@ -75,47 +76,74 @@ class OrderSerializer(serializers.ModelSerializer):
             'delivery_date',
         ]
 
-    def validate(self, data):
-        """Extra checks."""
-        data_combiner = DataCombiner(self.instance, data)
-        company = data_combiner.get_value('company')
-        contact = data_combiner.get_value('contact')
-
-        # check that contact works at company
+    def _validate_contact_works_at_company(self, contact, company):
+        """Validates that contact works at company."""
         if contact.company != company:
             raise serializers.ValidationError({
                 'contact': 'The contact does not work at the given company.'
             })
 
-        # company and primary_market cannot be changed after creation
+    def _validate_readonly_fields_after_creation(self, *objs):
+        """Validate fields that are readonly after creation."""
         if self.instance:
-            if company != self.instance.company:
-                raise serializers.ValidationError({
-                    'company': 'The company cannot be changed after creation.'
-                })
+            for field, obj in objs:
+                if obj != getattr(self.instance, field):
+                    field_name = self.Meta.model._meta.get_field(field).verbose_name
+                    raise serializers.ValidationError({
+                        field: f'The {field_name} cannot be changed after creation.'
+                    })
 
-            if data_combiner.get_value('primary_market') != self.instance.primary_market:
-                raise serializers.ValidationError({
-                    'primary_market': 'The primary market cannot be changed after creation.'
-                })
+    def validate_service_types(self, service_types):
+        """Validates that service types are not disabled."""
+        if self.instance:
+            created_on = self.instance.created_on
+        else:
+            created_on = now()
 
-        # cannot use a disabled service types
-        if 'service_types' in data:
-            if self.instance:
-                created_on = self.instance.created_on
-            else:
-                created_on = now()
+        disabled_service_types = [
+            service_type.name
+            for service_type in service_types
+            if service_type.was_disabled_on(created_on)
+        ]
 
-            disabled_service_types = [
-                service_type.name
-                for service_type in data['service_types']
-                if service_type.was_disabled_on(created_on)
-            ]
+        if disabled_service_types:
+            raise serializers.ValidationError(
+                f'"{", ".join(disabled_service_types)}" disabled.'
+            )
 
-            if disabled_service_types:
-                raise serializers.ValidationError({
-                    'service_types': f'"{", ".join(disabled_service_types)}" disabled.'
-                })
+        return service_types
+
+    def validate_primary_market(self, country):
+        """Validates that the primary market is not disabled."""
+        if self.instance:
+            created_on = self.instance.created_on
+        else:
+            created_on = now()
+
+        try:
+            market = Market.objects.get(pk=country)
+        except Market.DoesNotExist:
+            raise serializers.ValidationError(
+                f'The OMIS market for country "{country}" doesn\'t exist.'
+            )
+        else:
+            if market.was_disabled_on(created_on):
+                raise serializers.ValidationError(f'"{country}" disabled.')
+
+        return country
+
+    def validate(self, data):
+        """Extra checks."""
+        data_combiner = DataCombiner(self.instance, data)
+        company = data_combiner.get_value('company')
+        contact = data_combiner.get_value('contact')
+        country = data_combiner.get_value('primary_market')
+
+        self._validate_contact_works_at_company(contact, company)
+        self._validate_readonly_fields_after_creation(
+            ('company', company),
+            ('primary_market', country),
+        )
 
         return data
 
