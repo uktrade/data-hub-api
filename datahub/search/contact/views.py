@@ -42,7 +42,7 @@ class SearchContactAPIView(APIView):
         'first_name',
         'job_title',
         'last_name',
-        'notes'
+        'company_name',
     )
 
     http_method_names = ('post',)

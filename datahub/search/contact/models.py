@@ -42,7 +42,7 @@ class Contact(DocType, MapDBModelToDict):
     address_country = dsl_utils.id_name_mapping()
     adviser = dsl_utils.contact_mapping('adviser')
     archived_by = dsl_utils.contact_mapping('archived_by')
-    company = dsl_utils.id_name_mapping()
+    company = dsl_utils.id_name_partial_mapping('company')
     company_sector = dsl_utils.id_name_mapping()
 
     MAPPINGS = {
