@@ -42,6 +42,21 @@ class UKRegion(BaseConstantModel):
 class Country(BaseConstantModel):
     """Country."""
 
+    manager_email = models.EmailField(blank=True)
+    omis_disabled_on = models.DateTimeField(
+        blank=True, null=True,
+        help_text='Empty means enabled for OMIS.'
+    )
+
+    def was_omis_disabled_on(self, date_on):
+        """
+        Returns True if this Country was disabled for OMIS at time `date_on`,
+        False otherwise.
+        """
+        if not self.omis_disabled_on:
+            return False
+        return self.omis_disabled_on <= date_on
+
     class Meta(BaseConstantModel.Meta):  # noqa: D101
         verbose_name_plural = 'countries'
 

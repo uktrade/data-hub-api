@@ -1,9 +1,13 @@
 from . import models
 from .registry import registry
-from .serializers import TeamSerializer
+from .serializers import CountrySerializer, TeamSerializer
 
 registry.register(metadata_id='business-type', model=models.BusinessType)
-registry.register(metadata_id='country', model=models.Country)
+registry.register(
+    metadata_id='country',
+    model=models.Country,
+    serializer=CountrySerializer
+)
 registry.register(metadata_id='employee-range', model=models.EmployeeRange)
 registry.register(metadata_id='interaction-type', model=models.InteractionType)
 registry.register(metadata_id='role', model=models.Role)

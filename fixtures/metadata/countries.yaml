@@ -1,750 +1,750 @@
 - model: metadata.country
   pk: 0350bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Madagascar}
+  fields: {name: Madagascar, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 0450bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Malawi}
+  fields: {name: Malawi, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 0550bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Malaysia}
+  fields: {name: Malaysia, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 0650bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Maldives}
+  fields: {name: Maldives, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 0750bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Mali}
+  fields: {name: Mali, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 0850bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Malta}
+  fields: {name: Malta, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 0950bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Marshall Islands}
+  fields: {name: Marshall Islands, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 0a50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Martinique}
+  fields: {name: Martinique, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 0b50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Mauritania}
+  fields: {name: Mauritania, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 0c50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Mauritius}
+  fields: {name: Mauritius, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 0d50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Mayotte}
+  fields: {name: Mayotte, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 0e50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Mexico}
+  fields: {name: Mexico, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 0f50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Micronesia}
+  fields: {name: Micronesia, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 1050bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Moldova}
+  fields: {name: Moldova, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 1150bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Monaco}
+  fields: {name: Monaco, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 1250bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Mongolia}
+  fields: {name: Mongolia, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 1350bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Montserrat}
+  fields: {name: Montserrat, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 1450bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Morocco}
+  fields: {name: Morocco, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 1550bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Mozambique}
+  fields: {name: Mozambique, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 1650bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Namibia}
+  fields: {name: Namibia, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 1750bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Nauru}
+  fields: {name: Nauru, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 1850bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Nepal}
+  fields: {name: Nepal, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 1950bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Netherlands}
+  fields: {name: Netherlands, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 1a0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Saudi Arabia}
+  fields: {name: Saudi Arabia, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 1a50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Netherlands Antilles}
+  fields: {name: Netherlands Antilles, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 1b0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Senegal}
+  fields: {name: Senegal, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 1b50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: New Caledonia}
+  fields: {name: New Caledonia, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 1c0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Serbia}
+  fields: {name: Serbia, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 1c50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: New Zealand}
+  fields: {name: New Zealand, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 1d0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Seychelles}
+  fields: {name: Seychelles, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 1d50bdb8-5d95-e211-a939-e4115bead28a
-  fields: {name: Nicaragua}
+  fields: {name: Nicaragua, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 1e0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Sierra Leone}
+  fields: {name: Sierra Leone, omis_disabled_on: !!timestamp '2015-05-08 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 1f0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Singapore}
+  fields: {name: Singapore, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 200be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Slovakia}
+  fields: {name: Slovakia, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 210be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Slovenia}
+  fields: {name: Slovenia, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 220be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Solomon Islands}
+  fields: {name: Solomon Islands, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 230be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Somalia}
+  fields: {name: Somalia, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 240be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: South Africa}
+  fields: {name: South Africa, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 250be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: South Georgia and South Sandwich Islands}
+  fields: {name: South Georgia and South Sandwich Islands, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 260be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Sri Lanka}
+  fields: {name: Sri Lanka, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 270be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: St Helena}
+  fields: {name: St Helena, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 280be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: St Kitts and Nevis}
+  fields: {name: St Kitts and Nevis, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 290be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: St Lucia}
+  fields: {name: St Lucia, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 2a0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: St Pierre and Miquelon}
+  fields: {name: St Pierre and Miquelon, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 2b0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: St Vincent}
+  fields: {name: St Vincent, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 2c0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Sudan}
+  fields: {name: Sudan, omis_disabled_on: !!timestamp '2014-08-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 2d0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Surinam}
+  fields: {name: Surinam, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 2e0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Svalbard and Jan Mayen Islands}
+  fields: {name: Svalbard and Jan Mayen Islands, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 2f0be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Swaziland}
+  fields: {name: Swaziland, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 300be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Sweden}
+  fields: {name: Sweden, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 310be5c4-5d95-e211-a939-e4115bead28a
-  fields: {name: Switzerland}
+  fields: {name: Switzerland, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 34afd8d0-5d95-e211-a939-e4115bead28a
-  fields: {name: Wallis and Futuna}
+  fields: {name: Wallis and Futuna, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 35afd8d0-5d95-e211-a939-e4115bead28a
-  fields: {name: Occupied Palestinian Territories}
+  fields: {name: Occupied Palestinian Territories, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 36afd8d0-5d95-e211-a939-e4115bead28a
-  fields: {name: Western Sahara}
+  fields: {name: Western Sahara, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 37afd8d0-5d95-e211-a939-e4115bead28a
-  fields: {name: Yemen}
+  fields: {name: Yemen, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 38afd8d0-5d95-e211-a939-e4115bead28a
-  fields: {name: Zambia}
+  fields: {name: Zambia, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 39afd8d0-5d95-e211-a939-e4115bead28a
-  fields: {name: Zimbabwe}
+  fields: {name: Zimbabwe, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 4461b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Niger}
+  fields: {name: Niger, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 4561b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Nigeria}
+  fields: {name: Nigeria, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 4661b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Niue}
+  fields: {name: Niue, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 4761b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Norfolk Island}
+  fields: {name: Norfolk Island, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 4861b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Northern Mariana Islands}
+  fields: {name: Northern Mariana Islands, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 4961b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Norway}
+  fields: {name: Norway, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 4a61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Oman}
+  fields: {name: Oman, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 4b61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Pakistan}
+  fields: {name: Pakistan, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 4c61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Palau}
+  fields: {name: Palau, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 4d61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Panama}
+  fields: {name: Panama, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 4e61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Papua New Guinea}
+  fields: {name: Papua New Guinea, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 4f61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Paraguay}
+  fields: {name: Paraguay, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 5061b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Peru}
+  fields: {name: Peru, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 5161b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Philippines}
+  fields: {name: Philippines, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 5261b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: 'Pitcairn, Henderson, Ducie and Oeno Islands'}
+  fields: {name: 'Pitcairn, Henderson, Ducie and Oeno Islands', omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 5361b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Poland}
+  fields: {name: Poland, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 5461b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Portugal}
+  fields: {name: Portugal, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 5561b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Puerto Rico}
+  fields: {name: Puerto Rico, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 5661b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Qatar}
+  fields: {name: Qatar, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 56af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Brunei}
+  fields: {name: Brunei, omis_disabled_on: !!timestamp '2014-12-03 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 5761b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Reunion}
+  fields: {name: Reunion, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 57af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Bulgaria}
+  fields: {name: Bulgaria, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 5861b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Romania}
+  fields: {name: Romania, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 58af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Burkina}
+  fields: {name: Burkina, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 5961b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Russia}
+  fields: {name: Russia, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 59af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Burma}
+  fields: {name: Burma, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 5a61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Rwanda}
+  fields: {name: Rwanda, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 5aaf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Burundi}
+  fields: {name: Burundi, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 5b61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Samoa}
+  fields: {name: Samoa, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 5baf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Cambodia}
+  fields: {name: Cambodia, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 5c61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: San Marino}
+  fields: {name: San Marino, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 5caf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Cameroon}
+  fields: {name: Cameroon, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 5d61b8be-5d95-e211-a939-e4115bead28a
-  fields: {name: Sao Tome and Principe}
+  fields: {name: Sao Tome and Principe, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 5daf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Canada}
+  fields: {name: Canada, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 5eaf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Cape Verde}
+  fields: {name: Cape Verde, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 5faf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Cayman Islands}
+  fields: {name: Cayman Islands, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 60af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Central African Republic}
+  fields: {name: Central African Republic, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 61af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Chad}
+  fields: {name: Chad, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 62af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Chile}
+  fields: {name: Chile, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 63af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: China}
+  fields: {name: China, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 64af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Christmas Island}
+  fields: {name: Christmas Island, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 65af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Cocos (Keeling) Islands}
+  fields: {name: Cocos (Keeling) Islands, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 66af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Colombia}
+  fields: {name: Colombia, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 67af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Comoros}
+  fields: {name: Comoros, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 68af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Congo (Democratic Republic)}
+  fields: {name: Congo (Democratic Republic), omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 69af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Congo}
+  fields: {name: Congo, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 6aaf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Cook Islands}
+  fields: {name: Cook Islands, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 6baf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Costa Rica}
+  fields: {name: Costa Rica, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 6caf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Croatia}
+  fields: {name: Croatia, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 6d6a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Hungary}
+  fields: {name: Hungary, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 6daf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Cuba}
+  fields: {name: Cuba, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 6e6a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Iceland}
+  fields: {name: Iceland, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 6eaf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Cyprus}
+  fields: {name: Cyprus, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 6f6a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: India}
+  fields: {name: India, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 6faf72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Czech Republic}
+  fields: {name: Czech Republic, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 706a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Indonesia}
+  fields: {name: Indonesia, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 70af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Denmark}
+  fields: {name: Denmark, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 716a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Iran}
+  fields: {name: Iran, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 71af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Djibouti}
+  fields: {name: Djibouti, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 726a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Iraq}
+  fields: {name: Iraq, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 72af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Dominica}
+  fields: {name: Dominica, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 736a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Ireland}
+  fields: {name: Ireland, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 73af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Dominican Republic}
+  fields: {name: Dominican Republic, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 746a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Israel}
+  fields: {name: Israel, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 74af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: East Timor}
+  fields: {name: East Timor, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 756a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Ivory Coast}
+  fields: {name: Ivory Coast, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 75af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Ecuador}
+  fields: {name: Ecuador, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 766a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Jamaica}
+  fields: {name: Jamaica, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 76756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: TEST}
+  fields: {name: TEST, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 76af72a6-5d95-e211-a939-e4115bead28a
-  fields: {name: Egypt}
+  fields: {name: Egypt, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 776a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Jordan}
+  fields: {name: Jordan, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 77756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Guernsey}
+  fields: {name: Guernsey, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 786a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Kazakhstan}
+  fields: {name: Kazakhstan, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 78756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Jersey}
+  fields: {name: Jersey, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 796a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Kenya}
+  fields: {name: Kenya, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 79756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Isle of Man}
+  fields: {name: Isle of Man, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 7a6a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Kiribati}
+  fields: {name: Kiribati, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 7a756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Kosovo}
+  fields: {name: Kosovo, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 7b6a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Korea (North)}
+  fields: {name: Korea (North), omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 7b756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: St Barthelemy}
+  fields: {name: St Barthelemy, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 7c6a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Korea (South)}
+  fields: {name: Korea (South), omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 7c756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: St Martin}
+  fields: {name: St Martin, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 7d6a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Kuwait}
+  fields: {name: Kuwait, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 7e6a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Kyrgyzstan}
+  fields: {name: Kyrgyzstan, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 7e756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: 'Sudan, South'}
+  fields: {name: 'Sudan, South', omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 7f6a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Laos}
+  fields: {name: Laos, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 7f756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Montenegro}
+  fields: {name: Montenegro, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 806a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Latvia}
+  fields: {name: Latvia, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 80756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: United Kingdom}
+  fields: {name: United Kingdom, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 816a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Lebanon}
+  fields: {name: Lebanon, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 81756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: United States}
+  fields: {name: United States, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 826a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Lesotho}
+  fields: {name: Lesotho, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 82756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: France}
+  fields: {name: France, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 836a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Liberia}
+  fields: {name: Liberia, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 83756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Germany}
+  fields: {name: Germany, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 846a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Libya}
+  fields: {name: Libya, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 84756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Italy}
+  fields: {name: Italy, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 856a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Liechtenstein}
+  fields: {name: Liechtenstein, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 85756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Japan}
+  fields: {name: Japan, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 866a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Lithuania}
+  fields: {name: Lithuania, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 86756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Spain}
+  fields: {name: Spain, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 876a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Luxembourg}
+  fields: {name: Luxembourg, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 87756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Afghanistan}
+  fields: {name: Afghanistan, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 886a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Macao (SAR)}
+  fields: {name: Macao (SAR), omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 88756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: Aland Islands}
+  fields: {name: Aland Islands, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 896a9ab2-5d95-e211-a939-e4115bead28a
-  fields: {name: Macedonia}
+  fields: {name: Macedonia, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 945f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Albania}
+  fields: {name: Albania, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 955f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Algeria}
+  fields: {name: Algeria, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 965f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: American Samoa}
+  fields: {name: American Samoa, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 975f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Andorra}
+  fields: {name: Andorra, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 985f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Angola}
+  fields: {name: Angola, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 98c8d93d-5d06-e311-a78e-e4115bead28a
-  fields: {name: BLANK}
+  fields: {name: BLANK, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 995f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Anguilla}
+  fields: {name: Anguilla, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 9a5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Antarctica}
+  fields: {name: Antarctica, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 9b5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Antigua and Barbuda}
+  fields: {name: Antigua and Barbuda, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 9c5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Argentina}
+  fields: {name: Argentina, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: 9d5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Armenia}
+  fields: {name: Armenia, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 9e5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Aruba}
+  fields: {name: Aruba, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: 9f5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Australia}
+  fields: {name: Australia, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: a05f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Austria}
+  fields: {name: Austria, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: a15f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Azerbaijan}
+  fields: {name: Azerbaijan, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: a25f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Bahamas}
+  fields: {name: Bahamas, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: a35f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Bahrain}
+  fields: {name: Bahrain, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: a45f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Bangladesh}
+  fields: {name: Bangladesh, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: a46ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Syria}
+  fields: {name: Syria, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: a55f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Barbados}
+  fields: {name: Barbados, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: a56ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Taiwan}
+  fields: {name: Taiwan, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: a65f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Belarus}
+  fields: {name: Belarus, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: a66ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Tajikistan}
+  fields: {name: Tajikistan, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: a75f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Belgium}
+  fields: {name: Belgium, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: a76ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Tanzania}
+  fields: {name: Tanzania, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: a85f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Belize}
+  fields: {name: Belize, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: a86ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Thailand}
+  fields: {name: Thailand, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: a95f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Benin}
+  fields: {name: Benin, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: a96ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Togo}
+  fields: {name: Togo, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: aa5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Bermuda}
+  fields: {name: Bermuda, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: aa6ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Tokelau}
+  fields: {name: Tokelau, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: ab5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Bhutan}
+  fields: {name: Bhutan, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: ab6ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Tonga}
+  fields: {name: Tonga, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: ac5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Bolivia}
+  fields: {name: Bolivia, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: ac6ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Trinidad and Tobago}
+  fields: {name: Trinidad and Tobago, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: ad5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Bosnia and Herzegovina}
+  fields: {name: Bosnia and Herzegovina, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: ad6ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Tunisia}
+  fields: {name: Tunisia, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: ae5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Botswana}
+  fields: {name: Botswana, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: ae6ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Turkey}
+  fields: {name: Turkey, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: af5f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Bouvet Island}
+  fields: {name: Bouvet Island, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: af6ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Turkmenistan}
+  fields: {name: Turkmenistan, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: b05f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: Brazil}
+  fields: {name: Brazil, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: b06ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Turks and Caicos Islands}
+  fields: {name: Turks and Caicos Islands, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: b15f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: British Indian Ocean Territory}
+  fields: {name: British Indian Ocean Territory, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: b16ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Tuvalu}
+  fields: {name: Tuvalu, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: b25f66a0-5d95-e211-a939-e4115bead28a
-  fields: {name: British Virgin Islands}
+  fields: {name: British Virgin Islands, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: b26ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Uganda}
+  fields: {name: Uganda, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: b36ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Ukraine}
+  fields: {name: Ukraine, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: b46ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: United Arab Emirates}
+  fields: {name: United Arab Emirates, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: b56ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: United States Minor Outlying Islands}
+  fields: {name: United States Minor Outlying Islands, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: b66ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Uruguay}
+  fields: {name: Uruguay, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: b76ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Uzbekistan}
+  fields: {name: Uzbekistan, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: b86ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Vanuatu}
+  fields: {name: Vanuatu, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: b96ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Venezuela}
+  fields: {name: Venezuela, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: ba6ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Vietnam}
+  fields: {name: Vietnam, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: bb6ee1ca-5d95-e211-a939-e4115bead28a
-  fields: {name: Virgin Islands (US)}
+  fields: {name: Virgin Islands (US), omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: d2f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: El Salvador}
+  fields: {name: El Salvador, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: d3f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Equatorial Guinea}
+  fields: {name: Equatorial Guinea, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: d4f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Eritrea}
+  fields: {name: Eritrea, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: d5f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Estonia}
+  fields: {name: Estonia, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: d6f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Ethiopia}
+  fields: {name: Ethiopia, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: d7f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Falkland Islands}
+  fields: {name: Falkland Islands, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: d8f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Faroe Islands}
+  fields: {name: Faroe Islands, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: d9f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Fiji}
+  fields: {name: Fiji, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: daf682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Finland}
+  fields: {name: Finland, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: dbf682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: French Guiana}
+  fields: {name: French Guiana, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: dcf682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: French Polynesia}
+  fields: {name: French Polynesia, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: ddf682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: French Southern Territories}
+  fields: {name: French Southern Territories, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: def682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Gabon}
+  fields: {name: Gabon, omis_disabled_on: !!timestamp '2015-05-10 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: dff682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: 'Gambia, The'}
+  fields: {name: 'Gambia, The', omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: e0f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Georgia}
+  fields: {name: Georgia, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: e1f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Ghana}
+  fields: {name: Ghana, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: e2f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Gibraltar}
+  fields: {name: Gibraltar, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: e3f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Greece}
+  fields: {name: Greece, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: e4f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Greenland}
+  fields: {name: Greenland, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: e5f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Grenada}
+  fields: {name: Grenada, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: e6f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Guadeloupe}
+  fields: {name: Guadeloupe, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: e7f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Guam}
+  fields: {name: Guam, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: e8f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Guatemala}
+  fields: {name: Guatemala, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: e9f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Guinea}
+  fields: {name: Guinea, omis_disabled_on: !!timestamp '2015-05-18 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: eaf682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Guinea-Bissau}
+  fields: {name: Guinea-Bissau, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: ebf682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Guyana}
+  fields: {name: Guyana, omis_disabled_on: null, manager_email: ''}
 - model: metadata.country
   pk: ecf682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Haiti}
+  fields: {name: Haiti, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: edf682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Heard Island and McDonald Island}
+  fields: {name: Heard Island and McDonald Island, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: eef682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Vatican City}
+  fields: {name: Vatican City, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: eff682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Honduras}
+  fields: {name: Honduras, omis_disabled_on: !!timestamp '2010-01-01 00:00:00.000000', manager_email: ''}
 - model: metadata.country
   pk: f0f682ac-5d95-e211-a939-e4115bead28a
-  fields: {name: Hong Kong (SAR)}
+  fields: {name: Hong Kong (SAR), omis_disabled_on: null, manager_email: ''}

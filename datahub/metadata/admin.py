@@ -7,7 +7,6 @@ MODELS_TO_REGISTER = (
     models.InteractionType,
     models.Sector,
     models.UKRegion,
-    models.Country,
     models.Title,
     models.Role,
     models.TeamRole,
@@ -59,4 +58,13 @@ class TeamAdmin(MetadataAdmin):
     fields = ('name', 'country', 'uk_region', 'role')
     list_display = ('name', 'role')
     list_select_related = ('role', )
+    search_fields = ('name', 'pk')
+
+
+@admin.register(models.Country)
+class CountryAdmin(MetadataAdmin):
+    """Country Admin."""
+
+    fields = ('name', 'manager_email', 'omis_disabled_on')
+    list_display = ('name', 'manager_email', 'omis_disabled_on')
     search_fields = ('name', 'pk')

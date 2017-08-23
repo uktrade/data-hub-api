@@ -114,3 +114,18 @@ def test_team_view(api_client):
             'id': '80756b9a-5d95-e211-a939-e4115bead28a'
         }
     }
+
+
+def test_country_view(api_client):
+    """Test that the country view returns omis_disabled_on as well."""
+    url = reverse(viewname='country')
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()[0] == {
+        'id': '87756b9a-5d95-e211-a939-e4115bead28a',
+        'name': 'Afghanistan',
+        'omis_disabled_on': None
+    }
+    # make sure that we don't expose `manager_email` by mistake
+    assert 'manager_email' not in response.json()[0]
