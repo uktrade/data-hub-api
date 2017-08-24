@@ -10,7 +10,6 @@ from elasticsearch_dsl.query import Match, MatchPhrase, Q
 
 from .apps import get_search_apps
 
-
 lowercase_keyword_analyzer = analysis.CustomAnalyzer(
     'lowercase_keyword_analyzer',
     tokenizer='keyword',
@@ -153,7 +152,6 @@ def apply_aggs_query(search, aggs):
         # skip range filters as we can't aggregate them
         if any(agg.endswith(x) for x in ('_before', '_after')):
             continue
-        agg = remap_filter_id_field(agg)
 
         search_aggs = search.aggs
         if '.' in agg:
@@ -212,28 +210,6 @@ def get_search_by_entity_query(term=None,
 def bulk(actions=None, chunk_size=None, **kwargs):
     """Send data in bulk to Elasticsearch."""
     return es_bulk(connections.get_connection(), actions=actions, chunk_size=chunk_size, **kwargs)
-
-
-FILTER_MAP = {
-    'sector': 'sector.id',
-    'account_manager': 'account_manager.id',
-    'export_to_country': 'export_to_countries.id',
-    'future_interest_country': 'future_interest_countries.id',
-    'uk_region': 'uk_region.id',
-    'trading_address_country': 'trading_address_country.id',
-    'address_country': 'address_country.id',
-    'adviser': 'adviser.id',
-    'client_relationship_manager': 'client_relationship_manager.id',
-    'investor_company': 'investor_company.id',
-    'investment_type': 'investment_type.id',
-    'stage': 'stage.id',
-    'company_name': 'company.name_trigram',
-}
-
-
-def remap_filter_id_field(field):
-    """Maps api field to elasticsearch field."""
-    return FILTER_MAP.get(field, field)
 
 
 def date_range_fields(fields):

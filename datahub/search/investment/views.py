@@ -1,13 +1,14 @@
-from rest_framework.exceptions import ValidationError
-from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import InvestmentProject
-from .. import elasticsearch
+from ..views import SearchWithFiltersAPIMixin
 
 
-class SearchInvestmentProjectAPIView(APIView):
+class SearchInvestmentProjectAPIView(SearchWithFiltersAPIMixin, APIView):
     """Filtered investment project search view."""
+
+    entity = InvestmentProject
+    with_aggregations = True
 
     SORT_BY_FIELDS = (
         'actual_land_date',
@@ -69,53 +70,10 @@ class SearchInvestmentProjectAPIView(APIView):
         'stage'
     )
 
-    http_method_names = ('post',)
-
-    def post(self, request, format=None):
-        """Performs filtered contact search."""
-        filters = {elasticsearch.remap_filter_id_field(field): request.data[field]
-                   for field in self.FILTER_FIELDS if field in request.data}
-        try:
-            filters, ranges = elasticsearch.date_range_fields(filters)
-        except ValueError:
-            raise ValidationError('Date(s) in incorrect format.')
-
-        original_query = request.data.get('original_query', '')
-
-        sortby = request.data.get('sortby')
-        if sortby:
-            field = sortby.rsplit(':')[0]
-            if field not in self.SORT_BY_FIELDS:
-                raise ValidationError(f'"sortby" field is not one of {self.SORT_BY_FIELDS}.')
-
-        offset = int(request.data.get('offset', 0))
-        limit = int(request.data.get('limit', 100))
-
-        results = elasticsearch.get_search_by_entity_query(
-            entity=InvestmentProject,
-            term=original_query,
-            filters=filters,
-            ranges=ranges,
-            field_order=sortby,
-            aggs=self.FILTER_FIELDS,
-            offset=offset,
-            limit=limit,
-        ).execute()
-
-        aggregations = {}
-        for field in self.FILTER_FIELDS:
-            es_field = elasticsearch.remap_filter_id_field(field)
-            if es_field in results.aggregations:
-                aggregation = results.aggregations[es_field]
-                if '.' in es_field:
-                    aggregation = aggregation[es_field]
-
-                aggregations[field] = [bucket.to_dict() for bucket in aggregation['buckets']]
-
-        response = {
-            'count': results.hits.total,
-            'results': [x.to_dict() for x in results.hits],
-            'aggregations': aggregations,
-        }
-
-        return Response(data=response)
+    REMAP_FIELDS = {
+        'client_relationship_manager': 'client_relationship_manager.id',
+        'investment_type': 'investment_type.id',
+        'investor_company': 'investor_company.id',
+        'sector': 'sector.id',
+        'stage': 'stage.id',
+    }

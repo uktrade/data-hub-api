@@ -1,13 +1,16 @@
 import datetime
+from unittest import mock
 
 import pytest
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
 from datahub.investment.test.factories import InvestmentProjectFactory
+from ..views import PaginatedAPIMixin
 
 pytestmark = pytest.mark.django_db
 
@@ -382,3 +385,112 @@ class TestSearch(APITestMixin):
                         {'count': 1, 'entity': 'contact'},
                         {'count': 1, 'entity': 'investment_project'}]
         assert all(aggregation in response.data['aggregations'] for aggregation in aggregations)
+
+
+class TestPaginatedAPIMixin:
+    """Tests related to the paginated API mixin."""
+
+    def test_limit_as_valid_param(self):
+        """Test that get_limit returns the int value of the param if valid."""
+        mixin = PaginatedAPIMixin()
+
+        request = mock.MagicMock(
+            data={
+                PaginatedAPIMixin.limit_query_param: '3'
+            }
+        )
+
+        assert mixin.get_limit(request) == 3
+
+    def test_limit_as_non_int_defaults(self):
+        """Test that get_limit returns the default value if the param is not an int."""
+        mixin = PaginatedAPIMixin()
+
+        request = mock.MagicMock(
+            data={
+                PaginatedAPIMixin.limit_query_param: 'non-int'
+            }
+        )
+
+        assert mixin.get_limit(request) == PaginatedAPIMixin.default_limit
+
+    def test_limit_as_negative_int_defaults(self):
+        """Test that get_limit returns the default value if param is a negative value."""
+        mixin = PaginatedAPIMixin()
+
+        request = mock.MagicMock(
+            data={
+                PaginatedAPIMixin.limit_query_param: '-1'
+            }
+        )
+
+        assert mixin.get_limit(request) == PaginatedAPIMixin.default_limit
+
+    def test_limit_as_zero_defaults(self):
+        """Test that get_limit returns the default value if param is 0."""
+        mixin = PaginatedAPIMixin()
+
+        request = mock.MagicMock(
+            data={
+                PaginatedAPIMixin.limit_query_param: '0'
+            }
+        )
+
+        assert mixin.get_limit(request) == PaginatedAPIMixin.default_limit
+
+    def test_offset_as_valid_param(self):
+        """Test that get_offset returns the int value if the param is valid."""
+        mixin = PaginatedAPIMixin()
+
+        request = mock.MagicMock(
+            data={
+                PaginatedAPIMixin.offset_query_param: '4'
+            }
+        )
+
+        assert mixin.get_offset(request) == 4
+
+    def test_offset_as_non_int_defaults(self):
+        """Test that get_offset returns the default value if the param is not an int."""
+        mixin = PaginatedAPIMixin()
+
+        request = mock.MagicMock(
+            data={
+                PaginatedAPIMixin.offset_query_param: 'non-int'
+            }
+        )
+
+        assert mixin.get_offset(request) == 0
+
+    def test_pagination_params_within_limit(self):
+        """Test that if the result window (offset + limit) is within limit, everything is OK."""
+        mixin = PaginatedAPIMixin()
+
+        request = mock.MagicMock(
+            data={
+                PaginatedAPIMixin.limit_query_param: '100',
+                PaginatedAPIMixin.offset_query_param: '9900',
+            }
+        )
+
+        limit, offset = mixin.get_pagination_values(request)
+
+        assert limit == 100
+        assert offset == 9900
+
+    def test_pagination_params_outside_limit(self):
+        """
+        Test that if the result window (offset + limit) is too large,
+        a validator error is returned.
+        """
+        mixin = PaginatedAPIMixin()
+
+        request = mock.MagicMock(
+            data={
+                PaginatedAPIMixin.limit_query_param: '100',
+                PaginatedAPIMixin.offset_query_param: '9901',
+            }
+        )
+
+        with pytest.raises(ValidationError):
+            mixin.get_pagination_values(request)

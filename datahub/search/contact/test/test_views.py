@@ -2,8 +2,8 @@ import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import ContactFactory
-from datahub.core.constants import Country, Sector
+from datahub.company.test.factories import CompanyFactory, ContactFactory
+from datahub.core.constants import Country, Sector, UKRegion
 from datahub.core.test_utils import APITestMixin
 
 pytestmark = pytest.mark.django_db
@@ -27,15 +27,104 @@ class TestSearch(APITestMixin):
 
         url = reverse('api-v3:search:contact')
 
+        united_kingdom_id = Country.united_kingdom.value.id
+
         response = self.api_client.post(url, {
             'original_query': term,
-            'last_name': 'defg',
+            'address_country': united_kingdom_id,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] > 0
+        contact = response.data['results'][0]
+        assert contact['address_country']['id'] == united_kingdom_id
+
+    def test_filter_contact(self, setup_es, setup_data):
+        """Tests matching contact using multiple filters."""
+        company = CompanyFactory(
+            name='SlothsCats',
+            trading_address_country_id=Country.united_kingdom.value.id,
+            uk_region_id=UKRegion.east_of_england.value.id,
+            sector_id=Sector.renewable_energy_wind.value.id
+        )
+        ContactFactory(
+            address_same_as_company=True,
+            company=company
+        )
+
+        setup_es.indices.refresh()
+
+        term = ''
+
+        url = reverse('api-v3:search:contact')
+
+        response = self.api_client.post(url, {
+            'original_query': term,
+            'company_name': company.name,
+            'company_sector': company.sector_id,
+            'company_uk_region': company.uk_region_id,
+            'address_country': company.trading_address_country_id,
         })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
-        assert len(response.data['results']) == 1
-        assert response.data['results'][0]['last_name'] == 'defg'
+        contact = response.data['results'][0]
+        assert contact['address_country']['id'] == company.trading_address_country_id
+        assert contact['company']['name'] == company.name
+        assert contact['company_uk_region']['id'] == company.uk_region_id
+        assert contact['company_sector']['id'] == company.sector_id
+
+    def test_filter_without_uk_region(self, setup_es, setup_data):
+        """Tests matching contact without uk_region using multiple filters."""
+        company = CompanyFactory(
+            registered_address_country_id=Country.united_states.value.id,
+            trading_address_country_id=Country.united_states.value.id,
+            uk_region_id=None,
+            sector_id=Sector.renewable_energy_wind.value.id
+        )
+        ContactFactory(
+            address_same_as_company=True,
+            company=company
+        )
+
+        setup_es.indices.refresh()
+
+        term = ''
+
+        url = reverse('api-v3:search:contact')
+
+        response = self.api_client.post(url, {
+            'original_query': term,
+            'company_name': company.name,
+            'company_sector': company.sector_id,
+            'address_country': company.trading_address_country_id,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        contact = response.data['results'][0]
+        assert contact['address_country']['id'] == company.trading_address_country_id
+        assert contact['company']['name'] == company.name
+        assert contact['company_uk_region'] is None
+        assert contact['company_sector']['id'] == company.sector_id
+
+    def test_with_invalid_filters(self, setup_es, setup_data):
+        """Tests matching contact using invalid filters."""
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:contact')
+
+        response = self.api_client.post(url, {
+            'original_query': ['hello'],
+            'company_name': {
+                'test1': 1,
+                'test2': 2,
+            },
+            'company_sector': {1},
+            'address_country': 'test',
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_search_contact_by_partial_company_name(self, setup_es, setup_data):
         """Tests filtering by partially matching company name."""
