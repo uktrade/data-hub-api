@@ -101,6 +101,26 @@ def test_get_basic_search_query():
                         }
                     },
                     {
+                        'nested': {
+                            'path': 'contact',
+                            'query': {
+                                'match': {
+                                    'contact.name': 'test'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        'nested': {
+                            'path': 'dit_team',
+                            'query': {
+                                'match': {
+                                    'dit_team.name': 'test'
+                                }
+                            }
+                        }
+                    },
+                    {
                         'match': {
                             'email': 'test'
                         }
@@ -173,6 +193,11 @@ def test_get_basic_search_query():
                                     'sector.name': 'test'
                                 }
                             }
+                        }
+                    },
+                    {
+                        'match': {
+                            'subject': 'test'
                         }
                     },
                     {
