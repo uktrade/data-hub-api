@@ -55,37 +55,6 @@ def test_get_search_term_query():
     }
 
 
-def test_remap_fields():
-    """Tests fields remapping."""
-    fields = {
-        'sector': 'test',
-        'account_manager': 'test',
-        'export_to_country': 'test',
-        'future_interest_country': 'test',
-        'uk_region': 'test',
-        'trading_address_country': 'test',
-        'adviser': 'test',
-        'test': 'test',
-        'stage': ['a', 'b'],
-        'uk_based': [False]
-    }
-
-    remapped = {elasticsearch.remap_filter_id_field(field): value
-                for field, value in fields.items()}
-
-    assert 'sector.id' in remapped
-    assert 'account_manager.id' in remapped
-    assert 'export_to_countries.id' in remapped
-    assert 'future_interest_countries.id' in remapped
-    assert 'uk_region.id' in remapped
-    assert 'trading_address_country.id' in remapped
-    assert 'adviser.id' in remapped
-    assert 'test' in remapped
-    assert 'uk_based' in remapped
-    assert remapped['stage.id'] == ['a', 'b']
-    assert remapped['uk_based'] == [False]
-
-
 def test_remap_sort_field():
     """Test sort fields remapping."""
     fields = {
