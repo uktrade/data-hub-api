@@ -1,5 +1,6 @@
 import uuid
 
+from django.conf import settings
 from django.db import models
 from django.utils.crypto import get_random_string
 from django.utils.timezone import now
@@ -122,6 +123,10 @@ class Order(BaseModel):
         if not self.reference:
             self.reference = self._calculate_reference()
         return super().save(*args, **kwargs)
+
+    def get_datahub_frontend_url(self):
+        """Return the url to the Data Hub frontend order page."""
+        return f'{settings.DATAHUB_FRONTEND_BASE_URL}/omis/{self.pk}'
 
 
 class OrderSubscriber(BaseModel):

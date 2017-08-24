@@ -20,3 +20,6 @@ ES_INDEX_SETTINGS = {
 }
 DOCUMENT_BUCKET='test-bucket'
 AV_SERVICE_URL='http://av-service/'
+
+OMIS_NOTIFICATION_ADMIN_EMAIL = 'fake-omis-admin@digital.trade.gov.uk'
+OMIS_NOTIFICATION_API_KEY = ''

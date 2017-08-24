@@ -61,6 +61,7 @@ LOCAL_APPS = [
     'datahub.omis.core',
     'datahub.omis.order',
     'datahub.omis.market',
+    'datahub.omis.notification',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -177,3 +178,11 @@ HEROKU = False
 BULK_CREATE_BATCH_SIZE = env.int('BULK_CREATE_BATCH_SIZE', default=5000)
 DOCUMENTS_BUCKET = env('DOCUMENTS_BUCKET')
 AV_SERVICE_URL = env('AV_SERVICE_URL', default=None)
+
+# FRONTEND
+DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://localhost:3000')
+
+# OMIS
+OMIS_NOTIFICATION_ADMIN_EMAIL = env('OMIS_NOTIFICATION_ADMIN_EMAIL', default='')
+OMIS_NOTIFICATION_API_KEY = env('OMIS_NOTIFICATION_API_KEY', default='')
+OMIS_NOTIFICATION_TEST_API_KEY = env('OMIS_NOTIFICATION_TEST_API_KEY', default='')
