@@ -48,7 +48,7 @@ class Notify:
             warnings.warn(
                 '`settings.OMIS_NOTIFICATION_API_KEY` not specified therefore all '
                 'OMIS notifications will be mocked. '
-                'You might want to change this if it\'s not a '
+                "You might want to change this if it's not a "
                 'testing or development environment.',
                 RuntimeWarning,
                 stacklevel=2
@@ -115,13 +115,13 @@ class Notify:
         else:
             data = {
                 'order': order,
-                'what_happened': 'We couldn\'t notify the overseas manager'
+                'what_happened': "We couldn't notify the overseas manager"
             }
 
             if not market:
                 data['why'] = (
                     f'country {order.primary_market.name} '
-                    'doesn\'t have an OMIS market defined'
+                    "doesn't have an OMIS market defined"
                 )
             else:
                 data['why'] = (

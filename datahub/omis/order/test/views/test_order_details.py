@@ -229,7 +229,7 @@ class TestAddOrderDetails(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
             'primary_market': [
-                f'The OMIS market for country "{non_market_country}" doesn\'t exist.'
+                f"The OMIS market for country '{non_market_country}' doesn't exist."
             ]
         }
 

@@ -196,7 +196,7 @@ class OrderAssignee(BaseModel):
         we don't want to change history.
         """
         if not self._state.adding and self.__adviser != self.adviser:
-            raise ValueError('Updating the value of adviser isn\'t allowed.')
+            raise ValueError("Updating the value of adviser isn't allowed.")
 
         if self._state.adding:
             self.team = self.adviser.dit_team
