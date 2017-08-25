@@ -38,7 +38,7 @@ class TestTemplates:
         market.manager_email = 'test@test.com'
         market.save()
 
-        order = OrderFactory(primary_market=market.country)
+        order = OrderFactory(primary_market_id=market.country.pk)
 
         notify.order_created(order)
 

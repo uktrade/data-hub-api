@@ -59,7 +59,7 @@ class TestNotifyOnOrderCreated:
         market.manager_email = 'test@test.com'
         market.save()
 
-        order = OrderFactory(primary_market=market.country)
+        order = OrderFactory(primary_market_id=market.country.pk)
 
         notify.client.reset_mock()
 
@@ -80,7 +80,7 @@ class TestNotifyOnOrderCreated:
         market.manager_email = ''
         market.save()
 
-        order = OrderFactory(primary_market=market.country)
+        order = OrderFactory(primary_market_id=market.country.id)
 
         notify.client.reset_mock()
 
@@ -100,7 +100,7 @@ class TestNotifyOnOrderCreated:
         country = market.country
         market.delete()
 
-        order = OrderFactory(primary_market=country)
+        order = OrderFactory(primary_market_id=country.id)
 
         notify.client.reset_mock()
 
