@@ -14,7 +14,6 @@ class PaginatedAPIMixin:
     default_limit = api_settings.PAGE_SIZE
     limit_query_param = 'limit'
     offset_query_param = 'offset'
-    max_results = 10000
 
     def get_limit(self, request):
         """Return the limit specified by the user or the default one."""
@@ -43,11 +42,11 @@ class PaginatedAPIMixin:
         limit = self.get_limit(request)
         offset = self.get_offset(request)
 
-        if limit + offset > self.max_results:
+        if limit + offset > elasticsearch.MAX_RESULTS:
             raise ValidationError({
                 api_settings.NON_FIELD_ERRORS_KEY: (
                     'Invalid offset/limit. '
-                    f'Result window cannot be greater than {self.max_results}'
+                    f'Result window cannot be greater than {elasticsearch.MAX_RESULTS}'
                 )
             })
         return limit, offset
