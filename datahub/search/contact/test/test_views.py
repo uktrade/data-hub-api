@@ -2,7 +2,7 @@ import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import ContactFactory
+from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.constants import Country, Sector, UKRegion
 from datahub.core.test_utils import APITestMixin
 
@@ -69,6 +69,40 @@ class TestSearch(APITestMixin):
         assert contact['address_country']['id'] == company.trading_address_country_id
         assert contact['company']['name'] == company.name
         assert contact['company_uk_region']['id'] == company.uk_region_id
+        assert contact['company_sector']['id'] == company.sector_id
+
+    def test_filter_without_uk_region(self, setup_es, setup_data):
+        """Tests matching contact without uk_region using multiple filters."""
+        company = CompanyFactory(
+            registered_address_country_id=Country.united_states.value.id,
+            trading_address_country_id=Country.united_states.value.id,
+            uk_region_id=None,
+            sector_id=Sector.renewable_energy_wind.value.id
+        )
+        ContactFactory(
+            address_same_as_company=True,
+            company=company
+        )
+
+        setup_es.indices.refresh()
+
+        term = ''
+
+        url = reverse('api-v3:search:contact')
+
+        response = self.api_client.post(url, {
+            'original_query': term,
+            'company_name': company.name,
+            'company_sector': company.sector_id,
+            'address_country': company.trading_address_country_id,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        contact = response.data['results'][0]
+        assert contact['address_country']['id'] == company.trading_address_country_id
+        assert contact['company']['name'] == company.name
+        assert contact['company_uk_region'] is None
         assert contact['company_sector']['id'] == company.sector_id
 
     def test_search_contact_by_partial_company_name(self, setup_es, setup_data):
