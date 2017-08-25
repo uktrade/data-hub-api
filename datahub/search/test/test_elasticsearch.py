@@ -1,6 +1,8 @@
 import datetime
 from unittest import mock
 
+import pytest
+
 from .. import elasticsearch
 
 
@@ -53,6 +55,24 @@ def test_get_search_term_query():
             ]
         }
     }
+
+
+@pytest.mark.parametrize(
+    'offset,limit,expected_size', (
+        (8950, 1000, 1000),
+        (9950, 1000, 50),
+        (10000, 1000, 0),
+    )
+)
+def test_offset_near_max_results(offset, limit, expected_size):
+    """Tests limit clipping when near max_results."""
+    query = elasticsearch.get_basic_search_query(
+        'test', entities=(mock.Mock(),), offset=offset, limit=limit
+    )
+
+    query_dict = query.to_dict()
+    assert query_dict['from'] == offset
+    assert query_dict['size'] == expected_size
 
 
 def test_remap_fields():

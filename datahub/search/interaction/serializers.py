@@ -1,11 +1,11 @@
 from rest_framework import serializers
 from rest_framework.settings import api_settings
 
+from datahub.search.elasticsearch import MAX_RESULTS
+
 
 class LimitOffsetSerializer(serializers.Serializer):
     """Serialiser used to validate limit/offset values in POST bodies."""
-
-    MAX_RESULTS = 10000
 
     offset = serializers.IntegerField(default=0, min_value=0, max_value=MAX_RESULTS - 1)
     limit = serializers.IntegerField(default=api_settings.PAGE_SIZE, min_value=1)

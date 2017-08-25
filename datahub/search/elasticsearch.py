@@ -11,6 +11,8 @@ from elasticsearch_dsl.query import Match, MatchPhrase, Q
 from .apps import get_search_apps
 
 
+MAX_RESULTS = 10000
+
 lowercase_keyword_analyzer = analysis.CustomAnalyzer(
     'lowercase_keyword_analyzer',
     tokenizer='keyword',
@@ -110,6 +112,8 @@ def get_basic_search_query(term, entities=None, field_order=None, offset=0, limi
 
     Also returns number of results in other entities.
     """
+    limit = _clip_limit(offset, limit)
+
     all_models = (search_app.ESModel for search_app in get_search_apps())
     fields = set(chain.from_iterable(entity.SEARCH_FIELDS for entity in all_models))
 
@@ -175,6 +179,8 @@ def get_search_by_entity_query(term=None,
                                offset=0,
                                limit=100):
     """Perform filtered search for given terms in given entity."""
+    limit = _clip_limit(offset, limit)
+
     query = [Q('term', _type=entity._doc_type.name)]
     if term != '':
         query.append(get_search_term_query(term, fields=entity.SEARCH_FIELDS))
@@ -257,3 +263,7 @@ def date_range_fields(fields):
         filters.update({k: v})
 
     return filters, ranges
+
+
+def _clip_limit(offset, limit):
+    return max(min(limit, MAX_RESULTS - offset), 0)
