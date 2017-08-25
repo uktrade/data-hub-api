@@ -44,6 +44,7 @@ class Contact(DocType, MapDBModelToDict):
     archived_by = dsl_utils.contact_mapping('archived_by')
     company = dsl_utils.id_name_partial_mapping('company')
     company_sector = dsl_utils.id_name_mapping()
+    company_uk_region = dsl_utils.id_name_mapping()
 
     MAPPINGS = {
         'id': str,
@@ -55,6 +56,7 @@ class Contact(DocType, MapDBModelToDict):
 
     COMPUTED_MAPPINGS = {
         'company_sector': dict_utils.computed_nested_id_name_dict('company.sector'),
+        'company_uk_region': dict_utils.computed_nested_id_name_dict('company.uk_region'),
         'address_1': contact_dict_utils.computed_address_field('address_1'),
         'address_2': contact_dict_utils.computed_address_field('address_2'),
         'address_town': contact_dict_utils.computed_address_field('address_town'),
