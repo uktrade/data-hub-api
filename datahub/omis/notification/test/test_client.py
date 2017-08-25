@@ -6,47 +6,35 @@ from django.conf import settings
 
 from notifications_python_client.errors import APIError
 
+from datahub.core.test_utils import synchronous_executor_submit
 from datahub.omis.market.models import Market
 from datahub.omis.order.test.factories import OrderFactory
 
-from ..client import Notify, notify
+from ..client import notify, send_email
 from ..constants import Template
 
 pytestmark = pytest.mark.django_db
 
 
 class TestSendEmail:
-    """Tests for errors with the internal _send_email method."""
+    """Tests for errors with the internal send_email function."""
 
-    def test_error_in_debug_should_raise_exception(self, settings):
+    @mock.patch('datahub.omis.notification.client.raven_client')
+    def test_error_raises_exception(self, mock_raven_client, settings):
         """
-        Test that if an error occurs whilst sending an email and the env
-        is not production, the exception is raised and not caught.
+        Test that if an error occurs whilst sending an email,
+        the exception is raised and sent to sentry.
         """
-        settings.DEBUG = True
+        notify_client = mock.Mock()
+        notify_client.send_email_notification.side_effect = APIError()
 
-        notify = Notify()
-        notify.client.send_email_notification.side_effect = APIError()
         with pytest.raises(APIError):
-            notify._send_email()
+            send_email(notify_client)
 
-    def test_error_in_prod_should_faily_silently(self):
-        """
-        Test that if an error occurs whilst sending an email and the env
-        is production, the exception is caught, reported to sentry and
-        ignored.
-        """
-        settings.DEBUG = False
-
-        notify = Notify()
-        notify.client.send_email_notification.side_effect = APIError()
-
-        with mock.patch('datahub.omis.notification.client.raven_client') as raven_client:
-            notify._send_email()
-
-            assert raven_client.captureException.called
+        assert mock_raven_client.captureException.called
 
 
+@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
 class TestNotifyOnOrderCreated:
     """Tests for notifications sent when an order is created."""
 
@@ -112,6 +100,7 @@ class TestNotifyOnOrderCreated:
         assert call_args['template_id'] == Template.generic_order_info.value
 
 
+@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
 class TestNotifyOrderInfo:
     """Tests for generic notifications related to an order."""
 

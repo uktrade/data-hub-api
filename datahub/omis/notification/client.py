@@ -1,24 +1,33 @@
 import warnings
+from logging import getLogger
 from unittest import mock
 
 from django.conf import settings
-
-from notifications_python_client.errors import APIError
 from notifications_python_client.notifications import NotificationsAPIClient
-
 from raven.contrib.django.raven_compat.models import client as raven_client
 
+from datahub.core.utils import executor
 from datahub.omis.market.models import Market
 
 from .constants import Template
 
 
+logger = getLogger(__name__)
+
+
+def send_email(client, *args, **kwargs):
+    """Send email and catch potential errors."""
+    try:
+        client.send_email_notification(*args, **kwargs)
+    except:  # noqa: B901
+        logger.exception('Error while sending a notification email.')
+        raven_client.captureException()
+        raise
+
+
 class Notify:
     """
     Used to send notifications when something happens to an order.
-
-    If settings.DEBUG == True, all the exceptions will not be caught,
-    if False, they will fail silently and get reported to sentry.
 
     The GOV.UK notification key can be set in settings.OMIS_NOTIFICATION_API_KEY,
     if empty, the client will be mocked and no notification will be sent.
@@ -46,14 +55,8 @@ class Notify:
             )
 
     def _send_email(self, *args, **kwargs):
-        """Fail silently if `settings.DEBUG == True` but send error to sentry."""
-        try:
-            self.client.send_email_notification(*args, **kwargs)
-        except APIError as e:
-            if settings.DEBUG:
-                raise e
-            else:
-                raven_client.captureException()
+        """Send email in a separate thread."""
+        executor.submit(send_email, self.client, *args, **kwargs)
 
     def _prepare_personalisation(self, order, data=None):
         """Prepare the personalisation data with common values."""
