@@ -124,7 +124,7 @@ class OrderSerializer(serializers.ModelSerializer):
             market = Market.objects.get(pk=country)
         except Market.DoesNotExist:
             raise serializers.ValidationError(
-                f'The OMIS market for country "{country}" doesn\'t exist.'
+                f"The OMIS market for country '{country}' doesn't exist."
             )
         else:
             if market.was_disabled_on(created_on):

@@ -28,7 +28,7 @@ DEBUG_TOOLBAR_CONFIG = {
 # This gets normal Python logging working with Django
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
     'root': {
         'level': 'INFO',
         'handlers': ['console'],
