@@ -29,7 +29,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
     archived_by = dsl_utils.contact_mapping('archived_by')
     created_on = Date()
     modified_on = Date()
-    description = String()
+    description = dsl_utils.EnglishString()
     estimated_land_date = Date()
     fdi_type = dsl_utils.id_name_mapping()
     fdi_type_documents = dsl_utils.id_uri_mapping()

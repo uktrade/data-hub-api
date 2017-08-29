@@ -112,6 +112,7 @@ def test_mapping(setup_es):
                     'type': 'nested'
                 },
                 'description': {
+                    'analyzer': 'english_analyzer',
                     'type': 'string'
                 },
                 'contacts_not_to_approach': {

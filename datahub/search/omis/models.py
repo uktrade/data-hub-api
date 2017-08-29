@@ -17,7 +17,7 @@ class Order(DocType, MapDBModelToDict):
     created_on = Date()
     primary_market = dsl_utils.id_name_mapping()
     sector = dsl_utils.id_name_mapping()
-    description = String()
+    description = dsl_utils.EnglishString()
     contacts_not_to_approach = String()
     delivery_date = Date()
     service_types = dsl_utils.id_name_mapping()
