@@ -6,11 +6,11 @@ from rest_framework.exceptions import ValidationError
 from datahub.company.models import Advisor, Company, Contact
 from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
-from datahub.core.validate_utils import DataCombiner
 from datahub.metadata.models import Country, Sector, Team
 
 from datahub.omis.market.models import Market
 from .models import Order, OrderAssignee, OrderSubscriber, ServiceType
+from .validators import ContactWorksAtCompanyValidator, ReadonlyAfterCreationValidator
 
 
 class ServiceTypeSerializer(ConstantModelSerializer):
@@ -75,23 +75,10 @@ class OrderSerializer(serializers.ModelSerializer):
             'permission_to_approach_contacts',
             'delivery_date',
         ]
-
-    def _validate_contact_works_at_company(self, contact, company):
-        """Validates that contact works at company."""
-        if contact.company != company:
-            raise serializers.ValidationError({
-                'contact': 'The contact does not work at the given company.'
-            })
-
-    def _validate_readonly_fields_after_creation(self, *objs):
-        """Validate fields that are readonly after creation."""
-        if self.instance:
-            for field, obj in objs:
-                if obj != getattr(self.instance, field):
-                    field_name = self.Meta.model._meta.get_field(field).verbose_name
-                    raise serializers.ValidationError({
-                        field: f'The {field_name} cannot be changed after creation.'
-                    })
+        validators = [
+            ContactWorksAtCompanyValidator(),
+            ReadonlyAfterCreationValidator(fields=('company', 'primary_market'))
+        ]
 
     def validate_service_types(self, service_types):
         """Validates that service types are not disabled."""
@@ -131,21 +118,6 @@ class OrderSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(f'"{country}" disabled.')
 
         return country
-
-    def validate(self, data):
-        """Extra checks."""
-        data_combiner = DataCombiner(self.instance, data)
-        company = data_combiner.get_value('company')
-        contact = data_combiner.get_value('contact')
-        country = data_combiner.get_value('primary_market')
-
-        self._validate_contact_works_at_company(contact, company)
-        self._validate_readonly_fields_after_creation(
-            ('company', company),
-            ('primary_market', country),
-        )
-
-        return data
 
 
 def existing_adviser(adviser_id):
