@@ -9,7 +9,6 @@ from rest_framework.reverse import reverse
 from datahub.core.test_utils import APITestMixin
 from datahub.interaction.test.factories import InteractionFactory
 
-
 pytestmark = pytest.mark.django_db
 
 

@@ -22,7 +22,7 @@ class Company(DocType, MapDBModelToDict):
     company_number = dsl_utils.CaseInsensitiveKeywordString()
     companies_house_data = dsl_utils.company_mapping()
     created_on = Date()
-    description = String()
+    description = dsl_utils.EnglishString()
     employee_range = dsl_utils.id_name_mapping()
     headquarter_type = dsl_utils.id_name_mapping()
     modified_on = Date()
