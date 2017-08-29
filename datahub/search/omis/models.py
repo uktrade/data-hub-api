@@ -12,8 +12,8 @@ class Order(DocType, MapDBModelToDict):
     id = String(index='not_analyzed')
     reference = String(analyzer='lowercase_keyword_analyzer')
     company = dsl_utils.id_name_mapping()
-    contact = dsl_utils.contact_mapping('contact')
-    created_by = dsl_utils.contact_mapping('created_by')
+    contact = dsl_utils.contact_or_adviser_mapping('contact')
+    created_by = dsl_utils.contact_or_adviser_mapping('created_by')
     created_on = Date()
     primary_market = dsl_utils.id_name_mapping()
     sector = dsl_utils.id_name_mapping()
@@ -23,8 +23,8 @@ class Order(DocType, MapDBModelToDict):
     service_types = dsl_utils.id_name_mapping()
     contact_email = dsl_utils.CaseInsensitiveKeywordString()
     contact_phone = dsl_utils.KeywordString()
-    subscribers = dsl_utils.contact_mapping('subscribers', include_dit_team=True)
-    assignees = dsl_utils.contact_mapping('assignees', include_dit_team=True)
+    subscribers = dsl_utils.contact_or_adviser_mapping('subscribers', include_dit_team=True)
+    assignees = dsl_utils.contact_or_adviser_mapping('assignees', include_dit_team=True)
 
     MAPPINGS = {
         'id': str,

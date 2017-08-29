@@ -7,7 +7,7 @@ CaseInsensitiveKeywordString = partial(String, analyzer='lowercase_keyword_analy
 TrigramString = partial(String, analyzer='trigram_analyzer')
 
 
-def contact_mapping(field, include_dit_team=False):
+def contact_or_adviser_mapping(field, include_dit_team=False):
     """Mapping for Adviser/Contact fields."""
     props = {
         'id': KeywordString(),
