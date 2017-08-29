@@ -33,7 +33,8 @@ class SearchContactAPIView(APIView):
         'primary',
         'telephone_countrycode',
         'telephone_number',
-        'title.name'
+        'title.name',
+        'company_sector.name',
     )
 
     FILTER_FIELDS = (

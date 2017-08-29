@@ -1,3 +1,4 @@
+import uuid
 import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -161,6 +162,40 @@ class TestSearch(APITestMixin):
                 'cdefgh',
                 'bcdefg',
                 'abcdef'] == [contact['last_name'] for contact in response.data['results']]
+
+    def test_search_contact_sort_by_company_sector_desc(self, setup_es, setup_data):
+        """Tests sorting by company_sector in descending order."""
+        company1 = CompanyFactory(
+            sector_id=Sector.renewable_energy_wind.value.id,
+        )
+        company2 = CompanyFactory(
+            sector_id=Sector.aerospace_assembly_aircraft.value.id,
+        )
+
+        ContactFactory(
+            first_name='61409aa1fd47d4a5',
+            company=company1
+        )
+        ContactFactory(
+            first_name='61409aa1fd47d4a5',
+            company=company2
+        )
+
+        setup_es.indices.refresh()
+
+        term = '61409aa1fd47d4a5 332de23cbf59a36f'
+
+        url = reverse('api-v3:search:contact')
+        response = self.api_client.post(url, {
+            'original_query': term,
+            'sortby': 'company_sector.name:desc',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert [company1.sector.id,
+                company2.sector.id] == [uuid.UUID(contact['company_sector']['id'])
+                                        for contact in response.data['results']]
 
 
 class TestBasicSearch(APITestMixin):
