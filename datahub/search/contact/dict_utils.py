@@ -14,7 +14,10 @@ def computed_address_field(field):
         return getattr(contact, field)
 
     def get_id_name_field(contact):
-        return dict_utils.id_name_dict(get_field(contact))
+        id_name_field = get_field(contact)
+        if id_name_field is None:
+            return None
+        return dict_utils.id_name_dict(id_name_field)
 
     if field == 'address_country':
         return get_id_name_field
