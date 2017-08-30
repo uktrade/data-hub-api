@@ -1,4 +1,4 @@
-from logging import getLogger
+from logging import getLogger, WARNING
 
 from django.core.management.base import BaseCommand
 from django.core.paginator import Paginator
@@ -7,8 +7,6 @@ from django.db import models
 from datahub.search.elasticsearch import bulk
 
 from ...apps import get_search_apps
-
-logger = getLogger(__name__)
 
 
 def get_datasets():
@@ -28,6 +26,10 @@ def _batch_rows(qs, batch_size=100):
 
 def sync_dataset(item, batch_size=1, stdout=None):
     """Sends dataset to ElasticSearch in batches of batch_size."""
+    model_name = item.es_model.__name__
+    if stdout:
+        stdout.write(f'Processing {model_name} records...')
+
     rows_processed = 0
     total_rows = item.queryset.count() \
         if isinstance(item.queryset, models.query.QuerySet) else len(item.queryset)
@@ -46,17 +48,19 @@ def sync_dataset(item, batch_size=1, stdout=None):
         rows_processed += num_actions
         batches_processed += 1
         if stdout and batches_processed % 100 == 0:
-            stdout.write(f'Rows processed: {rows_processed}/{total_rows} '
+            stdout.write(f'{model_name} rows processed: {rows_processed}/{total_rows} '
                          f'{rows_processed*100//total_rows}%')
 
     if stdout:
-        stdout.write(f'Rows processed: {rows_processed}/{total_rows} 100%. Done!')
+        stdout.write(f'{model_name} rows processed: {rows_processed}/{total_rows} 100%.')
 
 
 def sync_es(batch_size, datasets, stdout=None):
     """Sends data to Elasticsearch."""
     for item in datasets:
         sync_dataset(item, batch_size=batch_size, stdout=stdout)
+    if stdout:
+        stdout.write(f'Elasticsearch sync complete!')
 
 
 class Command(BaseCommand):
@@ -73,4 +77,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Handle."""
+        root_logger = getLogger()
+        root_logger.setLevel(WARNING)
+
         sync_es(batch_size=options['batch_size'], datasets=get_datasets(), stdout=self.stdout)

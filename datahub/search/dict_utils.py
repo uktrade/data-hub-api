@@ -1,5 +1,8 @@
 def id_name_dict(obj):
     """Creates dictionary with selected field from supplied object."""
+    if obj is None:
+        return None
+
     return {
         'id': str(obj.id),
         'name': obj.name,
@@ -8,6 +11,9 @@ def id_name_dict(obj):
 
 def id_type_dict(obj):
     """Creates dictionary with selected field from supplied object."""
+    if obj is None:
+        return None
+
     return {
         'id': str(obj.id),
         'type': obj.type
@@ -16,6 +22,9 @@ def id_type_dict(obj):
 
 def id_uri_dict(obj):
     """Creates dictionary with selected field from supplied object."""
+    if obj is None:
+        return None
+
     return {
         'id': str(obj.id),
         'uri': obj.uri
@@ -24,6 +33,9 @@ def id_uri_dict(obj):
 
 def contact_or_adviser_dict(obj, include_dit_team=False):
     """Creates dictionary with selected field from supplied object."""
+    if obj is None:
+        return None
+
     data = {
         'id': str(obj.id),
         'first_name': obj.first_name,
@@ -61,6 +73,9 @@ def computed_nested_id_name_dict(nested_field):
 
 def company_dict(obj):
     """Creates dictionary from a company with id and company_number keys."""
+    if obj is None:
+        return None
+
     return {
         'id': str(obj.id),
         'company_number': obj.company_number,

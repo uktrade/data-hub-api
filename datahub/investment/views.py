@@ -7,8 +7,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.response import Response
 
+from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
-from datahub.core.serializers import AuditSerializer
 from datahub.core.utils import executor
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.documents.av_scan import virus_scan_document
@@ -24,10 +24,9 @@ from datahub.investment.serializers import (
 _team_member_queryset = InvestmentProjectTeamMember.objects.select_related('adviser')
 
 
-class IProjectAuditViewSet(CoreViewSetV3):
+class IProjectAuditViewSet(AuditViewSet):
     """Investment Project audit views."""
 
-    serializer_class = AuditSerializer
     queryset = InvestmentProject.objects.all()
 
     def get_view_name(self):

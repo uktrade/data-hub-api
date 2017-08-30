@@ -54,14 +54,8 @@ def test_get_basic_search_query():
                         'nested': {
                             'path': 'address_country',
                             'query': {
-                                'bool': {
-                                    'must': [
-                                        {
-                                            'match': {
-                                                'address_country.name': 'test'
-                                            }
-                                        }
-                                    ]
+                                'match': {
+                                    'address_country.name': 'test'
                                 }
                             }
                         }
@@ -80,14 +74,8 @@ def test_get_basic_search_query():
                         'nested': {
                             'path': 'business_activities',
                             'query': {
-                                'bool': {
-                                    'must': [
-                                        {
-                                            'match': {
-                                                'business_activities.name': 'test'
-                                            }
-                                        }
-                                    ]
+                                'match': {
+                                    'business_activities.name': 'test'
                                 }
                             }
                         }
@@ -96,14 +84,8 @@ def test_get_basic_search_query():
                         'nested': {
                             'path': 'classification',
                             'query': {
-                                'bool': {
-                                    'must': [
-                                        {
-                                            'match': {
-                                                'classification.name': 'test'
-                                            }
-                                        }
-                                    ]
+                                'match': {
+                                    'classification.name': 'test'
                                 }
                             }
                         }
@@ -112,14 +94,28 @@ def test_get_basic_search_query():
                         'nested': {
                             'path': 'company',
                             'query': {
-                                'bool': {
-                                    'must': [
-                                        {
-                                            'match': {
-                                                'company.name': 'test'
-                                            }
-                                        }
-                                    ]
+                                'match': {
+                                    'company.name': 'test'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        'nested': {
+                            'path': 'contact',
+                            'query': {
+                                'match': {
+                                    'contact.name': 'test'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        'nested': {
+                            'path': 'dit_team',
+                            'query': {
+                                'match': {
+                                    'dit_team.name': 'test'
                                 }
                             }
                         }
@@ -133,14 +129,8 @@ def test_get_basic_search_query():
                         'nested': {
                             'path': 'export_to_countries',
                             'query': {
-                                'bool': {
-                                    'must': [
-                                        {
-                                            'match': {
-                                                'export_to_countries.name': 'test'
-                                            }
-                                        }
-                                    ]
+                                'match': {
+                                    'export_to_countries.name': 'test'
                                 }
                             }
                         }
@@ -149,14 +139,8 @@ def test_get_basic_search_query():
                         'nested': {
                             'path': 'future_interest_countries',
                             'query': {
-                                'bool': {
-                                    'must': [
-                                        {
-                                            'match': {
-                                                'future_interest_countries.name': 'test'
-                                            }
-                                        }
-                                    ]
+                                'match': {
+                                    'future_interest_countries.name': 'test'
                                 }
                             }
                         }
@@ -165,14 +149,8 @@ def test_get_basic_search_query():
                         'nested': {
                             'path': 'intermediate_company',
                             'query': {
-                                'bool': {
-                                    'must': [
-                                        {
-                                            'match': {
-                                                'intermediate_company.name': 'test'
-                                            }
-                                        }
-                                    ]
+                                'match': {
+                                    'intermediate_company.name': 'test'
                                 }
                             }
                         }
@@ -181,14 +159,8 @@ def test_get_basic_search_query():
                         'nested': {
                             'path': 'investor_company',
                             'query': {
-                                'bool': {
-                                    'must': [
-                                        {
-                                            'match': {
-                                                'investor_company.name': 'test'
-                                            }
-                                        }
-                                    ]
+                                'match': {
+                                    'investor_company.name': 'test'
                                 }
                             }
                         }
@@ -202,14 +174,8 @@ def test_get_basic_search_query():
                         'nested': {
                             'path': 'registered_address_country',
                             'query': {
-                                'bool': {
-                                    'must': [
-                                        {
-                                            'match': {
-                                                'registered_address_country.name': 'test'
-                                            }
-                                        }
-                                    ]
+                                'match': {
+                                    'registered_address_country.name': 'test'
                                 }
                             }
                         }
@@ -223,30 +189,23 @@ def test_get_basic_search_query():
                         'nested': {
                             'path': 'sector',
                             'query': {
-                                'bool': {
-                                    'must': [
-                                        {
-                                            'match': {
-                                                'sector.name': 'test'
-                                            }
-                                        }
-                                    ]
+                                'match': {
+                                    'sector.name': 'test'
                                 }
                             }
+                        }
+                    },
+                    {
+                        'match': {
+                            'subject': 'test'
                         }
                     },
                     {
                         'nested': {
                             'path': 'trading_address_country',
                             'query': {
-                                'bool': {
-                                    'must': [
-                                        {
-                                            'match': {
-                                                'trading_address_country.name': 'test'
-                                            }
-                                        }
-                                    ]
+                                'match': {
+                                    'trading_address_country.name': 'test'
                                 }
                             }
                         }
@@ -260,14 +219,8 @@ def test_get_basic_search_query():
                         'nested': {
                             'path': 'uk_company',
                             'query': {
-                                'bool': {
-                                    'must': [
-                                        {
-                                            'match': {
-                                                'uk_company.name': 'test'
-                                            }
-                                        }
-                                    ]
+                                'match': {
+                                    'uk_company.name': 'test'
                                 }
                             }
                         }
@@ -276,14 +229,8 @@ def test_get_basic_search_query():
                         'nested': {
                             'path': 'uk_region',
                             'query': {
-                                'bool': {
-                                    'must': [
-                                        {
-                                            'match': {
-                                                'uk_region.name': 'test'
-                                            }
-                                        }
-                                    ]
+                                'match': {
+                                    'uk_region.name': 'test'
                                 }
                             }
                         }
@@ -389,14 +336,8 @@ def test_get_search_by_entity_query():
                                     'nested': {
                                         'path': 'address_country',
                                         'query': {
-                                            'bool': {
-                                                'must': [
-                                                    {
-                                                        'match': {
-                                                            'address_country.name': 'test'
-                                                        }
-                                                    }
-                                                ]
+                                            'match': {
+                                                'address_country.name': 'test'
                                             }
                                         }
                                     }
@@ -412,12 +353,8 @@ def test_get_search_by_entity_query():
                                     'nested': {
                                         'path': 'company',
                                         'query': {
-                                            'bool': {
-                                                'must': [{
-                                                    'match': {
-                                                        'company.name': 'test'
-                                                    }
-                                                }]
+                                            'match': {
+                                                'company.name': 'test'
                                             }
                                         }
                                     }

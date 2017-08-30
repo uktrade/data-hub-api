@@ -10,6 +10,7 @@ from elasticsearch_dsl.query import Match, MatchPhrase, Q
 
 from .apps import get_search_apps
 
+MAX_RESULTS = 10000
 
 lowercase_keyword_analyzer = analysis.CustomAnalyzer(
     'lowercase_keyword_analyzer',
@@ -29,6 +30,35 @@ trigram_analyzer = analysis.CustomAnalyzer(
     filter=('lowercase',),
 )
 
+english_possessive_stemmer = analysis.token_filter(
+    'english_possessive_stemmer',
+    type='stemmer',
+    language='possessive_english'
+)
+
+english_stemmer = analysis.token_filter(
+    'english_stemmer',
+    type='stemmer',
+    language='english'
+)
+
+english_stop = analysis.token_filter(
+    'english_stop',
+    type='stop',
+    stopwords='_english_'
+)
+
+english_analyzer = analysis.CustomAnalyzer(
+    'english_analyzer',
+    tokenizer='standard',
+    filter=[
+        english_possessive_stemmer,
+        'lowercase',
+        english_stop,
+        english_stemmer,
+    ]
+)
+
 
 def configure_connection():
     """Configure Elasticsearch default connection."""
@@ -39,13 +69,21 @@ def configure_connection():
     )
 
 
+ANALYZERS = (
+    lowercase_keyword_analyzer,
+    trigram_analyzer,
+    english_analyzer,
+)
+
+
 def configure_index(index_name, settings=None):
     """Configures Elasticsearch index."""
     client = connections.get_connection()
     if not client.indices.exists(index=index_name):
         index = Index(index_name)
-        index.analyzer(lowercase_keyword_analyzer)
-        index.analyzer(trigram_analyzer)
+        for analyzer in ANALYZERS:
+            index.analyzer(analyzer)
+
         if settings:
             index.settings(**settings)
         index.create()
@@ -68,7 +106,7 @@ def get_search_term_query(term, fields=None):
     ]
 
     if fields:
-        should_query.extend([get_match_query(field, term) for field in fields])
+        should_query.extend([get_field_query('match', field, term) for field in fields])
 
     return Q('bool', should=should_query)
 
@@ -110,6 +148,8 @@ def get_basic_search_query(term, entities=None, field_order=None, offset=0, limi
 
     Also returns number of results in other entities.
     """
+    limit = _clip_limit(offset, limit)
+
     all_models = (search_app.ESModel for search_app in get_search_apps())
     fields = set(chain.from_iterable(entity.SEARCH_FIELDS for entity in all_models))
 
@@ -131,22 +171,20 @@ def get_basic_search_query(term, entities=None, field_order=None, offset=0, limi
     return s[offset:offset + limit]
 
 
-def get_term_query(field, value):
-    """Gets term query."""
-    term = Q('term', **{field: value})
-    if '.' not in field:
-        return term
+def get_term_or_match_query(field, value):
+    """Gets term or match query."""
+    kind = 'match' if field.endswith('_trigram') else 'term'
 
-    return Q('nested', path=field.rsplit('.', maxsplit=1)[0], query=term)
+    return get_field_query(kind, field, value)
 
 
-def get_match_query(field, value):
+def get_field_query(kind, field, value):
     """Gets match query."""
-    match = Q('match', **{field: value})
+    match = Q(kind, **{field: value})
     if '.' not in field:
         return match
 
-    return Q('nested', path=field.split('.', maxsplit=1)[0], query=Q('bool', must=match))
+    return Q('nested', path=field.rsplit('.', maxsplit=1)[0], query=match)
 
 
 def apply_aggs_query(search, aggs):
@@ -177,6 +215,8 @@ def get_search_by_entity_query(term=None,
                                offset=0,
                                limit=100):
     """Perform filtered search for given terms in given entity."""
+    limit = _clip_limit(offset, limit)
+
     query = [Q('term', _type=entity._doc_type.name)]
     if term != '':
         query.append(get_search_term_query(term, fields=entity.SEARCH_FIELDS))
@@ -190,12 +230,12 @@ def get_search_by_entity_query(term=None,
                 # perform "or" query
                 must_filter.append(
                     Q('bool',
-                      should=[get_term_query(k, value) for value in v],
+                      should=[get_term_or_match_query(k, value) for value in v],
                       minimum_should_match=1
                       )
                 )
             else:
-                must_filter.append(get_term_query(k, v))
+                must_filter.append(get_term_or_match_query(k, v))
 
     if ranges:
         must_filter.extend([Q('range', **{k: v}) for k, v in ranges.items()])
@@ -216,7 +256,7 @@ def bulk(actions=None, chunk_size=None, **kwargs):
     return es_bulk(connections.get_connection(), actions=actions, chunk_size=chunk_size, **kwargs)
 
 
-FILTER_ID_MAP = {
+FILTER_MAP = {
     'sector': 'sector.id',
     'account_manager': 'account_manager.id',
     'export_to_country': 'export_to_countries.id',
@@ -229,12 +269,15 @@ FILTER_ID_MAP = {
     'investor_company': 'investor_company.id',
     'investment_type': 'investment_type.id',
     'stage': 'stage.id',
+    'company_name': 'company.name_trigram',
+    'company_sector': 'company_sector.id',
+    'company_uk_region': 'company_uk_region.id',
 }
 
 
 def remap_filter_id_field(field):
     """Maps api field to elasticsearch field."""
-    return FILTER_ID_MAP.get(field, field)
+    return FILTER_MAP.get(field, field)
 
 
 def date_range_fields(fields):
@@ -256,3 +299,7 @@ def date_range_fields(fields):
         filters.update({k: v})
 
     return filters, ranges
+
+
+def _clip_limit(offset, limit):
+    return max(min(limit, MAX_RESULTS - offset), 0)

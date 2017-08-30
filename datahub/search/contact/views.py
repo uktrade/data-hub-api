@@ -33,16 +33,15 @@ class SearchContactAPIView(APIView):
         'primary',
         'telephone_countrycode',
         'telephone_number',
-        'title.name'
+        'title.name',
+        'company_sector.name',
     )
 
     FILTER_FIELDS = (
-        'adviser',
-        'company',
-        'first_name',
-        'job_title',
-        'last_name',
-        'notes'
+        'company_name',
+        'company_sector',
+        'company_uk_region',
+        'address_country',
     )
 
     http_method_names = ('post',)

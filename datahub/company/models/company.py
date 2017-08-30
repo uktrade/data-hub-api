@@ -130,12 +130,14 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     class MPTTMeta:  # noqa: D101
         order_insertion_by = ['name']
 
-    @cached_property
+    @property
     def uk_based(self):
         """Whether a company is based in the UK or not."""
         if not self.registered_address_country:
             return None
-        return self.registered_address_country.name == constants.Country.united_kingdom.value.name
+
+        united_kingdom_id = uuid.UUID(constants.Country.united_kingdom.value.id)
+        return self.registered_address_country.id == united_kingdom_id
 
     @cached_property
     def companies_house_data(self):
@@ -147,6 +149,12 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
                 )
             except CompaniesHouseCompany.DoesNotExist:
                 return None
+
+    def has_valid_trading_address(self):
+        """Tells if Company has all required trading address fields defined."""
+        return all(
+            getattr(self, field) for field in self.REQUIRED_TRADING_ADDRESS_FIELDS
+        )
 
     def _validate_trading_address(self):
         """Trading address fields are not mandatory in the model definition.
@@ -162,10 +170,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
             self.trading_address_postcode,
             self.trading_address_country
         ))
-        all_required_trading_address_fields = all(
-            getattr(self, field) for field in self.REQUIRED_TRADING_ADDRESS_FIELDS
-        )
-        if any_trading_address_fields and not all_required_trading_address_fields:
+        if any_trading_address_fields and not self.has_valid_trading_address():
             return False
         return True
 

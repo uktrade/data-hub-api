@@ -12,5 +12,5 @@ class OrderSearchApp(SearchApp):
     name = 'order'
     plural_name = 'orders'
     ESModel = Order
-    DBModel = DBOrder
     view = SearchOrderAPIView
+    queryset = DBOrder.objects.all()

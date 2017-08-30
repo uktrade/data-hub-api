@@ -1,31 +1,21 @@
 import uuid
 
+from django.conf import settings
 from django.db import models
 from django.utils.crypto import get_random_string
 from django.utils.timezone import now
 
 from datahub.company.models import Advisor, Company, Contact
-from datahub.core.models import BaseModel, BaseOrderedConstantModel
+from datahub.core.models import BaseModel, BaseOrderedConstantModel, DisableableModel
 
 from datahub.metadata.models import Country, Sector, Team
 
 
-class ServiceType(BaseOrderedConstantModel):
+class ServiceType(BaseOrderedConstantModel, DisableableModel):
     """
     Order service type.
     E.g. 'Validated contacts', 'Event', 'Market Research'
     """
-
-    disabled_on = models.DateTimeField(blank=True, null=True)
-
-    def was_disabled_on(self, date_on):
-        """
-        Returns True if this service type was disabled at time `date_on`,
-        False otherwise.
-        """
-        if not self.disabled_on:
-            return False
-        return self.disabled_on <= date_on
 
 
 class Order(BaseModel):
@@ -134,6 +124,10 @@ class Order(BaseModel):
             self.reference = self._calculate_reference()
         return super().save(*args, **kwargs)
 
+    def get_datahub_frontend_url(self):
+        """Return the url to the Data Hub frontend order page."""
+        return f'{settings.DATAHUB_FRONTEND_BASE_URL}/omis/{self.pk}'
+
 
 class OrderSubscriber(BaseModel):
     """
@@ -202,7 +196,7 @@ class OrderAssignee(BaseModel):
         we don't want to change history.
         """
         if not self._state.adding and self.__adviser != self.adviser:
-            raise ValueError('Updating the value of adviser isn\'t allowed.')
+            raise ValueError("Updating the value of adviser isn't allowed.")
 
         if self._state.adding:
             self.team = self.adviser.dit_team
