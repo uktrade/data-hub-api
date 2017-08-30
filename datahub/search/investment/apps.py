@@ -12,5 +12,5 @@ class InvestmentSearchApp(SearchApp):
     name = 'investment_project'
     plural_name = 'investment_projects'
     ESModel = InvestmentProject
-    DBModel = DBInvestmentProject
     view = SearchInvestmentProjectAPIView
+    queryset = DBInvestmentProject.objects.all()

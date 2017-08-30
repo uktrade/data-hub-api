@@ -12,7 +12,6 @@ class CompanySearchApp(SearchApp):
     name = 'company'
     plural_name = 'companies'
     ESModel = Company
-    DBModel = DBCompany
     view = SearchCompanyAPIView
     queryset = DBCompany.objects.prefetch_related(
         'registered_address_country',

@@ -56,8 +56,7 @@ class SearchApp:
 
     def get_queryset(self):
         """Gets the queryset that will be synced with Elasticsearch."""
-        queryset = self.queryset or self.DBModel.objects.all()
-        return queryset.order_by('pk')
+        return self.queryset.order_by('pk')
 
     def get_dataset(self):
         """Returns dataset that will be synchronised with Elasticsearch."""
