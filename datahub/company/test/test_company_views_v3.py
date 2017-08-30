@@ -7,12 +7,10 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from reversion.models import Version
 
-from datahub.company.test.factories import (
-    CompaniesHouseCompanyFactory, CompanyFactory
-)
+from datahub.company.models import CompaniesHouseCompany
+from datahub.company.test.factories import CompaniesHouseCompanyFactory, CompanyFactory
 from datahub.core.constants import (
-    BusinessType, CompanyClassification, Country, HeadquarterType, Sector,
-    UKRegion
+    BusinessType, CompanyClassification, Country, HeadquarterType, Sector, UKRegion
 )
 from datahub.core.test_utils import APITestMixin
 from datahub.investment.test.factories import InvestmentProjectFactory
@@ -212,6 +210,27 @@ class TestCompany(APITestMixin):
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data['name'] == 'Acme'
         assert response.data['trading_name'] == 'Trading name'
+
+    def test_promote_a_ch_company(self):
+        """Promote a CH company to full company."""
+        CompaniesHouseCompanyFactory(company_number=1234567890)
+
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, {
+            'name': 'Acme',
+            'company_number': 1234567890,
+            'business_type': BusinessType.company.value.id,
+            'sector': Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_country': Country.united_kingdom.value.id,
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'trading_address_country': Country.ireland.value.id,
+            'trading_address_1': '1 Hello st.',
+            'trading_address_town': 'Dublin',
+            'uk_region': UKRegion.england.value.id
+        }, format='json')
+
+        assert response.status_code == status.HTTP_201_CREATED
 
     def test_add_uk_company_without_uk_region(self):
         """Test add new UK without UK region company."""
@@ -523,6 +542,17 @@ class TestAuditLogView(APITestMixin):
 class TestCHCompany(APITestMixin):
     """CH company tests."""
 
+    def test_list_ch_companies(self):
+        """List the companies house companies."""
+        CompaniesHouseCompanyFactory()
+        CompaniesHouseCompanyFactory()
+
+        url = reverse('api-v3:ch-company:collection')
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == CompaniesHouseCompany.objects.all().count()
+
     def test_get_ch_company(self):
         """Test retrieving a single CH company."""
         ch_company = CompaniesHouseCompanyFactory()
@@ -534,3 +564,10 @@ class TestCHCompany(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['company_number'] == ch_company.company_number
+
+    def test_ch_company_cannot_be_written(self):
+        """Test CH company POST is not allowed."""
+        url = reverse('api-v3:ch-company:collection')
+        response = self.api_client.post(url)
+
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
