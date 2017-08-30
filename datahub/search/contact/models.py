@@ -33,7 +33,7 @@ class Contact(DocType, MapDBModelToDict):
     address_postcode = String()
     telephone_alternative = String()
     email_alternative = String()
-    notes = String()
+    notes = dsl_utils.EnglishString()
     job_title = dsl_utils.CaseInsensitiveKeywordString()
     contactable_by_dit = Boolean()
     contactable_by_dit_partners = Boolean()
