@@ -7,43 +7,19 @@ from rest_framework.filters import OrderingFilter
 
 from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
-from datahub.core.viewsets import CoreViewSetV1, CoreViewSetV3
+from datahub.core.viewsets import CoreViewSetV3
 from datahub.investment.queryset import get_slim_investment_project_queryset
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
 from .queryset import get_contact_queryset
 from .serializers import (
-    AdviserSerializer, CompaniesHouseCompanySerializer,
-    CompanySerializerReadV1, CompanySerializerV3, CompanySerializerWriteV1,
-    ContactSerializer
+    AdviserSerializer, CompaniesHouseCompanySerializer, CompanySerializer, ContactSerializer
 )
 
 
-class CompanyViewSetV1(ArchivableViewSetMixin, CoreViewSetV1):
-    """Company ViewSet."""
-
-    read_serializer_class = CompanySerializerReadV1
-    write_serializer_class = CompanySerializerWriteV1
-    queryset = Company.objects.select_related(
-        'business_type',
-        'sector',
-        'archived_by',
-        'registered_address_country',
-        'trading_address_country',
-        'employee_range',
-        'turnover_range',
-        'account_manager'
-    ).prefetch_related(
-        'contacts',
-        'interactions',
-        'export_to_countries',
-        'future_interest_countries'
-    )
-
-
-class CompanyViewSetV3(ArchivableViewSetMixin, CoreViewSetV3):
+class CompanyViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     """Company view set V3."""
 
-    serializer_class = CompanySerializerV3
+    serializer_class = CompanySerializer
     queryset = Company.objects.select_related(
         'account_manager',
         'archived_by',
@@ -73,9 +49,9 @@ class CompanyAuditViewSet(AuditViewSet):
     queryset = Company.objects.all()
 
 
-class CompaniesHouseCompanyReadOnlyViewSetV1(
+class CompaniesHouseCompanyViewSet(
         mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
-    """Companies House company GET only views."""
+    """Companies House company read-only GET only views."""
 
     serializer_class = CompaniesHouseCompanySerializer
     queryset = CompaniesHouseCompany.objects.select_related('registered_address_country').all()
