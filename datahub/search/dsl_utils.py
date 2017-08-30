@@ -8,7 +8,7 @@ TrigramString = partial(String, analyzer='trigram_analyzer')
 EnglishString = partial(String, analyzer='english_analyzer')
 
 
-def contact_mapping(field, include_dit_team=False):
+def contact_or_adviser_mapping(field, include_dit_team=False):
     """Mapping for Adviser/Contact fields."""
     props = {
         'id': KeywordString(),
