@@ -1,5 +1,5 @@
 from django.conf import settings
-from elasticsearch_dsl import Date, DocType, String
+from elasticsearch_dsl import Date, DocType
 
 from datahub.search import dict_utils, dsl_utils
 from datahub.search.models import MapDBModelToDict
@@ -13,9 +13,9 @@ class Interaction(DocType, MapDBModelToDict):
     company = dsl_utils.id_name_partial_mapping('company')
     contact = dsl_utils.contact_or_adviser_mapping('contact')
     service = dsl_utils.id_name_mapping()
-    subject = String()
+    subject = dsl_utils.EnglishString()
     dit_adviser = dsl_utils.contact_or_adviser_mapping('dit_adviser')
-    notes = String()
+    notes = dsl_utils.EnglishString()
     dit_team = dsl_utils.id_name_mapping()
     interaction_type = dsl_utils.id_name_mapping()
     investment_project = dsl_utils.id_name_mapping()

@@ -10,7 +10,6 @@ from elasticsearch_dsl.query import Match, MatchPhrase, Q
 
 from .apps import get_search_apps
 
-
 MAX_RESULTS = 10000
 
 lowercase_keyword_analyzer = analysis.CustomAnalyzer(
@@ -31,6 +30,35 @@ trigram_analyzer = analysis.CustomAnalyzer(
     filter=('lowercase',),
 )
 
+english_possessive_stemmer = analysis.token_filter(
+    'english_possessive_stemmer',
+    type='stemmer',
+    language='possessive_english'
+)
+
+english_stemmer = analysis.token_filter(
+    'english_stemmer',
+    type='stemmer',
+    language='english'
+)
+
+english_stop = analysis.token_filter(
+    'english_stop',
+    type='stop',
+    stopwords='_english_'
+)
+
+english_analyzer = analysis.CustomAnalyzer(
+    'english_analyzer',
+    tokenizer='standard',
+    filter=[
+        english_possessive_stemmer,
+        'lowercase',
+        english_stop,
+        english_stemmer,
+    ]
+)
+
 
 def configure_connection():
     """Configure Elasticsearch default connection."""
@@ -41,13 +69,21 @@ def configure_connection():
     )
 
 
+ANALYZERS = (
+    lowercase_keyword_analyzer,
+    trigram_analyzer,
+    english_analyzer,
+)
+
+
 def configure_index(index_name, settings=None):
     """Configures Elasticsearch index."""
     client = connections.get_connection()
     if not client.indices.exists(index=index_name):
         index = Index(index_name)
-        index.analyzer(lowercase_keyword_analyzer)
-        index.analyzer(trigram_analyzer)
+        for analyzer in ANALYZERS:
+            index.analyzer(analyzer)
+
         if settings:
             index.settings(**settings)
         index.create()
