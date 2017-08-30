@@ -9,7 +9,7 @@ from . import elasticsearch
 from .apps import get_search_apps
 
 
-EntitySearch = namedtuple('EntitySearch', ['model', 'name', 'plural_name'])
+EntitySearch = namedtuple('EntitySearch', ['model', 'name'])
 
 
 class SearchBasicAPIView(APIView):
@@ -32,7 +32,6 @@ class SearchBasicAPIView(APIView):
             search_app.name: EntitySearch(
                 search_app.ESModel,
                 search_app.name,
-                search_app.plural_name
             )
             for search_app in get_search_apps()
         }
