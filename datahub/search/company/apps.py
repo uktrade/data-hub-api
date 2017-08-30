@@ -14,16 +14,16 @@ class CompanySearchApp(SearchApp):
     ESModel = Company
     view = SearchCompanyAPIView
     queryset = DBCompany.objects.prefetch_related(
-        'registered_address_country',
-        'business_type',
-        'sector',
-        'employee_range',
-        'turnover_range',
         'account_manager',
+        'business_type',
+        'classification',
+        'employee_range',
         'export_to_countries',
         'future_interest_countries',
-        'trading_address_country',
         'headquarter_type',
-        'classification',
         'one_list_account_owner',
+        'registered_address_country',
+        'sector',
+        'trading_address_country',
+        'turnover_range',
     )
