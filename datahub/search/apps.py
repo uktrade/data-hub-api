@@ -23,6 +23,7 @@ class SearchApp:
     plural_name = None
     ESModel = None
     view = None
+    queryset = None
 
     def __init__(self, mod):
         """Create this search app without initialising any ES config."""
@@ -53,11 +54,15 @@ class SearchApp:
         signals_mod = import_module(self.mod_signals)
         getattr(signals_mod, 'disconnect_signals')()
 
+    def get_queryset(self):
+        """Gets the queryset that will be synced with Elasticsearch."""
+        return self.queryset.order_by('pk')
+
     def get_dataset(self):
         """Returns dataset that will be synchronised with Elasticsearch."""
-        qs = self.DBModel.objects.all().order_by('pk')
+        queryset = self.get_queryset()
 
-        return DataSet(qs, self.ESModel)
+        return DataSet(queryset, self.ESModel)
 
 
 @lru_cache(maxsize=None)
