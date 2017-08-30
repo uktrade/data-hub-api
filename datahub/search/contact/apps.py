@@ -12,5 +12,5 @@ class ContactSearchApp(SearchApp):
     name = 'contact'
     plural_name = 'contacts'
     ESModel = Contact
-    DBModel = DBContact
     view = SearchContactAPIView
+    queryset = DBContact.objects.all()

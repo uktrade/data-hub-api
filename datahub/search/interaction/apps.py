@@ -1,4 +1,3 @@
-from datahub.interaction.models import Interaction as DBInteraction
 from datahub.interaction.queryset import get_interaction_queryset_v3
 
 from datahub.search.apps import SearchApp
@@ -12,6 +11,5 @@ class InteractionSearchApp(SearchApp):
     name = 'interaction'
     plural_name = 'interactions'
     ESModel = Interaction
-    DBModel = DBInteraction
     view = SearchInteractionAPIView
     queryset = get_interaction_queryset_v3()
