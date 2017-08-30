@@ -62,6 +62,7 @@ LOCAL_APPS = [
     'datahub.omis.order',
     'datahub.omis.market',
     'datahub.omis.notification',
+    'datahub.omis.quote',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
