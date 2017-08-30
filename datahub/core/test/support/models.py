@@ -1,6 +1,6 @@
 from django.db import models
 
-from ...models import BaseModel
+from ...models import BaseModel, DisableableModel
 
 
 class InheritedModel(BaseModel):
@@ -15,3 +15,7 @@ class EmptyModel(models.Model):
     Empty Django model.
     This is not going to have any fields apart from id.
     """
+
+
+class MyDisableableModel(DisableableModel):
+    """Simple DisableableModel."""

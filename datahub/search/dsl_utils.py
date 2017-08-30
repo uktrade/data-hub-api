@@ -5,9 +5,10 @@ from elasticsearch_dsl import Nested, String
 KeywordString = partial(String, index='not_analyzed')
 CaseInsensitiveKeywordString = partial(String, analyzer='lowercase_keyword_analyzer')
 TrigramString = partial(String, analyzer='trigram_analyzer')
+EnglishString = partial(String, analyzer='english_analyzer')
 
 
-def contact_mapping(field, include_dit_team=False):
+def contact_or_adviser_mapping(field, include_dit_team=False):
     """Mapping for Adviser/Contact fields."""
     props = {
         'id': KeywordString(),
@@ -25,7 +26,16 @@ def id_name_mapping():
     """Mapping for id name fields."""
     return Nested(properties={
         'id': KeywordString(),
-        'name': CaseInsensitiveKeywordString()
+        'name': CaseInsensitiveKeywordString(),
+    })
+
+
+def id_name_partial_mapping(field):
+    """Mapping for id name fields."""
+    return Nested(properties={
+        'id': KeywordString(),
+        'name': CaseInsensitiveKeywordString(copy_to=f'{field}.name_trigram'),
+        'name_trigram': TrigramString(),
     })
 
 

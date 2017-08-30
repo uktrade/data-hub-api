@@ -28,7 +28,7 @@ contact_unarchive = ContactViewSet.as_view({
 })
 
 contact_audit = ContactAuditViewSet.as_view({
-    'get': 'retrieve',
+    'get': 'list',
 })
 
 contact_urls = [
@@ -55,7 +55,7 @@ company_item = CompanyViewSetV3.as_view({
 })
 
 company_audit = CompanyAuditViewSet.as_view({
-    'get': 'retrieve',
+    'get': 'list',
 })
 
 company_archive = CompanyViewSetV3.as_view({

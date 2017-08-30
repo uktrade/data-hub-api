@@ -1,7 +1,7 @@
 import pytest
 
+from datahub.company.models import Contact
 from datahub.company.test.factories import ContactFactory
-
 from ..models import Contact as ESContact
 
 pytestmark = pytest.mark.django_db
@@ -23,7 +23,7 @@ def test_contact_dbmodel_to_dict():
             'address_country', 'address_postcode', 'telephone_alternative',
             'email_alternative', 'notes', 'contactable_by_dit',
             'contactable_by_dit_partners', 'contactable_by_email',
-            'contactable_by_phone', 'company_sector'}
+            'contactable_by_phone', 'company_sector', 'company_uk_region'}
 
     assert set(result.keys()) == keys
 
@@ -35,3 +35,18 @@ def test_contact_dbmodels_to_es_documents():
     result = ESContact.dbmodels_to_es_documents(contacts)
 
     assert len(list(result)) == len(contacts)
+
+
+def test_contact_dbmodels_to_es_documents_without_country():
+    """
+    Tests conversion of db models to Elasticsearch documents when
+    country is None.
+    """
+    # We want to bypass any validation
+    contact = Contact(
+        address_same_as_company=False,
+        address_country=None
+    )
+    result = ESContact.es_document(contact)
+
+    assert '_source' in result

@@ -32,6 +32,5 @@ class Command(BaseCommand):
                 METADATA_FIXTURE_DIR / 'teams.yaml',
                 METADATA_FIXTURE_DIR / 'titles.yaml',
                 METADATA_FIXTURE_DIR / 'uk_regions.yaml',
-                METADATA_FIXTURE_DIR / 'omis.yaml',
             ]
         )

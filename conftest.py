@@ -8,6 +8,7 @@ def django_db_setup(django_db_setup, django_db_blocker):
     """Fixture for DB setup."""
     with django_db_blocker.unblock():
         call_command('loadmetadata')
+        call_command('load_omis_metadata')
 
 
 @pytest.fixture
