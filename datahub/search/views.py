@@ -68,11 +68,9 @@ class SearchBasicAPIView(APIView):
 
         response = {
             'count': results.hits.total,
+            'results': [result.to_dict() for result in results.hits],
             'aggregations': [{'count': x['doc_count'], 'entity': x['key']}
                              for x in results.aggregations['count_by_type']['buckets']],
         }
 
-        hits = [x.to_dict() for x in results.hits]
-
-        response[self.entity_by_name[entity].plural_name] = hits
         return Response(data=response)
