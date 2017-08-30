@@ -11,7 +11,6 @@ from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import RequiredUnlessAlreadyBlank
 from datahub.interaction.models import Interaction
 from datahub.metadata import models as meta_models
-from datahub.metadata.serializers import NestedCountrySerializer
 
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -54,86 +53,6 @@ class CompaniesHouseCompanySerializer(serializers.ModelSerializer):
         model = CompaniesHouseCompany
         depth = 1
         fields = '__all__'
-
-
-class CompanySerializerReadV1(serializers.ModelSerializer):
-    """Company serializer."""
-
-    name = serializers.SerializerMethodField('get_registered_name')
-    trading_name = serializers.CharField(source='alias')
-    companies_house_data = CompaniesHouseCompanySerializer()
-    interactions = NestedInteractionSerializer(many=True)
-    contacts = NestedContactSerializer(many=True)
-    export_to_countries = NestedCountrySerializer(many=True)
-    future_interest_countries = NestedCountrySerializer(many=True)
-    uk_based = serializers.BooleanField()
-    account_manager = AdviserSerializer()
-    registered_address_1 = serializers.SerializerMethodField()
-    registered_address_2 = serializers.SerializerMethodField()
-    registered_address_town = serializers.SerializerMethodField()
-    registered_address_country = serializers.SerializerMethodField()
-    registered_address_county = serializers.SerializerMethodField()
-    registered_address_postcode = serializers.SerializerMethodField()
-
-    class Meta:  # noqa: D101
-        model = Company
-        depth = 1
-        fields = '__all__'
-
-    @staticmethod
-    def _address_partial(obj, attr):
-        """Return the address partial from obj."""
-        obj = obj.companies_house_data or obj
-        return getattr(obj, attr)
-
-    @staticmethod
-    def get_registered_name(obj):
-        """Use the CH name, if there's one, else the name."""
-        return obj.companies_house_data.name if obj.companies_house_data else obj.name
-
-    def get_registered_address_1(self, obj):
-        """Return CH address if present."""
-        return self._address_partial(obj, 'registered_address_1')
-
-    def get_registered_address_2(self, obj):
-        """Return CH address if present."""
-        return self._address_partial(obj, 'registered_address_2')
-
-    @staticmethod
-    def get_registered_address_country(obj):
-        """Return CH address if present."""
-        obj = obj.companies_house_data or obj
-        if obj.registered_address_country:
-            return {'id': str(obj.registered_address_country.id),
-                    'name': obj.registered_address_country.name}
-        else:
-            return {}
-
-    def get_registered_address_county(self, obj):
-        """Return CH address if present."""
-        return self._address_partial(obj, 'registered_address_county')
-
-    def get_registered_address_postcode(self, obj):
-        """Return CH address if present."""
-        return self._address_partial(obj, 'registered_address_postcode')
-
-    def get_registered_address_town(self, obj):
-        """Return CH address if present."""
-        return self._address_partial(obj, 'registered_address_town')
-
-
-class CompanySerializerWriteV1(serializers.ModelSerializer):
-    """Company serializer for writing operations."""
-
-    classification = serializers.PrimaryKeyRelatedField(read_only=True)
-
-    class Meta:  # noqa: D101
-        model = Company
-        fields = '__all__'
-        extra_kwargs = {
-            'registered_address_country': {'required': True, 'allow_null': False},
-        }
-        validators = [RequiredUnlessAlreadyBlank('sector', 'business_type')]
 
 
 NestedAdviserField = partial(
@@ -243,7 +162,7 @@ class _CHPreferredField(serializers.Field):
         return self._serializer_field.to_representation(value)
 
 
-class CompanySerializerV3(serializers.ModelSerializer):
+class CompanySerializer(serializers.ModelSerializer):
     """Company read/write serializer V3."""
 
     name = _CHPreferredField(

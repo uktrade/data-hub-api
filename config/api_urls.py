@@ -17,8 +17,6 @@ from datahub.v2.urls import urlpatterns as v2_urlpatterns
 # API V1
 
 router_v1 = routers.SimpleRouter()
-router_v1.register(r'company', company_views.CompanyViewSetV1)
-router_v1.register(r'ch-company', company_views.CompaniesHouseCompanyReadOnlyViewSetV1)
 router_v1.register(r'interaction', interaction_views.InteractionViewSetV1)
 router_v1.register(r'adviser', company_views.AdviserReadOnlyViewSetV1)
 
