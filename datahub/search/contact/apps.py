@@ -13,4 +13,14 @@ class ContactSearchApp(SearchApp):
     plural_name = 'contacts'
     ESModel = Contact
     view = SearchContactAPIView
-    queryset = DBContact.objects.all()
+    queryset = DBContact.objects.prefetch_related(
+        'title',
+        'company',
+        'adviser',
+        'address_country',
+        'archived_by',
+        'company__sector',
+        'company__uk_region',
+        'company__registered_address_country',
+        'company__trading_address_country',
+    )

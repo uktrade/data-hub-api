@@ -15,15 +15,19 @@ class CompanySearchApp(SearchApp):
     view = SearchCompanyAPIView
     queryset = DBCompany.objects.prefetch_related(
         'account_manager',
+        'archived_by',
         'business_type',
         'classification',
+        'contacts',
         'employee_range',
         'export_to_countries',
         'future_interest_countries',
         'headquarter_type',
         'one_list_account_owner',
+        'parent',
         'registered_address_country',
         'sector',
         'trading_address_country',
         'turnover_range',
+        'uk_region',
     )
