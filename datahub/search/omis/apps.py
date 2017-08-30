@@ -13,4 +13,13 @@ class OrderSearchApp(SearchApp):
     plural_name = 'orders'
     ESModel = Order
     view = SearchOrderAPIView
-    queryset = DBOrder.objects.all()
+    queryset = DBOrder.objects.prefetch_related(
+        'company',
+        'contact',
+        'created_by',
+        'primary_market',
+        'sector',
+        'service_types',
+        'subscribers',
+        'assignees',
+    )
