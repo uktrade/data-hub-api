@@ -33,6 +33,8 @@ class TestCreateQuote(APITestMixin):
             'created_on': '2017-04-18T13:00:00',
             'created_by': {
                 'id': str(self.user.pk),
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
                 'name': self.user.name
             }
         }
@@ -96,3 +98,44 @@ class TestCreateQuote(APITestMixin):
         order.refresh_from_db()
         assert not order.quote
         assert not Quote.objects.count()
+
+
+class TestGetQuote(APITestMixin):
+    """Get quote test case."""
+
+    def test_get(self):
+        """Test a successful call to get a quote."""
+        order = OrderWithOpenQuoteFactory()
+        quote = order.quote
+
+        url = reverse('api-v3:omis:quote:item', kwargs={'order_pk': order.pk})
+        response = self.api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'created_on': quote.created_on.isoformat(),
+            'created_by': {
+                'id': str(quote.created_by.pk),
+                'first_name': quote.created_by.first_name,
+                'last_name': quote.created_by.last_name,
+                'name': quote.created_by.name
+            },
+
+        }
+
+    def test_404_if_order_doesnt_exist(self):
+        """Test that if the order doesn't exist, the endpoint returns 404."""
+        url = reverse('api-v3:omis:quote:item', kwargs={'order_pk': uuid.uuid4()})
+        response = self.api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_404_if_quote_doesnt_exist(self):
+        """Test that if the quote doesn't exist, the endpoint returns 404."""
+        order = OrderFactory()
+        assert not order.quote
+
+        url = reverse('api-v3:omis:quote:item', kwargs={'order_pk': order.pk})
+        response = self.api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
