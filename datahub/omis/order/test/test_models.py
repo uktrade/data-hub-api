@@ -3,18 +3,23 @@ from unittest import mock
 import pytest
 from freezegun import freeze_time
 
+from rest_framework.exceptions import ValidationError
+
 from datahub.company.test.factories import AdviserFactory
 from datahub.core import constants
 from datahub.metadata.test.factories import TeamFactory
-from datahub.omis.order.test.factories import OrderAssigneeFactory, OrderFactory
+from datahub.omis.core.exceptions import Conflict
+from datahub.omis.quote.models import Quote
+
+from .factories import OrderAssigneeFactory, OrderFactory
 
 
 pytestmark = pytest.mark.django_db
 
 
-class TestOrder:
+class TestOrderGenerateReference:
     """
-    Tests for the Order model.
+    Tests the generate reference logic for the Order model.
     """
 
     @freeze_time('2017-07-12 13:00:00.000000+00:00')
@@ -68,6 +73,47 @@ class TestOrder:
         with pytest.raises(RuntimeError):
             for index in range(max_retries):
                 OrderFactory()
+
+
+class TestGenerateQuote:
+    """Tests for the generate quote logic."""
+
+    @mock.patch('datahub.omis.order.models.validators')
+    def test_fails_with_incomplete_fields(self, validators):
+        """Test raises ValidationError if the order is incomplete."""
+        validators.OrderDetailsFilledInValidator.side_effect = ValidationError('error')
+
+        order = OrderFactory()
+        with pytest.raises(ValidationError):
+            order.generate_quote({})
+
+    @mock.patch('datahub.omis.order.models.validators')
+    def test_fails_if_theres_already_an_active_quote(self, validators):
+        """Test raises Conflict if there's already an active quote."""
+        validators.NoOtherActiveQuoteExistsValidator.side_effect = Conflict('error')
+
+        order = OrderFactory()
+        with pytest.raises(Conflict):
+            order.generate_quote({})
+
+    def test_atomicity(self):
+        """Test that if there's a problem with saving the order, the quote is not saved either."""
+        order = OrderFactory()
+        order.save = mock.Mock()
+        order.save.side_effect = Exception()
+
+        with pytest.raises(Exception):
+            order.generate_quote({})
+        assert not Quote.objects.count()
+
+    def test_success(self):
+        """Test that a quote can be generated."""
+        order = OrderFactory()
+        order.generate_quote({})
+
+        assert order.quote.pk
+        assert order.quote.reference
+        assert order.quote.content
 
 
 class TestOrderAssignee:
