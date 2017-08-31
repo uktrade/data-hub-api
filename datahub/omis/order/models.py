@@ -151,7 +151,7 @@ class Order(BaseModel):
         quote = Quote.objects.create(
             **quote_data,
             reference=Quote.generate_reference(self),
-            content='Content of the quote'
+            content=Quote.generate_content(self)
         )
         self.quote = quote
         self.save()
