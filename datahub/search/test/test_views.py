@@ -65,7 +65,7 @@ class TestSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
-        assert len(response.data['companies']) == 1
+        assert len(response.data['results']) == 1
 
     def test_invalid_entity(self, setup_es, setup_data):
         """Tests case where provided entity is invalid."""
@@ -105,7 +105,7 @@ class TestSearch(APITestMixin):
             'The Advisory Group',
             'The Risk Advisory Group',
             'The Advisories'
-        ] == [company['name'] for company in response.data['companies']]
+        ] == [company['name'] for company in response.data['results']]
 
     def test_search_partial_match(self, setup_es, setup_data):
         """Tests partial matching."""
@@ -133,7 +133,7 @@ class TestSearch(APITestMixin):
             'Veryuniquename2',
             'Veryuniquename3',
             'Veryuniquename4'
-        } == {company['name'] for company in response.data['companies']}
+        } == {company['name'] for company in response.data['results']}
 
     def test_search_hyphen_match(self, setup_es, setup_data):
         """Tests hyphen query."""
@@ -161,7 +161,7 @@ class TestSearch(APITestMixin):
             'tshirt',
             'electronic shirt',
             't and e and a'
-        ] == [company['name'] for company in response.data['companies']]
+        ] == [company['name'] for company in response.data['results']]
 
     def test_search_id_match(self, setup_es, setup_data):
         """Tests exact id matching."""
@@ -182,7 +182,7 @@ class TestSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
-        assert '0fb4379c-341c-4dc4-b325-bf8d47b26baa' == response.data['companies'][0]['id']
+        assert '0fb4379c-341c-4dc4-b325-bf8d47b26baa' == response.data['results'][0]['id']
 
     def test_search_sort_desc(self, setup_es, setup_data):
         """Tests sorting in descending order."""
@@ -207,7 +207,7 @@ class TestSearch(APITestMixin):
         assert ['Water 4',
                 'water 3',
                 'water 2',
-                'Water 1'] == [company['name'] for company in response.data['companies']]
+                'Water 1'] == [company['name'] for company in response.data['results']]
 
     def test_search_sort_asc(self, setup_es, setup_data):
         """Tests sorting in ascending order."""
@@ -355,8 +355,8 @@ class TestSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
-        assert len(response.data['contacts']) == 1
-        assert response.data['contacts'][0]['address_country']['name'] == 'United States'
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['address_country']['name'] == 'United States'
 
     def test_basic_search_aggregations(self, setup_es, setup_data):
         """Tests basic aggregate query."""
@@ -376,7 +376,7 @@ class TestSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
-        assert response.data['companies'][0]['name'] == 'very_unique_company'
+        assert response.data['results'][0]['name'] == 'very_unique_company'
 
         aggregations = [{'count': 1, 'entity': 'company'},
                         {'count': 1, 'entity': 'contact'},

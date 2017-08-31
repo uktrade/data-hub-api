@@ -10,7 +10,6 @@ class OrderSearchApp(SearchApp):
     """SearchApp for order"""
 
     name = 'order'
-    plural_name = 'orders'
     ESModel = Order
     view = SearchOrderAPIView
     queryset = DBOrder.objects.prefetch_related(

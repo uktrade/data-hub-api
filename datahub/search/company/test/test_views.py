@@ -139,7 +139,7 @@ class TestBasicSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
-        assert response.data['companies'][0]['name'].startswith(term)
+        assert response.data['results'][0]['name'].startswith(term)
         assert [{'count': 2, 'entity': 'company'}] == response.data['aggregations']
 
     def test_no_results(self, setup_es, setup_data):
