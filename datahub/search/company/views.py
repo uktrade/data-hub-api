@@ -65,8 +65,10 @@ class SearchCompanyAPIView(APIView):
             if field not in self.SORT_BY_FIELDS:
                 raise ValidationError(f'"sortby" field is not one of {self.SORT_BY_FIELDS}.')
 
-        offset = int(request.query_params.get('offset', 0))
-        limit = int(request.query_params.get('limit', 100))
+        offset = int(request.data['offset']) if 'offset' in request.data \
+            else int(request.query_params.get('offset', 0))
+        limit = int(request.data['limit']) if 'limit' in request.data \
+            else int(request.query_params.get('limit', 100))
 
         results = elasticsearch.get_search_by_entity_query(
             entity=Company,

@@ -10,7 +10,6 @@ class ContactSearchApp(SearchApp):
     """SearchApp for contacts"""
 
     name = 'contact'
-    plural_name = 'contacts'
     ESModel = Contact
     view = SearchContactAPIView
     queryset = DBContact.objects.prefetch_related(

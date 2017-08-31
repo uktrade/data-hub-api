@@ -53,6 +53,34 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['trading_address_country']['id'] == united_states_id
 
+    def test_company_search_paging(self, setup_es, setup_data):
+        """Tests pagination of results."""
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:company')
+        response = self.api_client.post(url, {
+            'original_query': '',
+            'offset': 1,
+            'limit': 1,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] > 1
+        assert len(response.data['results']) == 1
+
+    def test_company_search_paging_query_params(self, setup_es, setup_data):
+        """Tests pagination of results."""
+        setup_es.indices.refresh()
+
+        url = f"{reverse('api-v3:search:company')}?offset=1&limit=1"
+        response = self.api_client.post(url, {
+            'original_query': '',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] > 1
+        assert len(response.data['results']) == 1
+
     def test_search_company_no_filters(self, setup_es, setup_data):
         """Tests case where there is no filters provided."""
         setup_es.indices.refresh()
@@ -111,7 +139,7 @@ class TestBasicSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
-        assert response.data['companies'][0]['name'].startswith(term)
+        assert response.data['results'][0]['name'].startswith(term)
         assert [{'count': 2, 'entity': 'company'}] == response.data['aggregations']
 
     def test_no_results(self, setup_es, setup_data):
