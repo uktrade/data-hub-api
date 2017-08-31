@@ -68,6 +68,19 @@ class TestSearch(APITestMixin):
         assert response.data['count'] > 1
         assert len(response.data['results']) == 1
 
+    def test_company_search_paging_query_params(self, setup_es, setup_data):
+        """Tests pagination of results."""
+        setup_es.indices.refresh()
+
+        url = f"{reverse('api-v3:search:company')}?offset=1&limit=1"
+        response = self.api_client.post(url, {
+            'original_query': '',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] > 1
+        assert len(response.data['results']) == 1
+
     def test_search_company_no_filters(self, setup_es, setup_data):
         """Tests case where there is no filters provided."""
         setup_es.indices.refresh()
