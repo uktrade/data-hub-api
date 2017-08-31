@@ -215,5 +215,5 @@ class TestBasicSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
-        assert response.data['investment_projects'][0]['name'] == term
+        assert response.data['results'][0]['name'] == term
         assert [{'count': 1, 'entity': 'investment_project'}] == response.data['aggregations']

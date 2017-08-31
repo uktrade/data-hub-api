@@ -8,7 +8,6 @@ class InteractionSearchApp(SearchApp):
     """SearchApp for interactions."""
 
     name = 'interaction'
-    plural_name = 'interactions'
     ESModel = Interaction
     view = SearchInteractionAPIView
     queryset = DBInteraction.objects.prefetch_related(
