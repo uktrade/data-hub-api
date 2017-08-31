@@ -1,11 +1,16 @@
 import uuid
+from pathlib import PurePath
 
 from django.db import models
+from django.template.loader import render_to_string
 from django.utils.crypto import get_random_string
 
 from datahub.core.models import BaseModel
 
 from datahub.omis.core.utils import generate_reference
+
+
+QUOTE_TEMPLATE = PurePath(__file__).parent / 'templates/content.md'
 
 
 class Quote(BaseModel):
@@ -28,6 +33,16 @@ class Quote(BaseModel):
                 numbers=get_random_string(length=1, allowed_chars='123456789')
             )
         return generate_reference(model=cls, gen=gen, prefix=f'{order.reference}/Q-')
+
+    @classmethod
+    def generate_content(cls, order):
+        """
+        :returns: the quote populated with the given order details.
+        """
+        return render_to_string(
+            QUOTE_TEMPLATE,
+            {'order': order}
+        )
 
     def __str__(self):
         """Human-readable representation"""
