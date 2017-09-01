@@ -148,11 +148,13 @@ class Order(BaseModel):
             validator.set_instance(self)
             validator()
 
-        quote = Quote.objects.create(
+        quote = Quote(
             **quote_data,
             reference=Quote.generate_reference(self),
             content=Quote.generate_content(self)
         )
+        quote.save()
+
         self.quote = quote
         self.save()
 
