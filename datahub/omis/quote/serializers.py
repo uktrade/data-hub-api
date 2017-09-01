@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
-from datahub.company.models import Advisor
-from datahub.core.serializers import NestedRelatedField
+from datahub.company.serializers import NestedAdviserField
 
 from .models import Quote
 
@@ -10,7 +9,7 @@ class QuoteSerializer(serializers.ModelSerializer):
     """Quote DRF serializer."""
 
     created_on = serializers.DateTimeField(read_only=True)
-    created_by = NestedRelatedField(Advisor, read_only=True)
+    created_by = NestedAdviserField(read_only=True)
 
     def create(self, validated_data):
         """Call `order.generate_quote` instead of creating the object directly."""

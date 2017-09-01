@@ -7,7 +7,8 @@ urlpatterns = [
     url(
         r'^order/(?P<order_pk>[0-9a-z-]{36})/quote$',
         QuoteViewSet.as_view({
-            'post': 'create'
+            'post': 'create',
+            'get': 'retrieve',
         }),
         name='item'
     ),
