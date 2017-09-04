@@ -9,18 +9,18 @@ from ..models import MapDBModelToDict
 class Contact(DocType, MapDBModelToDict):
     """Elasticsearch representation of Contact model."""
 
-    id = String(index='not_analyzed')
+    id = dsl_utils.KeywordString()
     archived = Boolean()
     archived_on = Date()
     archived_reason = String()
     created_on = Date()
     modified_on = Date()
-    name = String()
+    name = dsl_utils.SortableString()
     name_keyword = dsl_utils.CaseInsensitiveKeywordString()
     name_trigram = dsl_utils.TrigramString()
     title = dsl_utils.id_name_mapping()
-    first_name = String(copy_to=['name', 'name_keyword', 'name_trigram'])
-    last_name = String(copy_to=['name', 'name_keyword', 'name_trigram'])
+    first_name = dsl_utils.SortableString(copy_to=['name', 'name_keyword', 'name_trigram'])
+    last_name = dsl_utils.SortableString(copy_to=['name', 'name_keyword', 'name_trigram'])
     primary = Boolean()
     telephone_countrycode = dsl_utils.KeywordString()
     telephone_number = dsl_utils.KeywordString()

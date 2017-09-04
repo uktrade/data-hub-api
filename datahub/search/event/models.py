@@ -9,7 +9,7 @@ class Event(DocType, MapDBModelToDict):
     """Elasticsearch representation of Event model."""
 
     id = dsl_utils.KeywordString()
-    name = String(copy_to=['name_keyword', 'name_trigram'])
+    name = dsl_utils.SortableString(copy_to=['name_keyword', 'name_trigram'])
     name_keyword = dsl_utils.CaseInsensitiveKeywordString()
     name_trigram = dsl_utils.TrigramString()
     event_type = dsl_utils.id_name_mapping()
