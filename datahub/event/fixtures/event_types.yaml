@@ -1,0 +1,15 @@
+- model: event.eventtype
+  pk: 771f654d-e6b1-4fad-8a89-b6ac44147830
+  fields: {name: "Seminar"}
+- model: event.eventtype
+  pk: 2fade471-e868-4ea9-b125-945eb90ae5d4
+  fields: {name: "Exhibition"}
+- model: event.eventtype
+  pk: 1889641d-a021-4b6a-bbbe-20f501b8fdf4
+  fields: {name: "Inward mission"}
+- model: event.eventtype
+  pk: 6031f993-a689-49af-9a11-942a8413a779
+  fields: {name: "Outward mission"}
+- model: event.eventtype
+  pk: 91dbf298-84b3-4aa9-af7d-540721e5127c
+  fields: {name: "UK region local service"}
