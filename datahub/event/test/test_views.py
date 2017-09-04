@@ -4,6 +4,7 @@ from rest_framework.reverse import reverse
 from datahub.core.constants import Country, Team
 from datahub.core.test_utils import APITestMixin
 from datahub.event.constants import Programme
+from datahub.event.models import Event
 
 
 class TestEventViews(APITestMixin):
@@ -29,7 +30,7 @@ class TestEventViews(APITestMixin):
             'event_type': 'Seminar',
             'start_date': None,
             'end_date': None,
-            'location_type': None,
+            'location_type': '',
             'notes': '',
             'address_1': 'Grand Court Exhibition Centre',
             'address_2': '',
@@ -50,10 +51,10 @@ class TestEventViews(APITestMixin):
         url = reverse('api-v3:event:collection')
         request_data = {
             'name': 'Grand exhibition',
-            'event_type': 'Seminar',
+            'event_type': Event.EVENT_TYPES.seminar,
             'start_date': '2020-01-01',
             'end_date': '2020-01-02',
-            'location_type': 'HQ',
+            'location_type': Event.LOCATION_TYPES.hq,
             'notes': 'Some notes',
             'address_1': 'Grand Court Exhibition Centre',
             'address_2': 'Grand Court Lane',
@@ -72,10 +73,10 @@ class TestEventViews(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'name': 'Grand exhibition',
-            'event_type': 'Seminar',
+            'event_type': Event.EVENT_TYPES.seminar,
             'start_date': '2020-01-01',
             'end_date': '2020-01-02',
-            'location_type': 'HQ',
+            'location_type': Event.LOCATION_TYPES.hq,
             'notes': 'Some notes',
             'address_1': 'Grand Court Exhibition Centre',
             'address_2': 'Grand Court Lane',
