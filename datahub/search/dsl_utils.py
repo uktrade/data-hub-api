@@ -1,9 +1,7 @@
 from functools import partial
 from elasticsearch_dsl import Keyword, Nested, String
 
-
-KeywordString = Keyword
-CaseInsensitiveKeywordString = partial(
+SortableCaseInsensitiveKeywordString = partial(
     String,
     analyzer='lowercase_keyword_analyzer',
     fielddata=True
@@ -16,10 +14,10 @@ SortableString = partial(String, fielddata=True)
 def contact_or_adviser_mapping(field, include_dit_team=False):
     """Mapping for Adviser/Contact fields."""
     props = {
-        'id': KeywordString(),
-        'first_name': CaseInsensitiveKeywordString(),
-        'last_name': CaseInsensitiveKeywordString(),
-        'name': CaseInsensitiveKeywordString(),
+        'id': Keyword(),
+        'first_name': SortableCaseInsensitiveKeywordString(),
+        'last_name': SortableCaseInsensitiveKeywordString(),
+        'name': SortableCaseInsensitiveKeywordString(),
     }
 
     if include_dit_team:
@@ -30,10 +28,10 @@ def contact_or_adviser_mapping(field, include_dit_team=False):
 def contact_or_adviser_partial_mapping(field):
     """Mapping for Adviser/Contact fields that allows partial matching."""
     props = {
-        'id': KeywordString(),
-        'first_name': CaseInsensitiveKeywordString(),
-        'last_name': CaseInsensitiveKeywordString(),
-        'name': CaseInsensitiveKeywordString(copy_to=f'{field}.name_trigram'),
+        'id': Keyword(),
+        'first_name': SortableCaseInsensitiveKeywordString(),
+        'last_name': SortableCaseInsensitiveKeywordString(),
+        'name': SortableCaseInsensitiveKeywordString(copy_to=f'{field}.name_trigram'),
         'name_trigram': TrigramString(),
     }
     return Nested(properties=props)
@@ -42,16 +40,16 @@ def contact_or_adviser_partial_mapping(field):
 def id_name_mapping():
     """Mapping for id name fields."""
     return Nested(properties={
-        'id': KeywordString(),
-        'name': CaseInsensitiveKeywordString(),
+        'id': Keyword(),
+        'name': SortableCaseInsensitiveKeywordString(),
     })
 
 
 def id_name_partial_mapping(field):
     """Mapping for id name fields."""
     return Nested(properties={
-        'id': KeywordString(),
-        'name': CaseInsensitiveKeywordString(copy_to=f'{field}.name_trigram'),
+        'id': Keyword(),
+        'name': SortableCaseInsensitiveKeywordString(copy_to=f'{field}.name_trigram'),
         'name_trigram': TrigramString(),
     })
 
@@ -59,14 +57,14 @@ def id_name_partial_mapping(field):
 def id_uri_mapping():
     """Mapping for id uri fields."""
     return Nested(properties={
-        'id': KeywordString(),
-        'uri': CaseInsensitiveKeywordString()
+        'id': Keyword(),
+        'uri': SortableCaseInsensitiveKeywordString()
     })
 
 
 def company_mapping():
     """Mapping for id company_number fields."""
     return Nested(properties={
-        'id': KeywordString(),
-        'company_number': CaseInsensitiveKeywordString()
+        'id': Keyword(),
+        'company_number': SortableCaseInsensitiveKeywordString()
     })

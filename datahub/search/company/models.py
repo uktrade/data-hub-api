@@ -1,5 +1,5 @@
 from django.conf import settings
-from elasticsearch_dsl import Boolean, Date, DocType, String
+from elasticsearch_dsl import Boolean, Date, DocType, Keyword, String
 
 from .. import dict_utils
 from .. import dsl_utils
@@ -9,7 +9,7 @@ from ..models import MapDBModelToDict
 class Company(DocType, MapDBModelToDict):
     """Elasticsearch representation of Company model."""
 
-    id = dsl_utils.KeywordString()
+    id = Keyword()
     account_manager = dsl_utils.contact_or_adviser_mapping('account_manager')
     alias = dsl_utils.SortableString()
     archived = Boolean()
@@ -19,7 +19,7 @@ class Company(DocType, MapDBModelToDict):
     archived_reason = String()
     business_type = dsl_utils.id_name_mapping()
     classification = dsl_utils.id_name_mapping()
-    company_number = dsl_utils.CaseInsensitiveKeywordString()
+    company_number = dsl_utils.SortableCaseInsensitiveKeywordString()
     companies_house_data = dsl_utils.company_mapping()
     created_on = Date()
     description = dsl_utils.EnglishString()
@@ -27,7 +27,7 @@ class Company(DocType, MapDBModelToDict):
     headquarter_type = dsl_utils.id_name_mapping()
     modified_on = Date()
     name = dsl_utils.SortableString(copy_to=['name_keyword', 'name_trigram'])
-    name_keyword = dsl_utils.CaseInsensitiveKeywordString()
+    name_keyword = dsl_utils.SortableCaseInsensitiveKeywordString()
     name_trigram = dsl_utils.TrigramString()
     one_list_account_owner = dsl_utils.contact_or_adviser_mapping('one_list_account_owner')
     parent = dsl_utils.id_name_mapping()
@@ -36,14 +36,14 @@ class Company(DocType, MapDBModelToDict):
     registered_address_country = dsl_utils.id_name_mapping()
     registered_address_county = String()
     registered_address_postcode = String()
-    registered_address_town = dsl_utils.CaseInsensitiveKeywordString()
+    registered_address_town = dsl_utils.SortableCaseInsensitiveKeywordString()
     sector = dsl_utils.id_name_mapping()
     trading_address_1 = String()
     trading_address_2 = String()
     trading_address_country = dsl_utils.id_name_mapping()
     trading_address_county = String()
     trading_address_postcode = String()
-    trading_address_town = dsl_utils.CaseInsensitiveKeywordString()
+    trading_address_town = dsl_utils.SortableCaseInsensitiveKeywordString()
     turnover_range = dsl_utils.id_name_mapping()
     uk_region = dsl_utils.id_name_mapping()
     uk_based = Boolean()
