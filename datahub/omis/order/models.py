@@ -131,9 +131,13 @@ class Order(BaseModel):
         return f'{settings.DATAHUB_FRONTEND_BASE_URL}/omis/{self.pk}'
 
     @transaction.atomic
-    def generate_quote(self, quote_data):
+    def generate_quote(self, quote_data, commit=True):
         """
-        Generate a quote for this order if possible or raise
+        :returns: a quote for this order
+
+        :param quote_data: extra quote data e.g. created_by etc.
+            This should not include content or reference which are generated on the fly
+        :param commit: if False, the changes will not be saved. Useful for previewing a quote
 
         :raises rest_framework.exceptions.ValidationError: in case of validation error
         :raises datahub.omis.core.exceptions.Conflict: in case of errors with the state of the
@@ -153,10 +157,14 @@ class Order(BaseModel):
             reference=Quote.generate_reference(self),
             content=Quote.generate_content(self)
         )
-        quote.save()
+
+        if commit:
+            quote.save()
 
         self.quote = quote
-        self.save()
+
+        if commit:
+            self.save()
 
 
 class OrderSubscriber(BaseModel):

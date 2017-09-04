@@ -21,11 +21,16 @@ class BasicQuoteSerializer(serializers.ModelSerializer):
     created_on = serializers.DateTimeField(read_only=True)
     created_by = NestedAdviserField(read_only=True)
 
-    def create(self, validated_data):
+    def preview(self):
+        """Same as create but without saving the changes."""
+        self.instance = self.create(self.validated_data, commit=False)
+        return self.instance
+
+    def create(self, validated_data, commit=True):
         """Call `order.generate_quote` instead of creating the object directly."""
         order = self.context['order']
-        order.generate_quote(validated_data)
 
+        order.generate_quote(validated_data, commit=commit)
         return order.quote
 
     class Meta:  # noqa: D101

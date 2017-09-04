@@ -16,11 +16,61 @@ from ..models import Quote
 pytestmark = pytest.mark.django_db
 
 
-class TestCreateQuote(APITestMixin):
-    """Create quote test case."""
+class TestCreatePreviewOrder(APITestMixin):
+    """Tests for creating and previewing a quote."""
+
+    @pytest.mark.parametrize('quote_view_name', ('item', 'preview'))
+    def test_404_if_order_doesnt_exist(self, quote_view_name):
+        """Test that if the order doesn't exist, the endpoint returns 404."""
+        url = reverse(
+            f'api-v3:omis:quote:{quote_view_name}',
+            kwargs={'order_pk': uuid.uuid4()}
+        )
+        response = self.api_client.post(url, format='json')
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    @pytest.mark.parametrize('quote_view_name', ('item', 'preview'))
+    def test_409_if_theres_already_a_valid_quote(self, quote_view_name):
+        """Test that if the order has already an active quote, the endpoint returns 409."""
+        order = OrderWithOpenQuoteFactory()
+
+        url = reverse(
+            f'api-v3:omis:quote:{quote_view_name}',
+            kwargs={'order_pk': order.pk}
+        )
+        response = self.api_client.post(url, format='json')
+
+        assert response.status_code == status.HTTP_409_CONFLICT
+        assert response.json() == {'detail': "There's already an active quote."}
+
+    @pytest.mark.parametrize('quote_view_name', ('item', 'preview'))
+    @pytest.mark.parametrize(
+        'field,value',
+        (
+            ('service_types', []),
+            ('description', ''),
+            ('delivery_date', None),
+        )
+    )
+    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    def test_400_if_incomplete_order(self, quote_view_name, field, value):
+        """If the order is incomplete, the quote cannot be generated."""
+        order = OrderFactory(**{field: value})
+
+        url = reverse(
+            f'api-v3:omis:quote:{quote_view_name}',
+            kwargs={'order_pk': order.pk}
+        )
+        response = self.api_client.post(url, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            field: ['This field is required.']
+        }
 
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
-    def test_success(self):
+    def test_create_success(self):
         """Test a successful call to create a quote."""
         order = OrderFactory()
 
@@ -43,45 +93,7 @@ class TestCreateQuote(APITestMixin):
         quote = Quote.objects.first()
         assert order.quote == quote
 
-    def test_404_if_order_doesnt_exist(self):
-        """Test that if the order doesn't exist, the endpoint returns 404."""
-        url = reverse('api-v3:omis:quote:item', kwargs={'order_pk': uuid.uuid4()})
-        response = self.api_client.post(url, format='json')
-
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-
-    def test_409_if_theres_already_a_valid_quote(self):
-        """Test that if the order has already an active quote, the endpoint returns 409."""
-        order = OrderWithOpenQuoteFactory()
-
-        url = reverse('api-v3:omis:quote:item', kwargs={'order_pk': order.pk})
-        response = self.api_client.post(url, format='json')
-
-        assert response.status_code == status.HTTP_409_CONFLICT
-        assert response.json() == {'detail': "There's already an active quote."}
-
-    @pytest.mark.parametrize(
-        'field,value',
-        (
-            ('service_types', []),
-            ('description', ''),
-            ('delivery_date', None),
-        )
-    )
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
-    def test_400_if_incomplete_order(self, field, value):
-        """If the order is incomplete, the quote cannot be generated."""
-        order = OrderFactory(**{field: value})
-
-        url = reverse('api-v3:omis:quote:item', kwargs={'order_pk': order.pk})
-        response = self.api_client.post(url, format='json')
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {
-            field: ['This field is required.']
-        }
-
-    def test_atomic_operation(self):
+    def test_create_as_atomic_operation(self):
         """
         Test that if there's a problem when saving the order, the quote is not saved
         either so that we keep db integrity.
@@ -95,6 +107,28 @@ class TestCreateQuote(APITestMixin):
 
             with pytest.raises(Exception):
                 self.api_client.post(url, format='json')
+
+        order.refresh_from_db()
+        assert not order.quote
+        assert not Quote.objects.count()
+
+    def test_preview_success(self):
+        """
+        Test a successful call to preview a quote.
+        Changes are not saved in the db.
+        """
+        order = OrderFactory()
+
+        url = reverse('api-v3:omis:quote:preview', kwargs={'order_pk': order.pk})
+        response = self.api_client.post(url, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert order.reference in response.json()['content']
+        assert response.json() == {
+            'content': response.json()['content'],
+            'created_on': None,
+            'created_by': None
+        }
 
         order.refresh_from_db()
         assert not order.quote
