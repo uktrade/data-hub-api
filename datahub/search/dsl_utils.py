@@ -1,11 +1,16 @@
 from functools import partial
-from elasticsearch_dsl import Nested, String
+from elasticsearch_dsl import Keyword, Nested, String
 
 
-KeywordString = partial(String, index='not_analyzed')
-CaseInsensitiveKeywordString = partial(String, analyzer='lowercase_keyword_analyzer')
+KeywordString = Keyword
+CaseInsensitiveKeywordString = partial(
+    String,
+    analyzer='lowercase_keyword_analyzer',
+    fielddata=True
+)
 TrigramString = partial(String, analyzer='trigram_analyzer')
 EnglishString = partial(String, analyzer='english_analyzer')
+SortableString = partial(String, fielddata=True)
 
 
 def contact_or_adviser_mapping(field, include_dit_team=False):

@@ -9,7 +9,7 @@ from ..models import MapDBModelToDict
 class InvestmentProject(DocType, MapDBModelToDict):
     """Elasticsearch representation of InvestmentProject."""
 
-    id = String(index='not_analyzed')
+    id = dsl_utils.KeywordString()
     approved_commitment_to_invest = Boolean()
     approved_fdi = Boolean()
     approved_good_value = Boolean()
@@ -38,7 +38,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
     uk_company = dsl_utils.id_name_mapping()
     investor_company = dsl_utils.id_name_mapping()
     investment_type = dsl_utils.id_name_mapping()
-    name = String(copy_to=['name_keyword', 'name_trigram'])
+    name = dsl_utils.SortableString()
     name_keyword = dsl_utils.CaseInsensitiveKeywordString()
     name_trigram = dsl_utils.TrigramString()
     r_and_d_budget = Boolean()

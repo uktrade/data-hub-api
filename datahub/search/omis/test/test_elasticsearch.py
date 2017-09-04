@@ -18,283 +18,293 @@ def test_mapping(setup_es):
     assert mapping.to_dict() == {
         'order': {
             'properties': {
-                'id': {
-                    'index': 'not_analyzed',
-                    'type': 'string'
+                'assignees': {
+                    'properties': {
+                        'dit_team': {
+                            'properties': {
+                                'id': {
+                                    'type': 'keyword'
+                                },
+                                'name': {
+                                    'analyzer': 'lowercase_keyword_analyzer',
+                                    'fielddata': True,
+                                    'type': 'text'
+                                }
+                            },
+                            'type': 'nested'
+                        },
+                        'first_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        },
+                        'id': {
+                            'type': 'keyword'
+                        },
+                        'last_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        }
+                    },
+                    'type': 'nested'
                 },
-                'reference': {
+                'billing_address_1': {
+                    'type': 'text'
+                },
+                'billing_address_2': {
+                    'type': 'text'
+                },
+                'billing_address_country': {
+                    'properties': {
+                        'id': {
+                            'type': 'keyword'
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        }
+                    },
+                    'type': 'nested'
+                },
+                'billing_address_county': {
                     'analyzer': 'lowercase_keyword_analyzer',
-                    'type': 'string'
+                    'fielddata': True,
+                    'type': 'text'
                 },
-                'status': {
+                'billing_address_postcode': {
+                    'type': 'text'
+                },
+                'billing_address_town': {
                     'analyzer': 'lowercase_keyword_analyzer',
-                    'type': 'string'
+                    'fielddata': True,
+                    'type': 'text'
                 },
-                'po_number': {
-                    'index': 'no',
-                    'type': 'string'
+                'billing_contact_name': {
+                    'type': 'text'
+                },
+                'billing_email': {
+                    'analyzer': 'lowercase_keyword_analyzer',
+                    'fielddata': True,
+                    'type': 'text'
+                },
+                'billing_phone': {
+                    'analyzer': 'lowercase_keyword_analyzer',
+                    'fielddata': True,
+                    'type': 'text'
                 },
                 'company': {
                     'properties': {
                         'id': {
-                            'index': 'not_analyzed',
-                            'type': 'string'
+                            'type': 'keyword'
                         },
                         'name': {
                             'analyzer': 'lowercase_keyword_analyzer',
-                            'type': 'string'
+                            'fielddata': True,
+                            'type': 'text'
                         }
                     },
                     'type': 'nested'
                 },
                 'contact': {
                     'properties': {
-                        'id': {
-                            'index': 'not_analyzed',
-                            'type': 'string'
-                        },
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
-                            'type': 'string'
+                            'fielddata': True,
+                            'type': 'text'
+                        },
+                        'id': {
+                            'type': 'keyword'
                         },
                         'last_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
-                            'type': 'string'
+                            'fielddata': True,
+                            'type': 'text'
                         },
                         'name': {
                             'analyzer': 'lowercase_keyword_analyzer',
-                            'type': 'string'
-                        }
-                    },
-                    'type': 'nested'
-                },
-                'created_by': {
-                    'properties': {
-                        'id': {
-                            'index': 'not_analyzed',
-                            'type': 'string'
-                        },
-                        'first_name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'type': 'string'
-                        },
-                        'last_name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'type': 'string'
-                        },
-                        'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'type': 'string'
-                        }
-                    },
-                    'type': 'nested'
-                },
-                'created_on': {
-                    'format': 'strict_date_optional_time||epoch_millis',
-                    'type': 'date'
-                },
-                'modified_on': {
-                    'format': 'strict_date_optional_time||epoch_millis',
-                    'type': 'date'
-                },
-                'primary_market': {
-                    'properties': {
-                        'id': {
-                            'index': 'not_analyzed',
-                            'type': 'string'
-                        },
-                        'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'type': 'string'
-                        }
-                    },
-                    'type': 'nested'
-                },
-                'sector': {
-                    'properties': {
-                        'id': {
-                            'index': 'not_analyzed',
-                            'type': 'string'
-                        },
-                        'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'type': 'string'
-                        }
-                    },
-                    'type': 'nested'
-                },
-                'description': {
-                    'analyzer': 'english_analyzer',
-                    'type': 'string'
-                },
-                'contacts_not_to_approach': {
-                    'type': 'string'
-                },
-                'delivery_date': {
-                    'format': 'strict_date_optional_time||epoch_millis',
-                    'type': 'date'
-                },
-                'service_types': {
-                    'properties': {
-                        'id': {
-                            'index': 'not_analyzed',
-                            'type': 'string'
-                        },
-                        'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'type': 'string'
+                            'fielddata': True,
+                            'type': 'text'
                         }
                     },
                     'type': 'nested'
                 },
                 'contact_email': {
                     'analyzer': 'lowercase_keyword_analyzer',
-                    'type': 'string'
+                    'fielddata': True,
+                    'type': 'text'
                 },
                 'contact_phone': {
-                    'index': 'not_analyzed',
-                    'type': 'string'
+                    'type': 'keyword'
+                },
+                'contacts_not_to_approach': {
+                    'type': 'text'
+                },
+                'created_by': {
+                    'properties': {
+                        'first_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        },
+                        'id': {
+                            'type': 'keyword'
+                        },
+                        'last_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        }
+                    },
+                    'type': 'nested'
+                },
+                'created_on': {
+                    'type': 'date'
+                },
+                'delivery_date': {
+                    'type': 'date'
+                },
+                'description': {
+                    'analyzer': 'english_analyzer',
+                    'type': 'text'
+                },
+                'discount_value': {
+                    'index': False,
+                    'type': 'integer'
+                },
+                'id': {
+                    'type': 'keyword'
+                },
+                'modified_on': {
+                    'type': 'date'
+                },
+                'net_cost': {
+                    'index': False,
+                    'type': 'integer'
+                },
+                'po_number': {
+                    'index': False,
+                    'type': 'keyword'
+                },
+                'primary_market': {
+                    'properties': {
+                        'id': {
+                            'type': 'keyword'
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        }
+                    },
+                    'type': 'nested'
+                },
+                'reference': {
+                    'analyzer': 'lowercase_keyword_analyzer',
+                    'fielddata': True,
+                    'type': 'text'
+                },
+                'sector': {
+                    'properties': {
+                        'id': {
+                            'type': 'keyword'
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        }
+                    },
+                    'type': 'nested'
+                },
+                'service_types': {
+                    'properties': {
+                        'id': {
+                            'type': 'keyword'
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        }
+                    },
+                    'type': 'nested'
+                },
+                'status': {
+                    'analyzer': 'lowercase_keyword_analyzer',
+                    'fielddata': True,
+                    'type': 'text'
                 },
                 'subscribers': {
                     'properties': {
-                        'id': {
-                            'index': 'not_analyzed',
-                            'type': 'string'
-                        },
-                        'first_name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'type': 'string'
-                        },
-                        'last_name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'type': 'string'
-                        },
-                        'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'type': 'string'
-                        },
                         'dit_team': {
                             'properties': {
                                 'id': {
-                                    'index': 'not_analyzed',
-                                    'type': 'string'
+                                    'type': 'keyword'
                                 },
                                 'name': {
                                     'analyzer': 'lowercase_keyword_analyzer',
-                                    'type': 'string'
+                                    'fielddata': True,
+                                    'type': 'text'
                                 }
                             },
                             'type': 'nested'
-                        }
-                    },
-                    'type': 'nested'
-                },
-                'assignees': {
-                    'properties': {
-                        'id': {
-                            'index': 'not_analyzed',
-                            'type': 'string'
                         },
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
-                            'type': 'string'
+                            'fielddata': True,
+                            'type': 'text'
+                        },
+                        'id': {
+                            'type': 'keyword'
                         },
                         'last_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
-                            'type': 'string'
+                            'fielddata': True,
+                            'type': 'text'
                         },
                         'name': {
                             'analyzer': 'lowercase_keyword_analyzer',
-                            'type': 'string'
-                        },
-                        'dit_team': {
-                            'properties': {
-                                'id': {
-                                    'index': 'not_analyzed',
-                                    'type': 'string'
-                                },
-                                'name': {
-                                    'analyzer': 'lowercase_keyword_analyzer',
-                                    'type': 'string'
-                                }
-                            },
-                            'type': 'nested'
+                            'fielddata': True,
+                            'type': 'text'
                         }
                     },
                     'type': 'nested'
-                },
-                'discount_value': {
-                    'index': 'no',
-                    'type': 'integer'
-                },
-                'vat_status': {
-                    'index': 'no',
-                    'type': 'string'
-                },
-                'vat_number': {
-                    'index': 'no',
-                    'type': 'string'
-                },
-                'vat_verified': {
-                    'index': 'no',
-                    'type': 'boolean'
-                },
-                'net_cost': {
-                    'index': 'no',
-                    'type': 'integer'
                 },
                 'subtotal_cost': {
-                    'index': 'no',
-                    'type': 'integer'
-                },
-                'vat_cost': {
-                    'index': 'no',
+                    'index': False,
                     'type': 'integer'
                 },
                 'total_cost': {
                     'type': 'integer'
                 },
-                'billing_contact_name': {
-                    'type': 'string'
+                'vat_cost': {
+                    'index': False,
+                    'type': 'integer'
                 },
-                'billing_email': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'type': 'string'
+                'vat_number': {
+                    'index': False,
+                    'type': 'keyword'
                 },
-                'billing_phone': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'type': 'string'
+                'vat_status': {
+                    'index': False,
+                    'type': 'keyword'
                 },
-                'billing_address_1': {
-                    'type': 'string'
-                },
-                'billing_address_2': {
-                    'type': 'string'
-                },
-                'billing_address_county': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'type': 'string'
-                },
-                'billing_address_town': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'type': 'string'
-                },
-                'billing_address_postcode': {
-                    'type': 'string'
-                },
-                'billing_address_country': {
-                    'properties': {
-                        'id': {
-                            'index': 'not_analyzed',
-                            'type': 'string'
-                        },
-                        'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'type': 'string'
-                        }
-                    },
-                    'type': 'nested'
-                },
+                'vat_verified': {
+                    'index': False,
+                    'type': 'boolean'
+                }
             }
         }
     }

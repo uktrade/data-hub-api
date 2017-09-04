@@ -9,9 +9,9 @@ from ..models import MapDBModelToDict
 class Company(DocType, MapDBModelToDict):
     """Elasticsearch representation of Company model."""
 
-    id = String(index='not_analyzed')
+    id = dsl_utils.KeywordString()
     account_manager = dsl_utils.contact_or_adviser_mapping('account_manager')
-    alias = String()
+    alias = dsl_utils.SortableString()
     archived = Boolean()
     archived_by = dsl_utils.contact_or_adviser_mapping('archived_by')
     contacts = dsl_utils.contact_or_adviser_mapping('contacts')
@@ -26,7 +26,7 @@ class Company(DocType, MapDBModelToDict):
     employee_range = dsl_utils.id_name_mapping()
     headquarter_type = dsl_utils.id_name_mapping()
     modified_on = Date()
-    name = String(copy_to=['name_keyword', 'name_trigram'])
+    name = dsl_utils.SortableString(copy_to=['name_keyword', 'name_trigram'])
     name_keyword = dsl_utils.CaseInsensitiveKeywordString()
     name_trigram = dsl_utils.TrigramString()
     one_list_account_owner = dsl_utils.contact_or_adviser_mapping('one_list_account_owner')
