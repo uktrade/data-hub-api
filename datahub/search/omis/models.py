@@ -1,5 +1,5 @@
 from django.conf import settings
-from elasticsearch_dsl import Boolean, Date, DocType, Integer, String
+from elasticsearch_dsl import Boolean, Date, DocType, Integer, Keyword, String
 
 from .. import dict_utils
 from .. import dsl_utils
@@ -9,9 +9,9 @@ from ..models import MapDBModelToDict
 class Order(DocType, MapDBModelToDict):
     """Elasticsearch representation of Order model."""
 
-    id = dsl_utils.KeywordString()
-    reference = dsl_utils.CaseInsensitiveKeywordString()
-    status = dsl_utils.CaseInsensitiveKeywordString()
+    id = Keyword()
+    reference = dsl_utils.SortableCaseInsensitiveKeywordString()
+    status = dsl_utils.SortableCaseInsensitiveKeywordString()
     company = dsl_utils.id_name_mapping()
     contact = dsl_utils.contact_or_adviser_mapping('contact')
     created_by = dsl_utils.contact_or_adviser_mapping('created_by')
@@ -23,8 +23,8 @@ class Order(DocType, MapDBModelToDict):
     contacts_not_to_approach = String()
     delivery_date = Date()
     service_types = dsl_utils.id_name_mapping()
-    contact_email = dsl_utils.CaseInsensitiveKeywordString()
-    contact_phone = dsl_utils.KeywordString()
+    contact_email = dsl_utils.SortableCaseInsensitiveKeywordString()
+    contact_phone = Keyword()
     subscribers = dsl_utils.contact_or_adviser_mapping('subscribers', include_dit_team=True)
     assignees = dsl_utils.contact_or_adviser_mapping('assignees', include_dit_team=True)
     po_number = String(index='no')
@@ -38,12 +38,12 @@ class Order(DocType, MapDBModelToDict):
     total_cost = Integer()
 
     billing_contact_name = String()
-    billing_email = dsl_utils.CaseInsensitiveKeywordString()
-    billing_phone = dsl_utils.CaseInsensitiveKeywordString()
+    billing_email = dsl_utils.SortableCaseInsensitiveKeywordString()
+    billing_phone = dsl_utils.SortableCaseInsensitiveKeywordString()
     billing_address_1 = String()
     billing_address_2 = String()
-    billing_address_town = dsl_utils.CaseInsensitiveKeywordString()
-    billing_address_county = dsl_utils.CaseInsensitiveKeywordString()
+    billing_address_town = dsl_utils.SortableCaseInsensitiveKeywordString()
+    billing_address_county = dsl_utils.SortableCaseInsensitiveKeywordString()
     billing_address_postcode = String()
     billing_address_country = dsl_utils.id_name_mapping()
 
