@@ -32,9 +32,7 @@ class Event(BaseModel):
     event_type = models.CharField(max_length=MAX_LENGTH, choices=EVENT_TYPES)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
-    location_type = models.CharField(
-        max_length=MAX_LENGTH, null=True, blank=True, choices=LOCATION_TYPES
-    )
+    location_type = models.CharField(max_length=MAX_LENGTH, blank=True, choices=LOCATION_TYPES)
     address_1 = models.CharField(max_length=MAX_LENGTH)
     address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
     address_town = models.CharField(max_length=MAX_LENGTH)
