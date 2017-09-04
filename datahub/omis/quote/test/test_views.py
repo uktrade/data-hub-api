@@ -30,6 +30,7 @@ class TestCreateQuote(APITestMixin):
         order.refresh_from_db()
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == {
+            'content': order.quote.content,
             'created_on': '2017-04-18T13:00:00',
             'created_by': {
                 'id': str(self.user.pk),
@@ -103,8 +104,8 @@ class TestCreateQuote(APITestMixin):
 class TestGetQuote(APITestMixin):
     """Get quote test case."""
 
-    def test_get(self):
-        """Test a successful call to get a quote."""
+    def test_get_basic(self):
+        """Test a successful call to get a basic quote (without `expand` param)."""
         order = OrderWithOpenQuoteFactory()
         quote = order.quote
 
@@ -121,6 +122,48 @@ class TestGetQuote(APITestMixin):
                 'name': quote.created_by.name
             },
 
+        }
+
+    def test_get_expanded(self):
+        """Test a successful call to get a quote and its content (with `expand` param)."""
+        order = OrderWithOpenQuoteFactory()
+        quote = order.quote
+
+        url = reverse('api-v3:omis:quote:item', kwargs={'order_pk': order.pk})
+        response = self.api_client.get(
+            url,
+            {'expand': True},
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'created_on': quote.created_on.isoformat(),
+            'created_by': {
+                'id': str(quote.created_by.pk),
+                'first_name': quote.created_by.first_name,
+                'last_name': quote.created_by.last_name,
+                'name': quote.created_by.name
+            },
+            'content': quote.content
+        }
+
+    def test_400_with_invalid_expand_value(self):
+        """Test if `expand` is not a boolean value, 400 is returned."""
+        order = OrderWithOpenQuoteFactory()
+
+        url = reverse('api-v3:omis:quote:item', kwargs={'order_pk': order.pk})
+        response = self.api_client.get(
+            url,
+            {'expand': 'invalid-value'},
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'expand': [
+                '"invalid-value" is not a valid boolean.'
+            ]
         }
 
     def test_404_if_order_doesnt_exist(self):
