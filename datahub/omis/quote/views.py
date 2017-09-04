@@ -5,14 +5,15 @@ from datahub.core.viewsets import CoreViewSetV3
 from datahub.omis.order.models import Order
 
 from .models import Quote
-from .serializers import QuoteSerializer
+from .serializers import BasicQuoteSerializer, ExpandedQuoteSerializer, ExpandParamSerializer
 
 
 class QuoteViewSet(CoreViewSetV3):
     """Quote ViewSet."""
 
-    serializer_class = QuoteSerializer
     queryset = Quote.objects.none()
+    basic_serializer_class = BasicQuoteSerializer
+    expanded_serializer_class = ExpandedQuoteSerializer
 
     order_lookup_url_kwarg = 'order_pk'
 
@@ -38,6 +39,29 @@ class QuoteViewSet(CoreViewSetV3):
         if not quote:
             raise Http404('The specified quote does not exist.')
         return quote
+
+    def _requires_expanded(self):
+        """
+        :returns: True if expanded response required, False otherwise
+
+        This can be implicit from the action or explicitly requested with the
+        `expand` query param.
+        """
+        if self.action == 'create':
+            return True
+
+        param_serializer = ExpandParamSerializer(data=self.request.GET)
+        param_serializer.is_valid(raise_exception=True)
+        return param_serializer.validated_data['expand']
+
+    def get_serializer_class(self):
+        """
+        :returns: different serializers depending on if the action requires an expanded response
+            or the `expand` param has been specified.
+        """
+        if self._requires_expanded():
+            return self.expanded_serializer_class
+        return self.basic_serializer_class
 
     def get_serializer_context(self):
         """Extra context provided to the serializer class."""
