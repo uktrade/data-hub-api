@@ -4,7 +4,7 @@ jobs:
     docker:
       - image: python:3.6
 
-      - image: elasticsearch:2.3
+      - image: elasticsearch:5.5
 
       - image: postgres:9.5
         environment:
