@@ -7,6 +7,8 @@ from datahub.event.models import Event
 class EventSerializer(serializers.ModelSerializer):
     """Event serialiser."""
 
+    event_type = NestedRelatedField('event.EventType')
+    location_type = NestedRelatedField('event.LocationType', required=False, allow_null=True)
     lead_team = NestedRelatedField('metadata.Team', required=False, allow_null=True)
     additional_teams = NestedRelatedField(
         'metadata.Team', many=True, required=False, allow_empty=True
@@ -22,7 +24,6 @@ class EventSerializer(serializers.ModelSerializer):
             # As these don't have null=True, DRF defaults to required=True
             'address_2': {'required': False},
             'address_postcode': {'required': False},
-            'location_type': {'required': False},
             'notes': {'required': False},
         }
         fields = (

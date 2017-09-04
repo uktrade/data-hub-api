@@ -3,8 +3,7 @@ from rest_framework.reverse import reverse
 
 from datahub.core.constants import Country, Team
 from datahub.core.test_utils import APITestMixin
-from datahub.event.constants import Programme
-from datahub.event.models import Event
+from datahub.event.constants import EventType, LocationType, Programme
 
 
 class TestEventViews(APITestMixin):
@@ -15,7 +14,7 @@ class TestEventViews(APITestMixin):
         url = reverse('api-v3:event:collection')
         request_data = {
             'name': 'Grand exhibition',
-            'event_type': 'Seminar',
+            'event_type': EventType.seminar.value.id,
             'address_1': 'Grand Court Exhibition Centre',
             'address_town': 'London',
             'address_country': Country.united_kingdom.value.id,
@@ -27,10 +26,13 @@ class TestEventViews(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'name': 'Grand exhibition',
-            'event_type': 'Seminar',
+            'event_type': {
+                'id': EventType.seminar.value.id,
+                'name': EventType.seminar.value.name,
+            },
             'start_date': None,
             'end_date': None,
-            'location_type': '',
+            'location_type': None,
             'notes': '',
             'address_1': 'Grand Court Exhibition Centre',
             'address_2': '',
@@ -51,10 +53,10 @@ class TestEventViews(APITestMixin):
         url = reverse('api-v3:event:collection')
         request_data = {
             'name': 'Grand exhibition',
-            'event_type': Event.EVENT_TYPES.seminar,
+            'event_type': EventType.seminar.value.id,
             'start_date': '2020-01-01',
             'end_date': '2020-01-02',
-            'location_type': Event.LOCATION_TYPES.hq,
+            'location_type': LocationType.hq.value.id,
             'notes': 'Some notes',
             'address_1': 'Grand Court Exhibition Centre',
             'address_2': 'Grand Court Lane',
@@ -73,10 +75,16 @@ class TestEventViews(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'name': 'Grand exhibition',
-            'event_type': Event.EVENT_TYPES.seminar,
+            'event_type': {
+                'id': EventType.seminar.value.id,
+                'name': EventType.seminar.value.name,
+            },
             'start_date': '2020-01-01',
             'end_date': '2020-01-02',
-            'location_type': Event.LOCATION_TYPES.hq,
+            'location_type': {
+                'id': LocationType.hq.value.id,
+                'name': LocationType.hq.value.name,
+            },
             'notes': 'Some notes',
             'address_1': 'Grand Court Exhibition Centre',
             'address_2': 'Grand Court Lane',
@@ -124,7 +132,7 @@ class TestEventViews(APITestMixin):
             'address_1': '',
             'address_country': None,
             'address_town': '',
-            'event_type': '',
+            'event_type': None,
             'name': ''
         }
         response = self.api_client.post(url, format='json', data=request_data)
@@ -135,6 +143,6 @@ class TestEventViews(APITestMixin):
             'address_1': ['This field may not be blank.'],
             'address_country': ['This field may not be null.'],
             'address_town': ['This field may not be blank.'],
-            'event_type': ['"" is not a valid choice.'],
+            'event_type': ['This field may not be null.'],
             'name': ['This field may not be blank.']
         }

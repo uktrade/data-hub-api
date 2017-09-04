@@ -2,7 +2,6 @@ import uuid
 
 from django.conf import settings
 from django.db import models
-from model_utils import Choices
 
 from datahub.core.models import BaseConstantModel, BaseModel
 
@@ -12,27 +11,12 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 class Event(BaseModel):
     """An event (exhibition etc.)"""
 
-    EVENT_TYPES = Choices(
-        ('Seminar', 'seminar', 'Seminar'),
-        ('Exhibition', 'exhibition', 'Exhibition'),
-        ('Inward mission', 'inward_mission', 'Inward mission'),
-        ('Outward mission', 'outward_mission', 'Outward mission'),
-        ('UK region local service', 'uk_region_local_service', 'UK region local service'),
-    )
-
-    LOCATION_TYPES = Choices(
-        ('HQ', 'hq', 'HQ'),
-        ('Post', 'post', 'Post'),
-        ('Regional network', 'regional_network', 'Regional network'),
-        ('Other', 'other', 'Other'),
-    )
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=MAX_LENGTH)
-    event_type = models.CharField(max_length=MAX_LENGTH, choices=EVENT_TYPES)
+    event_type = models.ForeignKey('EventType')
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
-    location_type = models.CharField(max_length=MAX_LENGTH, blank=True, choices=LOCATION_TYPES)
+    location_type = models.ForeignKey('LocationType', null=True, blank=True)
     address_1 = models.CharField(max_length=MAX_LENGTH)
     address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
     address_town = models.CharField(max_length=MAX_LENGTH)
@@ -55,3 +39,11 @@ class Event(BaseModel):
 
 class Programme(BaseConstantModel):
     """Related programmes for events."""
+
+
+class EventType(BaseConstantModel):
+    """Event types."""
+
+
+class LocationType(BaseConstantModel):
+    """Location types for events."""
