@@ -20,7 +20,6 @@ class SearchApp:
     """Used to configure ES search modules to be used within Data Hub."""
 
     name = None
-    plural_name = None
     ESModel = None
     view = None
     queryset = None

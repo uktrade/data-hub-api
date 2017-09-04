@@ -71,7 +71,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '--batch_size',
             dest='batch_size',
-            default=100,
+            default=600,
             help='Batch size - number of rows processed at a time',
         )
 

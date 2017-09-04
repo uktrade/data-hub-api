@@ -1,7 +1,7 @@
 import uuid
 
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.utils.crypto import get_random_string
 from django.utils.timezone import now
 
@@ -9,6 +9,10 @@ from datahub.company.models import Advisor, Company, Contact
 from datahub.core.models import BaseModel, BaseOrderedConstantModel, DisableableModel
 
 from datahub.metadata.models import Country, Sector, Team
+from datahub.omis.core.utils import generate_reference
+from datahub.omis.quote.models import Quote
+
+from . import validators
 
 
 class ServiceType(BaseOrderedConstantModel, DisableableModel):
@@ -69,6 +73,12 @@ class Order(BaseModel):
     contact_email = models.EmailField(blank=True)
     contact_phone = models.CharField(max_length=254, blank=True)
 
+    quote = models.OneToOneField(
+        Quote,
+        null=True, blank=True,
+        on_delete=models.SET_NULL
+    )
+
     # legacy fields, only meant to be used in readonly mode as reference
     product_info = models.TextField(
         blank=True, editable=False,
@@ -91,42 +101,62 @@ class Order(BaseModel):
         """Human-readable representation"""
         return self.reference
 
-    def _calculate_reference(self):
+    @classmethod
+    def generate_reference(cls):
         """
-        Returns a random unused reference of form:
+        :returns: a random unused reference of form:
             <(3) letters><(3) numbers>/<year> e.g. GEA962/16
-        or RuntimeError if no reference can be generated.
+        :raises RuntimeError: if no reference can be generated.
         """
-        year_suffix = now().strftime('%y')
-        manager = self.__class__.objects
-
-        max_retries = 10
-        tries = 0
-        while tries < max_retries:
-            reference = '{letters}{numbers}/{year}'.format(
+        def gen():
+            year_suffix = now().strftime('%y')
+            return '{letters}{numbers}/{year}'.format(
                 letters=get_random_string(length=3, allowed_chars='ACEFHJKMNPRTUVWXY'),
                 numbers=get_random_string(length=3, allowed_chars='123456789'),
                 year=year_suffix
             )
-            if not manager.filter(reference=reference).exists():
-                return reference
-            tries += 1
 
-        # This should never happen as we have 3.5 milion choices per year
-        # and it's basically unrealistic to have more than 10 collisions.
-        raise RuntimeError('Cannot generate random reference')
+        return generate_reference(model=cls, gen=gen)
 
     def save(self, *args, **kwargs):
         """
         Like the django save but it creates a reference if it doesn't exist.
         """
         if not self.reference:
-            self.reference = self._calculate_reference()
+            self.reference = self.generate_reference()
         return super().save(*args, **kwargs)
 
     def get_datahub_frontend_url(self):
         """Return the url to the Data Hub frontend order page."""
         return f'{settings.DATAHUB_FRONTEND_BASE_URL}/omis/{self.pk}'
+
+    @transaction.atomic
+    def generate_quote(self, quote_data):
+        """
+        Generate a quote for this order if possible or raise
+
+        :raises rest_framework.exceptions.ValidationError: in case of validation error
+        :raises datahub.omis.core.exceptions.Conflict: in case of errors with the state of the
+            current order
+        :raises RuntimeError: after trying max_retries times without being able to generate a
+            valid value for the quote reference
+        """
+        for validator in [
+            validators.OrderDetailsFilledInValidator(),
+            validators.NoOtherActiveQuoteExistsValidator()
+        ]:
+            validator.set_instance(self)
+            validator()
+
+        quote = Quote(
+            **quote_data,
+            reference=Quote.generate_reference(self),
+            content=Quote.generate_content(self)
+        )
+        quote.save()
+
+        self.quote = quote
+        self.save()
 
 
 class OrderSubscriber(BaseModel):

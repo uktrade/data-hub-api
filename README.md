@@ -144,12 +144,12 @@ Dependencies:
 10. Optionally, you can load some test data and update elasticsearch:
 
     ```shell
-    ./manage.py loaddata /app/fixtures/test_data.yaml
+    ./manage.py loaddata fixtures/test_data.yaml
 
     ./manage.py sync_es
     ```
 
-11.  Start the server:
+11. Start the server:
 
     ```shell
     ./manage.py runserver

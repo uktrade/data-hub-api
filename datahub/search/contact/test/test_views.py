@@ -215,8 +215,8 @@ class TestBasicSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
-        assert response.data['contacts'][0]['first_name'] in term
-        assert response.data['contacts'][0]['last_name'] in term
+        assert response.data['results'][0]['first_name'] in term
+        assert response.data['results'][0]['last_name'] in term
         assert [{'count': 1, 'entity': 'contact'}] == response.data['aggregations']
 
     def test_basic_search_contact_notes(self, setup_es, setup_data):
@@ -236,7 +236,7 @@ class TestBasicSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
-        assert response.data['contacts'][0]['notes'] == contact.notes
+        assert response.data['results'][0]['notes'] == contact.notes
 
     def test_search_contact_has_sector(self, setup_es, setup_data):
         """Tests if contact has a sector."""

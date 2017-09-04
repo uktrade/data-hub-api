@@ -1,5 +1,3 @@
-"""Model instance factories for order tests."""
-
 import uuid
 
 import factory
@@ -7,6 +5,8 @@ import factory
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import Country, Sector
 from datahub.core.test.factories import to_many_field
+
+from datahub.omis.quote.test.factories import QuoteFactory
 
 from ..models import ServiceType
 
@@ -42,6 +42,12 @@ class OrderFactory(factory.django.DjangoModelFactory):
 
     class Meta:  # noqa: D101
         model = 'order.Order'
+
+
+class OrderWithOpenQuoteFactory(OrderFactory):
+    """Order factory with an active quote."""
+
+    quote = factory.SubFactory(QuoteFactory)
 
 
 class OrderSubscriberFactory(factory.django.DjangoModelFactory):

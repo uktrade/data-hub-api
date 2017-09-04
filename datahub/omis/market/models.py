@@ -7,7 +7,11 @@ from datahub.metadata.models import Country
 class Market(DisableableModel):
     """OMIS Market."""
 
-    country = models.OneToOneField(Country, primary_key=True)
+    country = models.OneToOneField(
+        Country,
+        primary_key=True,
+        on_delete=models.CASCADE
+    )
     manager_email = models.EmailField(blank=True)
 
     class Meta:  # noqa: D101
