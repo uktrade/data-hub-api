@@ -1,5 +1,8 @@
 from django.http import Http404
 
+from rest_framework import status
+from rest_framework.response import Response
+
 from datahub.core.viewsets import CoreViewSetV3
 
 from datahub.omis.order.models import Order
@@ -16,6 +19,15 @@ class QuoteViewSet(CoreViewSetV3):
     expanded_serializer_class = ExpandedQuoteSerializer
 
     order_lookup_url_kwarg = 'order_pk'
+
+    def preview(self, request, *args, **kwargs):
+        """
+        Same as `create` but without actually saving the changes.
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.preview()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get_order(self):
         """
@@ -47,7 +59,7 @@ class QuoteViewSet(CoreViewSetV3):
         This can be implicit from the action or explicitly requested with the
         `expand` query param.
         """
-        if self.action == 'create':
+        if self.action in ('create', 'preview'):
             return True
 
         param_serializer = ExpandParamSerializer(data=self.request.GET)

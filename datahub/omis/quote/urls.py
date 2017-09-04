@@ -12,4 +12,9 @@ urlpatterns = [
         }),
         name='item'
     ),
+    url(
+        r'^order/(?P<order_pk>[0-9a-z-]{36})/quote/preview$',
+        QuoteViewSet.as_view({'post': 'preview'}),
+        name='preview'
+    ),
 ]
