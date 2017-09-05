@@ -1,3 +1,5 @@
+from operator import itemgetter
+
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -74,6 +76,11 @@ class TestEventViews(APITestMixin):
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
+
+        # The teams are returned in an undefined order, so we sort them here for the
+        # comparison below
+        response_data['teams'].sort(key=itemgetter('id'))
+
         assert response_data == {
             'id': response_data['id'],
             'name': 'Grand exhibition',
@@ -108,11 +115,11 @@ class TestEventViews(APITestMixin):
                 'name': Team.crm.value.name,
             },
             'teams': [{
-                'id': Team.crm.value.id,
-                'name': Team.crm.value.name,
-            }, {
                 'id': Team.healthcare_uk.value.id,
                 'name': Team.healthcare_uk.value.name,
+            }, {
+                'id': Team.crm.value.id,
+                'name': Team.crm.value.name,
             }],
             'related_programmes': [{
                 'id': Programme.great_branded.value.id,
