@@ -8,7 +8,9 @@ from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import APITestMixin
 from datahub.omis.order.models import Order
-from datahub.omis.order.test.factories import OrderFactory, OrderWithOpenQuoteFactory
+from datahub.omis.order.test.factories import (
+    OrderFactory, OrderWithCancelledQuoteFactory, OrderWithOpenQuoteFactory
+)
 
 from ..models import Quote
 
@@ -70,9 +72,14 @@ class TestCreatePreviewOrder(APITestMixin):
         }
 
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
-    def test_create_success(self):
+    @pytest.mark.parametrize(
+        'OrderFactoryClass',  # noqa: N803
+        (OrderFactory, OrderWithCancelledQuoteFactory)
+    )
+    def test_create_success(self, OrderFactoryClass):
         """Test a successful call to create a quote."""
-        order = OrderFactory()
+        order = OrderFactoryClass()
+        orig_quote = order.quote
 
         url = reverse('api-v3:omis:quote:item', kwargs={'order_pk': order.pk})
         response = self.api_client.post(url, format='json')
@@ -87,11 +94,13 @@ class TestCreatePreviewOrder(APITestMixin):
                 'first_name': self.user.first_name,
                 'last_name': self.user.last_name,
                 'name': self.user.name
-            }
+            },
+            'cancelled_on': None,
+            'cancelled_by': None,
         }
 
-        quote = Quote.objects.first()
-        assert order.quote == quote
+        assert order.quote
+        assert order.quote != orig_quote
 
     def test_create_as_atomic_operation(self):
         """
@@ -112,12 +121,17 @@ class TestCreatePreviewOrder(APITestMixin):
         assert not order.quote
         assert not Quote.objects.count()
 
-    def test_preview_success(self):
+    @pytest.mark.parametrize(
+        'OrderFactoryClass',  # noqa: N803
+        (OrderFactory, OrderWithCancelledQuoteFactory)
+    )
+    def test_preview_success(self, OrderFactoryClass):
         """
         Test a successful call to preview a quote.
         Changes are not saved in the db.
         """
-        order = OrderFactory()
+        order = OrderFactoryClass()
+        orig_quote = order.quote
 
         url = reverse('api-v3:omis:quote:preview', kwargs={'order_pk': order.pk})
         response = self.api_client.post(url, format='json')
@@ -127,12 +141,13 @@ class TestCreatePreviewOrder(APITestMixin):
         assert response.json() == {
             'content': response.json()['content'],
             'created_on': None,
-            'created_by': None
+            'created_by': None,
+            'cancelled_on': None,
+            'cancelled_by': None,
         }
 
         order.refresh_from_db()
-        assert not order.quote
-        assert not Quote.objects.count()
+        assert order.quote == orig_quote
 
 
 class TestGetQuote(APITestMixin):
@@ -155,7 +170,8 @@ class TestGetQuote(APITestMixin):
                 'last_name': quote.created_by.last_name,
                 'name': quote.created_by.name
             },
-
+            'cancelled_on': None,
+            'cancelled_by': None,
         }
 
     def test_get_expanded(self):
@@ -179,7 +195,9 @@ class TestGetQuote(APITestMixin):
                 'last_name': quote.created_by.last_name,
                 'name': quote.created_by.name
             },
-            'content': quote.content
+            'content': quote.content,
+            'cancelled_on': None,
+            'cancelled_by': None,
         }
 
     def test_400_with_invalid_expand_value(self):
@@ -216,3 +234,97 @@ class TestGetQuote(APITestMixin):
         response = self.api_client.get(url, format='json')
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+class TestCancelOrder(APITestMixin):
+    """Tests for cancelling a quote."""
+
+    def test_404_if_order_doesnt_exist(self):
+        """Test that if the order doesn't exist, the endpoint returns 404."""
+        url = reverse(
+            f'api-v3:omis:quote:cancel',
+            kwargs={'order_pk': uuid.uuid4()}
+        )
+        response = self.api_client.post(url, format='json')
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_without_quote(self):
+        """Test that if the order doesn't have any quote, the endpoint returns 404."""
+        order = OrderFactory()
+
+        url = reverse(
+            f'api-v3:omis:quote:cancel',
+            kwargs={'order_pk': order.pk}
+        )
+        response = self.api_client.post(url, format='json')
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_with_open_quote(self):
+        """Test that if the quote is open, it gets cancelled."""
+        order = OrderWithOpenQuoteFactory()
+        quote = order.quote
+
+        url = reverse(
+            f'api-v3:omis:quote:cancel',
+            kwargs={'order_pk': order.pk}
+        )
+        with freeze_time('2017-07-12 13:00') as mocked_now:
+            response = self.api_client.post(url, format='json')
+
+            assert response.status_code == status.HTTP_200_OK
+            assert response.json() == {
+                'created_on': quote.created_on.isoformat(),
+                'created_by': {
+                    'id': str(quote.created_by.pk),
+                    'first_name': quote.created_by.first_name,
+                    'last_name': quote.created_by.last_name,
+                    'name': quote.created_by.name
+                },
+                'cancelled_on': mocked_now().isoformat(),
+                'cancelled_by': {
+                    'id': str(self.user.pk),
+                    'first_name': self.user.first_name,
+                    'last_name': self.user.last_name,
+                    'name': self.user.name
+                },
+            }
+
+            quote.refresh_from_db()
+            assert quote.is_cancelled()
+
+    def test_with_already_cancelled_quote(self):
+        """Test that if the quote is already cancelled, nothing happens."""
+        order = OrderWithCancelledQuoteFactory()
+        quote = order.quote
+
+        url = reverse(
+            f'api-v3:omis:quote:cancel',
+            kwargs={'order_pk': order.pk}
+        )
+
+        with freeze_time('2017-07-12 13:00') as mocked_now:
+            response = self.api_client.post(url, format='json')
+
+            assert response.status_code == status.HTTP_200_OK
+            assert response.json() == {
+                'created_on': quote.created_on.isoformat(),
+                'created_by': {
+                    'id': str(quote.created_by.pk),
+                    'first_name': quote.created_by.first_name,
+                    'last_name': quote.created_by.last_name,
+                    'name': quote.created_by.name
+                },
+                'cancelled_on': quote.cancelled_on.isoformat(),
+                'cancelled_by': {
+                    'id': str(quote.cancelled_by.pk),
+                    'first_name': quote.cancelled_by.first_name,
+                    'last_name': quote.cancelled_by.last_name,
+                    'name': quote.cancelled_by.name
+                },
+            }
+
+            quote.refresh_from_db()
+            assert quote.is_cancelled()
+            assert quote.cancelled_on != mocked_now()

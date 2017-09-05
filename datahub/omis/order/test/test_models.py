@@ -11,7 +11,12 @@ from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.core.exceptions import Conflict
 from datahub.omis.quote.models import Quote
 
-from .factories import OrderAssigneeFactory, OrderFactory
+from .factories import (
+    OrderAssigneeFactory,
+    OrderFactory,
+    OrderWithCancelledQuoteFactory,
+    OrderWithOpenQuoteFactory,
+)
 
 
 pytestmark = pytest.mark.django_db
@@ -126,6 +131,58 @@ class TestGenerateQuote:
         order.refresh_from_db()
         assert not order.quote
         assert not Quote.objects.count()
+
+
+class TestReopen:
+    """Tests for when an order is reopened."""
+
+    def test_without_quote(self):
+        """
+        Test that if an order without quote is reopened, nothing happens as
+        the order is already open.
+        """
+        order = OrderFactory()
+        assert not order.quote
+
+        order.reopen(by=AdviserFactory())
+        assert not order.quote
+
+    def test_with_active_quote(self):
+        """
+        Test that if an order with an active quote is reopened, the quote is cancelled.
+        """
+        order = OrderWithOpenQuoteFactory()
+        assert not order.quote.is_cancelled()
+
+        adviser = AdviserFactory()
+
+        with freeze_time('2017-07-12 13:00') as mocked_now:
+            order.reopen(by=adviser)
+
+            assert order.quote.is_cancelled()
+            assert order.quote.cancelled_by == adviser
+            assert order.quote.cancelled_on == mocked_now()
+
+    def test_with_already_cancelled_quote(self):
+        """
+        Test that if an order with an already cancelled quote is reopened, nothing happens.
+        """
+        order = OrderWithCancelledQuoteFactory()
+        assert order.quote.is_cancelled()
+        orig_cancelled_on = order.quote.cancelled_on
+        orig_cancelled_by = order.quote.cancelled_by
+
+        adviser = AdviserFactory()
+
+        with freeze_time('2017-07-12 13:00') as mocked_now:
+            order.reopen(by=adviser)
+
+            assert order.quote.is_cancelled()
+            assert order.quote.cancelled_by != adviser
+            assert order.quote.cancelled_on != mocked_now()
+
+            assert order.quote.cancelled_by == orig_cancelled_by
+            assert order.quote.cancelled_on == orig_cancelled_on
 
 
 class TestOrderAssignee:

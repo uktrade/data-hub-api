@@ -29,6 +29,16 @@ class QuoteViewSet(CoreViewSetV3):
         serializer.preview()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def cancel(self, request, *args, **kwargs):
+        """Cancel a quote."""
+        self.get_object()  # check if quote exists
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.cancel()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def get_order(self):
         """
         :returns: the main order from url kwargs.
@@ -80,4 +90,5 @@ class QuoteViewSet(CoreViewSetV3):
         return {
             **super().get_serializer_context(),
             'order': self.get_order(),
+            'current_user': self.request.user,
         }
