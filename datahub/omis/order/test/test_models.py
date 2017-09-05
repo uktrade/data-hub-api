@@ -115,6 +115,18 @@ class TestGenerateQuote:
         assert order.quote.reference
         assert order.quote.content
 
+    def test_without_committing(self):
+        """Test that a quote can be generated without saving its changes."""
+        order = OrderFactory()
+        order.generate_quote({}, commit=False)
+
+        assert order.quote.reference
+        assert order.quote.content
+
+        order.refresh_from_db()
+        assert not order.quote
+        assert not Quote.objects.count()
+
 
 class TestOrderAssignee:
     """Tests for the OrderAssignee model."""
