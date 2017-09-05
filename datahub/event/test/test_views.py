@@ -6,10 +6,87 @@ from rest_framework.reverse import reverse
 from datahub.core.constants import Country, Team
 from datahub.core.test_utils import APITestMixin
 from datahub.event.constants import EventType, LocationType, Programme
+from datahub.event.test.factories import EventFactory
 
 
-class TestEventViews(APITestMixin):
-    """Event view tests."""
+class TestGetEventView(APITestMixin):
+    """Get single event view tests."""
+
+    def test_get(self):
+        """Test getting a single event."""
+        event = EventFactory()
+        url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
+
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = _get_canonical_response_data(response)
+        expected_response_data = _canonicalise_response_data({
+            'id': response_data['id'],
+            'name': event.name,
+            'event_type': {
+                'id': str(event.event_type.id),
+                'name': str(event.event_type.name),
+            },
+            'start_date': event.start_date,
+            'end_date': event.end_date,
+            'location_type': {
+                'id': str(event.location_type.id),
+                'name': event.location_type.name,
+            },
+            'notes': event.notes,
+            'address_1': event.address_1,
+            'address_2': event.address_2,
+            'address_town': event.address_town,
+            'address_county': event.address_county,
+            'address_postcode': event.address_postcode,
+            'address_country': {
+                'id': str(event.address_country.id),
+                'name': event.address_country.name,
+            },
+            'organiser': {
+                'id': str(event.organiser.pk),
+                'first_name': event.organiser.first_name,
+                'last_name': event.organiser.last_name,
+                'name': event.organiser.name,
+            },
+            'lead_team': {
+                'id': str(event.lead_team.id),
+                'name': event.lead_team.name,
+            },
+            'teams': [{
+                'id': Team.healthcare_uk.value.id,
+                'name': Team.healthcare_uk.value.name,
+            }, {
+                'id': Team.crm.value.id,
+                'name': Team.crm.value.name,
+            }],
+            'related_programmes': [{
+                'id': Programme.great_branded.value.id,
+                'name': Programme.great_branded.value.name,
+            }]
+        })
+
+        assert response_data == expected_response_data
+
+
+class TestListEventView(APITestMixin):
+    """List events view tests."""
+
+    def test_list(self):
+        """Tests listing events."""
+        EventFactory.create_batch(2)
+        url = reverse('api-v3:event:collection')
+
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+
+        assert response_data['count'] == 2
+
+
+class TestCreateEventView(APITestMixin):
+    """Create event view tests."""
 
     def test_create_minimal_success(self):
         """Tests successfully creating an event with only the required fields."""
@@ -24,7 +101,7 @@ class TestEventViews(APITestMixin):
         response = self.api_client.post(url, format='json', data=request_data)
 
         assert response.status_code == status.HTTP_201_CREATED
-        response_data = response.json()
+        response_data = _get_canonical_response_data(response)
         assert response_data == {
             'id': response_data['id'],
             'name': 'Grand exhibition',
@@ -75,11 +152,7 @@ class TestEventViews(APITestMixin):
         response = self.api_client.post(url, format='json', data=request_data)
 
         assert response.status_code == status.HTTP_201_CREATED
-        response_data = response.json()
-
-        # The teams are returned in an undefined order, so we sort them here for the
-        # comparison below
-        response_data['teams'].sort(key=itemgetter('id'))
+        response_data = _get_canonical_response_data(response)
 
         assert response_data == {
             'id': response_data['id'],
@@ -106,9 +179,9 @@ class TestEventViews(APITestMixin):
             },
             'organiser': {
                 'id': str(self.user.pk),
-                'first_name': str(self.user.first_name),
-                'last_name': str(self.user.last_name),
-                'name': str(self.user.name),
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'name': self.user.name,
             },
             'lead_team': {
                 'id': Team.crm.value.id,
@@ -223,3 +296,15 @@ class TestEventViews(APITestMixin):
             'event_type': ['This field may not be null.'],
             'name': ['This field may not be blank.']
         }
+
+
+def _get_canonical_response_data(response):
+    return _canonicalise_response_data(response.json())
+
+
+def _canonicalise_response_data(response_data):
+    # The teams are returned in an undefined order, so we sort them here to allow
+    # full comparisons
+    response_data['teams'].sort(key=itemgetter('id'))
+    response_data['related_programmes'].sort(key=itemgetter('id'))
+    return response_data
