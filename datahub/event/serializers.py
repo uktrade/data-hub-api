@@ -1,3 +1,4 @@
+from django.utils.translation import ugettext_lazy
 from rest_framework import serializers
 
 from datahub.company.serializers import NestedAdviserField
@@ -9,7 +10,9 @@ from datahub.event.models import Event
 class EventSerializer(serializers.ModelSerializer):
     """Event serialiser."""
 
-    _lead_team_error_text = 'Lead team must be in teams array.'
+    default_error_messages = {
+        'lead_team_not_in_teams': ugettext_lazy('Lead team must be in teams array.'),
+    }
 
     event_type = NestedRelatedField('event.EventType')
     location_type = NestedRelatedField('event.LocationType', required=False, allow_null=True)
@@ -29,7 +32,7 @@ class EventSerializer(serializers.ModelSerializer):
 
         if lead_team and lead_team not in teams:
             raise serializers.ValidationError({
-                'lead_team': self._lead_team_error_text
+                'lead_team': self.error_messages['lead_team_not_in_teams']
             })
 
         return data
