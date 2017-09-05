@@ -90,7 +90,7 @@ class TestGenerateQuote:
 
         order = OrderFactory()
         with pytest.raises(ValidationError):
-            order.generate_quote({})
+            order.generate_quote(by=None)
 
     @mock.patch('datahub.omis.order.models.validators')
     def test_fails_if_theres_already_an_active_quote(self, validators):
@@ -99,7 +99,7 @@ class TestGenerateQuote:
 
         order = OrderFactory()
         with pytest.raises(Conflict):
-            order.generate_quote({})
+            order.generate_quote(by=None)
 
     def test_atomicity(self):
         """Test that if there's a problem with saving the order, the quote is not saved either."""
@@ -108,22 +108,24 @@ class TestGenerateQuote:
         order.save.side_effect = Exception()
 
         with pytest.raises(Exception):
-            order.generate_quote({})
+            order.generate_quote(by=None)
         assert not Quote.objects.count()
 
     def test_success(self):
         """Test that a quote can be generated."""
         order = OrderFactory()
-        order.generate_quote({})
+        adviser = AdviserFactory()
+        order.generate_quote(by=adviser)
 
         assert order.quote.pk
         assert order.quote.reference
         assert order.quote.content
+        assert order.quote.created_by == adviser
 
     def test_without_committing(self):
         """Test that a quote can be generated without saving its changes."""
         order = OrderFactory()
-        order.generate_quote({}, commit=False)
+        order.generate_quote(by=AdviserFactory(), commit=False)
 
         assert order.quote.reference
         assert order.quote.content
