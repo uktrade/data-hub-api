@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import DataCombiner
 from datahub.event.models import Event
@@ -12,6 +13,7 @@ class EventSerializer(serializers.ModelSerializer):
 
     event_type = NestedRelatedField('event.EventType')
     location_type = NestedRelatedField('event.LocationType', required=False, allow_null=True)
+    organiser = NestedAdviserField(required=False, allow_null=True)
     lead_team = NestedRelatedField('metadata.Team', required=False, allow_null=True)
     teams = NestedRelatedField('metadata.Team', many=True, required=False, allow_empty=True)
     address_country = NestedRelatedField('metadata.Country')
@@ -55,6 +57,7 @@ class EventSerializer(serializers.ModelSerializer):
             'location_type',
             'name',
             'notes',
+            'organiser',
             'related_programmes',
             'start_date',
             'teams',
