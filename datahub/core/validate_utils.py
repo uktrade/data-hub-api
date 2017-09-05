@@ -140,7 +140,7 @@ class DataCombiner:
             return self.data[field_name]
         if self.instance:
             return getattr(self.instance, field_name).all()
-        return None
+        return ()
 
     def get_value_id(self, field_name):
         """Returns the ID of foreign keys."""
