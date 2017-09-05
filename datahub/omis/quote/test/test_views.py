@@ -141,7 +141,12 @@ class TestCreatePreviewOrder(APITestMixin):
         assert response.json() == {
             'content': response.json()['content'],
             'created_on': None,
-            'created_by': None,
+            'created_by': {
+                'id': str(self.user.pk),
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'name': self.user.name
+            },
             'cancelled_on': None,
             'cancelled_by': None,
         }
