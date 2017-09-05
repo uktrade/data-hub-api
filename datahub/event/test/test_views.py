@@ -147,6 +147,45 @@ class TestEventViews(APITestMixin):
             'lead_team': ['Lead team must be in teams array.']
         }
 
+    def test_create_end_date_without_start_date(self):
+        """Tests specifying an end date without a start date."""
+        url = reverse('api-v3:event:collection')
+        request_data = {
+            'name': 'Grand exhibition',
+            'event_type': EventType.seminar.value.id,
+            'address_1': 'Grand Court Exhibition Centre',
+            'address_town': 'London',
+            'address_country': Country.united_kingdom.value.id,
+            'end_date': '2020-01-01',
+        }
+        response = self.api_client.post(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'end_date': ['Cannot have an end date without a start date.']
+        }
+
+    def test_create_end_date_before_start_date(self):
+        """Tests specifying an end date before the start date."""
+        url = reverse('api-v3:event:collection')
+        request_data = {
+            'name': 'Grand exhibition',
+            'event_type': EventType.seminar.value.id,
+            'address_1': 'Grand Court Exhibition Centre',
+            'address_town': 'London',
+            'address_country': Country.united_kingdom.value.id,
+            'start_date': '2020-01-02',
+            'end_date': '2020-01-01',
+        }
+        response = self.api_client.post(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'end_date': ['End date cannot be before start date.']
+        }
+
     def test_create_omitted_failure(self):
         """Tests creating an event without required fields."""
         url = reverse('api-v3:event:collection')
