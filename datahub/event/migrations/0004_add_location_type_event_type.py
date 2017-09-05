@@ -38,11 +38,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='event',
             name='event_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='event.EventType'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='event.EventType'),
         ),
         migrations.AlterField(
             model_name='event',
             name='location_type',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='event.LocationType'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='event.LocationType'),
         ),
     ]
