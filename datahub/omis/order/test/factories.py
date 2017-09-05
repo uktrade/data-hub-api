@@ -6,7 +6,7 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.core.constants import Country, Sector
 from datahub.core.test.factories import to_many_field
 
-from datahub.omis.quote.test.factories import QuoteFactory
+from datahub.omis.quote.test.factories import CancelledQuoteFactory, QuoteFactory
 
 from ..models import ServiceType
 
@@ -48,6 +48,12 @@ class OrderWithOpenQuoteFactory(OrderFactory):
     """Order factory with an active quote."""
 
     quote = factory.SubFactory(QuoteFactory)
+
+
+class OrderWithCancelledQuoteFactory(OrderFactory):
+    """Order factory with a cancelled quote."""
+
+    quote = factory.SubFactory(CancelledQuoteFactory)
 
 
 class OrderSubscriberFactory(factory.django.DjangoModelFactory):

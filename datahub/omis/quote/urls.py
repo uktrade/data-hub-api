@@ -17,4 +17,9 @@ urlpatterns = [
         QuoteViewSet.as_view({'post': 'preview'}),
         name='preview'
     ),
+    url(
+        r'^order/(?P<order_pk>[0-9a-z-]{36})/quote/cancel$',
+        QuoteViewSet.as_view({'post': 'cancel'}),
+        name='cancel'
+    ),
 ]
