@@ -40,8 +40,9 @@ class BasicQuoteSerializer(serializers.ModelSerializer):
     def create(self, validated_data, commit=True):
         """Call `order.generate_quote` instead of creating the object directly."""
         order = self.context['order']
+        current_user = self.context['current_user']
 
-        order.generate_quote(validated_data, commit=commit)
+        order.generate_quote(by=current_user, commit=commit)
         return order.quote
 
     class Meta:  # noqa: D101

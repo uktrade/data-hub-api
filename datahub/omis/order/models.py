@@ -153,12 +153,13 @@ class Order(BaseModel):
         return f'{settings.DATAHUB_FRONTEND_BASE_URL}/omis/{self.pk}'
 
     @transaction.atomic
-    def generate_quote(self, quote_data, commit=True):
+    def generate_quote(self, by, commit=True):
         """
+        Generate a new quote and assign it to the current order.
+
         :returns: a quote for this order
 
-        :param quote_data: extra quote data e.g. created_by etc.
-            This should not include content or reference which are generated on the fly
+        :param by: who made the action
         :param commit: if False, the changes will not be saved. Useful for previewing a quote
 
         :raises rest_framework.exceptions.ValidationError: in case of validation error
@@ -174,19 +175,12 @@ class Order(BaseModel):
             validator.set_instance(self)
             validator()
 
-        quote = Quote(
-            **quote_data,
-            reference=Quote.generate_reference(self),
-            content=Quote.generate_content(self)
-        )
-
-        if commit:
-            quote.save()
-
-        self.quote = quote
+        self.quote = Quote.objects.create_from_order(order=self, by=by, commit=commit)
 
         if commit:
             self.save()
+
+        return self.quote
 
     @transaction.atomic
     def reopen(self, by):
