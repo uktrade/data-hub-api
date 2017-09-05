@@ -13,10 +13,12 @@ class Event(BaseModel):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=MAX_LENGTH)
-    event_type = models.ForeignKey('EventType')
+    event_type = models.ForeignKey('EventType', on_delete=models.deletion.PROTECT)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
-    location_type = models.ForeignKey('LocationType', null=True, blank=True)
+    location_type = models.ForeignKey(
+        'LocationType', on_delete=models.deletion.SET_NULL, null=True, blank=True
+    )
     address_1 = models.CharField(max_length=MAX_LENGTH)
     address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
     address_town = models.CharField(max_length=MAX_LENGTH)
@@ -26,7 +28,9 @@ class Event(BaseModel):
         'metadata.Country', on_delete=models.PROTECT, related_name='+'
     )
     notes = models.TextField(blank=True)
-    organiser = models.ForeignKey('company.Advisor', null=True, blank=True)
+    organiser = models.ForeignKey(
+        'company.Advisor', on_delete=models.deletion.SET_NULL, null=True, blank=True
+    )
     lead_team = models.ForeignKey(
         'metadata.Team', on_delete=models.PROTECT, null=True, blank=True, related_name='+'
     )
