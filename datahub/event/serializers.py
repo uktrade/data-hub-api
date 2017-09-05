@@ -12,6 +12,9 @@ class EventSerializer(serializers.ModelSerializer):
 
     default_error_messages = {
         'lead_team_not_in_teams': ugettext_lazy('Lead team must be in teams array.'),
+        'end_date_without_start_date': ugettext_lazy('Cannot have an end date without a start '
+                                                     'date.'),
+        'end_date_before_start_date': ugettext_lazy('End date cannot be before start date.'),
     }
 
     event_type = NestedRelatedField('event.EventType')
@@ -26,14 +29,25 @@ class EventSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """Performs lead team/team cross-field validation."""
+        errors = {}
         combiner = DataCombiner(self.instance, data)
         lead_team = combiner.get_value('lead_team')
         teams = combiner.get_value_to_many('teams')
 
         if lead_team and lead_team not in teams:
-            raise serializers.ValidationError({
-                'lead_team': self.error_messages['lead_team_not_in_teams']
-            })
+            errors['lead_team'] = self.error_messages['lead_team_not_in_teams']
+
+        start_date = combiner.get_value('start_date')
+        end_date = combiner.get_value('end_date')
+
+        if end_date:
+            if not start_date:
+                errors['end_date'] = self.error_messages['end_date_without_start_date']
+            elif end_date < start_date:
+                errors['end_date'] = self.error_messages['end_date_before_start_date']
+
+        if errors:
+            raise serializers.ValidationError(errors)
 
         return data
 
