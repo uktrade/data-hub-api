@@ -26,6 +26,7 @@ class Event(BaseModel):
         'metadata.Country', on_delete=models.PROTECT, related_name='+'
     )
     notes = models.TextField(blank=True)
+    organiser = models.ForeignKey('company.Advisor', null=True, blank=True)
     lead_team = models.ForeignKey(
         'metadata.Team', on_delete=models.PROTECT, null=True, blank=True, related_name='+'
     )

@@ -43,6 +43,7 @@ class TestEventViews(APITestMixin):
                 'id': Country.united_kingdom.value.id,
                 'name': Country.united_kingdom.value.name,
             },
+            'organiser': None,
             'lead_team': None,
             'teams': [],
             'related_programmes': []
@@ -64,6 +65,7 @@ class TestEventViews(APITestMixin):
             'address_county': 'Londinium',
             'address_postcode': 'SW9 9AA',
             'address_country': Country.united_kingdom.value.id,
+            'organiser': str(self.user.pk),
             'lead_team': Team.crm.value.id,
             'teams': [Team.crm.value.id, Team.healthcare_uk.value.id],
             'related_programmes': [Programme.great_branded.value.id]
@@ -94,6 +96,12 @@ class TestEventViews(APITestMixin):
             'address_country': {
                 'id': Country.united_kingdom.value.id,
                 'name': Country.united_kingdom.value.name,
+            },
+            'organiser': {
+                'id': str(self.user.pk),
+                'first_name': str(self.user.first_name),
+                'last_name': str(self.user.last_name),
+                'name': str(self.user.name),
             },
             'lead_team': {
                 'id': Team.crm.value.id,
