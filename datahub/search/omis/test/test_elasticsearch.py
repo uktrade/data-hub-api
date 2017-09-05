@@ -85,6 +85,10 @@ def test_mapping(setup_es):
                     'format': 'strict_date_optional_time||epoch_millis',
                     'type': 'date'
                 },
+                'modified_on': {
+                    'format': 'strict_date_optional_time||epoch_millis',
+                    'type': 'date'
+                },
                 'primary_market': {
                     'properties': {
                         'id': {
@@ -271,6 +275,7 @@ def test_indexed_doc(setup_es):
                 for service_type in order.service_types.all()
             ],
             'created_on': order.created_on.isoformat(),
+            'modified_on': order.modified_on.isoformat(),
             'reference': order.reference,
             'description': order.description,
             'contacts_not_to_approach': order.contacts_not_to_approach,
