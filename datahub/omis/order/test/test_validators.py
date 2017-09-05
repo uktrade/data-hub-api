@@ -5,7 +5,11 @@ from rest_framework.exceptions import ValidationError
 
 from datahub.omis.core.exceptions import Conflict
 
-from .factories import OrderFactory, OrderWithOpenQuoteFactory
+from .factories import (
+    OrderFactory,
+    OrderWithCancelledQuoteFactory,
+    OrderWithOpenQuoteFactory,
+)
 
 from ..models import Order
 from ..validators import (
@@ -230,6 +234,18 @@ class TestNoOtherActiveQuoteExistsValidator:
     def test_without_any_active_quote(self):
         """Test that if there isn't any active quote, the validation passes."""
         order = OrderFactory()
+
+        validator = NoOtherActiveQuoteExistsValidator()
+        validator.set_instance(order)
+
+        try:
+            validator()
+        except Exception:
+            pytest.fail('Should not raise a validator error')
+
+    def test_with_cancelled_quote(self):
+        """Test that if there is a cancelled quote, the validation passes."""
+        order = OrderWithCancelledQuoteFactory()
 
         validator = NoOtherActiveQuoteExistsValidator()
         validator.set_instance(order)
