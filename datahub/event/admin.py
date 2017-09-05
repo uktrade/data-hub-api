@@ -26,5 +26,5 @@ class InvestmentProjectAdmin(BaseModelVersionAdmin):
     )
     raw_id_fields = (
         'lead_team',
-        'additional_teams',
+        'teams',
     )

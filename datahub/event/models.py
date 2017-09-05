@@ -29,7 +29,7 @@ class Event(BaseModel):
     lead_team = models.ForeignKey(
         'metadata.Team', on_delete=models.PROTECT, null=True, blank=True, related_name='+'
     )
-    additional_teams = models.ManyToManyField('metadata.Team', blank=True, related_name='+')
+    teams = models.ManyToManyField('metadata.Team', blank=True, related_name='+')
     related_programmes = models.ManyToManyField('Programme', blank=True)
 
     def __str__(self):
