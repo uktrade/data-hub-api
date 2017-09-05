@@ -1,12 +1,12 @@
 from django.contrib import admin
 
 from datahub.core.admin import BaseModelVersionAdmin
-from datahub.event.models import Event, Programme
+from datahub.event.models import Event, EventType, LocationType, Programme
 
 
-@admin.register(Programme)
-class ProgrammeAdmin(admin.ModelAdmin):
-    """Admin for programmes."""
+@admin.register(EventType, LocationType, Programme)
+class MetadataAdmin(admin.ModelAdmin):
+    """Admin for metadata models."""
 
     fields = ('name', )
     list_display = ('name', )
