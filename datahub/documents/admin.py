@@ -12,6 +12,8 @@ class DocumentsAdmin(admin.ModelAdmin):
     )
     raw_id_fields = (
         'archived_by',
+        'created_by',
+        'modified_by',
     )
     list_filter = (
         'av_clean',

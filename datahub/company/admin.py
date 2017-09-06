@@ -9,16 +9,37 @@ from .models import Advisor, CompaniesHouseCompany, Company, Contact
 class CompanyAdmin(BaseModelVersionAdmin):
     """Company admin."""
 
-    search_fields = ['name', 'id', 'company_number']
-    raw_id_fields = ('parent', 'one_list_account_owner', 'archived_by')
+    search_fields = (
+        'name',
+        'id',
+        'company_number',
+    )
+    raw_id_fields = (
+        'parent',
+        'one_list_account_owner',
+        'account_manager',
+        'archived_by',
+        'created_by',
+        'modified_by',
+    )
 
 
 @admin.register(Contact)
 class ContactAdmin(BaseModelVersionAdmin):
     """Contact admin."""
 
-    search_fields = ['first_name', 'last_name', 'company__name']
-    raw_id_fields = ('company', 'adviser', 'archived_by')
+    search_fields = (
+        'first_name',
+        'last_name',
+        'company__name'
+    )
+    raw_id_fields = (
+        'company',
+        'adviser',
+        'archived_by',
+        'created_by',
+        'modified_by',
+    )
 
 
 @admin.register(CompaniesHouseCompany)
