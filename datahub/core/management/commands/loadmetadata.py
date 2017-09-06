@@ -4,7 +4,29 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
 
-METADATA_FIXTURE_DIR = PurePath(__file__).parents[4] / 'fixtures/metadata'
+SOURCE_ROOT = PurePath(__file__).parents[4]
+SHARED_METADATA_FIXTURE_DIR = SOURCE_ROOT / 'fixtures' / 'metadata'
+EVENTS_FIXTURE_DIR = SOURCE_ROOT / 'datahub' / 'event' / 'fixtures'
+
+SHARED_FIXTURES = (
+    SHARED_METADATA_FIXTURE_DIR / 'companies.yaml',
+    SHARED_METADATA_FIXTURE_DIR / 'contacts.yaml',
+    SHARED_METADATA_FIXTURE_DIR / 'countries.yaml',
+    SHARED_METADATA_FIXTURE_DIR / 'interactions.yaml',
+    SHARED_METADATA_FIXTURE_DIR / 'investment.yaml',
+    SHARED_METADATA_FIXTURE_DIR / 'referrals.yaml',
+    SHARED_METADATA_FIXTURE_DIR / 'sectors.yaml',
+    SHARED_METADATA_FIXTURE_DIR / 'services.yaml',
+    SHARED_METADATA_FIXTURE_DIR / 'teams.yaml',
+    SHARED_METADATA_FIXTURE_DIR / 'titles.yaml',
+    SHARED_METADATA_FIXTURE_DIR / 'uk_regions.yaml',
+)
+
+EVENTS_FIXTURES = (
+    EVENTS_FIXTURE_DIR / 'programmes.yaml',
+    EVENTS_FIXTURE_DIR / 'location_types.yaml',
+    EVENTS_FIXTURE_DIR / 'event_types.yaml',
+)
 
 
 class Command(BaseCommand):
@@ -20,17 +42,6 @@ class Command(BaseCommand):
         """
         call_command(
             'loaddata',
-            *[
-                METADATA_FIXTURE_DIR / 'companies.yaml',
-                METADATA_FIXTURE_DIR / 'contacts.yaml',
-                METADATA_FIXTURE_DIR / 'countries.yaml',
-                METADATA_FIXTURE_DIR / 'interactions.yaml',
-                METADATA_FIXTURE_DIR / 'investment.yaml',
-                METADATA_FIXTURE_DIR / 'referrals.yaml',
-                METADATA_FIXTURE_DIR / 'sectors.yaml',
-                METADATA_FIXTURE_DIR / 'services.yaml',
-                METADATA_FIXTURE_DIR / 'teams.yaml',
-                METADATA_FIXTURE_DIR / 'titles.yaml',
-                METADATA_FIXTURE_DIR / 'uk_regions.yaml',
-            ]
+            *SHARED_FIXTURES,
+            *EVENTS_FIXTURES
         )

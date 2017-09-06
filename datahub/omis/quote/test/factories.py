@@ -1,6 +1,8 @@
 import uuid
 import factory
 
+from django.utils.timezone import now
+
 from datahub.company.test.factories import AdviserFactory
 
 
@@ -15,3 +17,10 @@ class QuoteFactory(factory.django.DjangoModelFactory):
 
     class Meta:  # noqa: D101
         model = 'omis-quote.Quote'
+
+
+class CancelledQuoteFactory(QuoteFactory):
+    """Cancelled Order factory."""
+
+    cancelled_on = now()
+    cancelled_by = factory.SubFactory(AdviserFactory)
