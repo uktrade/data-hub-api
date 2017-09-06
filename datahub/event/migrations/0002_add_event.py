@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ('address_2', models.CharField(blank=True, max_length=255)),
                 ('address_town', models.CharField(max_length=255)),
                 ('address_county', models.CharField(blank=True, max_length=255)),
-                ('address_postcode', models.CharField(max_length=255)),
+                ('address_postcode', models.CharField(blank=True, max_length=255)),
                 ('notes', models.TextField(blank=True)),
                 ('additional_teams', models.ManyToManyField(blank=True, related_name='_event_additional_teams_+', to='metadata.Team')),
                 ('address_country', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='metadata.Country')),

@@ -23,7 +23,7 @@ class Event(BaseModel):
     address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
     address_town = models.CharField(max_length=MAX_LENGTH)
     address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
-    address_postcode = models.CharField(max_length=MAX_LENGTH)
+    address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
     address_country = models.ForeignKey(
         'metadata.Country', on_delete=models.PROTECT, related_name='+'
     )
