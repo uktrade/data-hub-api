@@ -51,6 +51,7 @@ def test_order_to_dict():
             'last_name': order.created_by.last_name,
             'name': order.created_by.name
         },
+        'modified_on': order.modified_on,
         'reference': order.reference,
         'description': order.description,
         'contacts_not_to_approach': order.contacts_not_to_approach,

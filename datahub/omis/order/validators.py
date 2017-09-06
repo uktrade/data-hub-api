@@ -123,5 +123,5 @@ class NoOtherActiveQuoteExistsValidator:
 
     def __call__(self, data=None):
         """Validate that no other active quote exists."""
-        if self.instance.quote:
+        if self.instance.quote and not self.instance.quote.is_cancelled():
             raise Conflict(self.message)

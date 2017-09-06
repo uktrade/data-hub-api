@@ -15,6 +15,7 @@ class Order(DocType, MapDBModelToDict):
     contact = dsl_utils.contact_or_adviser_mapping('contact')
     created_by = dsl_utils.contact_or_adviser_mapping('created_by')
     created_on = Date()
+    modified_on = Date()
     primary_market = dsl_utils.id_name_mapping()
     sector = dsl_utils.id_name_mapping()
     description = dsl_utils.EnglishString()
@@ -44,7 +45,6 @@ class Order(DocType, MapDBModelToDict):
 
     IGNORED_FIELDS = (
         'modified_by',
-        'modified_on',
         'product_info',
         'further_info',
         'existing_agents',
