@@ -374,9 +374,6 @@
   pk: 766a9ab2-5d95-e211-a939-e4115bead28a
   fields: {name: Jamaica}
 - model: metadata.country
-  pk: 76756b9a-5d95-e211-a939-e4115bead28a
-  fields: {name: TEST}
-- model: metadata.country
   pk: 76af72a6-5d95-e211-a939-e4115bead28a
   fields: {name: Egypt}
 - model: metadata.country
@@ -502,9 +499,6 @@
 - model: metadata.country
   pk: 985f66a0-5d95-e211-a939-e4115bead28a
   fields: {name: Angola}
-- model: metadata.country
-  pk: 98c8d93d-5d06-e311-a78e-e4115bead28a
-  fields: {name: BLANK}
 - model: metadata.country
   pk: 995f66a0-5d95-e211-a939-e4115bead28a
   fields: {name: Anguilla}
