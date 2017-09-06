@@ -24,6 +24,8 @@ class Quote(BaseModel):
         related_name='+'
     )
 
+    expires_on = models.DateField()
+
     objects = QuoteManager()
 
     def cancel(self, by):

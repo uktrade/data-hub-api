@@ -3,21 +3,23 @@ from unittest import mock
 import pytest
 from dateutil.parser import parse as dateutil_parse
 from freezegun import freeze_time
+from rest_framework.exceptions import ValidationError
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.constants import Country
 from datahub.omis.order.test.factories import OrderFactory
 
-from ..utils import generate_quote_content, generate_quote_reference
+from ..utils import (
+    calculate_quote_expiry_date,
+    generate_quote_content,
+    generate_quote_reference
+)
 
 
 COMPILED_QUOTE_TEMPLATE = PurePath(__file__).parent / 'support/compiled_content.md'
 
 
-# mark the whole module for db use
-pytestmark = pytest.mark.django_db
-
-
+@pytest.mark.django_db
 class TestGenerateQuoteReference:
     """Tests for the generate_quote_reference logic."""
 
@@ -34,6 +36,7 @@ class TestGenerateQuoteReference:
         assert reference == 'ABC123/Q-DE4'
 
 
+@pytest.mark.django_db
 class TestGenerateQuoteContent:
     """Tests for the generate_quote_content logic."""
 
@@ -60,3 +63,50 @@ class TestGenerateQuoteContent:
             expected_content = f.read()
 
         assert content == expected_content
+
+
+class TestCalculateQuoteExpiryDate:
+    """Tests for the calculate_quote_expiry_date logic."""
+
+    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    def test_with_delivery_date_in_far_future(self):
+        """
+        Now = 18/04/2017
+        delivery date = 20/06/2017 (in 2 months)
+
+        Therefore expiry date = 18/05/2017 (in 30 days)
+        """
+        order = mock.MagicMock(
+            delivery_date=dateutil_parse('2017-06-20').date()
+        )
+        expiry_date = calculate_quote_expiry_date(order)
+        assert expiry_date == dateutil_parse('2017-05-18').date()
+
+    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    def test_with_close_delivery_date(self):
+        """
+        Now = 18/04/2017
+        delivery date = 11/05/2017 (in 23 days)
+
+        Therefore expiry date = 20/04/2017 (in 2 days)
+        """
+        order = mock.MagicMock(
+            delivery_date=dateutil_parse('2017-05-11').date()
+        )
+        expiry_date = calculate_quote_expiry_date(order)
+        assert expiry_date == dateutil_parse('2017-04-20').date()
+
+    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    def test_with_too_close_delivery_date(self):
+        """
+        Now = 18/04/2017
+        delivery date = 08/05/2017 (in 20 days)
+
+        Therefore expiry date would be passed so an exception is raised.
+        """
+        order = mock.MagicMock(
+            delivery_date=dateutil_parse('2017-05-08').date()
+        )
+
+        with pytest.raises(ValidationError):
+            calculate_quote_expiry_date(order)

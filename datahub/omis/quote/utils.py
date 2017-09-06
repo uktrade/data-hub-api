@@ -1,9 +1,14 @@
+from datetime import timedelta
 from pathlib import PurePath
 
 from django.template.loader import render_to_string
 from django.utils.crypto import get_random_string
+from django.utils.timezone import now
+from rest_framework.exceptions import ValidationError
 
 from datahub.omis.core.utils import generate_reference
+
+from .constants import QUOTE_EXPIRY_DAYS_BEFORE_DELIVERY, QUOTE_EXPIRY_DAYS_FROM_NOW
 
 
 QUOTE_TEMPLATE = PurePath(__file__).parent / 'templates/content.md'
@@ -33,3 +38,31 @@ def generate_quote_content(order):
         QUOTE_TEMPLATE,
         {'order': order}
     )
+
+
+def calculate_quote_expiry_date(order):
+    """
+    :returns: the calculated expiry date value for the quote attached to the order.
+        At the moment it's whichever is earliest of
+        [delivery date - x days] OR [date quote created + y days]
+    """
+    now_date = now().date()
+
+    x_days_before_delivery = (
+        order.delivery_date - timedelta(days=QUOTE_EXPIRY_DAYS_BEFORE_DELIVERY)
+    )
+
+    y_days_from_now = (
+        now_date + timedelta(days=QUOTE_EXPIRY_DAYS_FROM_NOW)
+    )
+
+    expiry_date = min(x_days_before_delivery, y_days_from_now)
+
+    if expiry_date < now_date:
+        raise ValidationError({
+            'delivery_date': [
+                'The calculated expiry date for the quote is in the past. '
+                'You might be able to fix this by changing the delivery date.'
+            ]
+        })
+    return expiry_date
