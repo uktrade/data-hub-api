@@ -58,7 +58,10 @@ class TestGenerateQuoteContent:
             description='lorem ipsum',
         )
 
-        content = generate_quote_content(order)
+        content = generate_quote_content(
+            order=order,
+            expires_on=dateutil_parse('2017-05-18').date()
+        )
         with open(COMPILED_QUOTE_TEMPLATE, 'r') as f:
             expected_content = f.read()
 
