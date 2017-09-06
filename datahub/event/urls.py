@@ -9,6 +9,7 @@ collection = EventViewSet.as_view({
 
 item = EventViewSet.as_view({
     'get': 'retrieve',
+    'patch': 'partial_update',
 })
 
 urlpatterns = [
