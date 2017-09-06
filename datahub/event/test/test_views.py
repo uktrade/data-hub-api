@@ -3,6 +3,7 @@ from operator import itemgetter
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import Country, Team
 from datahub.core.test_utils import APITestMixin
 from datahub.event.constants import EventType, LocationType, Programme
@@ -295,6 +296,115 @@ class TestCreateEventView(APITestMixin):
             'address_town': ['This field may not be blank.'],
             'event_type': ['This field may not be null.'],
             'name': ['This field may not be blank.']
+        }
+
+
+class TestUpdateEventView(APITestMixin):
+    """Update event view tests."""
+
+    def test_patch_all_fields(self):
+        """Test updating an event."""
+        event = EventFactory()
+        organiser = AdviserFactory()
+        url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
+
+        request_data = {
+            'name': 'Annual exhibition',
+            'event_type': EventType.exhibition.value.id,
+            'start_date': '2021-01-01',
+            'end_date': '2021-01-02',
+            'location_type': LocationType.post.value.id,
+            'notes': 'Updated notes',
+            'address_1': 'Annual Court Exhibition Centre',
+            'address_2': 'Annual Court Lane',
+            'address_town': 'Annual',
+            'address_county': 'County Annual',
+            'address_postcode': 'SW9 9AB',
+            'address_country': Country.isle_of_man.value.id,
+            'organiser': str(organiser.pk),
+            'lead_team': Team.food_from_britain.value.id,
+            'teams': [Team.food_from_britain.value.id, Team.healthcare_uk.value.id],
+            'related_programmes': [Programme.great_challenge_fund.value.id]
+        }
+        response = self.api_client.patch(url, request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = _get_canonical_response_data(response)
+
+        assert response_data == {
+            'id': str(event.pk),
+            'name': 'Annual exhibition',
+            'event_type': {
+                'id': EventType.exhibition.value.id,
+                'name': EventType.exhibition.value.name,
+            },
+            'start_date': '2021-01-01',
+            'end_date': '2021-01-02',
+            'location_type': {
+                'id': LocationType.post.value.id,
+                'name': LocationType.post.value.name,
+            },
+            'notes': 'Updated notes',
+            'address_1': 'Annual Court Exhibition Centre',
+            'address_2': 'Annual Court Lane',
+            'address_town': 'Annual',
+            'address_county': 'County Annual',
+            'address_postcode': 'SW9 9AB',
+            'address_country': {
+                'id': Country.isle_of_man.value.id,
+                'name': Country.isle_of_man.value.name,
+            },
+            'organiser': {
+                'id': str(organiser.pk),
+                'first_name': organiser.first_name,
+                'last_name': organiser.last_name,
+                'name': organiser.name,
+            },
+            'lead_team': {
+                'id': Team.food_from_britain.value.id,
+                'name': Team.food_from_britain.value.name,
+            },
+            'teams': [{
+                'id': Team.healthcare_uk.value.id,
+                'name': Team.healthcare_uk.value.name,
+            }, {
+                'id': Team.food_from_britain.value.id,
+                'name': Team.food_from_britain.value.name,
+            }],
+            'related_programmes': [{
+                'id': Programme.great_challenge_fund.value.id,
+                'name': Programme.great_challenge_fund.value.name,
+            }]
+        }
+
+    def test_patch_lead_team_success(self):
+        """Test updating an event's lead team."""
+        event = EventFactory()
+        url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
+
+        request_data = {
+            'lead_team': Team.healthcare_uk.value.id,
+        }
+        response = self.api_client.patch(url, request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = _get_canonical_response_data(response)
+        assert response_data['lead_team']['id'] == Team.healthcare_uk.value.id
+
+    def test_patch_lead_team_failure(self):
+        """Test updating an event's lead team to an invalid team."""
+        event = EventFactory()
+        url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
+
+        request_data = {
+            'lead_team': Team.food_from_britain.value.id,
+        }
+        response = self.api_client.patch(url, request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+        response_data = response.json()
+        assert response_data == {
+            'lead_team': ['Lead team must be in teams array.']
         }
 
 

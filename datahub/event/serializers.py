@@ -53,12 +53,6 @@ class EventSerializer(serializers.ModelSerializer):
 
     class Meta:  # noqa: D101
         model = Event
-        extra_kwargs = {
-            # As these don't have null=True, DRF defaults to required=True
-            'address_2': {'required': False},
-            'address_postcode': {'required': False},
-            'notes': {'required': False},
-        }
         fields = (
             'address_1',
             'address_2',
