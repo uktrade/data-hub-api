@@ -3,12 +3,12 @@ lxml==3.8.0
 cssselect==1.0.1
 
 # Django and django related
-Django==1.11.4
-djangorestframework==3.6.3
-django-environ==0.4.3
-django-extensions==1.8.1
+Django==1.11.5
+djangorestframework==3.6.4
+django-environ==0.4.4
+django-extensions==1.9.0
 django-filter==1.0.4
-django-reversion==2.0.9
+django-reversion==2.0.10
 django-pglocks==1.0.2
 django-model-utils==3.0.0
 django-mptt==0.8.7  # Remove after squashing migrations
@@ -21,9 +21,9 @@ pyquery==1.2.17
 python-dateutil==2.6.1
 
 # Persistency layer
-psycopg2==2.7.3
+psycopg2==2.7.3.1
 
-boto3==1.4.6
+boto3==1.4.7
 
 notifications-python-client==4.3.1
 
@@ -60,5 +60,5 @@ pydocstyle==2.0.0
 
 gunicorn==19.7.1
 raven==6.1.0
-requests==2.18.3
+requests==2.18.4
 requests_toolbelt==0.8.0
