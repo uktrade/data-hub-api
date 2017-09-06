@@ -22,6 +22,7 @@ class BasicQuoteSerializer(serializers.ModelSerializer):
     created_by = NestedAdviserField(read_only=True)
     cancelled_on = serializers.DateTimeField(read_only=True)
     cancelled_by = NestedAdviserField(read_only=True)
+    expires_on = serializers.DateTimeField(read_only=True)
 
     def preview(self):
         """Same as create but without saving the changes."""
@@ -52,6 +53,7 @@ class BasicQuoteSerializer(serializers.ModelSerializer):
             'created_by',
             'cancelled_on',
             'cancelled_by',
+            'expires_on',
         ]
 
 
