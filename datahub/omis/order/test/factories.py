@@ -1,6 +1,8 @@
+import datetime
 import uuid
-
 import factory
+
+from django.utils.timezone import now
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import Country, Sector
@@ -27,7 +29,9 @@ class OrderFactory(factory.django.DjangoModelFactory):
     further_info = factory.Faker('text')
     existing_agents = factory.Faker('text')
     permission_to_approach_contacts = factory.Faker('text')
-    delivery_date = factory.Faker('future_date')
+    delivery_date = factory.LazyFunction(
+        lambda: (now() + datetime.timedelta(days=60)).date()
+    )
     contact_email = factory.Faker('email')
     contact_phone = '+44 (0)7123 123456'
 
