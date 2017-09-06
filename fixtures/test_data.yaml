@@ -601,3 +601,49 @@
     dit_team: 197c51d4-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
     interaction_type: 70c226d7-5d95-e211-a939-e4115bead28a
+
+- model: event.event
+  pk: bda12a57-433c-4a0c-a7ce-5ebd080e09e8
+  fields:
+    name: Grand exhibition
+    event_type: 2fade471-e868-4ea9-b125-945eb90ae5d4
+    start_date: 2020-01-01
+    end_date: 2020-01-02
+    location_type: b71fa81c-0c22-44c6-ab6f-13b9e045dc10
+    notes: This is a dummy event for testing.
+    address_1: Grand Court Exhibition Centre
+    address_2: Grand Court Lane
+    address_town: London
+    address_county: Londinium
+    address_postcode: SW9 9AA
+    address_country: 80756b9a-5d95-e211-a939-e4115bead28a
+    organiser: e83a608e-84a4-11e6-ae22-56b6b6499611
+    lead_team: 18e84437-5a25-e511-b6bc-e4115bead28a
+    teams:
+      - 18e84437-5a25-e511-b6bc-e4115bead28a
+      - 8880da16-d80e-e611-9bdc-e4115bead28a
+    related_programmes:
+      - 1abe5563-6482-41d8-b566-6a9ee9e37c5f
+
+- model: event.event
+  pk: b93d4273-36fe-4008-ac40-fbc197910791
+  fields:
+    name: One-day exhibition
+    event_type: 2fade471-e868-4ea9-b125-945eb90ae5d4
+    start_date: 2021-01-01
+    end_date: ~
+    location_type: b71fa81c-0c22-44c6-ab6f-13b9e045dc10
+    notes: This is a dummy event for testing.
+    address_1: Day Court Exhibition Centre
+    address_2: Day Court Lane
+    address_town: China
+    address_county: ''
+    address_postcode: SW9 9AB
+    address_country: 63af72a6-5d95-e211-a939-e4115bead28a
+    organiser: 7bad8082-4978-4fe8-a018-740257f01637
+    lead_team: 5d4d24c2-9698-e211-a939-e4115bead28a
+    teams:
+      - 5d4d24c2-9698-e211-a939-e4115bead28a
+      - 4e4d24c2-9698-e211-a939-e4115bead28a
+    related_programmes:
+      - d352a68f-aaf4-4c43-b39d-9bca67a8322e
