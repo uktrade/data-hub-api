@@ -1,12 +1,10 @@
-Date: {% now "j F Y" %}
+Quote date: {% now "j F Y" %}
 
 Dear {{order.contact.name}}
 
-# Quote for the Provision of an Overseas Market Introduction Service: {{order.reference}}
+# Quote for the provision of an Overseas Market Introduction Service: {{order.reference}}
 
-Introduction copy.
-
-## 1.	Proposed Activities
+## 1.	Proposed activities
 
 DIT {{order.primary_market}} will aim to provide {{order.company.name}} (“the Customer”) with the following –
 
@@ -16,17 +14,17 @@ DIT {{order.primary_market}} will aim to provide {{order.company.name}} (“the 
 
 You shall pay DIT the Charge detailed below in the manner and at the times described in Section 4 below and in the Terms.
 
-Net Charge:			£ <0.00>
+Net Charge:			£<0.00>
 
-Net Payable:		£ <0.00>
+Net Payable:		£<0.00>
 
-## 3.	Acceptance of Quote and Delivery Date
+## 3.	Acceptance of quote and delivery date
 
-**Quote to be accepted by: {{expiry_date}}**
+**Quote to be accepted by: {{expires_on|date:"j F Y"}}**
 
 Work will commence on your acceptance of the Quote, Terms and Charges.  If acceptance is delayed for any reason, we may have to amend the delivery date for the Service.
 
-**Delivery Date: {{order.delivery_date|date:"j F Y"}}**
+**Delivery date: {{order.delivery_date|date:"j F Y"}}**
 
 On acceptance of the Quote, Terms and Charges, your first agreed activity will be delivered by the date indicated above.  If there is a necessity to change this date you will be notified and a new date agreed.
 
@@ -43,6 +41,3 @@ Payment can be made by a number of methods, of which details can be found on you
 Your use of OMIS is subject to DIT’s OMIS terms & conditions (“the Terms”).  Please read these carefully, available on the Website, before accepting the Quote.  Such an acceptance will signify your agreement to be bound by these Terms.
 
 Do not hesitate to contact me direct or your International Trade Adviser (ITA), Scottish Development International (SDI), Welsh Government (WG) or Invest Northern Ireland (INI) adviser if you have any further questions about this service.  We look forward to hearing from you soon and working with you to help expand your business.
-
-
-Yours sincerely
