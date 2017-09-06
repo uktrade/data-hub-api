@@ -30,13 +30,16 @@ def generate_quote_reference(order):
     return generate_reference(model=Quote, gen=gen, prefix=f'{order.reference}/Q-')
 
 
-def generate_quote_content(order):
+def generate_quote_content(order, expires_on):
     """
     :returns: the content of the quote populated with the given order details.
     """
     return render_to_string(
         QUOTE_TEMPLATE,
-        {'order': order}
+        {
+            'order': order,
+            'expires_on': expires_on,
+        }
     )
 
 
