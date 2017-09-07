@@ -64,7 +64,8 @@ def configure_connection():
     """Configure Elasticsearch default connection."""
     connections.configure(
         default={
-            'hosts': [settings.ES_URL]
+            'hosts': [settings.ES_URL],
+            'verify_certs': settings.ES_VERIFY_CERTS
         }
     )
 
