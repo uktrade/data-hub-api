@@ -111,10 +111,10 @@ class SearchAPIView(APIView):
         data = request.data.copy()
 
         # to support legacy paging parameters that can be in query_string
-        for legacy_query_params in ('limit', 'offset',):
-            if legacy_query_params in request.query_params \
-                    and legacy_query_params not in request.data:
-                data[legacy_query_params] = request.query_params[legacy_query_params]
+        for legacy_query_param in ('limit', 'offset',):
+            if legacy_query_param in request.query_params \
+                    and legacy_query_param not in request.data:
+                data[legacy_query_param] = request.query_params[legacy_query_param]
 
         serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
