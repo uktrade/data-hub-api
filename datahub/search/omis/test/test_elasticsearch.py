@@ -26,6 +26,10 @@ def test_mapping(setup_es):
                     'analyzer': 'lowercase_keyword_analyzer',
                     'type': 'string'
                 },
+                'status': {
+                    'analyzer': 'lowercase_keyword_analyzer',
+                    'type': 'string'
+                },
                 'company': {
                     'properties': {
                         'id': {
@@ -277,6 +281,7 @@ def test_indexed_doc(setup_es):
             'created_on': order.created_on.isoformat(),
             'modified_on': order.modified_on.isoformat(),
             'reference': order.reference,
+            'status': order.status,
             'description': order.description,
             'contacts_not_to_approach': order.contacts_not_to_approach,
             'delivery_date': order.delivery_date.isoformat(),

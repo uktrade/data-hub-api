@@ -11,11 +11,13 @@ from .factories import (
     OrderWithOpenQuoteFactory,
 )
 
+from ..constants import OrderStatus
 from ..models import Order
 from ..validators import (
     ContactWorksAtCompanyValidator,
     NoOtherActiveQuoteExistsValidator,
     OrderDetailsFilledInValidator,
+    OrderInStatusValidator,
     ReadonlyAfterCreationValidator,
 )
 
@@ -254,3 +256,45 @@ class TestNoOtherActiveQuoteExistsValidator:
             validator()
         except Exception:
             pytest.fail('Should not raise a validator error')
+
+
+@pytest.mark.django_db
+class TestOrderInStatusValidator:
+    """Tests for the OrderInStatusValidator."""
+
+    def test_validation_passes(self):
+        """
+        Test that the validation passes if order.status is one of the allowed statuses.
+        """
+        order = OrderFactory(status=OrderStatus.complete)
+
+        validator = OrderInStatusValidator(
+            allowed_statuses=(
+                OrderStatus.draft,
+                OrderStatus.complete,
+                OrderStatus.cancelled
+            )
+        )
+        validator.set_instance(order)
+
+        try:
+            validator()
+        except Exception:
+            pytest.fail('Should not raise a validator error')
+
+    def test_validation_fails(self):
+        """
+        Test that the validation fails if order.status is NOT one of the allowed statuses.
+        """
+        order = OrderFactory(status=OrderStatus.complete)
+
+        validator = OrderInStatusValidator(
+            allowed_statuses=(
+                OrderStatus.draft,
+                OrderStatus.cancelled
+            )
+        )
+        validator.set_instance(order)
+
+        with pytest.raises(Conflict):
+            validator()

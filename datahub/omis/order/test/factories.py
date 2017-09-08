@@ -10,6 +10,7 @@ from datahub.core.test.factories import to_many_field
 
 from datahub.omis.quote.test.factories import CancelledQuoteFactory, QuoteFactory
 
+from ..constants import OrderStatus
 from ..models import ServiceType
 
 
@@ -34,6 +35,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
     )
     contact_email = factory.Faker('email')
     contact_phone = '+44 (0)7123 123456'
+    status = OrderStatus.draft
 
     @to_many_field
     def service_types(self):
@@ -52,6 +54,7 @@ class OrderWithOpenQuoteFactory(OrderFactory):
     """Order factory with an active quote."""
 
     quote = factory.SubFactory(QuoteFactory)
+    status = OrderStatus.quote_awaiting_acceptance
 
 
 class OrderWithCancelledQuoteFactory(OrderFactory):

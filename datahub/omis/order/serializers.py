@@ -24,6 +24,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     id = serializers.UUIDField(read_only=True)
     reference = serializers.CharField(read_only=True)
+    status = serializers.CharField(read_only=True)
 
     created_on = serializers.DateTimeField(read_only=True)
     created_by = NestedRelatedField(Advisor, read_only=True)
@@ -56,6 +57,7 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'reference',
+            'status',
             'created_on',
             'created_by',
             'modified_on',
