@@ -9,7 +9,7 @@ class SearchInvestmentProjectAPIView(SearchAPIView):
     entity = InvestmentProject
     serializer_class = SearchInvestmentProjectSerializer
 
-    aggregations = True
+    include_aggregations = True
 
     FILTER_FIELDS = (
         'client_relationship_manager',

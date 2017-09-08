@@ -11,7 +11,7 @@ class LimitOffsetSerializer(serializers.Serializer):
 
 
 class SearchSerializer(LimitOffsetSerializer):
-    """Serialiser used to validate interaction search POST bodies."""
+    """Serialiser used to validate search POST bodies."""
 
     SORT_BY_FIELDS = []
 
