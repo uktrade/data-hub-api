@@ -7,5 +7,5 @@ class SearchOrderSerializer(SearchSerializer):
     DEFAULT_ORDERING = 'created_on:desc'
 
     SORT_BY_FIELDS = (
-        'created_on'
+        'created_on',
     )

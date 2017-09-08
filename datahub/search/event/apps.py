@@ -12,6 +12,7 @@ class EventSearchApp(SearchApp):
     view = SearchEventAPIView
     queryset = DBEvent.objects.prefetch_related(
         'address_country',
+        'event_type',
         'location_type',
         'organiser'
         'lead_team',

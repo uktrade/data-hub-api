@@ -9,8 +9,7 @@ from datahub.event.test.factories import EventFactory
 @pytest.fixture
 def setup_data():
     """Sets up data for the tests."""
-    EventFactory()
-    EventFactory()
+    EventFactory.create_batch(2)
 
 
 pytestmark = pytest.mark.django_db
@@ -82,7 +81,7 @@ class TestBasicSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] > 0
 
-    def test_events(self, setup_es, setup_data):
+    def test_aggregations(self, setup_es, setup_data):
         """Tests basic aggregate events query."""
         EventFactory(name='abcdefghijkl')
         EventFactory(name='abcdefghijkm')
