@@ -6,6 +6,8 @@ from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import APITestMixin
 
 from ..factories import OrderFactory, OrderSubscriberFactory
+from ...constants import OrderStatus
+
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
@@ -171,3 +173,38 @@ class TestChangeSubscriberList(APITestMixin):
         assert response.json() == [
             {}, {}, {'id': ['00000000-0000-0000-0000-000000000000 is not a valid adviser']},
         ]
+
+    @pytest.mark.parametrize(
+        'disallowed_status', (
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.quote_accepted,
+            OrderStatus.paid,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_409_if_order_not_in_draft(self, disallowed_status):
+        """
+        Test that if the order is not in one of the allowed statuses, the endpoint
+        returns 409.
+        """
+        order = OrderFactory(status=disallowed_status)
+
+        url = reverse(
+            'api-v3:omis:order:subscriber-list',
+            kwargs={'order_pk': order.id}
+        )
+
+        response = self.api_client.put(
+            url,
+            [{'id': AdviserFactory().id}],
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_409_CONFLICT
+        assert response.json() == {
+            'detail': (
+                'The action cannot be performed '
+                f'in the current status {OrderStatus[disallowed_status]}.'
+            )
+        }

@@ -43,7 +43,7 @@ class TestContactWorksAtCompanyValidator:
                 'company': company
             })
         except Exception:
-            pytest.fail('Should not raise a validator error')
+            pytest.fail('Should not raise a validator error.')
 
     def test_contact_not_from_company(self):
         """
@@ -83,7 +83,7 @@ class TestContactWorksAtCompanyValidator:
                 'main_company': company
             })
         except Exception:
-            pytest.fail('Should not raise a validator error')
+            pytest.fail('Should not raise a validator error.')
 
 
 class TestReadonlyAfterCreationValidator:
@@ -104,7 +104,7 @@ class TestReadonlyAfterCreationValidator:
                 'field2': 'some value',
             })
         except Exception:
-            pytest.fail('Should not raise a validator error')
+            pytest.fail('Should not raise a validator error.')
 
     def test_cannot_change_after_creation(self):
         """
@@ -143,7 +143,7 @@ class TestReadonlyAfterCreationValidator:
                 'field2': instance.field2,
             })
         except Exception:
-            pytest.fail('Should not raise a validator error')
+            pytest.fail('Should not raise a validator error.')
 
 
 @pytest.mark.django_db
@@ -199,7 +199,7 @@ class TestOrderDetailsFilledInValidator:
         try:
             validator()
         except Exception:
-            pytest.fail('Should not raise a validator error')
+            pytest.fail('Should not raise a validator error.')
 
     def test_complete_data(self):
         """Test that if the data for an order is complete, the validation passes."""
@@ -216,7 +216,7 @@ class TestOrderDetailsFilledInValidator:
                 'delivery_date': order.delivery_date,
             })
         except Exception:
-            pytest.fail('Should not raise a validator error')
+            pytest.fail('Should not raise a validator error.')
 
 
 @pytest.mark.django_db
@@ -243,7 +243,7 @@ class TestNoOtherActiveQuoteExistsValidator:
         try:
             validator()
         except Exception:
-            pytest.fail('Should not raise a validator error')
+            pytest.fail('Should not raise a validator error.')
 
     def test_with_cancelled_quote(self):
         """Test that if there is a cancelled quote, the validation passes."""
@@ -255,7 +255,7 @@ class TestNoOtherActiveQuoteExistsValidator:
         try:
             validator()
         except Exception:
-            pytest.fail('Should not raise a validator error')
+            pytest.fail('Should not raise a validator error.')
 
 
 @pytest.mark.django_db
@@ -280,7 +280,7 @@ class TestOrderInStatusValidator:
         try:
             validator()
         except Exception:
-            pytest.fail('Should not raise a validator error')
+            pytest.fail('Should not raise a validator error.')
 
     def test_validation_fails(self):
         """
@@ -298,3 +298,45 @@ class TestOrderInStatusValidator:
 
         with pytest.raises(Conflict):
             validator()
+
+    def test_set_instance_via_serializer_instance(self):
+        """
+        Test that seriaizer.set_context gets the order from serializer.instance.
+        """
+        order = Order()
+        serializer = mock.Mock(instance=order, context={})
+
+        validator = OrderInStatusValidator(allowed_statuses=())
+        validator.set_context(serializer)
+        assert validator.instance == order
+
+    def test_set_instance_via_serializer_context(self):
+        """
+        Test that seriaizer.set_context gets the order from serializer.context['order'].
+        """
+        order = Order()
+        serializer = mock.Mock(context={'order': order})
+
+        validator = OrderInStatusValidator(allowed_statuses=())
+        validator.set_context(serializer)
+        assert validator.instance == order
+
+    def test_order_not_required(self):
+        """
+        Test that if order_required == False and the order passed in is None,
+        the validation passes.
+        """
+        validator = OrderInStatusValidator(
+            allowed_statuses=(
+                OrderStatus.draft,
+                OrderStatus.complete,
+                OrderStatus.cancelled
+            ),
+            order_required=False
+        )
+        validator.set_instance(None)
+
+        try:
+            validator()
+        except Exception:
+            pytest.fail('Should not raise a validator error.')
