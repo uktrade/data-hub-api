@@ -191,6 +191,10 @@ def get_field_query(kind, field, value):
 def apply_aggs_query(search, aggregates):
     """Applies aggregates query to the search."""
     for aggregate in aggregates:
+        # skip range filters as we can't aggregate them
+        if any(aggregate.endswith(x) for x in ('_before', '_after')):
+            continue
+
         search_aggs = search.aggs
         if '.' in aggregate:
             search_aggs = search_aggs.bucket(
@@ -207,7 +211,7 @@ def get_search_by_entity_query(term=None,
                                entity=None,
                                ranges=None,
                                field_order=None,
-                               include_aggregations=False,
+                               aggregations=None,
                                offset=0,
                                limit=100):
     """Perform filtered search for given terms in given entity."""
@@ -241,8 +245,8 @@ def get_search_by_entity_query(term=None,
 
     s = s.post_filter('bool', must=must_filter)
 
-    if include_aggregations:
-        apply_aggs_query(s, filters.keys())
+    if aggregations:
+        apply_aggs_query(s, aggregations)
 
     return s[offset:offset + limit]
 

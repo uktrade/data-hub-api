@@ -128,7 +128,7 @@ class SearchAPIView(APIView):
             filters=filters,
             ranges=ranges,
             field_order=validated_data['sortby'],
-            include_aggregations=self.include_aggregations,
+            aggregations=(self.REMAP_FIELDS.get(field, field) for field in self.FILTER_FIELDS),
             offset=validated_data['offset'],
             limit=validated_data['limit'],
         ).execute()
