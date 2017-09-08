@@ -18,6 +18,8 @@ from .factories import (
     OrderWithOpenQuoteFactory,
 )
 
+from ..constants import OrderStatus
+
 
 pytestmark = pytest.mark.django_db
 
@@ -101,6 +103,22 @@ class TestGenerateQuote:
         with pytest.raises(Conflict):
             order.generate_quote(by=None)
 
+    @pytest.mark.parametrize(
+        'disallowed_status',
+        (
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.quote_accepted,
+            OrderStatus.paid,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_fails_if_order_not_in_draft(self, disallowed_status):
+        """Test that if the order is not in `draft`, a quote cannot be generated."""
+        order = OrderFactory(status=disallowed_status)
+        with pytest.raises(Conflict):
+            order.generate_quote(by=None)
+
     def test_atomicity(self):
         """Test that if there's a problem with saving the order, the quote is not saved either."""
         order = OrderFactory()
@@ -121,6 +139,7 @@ class TestGenerateQuote:
         assert order.quote.reference
         assert order.quote.content
         assert order.quote.created_by == adviser
+        assert order.status == OrderStatus.quote_awaiting_acceptance
 
     def test_without_committing(self):
         """Test that a quote can be generated without saving its changes."""
@@ -129,14 +148,34 @@ class TestGenerateQuote:
 
         assert order.quote.reference
         assert order.quote.content
+        assert order.status == OrderStatus.quote_awaiting_acceptance
 
         order.refresh_from_db()
         assert not order.quote
         assert not Quote.objects.count()
+        assert order.status == OrderStatus.draft
 
 
 class TestReopen:
     """Tests for when an order is reopened."""
+
+    @pytest.mark.parametrize('allowed_status', (
+        OrderStatus.draft,
+        OrderStatus.quote_awaiting_acceptance,
+        OrderStatus.quote_accepted,
+    ))
+    def test_ok_if_order_in_allowed_status(self, allowed_status):
+        """
+        Test that an order can be reopened if it's in one of the allowed statuses.
+        """
+        order = OrderFactory(status=allowed_status)
+
+        try:
+            order.reopen(by=AdviserFactory())
+        except Exception:
+            pytest.fail('Should not raise a validator error')
+
+        assert order.status == OrderStatus.draft
 
     def test_without_quote(self):
         """
@@ -148,6 +187,7 @@ class TestReopen:
 
         order.reopen(by=AdviserFactory())
         assert not order.quote
+        assert order.status == OrderStatus.draft
 
     def test_with_active_quote(self):
         """
@@ -164,6 +204,7 @@ class TestReopen:
             assert order.quote.is_cancelled()
             assert order.quote.cancelled_by == adviser
             assert order.quote.cancelled_on == mocked_now()
+            assert order.status == OrderStatus.draft
 
     def test_with_already_cancelled_quote(self):
         """
@@ -185,6 +226,24 @@ class TestReopen:
 
             assert order.quote.cancelled_by == orig_cancelled_by
             assert order.quote.cancelled_on == orig_cancelled_on
+
+            assert order.status == OrderStatus.draft
+
+    @pytest.mark.parametrize(
+        'disallowed_status',
+        (
+            OrderStatus.paid,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
+        """Test that if the order is in a disallowed status, it cannot be reopened."""
+        order = OrderFactory(status=disallowed_status)
+        with pytest.raises(Conflict):
+            order.reopen(by=None)
+
+        assert order.status == disallowed_status
 
 
 class TestOrderAssignee:

@@ -8,12 +8,15 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import APITestMixin
+from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.models import Order
 from datahub.omis.order.test.factories import (
     OrderFactory, OrderWithCancelledQuoteFactory, OrderWithOpenQuoteFactory
 )
 
+from .factories import QuoteFactory
 from ..models import Quote
+
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
@@ -46,6 +49,35 @@ class TestCreatePreviewOrder(APITestMixin):
 
         assert response.status_code == status.HTTP_409_CONFLICT
         assert response.json() == {'detail': "There's already an active quote."}
+
+    @pytest.mark.parametrize('quote_view_name', ('item', 'preview'))
+    @pytest.mark.parametrize('disallowed_status', (
+        OrderStatus.quote_awaiting_acceptance,
+        OrderStatus.quote_accepted,
+        OrderStatus.paid,
+        OrderStatus.complete,
+        OrderStatus.cancelled,
+    ))
+    def test_409_if_order_in_disallowed_status(self, quote_view_name, disallowed_status):
+        """
+        Test that if the order is not in one of the allowed statuses, the endpoint
+        returns 409.
+        """
+        order = OrderFactory(status=disallowed_status)
+
+        url = reverse(
+            f'api-v3:omis:quote:{quote_view_name}',
+            kwargs={'order_pk': order.pk}
+        )
+        response = self.api_client.post(url, format='json')
+
+        assert response.status_code == status.HTTP_409_CONFLICT
+        assert response.json() == {
+            'detail': (
+                'The action cannot be performed '
+                f'in the current status {OrderStatus[disallowed_status]}.'
+            )
+        }
 
     @pytest.mark.parametrize('quote_view_name', ('item', 'preview'))
     @pytest.mark.parametrize(
@@ -283,6 +315,36 @@ class TestCancelOrder(APITestMixin):
         response = self.api_client.post(url, format='json')
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    @pytest.mark.parametrize('disallowed_status', (
+        OrderStatus.paid,
+        OrderStatus.complete,
+        OrderStatus.cancelled,
+    ))
+    def test_409_if_order_in_disallowed_status(self, disallowed_status):
+        """
+        Test that if the order is not in one of the allowed statuses, the endpoint
+        returns 409.
+        """
+        quote = QuoteFactory()
+        order = OrderFactory(
+            status=disallowed_status,
+            quote=quote
+        )
+
+        url = reverse(
+            f'api-v3:omis:quote:cancel',
+            kwargs={'order_pk': order.pk}
+        )
+        response = self.api_client.post(url, format='json')
+
+        assert response.status_code == status.HTTP_409_CONFLICT
+        assert response.json() == {
+            'detail': (
+                'The action cannot be performed '
+                f'in the current status {OrderStatus[disallowed_status]}.'
+            )
+        }
 
     def test_without_quote(self):
         """Test that if the order doesn't have any quote, the endpoint returns 404."""

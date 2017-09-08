@@ -15,6 +15,7 @@ class ContactWorksAtCompanyValidator:
         """Set the fields."""
         self.contact_field = contact_field
         self.company_field = company_field
+        self.instance = None
 
     def set_context(self, serializer):
         """
@@ -46,6 +47,7 @@ class ReadonlyAfterCreationValidator:
     def __init__(self, fields):
         """Set the fields."""
         self.fields = fields
+        self.instance = None
 
     def set_context(self, serializer):
         """
@@ -80,6 +82,10 @@ class OrderDetailsFilledInValidator:
     )
 
     message = 'This field is required.'
+
+    def __init__(self):
+        """Constructor."""
+        self.instance = None
 
     def set_instance(self, instance):
         """Set the current instance."""
@@ -117,6 +123,10 @@ class NoOtherActiveQuoteExistsValidator:
 
     message = "There's already an active quote."
 
+    def __init__(self):
+        """Constructor."""
+        self.instance = None
+
     def set_instance(self, instance):
         """Set the current instance."""
         self.instance = instance
@@ -125,3 +135,32 @@ class NoOtherActiveQuoteExistsValidator:
         """Validate that no other active quote exists."""
         if self.instance.quote and not self.instance.quote.is_cancelled():
             raise Conflict(self.message)
+
+
+class OrderInStatusValidator:
+    """
+    Validator which checks that the order is in one of the given statuses.
+    """
+
+    message = 'The action cannot be performed in the current status {0}.'
+
+    def __init__(self, allowed_statuses):
+        """Constructor."""
+        self.allowed_statuses = allowed_statuses
+        self.instance = None
+
+    def set_instance(self, instance):
+        """Set the current instance."""
+        self.instance = instance
+
+    def __call__(self, data=None):
+        """Validate that the order is in one of the statuses."""
+        allowed = any(
+            self.instance.status == status
+            for status in self.allowed_statuses
+        )
+
+        if not allowed:
+            raise Conflict(
+                self.message.format(self.instance.get_status_display())
+            )
