@@ -30,6 +30,10 @@ def test_mapping(setup_es):
                     'analyzer': 'lowercase_keyword_analyzer',
                     'type': 'string'
                 },
+                'po_number': {
+                    'analyzer': 'lowercase_keyword_analyzer',
+                    'type': 'string'
+                },
                 'company': {
                     'properties': {
                         'id': {
@@ -301,5 +305,6 @@ def test_indexed_doc(setup_es):
                 }
                 for subscriber in order.assignees.all()
             ],
+            'po_number': order.po_number,
         }
     }

@@ -85,6 +85,7 @@ def test_order_to_dict():
             }
             for assignee in order.assignees.all()
         ],
+        'po_number': order.po_number,
     }
 
 
