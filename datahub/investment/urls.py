@@ -3,8 +3,8 @@
 from django.conf.urls import url
 
 from datahub.investment.views import (
-    IProjectAuditViewSet, IProjectDocumentViewSet, IProjectTeamMembersViewSet,
-    IProjectViewSet
+    IProjectAuditViewSet, IProjectDocumentViewSet, IProjectModifiedSinceViewSet,
+    IProjectTeamMembersViewSet, IProjectViewSet
 )
 
 project_collection = IProjectViewSet.as_view({
@@ -26,6 +26,10 @@ project_team_member_item = IProjectTeamMembersViewSet.as_view({
     'get': 'retrieve',
     'patch': 'partial_update',
     'delete': 'destroy'
+})
+
+project_modified_since_collection = IProjectModifiedSinceViewSet.as_view({
+    'get': 'list',
 })
 
 audit_item = IProjectAuditViewSet.as_view({
@@ -56,6 +60,8 @@ project_document_callback = IProjectDocumentViewSet.as_view({
 
 urlpatterns = [
     url(r'^investment$', project_collection, name='investment-collection'),
+    url(r'^investment/from$', project_modified_since_collection,
+        name='investment-modified-since-collection'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})$', project_item,
         name='investment-item'),
     url(r'^investment/(?P<pk>[0-9a-z-]{36})/archive$', archive_item,

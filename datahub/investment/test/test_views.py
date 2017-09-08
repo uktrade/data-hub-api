@@ -9,6 +9,7 @@ from unittest.mock import patch
 import pytest
 import reversion
 from django.utils.timezone import now
+from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 from reversion.models import Version
@@ -846,6 +847,44 @@ class TestUnifiedViews(APITestMixin):
         }
         assert response_data['team_members'] == []
         assert response_data['team_complete'] is True
+
+
+class TestModifiedSinceView(APITestMixin):
+    """Tests for the modified-since view."""
+
+    @pytest.mark.parametrize(
+        'timestamp,num_results', (
+            (datetime(2017, 12, 31), 5),
+            (datetime(2018, 1, 1), 5),
+            (datetime(2018, 1, 2), 0),
+        )
+    )
+    def test_get_modified_since_filter(self, timestamp: datetime, num_results: int):
+        """Test the that results are correctly filtered."""
+        with freeze_time(datetime(2017, 1, 1)):
+            InvestmentProjectFactory.create_batch(4)
+        with freeze_time(datetime(2018, 1, 1)):
+            InvestmentProjectFactory.create_batch(5)
+
+        url = reverse('api-v3:investment:investment-modified-since-collection')
+        response = self.api_client.get(url, data={
+            'time': timestamp.isoformat()
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == num_results
+
+    def test_get_all(self):
+        """Test that all results are returned if no filter value is provided."""
+        InvestmentProjectFactory.create_batch(4, modified_on=datetime(2017, 1, 1))
+        InvestmentProjectFactory.create_batch(5, modified_on=datetime(2018, 1, 1))
+        url = reverse('api-v3:investment:investment-modified-since-collection')
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 9
 
 
 class TestTeamMemberViews(APITestMixin):
