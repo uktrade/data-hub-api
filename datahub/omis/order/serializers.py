@@ -9,8 +9,13 @@ from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
 from datahub.metadata.models import Country, Sector, Team
 
 from datahub.omis.market.models import Market
+from .constants import OrderStatus
 from .models import Order, OrderAssignee, OrderSubscriber, ServiceType
-from .validators import ContactWorksAtCompanyValidator, ReadonlyAfterCreationValidator
+from .validators import (
+    ContactWorksAtCompanyValidator,
+    OrderInStatusValidator,
+    ReadonlyAfterCreationValidator
+)
 
 
 class ServiceTypeSerializer(ConstantModelSerializer):
@@ -80,7 +85,11 @@ class OrderSerializer(serializers.ModelSerializer):
         ]
         validators = [
             ContactWorksAtCompanyValidator(),
-            ReadonlyAfterCreationValidator(fields=('company', 'primary_market'))
+            ReadonlyAfterCreationValidator(fields=('company', 'primary_market')),
+            OrderInStatusValidator(
+                allowed_statuses=(OrderStatus.draft,),
+                order_required=False
+            )
         ]
 
     def validate_service_types(self, service_types):
@@ -137,6 +146,10 @@ def existing_adviser(adviser_id):
 class SubscribedAdviserListSerializer(serializers.ListSerializer):
     """DRF List serializer for OrderSubscriber(s)."""
 
+    default_validators = [
+        OrderInStatusValidator(allowed_statuses=(OrderStatus.draft,))
+    ]
+
     def save(self, **kwargs):
         """
         Overrides save as the logic is not the standard DRF one.
@@ -189,6 +202,10 @@ class SubscribedAdviserSerializer(serializers.Serializer):
 
 class OrderAssigneeListSerializer(serializers.ListSerializer):
     """DRF List serializer for OrderAssignee(s)."""
+
+    default_validators = [
+        OrderInStatusValidator(allowed_statuses=(OrderStatus.draft,))
+    ]
 
     def validate(self, data):
         """Validates the list of assignees."""
