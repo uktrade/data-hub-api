@@ -111,6 +111,8 @@ class Order(BaseModel):
         on_delete=models.SET_NULL
     )
 
+    po_number = models.CharField(max_length=100, blank=True)
+
     # legacy fields, only meant to be used in readonly mode as reference
     product_info = models.TextField(
         blank=True, editable=False,

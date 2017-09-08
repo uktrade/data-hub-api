@@ -76,6 +76,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'existing_agents',
             'permission_to_approach_contacts',
             'delivery_date',
+            'po_number',
         ]
         validators = [
             ContactWorksAtCompanyValidator(),
