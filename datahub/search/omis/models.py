@@ -10,7 +10,8 @@ class Order(DocType, MapDBModelToDict):
     """Elasticsearch representation of Order model."""
 
     id = String(index='not_analyzed')
-    reference = String(analyzer='lowercase_keyword_analyzer')
+    reference = dsl_utils.CaseInsensitiveKeywordString()
+    status = dsl_utils.CaseInsensitiveKeywordString()
     company = dsl_utils.id_name_mapping()
     contact = dsl_utils.contact_or_adviser_mapping('contact')
     created_by = dsl_utils.contact_or_adviser_mapping('created_by')

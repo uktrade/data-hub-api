@@ -13,6 +13,7 @@ from datahub.omis.market.models import Market
 
 from ..factories import OrderFactory
 
+from ...constants import OrderStatus
 from ...models import ServiceType
 
 
@@ -54,6 +55,7 @@ class TestAddOrderDetails(APITestMixin):
         assert response.json() == {
             'id': response.json()['id'],
             'reference': response.json()['reference'],
+            'status': OrderStatus.draft,
             'created_on': '2017-04-18T13:00:00',
             'created_by': {
                 'id': str(self.user.pk),
@@ -292,6 +294,7 @@ class TestChangeOrderDetails(APITestMixin):
         assert response.json() == {
             'id': str(order.pk),
             'reference': order.reference,
+            'status': OrderStatus.draft,
             'created_on': '2017-04-18T13:00:00',
             'created_by': {
                 'id': str(order.created_by.pk),
@@ -513,6 +516,7 @@ class TestChangeOrderDetails(APITestMixin):
         response = self.api_client.patch(
             url,
             {
+                'status': OrderStatus.complete,
                 'product_info': 'Updated product info',
                 'further_info': 'Updated further info',
                 'existing_agents': 'Updated existing agents',
@@ -524,6 +528,7 @@ class TestChangeOrderDetails(APITestMixin):
         )
 
         assert response.status_code == status.HTTP_200_OK
+        assert response.json()['status'] == OrderStatus.draft
         assert response.json()['product_info'] != 'Updated product info'
         assert response.json()['further_info'] != 'Updated further info'
         assert response.json()['existing_agents'] != 'Updated existing agents'
@@ -547,6 +552,7 @@ class TestViewOrderDetails(APITestMixin):
         assert response.json() == {
             'id': str(order.pk),
             'reference': order.reference,
+            'status': OrderStatus.draft,
             'created_on': order.created_on.isoformat(),
             'created_by': {
                 'id': str(order.created_by.pk),

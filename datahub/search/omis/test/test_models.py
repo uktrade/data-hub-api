@@ -53,6 +53,7 @@ def test_order_to_dict():
         },
         'modified_on': order.modified_on,
         'reference': order.reference,
+        'status': order.status,
         'description': order.description,
         'contacts_not_to_approach': order.contacts_not_to_approach,
         'delivery_date': order.delivery_date,
