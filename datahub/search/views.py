@@ -141,7 +141,7 @@ class SearchAPIView(APIView):
         if self.include_aggregations:
             aggregations = {}
             for field in self.FILTER_FIELDS:
-                es_field = elasticsearch.remap_filter_id_field(field)
+                es_field = self.REMAP_FIELDS.get(field, field)
                 if es_field in results.aggregations:
                     aggregation = results.aggregations[es_field]
                     if '.' in es_field:
