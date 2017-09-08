@@ -2,7 +2,7 @@ from ..serializers import SearchSerializer
 
 
 class SearchContactSerializer(SearchSerializer):
-    """Serialiser used to validate event search POST bodies."""
+    """Serialiser used to validate contact search POST bodies."""
 
     SORT_BY_FIELDS = (
         'address_country.name',

@@ -2,7 +2,7 @@ from ..serializers import SearchSerializer
 
 
 class SearchCompanySerializer(SearchSerializer):
-    """Serialiser used to validate event search POST bodies."""
+    """Serialiser used to validate company search POST bodies."""
 
     SORT_BY_FIELDS = (
         'account_manager.name',
