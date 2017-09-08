@@ -85,7 +85,7 @@ class SearchAPIView(APIView):
     serializer_class = SearchSerializer
     entity = None
 
-    aggregations = False
+    include_aggregations = False
 
     http_method_names = ('post',)
 
@@ -111,7 +111,11 @@ class SearchAPIView(APIView):
         data = request.data.copy()
 
         # to support legacy paging parameters that can be in query_string
-        data.update(request.query_params)
+        for legacy_query_params in ('limit', 'offset',):
+            if legacy_query_params in request.query_params \
+                    and legacy_query_params not in request.data:
+                data[legacy_query_params] = request.query_params[legacy_query_params]
+
         serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
@@ -124,7 +128,7 @@ class SearchAPIView(APIView):
             filters=filters,
             ranges=ranges,
             field_order=validated_data['sortby'],
-            aggs=self.FILTER_FIELDS,
+            include_aggregations=self.include_aggregations,
             offset=validated_data['offset'],
             limit=validated_data['limit'],
         ).execute()
@@ -134,7 +138,7 @@ class SearchAPIView(APIView):
             'results': [x.to_dict() for x in results.hits],
         }
 
-        if self.aggregations:
+        if self.include_aggregations:
             aggregations = {}
             for field in self.FILTER_FIELDS:
                 es_field = elasticsearch.remap_filter_id_field(field)

@@ -212,7 +212,7 @@ def get_search_by_entity_query(term=None,
                                entity=None,
                                ranges=None,
                                field_order=None,
-                               aggs=None,
+                               include_aggregations=False,
                                offset=0,
                                limit=100):
     """Perform filtered search for given terms in given entity."""
@@ -246,8 +246,8 @@ def get_search_by_entity_query(term=None,
 
     s = s.post_filter('bool', must=must_filter)
 
-    if aggs:
-        apply_aggs_query(s, aggs)
+    if include_aggregations:
+        apply_aggs_query(s, filters.keys())
 
     return s[offset:offset + limit]
 
