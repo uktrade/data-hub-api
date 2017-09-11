@@ -59,6 +59,7 @@ pep8-naming==0.4.1
 pydocstyle==2.0.0
 
 gunicorn==19.7.1
+gevent==1.2.2
 raven==6.1.0
 requests==2.18.4
 requests_toolbelt==0.8.0
