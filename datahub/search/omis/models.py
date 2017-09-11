@@ -27,6 +27,7 @@ class Order(DocType, MapDBModelToDict):
     contact_phone = dsl_utils.KeywordString()
     subscribers = dsl_utils.contact_or_adviser_mapping('subscribers', include_dit_team=True)
     assignees = dsl_utils.contact_or_adviser_mapping('assignees', include_dit_team=True)
+    po_number = dsl_utils.CaseInsensitiveKeywordString()
 
     MAPPINGS = {
         'id': str,
