@@ -14,7 +14,7 @@ class EventSearchApp(SearchApp):
         'address_country',
         'event_type',
         'location_type',
-        'organiser'
+        'organiser',
         'lead_team',
         'related_programmes',
         'teams',
