@@ -36,6 +36,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
     contact_email = factory.Faker('email')
     contact_phone = '+44 (0)7123 123456'
     status = OrderStatus.draft
+    po_number = factory.Faker('text', max_nb_chars=50)
 
     @to_many_field
     def service_types(self):
