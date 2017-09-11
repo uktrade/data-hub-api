@@ -542,6 +542,32 @@ class TestChangeOrderDetails(APITestMixin):
         assert response.json()['contact_email'] != 'updated-email@email.com'
         assert response.json()['contact_phone'] != '1234'
 
+    @pytest.mark.parametrize(
+        'disallowed_status', (
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.quote_accepted,
+            OrderStatus.paid,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_409_if_order_not_in_draft(self, disallowed_status):
+        """
+        Test that if the order is not in one of the allowed statuses, the endpoint
+        returns 409.
+        """
+        order = OrderFactory(status=disallowed_status)
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(url, {}, format='json')
+        assert response.status_code == status.HTTP_409_CONFLICT
+        assert response.json() == {
+            'detail': (
+                'The action cannot be performed '
+                f'in the current status {OrderStatus[disallowed_status]}.'
+            )
+        }
+
 
 class TestViewOrderDetails(APITestMixin):
     """View order details test case."""

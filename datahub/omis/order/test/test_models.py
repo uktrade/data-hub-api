@@ -173,7 +173,7 @@ class TestReopen:
         try:
             order.reopen(by=AdviserFactory())
         except Exception:
-            pytest.fail('Should not raise a validator error')
+            pytest.fail('Should not raise a validator error.')
 
         assert order.status == OrderStatus.draft
 
