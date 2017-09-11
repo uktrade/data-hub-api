@@ -144,17 +144,38 @@ class OrderInStatusValidator:
 
     message = 'The action cannot be performed in the current status {0}.'
 
-    def __init__(self, allowed_statuses):
-        """Constructor."""
+    def __init__(self, allowed_statuses, order_required=True):
+        """
+        :param allowed_statuses: list of OrderStatus values allowed
+        :param order_required: if False and the order is None, the validation passes,
+            useful when creating orders
+        """
         self.allowed_statuses = allowed_statuses
+        self.order_required = order_required
         self.instance = None
 
     def set_instance(self, instance):
         """Set the current instance."""
         self.instance = instance
 
+    def set_context(self, serializer):
+        """
+        This hook is called by the serializer instance, prior to the validation call being made.
+
+        It sets self.instance searching for an order in the following order:
+            - serializer.context['order]
+            - serializer.instance
+        """
+        if 'order' in serializer.context:
+            self.set_instance(serializer.context['order'])
+        else:
+            self.set_instance(serializer.instance)
+
     def __call__(self, data=None):
         """Validate that the order is in one of the statuses."""
+        if not self.instance and not self.order_required:
+            return  # all fine
+
         allowed = any(
             self.instance.status == status
             for status in self.allowed_statuses

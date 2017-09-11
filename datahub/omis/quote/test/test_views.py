@@ -51,13 +51,15 @@ class TestCreatePreviewOrder(APITestMixin):
         assert response.json() == {'detail': "There's already an active quote."}
 
     @pytest.mark.parametrize('quote_view_name', ('item', 'preview'))
-    @pytest.mark.parametrize('disallowed_status', (
-        OrderStatus.quote_awaiting_acceptance,
-        OrderStatus.quote_accepted,
-        OrderStatus.paid,
-        OrderStatus.complete,
-        OrderStatus.cancelled,
-    ))
+    @pytest.mark.parametrize(
+        'disallowed_status', (
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.quote_accepted,
+            OrderStatus.paid,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
     def test_409_if_order_in_disallowed_status(self, quote_view_name, disallowed_status):
         """
         Test that if the order is not in one of the allowed statuses, the endpoint
@@ -316,11 +318,13 @@ class TestCancelOrder(APITestMixin):
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    @pytest.mark.parametrize('disallowed_status', (
-        OrderStatus.paid,
-        OrderStatus.complete,
-        OrderStatus.cancelled,
-    ))
+    @pytest.mark.parametrize(
+        'disallowed_status', (
+            OrderStatus.paid,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
     def test_409_if_order_in_disallowed_status(self, disallowed_status):
         """
         Test that if the order is not in one of the allowed statuses, the endpoint
