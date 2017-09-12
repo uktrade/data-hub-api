@@ -1,19 +1,22 @@
 import uuid
 
 from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
 from django.utils.crypto import get_random_string
 from django.utils.timezone import now
 
 from datahub.company.models import Advisor, Company, Contact
-from datahub.core.models import BaseModel, BaseOrderedConstantModel, DisableableModel
+from datahub.core.models import (
+    BaseConstantModel, BaseModel, BaseOrderedConstantModel, DisableableModel
+)
 
 from datahub.metadata.models import Country, Sector, Team
 from datahub.omis.core.utils import generate_reference
 from datahub.omis.quote.models import Quote
 
 from . import validators
-from .constants import OrderStatus
+from .constants import DEFAULT_HOURLY_RATE, OrderStatus
 
 
 class ServiceType(BaseOrderedConstantModel, DisableableModel):
@@ -21,6 +24,31 @@ class ServiceType(BaseOrderedConstantModel, DisableableModel):
     Order service type.
     E.g. 'Validated contacts', 'Event', 'Market Research'
     """
+
+
+class HourlyRate(BaseConstantModel):
+    """
+    Values for the hourly rates used to calculate order pricing and for the
+    current VAT to apply.
+    """
+
+    created_on = models.DateTimeField(auto_now_add=True)
+    modified_on = models.DateTimeField(auto_now=True)
+
+    rate_value = models.PositiveIntegerField(
+        help_text='Rate in pence. E.g. 1 pound should be stored as 100 (100 pence).'
+    )
+    vat_value = models.DecimalField(
+        max_digits=5, decimal_places=2,
+        help_text='VAT to apply as percentage value (0.00 to 100.00).',
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(100),
+        ]
+    )
+
+    class Meta(BaseConstantModel.Meta):  # noqa: D101
+        db_table = 'omis-order_hourlyrate'
 
 
 class Order(BaseModel):
@@ -112,6 +140,13 @@ class Order(BaseModel):
     )
 
     po_number = models.CharField(max_length=100, blank=True)
+
+    hourly_rate = models.ForeignKey(
+        HourlyRate,
+        related_name="%(class)ss",  # noqa: Q000
+        on_delete=models.PROTECT,
+        default=DEFAULT_HOURLY_RATE
+    )
 
     # legacy fields, only meant to be used in readonly mode as reference
     product_info = models.TextField(
