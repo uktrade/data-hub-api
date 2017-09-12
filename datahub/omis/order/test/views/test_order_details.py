@@ -99,6 +99,7 @@ class TestAddOrderDetails(APITestMixin):
             'contact_email': '',
             'contact_phone': '',
             'po_number': 'PO 123',
+            'discount_value': 0,
         }
 
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
@@ -341,6 +342,7 @@ class TestChangeOrderDetails(APITestMixin):
             'contact_email': order.contact_email,
             'contact_phone': order.contact_phone,
             'po_number': 'NEW PO 321',
+            'discount_value': order.discount_value,
         }
 
     def test_fails_if_contact_not_from_company(self):
@@ -527,7 +529,8 @@ class TestChangeOrderDetails(APITestMixin):
                 'existing_agents': 'Updated existing agents',
                 'permission_to_approach_contacts': 'Updated permission to approach contacts',
                 'contact_email': 'updated-email@email.com',
-                'contact_phone': '1234'
+                'contact_phone': '1234',
+                'discount_value': 99999,
             },
             format='json'
         )
@@ -541,6 +544,7 @@ class TestChangeOrderDetails(APITestMixin):
             'Updated permission to approach contacts'
         assert response.json()['contact_email'] != 'updated-email@email.com'
         assert response.json()['contact_phone'] != '1234'
+        assert response.json()['discount_value'] != 99999
 
     @pytest.mark.parametrize(
         'disallowed_status', (
@@ -626,6 +630,7 @@ class TestViewOrderDetails(APITestMixin):
             'contact_email': order.contact_email,
             'contact_phone': order.contact_phone,
             'po_number': order.po_number,
+            'discount_value': order.discount_value,
         }
 
     def test_not_found(self):

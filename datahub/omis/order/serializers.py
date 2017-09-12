@@ -51,6 +51,8 @@ class OrderSerializer(serializers.ModelSerializer):
     contact_email = serializers.CharField(read_only=True)
     contact_phone = serializers.CharField(read_only=True)
 
+    discount_value = serializers.ReadOnlyField(read_only=True)
+
     # legacy fields
     product_info = serializers.CharField(read_only=True)
     further_info = serializers.CharField(read_only=True)
@@ -82,6 +84,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'permission_to_approach_contacts',
             'delivery_date',
             'po_number',
+            'discount_value',
         ]
         validators = [
             ContactWorksAtCompanyValidator(),
