@@ -27,13 +27,7 @@ class ServiceTypeSerializer(ConstantModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     """Order DRF serializer"""
 
-    id = serializers.UUIDField(read_only=True)
-    reference = serializers.CharField(read_only=True)
-    status = serializers.CharField(read_only=True)
-
-    created_on = serializers.DateTimeField(read_only=True)
     created_by = NestedRelatedField(Advisor, read_only=True)
-    modified_on = serializers.DateTimeField(read_only=True)
     modified_by = NestedRelatedField(Advisor, read_only=True)
 
     company = NestedRelatedField(Company)
@@ -48,18 +42,9 @@ class OrderSerializer(serializers.ModelSerializer):
 
     delivery_date = serializers.DateField(required=False, allow_null=True)
 
-    contact_email = serializers.CharField(read_only=True)
-    contact_phone = serializers.CharField(read_only=True)
-
-    # legacy fields
-    product_info = serializers.CharField(read_only=True)
-    further_info = serializers.CharField(read_only=True)
-    existing_agents = serializers.CharField(read_only=True)
-    permission_to_approach_contacts = serializers.CharField(read_only=True)
-
     class Meta:  # noqa: D101
         model = Order
-        fields = [
+        fields = (
             'id',
             'reference',
             'status',
@@ -82,15 +67,32 @@ class OrderSerializer(serializers.ModelSerializer):
             'permission_to_approach_contacts',
             'delivery_date',
             'po_number',
-        ]
-        validators = [
+            'discount_value',
+        )
+        read_only_fields = (
+            'id',
+            'reference',
+            'status',
+            'created_on',
+            'created_by',
+            'modified_on',
+            'modified_by',
+            'contact_email',
+            'contact_phone',
+            'product_info',
+            'further_info',
+            'existing_agents',
+            'permission_to_approach_contacts',
+            'discount_value',
+        )
+        validators = (
             ContactWorksAtCompanyValidator(),
             ReadonlyAfterCreationValidator(fields=('company', 'primary_market')),
             OrderInStatusValidator(
                 allowed_statuses=(OrderStatus.draft,),
                 order_required=False
             )
-        ]
+        )
 
     def validate_service_types(self, service_types):
         """Validates that service types are not disabled."""

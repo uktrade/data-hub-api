@@ -1,5 +1,5 @@
 from django.conf import settings
-from elasticsearch_dsl import Date, DocType, String
+from elasticsearch_dsl import Date, DocType, Integer, String
 
 from .. import dict_utils
 from .. import dsl_utils
@@ -28,6 +28,7 @@ class Order(DocType, MapDBModelToDict):
     subscribers = dsl_utils.contact_or_adviser_mapping('subscribers', include_dit_team=True)
     assignees = dsl_utils.contact_or_adviser_mapping('assignees', include_dit_team=True)
     po_number = dsl_utils.CaseInsensitiveKeywordString()
+    discount_value = Integer()
 
     MAPPINGS = {
         'id': str,
@@ -53,6 +54,7 @@ class Order(DocType, MapDBModelToDict):
         'permission_to_approach_contacts',
         'quote',
         'hourly_rate',
+        'discount_label',
     )
 
     SEARCH_FIELDS = []
