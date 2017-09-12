@@ -6,7 +6,7 @@ SortableCaseInsensitiveKeywordString = partial(
     analyzer='lowercase_keyword_analyzer',
     fielddata=True
 )
-TrigramString = partial(String, analyzer='trigram_analyzer')
+TrigramString = partial(String, analyzer='trigram_analyzer', fielddata=True)
 EnglishString = partial(String, analyzer='english_analyzer')
 SortableString = partial(String, fielddata=True)
 

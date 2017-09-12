@@ -17,6 +17,7 @@ class Contact(DocType, MapDBModelToDict):
     modified_on = Date()
     name = dsl_utils.SortableString()
     name_keyword = dsl_utils.SortableCaseInsensitiveKeywordString()
+    # field is being aggregated
     name_trigram = dsl_utils.TrigramString()
     title = dsl_utils.id_name_mapping()
     first_name = dsl_utils.SortableString(copy_to=['name', 'name_keyword', 'name_trigram'])
