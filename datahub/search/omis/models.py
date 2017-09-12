@@ -52,6 +52,7 @@ class Order(DocType, MapDBModelToDict):
         'existing_agents',
         'permission_to_approach_contacts',
         'quote',
+        'hourly_rate',
     )
 
     SEARCH_FIELDS = []
