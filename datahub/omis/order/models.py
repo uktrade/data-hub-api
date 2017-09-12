@@ -147,6 +147,8 @@ class Order(BaseModel):
         on_delete=models.PROTECT,
         default=DEFAULT_HOURLY_RATE
     )
+    discount_value = models.PositiveIntegerField(default=0)
+    discount_label = models.CharField(max_length=100, blank=True)
 
     # legacy fields, only meant to be used in readonly mode as reference
     product_info = models.TextField(
