@@ -223,6 +223,9 @@ def test_mapping(setup_es):
                     },
                     'type': 'nested'
                 },
+                'discount_value': {
+                    'type': 'integer'
+                },
             }
         }
     }
@@ -306,5 +309,6 @@ def test_indexed_doc(setup_es):
                 for subscriber in order.assignees.all()
             ],
             'po_number': order.po_number,
+            'discount_value': order.discount_value,
         }
     }
