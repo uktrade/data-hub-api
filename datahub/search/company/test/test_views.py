@@ -186,7 +186,7 @@ class TestBasicSearch(APITestMixin):
 class TestSearchExport(APITestMixin):
     """Tests search export views."""
 
-    def test_search_company(self, setup_es, setup_data):
+    def test_company_export(self, setup_es, setup_data):
         """Tests export of detailed company search."""
         setup_es.indices.refresh()
 
@@ -207,9 +207,11 @@ class TestSearchExport(APITestMixin):
         # checks if filename includes our search term
         assert filename in response['Content-Disposition']
 
-        csv_file = csv.reader(line.decode('utf-8') for line in response.streaming_content)
+        csv_file = csv.DictReader(line.decode('utf-8') for line in response.streaming_content)
 
-        data = list(csv_file)
+        rows = list(csv_file)
+
+        assert len(rows) == 1
 
         # checks if we have headers in the CSV file
         assert {'business_type',
@@ -248,9 +250,9 @@ class TestSearchExport(APITestMixin):
                 'headquarter_type',
                 'classification',
                 'parent',
-                'one_list_account_owner'} == set(data[0])
+                'one_list_account_owner'} == set(rows[0].keys())
 
         # checks if we have a company we look for in the CSV file
-        data_row = ','.join(data[1])
+        data_row = ','.join(rows[0].values())
         assert 'abc defg' in data_row
         assert 'United States' in data_row
