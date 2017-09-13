@@ -1,4 +1,4 @@
-class Echo(object):
+class Echo:
     """Represents dummy writer."""
 
     def write(self, value):

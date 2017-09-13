@@ -164,27 +164,25 @@ class SearchAPIView(APIView):
 class SearchExportAPIView(SearchAPIView):
     """Returns CSV file with all search results."""
 
-    def format_cell(self, cell):
+    def _format_cell(self, cell):
         """Gets cell or name from cell and flattens the cell if necessary."""
         if isinstance(cell, dict):
             if 'name' in cell:
                 return cell['name']
 
         if isinstance(cell, list):
-            return ','.join([self.format_cell(item) for item in cell])
+            return ','.join(self._format_cell(item) for item in cell)
 
         return cell
 
-    def get_row(self, query):
+    def _get_row(self, query):
         """Gets formatted row of results."""
-        row = 0
         # we want to keep the same order of rows that is in the search results
         query.params(preserve_order=True)
-        for hit in query.scan():
-            if row == 0:
+        for row_number, hit in enumerate(query.scan()):
+            if row_number == 0:
                 yield [k for k in hit.to_dict().keys()]
-            yield [self.format_cell(v) for v in hit.to_dict().values()]
-            row += 1
+            yield [self._format_cell(v) for v in hit.to_dict().values()]
 
     def post(self, request, format=None):
         """Performs search and returns CSV file."""
@@ -208,7 +206,7 @@ class SearchExportAPIView(SearchAPIView):
 
         writer = csv.writer(Echo())
 
-        response = StreamingHttpResponse((writer.writerow(row) for row in self.get_row(results)),
+        response = StreamingHttpResponse((writer.writerow(row) for row in self._get_row(results)),
                                          content_type='text/csv')
 
         response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
