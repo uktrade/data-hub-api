@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='order',
             name='vat_status',
-            field=models.CharField(blank=True, choices=[('eu', 'Europe'), ('outside_eu', 'Outside Europe'), ('uk', 'UK')], max_length=100),
+            field=models.CharField(blank=True, choices=[('uk', 'UK'), ('eu', 'EU excluding the UK'), ('outside_eu', 'Outside the EU')], max_length=100),
         ),
         migrations.AddField(
             model_name='order',
