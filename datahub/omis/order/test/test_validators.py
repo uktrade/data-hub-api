@@ -11,7 +11,7 @@ from .factories import (
     OrderWithOpenQuoteFactory,
 )
 
-from ..constants import OrderStatus
+from ..constants import OrderStatus, VATStatus
 from ..models import Order
 from ..validators import (
     ContactWorksAtCompanyValidator,
@@ -19,6 +19,7 @@ from ..validators import (
     OrderDetailsFilledInValidator,
     OrderInStatusValidator,
     ReadonlyAfterCreationValidator,
+    VATValidator,
 )
 
 
@@ -150,73 +151,99 @@ class TestReadonlyAfterCreationValidator:
 class TestOrderDetailsFilledInValidator:
     """Tests for the OrderDetailsFilledInValidator."""
 
-    @pytest.mark.parametrize(
-        'field,value',
-        (
-            ('primary_market', None),
-            ('service_types', []),
-            ('description', ''),
-            ('delivery_date', None),
-        )
-    )
-    def test_incomplete_order(self, field, value):
-        """Test that an incomplete order doesn't pass the validation."""
-        order = OrderFactory()
-        setattr(order, field, value)
+    @pytest.mark.parametrize('values_as_data', (True, False))
+    def test_incomplete_order(self, values_as_data):
+        """
+        Test that an incomplete order doesn't pass the validation.
+
+        Test both scenarios:
+        - with fields on the instance (values_as_data=False)
+        - with fields as values in the data param (values_as_data=True)
+        """
+        order_fields = {
+            'primary_market': None,
+            'service_types': [],
+            'description': '',
+            'delivery_date': None,
+            'vat_status': '',
+        }
+        order = Order(**(order_fields if not values_as_data else {}))
+        data = order_fields if values_as_data else {}
 
         validator = OrderDetailsFilledInValidator()
         validator.set_instance(order)
 
-        with pytest.raises(ValidationError):
-            validator()
+        with pytest.raises(ValidationError) as exc:
+            validator(data)
 
-    @pytest.mark.parametrize(
-        'field,value',
-        (
-            ('primary_market', None),
-            ('service_types', []),
-            ('description', ''),
-            ('delivery_date', None),
-        )
-    )
-    def test_incomplete_data(self, field, value):
-        """Test that if the data for an order is incomplete, the validation fails."""
-        order = OrderFactory()
+        assert exc.value.detail == {
+            field: ['This field is required.'] for field in order_fields
+        }
 
-        validator = OrderDetailsFilledInValidator()
-        validator.set_instance(order)
+    @pytest.mark.parametrize('values_as_data', (True, False))
+    def test_complete_order(self, values_as_data):
+        """
+        Test that a complete order passes the validation.
 
-        with pytest.raises(ValidationError):
-            validator({field: value})
+        Test both scenarios:
+        - with fields on the instance (values_as_data=False)
+        - with fields as values in the data param (values_as_data=True)
+        """
+        random_values = OrderFactory()  # used only to set up the related props easily
 
-    def test_complete_order(self):
-        """Test that a complete order passes the validation."""
-        order = OrderFactory()
+        order_fields = {
+            'primary_market': random_values.primary_market,
+            'service_types': random_values.service_types.all(),
+            'description': random_values.description,
+            'delivery_date': random_values.delivery_date,
+            'vat_status': random_values.vat_status,
+        }
+        order = OrderFactory(**(order_fields if not values_as_data else {}))
+        data = order_fields if values_as_data else {}
 
         validator = OrderDetailsFilledInValidator()
         validator.set_instance(order)
 
         try:
-            validator()
+            validator(data)
         except Exception:
             pytest.fail('Should not raise a validator error.')
 
-    def test_complete_data(self):
-        """Test that if the data for an order is complete, the validation passes."""
-        order = OrderFactory()  # used only to set up the related props easily
+    def test_validation_errors_appended(self):
+        """
+        Test that if a field gets more than one error during the validation,
+        the errors are appended to the same list and not overridden by other validators.
+        """
+        order = OrderFactory()
 
-        validator = OrderDetailsFilledInValidator()
-        validator.set_instance(Order())  # new order
+        with mock.patch.object(
+            OrderDetailsFilledInValidator,
+            'get_extra_validators'
+        ) as get_extra_validators:
 
-        try:
-            validator({
-                'primary_market': order.primary_market,
-                'service_types': list(order.service_types.all()),
-                'description': 'lorem ipsum',
-                'delivery_date': order.delivery_date,
-            })
-        except Exception:
-            pytest.fail('Should not raise a validator error.')
+            # trigger a second validation error on the same field
+            get_extra_validators.return_value = [
+                mock.Mock(
+                    side_effect=ValidationError({
+                        'description': ['A different error...']
+                    })
+                )
+            ]
+
+            validator = OrderDetailsFilledInValidator()
+            validator.set_instance(order)
+
+            with pytest.raises(ValidationError) as exc:
+                validator({
+                    'description': ''
+                })
+
+            assert exc.value.detail == {
+                'description': [
+                    'This field is required.',
+                    'A different error...'
+                ]
+            }
 
 
 @pytest.mark.django_db
@@ -338,5 +365,168 @@ class TestOrderInStatusValidator:
 
         try:
             validator()
+        except Exception:
+            pytest.fail('Should not raise a validator error.')
+
+
+class TestVATValidator:
+    """Tests for the VATValidator."""
+
+    @pytest.mark.parametrize('values_as_data', (True, False))
+    def test_nothing_specified_fails(self, values_as_data):
+        """
+        Test that if none of the vat fields are specified, it raises a ValidationError.
+
+        Test both scenarios:
+        - with fields on the instance (values_as_data=False)
+        - with fields as values in the data param (values_as_data=True)
+        """
+        order_fields = {
+            'vat_status': '',
+            'vat_number': '',
+            'vat_verified': None
+        }
+
+        order = Order(**(order_fields if not values_as_data else {}))
+        data = order_fields if values_as_data else {}
+
+        validator = VATValidator()
+        validator.set_instance(order)
+
+        with pytest.raises(ValidationError) as exc:
+            validator(data)
+        assert exc.value.detail == {'vat_status': ['This field is required.']}
+
+    @pytest.mark.parametrize('values_as_data', (True, False))
+    def test_only_status_eu_specified_fails(self, values_as_data):
+        """
+        Test that if only vat_status = eu is specified, it raises a ValidationError
+        as vat_verified (true or false) has to be specified as well.
+
+        Test both scenarios:
+        - with fields on the instance (values_as_data=False)
+        - with fields as values in the data param (values_as_data=True)
+        """
+        order_fields = {
+            'vat_status': VATStatus.eu,
+            'vat_number': '',
+            'vat_verified': None
+        }
+
+        order = Order(**(order_fields if not values_as_data else {}))
+        data = order_fields if values_as_data else {}
+
+        validator = VATValidator()
+        validator.set_instance(order)
+
+        with pytest.raises(ValidationError) as exc:
+            validator(data)
+        assert exc.value.detail == {'vat_verified': ['This field is required.']}
+
+    @pytest.mark.parametrize('values_as_data', (True, False))
+    def test_only_status_eu_verified_true_specified_fails(self, values_as_data):
+        """
+        Test that if vat_status = eu and vat_verified = True but vat_number is not specified,
+        it raises a ValidationError.
+
+        Test both scenarios:
+        - with fields on the instance (values_as_data=False)
+        - with fields as values in the data param (values_as_data=True)
+        """
+        order_fields = {
+            'vat_status': VATStatus.eu,
+            'vat_number': '',
+            'vat_verified': True
+        }
+
+        order = Order(**(order_fields if not values_as_data else {}))
+        data = order_fields if values_as_data else {}
+
+        validator = VATValidator()
+        validator.set_instance(order)
+
+        with pytest.raises(ValidationError) as exc:
+            validator(data)
+        assert exc.value.detail == {'vat_number': ['This field is required.']}
+
+    @pytest.mark.parametrize('values_as_data', (True, False))
+    def test_complete_verified_eu_vat_succeeds(self, values_as_data):
+        """
+        Test that if vat_status = eu, vat_verified = True and vat_number is specified,
+        the validation passes.
+
+        Test both scenarios:
+        - with fields on the instance (values_as_data=False)
+        - with fields as values in the data param (values_as_data=True)
+        """
+        order_fields = {
+            'vat_status': VATStatus.eu,
+            'vat_number': '0123456789',
+            'vat_verified': True
+        }
+
+        order = Order(**(order_fields if not values_as_data else {}))
+        data = order_fields if values_as_data else {}
+
+        validator = VATValidator()
+        validator.set_instance(order)
+
+        try:
+            validator(data)
+        except Exception:
+            pytest.fail('Should not raise a validator error.')
+
+    @pytest.mark.parametrize('values_as_data', (True, False))
+    def test_only_status_eu_verified_false_specified_succeeds(self, values_as_data):
+        """
+        Test that if vat_status = eu, vat_verified = False and vat_number is not specified,
+        the validation passes and vat_number is not required when vat_verified is False.
+
+        Test both scenarios:
+        - with fields on the instance (values_as_data=False)
+        - with fields as values in the data param (values_as_data=True)
+        """
+        order_fields = {
+            'vat_status': VATStatus.eu,
+            'vat_number': '',
+            'vat_verified': False
+        }
+
+        order = Order(**(order_fields if not values_as_data else {}))
+        data = order_fields if values_as_data else {}
+
+        validator = VATValidator()
+        validator.set_instance(order)
+
+        try:
+            validator(data)
+        except Exception:
+            pytest.fail('Should not raise a validator error.')
+
+    @pytest.mark.parametrize('values_as_data', (True, False))
+    @pytest.mark.parametrize('vat_status', (VATStatus.outside_eu, VATStatus.uk))
+    def test_only_status_non_eu_succeeds(self, values_as_data, vat_status):
+        """
+        Test that if vat_status != eu, the validation passes even if the other
+        fields are empty.
+
+        Test both scenarios:
+        - with fields on the instance (values_as_data=False)
+        - with fields as values in the data param (values_as_data=True)
+        """
+        order_fields = {
+            'vat_status': vat_status,
+            'vat_number': '',
+            'vat_verified': None
+        }
+
+        order = Order(**(order_fields if not values_as_data else {}))
+        data = order_fields if values_as_data else {}
+
+        validator = VATValidator()
+        validator.set_instance(order)
+
+        try:
+            validator(data)
         except Exception:
             pytest.fail('Should not raise a validator error.')

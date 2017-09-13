@@ -31,7 +31,7 @@ def test_mapping(setup_es):
                     'type': 'string'
                 },
                 'po_number': {
-                    'analyzer': 'lowercase_keyword_analyzer',
+                    'index': 'no',
                     'type': 'string'
                 },
                 'company': {
@@ -224,7 +224,20 @@ def test_mapping(setup_es):
                     'type': 'nested'
                 },
                 'discount_value': {
+                    'index': 'no',
                     'type': 'integer'
+                },
+                'vat_status': {
+                    'index': 'no',
+                    'type': 'string'
+                },
+                'vat_number': {
+                    'index': 'no',
+                    'type': 'string'
+                },
+                'vat_verified': {
+                    'index': 'no',
+                    'type': 'boolean'
                 },
             }
         }
@@ -310,5 +323,8 @@ def test_indexed_doc(setup_es):
             ],
             'po_number': order.po_number,
             'discount_value': order.discount_value,
+            'vat_status': order.vat_status,
+            'vat_number': order.vat_number,
+            'vat_verified': order.vat_verified,
         }
     }

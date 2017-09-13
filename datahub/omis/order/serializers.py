@@ -6,10 +6,11 @@ from rest_framework.exceptions import ValidationError
 from datahub.company.models import Advisor, Company, Contact
 from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
+from datahub.core.validate_utils import DataCombiner
 from datahub.metadata.models import Country, Sector, Team
 
 from datahub.omis.market.models import Market
-from .constants import OrderStatus
+from .constants import OrderStatus, VATStatus
 from .models import Order, OrderAssignee, OrderSubscriber, ServiceType
 from .validators import (
     ContactWorksAtCompanyValidator,
@@ -68,6 +69,9 @@ class OrderSerializer(serializers.ModelSerializer):
             'delivery_date',
             'po_number',
             'discount_value',
+            'vat_status',
+            'vat_number',
+            'vat_verified',
         )
         read_only_fields = (
             'id',
@@ -132,6 +136,22 @@ class OrderSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(f'"{country}" disabled.')
 
         return country
+
+    def _reset_vat_fields_if_necessary(self, data):
+        """If vat_status is set and != 'eu', vat_number and vat_verified are reset."""
+        data_combiner = DataCombiner(self.instance, data)
+
+        vat_status = data_combiner.get_value('vat_status')
+        if vat_status and vat_status != VATStatus.eu:
+            data['vat_number'] = ''
+            data['vat_verified'] = None
+
+        return data
+
+    def validate(self, data):
+        """Add extra logic to the default DRF one."""
+        data = self._reset_vat_fields_if_necessary(data)
+        return data
 
 
 def existing_adviser(adviser_id):

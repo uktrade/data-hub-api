@@ -10,7 +10,7 @@ from datahub.core.test.factories import to_many_field
 
 from datahub.omis.quote.test.factories import CancelledQuoteFactory, QuoteFactory
 
-from ..constants import OrderStatus
+from ..constants import OrderStatus, VATStatus
 from ..models import ServiceType
 
 
@@ -39,6 +39,9 @@ class OrderFactory(factory.django.DjangoModelFactory):
     po_number = factory.Faker('text', max_nb_chars=50)
     discount_value = factory.Faker('random_int', max=100)
     discount_label = factory.Faker('text', max_nb_chars=50)
+    vat_status = VATStatus.eu
+    vat_number = '0123456789'
+    vat_verified = True
 
     @to_many_field
     def service_types(self):
