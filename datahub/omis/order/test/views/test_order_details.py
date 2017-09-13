@@ -13,7 +13,7 @@ from datahub.omis.market.models import Market
 
 from ..factories import OrderFactory
 
-from ...constants import OrderStatus, VatStatus
+from ...constants import OrderStatus, VATStatus
 from ...models import ServiceType
 
 
@@ -48,7 +48,7 @@ class TestAddOrderDetails(APITestMixin):
                 'contacts_not_to_approach': 'Contacts not to approach details',
                 'delivery_date': '2017-04-20',
                 'po_number': 'PO 123',
-                'vat_status': VatStatus.eu,
+                'vat_status': VATStatus.eu,
                 'vat_number': '01234566789',
                 'vat_verified': True
             },
@@ -103,7 +103,7 @@ class TestAddOrderDetails(APITestMixin):
             'contact_phone': '',
             'po_number': 'PO 123',
             'discount_value': 0,
-            'vat_status': VatStatus.eu,
+            'vat_status': VATStatus.eu,
             'vat_number': '01234566789',
             'vat_verified': True
         }
@@ -277,7 +277,7 @@ class TestAddOrderDetails(APITestMixin):
 
     @pytest.mark.parametrize(
         'vat_status',
-        (VatStatus.outside_eu, VatStatus.uk)
+        (VATStatus.outside_eu, VATStatus.uk)
     )
     def test_vat_number_and_verified_reset_if_vat_status_not_eu(self, vat_status):
         """
@@ -314,7 +314,7 @@ class TestChangeOrderDetails(APITestMixin):
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
     def test_success(self):
         """Test changing an existing order."""
-        order = OrderFactory(vat_status=VatStatus.outside_eu)
+        order = OrderFactory(vat_status=VATStatus.outside_eu)
         new_contact = ContactFactory(company=order.company)
         new_sector = Sector.renewable_energy_wind.value
         new_service_type = ServiceType.objects.filter(disabled_on__isnull=True).first()
@@ -332,7 +332,7 @@ class TestChangeOrderDetails(APITestMixin):
                 'contacts_not_to_approach': 'Updated contacts not to approach',
                 'delivery_date': '2017-04-21',
                 'po_number': 'NEW PO 321',
-                'vat_status': VatStatus.eu,
+                'vat_status': VATStatus.eu,
                 'vat_number': 'new vat number',
                 'vat_verified': False
             },
@@ -387,7 +387,7 @@ class TestChangeOrderDetails(APITestMixin):
             'contact_phone': order.contact_phone,
             'po_number': 'NEW PO 321',
             'discount_value': order.discount_value,
-            'vat_status': VatStatus.eu,
+            'vat_status': VATStatus.eu,
             'vat_number': 'new vat number',
             'vat_verified': False,
         }
@@ -621,7 +621,7 @@ class TestChangeOrderDetails(APITestMixin):
 
     @pytest.mark.parametrize(
         'vat_status',
-        (VatStatus.outside_eu, VatStatus.uk)
+        (VATStatus.outside_eu, VATStatus.uk)
     )
     def test_vat_number_and_verified_reset_if_vat_status_not_eu(self, vat_status):
         """
@@ -629,7 +629,7 @@ class TestChangeOrderDetails(APITestMixin):
         they are set to '' and None as they only make sense if company in 'eu'.
         """
         order = OrderFactory(
-            vat_status=VatStatus.eu,
+            vat_status=VATStatus.eu,
             vat_number='0123456789',
             vat_verified=True
         )

@@ -17,7 +17,7 @@ OrderStatus = Choices(
 DEFAULT_HOURLY_RATE = '7e1ca5c3-dc5a-e511-9d3c-e4115bead28a'
 
 
-VatStatus = Choices(
+VATStatus = Choices(
     ('eu', 'Europe'),
     ('outside_eu', 'Outside Europe'),
     ('uk', 'UK'),

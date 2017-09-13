@@ -11,7 +11,7 @@ from .factories import (
     OrderWithOpenQuoteFactory,
 )
 
-from ..constants import OrderStatus, VatStatus
+from ..constants import OrderStatus, VATStatus
 from ..models import Order
 from ..validators import (
     ContactWorksAtCompanyValidator,
@@ -408,7 +408,7 @@ class TestVATValidator:
         - with fields as values in the data param (values_as_data=True)
         """
         order_fields = {
-            'vat_status': VatStatus.eu,
+            'vat_status': VATStatus.eu,
             'vat_number': '',
             'vat_verified': None
         }
@@ -434,7 +434,7 @@ class TestVATValidator:
         - with fields as values in the data param (values_as_data=True)
         """
         order_fields = {
-            'vat_status': VatStatus.eu,
+            'vat_status': VATStatus.eu,
             'vat_number': '',
             'vat_verified': True
         }
@@ -460,7 +460,7 @@ class TestVATValidator:
         - with fields as values in the data param (values_as_data=True)
         """
         order_fields = {
-            'vat_status': VatStatus.eu,
+            'vat_status': VATStatus.eu,
             'vat_number': '0123456789',
             'vat_verified': True
         }
@@ -487,7 +487,7 @@ class TestVATValidator:
         - with fields as values in the data param (values_as_data=True)
         """
         order_fields = {
-            'vat_status': VatStatus.eu,
+            'vat_status': VATStatus.eu,
             'vat_number': '',
             'vat_verified': False
         }
@@ -504,7 +504,7 @@ class TestVATValidator:
             pytest.fail('Should not raise a validator error.')
 
     @pytest.mark.parametrize('values_as_data', (True, False))
-    @pytest.mark.parametrize('vat_status', (VatStatus.outside_eu, VatStatus.uk))
+    @pytest.mark.parametrize('vat_status', (VATStatus.outside_eu, VATStatus.uk))
     def test_only_status_non_eu_succeeds(self, values_as_data, vat_status):
         """
         Test that if vat_status != eu, the validation passes even if the other

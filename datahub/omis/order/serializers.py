@@ -10,7 +10,7 @@ from datahub.core.validate_utils import DataCombiner
 from datahub.metadata.models import Country, Sector, Team
 
 from datahub.omis.market.models import Market
-from .constants import OrderStatus, VatStatus
+from .constants import OrderStatus, VATStatus
 from .models import Order, OrderAssignee, OrderSubscriber, ServiceType
 from .validators import (
     ContactWorksAtCompanyValidator,
@@ -142,7 +142,7 @@ class OrderSerializer(serializers.ModelSerializer):
         data_combiner = DataCombiner(self.instance, data)
 
         vat_status = data_combiner.get_value('vat_status')
-        if vat_status and vat_status != VatStatus.eu:
+        if vat_status and vat_status != VATStatus.eu:
             data['vat_number'] = ''
             data['vat_verified'] = None
 

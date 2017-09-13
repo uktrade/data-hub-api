@@ -6,7 +6,7 @@ from rest_framework.exceptions import ValidationError
 from datahub.core.validate_utils import DataCombiner
 from datahub.omis.core.exceptions import Conflict
 
-from .constants import VatStatus
+from .constants import VATStatus
 
 
 class ContactWorksAtCompanyValidator:
@@ -104,7 +104,7 @@ class VATValidator:
                 'vat_status': [self.message]
             })
 
-        if vat_status == VatStatus.eu:
+        if vat_status == VATStatus.eu:
             vat_verified = data_combiner.get_value('vat_verified')
             if vat_verified is None:
                 raise ValidationError({

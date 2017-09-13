@@ -16,7 +16,7 @@ from datahub.omis.core.utils import generate_reference
 from datahub.omis.quote.models import Quote
 
 from . import validators
-from .constants import DEFAULT_HOURLY_RATE, OrderStatus, VatStatus
+from .constants import DEFAULT_HOURLY_RATE, OrderStatus, VATStatus
 
 
 class ServiceType(BaseOrderedConstantModel, DisableableModel):
@@ -149,7 +149,7 @@ class Order(BaseModel):
     )
     discount_value = models.PositiveIntegerField(default=0)
     discount_label = models.CharField(max_length=100, blank=True)
-    vat_status = models.CharField(max_length=100, choices=VatStatus, blank=True)
+    vat_status = models.CharField(max_length=100, choices=VATStatus, blank=True)
     vat_number = models.CharField(max_length=100, blank=True)
     vat_verified = models.NullBooleanField()
 
