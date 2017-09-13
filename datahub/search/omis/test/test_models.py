@@ -87,6 +87,9 @@ def test_order_to_dict():
         ],
         'po_number': order.po_number,
         'discount_value': order.discount_value,
+        'vat_status': order.vat_status,
+        'vat_number': order.vat_number,
+        'vat_verified': order.vat_verified,
     }
 
 

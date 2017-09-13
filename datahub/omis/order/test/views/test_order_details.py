@@ -13,7 +13,7 @@ from datahub.omis.market.models import Market
 
 from ..factories import OrderFactory
 
-from ...constants import OrderStatus
+from ...constants import OrderStatus, VATStatus
 from ...models import ServiceType
 
 
@@ -48,6 +48,9 @@ class TestAddOrderDetails(APITestMixin):
                 'contacts_not_to_approach': 'Contacts not to approach details',
                 'delivery_date': '2017-04-20',
                 'po_number': 'PO 123',
+                'vat_status': VATStatus.eu,
+                'vat_number': '01234566789',
+                'vat_verified': True
             },
             format='json'
         )
@@ -100,6 +103,9 @@ class TestAddOrderDetails(APITestMixin):
             'contact_phone': '',
             'po_number': 'PO 123',
             'discount_value': 0,
+            'vat_status': VATStatus.eu,
+            'vat_number': '01234566789',
+            'vat_verified': True
         }
 
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
@@ -127,6 +133,9 @@ class TestAddOrderDetails(APITestMixin):
         assert response.json()['contacts_not_to_approach'] == ''
         assert response.json()['delivery_date'] is None
         assert response.json()['po_number'] == ''
+        assert response.json()['vat_status'] == ''
+        assert response.json()['vat_number'] == ''
+        assert response.json()['vat_verified'] is None
 
     def test_fails_if_contact_not_from_company(self):
         """
@@ -266,6 +275,38 @@ class TestAddOrderDetails(APITestMixin):
         assert response.json()['existing_agents'] == ''
         assert response.json()['permission_to_approach_contacts'] == ''
 
+    @pytest.mark.parametrize(
+        'vat_status',
+        (VATStatus.outside_eu, VATStatus.uk)
+    )
+    def test_vat_number_and_verified_reset_if_vat_status_not_eu(self, vat_status):
+        """
+        Test that if vat_number and vat_verified are set but vat_status != 'eu',
+        they are set to '' and None as they only make sense if company in 'eu'.
+        """
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
+        country = Country.canada.value
+
+        url = reverse('api-v3:omis:order:list')
+        response = self.api_client.post(
+            url,
+            {
+                'company': {'id': company.pk},
+                'contact': {'id': contact.pk},
+                'primary_market': {'id': country.id},
+                'vat_status': vat_status,
+                'vat_number': '0123456789',
+                'vat_verified': True,
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.json()['vat_status'] == vat_status
+        assert response.json()['vat_number'] == ''
+        assert response.json()['vat_verified'] is None
+
 
 class TestChangeOrderDetails(APITestMixin):
     """Change Order details test case."""
@@ -273,7 +314,7 @@ class TestChangeOrderDetails(APITestMixin):
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
     def test_success(self):
         """Test changing an existing order."""
-        order = OrderFactory()
+        order = OrderFactory(vat_status=VATStatus.outside_eu)
         new_contact = ContactFactory(company=order.company)
         new_sector = Sector.renewable_energy_wind.value
         new_service_type = ServiceType.objects.filter(disabled_on__isnull=True).first()
@@ -291,6 +332,9 @@ class TestChangeOrderDetails(APITestMixin):
                 'contacts_not_to_approach': 'Updated contacts not to approach',
                 'delivery_date': '2017-04-21',
                 'po_number': 'NEW PO 321',
+                'vat_status': VATStatus.eu,
+                'vat_number': 'new vat number',
+                'vat_verified': False
             },
             format='json'
         )
@@ -343,6 +387,9 @@ class TestChangeOrderDetails(APITestMixin):
             'contact_phone': order.contact_phone,
             'po_number': 'NEW PO 321',
             'discount_value': order.discount_value,
+            'vat_status': VATStatus.eu,
+            'vat_number': 'new vat number',
+            'vat_verified': False,
         }
 
     def test_fails_if_contact_not_from_company(self):
@@ -572,6 +619,33 @@ class TestChangeOrderDetails(APITestMixin):
             )
         }
 
+    @pytest.mark.parametrize(
+        'vat_status',
+        (VATStatus.outside_eu, VATStatus.uk)
+    )
+    def test_vat_number_and_verified_reset_if_vat_status_not_eu(self, vat_status):
+        """
+        Test that if vat_number and vat_verified are set but vat_status != 'eu',
+        they are set to '' and None as they only make sense if company in 'eu'.
+        """
+        order = OrderFactory(
+            vat_status=VATStatus.eu,
+            vat_number='0123456789',
+            vat_verified=True
+        )
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(
+            url,
+            {'vat_status': vat_status},
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['vat_status'] == vat_status
+        assert response.json()['vat_number'] == ''
+        assert response.json()['vat_verified'] is None
+
 
 class TestViewOrderDetails(APITestMixin):
     """View order details test case."""
@@ -631,6 +705,9 @@ class TestViewOrderDetails(APITestMixin):
             'contact_phone': order.contact_phone,
             'po_number': order.po_number,
             'discount_value': order.discount_value,
+            'vat_status': order.vat_status,
+            'vat_number': order.vat_number,
+            'vat_verified': order.vat_verified,
         }
 
     def test_not_found(self):

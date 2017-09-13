@@ -1,9 +1,12 @@
+from collections import defaultdict
 from django.db import models
 
 from rest_framework.exceptions import ValidationError
 
 from datahub.core.validate_utils import DataCombiner
 from datahub.omis.core.exceptions import Conflict
+
+from .constants import VATStatus
 
 
 class ContactWorksAtCompanyValidator:
@@ -71,15 +74,8 @@ class ReadonlyAfterCreationValidator:
                     })
 
 
-class OrderDetailsFilledInValidator:
-    """Validator which checks that the order has all detail fields filled in."""
-
-    REQUIRED_FIELDS = (
-        'primary_market',
-        'service_types',
-        'description',
-        'delivery_date',
-    )
+class VATValidator:
+    """Validator for checking VAT fields on the order."""
 
     message = 'This field is required.'
 
@@ -92,11 +88,92 @@ class OrderDetailsFilledInValidator:
         self.instance = instance
 
     def __call__(self, data=None):
+        """
+        Check that:
+        - vat_status is specified
+        - if vat_status == eu:
+            - vat_verified is specified
+            - if vat_verified == True:
+                - vat_number is specified
+        """
+        data_combiner = DataCombiner(self.instance, data)
+
+        vat_status = data_combiner.get_value('vat_status')
+        if not vat_status:
+            raise ValidationError({
+                'vat_status': [self.message]
+            })
+
+        if vat_status == VATStatus.eu:
+            vat_verified = data_combiner.get_value('vat_verified')
+            if vat_verified is None:
+                raise ValidationError({
+                    'vat_verified': [self.message]
+                })
+
+            vat_number = data_combiner.get_value('vat_number')
+            if vat_verified and not vat_number:
+                raise ValidationError({
+                    'vat_number': [self.message]
+                })
+
+
+class OrderDetailsFilledInValidator:
+    """Validator which checks that the order has all detail fields filled in."""
+
+    REQUIRED_FIELDS = (
+        'primary_market',
+        'service_types',
+        'description',
+        'delivery_date',
+    )
+
+    extra_validators = (
+        VATValidator(),
+    )
+
+    message = 'This field is required.'
+
+    def __init__(self):
+        """Constructor."""
+        self.instance = None
+
+    def set_instance(self, instance):
+        """Set the current instance."""
+        self.instance = instance
+
+    def get_extra_validators(self):
+        """
+        Useful for subclassing or testing.
+
+        :returns: the extra_validators.
+        """
+        return self.extra_validators
+
+    def _run_extra_validators(self, data):
+        """
+        Run the extra validators against the instance/data.
+
+        :returns: errors dict, either filled in or empty
+        """
+        errors = defaultdict(list)
+        for validator in self.get_extra_validators():
+            validator.set_instance(self.instance)
+            try:
+                validator(data)
+            except ValidationError as exc:
+                for field, field_errors in exc.detail.items():
+                    errors[field] += field_errors
+        return errors
+
+    def __call__(self, data=None):
         """Validate that all the fields required are set."""
         data_combiner = DataCombiner(self.instance, data)
 
         meta = self.instance._meta
-        errors = {}
+        errors = defaultdict(list)
+
+        # direct required fields
         for field_name in self.REQUIRED_FIELDS:
             field = meta.get_field(field_name)
 
@@ -106,9 +183,12 @@ class OrderDetailsFilledInValidator:
                 value = data_combiner.get_value(field_name)
 
             if not value:
-                errors[field_name] = [
-                    self.message
-                ]
+                errors[field_name] = [self.message]
+
+        # extra validators
+        extra_errors = self._run_extra_validators(data)
+        for field, field_errors in extra_errors.items():
+            errors[field] += field_errors
 
         if errors:
             raise ValidationError(errors)
