@@ -77,7 +77,7 @@ class SearchBasicAPIView(APIView):
 
 
 class SearchAPIView(APIView):
-    """Filtered investment project search view."""
+    """Filtered search view."""
 
     FILTER_FIELDS = []
     REMAP_FIELDS = {}
