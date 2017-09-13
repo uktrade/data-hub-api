@@ -12,10 +12,12 @@ from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
+from rest_framework.test import APIClient
 from reversion.models import Version
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
+from datahub.core.test.factories import AccessTokenFactory, OAuthApplicationScopeFactory
 from datahub.core.test_utils import (
     APITestMixin, synchronous_executor_submit, synchronous_transaction_on_commit
 )
@@ -885,6 +887,35 @@ class TestModifiedSinceView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['count'] == 9
+
+    def test_as_oauth_application_with_scope(self):
+        """Test getting investment projects as an oauth app with correct scope."""
+        app_and_scope = OAuthApplicationScopeFactory(scopes=['investment:read'])
+        access_token = AccessTokenFactory(application=app_and_scope.application,
+                                          scope='investment:read')
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=f'bearer {access_token.token}')
+        url = reverse('api-v3:investment:investment-modified-since-collection')
+        response = client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_as_oauth_application_without_scope(self):
+        """Test getting investment projects as an oauth app without correct scope."""
+        app_and_scope = OAuthApplicationScopeFactory(scopes=[''])
+        access_token = AccessTokenFactory(application=app_and_scope.application,
+                                          scope='')
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=f'bearer {access_token.token}')
+        url = reverse('api-v3:investment:investment-modified-since-collection')
+        response = client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_without_auth(self):
+        """Test getting investment projects unauthenticated."""
+        client = APIClient()
+        url = reverse('api-v3:investment:investment-modified-since-collection')
+        response = client.get(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 class TestTeamMemberViews(APITestMixin):

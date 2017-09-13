@@ -138,6 +138,9 @@ AUTHENTICATION_BACKENDS = [
 # django-oauth-toolkit settings
 
 OAUTH2_PROVIDER = {
+    'SCOPES': {
+        'investment:read': 'Ability to read investment projects',
+    },
     'SCOPES_BACKEND_CLASS': 'datahub.core.oauth.ApplicationScopesBackend',
 }
 

@@ -5,12 +5,15 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters import IsoDateTimeFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
+from oauth2_provider.contrib.rest_framework import TokenHasScope
 from rest_framework import status
 from rest_framework.pagination import BasePagination
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
+from datahub.core.permissions import AnyOfChainer
 from datahub.core.utils import executor
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.documents.av_scan import virus_scan_document
@@ -111,6 +114,8 @@ class IProjectModifiedSinceViewSet(IProjectViewSet):
     """View set for the modified-since endpoint (intended for use by Data Hub MI)."""
 
     pagination_class = _SinglePagePaginator
+    permission_classes = [AnyOfChainer(IsAuthenticated, TokenHasScope)]
+    required_scopes = ['investment:read']
 
     filter_backends = (DjangoFilterBackend,)
     filter_fields = None
