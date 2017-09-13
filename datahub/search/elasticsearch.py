@@ -191,8 +191,8 @@ def get_field_query(kind, field, value):
 def apply_aggs_query(search, aggregates):
     """Applies aggregates query to the search."""
     for aggregate in aggregates:
-        # skip range filters as we can't aggregate them
-        if any(aggregate.endswith(x) for x in ('_before', '_after')):
+        # skip range and "search" filters as we can't aggregate them
+        if any(aggregate.endswith(x) for x in ('_before', '_after', '_trigram')):
             continue
 
         search_aggs = search.aggs

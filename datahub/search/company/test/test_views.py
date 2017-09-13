@@ -1,12 +1,12 @@
+from unittest import mock
+
 import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import CompanyFactory
-
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
-
 
 pytestmark = pytest.mark.django_db
 
@@ -80,6 +80,21 @@ class TestSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] > 1
         assert len(response.data['results']) == 1
+
+    @mock.patch('datahub.search.views.elasticsearch.apply_aggs_query')
+    def test_company_search_no_aggregations(self, apply_aggs_query, setup_es, setup_data):
+        """Tests if no aggregation occurs."""
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:company')
+        response = self.api_client.post(url, {
+            'original_query': '',
+        })
+
+        assert apply_aggs_query.call_count == 0
+
+        assert response.status_code == status.HTTP_200_OK
+        assert 'aggregations' not in response.data
 
     def test_search_company_no_filters(self, setup_es, setup_data):
         """Tests case where there is no filters provided."""
