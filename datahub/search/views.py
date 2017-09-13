@@ -77,7 +77,7 @@ class SearchBasicAPIView(APIView):
 
 
 class SearchAPIView(APIView):
-    """Filtered investment project search view."""
+    """Filtered search view."""
 
     FILTER_FIELDS = []
     REMAP_FIELDS = {}
@@ -122,13 +122,16 @@ class SearchAPIView(APIView):
 
         filters, ranges = self.get_filtering_data(request)
 
+        aggregations = (self.REMAP_FIELDS.get(field, field) for field in self.FILTER_FIELDS) \
+            if self.include_aggregations else None
+
         results = elasticsearch.get_search_by_entity_query(
             entity=self.entity,
             term=validated_data['original_query'],
             filters=filters,
             ranges=ranges,
             field_order=validated_data['sortby'],
-            aggregations=(self.REMAP_FIELDS.get(field, field) for field in self.FILTER_FIELDS),
+            aggregations=aggregations,
             offset=validated_data['offset'],
             limit=validated_data['limit'],
         ).execute()
