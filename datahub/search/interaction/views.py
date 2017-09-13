@@ -1,10 +1,18 @@
 from .models import Interaction
 from .serializers import SearchInteractionSerializer
-from ..views import SearchAPIView
+from ..views import SearchAPIView, SearchExportAPIView
 
 
-class SearchInteractionAPIView(SearchAPIView):
-    """Filtered interaction search view."""
+class SearchInteractionParams:
+    """Search interaction params."""
 
     entity = Interaction
     serializer_class = SearchInteractionSerializer
+
+
+class SearchInteractionAPIView(SearchInteractionParams, SearchAPIView):
+    """Filtered interaction search view."""
+
+
+class SearchInteractionExportAPIView(SearchInteractionParams, SearchExportAPIView):
+    """Filtered interaction search export view."""

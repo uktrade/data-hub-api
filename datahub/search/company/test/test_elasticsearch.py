@@ -268,7 +268,7 @@ def test_get_basic_search_query():
     }
 
 
-def test_get_search_by_entity_query():
+def test_limited_get_search_by_entity_query():
     """Tests search by entity."""
     date = '2017-06-13T09:44:31.062870'
     filters = {
@@ -281,7 +281,7 @@ def test_get_search_by_entity_query():
             'lte': date
         }
     }
-    query = elasticsearch.get_search_by_entity_query(
+    query = elasticsearch.get_limited_search_by_entity_query(
         term='test',
         filters=filters,
         ranges=ranges,

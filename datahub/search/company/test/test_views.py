@@ -1,6 +1,8 @@
+import csv
 from unittest import mock
 
 import pytest
+from django.utils.text import slugify
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -179,3 +181,76 @@ class TestBasicSearch(APITestMixin):
         response = self.api_client.get(url, {})
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+class TestSearchExport(APITestMixin):
+    """Tests search export views."""
+
+    def test_search_company(self, setup_es, setup_data):
+        """Tests export of detailed company search."""
+        setup_es.indices.refresh()
+
+        term = 'abc defg'
+
+        url = reverse('api-v3:search:company-export')
+        united_states_id = constants.Country.united_states.value.id
+
+        response = self.api_client.post(url, {
+            'original_query': term,
+            'trading_address_country': united_states_id,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+
+        filename = slugify(term)
+
+        # checks if filename includes our search term
+        assert filename in response['Content-Disposition']
+
+        csv_file = csv.reader(line.decode('utf-8') for line in response.streaming_content)
+
+        data = list(csv_file)
+
+        # checks if we have headers in the CSV file
+        assert {'business_type',
+                'registered_address_country',
+                'sector',
+                'trading_address_country',
+                'uk_region', 'contacts',
+                'id',
+                'uk_based',
+                'export_to_countries',
+                'future_interest_countries',
+                'created_on',
+                'modified_on',
+                'archived',
+                'archived_on',
+                'archived_reason',
+                'archived_by',
+                'name',
+                'registered_address_1',
+                'registered_address_2',
+                'registered_address_town',
+                'registered_address_county',
+                'registered_address_postcode',
+                'company_number',
+                'alias',
+                'employee_range',
+                'turnover_range',
+                'account_manager',
+                'description',
+                'website',
+                'trading_address_1',
+                'trading_address_2',
+                'trading_address_town',
+                'trading_address_county',
+                'trading_address_postcode',
+                'headquarter_type',
+                'classification',
+                'parent',
+                'one_list_account_owner'} == set(data[0])
+
+        # checks if we have a company we look for in the CSV file
+        data_row = ','.join(data[1])
+        assert 'abc defg' in data_row
+        assert 'United States' in data_row

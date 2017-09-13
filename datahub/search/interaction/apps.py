@@ -1,7 +1,8 @@
 from datahub.interaction.models import Interaction as DBInteraction
 from datahub.search.apps import SearchApp
 from datahub.search.interaction.models import Interaction
-from datahub.search.interaction.views import SearchInteractionAPIView
+from datahub.search.interaction.views import SearchInteractionAPIView, \
+    SearchInteractionExportAPIView
 
 
 class InteractionSearchApp(SearchApp):
@@ -10,6 +11,7 @@ class InteractionSearchApp(SearchApp):
     name = 'interaction'
     ESModel = Interaction
     view = SearchInteractionAPIView
+    export_view = SearchInteractionExportAPIView
     queryset = DBInteraction.objects.prefetch_related(
         'company',
         'contact',
