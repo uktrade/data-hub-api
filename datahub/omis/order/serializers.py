@@ -150,7 +150,6 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """Add extra logic to the default DRF one."""
-        data = super().validate(data)
         data = self._reset_vat_fields_if_necessary(data)
         return data
 
