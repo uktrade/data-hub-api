@@ -45,7 +45,6 @@ class APITestMixin:
                 application=self.application,
                 token='123456789',  # unsafe token, just for testing
                 expires=datetime.datetime.now() + datetime.timedelta(hours=1),
-                scope='write read'
             )
         return self._token.token
 

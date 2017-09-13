@@ -1,4 +1,7 @@
+from django.contrib import admin
 from reversion.admin import VersionAdmin
+
+from datahub.core.models import OAuthApplicationScope
 
 
 class ConfigurableVersionAdmin(VersionAdmin):
@@ -34,3 +37,8 @@ class BaseModelVersionAdmin(ConfigurableVersionAdmin):
     """
 
     reversion_excluded_fields = ('created_on', 'created_by', 'modified_on', 'modified_by')
+
+
+@admin.register(OAuthApplicationScope)
+class OAuthApplicationScopeAdmin(admin.ModelAdmin):
+    """OAuthApplicationScope Admin."""
