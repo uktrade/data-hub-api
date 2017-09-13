@@ -1,6 +1,9 @@
 """Search views."""
+import csv
 from collections import namedtuple
 
+from django.http import StreamingHttpResponse
+from django.utils.text import slugify
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
@@ -9,6 +12,7 @@ from rest_framework.views import APIView
 from . import elasticsearch
 from .apps import get_search_apps
 from .serializers import SearchSerializer
+from .utils import Echo
 
 EntitySearch = namedtuple('EntitySearch', ['model', 'name'])
 
@@ -125,7 +129,7 @@ class SearchAPIView(APIView):
         aggregations = (self.REMAP_FIELDS.get(field, field) for field in self.FILTER_FIELDS) \
             if self.include_aggregations else None
 
-        results = elasticsearch.get_search_by_entity_query(
+        results = elasticsearch.get_limited_search_by_entity_query(
             entity=self.entity,
             term=validated_data['original_query'],
             filters=filters,
@@ -155,3 +159,57 @@ class SearchAPIView(APIView):
             response['aggregations'] = aggregations
 
         return Response(data=response)
+
+
+class SearchExportAPIView(SearchAPIView):
+    """Returns CSV file with all search results."""
+
+    def format_cell(self, cell):
+        """Gets cell or name from cell and flattens the cell if necessary."""
+        if isinstance(cell, dict):
+            if 'name' in cell:
+                return cell['name']
+
+        if isinstance(cell, list):
+            return ','.join([self.format_cell(item) for item in cell])
+
+        return cell
+
+    def get_row(self, query):
+        """Gets formatted row of results."""
+        row = 0
+        # we want to keep the same order of rows that is in the search results
+        query.params(preserve_order=True)
+        for hit in query.scan():
+            if row == 0:
+                yield [k for k in hit.to_dict().keys()]
+            yield [self.format_cell(v) for v in hit.to_dict().values()]
+            row += 1
+
+    def post(self, request, format=None):
+        """Performs search and returns CSV file."""
+        data = request.data.copy()
+
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+
+        filters, ranges = self.get_filtering_data(request)
+
+        results = elasticsearch.get_search_by_entity_query(
+            entity=self.entity,
+            term=validated_data['original_query'],
+            filters=filters,
+            ranges=ranges,
+            field_order=validated_data['sortby'],
+        )
+
+        filename = slugify(f"{self.entity.__name__}-{validated_data['original_query']}")
+
+        writer = csv.writer(Echo())
+
+        response = StreamingHttpResponse((writer.writerow(row) for row in self.get_row(results)),
+                                         content_type='text/csv')
+
+        response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
+        return response

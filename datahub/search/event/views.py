@@ -1,10 +1,10 @@
 from .models import Event
 from .serializers import SearchEventSerializer
-from ..views import SearchAPIView
+from ..views import SearchAPIView, SearchExportAPIView
 
 
-class SearchEventAPIView(SearchAPIView):
-    """Filtered event search view."""
+class SearchEventParams:
+    """Search event params."""
 
     entity = Event
     serializer_class = SearchEventSerializer
@@ -24,3 +24,10 @@ class SearchEventAPIView(SearchAPIView):
         'event_type': 'event_type.id',
         'address_country': 'address_country.id',
     }
+
+class SearchEventAPIView(SearchEventParams, SearchAPIView):
+    """Filtered event search view."""
+
+
+class SearchEventExportAPIView(SearchEventParams, SearchExportAPIView):
+    """Filtered event search export view."""

@@ -1,10 +1,10 @@
 from .models import InvestmentProject
 from .serializers import SearchInvestmentProjectSerializer
-from ..views import SearchAPIView
+from ..views import SearchAPIView, SearchExportAPIView
 
 
-class SearchInvestmentProjectAPIView(SearchAPIView):
-    """Filtered investment project search view."""
+class SearchInvestmentProjectParams:
+    """Search investment project params."""
 
     entity = InvestmentProject
     serializer_class = SearchInvestmentProjectSerializer
@@ -28,3 +28,11 @@ class SearchInvestmentProjectAPIView(SearchAPIView):
         'sector': 'sector.id',
         'stage': 'stage.id',
     }
+
+
+class SearchInvestmentProjectAPIView(SearchInvestmentProjectParams, SearchAPIView):
+    """Filtered investment project search view."""
+
+
+class SearchInvestmentProjectExportAPIView(SearchInvestmentProjectParams, SearchExportAPIView):
+    """Filtered investment project search export view."""

@@ -1,7 +1,7 @@
 from datahub.company.models import Contact as DBContact
 
 from .models import Contact
-from .views import SearchContactAPIView
+from .views import SearchContactAPIView, SearchContactExportAPIView
 
 from ..apps import SearchApp
 
@@ -12,6 +12,7 @@ class ContactSearchApp(SearchApp):
     name = 'contact'
     ESModel = Contact
     view = SearchContactAPIView
+    export_view = SearchContactExportAPIView
     queryset = DBContact.objects.prefetch_related(
         'title',
         'company',

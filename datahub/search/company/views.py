@@ -1,10 +1,10 @@
 from .models import Company
 from .serializers import SearchCompanySerializer
-from ..views import SearchAPIView
+from ..views import SearchAPIView, SearchExportAPIView
 
 
-class SearchCompanyAPIView(SearchAPIView):
-    """Filtered company search view."""
+class SearchCompanyParams:
+    """Search company parameters."""
 
     entity = Company
     serializer_class = SearchCompanySerializer
@@ -33,3 +33,11 @@ class SearchCompanyAPIView(SearchAPIView):
         'trading_address_country': 'trading_address_country.id',
         'uk_region': 'uk_region.id',
     }
+
+
+class SearchCompanyAPIView(SearchCompanyParams, SearchAPIView):
+    """Filtered company search view."""
+
+
+class SearchCompanyExportAPIView(SearchCompanyParams, SearchExportAPIView):
+    """Filtered company search export view."""

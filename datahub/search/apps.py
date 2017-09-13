@@ -23,6 +23,7 @@ class SearchApp:
     name = None
     ESModel = None
     view = None
+    export_view = None
     queryset = None
 
     def __init__(self, mod):

@@ -211,12 +211,8 @@ def get_search_by_entity_query(term=None,
                                entity=None,
                                ranges=None,
                                field_order=None,
-                               aggregations=None,
-                               offset=0,
-                               limit=100):
+                               aggregations=None):
     """Perform filtered search for given terms in given entity."""
-    limit = _clip_limit(offset, limit)
-
     query = [Q('term', _type=entity._doc_type.name)]
     if term != '':
         query.append(get_search_term_query(term, fields=entity.SEARCH_FIELDS))
@@ -247,6 +243,32 @@ def get_search_by_entity_query(term=None,
 
     if aggregations:
         apply_aggs_query(s, aggregations)
+
+    return s
+
+
+def get_limited_search_by_entity_query(term=None,
+                                       filters=None,
+                                       entity=None,
+                                       ranges=None,
+                                       field_order=None,
+                                       aggregations=None,
+                                       offset=0,
+                                       limit=100):
+    """
+    Perform filtered search for given terms in given entity.
+    Search results are paged using offset and limit.
+    """
+    limit = _clip_limit(offset, limit)
+
+    s = get_search_by_entity_query(
+        term=term,
+        filters=filters,
+        entity=entity,
+        ranges=ranges,
+        field_order=field_order,
+        aggregations=aggregations
+    )
 
     return s[offset:offset + limit]
 
