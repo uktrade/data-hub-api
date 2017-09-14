@@ -227,7 +227,7 @@ class SearchExportAPIView(SearchAPIView):
 
         base_filename = self._get_base_filename(validated_data['original_query'])
 
-        writer = csv.DictWriter(Echo(), fieldnames=self._get_fieldnames())
+        writer = csv.DictWriter(Echo(), fieldnames=sorted(self._get_fieldnames()))
 
         response = StreamingHttpResponse(self._get_csv(writer, results), content_type='text/csv')
 
