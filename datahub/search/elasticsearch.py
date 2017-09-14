@@ -247,30 +247,10 @@ def get_search_by_entity_query(term=None,
     return s
 
 
-def get_limited_search_by_entity_query(term=None,
-                                       filters=None,
-                                       entity=None,
-                                       ranges=None,
-                                       field_order=None,
-                                       aggregations=None,
-                                       offset=0,
-                                       limit=100):
-    """
-    Perform filtered search for given terms in given entity.
-    Search results are paged using offset and limit.
-    """
+def limit_search_query(query, offset=0, limit=100):
+    """Limits search query to the page defined by offset and limit."""
     limit = _clip_limit(offset, limit)
-
-    s = get_search_by_entity_query(
-        term=term,
-        filters=filters,
-        entity=entity,
-        ranges=ranges,
-        field_order=field_order,
-        aggregations=aggregations
-    )
-
-    return s[offset:offset + limit]
+    return query[offset:offset + limit]
 
 
 def bulk(actions=None, chunk_size=None, **kwargs):
