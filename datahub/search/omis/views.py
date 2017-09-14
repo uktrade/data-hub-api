@@ -1,6 +1,6 @@
 from .models import Order
 from .serializers import SearchOrderSerializer
-from ..views import SearchAPIView, SearchExportAPIView
+from ..views import SearchAPIView
 
 
 class SearchOrderParams:
@@ -26,7 +26,3 @@ class SearchOrderParams:
 
 class SearchOrderAPIView(SearchOrderParams, SearchAPIView):
     """Filtered order search view."""
-
-
-class SearchOrderExportAPIView(SearchOrderParams, SearchExportAPIView):
-    """Filtered order search export view."""

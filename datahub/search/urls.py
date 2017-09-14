@@ -10,18 +10,16 @@ urlpatterns = [
 ]
 
 for search_app in get_search_apps():
-    if not search_app.view:
-        continue
-
-    urlpatterns.extend([
-        url(
+    if search_app.view:
+        urlpatterns.append(url(
             rf'^search/{search_app.name}$',
             search_app.view.as_view(),
             name=search_app.name
-        ),
-        url(
+        ))
+
+    if search_app.export_view:
+        urlpatterns.append(url(
             rf'^search/{search_app.name}/export$',
             search_app.export_view.as_view(),
             name=f'{search_app.name}-export'
-        )
-    ])
+        ))
