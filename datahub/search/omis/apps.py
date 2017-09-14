@@ -1,7 +1,7 @@
 from datahub.omis.order.models import Order as DBOrder
 
 from .models import Order
-from .views import SearchOrderAPIView, SearchOrderExportAPIView
+from .views import SearchOrderAPIView
 
 from ..apps import SearchApp
 
@@ -12,7 +12,6 @@ class OrderSearchApp(SearchApp):
     name = 'order'
     ESModel = Order
     view = SearchOrderAPIView
-    export_view = SearchOrderExportAPIView
     queryset = DBOrder.objects.prefetch_related(
         'company',
         'contact',
