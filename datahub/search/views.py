@@ -211,7 +211,7 @@ class SearchExportAPIView(SearchAPIView):
             field_order=validated_data['sortby'],
         )
 
-        filename_parts = [self.entity.__name__]
+        filename_parts = ['data-hub', self.entity.__name__]
         if validated_data['original_query']:
             filename_parts.append(validated_data['original_query'])
 
