@@ -218,6 +218,7 @@ class TestSearchExport(APITestMixin):
                 'registered_address_country',
                 'sector',
                 'trading_address_country',
+                'companies_house_data',
                 'uk_region', 'contacts',
                 'id',
                 'uk_based',
@@ -253,6 +254,5 @@ class TestSearchExport(APITestMixin):
                 'one_list_account_owner'} == set(rows[0].keys())
 
         # checks if we have a company we look for in the CSV file
-        data_row = ','.join(rows[0].values())
-        assert 'abc defg' in data_row
-        assert 'United States' in data_row
+        assert 'abc defg' in rows[0]['name']
+        assert 'United States' in rows[0]['trading_address_country']
