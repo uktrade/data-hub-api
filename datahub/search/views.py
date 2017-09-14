@@ -129,13 +129,15 @@ class SearchAPIView(APIView):
         aggregations = (self.REMAP_FIELDS.get(field, field) for field in self.FILTER_FIELDS) \
             if self.include_aggregations else None
 
-        results = elasticsearch.get_limited_search_by_entity_query(
-            entity=self.entity,
-            term=validated_data['original_query'],
-            filters=filters,
-            ranges=ranges,
-            field_order=validated_data['sortby'],
-            aggregations=aggregations,
+        results = elasticsearch.limit_search_query(
+            elasticsearch.get_search_by_entity_query(
+                entity=self.entity,
+                term=validated_data['original_query'],
+                filters=filters,
+                ranges=ranges,
+                field_order=validated_data['sortby'],
+                aggregations=aggregations,
+            ),
             offset=validated_data['offset'],
             limit=validated_data['limit'],
         ).execute()
