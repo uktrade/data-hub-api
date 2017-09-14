@@ -164,6 +164,13 @@ class SearchAPIView(APIView):
 class SearchExportAPIView(SearchAPIView):
     """Returns CSV file with all search results."""
 
+    IGNORED_SUFFIXES = ('_trigram', '_keyword',)
+
+    def _clean_fieldnames(self, fieldnames):
+        """Remove special fields from the export."""
+        return [field for field in fieldnames
+                if not any(field.endswith(suffix) for suffix in self.IGNORED_SUFFIXES)]
+
     def _format_cell(self, cell):
         """Gets cell or name from cell and flattens the cell if necessary."""
         if isinstance(cell, dict):
@@ -175,14 +182,16 @@ class SearchExportAPIView(SearchAPIView):
 
         return cell
 
-    def _get_row(self, query):
+    def _get_rows(self, writer, query):
         """Gets formatted row of results."""
         # we want to keep the same order of rows that is in the search results
         query.params(preserve_order=True)
-        for row_number, hit in enumerate(query.scan()):
-            if row_number == 0:
-                yield [k for k in hit.to_dict().keys()]
-            yield [self._format_cell(v) for v in hit.to_dict().values()]
+        # work around bug: https://bugs.python.org/issue27497
+        header = dict(zip(writer.fieldnames, writer.fieldnames))
+        yield writer.writerow(header)
+        for hit in query.scan():
+            yield writer.writerow({k: self._format_cell(v)
+                                   for k, v in hit.to_dict().items() if k in writer.fieldnames})
 
     def post(self, request, format=None):
         """Performs search and returns CSV file."""
@@ -202,12 +211,19 @@ class SearchExportAPIView(SearchAPIView):
             field_order=validated_data['sortby'],
         )
 
-        filename = slugify(f"{self.entity.__name__}-{validated_data['original_query']}")
+        filename_parts = [self.entity.__name__]
+        if validated_data['original_query']:
+            filename_parts.append(validated_data['original_query'])
 
-        writer = csv.writer(Echo())
+        filename = slugify('-'.join(filename_parts))
 
-        response = StreamingHttpResponse((writer.writerow(row) for row in self._get_row(results)),
-                                         content_type='text/csv')
+        fieldnames = self._clean_fieldnames(
+            self.entity._doc_type.mapping.properties._params['properties'].keys()
+        )
+
+        writer = csv.DictWriter(Echo(), fieldnames=fieldnames)
+
+        response = StreamingHttpResponse(self._get_rows(writer, results), content_type='text/csv')
 
         response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
         return response
