@@ -258,7 +258,7 @@ class TestCreateEventView(APITestMixin):
             'event_type': EventType.seminar.value.id,
             'address_1': 'Grand Court Exhibition Centre',
             'address_town': 'London',
-            'address_country': Country.united_kingdom.value.id,
+            'address_country': Country.united_states.value.id,
             'uk_region': UKRegion.east_of_england.value.id,
         }
         response = self.api_client.post(url, format='json', data=request_data)
