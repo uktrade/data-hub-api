@@ -135,6 +135,15 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend'
 ]
 
+# django-oauth-toolkit settings
+
+OAUTH2_PROVIDER = {
+    'SCOPES': {
+        'investment:read': 'Ability to read investment projects',
+    },
+    'SCOPES_BACKEND_CLASS': 'datahub.core.oauth.ApplicationScopesBackend',
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
