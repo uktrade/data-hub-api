@@ -27,6 +27,9 @@ class Event(BaseModel):
     address_country = models.ForeignKey(
         'metadata.Country', on_delete=models.PROTECT, related_name='+'
     )
+    uk_region = models.ForeignKey(
+        'metadata.UKRegion', blank=True, null=True, on_delete=models.SET_NULL
+    )
     notes = models.TextField(blank=True)
     organiser = models.ForeignKey(
         'company.Advisor', on_delete=models.deletion.SET_NULL, null=True, blank=True
