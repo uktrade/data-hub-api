@@ -1,6 +1,7 @@
 import csv
 import random
 import uuid
+from datetime import datetime
 from unittest import mock
 
 import factory
@@ -278,10 +279,15 @@ class TestSearchExport(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
 
-        filename = slugify(term)
-
-        # checks if filename includes our search term
-        assert filename in response['Content-Disposition']
+        # check if filename contains data-hub, current date, term and entity
+        filename_parts = [
+            slugify(term),
+            'company',
+            datetime.utcnow().strftime('%Y-%m-%d'),
+            'data-hub'
+        ]
+        for filename_part in filename_parts:
+            assert filename_part in response['Content-Disposition']
 
         csv_file = csv.DictReader(line.decode('utf-8') for line in response.streaming_content)
 

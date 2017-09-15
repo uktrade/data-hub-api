@@ -1,6 +1,7 @@
 """Search views."""
 import csv
 from collections import namedtuple
+from datetime import datetime
 
 from django.http import StreamingHttpResponse
 from django.utils.text import slugify
@@ -199,7 +200,11 @@ class SearchExportAPIView(SearchAPIView):
 
     def _get_base_filename(self, original_query):
         """Gets base filename that contains sanitized entity name and original_query."""
-        filename_parts = ['data-hub', self.entity.__name__]
+        filename_parts = [
+            datetime.utcnow().strftime('%Y-%m-%d'),
+            'data-hub',
+            self.entity.__name__
+        ]
         if original_query:
             filename_parts.append(original_query)
 
