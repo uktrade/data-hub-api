@@ -22,6 +22,7 @@ class Event(DocType, MapDBModelToDict):
     address_county = dsl_utils.CaseInsensitiveKeywordString()
     address_postcode = String()
     address_country = dsl_utils.id_name_mapping()
+    uk_region = dsl_utils.id_name_mapping()
     notes = dsl_utils.EnglishString()
     organiser = dsl_utils.contact_or_adviser_mapping('organiser')
     lead_team = dsl_utils.id_name_mapping()
@@ -33,6 +34,7 @@ class Event(DocType, MapDBModelToDict):
         'event_type': dict_utils.id_name_dict,
         'location_type': dict_utils.id_name_dict,
         'address_country': dict_utils.id_name_dict,
+        'uk_region': dict_utils.id_name_dict,
         'organiser': dict_utils.contact_or_adviser_dict,
         'lead_team': dict_utils.id_name_dict,
         'teams': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],

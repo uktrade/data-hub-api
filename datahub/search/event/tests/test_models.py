@@ -16,7 +16,7 @@ def test_event_dbmodel_to_dict():
             'organiser', 'lead_team', 'teams', 'related_programmes',
             'created_on', 'modified_on', 'name', 'start_date', 'end_date',
             'address_1', 'address_2', 'address_town', 'address_county',
-            'address_postcode', 'notes'}
+            'address_postcode', 'notes', 'uk_region'}
 
     assert set(result.keys()) == keys
 

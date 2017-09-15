@@ -3,7 +3,7 @@ import uuid
 import factory
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.core.constants import Country, Team
+from datahub.core.constants import Country, Team, UKRegion
 from datahub.core.test.factories import to_many_field
 from datahub.event.constants import EventType, LocationType, Programme
 
@@ -23,6 +23,7 @@ class EventFactory(factory.django.DjangoModelFactory):
     address_town = factory.Faker('text')
     address_postcode = factory.Faker('text')
     address_country_id = Country.united_kingdom.value.id
+    uk_region_id = UKRegion.east_of_england.value.id
     notes = factory.Faker('text')
     organiser = factory.SubFactory(AdviserFactory)
     lead_team_id = Team.crm.value.id
