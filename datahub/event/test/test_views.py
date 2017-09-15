@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.core.constants import Country, Team
+from datahub.core.constants import Country, Team, UKRegion
 from datahub.core.test_utils import APITestMixin
 from datahub.event.constants import EventType, LocationType, Programme
 from datahub.event.test.factories import EventFactory
@@ -44,6 +44,10 @@ class TestGetEventView(APITestMixin):
             'address_country': {
                 'id': str(event.address_country.id),
                 'name': event.address_country.name,
+            },
+            'uk_region': {
+                'id': UKRegion.east_of_england.value.id,
+                'name': UKRegion.east_of_england.value.name,
             },
             'organiser': {
                 'id': str(event.organiser.pk),
@@ -96,8 +100,8 @@ class TestCreateEventView(APITestMixin):
             'name': 'Grand exhibition',
             'event_type': EventType.seminar.value.id,
             'address_1': 'Grand Court Exhibition Centre',
-            'address_town': 'London',
-            'address_country': Country.united_kingdom.value.id,
+            'address_town': 'New York',
+            'address_country': Country.united_states.value.id,
         }
         response = self.api_client.post(url, format='json', data=request_data)
 
@@ -116,13 +120,14 @@ class TestCreateEventView(APITestMixin):
             'notes': '',
             'address_1': 'Grand Court Exhibition Centre',
             'address_2': '',
-            'address_town': 'London',
+            'address_town': 'New York',
             'address_county': '',
             'address_postcode': '',
             'address_country': {
-                'id': Country.united_kingdom.value.id,
-                'name': Country.united_kingdom.value.name,
+                'id': Country.united_states.value.id,
+                'name': Country.united_states.value.name,
             },
+            'uk_region': None,
             'organiser': None,
             'lead_team': None,
             'teams': [],
@@ -145,6 +150,7 @@ class TestCreateEventView(APITestMixin):
             'address_county': 'Londinium',
             'address_postcode': 'SW9 9AA',
             'address_country': Country.united_kingdom.value.id,
+            'uk_region': UKRegion.east_of_england.value.id,
             'organiser': str(self.user.pk),
             'lead_team': Team.crm.value.id,
             'teams': [Team.crm.value.id, Team.healthcare_uk.value.id],
@@ -178,6 +184,10 @@ class TestCreateEventView(APITestMixin):
                 'id': Country.united_kingdom.value.id,
                 'name': Country.united_kingdom.value.name,
             },
+            'uk_region': {
+                'id': UKRegion.east_of_england.value.id,
+                'name': UKRegion.east_of_england.value.name,
+            },
             'organiser': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
@@ -210,6 +220,7 @@ class TestCreateEventView(APITestMixin):
             'address_1': 'Grand Court Exhibition Centre',
             'address_town': 'London',
             'address_country': Country.united_kingdom.value.id,
+            'uk_region': UKRegion.east_of_england.value.id,
             'lead_team': Team.crm.value.id,
             'teams': [Team.healthcare_uk.value.id],
         }
@@ -221,6 +232,43 @@ class TestCreateEventView(APITestMixin):
             'lead_team': ['Lead team must be in teams array.']
         }
 
+    def test_create_uk_no_uk_region(self):
+        """Tests UK region requirement for UK events."""
+        url = reverse('api-v3:event:collection')
+        request_data = {
+            'name': 'Grand exhibition',
+            'event_type': EventType.seminar.value.id,
+            'address_1': 'Grand Court Exhibition Centre',
+            'address_town': 'London',
+            'address_country': Country.united_kingdom.value.id,
+        }
+        response = self.api_client.post(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'uk_region': ['This field is required.']
+        }
+
+    def test_create_non_uk_with_uk_region(self):
+        """Tests creating a non-UK event with a UK region."""
+        url = reverse('api-v3:event:collection')
+        request_data = {
+            'name': 'Grand exhibition',
+            'event_type': EventType.seminar.value.id,
+            'address_1': 'Grand Court Exhibition Centre',
+            'address_town': 'London',
+            'address_country': Country.united_states.value.id,
+            'uk_region': UKRegion.east_of_england.value.id,
+        }
+        response = self.api_client.post(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'uk_region': ['Cannot specify a UK region for a non-UK country.']
+        }
+
     def test_create_end_date_without_start_date(self):
         """Tests specifying an end date without a start date."""
         url = reverse('api-v3:event:collection')
@@ -230,6 +278,7 @@ class TestCreateEventView(APITestMixin):
             'address_1': 'Grand Court Exhibition Centre',
             'address_town': 'London',
             'address_country': Country.united_kingdom.value.id,
+            'uk_region': UKRegion.east_of_england.value.id,
             'end_date': '2020-01-01',
         }
         response = self.api_client.post(url, format='json', data=request_data)
@@ -249,6 +298,7 @@ class TestCreateEventView(APITestMixin):
             'address_1': 'Grand Court Exhibition Centre',
             'address_town': 'London',
             'address_country': Country.united_kingdom.value.id,
+            'uk_region': UKRegion.east_of_england.value.id,
             'start_date': '2020-01-02',
             'end_date': '2020-01-01',
         }
@@ -321,6 +371,7 @@ class TestUpdateEventView(APITestMixin):
             'address_county': 'County Annual',
             'address_postcode': 'SW9 9AB',
             'address_country': Country.isle_of_man.value.id,
+            'uk_region': None,
             'organiser': str(organiser.pk),
             'lead_team': Team.food_from_britain.value.id,
             'teams': [Team.food_from_britain.value.id, Team.healthcare_uk.value.id],
@@ -354,6 +405,7 @@ class TestUpdateEventView(APITestMixin):
                 'id': Country.isle_of_man.value.id,
                 'name': Country.isle_of_man.value.name,
             },
+            'uk_region': None,
             'organiser': {
                 'id': str(organiser.pk),
                 'first_name': organiser.first_name,
