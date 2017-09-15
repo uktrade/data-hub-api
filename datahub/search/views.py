@@ -176,8 +176,10 @@ class SearchExportAPIView(SearchAPIView):
     def _format_cell(self, cell):
         """Gets cell or name from cell and flattens the cell if necessary."""
         if isinstance(cell, dict):
-            if 'name' in cell:
-                return cell['name']
+            for k in ('name', 'type', 'company_number', 'uri', 'id',):
+                if k in cell:
+                    return cell[k]
+            return str(cell)
 
         if isinstance(cell, list):
             return ','.join(self._format_cell(item) for item in cell)
