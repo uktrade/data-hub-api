@@ -72,6 +72,10 @@ class OrderSerializer(serializers.ModelSerializer):
             'vat_status',
             'vat_number',
             'vat_verified',
+            'net_cost',
+            'subtotal_cost',
+            'vat_cost',
+            'total_cost',
         )
         read_only_fields = (
             'id',
@@ -88,6 +92,10 @@ class OrderSerializer(serializers.ModelSerializer):
             'existing_agents',
             'permission_to_approach_contacts',
             'discount_value',
+            'net_cost',
+            'subtotal_cost',
+            'vat_cost',
+            'total_cost',
         )
         validators = (
             ContactWorksAtCompanyValidator(),
