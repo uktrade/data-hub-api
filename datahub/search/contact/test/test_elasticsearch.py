@@ -281,13 +281,14 @@ def test_get_limited_search_by_entity_query():
             'lte': date
         }
     }
+    query = elasticsearch.get_search_by_entity_query(
+        term='test',
+        filters=filters,
+        ranges=ranges,
+        entity=ESContact,
+    )
     query = elasticsearch.limit_search_query(
-        elasticsearch.get_search_by_entity_query(
-            term='test',
-            filters=filters,
-            ranges=ranges,
-            entity=ESContact,
-        ),
+        query,
         offset=5,
         limit=5,
     )
