@@ -105,7 +105,11 @@ class TestAddOrderDetails(APITestMixin):
             'discount_value': 0,
             'vat_status': VATStatus.eu,
             'vat_number': '01234566789',
-            'vat_verified': True
+            'vat_verified': True,
+            'net_cost': 0,
+            'subtotal_cost': 0,
+            'vat_cost': 0,
+            'total_cost': 0,
         }
 
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
@@ -136,6 +140,11 @@ class TestAddOrderDetails(APITestMixin):
         assert response.json()['vat_status'] == ''
         assert response.json()['vat_number'] == ''
         assert response.json()['vat_verified'] is None
+        assert response.json()['discount_value'] == 0
+        assert response.json()['net_cost'] == 0
+        assert response.json()['subtotal_cost'] == 0
+        assert response.json()['vat_cost'] == 0
+        assert response.json()['total_cost'] == 0
 
     def test_fails_if_contact_not_from_company(self):
         """
@@ -339,6 +348,7 @@ class TestChangeOrderDetails(APITestMixin):
             format='json'
         )
 
+        order.refresh_from_db()
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
             'id': str(order.pk),
@@ -390,6 +400,10 @@ class TestChangeOrderDetails(APITestMixin):
             'vat_status': VATStatus.eu,
             'vat_number': 'new vat number',
             'vat_verified': False,
+            'net_cost': order.net_cost,
+            'subtotal_cost': order.subtotal_cost,
+            'vat_cost': order.vat_cost,
+            'total_cost': order.total_cost,
         }
 
     def test_fails_if_contact_not_from_company(self):
@@ -578,6 +592,10 @@ class TestChangeOrderDetails(APITestMixin):
                 'contact_email': 'updated-email@email.com',
                 'contact_phone': '1234',
                 'discount_value': 99999,
+                'net_cost': 99999,
+                'subtotal_cost': 99999,
+                'vat_cost': 99999,
+                'total_cost': 99999,
             },
             format='json'
         )
@@ -592,6 +610,10 @@ class TestChangeOrderDetails(APITestMixin):
         assert response.json()['contact_email'] != 'updated-email@email.com'
         assert response.json()['contact_phone'] != '1234'
         assert response.json()['discount_value'] != 99999
+        assert response.json()['net_cost'] != 99999
+        assert response.json()['subtotal_cost'] != 99999
+        assert response.json()['vat_cost'] != 99999
+        assert response.json()['total_cost'] != 99999
 
     @pytest.mark.parametrize(
         'disallowed_status', (
@@ -708,6 +730,10 @@ class TestViewOrderDetails(APITestMixin):
             'vat_status': order.vat_status,
             'vat_number': order.vat_number,
             'vat_verified': order.vat_verified,
+            'net_cost': order.net_cost,
+            'subtotal_cost': order.subtotal_cost,
+            'vat_cost': order.vat_cost,
+            'total_cost': order.total_cost,
         }
 
     def test_not_found(self):

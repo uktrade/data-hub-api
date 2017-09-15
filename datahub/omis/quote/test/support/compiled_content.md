@@ -14,9 +14,11 @@ lorem ipsum
 
 You shall pay DIT the Charge detailed below in the manner and at the times described in Section 4 below and in the Terms.
 
-Net Charge:			£<0.00>
+Subtotal:   £30.25
 
-Net Payable:		£<0.00>
+VAT:        £5.29
+
+Total:      £35.54
 
 ## 3.	Acceptance of quote and delivery date
 

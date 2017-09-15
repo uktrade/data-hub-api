@@ -7,6 +7,7 @@ from django.utils.timezone import now
 from rest_framework.exceptions import ValidationError
 
 from datahub.omis.core.utils import generate_reference
+from datahub.omis.order.pricing import get_pricing_from_order
 
 from .constants import QUOTE_EXPIRY_DAYS_BEFORE_DELIVERY, QUOTE_EXPIRY_DAYS_FROM_NOW
 
@@ -38,6 +39,7 @@ def generate_quote_content(order, expires_on):
         QUOTE_TEMPLATE,
         {
             'order': order,
+            'pound_pricing': get_pricing_from_order(order, in_pence=False),
             'expires_on': expires_on,
         }
     )

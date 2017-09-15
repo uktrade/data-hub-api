@@ -149,9 +149,23 @@ class Order(BaseModel):
     )
     discount_value = models.PositiveIntegerField(default=0)
     discount_label = models.CharField(max_length=100, blank=True)
+
     vat_status = models.CharField(max_length=100, choices=VATStatus, blank=True)
     vat_number = models.CharField(max_length=100, blank=True)
     vat_verified = models.NullBooleanField()
+
+    net_cost = models.PositiveIntegerField(
+        default=0, help_text='Total hours * hourly rate in pence.'
+    )
+    subtotal_cost = models.PositiveIntegerField(
+        default=0, help_text='Net cost - discount value in pence.'
+    )
+    vat_cost = models.PositiveIntegerField(
+        default=0, help_text='VAT amount of subtotal in pence.'
+    )
+    total_cost = models.PositiveIntegerField(
+        default=0, help_text='Subtotal + VAT cost in pence.'
+    )
 
     # legacy fields, only meant to be used in readonly mode as reference
     product_info = models.TextField(

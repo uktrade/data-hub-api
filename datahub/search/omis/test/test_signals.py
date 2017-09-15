@@ -86,7 +86,7 @@ def test_adding_assignees_syncs_order_to_es(setup_es):
     Test that when an assignee is added to an order,
     the linked order gets synced to ES.
     """
-    order = OrderFactory()
+    order = OrderFactory(assignees=[])
     assignees = OrderAssigneeFactory.create_batch(2, order=order)
     setup_es.indices.refresh()
 
@@ -107,7 +107,7 @@ def test_removing_assignees_syncs_order_to_es(setup_es):
     Test that when an assignee is removed from an order,
     the linked order gets synced to ES.
     """
-    order = OrderFactory()
+    order = OrderFactory(assignees=[])
     assignees = OrderAssigneeFactory.create_batch(2, order=order)
     assignees.pop().delete()
     setup_es.indices.refresh()

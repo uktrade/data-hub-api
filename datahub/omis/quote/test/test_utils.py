@@ -1,3 +1,4 @@
+from decimal import Decimal
 from pathlib import PurePath
 from unittest import mock
 import pytest
@@ -7,7 +8,10 @@ from rest_framework.exceptions import ValidationError
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.constants import Country
-from datahub.omis.order.test.factories import OrderFactory
+from datahub.omis.order.constants import VATStatus
+from datahub.omis.order.test.factories import (
+    HourlyRateFactory, OrderAssigneeFactory, OrderFactory
+)
 
 from ..utils import (
     calculate_quote_expiry_date,
@@ -43,6 +47,7 @@ class TestGenerateQuoteContent:
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
     def test_content(self):
         """Test that the quote content is populated as expected."""
+        hourly_rate = HourlyRateFactory(rate_value=1250, vat_value=Decimal(17.5))
         company = CompanyFactory(name='My Coorp')
         contact = ContactFactory(
             company=company,
@@ -56,7 +61,12 @@ class TestGenerateQuoteContent:
             reference='ABC123',
             primary_market_id=Country.france.value.id,
             description='lorem ipsum',
+            discount_value=100,
+            hourly_rate=hourly_rate,
+            assignees=[],
+            vat_status=VATStatus.uk
         )
+        OrderAssigneeFactory(order=order, estimated_time=150)
 
         content = generate_quote_content(
             order=order,

@@ -32,6 +32,10 @@ class Order(DocType, MapDBModelToDict):
     vat_status = String(index='no')
     vat_number = String(index='no')
     vat_verified = Boolean(index='no')
+    net_cost = Integer(index='no')
+    subtotal_cost = Integer(index='no')
+    vat_cost = Integer(index='no')
+    total_cost = Integer()
 
     MAPPINGS = {
         'id': str,
