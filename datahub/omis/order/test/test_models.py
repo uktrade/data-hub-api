@@ -1,8 +1,10 @@
+import secrets
+from functools import partial
 from unittest import mock
-
+import factory
 import pytest
+from django.utils.crypto import get_random_string
 from freezegun import freeze_time
-
 from rest_framework.exceptions import ValidationError
 
 from datahub.company.test.factories import AdviserFactory, ContactFactory
@@ -24,10 +26,20 @@ from ..constants import OrderStatus
 pytestmark = pytest.mark.django_db
 
 
+class OrderWithRandomPublicTokenFactory(OrderFactory):
+    """OrderFactory with an already populated public_token field."""
+
+    public_token = factory.LazyFunction(partial(secrets.token_urlsafe, 37))
+
+
+class OrderWithRandomReferenceFactory(OrderFactory):
+    """OrderFactory with an already populated reference field."""
+
+    reference = factory.LazyFunction(get_random_string)
+
+
 class TestOrderGenerateReference:
-    """
-    Tests the generate reference logic for the Order model.
-    """
+    """Tests for the generate reference logic."""
 
     @freeze_time('2017-07-12 13:00:00.000000+00:00')
     @mock.patch('datahub.omis.order.models.get_random_string')
@@ -40,11 +52,11 @@ class TestOrderGenerateReference:
         ]
 
         # create 1st
-        order = OrderFactory()
+        order = OrderWithRandomPublicTokenFactory()
         assert order.reference == 'ABC123/17'
 
         # create 2nd
-        order = OrderFactory()
+        order = OrderWithRandomPublicTokenFactory()
         assert order.reference == 'CBA321/17'
 
     @freeze_time('2017-07-12 13:00:00.000000+00:00')
@@ -55,14 +67,14 @@ class TestOrderGenerateReference:
         exists, it skips it and generates the next one.
         """
         # create existing Order with ref == 'ABC123/17'
-        OrderFactory(reference='ABC123/17')
+        OrderWithRandomPublicTokenFactory(reference='ABC123/17')
 
         mock_get_random_string.side_effect = [
             'ABC', '123', 'CBA', '321'
         ]
 
         # ABC123/17 already exists so create CBA321/17 instead
-        order = OrderFactory()
+        order = OrderWithRandomPublicTokenFactory()
         assert order.reference == 'CBA321/17'
 
     @freeze_time('2017-07-12 13:00:00.000000+00:00')
@@ -73,13 +85,63 @@ class TestOrderGenerateReference:
         RuntimeError.
         """
         max_retries = 10
-        OrderFactory(reference='ABC123/17')
+        OrderWithRandomPublicTokenFactory(reference='ABC123/17')
 
         mock_get_random_string.side_effect = ['ABC', '123'] * max_retries
 
         with pytest.raises(RuntimeError):
             for index in range(max_retries):
-                OrderFactory()
+                OrderWithRandomPublicTokenFactory()
+
+
+class TestOrderGeneratePublicToken:
+    """Tests for the generate public token logic."""
+
+    @mock.patch('datahub.omis.order.models.secrets')
+    def test_generates_public_token_if_doesnt_exist(self, mock_secrets):
+        """
+        Test that if an order is saved without public_token,
+        the system generates one automatically.
+        """
+        mock_secrets.token_urlsafe.side_effect = ['9999', '8888']
+
+        # create 1st
+        order = OrderWithRandomReferenceFactory()
+        assert order.public_token == '9999'
+
+        # create 2nd
+        order = OrderWithRandomReferenceFactory()
+        assert order.public_token == '8888'
+
+    @mock.patch('datahub.omis.order.models.secrets')
+    def test_look_for_unused_public_token(self, mock_secrets):
+        """
+        Test that when creating a new order, if the system generates a public token
+        that already exists, it skips it and generates the next one.
+        """
+        # create existing order with public_token == '9999'
+        OrderWithRandomReferenceFactory(public_token='9999')
+
+        mock_secrets.token_urlsafe.side_effect = ['9999', '8888']
+
+        # 9999 already exists so create 8888 instead
+        order = OrderWithRandomReferenceFactory()
+        assert order.public_token == '8888'
+
+    @mock.patch('datahub.omis.order.models.secrets')
+    def test_cannot_generate_public_token(self, mock_secrets):
+        """
+        Test that if there are more than 10 collisions, the generator algorithm raises a
+        RuntimeError.
+        """
+        max_retries = 10
+        OrderWithRandomReferenceFactory(public_token='9999')
+
+        mock_secrets.token_urlsafe.side_effect = ['9999'] * max_retries
+
+        with pytest.raises(RuntimeError):
+            for index in range(max_retries):
+                OrderWithRandomReferenceFactory()
 
 
 class TestGenerateQuote:
