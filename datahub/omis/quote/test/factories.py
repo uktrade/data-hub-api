@@ -3,7 +3,7 @@ import factory
 
 from django.utils.timezone import now
 
-from datahub.company.test.factories import AdviserFactory
+from datahub.company.test.factories import AdviserFactory, ContactFactory
 
 
 class QuoteFactory(factory.django.DjangoModelFactory):
@@ -25,3 +25,10 @@ class CancelledQuoteFactory(QuoteFactory):
 
     cancelled_on = now()
     cancelled_by = factory.SubFactory(AdviserFactory)
+
+
+class AcceptedQuoteFactory(QuoteFactory):
+    """Accepted Order factory."""
+
+    accepted_on = now()
+    accepted_by = factory.SubFactory(ContactFactory)
