@@ -1,4 +1,6 @@
+import secrets
 import uuid
+from functools import partial
 
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -17,6 +19,7 @@ from datahub.omis.quote.models import Quote
 
 from . import validators
 from .constants import DEFAULT_HOURLY_RATE, OrderStatus, VATStatus
+from .signals import quote_generated
 
 
 class ServiceType(BaseOrderedConstantModel, DisableableModel):
@@ -83,6 +86,9 @@ class Order(BaseModel):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     reference = models.CharField(max_length=100)
+    public_token = models.CharField(
+        max_length=100, unique=True, help_text='Used for public facing access.'
+    )
 
     status = models.CharField(
         max_length=100,
@@ -194,7 +200,7 @@ class Order(BaseModel):
         """
         :returns: a random unused reference of form:
             <(3) letters><(3) numbers>/<year> e.g. GEA962/16
-        :raises RuntimeError: if no reference can be generated.
+        :raises RuntimeError: if no reference can be generated
         """
         def gen():
             year_suffix = now().strftime('%y')
@@ -206,17 +212,33 @@ class Order(BaseModel):
 
         return generate_reference(model=cls, gen=gen)
 
+    @classmethod
+    def generate_public_token(cls):
+        """
+        :returns: a random unused public token of form
+            <50 uppercase/lowercase letters, digits and symbols>
+        :raises RuntimeError: if no public_token can be generated
+        """
+        gen = partial(secrets.token_urlsafe, 37)
+        return generate_reference(model=cls, gen=gen, field='public_token')
+
     def save(self, *args, **kwargs):
         """
-        Like the django save but it creates a reference if it doesn't exist.
+        Like the django save but it creates a reference and a public token if needed.
         """
         if not self.reference:
             self.reference = self.generate_reference()
+        if not self.public_token:
+            self.public_token = self.generate_public_token()
         return super().save(*args, **kwargs)
 
     def get_datahub_frontend_url(self):
         """Return the url to the Data Hub frontend order page."""
         return f'{settings.DATAHUB_FRONTEND_BASE_URL}/omis/{self.pk}'
+
+    def get_public_facing_url(self):
+        """Return the url to the OMIS public facing order page."""
+        return f'{settings.OMIS_PUBLIC_BASE_URL}/{self.public_token}'
 
     @transaction.atomic
     def generate_quote(self, by, commit=True):
@@ -250,6 +272,9 @@ class Order(BaseModel):
 
         if commit:
             self.save()
+
+            # send signal
+            quote_generated.send(sender=self.__class__, order=self)
 
         return self.quote
 
