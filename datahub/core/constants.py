@@ -431,6 +431,7 @@ class Service(Enum):
     """Service."""
 
     trade_enquiry = Constant('Trade - Enquiry', '330bba2b-3499-e211-a939-e4115bead28a')
+    account_management = Constant('Account Management', '9484b82b-3499-e211-a939-e4115bead28a')
 
 
 class Team(Enum):

@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.core.constants import Country, Team, UKRegion
+from datahub.core.constants import Country, Service, Team, UKRegion
 from datahub.core.test_utils import APITestMixin
 from datahub.event.constants import EventType, LocationType, Programme
 from datahub.event.test.factories import EventFactory
@@ -69,7 +69,11 @@ class TestGetEventView(APITestMixin):
             'related_programmes': [{
                 'id': Programme.great_branded.value.id,
                 'name': Programme.great_branded.value.name,
-            }]
+            }],
+            'service': {
+                'id': Service.trade_enquiry.value.id,
+                'name': Service.trade_enquiry.value.name,
+            }
         })
 
         assert response_data == expected_response_data
@@ -102,6 +106,7 @@ class TestCreateEventView(APITestMixin):
             'address_1': 'Grand Court Exhibition Centre',
             'address_town': 'New York',
             'address_country': Country.united_states.value.id,
+            'service': Service.trade_enquiry.value.id,
         }
         response = self.api_client.post(url, format='json', data=request_data)
 
@@ -131,7 +136,11 @@ class TestCreateEventView(APITestMixin):
             'organiser': None,
             'lead_team': None,
             'teams': [],
-            'related_programmes': []
+            'related_programmes': [],
+            'service': {
+                'id': Service.trade_enquiry.value.id,
+                'name': Service.trade_enquiry.value.name,
+            },
         }
 
     def test_create_maximal_success(self):
@@ -154,7 +163,8 @@ class TestCreateEventView(APITestMixin):
             'organiser': str(self.user.pk),
             'lead_team': Team.crm.value.id,
             'teams': [Team.crm.value.id, Team.healthcare_uk.value.id],
-            'related_programmes': [Programme.great_branded.value.id]
+            'related_programmes': [Programme.great_branded.value.id],
+            'service': Service.trade_enquiry.value.id,
         }
         response = self.api_client.post(url, format='json', data=request_data)
 
@@ -208,7 +218,11 @@ class TestCreateEventView(APITestMixin):
             'related_programmes': [{
                 'id': Programme.great_branded.value.id,
                 'name': Programme.great_branded.value.name,
-            }]
+            }],
+            'service': {
+                'id': Service.trade_enquiry.value.id,
+                'name': Service.trade_enquiry.value.name,
+            },
         }
 
     def test_create_lead_team_not_in_teams(self):
@@ -223,6 +237,7 @@ class TestCreateEventView(APITestMixin):
             'uk_region': UKRegion.east_of_england.value.id,
             'lead_team': Team.crm.value.id,
             'teams': [Team.healthcare_uk.value.id],
+            'service': Service.trade_enquiry.value.id,
         }
         response = self.api_client.post(url, format='json', data=request_data)
 
@@ -241,6 +256,7 @@ class TestCreateEventView(APITestMixin):
             'address_1': 'Grand Court Exhibition Centre',
             'address_town': 'London',
             'address_country': Country.united_kingdom.value.id,
+            'service': Service.trade_enquiry.value.id,
         }
         response = self.api_client.post(url, format='json', data=request_data)
 
@@ -260,6 +276,7 @@ class TestCreateEventView(APITestMixin):
             'address_town': 'London',
             'address_country': Country.united_states.value.id,
             'uk_region': UKRegion.east_of_england.value.id,
+            'service': Service.trade_enquiry.value.id,
         }
         response = self.api_client.post(url, format='json', data=request_data)
 
@@ -279,6 +296,7 @@ class TestCreateEventView(APITestMixin):
             'address_town': 'London',
             'address_country': Country.united_kingdom.value.id,
             'uk_region': UKRegion.east_of_england.value.id,
+            'service': Service.trade_enquiry.value.id,
             'end_date': '2020-01-01',
         }
         response = self.api_client.post(url, format='json', data=request_data)
@@ -299,6 +317,7 @@ class TestCreateEventView(APITestMixin):
             'address_town': 'London',
             'address_country': Country.united_kingdom.value.id,
             'uk_region': UKRegion.east_of_england.value.id,
+            'service': Service.trade_enquiry.value.id,
             'start_date': '2020-01-02',
             'end_date': '2020-01-01',
         }
@@ -323,7 +342,8 @@ class TestCreateEventView(APITestMixin):
             'address_country': ['This field is required.'],
             'address_town': ['This field is required.'],
             'event_type': ['This field is required.'],
-            'name': ['This field is required.']
+            'name': ['This field is required.'],
+            'service': ['This field is required.'],
         }
 
     def test_create_blank_failure(self):
@@ -334,7 +354,8 @@ class TestCreateEventView(APITestMixin):
             'address_country': None,
             'address_town': '',
             'event_type': None,
-            'name': ''
+            'name': '',
+            'service': None,
         }
         response = self.api_client.post(url, format='json', data=request_data)
 
@@ -345,7 +366,8 @@ class TestCreateEventView(APITestMixin):
             'address_country': ['This field may not be null.'],
             'address_town': ['This field may not be blank.'],
             'event_type': ['This field may not be null.'],
-            'name': ['This field may not be blank.']
+            'name': ['This field may not be blank.'],
+            'service': ['This field may not be null.'],
         }
 
 
@@ -375,7 +397,8 @@ class TestUpdateEventView(APITestMixin):
             'organiser': str(organiser.pk),
             'lead_team': Team.food_from_britain.value.id,
             'teams': [Team.food_from_britain.value.id, Team.healthcare_uk.value.id],
-            'related_programmes': [Programme.great_challenge_fund.value.id]
+            'related_programmes': [Programme.great_challenge_fund.value.id],
+            'service': Service.account_management.value.id,
         }
         response = self.api_client.patch(url, request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
@@ -426,7 +449,11 @@ class TestUpdateEventView(APITestMixin):
             'related_programmes': [{
                 'id': Programme.great_challenge_fund.value.id,
                 'name': Programme.great_challenge_fund.value.name,
-            }]
+            }],
+            'service': {
+                'id': Service.account_management.value.id,
+                'name': Service.account_management.value.name,
+            },
         }
 
     def test_patch_lead_team_success(self):

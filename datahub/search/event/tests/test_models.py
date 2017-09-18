@@ -33,6 +33,7 @@ def test_event_dbmodel_to_dict():
         'address_postcode',
         'notes',
         'uk_region',
+        'service',
     }
 
     assert result.keys() == keys
