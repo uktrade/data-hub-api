@@ -19,7 +19,7 @@ class TestGetOrderAssignees(APITestMixin):
 
     def test_empty(self):
         """Test that calling GET returns [] if no-one is assigned."""
-        order = OrderFactory()
+        order = OrderFactory(assignees=[])
 
         url = reverse(
             'api-v3:omis:order:assignee',
@@ -35,7 +35,7 @@ class TestGetOrderAssignees(APITestMixin):
         Test that calling GET returns the list of advisers assigned to the order.
         """
         advisers = AdviserFactory.create_batch(3)
-        order = OrderFactory()
+        order = OrderFactory(assignees=[])
         for i, adviser in enumerate(advisers[:2]):
             OrderAssigneeFactory(
                 order=order,
@@ -129,7 +129,7 @@ class TestChangeOrderAssignees(APITestMixin):
             3. adviser 3 gets added
         """
         created_by = AdviserFactory()
-        order = OrderFactory()
+        order = OrderFactory(assignees=[])
         adviser1 = AdviserFactory()
         adviser2 = AdviserFactory()
         adviser3 = AdviserFactory()
@@ -427,7 +427,7 @@ class TestChangeOrderAssignees(APITestMixin):
             2. adviser 1 doesn't get updated
             3. adviser 3 doesn't get added
         """
-        order = OrderFactory()
+        order = OrderFactory(assignees=[])
         adviser1 = AdviserFactory()
         adviser2 = AdviserFactory()
         adviser3 = AdviserFactory()
