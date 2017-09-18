@@ -14,9 +14,11 @@ DIT {{order.primary_market}} will aim to provide {{order.company.name}} (“the 
 
 You shall pay DIT the Charge detailed below in the manner and at the times described in Section 4 below and in the Terms.
 
-Net Charge:			£<0.00>
+Subtotal:   £{{pound_pricing.subtotal_cost}}
 
-Net Payable:		£<0.00>
+VAT:        £{{pound_pricing.vat_cost}}
+
+Total:      £{{pound_pricing.total_cost}}
 
 ## 3.	Acceptance of quote and delivery date
 

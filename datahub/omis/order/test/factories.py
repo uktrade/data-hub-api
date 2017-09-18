@@ -52,6 +52,15 @@ class OrderFactory(factory.django.DjangoModelFactory):
         """
         return ServiceType.objects.filter(disabled_on__isnull=True).order_by('?')[:2]
 
+    @to_many_field
+    def assignees(self):
+        """
+        Add support for setting assignees.
+        If nothing specified when instantiating the object, the value returned by
+        this method will be used by default.
+        """
+        return OrderAssigneeFactory.create_batch(1, order=self)
+
     class Meta:  # noqa: D101
         model = 'order.Order'
 
@@ -86,7 +95,16 @@ class OrderAssigneeFactory(factory.django.DjangoModelFactory):
     id = factory.LazyFunction(uuid.uuid4)
     order = factory.SubFactory(OrderFactory)
     adviser = factory.SubFactory(AdviserFactory)
-    estimated_time = 120
+    estimated_time = factory.Faker('random_int', min=10, max=100)
 
     class Meta:  # noqa: D101
         model = 'order.OrderAssignee'
+
+
+class HourlyRateFactory(factory.django.DjangoModelFactory):
+    """HourlyRate factory."""
+
+    id = factory.LazyFunction(uuid.uuid4)
+
+    class Meta:  # noqa: D101
+        model = 'order.HourlyRate'

@@ -19,7 +19,8 @@ def setup_data():
     with freeze_time('2017-01-01 13:00:00'):
         order = OrderFactory(
             reference='ref1',
-            primary_market_id=constants.Country.japan.value.id
+            primary_market_id=constants.Country.japan.value.id,
+            assignees=[]
         )
         OrderSubscriberFactory(
             order=order,
@@ -33,7 +34,8 @@ def setup_data():
     with freeze_time('2017-02-01 13:00:00'):
         order = OrderFactory(
             reference='ref2',
-            primary_market_id=constants.Country.france.value.id
+            primary_market_id=constants.Country.france.value.id,
+            assignees=[]
         )
         OrderSubscriberFactory(
             order=order,
