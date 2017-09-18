@@ -624,6 +624,8 @@
       - 8880da16-d80e-e611-9bdc-e4115bead28a
     related_programmes:
       - 1abe5563-6482-41d8-b566-6a9ee9e37c5f
+    uk_region: 864cd12a-6095-e211-a939-e4115bead28a
+    service: 9584b82b-3499-e211-a939-e4115bead28a
 
 - model: event.event
   pk: b93d4273-36fe-4008-ac40-fbc197910791
@@ -647,3 +649,4 @@
       - 4e4d24c2-9698-e211-a939-e4115bead28a
     related_programmes:
       - d352a68f-aaf4-4c43-b39d-9bca67a8322e
+    service: ccf9b82b-3499-e211-a939-e4115bead28a
