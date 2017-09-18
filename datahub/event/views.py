@@ -13,6 +13,8 @@ class EventViewSet(CoreViewSetV3):
         'lead_team',
         'location_type',
         'organiser',
+        'uk_region',
+        'service',
     ).prefetch_related(
         'teams',
         'related_programmes',

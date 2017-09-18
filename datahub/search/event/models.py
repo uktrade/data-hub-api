@@ -28,6 +28,7 @@ class Event(DocType, MapDBModelToDict):
     lead_team = dsl_utils.id_name_mapping()
     teams = dsl_utils.id_name_mapping()
     related_programmes = dsl_utils.id_name_mapping()
+    service = dsl_utils.id_name_mapping()
 
     MAPPINGS = {
         'id': str,
@@ -39,6 +40,7 @@ class Event(DocType, MapDBModelToDict):
         'lead_team': dict_utils.id_name_dict,
         'teams': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
         'related_programmes': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
+        'service': dict_utils.id_name_dict,
     }
 
     COMPUTED_MAPPINGS = {}

@@ -18,4 +18,6 @@ class EventSearchApp(SearchApp):
         'lead_team',
         'related_programmes',
         'teams',
+        'uk_region',
+        'service',
     )

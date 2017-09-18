@@ -39,6 +39,9 @@ class Event(BaseModel):
     )
     teams = models.ManyToManyField('metadata.Team', blank=True, related_name='+')
     related_programmes = models.ManyToManyField('Programme', blank=True)
+    service = models.ForeignKey(
+        'metadata.Service', null=True, blank=True, on_delete=models.PROTECT
+    )
 
     def __str__(self):
         """Human-readable representation"""
