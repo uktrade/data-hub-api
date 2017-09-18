@@ -24,7 +24,7 @@ class Event(DocType, MapDBModelToDict):
     address_country = dsl_utils.id_name_mapping()
     uk_region = dsl_utils.id_name_mapping()
     notes = dsl_utils.EnglishString()
-    organiser = dsl_utils.contact_or_adviser_mapping('organiser')
+    organiser = dsl_utils.contact_or_adviser_partial_mapping('organiser')
     lead_team = dsl_utils.id_name_mapping()
     teams = dsl_utils.id_name_mapping()
     related_programmes = dsl_utils.id_name_mapping()
