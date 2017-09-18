@@ -5,7 +5,7 @@ from freezegun import freeze_time
 
 from rest_framework.exceptions import ValidationError
 
-from datahub.company.test.factories import AdviserFactory
+from datahub.company.test.factories import AdviserFactory, ContactFactory
 from datahub.core import constants
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.core.exceptions import Conflict
@@ -122,12 +122,12 @@ class TestGenerateQuote:
     def test_atomicity(self):
         """Test that if there's a problem with saving the order, the quote is not saved either."""
         order = OrderFactory()
-        order.save = mock.Mock()
-        order.save.side_effect = Exception()
+        with mock.patch.object(order, 'save') as mocked_save:
+            mocked_save.side_effect = Exception()
 
-        with pytest.raises(Exception):
-            order.generate_quote(by=None)
-        assert not Quote.objects.count()
+            with pytest.raises(Exception):
+                order.generate_quote(by=None)
+            assert not Quote.objects.count()
 
     def test_success(self):
         """Test that a quote can be generated."""
@@ -244,6 +244,61 @@ class TestReopen:
             order.reopen(by=None)
 
         assert order.status == disallowed_status
+
+
+class TestAcceptQuote:
+    """Tests for when a quote is accepted."""
+
+    @pytest.mark.parametrize(
+        'allowed_status',
+        (OrderStatus.quote_awaiting_acceptance,)
+    )
+    def test_ok_if_order_in_allowed_status(self, allowed_status):
+        """
+        Test that the quote of an order can be accepted if the order is
+        in one of the allowed statuses.
+        """
+        order = OrderWithOpenQuoteFactory(status=allowed_status)
+        contact = ContactFactory()
+
+        try:
+            order.accept_quote(by=contact)
+        except Exception:
+            pytest.fail('Should not raise a validator error.')
+
+        assert order.status == OrderStatus.quote_accepted
+        assert order.quote.accepted_on
+        assert order.quote.accepted_by == contact
+
+    @pytest.mark.parametrize(
+        'disallowed_status',
+        (
+            OrderStatus.paid,
+            OrderStatus.quote_accepted,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
+        """Test that if the order is in a disallowed status, the quote cannot be accepted."""
+        order = OrderFactory(status=disallowed_status)
+        with pytest.raises(Conflict):
+            order.accept_quote(by=None)
+
+        assert order.status == disallowed_status
+
+    def test_atomicity(self):
+        """Test that if there's a problem with saving the order, the quote is not saved either."""
+        order = OrderWithOpenQuoteFactory()
+        with mock.patch.object(order, 'save') as mocked_save:
+            mocked_save.side_effect = Exception()
+
+            with pytest.raises(Exception):
+                order.accept_quote(by=None)
+
+            quote = order.quote
+            quote.refresh_from_db()
+            assert not quote.is_accepted()
 
 
 class TestOrderAssignee:

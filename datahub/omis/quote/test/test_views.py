@@ -159,6 +159,8 @@ class TestCreatePreviewOrder(APITestMixin):
             },
             'cancelled_on': None,
             'cancelled_by': None,
+            'accepted_on': None,
+            'accepted_by': None,
             'expires_on': '2017-05-18',  # now + 30 days
         }
 
@@ -210,6 +212,8 @@ class TestCreatePreviewOrder(APITestMixin):
             'created_by': None,
             'cancelled_on': None,
             'cancelled_by': None,
+            'accepted_on': None,
+            'accepted_by': None,
             'expires_on': '2017-05-18',  # now + 30 days
         }
 
@@ -239,6 +243,8 @@ class TestGetQuote(APITestMixin):
             },
             'cancelled_on': None,
             'cancelled_by': None,
+            'accepted_on': None,
+            'accepted_by': None,
             'expires_on': quote.expires_on.isoformat(),
         }
 
@@ -266,6 +272,8 @@ class TestGetQuote(APITestMixin):
             'content': quote.content,
             'cancelled_on': None,
             'cancelled_by': None,
+            'accepted_on': None,
+            'accepted_by': None,
             'expires_on': quote.expires_on.isoformat(),
         }
 
@@ -390,6 +398,8 @@ class TestCancelOrder(APITestMixin):
                     'last_name': self.user.last_name,
                     'name': self.user.name
                 },
+                'accepted_on': None,
+                'accepted_by': None,
                 'expires_on': quote.expires_on.isoformat(),
             }
 
@@ -425,6 +435,8 @@ class TestCancelOrder(APITestMixin):
                     'last_name': quote.cancelled_by.last_name,
                     'name': quote.cancelled_by.name
                 },
+                'accepted_on': None,
+                'accepted_by': None,
                 'expires_on': quote.expires_on.isoformat(),
             }
 

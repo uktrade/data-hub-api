@@ -258,6 +258,8 @@ class Order(BaseModel):
         """
         Cancel quote and reopen order if possible.
         The status of the order changes back to "Draft".
+
+        :param by: the adviser who is cancelling the quote
         """
         for validator in [
             validators.OrderInStatusValidator(
@@ -275,6 +277,28 @@ class Order(BaseModel):
             self.quote.cancel(by)
 
         self.status = OrderStatus.draft
+        self.save()
+
+    @transaction.atomic
+    def accept_quote(self, by):
+        """
+        Accept quote and change the status of the order to "Quote accepted".
+
+        :param by: the contact who is accepting the quote
+        """
+        for validator in [
+            validators.OrderInStatusValidator(
+                allowed_statuses=(
+                    OrderStatus.quote_awaiting_acceptance,
+                )
+            )
+        ]:
+            validator.set_instance(self)
+            validator()
+
+        self.quote.accept(by)
+
+        self.status = OrderStatus.quote_accepted
         self.save()
 
 
