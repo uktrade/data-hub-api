@@ -30,6 +30,7 @@ class EventSerializer(serializers.ModelSerializer):
     related_programmes = NestedRelatedField(
         'event.Programme', many=True, required=False, allow_empty=True
     )
+    service = NestedRelatedField('metadata.Service')
 
     def validate(self, data):
         """Performs cross-field validation."""
@@ -112,4 +113,5 @@ class EventSerializer(serializers.ModelSerializer):
             'related_programmes',
             'start_date',
             'teams',
+            'service',
         )

@@ -3,7 +3,7 @@ import uuid
 import factory
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.core.constants import Country, Team, UKRegion
+from datahub.core.constants import Country, Service, Team, UKRegion
 from datahub.core.test.factories import to_many_field
 from datahub.event.constants import EventType, LocationType, Programme
 
@@ -27,6 +27,7 @@ class EventFactory(factory.django.DjangoModelFactory):
     notes = factory.Faker('text')
     organiser = factory.SubFactory(AdviserFactory)
     lead_team_id = Team.crm.value.id
+    service_id = Service.trade_enquiry.value.id
 
     @to_many_field
     def teams(self):  # noqa: D102
