@@ -57,6 +57,7 @@ LOCAL_APPS = [
     'datahub.investment',
     'datahub.leads',
     'datahub.metadata',
+    'datahub.oauth',
     'datahub.search.apps.SearchConfig',
     'datahub.user',
     'datahub.omis.core',
@@ -134,6 +135,14 @@ AUTHENTICATION_BACKENDS = [
     'datahub.core.auth.CDMSUserBackend',
     'django.contrib.auth.backends.ModelBackend'
 ]
+
+# django-oauth-toolkit settings
+
+OAUTH2_PROVIDER = {
+    'SCOPES': {
+    },
+    'SCOPES_BACKEND_CLASS': 'datahub.oauth.scopes.ApplicationScopesBackend',
+}
 
 
 # Internationalization
