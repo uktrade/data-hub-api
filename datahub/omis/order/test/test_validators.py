@@ -1,5 +1,6 @@
 from unittest import mock
 import pytest
+from django.db.models import Sum
 
 from rest_framework.exceptions import ValidationError
 
@@ -14,6 +15,7 @@ from .factories import (
 from ..constants import OrderStatus, VATStatus
 from ..models import Order
 from ..validators import (
+    AssigneesFilledInValidator,
     ContactWorksAtCompanyValidator,
     NoOtherActiveQuoteExistsValidator,
     OrderDetailsFilledInValidator,
@@ -148,6 +150,59 @@ class TestReadonlyAfterCreationValidator:
 
 
 @pytest.mark.django_db
+class TestAssigneesFilledInValidator:
+    """Tests for the AssigneesFilledInValidator."""
+
+    def test_no_assignees_fails(self):
+        """Test that the validation fails if the order doesn't have any assignees."""
+        order = OrderFactory(assignees=[])
+
+        validator = AssigneesFilledInValidator()
+        validator.set_instance(order)
+
+        with pytest.raises(ValidationError) as exc:
+            validator()
+
+        assert exc.value.detail == {
+            'assignees': ['You need to add at least one assignee.']
+        }
+
+    def test_no_estimated_time_fails(self):
+        """
+        Test that the validation fails if the combined estimated time of the assignees
+        is zero.
+        """
+        order = OrderFactory()
+        order.assignees.update(estimated_time=0)
+
+        validator = AssigneesFilledInValidator()
+        validator.set_instance(order)
+
+        with pytest.raises(ValidationError) as exc:
+            validator()
+
+        assert exc.value.detail == {
+            'assignees': ['The total estimated time cannot be zero.']
+        }
+
+    def test_non_zero_estimated_time_succeeds(self):
+        """
+        Test that the validation succeeds if the combined estimated time of the assignees
+        is greater than zero.
+        """
+        order = OrderFactory()
+        assert order.assignees.aggregate(sum=Sum('estimated_time'))['sum'] > 0
+
+        validator = AssigneesFilledInValidator()
+        validator.set_instance(order)
+
+        try:
+            validator()
+        except Exception:
+            pytest.fail('Should not raise a validator error.')
+
+
+@pytest.mark.django_db
 class TestOrderDetailsFilledInValidator:
     """Tests for the OrderDetailsFilledInValidator."""
 
@@ -177,7 +232,8 @@ class TestOrderDetailsFilledInValidator:
             validator(data)
 
         assert exc.value.detail == {
-            field: ['This field is required.'] for field in order_fields
+            **{field: ['This field is required.'] for field in order_fields},
+            'assignees': ['You need to add at least one assignee.']
         }
 
     @pytest.mark.parametrize('values_as_data', (True, False))

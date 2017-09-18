@@ -118,6 +118,33 @@ class VATValidator:
                 })
 
 
+class AssigneesFilledInValidator:
+    """Validator which checks that the order has enough information about assignees."""
+
+    no_assignees_message = 'You need to add at least one assignee.'
+    no_estimated_time_message = 'The total estimated time cannot be zero.'
+
+    def __init__(self):
+        """Constructor."""
+        self.instance = None
+
+    def set_instance(self, instance):
+        """Set the current instance."""
+        self.instance = instance
+
+    def __call__(self, data=None):
+        """Validate that the information about the assignees is set."""
+        if not self.instance.assignees.count():
+            raise ValidationError({
+                'assignees': [self.no_assignees_message]
+            })
+
+        if not self.instance.assignees.aggregate(sum=models.Sum('estimated_time'))['sum']:
+            raise ValidationError({
+                'assignees': [self.no_estimated_time_message]
+            })
+
+
 class OrderDetailsFilledInValidator:
     """Validator which checks that the order has all detail fields filled in."""
 
@@ -130,6 +157,7 @@ class OrderDetailsFilledInValidator:
 
     extra_validators = (
         VATValidator(),
+        AssigneesFilledInValidator(),
     )
 
     message = 'This field is required.'
