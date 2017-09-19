@@ -205,7 +205,7 @@ class TestSearchExport(APITestMixin):
     def _create_company(self, name_prefix, archived=False):
         country = TestSearchExport._get_random_constant_id(constants.Country)
         ch = CompaniesHouseCompanyFactory()
-        name = f"{name_prefix} {factory.Faker('word').generate({})}",
+        name = f"{name_prefix} {factory.Faker('word').generate({})}"
         data = {
             'account_manager': AdviserFactory(),
             'alias': factory.Faker('text'),
@@ -261,6 +261,7 @@ class TestSearchExport(APITestMixin):
         company.future_interest_countries.set(
             TestSearchExport._get_random_list_of_constant_ids(constants.Country)
         )
+        company.save()
         return company
 
     def test_company_export(self, setup_es, setup_data):

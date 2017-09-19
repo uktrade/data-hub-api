@@ -25,6 +25,7 @@ class SearchEventParams:
         'address_country': 'address_country.id',
     }
 
+
 class SearchEventAPIView(SearchEventParams, SearchAPIView):
     """Filtered event search view."""
 
