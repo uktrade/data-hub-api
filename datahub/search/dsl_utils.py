@@ -22,6 +22,18 @@ def contact_or_adviser_mapping(field, include_dit_team=False):
     return Nested(properties=props)
 
 
+def contact_or_adviser_partial_mapping(field):
+    """Mapping for Adviser/Contact fields that allows partial matching."""
+    props = {
+        'id': KeywordString(),
+        'first_name': CaseInsensitiveKeywordString(),
+        'last_name': CaseInsensitiveKeywordString(),
+        'name': CaseInsensitiveKeywordString(copy_to=f'{field}.name_trigram'),
+        'name_trigram': TrigramString(),
+    }
+    return Nested(properties=props)
+
+
 def id_name_mapping():
     """Mapping for id name fields."""
     return Nested(properties={
