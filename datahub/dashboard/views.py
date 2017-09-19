@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 
 from datahub.company.queryset import get_contact_queryset
 from datahub.interaction.queryset import get_interaction_queryset_v1
+from datahub.oauth.scopes import Scope
 
 from .serializers import IntelligentHomepageSerializer
 
@@ -13,6 +14,7 @@ from .serializers import IntelligentHomepageSerializer
 class IntelligentHomepageView(APIView):
     """Return the data for the intelligent homepage."""
 
+    required_scopes = (Scope.internal_front_end,)
     http_method_names = ['get']
 
     def get(self, request, format=None):

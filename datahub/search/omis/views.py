@@ -1,3 +1,4 @@
+from datahub.oauth.scopes import Scope
 from .models import Order
 from .serializers import SearchOrderSerializer
 from ..views import SearchAPIView
@@ -6,6 +7,7 @@ from ..views import SearchAPIView
 class SearchOrderParams:
     """Search order params."""
 
+    required_scopes = (Scope.internal_front_end,)
     entity = Order
     serializer_class = SearchOrderSerializer
 

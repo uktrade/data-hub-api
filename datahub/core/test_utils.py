@@ -1,10 +1,13 @@
 import datetime
+from secrets import token_hex
 
 import pytest
 from django.contrib.auth import get_user_model
 from django.utils.timezone import now
 from oauth2_provider.models import AccessToken, Application
 from rest_framework.test import APIClient
+
+from datahub.oauth.scopes import Scope
 
 
 def get_test_user():
@@ -36,30 +39,33 @@ class APITestMixin:
             self._user = get_test_user()
         return self._user
 
-    @property
-    def token(self):
+    def get_token(self, *scopes):
         """Get access token for user test."""
-        if not hasattr(self, '_token'):
-            self._token = AccessToken(
+        if not hasattr(self, '_tokens'):
+            self._tokens = {}
+
+        scope = ' '.join(scopes)
+
+        if scope not in self._tokens:
+            self._tokens[scope] = AccessToken.objects.create(
                 user=self.user,
                 application=self.application,
-                token='123456789',  # unsafe token, just for testing
+                token=token_hex(16),
                 expires=datetime.datetime.now() + datetime.timedelta(hours=1),
+                scope=scope
             )
-        return self._token.token
+        return self._tokens[scope]
 
     @property
     def api_client(self):
-        """
-        Login using the OAuth2 authentication.
+        """An API client with internal-front-end scope."""
+        return self.create_api_client()
 
-        1) Create an application instance, if necessary
-        2) Generate the token
-        3) Add the auth credentials to the header
-        """
+    def create_api_client(self, scope=Scope.internal_front_end, *additional_scopes):
+        """Creates an API client associated with an OAuth token with the specified scope."""
+        token = self.get_token(scope, *additional_scopes)
         client = APIClient()
-        client.force_authenticate(user=self.user)
-        client.credentials(Authorization=f'Bearer {self.token}')
+        client.credentials(Authorization=f'Bearer {token}')
         return client
 
     @property

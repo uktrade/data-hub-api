@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
+from datahub.oauth.scopes import Scope
 from datahub.v2.parsers import JSONParser
 from datahub.v2.renderers import JSONRenderer
 from datahub.v2.repos import service_deliveries as service_deliveries_repos
@@ -15,6 +16,7 @@ from datahub.v2.repos import service_deliveries as service_deliveries_repos
 class ServiceDeliveryListViewV2(APIView):
     """Service delivery list view."""
 
+    required_scopes = (Scope.internal_front_end,)
     repo_class = service_deliveries_repos.ServiceDeliveryDatabaseRepo
     param_keys = frozenset({'company_id', 'contact_id', 'offset', 'limit'})
     renderer_classes = (JSONRenderer, BrowsableAPIRenderer)
@@ -60,6 +62,7 @@ class ServiceDeliveryListViewV2(APIView):
 class ServiceDeliveryDetailViewV2(APIView):
     """Service delivery detail view."""
 
+    required_scopes = (Scope.internal_front_end,)
     repo_class = service_deliveries_repos.ServiceDeliveryDatabaseRepo
     renderer_classes = (JSONRenderer, BrowsableAPIRenderer)
     parser_classes = (JSONParser, parsers.FormParser, parsers.MultiPartParser)

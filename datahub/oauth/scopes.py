@@ -1,8 +1,23 @@
 from oauth2_provider.scopes import BaseScopes
-from oauth2_provider.settings import oauth2_settings
 
 
+from datahub.core.utils import StrEnum
 from datahub.oauth.models import OAuthApplicationScope
+
+
+class Scope(StrEnum):
+    """Defined OAuth scopes."""
+
+    mi = 'mi'
+    internal_front_end = 'internal-front-end'
+    public_omis_front_end = 'public-omis-front-end'
+
+
+SCOPES_DESCS = {
+    Scope.mi.value: 'Endpoints used by Data Hub MI (machine-to-machine)',
+    Scope.internal_front_end.value: 'Endpoints used by the internal front end',
+    Scope.public_omis_front_end.value: 'Endpoints used by the OMIS public front end',
+}
 
 
 class ApplicationScopesBackend(BaseScopes):
@@ -20,7 +35,7 @@ class ApplicationScopesBackend(BaseScopes):
 
     def get_all_scopes(self) -> dict:
         """Gets a mapping of all scopes."""
-        return oauth2_settings.SCOPES
+        return SCOPES_DESCS
 
     def get_available_scopes(self, application=None, request=None, *args, **kwargs) -> set:
         """
