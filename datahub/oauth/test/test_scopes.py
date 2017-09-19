@@ -2,27 +2,28 @@ from base64 import b64encode
 from unittest import mock
 
 import pytest
+from django.test.utils import override_settings
+from factory import Faker
 from rest_framework import HTTP_HEADER_ENCODING, status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
+from datahub.core.test_utils import APITestMixin
 from datahub.oauth.scopes import SCOPES_DESCS
-from datahub.oauth.test.factories import OAuthApplicationScopeFactory
+from datahub.oauth.test.factories import AccessTokenFactory, OAuthApplicationScopeFactory
+from datahub.oauth.test.scopes import TEST_SCOPES_DESC, TestScope
 
 
 pytestmark = pytest.mark.django_db
 
 
-@mock.patch.dict(SCOPES_DESCS, {
-    'test_scope_1': 'Scope for testing 1.',
-    'test_scope_2': 'Scope for testing 2.',
-})
+@mock.patch.dict(SCOPES_DESCS, TEST_SCOPES_DESC)
 class TestOAuthScopeBackend:
     """Tests app-specific OAuth scopes."""
 
     def test_creating_a_token_default_scope(self):
         """Test creating an access token with default application scopes."""
-        app_and_scope = OAuthApplicationScopeFactory(scopes=['test_scope_1'])
+        app_and_scope = OAuthApplicationScopeFactory(scopes=[TestScope.test_scope_1])
         app = app_and_scope.application
         client = APIClient()
         client.credentials(
@@ -33,11 +34,14 @@ class TestOAuthScopeBackend:
             'grant_type': 'client_credentials',
         })
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['scope'] == 'test_scope_1'
+        assert response.json()['scope'] == TestScope.test_scope_1
 
     def test_creating_a_token_allowed_scope(self):
         """Test creating an access token with specified application scopes."""
-        app_and_scope = OAuthApplicationScopeFactory(scopes=['test_scope_1', 'test_scope_2'])
+        app_and_scope = OAuthApplicationScopeFactory(scopes=[
+            TestScope.test_scope_1,
+            TestScope.test_scope_2,
+        ])
         app = app_and_scope.application
         client = APIClient()
         client.credentials(
@@ -46,16 +50,18 @@ class TestOAuthScopeBackend:
         url = reverse('token')
         response = client.post(url, data={
             'grant_type': 'client_credentials',
-            'scope': 'test_scope_1',
+            'scope': TestScope.test_scope_1,
         })
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['scope'] == 'test_scope_1'
+        assert response.json()['scope'] == TestScope.test_scope_1
 
     def test_creating_a_token_disallowed_scope(self):
         """
         Test creating an access token when specifying a scope that the app hasn't been assigned.
         """
-        app_and_scope = OAuthApplicationScopeFactory(scopes=['test_scope_1'])
+        app_and_scope = OAuthApplicationScopeFactory(scopes=[
+            TestScope.test_scope_1
+        ])
         app = app_and_scope.application
         client = APIClient()
         client.credentials(
@@ -64,12 +70,56 @@ class TestOAuthScopeBackend:
         url = reverse('token')
         response = client.post(url, data={
             'grant_type': 'client_credentials',
-            'scope': 'test_scope_2',
+            'scope': TestScope.test_scope_2,
         })
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert response.json() == {
             'error': 'invalid_scope'
         }
+
+
+@pytest.fixture
+def test_urls():  # noqa: D403
+    """pytest fixture to override the ROOT_URLCONF with test views."""
+    with override_settings(ROOT_URLCONF='datahub.core.test.support.urls'):
+        yield
+
+
+@mock.patch.dict(SCOPES_DESCS, TEST_SCOPES_DESC)
+class TestOAuthViewScope(APITestMixin):
+    """Tests app-specific OAuth scopes in views."""
+
+    def test_scope_allowed(self, test_urls):
+        """Tests a test view with the required scope."""
+        client = self.create_api_client(TestScope.test_scope_1)
+        url = reverse('test-disableable-collection')
+        response = client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_scope_not_allowed(self, test_urls):
+        """Tests a test view without the required scope."""
+        client = self.create_api_client(TestScope.test_scope_2)
+        url = reverse('test-disableable-collection')
+        response = client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_expired_token(self, test_urls):
+        """Tests a test view with an expired token and the required scope."""
+        access_token = AccessTokenFactory(application=self.application,
+                                          scope=TestScope.test_scope_1,
+                                          expires=Faker('past_datetime'))
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=f'bearer {access_token.token}')
+        url = reverse('test-disableable-collection')
+        response = client.get(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_unauthenticated(self, test_urls):
+        """Tests a test view unauthenticated."""
+        client = APIClient()
+        url = reverse('test-disableable-collection')
+        response = client.get(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 def _create_auth_header(user, password):
