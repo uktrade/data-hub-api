@@ -21,6 +21,8 @@ from . import validators
 from .constants import DEFAULT_HOURLY_RATE, OrderStatus, VATStatus
 from .signals import quote_generated
 
+MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
 
 class ServiceType(BaseOrderedConstantModel, DisableableModel):
     """
@@ -171,6 +173,22 @@ class Order(BaseModel):
     )
     total_cost = models.PositiveIntegerField(
         default=0, help_text='Subtotal + VAT cost in pence.'
+    )
+
+    billing_contact_name = models.CharField(max_length=MAX_LENGTH, blank=True)
+    billing_email = models.EmailField(max_length=MAX_LENGTH, blank=True)
+    billing_phone = models.CharField(max_length=150, blank=True)
+    billing_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
+    billing_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
+    billing_address_town = models.CharField(max_length=MAX_LENGTH, blank=True)
+    billing_address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
+    billing_address_postcode = models.CharField(max_length=100, blank=True)
+    billing_address_country = models.ForeignKey(
+        Country,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
     )
 
     # legacy fields, only meant to be used in readonly mode as reference
