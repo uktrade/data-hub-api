@@ -182,7 +182,7 @@ class TestAssigneesFilledInValidator:
             validator()
 
         assert exc.value.detail == {
-            'assignees': ['The total estimated time cannot be zero.']
+            'assignee_time': ['The total estimated time cannot be zero.']
         }
 
     def test_non_zero_estimated_time_succeeds(self):
