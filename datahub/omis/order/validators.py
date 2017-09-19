@@ -141,7 +141,7 @@ class AssigneesFilledInValidator:
 
         if not self.instance.assignees.aggregate(sum=models.Sum('estimated_time'))['sum']:
             raise ValidationError({
-                'assignees': [self.no_estimated_time_message]
+                'assignee_time': [self.no_estimated_time_message]
             })
 
 
