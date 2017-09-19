@@ -1,7 +1,11 @@
+import datetime
+
 import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.test.factories import AdviserFactory
+from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
 from datahub.event.test.factories import EventFactory
 
@@ -61,6 +65,90 @@ class TestSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data['results']) > 0
+
+    def test_search_event_name(self, setup_es, setup_data):
+        """Tests event_name filter."""
+        event_name = '0000000000'
+        EventFactory(
+            name=event_name
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:event')
+
+        response = self.api_client.post(url, {
+            'original_query': '',
+            'name': event_name[:5],
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['name'] == event_name
+
+    def test_search_event_organiser_name(self, setup_es, setup_data):
+        """Tests organiser_name filter."""
+        organiser_name = '00000000 000000000'
+        EventFactory(
+            organiser=AdviserFactory(
+                first_name=organiser_name.split(' ', maxsplit=1)[0],
+                last_name=organiser_name.split(' ', maxsplit=1)[1],
+            )
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:event')
+
+        response = self.api_client.post(url, {
+            'original_query': '',
+            'organiser_name': '00000',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['organiser']['name'] == organiser_name
+
+    def test_search_event_address_country(self, setup_es, setup_data):
+        """Tests address_country filter."""
+        country_id = constants.Country.united_states.value.id
+        EventFactory(
+            address_country_id=country_id,
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:event')
+
+        response = self.api_client.post(url, {
+            'original_query': '',
+            'address_country': country_id,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['address_country']['id'] == country_id
+
+    def test_search_event_date(self, setup_es, setup_data):
+        """Tests start_date filter."""
+        start_date = datetime.datetime(2017, 7, 2)
+        event = EventFactory(
+            start_date=start_date,
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:event')
+
+        response = self.api_client.post(url, {
+            'original_query': '',
+            'start_date_after': start_date,
+            'start_date_before': start_date,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['id'] == str(event.id)
 
 
 class TestBasicSearch(APITestMixin):
