@@ -12,11 +12,6 @@ INSTALLED_APPS += [
     'datahub.core.test.support'
 ]
 
-OAUTH2_PROVIDER['SCOPES'].update({
-    'test_scope_1': 'Scope for testing 1.',
-    'test_scope_2': 'Scope for testing 2.',
-})
-
 ES_INDEX = 'test'
 ES_INDEX_SETTINGS = {
     'index.mapping.nested_fields.limit': 100,

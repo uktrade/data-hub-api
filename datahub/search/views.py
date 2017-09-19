@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 
+from datahub.oauth.scopes import Scope
 from . import elasticsearch
 from .apps import get_search_apps
 from .serializers import SearchSerializer
@@ -21,6 +22,7 @@ EntitySearch = namedtuple('EntitySearch', ['model', 'name'])
 class SearchBasicAPIView(APIView):
     """Aggregate all entities search view."""
 
+    required_scopes = (Scope.internal_front_end,)
     http_method_names = ('get',)
 
     SORT_BY_FIELDS = (

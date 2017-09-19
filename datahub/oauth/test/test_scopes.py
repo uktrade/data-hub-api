@@ -1,17 +1,23 @@
 from base64 import b64encode
+from unittest import mock
 
 import pytest
 from rest_framework import HTTP_HEADER_ENCODING, status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
+from datahub.oauth.scopes import SCOPES_DESCS
 from datahub.oauth.test.factories import OAuthApplicationScopeFactory
 
 
 pytestmark = pytest.mark.django_db
 
 
-class TestOAuth:
+@mock.patch.dict(SCOPES_DESCS, {
+    'test_scope_1': 'Scope for testing 1.',
+    'test_scope_2': 'Scope for testing 2.',
+})
+class TestOAuthScopeBackend:
     """Tests app-specific OAuth scopes."""
 
     def test_creating_a_token_default_scope(self):
