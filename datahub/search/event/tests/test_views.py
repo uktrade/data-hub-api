@@ -131,7 +131,7 @@ class TestSearch(APITestMixin):
 
     def test_search_event_date(self, setup_es, setup_data):
         """Tests start_date filter."""
-        start_date = datetime.datetime(2017, 7, 2)
+        start_date = datetime.date(2017, 7, 2)
         event = EventFactory(
             start_date=start_date,
         )
@@ -149,6 +149,77 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['id'] == str(event.id)
+
+    def test_search_event_sortby_start_date(self, setup_es, setup_data):
+        """Tests sort by start_date desc."""
+        start_date_a = datetime.date(2011, 9, 29)
+        start_date_b = datetime.date(2011, 9, 30)
+        EventFactory(start_date=start_date_a)
+        EventFactory(start_date=start_date_b)
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:event')
+
+        response = self.api_client.post(url, {
+            'original_query': '',
+            'start_date_after': start_date_a,
+            'start_date_before': start_date_b,
+            'sortby': 'start_date:desc',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert len(response.data['results']) == 2
+        assert response.data['results'][0]['start_date'] == start_date_b.isoformat()
+        assert response.data['results'][1]['start_date'] == start_date_a.isoformat()
+
+    def test_search_event_sortby_end_date(self, setup_es, setup_data):
+        """Tests sort by end_date desc."""
+        start_date = datetime.date(2000, 9, 29)
+        end_date_a = datetime.date(2014, 9, 29)
+        end_date_b = datetime.date(2015, 9, 29)
+        EventFactory(start_date=start_date, end_date=end_date_a)
+        EventFactory(start_date=start_date, end_date=end_date_b)
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:event')
+
+        response = self.api_client.post(url, {
+            'original_query': '',
+            'start_date_after': start_date,
+            'start_date_before': start_date,
+            'sortby': 'end_date:desc',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert len(response.data['results']) == 2
+        assert response.data['results'][0]['end_date'] == end_date_b.isoformat()
+        assert response.data['results'][1]['end_date'] == end_date_a.isoformat()
+
+    def test_search_event_sortby_modified_on(self, setup_es, setup_data):
+        """Tests sort by modified_on desc."""
+        start_date = datetime.date(2001, 9, 29)
+        event_a = EventFactory(start_date=start_date)
+        event_b = EventFactory(start_date=start_date)
+        event_a.name = 'testing'
+        event_a.save()
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:event')
+
+        response = self.api_client.post(url, {
+            'original_query': '',
+            'start_date_after': start_date,
+            'start_date_before': start_date,
+            'sortby': 'modified_on:desc',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert len(response.data['results']) == 2
+        assert response.data['results'][0]['id'] == str(event_a.id)
+        assert response.data['results'][1]['id'] == str(event_b.id)
 
 
 class TestBasicSearch(APITestMixin):

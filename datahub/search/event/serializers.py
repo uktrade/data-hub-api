@@ -9,4 +9,6 @@ class SearchEventSerializer(SearchSerializer):
         'name',
         'created_on',
         'modified_on',
+        'start_date',
+        'end_date',
     )
