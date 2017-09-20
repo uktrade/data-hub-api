@@ -7,7 +7,7 @@ from datahub.investment.models import (
 )
 
 from .models import InvestmentProject
-from .views import SearchInvestmentProjectAPIView
+from .views import SearchInvestmentProjectAPIView, SearchInvestmentProjectExportAPIView
 
 from ..apps import SearchApp
 
@@ -18,6 +18,7 @@ class InvestmentSearchApp(SearchApp):
     name = 'investment_project'
     ESModel = InvestmentProject
     view = SearchInvestmentProjectAPIView
+    export_view = SearchInvestmentProjectExportAPIView
     queryset = DBInvestmentProject.objects.prefetch_related(
         'archived_by',
         'average_salary',

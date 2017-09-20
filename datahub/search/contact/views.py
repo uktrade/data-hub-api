@@ -1,10 +1,10 @@
 from .models import Contact
 from .serializers import SearchContactSerializer
-from ..views import SearchAPIView
+from ..views import SearchAPIView, SearchExportAPIView
 
 
-class SearchContactAPIView(SearchAPIView):
-    """Filtered contact search view."""
+class SearchContactParams:
+    """Search contact params."""
 
     entity = Contact
     serializer_class = SearchContactSerializer
@@ -22,3 +22,11 @@ class SearchContactAPIView(SearchAPIView):
         'company_uk_region': 'company_uk_region.id',
         'address_country': 'address_country.id',
     }
+
+
+class SearchContactAPIView(SearchContactParams, SearchAPIView):
+    """Filtered contact search view."""
+
+
+class SearchContactExportAPIView(SearchContactParams, SearchExportAPIView):
+    """Filtered contact search export view."""
