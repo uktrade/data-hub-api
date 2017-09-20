@@ -1,13 +1,18 @@
+import datetime
 import uuid
-
 import factory
+
+from django.utils.timezone import now
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import Country, Sector
 from datahub.core.test.factories import to_many_field
 
-from datahub.omis.quote.test.factories import CancelledQuoteFactory, QuoteFactory
+from datahub.omis.quote.test.factories import (
+    AcceptedQuoteFactory, CancelledQuoteFactory, QuoteFactory
+)
 
+from ..constants import OrderStatus, VATStatus
 from ..models import ServiceType
 
 
@@ -27,9 +32,18 @@ class OrderFactory(factory.django.DjangoModelFactory):
     further_info = factory.Faker('text')
     existing_agents = factory.Faker('text')
     permission_to_approach_contacts = factory.Faker('text')
-    delivery_date = factory.Faker('future_date')
+    delivery_date = factory.LazyFunction(
+        lambda: (now() + datetime.timedelta(days=60)).date()
+    )
     contact_email = factory.Faker('email')
     contact_phone = '+44 (0)7123 123456'
+    status = OrderStatus.draft
+    po_number = factory.Faker('text', max_nb_chars=50)
+    discount_value = factory.Faker('random_int', max=100)
+    discount_label = factory.Faker('text', max_nb_chars=50)
+    vat_status = VATStatus.eu
+    vat_number = '0123456789'
+    vat_verified = True
 
     @to_many_field
     def service_types(self):
@@ -40,6 +54,15 @@ class OrderFactory(factory.django.DjangoModelFactory):
         """
         return ServiceType.objects.filter(disabled_on__isnull=True).order_by('?')[:2]
 
+    @to_many_field
+    def assignees(self):
+        """
+        Add support for setting assignees.
+        If nothing specified when instantiating the object, the value returned by
+        this method will be used by default.
+        """
+        return OrderAssigneeFactory.create_batch(1, order=self)
+
     class Meta:  # noqa: D101
         model = 'order.Order'
 
@@ -48,12 +71,20 @@ class OrderWithOpenQuoteFactory(OrderFactory):
     """Order factory with an active quote."""
 
     quote = factory.SubFactory(QuoteFactory)
+    status = OrderStatus.quote_awaiting_acceptance
 
 
 class OrderWithCancelledQuoteFactory(OrderFactory):
     """Order factory with a cancelled quote."""
 
     quote = factory.SubFactory(CancelledQuoteFactory)
+
+
+class OrderWithAcceptedQuoteFactory(OrderFactory):
+    """Order factory with an accepted quote."""
+
+    quote = factory.SubFactory(AcceptedQuoteFactory)
+    status = OrderStatus.quote_accepted
 
 
 class OrderSubscriberFactory(factory.django.DjangoModelFactory):
@@ -73,7 +104,16 @@ class OrderAssigneeFactory(factory.django.DjangoModelFactory):
     id = factory.LazyFunction(uuid.uuid4)
     order = factory.SubFactory(OrderFactory)
     adviser = factory.SubFactory(AdviserFactory)
-    estimated_time = 120
+    estimated_time = factory.Faker('random_int', min=10, max=100)
 
     class Meta:  # noqa: D101
         model = 'order.OrderAssignee'
+
+
+class HourlyRateFactory(factory.django.DjangoModelFactory):
+    """HourlyRate factory."""
+
+    id = factory.LazyFunction(uuid.uuid4)
+
+    class Meta:  # noqa: D101
+        model = 'order.HourlyRate'

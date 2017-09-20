@@ -6,6 +6,7 @@ from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import APITestMixin
 
 from ..factories import OrderAssigneeFactory, OrderFactory
+from ...constants import OrderStatus
 from ...models import OrderAssignee
 from ...views import AssigneeView
 
@@ -18,7 +19,7 @@ class TestGetOrderAssignees(APITestMixin):
 
     def test_empty(self):
         """Test that calling GET returns [] if no-one is assigned."""
-        order = OrderFactory()
+        order = OrderFactory(assignees=[])
 
         url = reverse(
             'api-v3:omis:order:assignee',
@@ -34,7 +35,7 @@ class TestGetOrderAssignees(APITestMixin):
         Test that calling GET returns the list of advisers assigned to the order.
         """
         advisers = AdviserFactory.create_batch(3)
-        order = OrderFactory()
+        order = OrderFactory(assignees=[])
         for i, adviser in enumerate(advisers[:2]):
             OrderAssigneeFactory(
                 order=order,
@@ -128,7 +129,7 @@ class TestChangeOrderAssignees(APITestMixin):
             3. adviser 3 gets added
         """
         created_by = AdviserFactory()
-        order = OrderFactory()
+        order = OrderFactory(assignees=[])
         adviser1 = AdviserFactory()
         adviser2 = AdviserFactory()
         adviser3 = AdviserFactory()
@@ -426,7 +427,7 @@ class TestChangeOrderAssignees(APITestMixin):
             2. adviser 1 doesn't get updated
             3. adviser 3 doesn't get added
         """
-        order = OrderFactory()
+        order = OrderFactory(assignees=[])
         adviser1 = AdviserFactory()
         adviser2 = AdviserFactory()
         adviser3 = AdviserFactory()
@@ -584,3 +585,41 @@ class TestChangeOrderAssignees(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {'non_field_errors': ['Only one lead allowed.']}
+
+    @pytest.mark.parametrize(
+        'disallowed_status', (
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.quote_accepted,
+            OrderStatus.paid,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_409_if_order_not_in_draft(self, disallowed_status):
+        """
+        Test that if the order is not in one of the allowed statuses, the endpoint
+        returns 409.
+        """
+        order = OrderFactory(status=disallowed_status)
+
+        url = reverse(
+            'api-v3:omis:order:assignee',
+            kwargs={'order_pk': order.id}
+        )
+        response = self.api_client.patch(
+            url,
+            [{
+                'adviser': {
+                    'id': AdviserFactory().id,
+                }
+            }],
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_409_CONFLICT
+        assert response.json() == {
+            'detail': (
+                'The action cannot be performed '
+                f'in the current status {OrderStatus[disallowed_status]}.'
+            )
+        }

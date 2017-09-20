@@ -21,7 +21,9 @@ class InvestmentProjectAdmin(BaseModelVersionAdmin):
         'referral_source_adviser',
         'project_manager',
         'project_assurance_adviser',
-        'uk_company'
+        'uk_company',
+        'created_by',
+        'modified_by',
     )
 
 
@@ -49,5 +51,7 @@ class IProjectDocumentAdmin(admin.ModelAdmin):
         'archived_by',
         'project',
         'document',
+        'created_by',
+        'modified_by',
     )
     date_hierarchy = 'created_on'

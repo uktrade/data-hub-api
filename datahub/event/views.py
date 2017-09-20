@@ -8,8 +8,14 @@ class EventViewSet(CoreViewSetV3):
 
     serializer_class = EventSerializer
     queryset = Event.objects.select_related(
-        'address_country'
+        'address_country',
+        'event_type',
+        'lead_team',
+        'location_type',
+        'organiser',
+        'uk_region',
+        'service',
     ).prefetch_related(
-        'additional_teams',
+        'teams',
         'related_programmes',
     )

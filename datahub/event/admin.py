@@ -19,12 +19,10 @@ class InvestmentProjectAdmin(BaseModelVersionAdmin):
     """Admin for events."""
 
     search_fields = ['name']
-    readonly_fields = (
-        'id',
-        'created_by',
-        'modified_by',
-    )
     raw_id_fields = (
         'lead_team',
         'teams',
+        'organiser',
+        'modified_by',
+        'created_by',
     )

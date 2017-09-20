@@ -13,6 +13,7 @@ from datahub.omis.market.models import Market
 
 from ..factories import OrderFactory
 
+from ...constants import OrderStatus, VATStatus
 from ...models import ServiceType
 
 
@@ -46,6 +47,10 @@ class TestAddOrderDetails(APITestMixin):
                 'description': 'Description test',
                 'contacts_not_to_approach': 'Contacts not to approach details',
                 'delivery_date': '2017-04-20',
+                'po_number': 'PO 123',
+                'vat_status': VATStatus.eu,
+                'vat_number': '01234566789',
+                'vat_verified': True
             },
             format='json'
         )
@@ -54,6 +59,7 @@ class TestAddOrderDetails(APITestMixin):
         assert response.json() == {
             'id': response.json()['id'],
             'reference': response.json()['reference'],
+            'status': OrderStatus.draft,
             'created_on': '2017-04-18T13:00:00',
             'created_by': {
                 'id': str(self.user.pk),
@@ -95,6 +101,15 @@ class TestAddOrderDetails(APITestMixin):
             'delivery_date': '2017-04-20',
             'contact_email': '',
             'contact_phone': '',
+            'po_number': 'PO 123',
+            'discount_value': 0,
+            'vat_status': VATStatus.eu,
+            'vat_number': '01234566789',
+            'vat_verified': True,
+            'net_cost': 0,
+            'subtotal_cost': 0,
+            'vat_cost': 0,
+            'total_cost': 0,
         }
 
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
@@ -121,6 +136,15 @@ class TestAddOrderDetails(APITestMixin):
         assert response.json()['description'] == ''
         assert response.json()['contacts_not_to_approach'] == ''
         assert response.json()['delivery_date'] is None
+        assert response.json()['po_number'] == ''
+        assert response.json()['vat_status'] == ''
+        assert response.json()['vat_number'] == ''
+        assert response.json()['vat_verified'] is None
+        assert response.json()['discount_value'] == 0
+        assert response.json()['net_cost'] == 0
+        assert response.json()['subtotal_cost'] == 0
+        assert response.json()['vat_cost'] == 0
+        assert response.json()['total_cost'] == 0
 
     def test_fails_if_contact_not_from_company(self):
         """
@@ -260,6 +284,38 @@ class TestAddOrderDetails(APITestMixin):
         assert response.json()['existing_agents'] == ''
         assert response.json()['permission_to_approach_contacts'] == ''
 
+    @pytest.mark.parametrize(
+        'vat_status',
+        (VATStatus.outside_eu, VATStatus.uk)
+    )
+    def test_vat_number_and_verified_reset_if_vat_status_not_eu(self, vat_status):
+        """
+        Test that if vat_number and vat_verified are set but vat_status != 'eu',
+        they are set to '' and None as they only make sense if company in 'eu'.
+        """
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
+        country = Country.canada.value
+
+        url = reverse('api-v3:omis:order:list')
+        response = self.api_client.post(
+            url,
+            {
+                'company': {'id': company.pk},
+                'contact': {'id': contact.pk},
+                'primary_market': {'id': country.id},
+                'vat_status': vat_status,
+                'vat_number': '0123456789',
+                'vat_verified': True,
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.json()['vat_status'] == vat_status
+        assert response.json()['vat_number'] == ''
+        assert response.json()['vat_verified'] is None
+
 
 class TestChangeOrderDetails(APITestMixin):
     """Change Order details test case."""
@@ -267,7 +323,7 @@ class TestChangeOrderDetails(APITestMixin):
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
     def test_success(self):
         """Test changing an existing order."""
-        order = OrderFactory()
+        order = OrderFactory(vat_status=VATStatus.outside_eu)
         new_contact = ContactFactory(company=order.company)
         new_sector = Sector.renewable_energy_wind.value
         new_service_type = ServiceType.objects.filter(disabled_on__isnull=True).first()
@@ -284,14 +340,20 @@ class TestChangeOrderDetails(APITestMixin):
                 'description': 'Updated description',
                 'contacts_not_to_approach': 'Updated contacts not to approach',
                 'delivery_date': '2017-04-21',
+                'po_number': 'NEW PO 321',
+                'vat_status': VATStatus.eu,
+                'vat_number': 'new vat number',
+                'vat_verified': False
             },
             format='json'
         )
 
+        order.refresh_from_db()
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
             'id': str(order.pk),
             'reference': order.reference,
+            'status': OrderStatus.draft,
             'created_on': '2017-04-18T13:00:00',
             'created_by': {
                 'id': str(order.created_by.pk),
@@ -333,6 +395,15 @@ class TestChangeOrderDetails(APITestMixin):
             'delivery_date': '2017-04-21',
             'contact_email': order.contact_email,
             'contact_phone': order.contact_phone,
+            'po_number': 'NEW PO 321',
+            'discount_value': order.discount_value,
+            'vat_status': VATStatus.eu,
+            'vat_number': 'new vat number',
+            'vat_verified': False,
+            'net_cost': order.net_cost,
+            'subtotal_cost': order.subtotal_cost,
+            'vat_cost': order.vat_cost,
+            'total_cost': order.total_cost,
         }
 
     def test_fails_if_contact_not_from_company(self):
@@ -513,17 +584,24 @@ class TestChangeOrderDetails(APITestMixin):
         response = self.api_client.patch(
             url,
             {
+                'status': OrderStatus.complete,
                 'product_info': 'Updated product info',
                 'further_info': 'Updated further info',
                 'existing_agents': 'Updated existing agents',
                 'permission_to_approach_contacts': 'Updated permission to approach contacts',
                 'contact_email': 'updated-email@email.com',
-                'contact_phone': '1234'
+                'contact_phone': '1234',
+                'discount_value': 99999,
+                'net_cost': 99999,
+                'subtotal_cost': 99999,
+                'vat_cost': 99999,
+                'total_cost': 99999,
             },
             format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
+        assert response.json()['status'] == OrderStatus.draft
         assert response.json()['product_info'] != 'Updated product info'
         assert response.json()['further_info'] != 'Updated further info'
         assert response.json()['existing_agents'] != 'Updated existing agents'
@@ -531,6 +609,64 @@ class TestChangeOrderDetails(APITestMixin):
             'Updated permission to approach contacts'
         assert response.json()['contact_email'] != 'updated-email@email.com'
         assert response.json()['contact_phone'] != '1234'
+        assert response.json()['discount_value'] != 99999
+        assert response.json()['net_cost'] != 99999
+        assert response.json()['subtotal_cost'] != 99999
+        assert response.json()['vat_cost'] != 99999
+        assert response.json()['total_cost'] != 99999
+
+    @pytest.mark.parametrize(
+        'disallowed_status', (
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.quote_accepted,
+            OrderStatus.paid,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_409_if_order_not_in_draft(self, disallowed_status):
+        """
+        Test that if the order is not in one of the allowed statuses, the endpoint
+        returns 409.
+        """
+        order = OrderFactory(status=disallowed_status)
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(url, {}, format='json')
+        assert response.status_code == status.HTTP_409_CONFLICT
+        assert response.json() == {
+            'detail': (
+                'The action cannot be performed '
+                f'in the current status {OrderStatus[disallowed_status]}.'
+            )
+        }
+
+    @pytest.mark.parametrize(
+        'vat_status',
+        (VATStatus.outside_eu, VATStatus.uk)
+    )
+    def test_vat_number_and_verified_reset_if_vat_status_not_eu(self, vat_status):
+        """
+        Test that if vat_number and vat_verified are set but vat_status != 'eu',
+        they are set to '' and None as they only make sense if company in 'eu'.
+        """
+        order = OrderFactory(
+            vat_status=VATStatus.eu,
+            vat_number='0123456789',
+            vat_verified=True
+        )
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(
+            url,
+            {'vat_status': vat_status},
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['vat_status'] == vat_status
+        assert response.json()['vat_number'] == ''
+        assert response.json()['vat_verified'] is None
 
 
 class TestViewOrderDetails(APITestMixin):
@@ -547,6 +683,7 @@ class TestViewOrderDetails(APITestMixin):
         assert response.json() == {
             'id': str(order.pk),
             'reference': order.reference,
+            'status': OrderStatus.draft,
             'created_on': order.created_on.isoformat(),
             'created_by': {
                 'id': str(order.created_by.pk),
@@ -588,6 +725,15 @@ class TestViewOrderDetails(APITestMixin):
             'delivery_date': order.delivery_date.isoformat(),
             'contact_email': order.contact_email,
             'contact_phone': order.contact_phone,
+            'po_number': order.po_number,
+            'discount_value': order.discount_value,
+            'vat_status': order.vat_status,
+            'vat_number': order.vat_number,
+            'vat_verified': order.vat_verified,
+            'net_cost': order.net_cost,
+            'subtotal_cost': order.subtotal_cost,
+            'vat_cost': order.vat_cost,
+            'total_cost': order.total_cost,
         }
 
     def test_not_found(self):

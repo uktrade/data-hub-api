@@ -10,6 +10,7 @@ from .models import DataSet
 SEARCH_APPS = [
     'datahub.search.company.CompanySearchApp',
     'datahub.search.contact.ContactSearchApp',
+    'datahub.search.event.EventSearchApp',
     'datahub.search.investment.InvestmentSearchApp',
     'datahub.search.interaction.InteractionSearchApp',
     'datahub.search.omis.OrderSearchApp',

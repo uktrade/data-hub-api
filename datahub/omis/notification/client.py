@@ -131,5 +131,22 @@ class Notify:
 
             self.order_info(**data)
 
+    def quote_generated(self, order):
+        """
+        Send a notification to the contact that a quote has just been created
+        and needs to be accepted.
+        """
+        self._send_email(
+            email_address=order.contact.email,
+            template_id=Template.quote_awaiting_acceptance_for_contact.value,
+            personalisation=self._prepare_personalisation(
+                order,
+                {
+                    'recipient name': order.contact.name,
+                    'embedded link': order.get_public_facing_url(),
+                }
+            )
+        )
+
 
 notify = Notify()

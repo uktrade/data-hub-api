@@ -2,17 +2,21 @@ import uuid
 from unittest import mock
 import pytest
 
+from dateutil.parser import parse as dateutil_parse
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import APITestMixin
+from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.models import Order
 from datahub.omis.order.test.factories import (
     OrderFactory, OrderWithCancelledQuoteFactory, OrderWithOpenQuoteFactory
 )
 
+from .factories import QuoteFactory
 from ..models import Quote
+
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
@@ -48,6 +52,37 @@ class TestCreatePreviewOrder(APITestMixin):
 
     @pytest.mark.parametrize('quote_view_name', ('item', 'preview'))
     @pytest.mark.parametrize(
+        'disallowed_status', (
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.quote_accepted,
+            OrderStatus.paid,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_409_if_order_in_disallowed_status(self, quote_view_name, disallowed_status):
+        """
+        Test that if the order is not in one of the allowed statuses, the endpoint
+        returns 409.
+        """
+        order = OrderFactory(status=disallowed_status)
+
+        url = reverse(
+            f'api-v3:omis:quote:{quote_view_name}',
+            kwargs={'order_pk': order.pk}
+        )
+        response = self.api_client.post(url, format='json')
+
+        assert response.status_code == status.HTTP_409_CONFLICT
+        assert response.json() == {
+            'detail': (
+                'The action cannot be performed '
+                f'in the current status {OrderStatus[disallowed_status]}.'
+            )
+        }
+
+    @pytest.mark.parametrize('quote_view_name', ('item', 'preview'))
+    @pytest.mark.parametrize(
         'field,value',
         (
             ('service_types', []),
@@ -71,6 +106,31 @@ class TestCreatePreviewOrder(APITestMixin):
             field: ['This field is required.']
         }
 
+    @pytest.mark.parametrize('quote_view_name', ('item', 'preview'))
+    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    def test_400_if_expiry_date_passed(self, quote_view_name):
+        """
+        If the generated quote expiry date is in the past because the delivery date
+        is too close, return 400.
+        """
+        order = OrderFactory(
+            delivery_date=dateutil_parse('2017-04-20').date()
+        )
+
+        url = reverse(
+            f'api-v3:omis:quote:{quote_view_name}',
+            kwargs={'order_pk': order.pk}
+        )
+        response = self.api_client.post(url, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'delivery_date': [
+                'The calculated expiry date for the quote is in the past. '
+                'You might be able to fix this by changing the delivery date.'
+            ]
+        }
+
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
     @pytest.mark.parametrize(
         'OrderFactoryClass',  # noqa: N803
@@ -78,7 +138,9 @@ class TestCreatePreviewOrder(APITestMixin):
     )
     def test_create_success(self, OrderFactoryClass):
         """Test a successful call to create a quote."""
-        order = OrderFactoryClass()
+        order = OrderFactoryClass(
+            delivery_date=dateutil_parse('2017-06-18').date()
+        )
         orig_quote = order.quote
 
         url = reverse('api-v3:omis:quote:item', kwargs={'order_pk': order.pk})
@@ -97,6 +159,9 @@ class TestCreatePreviewOrder(APITestMixin):
             },
             'cancelled_on': None,
             'cancelled_by': None,
+            'accepted_on': None,
+            'accepted_by': None,
+            'expires_on': '2017-05-18',  # now + 30 days
         }
 
         assert order.quote
@@ -121,6 +186,7 @@ class TestCreatePreviewOrder(APITestMixin):
         assert not order.quote
         assert not Quote.objects.count()
 
+    @freeze_time('2017-04-18 13:00:00.000000+00:00')
     @pytest.mark.parametrize(
         'OrderFactoryClass',  # noqa: N803
         (OrderFactory, OrderWithCancelledQuoteFactory)
@@ -130,7 +196,9 @@ class TestCreatePreviewOrder(APITestMixin):
         Test a successful call to preview a quote.
         Changes are not saved in the db.
         """
-        order = OrderFactoryClass()
+        order = OrderFactoryClass(
+            delivery_date=dateutil_parse('2017-06-18').date()
+        )
         orig_quote = order.quote
 
         url = reverse('api-v3:omis:quote:preview', kwargs={'order_pk': order.pk})
@@ -141,14 +209,12 @@ class TestCreatePreviewOrder(APITestMixin):
         assert response.json() == {
             'content': response.json()['content'],
             'created_on': None,
-            'created_by': {
-                'id': str(self.user.pk),
-                'first_name': self.user.first_name,
-                'last_name': self.user.last_name,
-                'name': self.user.name
-            },
+            'created_by': None,
             'cancelled_on': None,
             'cancelled_by': None,
+            'accepted_on': None,
+            'accepted_by': None,
+            'expires_on': '2017-05-18',  # now + 30 days
         }
 
         order.refresh_from_db()
@@ -177,6 +243,9 @@ class TestGetQuote(APITestMixin):
             },
             'cancelled_on': None,
             'cancelled_by': None,
+            'accepted_on': None,
+            'accepted_by': None,
+            'expires_on': quote.expires_on.isoformat(),
         }
 
     def test_get_expanded(self):
@@ -203,6 +272,9 @@ class TestGetQuote(APITestMixin):
             'content': quote.content,
             'cancelled_on': None,
             'cancelled_by': None,
+            'accepted_on': None,
+            'accepted_by': None,
+            'expires_on': quote.expires_on.isoformat(),
         }
 
     def test_400_with_invalid_expand_value(self):
@@ -254,6 +326,38 @@ class TestCancelOrder(APITestMixin):
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.parametrize(
+        'disallowed_status', (
+            OrderStatus.paid,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_409_if_order_in_disallowed_status(self, disallowed_status):
+        """
+        Test that if the order is not in one of the allowed statuses, the endpoint
+        returns 409.
+        """
+        quote = QuoteFactory()
+        order = OrderFactory(
+            status=disallowed_status,
+            quote=quote
+        )
+
+        url = reverse(
+            f'api-v3:omis:quote:cancel',
+            kwargs={'order_pk': order.pk}
+        )
+        response = self.api_client.post(url, format='json')
+
+        assert response.status_code == status.HTTP_409_CONFLICT
+        assert response.json() == {
+            'detail': (
+                'The action cannot be performed '
+                f'in the current status {OrderStatus[disallowed_status]}.'
+            )
+        }
+
     def test_without_quote(self):
         """Test that if the order doesn't have any quote, the endpoint returns 404."""
         order = OrderFactory()
@@ -294,6 +398,9 @@ class TestCancelOrder(APITestMixin):
                     'last_name': self.user.last_name,
                     'name': self.user.name
                 },
+                'accepted_on': None,
+                'accepted_by': None,
+                'expires_on': quote.expires_on.isoformat(),
             }
 
             quote.refresh_from_db()
@@ -328,6 +435,9 @@ class TestCancelOrder(APITestMixin):
                     'last_name': quote.cancelled_by.last_name,
                     'name': quote.cancelled_by.name
                 },
+                'accepted_on': None,
+                'accepted_by': None,
+                'expires_on': quote.expires_on.isoformat(),
             }
 
             quote.refresh_from_db()

@@ -53,6 +53,7 @@ def test_order_to_dict():
         },
         'modified_on': order.modified_on,
         'reference': order.reference,
+        'status': order.status,
         'description': order.description,
         'contacts_not_to_approach': order.contacts_not_to_approach,
         'delivery_date': order.delivery_date,
@@ -84,6 +85,15 @@ def test_order_to_dict():
             }
             for assignee in order.assignees.all()
         ],
+        'po_number': order.po_number,
+        'discount_value': order.discount_value,
+        'vat_status': order.vat_status,
+        'vat_number': order.vat_number,
+        'vat_verified': order.vat_verified,
+        'net_cost': order.net_cost,
+        'subtotal_cost': order.subtotal_cost,
+        'vat_cost': order.vat_cost,
+        'total_cost': order.total_cost,
     }
 
 

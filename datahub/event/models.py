@@ -23,9 +23,12 @@ class Event(BaseModel):
     address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
     address_town = models.CharField(max_length=MAX_LENGTH)
     address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
-    address_postcode = models.CharField(max_length=MAX_LENGTH)
+    address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
     address_country = models.ForeignKey(
         'metadata.Country', on_delete=models.PROTECT, related_name='+'
+    )
+    uk_region = models.ForeignKey(
+        'metadata.UKRegion', blank=True, null=True, on_delete=models.SET_NULL
     )
     notes = models.TextField(blank=True)
     organiser = models.ForeignKey(
@@ -36,6 +39,9 @@ class Event(BaseModel):
     )
     teams = models.ManyToManyField('metadata.Team', blank=True, related_name='+')
     related_programmes = models.ManyToManyField('Programme', blank=True)
+    service = models.ForeignKey(
+        'metadata.Service', null=True, blank=True, on_delete=models.PROTECT
+    )
 
     def __str__(self):
         """Human-readable representation"""

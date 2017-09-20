@@ -8,16 +8,40 @@ from .models import Interaction, ServiceDelivery, ServiceOffer
 class InteractionAdmin(BaseModelVersionAdmin):
     """Interaction admin."""
 
-    search_fields = ['id', 'company__company_number', 'company__company_name', 'contact_email']
-    raw_id_fields = ('company', 'dit_adviser', 'investment_project', 'contact')
+    search_fields = (
+        'id',
+        'company__company_number',
+        'company__company_name',
+        'contact_email'
+    )
+    raw_id_fields = (
+        'company',
+        'dit_adviser',
+        'investment_project',
+        'contact',
+        'created_by',
+        'modified_by',
+    )
 
 
 @admin.register(ServiceDelivery)
 class ServiceDeliveryAdmin(BaseModelVersionAdmin):
     """Service Delivery admin."""
 
-    search_fields = ['id', 'company__company_number', 'company__company_name', 'contact_email']
-    raw_id_fields = ('company', 'dit_adviser', 'contact', 'event')
+    search_fields = (
+        'id',
+        'company__company_number',
+        'company__company_name',
+        'contact_email'
+    )
+    raw_id_fields = (
+        'company',
+        'dit_adviser',
+        'contact',
+        'event',
+        'created_by',
+        'modified_by',
+    )
 
 
 @admin.register(ServiceOffer)

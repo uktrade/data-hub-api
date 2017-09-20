@@ -64,7 +64,8 @@ def configure_connection():
     """Configure Elasticsearch default connection."""
     connections.configure(
         default={
-            'hosts': [settings.ES_URL]
+            'hosts': [settings.ES_URL],
+            'verify_certs': settings.ES_VERIFY_CERTS
         }
     )
 
@@ -187,23 +188,22 @@ def get_field_query(kind, field, value):
     return Q('nested', path=field.rsplit('.', maxsplit=1)[0], query=match)
 
 
-def apply_aggs_query(search, aggs):
+def apply_aggs_query(search, aggregates):
     """Applies aggregates query to the search."""
-    for agg in aggs:
-        # skip range filters as we can't aggregate them
-        if any(agg.endswith(x) for x in ('_before', '_after')):
+    for aggregate in aggregates:
+        # skip range and "search" filters as we can't aggregate them
+        if any(aggregate.endswith(x) for x in ('_before', '_after', '_trigram')):
             continue
-        agg = remap_filter_id_field(agg)
 
         search_aggs = search.aggs
-        if '.' in agg:
+        if '.' in aggregate:
             search_aggs = search_aggs.bucket(
-                agg,
+                aggregate,
                 'nested',
-                path=agg.split('.', 1)[0]
+                path=aggregate.split('.', 1)[0]
             )
 
-        search_aggs.bucket(agg, 'terms', field=agg)
+        search_aggs.bucket(aggregate, 'terms', field=aggregate)
 
 
 def get_search_by_entity_query(term=None,
@@ -211,7 +211,7 @@ def get_search_by_entity_query(term=None,
                                entity=None,
                                ranges=None,
                                field_order=None,
-                               aggs=None,
+                               aggregations=None,
                                offset=0,
                                limit=100):
     """Perform filtered search for given terms in given entity."""
@@ -245,8 +245,8 @@ def get_search_by_entity_query(term=None,
 
     s = s.post_filter('bool', must=must_filter)
 
-    if aggs:
-        apply_aggs_query(s, aggs)
+    if aggregations:
+        apply_aggs_query(s, aggregations)
 
     return s[offset:offset + limit]
 
@@ -254,30 +254,6 @@ def get_search_by_entity_query(term=None,
 def bulk(actions=None, chunk_size=None, **kwargs):
     """Send data in bulk to Elasticsearch."""
     return es_bulk(connections.get_connection(), actions=actions, chunk_size=chunk_size, **kwargs)
-
-
-FILTER_MAP = {
-    'sector': 'sector.id',
-    'account_manager': 'account_manager.id',
-    'export_to_country': 'export_to_countries.id',
-    'future_interest_country': 'future_interest_countries.id',
-    'uk_region': 'uk_region.id',
-    'trading_address_country': 'trading_address_country.id',
-    'address_country': 'address_country.id',
-    'adviser': 'adviser.id',
-    'client_relationship_manager': 'client_relationship_manager.id',
-    'investor_company': 'investor_company.id',
-    'investment_type': 'investment_type.id',
-    'stage': 'stage.id',
-    'company_name': 'company.name_trigram',
-    'company_sector': 'company_sector.id',
-    'company_uk_region': 'company_uk_region.id',
-}
-
-
-def remap_filter_id_field(field):
-    """Maps api field to elasticsearch field."""
-    return FILTER_MAP.get(field, field)
 
 
 def date_range_fields(fields):
