@@ -1,7 +1,7 @@
 from datahub.company.models import Company as DBCompany
 
 from .models import Company
-from .views import SearchCompanyAPIView
+from .views import SearchCompanyAPIView, SearchCompanyExportAPIView
 
 from ..apps import SearchApp
 
@@ -12,6 +12,7 @@ class CompanySearchApp(SearchApp):
     name = 'company'
     ESModel = Company
     view = SearchCompanyAPIView
+    export_view = SearchCompanyExportAPIView
     queryset = DBCompany.objects.prefetch_related(
         'account_manager',
         'archived_by',
