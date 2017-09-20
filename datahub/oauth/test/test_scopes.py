@@ -4,6 +4,7 @@ from unittest import mock
 import pytest
 from django.test.utils import override_settings
 from factory import Faker
+from oauth2_provider.models import Application
 from rest_framework import HTTP_HEADER_ENCODING, status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
@@ -89,23 +90,36 @@ def test_urls():  # noqa: D403
 class TestOAuthViewScope(APITestMixin):
     """Tests app-specific OAuth scopes in views."""
 
-    def test_scope_allowed(self, test_urls):
+    @pytest.mark.parametrize('grant_type', (
+        Application.GRANT_PASSWORD,
+        Application.GRANT_CLIENT_CREDENTIALS,
+    ))
+    def test_scope_allowed(self, test_urls, grant_type):
         """Tests a test view with the required scope."""
-        client = self.create_api_client(TestScope.test_scope_1)
+        client = self.create_api_client(TestScope.test_scope_1, grant_type=grant_type)
         url = reverse('test-disableable-collection')
         response = client.get(url)
         assert response.status_code == status.HTTP_200_OK
 
-    def test_scope_not_allowed(self, test_urls):
+    @pytest.mark.parametrize('grant_type', (
+        Application.GRANT_PASSWORD,
+        Application.GRANT_CLIENT_CREDENTIALS,
+    ))
+    def test_scope_not_allowed(self, test_urls, grant_type):
         """Tests a test view without the required scope."""
-        client = self.create_api_client(TestScope.test_scope_2)
+        client = self.create_api_client(TestScope.test_scope_2, grant_type=grant_type)
         url = reverse('test-disableable-collection')
         response = client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_expired_token(self, test_urls):
+    @pytest.mark.parametrize('grant_type', (
+        Application.GRANT_PASSWORD,
+        Application.GRANT_CLIENT_CREDENTIALS,
+    ))
+    def test_expired_token(self, test_urls, grant_type):
         """Tests a test view with an expired token and the required scope."""
-        access_token = AccessTokenFactory(application=self.application,
+        application = self.get_application(grant_type=grant_type)
+        access_token = AccessTokenFactory(application=application,
                                           scope=TestScope.test_scope_1,
                                           expires=Faker('past_datetime'))
         client = APIClient()

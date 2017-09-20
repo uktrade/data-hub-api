@@ -10,6 +10,7 @@ import pytest
 import reversion
 from django.utils.timezone import now
 from freezegun import freeze_time
+from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse
 from reversion.models import Version
@@ -868,7 +869,10 @@ class TestModifiedSinceView(APITestMixin):
             InvestmentProjectFactory.create_batch(5)
 
         url = reverse('api-v3:investment:investment-modified-since-collection')
-        client = self.create_api_client(scope=Scope.mi)
+        client = self.create_api_client(
+            scope=Scope.mi,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
         response = client.get(url, data={
             'time': timestamp.isoformat()
         })
@@ -882,7 +886,10 @@ class TestModifiedSinceView(APITestMixin):
         InvestmentProjectFactory.create_batch(4, modified_on=datetime(2017, 1, 1))
         InvestmentProjectFactory.create_batch(5, modified_on=datetime(2018, 1, 1))
         url = reverse('api-v3:investment:investment-modified-since-collection')
-        client = self.create_api_client(scope=Scope.mi)
+        client = self.create_api_client(
+            scope=Scope.mi,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
         response = client.get(url)
 
         assert response.status_code == status.HTTP_200_OK

@@ -39,7 +39,7 @@ class APITestMixin:
             self._user = get_test_user()
         return self._user
 
-    def get_token(self, *scopes):
+    def get_token(self, *scopes, grant_type=Application.GRANT_PASSWORD):
         """Get access token for user test."""
         if not hasattr(self, '_tokens'):
             self._tokens = {}
@@ -49,7 +49,7 @@ class APITestMixin:
         if scope not in self._tokens:
             self._tokens[scope] = AccessToken.objects.create(
                 user=self.user,
-                application=self.application,
+                application=self.get_application(grant_type),
                 token=token_hex(16),
                 expires=datetime.datetime.now() + datetime.timedelta(hours=1),
                 scope=scope
@@ -61,24 +61,26 @@ class APITestMixin:
         """An API client with internal-front-end scope."""
         return self.create_api_client()
 
-    def create_api_client(self, scope=Scope.internal_front_end, *additional_scopes):
+    def create_api_client(self, scope=Scope.internal_front_end, *additional_scopes,
+                          grant_type=Application.GRANT_PASSWORD):
         """Creates an API client associated with an OAuth token with the specified scope."""
-        token = self.get_token(scope, *additional_scopes)
+        token = self.get_token(scope, *additional_scopes, grant_type=grant_type)
         client = APIClient()
         client.credentials(Authorization=f'Bearer {token}')
         return client
 
-    @property
-    def application(self):
-        """Return the test application."""
-        if not hasattr(self, '_application'):
-            self._application, _ = Application.objects.get_or_create(
-                user=self.user,
+    def get_application(self, grant_type=Application.GRANT_PASSWORD):
+        """Return a test application with the specified grant type."""
+        if not hasattr(self, '_applications'):
+            self._applications = {}
+
+        if grant_type not in self._applications:
+            self._applications[grant_type] = Application.objects.create(
                 client_type=Application.CLIENT_CONFIDENTIAL,
-                authorization_grant_type=Application.GRANT_PASSWORD,
-                name='Test client'
+                authorization_grant_type=grant_type,
+                name=f'Test client ({grant_type})'
             )
-        return self._application
+        return self._applications[grant_type]
 
 
 def synchronous_executor_submit(fn, *args, **kwargs):
