@@ -26,6 +26,14 @@ def test_mapping(setup_es):
                     'analyzer': 'lowercase_keyword_analyzer',
                     'type': 'string'
                 },
+                'status': {
+                    'analyzer': 'lowercase_keyword_analyzer',
+                    'type': 'string'
+                },
+                'po_number': {
+                    'index': 'no',
+                    'type': 'string'
+                },
                 'company': {
                     'properties': {
                         'id': {
@@ -215,6 +223,37 @@ def test_mapping(setup_es):
                     },
                     'type': 'nested'
                 },
+                'discount_value': {
+                    'index': 'no',
+                    'type': 'integer'
+                },
+                'vat_status': {
+                    'index': 'no',
+                    'type': 'string'
+                },
+                'vat_number': {
+                    'index': 'no',
+                    'type': 'string'
+                },
+                'vat_verified': {
+                    'index': 'no',
+                    'type': 'boolean'
+                },
+                'net_cost': {
+                    'index': 'no',
+                    'type': 'integer'
+                },
+                'subtotal_cost': {
+                    'index': 'no',
+                    'type': 'integer'
+                },
+                'vat_cost': {
+                    'index': 'no',
+                    'type': 'integer'
+                },
+                'total_cost': {
+                    'type': 'integer'
+                },
             }
         }
     }
@@ -277,6 +316,7 @@ def test_indexed_doc(setup_es):
             'created_on': order.created_on.isoformat(),
             'modified_on': order.modified_on.isoformat(),
             'reference': order.reference,
+            'status': order.status,
             'description': order.description,
             'contacts_not_to_approach': order.contacts_not_to_approach,
             'delivery_date': order.delivery_date.isoformat(),
@@ -285,16 +325,33 @@ def test_indexed_doc(setup_es):
             'subscribers': [
                 {
                     'id': str(subscriber.adviser.pk),
-                    'name': str(subscriber.adviser.name),
+                    'name': subscriber.adviser.name,
+                    'first_name': subscriber.adviser.first_name,
+                    'last_name': subscriber.adviser.last_name,
                 }
                 for subscriber in order.subscribers.all()
             ],
             'assignees': [
                 {
-                    'id': str(subscriber.adviser.pk),
-                    'name': str(subscriber.adviser.name),
+                    'id': str(assignee.adviser.pk),
+                    'name': assignee.adviser.name,
+                    'first_name': assignee.adviser.first_name,
+                    'last_name': assignee.adviser.last_name,
+                    'dit_team': {
+                        'id': str(assignee.adviser.dit_team.id),
+                        'name': assignee.adviser.dit_team.name,
+                    }
                 }
-                for subscriber in order.assignees.all()
+                for assignee in order.assignees.all()
             ],
+            'po_number': order.po_number,
+            'discount_value': order.discount_value,
+            'vat_status': order.vat_status,
+            'vat_number': order.vat_number,
+            'vat_verified': order.vat_verified,
+            'net_cost': order.net_cost,
+            'subtotal_cost': order.subtotal_cost,
+            'vat_cost': order.vat_cost,
+            'total_cost': order.total_cost,
         }
     }

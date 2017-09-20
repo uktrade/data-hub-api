@@ -51,7 +51,6 @@ class Country(Enum):
     benin = Constant('Benin', 'a95f66a0-5d95-e211-a939-e4115bead28a')
     bermuda = Constant('Bermuda', 'aa5f66a0-5d95-e211-a939-e4115bead28a')
     bhutan = Constant('Bhutan', 'ab5f66a0-5d95-e211-a939-e4115bead28a')
-    blank = Constant('BLANK', '98c8d93d-5d06-e311-a78e-e4115bead28a')
     bolivia = Constant('Bolivia', 'ac5f66a0-5d95-e211-a939-e4115bead28a')
     bosnia_and_herzegovina = Constant(
         'Bosnia and Herzegovina', 'ad5f66a0-5d95-e211-a939-e4115bead28a'
@@ -273,7 +272,6 @@ class Country(Enum):
     taiwan = Constant('Taiwan', 'a56ee1ca-5d95-e211-a939-e4115bead28a')
     tajikistan = Constant('Tajikistan', 'a66ee1ca-5d95-e211-a939-e4115bead28a')
     tanzania = Constant('Tanzania', 'a76ee1ca-5d95-e211-a939-e4115bead28a')
-    test = Constant('TEST', '76756b9a-5d95-e211-a939-e4115bead28a')
     thailand = Constant('Thailand', 'a86ee1ca-5d95-e211-a939-e4115bead28a')
     togo = Constant('Togo', 'a96ee1ca-5d95-e211-a939-e4115bead28a')
     tokelau = Constant('Tokelau', 'aa6ee1ca-5d95-e211-a939-e4115bead28a')
@@ -433,6 +431,7 @@ class Service(Enum):
     """Service."""
 
     trade_enquiry = Constant('Trade - Enquiry', '330bba2b-3499-e211-a939-e4115bead28a')
+    account_management = Constant('Account Management', '9484b82b-3499-e211-a939-e4115bead28a')
 
 
 class Team(Enum):

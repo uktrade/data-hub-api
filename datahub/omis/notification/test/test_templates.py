@@ -5,7 +5,7 @@ from django.conf import settings
 
 from datahub.core.test_utils import synchronous_executor_submit
 from datahub.omis.market.models import Market
-from datahub.omis.order.test.factories import OrderFactory
+from datahub.omis.order.test.factories import OrderFactory, OrderWithOpenQuoteFactory
 
 from ..client import Notify
 
@@ -55,3 +55,16 @@ class TestTemplates:
         notify = Notify()
 
         notify.order_info(OrderFactory(), what_happened='', why='')
+
+    def test_quote_awaiting_acceptance_for_contact(self, settings):
+        """
+        Test the quote generated template.
+        If the template variables have been changed in GOV.UK notifications this
+        is going to raise an exception.
+        """
+        settings.OMIS_NOTIFICATION_API_KEY = settings.OMIS_NOTIFICATION_TEST_API_KEY
+        notify = Notify()
+
+        order = OrderWithOpenQuoteFactory()
+
+        notify.quote_generated(order)

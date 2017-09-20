@@ -24,10 +24,24 @@ class Quote(BaseModel):
         related_name='+'
     )
 
+    accepted_on = models.DateTimeField(null=True, blank=True)
+    accepted_by = models.ForeignKey(
+        'company.Contact',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
+
+    expires_on = models.DateField()
+
     objects = QuoteManager()
 
     def cancel(self, by):
-        """Cancel the current quote."""
+        """
+        Cancel the current quote.
+
+        :param by: the adviser who is cancelling the quote
+        """
         if self.is_cancelled():  # already cancelled, skip
             return
 
@@ -35,11 +49,32 @@ class Quote(BaseModel):
         self.cancelled_by = by
         self.save()
 
+    def accept(self, by):
+        """
+        Accepts the current quote.
+
+        :param by: the contact who is accepting the quote
+        """
+        assert not self.is_cancelled()
+
+        if self.is_accepted():  # already cancelled, skip
+            return
+
+        self.accepted_on = now()
+        self.accepted_by = by
+        self.save()
+
     def is_cancelled(self):
         """
         :returns: True if this quote is cancelled, False otherwise.
         """
         return self.cancelled_on
+
+    def is_accepted(self):
+        """
+        :returns: True if this quote has been accepted, False otherwise.
+        """
+        return self.accepted_on
 
     def __str__(self):
         """Human-readable representation"""

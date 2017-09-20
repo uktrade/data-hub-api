@@ -3,7 +3,7 @@ import factory
 
 from django.utils.timezone import now
 
-from datahub.company.test.factories import AdviserFactory
+from datahub.company.test.factories import AdviserFactory, ContactFactory
 
 
 class QuoteFactory(factory.django.DjangoModelFactory):
@@ -14,6 +14,7 @@ class QuoteFactory(factory.django.DjangoModelFactory):
     modified_by = factory.SubFactory(AdviserFactory)
     reference = factory.Faker('text', max_nb_chars=10)
     content = factory.Faker('text')
+    expires_on = factory.Faker('future_date')
 
     class Meta:  # noqa: D101
         model = 'omis-quote.Quote'
@@ -24,3 +25,10 @@ class CancelledQuoteFactory(QuoteFactory):
 
     cancelled_on = now()
     cancelled_by = factory.SubFactory(AdviserFactory)
+
+
+class AcceptedQuoteFactory(QuoteFactory):
+    """Accepted Order factory."""
+
+    accepted_on = now()
+    accepted_by = factory.SubFactory(ContactFactory)

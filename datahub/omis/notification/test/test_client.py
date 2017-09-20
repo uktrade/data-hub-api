@@ -8,7 +8,7 @@ from notifications_python_client.errors import APIError
 
 from datahub.core.test_utils import synchronous_executor_submit
 from datahub.omis.market.models import Market
-from datahub.omis.order.test.factories import OrderFactory
+from datahub.omis.order.test.factories import OrderFactory, OrderWithOpenQuoteFactory
 
 from ..client import notify, send_email
 from ..constants import Template
@@ -170,3 +170,26 @@ class TestNotifyOrderInfo:
         assert call_args['email_address'] == settings.OMIS_NOTIFICATION_ADMIN_EMAIL
         assert call_args['template_id'] == Template.generic_order_info.value
         assert call_args['personalisation']['recipient name'] == 'example name'
+
+
+@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+class TestNotifyQuoteGenerated:
+    """Tests for the quote_generated logic."""
+
+    def test_contact_notified(self):
+        """
+        Test that calling `quote_generated` sends an email notifying the contact that
+        they have to accept the quote.
+        """
+        order = OrderWithOpenQuoteFactory()
+
+        notify.client.reset_mock()
+
+        notify.quote_generated(order)
+
+        assert notify.client.send_email_notification.called
+        call_args = notify.client.send_email_notification.call_args_list[0][1]
+        assert call_args['email_address'] == order.contact.email
+        assert call_args['template_id'] == Template.quote_awaiting_acceptance_for_contact.value
+        assert call_args['personalisation']['recipient name'] == order.contact.name
+        assert call_args['personalisation']['embedded link'] == order.get_public_facing_url()

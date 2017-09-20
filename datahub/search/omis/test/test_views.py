@@ -1,9 +1,6 @@
-from unittest import mock
 import pytest
-
 from freezegun import freeze_time
 from rest_framework import status
-from rest_framework.exceptions import ValidationError
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory
@@ -12,9 +9,6 @@ from datahub.core.test_utils import APITestMixin
 from datahub.omis.order.models import Order
 from datahub.omis.order.test.factories import OrderAssigneeFactory, OrderFactory, \
     OrderSubscriberFactory
-
-from ..views import PaginatedAPIMixin
-
 
 pytestmark = pytest.mark.django_db
 
@@ -25,7 +19,8 @@ def setup_data():
     with freeze_time('2017-01-01 13:00:00'):
         order = OrderFactory(
             reference='ref1',
-            primary_market_id=constants.Country.japan.value.id
+            primary_market_id=constants.Country.japan.value.id,
+            assignees=[]
         )
         OrderSubscriberFactory(
             order=order,
@@ -39,7 +34,8 @@ def setup_data():
     with freeze_time('2017-02-01 13:00:00'):
         order = OrderFactory(
             reference='ref2',
-            primary_market_id=constants.Country.france.value.id
+            primary_market_id=constants.Country.france.value.id,
+            assignees=[]
         )
         OrderSubscriberFactory(
             order=order,
@@ -203,112 +199,3 @@ class TestSearchOrder(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()['results']) == 1
         assert response.json()['results'][0]['reference'] == 'ref2'
-
-
-class TestPaginatedAPIMixin:
-    """Tests related to the paginated API mixin."""
-
-    def test_limit_as_valid_param(self):
-        """Test that get_limit returns the int value of the param if valid."""
-        mixin = PaginatedAPIMixin()
-
-        request = mock.MagicMock(
-            data={
-                PaginatedAPIMixin.limit_query_param: '3'
-            }
-        )
-
-        assert mixin.get_limit(request) == 3
-
-    def test_limit_as_non_int_defaults(self):
-        """Test that get_limit returns the default value if the param is not an int."""
-        mixin = PaginatedAPIMixin()
-
-        request = mock.MagicMock(
-            data={
-                PaginatedAPIMixin.limit_query_param: 'non-int'
-            }
-        )
-
-        assert mixin.get_limit(request) == PaginatedAPIMixin.default_limit
-
-    def test_limit_as_negative_int_defaults(self):
-        """Test that get_limit returns the default value if param is a negative value."""
-        mixin = PaginatedAPIMixin()
-
-        request = mock.MagicMock(
-            data={
-                PaginatedAPIMixin.limit_query_param: '-1'
-            }
-        )
-
-        assert mixin.get_limit(request) == PaginatedAPIMixin.default_limit
-
-    def test_limit_as_zero_defaults(self):
-        """Test that get_limit returns the default value if param is 0."""
-        mixin = PaginatedAPIMixin()
-
-        request = mock.MagicMock(
-            data={
-                PaginatedAPIMixin.limit_query_param: '0'
-            }
-        )
-
-        assert mixin.get_limit(request) == PaginatedAPIMixin.default_limit
-
-    def test_offset_as_valid_param(self):
-        """Test that get_offset returns the int value if the param is valid."""
-        mixin = PaginatedAPIMixin()
-
-        request = mock.MagicMock(
-            data={
-                PaginatedAPIMixin.offset_query_param: '4'
-            }
-        )
-
-        assert mixin.get_offset(request) == 4
-
-    def test_offset_as_non_int_defaults(self):
-        """Test that get_offset returns the default value if the param is not an int."""
-        mixin = PaginatedAPIMixin()
-
-        request = mock.MagicMock(
-            data={
-                PaginatedAPIMixin.offset_query_param: 'non-int'
-            }
-        )
-
-        assert mixin.get_offset(request) == 0
-
-    def test_pagination_params_within_limit(self):
-        """Test that if the result window (offset + limit) is within limit, everything is OK."""
-        mixin = PaginatedAPIMixin()
-
-        request = mock.MagicMock(
-            data={
-                PaginatedAPIMixin.limit_query_param: '100',
-                PaginatedAPIMixin.offset_query_param: '9900',
-            }
-        )
-
-        limit, offset = mixin.get_pagination_values(request)
-
-        assert limit == 100
-        assert offset == 9900
-
-    def test_pagination_params_outside_limit(self):
-        """
-        Test that if the result window (offset + limit) is too large,
-        a validator error is returned.
-        """
-        mixin = PaginatedAPIMixin()
-
-        request = mock.MagicMock(
-            data={
-                PaginatedAPIMixin.limit_query_param: '100',
-                PaginatedAPIMixin.offset_query_param: '9901',
-            }
-        )
-
-        with pytest.raises(ValidationError):
-            mixin.get_pagination_values(request)

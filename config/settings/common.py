@@ -168,6 +168,7 @@ APPEND_SLASH = False
 
 # Leeloo stuff
 ES_URL = env('ES_URL')
+ES_VERIFY_CERTS = env.bool('ES_VERIFY_CERTS', True)
 ES_INDEX = env('ES_INDEX')
 ES_INDEX_SETTINGS = {
     'index.mapping.nested_fields.limit': 100
@@ -188,3 +189,4 @@ DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://loc
 OMIS_NOTIFICATION_ADMIN_EMAIL = env('OMIS_NOTIFICATION_ADMIN_EMAIL', default='')
 OMIS_NOTIFICATION_API_KEY = env('OMIS_NOTIFICATION_API_KEY', default='')
 OMIS_NOTIFICATION_TEST_API_KEY = env('OMIS_NOTIFICATION_TEST_API_KEY', default='')
+OMIS_PUBLIC_BASE_URL = env('OMIS_PUBLIC_BASE_URL', default='http://localhost:4000')

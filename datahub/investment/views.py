@@ -3,8 +3,10 @@ from django.db import transaction
 from django.db.models import Prefetch
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import IsoDateTimeFilter
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from rest_framework import status
+from rest_framework.pagination import BasePagination
 from rest_framework.response import Response
 
 from datahub.core.audit import AuditViewSet
@@ -76,6 +78,43 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     def get_view_name(self):
         """Returns the view set name for the DRF UI."""
         return 'Investment projects'
+
+
+class _ModifiedOnFilter(FilterSet):
+    """Filter set for the modified-since view."""
+
+    time = IsoDateTimeFilter(name='modified_on', lookup_expr='gte')
+
+    class Meta:
+        model = InvestmentProject
+        fields = ()
+
+
+class _SinglePagePaginator(BasePagination):
+    """Paginator that returns all items in a single page.
+
+    The purpose of this is to wrap the results in a dict with count and results keys,
+    for consistency with other endpoints.
+    """
+
+    def paginate_queryset(self, queryset, request, view=None):
+        return queryset
+
+    def get_paginated_response(self, data):
+        return Response({
+            'count': len(data),
+            'results': data
+        })
+
+
+class IProjectModifiedSinceViewSet(IProjectViewSet):
+    """View set for the modified-since endpoint (intended for use by Data Hub MI)."""
+
+    pagination_class = _SinglePagePaginator
+
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = None
+    filter_class = _ModifiedOnFilter
 
 
 class IProjectTeamMembersViewSet(CoreViewSetV3):

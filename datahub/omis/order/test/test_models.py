@@ -1,11 +1,13 @@
+import secrets
+from functools import partial
 from unittest import mock
-
+import factory
 import pytest
+from django.utils.crypto import get_random_string
 from freezegun import freeze_time
-
 from rest_framework.exceptions import ValidationError
 
-from datahub.company.test.factories import AdviserFactory
+from datahub.company.test.factories import AdviserFactory, ContactFactory
 from datahub.core import constants
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.core.exceptions import Conflict
@@ -18,14 +20,26 @@ from .factories import (
     OrderWithOpenQuoteFactory,
 )
 
+from ..constants import OrderStatus
+
 
 pytestmark = pytest.mark.django_db
 
 
+class OrderWithRandomPublicTokenFactory(OrderFactory):
+    """OrderFactory with an already populated public_token field."""
+
+    public_token = factory.LazyFunction(partial(secrets.token_urlsafe, 37))
+
+
+class OrderWithRandomReferenceFactory(OrderFactory):
+    """OrderFactory with an already populated reference field."""
+
+    reference = factory.LazyFunction(get_random_string)
+
+
 class TestOrderGenerateReference:
-    """
-    Tests the generate reference logic for the Order model.
-    """
+    """Tests for the generate reference logic."""
 
     @freeze_time('2017-07-12 13:00:00.000000+00:00')
     @mock.patch('datahub.omis.order.models.get_random_string')
@@ -38,11 +52,11 @@ class TestOrderGenerateReference:
         ]
 
         # create 1st
-        order = OrderFactory()
+        order = OrderWithRandomPublicTokenFactory()
         assert order.reference == 'ABC123/17'
 
         # create 2nd
-        order = OrderFactory()
+        order = OrderWithRandomPublicTokenFactory()
         assert order.reference == 'CBA321/17'
 
     @freeze_time('2017-07-12 13:00:00.000000+00:00')
@@ -53,14 +67,14 @@ class TestOrderGenerateReference:
         exists, it skips it and generates the next one.
         """
         # create existing Order with ref == 'ABC123/17'
-        OrderFactory(reference='ABC123/17')
+        OrderWithRandomPublicTokenFactory(reference='ABC123/17')
 
         mock_get_random_string.side_effect = [
             'ABC', '123', 'CBA', '321'
         ]
 
         # ABC123/17 already exists so create CBA321/17 instead
-        order = OrderFactory()
+        order = OrderWithRandomPublicTokenFactory()
         assert order.reference == 'CBA321/17'
 
     @freeze_time('2017-07-12 13:00:00.000000+00:00')
@@ -71,13 +85,63 @@ class TestOrderGenerateReference:
         RuntimeError.
         """
         max_retries = 10
-        OrderFactory(reference='ABC123/17')
+        OrderWithRandomPublicTokenFactory(reference='ABC123/17')
 
         mock_get_random_string.side_effect = ['ABC', '123'] * max_retries
 
         with pytest.raises(RuntimeError):
             for index in range(max_retries):
-                OrderFactory()
+                OrderWithRandomPublicTokenFactory()
+
+
+class TestOrderGeneratePublicToken:
+    """Tests for the generate public token logic."""
+
+    @mock.patch('datahub.omis.order.models.secrets')
+    def test_generates_public_token_if_doesnt_exist(self, mock_secrets):
+        """
+        Test that if an order is saved without public_token,
+        the system generates one automatically.
+        """
+        mock_secrets.token_urlsafe.side_effect = ['9999', '8888']
+
+        # create 1st
+        order = OrderWithRandomReferenceFactory()
+        assert order.public_token == '9999'
+
+        # create 2nd
+        order = OrderWithRandomReferenceFactory()
+        assert order.public_token == '8888'
+
+    @mock.patch('datahub.omis.order.models.secrets')
+    def test_look_for_unused_public_token(self, mock_secrets):
+        """
+        Test that when creating a new order, if the system generates a public token
+        that already exists, it skips it and generates the next one.
+        """
+        # create existing order with public_token == '9999'
+        OrderWithRandomReferenceFactory(public_token='9999')
+
+        mock_secrets.token_urlsafe.side_effect = ['9999', '8888']
+
+        # 9999 already exists so create 8888 instead
+        order = OrderWithRandomReferenceFactory()
+        assert order.public_token == '8888'
+
+    @mock.patch('datahub.omis.order.models.secrets')
+    def test_cannot_generate_public_token(self, mock_secrets):
+        """
+        Test that if there are more than 10 collisions, the generator algorithm raises a
+        RuntimeError.
+        """
+        max_retries = 10
+        OrderWithRandomReferenceFactory(public_token='9999')
+
+        mock_secrets.token_urlsafe.side_effect = ['9999'] * max_retries
+
+        with pytest.raises(RuntimeError):
+            for index in range(max_retries):
+                OrderWithRandomReferenceFactory()
 
 
 class TestGenerateQuote:
@@ -101,15 +165,31 @@ class TestGenerateQuote:
         with pytest.raises(Conflict):
             order.generate_quote(by=None)
 
+    @pytest.mark.parametrize(
+        'disallowed_status',
+        (
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.quote_accepted,
+            OrderStatus.paid,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_fails_if_order_not_in_draft(self, disallowed_status):
+        """Test that if the order is not in `draft`, a quote cannot be generated."""
+        order = OrderFactory(status=disallowed_status)
+        with pytest.raises(Conflict):
+            order.generate_quote(by=None)
+
     def test_atomicity(self):
         """Test that if there's a problem with saving the order, the quote is not saved either."""
         order = OrderFactory()
-        order.save = mock.Mock()
-        order.save.side_effect = Exception()
+        with mock.patch.object(order, 'save') as mocked_save:
+            mocked_save.side_effect = Exception()
 
-        with pytest.raises(Exception):
-            order.generate_quote(by=None)
-        assert not Quote.objects.count()
+            with pytest.raises(Exception):
+                order.generate_quote(by=None)
+            assert not Quote.objects.count()
 
     def test_success(self):
         """Test that a quote can be generated."""
@@ -121,6 +201,7 @@ class TestGenerateQuote:
         assert order.quote.reference
         assert order.quote.content
         assert order.quote.created_by == adviser
+        assert order.status == OrderStatus.quote_awaiting_acceptance
 
     def test_without_committing(self):
         """Test that a quote can be generated without saving its changes."""
@@ -129,14 +210,34 @@ class TestGenerateQuote:
 
         assert order.quote.reference
         assert order.quote.content
+        assert order.status == OrderStatus.quote_awaiting_acceptance
 
         order.refresh_from_db()
         assert not order.quote
         assert not Quote.objects.count()
+        assert order.status == OrderStatus.draft
 
 
 class TestReopen:
     """Tests for when an order is reopened."""
+
+    @pytest.mark.parametrize('allowed_status', (
+        OrderStatus.draft,
+        OrderStatus.quote_awaiting_acceptance,
+        OrderStatus.quote_accepted,
+    ))
+    def test_ok_if_order_in_allowed_status(self, allowed_status):
+        """
+        Test that an order can be reopened if it's in one of the allowed statuses.
+        """
+        order = OrderFactory(status=allowed_status)
+
+        try:
+            order.reopen(by=AdviserFactory())
+        except Exception:
+            pytest.fail('Should not raise a validator error.')
+
+        assert order.status == OrderStatus.draft
 
     def test_without_quote(self):
         """
@@ -148,6 +249,7 @@ class TestReopen:
 
         order.reopen(by=AdviserFactory())
         assert not order.quote
+        assert order.status == OrderStatus.draft
 
     def test_with_active_quote(self):
         """
@@ -164,6 +266,7 @@ class TestReopen:
             assert order.quote.is_cancelled()
             assert order.quote.cancelled_by == adviser
             assert order.quote.cancelled_on == mocked_now()
+            assert order.status == OrderStatus.draft
 
     def test_with_already_cancelled_quote(self):
         """
@@ -185,6 +288,79 @@ class TestReopen:
 
             assert order.quote.cancelled_by == orig_cancelled_by
             assert order.quote.cancelled_on == orig_cancelled_on
+
+            assert order.status == OrderStatus.draft
+
+    @pytest.mark.parametrize(
+        'disallowed_status',
+        (
+            OrderStatus.paid,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
+        """Test that if the order is in a disallowed status, it cannot be reopened."""
+        order = OrderFactory(status=disallowed_status)
+        with pytest.raises(Conflict):
+            order.reopen(by=None)
+
+        assert order.status == disallowed_status
+
+
+class TestAcceptQuote:
+    """Tests for when a quote is accepted."""
+
+    @pytest.mark.parametrize(
+        'allowed_status',
+        (OrderStatus.quote_awaiting_acceptance,)
+    )
+    def test_ok_if_order_in_allowed_status(self, allowed_status):
+        """
+        Test that the quote of an order can be accepted if the order is
+        in one of the allowed statuses.
+        """
+        order = OrderWithOpenQuoteFactory(status=allowed_status)
+        contact = ContactFactory()
+
+        try:
+            order.accept_quote(by=contact)
+        except Exception:
+            pytest.fail('Should not raise a validator error.')
+
+        assert order.status == OrderStatus.quote_accepted
+        assert order.quote.accepted_on
+        assert order.quote.accepted_by == contact
+
+    @pytest.mark.parametrize(
+        'disallowed_status',
+        (
+            OrderStatus.paid,
+            OrderStatus.quote_accepted,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
+        """Test that if the order is in a disallowed status, the quote cannot be accepted."""
+        order = OrderFactory(status=disallowed_status)
+        with pytest.raises(Conflict):
+            order.accept_quote(by=None)
+
+        assert order.status == disallowed_status
+
+    def test_atomicity(self):
+        """Test that if there's a problem with saving the order, the quote is not saved either."""
+        order = OrderWithOpenQuoteFactory()
+        with mock.patch.object(order, 'save') as mocked_save:
+            mocked_save.side_effect = Exception()
+
+            with pytest.raises(Exception):
+                order.accept_quote(by=None)
+
+            quote = order.quote
+            quote.refresh_from_db()
+            assert not quote.is_accepted()
 
 
 class TestOrderAssignee:

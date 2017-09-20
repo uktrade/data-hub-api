@@ -1,5 +1,5 @@
 from django.conf import settings
-from elasticsearch_dsl import Date, DocType, String
+from elasticsearch_dsl import Boolean, Date, DocType, Integer, String
 
 from .. import dict_utils
 from .. import dsl_utils
@@ -9,8 +9,9 @@ from ..models import MapDBModelToDict
 class Order(DocType, MapDBModelToDict):
     """Elasticsearch representation of Order model."""
 
-    id = String(index='not_analyzed')
-    reference = String(analyzer='lowercase_keyword_analyzer')
+    id = dsl_utils.KeywordString()
+    reference = dsl_utils.CaseInsensitiveKeywordString()
+    status = dsl_utils.CaseInsensitiveKeywordString()
     company = dsl_utils.id_name_mapping()
     contact = dsl_utils.contact_or_adviser_mapping('contact')
     created_by = dsl_utils.contact_or_adviser_mapping('created_by')
@@ -26,6 +27,15 @@ class Order(DocType, MapDBModelToDict):
     contact_phone = dsl_utils.KeywordString()
     subscribers = dsl_utils.contact_or_adviser_mapping('subscribers', include_dit_team=True)
     assignees = dsl_utils.contact_or_adviser_mapping('assignees', include_dit_team=True)
+    po_number = String(index='no')
+    discount_value = Integer(index='no')
+    vat_status = String(index='no')
+    vat_number = String(index='no')
+    vat_verified = Boolean(index='no')
+    net_cost = Integer(index='no')
+    subtotal_cost = Integer(index='no')
+    vat_cost = Integer(index='no')
+    total_cost = Integer()
 
     MAPPINGS = {
         'id': str,
@@ -50,6 +60,9 @@ class Order(DocType, MapDBModelToDict):
         'existing_agents',
         'permission_to_approach_contacts',
         'quote',
+        'hourly_rate',
+        'discount_label',
+        'public_token',
     )
 
     SEARCH_FIELDS = []

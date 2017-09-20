@@ -6,11 +6,17 @@ from rest_framework.exceptions import ValidationError
 from datahub.company.models import Advisor, Company, Contact
 from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
+from datahub.core.validate_utils import DataCombiner
 from datahub.metadata.models import Country, Sector, Team
 
 from datahub.omis.market.models import Market
+from .constants import OrderStatus, VATStatus
 from .models import Order, OrderAssignee, OrderSubscriber, ServiceType
-from .validators import ContactWorksAtCompanyValidator, ReadonlyAfterCreationValidator
+from .validators import (
+    ContactWorksAtCompanyValidator,
+    OrderInStatusValidator,
+    ReadonlyAfterCreationValidator
+)
 
 
 class ServiceTypeSerializer(ConstantModelSerializer):
@@ -22,12 +28,7 @@ class ServiceTypeSerializer(ConstantModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     """Order DRF serializer"""
 
-    id = serializers.UUIDField(read_only=True)
-    reference = serializers.CharField(read_only=True)
-
-    created_on = serializers.DateTimeField(read_only=True)
     created_by = NestedRelatedField(Advisor, read_only=True)
-    modified_on = serializers.DateTimeField(read_only=True)
     modified_by = NestedRelatedField(Advisor, read_only=True)
 
     company = NestedRelatedField(Company)
@@ -42,20 +43,12 @@ class OrderSerializer(serializers.ModelSerializer):
 
     delivery_date = serializers.DateField(required=False, allow_null=True)
 
-    contact_email = serializers.CharField(read_only=True)
-    contact_phone = serializers.CharField(read_only=True)
-
-    # legacy fields
-    product_info = serializers.CharField(read_only=True)
-    further_info = serializers.CharField(read_only=True)
-    existing_agents = serializers.CharField(read_only=True)
-    permission_to_approach_contacts = serializers.CharField(read_only=True)
-
     class Meta:  # noqa: D101
         model = Order
-        fields = [
+        fields = (
             'id',
             'reference',
+            'status',
             'created_on',
             'created_by',
             'modified_on',
@@ -74,11 +67,44 @@ class OrderSerializer(serializers.ModelSerializer):
             'existing_agents',
             'permission_to_approach_contacts',
             'delivery_date',
-        ]
-        validators = [
+            'po_number',
+            'discount_value',
+            'vat_status',
+            'vat_number',
+            'vat_verified',
+            'net_cost',
+            'subtotal_cost',
+            'vat_cost',
+            'total_cost',
+        )
+        read_only_fields = (
+            'id',
+            'reference',
+            'status',
+            'created_on',
+            'created_by',
+            'modified_on',
+            'modified_by',
+            'contact_email',
+            'contact_phone',
+            'product_info',
+            'further_info',
+            'existing_agents',
+            'permission_to_approach_contacts',
+            'discount_value',
+            'net_cost',
+            'subtotal_cost',
+            'vat_cost',
+            'total_cost',
+        )
+        validators = (
             ContactWorksAtCompanyValidator(),
-            ReadonlyAfterCreationValidator(fields=('company', 'primary_market'))
-        ]
+            ReadonlyAfterCreationValidator(fields=('company', 'primary_market')),
+            OrderInStatusValidator(
+                allowed_statuses=(OrderStatus.draft,),
+                order_required=False
+            )
+        )
 
     def validate_service_types(self, service_types):
         """Validates that service types are not disabled."""
@@ -119,6 +145,22 @@ class OrderSerializer(serializers.ModelSerializer):
 
         return country
 
+    def _reset_vat_fields_if_necessary(self, data):
+        """If vat_status is set and != 'eu', vat_number and vat_verified are reset."""
+        data_combiner = DataCombiner(self.instance, data)
+
+        vat_status = data_combiner.get_value('vat_status')
+        if vat_status and vat_status != VATStatus.eu:
+            data['vat_number'] = ''
+            data['vat_verified'] = None
+
+        return data
+
+    def validate(self, data):
+        """Add extra logic to the default DRF one."""
+        data = self._reset_vat_fields_if_necessary(data)
+        return data
+
 
 def existing_adviser(adviser_id):
     """
@@ -133,6 +175,10 @@ def existing_adviser(adviser_id):
 
 class SubscribedAdviserListSerializer(serializers.ListSerializer):
     """DRF List serializer for OrderSubscriber(s)."""
+
+    default_validators = [
+        OrderInStatusValidator(allowed_statuses=(OrderStatus.draft,))
+    ]
 
     def save(self, **kwargs):
         """
@@ -186,6 +232,10 @@ class SubscribedAdviserSerializer(serializers.Serializer):
 
 class OrderAssigneeListSerializer(serializers.ListSerializer):
     """DRF List serializer for OrderAssignee(s)."""
+
+    default_validators = [
+        OrderInStatusValidator(allowed_statuses=(OrderStatus.draft,))
+    ]
 
     def validate(self, data):
         """Validates the list of assignees."""
