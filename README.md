@@ -52,13 +52,6 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
     docker-compose up
     ```
 
-7.  To set up the [data hub frontend app](https://github.com/uktrade/data-hub-frontend), log into the [django admin](http://localhost:8000/admin/oauth2_provider/application/) and add a new oauth application with:
-
-        - Client type: Confidential
-        - Authorization grant type: Resource owner password-based
-
-8.  Add the client id / client secret to the frontend .env file
-
 Local development with Docker
 -----------------------------
 
@@ -155,12 +148,41 @@ Dependencies:
     ./manage.py runserver
     ```
 
-12. To set up the [data hub frontend app](https://github.com/uktrade/data-hub-frontend), log into the [django admin](http://localhost:8000/admin/oauth2_provider/application/) and add a new oauth application with:
+# Granting access to the front end
 
-        - Client type: Confidential
-        - Authorization grant type: Resource owner password-based
+To give access to the [internal front end](https://github.com/uktrade/data-hub-frontend):
 
-13. Add the client id / client secret to the frontend .env file
+1. Log into the [Django admin applications page](http://localhost:8000/admin/oauth2_provider/application/) and add a new OAuth application with these details:
+
+    * Client type: Confidential
+    * Authorization grant type: Resource owner password-based
+
+1. Define the required scopes for the app by adding a new record in the 
+[OAuth application scopes](http://localhost:8000/admin/oauth/oauthapplicationscope/) 
+page with these details:
+    * Application: The application just created
+    * Scope: `internal-front-end`
+
+1. Add the client ID and secret to the front-end environment variables
+
+# Granting access to machine-to-machine clients
+
+To give access to a machine-to-machine client that doesn't require user authentication: 
+
+1. Log into the [Django admin applications page](http://localhost:8000/admin/oauth2_provider/application/) and add a new OAuth application with these details:
+
+    * Client type: Confidential
+    * Authorization grant type: Client credentials
+
+1. Define the required scopes for the app by adding a new record in the 
+[OAuth application scopes](http://localhost:8000/admin/oauth/oauthapplicationscope/) 
+page with these details:
+    * Application: The application just created
+    * Scope: The required scopes
+
+The currently defined scopes can be found in [`datahub/oauth/scopes.py`](https://github.com/uktrade/data-hub-leeloo/tree/develop/datahub/oauth/scopes.py).
+
+[Further information about the available grant types can be found in the OAuthLib docs](http://oauthlib.readthedocs.io/en/stable/oauth2/grants/grants.html).
 
 Local development (without Docker)
 ----------------------------------
