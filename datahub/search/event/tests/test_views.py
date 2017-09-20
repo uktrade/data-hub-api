@@ -170,8 +170,8 @@ class TestSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
         assert len(response.data['results']) == 2
-        assert response.data['results'][0]['start_date'] == start_date_b.strftime('%Y-%m-%d')
-        assert response.data['results'][1]['start_date'] == start_date_a.strftime('%Y-%m-%d')
+        assert response.data['results'][0]['start_date'] == start_date_b.isoformat()
+        assert response.data['results'][1]['start_date'] == start_date_a.isoformat()
 
     def test_search_event_sortby_end_date(self, setup_es, setup_data):
         """Tests sort by end_date desc."""
