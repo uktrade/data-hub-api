@@ -1,3 +1,4 @@
+from datahub.oauth.scopes import Scope
 from .models import InvestmentProject
 from .serializers import SearchInvestmentProjectSerializer
 from ..views import SearchAPIView, SearchExportAPIView
@@ -6,6 +7,7 @@ from ..views import SearchAPIView, SearchExportAPIView
 class SearchInvestmentProjectParams:
     """Search investment project params."""
 
+    required_scopes = (Scope.internal_front_end,)
     entity = InvestmentProject
     serializer_class = SearchInvestmentProjectSerializer
 

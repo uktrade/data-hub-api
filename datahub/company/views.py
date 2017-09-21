@@ -9,6 +9,7 @@ from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.investment.queryset import get_slim_investment_project_queryset
+from datahub.oauth.scopes import Scope
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
 from .queryset import get_contact_queryset
 from .serializers import (
@@ -19,6 +20,7 @@ from .serializers import (
 class CompanyViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     """Company view set V3."""
 
+    required_scopes = (Scope.internal_front_end,)
     serializer_class = CompanySerializer
     queryset = Company.objects.select_related(
         'account_manager',
@@ -46,6 +48,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSetV3):
 class CompanyAuditViewSet(AuditViewSet):
     """Company audit views."""
 
+    required_scopes = (Scope.internal_front_end,)
     queryset = Company.objects.all()
 
 
@@ -53,6 +56,7 @@ class CompaniesHouseCompanyViewSet(
         mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     """Companies House company read-only GET only views."""
 
+    required_scopes = (Scope.internal_front_end,)
     serializer_class = CompaniesHouseCompanySerializer
     queryset = CompaniesHouseCompany.objects.select_related('registered_address_country').all()
     lookup_field = 'company_number'
@@ -61,6 +65,7 @@ class CompaniesHouseCompanyViewSet(
 class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     """Contact ViewSet v3."""
 
+    required_scopes = (Scope.internal_front_end,)
     serializer_class = ContactSerializer
     queryset = get_contact_queryset()
     filter_backends = (
@@ -79,6 +84,7 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
 class ContactAuditViewSet(AuditViewSet):
     """Contact audit views."""
 
+    required_scopes = (Scope.internal_front_end,)
     queryset = Contact.objects.all()
 
 
@@ -98,6 +104,7 @@ class AdviserReadOnlyViewSetV1(
         mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     """Adviser GET only views."""
 
+    required_scopes = (Scope.internal_front_end,)
     serializer_class = AdviserSerializer
     queryset = Advisor.objects.select_related(
         'dit_team',

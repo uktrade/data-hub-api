@@ -1,3 +1,4 @@
+from datahub.oauth.scopes import Scope
 from .models import Event
 from .serializers import SearchEventSerializer
 from ..views import SearchAPIView, SearchExportAPIView
@@ -6,6 +7,7 @@ from ..views import SearchAPIView, SearchExportAPIView
 class SearchEventParams:
     """Search event params."""
 
+    required_scopes = (Scope.internal_front_end,)
     entity = Event
     serializer_class = SearchEventSerializer
 

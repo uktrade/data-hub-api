@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from datahub.core.viewsets import CoreViewSetV3
-
+from datahub.oauth.scopes import Scope
 from datahub.omis.order.models import Order
 
 from .models import Quote
@@ -14,6 +14,7 @@ from .serializers import BasicQuoteSerializer, ExpandedQuoteSerializer, ExpandPa
 class QuoteViewSet(CoreViewSetV3):
     """Quote ViewSet."""
 
+    required_scopes = (Scope.internal_front_end,)
     queryset = Quote.objects.none()
     basic_serializer_class = BasicQuoteSerializer
     expanded_serializer_class = ExpandedQuoteSerializer

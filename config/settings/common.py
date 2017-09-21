@@ -8,6 +8,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 
 import environ
+
 from .companieshouse import *
 
 
@@ -57,6 +58,7 @@ LOCAL_APPS = [
     'datahub.investment',
     'datahub.leads',
     'datahub.metadata',
+    'datahub.oauth',
     'datahub.search.apps.SearchConfig',
     'datahub.user',
     'datahub.omis.core',
@@ -135,6 +137,12 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend'
 ]
 
+# django-oauth-toolkit settings
+
+OAUTH2_PROVIDER = {
+    'SCOPES_BACKEND_CLASS': 'datahub.oauth.scopes.ApplicationScopesBackend',
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
@@ -155,8 +163,12 @@ REST_FRAMEWORK = {
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
-    'DEFAULT_AUTHENTICATION_CLASSES': ['oauth2_provider.contrib.rest_framework.OAuth2Authentication'],
-    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication'
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'oauth2_provider.contrib.rest_framework.IsAuthenticatedOrTokenHasScope'
+    ],
     'ORDERING_PARAM': 'sortby'
 }
 
