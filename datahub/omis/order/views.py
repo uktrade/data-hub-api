@@ -6,8 +6,14 @@ from rest_framework.views import APIView
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.oauth.scopes import Scope
 
+from .constants import OrderStatus
 from .models import Order
-from .serializers import OrderAssigneeSerializer, OrderSerializer, SubscribedAdviserSerializer
+from .serializers import (
+    OrderAssigneeSerializer,
+    OrderSerializer,
+    PublicOrderSerializer,
+    SubscribedAdviserSerializer
+)
 
 
 class OrderViewSet(CoreViewSetV3):
@@ -19,6 +25,26 @@ class OrderViewSet(CoreViewSetV3):
         'company',
         'contact',
         'primary_market',
+    )
+
+
+class PublicOrderViewSet(CoreViewSetV3):
+    """ViewSet for public facing order endpoint."""
+
+    lookup_field = 'public_token'
+
+    required_scopes = (Scope.public_omis_front_end,)
+    serializer_class = PublicOrderSerializer
+    queryset = Order.objects.filter(
+        status__in=(
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.quote_accepted,
+            OrderStatus.paid,
+            OrderStatus.complete,
+        )
+    ).select_related(
+        'company',
+        'contact'
     )
 
 

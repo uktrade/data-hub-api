@@ -40,5 +40,9 @@ v3_urls = [
     url(r'^', include((investment_urls, 'investment'), namespace='investment')),
     url(r'^', include((leads_urls, 'business-leads'), namespace='business-leads')),
     url(r'^', include((search_urls, 'search'), namespace='search')),
-    url(r'^omis/', include((omis_urls, 'omis'), namespace='omis'))
+    url(r'^omis/', include((omis_urls.internal_frontend_urls, 'omis'), namespace='omis')),
+    url(
+        r'^omis/public/',
+        include((omis_urls.public_urls, 'omis-public'), namespace='omis-public')
+    ),
 ]
