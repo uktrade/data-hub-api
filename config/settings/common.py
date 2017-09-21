@@ -198,6 +198,12 @@ AV_SERVICE_URL = env('AV_SERVICE_URL', default=None)
 DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://localhost:3000')
 
 # OMIS
+
+# if set, all the notifications will be sent to this address instead of the
+# intended recipient, useful for environments != live
+OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL = env(
+    'OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL', default=''
+)
 OMIS_NOTIFICATION_ADMIN_EMAIL = env('OMIS_NOTIFICATION_ADMIN_EMAIL', default='')
 OMIS_NOTIFICATION_API_KEY = env('OMIS_NOTIFICATION_API_KEY', default='')
 OMIS_NOTIFICATION_TEST_API_KEY = env('OMIS_NOTIFICATION_TEST_API_KEY', default='')
