@@ -63,6 +63,7 @@ class CHCompany(admin.ModelAdmin):
 class AdviserAdmin(BaseModelVersionAdmin, UserAdmin):
     """Adviser admin."""
 
+    reversion_excluded_fields = BaseModelVersionAdmin.reversion_excluded_fields + ('last_login',)
     fieldsets = (
         (None, {
             'fields': (
@@ -106,11 +107,6 @@ class AdviserAdmin(BaseModelVersionAdmin, UserAdmin):
     ordering = ('email', 'use_cdms_auth')
     list_filter = ('use_cdms_auth',)
     actions = ['enable_users', 'disable_users']
-
-    def reversion_register(self, model, **kwargs):
-        """Exclude last login from reversion changesets."""
-        kwargs['exclude'] = ('last_login',)
-        super().reversion_register(model, **kwargs)
 
     def enable_users(self, request, queryset):
         """Enable users for login."""
