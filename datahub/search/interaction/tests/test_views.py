@@ -1,11 +1,12 @@
 from collections import Counter
 
 import pytest
-
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
 from datahub.interaction.test.factories import InteractionFactory
 
@@ -173,3 +174,151 @@ class TestViews(APITestMixin):
             'created_on': interaction.created_on.isoformat(),
             'modified_on': interaction.modified_on.isoformat(),
         }]
+
+    def test_filter_by_company_name(self, setup_es):
+        """Tests filtering interaction by company name."""
+        company_name = 'abcdefghjijk'
+        company = CompanyFactory(name=company_name)
+        interaction = InteractionFactory(
+            company=company
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:interaction')
+        request_data = {
+            'original_query': '',
+            'company_name': company_name
+        }
+        response = self.api_client.post(url, request_data, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+
+        assert response_data['count'] == 1
+
+        results = response_data['results']
+        assert results[0]['company']['id'] == str(interaction.company.id)
+        assert results[0]['company']['name'] == interaction.company.name
+
+    def test_filter_by_contact_name(self, setup_es):
+        """Tests filtering interaction by contact name."""
+        contact = ContactFactory(first_name='lynx', last_name='lion')
+        interaction = InteractionFactory(
+            contact=contact
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:interaction')
+        request_data = {
+            'original_query': '',
+            'contact_name': contact.name
+        }
+        response = self.api_client.post(url, request_data, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+
+        assert response_data['count'] == 1
+
+        results = response_data['results']
+        assert results[0]['contact']['id'] == str(interaction.contact.id)
+        assert results[0]['contact']['name'] == interaction.contact.name
+
+    def test_filter_by_dit_adviser_name(self, setup_es):
+        """Tests filtering interaction by dit adviser name."""
+        adviser = AdviserFactory(first_name='pallas', last_name='kodkod')
+        interaction = InteractionFactory(
+            dit_adviser=adviser
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:interaction')
+        request_data = {
+            'original_query': '',
+            'dit_adviser_name': adviser.name
+        }
+        response = self.api_client.post(url, request_data, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+
+        assert response_data['count'] == 1
+
+        results = response_data['results']
+        assert results[0]['dit_adviser']['id'] == str(interaction.dit_adviser.id)
+        assert results[0]['dit_adviser']['name'] == interaction.dit_adviser.name
+
+    def test_filter_by_dit_team(self, setup_es):
+        """Tests filtering interaction by dit team."""
+        dit_team_id = constants.Team.td_events_healthcare.value.id
+        interaction = InteractionFactory(
+            dit_team_id=dit_team_id
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:interaction')
+        request_data = {
+            'original_query': '',
+            'dit_team': dit_team_id
+        }
+        response = self.api_client.post(url, request_data, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+
+        assert response_data['count'] == 1
+
+        results = response_data['results']
+        assert results[0]['dit_team']['id'] == str(interaction.dit_team.id)
+
+    def test_filter_by_interaction_type(self, setup_es):
+        """Tests filtering interaction by interaction type."""
+        interaction_type_id = constants.InteractionType.social_media.value.id
+        interaction = InteractionFactory(
+            interaction_type_id=interaction_type_id
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:interaction')
+        request_data = {
+            'original_query': '',
+            'interaction_type': interaction_type_id
+        }
+        response = self.api_client.post(url, request_data, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+
+        assert response_data['count'] == 1
+
+        results = response_data['results']
+        assert results[0]['interaction_type']['id'] == str(interaction.interaction_type.id)
+
+    def test_filter_by_service(self, setup_es):
+        """Tests filtering interaction by service."""
+        service_id = constants.Service.account_management.value.id
+        interaction = InteractionFactory(
+            service_id=service_id
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:interaction')
+        request_data = {
+            'original_query': '',
+            'service': service_id
+        }
+        response = self.api_client.post(url, request_data, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+
+        assert response_data['count'] == 1
+
+        results = response_data['results']
+        assert results[0]['service']['id'] == str(interaction.service.id)
