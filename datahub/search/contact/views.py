@@ -1,3 +1,4 @@
+from datahub.oauth.scopes import Scope
 from .models import Contact
 from .serializers import SearchContactSerializer
 from ..views import SearchAPIView, SearchExportAPIView
@@ -6,6 +7,7 @@ from ..views import SearchAPIView, SearchExportAPIView
 class SearchContactParams:
     """Search contact params."""
 
+    required_scopes = (Scope.internal_front_end,)
     entity = Contact
     serializer_class = SearchContactSerializer
 

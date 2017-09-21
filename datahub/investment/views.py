@@ -21,6 +21,7 @@ from datahub.investment.serializers import (
     IProjectDocumentSerializer, IProjectSerializer, IProjectTeamMemberSerializer,
     UploadStatusSerializer
 )
+from datahub.oauth.scopes import Scope
 
 
 _team_member_queryset = InvestmentProjectTeamMember.objects.select_related('adviser')
@@ -29,6 +30,7 @@ _team_member_queryset = InvestmentProjectTeamMember.objects.select_related('advi
 class IProjectAuditViewSet(AuditViewSet):
     """Investment Project audit views."""
 
+    required_scopes = (Scope.internal_front_end,)
     queryset = InvestmentProject.objects.all()
 
     def get_view_name(self):
@@ -42,6 +44,7 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     This replaces the previous project, value, team and requirements endpoints.
     """
 
+    required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectSerializer
     queryset = InvestmentProject.objects.select_related(
         'archived_by',
@@ -110,6 +113,7 @@ class _SinglePagePaginator(BasePagination):
 class IProjectModifiedSinceViewSet(IProjectViewSet):
     """View set for the modified-since endpoint (intended for use by Data Hub MI)."""
 
+    required_scopes = (Scope.mi,)
     pagination_class = _SinglePagePaginator
 
     filter_backends = (DjangoFilterBackend,)
@@ -120,6 +124,7 @@ class IProjectModifiedSinceViewSet(IProjectViewSet):
 class IProjectTeamMembersViewSet(CoreViewSetV3):
     """Investment project team member views."""
 
+    required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectTeamMemberSerializer
     lookup_field = 'adviser_id'
     lookup_url_kwarg = 'adviser_pk'
@@ -168,6 +173,7 @@ class IProjectTeamMembersViewSet(CoreViewSetV3):
 class IProjectDocumentViewSet(CoreViewSetV3):
     """Investment Project Documents ViewSet."""
 
+    required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectDocumentSerializer
     queryset = IProjectDocument.objects.all()
 

@@ -1,4 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
+from enum import Enum
 from itertools import islice
 from logging import getLogger
 
@@ -7,6 +8,14 @@ import requests
 
 executor = ThreadPoolExecutor()
 logger = getLogger(__name__)
+
+
+class StrEnum(str, Enum):
+    """
+    Enum subclass where members are also str instances.
+
+    Defined as per https://docs.python.org/3.6/library/enum.html#others
+    """
 
 
 def generate_enum_code_from_queryset(model_queryset):
