@@ -185,6 +185,65 @@ class OrderSerializer(serializers.ModelSerializer):
         return data
 
 
+class CompanyWithAddressSerializer(serializers.ModelSerializer):
+    """
+    Read-only DRF Serializer for Company with id, name an registered address.
+    """
+
+    registered_address_country = NestedRelatedField(Country)
+
+    class Meta:  # noqa: D101
+        model = Company
+        fields = (
+            'id',
+            'name',
+            'registered_address_1',
+            'registered_address_2',
+            'registered_address_county',
+            'registered_address_postcode',
+            'registered_address_town',
+            'registered_address_country',
+        )
+        read_only_fields = fields
+
+
+class PublicOrderSerializer(serializers.ModelSerializer):
+    """DRF serializer for public facing API."""
+
+    company = CompanyWithAddressSerializer()
+    contact = NestedRelatedField(Contact)
+    billing_address_country = NestedRelatedField(Country)
+
+    class Meta:  # noqa: D101
+        model = Order
+        fields = (
+            'public_token',
+            'reference',
+            'status',
+            'created_on',
+            'company',
+            'contact',
+            'contact_email',
+            'contact_phone',
+            'po_number',
+            'discount_value',
+            'net_cost',
+            'subtotal_cost',
+            'vat_cost',
+            'total_cost',
+            'billing_contact_name',
+            'billing_email',
+            'billing_phone',
+            'billing_address_1',
+            'billing_address_2',
+            'billing_address_town',
+            'billing_address_county',
+            'billing_address_postcode',
+            'billing_address_country',
+        )
+        read_only_fields = fields
+
+
 def existing_adviser(adviser_id):
     """
     DRF Validator. It raises a ValidationError if adviser_id is not a valid adviser id.
