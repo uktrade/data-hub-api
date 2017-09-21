@@ -74,6 +74,7 @@ class AdviserAdmin(BaseModelVersionAdmin, UserAdmin):
             'fields': (
                 'first_name',
                 'last_name',
+                'telephone_number',
                 'dit_team'
             )
         }),
