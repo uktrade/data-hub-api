@@ -30,6 +30,7 @@ class AdviserSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'email',
+            'telephone_number',
             'dit_team',
         )
         depth = 1
