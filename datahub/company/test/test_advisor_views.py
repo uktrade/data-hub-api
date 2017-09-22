@@ -17,13 +17,15 @@ class TestAdviser(APITestMixin):
 
     def test_adviser_filtered_view(self):
         """Test filtering."""
-        AdviserFactory(last_name='UNIQUE')
+        adviser = AdviserFactory(last_name='UNIQUE')
         url = reverse('api-v1:advisor-list')
         response = self.api_client.get(url, data=dict(last_name__icontains='uniq'))
         assert response.status_code == status.HTTP_200_OK
-        result = response.json()
-        assert len(result['results']) == 1
-        assert result['results'][0]['last_name'] == 'UNIQUE'
+        response_data = response.json()
+        assert len(response_data['results']) == 1
+        result = response_data['results'][0]
+        assert result['last_name'] == adviser.last_name
+        assert result['telephone_number'] == adviser.telephone_number
 
     def test_adviser_list_view_default_sort_order(self):
         """Test default sorting."""
