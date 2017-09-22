@@ -55,6 +55,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     first_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     last_name = models.CharField(max_length=MAX_LENGTH, blank=True)
+    telephone_number = models.CharField(max_length=MAX_LENGTH, blank=True)
     email = CICharField(max_length=MAX_LENGTH, unique=True)  # CDMS users may not have tld
     dit_team = models.ForeignKey(
         metadata_models.Team, blank=True, null=True, on_delete=models.SET_NULL
