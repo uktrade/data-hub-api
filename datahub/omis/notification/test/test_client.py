@@ -20,7 +20,7 @@ class TestSendEmail:
     """Tests for errors with the internal send_email function."""
 
     @mock.patch('datahub.omis.notification.client.raven_client')
-    def test_error_raises_exception(self, mock_raven_client, settings):
+    def test_error_raises_exception(self, mock_raven_client):
         """
         Test that if an error occurs whilst sending an email,
         the exception is raised and sent to sentry.
@@ -32,6 +32,34 @@ class TestSendEmail:
             send_email(notify_client)
 
         assert mock_raven_client.captureException.called
+
+    def test_override_recipient_email(self, settings):
+        """
+        Test that if settings.OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL is set,
+        all the emails are sent to it.
+        """
+        settings.OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL = 'different_email@example.com'
+
+        notify_client = mock.Mock()
+        send_email(notify_client, email_address='test@example.com')
+
+        notify_client.send_email_notification.assert_called_with(
+            email_address='different_email@example.com'
+        )
+
+    def test_without_overriding_recipient_email(self, settings):
+        """
+        Test that if settings.OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL is not set,
+        all the emails are sent to the intended recipient.
+        """
+        settings.OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL = ''
+
+        notify_client = mock.Mock()
+        send_email(notify_client, email_address='test@example.com')
+
+        notify_client.send_email_notification.assert_called_with(
+            email_address='test@example.com'
+        )
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
