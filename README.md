@@ -57,8 +57,8 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
 
 Dependencies:
 
--   Python 3.6.1
--   Postgres (tested on 9.5+)
+-   Python 3.6.x
+-   PostgreSQL (tested on 9.5 and 9.6)
 
 1.  Clone the repository:
 
@@ -101,7 +101,7 @@ Dependencies:
     create database datahub;
     ```
 
-8. Make sure you have elasticsearch running locally. If you don't, you can run one in docker:
+8. Make sure you have Elasticsearch running locally. If you don't, you can run one in Docker:
 
     ```shell
     docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" elasticsearch:2.3
@@ -118,7 +118,7 @@ Dependencies:
     ./manage.py createinitialrevisions
     ```
 
-10. Optionally, you can load some test data and update elasticsearch:
+10. Optionally, you can load some test data and update Elasticsearch:
 
     ```shell
     ./manage.py loaddata fixtures/test_data.yaml
