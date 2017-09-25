@@ -46,6 +46,31 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['count'] == 1
         assert response_data['results'][0]['id'] == str(project.id)
 
+    def test_list_is_sorted_by_created_on_desc(self):
+        """Test list is sorted by created on desc."""
+        investment_projects = (
+            InvestmentProjectFactory(created_on=date(2010, 1, 10)),
+            InvestmentProjectFactory(created_on=date(2011, 1, 10)),
+            InvestmentProjectFactory(created_on=date(2012, 1, 10)),
+            InvestmentProjectFactory(created_on=date(2013, 1, 10)),
+            InvestmentProjectFactory(created_on=date(2014, 1, 10)),
+        )
+
+        url = reverse('api-v3:investment:investment-collection')
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 5
+        response_data = response.json()['results']
+
+        investment_projects = sorted(
+            investment_projects,
+            key=lambda key: key.created_on,
+            reverse=True
+        )
+        ids = [str(ip.id) for ip in investment_projects]
+        assert [ip['id'] for ip in response_data] == ids
+
     def test_list_projects_investor_company_success(self):
         """Test successfully listing projects for an investor company."""
         company = CompanyFactory()

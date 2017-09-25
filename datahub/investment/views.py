@@ -4,8 +4,11 @@ from django.db.models import Prefetch
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters import IsoDateTimeFilter
-from django_filters.rest_framework import DjangoFilterBackend, FilterSet
+from django_filters.rest_framework import (
+    DjangoFilterBackend, FilterSet
+)
 from rest_framework import status
+from rest_framework.filters import OrderingFilter
 from rest_framework.pagination import BasePagination
 from rest_framework.response import Response
 
@@ -22,7 +25,6 @@ from datahub.investment.serializers import (
     UploadStatusSerializer
 )
 from datahub.oauth.scopes import Scope
-
 
 _team_member_queryset = InvestmentProjectTeamMember.objects.select_related('adviser')
 
@@ -75,8 +77,9 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'strategic_drivers',
         Prefetch('team_members', queryset=_team_member_queryset),
     )
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, OrderingFilter,)
     filter_fields = ('investor_company_id',)
+    ordering = ('-created_on',)
 
     def get_view_name(self):
         """Returns the view set name for the DRF UI."""
