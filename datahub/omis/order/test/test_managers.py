@@ -23,11 +23,11 @@ class TestOrderManager:
             )
 
         publicly_accessible_qs = Order.objects.publicly_accessible()
-        publicly_accessible_refs = list(publicly_accessible_qs.values_list('reference', flat=True))
+        publicly_accessible_refs = set(publicly_accessible_qs.values_list('reference', flat=True))
 
-        assert publicly_accessible_refs == [
+        assert publicly_accessible_refs == {
             OrderStatus.quote_awaiting_acceptance,
             OrderStatus.quote_accepted,
             OrderStatus.paid,
             OrderStatus.complete,
-        ]
+        }
