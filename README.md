@@ -28,23 +28,23 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
 3.  Populate the db:
 
     ```shell
-    docker-compose run leeloo python manage.py migrate
-    docker-compose run leeloo python manage.py loadmetadata
-    docker-compose run leeloo python manage.py load_omis_metadata
-    docker-compose run leeloo python manage.py createinitialrevisions
+    docker-compose run leeloo ./manage.py migrate
+    docker-compose run leeloo ./manage.py loadmetadata
+    docker-compose run leeloo ./manage.py load_omis_metadata
+    docker-compose run leeloo ./manage.py createinitialrevisions
     ```
 4. Optionally, you can load some test data and update elasticsearch:
 
     ```shell
-    docker-compose run leeloo python manage.py loaddata /app/fixtures/test_data.yaml
+    docker-compose run leeloo ./manage.py loaddata /app/fixtures/test_data.yaml
 
-    docker-compose run leeloo python manage.py sync_es
+    docker-compose run leeloo ./manage.py sync_es
     ```
 
 5.  Create a superuser:
 
     ```shell
-    docker-compose run leeloo python manage.py createsuperuser
+    docker-compose run leeloo ./manage.py createsuperuser
     ```
 
 6.  Run the services:
