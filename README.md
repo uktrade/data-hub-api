@@ -1,3 +1,5 @@
+# Data Hub Leeloo
+
 [![image](https://circleci.com/gh/uktrade/data-hub-leeloo/tree/master.svg?style=svg)](https://circleci.com/gh/uktrade/data-hub-leeloo/tree/master)
 [![image](https://codecov.io/gh/uktrade/data-hub-leeloo/branch/master/graph/badge.svg)](https://codecov.io/gh/uktrade/data-hub-leeloo)
 [![image](https://codeclimate.com/github/uktrade/data-hub-leeloo/badges/gpa.svg)](https://codeclimate.com/github/uktrade/data-hub-leeloo)
@@ -6,8 +8,7 @@
 
 Leeloo provides an API into Data Hub for Data Hub clients. Using Leeloo you can search for entities and manage companies, contacts and interactions.
 
-Installation with Docker
-========================
+## Installation with Docker
 
 Leeloo uses Docker compose to setup and run all the necessary components. The docker-compose.yml file provided is meant to be used for running tests and development.
 
@@ -52,8 +53,7 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
     docker-compose up
     ```
 
-Local development with Docker
------------------------------
+## Local development with Docker
 
 To run the tests:
 
@@ -68,8 +68,7 @@ To run the linter:
 docker-compose run leeloo flake8
 ```
 
-Native installation (without Docker)
-====================================
+## Native installation (without Docker)
 
 Dependencies:
 
@@ -148,7 +147,22 @@ Dependencies:
     ./manage.py runserver
     ```
 
-# Granting access to the front end
+## Local development (without Docker)
+
+To run the tests:
+
+```shell
+bash tests.sh
+bash tests-auth.sh
+```
+
+To run the linter:
+
+```shell
+flake8
+```
+
+## Granting access to the front end
 
 To give access to the [internal front end](https://github.com/uktrade/data-hub-frontend):
 
@@ -165,7 +179,7 @@ page with these details:
 
 1. Add the client ID and secret to the front-end environment variables
 
-# Granting access to machine-to-machine clients
+## Granting access to machine-to-machine clients
 
 To give access to a machine-to-machine client that doesn't require user authentication: 
 
@@ -184,24 +198,7 @@ The currently defined scopes can be found in [`datahub/oauth/scopes.py`](https:/
 
 [Further information about the available grant types can be found in the OAuthLib docs](http://oauthlib.readthedocs.io/en/stable/oauth2/grants/grants.html).
 
-Local development (without Docker)
-----------------------------------
-
-To run the tests:
-
-```shell
-bash tests.sh
-bash tests-auth.sh
-```
-
-To run the linter:
-
-```shell
-flake8
-```
-
-Heroku
-======
+## Deployment
 
 Leeloo can run on any Heroku style platform. These environment variables MUST be configured:
 
@@ -218,8 +215,7 @@ Leeloo can run on any Heroku style platform. These environment variables MUST be
 -   AWS\_SECRET\_ACCESS\_KEY
 -   DOCUMENTS\_BUCKET
 
-Management commands
-===================
+## Management commands
 
 Enable CDMS login for users (use this to let a CDMS user log in):
 
@@ -258,8 +254,7 @@ Update Elasticsearch:
 docker-compose run leeloo python manage.py sync_es
 ```
 
-Dependencies
-============
+## Dependencies
 
 Direct dependencies are specified in `requirements.in`. `requirements.txt` is a lock file generated using [pip-compile (from pip-tools)](https://github.com/jazzband/pip-tools) and should not be manually edited.
 
