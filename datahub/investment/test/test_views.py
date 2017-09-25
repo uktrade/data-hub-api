@@ -48,13 +48,7 @@ class TestUnifiedViews(APITestMixin):
 
     def test_list_is_sorted_by_created_on_desc(self):
         """Test list is sorted by created on desc."""
-        investment_projects = (
-            InvestmentProjectFactory(created_on=date(2010, 1, 10)),
-            InvestmentProjectFactory(created_on=date(2011, 1, 10)),
-            InvestmentProjectFactory(created_on=date(2012, 1, 10)),
-            InvestmentProjectFactory(created_on=date(2013, 1, 10)),
-            InvestmentProjectFactory(created_on=date(2014, 1, 10)),
-        )
+        investment_projects = InvestmentProjectFactory.create_batch(5)
 
         url = reverse('api-v3:investment:investment-collection')
         response = self.api_client.get(url)
