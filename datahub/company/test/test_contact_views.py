@@ -1,5 +1,3 @@
-from datetime import date
-
 import pytest
 import reversion
 from django.utils.timezone import now
@@ -528,13 +526,7 @@ class TestContactList(APITestMixin):
 
     def test_contacts_are_sorted_by_created_on_desc(self):
         """Test contacts are sorted by created on desc."""
-        contacts = (
-            ContactFactory(created_on=date(2010, 1, 10)),
-            ContactFactory(created_on=date(2011, 1, 10)),
-            ContactFactory(created_on=date(2012, 1, 10)),
-            ContactFactory(created_on=date(2013, 1, 10)),
-            ContactFactory(created_on=date(2014, 1, 10)),
-        )
+        contacts = ContactFactory.create_batch(5)
 
         url = reverse('api-v3:contact:list')
         response = self.api_client.get(url)
