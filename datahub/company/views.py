@@ -69,9 +69,10 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     serializer_class = ContactSerializer
     queryset = get_contact_queryset()
     filter_backends = (
-        DjangoFilterBackend,
+        DjangoFilterBackend, OrderingFilter
     )
     filter_fields = ['company_id']
+    ordering = ('-created_on',)
 
     def get_additional_data(self, create):
         """Set adviser to the user on model instance creation."""
