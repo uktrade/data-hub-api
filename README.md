@@ -217,42 +217,58 @@ Leeloo can run on any Heroku style platform. These environment variables MUST be
 
 ## Management commands
 
+If using Docker, remember to run these commands inside your container by prefixing them with `docker-compose run leeloo`.
+
+### CDMS authentication 
 Enable CDMS login for users (use this to let a CDMS user log in):
 
 ```shell
-docker-compose run leeloo python manage.py manageusers test@bar.com foo@bar.com --enable
+./manage.py manageusers test@bar.com foo@bar.com --enable
 ```
 
 Disable CDMS login for users:
 
 ```shell
-docker-compose run leeloo python manage.py manageusers test@bar.com foo@bar.com --disable
+./manage.py manageusers test@bar.com foo@bar.com --disable
 ```
+### Database
 
 Apply migrations:
 
 ```shell
-docker-compose run leeloo python manage.py migrate
+docker-compose run leeloo ./manage.py migrate
 ```
 
 If the database is freshly built or a new versioned model is added run:
 
 ```shell
-docker-compose run leeloo python manage.py createinitialrevisions
+./manage.py createinitialrevisions
 ```
 
 Load metadata:
 
 ```shell
-docker-compose run leeloo python manage.py loadmetadata
-docker-compose run leeloo python manage.py load_omis_metadata
+./manage.py loadmetadata
+./manage.py load_omis_metadata
 ```
 
-Update Elasticsearch:
+### Elasticsearch
+
+Resync all Elasticsearch records:
 
 ```shell
-docker-compose run leeloo python manage.py sync_es
+./manage.py sync_es
 ```
+
+### Companies House
+
+Update Companies House records:
+
+```shell
+./manage.py sync_ch
+```
+
+This truncates the Companies House table, downloads the latest data from Companies House and repopulates the table.
 
 ## Dependencies
 
