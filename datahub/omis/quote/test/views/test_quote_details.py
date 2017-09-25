@@ -14,8 +14,8 @@ from datahub.omis.order.test.factories import (
     OrderFactory, OrderWithCancelledQuoteFactory, OrderWithOpenQuoteFactory
 )
 
-from .factories import QuoteFactory
-from ..models import Quote
+from ..factories import QuoteFactory
+from ...models import Quote
 
 
 # mark the whole module for db use
@@ -25,7 +25,7 @@ pytestmark = pytest.mark.django_db
 class TestCreatePreviewOrder(APITestMixin):
     """Tests for creating and previewing a quote."""
 
-    @pytest.mark.parametrize('quote_view_name', ('item', 'preview'))
+    @pytest.mark.parametrize('quote_view_name', ('detail', 'preview'))
     def test_404_if_order_doesnt_exist(self, quote_view_name):
         """Test that if the order doesn't exist, the endpoint returns 404."""
         url = reverse(
@@ -36,7 +36,7 @@ class TestCreatePreviewOrder(APITestMixin):
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    @pytest.mark.parametrize('quote_view_name', ('item', 'preview'))
+    @pytest.mark.parametrize('quote_view_name', ('detail', 'preview'))
     def test_409_if_theres_already_a_valid_quote(self, quote_view_name):
         """Test that if the order has already an active quote, the endpoint returns 409."""
         order = OrderWithOpenQuoteFactory()
@@ -50,7 +50,7 @@ class TestCreatePreviewOrder(APITestMixin):
         assert response.status_code == status.HTTP_409_CONFLICT
         assert response.json() == {'detail': "There's already an active quote."}
 
-    @pytest.mark.parametrize('quote_view_name', ('item', 'preview'))
+    @pytest.mark.parametrize('quote_view_name', ('detail', 'preview'))
     @pytest.mark.parametrize(
         'disallowed_status', (
             OrderStatus.quote_awaiting_acceptance,
@@ -81,7 +81,7 @@ class TestCreatePreviewOrder(APITestMixin):
             )
         }
 
-    @pytest.mark.parametrize('quote_view_name', ('item', 'preview'))
+    @pytest.mark.parametrize('quote_view_name', ('detail', 'preview'))
     @pytest.mark.parametrize(
         'field,value',
         (
@@ -106,7 +106,7 @@ class TestCreatePreviewOrder(APITestMixin):
             field: ['This field is required.']
         }
 
-    @pytest.mark.parametrize('quote_view_name', ('item', 'preview'))
+    @pytest.mark.parametrize('quote_view_name', ('detail', 'preview'))
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
     def test_400_if_expiry_date_passed(self, quote_view_name):
         """
@@ -143,7 +143,7 @@ class TestCreatePreviewOrder(APITestMixin):
         )
         orig_quote = order.quote
 
-        url = reverse('api-v3:omis:quote:item', kwargs={'order_pk': order.pk})
+        url = reverse('api-v3:omis:quote:detail', kwargs={'order_pk': order.pk})
         response = self.api_client.post(url, format='json')
 
         order.refresh_from_db()
@@ -174,7 +174,7 @@ class TestCreatePreviewOrder(APITestMixin):
         """
         order = OrderFactory()
 
-        url = reverse('api-v3:omis:quote:item', kwargs={'order_pk': order.pk})
+        url = reverse('api-v3:omis:quote:detail', kwargs={'order_pk': order.pk})
 
         with mock.patch.object(Order, 'save') as mocked_save:
             mocked_save.side_effect = Exception()
@@ -229,7 +229,7 @@ class TestGetQuote(APITestMixin):
         order = OrderWithOpenQuoteFactory()
         quote = order.quote
 
-        url = reverse('api-v3:omis:quote:item', kwargs={'order_pk': order.pk})
+        url = reverse('api-v3:omis:quote:detail', kwargs={'order_pk': order.pk})
         response = self.api_client.get(url, format='json')
 
         assert response.status_code == status.HTTP_200_OK
@@ -251,7 +251,7 @@ class TestGetQuote(APITestMixin):
 
     def test_404_if_order_doesnt_exist(self):
         """Test that if the order doesn't exist, the endpoint returns 404."""
-        url = reverse('api-v3:omis:quote:item', kwargs={'order_pk': uuid.uuid4()})
+        url = reverse('api-v3:omis:quote:detail', kwargs={'order_pk': uuid.uuid4()})
         response = self.api_client.get(url, format='json')
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -261,7 +261,7 @@ class TestGetQuote(APITestMixin):
         order = OrderFactory()
         assert not order.quote
 
-        url = reverse('api-v3:omis:quote:item', kwargs={'order_pk': order.pk})
+        url = reverse('api-v3:omis:quote:detail', kwargs={'order_pk': order.pk})
         response = self.api_client.get(url, format='json')
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -360,42 +360,3 @@ class TestCancelOrder(APITestMixin):
 
             quote.refresh_from_db()
             assert quote.is_cancelled()
-
-    def test_with_already_cancelled_quote(self):
-        """Test that if the quote is already cancelled, nothing happens."""
-        order = OrderWithCancelledQuoteFactory()
-        quote = order.quote
-
-        url = reverse(
-            f'api-v3:omis:quote:cancel',
-            kwargs={'order_pk': order.pk}
-        )
-
-        with freeze_time('2017-07-12 13:00') as mocked_now:
-            response = self.api_client.post(url, format='json')
-
-            assert response.status_code == status.HTTP_200_OK
-            assert response.json() == {
-                'created_on': quote.created_on.isoformat(),
-                'created_by': {
-                    'id': str(quote.created_by.pk),
-                    'first_name': quote.created_by.first_name,
-                    'last_name': quote.created_by.last_name,
-                    'name': quote.created_by.name
-                },
-                'cancelled_on': quote.cancelled_on.isoformat(),
-                'cancelled_by': {
-                    'id': str(quote.cancelled_by.pk),
-                    'first_name': quote.cancelled_by.first_name,
-                    'last_name': quote.cancelled_by.last_name,
-                    'name': quote.cancelled_by.name
-                },
-                'accepted_on': None,
-                'accepted_by': None,
-                'expires_on': quote.expires_on.isoformat(),
-                'content': quote.content
-            }
-
-            quote.refresh_from_db()
-            assert quote.is_cancelled()
-            assert quote.cancelled_on != mocked_now()

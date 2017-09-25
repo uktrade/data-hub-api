@@ -19,6 +19,7 @@ from datahub.omis.quote.models import Quote
 
 from . import validators
 from .constants import DEFAULT_HOURLY_RATE, OrderStatus, VATStatus
+from .manager import OrderQuerySet
 from .signals import quote_generated
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -209,6 +210,8 @@ class Order(BaseModel):
         help_text='Legacy field. Can DIT speak to the contacts?'
     )
 
+    objects = OrderQuerySet.as_manager()
+
     def __str__(self):
         """Human-readable representation"""
         return self.reference
@@ -307,7 +310,6 @@ class Order(BaseModel):
         for validator in [
             validators.OrderInStatusValidator(
                 allowed_statuses=(
-                    OrderStatus.draft,
                     OrderStatus.quote_awaiting_acceptance,
                     OrderStatus.quote_accepted,
                 )

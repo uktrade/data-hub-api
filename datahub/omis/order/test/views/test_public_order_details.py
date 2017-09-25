@@ -90,8 +90,8 @@ class TestViewPublicOrderDetails(APITestMixin):
             },
         }
 
-    def test_not_found_with_invalid_public_token(self):
-        """Test 404 when getting a non-existent order."""
+    def test_404_with_invalid_public_token(self):
+        """Test that if the order doesn't exist, the endpoint returns 404."""
         url = reverse(
             'api-v3:omis-public:order:detail',
             kwargs={'public_token': ('1234-abcd-' * 5)}  # len(token) == 50
@@ -108,8 +108,8 @@ class TestViewPublicOrderDetails(APITestMixin):
         'order_status',
         (OrderStatus.draft, OrderStatus.cancelled)
     )
-    def test_not_found_if_in_disallowed_status(self, order_status):
-        """Test 404 when the order is not in an allowed state."""
+    def test_404_if_in_disallowed_status(self, order_status):
+        """Test that if the order is not in an allowed state, the endpoint returns 404."""
         order = OrderFactory(status=order_status)
 
         url = reverse(
@@ -147,7 +147,7 @@ class TestViewPublicOrderDetails(APITestMixin):
         'scope',
         (s.value for s in Scope if s != Scope.public_omis_front_end.value)
     )
-    def test_other_scopes_not_allowed(self, scope):
+    def test_403_if_scope_not_allowed(self, scope):
         """Test that other oauth2 scopes are not allowed."""
         order = OrderFactory(
             quote=QuoteFactory(),

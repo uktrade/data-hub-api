@@ -8,36 +8,18 @@ from datahub.oauth.scopes import Scope
 from datahub.omis.order.models import Order
 
 from .models import Quote
-from .serializers import QuoteSerializer
+from .serializers import PublicQuoteSerializer, QuoteSerializer
 
 
-class QuoteViewSet(CoreViewSetV3):
+class BaseQuoteViewSet(CoreViewSetV3):
     """Quote ViewSet."""
 
-    required_scopes = (Scope.internal_front_end,)
     queryset = Quote.objects.none()
-    serializer_class = QuoteSerializer
+    serializer_class = None
 
+    order_lookup_field = 'pk'
     order_lookup_url_kwarg = 'order_pk'
-
-    def preview(self, request, *args, **kwargs):
-        """
-        Same as `create` but without actually saving the changes.
-        """
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.preview()
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def cancel(self, request, *args, **kwargs):
-        """Cancel a quote."""
-        self.get_object()  # check if quote exists
-
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.cancel()
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    order_queryset = Order.objects
 
     def get_order(self):
         """
@@ -46,7 +28,9 @@ class QuoteViewSet(CoreViewSetV3):
         :raises Http404: if the order doesn't exist
         """
         try:
-            order = Order.objects.get(pk=self.kwargs[self.order_lookup_url_kwarg])
+            order = self.order_queryset.get(
+                **{self.order_lookup_field: self.kwargs[self.order_lookup_url_kwarg]}
+            )
         except Order.DoesNotExist:
             raise Http404('The specified order does not exist.')
         return order
@@ -69,3 +53,45 @@ class QuoteViewSet(CoreViewSetV3):
             'order': self.get_order(),
             'current_user': self.request.user,
         }
+
+
+class QuoteViewSet(BaseQuoteViewSet):
+    """Quote ViewSet."""
+
+    required_scopes = (Scope.internal_front_end,)
+    serializer_class = QuoteSerializer
+
+    def preview(self, request, *args, **kwargs):
+        """Same as `create` but without actually saving the changes."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.preview()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def cancel(self, request, *args, **kwargs):
+        """Cancel a quote."""
+        self.get_object()  # check if quote exists
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.cancel()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class PublicQuoteViewSet(BaseQuoteViewSet):
+    """ViewSet for public facing API."""
+
+    required_scopes = (Scope.public_omis_front_end,)
+    serializer_class = PublicQuoteSerializer
+
+    order_lookup_field = 'public_token'
+    order_lookup_url_kwarg = 'public_token'
+    order_queryset = Order.objects.publicly_accessible()
+
+    def accept(self, request, *args, **kwargs):
+        """Accept a quote."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.accept()
+        return Response(serializer.data, status=status.HTTP_200_OK)
