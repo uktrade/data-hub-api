@@ -53,21 +53,6 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
     docker-compose up
     ```
 
-## Local development with Docker
-
-To run the tests:
-
-```shell
-docker-compose run leeloo bash tests.sh
-docker-compose run leeloo bash tests-auth.sh
-```
-
-To run the linter:
-
-```shell
-docker-compose run leeloo flake8
-```
-
 ## Native installation (without Docker)
 
 Dependencies:
@@ -147,7 +132,9 @@ Dependencies:
     ./manage.py runserver
     ```
 
-## Local development (without Docker)
+## Local development
+
+If using Docker, prefix these commands with `docker-compose run leeloo`.
 
 To run the tests:
 
