@@ -187,20 +187,38 @@ The currently defined scopes can be found in [`datahub/oauth/scopes.py`](https:/
 
 ## Deployment
 
-Leeloo can run on any Heroku style platform. These environment variables MUST be configured:
+Leeloo can run on any Heroku-style platform. Configuration is performed via the following environment variables:
 
--   DATABASE\_URL
--   DATAHUB\_SECRET
--   DEBUG
--   DJANGO\_SECRET\_KEY
--   DJANGO\_SENTRY\_DSN
--   DJANGO\_SETTINGS\_MODULE
--   BULK\_CREATE\_BATCH\_SIZE (default=5000)
--   ES\_URL
--   ES\_INDEX
--   AWS\_ACCESS\_KEY\_ID
--   AWS\_SECRET\_ACCESS\_KEY
--   DOCUMENTS\_BUCKET
+
+| Variable name | Required | Description |
+| ------------- | ------------- | ------------- |
+| `AV_SERVICE_URL` | Yes | URL for ClamAV service. If not configured, virus scanning will fail. |
+| `AWS_ACCESS_KEY_ID` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
+| `AWS_DEFAULT_REGION` | No | [Default region used by boto3.](http://boto3.readthedocs.io/en/latest/guide/configuration.html#environment-variable-configuration) |
+| `AWS_SECRET_ACCESS_KEY` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
+| `BULK_CREATE_BATCH_SIZE`  | No | Used when loading Companies House records (default=5000). |
+| `CDMS_AUTH_URL`  | Yes | |
+| `DATABASE_URL`  | Yes | PostgreSQL server URL (with embedded credentials). |
+| `DATAHUB_FRONTEND_BASE_URL`  | Yes | |
+| `DATAHUB_SECRET`  | Yes | |
+| `DEBUG`  | Yes | Whether Django's debug mode should be enabled. |
+| `DJANGO_SECRET_KEY`  | Yes | |
+| `DJANGO_SENTRY_DSN`  | Yes | |
+| `DJANGO_SETTINGS_MODULE`  | Yes | |
+| `DOCUMENTS_BUCKET`  | Yes | S3 bucket for document storage. |
+| `ES_INDEX`  | Yes | |
+| `ES_URL`  | Yes | |
+| `ES_VERIFY_CERTS`  | No | |
+| `GUNICORN_ACCESSLOG`  | No | File to direct Gunicorn logs to (default=stdout). |
+| `GUNICORN_ACCESS_LOG_FORMAT`  | No |  |
+| `GUNICORN_WORKER_CLASS`  | No | [Type of Gunicorn worker.](http://docs.gunicorn.org/en/stable/settings.html#worker-class) Uses async workers via gevent by default. |
+| `GUNICORN_WORKER_CONNECTIONS`  | No | Maximum no. of connections for async workers (default=10). |
+| `OMIS_NOTIFICATION_ADMIN_EMAIL`  | Yes | |
+| `OMIS_NOTIFICATION_API_KEY`  | Yes | |
+| `OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL`  | No | |
+| `OMIS_PUBLIC_BASE_URL`  | Yes | |
+| `WEB_CONCURRENCY` | No | Number of Gunicorn workers (set automatically by Heroku, otherwise defaults to 1). |
+
 
 ## Management commands
 
