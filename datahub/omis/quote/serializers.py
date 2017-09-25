@@ -49,3 +49,26 @@ class QuoteSerializer(serializers.ModelSerializer):
             'content',
         ]
         read_only_fields = fields
+
+
+class PublicQuoteSerializer(serializers.ModelSerializer):
+    """Public Quote DRF serializer."""
+
+    def accept(self):
+        """Call `order.accept_quote` to accept this quote."""
+        order = self.context['order']
+
+        order.accept_quote(by=order.contact)  # assume that the contact accepted the quote
+        self.instance = order.quote
+        return self.instance
+
+    class Meta:  # noqa: D101
+        model = Quote
+        fields = [
+            'created_on',
+            'cancelled_on',
+            'accepted_on',
+            'expires_on',
+            'content',
+        ]
+        read_only_fields = fields
