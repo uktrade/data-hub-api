@@ -8,6 +8,7 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.core.constants import Country, Sector
 from datahub.core.test.factories import to_many_field
 
+from datahub.omis.invoice.test.factories import InvoiceFactory
 from datahub.omis.quote.test.factories import (
     AcceptedQuoteFactory, CancelledQuoteFactory, QuoteFactory
 )
@@ -93,6 +94,7 @@ class OrderWithAcceptedQuoteFactory(OrderFactory):
     """Order factory with an accepted quote."""
 
     quote = factory.SubFactory(AcceptedQuoteFactory)
+    invoice = factory.SubFactory(InvoiceFactory)
     status = OrderStatus.quote_accepted
 
 
