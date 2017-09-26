@@ -48,13 +48,20 @@ class TestUnifiedViews(APITestMixin):
 
     def test_list_is_sorted_by_created_on_desc(self):
         """Test list is sorted by created on desc."""
-        investment_projects = InvestmentProjectFactory.create_batch(5)
+        datetimes = [date(year, 1, 1) for year in range(2015, 2030)]
+        investment_projects = []
+
+        for creation_datetime in datetimes:
+            with freeze_time(creation_datetime):
+                investment_projects.append(
+                    InvestmentProjectFactory()
+                )
 
         url = reverse('api-v3:investment:investment-collection')
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 5
+        assert response.data['count'] == len(investment_projects)
         response_data = response.json()['results']
 
         investment_projects = sorted(
