@@ -11,6 +11,7 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.core import constants
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.core.exceptions import Conflict
+from datahub.omis.invoice.models import Invoice
 from datahub.omis.quote.models import Quote
 
 from .factories import (
@@ -328,9 +329,11 @@ class TestAcceptQuote:
         except Exception:
             pytest.fail('Should not raise a validator error.')
 
+        order.refresh_from_db()
         assert order.status == OrderStatus.quote_accepted
         assert order.quote.accepted_on
         assert order.quote.accepted_by == contact
+        assert order.invoice
 
     @pytest.mark.parametrize(
         'disallowed_status',
@@ -359,8 +362,11 @@ class TestAcceptQuote:
                 order.accept_quote(by=None)
 
             quote = order.quote
+            order.refresh_from_db()
             quote.refresh_from_db()
             assert not quote.is_accepted()
+            assert not order.invoice
+            assert not Invoice.objects.count()
 
 
 class TestOrderAssignee:
