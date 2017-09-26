@@ -1,3 +1,5 @@
+from datetime import date
+
 import pytest
 import reversion
 from django.utils.timezone import now
@@ -523,6 +525,28 @@ class TestContactList(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 5
+
+    def test_contacts_are_sorted_by_created_on_desc(self):
+        """Test contacts are sorted by created on desc."""
+        datetimes = [date(year, 1, 1) for year in range(2015, 2030)]
+        contacts = []
+
+        for creation_datetime in datetimes:
+            with freeze_time(creation_datetime):
+                contacts.append(
+                    ContactFactory()
+                )
+
+        url = reverse('api-v3:contact:list')
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == len(contacts)
+        response_data = response.json()['results']
+
+        contacts = sorted(contacts, key=lambda key: key.created_on, reverse=True)
+        contact_ids = [str(contact.id) for contact in contacts]
+        assert [contact['id'] for contact in response_data] == contact_ids
 
     def test_filter_by_company(self):
         """Test getting contacts by company id"""
