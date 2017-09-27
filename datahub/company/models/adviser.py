@@ -53,10 +53,13 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    # Used as a username. In many cases this is not the user's actual email address. Some do not
+    # pass Django's EmailValidator so CICharField is used here.
+    email = CICharField(max_length=MAX_LENGTH, unique=True, verbose_name='username')
     first_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     last_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     telephone_number = models.CharField(max_length=MAX_LENGTH, blank=True)
-    email = CICharField(max_length=MAX_LENGTH, unique=True)  # CDMS users may not have tld
+    contact_email = models.EmailField(max_length=MAX_LENGTH, blank=True)
     dit_team = models.ForeignKey(
         metadata_models.Team, blank=True, null=True, on_delete=models.SET_NULL
     )
