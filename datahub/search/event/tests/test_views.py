@@ -86,6 +86,26 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['name'] == event_name
 
+    def test_search_event_organiser(self, setup_es, setup_data):
+        """Tests organiser filter."""
+        organiser = AdviserFactory()
+        EventFactory(
+            organiser=organiser
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:event')
+
+        response = self.api_client.post(url, {
+            'original_query': '',
+            'organiser': organiser.id,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['organiser']['id'] == str(organiser.id)
+
     def test_search_event_organiser_name(self, setup_es, setup_data):
         """Tests organiser_name filter."""
         organiser_name = '00000000 000000000'
