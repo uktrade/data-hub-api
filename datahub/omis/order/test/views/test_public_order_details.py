@@ -54,15 +54,6 @@ class TestViewPublicOrderDetails(APITestMixin):
             'company': {
                 'id': str(order.company.pk),
                 'name': order.company.name,
-                'registered_address_1': order.company.registered_address_1,
-                'registered_address_2': order.company.registered_address_2,
-                'registered_address_county': order.company.registered_address_county,
-                'registered_address_postcode': order.company.registered_address_postcode,
-                'registered_address_town': order.company.registered_address_town,
-                'registered_address_country': {
-                    'id': str(order.company.registered_address_country.pk),
-                    'name': order.company.registered_address_country.name
-                },
             },
             'contact': {
                 'id': str(order.contact.pk),
