@@ -14,6 +14,7 @@ class AdviserFactory(factory.django.DjangoModelFactory):
     last_name = factory.Sequence(lambda n: f'surname {n}')
     dit_team_id = constants.Team.healthcare_uk.value.id
     email = factory.Sequence(lambda n: f'foo-{n}@bar.com')
+    contact_email = factory.Faker('email')
     telephone_number = factory.Faker('phone_number')
     date_joined = now()
 
