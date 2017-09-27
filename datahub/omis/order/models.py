@@ -21,6 +21,7 @@ from . import validators
 from .constants import DEFAULT_HOURLY_RATE, OrderStatus, VATStatus
 from .manager import OrderQuerySet
 from .signals import quote_generated
+from .utils import populate_billing_data
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -290,6 +291,7 @@ class Order(BaseModel):
 
         self.quote = Quote.objects.create_from_order(order=self, by=by, commit=commit)
         self.status = OrderStatus.quote_awaiting_acceptance
+        populate_billing_data(self)
 
         if commit:
             self.save()
