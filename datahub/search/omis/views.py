@@ -17,6 +17,7 @@ class SearchOrderParams:
         'created_on_after',
         'assigned_to_adviser',
         'assigned_to_team',
+        'status',
     ]
 
     REMAP_FIELDS = {
