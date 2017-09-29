@@ -139,6 +139,7 @@ class TestViews(APITestMixin):
         assert response_data['count'] == 1
         assert response_data['results'] == [{
             'id': str(interaction.pk),
+            'kind': interaction.kind,
             'date': interaction.date.isoformat(),
             'company': {
                 'id': str(interaction.company.pk),

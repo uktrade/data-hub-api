@@ -26,6 +26,10 @@ class InteractionSerializerWriteV1(serializers.ModelSerializer):
     class Meta:  # noqa: D101
         model = Interaction
         fields = '__all__'
+        extra_kwargs = {
+            # Temporarily set a default for kind for backwards compatibility
+            'kind': {'default': Interaction.KINDS.interaction},
+        }
         validators = [
             AnyOfValidator('company', 'investment_project'),
             RequiredUnlessAlreadyBlank('dit_team', 'interaction_type', 'service')
@@ -54,7 +58,9 @@ class InteractionSerializerV3(serializers.ModelSerializer):
             # (at present). Setting the formats as below effectively makes the field
             # behave like a date field without changing the schema and breaking the
             # v1 API.
-            'date': {'format': '%Y-%m-%d', 'input_formats': ['%Y-%m-%d']}
+            'date': {'format': '%Y-%m-%d', 'input_formats': ['%Y-%m-%d']},
+            # Temporarily set a default for kind for backwards compatibility
+            'kind': {'default': Interaction.KINDS.interaction},
         }
         fields = (
             'id',
@@ -62,6 +68,7 @@ class InteractionSerializerV3(serializers.ModelSerializer):
             'contact',
             'created_on',
             'created_by',
+            'kind',
             'modified_by',
             'modified_on',
             'date',

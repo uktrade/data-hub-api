@@ -3,6 +3,7 @@ import uuid
 from django.conf import settings
 from django.db import models
 from django.utils.functional import cached_property
+from model_utils import Choices
 
 from datahub.core.models import BaseModel
 
@@ -10,7 +11,13 @@ from datahub.core.models import BaseModel
 class Interaction(BaseModel):
     """Interaction."""
 
+    KINDS = Choices(
+        ('interaction', 'Interaction'),
+        ('service_delivery', 'Service delivery'),
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    kind = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH, choices=KINDS)
     date = models.DateTimeField()
     company = models.ForeignKey(
         'company.Company',

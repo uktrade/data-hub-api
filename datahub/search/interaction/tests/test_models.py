@@ -17,6 +17,7 @@ def test_interaction_to_dict():
 
     assert result == {
         'id': str(interaction.pk),
+        'kind': interaction.kind,
         'date': interaction.date,
         'company': {
             'id': str(interaction.company.pk),
