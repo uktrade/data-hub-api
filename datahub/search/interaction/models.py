@@ -9,6 +9,7 @@ class Interaction(DocType, MapDBModelToDict):
     """Elasticsearch representation of Interaction model."""
 
     id = dsl_utils.KeywordString()
+    kind = dsl_utils.KeywordString()
     date = Date()
     company = dsl_utils.id_name_partial_mapping('company')
     contact = dsl_utils.contact_or_adviser_partial_mapping('contact')
