@@ -8,6 +8,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 
 import environ
+
 from .companieshouse import *
 
 
@@ -57,6 +58,7 @@ LOCAL_APPS = [
     'datahub.investment',
     'datahub.leads',
     'datahub.metadata',
+    'datahub.oauth',
     'datahub.search.apps.SearchConfig',
     'datahub.user',
     'datahub.omis.core',
@@ -64,6 +66,7 @@ LOCAL_APPS = [
     'datahub.omis.market',
     'datahub.omis.notification',
     'datahub.omis.quote',
+    'datahub.omis.invoice',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -135,6 +138,12 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend'
 ]
 
+# django-oauth-toolkit settings
+
+OAUTH2_PROVIDER = {
+    'SCOPES_BACKEND_CLASS': 'datahub.oauth.scopes.ApplicationScopesBackend',
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
@@ -155,8 +164,12 @@ REST_FRAMEWORK = {
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
-    'DEFAULT_AUTHENTICATION_CLASSES': ['oauth2_provider.contrib.rest_framework.OAuth2Authentication'],
-    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication'
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'oauth2_provider.contrib.rest_framework.IsAuthenticatedOrTokenHasScope'
+    ],
     'ORDERING_PARAM': 'sortby'
 }
 
@@ -186,6 +199,12 @@ AV_SERVICE_URL = env('AV_SERVICE_URL', default=None)
 DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://localhost:3000')
 
 # OMIS
+
+# if set, all the notifications will be sent to this address instead of the
+# intended recipient, useful for environments != live
+OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL = env(
+    'OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL', default=''
+)
 OMIS_NOTIFICATION_ADMIN_EMAIL = env('OMIS_NOTIFICATION_ADMIN_EMAIL', default='')
 OMIS_NOTIFICATION_API_KEY = env('OMIS_NOTIFICATION_API_KEY', default='')
 OMIS_NOTIFICATION_TEST_API_KEY = env('OMIS_NOTIFICATION_TEST_API_KEY', default='')

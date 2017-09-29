@@ -4,14 +4,21 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from datahub.core.viewsets import CoreViewSetV3
+from datahub.oauth.scopes import Scope
 
 from .models import Order
-from .serializers import OrderAssigneeSerializer, OrderSerializer, SubscribedAdviserSerializer
+from .serializers import (
+    OrderAssigneeSerializer,
+    OrderSerializer,
+    PublicOrderSerializer,
+    SubscribedAdviserSerializer
+)
 
 
 class OrderViewSet(CoreViewSetV3):
     """Order ViewSet"""
 
+    required_scopes = (Scope.internal_front_end,)
     serializer_class = OrderSerializer
     queryset = Order.objects.select_related(
         'company',
@@ -20,8 +27,23 @@ class OrderViewSet(CoreViewSetV3):
     )
 
 
+class PublicOrderViewSet(CoreViewSetV3):
+    """ViewSet for public facing order endpoint."""
+
+    lookup_field = 'public_token'
+
+    required_scopes = (Scope.public_omis_front_end,)
+    serializer_class = PublicOrderSerializer
+    queryset = Order.objects.publicly_accessible().select_related(
+        'company',
+        'contact'
+    )
+
+
 class SubscriberListView(APIView):
     """API View for advisers subscribed to an order."""
+
+    required_scopes = (Scope.internal_front_end,)
 
     def get_order(self, order_pk):
         """
@@ -75,6 +97,7 @@ class AssigneeView(APIView):
     """API View for advisers assigned to an order."""
 
     FORCE_DELETE_PARAM = 'force-delete'
+    required_scopes = (Scope.internal_front_end,)
 
     def get_order(self, order_pk):
         """

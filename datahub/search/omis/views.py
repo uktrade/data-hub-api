@@ -1,11 +1,13 @@
+from datahub.oauth.scopes import Scope
 from .models import Order
 from .serializers import SearchOrderSerializer
 from ..views import SearchAPIView
 
 
-class SearchOrderAPIView(SearchAPIView):
-    """Filtered order search view."""
+class SearchOrderParams:
+    """Search order params."""
 
+    required_scopes = (Scope.internal_front_end,)
     entity = Order
     serializer_class = SearchOrderSerializer
 
@@ -15,6 +17,7 @@ class SearchOrderAPIView(SearchAPIView):
         'created_on_after',
         'assigned_to_adviser',
         'assigned_to_team',
+        'status',
     ]
 
     REMAP_FIELDS = {
@@ -22,3 +25,7 @@ class SearchOrderAPIView(SearchAPIView):
         'assigned_to_adviser': 'assignees.id',
         'assigned_to_team': 'assignees.dit_team.id',
     }
+
+
+class SearchOrderAPIView(SearchOrderParams, SearchAPIView):
+    """Filtered order search view."""

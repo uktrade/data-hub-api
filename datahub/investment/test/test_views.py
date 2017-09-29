@@ -10,6 +10,7 @@ import pytest
 import reversion
 from django.utils.timezone import now
 from freezegun import freeze_time
+from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse
 from reversion.models import Version
@@ -28,6 +29,7 @@ from datahub.investment.models import (
 from datahub.investment.test.factories import (
     InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
 )
+from datahub.oauth.scopes import Scope
 
 
 class TestUnifiedViews(APITestMixin):
@@ -43,6 +45,32 @@ class TestUnifiedViews(APITestMixin):
         response_data = response.json()
         assert response_data['count'] == 1
         assert response_data['results'][0]['id'] == str(project.id)
+
+    def test_list_is_sorted_by_created_on_desc(self):
+        """Test list is sorted by created on desc."""
+        datetimes = [date(year, 1, 1) for year in range(2015, 2030)]
+        investment_projects = []
+
+        for creation_datetime in datetimes:
+            with freeze_time(creation_datetime):
+                investment_projects.append(
+                    InvestmentProjectFactory()
+                )
+
+        url = reverse('api-v3:investment:investment-collection')
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == len(investment_projects)
+        response_data = response.json()['results']
+
+        investment_projects = sorted(
+            investment_projects,
+            key=lambda key: key.created_on,
+            reverse=True
+        )
+        ids = [str(ip.id) for ip in investment_projects]
+        assert [ip['id'] for ip in response_data] == ids
 
     def test_list_projects_investor_company_success(self):
         """Test successfully listing projects for an investor company."""
@@ -867,7 +895,11 @@ class TestModifiedSinceView(APITestMixin):
             InvestmentProjectFactory.create_batch(5)
 
         url = reverse('api-v3:investment:investment-modified-since-collection')
-        response = self.api_client.get(url, data={
+        client = self.create_api_client(
+            scope=Scope.mi,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
+        response = client.get(url, data={
             'time': timestamp.isoformat()
         })
 
@@ -880,7 +912,11 @@ class TestModifiedSinceView(APITestMixin):
         InvestmentProjectFactory.create_batch(4, modified_on=datetime(2017, 1, 1))
         InvestmentProjectFactory.create_batch(5, modified_on=datetime(2018, 1, 1))
         url = reverse('api-v3:investment:investment-modified-since-collection')
-        response = self.api_client.get(url)
+        client = self.create_api_client(
+            scope=Scope.mi,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
+        response = client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()

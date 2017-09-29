@@ -13,6 +13,7 @@ from datahub.omis.market.models import Market
 from .constants import OrderStatus, VATStatus
 from .models import Order, OrderAssignee, OrderSubscriber, ServiceType
 from .validators import (
+    AddressValidator,
     ContactWorksAtCompanyValidator,
     OrderInStatusValidator,
     ReadonlyAfterCreationValidator
@@ -42,6 +43,8 @@ class OrderSerializer(serializers.ModelSerializer):
     contacts_not_to_approach = serializers.CharField(allow_blank=True, required=False)
 
     delivery_date = serializers.DateField(required=False, allow_null=True)
+
+    billing_address_country = NestedRelatedField(Country, required=False, allow_null=True)
 
     class Meta:  # noqa: D101
         model = Order
@@ -76,6 +79,15 @@ class OrderSerializer(serializers.ModelSerializer):
             'subtotal_cost',
             'vat_cost',
             'total_cost',
+            'billing_contact_name',
+            'billing_email',
+            'billing_phone',
+            'billing_address_1',
+            'billing_address_2',
+            'billing_address_town',
+            'billing_address_county',
+            'billing_address_postcode',
+            'billing_address_country',
         )
         read_only_fields = (
             'id',
@@ -103,6 +115,17 @@ class OrderSerializer(serializers.ModelSerializer):
             OrderInStatusValidator(
                 allowed_statuses=(OrderStatus.draft,),
                 order_required=False
+            ),
+            AddressValidator(
+                lazy=True,
+                fields_mapping={
+                    'billing_address_1': {'required': True},
+                    'billing_address_2': {'required': False},
+                    'billing_address_town': {'required': True},
+                    'billing_address_county': {'required': False},
+                    'billing_address_postcode': {'required': True},
+                    'billing_address_country': {'required': True},
+                }
             )
         )
 
@@ -160,6 +183,43 @@ class OrderSerializer(serializers.ModelSerializer):
         """Add extra logic to the default DRF one."""
         data = self._reset_vat_fields_if_necessary(data)
         return data
+
+
+class PublicOrderSerializer(serializers.ModelSerializer):
+    """DRF serializer for public facing API."""
+
+    company = NestedRelatedField(Company)
+    contact = NestedRelatedField(Contact)
+    billing_address_country = NestedRelatedField(Country)
+
+    class Meta:  # noqa: D101
+        model = Order
+        fields = (
+            'public_token',
+            'reference',
+            'status',
+            'created_on',
+            'company',
+            'contact',
+            'contact_email',
+            'contact_phone',
+            'po_number',
+            'discount_value',
+            'net_cost',
+            'subtotal_cost',
+            'vat_cost',
+            'total_cost',
+            'billing_contact_name',
+            'billing_email',
+            'billing_phone',
+            'billing_address_1',
+            'billing_address_2',
+            'billing_address_town',
+            'billing_address_county',
+            'billing_address_postcode',
+            'billing_address_country',
+        )
+        read_only_fields = fields
 
 
 def existing_adviser(adviser_id):

@@ -23,7 +23,17 @@ class AdviserSerializer(serializers.ModelSerializer):
 
     class Meta:  # noqa: D101
         model = Advisor
-        fields = ('id', 'name', 'last_login', 'first_name', 'last_name', 'email', 'dit_team')
+        fields = (
+            'id',
+            'name',
+            'last_login',
+            'first_name',
+            'last_name',
+            'email',
+            'contact_email',
+            'telephone_number',
+            'dit_team',
+        )
         depth = 1
 
 

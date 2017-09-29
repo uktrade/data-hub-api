@@ -1,38 +1,46 @@
-from datetime import timedelta
-
-from django.utils.timezone import now
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from datahub.company.queryset import get_contact_queryset
 from datahub.interaction.queryset import get_interaction_queryset_v1
+from datahub.oauth.scopes import Scope
 
-from .serializers import IntelligentHomepageSerializer
+from .serializers import IntelligentHomepageSerializer, LimitParamSerializer
 
 
 class IntelligentHomepageView(APIView):
     """Return the data for the intelligent homepage."""
 
+    required_scopes = (Scope.internal_front_end,)
     http_method_names = ['get']
 
     def get(self, request, format=None):
         """Implement GET method."""
         user = request.user
-        days = request.GET.get('days', 15)
-        days_in_the_past = now() - timedelta(days=int(days))
+        serializer = LimitParamSerializer(data=request.GET)
+        serializer.is_valid(raise_exception=True)
+        limit = serializer.validated_data['limit']
 
-        interactions = get_interaction_queryset_v1().filter(
-            dit_adviser=user,
-            created_on__gte=days_in_the_past
-        ).order_by('-created_on')
+        interactions = _filter_queryset(
+            get_interaction_queryset_v1().filter(dit_adviser=user),
+            limit
+        )
 
-        contacts = get_contact_queryset().filter(
-            adviser=user,
-            created_on__gte=days_in_the_past
-        ).order_by('-created_on')
+        contacts = _filter_queryset(
+            get_contact_queryset().filter(created_by=user),
+            limit
+        )
 
         serializer = IntelligentHomepageSerializer({
             'interactions': interactions,
             'contacts': contacts
         })
         return Response(data=serializer.data)
+
+
+def _filter_queryset(queryset, limit):
+    return queryset.exclude(
+        created_on=None
+    ).order_by(
+        '-created_on'
+    )[:limit]

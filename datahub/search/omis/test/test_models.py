@@ -94,6 +94,18 @@ def test_order_to_dict():
         'subtotal_cost': order.subtotal_cost,
         'vat_cost': order.vat_cost,
         'total_cost': order.total_cost,
+        'billing_contact_name': order.billing_contact_name,
+        'billing_email': order.billing_email,
+        'billing_phone': order.billing_phone,
+        'billing_address_1': order.billing_address_1,
+        'billing_address_2': order.billing_address_2,
+        'billing_address_town': order.billing_address_town,
+        'billing_address_county': order.billing_address_county,
+        'billing_address_postcode': order.billing_address_postcode,
+        'billing_address_country': {
+            'id': str(order.billing_address_country.pk),
+            'name': order.billing_address_country.name
+        },
     }
 
 

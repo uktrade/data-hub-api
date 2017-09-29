@@ -1,14 +1,20 @@
 """Search views."""
+import csv
 from collections import namedtuple
+from datetime import datetime
 
+from django.http import StreamingHttpResponse
+from django.utils.text import slugify
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 
+from datahub.oauth.scopes import Scope
 from . import elasticsearch
 from .apps import get_search_apps
 from .serializers import SearchSerializer
+from .utils import Echo
 
 EntitySearch = namedtuple('EntitySearch', ['model', 'name'])
 
@@ -16,6 +22,7 @@ EntitySearch = namedtuple('EntitySearch', ['model', 'name'])
 class SearchBasicAPIView(APIView):
     """Aggregate all entities search view."""
 
+    required_scopes = (Scope.internal_front_end,)
     http_method_names = ('get',)
 
     SORT_BY_FIELDS = (
@@ -125,13 +132,17 @@ class SearchAPIView(APIView):
         aggregations = (self.REMAP_FIELDS.get(field, field) for field in self.FILTER_FIELDS) \
             if self.include_aggregations else None
 
-        results = elasticsearch.get_search_by_entity_query(
+        query = elasticsearch.get_search_by_entity_query(
             entity=self.entity,
             term=validated_data['original_query'],
             filters=filters,
             ranges=ranges,
             field_order=validated_data['sortby'],
             aggregations=aggregations,
+        )
+
+        results = elasticsearch.limit_search_query(
+            query,
             offset=validated_data['offset'],
             limit=validated_data['limit'],
         ).execute()
@@ -155,3 +166,81 @@ class SearchAPIView(APIView):
             response['aggregations'] = aggregations
 
         return Response(data=response)
+
+
+class SearchExportAPIView(SearchAPIView):
+    """Returns CSV file with all search results."""
+
+    IGNORED_SUFFIXES = ('_trigram', '_keyword',)
+
+    def _clean_fieldnames(self, fieldnames):
+        """Remove special fields from the export."""
+        return [field for field in fieldnames
+                if not any(field.endswith(suffix) for suffix in self.IGNORED_SUFFIXES)]
+
+    def _format_cell(self, cell):
+        """Gets cell or name from cell and flattens the cell if necessary."""
+        if isinstance(cell, dict):
+            for k in ('name', 'type', 'company_number', 'uri', 'id',):
+                if k in cell:
+                    return cell[k]
+            return str(cell)
+
+        if isinstance(cell, list):
+            return ','.join(self._format_cell(item) for item in cell)
+
+        return cell
+
+    def _get_csv(self, writer, query):
+        """Generates header and formatted search results."""
+        # we want to keep the same order of rows that is in the search results
+        query.params(preserve_order=True)
+        # work around bug: https://bugs.python.org/issue27497
+        header = dict(zip(writer.fieldnames, writer.fieldnames))
+        yield writer.writerow(header)
+        for hit in query.scan():
+            yield writer.writerow({k: self._format_cell(v)
+                                   for k, v in hit.to_dict().items() if k in writer.fieldnames})
+
+    def _get_base_filename(self, original_query):
+        """Gets base filename that contains sanitized entity name and original_query."""
+        filename_parts = [
+            datetime.utcnow().strftime('%Y-%m-%d'),
+            'data-hub',
+            self.entity.__name__
+        ]
+        if original_query:
+            filename_parts.append(original_query)
+
+        return slugify('-'.join(filename_parts))
+
+    def _get_fieldnames(self):
+        """Gets cleaned list of entity field names."""
+        return self._clean_fieldnames(
+            self.entity._doc_type.mapping.properties._params['properties'].keys()
+        )
+
+    def post(self, request, format=None):
+        """Performs search and returns CSV file."""
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+
+        filters, ranges = self.get_filtering_data(request)
+
+        results = elasticsearch.get_search_by_entity_query(
+            entity=self.entity,
+            term=validated_data['original_query'],
+            filters=filters,
+            ranges=ranges,
+            field_order=validated_data['sortby'],
+        )
+
+        base_filename = self._get_base_filename(validated_data['original_query'])
+
+        writer = csv.DictWriter(Echo(), fieldnames=sorted(self._get_fieldnames()))
+
+        response = StreamingHttpResponse(self._get_csv(writer, results), content_type='text/csv')
+
+        response['Content-Disposition'] = f'attachment; filename="{base_filename}.csv"'
+        return response

@@ -6,6 +6,7 @@ from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.leads.models import BusinessLead
 from datahub.leads.serializers import BusinessLeadSerializer
+from datahub.oauth.scopes import Scope
 
 
 class BusinessLeadViewSet(ArchivableViewSetMixin, CoreViewSetV3):
@@ -15,6 +16,7 @@ class BusinessLeadViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     Users can only view business leads that are associated with them.
     """
 
+    required_scopes = (Scope.internal_front_end,)
     serializer_class = BusinessLeadSerializer
     filter_backends = (
         DjangoFilterBackend,

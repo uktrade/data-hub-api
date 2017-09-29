@@ -1,7 +1,7 @@
 from datahub.event.models import Event as DBEvent
 from datahub.search.apps import SearchApp
 from datahub.search.event.models import Event
-from datahub.search.event.views import SearchEventAPIView
+from datahub.search.event.views import SearchEventAPIView, SearchEventExportAPIView
 
 
 class EventSearchApp(SearchApp):
@@ -10,6 +10,7 @@ class EventSearchApp(SearchApp):
     name = 'event'
     ESModel = Event
     view = SearchEventAPIView
+    export_view = SearchEventExportAPIView
     queryset = DBEvent.objects.prefetch_related(
         'address_country',
         'event_type',

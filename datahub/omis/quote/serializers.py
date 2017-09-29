@@ -7,26 +7,12 @@ from datahub.core.serializers import NestedRelatedField
 from .models import Quote
 
 
-class ExpandParamSerializer(serializers.Serializer):
-    """Holds the `expand` param for getting the complete details of an object."""
+class QuoteSerializer(serializers.ModelSerializer):
+    """Quote DRF serializer."""
 
-    expand = serializers.BooleanField(default=False)
-
-
-class BasicQuoteSerializer(serializers.ModelSerializer):
-    """
-    Basic Quote DRF serializer.
-
-    It does not include the content of a quote which is usually long.
-    """
-
-    created_on = serializers.DateTimeField(read_only=True)
     created_by = NestedAdviserField(read_only=True)
-    cancelled_on = serializers.DateTimeField(read_only=True)
     cancelled_by = NestedAdviserField(read_only=True)
-    accepted_on = serializers.DateTimeField(read_only=True)
     accepted_by = NestedRelatedField(Contact, read_only=True)
-    expires_on = serializers.DateTimeField(read_only=True)
 
     def preview(self):
         """Same as create but without saving the changes."""
@@ -60,19 +46,29 @@ class BasicQuoteSerializer(serializers.ModelSerializer):
             'accepted_on',
             'accepted_by',
             'expires_on',
-        ]
-
-
-class ExpandedQuoteSerializer(BasicQuoteSerializer):
-    """
-    Expanded Quote DRF serializer.
-
-    It includes the content of a quote which is usually long.
-    """
-
-    content = serializers.CharField(read_only=True)
-
-    class Meta(BasicQuoteSerializer.Meta):  # noqa: D101
-        fields = BasicQuoteSerializer.Meta.fields + [
             'content',
         ]
+        read_only_fields = fields
+
+
+class PublicQuoteSerializer(serializers.ModelSerializer):
+    """Public Quote DRF serializer."""
+
+    def accept(self):
+        """Call `order.accept_quote` to accept this quote."""
+        order = self.context['order']
+
+        order.accept_quote(by=order.contact)  # assume that the contact accepted the quote
+        self.instance = order.quote
+        return self.instance
+
+    class Meta:  # noqa: D101
+        model = Quote
+        fields = [
+            'created_on',
+            'cancelled_on',
+            'accepted_on',
+            'expires_on',
+            'content',
+        ]
+        read_only_fields = fields

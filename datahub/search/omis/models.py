@@ -37,6 +37,16 @@ class Order(DocType, MapDBModelToDict):
     vat_cost = Integer(index='no')
     total_cost = Integer()
 
+    billing_contact_name = String()
+    billing_email = dsl_utils.CaseInsensitiveKeywordString()
+    billing_phone = dsl_utils.CaseInsensitiveKeywordString()
+    billing_address_1 = String()
+    billing_address_2 = String()
+    billing_address_town = dsl_utils.CaseInsensitiveKeywordString()
+    billing_address_county = dsl_utils.CaseInsensitiveKeywordString()
+    billing_address_postcode = String()
+    billing_address_country = dsl_utils.id_name_mapping()
+
     MAPPINGS = {
         'id': str,
         'company': dict_utils.id_name_dict,
@@ -51,6 +61,7 @@ class Order(DocType, MapDBModelToDict):
         'assignees': lambda col: [
             dict_utils.contact_or_adviser_dict(c.adviser, include_dit_team=True) for c in col.all()
         ],
+        'billing_address_country': dict_utils.id_name_dict,
     }
 
     IGNORED_FIELDS = (
@@ -63,6 +74,7 @@ class Order(DocType, MapDBModelToDict):
         'hourly_rate',
         'discount_label',
         'public_token',
+        'invoice',
     )
 
     SEARCH_FIELDS = []
