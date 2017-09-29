@@ -15,6 +15,7 @@ from datahub.core.models import (
 
 from datahub.metadata.models import Country, Sector, Team
 from datahub.omis.core.utils import generate_reference
+from datahub.omis.invoice.models import Invoice
 from datahub.omis.quote.models import Quote
 
 from . import validators
@@ -145,6 +146,12 @@ class Order(BaseModel):
 
     quote = models.OneToOneField(
         Quote,
+        null=True, blank=True,
+        on_delete=models.SET_NULL
+    )
+
+    invoice = models.OneToOneField(
+        Invoice,
         null=True, blank=True,
         on_delete=models.SET_NULL
     )
@@ -345,6 +352,7 @@ class Order(BaseModel):
 
         self.quote.accept(by)
 
+        self.invoice = Invoice.objects.create_populated()
         self.status = OrderStatus.quote_accepted
         self.save()
 
