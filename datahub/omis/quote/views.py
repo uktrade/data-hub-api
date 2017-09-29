@@ -12,7 +12,7 @@ from .serializers import PublicQuoteSerializer, QuoteSerializer
 
 
 class BaseQuoteViewSet(BaseNestedOrderViewSet):
-    """Quote ViewSet."""
+    """Base Quote ViewSet."""
 
     queryset = Quote.objects.none()
 
