@@ -268,7 +268,7 @@ def test_get_basic_search_query():
     }
 
 
-def test_get_search_by_entity_query():
+def test_get_limited_search_by_entity_query():
     """Tests search by entity."""
     date = '2017-06-13T09:44:31.062870'
     filters = {
@@ -286,8 +286,11 @@ def test_get_search_by_entity_query():
         filters=filters,
         ranges=ranges,
         entity=ESContact,
+    )
+    query = elasticsearch.limit_search_query(
+        query,
         offset=5,
-        limit=5
+        limit=5,
     )
 
     assert query.to_dict() == {

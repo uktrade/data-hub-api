@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django_filters import IsoDateTimeFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from rest_framework import status
+from rest_framework.filters import OrderingFilter
 from rest_framework.pagination import BasePagination
 from rest_framework.response import Response
 
@@ -21,7 +22,7 @@ from datahub.investment.serializers import (
     IProjectDocumentSerializer, IProjectSerializer, IProjectTeamMemberSerializer,
     UploadStatusSerializer
 )
-
+from datahub.oauth.scopes import Scope
 
 _team_member_queryset = InvestmentProjectTeamMember.objects.select_related('adviser')
 
@@ -29,6 +30,7 @@ _team_member_queryset = InvestmentProjectTeamMember.objects.select_related('advi
 class IProjectAuditViewSet(AuditViewSet):
     """Investment Project audit views."""
 
+    required_scopes = (Scope.internal_front_end,)
     queryset = InvestmentProject.objects.all()
 
     def get_view_name(self):
@@ -42,6 +44,7 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     This replaces the previous project, value, team and requirements endpoints.
     """
 
+    required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectSerializer
     queryset = InvestmentProject.objects.select_related(
         'archived_by',
@@ -72,8 +75,9 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'strategic_drivers',
         Prefetch('team_members', queryset=_team_member_queryset),
     )
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, OrderingFilter,)
     filter_fields = ('investor_company_id',)
+    ordering = ('-created_on',)
 
     def get_view_name(self):
         """Returns the view set name for the DRF UI."""
@@ -110,6 +114,7 @@ class _SinglePagePaginator(BasePagination):
 class IProjectModifiedSinceViewSet(IProjectViewSet):
     """View set for the modified-since endpoint (intended for use by Data Hub MI)."""
 
+    required_scopes = (Scope.mi,)
     pagination_class = _SinglePagePaginator
 
     filter_backends = (DjangoFilterBackend,)
@@ -120,6 +125,7 @@ class IProjectModifiedSinceViewSet(IProjectViewSet):
 class IProjectTeamMembersViewSet(CoreViewSetV3):
     """Investment project team member views."""
 
+    required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectTeamMemberSerializer
     lookup_field = 'adviser_id'
     lookup_url_kwarg = 'adviser_pk'
@@ -168,6 +174,7 @@ class IProjectTeamMembersViewSet(CoreViewSetV3):
 class IProjectDocumentViewSet(CoreViewSetV3):
     """Investment Project Documents ViewSet."""
 
+    required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectDocumentSerializer
     queryset = IProjectDocument.objects.all()
 

@@ -476,6 +476,25 @@ class CompanyClassification(Enum):
     tier_dg = Constant('Tier D - POST Identified/Managed', '572dfefe-cd1d-e611-9bdc-e4115bead28a')
 
 
+class EmployeeRange(Enum):
+    """Employee range constants."""
+
+    range_1_to_9 = Constant('1 to 9', '3dafd8d0-5d95-e211-a939-e4115bead28a')
+    range_10_to_49 = Constant('10 to 49', '3eafd8d0-5d95-e211-a939-e4115bead28a')
+    range_50_to_249 = Constant('50 to 249', '3fafd8d0-5d95-e211-a939-e4115bead28a')
+    range_250_to_499 = Constant('250 to 499', '40afd8d0-5d95-e211-a939-e4115bead28a')
+    range_500_plus = Constant('500+', '41afd8d0-5d95-e211-a939-e4115bead28a')
+
+
+class TurnoverRange(Enum):
+    """Turnover range constants."""
+
+    range_0_to_1_34 = Constant('£0 ti £1.34M', '774cd12a-6095-e211-a939-e4115bead28a')
+    range_1_34_to_6_7 = Constant('£1.34 to £6.7M', '784cd12a-6095-e211-a939-e4115bead28a')
+    range_6_7_to_33_5 = Constant('£6.7 to £33.5M', '794cd12a-6095-e211-a939-e4115bead28a')
+    range_33_5_plus = Constant('£33.5M+', '7a4cd12a-6095-e211-a939-e4115bead28a')
+
+
 class InvestmentProjectStage(Enum):
     """Investment project stage constants."""
 

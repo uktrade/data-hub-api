@@ -15,11 +15,16 @@ from datahub.core.models import (
 
 from datahub.metadata.models import Country, Sector, Team
 from datahub.omis.core.utils import generate_reference
+from datahub.omis.invoice.models import Invoice
 from datahub.omis.quote.models import Quote
 
 from . import validators
 from .constants import DEFAULT_HOURLY_RATE, OrderStatus, VATStatus
+from .manager import OrderQuerySet
 from .signals import quote_generated
+from .utils import populate_billing_data
+
+MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 class ServiceType(BaseOrderedConstantModel, DisableableModel):
@@ -145,6 +150,12 @@ class Order(BaseModel):
         on_delete=models.SET_NULL
     )
 
+    invoice = models.OneToOneField(
+        Invoice,
+        null=True, blank=True,
+        on_delete=models.SET_NULL
+    )
+
     po_number = models.CharField(max_length=100, blank=True)
 
     hourly_rate = models.ForeignKey(
@@ -173,6 +184,22 @@ class Order(BaseModel):
         default=0, help_text='Subtotal + VAT cost in pence.'
     )
 
+    billing_contact_name = models.CharField(max_length=MAX_LENGTH, blank=True)
+    billing_email = models.EmailField(max_length=MAX_LENGTH, blank=True)
+    billing_phone = models.CharField(max_length=150, blank=True)
+    billing_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
+    billing_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
+    billing_address_town = models.CharField(max_length=MAX_LENGTH, blank=True)
+    billing_address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
+    billing_address_postcode = models.CharField(max_length=100, blank=True)
+    billing_address_country = models.ForeignKey(
+        Country,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
+
     # legacy fields, only meant to be used in readonly mode as reference
     product_info = models.TextField(
         blank=True, editable=False,
@@ -190,6 +217,8 @@ class Order(BaseModel):
         blank=True, editable=False,
         help_text='Legacy field. Can DIT speak to the contacts?'
     )
+
+    objects = OrderQuerySet.as_manager()
 
     def __str__(self):
         """Human-readable representation"""
@@ -269,6 +298,7 @@ class Order(BaseModel):
 
         self.quote = Quote.objects.create_from_order(order=self, by=by, commit=commit)
         self.status = OrderStatus.quote_awaiting_acceptance
+        populate_billing_data(self)
 
         if commit:
             self.save()
@@ -289,7 +319,6 @@ class Order(BaseModel):
         for validator in [
             validators.OrderInStatusValidator(
                 allowed_statuses=(
-                    OrderStatus.draft,
                     OrderStatus.quote_awaiting_acceptance,
                     OrderStatus.quote_accepted,
                 )
@@ -323,6 +352,7 @@ class Order(BaseModel):
 
         self.quote.accept(by)
 
+        self.invoice = Invoice.objects.create_populated()
         self.status = OrderStatus.quote_accepted
         self.save()
 

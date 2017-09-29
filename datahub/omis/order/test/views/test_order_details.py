@@ -50,7 +50,16 @@ class TestAddOrderDetails(APITestMixin):
                 'po_number': 'PO 123',
                 'vat_status': VATStatus.eu,
                 'vat_number': '01234566789',
-                'vat_verified': True
+                'vat_verified': True,
+                'billing_contact_name': 'Billing contact name',
+                'billing_email': 'billing@example.com',
+                'billing_phone': '00112233',
+                'billing_address_1': 'Apt 1',
+                'billing_address_2': 'London Street',
+                'billing_address_town': 'London',
+                'billing_address_county': 'London',
+                'billing_address_postcode': 'SW1A1AA',
+                'billing_address_country': Country.united_kingdom.value.id,
             },
             format='json'
         )
@@ -110,6 +119,18 @@ class TestAddOrderDetails(APITestMixin):
             'subtotal_cost': 0,
             'vat_cost': 0,
             'total_cost': 0,
+            'billing_contact_name': 'Billing contact name',
+            'billing_email': 'billing@example.com',
+            'billing_phone': '00112233',
+            'billing_address_1': 'Apt 1',
+            'billing_address_2': 'London Street',
+            'billing_address_town': 'London',
+            'billing_address_county': 'London',
+            'billing_address_postcode': 'SW1A1AA',
+            'billing_address_country': {
+                'id': str(Country.united_kingdom.value.id),
+                'name': Country.united_kingdom.value.name
+            },
         }
 
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
@@ -145,6 +166,15 @@ class TestAddOrderDetails(APITestMixin):
         assert response.json()['subtotal_cost'] == 0
         assert response.json()['vat_cost'] == 0
         assert response.json()['total_cost'] == 0
+        assert response.json()['billing_contact_name'] == ''
+        assert response.json()['billing_email'] == ''
+        assert response.json()['billing_phone'] == ''
+        assert response.json()['billing_address_1'] == ''
+        assert response.json()['billing_address_2'] == ''
+        assert response.json()['billing_address_town'] == ''
+        assert response.json()['billing_address_county'] == ''
+        assert response.json()['billing_address_postcode'] == ''
+        assert not response.json()['billing_address_country']
 
     def test_fails_if_contact_not_from_company(self):
         """
@@ -316,6 +346,67 @@ class TestAddOrderDetails(APITestMixin):
         assert response.json()['vat_number'] == ''
         assert response.json()['vat_verified'] is None
 
+    def test_fails_with_incomplete_billing_address(self):
+        """
+        Test that if one of the billing address fields is set, all the other required
+        billing fields should be set as well.
+        """
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
+        country = Country.france.value
+
+        url = reverse('api-v3:omis:order:list')
+        response = self.api_client.post(
+            url,
+            {
+                'company': {'id': company.pk},
+                'contact': {'id': contact.pk},
+                'primary_market': {'id': country.id},
+                'billing_address_2': 'London Street',
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'billing_address_1': ['This field is required.'],
+            'billing_address_town': ['This field is required.'],
+            'billing_address_postcode': ['This field is required.'],
+            'billing_address_country': ['This field is required.'],
+        }
+
+    @pytest.mark.parametrize(
+        'field,value',
+        (
+            ('billing_contact_name', 'lorem'),
+            ('billing_email', 'billing@example.com'),
+            ('billing_phone', '0011'),
+        )
+    )
+    def test_ok_with_non_address_billing_fields_set(self, field, value):
+        """
+        Test that if a non-address billing field is set, the validation of the
+        billing address is not triggered.
+        E.g. I can set billing email without billing address.
+        """
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
+        country = Country.france.value
+
+        url = reverse('api-v3:omis:order:list')
+        response = self.api_client.post(
+            url,
+            {
+                'company': {'id': company.pk},
+                'contact': {'id': contact.pk},
+                'primary_market': {'id': country.id},
+                field: value,
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+
 
 class TestChangeOrderDetails(APITestMixin):
     """Change Order details test case."""
@@ -343,7 +434,16 @@ class TestChangeOrderDetails(APITestMixin):
                 'po_number': 'NEW PO 321',
                 'vat_status': VATStatus.eu,
                 'vat_number': 'new vat number',
-                'vat_verified': False
+                'vat_verified': False,
+                'billing_contact_name': 'Billing contact name',
+                'billing_email': 'billing@example.com',
+                'billing_phone': '00112233',
+                'billing_address_1': 'Apt 1',
+                'billing_address_2': 'London Street',
+                'billing_address_town': 'London',
+                'billing_address_county': 'London',
+                'billing_address_postcode': 'SW1A1AA',
+                'billing_address_country': Country.united_kingdom.value.id,
             },
             format='json'
         )
@@ -404,6 +504,18 @@ class TestChangeOrderDetails(APITestMixin):
             'subtotal_cost': order.subtotal_cost,
             'vat_cost': order.vat_cost,
             'total_cost': order.total_cost,
+            'billing_contact_name': 'Billing contact name',
+            'billing_email': 'billing@example.com',
+            'billing_phone': '00112233',
+            'billing_address_1': 'Apt 1',
+            'billing_address_2': 'London Street',
+            'billing_address_town': 'London',
+            'billing_address_county': 'London',
+            'billing_address_postcode': 'SW1A1AA',
+            'billing_address_country': {
+                'id': str(Country.united_kingdom.value.id),
+                'name': Country.united_kingdom.value.name
+            },
         }
 
     def test_fails_if_contact_not_from_company(self):
@@ -668,6 +780,37 @@ class TestChangeOrderDetails(APITestMixin):
         assert response.json()['vat_number'] == ''
         assert response.json()['vat_verified'] is None
 
+    def test_fails_with_incomplete_billing_address(self):
+        """
+        Test that if one of the billing address fields is set, all the other required
+        billing fields should be set as well.
+        """
+        order = OrderFactory(
+            billing_address_1='',
+            billing_address_2='',
+            billing_address_country_id=None,
+            billing_address_county='',
+            billing_address_postcode='',
+            billing_address_town=''
+        )
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(
+            url,
+            {
+                'billing_address_2': 'London Street',
+            },
+            format='json'
+        )
+
+        order.refresh_from_db()
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'billing_address_1': ['This field is required.'],
+            'billing_address_town': ['This field is required.'],
+            'billing_address_postcode': ['This field is required.'],
+            'billing_address_country': ['This field is required.'],
+        }
+
 
 class TestViewOrderDetails(APITestMixin):
     """View order details test case."""
@@ -734,6 +877,18 @@ class TestViewOrderDetails(APITestMixin):
             'subtotal_cost': order.subtotal_cost,
             'vat_cost': order.vat_cost,
             'total_cost': order.total_cost,
+            'billing_contact_name': order.billing_contact_name,
+            'billing_email': order.billing_email,
+            'billing_phone': order.billing_phone,
+            'billing_address_1': order.billing_address_1,
+            'billing_address_2': order.billing_address_2,
+            'billing_address_town': order.billing_address_town,
+            'billing_address_county': order.billing_address_county,
+            'billing_address_postcode': order.billing_address_postcode,
+            'billing_address_country': {
+                'id': str(order.billing_address_country.pk),
+                'name': order.billing_address_country.name
+            },
         }
 
     def test_not_found(self):

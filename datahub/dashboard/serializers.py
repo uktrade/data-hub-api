@@ -12,3 +12,9 @@ class IntelligentHomepageSerializer(serializers.Serializer):
 
     class Meta:  # noqa: D101
         fields = '__all__'
+
+
+class LimitParamSerializer(serializers.Serializer):
+    """Serialiser for limit param in the home page endpoint query string."""
+
+    limit = serializers.IntegerField(min_value=1, default=5)

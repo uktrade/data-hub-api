@@ -15,10 +15,16 @@ from .constants import Template
 logger = getLogger(__name__)
 
 
-def send_email(client, *args, **kwargs):
+def send_email(client, **kwargs):
     """Send email and catch potential errors."""
+    data = dict(kwargs)
+
+    # override recipient if needed
+    if settings.OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL:
+        data['email_address'] = settings.OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL
+
     try:
-        client.send_email_notification(*args, **kwargs)
+        client.send_email_notification(**data)
     except:  # noqa: B901
         logger.exception('Error while sending a notification email.')
         raven_client.captureException()
@@ -54,9 +60,9 @@ class Notify:
                 stacklevel=2
             )
 
-    def _send_email(self, *args, **kwargs):
+    def _send_email(self, **kwargs):
         """Send email in a separate thread."""
-        executor.submit(send_email, self.client, *args, **kwargs)
+        executor.submit(send_email, self.client, **kwargs)
 
     def _prepare_personalisation(self, order, data=None):
         """Prepare the personalisation data with common values."""

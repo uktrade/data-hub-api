@@ -1,12 +1,12 @@
 # For CH Sync
-lxml==3.8.0
+lxml==4.0.0
 cssselect==1.0.1
 
 # Django and django related
 Django==1.11.5
 djangorestframework==3.6.4
 django-environ==0.4.4
-django-extensions==1.9.0
+django-extensions==1.9.1
 django-filter==1.0.4
 django-reversion==2.0.10
 django-pglocks==1.0.2
@@ -14,7 +14,7 @@ django-model-utils==3.0.0
 django-mptt==0.8.7  # Remove after squashing migrations
 
 django-oauth-toolkit==1.0.0
-whitenoise==3.3.0
+whitenoise==3.3.1
 pyyaml==3.12
 colander==1.4
 pyquery==1.2.17
@@ -25,18 +25,18 @@ psycopg2==2.7.3.1
 
 boto3==1.4.7
 
-notifications-python-client==4.3.1
+notifications-python-client==4.4.0
 
 # ES
 elasticsearch==2.4.1
 elasticsearch-dsl==2.2.0
 
 # Testing and dev
-pytest==3.1.3
+pytest==3.2.2
 pytest-django==3.1.2
-pytest-sugar==0.8.0
+pytest-sugar==0.9.0
 pytest-cov==2.5.1
-ipython==6.1.0
+ipython==6.2.0
 ipdb==0.10.3
 factory-boy==2.9.2
 freezegun==0.3.9
@@ -60,6 +60,6 @@ pydocstyle==2.0.0
 
 gunicorn==19.7.1
 gevent==1.2.2
-raven==6.1.0
+raven==6.2.1
 requests==2.18.4
 requests_toolbelt==0.8.0

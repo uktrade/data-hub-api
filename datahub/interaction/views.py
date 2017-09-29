@@ -6,11 +6,13 @@ from datahub.interaction.queryset import get_interaction_queryset_v1, get_intera
 from datahub.interaction.serializers import (
     InteractionSerializerReadV1, InteractionSerializerV3, InteractionSerializerWriteV1,
 )
+from datahub.oauth.scopes import Scope
 
 
 class InteractionViewSetV1(CoreViewSetV1):
     """Interaction ViewSet."""
 
+    required_scopes = (Scope.internal_front_end,)
     read_serializer_class = InteractionSerializerReadV1
     write_serializer_class = InteractionSerializerWriteV1
     # It's difficult to include everything in select_related() and prefetch_related()
@@ -28,6 +30,7 @@ class InteractionViewSetV1(CoreViewSetV1):
 class InteractionViewSetV3(CoreViewSetV3):
     """Interaction ViewSet v3."""
 
+    required_scopes = (Scope.internal_front_end,)
     serializer_class = InteractionSerializerV3
     queryset = get_interaction_queryset_v3()
     filter_backends = (

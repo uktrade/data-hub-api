@@ -8,6 +8,7 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.core.constants import Country, Sector
 from datahub.core.test.factories import to_many_field
 
+from datahub.omis.invoice.test.factories import InvoiceFactory
 from datahub.omis.quote.test.factories import (
     AcceptedQuoteFactory, CancelledQuoteFactory, QuoteFactory
 )
@@ -44,6 +45,15 @@ class OrderFactory(factory.django.DjangoModelFactory):
     vat_status = VATStatus.eu
     vat_number = '0123456789'
     vat_verified = True
+    billing_contact_name = factory.Faker('name')
+    billing_email = factory.Faker('email')
+    billing_phone = '+44 (0)444 123456'
+    billing_address_1 = factory.Sequence(lambda n: f'Apt {n}.')
+    billing_address_2 = factory.Sequence(lambda n: f'{n} Foo st.')
+    billing_address_country_id = Country.united_kingdom.value.id
+    billing_address_county = factory.Faker('text')
+    billing_address_postcode = 'SW1A1AA'
+    billing_address_town = 'London'
 
     @to_many_field
     def service_types(self):
@@ -84,6 +94,7 @@ class OrderWithAcceptedQuoteFactory(OrderFactory):
     """Order factory with an accepted quote."""
 
     quote = factory.SubFactory(AcceptedQuoteFactory)
+    invoice = factory.SubFactory(InvoiceFactory)
     status = OrderStatus.quote_accepted
 
 
