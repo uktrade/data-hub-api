@@ -8,7 +8,7 @@ class InvoiceFactory(factory.django.DjangoModelFactory):
     """Invoice factory."""
 
     id = factory.LazyFunction(uuid.uuid4)
-    invoice_number = factory.Faker('text', max_nb_chars=10)
+    invoice_number = factory.Faker('pystr')
     invoice_company_name = constants.DIT_COMPANY_NAME
     invoice_address_1 = constants.DIT_ADDRESS_1
     invoice_address_2 = constants.DIT_ADDRESS_2
