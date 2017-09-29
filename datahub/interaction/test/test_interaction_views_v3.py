@@ -69,6 +69,7 @@ class TestInteractionV3(APITestMixin):
                 'id': str(contact.pk),
                 'name': contact.name
             },
+            'event': None,
             'service': {
                 'id': str(Service.trade_enquiry.value.id),
                 'name': Service.trade_enquiry.value.name,
@@ -140,6 +141,7 @@ class TestInteractionV3(APITestMixin):
                 'id': str(contact.pk),
                 'name': contact.name
             },
+            'event': None,
             'service': {
                 'id': str(Service.trade_enquiry.value.id),
                 'name': Service.trade_enquiry.value.name,

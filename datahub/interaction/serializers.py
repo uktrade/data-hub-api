@@ -4,6 +4,7 @@ from datahub.company.models import Company, Contact
 from datahub.company.serializers import AdviserSerializer, NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import AnyOfValidator, RequiredUnlessAlreadyBlank
+from datahub.event.models import Event
 from datahub.investment.models import InvestmentProject
 from datahub.metadata.models import InteractionType, Service, Team
 from .models import Interaction
@@ -45,6 +46,7 @@ class InteractionSerializerV3(serializers.ModelSerializer):
     created_by = NestedAdviserField(read_only=True)
     dit_team = NestedRelatedField(Team)
     interaction_type = NestedRelatedField(InteractionType)
+    event = NestedRelatedField(Event, required=False, allow_null=True)
     investment_project = NestedRelatedField(
         InvestmentProject, required=False, allow_null=True, extra_fields=('name', 'project_code')
     )
@@ -68,6 +70,7 @@ class InteractionSerializerV3(serializers.ModelSerializer):
             'contact',
             'created_on',
             'created_by',
+            'event',
             'kind',
             'modified_by',
             'modified_on',

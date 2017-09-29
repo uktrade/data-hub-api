@@ -33,6 +33,9 @@ class Interaction(BaseModel):
         null=True,
         on_delete=models.CASCADE
     )
+    event = models.ForeignKey(
+        'event.Event', blank=True, null=True, on_delete=models.SET_NULL
+    )
     service = models.ForeignKey(
         'metadata.Service', blank=True, null=True, on_delete=models.SET_NULL
     )
