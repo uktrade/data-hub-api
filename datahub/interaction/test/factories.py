@@ -3,6 +3,7 @@ from django.utils.timezone import now
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
+from datahub.interaction.models import Interaction
 from datahub.metadata.test.factories import ServiceFactory, TeamFactory
 
 
@@ -19,6 +20,7 @@ class ServiceOfferFactory(factory.django.DjangoModelFactory):
 class InteractionFactory(factory.django.DjangoModelFactory):
     """Interaction factory."""
 
+    kind = Interaction.KINDS.interaction
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SubFactory(AdviserFactory)
     company = factory.SubFactory(CompanyFactory)
