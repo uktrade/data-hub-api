@@ -7,8 +7,8 @@ from django.utils.functional import cached_property
 from datahub.core.models import BaseModel
 
 
-class InteractionAbstract(BaseModel):
-    """Common fields for all interaction flavours."""
+class Interaction(BaseModel):
+    """Interaction."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     date = models.DateTimeField()
@@ -41,18 +41,6 @@ class InteractionAbstract(BaseModel):
     dit_team = models.ForeignKey(
         'metadata.Team', blank=True, null=True, on_delete=models.SET_NULL
     )
-
-    class Meta:  # noqa: D101
-        abstract = True
-
-    def __str__(self):
-        """Admin displayed human readable name."""
-        return self.subject
-
-
-class Interaction(InteractionAbstract):
-    """Interaction."""
-
     interaction_type = models.ForeignKey(
         'metadata.InteractionType', blank=True, null=True,
         on_delete=models.SET_NULL
@@ -65,14 +53,22 @@ class Interaction(InteractionAbstract):
         on_delete=models.CASCADE
     )
 
-    class Meta(InteractionAbstract.Meta):  # noqa: D101
+    def __str__(self):
+        """Human-readable representation."""
+        return self.subject
+
+    class Meta:  # noqa: D101
         indexes = [
             models.Index(fields=['-date', '-created_on']),
         ]
 
 
 class ServiceOffer(models.Model):
-    """Service offer."""
+    """
+    Service offer.
+
+    Deprecated.
+    """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     service = models.ForeignKey('metadata.Service', on_delete=models.CASCADE)
@@ -96,8 +92,12 @@ class ServiceOffer(models.Model):
         return self.name
 
 
-class ServiceDelivery(InteractionAbstract):
-    """Service delivery."""
+class ServiceDelivery(BaseModel):
+    """
+    Service delivery.
+
+    Deprecated.
+    """
 
     ENTITY_NAME = 'ServiceDelivery'
     API_MAPPING = {
@@ -114,6 +114,37 @@ class ServiceDelivery(InteractionAbstract):
         ('event', 'Event')
     }
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    date = models.DateTimeField()
+    company = models.ForeignKey(
+        'company.Company',
+        related_name="%(class)ss",  # noqa: Q000
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE
+    )
+    contact = models.ForeignKey(
+        'company.Contact',
+        related_name="%(class)ss",  # noqa: Q000
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE
+    )
+    service = models.ForeignKey(
+        'metadata.Service', blank=True, null=True, on_delete=models.SET_NULL
+    )
+    subject = models.TextField()
+    dit_adviser = models.ForeignKey(
+        'company.Advisor',
+        related_name="%(class)ss",  # noqa: Q000
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL
+    )
+    notes = models.TextField(max_length=settings.CDMS_TEXT_MAX_LENGTH)
+    dit_team = models.ForeignKey(
+        'metadata.Team', blank=True, null=True, on_delete=models.SET_NULL
+    )
     status = models.ForeignKey(
         'metadata.ServiceDeliveryStatus', on_delete=models.PROTECT
     )
@@ -136,11 +167,15 @@ class ServiceDelivery(InteractionAbstract):
         'metadata.Event', blank=True, null=True, on_delete=models.SET_NULL
     )
 
+    def __str__(self):
+        """Human-readable representation."""
+        return self.subject
+
     def clean(self):
         """Custom validation."""
         if self.service_offer and not self.event:
             self.event = self.service_offer.event
         super().clean()
 
-    class Meta(InteractionAbstract.Meta):  # noqa: D101
+    class Meta:  # noqa: D101
         verbose_name_plural = 'service deliveries'
