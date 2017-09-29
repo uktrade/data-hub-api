@@ -9,7 +9,7 @@ from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
 
-from datahub.interaction.test.factories import ServiceDeliveryFactory, ServiceOfferFactory
+from datahub.interaction.test.factories import LegacyServiceDeliveryFactory, ServiceOfferFactory
 from datahub.metadata.test.factories import EventFactory
 
 
@@ -19,7 +19,7 @@ class TestServiceDeliveryView(APITestMixin):
     def test_service_delivery_detail_view(self):
         """Service Delivery detail view."""
         service_offer = ServiceOfferFactory()
-        servicedelivery = ServiceDeliveryFactory(
+        servicedelivery = LegacyServiceDeliveryFactory(
             service=service_offer.service,
             dit_team=service_offer.dit_team,
         )
@@ -52,7 +52,7 @@ class TestServiceDeliveryView(APITestMixin):
             event=event
         )
         [
-            ServiceDeliveryFactory(
+            LegacyServiceDeliveryFactory(
                 service=service_offer.service,
                 dit_team=service_offer.dit_team,
                 event=service_offer.event
@@ -235,7 +235,7 @@ class TestServiceDeliveryView(APITestMixin):
     def test_modify_service_delivery(self):
         """Modify an existing service delivery."""
         service_offer = ServiceOfferFactory()
-        servicedelivery = ServiceDeliveryFactory(
+        servicedelivery = LegacyServiceDeliveryFactory(
             service=service_offer.service,
             dit_team=service_offer.dit_team,
             event=service_offer.event,
@@ -271,17 +271,17 @@ class TestServiceDeliveryView(APITestMixin):
         """Filter by company."""
         company = CompanyFactory()
         service_offer = ServiceOfferFactory()
-        servicedelivery = ServiceDeliveryFactory(
+        servicedelivery = LegacyServiceDeliveryFactory(
             company=company,
             service=service_offer.service,
             dit_team=service_offer.dit_team
         )
-        servicedelivery2 = ServiceDeliveryFactory(
+        servicedelivery2 = LegacyServiceDeliveryFactory(
             company=company,
             service=service_offer.service,
             dit_team=service_offer.dit_team
         )
-        ServiceDeliveryFactory(
+        LegacyServiceDeliveryFactory(
             service=service_offer.service,
             dit_team=service_offer.dit_team
         )
@@ -296,17 +296,17 @@ class TestServiceDeliveryView(APITestMixin):
         """Filter by contact."""
         contact = ContactFactory()
         service_offer = ServiceOfferFactory()
-        servicedelivery = ServiceDeliveryFactory(
+        servicedelivery = LegacyServiceDeliveryFactory(
             contact=contact,
             service=service_offer.service,
             dit_team=service_offer.dit_team
         )
-        servicedelivery2 = ServiceDeliveryFactory(
+        servicedelivery2 = LegacyServiceDeliveryFactory(
             contact=contact,
             service=service_offer.service,
             dit_team=service_offer.dit_team
         )
-        ServiceDeliveryFactory(
+        LegacyServiceDeliveryFactory(
             service=service_offer.service,
             dit_team=service_offer.dit_team
         )
