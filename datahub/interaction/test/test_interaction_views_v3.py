@@ -178,10 +178,33 @@ class TestInteractionV3(APITestMixin):
             'date': ['This field is required.'],
             'dit_adviser': ['This field is required.'],
             'dit_team': ['This field is required.'],
-            'interaction_type': ['This field is required.'],
             'notes': ['This field is required.'],
             'service': ['This field is required.'],
             'subject': ['This field is required.'],
+        }
+
+    def test_add_interaction_missing_interaction_only_fields(self):
+        """Test add new interaction without required interaction-only fields."""
+        adviser = AdviserFactory()
+        company = CompanyFactory()
+        contact = ContactFactory()
+        url = reverse('api-v3:interaction:collection')
+        request_data = {
+            'kind': 'interaction',
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': adviser.pk,
+            'notes': 'hello',
+            'company': company.pk,
+            'contact': contact.pk,
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id
+        }
+        response = self.api_client.post(url, request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'interaction_type': ['This field is required.'],
         }
 
     @freeze_time('2017-04-18 13:25:30.986208+00:00')
