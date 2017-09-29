@@ -7,7 +7,7 @@ from django.utils.crypto import get_random_string
 from freezegun import freeze_time
 from rest_framework.exceptions import ValidationError
 
-from datahub.company.test.factories import AdviserFactory, ContactFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.core.exceptions import Conflict
@@ -192,15 +192,48 @@ class TestGenerateQuote:
 
     def test_success(self):
         """Test that a quote can be generated."""
-        order = OrderFactory()
+        company = CompanyFactory(
+            registered_address_1='Reg address 1',
+            registered_address_2='Reg address 2',
+            registered_address_town='Reg address town',
+            registered_address_county='Reg address county',
+            registered_address_postcode='Reg address postcode',
+            registered_address_country_id=constants.Country.japan.value.id
+        )
+        order = OrderFactory(
+            company=company,
+            billing_contact_name='',
+            billing_email='',
+            billing_phone='',
+            billing_address_1='',
+            billing_address_2='',
+            billing_address_town='',
+            billing_address_county='',
+            billing_address_postcode='',
+            billing_address_country_id=None
+        )
         adviser = AdviserFactory()
         order.generate_quote(by=adviser)
 
+        # quote created and populated
         assert order.quote.pk
         assert order.quote.reference
         assert order.quote.content
         assert order.quote.created_by == adviser
+
+        # status changed
         assert order.status == OrderStatus.quote_awaiting_acceptance
+
+        # billing fields populated
+        assert order.billing_contact_name == order.contact.name
+        assert order.billing_email == order.contact.email
+        assert order.billing_phone == order.contact.telephone_number
+        assert order.billing_address_1 == company.registered_address_1
+        assert order.billing_address_2 == company.registered_address_2
+        assert order.billing_address_county == company.registered_address_county
+        assert order.billing_address_town == company.registered_address_town
+        assert order.billing_address_postcode == company.registered_address_postcode
+        assert order.billing_address_country == company.registered_address_country
 
     def test_without_committing(self):
         """Test that a quote can be generated without saving its changes."""

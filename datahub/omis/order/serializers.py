@@ -185,32 +185,10 @@ class OrderSerializer(serializers.ModelSerializer):
         return data
 
 
-class CompanyWithAddressSerializer(serializers.ModelSerializer):
-    """
-    Read-only DRF Serializer for Company with id, name an registered address.
-    """
-
-    registered_address_country = NestedRelatedField(Country)
-
-    class Meta:  # noqa: D101
-        model = Company
-        fields = (
-            'id',
-            'name',
-            'registered_address_1',
-            'registered_address_2',
-            'registered_address_county',
-            'registered_address_postcode',
-            'registered_address_town',
-            'registered_address_country',
-        )
-        read_only_fields = fields
-
-
 class PublicOrderSerializer(serializers.ModelSerializer):
     """DRF serializer for public facing API."""
 
-    company = CompanyWithAddressSerializer()
+    company = NestedRelatedField(Company)
     contact = NestedRelatedField(Contact)
     billing_address_country = NestedRelatedField(Country)
 
