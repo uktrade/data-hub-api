@@ -178,6 +178,7 @@
 - model: interaction.interaction
   pk: 236b656c-ae26-43ca-bb51-c72d553383f3
   fields:
+    kind: interaction
     subject: Provided alpha service
     date: 2017-06-01
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
@@ -191,6 +192,7 @@
 - model: interaction.interaction
   pk: 6015dbf3-d777-4947-a254-afd5f0d0499c
   fields:
+    kind: interaction
     subject: Discussed exports event
     date: 2017-06-03
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
@@ -579,6 +581,7 @@
 - model: interaction.interaction
   pk: 94d03877-fceb-44a0-8813-17b727d2e7f6
   fields:
+    kind: interaction
     date: 2017-06-03
     investment_project: 721e2a04-21c3-4172-a321-4368463a4b2d
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -592,6 +595,7 @@
 - model: interaction.interaction
   pk: 0dcb3748-c097-4f20-b84f-0114bbb1a8e0
   fields:
+    kind: interaction
     date: 2017-06-05
     investment_project: 721e2a04-21c3-4172-a321-4368463a4b2d
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
