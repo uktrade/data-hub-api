@@ -29,7 +29,7 @@ class TestInteraction(APITestMixin):
         adviser = AdviserFactory()
         url = reverse('api-v1:interaction-list')
         response = self.api_client.post(url, {
-            'interaction_type': constants.InteractionType.face_to_face.value.id,
+            'communication_channel': constants.InteractionType.face_to_face.value.id,
             'subject': 'whatever',
             'date': now().isoformat(),
             'dit_adviser': adviser.pk,
@@ -59,7 +59,7 @@ class TestInteraction(APITestMixin):
         response_data = response.json()
         assert response_data == {
             'dit_team': ['This field is required.'],
-            'interaction_type': ['This field is required.'],
+            'communication_channel': ['This field is required.'],
             'service': ['This field is required.']
         }
 
@@ -70,7 +70,7 @@ class TestInteraction(APITestMixin):
         adviser = AdviserFactory()
         url = reverse('api-v1:interaction-list')
         response = self.api_client.post(url, {
-            'interaction_type': constants.InteractionType.face_to_face.value.id,
+            'communication_channel': constants.InteractionType.face_to_face.value.id,
             'subject': 'whatever',
             'date': now().isoformat(),
             'dit_adviser': adviser.pk,
@@ -93,7 +93,7 @@ class TestInteraction(APITestMixin):
         """
         url = reverse('api-v1:interaction-list')
         response = self.api_client.post(url, {
-            'interaction_type': constants.InteractionType.face_to_face.value.id,
+            'communication_channel': constants.InteractionType.face_to_face.value.id,
             'subject': 'whatever',
             'date': now().isoformat(),
             'dit_adviser': AdviserFactory().pk,
@@ -112,7 +112,7 @@ class TestInteraction(APITestMixin):
 
     @pytest.mark.parametrize('field,value', (
         ('dit_team', constants.Team.crm.value.id),
-        ('interaction_type', constants.InteractionType.email_website.value.id),
+        ('communication_channel', constants.InteractionType.email_website.value.id),
         ('service', constants.Service.trade_enquiry.value.id)
     ))
     def test_update_non_null_field_to_null(self, field, value):
@@ -139,7 +139,7 @@ class TestInteraction(APITestMixin):
             field: ['This field is required.'],
         }
 
-    @pytest.mark.parametrize('field', ('dit_team', 'interaction_type', 'service',))
+    @pytest.mark.parametrize('field', ('dit_team', 'communication_channel', 'service',))
     def test_update_null_field_to_null(self, field):
         """
         Tests setting fields to null that are currently null, and are allowed to be null

@@ -168,9 +168,9 @@ class TestViews(APITestMixin):
                 'id': str(interaction.dit_team.pk),
                 'name': interaction.dit_team.name,
             },
-            'interaction_type': {
-                'id': str(interaction.interaction_type.pk),
-                'name': interaction.interaction_type.name,
+            'communication_channel': {
+                'id': str(interaction.communication_channel.pk),
+                'name': interaction.communication_channel.name,
             },
             'investment_project': None,
             'created_on': interaction.created_on.isoformat(),
@@ -277,18 +277,18 @@ class TestViews(APITestMixin):
         results = response_data['results']
         assert results[0]['dit_team']['id'] == str(interaction.dit_team.id)
 
-    def test_filter_by_interaction_type(self, setup_es):
+    def test_filter_by_communication_channel(self, setup_es):
         """Tests filtering interaction by interaction type."""
-        interaction_type_id = constants.InteractionType.social_media.value.id
+        communication_channel_id = constants.InteractionType.social_media.value.id
         interaction = InteractionFactory(
-            interaction_type_id=interaction_type_id
+            communication_channel_id=communication_channel_id
         )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
         request_data = {
             'original_query': '',
-            'interaction_type': interaction_type_id
+            'communication_channel': communication_channel_id
         }
         response = self.api_client.post(url, request_data, format='json')
 
@@ -299,7 +299,8 @@ class TestViews(APITestMixin):
         assert response_data['count'] == 1
 
         results = response_data['results']
-        assert results[0]['interaction_type']['id'] == str(interaction.interaction_type.id)
+        assert results[0]['communication_channel']['id'] == str(
+            interaction.communication_channel.id)
 
     def test_filter_by_service(self, setup_es):
         """Tests filtering interaction by service."""
