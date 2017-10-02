@@ -60,7 +60,7 @@ class PublicQuoteViewSet(BaseQuoteViewSet):
 
     order_lookup_field = 'public_token'
     order_lookup_url_kwarg = 'public_token'
-    order_queryset = Order.objects.publicly_accessible()
+    order_queryset = Order.objects.publicly_accessible(include_reopened=True)
 
     def accept(self, request, *args, **kwargs):
         """Accept a quote."""

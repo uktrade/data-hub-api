@@ -8,7 +8,7 @@ from datahub.core.test_utils import APITestMixin
 from datahub.oauth.scopes import Scope
 from datahub.omis.quote.test.factories import QuoteFactory
 
-from ..factories import OrderFactory
+from ..factories import OrderFactory, OrderWithCancelledQuoteFactory
 from ...constants import OrderStatus
 
 
@@ -80,6 +80,22 @@ class TestViewPublicOrderDetails(APITestMixin):
                 'name': order.billing_address_country.name
             },
         }
+
+    def test_get_draft_with_cancelled_quote(self):
+        """Test getting an order in draft with a cancelled quote is allowed."""
+        order = OrderWithCancelledQuoteFactory()
+
+        url = reverse(
+            'api-v3:omis-public:order:detail',
+            kwargs={'public_token': order.public_token}
+        )
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
+        response = client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
 
     def test_404_with_invalid_public_token(self):
         """Test that if the order doesn't exist, the endpoint returns 404."""
