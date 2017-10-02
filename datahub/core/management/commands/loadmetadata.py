@@ -7,12 +7,12 @@ from django.core.management.base import BaseCommand
 SOURCE_ROOT = PurePath(__file__).parents[4]
 SHARED_METADATA_FIXTURE_DIR = SOURCE_ROOT / 'fixtures' / 'metadata'
 EVENTS_FIXTURE_DIR = SOURCE_ROOT / 'datahub' / 'event' / 'fixtures'
+INTERACTIONS_FIXTURE_DIR = SOURCE_ROOT / 'datahub' / 'interaction' / 'fixtures'
 
 SHARED_FIXTURES = (
     SHARED_METADATA_FIXTURE_DIR / 'companies.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'contacts.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'countries.yaml',
-    SHARED_METADATA_FIXTURE_DIR / 'interactions.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'investment.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'referrals.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'sectors.yaml',
@@ -26,6 +26,10 @@ EVENTS_FIXTURES = (
     EVENTS_FIXTURE_DIR / 'programmes.yaml',
     EVENTS_FIXTURE_DIR / 'location_types.yaml',
     EVENTS_FIXTURE_DIR / 'event_types.yaml',
+)
+
+INTERACTION_FIXTURES = (
+    INTERACTIONS_FIXTURE_DIR / 'communication_channels.yaml',
 )
 
 
@@ -43,5 +47,6 @@ class Command(BaseCommand):
         call_command(
             'loaddata',
             *SHARED_FIXTURES,
-            *EVENTS_FIXTURES
+            *EVENTS_FIXTURES,
+            *INTERACTION_FIXTURES,
         )

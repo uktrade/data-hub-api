@@ -5,7 +5,6 @@ from .serializers import TeamSerializer
 registry.register(metadata_id='business-type', model=models.BusinessType)
 registry.register(metadata_id='country', model=models.Country)
 registry.register(metadata_id='employee-range', model=models.EmployeeRange)
-registry.register(metadata_id='interaction-type', model=models.InteractionType)
 registry.register(metadata_id='role', model=models.Role)
 registry.register(metadata_id='sector', model=models.Sector)
 registry.register(metadata_id='service', model=models.Service)
