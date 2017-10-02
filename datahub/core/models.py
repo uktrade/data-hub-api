@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.conf import settings
 from django.db import models
 from django.utils.timezone import now
@@ -67,11 +68,24 @@ class DisableableModel(models.Model):
             return False
         return self.disabled_on <= date_on
 
+    @property
+    def is_disabled(self):
+        """Tells is entity is active."""
+        return self.disabled_on is not None
+
+    @is_disabled.setter
+    def is_disabled(self, value):
+        """If field gets disabled then disabled_on is set."""
+        if value is True:
+            self.disabled_on = datetime.utcnow() if not self.disabled_on else self.disabled_on
+        else:
+            self.disabled_on = None
+
     class Meta:  # noqa: D101
         abstract = True
 
 
-class BaseConstantModel(models.Model):
+class BaseConstantModel(DisableableModel):
     """Constant tables for FKs."""
 
     id = models.UUIDField(primary_key=True)

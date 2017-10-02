@@ -1,14 +1,13 @@
 from contextlib import suppress
+
 import pytest
-
 from django.core.exceptions import FieldDoesNotExist
-
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from .factories import EventFactory
 from .. import urls
 from ..registry import registry
-
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
@@ -114,3 +113,38 @@ def test_team_view(api_client):
             'id': '80756b9a-5d95-e211-a939-e4115bead28a'
         }
     }
+
+
+@pytest.fixture
+def events_data():
+    """Creates test events data."""
+    EventFactory.create_batch(5)
+    EventFactory(is_disabled=True)
+
+
+@pytest.mark.parametrize('is_disabled,expected', (
+    (True, 1),
+    (False, 5),
+))
+def test_filter_disabled_events(api_client, events_data, is_disabled, expected):
+    """Test that we can filter disabled events."""
+    url = reverse(viewname='event')
+
+    response = api_client.get(url, {'is_disabled': is_disabled})
+
+    assert response.status_code == status.HTTP_200_OK
+    events = response.json()
+    assert len(events) == expected
+    if is_disabled is not None:
+        assert all(event['is_disabled'] is is_disabled for event in events) is True
+
+
+def test_get_all_events(api_client, events_data):
+    """Test that we can get all events."""
+    url = reverse(viewname='event')
+
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK
+    events = response.json()
+    assert len(events) == 6
