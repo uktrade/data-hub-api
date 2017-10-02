@@ -186,7 +186,7 @@
     dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
     dit_team: 8248318c-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
-    interaction_type: 70c226d7-5d95-e211-a939-e4115bead28a
+    communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
 
 - model: interaction.interaction
   pk: 6015dbf3-d777-4947-a254-afd5f0d0499c
@@ -199,7 +199,7 @@
     dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
     dit_team: 8248318c-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
-    interaction_type: a5d71fdd-5d95-e211-a939-e4115bead28a
+    communication_channel: a5d71fdd-5d95-e211-a939-e4115bead28a
 
 - model: interaction.servicedelivery
   pk: cbd85bc2-d17a-4c7c-9bfe-622d6e77201a
@@ -587,7 +587,7 @@
     dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
     dit_team: 197c51d4-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
-    interaction_type: 72c226d7-5d95-e211-a939-e4115bead28a
+    communication_channel: 72c226d7-5d95-e211-a939-e4115bead28a
 
 - model: interaction.interaction
   pk: 0dcb3748-c097-4f20-b84f-0114bbb1a8e0
@@ -600,7 +600,7 @@
     dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
     dit_team: 197c51d4-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
-    interaction_type: 70c226d7-5d95-e211-a939-e4115bead28a
+    communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
 
 - model: event.event
   pk: bda12a57-433c-4a0c-a7ce-5ebd080e09e8

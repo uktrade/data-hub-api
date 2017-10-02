@@ -32,7 +32,7 @@ class TestInteractionV3(APITestMixin):
         url = reverse('api-v3:interaction:collection')
         request_data = {
             'kind': 'interaction',
-            'interaction_type': InteractionType.face_to_face.value.id,
+            'communication_channel': InteractionType.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -49,6 +49,10 @@ class TestInteractionV3(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': 'interaction',
+            'communication_channel': {
+                'id': InteractionType.face_to_face.value.id,
+                'name': InteractionType.face_to_face.value.name
+            },
             'interaction_type': {
                 'id': InteractionType.face_to_face.value.id,
                 'name': InteractionType.face_to_face.value.name
@@ -123,6 +127,7 @@ class TestInteractionV3(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': 'service_delivery',
+            'communication_channel': None,
             'interaction_type': None,
             'subject': 'whatever',
             'date': '2017-04-18',
@@ -195,6 +200,10 @@ class TestInteractionV3(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': 'interaction',
+            'communication_channel': {
+                'id': InteractionType.face_to_face.value.id,
+                'name': InteractionType.face_to_face.value.name
+            },
             'interaction_type': {
                 'id': InteractionType.face_to_face.value.id,
                 'name': InteractionType.face_to_face.value.name
@@ -279,7 +288,7 @@ class TestInteractionV3(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'interaction_type': ['This field is required.'],
+            'communication_channel': ['This field is required.'],
         }
 
     @freeze_time('2017-04-18 13:25:30.986208+00:00')
@@ -290,7 +299,7 @@ class TestInteractionV3(APITestMixin):
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.post(url, {
             'kind': 'interaction',
-            'interaction_type': InteractionType.face_to_face.value.id,
+            'communication_channel': InteractionType.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -313,7 +322,7 @@ class TestInteractionV3(APITestMixin):
         """
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.post(url, {
-            'interaction_type': InteractionType.face_to_face.value.id,
+            'communication_channel': InteractionType.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': AdviserFactory().pk,

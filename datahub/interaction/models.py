@@ -55,7 +55,7 @@ class Interaction(BaseModel):
     dit_team = models.ForeignKey(
         'metadata.Team', blank=True, null=True, on_delete=models.SET_NULL
     )
-    interaction_type = models.ForeignKey(
+    communication_channel = models.ForeignKey(
         'metadata.InteractionType', blank=True, null=True,
         on_delete=models.SET_NULL
     )

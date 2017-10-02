@@ -16,7 +16,7 @@ class SearchInteractionParams:
         'contact_name',
         'dit_adviser_name',
         'dit_team',
-        'interaction_type',
+        'communication_channel',
         'investment_project',
         'service',
     )
@@ -26,7 +26,7 @@ class SearchInteractionParams:
         'contact_name': 'contact.name_trigram',
         'dit_adviser_name': 'dit_adviser.name_trigram',
         'dit_team': 'dit_team.id',
-        'interaction_type': 'interaction_type.id',
+        'communication_channel': 'communication_channel.id',
         'investment_project': 'investment_project.id',
         'service': 'service.id',
     }
