@@ -70,7 +70,7 @@ class DisableableModel(models.Model):
 
     @property
     def is_disabled(self):
-        """Tells is entity is active."""
+        """Tells if entity is disabled."""
         return self.disabled_on is not None
 
     @is_disabled.setter
