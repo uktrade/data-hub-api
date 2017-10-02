@@ -151,6 +151,7 @@ class TestViews(APITestMixin):
                 'name': interaction.contact.name,
                 'last_name': interaction.contact.last_name,
             },
+            'event': None,
             'service': {
                 'id': str(interaction.service.pk),
                 'name': interaction.service.name,

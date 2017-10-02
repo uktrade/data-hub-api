@@ -3,7 +3,8 @@ from rest_framework import serializers
 from datahub.company.models import Company, Contact
 from datahub.company.serializers import AdviserSerializer, NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
-from datahub.core.validate_utils import AnyOfValidator, RequiredUnlessAlreadyBlank
+from datahub.core.validate_utils import AnyOfValidator, DataCombiner, RequiredUnlessAlreadyBlank
+from datahub.event.models import Event
 from datahub.investment.models import InvestmentProject
 from datahub.metadata.models import InteractionType, Service, Team
 from .models import Interaction
@@ -44,12 +45,29 @@ class InteractionSerializerV3(serializers.ModelSerializer):
     dit_adviser = NestedAdviserField()
     created_by = NestedAdviserField(read_only=True)
     dit_team = NestedRelatedField(Team)
-    interaction_type = NestedRelatedField(InteractionType)
+    interaction_type = NestedRelatedField(InteractionType, required=False, allow_null=True)
+    event = NestedRelatedField(Event, required=False, allow_null=True)
     investment_project = NestedRelatedField(
         InvestmentProject, required=False, allow_null=True, extra_fields=('name', 'project_code')
     )
     modified_by = NestedAdviserField(read_only=True)
     service = NestedRelatedField(Service)
+
+    def validate(self, data):
+        """
+        Perform cross-field validation.
+
+        Called by DRF.
+        """
+        combiner = DataCombiner(instance=self.instance, update_data=data)
+        is_interaction = combiner.get_value('kind') == Interaction.KINDS.interaction
+
+        if is_interaction and not combiner.get_value('interaction_type'):
+            raise serializers.ValidationError({
+                'interaction_type': self.error_messages['required']
+            })
+
+        return data
 
     class Meta:  # noqa: D101
         model = Interaction
@@ -68,6 +86,7 @@ class InteractionSerializerV3(serializers.ModelSerializer):
             'contact',
             'created_on',
             'created_by',
+            'event',
             'kind',
             'modified_by',
             'modified_on',

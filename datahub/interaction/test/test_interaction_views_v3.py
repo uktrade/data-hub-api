@@ -6,6 +6,7 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import InteractionType, Service, Team
 from datahub.core.test_utils import APITestMixin
+from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import InteractionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
 
@@ -68,6 +69,81 @@ class TestInteractionV3(APITestMixin):
             'contact': {
                 'id': str(contact.pk),
                 'name': contact.name
+            },
+            'event': None,
+            'service': {
+                'id': str(Service.trade_enquiry.value.id),
+                'name': Service.trade_enquiry.value.name,
+            },
+            'dit_team': {
+                'id': str(Team.healthcare_uk.value.id),
+                'name': Team.healthcare_uk.value.name,
+            },
+            'investment_project': None,
+            'created_by': {
+                'id': str(self.user.pk),
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'name': self.user.name
+            },
+            'modified_by': {
+                'id': str(self.user.pk),
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'name': self.user.name
+            },
+            'created_on': '2017-04-18T13:25:30.986208',
+            'modified_on': '2017-04-18T13:25:30.986208'
+        }
+
+    @freeze_time('2017-04-18 13:25:30.986208+00:00')
+    def test_add_service_delivery(self):
+        """Test add new service delivery."""
+        adviser = AdviserFactory()
+        company = CompanyFactory()
+        contact = ContactFactory()
+        event = EventFactory()
+        url = reverse('api-v3:interaction:collection')
+        request_data = {
+            'kind': 'service_delivery',
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': adviser.pk,
+            'notes': 'hello',
+            'company': company.pk,
+            'contact': contact.pk,
+            'event': event.pk,
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id
+        }
+        response = self.api_client.post(url, request_data, format='json')
+
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data == {
+            'id': response_data['id'],
+            'kind': 'service_delivery',
+            'interaction_type': None,
+            'subject': 'whatever',
+            'date': '2017-04-18',
+            'dit_adviser': {
+                'id': str(adviser.pk),
+                'first_name': adviser.first_name,
+                'last_name': adviser.last_name,
+                'name': adviser.name
+            },
+            'notes': 'hello',
+            'company': {
+                'id': str(company.pk),
+                'name': company.name
+            },
+            'contact': {
+                'id': str(contact.pk),
+                'name': contact.name
+            },
+            'event': {
+                'id': str(event.pk),
+                'name': event.name,
             },
             'service': {
                 'id': str(Service.trade_enquiry.value.id),
@@ -140,6 +216,7 @@ class TestInteractionV3(APITestMixin):
                 'id': str(contact.pk),
                 'name': contact.name
             },
+            'event': None,
             'service': {
                 'id': str(Service.trade_enquiry.value.id),
                 'name': Service.trade_enquiry.value.name,
@@ -176,10 +253,33 @@ class TestInteractionV3(APITestMixin):
             'date': ['This field is required.'],
             'dit_adviser': ['This field is required.'],
             'dit_team': ['This field is required.'],
-            'interaction_type': ['This field is required.'],
             'notes': ['This field is required.'],
             'service': ['This field is required.'],
             'subject': ['This field is required.'],
+        }
+
+    def test_add_interaction_missing_interaction_only_fields(self):
+        """Test add new interaction without required interaction-only fields."""
+        adviser = AdviserFactory()
+        company = CompanyFactory()
+        contact = ContactFactory()
+        url = reverse('api-v3:interaction:collection')
+        request_data = {
+            'kind': 'interaction',
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': adviser.pk,
+            'notes': 'hello',
+            'company': company.pk,
+            'contact': contact.pk,
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id
+        }
+        response = self.api_client.post(url, request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'interaction_type': ['This field is required.'],
         }
 
     @freeze_time('2017-04-18 13:25:30.986208+00:00')
