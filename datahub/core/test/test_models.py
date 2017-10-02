@@ -31,8 +31,3 @@ class TestDisableableModel:
 
         obj = MyDisableableModel(disabled_on=disabled_on)
         assert not obj.was_disabled_on(date_on)
-
-    def test_can_be_disabled(self):
-        """If is_disabled is True, disabled_on is set."""
-        obj = MyDisableableModel(is_disabled=True)
-        assert obj.disabled_on is not None
