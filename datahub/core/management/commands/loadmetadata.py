@@ -3,11 +3,12 @@ from pathlib import PurePath
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
+from datahub.metadata.fixtures import Fixture
+
 
 SOURCE_ROOT = PurePath(__file__).parents[4]
 SHARED_METADATA_FIXTURE_DIR = SOURCE_ROOT / 'fixtures' / 'metadata'
 EVENTS_FIXTURE_DIR = SOURCE_ROOT / 'datahub' / 'event' / 'fixtures'
-INTERACTIONS_FIXTURE_DIR = SOURCE_ROOT / 'datahub' / 'interaction' / 'fixtures'
 
 SHARED_FIXTURES = (
     SHARED_METADATA_FIXTURE_DIR / 'companies.yaml',
@@ -28,10 +29,6 @@ EVENTS_FIXTURES = (
     EVENTS_FIXTURE_DIR / 'event_types.yaml',
 )
 
-INTERACTION_FIXTURES = (
-    INTERACTIONS_FIXTURE_DIR / 'communication_channels.yaml',
-)
-
 
 class Command(BaseCommand):
     """Loads all the metadata fixtures."""
@@ -44,9 +41,11 @@ class Command(BaseCommand):
         folder but some could have dependencies so it's safer to specify the
         list manually.
         """
+        registered_fixtures = Fixture.all()
+
         call_command(
             'loaddata',
             *SHARED_FIXTURES,
             *EVENTS_FIXTURES,
-            *INTERACTION_FIXTURES,
+            *registered_fixtures,
         )
