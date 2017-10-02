@@ -28,13 +28,8 @@ class TestPublicGetQuote(APITestMixin):
     )
     def test_get(self, order_status):
         """Test a successful call to get a quote."""
-        # in practice, accepted_on and cancelled_on will never be both set,
-        # they are here just to check the response body
         order = OrderFactory(
-            quote=QuoteFactory(
-                accepted_on=now(),
-                cancelled_on=now(),
-            ),
+            quote=QuoteFactory(accepted_on=now()),
             status=order_status
         )
 
@@ -52,8 +47,35 @@ class TestPublicGetQuote(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
             'created_on': quote.created_on.isoformat(),
-            'cancelled_on': quote.cancelled_on.isoformat(),
+            'cancelled_on': None,
             'accepted_on': quote.accepted_on.isoformat(),
+            'expires_on': quote.expires_on.isoformat(),
+            'content': quote.content
+        }
+
+    def test_get_draft_with_cancelled_quote(self):
+        """Test getting a cancelled quote with order in draft is allowed."""
+        order = OrderFactory(
+            quote=QuoteFactory(cancelled_on=now()),
+            status=OrderStatus.draft
+        )
+
+        url = reverse(
+            'api-v3:omis-public:quote:detail',
+            kwargs={'public_token': order.public_token}
+        )
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
+        response = client.get(url, format='json')
+
+        quote = order.quote
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'created_on': quote.created_on.isoformat(),
+            'cancelled_on': quote.cancelled_on.isoformat(),
+            'accepted_on': None,
             'expires_on': quote.expires_on.isoformat(),
             'content': quote.content
         }
@@ -169,19 +191,20 @@ class TestAcceptOrder(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @pytest.mark.parametrize(
-        'disallowed_status',
+        'disallowed_status,quote_fields',
         (
-            OrderStatus.quote_accepted,
-            OrderStatus.paid,
-            OrderStatus.complete,
+            (OrderStatus.draft, {'cancelled_on': now()}),
+            (OrderStatus.quote_accepted, {}),
+            (OrderStatus.paid, {}),
+            (OrderStatus.complete, {}),
         )
     )
-    def test_409_if_order_in_disallowed_status(self, disallowed_status):
+    def test_409_if_order_in_disallowed_status(self, disallowed_status, quote_fields):
         """
         Test that if the order is not in one of the allowed statuses, the endpoint
         returns 409.
         """
-        quote = QuoteFactory()
+        quote = QuoteFactory(**quote_fields)
         order = OrderFactory(
             status=disallowed_status,
             quote=quote
