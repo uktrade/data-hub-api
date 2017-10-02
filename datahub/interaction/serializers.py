@@ -33,7 +33,7 @@ class InteractionSerializerWriteV1(serializers.ModelSerializer):
         }
         validators = [
             AnyOfValidator('company', 'investment_project'),
-            RequiredUnlessAlreadyBlank('dit_team', 'interaction_type', 'service')
+            RequiredUnlessAlreadyBlank('dit_team', 'communication_channel', 'service')
         ]
 
 
@@ -45,13 +45,20 @@ class InteractionSerializerV3(serializers.ModelSerializer):
     dit_adviser = NestedAdviserField()
     created_by = NestedAdviserField(read_only=True)
     dit_team = NestedRelatedField(Team)
-    interaction_type = NestedRelatedField(InteractionType, required=False, allow_null=True)
+    communication_channel = NestedRelatedField(InteractionType, required=False, allow_null=True)
     event = NestedRelatedField(Event, required=False, allow_null=True)
     investment_project = NestedRelatedField(
         InvestmentProject, required=False, allow_null=True, extra_fields=('name', 'project_code')
     )
     modified_by = NestedAdviserField(read_only=True)
     service = NestedRelatedField(Service)
+    # Added for backwards compatibility. Will be removed once the front end is updated.
+    interaction_type = NestedRelatedField(
+        InteractionType,
+        source='communication_channel',
+        required=False,
+        allow_null=True
+    )
 
     def validate(self, data):
         """
@@ -62,9 +69,9 @@ class InteractionSerializerV3(serializers.ModelSerializer):
         combiner = DataCombiner(instance=self.instance, update_data=data)
         is_interaction = combiner.get_value('kind') == Interaction.KINDS.interaction
 
-        if is_interaction and not combiner.get_value('interaction_type'):
+        if is_interaction and not combiner.get_value('communication_channel'):
             raise serializers.ValidationError({
-                'interaction_type': self.error_messages['required']
+                'communication_channel': self.error_messages['required']
             })
 
         return data
@@ -93,6 +100,7 @@ class InteractionSerializerV3(serializers.ModelSerializer):
             'date',
             'dit_adviser',
             'dit_team',
+            'communication_channel',
             'interaction_type',
             'investment_project',
             'service',

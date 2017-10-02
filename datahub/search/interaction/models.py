@@ -19,7 +19,7 @@ class Interaction(DocType, MapDBModelToDict):
     dit_adviser = dsl_utils.contact_or_adviser_partial_mapping('dit_adviser')
     notes = dsl_utils.EnglishString()
     dit_team = dsl_utils.id_name_mapping()
-    interaction_type = dsl_utils.id_name_mapping()
+    communication_channel = dsl_utils.id_name_mapping()
     investment_project = dsl_utils.id_name_mapping()
     created_on = Date()
     modified_on = Date()
@@ -32,7 +32,7 @@ class Interaction(DocType, MapDBModelToDict):
         'service': dict_utils.id_name_dict,
         'dit_adviser': dict_utils.contact_or_adviser_dict,
         'dit_team': dict_utils.id_name_dict,
-        'interaction_type': dict_utils.id_name_dict,
+        'communication_channel': dict_utils.id_name_dict,
         'investment_project': dict_utils.id_name_dict,
     }
 
