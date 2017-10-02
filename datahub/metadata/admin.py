@@ -4,7 +4,6 @@ from . import models
 
 MODELS_TO_REGISTER = (
     models.BusinessType,
-    models.InteractionType,
     models.Sector,
     models.UKRegion,
     models.Country,
