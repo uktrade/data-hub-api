@@ -46,9 +46,9 @@ def test_interaction_to_dict():
             'id': str(interaction.dit_team.pk),
             'name': interaction.dit_team.name,
         },
-        'interaction_type': {
-            'id': str(interaction.interaction_type.pk),
-            'name': interaction.interaction_type.name,
+        'communication_channel': {
+            'id': str(interaction.communication_channel.pk),
+            'name': interaction.communication_channel.name,
         },
         'investment_project': {
             'id': str(interaction.investment_project.pk),

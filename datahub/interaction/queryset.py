@@ -8,7 +8,7 @@ def get_interaction_queryset_v1():
         'contact',
         'dit_adviser',
         'dit_team',
-        'interaction_type',
+        'communication_channel',
         'service',
         'contact__company',
         'investment_project__investor_company',
@@ -22,6 +22,6 @@ def get_interaction_queryset_v3():
         'contact',
         'dit_adviser',
         'dit_team',
-        'interaction_type',
+        'communication_channel',
         'service',
     )
