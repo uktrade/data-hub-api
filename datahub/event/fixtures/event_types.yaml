@@ -13,3 +13,6 @@
 - model: event.eventtype
   pk: 91dbf298-84b3-4aa9-af7d-540721e5127c
   fields: {name: "UK region local service"}
+- model: event.eventtype
+  pk: c100fb8c-8d44-4c40-b40a-3d8ae3e5de86
+  fields: {name: "Conference", disabled_on: !!timestamp '2017-10-02 10:51:46.671808'}

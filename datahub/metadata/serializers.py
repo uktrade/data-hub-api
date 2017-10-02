@@ -1,4 +1,4 @@
-from rest_framework import serializers
+from rest_framework import fields, serializers
 
 from datahub.core.serializers import NestedRelatedField
 
@@ -16,3 +16,9 @@ class TeamSerializer(serializers.Serializer):
 
     class Meta:  # noqa: D101
         fields = '__all__'
+
+
+class DisableableRequestSerializer(serializers.Serializer):
+    """Disableable request serializer."""
+
+    is_disabled = fields.NullBooleanField(required=False)
