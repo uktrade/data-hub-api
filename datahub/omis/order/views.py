@@ -34,7 +34,9 @@ class PublicOrderViewSet(CoreViewSetV3):
 
     required_scopes = (Scope.public_omis_front_end,)
     serializer_class = PublicOrderSerializer
-    queryset = Order.objects.publicly_accessible().select_related(
+    queryset = Order.objects.publicly_accessible(
+        include_reopened=True
+    ).select_related(
         'company',
         'contact'
     )
