@@ -48,6 +48,7 @@ class Event(DocType, MapDBModelToDict):
     IGNORED_FIELDS = (
         'created_by',
         'modified_by',
+        'interactions',
     )
 
     SEARCH_FIELDS = (

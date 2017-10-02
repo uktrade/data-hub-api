@@ -3,6 +3,7 @@ from django.utils.timezone import now
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
+from datahub.event.test.factories import EventFactory
 from datahub.interaction.models import Interaction
 from datahub.metadata.test.factories import ServiceFactory, TeamFactory
 
@@ -40,6 +41,27 @@ class InteractionFactory(factory.django.DjangoModelFactory):
 
 class ServiceDeliveryFactory(factory.django.DjangoModelFactory):
     """Service delivery factory."""
+
+    kind = Interaction.KINDS.service_delivery
+    created_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SubFactory(AdviserFactory)
+    company = factory.SubFactory(CompanyFactory)
+    contact = factory.SubFactory(ContactFactory)
+    event = factory.SubFactory(EventFactory)
+    subject = 'foo'
+    date = now()
+    notes = 'Bar'
+    dit_adviser = factory.SubFactory(AdviserFactory)
+    service_id = constants.Service.trade_enquiry.value.id
+    dit_team_id = constants.Team.healthcare_uk.value.id
+    created_on = now()
+
+    class Meta:  # noqa: D101
+        model = 'interaction.Interaction'
+
+
+class LegacyServiceDeliveryFactory(factory.django.DjangoModelFactory):
+    """Legacy service delivery factory."""
 
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SubFactory(AdviserFactory)
