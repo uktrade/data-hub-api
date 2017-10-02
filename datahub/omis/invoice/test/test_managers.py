@@ -1,5 +1,6 @@
 from unittest import mock
 import pytest
+from dateutil.parser import parse as dateutil_parse
 
 from .. import constants
 from ..models import Invoice
@@ -12,15 +13,24 @@ pytestmark = pytest.mark.django_db
 class TestInvoiceManager:
     """Tests for the Invoice Manager."""
 
+    @mock.patch('datahub.omis.invoice.manager.calculate_payment_due_date')
     @mock.patch('datahub.omis.invoice.manager.generate_invoice_number')
-    def test_create_populated(self, mocked_generate_invoice_number):
-        """Test that Invoice.objects.create_populated creates an invoice."""
-        mocked_generate_invoice_number.return_value = '201702010004'
+    def test_create_from_order(
+        self,
+        mocked_generate_invoice_number,
+        mocked_calculate_payment_due_date
+    ):
+        """Test that Invoice.objects.create_from_order creates an invoice."""
+        payment_due_date = dateutil_parse('2030-01-01').date()
 
-        invoice = Invoice.objects.create_populated()
+        mocked_generate_invoice_number.return_value = '201702010004'
+        mocked_calculate_payment_due_date.return_value = payment_due_date
+
+        invoice = Invoice.objects.create_from_order(mock.MagicMock())
 
         invoice.refresh_from_db()
         assert invoice.invoice_number == '201702010004'
+        assert invoice.payment_due_date == payment_due_date
         assert invoice.invoice_company_name == constants.DIT_COMPANY_NAME
         assert invoice.invoice_address_1 == constants.DIT_ADDRESS_1
         assert invoice.invoice_address_2 == constants.DIT_ADDRESS_2

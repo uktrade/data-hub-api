@@ -17,6 +17,7 @@ class InvoiceFactory(factory.django.DjangoModelFactory):
     invoice_address_postcode = constants.DIT_ADDRESS_POSTCODE
     invoice_address_country_id = constants.DIT_ADDRESS_COUNTRY_ID
     invoice_vat_number = constants.DIT_VAT_NUMBER
+    payment_due_date = factory.Faker('future_date')
 
     class Meta:  # noqa: D101
         model = 'omis-invoice.Invoice'
