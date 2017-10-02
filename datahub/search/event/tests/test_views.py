@@ -149,6 +149,29 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['address_country']['id'] == country_id
 
+    def test_search_event_uk_region(self, setup_es, setup_data):
+        """Tests uk_region filter."""
+        country_id = constants.Country.united_kingdom.value.id
+        uk_region_id = constants.UKRegion.jersey.value.id
+        EventFactory(
+            address_country_id=country_id,
+            uk_region_id=uk_region_id,
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:event')
+
+        response = self.api_client.post(url, {
+            'original_query': '',
+            'uk_region': uk_region_id,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['address_country']['id'] == country_id
+        assert response.data['results'][0]['uk_region']['id'] == uk_region_id
+
     def test_search_event_date(self, setup_es, setup_data):
         """Tests start_date filter."""
         start_date = datetime.date(2017, 7, 2)
