@@ -34,6 +34,7 @@ class TestGetInvoice(APITestMixin):
                 'name': invoice.invoice_address_country.name
             },
             'invoice_vat_number': invoice.invoice_vat_number,
+            'payment_due_date': invoice.payment_due_date.isoformat(),
 
             'billing_contact_name': order.billing_contact_name,
             'billing_address_1': order.billing_address_1,

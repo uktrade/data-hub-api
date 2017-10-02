@@ -33,6 +33,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
             'invoice_address_postcode',
             'invoice_address_country',
             'invoice_vat_number',
+            'payment_due_date',
             'billing_contact_name',
             'billing_address_1',
             'billing_address_2',
