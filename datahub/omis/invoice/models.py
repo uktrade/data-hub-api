@@ -31,6 +31,7 @@ class Invoice(BaseModel):
         related_name='+'
     )
     invoice_vat_number = models.CharField(max_length=100, blank=True)
+    payment_due_date = models.DateField()
 
     objects = InvoiceManager()
 

@@ -352,7 +352,7 @@ class Order(BaseModel):
 
         self.quote.accept(by)
 
-        self.invoice = Invoice.objects.create_populated()
+        self.invoice = Invoice.objects.create_from_order(self)
         self.status = OrderStatus.quote_accepted
         self.save()
 
