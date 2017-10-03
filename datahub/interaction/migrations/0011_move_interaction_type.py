@@ -9,6 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('interaction', '0010_ren_interaction_type_comm_channel'),
+        ('metadata', '0005_auto_20171002_0950'),
     ]
 
     state_operations = [
@@ -17,6 +18,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.UUIDField(primary_key=True, serialize=False)),
                 ('name', models.TextField(blank=True)),
+                ('disabled_on', models.DateTimeField(blank=True, null=True)),
             ],
             options={
                 'ordering': ('name',),
