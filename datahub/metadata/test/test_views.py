@@ -1,14 +1,12 @@
 from contextlib import suppress
+
 import pytest
-
 from django.core.exceptions import FieldDoesNotExist
-
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from .. import urls
 from ..registry import registry
-
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
