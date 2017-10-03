@@ -9,12 +9,6 @@ class BusinessType(BaseConstantModel):
     pass
 
 
-class InteractionType(BaseConstantModel):
-    """Interaction type."""
-
-    pass
-
-
 class Sector(BaseConstantModel):
     """Company sector."""
 

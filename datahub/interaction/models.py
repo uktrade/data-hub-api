@@ -5,7 +5,11 @@ from django.db import models
 from django.utils.functional import cached_property
 from model_utils import Choices
 
-from datahub.core.models import BaseModel
+from datahub.core.models import BaseConstantModel, BaseModel
+
+
+class CommunicationChannel(BaseConstantModel):
+    """Communication channel/mode of communication."""
 
 
 class Interaction(BaseModel):
@@ -56,7 +60,7 @@ class Interaction(BaseModel):
         'metadata.Team', blank=True, null=True, on_delete=models.SET_NULL
     )
     communication_channel = models.ForeignKey(
-        'metadata.InteractionType', blank=True, null=True,
+        'CommunicationChannel', blank=True, null=True,
         on_delete=models.SET_NULL
     )
     investment_project = models.ForeignKey(

@@ -3,6 +3,8 @@ from pathlib import PurePath
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
+from datahub.metadata.fixtures import Fixture
+
 
 SOURCE_ROOT = PurePath(__file__).parents[4]
 SHARED_METADATA_FIXTURE_DIR = SOURCE_ROOT / 'fixtures' / 'metadata'
@@ -12,7 +14,6 @@ SHARED_FIXTURES = (
     SHARED_METADATA_FIXTURE_DIR / 'companies.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'contacts.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'countries.yaml',
-    SHARED_METADATA_FIXTURE_DIR / 'interactions.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'investment.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'referrals.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'sectors.yaml',
@@ -40,8 +41,11 @@ class Command(BaseCommand):
         folder but some could have dependencies so it's safer to specify the
         list manually.
         """
+        registered_fixtures = Fixture.all()
+
         call_command(
             'loaddata',
             *SHARED_FIXTURES,
-            *EVENTS_FIXTURES
+            *EVENTS_FIXTURES,
+            *registered_fixtures,
         )
