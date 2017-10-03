@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from typing import Callable, NamedTuple, Sequence
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -103,6 +103,41 @@ class RequiredUnlessAlreadyBlank:
     def __repr__(self):
         """Returns the string representation of this object."""
         return f'{self.__class__.__name__}(*{self.fields!r})'
+
+
+class ValidationCondition(NamedTuple):
+    """Validation condition."""
+
+    field: str
+    operator: Callable
+    operator_extra_args: Sequence = ()
+
+    def __call__(self, combiner):
+        """Test whether the condition is True or False."""
+        value = combiner.get_value(self.field)
+        return self.operator(value, *self.operator_extra_args)
+
+
+class ValidationRule:
+    """Validation rule."""
+
+    def __init__(self,
+                 error_key: str,
+                 field: str,
+                 operator_: Callable,
+                 operator_extra_args: Sequence = (),
+                 condition: ValidationCondition = None):
+        """Initialises a validation rule."""
+        self.error_key = error_key
+        self.condition = condition
+        self.rule = ValidationCondition(field, operator_, operator_extra_args)
+
+    def __call__(self, combiner):
+        """Test whether the rule passes or fails."""
+        if self.condition and not self.condition(combiner):
+            return True
+
+        return self.rule(combiner)
 
 
 class DataCombiner:
