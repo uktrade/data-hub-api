@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('metadata', '0004_team_roles_regions_countries'),
+        ('metadata', '0005_auto_20171002_0950'),
         ('interaction', '0013_rename_interaction_type_table'),
     ]
 
