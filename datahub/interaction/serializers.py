@@ -6,8 +6,8 @@ from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import AnyOfValidator, DataCombiner, RequiredUnlessAlreadyBlank
 from datahub.event.models import Event
 from datahub.investment.models import InvestmentProject
-from datahub.metadata.models import InteractionType, Service, Team
-from .models import Interaction
+from datahub.metadata.models import Service, Team
+from .models import CommunicationChannel, Interaction
 
 
 class InteractionSerializerReadV1(serializers.ModelSerializer):
@@ -45,7 +45,9 @@ class InteractionSerializerV3(serializers.ModelSerializer):
     dit_adviser = NestedAdviserField()
     created_by = NestedAdviserField(read_only=True)
     dit_team = NestedRelatedField(Team)
-    communication_channel = NestedRelatedField(InteractionType, required=False, allow_null=True)
+    communication_channel = NestedRelatedField(
+        CommunicationChannel, required=False, allow_null=True
+    )
     event = NestedRelatedField(Event, required=False, allow_null=True)
     investment_project = NestedRelatedField(
         InvestmentProject, required=False, allow_null=True, extra_fields=('name', 'project_code')
@@ -54,7 +56,7 @@ class InteractionSerializerV3(serializers.ModelSerializer):
     service = NestedRelatedField(Service)
     # Added for backwards compatibility. Will be removed once the front end is updated.
     interaction_type = NestedRelatedField(
-        InteractionType,
+        CommunicationChannel,
         source='communication_channel',
         required=False,
         allow_null=True

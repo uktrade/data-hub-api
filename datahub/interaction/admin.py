@@ -1,7 +1,17 @@
 from django.contrib import admin
 
 from datahub.core.admin import BaseModelVersionAdmin
-from .models import Interaction, ServiceDelivery, ServiceOffer
+from .models import CommunicationChannel, Interaction, ServiceDelivery, ServiceOffer
+
+
+@admin.register(CommunicationChannel)
+class MetadataAdmin(admin.ModelAdmin):
+    """Communication channel admin."""
+
+    fields = ('name', )
+    list_display = ('name', )
+    readonly_fields = ('id',)
+    search_fields = ('name', 'pk')
 
 
 @admin.register(Interaction)
