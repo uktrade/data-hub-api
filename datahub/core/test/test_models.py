@@ -3,7 +3,6 @@ from dateutil.parser import parse as dateutil_parse
 
 from .support.models import MyDisableableModel
 
-
 pytestmark = pytest.mark.django_db
 
 
