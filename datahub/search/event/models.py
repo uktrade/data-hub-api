@@ -1,5 +1,5 @@
 from django.conf import settings
-from elasticsearch_dsl import Date, DocType, String
+from elasticsearch_dsl import Date, DocType, Keyword, String
 
 from datahub.search import dict_utils, dsl_utils
 from datahub.search.models import MapDBModelToDict
@@ -8,9 +8,9 @@ from datahub.search.models import MapDBModelToDict
 class Event(DocType, MapDBModelToDict):
     """Elasticsearch representation of Event model."""
 
-    id = dsl_utils.KeywordString()
-    name = String(copy_to=['name_keyword', 'name_trigram'])
-    name_keyword = dsl_utils.CaseInsensitiveKeywordString()
+    id = Keyword()
+    name = dsl_utils.SortableString(copy_to=['name_keyword', 'name_trigram'])
+    name_keyword = dsl_utils.SortableCaseInsensitiveKeywordString()
     name_trigram = dsl_utils.TrigramString()
     event_type = dsl_utils.id_name_mapping()
     start_date = Date()
@@ -18,8 +18,8 @@ class Event(DocType, MapDBModelToDict):
     location_type = dsl_utils.id_name_mapping()
     address_1 = String()
     address_2 = String()
-    address_town = dsl_utils.CaseInsensitiveKeywordString()
-    address_county = dsl_utils.CaseInsensitiveKeywordString()
+    address_town = dsl_utils.SortableCaseInsensitiveKeywordString()
+    address_county = dsl_utils.SortableCaseInsensitiveKeywordString()
     address_postcode = String()
     address_country = dsl_utils.id_name_mapping()
     uk_region = dsl_utils.id_name_mapping()
