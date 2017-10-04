@@ -1,6 +1,7 @@
 from collections import Counter
 
 import pytest
+from django.utils.crypto import get_random_string
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -180,9 +181,15 @@ class TestViews(APITestMixin):
 
     def test_filter_by_kind(self, setup_es):
         """Tests filtering interaction by kind."""
-        interaction = InteractionFactory(
-            kind=Interaction.KINDS.service_delivery,
-        )
+        service_deliveries = []
+
+        for _ in range(10):
+            InteractionFactory(
+                kind=Interaction.KINDS.interaction,
+            )
+            service_deliveries.append(InteractionFactory(
+                kind=Interaction.KINDS.service_delivery,
+            ))
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
@@ -195,22 +202,24 @@ class TestViews(APITestMixin):
 
         response_data = response.json()
 
-        assert response_data['count'] == 1
+        assert response_data['count'] == 10
 
         results = response_data['results']
-        assert results[0]['id'] == str(interaction.id)
+        service_delivery_ids = {str(interaction.id) for interaction in service_deliveries}
+        assert {result['id'] for result in results} == service_delivery_ids
 
     def test_filter_by_company_id(self, setup_es):
         """Tests filtering interaction by company id."""
-        company = CompanyFactory()
-        interaction = InteractionFactory(
-            company=company
-        )
+        companies = CompanyFactory.create_batch(10)
+        for company in companies:
+            InteractionFactory(
+                company=company
+            )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
         request_data = {
-            'company': company.id
+            'company': companies[5].id
         }
         response = self.api_client.post(url, request_data, format='json')
 
@@ -221,21 +230,20 @@ class TestViews(APITestMixin):
         assert response_data['count'] == 1
 
         results = response_data['results']
-        assert results[0]['company']['id'] == str(interaction.company.id)
+        assert results[0]['company']['id'] == str(companies[5].id)
 
     def test_filter_by_company_name(self, setup_es):
         """Tests filtering interaction by company name."""
-        company_name = 'abcdefghjijk'
-        company = CompanyFactory(name=company_name)
-        interaction = InteractionFactory(
-            company=company
-        )
+        companies = []
+        for i in range(10):
+            companies.append(CompanyFactory(name=get_random_string(16)))
+            InteractionFactory(company=companies[i])
+
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
         request_data = {
-            'original_query': '',
-            'company_name': company_name
+            'company_name': companies[5].name
         }
         response = self.api_client.post(url, request_data, format='json')
 
@@ -243,23 +251,24 @@ class TestViews(APITestMixin):
 
         response_data = response.json()
 
-        assert response_data['count'] == 1
+        assert response_data['count'] > 0
 
         results = response_data['results']
-        assert results[0]['company']['id'] == str(interaction.company.id)
-        assert results[0]['company']['name'] == interaction.company.name
+        assert results[0]['company']['id'] == str(companies[5].id)
+        assert results[0]['company']['name'] == companies[5].name
 
     def test_filter_by_contact_id(self, setup_es):
         """Tests filtering interaction by contact id."""
-        contact = ContactFactory()
-        interaction = InteractionFactory(
-            contact=contact
-        )
+        contacts = ContactFactory.create_batch(10)
+        for contact in contacts:
+            InteractionFactory(
+                contact=contact
+            )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
         request_data = {
-            'contact': contact.id
+            'contact': contacts[5].id
         }
         response = self.api_client.post(url, request_data, format='json')
 
@@ -270,20 +279,24 @@ class TestViews(APITestMixin):
         assert response_data['count'] == 1
 
         results = response_data['results']
-        assert results[0]['contact']['id'] == str(interaction.contact.id)
+        assert results[0]['contact']['id'] == str(contacts[5].id)
 
     def test_filter_by_contact_name(self, setup_es):
         """Tests filtering interaction by contact name."""
-        contact = ContactFactory(first_name='lynx', last_name='lion')
-        interaction = InteractionFactory(
-            contact=contact
-        )
+        contacts = []
+        for i in range(10):
+            contacts.append(ContactFactory(
+                first_name=get_random_string(16),
+                last_name=get_random_string(16),
+            ))
+            InteractionFactory(
+                contact=contacts[i]
+            )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
         request_data = {
-            'original_query': '',
-            'contact_name': contact.name
+            'contact_name': contacts[5].name
         }
         response = self.api_client.post(url, request_data, format='json')
 
@@ -291,24 +304,28 @@ class TestViews(APITestMixin):
 
         response_data = response.json()
 
-        assert response_data['count'] == 1
+        assert response_data['count'] > 0
 
         results = response_data['results']
-        assert results[0]['contact']['id'] == str(interaction.contact.id)
-        assert results[0]['contact']['name'] == interaction.contact.name
+        assert results[0]['contact']['id'] == str(contacts[5].id)
+        assert results[0]['contact']['name'] == contacts[5].name
 
     def test_filter_by_dit_adviser_name(self, setup_es):
         """Tests filtering interaction by dit adviser name."""
-        adviser = AdviserFactory(first_name='pallas', last_name='kodkod')
-        interaction = InteractionFactory(
-            dit_adviser=adviser
-        )
+        advisers = []
+        for i in range(10):
+            advisers.append(AdviserFactory(
+                first_name=get_random_string(16),
+                last_name=get_random_string(16),
+            ))
+            InteractionFactory(
+                dit_adviser=advisers[i]
+            )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
         request_data = {
-            'original_query': '',
-            'dit_adviser_name': adviser.name
+            'dit_adviser_name': advisers[5].name
         }
         response = self.api_client.post(url, request_data, format='json')
 
@@ -316,23 +333,24 @@ class TestViews(APITestMixin):
 
         response_data = response.json()
 
-        assert response_data['count'] == 1
+        assert response_data['count'] > 0
 
         results = response_data['results']
-        assert results[0]['dit_adviser']['id'] == str(interaction.dit_adviser.id)
-        assert results[0]['dit_adviser']['name'] == interaction.dit_adviser.name
+        assert results[0]['dit_adviser']['id'] == str(advisers[5].id)
+        assert results[0]['dit_adviser']['name'] == advisers[5].name
 
     def test_filter_by_dit_team(self, setup_es):
         """Tests filtering interaction by dit team."""
         dit_team_id = constants.Team.td_events_healthcare.value.id
-        interaction = InteractionFactory(
-            dit_team_id=dit_team_id
-        )
+        for _ in range(5):
+            InteractionFactory(dit_team_id=constants.Team.crm.value.id)
+            InteractionFactory(
+                dit_team_id=dit_team_id
+            )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
         request_data = {
-            'original_query': '',
             'dit_team': dit_team_id
         }
         response = self.api_client.post(url, request_data, format='json')
@@ -341,17 +359,21 @@ class TestViews(APITestMixin):
 
         response_data = response.json()
 
-        assert response_data['count'] == 1
+        assert response_data['count'] == 5
 
         results = response_data['results']
-        assert results[0]['dit_team']['id'] == str(interaction.dit_team.id)
+        assert {result['dit_team']['id'] for result in results} == {str(dit_team_id)}
 
     def test_filter_by_communication_channel(self, setup_es):
         """Tests filtering interaction by interaction type."""
         communication_channel_id = constants.InteractionType.social_media.value.id
-        interaction = InteractionFactory(
-            communication_channel_id=communication_channel_id
-        )
+        for _ in range(5):
+            InteractionFactory(
+                communication_channel_id=constants.InteractionType.email_website.value.id
+            )
+            InteractionFactory(
+                communication_channel_id=communication_channel_id
+            )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
@@ -365,23 +387,26 @@ class TestViews(APITestMixin):
 
         response_data = response.json()
 
-        assert response_data['count'] == 1
+        assert response_data['count'] == 5
 
         results = response_data['results']
-        assert results[0]['communication_channel']['id'] == str(
-            interaction.communication_channel.id)
+        result_ids = {result['communication_channel']['id'] for result in results}
+        assert result_ids == {str(communication_channel_id)}
 
     def test_filter_by_service(self, setup_es):
         """Tests filtering interaction by service."""
         service_id = constants.Service.account_management.value.id
-        interaction = InteractionFactory(
-            service_id=service_id
-        )
+        for _ in range(5):
+            InteractionFactory(
+                service_id=constants.Service.trade_enquiry.value.id
+            )
+            InteractionFactory(
+                service_id=service_id
+            )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
         request_data = {
-            'original_query': '',
             'service': service_id
         }
         response = self.api_client.post(url, request_data, format='json')
@@ -390,7 +415,8 @@ class TestViews(APITestMixin):
 
         response_data = response.json()
 
-        assert response_data['count'] == 1
+        assert response_data['count'] == 5
 
         results = response_data['results']
-        assert results[0]['service']['id'] == str(interaction.service.id)
+        result_ids = {result['service']['id'] for result in results}
+        assert result_ids == {str(service_id)}
