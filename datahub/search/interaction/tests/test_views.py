@@ -254,8 +254,9 @@ class TestViews(APITestMixin):
         assert response_data['count'] > 0
 
         results = response_data['results']
-        assert results[0]['company']['id'] == str(companies[5].id)
-        assert results[0]['company']['name'] == companies[5].name
+        # multiple records can match our filter, let's make sure at least one is exact match
+        assert any(result['company']['id'] == str(companies[5].id) for result in results)
+        assert any(result['company']['name'] == companies[5].name for result in results)
 
     def test_filter_by_contact_id(self, setup_es):
         """Tests filtering interaction by contact id."""
@@ -307,8 +308,9 @@ class TestViews(APITestMixin):
         assert response_data['count'] > 0
 
         results = response_data['results']
-        assert results[0]['contact']['id'] == str(contacts[5].id)
-        assert results[0]['contact']['name'] == contacts[5].name
+        # multiple records can match our filter, let's make sure at least one is exact match
+        assert any(result['contact']['id'] == str(contacts[5].id) for result in results)
+        assert any(result['contact']['name'] == contacts[5].name for result in results)
 
     def test_filter_by_dit_adviser_name(self, setup_es):
         """Tests filtering interaction by dit adviser name."""
@@ -336,8 +338,9 @@ class TestViews(APITestMixin):
         assert response_data['count'] > 0
 
         results = response_data['results']
-        assert results[0]['dit_adviser']['id'] == str(advisers[5].id)
-        assert results[0]['dit_adviser']['name'] == advisers[5].name
+        # multiple records can match our filter, let's make sure at least one is exact match
+        assert any(result['dit_adviser']['id'] == str(advisers[5].id) for result in results)
+        assert any(result['dit_adviser']['name'] == advisers[5].name for result in results)
 
     def test_filter_by_dit_team(self, setup_es):
         """Tests filtering interaction by dit team."""
