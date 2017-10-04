@@ -105,7 +105,7 @@ class RequiredUnlessAlreadyBlank:
         return f'{self.__class__.__name__}(*{self.fields!r})'
 
 
-class ValidationCondition(NamedTuple):
+class Condition(NamedTuple):
     """Validation condition."""
 
     field: str
@@ -126,11 +126,11 @@ class ValidationRule:
                  field: str,
                  operator_: Callable,
                  operator_extra_args: Sequence = (),
-                 condition: ValidationCondition = None):
+                 condition: Condition = None):
         """Initialises a validation rule."""
         self.error_key = error_key
         self.condition = condition
-        self.rule = ValidationCondition(field, operator_, operator_extra_args)
+        self.rule = Condition(field, operator_, operator_extra_args)
 
     def __call__(self, combiner):
         """Test whether the rule passes or fails."""
@@ -138,6 +138,56 @@ class ValidationRule:
             return True
 
         return self.rule(combiner)
+
+    def __repr__(self):
+        """Returns the Python representation of this object."""
+        return (
+            f'{self.__class__.__name__}({self.error_key!r}, {self.rule.field!r}, '
+            f'{self.rule.operator!r}, operator_extra_args={self.rule.operator_extra_args!r}, '
+            f'condition={self.rule.condition!r})'
+        )
+
+
+class RulesBasedValidator:
+    """
+    Class-level DRF validator for cross-field validation.
+
+    Validation is performed using rules (instances of ValidationRule).
+    """
+
+    def __init__(self, *rules: ValidationRule):
+        """
+        Initialises the validator with rules.
+        """
+        self._rules = rules
+        self._serializer = None
+
+    def __call__(self, data):
+        """
+        Performs validation.
+
+        Called by DRF.
+        """
+        errors = {}
+        combiner = DataCombiner(instance=self._serializer.instance, update_data=data)
+        for rule in self._rules:
+            if not rule(combiner):
+                errors[rule.rule.field] = self._serializer.error_messages[rule.error_key]
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+    def set_context(self, serializer):
+        """
+        Saves a reference to the serializer instance.
+
+        Called by DRF.
+        """
+        self._serializer = serializer
+
+    def __repr__(self):
+        """Returns the Python representation of this object."""
+        return f'{self.__class__.__name__}(*{self._rules!r})'
 
 
 class DataCombiner:
