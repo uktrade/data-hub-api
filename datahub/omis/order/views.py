@@ -34,7 +34,9 @@ class PublicOrderViewSet(CoreViewSetV3):
 
     required_scopes = (Scope.public_omis_front_end,)
     serializer_class = PublicOrderSerializer
-    queryset = Order.objects.publicly_accessible().select_related(
+    queryset = Order.objects.publicly_accessible(
+        include_reopened=True
+    ).select_related(
         'company',
         'contact'
     )
@@ -146,3 +148,38 @@ class AssigneeView(APIView):
         serializer.save()
 
         return self.get_list_response(order)
+
+
+class BaseNestedOrderViewSet(CoreViewSetV3):
+    """
+    Base class for nested viewsets with order as parent
+    E.g. /order/<order-id>/<child>
+    """
+
+    serializer_class = None
+
+    order_lookup_field = 'pk'
+    order_lookup_url_kwarg = 'order_pk'
+    order_queryset = Order.objects
+
+    def get_order(self):
+        """
+        :returns: the main order from url kwargs.
+
+        :raises Http404: if the order doesn't exist
+        """
+        try:
+            order = self.order_queryset.get(
+                **{self.order_lookup_field: self.kwargs[self.order_lookup_url_kwarg]}
+            )
+        except Order.DoesNotExist:
+            raise Http404('The specified order does not exist.')
+        return order
+
+    def get_serializer_context(self):
+        """Extra context provided to the serializer class."""
+        return {
+            **super().get_serializer_context(),
+            'order': self.get_order(),
+            'current_user': self.request.user,
+        }

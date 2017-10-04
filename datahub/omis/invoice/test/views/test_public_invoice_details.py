@@ -6,121 +6,116 @@ from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import APITestMixin
 from datahub.oauth.scopes import Scope
-from datahub.omis.quote.test.factories import QuoteFactory
+from datahub.omis.order.constants import OrderStatus
+from datahub.omis.order.test.factories import OrderFactory, OrderWithAcceptedQuoteFactory
 
-from ..factories import OrderFactory, OrderWithCancelledQuoteFactory
-from ...constants import OrderStatus
-
-
-# mark the whole module for db use
-pytestmark = pytest.mark.django_db
+from ..factories import InvoiceFactory
 
 
-class TestViewPublicOrderDetails(APITestMixin):
-    """Tests for the pubic facing order endpoints."""
+class TestPublicGetInvoice(APITestMixin):
+    """Get public invoice test case."""
 
     @pytest.mark.parametrize(
         'order_status',
         (
-            OrderStatus.quote_awaiting_acceptance,
             OrderStatus.quote_accepted,
             OrderStatus.paid,
             OrderStatus.complete
         )
     )
     def test_get(self, order_status):
-        """Test getting an existing order by `public_token`."""
+        """Test a successful call to get a invoice."""
         order = OrderFactory(
-            quote=QuoteFactory(),
+            invoice=InvoiceFactory(),
             status=order_status
         )
 
         url = reverse(
-            'api-v3:omis-public:order:detail',
+            'api-v3:omis-public:invoice:detail',
             kwargs={'public_token': order.public_token}
         )
         client = self.create_api_client(
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.get(url)
+        response = client.get(url, format='json')
 
+        invoice = order.invoice
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
-            'public_token': order.public_token,
-            'reference': order.reference,
-            'status': order.status,
-            'created_on': order.created_on.isoformat(),
-            'company': {
-                'id': str(order.company.pk),
-                'name': order.company.name,
+            'created_on': invoice.created_on.isoformat(),
+
+            'invoice_number': invoice.invoice_number,
+            'invoice_company_name': invoice.invoice_company_name,
+            'invoice_address_1': invoice.invoice_address_1,
+            'invoice_address_2': invoice.invoice_address_2,
+            'invoice_address_county': invoice.invoice_address_county,
+            'invoice_address_town': invoice.invoice_address_town,
+            'invoice_address_postcode': invoice.invoice_address_postcode,
+            'invoice_address_country': {
+                'id': str(invoice.invoice_address_country.pk),
+                'name': invoice.invoice_address_country.name
             },
-            'contact': {
-                'id': str(order.contact.pk),
-                'name': order.contact.name
-            },
-            'contact_email': order.contact_email,
-            'contact_phone': order.contact_phone,
-            'po_number': order.po_number,
-            'discount_value': order.discount_value,
-            'net_cost': order.net_cost,
-            'subtotal_cost': order.subtotal_cost,
-            'vat_cost': order.vat_cost,
-            'total_cost': order.total_cost,
+            'invoice_vat_number': invoice.invoice_vat_number,
+            'payment_due_date': invoice.payment_due_date.isoformat(),
+
             'billing_contact_name': order.billing_contact_name,
-            'billing_email': order.billing_email,
-            'billing_phone': order.billing_phone,
             'billing_address_1': order.billing_address_1,
             'billing_address_2': order.billing_address_2,
-            'billing_address_town': order.billing_address_town,
             'billing_address_county': order.billing_address_county,
             'billing_address_postcode': order.billing_address_postcode,
+            'billing_address_town': order.billing_address_town,
             'billing_address_country': {
                 'id': str(order.billing_address_country.pk),
                 'name': order.billing_address_country.name
             },
+            'po_number': order.po_number,
         }
 
-    def test_get_draft_with_cancelled_quote(self):
-        """Test getting an order in draft with a cancelled quote is allowed."""
-        order = OrderWithCancelledQuoteFactory()
-
-        url = reverse(
-            'api-v3:omis-public:order:detail',
-            kwargs={'public_token': order.public_token}
-        )
-        client = self.create_api_client(
-            scope=Scope.public_omis_front_end,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS
-        )
-        response = client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-
-    def test_404_with_invalid_public_token(self):
+    def test_404_if_order_doesnt_exist(self):
         """Test that if the order doesn't exist, the endpoint returns 404."""
         url = reverse(
-            'api-v3:omis-public:order:detail',
+            'api-v3:omis-public:invoice:detail',
             kwargs={'public_token': ('1234-abcd-' * 5)}  # len(token) == 50
         )
         client = self.create_api_client(
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.get(url)
+        response = client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_404_if_invoice_doesnt_exist(self):
+        """Test that if the invoice doesn't exist, the endpoint returns 404."""
+        order = OrderFactory(status=OrderStatus.quote_accepted)
+        assert not order.invoice
+
+        url = reverse(
+            'api-v3:omis-public:invoice:detail',
+            kwargs={'public_token': order.public_token}
+        )
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
+        response = client.get(url, format='json')
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @pytest.mark.parametrize(
         'order_status',
-        (OrderStatus.draft, OrderStatus.cancelled)
+        (OrderStatus.draft, OrderStatus.quote_awaiting_acceptance, OrderStatus.cancelled)
     )
     def test_404_if_in_disallowed_status(self, order_status):
         """Test that if the order is not in an allowed state, the endpoint returns 404."""
-        order = OrderFactory(status=order_status)
+        order = OrderFactory(
+            status=order_status,
+            invoice=InvoiceFactory()
+        )
 
         url = reverse(
-            'api-v3:omis-public:order:detail',
+            'api-v3:omis-public:invoice:detail',
             kwargs={'public_token': order.public_token}
         )
         client = self.create_api_client(
@@ -134,13 +129,10 @@ class TestViewPublicOrderDetails(APITestMixin):
     @pytest.mark.parametrize('verb', ('post', 'patch', 'delete'))
     def test_verbs_not_allowed(self, verb):
         """Test that makes sure the other verbs are not allowed."""
-        order = OrderFactory(
-            quote=QuoteFactory(),
-            status=OrderStatus.quote_awaiting_acceptance
-        )
+        order = OrderWithAcceptedQuoteFactory()
 
         url = reverse(
-            'api-v3:omis-public:order:detail',
+            'api-v3:omis-public:invoice:detail',
             kwargs={'public_token': order.public_token}
         )
         client = self.create_api_client(
@@ -156,13 +148,10 @@ class TestViewPublicOrderDetails(APITestMixin):
     )
     def test_403_if_scope_not_allowed(self, scope):
         """Test that other oauth2 scopes are not allowed."""
-        order = OrderFactory(
-            quote=QuoteFactory(),
-            status=OrderStatus.quote_awaiting_acceptance
-        )
+        order = OrderWithAcceptedQuoteFactory()
 
         url = reverse(
-            'api-v3:omis-public:order:detail',
+            'api-v3:omis-public:invoice:detail',
             kwargs={'public_token': order.public_token}
         )
         client = self.create_api_client(

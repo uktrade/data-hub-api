@@ -11,7 +11,8 @@ from .registry import registry
 @permission_classes([])
 def metadata_view(request, mapping):
     """Metadata generic view."""
-    serializer = mapping.serializer(mapping.queryset.all(), many=True)
+    qs = mapping.queryset.all()
+    serializer = mapping.serializer(qs, many=True)
     return Response(data=serializer.data)
 
 

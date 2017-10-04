@@ -71,7 +71,7 @@ class DisableableModel(models.Model):
         abstract = True
 
 
-class BaseConstantModel(models.Model):
+class BaseConstantModel(DisableableModel):
     """Constant tables for FKs."""
 
     id = models.UUIDField(primary_key=True)

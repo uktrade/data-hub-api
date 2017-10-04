@@ -10,7 +10,7 @@ from django.utils.timezone import now
 
 from datahub.company.models import Advisor, Company, Contact
 from datahub.core.models import (
-    BaseConstantModel, BaseModel, BaseOrderedConstantModel, DisableableModel
+    BaseConstantModel, BaseModel, BaseOrderedConstantModel
 )
 
 from datahub.metadata.models import Country, Sector, Team
@@ -27,7 +27,7 @@ from .utils import populate_billing_data
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-class ServiceType(BaseOrderedConstantModel, DisableableModel):
+class ServiceType(BaseOrderedConstantModel):
     """
     Order service type.
     E.g. 'Validated contacts', 'Event', 'Market Research'
@@ -352,7 +352,7 @@ class Order(BaseModel):
 
         self.quote.accept(by)
 
-        self.invoice = Invoice.objects.create_populated()
+        self.invoice = Invoice.objects.create_from_order(self)
         self.status = OrderStatus.quote_accepted
         self.save()
 

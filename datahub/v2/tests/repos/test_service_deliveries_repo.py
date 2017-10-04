@@ -23,7 +23,7 @@ class TestServiceDeliveriesRepo:
     def test_get(self):
         """Test get service delivery."""
         service_offer = factories.ServiceOfferFactory()
-        service_delivery = factories.ServiceDeliveryFactory(
+        service_delivery = factories.LegacyServiceDeliveryFactory(
             service=service_offer.service,
             dit_team=service_offer.dit_team
         )
@@ -135,7 +135,7 @@ class TestServiceDeliveriesRepo:
     def test_update(self):
         """Test update existing service delivery."""
         service_offer = factories.ServiceOfferFactory()
-        service_delivery = factories.ServiceDeliveryFactory(
+        service_delivery = factories.LegacyServiceDeliveryFactory(
             service=service_offer.service,
             dit_team=service_offer.dit_team,
             subject='foo'
@@ -166,7 +166,7 @@ class TestServiceDeliveriesRepo:
         """Test filter with pagination."""
         service_offer = factories.ServiceOfferFactory()
         service_deliveries = [
-            factories.ServiceDeliveryFactory(
+            factories.LegacyServiceDeliveryFactory(
                 service=service_offer.service,
                 dit_team=service_offer.dit_team)
             for i in range(6)]
@@ -180,11 +180,11 @@ class TestServiceDeliveriesRepo:
         """Test filter by company id."""
         service_offer = factories.ServiceOfferFactory()
         company = factories.CompanyFactory()
-        factories.ServiceDeliveryFactory(
+        factories.LegacyServiceDeliveryFactory(
             service=service_offer.service,
             dit_team=service_offer.dit_team,
         )
-        service_delivery = factories.ServiceDeliveryFactory(
+        service_delivery = factories.LegacyServiceDeliveryFactory(
             service=service_offer.service,
             dit_team=service_offer.dit_team,
             company=company
@@ -201,11 +201,11 @@ class TestServiceDeliveriesRepo:
         """Test filter by contact id."""
         service_offer = factories.ServiceOfferFactory()
         contact = factories.ContactFactory()
-        factories.ServiceDeliveryFactory(
+        factories.LegacyServiceDeliveryFactory(
             service=service_offer.service,
             dit_team=service_offer.dit_team,
         )
-        service_delivery = factories.ServiceDeliveryFactory(
+        service_delivery = factories.LegacyServiceDeliveryFactory(
             service=service_offer.service,
             dit_team=service_offer.dit_team,
             contact=contact
@@ -223,11 +223,11 @@ class TestServiceDeliveriesRepo:
         service_offer = factories.ServiceOfferFactory()
         contact = factories.ContactFactory()
         company = factories.CompanyFactory()
-        factories.ServiceDeliveryFactory(
+        factories.LegacyServiceDeliveryFactory(
             service=service_offer.service,
             dit_team=service_offer.dit_team,
         )
-        service_delivery = factories.ServiceDeliveryFactory(
+        service_delivery = factories.LegacyServiceDeliveryFactory(
             service=service_offer.service,
             dit_team=service_offer.dit_team,
             contact=contact,

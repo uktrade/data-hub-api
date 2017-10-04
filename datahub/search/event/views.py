@@ -19,6 +19,7 @@ class SearchEventParams:
         'start_date_after',
         'start_date_before',
         'address_country',
+        'uk_region',
     )
 
     REMAP_FIELDS = {
@@ -27,6 +28,7 @@ class SearchEventParams:
         'organiser_name': 'organiser.name_trigram',
         'event_type': 'event_type.id',
         'address_country': 'address_country.id',
+        'uk_region': 'uk_region.id',
     }
 
 
