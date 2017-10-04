@@ -8,6 +8,7 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
+from datahub.interaction.models import Interaction
 from datahub.interaction.test.factories import InteractionFactory
 
 pytestmark = pytest.mark.django_db
@@ -177,6 +178,51 @@ class TestViews(APITestMixin):
             'modified_on': interaction.modified_on.isoformat(),
         }]
 
+    def test_filter_by_kind(self, setup_es):
+        """Tests filtering interaction by kind."""
+        interaction = InteractionFactory(
+            kind=Interaction.KINDS.service_delivery,
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:interaction')
+        request_data = {
+            'kind': Interaction.KINDS.service_delivery,
+        }
+        response = self.api_client.post(url, request_data, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+
+        assert response_data['count'] == 1
+
+        results = response_data['results']
+        assert results[0]['id'] == str(interaction.id)
+
+    def test_filter_by_company_id(self, setup_es):
+        """Tests filtering interaction by company id."""
+        company = CompanyFactory()
+        interaction = InteractionFactory(
+            company=company
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:interaction')
+        request_data = {
+            'company': company.id
+        }
+        response = self.api_client.post(url, request_data, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+
+        assert response_data['count'] == 1
+
+        results = response_data['results']
+        assert results[0]['company']['id'] == str(interaction.company.id)
+
     def test_filter_by_company_name(self, setup_es):
         """Tests filtering interaction by company name."""
         company_name = 'abcdefghjijk'
@@ -202,6 +248,29 @@ class TestViews(APITestMixin):
         results = response_data['results']
         assert results[0]['company']['id'] == str(interaction.company.id)
         assert results[0]['company']['name'] == interaction.company.name
+
+    def test_filter_by_contact_id(self, setup_es):
+        """Tests filtering interaction by contact id."""
+        contact = ContactFactory()
+        interaction = InteractionFactory(
+            contact=contact
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:interaction')
+        request_data = {
+            'contact': contact.id
+        }
+        response = self.api_client.post(url, request_data, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+
+        assert response_data['count'] == 1
+
+        results = response_data['results']
+        assert results[0]['contact']['id'] == str(interaction.contact.id)
 
     def test_filter_by_contact_name(self, setup_es):
         """Tests filtering interaction by contact name."""
