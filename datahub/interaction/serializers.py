@@ -7,7 +7,7 @@ from datahub.company.models import Company, Contact
 from datahub.company.serializers import AdviserSerializer, NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import (
-    AnyOfValidator, DataCombiner, RequiredUnlessAlreadyBlank, ValidationCondition, ValidationRule
+    AnyOfValidator, Condition, RequiredUnlessAlreadyBlank, RulesBasedValidator, ValidationRule
 )
 from datahub.event.models import Event
 from datahub.investment.models import InvestmentProject
@@ -40,22 +40,6 @@ class InteractionSerializerWriteV1(serializers.ModelSerializer):
             AnyOfValidator('company', 'investment_project'),
             RequiredUnlessAlreadyBlank('dit_team', 'communication_channel', 'service')
         ]
-
-
-VALIDATION_RULES = (
-    ValidationRule(
-        'required', 'communication_channel', bool,
-        condition=ValidationCondition('kind', eq, (Interaction.KINDS.interaction,))
-    ),
-    ValidationRule(
-        'invalid_for_service_delivery', 'communication_channel', not_,
-        condition=ValidationCondition('kind', eq, (Interaction.KINDS.service_delivery,))
-    ),
-    ValidationRule(
-        'invalid_for_interaction', 'event', not_,
-        condition=ValidationCondition('kind', eq, (Interaction.KINDS.interaction,))
-    ),
-)
 
 
 class InteractionSerializerV3(serializers.ModelSerializer):
@@ -92,23 +76,6 @@ class InteractionSerializerV3(serializers.ModelSerializer):
         allow_null=True
     )
 
-    def validate(self, data):
-        """
-        Perform cross-field validation.
-
-        Called by DRF.
-        """
-        errors = {}
-        combiner = DataCombiner(instance=self.instance, update_data=data)
-
-        for rule in VALIDATION_RULES:
-            if not rule(combiner):
-                errors[rule.rule.field] = self.error_messages[rule.error_key]
-
-        if errors:
-            raise serializers.ValidationError(errors)
-        return data
-
     class Meta:  # noqa: D101
         model = Interaction
         extra_kwargs = {
@@ -142,4 +109,18 @@ class InteractionSerializerV3(serializers.ModelSerializer):
         )
         validators = [
             AnyOfValidator('company', 'investment_project'),
+            RulesBasedValidator(
+                ValidationRule(
+                    'required', 'communication_channel', bool,
+                    condition=Condition('kind', eq, (Interaction.KINDS.interaction,))
+                ),
+                ValidationRule(
+                    'invalid_for_service_delivery', 'communication_channel', not_,
+                    condition=Condition('kind', eq, (Interaction.KINDS.service_delivery,))
+                ),
+                ValidationRule(
+                    'invalid_for_interaction', 'event', not_,
+                    condition=Condition('kind', eq, (Interaction.KINDS.interaction,))
+                ),
+            )
         ]
