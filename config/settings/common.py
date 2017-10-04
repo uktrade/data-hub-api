@@ -180,7 +180,7 @@ REST_FRAMEWORK = {
 APPEND_SLASH = False
 
 # Leeloo stuff
-ES_URL = env('ES_URL')
+ES_URL = env('ES5_URL')
 ES_VERIFY_CERTS = env.bool('ES_VERIFY_CERTS', True)
 ES_INDEX = env('ES_INDEX')
 ES_INDEX_SETTINGS = {

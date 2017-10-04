@@ -1,5 +1,5 @@
 from django.conf import settings
-from elasticsearch_dsl import Boolean, Date, DocType, Double, Integer, String
+from elasticsearch_dsl import Boolean, Date, DocType, Double, Integer, Keyword, String
 
 from .. import dict_utils
 from .. import dsl_utils
@@ -9,7 +9,7 @@ from ..models import MapDBModelToDict
 class InvestmentProject(DocType, MapDBModelToDict):
     """Elasticsearch representation of InvestmentProject."""
 
-    id = String(index='not_analyzed')
+    id = Keyword()
     approved_commitment_to_invest = Boolean()
     approved_fdi = Boolean()
     approved_good_value = Boolean()
@@ -38,8 +38,8 @@ class InvestmentProject(DocType, MapDBModelToDict):
     uk_company = dsl_utils.id_name_mapping()
     investor_company = dsl_utils.id_name_mapping()
     investment_type = dsl_utils.id_name_mapping()
-    name = String(copy_to=['name_keyword', 'name_trigram'])
-    name_keyword = dsl_utils.CaseInsensitiveKeywordString()
+    name = dsl_utils.SortableString()
+    name_keyword = dsl_utils.SortableCaseInsensitiveKeywordString()
     name_trigram = dsl_utils.TrigramString()
     r_and_d_budget = Boolean()
     non_fdi_r_and_d_budget = Boolean()
@@ -56,12 +56,12 @@ class InvestmentProject(DocType, MapDBModelToDict):
     not_shareable_reason = String()
     operations_commenced_documents = dsl_utils.id_uri_mapping()
     stage = dsl_utils.id_name_mapping()
-    project_code = dsl_utils.CaseInsensitiveKeywordString()
+    project_code = dsl_utils.SortableCaseInsensitiveKeywordString()
     project_shareable = Boolean()
     referral_source_activity = dsl_utils.id_name_mapping()
     referral_source_activity_marketing = dsl_utils.id_name_mapping()
     referral_source_activity_website = dsl_utils.id_name_mapping()
-    referral_source_activity_event = dsl_utils.CaseInsensitiveKeywordString()
+    referral_source_activity_event = dsl_utils.SortableCaseInsensitiveKeywordString()
     referral_source_advisor = dsl_utils.contact_or_adviser_mapping('referral_source_advisor')
     sector = dsl_utils.id_name_mapping()
     average_salary = dsl_utils.id_name_mapping()
