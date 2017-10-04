@@ -17,7 +17,7 @@ class InteractionSearchApp(SearchApp):
         'contact',
         'dit_adviser',
         'dit_team',
-        'interaction_type',
+        'communication_channel',
         'investment_project',
         'service',
     )

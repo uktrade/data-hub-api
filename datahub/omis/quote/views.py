@@ -3,37 +3,18 @@ from django.http import Http404
 from rest_framework import status
 from rest_framework.response import Response
 
-from datahub.core.viewsets import CoreViewSetV3
 from datahub.oauth.scopes import Scope
 from datahub.omis.order.models import Order
+from datahub.omis.order.views import BaseNestedOrderViewSet
 
 from .models import Quote
 from .serializers import PublicQuoteSerializer, QuoteSerializer
 
 
-class BaseQuoteViewSet(CoreViewSetV3):
-    """Quote ViewSet."""
+class BaseQuoteViewSet(BaseNestedOrderViewSet):
+    """Base Quote ViewSet."""
 
     queryset = Quote.objects.none()
-    serializer_class = None
-
-    order_lookup_field = 'pk'
-    order_lookup_url_kwarg = 'order_pk'
-    order_queryset = Order.objects
-
-    def get_order(self):
-        """
-        :returns: the main order from url kwargs.
-
-        :raises Http404: if the order doesn't exist
-        """
-        try:
-            order = self.order_queryset.get(
-                **{self.order_lookup_field: self.kwargs[self.order_lookup_url_kwarg]}
-            )
-        except Order.DoesNotExist:
-            raise Http404('The specified order does not exist.')
-        return order
 
     def get_object(self):
         """
@@ -45,14 +26,6 @@ class BaseQuoteViewSet(CoreViewSetV3):
         if not quote:
             raise Http404('The specified quote does not exist.')
         return quote
-
-    def get_serializer_context(self):
-        """Extra context provided to the serializer class."""
-        return {
-            **super().get_serializer_context(),
-            'order': self.get_order(),
-            'current_user': self.request.user,
-        }
 
 
 class QuoteViewSet(BaseQuoteViewSet):
@@ -87,7 +60,7 @@ class PublicQuoteViewSet(BaseQuoteViewSet):
 
     order_lookup_field = 'public_token'
     order_lookup_url_kwarg = 'public_token'
-    order_queryset = Order.objects.publicly_accessible()
+    order_queryset = Order.objects.publicly_accessible(include_reopened=True)
 
     def accept(self, request, *args, **kwargs):
         """Accept a quote."""

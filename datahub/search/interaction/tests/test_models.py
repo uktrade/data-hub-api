@@ -17,6 +17,7 @@ def test_interaction_to_dict():
 
     assert result == {
         'id': str(interaction.pk),
+        'kind': interaction.kind,
         'date': interaction.date,
         'company': {
             'id': str(interaction.company.pk),
@@ -28,6 +29,7 @@ def test_interaction_to_dict():
             'name': interaction.contact.name,
             'last_name': interaction.contact.last_name,
         },
+        'event': None,
         'service': {
             'id': str(interaction.service.pk),
             'name': interaction.service.name,
@@ -44,9 +46,9 @@ def test_interaction_to_dict():
             'id': str(interaction.dit_team.pk),
             'name': interaction.dit_team.name,
         },
-        'interaction_type': {
-            'id': str(interaction.interaction_type.pk),
-            'name': interaction.interaction_type.name,
+        'communication_channel': {
+            'id': str(interaction.communication_channel.pk),
+            'name': interaction.communication_channel.name,
         },
         'investment_project': {
             'id': str(interaction.investment_project.pk),
