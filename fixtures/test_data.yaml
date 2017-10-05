@@ -203,6 +203,42 @@
     notes: This is a dummy interaction for testing
     communication_channel: a5d71fdd-5d95-e211-a939-e4115bead28a
 
+- model: interaction.interaction
+  pk: 2a162e87-06d5-423d-963e-1ecbe46c62af
+  fields:
+    kind: service_delivery
+    subject: Provided beta service
+    date: 2017-06-05
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    event: ~
+    service: f56eb92b-3499-e211-a939-e4115bead28a
+    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
+    notes: This is a dummy service delivery for testing
+    dit_team: 8248318c-9698-e211-a939-e4115bead28a
+    communication_channel: ~
+    investment_project: ~
+    created_by: 7bad8082-4978-4fe8-a018-740257f01637
+    modified_by: 7bad8082-4978-4fe8-a018-740257f01637
+
+- model: interaction.interaction
+  pk: ec4a46ef-6e50-4a5c-bba0-e311f0471312
+  fields:
+    kind: service_delivery
+    subject: Attended gamma event
+    date: 2017-09-05
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    contact: 9b1138ab-ec7b-497f-b8c3-27fed21694ef
+    event: bda12a57-433c-4a0c-a7ce-5ebd080e09e8
+    service: 9584b82b-3499-e211-a939-e4115bead28a
+    dit_adviser: e83a608e-84a4-11e6-ae22-56b6b6499611
+    notes: This is a dummy service delivery for testing
+    dit_team: 602b971d-5df6-e511-888e-e4115bead28a
+    communication_channel: ~
+    investment_project: ~
+    created_by: e83a608e-84a4-11e6-ae22-56b6b6499611
+    modified_by: e83a608e-84a4-11e6-ae22-56b6b6499611
+
 - model: interaction.servicedelivery
   pk: cbd85bc2-d17a-4c7c-9bfe-622d6e77201a
   fields:
