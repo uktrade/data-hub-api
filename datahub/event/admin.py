@@ -57,16 +57,44 @@ def confirm_action(title, action_message):
     return decorator
 
 
-@admin.register(EventType)
-class DisableableMetadataAdmin(admin.ModelAdmin):
-    """Admin for disableable metadata models."""
+@admin.register(Event)
+class EventAdmin(BaseModelVersionAdmin):
+    """Admin for Events."""
 
-    fields = ('name', 'disabled_on',)
+    fields = (
+        'name',
+        'event_type',
+        'start_date',
+        'end_date',
+        'location_type',
+        'address_1',
+        'address_2',
+        'address_town',
+        'address_county',
+        'address_postcode',
+        'address_country',
+        'uk_region',
+        'notes',
+        'organiser',
+        'lead_team',
+        'teams',
+        'related_programmes',
+        'service',
+        'disabled_on',
+    )
     list_display = ('name', 'disabled_on',)
     list_editable = ('disabled_on',)
     list_filter = (DisabledOnFilter,)
     readonly_fields = ('id',)
     search_fields = ('name', 'pk')
+
+    raw_id_fields = (
+        'lead_team',
+        'teams',
+        'organiser',
+        'modified_by',
+        'created_by',
+    )
 
     actions = ('disable_selected', 'enable_selected',)
 
@@ -91,7 +119,7 @@ class DisableableMetadataAdmin(admin.ModelAdmin):
     enable_selected.short_description = 'Enable selected'
 
 
-@admin.register(LocationType, Programme)
+@admin.register(EventType, LocationType, Programme)
 class MetadataAdmin(admin.ModelAdmin):
     """Admin for metadata models."""
 
@@ -99,17 +127,3 @@ class MetadataAdmin(admin.ModelAdmin):
     list_display = ('name',)
     readonly_fields = ('id',)
     search_fields = ('name', 'pk')
-
-
-@admin.register(Event)
-class InvestmentProjectAdmin(BaseModelVersionAdmin):
-    """Admin for events."""
-
-    search_fields = ['name']
-    raw_id_fields = (
-        'lead_team',
-        'teams',
-        'organiser',
-        'modified_by',
-        'created_by',
-    )

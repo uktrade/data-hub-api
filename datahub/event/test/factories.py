@@ -8,16 +8,6 @@ from datahub.core.test.factories import to_many_field
 from datahub.event.constants import EventType, LocationType, Programme
 
 
-class EventTypeFactory(factory.django.DjangoModelFactory):
-    """EventType factory."""
-
-    id = factory.LazyFunction(uuid.uuid4)
-    name = factory.Faker('text')
-
-    class Meta:  # noqa: D101
-        model = 'event.EventType'
-
-
 class EventFactory(factory.django.DjangoModelFactory):
     """Event factory."""
 
