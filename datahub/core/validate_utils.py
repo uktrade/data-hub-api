@@ -127,7 +127,18 @@ class ValidationRule:
                  operator_: Callable,
                  operator_extra_args: Sequence = (),
                  condition: Condition = None):
-        """Initialises a validation rule."""
+        """
+        Initialises a validation rule.
+
+        :param error_key: The key of the error message associated with this rule.
+        :param field:     The name of the field the rule applies to.
+        :param operator_: Callable that returns a truthy or falsey value (indicating whether the
+                          value is valid). Will be called with the field value as the first
+                          argument.
+        :param operator_extra_args: Extra arguments to pass to operator_.
+        :param condition: Optional conditional rule to check before applying this rule.
+                          If the condition evaluates to False, validation passes.
+        """
         self.error_key = error_key
         self.condition = condition
         self.rule = Condition(field, operator_, operator_extra_args)
