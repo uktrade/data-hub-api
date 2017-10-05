@@ -3,6 +3,7 @@ from secrets import token_hex
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.test.client import Client
 from django.utils.timezone import now
 from oauth2_provider.models import AccessToken, Application
 from rest_framework.test import APIClient
@@ -25,6 +26,45 @@ def get_test_user():
         test_user.set_password('password')
         test_user.save()
     return test_user
+
+
+def get_admin_user(password=None):
+    """Return the test admin user."""
+    email = 'powerfuluser@trade.dit'
+    user_model = get_user_model()
+    try:
+        admin_user = user_model.objects.get(email=email)
+    except user_model.DoesNotExist:
+        admin_user = user_model.objects.create_superuser(email=email, password=password)
+    return admin_user
+
+
+class AdminTestMixin:
+    """All the tests using the DB and accessing admin endpoints should use this class."""
+
+    pytestmark = pytest.mark.django_db  # use db
+
+    PASSWORD = 'password'
+
+    @property
+    def user(self):
+        """Returns admin user."""
+        if not hasattr(self, '_user'):
+            self._user = get_admin_user(self.PASSWORD)
+        return self._user
+
+    @property
+    def client(self):
+        """Returns an authenticated admin client."""
+        return self.create_client()
+
+    def create_client(self, user=None):
+        """Creates a client with admin access."""
+        if not user:
+            user = self.user
+        client = Client()
+        client.login(username=user.email, password=self.PASSWORD)
+        return client
 
 
 class APITestMixin:
