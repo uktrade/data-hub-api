@@ -329,6 +329,7 @@ class TestInteractionV3(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
+            'contact': ['This field is required.'],
             'date': ['This field is required.'],
             'dit_adviser': ['This field is required.'],
             'dit_team': ['This field is required.'],
@@ -418,9 +419,11 @@ class TestInteractionV3(APITestMixin):
         """Test add new interaction for an investment project."""
         project = InvestmentProjectFactory()
         adviser = AdviserFactory()
+        contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.post(url, {
             'kind': 'interaction',
+            'contact': contact.pk,
             'communication_channel': InteractionType.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -442,8 +445,10 @@ class TestInteractionV3(APITestMixin):
         """Test add new interaction without a contact, company or
         investment project.
         """
+        contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.post(url, {
+            'contact': contact.pk,
             'communication_channel': InteractionType.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
