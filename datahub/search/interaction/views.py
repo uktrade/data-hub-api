@@ -12,7 +12,10 @@ class SearchInteractionParams:
     serializer_class = SearchInteractionSerializer
 
     FILTER_FIELDS = (
+        'kind',
+        'company',
         'company_name',
+        'contact',
         'contact_name',
         'dit_adviser_name',
         'dit_team',
@@ -22,6 +25,8 @@ class SearchInteractionParams:
     )
 
     REMAP_FIELDS = {
+        'company': 'company.id',
+        'contact': 'contact.id',
         'company_name': 'company.name_trigram',
         'contact_name': 'contact.name_trigram',
         'dit_adviser_name': 'dit_adviser.name_trigram',
