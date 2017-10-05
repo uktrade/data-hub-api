@@ -155,7 +155,7 @@ class ValidationRule:
         return (
             f'{self.__class__.__name__}({self.error_key!r}, {self.rule.field!r}, '
             f'{self.rule.operator!r}, operator_extra_args={self.rule.operator_extra_args!r}, '
-            f'condition={self.rule.condition!r})'
+            f'condition={self.condition!r})'
         )
 
 
