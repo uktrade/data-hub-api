@@ -39,7 +39,7 @@ class TestEventTypeAdmin(AdminTestMixin):
         response = self.client.post(url, data)
         assert response.status_code == status.HTTP_302_FOUND
 
-        # Check if out event types have been disabled.
+        # Check if selected event types have been disabled.
         for event_type in event_types:
             event_type.refresh_from_db()
             assert event_type.disabled_on is not None
@@ -78,7 +78,7 @@ class TestEventTypeAdmin(AdminTestMixin):
         response = self.client.post(url, data)
         assert response.status_code == status.HTTP_302_FOUND
 
-        # Check if out event types have been enabled.
+        # Check if selected event types have been enabled.
         for event_type in event_types:
             event_type.refresh_from_db()
             assert event_type.disabled_on is None
