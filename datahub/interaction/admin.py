@@ -20,17 +20,33 @@ class InteractionAdmin(BaseModelVersionAdmin):
 
     search_fields = (
         'id',
-        'company__company_number',
-        'company__company_name',
-        'contact_email'
+        'subject',
+        'company__name',
+    )
+    list_display = (
+        '__str__',
+        'date',
+        'company',
+        'contact',
+        'investment_project',
+    )
+    list_filter = (
+        'kind',
     )
     raw_id_fields = (
         'company',
+        'event',
         'dit_adviser',
         'investment_project',
         'contact',
         'created_by',
         'modified_by',
+    )
+    list_select_related = (
+        'company',
+        'contact',
+        'investment_project',
+        'investment_project__investor_company',
     )
 
 
