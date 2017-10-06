@@ -34,6 +34,7 @@ def test_event_dbmodel_to_dict():
         'notes',
         'uk_region',
         'service',
+        'disabled_on',
     }
 
     assert result.keys() == keys
