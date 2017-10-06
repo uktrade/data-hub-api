@@ -23,5 +23,7 @@ def get_interaction_queryset_v3():
         'dit_adviser',
         'dit_team',
         'communication_channel',
+        'investment_project',
         'service',
+        'event',
     )

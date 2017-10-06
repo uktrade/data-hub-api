@@ -149,6 +149,7 @@ OAUTH2_PROVIDER = {
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
 LANGUAGE_CODE = 'en-gb'
+USE_L10N = True
 PUBLIC_ROOT = str(ROOT_DIR('public'))
 STATIC_ROOT = str(ROOT_DIR('staticfiles'))
 STATIC_URL = '/static/'
