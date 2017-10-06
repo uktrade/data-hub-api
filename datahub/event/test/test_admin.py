@@ -27,7 +27,8 @@ class TestEventAdmin(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
 
         # Check if we get confirmation page in the response.
-        assert 'Are you sure you want to disable selected?' in str(response.content)
+        query = 'Are you sure you want to disable the selected events?'
+        assert query in str(response.content)
 
         # Make sure none of selected events has been disabled.
         for event in events:
@@ -66,7 +67,7 @@ class TestEventAdmin(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
 
         # Check if we get confirmation page in the response.
-        assert 'Are you sure you want to enable selected?' in str(response.content)
+        assert 'Are you sure you want to enable the selected events?' in str(response.content)
 
         # Make sure none of selected events has been enabled.
         for event in events:
