@@ -198,6 +198,10 @@ def test_get_basic_search_query():
                             'subject': 'test'
                         }
                     }, {
+                        'match': {
+                            'subject_english': 'test'
+                        }
+                    }, {
                         'nested': {
                             'path': 'teams',
                             'query': {
