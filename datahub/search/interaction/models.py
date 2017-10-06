@@ -15,7 +15,7 @@ class Interaction(DocType, MapDBModelToDict):
     contact = dsl_utils.contact_or_adviser_partial_mapping('contact')
     event = dsl_utils.id_name_partial_mapping('event')
     service = dsl_utils.id_name_mapping()
-    subject = Keyword(copy_to='subject_english')
+    subject = dsl_utils.SortableCaseInsensitiveKeywordString(copy_to='subject_english')
     subject_english = dsl_utils.EnglishString()
     dit_adviser = dsl_utils.contact_or_adviser_partial_mapping('dit_adviser')
     notes = dsl_utils.EnglishString()
