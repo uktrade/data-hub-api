@@ -22,9 +22,9 @@ def interactions(setup_es):
     with freeze_time('2017-01-01 13:00:00'):
         data.extend([
             InteractionFactory(subject='Exports meeting'),
-            InteractionFactory(subject='A coffee'),
+            InteractionFactory(subject='a coffee'),
             InteractionFactory(subject='Email about exhibition'),
-            InteractionFactory(subject='Talking about cats'),
+            InteractionFactory(subject='talking about cats'),
             InteractionFactory(subject='Event at HQ'),
         ])
 
@@ -89,7 +89,8 @@ class TestViews(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['count'] == len(interactions)
-        expected_subjects = list(sorted(interaction.subject for interaction in interactions))
+        subjects = (interaction.subject for interaction in interactions)
+        expected_subjects = list(sorted(subjects, key=lambda s: s.lower()))
         assert [item['subject'] for item in response_data['results']] == expected_subjects
 
     def test_sort_by_subject_desc(self, interactions):
@@ -104,8 +105,8 @@ class TestViews(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['count'] == len(interactions)
-        expected_subjects = list(sorted((interaction.subject for interaction in interactions),
-                                        reverse=True))
+        subjects = (interaction.subject for interaction in interactions)
+        expected_subjects = list(sorted(subjects, key=lambda s: s.lower(), reverse=True))
         assert [item['subject'] for item in response_data['results']] == expected_subjects
 
     def test_sort_by_invalid_field(self):
