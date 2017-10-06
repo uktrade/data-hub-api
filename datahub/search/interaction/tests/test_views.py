@@ -22,7 +22,9 @@ def interactions(setup_es):
     with freeze_time('2017-01-01 13:00:00'):
         data.extend([
             InteractionFactory(subject='Exports meeting'),
+            InteractionFactory(subject='A coffee'),
             InteractionFactory(subject='Email about exhibition'),
+            InteractionFactory(subject='Talking about cats'),
             InteractionFactory(subject='Event at HQ'),
         ])
 
@@ -73,7 +75,7 @@ class TestViews(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert len(response_data['results']) == 2
+        assert len(response_data['results']) == 4
 
     def test_sort_by_subject_asc(self, interactions):
         """Tests sorting of results by subject (ascending)."""
