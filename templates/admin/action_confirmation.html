@@ -21,7 +21,7 @@
 
 {% block content %}
     <p>Are you sure you want to {{ action_message }}?</p>
-    <h2>{% trans "Objects" %}</h2>
+    <h2>{{ opts.verbose_name_plural|capfirst }}</h2>
     <br/>
     <ul style="padding: 0">
         {% for obj in queryset.all %}
