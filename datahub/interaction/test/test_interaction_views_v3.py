@@ -101,8 +101,8 @@ class TestInteractionV3(APITestMixin):
         }
 
     @freeze_time('2017-04-18 13:25:30.986208+00:00')
-    def test_add_service_delivery(self):
-        """Test add new service delivery."""
+    def test_add_service_delivery_with_event(self):
+        """Test add new service delivery with an event."""
         adviser = AdviserFactory()
         company = CompanyFactory()
         contact = ContactFactory()
@@ -150,6 +150,76 @@ class TestInteractionV3(APITestMixin):
                 'id': str(event.pk),
                 'name': event.name,
             },
+            'service': {
+                'id': str(Service.trade_enquiry.value.id),
+                'name': Service.trade_enquiry.value.name,
+            },
+            'dit_team': {
+                'id': str(Team.healthcare_uk.value.id),
+                'name': Team.healthcare_uk.value.name,
+            },
+            'investment_project': None,
+            'created_by': {
+                'id': str(self.user.pk),
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'name': self.user.name
+            },
+            'modified_by': {
+                'id': str(self.user.pk),
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'name': self.user.name
+            },
+            'created_on': '2017-04-18T13:25:30.986208',
+            'modified_on': '2017-04-18T13:25:30.986208'
+        }
+
+    @freeze_time('2017-04-18 13:25:30.986208+00:00')
+    def test_add_service_delivery_without_event(self):
+        """Test add new service delivery without an event."""
+        adviser = AdviserFactory()
+        company = CompanyFactory()
+        contact = ContactFactory()
+        url = reverse('api-v3:interaction:collection')
+        request_data = {
+            'kind': 'service_delivery',
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': adviser.pk,
+            'notes': 'hello',
+            'company': company.pk,
+            'contact': contact.pk,
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id
+        }
+        response = self.api_client.post(url, request_data, format='json')
+
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data == {
+            'id': response_data['id'],
+            'kind': 'service_delivery',
+            'communication_channel': None,
+            'interaction_type': None,
+            'subject': 'whatever',
+            'date': '2017-04-18',
+            'dit_adviser': {
+                'id': str(adviser.pk),
+                'first_name': adviser.first_name,
+                'last_name': adviser.last_name,
+                'name': adviser.name
+            },
+            'notes': 'hello',
+            'company': {
+                'id': str(company.pk),
+                'name': company.name
+            },
+            'contact': {
+                'id': str(contact.pk),
+                'name': contact.name
+            },
+            'event': None,
             'service': {
                 'id': str(Service.trade_enquiry.value.id),
                 'name': Service.trade_enquiry.value.name,
@@ -259,6 +329,7 @@ class TestInteractionV3(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
+            'contact': ['This field is required.'],
             'date': ['This field is required.'],
             'dit_adviser': ['This field is required.'],
             'dit_team': ['This field is required.'],
@@ -291,14 +362,68 @@ class TestInteractionV3(APITestMixin):
             'communication_channel': ['This field is required.'],
         }
 
+    def test_add_interaction_with_service_delivery_fields(self):
+        """Tests that adding an interaction with an event fails."""
+        adviser = AdviserFactory()
+        company = CompanyFactory()
+        contact = ContactFactory()
+        url = reverse('api-v3:interaction:collection')
+        request_data = {
+            'kind': 'interaction',
+            'communication_channel': InteractionType.face_to_face.value.id,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': adviser.pk,
+            'notes': 'hello',
+            'company': company.pk,
+            'contact': contact.pk,
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id,
+            'event': EventFactory().pk
+        }
+        response = self.api_client.post(url, request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'event': ['This field cannot be specified for an interaction.'],
+        }
+
+    def test_add_service_delivery_with_interaction_fields(self):
+        """Tests that adding a service delivery with a communication channel fails."""
+        adviser = AdviserFactory()
+        company = CompanyFactory()
+        contact = ContactFactory()
+        url = reverse('api-v3:interaction:collection')
+        request_data = {
+            'kind': 'service_delivery',
+            'communication_channel': InteractionType.face_to_face.value.id,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': adviser.pk,
+            'notes': 'hello',
+            'company': company.pk,
+            'contact': contact.pk,
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id,
+            'event': EventFactory().pk
+        }
+        response = self.api_client.post(url, request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'communication_channel': ['This field cannot be specified for a service delivery.'],
+        }
+
     @freeze_time('2017-04-18 13:25:30.986208+00:00')
     def test_add_interaction_project(self):
         """Test add new interaction for an investment project."""
         project = InvestmentProjectFactory()
         adviser = AdviserFactory()
+        contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.post(url, {
             'kind': 'interaction',
+            'contact': contact.pk,
             'communication_channel': InteractionType.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -320,8 +445,10 @@ class TestInteractionV3(APITestMixin):
         """Test add new interaction without a contact, company or
         investment project.
         """
+        contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.post(url, {
+            'contact': contact.pk,
             'communication_channel': InteractionType.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),

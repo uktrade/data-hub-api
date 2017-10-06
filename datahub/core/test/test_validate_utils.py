@@ -1,3 +1,4 @@
+from operator import eq
 from types import SimpleNamespace
 from unittest.mock import MagicMock, Mock
 
@@ -5,7 +6,8 @@ import pytest
 from rest_framework.exceptions import ValidationError
 
 from datahub.core.validate_utils import (
-    AnyOfValidator, DataCombiner, is_blank, RequiredUnlessAlreadyBlank
+    AnyOfValidator, Condition, DataCombiner, is_blank, RequiredUnlessAlreadyBlank,
+    RulesBasedValidator, ValidationRule
 )
 
 
@@ -46,6 +48,78 @@ def test_any_of_all():
 def test_is_blank(value, blank):
     """Tests is_blank() for various values."""
     assert is_blank(value) == blank
+
+
+@pytest.mark.parametrize('data,field,op,args,res', (
+    ({'colour': 'red'}, 'colour', eq, ('red',), True),
+    ({'colour': 'red'}, 'colour', eq, ('blue',), False),
+))
+def test_validation_condition(data, field, op, args, res):
+    """Tests ValidationCondition for various cases."""
+    combiner = Mock(spec_set=DataCombiner, get_value=lambda field_: data[field_])
+    condition = Condition(field, op, args)
+    assert condition(combiner) == res
+
+
+@pytest.mark.parametrize('data,field,op,extra_args,condition,res', (
+    ({'colour': 'red', 'valid': True}, 'valid', bool, (), lambda x: True, True),
+    ({'colour': 'red', 'valid': False}, 'valid', bool, (), lambda x: True, False),
+    ({'colour': 'red', 'valid': True}, 'valid', bool, (), lambda x: False, True),
+    ({'colour': 'red', 'valid': False}, 'valid', bool, (), lambda x: False, True),
+    ({'colour': 'red', 'valid': False}, 'colour', eq, ('red',), lambda x: True, True),
+    ({'colour': 'red', 'valid': False}, 'colour', eq, ('blue',), lambda x: True, False),
+))
+def test_validation_rule(data, field, op, extra_args, condition, res):
+    """Tests ValidationRule for various cases."""
+    combiner = Mock(spec_set=DataCombiner, get_value=lambda field_: data[field_])
+    rule = ValidationRule(
+        'error_key', field, op, operator_extra_args=extra_args, condition=condition
+    )
+    assert rule(combiner) == res
+
+
+def _make_stub_rule(field, return_value):
+    return Mock(return_value=return_value, error_key='error', rule=Mock(field=field))
+
+
+class TestRulesBasedValidator:
+    """RulesBasedValidator tests."""
+
+    @pytest.mark.parametrize('rules', (
+        (_make_stub_rule('field1', True),),
+        (_make_stub_rule('field1', True), _make_stub_rule(True, 'field2')),
+    ))
+    def test_validation_passes(self, rules):
+        """Test that validation passes when the rules pass."""
+        instance = Mock()
+        serializer = Mock(instance=instance, error_messages={'error': 'test error'})
+        validator = RulesBasedValidator(*rules)
+        validator.set_context(serializer)
+        assert validator({}) is None
+
+    @pytest.mark.parametrize('rules,errors', (
+        (
+            (_make_stub_rule('field1', False),),
+            {'field1': 'test error'}
+        ),
+        (
+            (_make_stub_rule('field1', False), _make_stub_rule('field2', False),),
+            {'field1': 'test error', 'field2': 'test error'}
+        ),
+        (
+            (_make_stub_rule('field1', False), _make_stub_rule('field2', True),),
+            {'field1': 'test error'}
+        ),
+    ))
+    def test_validation_fails(self, rules, errors):
+        """Test that validation fails when any rule fails."""
+        instance = Mock()
+        serializer = Mock(instance=instance, error_messages={'error': 'test error'})
+        validator = RulesBasedValidator(*rules)
+        validator.set_context(serializer)
+        with pytest.raises(ValidationError) as excinfo:
+            validator({})
+        assert excinfo.value.detail == errors
 
 
 class TestDataCombiner:
