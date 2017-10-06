@@ -8,7 +8,7 @@ from datahub.company.models import (
     Advisor, CompaniesHouseCompany, Company, Contact
 )
 from datahub.core.serializers import NestedRelatedField
-from datahub.core.validate_utils import RequiredUnlessAlreadyBlank
+from datahub.core.validators import RequiredUnlessAlreadyBlankValidator
 from datahub.interaction.models import Interaction
 from datahub.metadata import models as meta_models
 
@@ -301,4 +301,4 @@ class CompanySerializer(serializers.ModelSerializer):
             'archived_on': {'read_only': True},
             'archived_reason': {'read_only': True}
         }
-        validators = [RequiredUnlessAlreadyBlank('sector', 'business_type')]
+        validators = [RequiredUnlessAlreadyBlankValidator('sector', 'business_type')]
