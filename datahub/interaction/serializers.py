@@ -13,7 +13,7 @@ from datahub.metadata.models import Service, Team
 from .models import CommunicationChannel, Interaction
 
 
-class InteractionSerializerV3(serializers.ModelSerializer):
+class InteractionSerializer(serializers.ModelSerializer):
     """V3 interaction serialiser."""
 
     default_error_messages = {

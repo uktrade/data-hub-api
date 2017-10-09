@@ -1,7 +1,7 @@
 from datahub.interaction.models import Interaction
 
 
-def get_interaction_queryset_v3():
+def get_interaction_queryset():
     """Gets the interaction query set used by v3 views."""
     return Interaction.objects.select_related(
         'company',
