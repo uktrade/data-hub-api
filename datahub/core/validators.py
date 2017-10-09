@@ -127,7 +127,6 @@ class ValidationRule:
                  error_key: str,
                  field: str,
                  operator_: Callable,
-                 operator_extra_args: Sequence = (),
                  condition: Condition = None):
         """
         Initialises a validation rule.
@@ -137,13 +136,12 @@ class ValidationRule:
         :param operator_: Callable that returns a truthy or falsey value (indicating whether the
                           value is valid). Will be called with the field value as the first
                           argument.
-        :param operator_extra_args: Extra arguments to pass to operator_.
         :param condition: Optional conditional rule to check before applying this rule.
                           If the condition evaluates to False, validation passes.
         """
         self.error_key = error_key
         self.condition = condition
-        self.rule = Condition(field, operator_, operator_extra_args)
+        self.rule = Condition(field, operator_)
 
     def __call__(self, combiner):
         """Test whether the rule passes or fails."""
@@ -156,8 +154,7 @@ class ValidationRule:
         """Returns the Python representation of this object."""
         return (
             f'{self.__class__.__name__}({self.error_key!r}, {self.rule.field!r}, '
-            f'{self.rule.operator!r}, operator_extra_args={self.rule.operator_extra_args!r}, '
-            f'condition={self.condition!r})'
+            f'{self.rule.operator!r}, condition={self.condition!r})'
         )
 
 

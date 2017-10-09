@@ -48,19 +48,17 @@ def test_validation_condition(data, field, op, args, res):
     assert condition(combiner) == res
 
 
-@pytest.mark.parametrize('data,field,op,extra_args,condition,res', (
-    ({'colour': 'red', 'valid': True}, 'valid', bool, (), lambda x: True, True),
-    ({'colour': 'red', 'valid': False}, 'valid', bool, (), lambda x: True, False),
-    ({'colour': 'red', 'valid': True}, 'valid', bool, (), lambda x: False, True),
-    ({'colour': 'red', 'valid': False}, 'valid', bool, (), lambda x: False, True),
-    ({'colour': 'red', 'valid': False}, 'colour', eq, ('red',), lambda x: True, True),
-    ({'colour': 'red', 'valid': False}, 'colour', eq, ('blue',), lambda x: True, False),
+@pytest.mark.parametrize('data,field,op,condition,res', (
+    ({'colour': 'red', 'valid': True}, 'valid', bool, lambda x: True, True),
+    ({'colour': 'red', 'valid': False}, 'valid', bool, lambda x: True, False),
+    ({'colour': 'red', 'valid': True}, 'valid', bool, lambda x: False, True),
+    ({'colour': 'red', 'valid': False}, 'valid', bool, lambda x: False, True),
 ))
-def test_validation_rule(data, field, op, extra_args, condition, res):
+def test_validation_rule(data, field, op, condition, res):
     """Tests ValidationRule for various cases."""
     combiner = Mock(spec_set=DataCombiner, get_value=lambda field_: data[field_])
     rule = ValidationRule(
-        'error_key', field, op, operator_extra_args=extra_args, condition=condition
+        'error_key', field, op, condition=condition
     )
     assert rule(combiner) == res
 
