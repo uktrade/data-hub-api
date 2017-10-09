@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from datahub.company.queryset import get_contact_queryset
-from datahub.interaction.queryset import get_interaction_queryset_v3
+from datahub.interaction.queryset import get_interaction_queryset
 from datahub.oauth.scopes import Scope
 
 from .serializers import IntelligentHomepageSerializer, LimitParamSerializer
@@ -13,7 +13,7 @@ class IntelligentHomepageView(APIView):
 
     required_scopes = (Scope.internal_front_end,)
     http_method_names = ['get']
-    interaction_queryset = get_interaction_queryset_v3().select_related(
+    interaction_queryset = get_interaction_queryset().select_related(
         'contact__company',
         'investment_project__investor_company',
     )
