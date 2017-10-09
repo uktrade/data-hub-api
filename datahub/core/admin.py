@@ -1,4 +1,27 @@
+from django.contrib import admin
 from reversion.admin import VersionAdmin
+
+
+class DisabledOnFilter(admin.SimpleListFilter):
+    """This filter allows us to filter values that have disabled_on value."""
+
+    title = 'Is disabled'
+    parameter_name = 'disabled_on'
+
+    def lookups(self, request, model_admin):
+        """Returns parameters."""
+        return (
+            ('yes', 'Yes'),
+            ('no', 'No'),
+        )
+
+    def queryset(self, request, queryset):
+        """Modify query according to filter parameter."""
+        value = self.value()
+        if value is not None:
+            is_disabled = True if value == 'yes' else False
+            return queryset.filter(disabled_on__isnull=(not is_disabled))
+        return queryset
 
 
 class ConfigurableVersionAdmin(VersionAdmin):
