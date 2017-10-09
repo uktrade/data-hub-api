@@ -267,8 +267,46 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['estimated_land_date'] == str(project.estimated_land_date)
         assert response_data['investment_type']['id'] == str(project.investment_type.id)
         assert (response_data['stage']['id'] == str(project.stage.id))
+        investor_company = project.investor_company
+        assert response_data['investor_company'] == {
+            'id': str(investor_company.id),
+            'name': investor_company.name
+        }
+        assert response_data['investor_company_country'] == {
+            'id': str(investor_company.registered_address_country.id),
+            'name': investor_company.registered_address_country.name
+        }
+        client_relationship_manager = project.client_relationship_manager
+        assert response_data['client_relationship_manager'] == {
+            'id': str(client_relationship_manager.id),
+            'first_name': client_relationship_manager.first_name,
+            'name': client_relationship_manager.name,
+            'last_name': client_relationship_manager.last_name,
+        }
+        assert response_data['client_relationship_manager_team'] == {
+            'id': str(client_relationship_manager.dit_team.id),
+            'name': client_relationship_manager.dit_team.name
+        }
         assert sorted(contact['id'] for contact in response_data[
             'client_contacts']) == sorted(contacts)
+
+    def test_get_project_no_investor_and_crm(self):
+        """
+        Test getting a company when investor_company and client_relationship_manager are None.
+        """
+        project = InvestmentProjectFactory(
+            investor_company=None,
+            client_relationship_manager=None,
+        )
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['id'] == str(project.id)
+        assert response_data['investor_company'] is None
+        assert response_data['investor_company_country'] is None
+        assert response_data['client_relationship_manager'] is None
+        assert response_data['client_relationship_manager_team'] is None
 
     def test_get_project_status(self):
         """Test getting project status fields."""
