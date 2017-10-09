@@ -6,8 +6,9 @@ from rest_framework import serializers
 from datahub.company.models import Company, Contact
 from datahub.company.serializers import AdviserSerializer, NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
-from datahub.core.validate_utils import (
-    AnyOfValidator, Condition, RequiredUnlessAlreadyBlank, RulesBasedValidator, ValidationRule
+from datahub.core.validators import (
+    AnyOfValidator, Condition, RequiredUnlessAlreadyBlankValidator, RulesBasedValidator,
+    ValidationRule
 )
 from datahub.event.models import Event
 from datahub.investment.models import InvestmentProject
@@ -38,7 +39,7 @@ class InteractionSerializerWriteV1(serializers.ModelSerializer):
         }
         validators = [
             AnyOfValidator('company', 'investment_project'),
-            RequiredUnlessAlreadyBlank('dit_team', 'communication_channel', 'service')
+            RequiredUnlessAlreadyBlankValidator('dit_team', 'communication_channel', 'service')
         ]
 
 
