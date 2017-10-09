@@ -4,43 +4,13 @@ from django.utils.translation import ugettext_lazy
 from rest_framework import serializers
 
 from datahub.company.models import Company, Contact
-from datahub.company.serializers import AdviserSerializer, NestedAdviserField
+from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
-from datahub.core.validators import (
-    AnyOfValidator, Condition, RequiredUnlessAlreadyBlankValidator, RulesBasedValidator,
-    ValidationRule
-)
+from datahub.core.validators import AnyOfValidator, Condition, RulesBasedValidator, ValidationRule
 from datahub.event.models import Event
 from datahub.investment.models import InvestmentProject
 from datahub.metadata.models import Service, Team
 from .models import CommunicationChannel, Interaction
-
-
-class InteractionSerializerReadV1(serializers.ModelSerializer):
-    """Interaction Serializer."""
-
-    dit_adviser = AdviserSerializer()
-
-    class Meta:  # noqa: D101
-        model = Interaction
-        depth = 2
-        fields = '__all__'
-
-
-class InteractionSerializerWriteV1(serializers.ModelSerializer):
-    """Interaction Serializer for writing operations."""
-
-    class Meta:  # noqa: D101
-        model = Interaction
-        fields = '__all__'
-        extra_kwargs = {
-            # Temporarily set a default for kind for backwards compatibility
-            'kind': {'default': Interaction.KINDS.interaction},
-        }
-        validators = [
-            AnyOfValidator('company', 'investment_project'),
-            RequiredUnlessAlreadyBlankValidator('dit_team', 'communication_channel', 'service')
-        ]
 
 
 class InteractionSerializerV3(serializers.ModelSerializer):
