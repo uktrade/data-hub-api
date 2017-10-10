@@ -188,11 +188,22 @@ def get_field_query(kind, field, value):
     return Q('nested', path=field.rsplit('.', maxsplit=1)[0], query=match)
 
 
+def get_exists_query(field, value):
+    """Gets exists query."""
+    real_field = field[:field.rindex('_')]
+
+    kind = 'must' if value else 'must_not'
+    query = {
+        kind: Q('exists', field=real_field)
+    }
+    return Q('bool', **query)
+
+
 def apply_aggs_query(search, aggregates):
     """Applies aggregates query to the search."""
     for aggregate in aggregates:
         # skip range and "search" filters as we can't aggregate them
-        if any(aggregate.endswith(x) for x in ('_before', '_after', '_trigram')):
+        if any(aggregate.endswith(x) for x in ('_before', '_after', '_trigram', '_exists')):
             continue
 
         search_aggs = search.aggs
@@ -230,6 +241,8 @@ def get_search_by_entity_query(term=None,
                       minimum_should_match=1
                       )
                 )
+            elif k.endswith('_exists'):
+                must_filter.append(get_exists_query(k, v))
             else:
                 must_filter.append(get_term_or_match_query(k, v))
 
