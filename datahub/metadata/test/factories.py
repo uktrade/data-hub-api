@@ -5,16 +5,6 @@ import factory
 from datahub.core import constants
 
 
-class EventFactory(factory.django.DjangoModelFactory):
-    """Event factory."""
-
-    id = factory.LazyFunction(uuid.uuid4)
-    name = factory.Sequence(lambda n: f'name {n}')
-
-    class Meta:  # noqa: D101
-        model = 'metadata.Event'
-
-
 class ServiceFactory(factory.django.DjangoModelFactory):
     """Service factory."""
 

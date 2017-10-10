@@ -87,12 +87,6 @@ class Service(BaseConstantModel):
     pass
 
 
-class Event(BaseConstantModel):
-    """Event."""
-
-    pass
-
-
 class HeadquarterType(BaseConstantModel):
     """Head Quarter."""
 
