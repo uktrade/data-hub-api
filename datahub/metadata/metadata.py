@@ -18,7 +18,6 @@ registry.register(
 registry.register(metadata_id='title', model=models.Title)
 registry.register(metadata_id='turnover', model=models.TurnoverRange)
 registry.register(metadata_id='uk-region', model=models.UKRegion)
-registry.register(metadata_id='event', model=models.Event)
 registry.register(metadata_id='headquarter-type', model=models.HeadquarterType)
 registry.register(metadata_id='company-classification', model=models.CompanyClassification)
 registry.register(metadata_id='investment-type', model=models.InvestmentType)
