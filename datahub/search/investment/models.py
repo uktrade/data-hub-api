@@ -79,6 +79,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         ],
         'fdi_type': dict_utils.id_name_dict,
         'fdi_type_documents': lambda col: [dict_utils.id_uri_dict(c) for c in col.all()],
+        'fdi_value': dict_utils.id_name_dict,
         'intermediate_company': dict_utils.id_name_dict,
         'investor_company': dict_utils.id_name_dict,
         'uk_company': dict_utils.id_name_dict,
