@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from datahub.core.admin import BaseModelVersionAdmin
-from .models import CommunicationChannel, Interaction, ServiceDelivery, ServiceOffer
+from .models import CommunicationChannel, Interaction
 
 
 @admin.register(CommunicationChannel)
@@ -48,30 +48,3 @@ class InteractionAdmin(BaseModelVersionAdmin):
         'investment_project',
         'investment_project__investor_company',
     )
-
-
-@admin.register(ServiceDelivery)
-class ServiceDeliveryAdmin(BaseModelVersionAdmin):
-    """Service Delivery admin."""
-
-    search_fields = (
-        'id',
-        'company__company_number',
-        'company__company_name',
-        'contact_email'
-    )
-    raw_id_fields = (
-        'company',
-        'dit_adviser',
-        'contact',
-        'event',
-        'created_by',
-        'modified_by',
-    )
-
-
-@admin.register(ServiceOffer)
-class ServiceOfferAdmin(BaseModelVersionAdmin):
-    """Service Offer admin."""
-
-    raw_id_fields = ('event',)

@@ -10,7 +10,6 @@ MODELS_TO_REGISTER = (
     models.Title,
     models.Role,
     models.TeamRole,
-    models.ServiceDeliveryStatus,
     models.Event,
     models.InvestmentType,
     models.FDIType,

@@ -9,7 +9,6 @@ botocore==1.7.25          # via boto3, s3transfer
 certifi==2017.7.27.1      # via certifi, requests
 chardet==3.0.4            # via chardet, requests
 click==6.7                # via click, pip-tools
-colander==1.4
 coverage==4.4.1           # via coverage, pytest-cov
 cssselect==1.0.1
 decorator==4.1.2          # via decorator, ipython, traitlets
@@ -48,7 +47,6 @@ idna==2.6                 # via idna, requests
 ipdb==0.10.3
 ipython-genutils==0.2.0   # via ipython-genutils, traitlets
 ipython==6.2.1
-iso8601==0.1.12           # via colander, iso8601
 jedi==0.11.0              # via ipython, jedi
 jmespath==0.9.3           # via boto3, botocore, jmespath
 lxml==4.0.0
@@ -90,7 +88,6 @@ snowballstemmer==1.2.1    # via pydocstyle, snowballstemmer
 sqlparse==0.2.4           # via django-debug-toolbar, sqlparse
 termcolor==1.1.0          # via pytest-sugar, termcolor
 traitlets==4.3.2          # via ipython, traitlets
-translationstring==1.3    # via colander, translationstring
 urllib3==1.22             # via elasticsearch, requests, urllib3
 wcwidth==0.1.7            # via prompt-toolkit, wcwidth
 werkzeug==0.12.2
