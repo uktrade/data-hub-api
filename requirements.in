@@ -11,7 +11,6 @@ django-filter==1.0.4
 django-reversion==2.0.10
 django-pglocks==1.0.2
 django-model-utils==3.0.0
-django-mptt==0.8.7  # Remove after squashing migrations
 
 django-oauth-toolkit==1.0.0
 whitenoise==3.3.1
