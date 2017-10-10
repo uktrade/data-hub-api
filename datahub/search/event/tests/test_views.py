@@ -150,12 +150,8 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:event')
 
         team = TeamFactory()
-        for _ in range(5):
-            EventFactory()
-            EventFactory(
-                lead_team_id=team.id
-            )
-
+        EventFactory.create_batch(5)
+        EventFactory.create_batch(5, lead_team_id=team.id)
         setup_es.indices.refresh()
 
         response = self.api_client.post(url, {
@@ -176,38 +172,34 @@ class TestSearch(APITestMixin):
 
         team_a = TeamFactory()
         team_b = TeamFactory()
-        for _ in range(5):
-            EventFactory(
-                teams=[team_a]
-            )
-            EventFactory(
-                teams=[team_b]
-            )
+        team_c = TeamFactory()
+        EventFactory(teams=(team_c,))
+        EventFactory.create_batch(5, teams=(team_a, team_b,))
+        EventFactory.create_batch(5, teams=(team_b,))
 
         setup_es.indices.refresh()
 
         response = self.api_client.post(url, {
-            'teams': team_a.id,
+            'teams': (team_a.id, team_c.id,)
         }, format='json')
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 5
-        assert len(response.data['results']) == 5
+        print(response.data['results'])
+        assert response.data['count'] == 6
+        assert len(response.data['results']) == 6
 
-        team_ids = [result['teams'][0]['id'] for result in response.data['results']]
-
-        assert all(team_id == str(team_a.id) for team_id in team_ids)
+        event_teams = (result['teams'] for result in response.data['results'])
+        for teams in event_teams:
+            team_ids = {team['id'] for team in teams}
+            assert len(team_ids.intersection({str(team_a.id), str(team_c.id)})) > 0
 
     def test_search_event_disabled_on(self, setup_es):
         """Tests disabled_on filter."""
         url = reverse('api-v3:search:event')
 
         current_datetime = datetime.datetime.utcnow()
-        for _ in range(5):
-            EventFactory()
-            EventFactory(
-                disabled_on=current_datetime
-            )
+        EventFactory.create_batch(5)
+        EventFactory.create_batch(5, disabled_on=current_datetime)
 
         setup_es.indices.refresh()
 
@@ -227,11 +219,8 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:event')
 
         current_datetime = datetime.datetime.utcnow()
-        for _ in range(5):
-            EventFactory()
-            EventFactory(
-                disabled_on=current_datetime
-            )
+        EventFactory.create_batch(5)
+        EventFactory.create_batch(5, disabled_on=current_datetime)
 
         setup_es.indices.refresh()
 
@@ -243,7 +232,7 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 5
         assert len(response.data['results']) == 5
 
-        disabled_ons = [result['disabled_on'] for result in response.data['results']]
+        disabled_ons = (result['disabled_on'] for result in response.data['results'])
         assert all(disabled_on is None for disabled_on in disabled_ons)
 
     def test_search_event_disabled_on_exists(self, setup_es):
@@ -251,11 +240,8 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:event')
 
         current_datetime = datetime.datetime.utcnow()
-        for _ in range(5):
-            EventFactory()
-            EventFactory(
-                disabled_on=current_datetime
-            )
+        EventFactory.create_batch(5)
+        EventFactory.create_batch(5, disabled_on=current_datetime)
 
         setup_es.indices.refresh()
 
@@ -268,7 +254,7 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 5
         assert len(response.data['results']) == 5
 
-        disabled_ons = [result['disabled_on'] for result in response.data['results']]
+        disabled_ons = (result['disabled_on'] for result in response.data['results'])
         assert all(disabled_on is not None for disabled_on in disabled_ons)
 
     def test_search_event_uk_region(self, setup_es):
