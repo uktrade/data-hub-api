@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from datahub.company.queryset import get_contact_queryset
-from datahub.interaction.queryset import get_interaction_queryset_v1
+from datahub.interaction.queryset import get_interaction_queryset
 from datahub.oauth.scopes import Scope
 
 from .serializers import IntelligentHomepageSerializer, LimitParamSerializer
@@ -13,6 +13,11 @@ class IntelligentHomepageView(APIView):
 
     required_scopes = (Scope.internal_front_end,)
     http_method_names = ['get']
+    interaction_queryset = get_interaction_queryset().select_related(
+        'contact__company',
+        'investment_project__investor_company',
+    )
+    contact_queryset = get_contact_queryset()
 
     def get(self, request, format=None):
         """Implement GET method."""
@@ -22,12 +27,12 @@ class IntelligentHomepageView(APIView):
         limit = serializer.validated_data['limit']
 
         interactions = _filter_queryset(
-            get_interaction_queryset_v1().filter(dit_adviser=user),
+            self.interaction_queryset.filter(dit_adviser=user),
             limit
         )
 
         contacts = _filter_queryset(
-            get_contact_queryset().filter(created_by=user),
+            self.contact_queryset.filter(created_by=user),
             limit
         )
 

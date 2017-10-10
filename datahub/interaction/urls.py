@@ -1,13 +1,13 @@
 from django.conf.urls import url
 
-from datahub.interaction.views import InteractionViewSetV3
+from datahub.interaction.views import InteractionViewSet
 
-collection = InteractionViewSetV3.as_view({
+collection = InteractionViewSet.as_view({
     'get': 'list',
     'post': 'create'
 })
 
-item = InteractionViewSetV3.as_view({
+item = InteractionViewSet.as_view({
     'get': 'retrieve',
     'patch': 'partial_update'
 })

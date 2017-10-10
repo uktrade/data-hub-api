@@ -1,13 +1,24 @@
 from rest_framework import serializers
 
-from datahub.company.serializers import NestedContactSerializer
-from datahub.interaction.serializers import InteractionSerializerReadV1
+from datahub.company.serializers import AdviserSerializer, NestedContactSerializer
+from datahub.interaction.models import Interaction
+
+
+class InteractionSerializer(serializers.ModelSerializer):
+    """Interaction serializer for IntelligentHomepageSerializer."""
+
+    dit_adviser = AdviserSerializer()
+
+    class Meta:  # noqa: D101
+        model = Interaction
+        depth = 2
+        fields = '__all__'
 
 
 class IntelligentHomepageSerializer(serializers.Serializer):
     """Intelligent homepage serializer."""
 
-    interactions = InteractionSerializerReadV1(many=True)
+    interactions = InteractionSerializer(many=True)
     contacts = NestedContactSerializer(many=True)
 
     class Meta:  # noqa: D101
