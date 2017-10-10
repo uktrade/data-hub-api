@@ -8,6 +8,7 @@ from datahub.company.test.factories import AdviserFactory
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
 from datahub.event.test.factories import EventFactory
+from datahub.metadata.test.factories import TeamFactory
 
 
 @pytest.fixture
@@ -47,7 +48,6 @@ class TestSearch(APITestMixin):
 
         url = reverse('api-v3:search:event')
         response = self.api_client.post(url, {
-            'original_query': '',
             'offset': 1,
             'limit': 1,
         })
@@ -77,7 +77,6 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:event')
 
         response = self.api_client.post(url, {
-            'original_query': '',
             'name': event_name[:5],
         })
 
@@ -97,7 +96,6 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:event')
 
         response = self.api_client.post(url, {
-            'original_query': '',
             'organiser': organiser.id,
         })
 
@@ -120,7 +118,6 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:event')
 
         response = self.api_client.post(url, {
-            'original_query': '',
             'organiser_name': '00000',
         })
 
@@ -140,7 +137,6 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:event')
 
         response = self.api_client.post(url, {
-            'original_query': '',
             'address_country': country_id,
         })
 
@@ -148,6 +144,83 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['address_country']['id'] == country_id
+
+    def test_search_event_lead_team(self, setup_es, setup_data):
+        """Tests lead_team filter."""
+        url = reverse('api-v3:search:event')
+
+        team = TeamFactory()
+        for _ in range(5):
+            EventFactory()
+            EventFactory(
+                lead_team_id=team.id
+            )
+
+        setup_es.indices.refresh()
+
+        response = self.api_client.post(url, {
+            'lead_team': team.id,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 5
+        assert len(response.data['results']) == 5
+
+        team_ids = [result['lead_team']['id'] for result in response.data['results']]
+
+        assert all(team_id == str(team.id) for team_id in team_ids)
+
+    def test_search_event_teams(self, setup_es, setup_data):
+        """Tests teams filter."""
+        url = reverse('api-v3:search:event')
+
+        team_a = TeamFactory()
+        team_b = TeamFactory()
+        for _ in range(5):
+            EventFactory(
+                teams=[team_a]
+            )
+            EventFactory(
+                teams=[team_b]
+            )
+
+        setup_es.indices.refresh()
+
+        response = self.api_client.post(url, {
+            'teams': team_a.id,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 5
+        assert len(response.data['results']) == 5
+
+        team_ids = [result['teams'][0]['id'] for result in response.data['results']]
+
+        assert all(team_id == str(team_a.id) for team_id in team_ids)
+
+    def test_search_event_disabled_on(self, setup_es, setup_data):
+        """Tests disabled_on filter."""
+        url = reverse('api-v3:search:event')
+
+        current_datetime = datetime.datetime.utcnow()
+        for _ in range(5):
+            EventFactory()
+            EventFactory(
+                disabled_on=current_datetime
+            )
+
+        setup_es.indices.refresh()
+
+        response = self.api_client.post(url, {
+            'disabled_on_after': current_datetime,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 5
+        assert len(response.data['results']) == 5
+
+        disabled_ons = [result['disabled_on'] for result in response.data['results']]
+        assert all(disabled_on == current_datetime.isoformat() for disabled_on in disabled_ons)
 
     def test_search_event_uk_region(self, setup_es, setup_data):
         """Tests uk_region filter."""
@@ -162,7 +235,6 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:event')
 
         response = self.api_client.post(url, {
-            'original_query': '',
             'uk_region': uk_region_id,
         })
 
@@ -204,7 +276,6 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:event')
 
         response = self.api_client.post(url, {
-            'original_query': '',
             'start_date_after': start_date_a,
             'start_date_before': start_date_b,
             'sortby': 'start_date:desc',
@@ -252,7 +323,6 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:event')
 
         response = self.api_client.post(url, {
-            'original_query': '',
             'start_date_after': start_date,
             'start_date_before': start_date,
             'sortby': 'modified_on:desc',

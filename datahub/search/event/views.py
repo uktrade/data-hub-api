@@ -12,22 +12,28 @@ class SearchEventParams:
     serializer_class = SearchEventSerializer
 
     FILTER_FIELDS = (
+        'address_country',
+        'disabled_on_after',
+        'disabled_on_before',
+        'event_type',
+        'lead_team',
         'name',
         'organiser',
         'organiser_name',
-        'event_type',
         'start_date_after',
         'start_date_before',
-        'address_country',
+        'teams',
         'uk_region',
     )
 
     REMAP_FIELDS = {
+        'address_country': 'address_country.id',
+        'event_type': 'event_type.id',
+        'lead_team': 'lead_team.id',
         'name': 'name_trigram',
         'organiser': 'organiser.id',
         'organiser_name': 'organiser.name_trigram',
-        'event_type': 'event_type.id',
-        'address_country': 'address_country.id',
+        'teams': 'teams.id',
         'uk_region': 'uk_region.id',
     }
 
