@@ -5,7 +5,6 @@
 dockerize -wait ${POSTGRES_URL} -wait ${ES5_URL} -timeout 60s
 python /app/manage.py migrate
 python /app/manage.py loadmetadata
-python /app/manage.py createinitialrevisions
 python /app/manage.py load_omis_metadata
 
 echo "from oauth2_provider.models import Application;
@@ -28,5 +27,6 @@ Advisor.objects.create_user(
 )" | /app/manage.py shell
 
 python /app/manage.py loaddata /app/fixtures/test_data.yaml
+python /app/manage.py createinitialrevisions
 python /app/manage.py sync_es
 python /app/manage.py runserver 0.0.0.0:8000
