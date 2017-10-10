@@ -25,6 +25,7 @@ def setup_data():
         estimated_land_date=datetime.datetime(2057, 6, 13, 9, 44, 31, 62870),
         project_manager=AdviserFactory(),
         project_assurance_adviser=AdviserFactory(),
+        fdi_value_id=constants.FDIValue.higher.value.id,
     )
 
 
