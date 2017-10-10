@@ -36,6 +36,42 @@ def test_no_project_code():
     assert project.project_code is None
 
 
+def test_client_relationship_manager_team_none():
+    """
+    Tests client_relationship_manager_team for a project without a client relationship
+    manager.
+    """
+    project = InvestmentProjectFactory(client_relationship_manager=None)
+    assert project.client_relationship_manager_team is None
+
+
+def test_client_relationship_manager_team_valid():
+    """
+    Tests client_relationship_manager_team for a project with a client relationship
+    manager.
+    """
+    project = InvestmentProjectFactory()
+    assert project.client_relationship_manager_team
+
+
+def test_investor_company_country_none():
+    """
+    Tests client_relationship_manager_team for a project without a client relationship
+    manager.
+    """
+    project = InvestmentProjectFactory(investor_company=None)
+    assert project.investor_company_country is None
+
+
+def test_investor_company_country_valid():
+    """
+    Tests client_relationship_manager_team for a project with a client relationship
+    manager.
+    """
+    project = InvestmentProjectFactory()
+    assert project.investor_company_country
+
+
 def test_project_manager_team_none():
     """Tests project_manager_team for a project without a project manager."""
     project = InvestmentProjectFactory()

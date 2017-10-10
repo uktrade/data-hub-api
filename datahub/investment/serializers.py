@@ -21,12 +21,18 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
     country_lost_to = NestedRelatedField(meta_models.Country, required=False, allow_null=True)
     project_shareable = serializers.BooleanField(required=True)
     investor_company = NestedRelatedField(Company, required=True, allow_null=False)
+    investor_company_country = NestedRelatedField(
+        meta_models.Country, read_only=True
+    )
     intermediate_company = NestedRelatedField(Company, required=False, allow_null=True)
     client_contacts = NestedRelatedField(
         Contact, many=True, required=True, allow_null=False, allow_empty=False
     )
 
     client_relationship_manager = NestedAdviserField(required=True, allow_null=False)
+    client_relationship_manager_team = NestedRelatedField(
+        meta_models.Team, read_only=True
+    )
     referral_source_adviser = NestedAdviserField(required=True, allow_null=False)
     referral_source_activity = NestedRelatedField(
         meta_models.ReferralSourceActivity, required=True, allow_null=False
@@ -102,9 +108,11 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
             'date_lost',
             'country_lost_to',
             'investor_company',
+            'investor_company_country',
             'intermediate_company',
             'client_contacts',
             'client_relationship_manager',
+            'client_relationship_manager_team',
             'referral_source_adviser',
             'referral_source_activity',
             'referral_source_activity_website',

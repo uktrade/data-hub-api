@@ -142,6 +142,20 @@ class IProjectAbstract(models.Model):
         except ObjectDoesNotExist:
             return None
 
+    @property
+    def investor_company_country(self):
+        """The country of the investor company."""
+        if self.investor_company:
+            return self.investor_company.registered_address_country
+        return None
+
+    @property
+    def client_relationship_manager_team(self):
+        """The DIT team associated with the client relationship manager."""
+        if self.client_relationship_manager:
+            return self.client_relationship_manager.dit_team
+        return None
+
 
 class IProjectValueAbstract(models.Model):
     """The value part of an investment project."""

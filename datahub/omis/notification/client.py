@@ -70,6 +70,7 @@ class Notify:
             'order ref': order.reference,
             'company name': order.company.name,
             'embedded link': order.get_datahub_frontend_url(),
+            'primary market': order.primary_market.name,
             **(data or {})
         }
 
