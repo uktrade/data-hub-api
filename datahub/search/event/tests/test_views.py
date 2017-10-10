@@ -145,7 +145,7 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['address_country']['id'] == country_id
 
-    def test_search_event_lead_team(self, setup_es, setup_data):
+    def test_search_event_lead_team(self, setup_es):
         """Tests lead_team filter."""
         url = reverse('api-v3:search:event')
 
@@ -170,7 +170,7 @@ class TestSearch(APITestMixin):
 
         assert all(team_id == str(team.id) for team_id in team_ids)
 
-    def test_search_event_teams(self, setup_es, setup_data):
+    def test_search_event_teams(self, setup_es):
         """Tests teams filter."""
         url = reverse('api-v3:search:event')
 
@@ -198,7 +198,7 @@ class TestSearch(APITestMixin):
 
         assert all(team_id == str(team_a.id) for team_id in team_ids)
 
-    def test_search_event_disabled_on(self, setup_es, setup_data):
+    def test_search_event_disabled_on(self, setup_es):
         """Tests disabled_on filter."""
         url = reverse('api-v3:search:event')
 
@@ -222,7 +222,56 @@ class TestSearch(APITestMixin):
         disabled_ons = [result['disabled_on'] for result in response.data['results']]
         assert all(disabled_on == current_datetime.isoformat() for disabled_on in disabled_ons)
 
-    def test_search_event_uk_region(self, setup_es, setup_data):
+    def test_search_event_disabled_on_doesnt_exist(self, setup_es):
+        """Tests disabled_on is null filter."""
+        url = reverse('api-v3:search:event')
+
+        current_datetime = datetime.datetime.utcnow()
+        for _ in range(5):
+            EventFactory()
+            EventFactory(
+                disabled_on=current_datetime
+            )
+
+        setup_es.indices.refresh()
+
+        response = self.api_client.post(url, {
+            'disabled_on_exists': False,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 5
+        assert len(response.data['results']) == 5
+
+        disabled_ons = [result['disabled_on'] for result in response.data['results']]
+        assert all(disabled_on is None for disabled_on in disabled_ons)
+
+    def test_search_event_disabled_on_exists(self, setup_es):
+        """Tests disabled_on is null filter."""
+        url = reverse('api-v3:search:event')
+
+        current_datetime = datetime.datetime.utcnow()
+        for _ in range(5):
+            EventFactory()
+            EventFactory(
+                disabled_on=current_datetime
+            )
+
+        setup_es.indices.refresh()
+
+        response = self.api_client.post(url, {
+            'disabled_on_exists': True,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        # We should get at least 5 disabled events, as some already exist
+        assert response.data['count'] == 5
+        assert len(response.data['results']) == 5
+
+        disabled_ons = [result['disabled_on'] for result in response.data['results']]
+        assert all(disabled_on is not None for disabled_on in disabled_ons)
+
+    def test_search_event_uk_region(self, setup_es):
         """Tests uk_region filter."""
         country_id = constants.Country.united_kingdom.value.id
         uk_region_id = constants.UKRegion.jersey.value.id
