@@ -66,6 +66,7 @@ LOCAL_APPS = [
     'datahub.omis.notification',
     'datahub.omis.quote',
     'datahub.omis.invoice',
+    'datahub.omis.payment',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
