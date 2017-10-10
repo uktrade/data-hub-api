@@ -127,9 +127,6 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     class Meta:  # noqa: D101
         verbose_name_plural = 'companies'
 
-    class MPTTMeta:  # noqa: D101
-        order_insertion_by = ['name']
-
     @property
     def uk_based(self):
         """Whether a company is based in the UK or not."""
