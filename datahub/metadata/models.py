@@ -87,13 +87,6 @@ class Service(BaseConstantModel):
     pass
 
 
-class ServiceDeliveryStatus(BaseConstantModel):
-    """Service delivery status."""
-
-    class Meta(BaseConstantModel.Meta):  # noqa: D101
-        verbose_name_plural = 'service delivery statuses'
-
-
 class Event(BaseConstantModel):
     """Event."""
 
