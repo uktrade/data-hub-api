@@ -26,9 +26,9 @@ class InteractionFactory(factory.django.DjangoModelFactory):
     modified_by = factory.SubFactory(AdviserFactory)
     company = factory.SubFactory(CompanyFactory)
     contact = factory.SubFactory(ContactFactory)
-    subject = 'foo'
+    subject = factory.Faker('sentence', nb_words=8)
     date = now()
-    notes = 'Bar'
+    notes = factory.Faker('paragraph', nb_sentences=10)
     dit_adviser = factory.SubFactory(AdviserFactory)
     service_id = constants.Service.trade_enquiry.value.id
     dit_team_id = constants.Team.healthcare_uk.value.id
@@ -48,9 +48,9 @@ class ServiceDeliveryFactory(factory.django.DjangoModelFactory):
     company = factory.SubFactory(CompanyFactory)
     contact = factory.SubFactory(ContactFactory)
     event = factory.SubFactory(EventFactory)
-    subject = 'foo'
+    subject = factory.Faker('sentence', nb_words=8)
     date = now()
-    notes = 'Bar'
+    notes = factory.Faker('paragraph', nb_sentences=10)
     dit_adviser = factory.SubFactory(AdviserFactory)
     service_id = constants.Service.trade_enquiry.value.id
     dit_team_id = constants.Team.healthcare_uk.value.id

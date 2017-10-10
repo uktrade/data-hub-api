@@ -1,5 +1,5 @@
 from django.conf import settings
-from elasticsearch_dsl import Boolean, Date, DocType, String
+from elasticsearch_dsl import Boolean, Date, DocType, Keyword, String
 from . import dict_utils as contact_dict_utils
 from .. import dict_utils
 from .. import dsl_utils
@@ -9,32 +9,33 @@ from ..models import MapDBModelToDict
 class Contact(DocType, MapDBModelToDict):
     """Elasticsearch representation of Contact model."""
 
-    id = String(index='not_analyzed')
+    id = Keyword()
     archived = Boolean()
     archived_on = Date()
     archived_reason = String()
     created_on = Date()
     modified_on = Date()
-    name = String()
-    name_keyword = dsl_utils.CaseInsensitiveKeywordString()
+    name = dsl_utils.SortableString()
+    name_keyword = dsl_utils.SortableCaseInsensitiveKeywordString()
+    # field is being aggregated
     name_trigram = dsl_utils.TrigramString()
     title = dsl_utils.id_name_mapping()
-    first_name = String(copy_to=['name', 'name_keyword', 'name_trigram'])
-    last_name = String(copy_to=['name', 'name_keyword', 'name_trigram'])
+    first_name = dsl_utils.SortableString(copy_to=['name', 'name_keyword', 'name_trigram'])
+    last_name = dsl_utils.SortableString(copy_to=['name', 'name_keyword', 'name_trigram'])
     primary = Boolean()
-    telephone_countrycode = dsl_utils.KeywordString()
-    telephone_number = dsl_utils.KeywordString()
-    email = dsl_utils.CaseInsensitiveKeywordString()
+    telephone_countrycode = Keyword()
+    telephone_number = Keyword()
+    email = dsl_utils.SortableCaseInsensitiveKeywordString()
     address_same_as_company = Boolean()
     address_1 = String()
     address_2 = String()
-    address_town = dsl_utils.CaseInsensitiveKeywordString()
-    address_county = dsl_utils.CaseInsensitiveKeywordString()
+    address_town = dsl_utils.SortableCaseInsensitiveKeywordString()
+    address_county = dsl_utils.SortableCaseInsensitiveKeywordString()
     address_postcode = String()
     telephone_alternative = String()
     email_alternative = String()
     notes = dsl_utils.EnglishString()
-    job_title = dsl_utils.CaseInsensitiveKeywordString()
+    job_title = dsl_utils.SortableCaseInsensitiveKeywordString()
     contactable_by_dit = Boolean()
     contactable_by_dit_partners = Boolean()
     contactable_by_email = Boolean()
