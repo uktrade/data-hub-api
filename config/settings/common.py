@@ -154,11 +154,6 @@ PUBLIC_ROOT = str(ROOT_DIR('public'))
 STATIC_ROOT = str(ROOT_DIR('staticfiles'))
 STATIC_URL = '/static/'
 
-# Extra places for collectstatic to find static files.
-STATICFILES_DIRS = (
-    str(ROOT_DIR.path('static')),
-)
-
 # DRF
 REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': None,
