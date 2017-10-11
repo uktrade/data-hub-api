@@ -52,6 +52,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'abstract': False,
+                'ordering': ('created_on',)
             },
         ),
     ]

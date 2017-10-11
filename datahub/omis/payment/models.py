@@ -67,6 +67,9 @@ class Payment(BaseModel):
         related_name='+'
     )
 
+    class Meta:  # noqa: D101
+        ordering = ('created_on', )
+
     def __str__(self):
         """Human-readable representation"""
         return self.reference
