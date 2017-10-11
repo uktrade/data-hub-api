@@ -98,6 +98,12 @@ class OrderWithAcceptedQuoteFactory(OrderFactory):
     status = OrderStatus.quote_accepted
 
 
+class OrderPaidFactory(OrderWithAcceptedQuoteFactory):
+    """Factory for orders marked as paid."""
+
+    status = OrderStatus.paid
+
+
 class OrderSubscriberFactory(factory.django.DjangoModelFactory):
     """Order Subscriber factory."""
 
