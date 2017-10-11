@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('company', '0007_remove_mptt'),
+        ('company', '0001_squashed_0010_auto_20170807_1124'),
         ('metadata', '0002_rename_phase_to_stage'),
     ]
 

@@ -15,8 +15,6 @@ import uuid
 
 class Migration(migrations.Migration):
 
-    replaces = [('company', '0001_squash_0030_initial'), ('company', '0002_auto_20170526_1257'), ('company', '0003_fix_blank_fields'), ('company', '0004_rename_advsor_fkeys_to_adviser'), ('company', '0005_remove_lead_address_3_4'), ('company', '0006_reanme_enabled_to_use_cdms_auth'), ('company', '0007_remove_mptt'), ('company', '0008_add_adviser_name_index'), ('company', '0009_created_modified_by'), ('company', '0010_auto_20170807_1124')]
-
     initial = True
 
     dependencies = [

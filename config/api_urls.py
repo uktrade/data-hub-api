@@ -6,7 +6,6 @@ from rest_framework import routers
 from datahub.company import urls as company_urls
 from datahub.company import views as company_views
 from datahub.event import urls as event_urls
-from datahub.interaction import views as interaction_views
 from datahub.interaction import urls as interaction_urls
 from datahub.investment import urls as investment_urls
 from datahub.leads import urls as leads_urls
@@ -18,7 +17,6 @@ from datahub.v2.urls import urlpatterns as v2_urlpatterns
 # API V1
 
 router_v1 = routers.SimpleRouter()
-router_v1.register(r'interaction', interaction_views.InteractionViewSetV1)
 router_v1.register(r'adviser', company_views.AdviserReadOnlyViewSetV1)
 
 v1_urls = router_v1.urls
