@@ -15,7 +15,7 @@ class PaymentSerializer(serializers.ModelSerializer):
             'additional_reference',
             'amount',
             'method',
-            'payment_received_on',
+            'received_on',
         )
         read_only_fields = (
             'created_on',
