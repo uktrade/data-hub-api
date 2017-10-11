@@ -1,4 +1,4 @@
 ---
 applications:
 - buildpack: python_buildpack
-  command:  python manage.py distributed_migrate --noinput && gunicorn config.wsgi --config config/gunicorn.py
+  command:  python manage.py collectstatic --noinput && python manage.py distributed_migrate --noinput && gunicorn config.wsgi --config config/gunicorn.py
