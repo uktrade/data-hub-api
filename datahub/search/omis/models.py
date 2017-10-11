@@ -75,6 +75,7 @@ class Order(DocType, MapDBModelToDict):
         'discount_label',
         'public_token',
         'invoice',
+        'payments',
     )
 
     SEARCH_FIELDS = []

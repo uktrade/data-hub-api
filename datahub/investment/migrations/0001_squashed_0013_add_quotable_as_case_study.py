@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('company', '0001_squash_0030_initial'),
+        ('company', '0001_squashed_0010_auto_20170807_1124'),
         ('metadata', '0003_add_fdi_value'),
         ('documents', '0001_initial'),
     ]
