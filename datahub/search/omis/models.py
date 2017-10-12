@@ -1,5 +1,5 @@
 from django.conf import settings
-from elasticsearch_dsl import Boolean, Date, DocType, Integer, Keyword, String
+from elasticsearch_dsl import Boolean, Date, DocType, Integer, Keyword, Text
 
 from .. import dict_utils
 from .. import dsl_utils
@@ -10,8 +10,8 @@ class Order(DocType, MapDBModelToDict):
     """Elasticsearch representation of Order model."""
 
     id = Keyword()
-    reference = dsl_utils.SortableCaseInsensitiveKeywordString()
-    status = dsl_utils.SortableCaseInsensitiveKeywordString()
+    reference = dsl_utils.SortableCaseInsensitiveKeywordText()
+    status = dsl_utils.SortableCaseInsensitiveKeywordText()
     company = dsl_utils.id_name_mapping()
     contact = dsl_utils.contact_or_adviser_mapping('contact')
     created_by = dsl_utils.contact_or_adviser_mapping('created_by')
@@ -19,32 +19,32 @@ class Order(DocType, MapDBModelToDict):
     modified_on = Date()
     primary_market = dsl_utils.id_name_mapping()
     sector = dsl_utils.id_name_mapping()
-    description = dsl_utils.EnglishString()
-    contacts_not_to_approach = String()
+    description = dsl_utils.EnglishText()
+    contacts_not_to_approach = Text()
     delivery_date = Date()
     service_types = dsl_utils.id_name_mapping()
-    contact_email = dsl_utils.SortableCaseInsensitiveKeywordString()
+    contact_email = dsl_utils.SortableCaseInsensitiveKeywordText()
     contact_phone = Keyword()
     subscribers = dsl_utils.contact_or_adviser_mapping('subscribers', include_dit_team=True)
     assignees = dsl_utils.contact_or_adviser_mapping('assignees', include_dit_team=True)
-    po_number = String(index='no')
-    discount_value = Integer(index='no')
-    vat_status = String(index='no')
-    vat_number = String(index='no')
-    vat_verified = Boolean(index='no')
-    net_cost = Integer(index='no')
-    subtotal_cost = Integer(index='no')
-    vat_cost = Integer(index='no')
+    po_number = Keyword(index=False)
+    discount_value = Integer(index=False)
+    vat_status = Keyword(index=False)
+    vat_number = Keyword(index=False)
+    vat_verified = Boolean(index=False)
+    net_cost = Integer(index=False)
+    subtotal_cost = Integer(index=False)
+    vat_cost = Integer(index=False)
     total_cost = Integer()
 
-    billing_contact_name = String()
-    billing_email = dsl_utils.SortableCaseInsensitiveKeywordString()
-    billing_phone = dsl_utils.SortableCaseInsensitiveKeywordString()
-    billing_address_1 = String()
-    billing_address_2 = String()
-    billing_address_town = dsl_utils.SortableCaseInsensitiveKeywordString()
-    billing_address_county = dsl_utils.SortableCaseInsensitiveKeywordString()
-    billing_address_postcode = String()
+    billing_contact_name = Text()
+    billing_email = dsl_utils.SortableCaseInsensitiveKeywordText()
+    billing_phone = dsl_utils.SortableCaseInsensitiveKeywordText()
+    billing_address_1 = Text()
+    billing_address_2 = Text()
+    billing_address_town = dsl_utils.SortableCaseInsensitiveKeywordText()
+    billing_address_county = dsl_utils.SortableCaseInsensitiveKeywordText()
+    billing_address_postcode = Text()
     billing_address_country = dsl_utils.id_name_mapping()
 
     MAPPINGS = {
