@@ -35,6 +35,7 @@ class IProjectAbstract(models.Model):
 
     name = models.CharField(max_length=MAX_LENGTH)
     description = models.TextField()
+    anonymous_description = models.TextField(blank=True)
     nda_signed = models.BooleanField()
     estimated_land_date = models.DateField()
     investment_type = models.ForeignKey(

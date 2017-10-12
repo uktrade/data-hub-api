@@ -32,6 +32,7 @@ def test_investment_project_to_dict():
         'archived_by',
         'name',
         'description',
+        'anonymous_description',
         'nda_signed',
         'estimated_land_date',
         'project_shareable',
