@@ -1,5 +1,5 @@
 from django.conf import settings
-from elasticsearch_dsl import Boolean, Date, DocType, Double, Integer, Keyword, String
+from elasticsearch_dsl import Boolean, Date, DocType, Double, Integer, Keyword, Text
 
 from .. import dict_utils
 from .. import dsl_utils
@@ -25,11 +25,11 @@ class InvestmentProject(DocType, MapDBModelToDict):
     project_assurance_adviser = dsl_utils.contact_or_adviser_mapping('project_assurance_adviser')
     team_members = dsl_utils.contact_or_adviser_mapping('team_members')
     archived = Boolean()
-    archived_reason = String()
+    archived_reason = Text()
     archived_by = dsl_utils.contact_or_adviser_mapping('archived_by')
     created_on = Date()
     modified_on = Date()
-    description = dsl_utils.EnglishString()
+    description = dsl_utils.EnglishText()
     estimated_land_date = Date()
     fdi_type = dsl_utils.id_name_mapping()
     fdi_type_documents = dsl_utils.id_uri_mapping()
@@ -38,9 +38,9 @@ class InvestmentProject(DocType, MapDBModelToDict):
     uk_company = dsl_utils.id_name_mapping()
     investor_company = dsl_utils.id_name_mapping()
     investment_type = dsl_utils.id_name_mapping()
-    name = dsl_utils.SortableString()
-    name_keyword = dsl_utils.SortableCaseInsensitiveKeywordString()
-    name_trigram = dsl_utils.TrigramString()
+    name = dsl_utils.SortableText()
+    name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
+    name_trigram = dsl_utils.TrigramText()
     r_and_d_budget = Boolean()
     non_fdi_r_and_d_budget = Boolean()
     new_tech_to_uk = Boolean()
@@ -53,15 +53,15 @@ class InvestmentProject(DocType, MapDBModelToDict):
     foreign_equity_investment = Double()
     number_new_jobs = Integer()
     non_fdi_type = dsl_utils.id_name_mapping()
-    not_shareable_reason = String()
+    not_shareable_reason = Text()
     operations_commenced_documents = dsl_utils.id_uri_mapping()
     stage = dsl_utils.id_name_mapping()
-    project_code = dsl_utils.SortableCaseInsensitiveKeywordString()
+    project_code = dsl_utils.SortableCaseInsensitiveKeywordText()
     project_shareable = Boolean()
     referral_source_activity = dsl_utils.id_name_mapping()
     referral_source_activity_marketing = dsl_utils.id_name_mapping()
     referral_source_activity_website = dsl_utils.id_name_mapping()
-    referral_source_activity_event = dsl_utils.SortableCaseInsensitiveKeywordString()
+    referral_source_activity_event = dsl_utils.SortableCaseInsensitiveKeywordText()
     referral_source_advisor = dsl_utils.contact_or_adviser_mapping('referral_source_advisor')
     sector = dsl_utils.id_name_mapping()
     average_salary = dsl_utils.id_name_mapping()
