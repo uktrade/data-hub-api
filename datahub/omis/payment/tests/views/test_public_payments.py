@@ -53,7 +53,7 @@ class TestPublicGetPayments(APITestMixin):
                     'additional_reference': payment.additional_reference,
                     'amount': payment.amount,
                     'method': payment.method,
-                    'payment_received_on': payment.payment_received_on.isoformat()
+                    'received_on': payment.received_on.isoformat()
                 }
                 for payment in order.payments.all()
             ]
