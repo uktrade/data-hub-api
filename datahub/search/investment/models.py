@@ -30,6 +30,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
     created_on = Date()
     modified_on = Date()
     description = dsl_utils.EnglishText()
+    anonymous_description = dsl_utils.EnglishText()
     estimated_land_date = Date()
     fdi_type = dsl_utils.id_name_mapping()
     fdi_type_documents = dsl_utils.id_uri_mapping()

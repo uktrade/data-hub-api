@@ -106,6 +106,7 @@ class TestUnifiedViews(APITestMixin):
         request_data = {
             'name': 'project name',
             'description': 'project description',
+            'anonymous_description': 'project anon description',
             'nda_signed': False,
             'estimated_land_date': '2020-12-12',
             'project_shareable': False,
@@ -152,6 +153,7 @@ class TestUnifiedViews(APITestMixin):
         response_data = response.json()
         assert response_data['name'] == request_data['name']
         assert response_data['description'] == request_data['description']
+        assert response_data['anonymous_description'] == request_data['anonymous_description']
         assert response_data['nda_signed'] == request_data['nda_signed']
         assert response_data['estimated_land_date'] == request_data['estimated_land_date']
         assert response_data['project_shareable'] == request_data['project_shareable']
