@@ -18,7 +18,7 @@ class AdviserFactory(factory.django.DjangoModelFactory):
     telephone_number = factory.Faker('phone_number')
     date_joined = now()
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'company.Advisor'
         django_get_or_create = ('email', )
 
@@ -42,7 +42,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     uk_region_id = constants.UKRegion.england.value.id
     created_on = now()
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'company.Company'
 
 
@@ -56,7 +56,7 @@ class CompaniesHouseCompanyFactory(factory.django.DjangoModelFactory):
     registered_address_country_id = constants.Country.italy.value.id
     incorporation_date = now()
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'company.CompaniesHouseCompany'
         django_get_or_create = ('company_number', )
 
@@ -79,5 +79,5 @@ class ContactFactory(factory.django.DjangoModelFactory):
     created_on = now()
     contactable_by_email = True
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'company.Contact'

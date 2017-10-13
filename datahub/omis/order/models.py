@@ -55,7 +55,7 @@ class HourlyRate(BaseConstantModel):
         ]
     )
 
-    class Meta(BaseConstantModel.Meta):  # noqa: D101
+    class Meta(BaseConstantModel.Meta):
         db_table = 'omis-order_hourlyrate'
 
 
@@ -374,7 +374,7 @@ class OrderSubscriber(BaseModel):
         """Human-readable representation"""
         return f'{self.order} – {self.adviser}'
 
-    class Meta:  # noqa: D101
+    class Meta:
         ordering = ['created_on']
         unique_together = (
             ('order', 'adviser'),
@@ -396,7 +396,7 @@ class OrderAssignee(BaseModel):
     estimated_time = models.IntegerField(default=0, help_text='Estimated time in minutes.')
     is_lead = models.BooleanField(default=False)
 
-    class Meta:  # noqa: D101
+    class Meta:
         ordering = ['created_on']
         unique_together = (
             ('order', 'adviser'),

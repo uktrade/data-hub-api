@@ -13,7 +13,7 @@ class ConstantModelSerializer(serializers.Serializer):
     name = serializers.ReadOnlyField()
     disabled_on = serializers.ReadOnlyField()
 
-    class Meta:  # noqa: D101
+    class Meta:
         fields = '__all__'
 
 

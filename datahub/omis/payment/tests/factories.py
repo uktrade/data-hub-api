@@ -18,5 +18,5 @@ class PaymentFactory(factory.django.DjangoModelFactory):
     method = constants.PaymentMethod.bacs
     received_on = factory.Faker('date_time')
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'omis-payment.Payment'

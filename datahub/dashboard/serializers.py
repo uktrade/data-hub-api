@@ -9,7 +9,7 @@ class InteractionSerializer(serializers.ModelSerializer):
 
     dit_adviser = AdviserSerializer()
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = Interaction
         depth = 2
         fields = '__all__'
@@ -21,7 +21,7 @@ class IntelligentHomepageSerializer(serializers.Serializer):
     interactions = InteractionSerializer(many=True)
     contacts = NestedContactSerializer(many=True)
 
-    class Meta:  # noqa: D101
+    class Meta:
         fields = '__all__'
 
 

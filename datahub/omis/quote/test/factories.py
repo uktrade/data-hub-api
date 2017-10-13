@@ -16,7 +16,7 @@ class QuoteFactory(factory.django.DjangoModelFactory):
     content = factory.Faker('text')
     expires_on = factory.Faker('future_date')
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'omis-quote.Quote'
 
 
