@@ -1,7 +1,9 @@
 from django.db import models
 
+from datahub.omis.core.utils import generate_datetime_based_reference
+
 from . import constants
-from .utils import calculate_payment_due_date, generate_invoice_number
+from .utils import calculate_payment_due_date
 
 
 class InvoiceManager(models.Manager):
@@ -14,7 +16,7 @@ class InvoiceManager(models.Manager):
         :returns: Invoice object generated from the order
         """
         return self.create(
-            invoice_number=generate_invoice_number(),
+            invoice_number=generate_datetime_based_reference(self.model, field='invoice_number'),
             payment_due_date=calculate_payment_due_date(order),
             invoice_company_name=constants.DIT_COMPANY_NAME,
             invoice_address_1=constants.DIT_ADDRESS_1,

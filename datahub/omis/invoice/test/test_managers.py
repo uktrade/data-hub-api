@@ -14,16 +14,16 @@ class TestInvoiceManager:
     """Tests for the Invoice Manager."""
 
     @mock.patch('datahub.omis.invoice.manager.calculate_payment_due_date')
-    @mock.patch('datahub.omis.invoice.manager.generate_invoice_number')
+    @mock.patch('datahub.omis.invoice.manager.generate_datetime_based_reference')
     def test_create_from_order(
         self,
-        mocked_generate_invoice_number,
+        mocked_generate_datetime_based_reference,
         mocked_calculate_payment_due_date
     ):
         """Test that Invoice.objects.create_from_order creates an invoice."""
         payment_due_date = dateutil_parse('2030-01-01').date()
 
-        mocked_generate_invoice_number.return_value = '201702010004'
+        mocked_generate_datetime_based_reference.return_value = '201702010004'
         mocked_calculate_payment_due_date.return_value = payment_due_date
 
         invoice = Invoice.objects.create_from_order(mock.MagicMock())
