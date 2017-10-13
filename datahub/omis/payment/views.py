@@ -11,6 +11,7 @@ class BasePaymentViewSet(BaseNestedOrderViewSet):
 
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
+    pagination_class = None
 
     def get_queryset(self):
         """
