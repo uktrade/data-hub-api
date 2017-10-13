@@ -8,5 +8,5 @@ class MarketSerializer(serializers.Serializer):
     name = serializers.ReadOnlyField(source='country.name')
     disabled_on = serializers.ReadOnlyField()
 
-    class Meta:  # noqa: D101
+    class Meta:
         fields = '__all__'

@@ -14,7 +14,7 @@ class ServiceOfferFactory(factory.django.DjangoModelFactory):
     service = factory.SubFactory(ServiceFactory)
     dit_team = factory.SubFactory(TeamFactory)
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'interaction.ServiceOffer'
 
 
@@ -35,7 +35,7 @@ class InteractionFactory(factory.django.DjangoModelFactory):
     created_on = now()
     communication_channel_id = constants.InteractionType.face_to_face.value.id
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'interaction.Interaction'
 
 
@@ -56,7 +56,7 @@ class ServiceDeliveryFactory(factory.django.DjangoModelFactory):
     dit_team_id = constants.Team.healthcare_uk.value.id
     created_on = now()
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'interaction.Interaction'
 
 
@@ -76,5 +76,5 @@ class LegacyServiceDeliveryFactory(factory.django.DjangoModelFactory):
     uk_region_id = constants.UKRegion.east_midlands.value.id
     feedback = 'foobar'
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'interaction.ServiceDelivery'

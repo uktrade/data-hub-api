@@ -110,7 +110,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         """Sends an email to this User."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
-    class Meta:  # noqa: D101
+    class Meta:
         indexes = [
             models.Index(fields=['first_name', 'last_name']),
         ]

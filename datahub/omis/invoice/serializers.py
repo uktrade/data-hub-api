@@ -20,7 +20,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
     billing_address_country = NestedRelatedField(Country, source='order.billing_address_country')
     po_number = serializers.ReadOnlyField(source='order.po_number')
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = Invoice
         fields = (
             'created_on',

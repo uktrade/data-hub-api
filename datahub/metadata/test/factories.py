@@ -11,7 +11,7 @@ class EventFactory(factory.django.DjangoModelFactory):
     id = factory.LazyFunction(uuid.uuid4)
     name = factory.Sequence(lambda n: f'name {n}')
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'metadata.Event'
 
 
@@ -21,7 +21,7 @@ class ServiceFactory(factory.django.DjangoModelFactory):
     id = factory.LazyFunction(uuid.uuid4)
     name = factory.Sequence(lambda n: f'name {n}')
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'metadata.Service'
 
 
@@ -31,7 +31,7 @@ class TeamRoleFactory(factory.django.DjangoModelFactory):
     id = factory.LazyFunction(uuid.uuid4)
     name = factory.Sequence(lambda n: f'name {n}')
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'metadata.TeamRole'
 
 
@@ -44,5 +44,5 @@ class TeamFactory(factory.django.DjangoModelFactory):
     uk_region_id = constants.UKRegion.east_midlands.value.id
     country_id = constants.Country.france.value.id
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'metadata.Team'

@@ -47,7 +47,7 @@ class InteractionSerializer(serializers.ModelSerializer):
         allow_null=True
     )
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = Interaction
         extra_kwargs = {
             # Date is a datetime in the model, but only the date component is used

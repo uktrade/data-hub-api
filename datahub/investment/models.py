@@ -17,7 +17,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 class IProjectAbstract(models.Model):
     """The core part of an investment project."""
 
-    class Meta:  # noqa: D101
+    class Meta:
         abstract = True
 
     PRIORITIES = Choices(
@@ -161,7 +161,7 @@ class IProjectAbstract(models.Model):
 class IProjectValueAbstract(models.Model):
     """The value part of an investment project."""
 
-    class Meta:  # noqa: D101
+    class Meta:
         abstract = True
 
     fdi_value = models.ForeignKey(
@@ -193,7 +193,7 @@ class IProjectValueAbstract(models.Model):
 class IProjectRequirementsAbstract(models.Model):
     """The requirements part of an investment project."""
 
-    class Meta:  # noqa: D101
+    class Meta:
         abstract = True
 
     client_requirements = models.TextField(blank=True, null=True)
@@ -221,7 +221,7 @@ class IProjectRequirementsAbstract(models.Model):
 class IProjectTeamAbstract(models.Model):
     """The team part of an investment project."""
 
-    class Meta:  # noqa: D101
+    class Meta:
         abstract = True
 
     project_manager = models.ForeignKey(
@@ -277,7 +277,7 @@ class InvestmentProjectTeamMember(models.Model):
         """Human-readable representation."""
         return f'{self.investment_project} – {self.adviser} – {self.role}'
 
-    class Meta:  # noqa: D101
+    class Meta:
         unique_together = (('investment_project', 'adviser'),)
 
 
@@ -333,7 +333,7 @@ class IProjectDocument(BaseModel, ArchivableModel):
         """Generate pre-signed upload URL."""
         return self.document.generate_signed_upload_url()
 
-    class Meta:  # noqa: D101
+    class Meta:
         verbose_name = 'investment project document'
         verbose_name_plural = 'investment project documents'
         unique_together = (
