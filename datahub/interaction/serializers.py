@@ -39,13 +39,6 @@ class InteractionSerializer(serializers.ModelSerializer):
     )
     modified_by = NestedAdviserField(read_only=True)
     service = NestedRelatedField(Service)
-    # Added for backwards compatibility. Will be removed once the front end is updated.
-    interaction_type = NestedRelatedField(
-        CommunicationChannel,
-        source='communication_channel',
-        required=False,
-        allow_null=True
-    )
 
     class Meta:
         model = Interaction
@@ -55,8 +48,6 @@ class InteractionSerializer(serializers.ModelSerializer):
             # behave like a date field without changing the schema and breaking the
             # v1 API.
             'date': {'format': '%Y-%m-%d', 'input_formats': ['%Y-%m-%d']},
-            # Temporarily set a default for kind for backwards compatibility
-            'kind': {'default': Interaction.KINDS.interaction},
         }
         fields = (
             'id',
@@ -72,7 +63,6 @@ class InteractionSerializer(serializers.ModelSerializer):
             'dit_adviser',
             'dit_team',
             'communication_channel',
-            'interaction_type',
             'investment_project',
             'service',
             'subject',
