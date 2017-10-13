@@ -151,6 +151,9 @@ class IProjectValueSerializer(serializers.ModelSerializer):
         allow_null=True
     )
     value_complete = serializers.SerializerMethodField()
+    associated_non_fdi_r_and_d_project = NestedRelatedField(
+        InvestmentProject, required=False, allow_null=True, extra_fields=('name', 'project_code')
+    )
 
     def get_value_complete(self, instance):
         """Whether the value fields required to move to the next stage are complete."""
@@ -172,6 +175,7 @@ class IProjectValueSerializer(serializers.ModelSerializer):
             'number_safeguarded_jobs',
             'r_and_d_budget',
             'non_fdi_r_and_d_budget',
+            'associated_non_fdi_r_and_d_project',
             'new_tech_to_uk',
             'export_revenue',
             'value_complete',

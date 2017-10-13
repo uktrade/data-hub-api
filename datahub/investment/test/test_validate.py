@@ -361,15 +361,28 @@ def test_validate_verify_win_instance_cond_validation():
         stage_id=constants.InvestmentProjectStage.verify_win.value.id,
         client_cannot_provide_total_investment=True,
         client_cannot_provide_foreign_investment=True,
+        non_fdi_r_and_d_budget=False,
         number_new_jobs=0
     )
     errors = validate(instance=project)
     assert 'total_investment' not in errors
     assert 'foreign_equity_investment' not in errors
     assert 'average_salary' not in errors
+    assert 'associated_non_fdi_r_and_d_project' not in errors
 
 
-def test_validate_verify_win_instance_success():
+def test_validate_verify_win_instance_cond_validation_failure():
+    """Tests conditional validation for associated non-FDI R&D projects in the verify win stage."""
+    project = InvestmentProjectFactory(
+        stage_id=constants.InvestmentProjectStage.verify_win.value.id,
+        non_fdi_r_and_d_budget=True,
+    )
+    errors = validate(instance=project)
+    assert 'associated_non_fdi_r_and_d_project' in errors
+    assert errors['associated_non_fdi_r_and_d_project'] == 'This field is required.'
+
+
+def test_validate_verify_win_instance_with_cond_fields():
     """Tests validation for the verify win stage for a complete project instance."""
     adviser = AdviserFactory()
     strategic_drivers = [
@@ -394,6 +407,7 @@ def test_validate_verify_win_instance_success():
         number_safeguarded_jobs=0,
         r_and_d_budget=True,
         non_fdi_r_and_d_budget=True,
+        associated_non_fdi_r_and_d_project=InvestmentProjectFactory(),
         new_tech_to_uk=True,
         export_revenue=True,
         address_line_1='12 London Road',

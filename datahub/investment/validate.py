@@ -92,6 +92,8 @@ CONDITIONAL_VALIDATION_MAPPING = {
         CondValRule('client_cannot_provide_foreign_investment', not_, Stage.verify_win.value),
     'average_salary':
         CondValRule('number_new_jobs', bool, Stage.verify_win.value),
+    'associated_non_fdi_r_and_d_project':
+        CondValRule('non_fdi_r_and_d_budget', bool, Stage.verify_win.value),
 }
 
 

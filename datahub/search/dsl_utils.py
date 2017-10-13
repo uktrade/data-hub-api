@@ -68,3 +68,12 @@ def company_mapping():
         'id': Keyword(),
         'company_number': SortableCaseInsensitiveKeywordText()
     })
+
+
+def investment_project_mapping():
+    """Mapping for investment project relations."""
+    return Nested(properties={
+        'id': Keyword(),
+        'name': SortableCaseInsensitiveKeywordText(),
+        'project_code': SortableCaseInsensitiveKeywordText(),
+    })
