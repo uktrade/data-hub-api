@@ -84,6 +84,7 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
             'name',
             'project_code',
             'description',
+            'anonymous_description',
             'nda_signed',
             'estimated_land_date',
             'actual_land_date',
