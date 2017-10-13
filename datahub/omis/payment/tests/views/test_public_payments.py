@@ -41,23 +41,18 @@ class TestPublicGetPayments(APITestMixin):
         response = client.get(url, format='json')
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            'count': 2,
-            'next': None,
-            'previous': None,
-            'results': [
-                {
-                    'created_on': payment.created_on.isoformat(),
-                    'reference': payment.reference,
-                    'transaction_reference': payment.transaction_reference,
-                    'additional_reference': payment.additional_reference,
-                    'amount': payment.amount,
-                    'method': payment.method,
-                    'received_on': payment.received_on.isoformat()
-                }
-                for payment in order.payments.all()
-            ]
-        }
+        assert response.json() == [
+            {
+                'created_on': payment.created_on.isoformat(),
+                'reference': payment.reference,
+                'transaction_reference': payment.transaction_reference,
+                'additional_reference': payment.additional_reference,
+                'amount': payment.amount,
+                'method': payment.method,
+                'received_on': payment.received_on.isoformat()
+            }
+            for payment in order.payments.all()
+        ]
 
     def test_404_if_order_doesnt_exist(self):
         """Test that if the order doesn't exist, the endpoint returns 404."""
