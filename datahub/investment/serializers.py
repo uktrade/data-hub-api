@@ -76,7 +76,7 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(errors)
         return data
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = InvestmentProject
         fields = (
             'id',
@@ -158,7 +158,7 @@ class IProjectValueSerializer(serializers.ModelSerializer):
             instance=instance, fields=IProjectValueSerializer.Meta.fields, next_stage=True
         )
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = InvestmentProject
         fields = (
             'fdi_value',
@@ -197,7 +197,7 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
             instance=instance, fields=IProjectRequirementsSerializer.Meta.fields, next_stage=True
         )
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = InvestmentProject
         fields = (
             'client_requirements',
@@ -222,7 +222,7 @@ class IProjectTeamMemberSerializer(serializers.ModelSerializer):
     investment_project = NestedRelatedField(InvestmentProject)
     adviser = NestedAdviserField()
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = InvestmentProjectTeamMember
         fields = ('investment_project', 'adviser', 'role')
 
@@ -236,7 +236,7 @@ class NestedIProjectTeamMemberSerializer(serializers.ModelSerializer):
 
     adviser = NestedAdviserField()
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = InvestmentProjectTeamMember
         fields = ('adviser', 'role')
 
@@ -257,7 +257,7 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
             instance=instance, fields=IProjectTeamSerializer.Meta.fields, next_stage=True
         )
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = InvestmentProject
         fields = (
             'project_manager',
@@ -273,7 +273,7 @@ class IProjectSerializer(IProjectSummarySerializer, IProjectValueSerializer,
                          IProjectRequirementsSerializer, IProjectTeamSerializer):
     """Serialiser for investment projects, used with the new unified investment endpoint."""
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = InvestmentProject
         fields = (
             IProjectSummarySerializer.Meta.fields
@@ -291,7 +291,7 @@ class IProjectDocumentSerializer(serializers.ModelSerializer):
         InvestmentProject,
     )
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = IProjectDocument
         fields = (
             'id',

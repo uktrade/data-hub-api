@@ -55,7 +55,7 @@ flake8-print==2.0.2
 flake8-quotes==0.9.0
 flake8-string-format==0.2.3
 pep8-naming==0.4.1
-pydocstyle==2.0.0
+pydocstyle==2.1.1
 
 gunicorn==19.7.1
 gevent==1.2.2

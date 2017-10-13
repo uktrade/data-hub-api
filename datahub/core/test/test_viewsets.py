@@ -15,7 +15,7 @@ factory = APIRequestFactory()
 class InheritedModelSerializer(serializers.ModelSerializer):
     """DRF Serializer to use with the InheritedModel."""
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = InheritedModel
         depth = 1
         fields = '__all__'
@@ -24,7 +24,7 @@ class InheritedModelSerializer(serializers.ModelSerializer):
 class EmptyModelSerializer(serializers.ModelSerializer):
     """DRF Serializer to use with the EmptyModel."""
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = EmptyModel
         depth = 1
         fields = '__all__'

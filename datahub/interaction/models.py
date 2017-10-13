@@ -75,7 +75,7 @@ class Interaction(BaseModel):
         """Human-readable representation."""
         return self.subject
 
-    class Meta:  # noqa: D101
+    class Meta:
         indexes = [
             models.Index(fields=['-date', '-created_on']),
         ]
@@ -195,5 +195,5 @@ class ServiceDelivery(BaseModel):
             self.event = self.service_offer.event
         super().clean()
 
-    class Meta:  # noqa: D101
+    class Meta:
         verbose_name_plural = 'service deliveries'

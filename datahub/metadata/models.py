@@ -36,7 +36,7 @@ class UKRegion(BaseConstantModel):
 class Country(BaseConstantModel):
     """Country."""
 
-    class Meta(BaseConstantModel.Meta):  # noqa: D101
+    class Meta(BaseConstantModel.Meta):
         verbose_name_plural = 'countries'
 
 
@@ -90,7 +90,7 @@ class Service(BaseConstantModel):
 class ServiceDeliveryStatus(BaseConstantModel):
     """Service delivery status."""
 
-    class Meta(BaseConstantModel.Meta):  # noqa: D101
+    class Meta(BaseConstantModel.Meta):
         verbose_name_plural = 'service delivery statuses'
 
 
@@ -131,7 +131,7 @@ class NonFDIType(BaseConstantModel):
 class ReferralSourceActivity(BaseConstantModel):
     """Referral source activity type (for investment projects)."""
 
-    class Meta(BaseConstantModel.Meta):  # noqa: D101
+    class Meta(BaseConstantModel.Meta):
         verbose_name_plural = 'referral source activities'
 
 
@@ -146,7 +146,7 @@ class ReferralSourceMarketing(BaseConstantModel):
 class InvestmentBusinessActivity(BaseConstantModel):
     """Business activity (for investment projects)."""
 
-    class Meta(BaseConstantModel.Meta):  # noqa: D101
+    class Meta(BaseConstantModel.Meta):
         verbose_name_plural = 'investment business activities'
 
 

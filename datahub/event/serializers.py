@@ -91,7 +91,7 @@ class EventSerializer(serializers.ModelSerializer):
 
         return errors
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = Event
         fields = (
             'address_1',

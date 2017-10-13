@@ -55,7 +55,7 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     def uk_region_locations(self):
         """Add support for setting uk_region_locations."""
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'investment.InvestmentProject'
 
 
@@ -66,5 +66,5 @@ class InvestmentProjectTeamMemberFactory(factory.django.DjangoModelFactory):
     adviser = factory.SubFactory(AdviserFactory)
     role = factory.Sequence(lambda n: f'role {n}')
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'investment.InvestmentProjectTeamMember'
