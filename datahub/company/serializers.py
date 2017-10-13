@@ -21,7 +21,7 @@ class AdviserSerializer(serializers.ModelSerializer):
 
     name = serializers.CharField()
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = Advisor
         fields = (
             'id',
@@ -42,7 +42,7 @@ class NestedContactSerializer(serializers.ModelSerializer):
 
     adviser = AdviserSerializer()
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = Contact
         depth = 1
         fields = '__all__'
@@ -51,7 +51,7 @@ class NestedContactSerializer(serializers.ModelSerializer):
 class NestedInteractionSerializer(serializers.ModelSerializer):
     """Nested Interaction Serializer."""
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = Interaction
         fields = '__all__'
 
@@ -59,7 +59,7 @@ class NestedInteractionSerializer(serializers.ModelSerializer):
 class CompaniesHouseCompanySerializer(serializers.ModelSerializer):
     """Companies House company serializer."""
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = CompaniesHouseCompany
         depth = 1
         fields = '__all__'
@@ -90,7 +90,7 @@ class ContactSerializer(serializers.ModelSerializer):
     archived_by = NestedAdviserField(read_only=True)
     primary = serializers.BooleanField()
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = Contact
         fields = (
             'id',
@@ -250,7 +250,7 @@ class CompanySerializer(serializers.ModelSerializer):
         source='investor_investment_projects.count', read_only=True
     )
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = Company
         fields = (
             'id',

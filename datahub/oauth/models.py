@@ -17,5 +17,5 @@ class OAuthApplicationScope(models.Model):
         """Human-friendly representation."""
         return str(self.application)
 
-    class Meta:  # noqa: D101
+    class Meta:
         verbose_name = 'oauth application scope'

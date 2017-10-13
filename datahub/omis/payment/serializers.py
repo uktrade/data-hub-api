@@ -6,7 +6,7 @@ from .models import Payment
 class PaymentSerializer(serializers.ModelSerializer):
     """Payment DRF serializer."""
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = Payment
         fields = (
             'created_on',
