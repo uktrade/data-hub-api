@@ -14,6 +14,7 @@ class InvestmentProjectAdmin(BaseModelVersionAdmin):
     search_fields = ['name']
     raw_id_fields = (
         'archived_by',
+        'associated_non_fdi_r_and_d_project',
         'investor_company',
         'intermediate_company',
         'client_contacts',

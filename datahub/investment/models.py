@@ -185,7 +185,13 @@ class IProjectValueAbstract(models.Model):
     )
     number_safeguarded_jobs = models.IntegerField(null=True, blank=True)
     r_and_d_budget = models.NullBooleanField()
-    non_fdi_r_and_d_budget = models.NullBooleanField()
+    non_fdi_r_and_d_budget = models.NullBooleanField(
+        verbose_name='has associated non-FDI R&D project'
+    )
+    associated_non_fdi_r_and_d_project = models.ForeignKey(
+        'InvestmentProject', related_name='+', null=True, blank=True, on_delete=models.SET_NULL,
+        verbose_name='associated non-FDI R&D project',
+    )
     new_tech_to_uk = models.NullBooleanField()
     export_revenue = models.NullBooleanField()
 
