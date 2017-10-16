@@ -47,7 +47,7 @@ class ServiceDeliveryFactory(factory.django.DjangoModelFactory):
     modified_by = factory.SubFactory(AdviserFactory)
     company = factory.SubFactory(CompanyFactory)
     contact = factory.SubFactory(ContactFactory)
-    event = factory.SubFactory(EventFactory)
+    event = None
     subject = factory.Faker('sentence', nb_words=8)
     date = now()
     notes = factory.Faker('paragraph', nb_sentences=10)
@@ -58,6 +58,12 @@ class ServiceDeliveryFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'interaction.Interaction'
+
+
+class EventServiceDeliveryFactory(ServiceDeliveryFactory):
+    """Event service delivery factory."""
+
+    event = factory.SubFactory(EventFactory)
 
 
 class LegacyServiceDeliveryFactory(factory.django.DjangoModelFactory):
