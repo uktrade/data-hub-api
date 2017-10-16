@@ -1,10 +1,7 @@
-from datetime import date
-
 import pytest
 
 from datahub.company.test.factories import AdviserFactory, ContactFactory
 from datahub.core import constants
-from datahub.investment.models import InvestmentProject
 from datahub.investment.serializers import (
     IProjectRequirementsSerializer, IProjectSummarySerializer, IProjectTeamSerializer,
     IProjectValueSerializer
@@ -34,86 +31,6 @@ def test_validate_project_instance_success():
         client_contacts=[ContactFactory().id, ContactFactory().id]
     )
     errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
-    assert not errors
-
-
-def test_validate_project_status_delayed_failure():
-    """Tests validating a project with status delayed and missing reason."""
-    project = InvestmentProjectFactory(
-        client_contacts=[ContactFactory().id, ContactFactory().id],
-        status=InvestmentProject.STATUSES.delayed
-
-    )
-    errors = validate(instance=project)
-    assert errors == {
-        'reason_delayed': 'This field is required.'
-    }
-
-
-def test_validate_project_status_delayed_success():
-    """Tests validating a project with status delayed and reason given."""
-    project = InvestmentProjectFactory(
-        client_contacts=[ContactFactory().id, ContactFactory().id],
-        status=InvestmentProject.STATUSES.delayed,
-        reason_delayed='Problems getting planning permission.'
-
-    )
-    errors = validate(instance=project)
-    assert not errors
-
-
-def test_validate_project_status_abandoned_failure():
-    """Tests validating a project with status abandoned and no reason/date given."""
-    project = InvestmentProjectFactory(
-        client_contacts=[ContactFactory().id, ContactFactory().id],
-        status=InvestmentProject.STATUSES.abandoned
-
-    )
-    errors = validate(instance=project)
-    assert errors == {
-        'reason_abandoned': 'This field is required.',
-        'date_abandoned': 'This field is required.'
-    }
-
-
-def test_validate_project_status_abandoned_success():
-    """Tests validating a project with status abandoned and reason/date given."""
-    project = InvestmentProjectFactory(
-        client_contacts=[ContactFactory().id, ContactFactory().id],
-        status=InvestmentProject.STATUSES.abandoned,
-        date_abandoned=date(2019, 1, 1),
-        reason_abandoned='No longer viable.'
-
-    )
-    errors = validate(instance=project)
-    assert not errors
-
-
-def test_validate_project_status_lost_failure():
-    """Tests validating a project with status lost and no reason/date/country given."""
-    project = InvestmentProjectFactory(
-        client_contacts=[ContactFactory().id, ContactFactory().id],
-        status=InvestmentProject.STATUSES.lost
-
-    )
-    errors = validate(instance=project)
-    assert errors == {
-        'reason_lost': 'This field is required.',
-        'date_lost': 'This field is required.',
-        'country_lost_to': 'This field is required.',
-    }
-
-
-def test_validate_project_status_lost_success():
-    """Tests validating a project with status lost and reason/date/country given."""
-    project = InvestmentProjectFactory(
-        client_contacts=[ContactFactory().id, ContactFactory().id],
-        status=InvestmentProject.STATUSES.lost,
-        reason_lost='Lower set-up costs.',
-        date_lost=date(2019, 1, 1),
-        country_lost_to_id=constants.Country.japan.value.id
-    )
-    errors = validate(instance=project)
     assert not errors
 
 
