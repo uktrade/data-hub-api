@@ -661,6 +661,7 @@ class TestUnifiedViews(APITestMixin):
             number_safeguarded_jobs=0,
             r_and_d_budget=True,
             non_fdi_r_and_d_budget=True,
+            associated_non_fdi_r_and_d_project=InvestmentProjectFactory(),
             new_tech_to_uk=True,
             export_revenue=True,
             address_line_1='12 London Road',
@@ -736,6 +737,7 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['number_safeguarded_jobs'] == 10
         assert response_data['r_and_d_budget'] is False
         assert response_data['non_fdi_r_and_d_budget'] is False
+        assert response_data['associated_non_fdi_r_and_d_project'] is None
         assert response_data['new_tech_to_uk'] is False
         assert response_data['export_revenue'] is True
         assert response_data['value_complete'] is True
