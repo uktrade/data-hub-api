@@ -4,9 +4,9 @@ from django.conf import settings
 from django.db import models
 
 from datahub.core.models import BaseModel
-from datahub.omis.order.models import Order
 
 from .constants import PaymentMethod
+from .manager import PaymentManager
 
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -17,7 +17,7 @@ class Payment(BaseModel):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     order = models.ForeignKey(
-        Order,
+        'order.Order',
         on_delete=models.CASCADE,
         related_name="%(class)ss",  # noqa: Q000
     )
@@ -66,6 +66,8 @@ class Payment(BaseModel):
         on_delete=models.SET_NULL,
         related_name='+'
     )
+
+    objects = PaymentManager()
 
     class Meta:
         ordering = ('created_on', )
