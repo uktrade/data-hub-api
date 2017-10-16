@@ -63,6 +63,7 @@ def test_investment_project_to_dict():
         'number_safeguarded_jobs',
         'r_and_d_budget',
         'non_fdi_r_and_d_budget',
+        'associated_non_fdi_r_and_d_project',
         'new_tech_to_uk',
         'export_revenue',
         'client_requirements',

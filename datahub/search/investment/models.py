@@ -44,6 +44,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
     name_trigram = dsl_utils.TrigramText()
     r_and_d_budget = Boolean()
     non_fdi_r_and_d_budget = Boolean()
+    associated_non_fdi_r_and_d_project = dsl_utils.investment_project_mapping()
     new_tech_to_uk = Boolean()
     export_revenue = Boolean()
     site_decided = Boolean()
@@ -85,6 +86,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'investor_company': dict_utils.id_name_dict,
         'uk_company': dict_utils.id_name_dict,
         'investment_type': dict_utils.id_name_dict,
+        'associated_non_fdi_r_and_d_project': dict_utils.investment_project_dict,
         'non_fdi_type': dict_utils.id_name_dict,
         'operations_commenced_documents': lambda col: [
             dict_utils.id_uri_dict(c) for c in col.all()
