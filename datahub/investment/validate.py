@@ -59,18 +59,6 @@ def _get_to_many_id(instance):
 
 # Conditional validation rules. Mapping from field names to validation rules.
 CONDITIONAL_VALIDATION_MAPPING = {
-    'reason_delayed':
-        CondValRule('status', InvestmentProject.STATUSES.delayed, Stage.prospect.value),
-    'reason_abandoned':
-        CondValRule('status', InvestmentProject.STATUSES.abandoned, Stage.prospect.value),
-    'date_abandoned':
-        CondValRule('status', InvestmentProject.STATUSES.abandoned, Stage.prospect.value),
-    'reason_lost':
-        CondValRule('status', InvestmentProject.STATUSES.lost, Stage.prospect.value),
-    'date_lost':
-        CondValRule('status', InvestmentProject.STATUSES.lost, Stage.prospect.value),
-    'country_lost_to':
-        CondValRule('status', InvestmentProject.STATUSES.lost, Stage.prospect.value),
     'referral_source_activity_event':
         CondValRule('referral_source_activity', Activity.event.value.id, Stage.prospect.value),
     'other_business_activity':
