@@ -1,6 +1,25 @@
 from rest_framework import serializers
 
+from .constants import PaymentMethod
 from .models import Payment
+
+
+class PaymentListSerializer(serializers.ListSerializer):
+    """DRF List Serializer for Payment objects."""
+
+    def create(self, validated_data):
+        """Create payments."""
+        order = self.context['order']
+        created_by = self.context['current_user']
+
+        # add bacs method
+        payments_data = [
+            {**data, 'method': PaymentMethod.bacs}
+            for data in validated_data
+        ]
+
+        order.mark_as_paid(created_by, payments_data)
+        return list(order.payments.all())
 
 
 class PaymentSerializer(serializers.ModelSerializer):
@@ -8,6 +27,7 @@ class PaymentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Payment
+        list_serializer_class = PaymentListSerializer
         fields = (
             'created_on',
             'reference',

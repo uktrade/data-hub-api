@@ -3,6 +3,7 @@ from functools import partial
 from unittest import mock
 import factory
 import pytest
+from dateutil.parser import parse as dateutil_parse
 from django.utils.crypto import get_random_string
 from freezegun import freeze_time
 from rest_framework.exceptions import ValidationError
@@ -12,11 +13,13 @@ from datahub.core import constants
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.core.exceptions import Conflict
 from datahub.omis.invoice.models import Invoice
+from datahub.omis.payment.models import Payment
 from datahub.omis.quote.models import Quote
 
 from .factories import (
     OrderAssigneeFactory,
     OrderFactory,
+    OrderWithAcceptedQuoteFactory,
     OrderWithOpenQuoteFactory,
 )
 
@@ -367,6 +370,104 @@ class TestAcceptQuote:
             assert not quote.is_accepted()
             assert not order.invoice
             assert not Invoice.objects.count()
+
+
+class TestMarkOrderAsPaid:
+    """Tests for when an order is marked as paid."""
+
+    @pytest.mark.parametrize(
+        'allowed_status',
+        (OrderStatus.quote_accepted,)
+    )
+    def test_ok_if_order_in_allowed_status(self, allowed_status):
+        """
+        Test that the order can be marked as paid if the order is in one of the allowed statuses.
+        """
+        order = OrderWithAcceptedQuoteFactory(status=allowed_status)
+        adviser = AdviserFactory()
+
+        try:
+            order.mark_as_paid(
+                by=adviser,
+                payments_data=[
+                    {
+                        'amount': 1,
+                        'received_on': dateutil_parse('2017-01-01 13:00:00')
+                    },
+                    {
+                        'amount': order.total_cost - 1,
+                        'received_on': dateutil_parse('2017-01-02 13:00:00')
+                    },
+                ]
+            )
+        except Exception:
+            pytest.fail('Should not raise a validator error.')
+
+        order.refresh_from_db()
+        assert order.status == OrderStatus.paid
+        assert list(
+            order.payments.order_by('received_on').values_list('amount', 'received_on')
+        ) == [
+            (1, dateutil_parse('2017-01-01 13:00:00')),
+            (order.total_cost - 1, dateutil_parse('2017-01-02 13:00:00')),
+        ]
+
+    @pytest.mark.parametrize(
+        'disallowed_status',
+        (
+            OrderStatus.draft,
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.paid,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
+        """
+        Test that if the order is in a disallowed status, the order cannot be marked as paid.
+        """
+        order = OrderFactory(status=disallowed_status)
+        with pytest.raises(Conflict):
+            order.mark_as_paid(by=None, payments_data=[])
+
+        assert order.status == disallowed_status
+
+    def test_atomicity(self):
+        """
+        Test that if there's a problem with saving the order, the payments are not saved either.
+        """
+        order = OrderWithAcceptedQuoteFactory()
+        with mock.patch.object(order, 'save') as mocked_save:
+            mocked_save.side_effect = Exception()
+
+            with pytest.raises(Exception):
+                order.mark_as_paid(
+                    by=None,
+                    payments_data=[{
+                        'amount': order.total_cost,
+                        'received_on': dateutil_parse('2017-01-02 13:00:00')
+                    }]
+                )
+
+            order.refresh_from_db()
+            assert order.status == OrderStatus.quote_accepted
+            assert not Payment.objects.count()
+
+    def test_validation_error_if_amounts_less_then_total_cost(self):
+        """
+        Test that if the sum of the amounts is < order.total_cose, the call fails.
+        """
+        order = OrderWithAcceptedQuoteFactory()
+        with pytest.raises(ValidationError):
+            order.mark_as_paid(
+                by=None,
+                payments_data=[
+                    {
+                        'amount': order.total_cost - 1,
+                        'received_on': dateutil_parse('2017-01-02 13:00:00')
+                    }
+                ]
+            )
 
 
 class TestOrderAssignee:
