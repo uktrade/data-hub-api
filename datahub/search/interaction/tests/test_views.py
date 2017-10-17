@@ -13,7 +13,7 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
 from datahub.interaction.models import Interaction
-from datahub.interaction.test.factories import InteractionFactory
+from datahub.interaction.test.factories import InteractionFactory, ServiceDeliveryFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -90,10 +90,9 @@ class TestViews(APITestMixin):
             datetime(2017, 7, 5, 11, 44, 33),
             datetime(2017, 2, 1, 18, 15, 1),
         )
-        date_iter = iter(dates)
         InteractionFactory.create_batch(
             len(dates),
-            date=factory.LazyFunction(lambda: next(date_iter))
+            date=factory.Iterator(dates)
         )
         setup_es.indices.refresh()
 
@@ -101,6 +100,7 @@ class TestViews(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
+
         sorted_dates = sorted(dates, reverse=True)
         expected_dates = [d.isoformat() for d in sorted_dates]
         assert response_data['count'] == len(dates)
@@ -213,11 +213,8 @@ class TestViews(APITestMixin):
 
     def test_filter_by_kind(self, setup_es):
         """Tests filtering interaction by kind."""
-        InteractionFactory.create_batch(10, kind=Interaction.KINDS.interaction),
-        service_deliveries = InteractionFactory.create_batch(
-            10,
-            kind=Interaction.KINDS.service_delivery
-        )
+        InteractionFactory.create_batch(10),
+        service_deliveries = ServiceDeliveryFactory.create_batch(10)
 
         setup_es.indices.refresh()
 
@@ -240,10 +237,9 @@ class TestViews(APITestMixin):
     def test_filter_by_company_id(self, setup_es):
         """Tests filtering interaction by company id."""
         companies = CompanyFactory.create_batch(10)
-        company_iter = iter(companies)
         InteractionFactory.create_batch(
-            10,
-            company=factory.LazyFunction(lambda: next(company_iter))
+            len(companies),
+            company=factory.Iterator(companies)
         )
         setup_es.indices.refresh()
 
@@ -268,11 +264,9 @@ class TestViews(APITestMixin):
             10,
             name=factory.LazyFunction(partial(get_random_string, 16))
         )
-
-        company_iter = iter(companies)
         InteractionFactory.create_batch(
-            10,
-            company=factory.LazyFunction(lambda: next(company_iter))
+            len(companies),
+            company=factory.Iterator(companies)
         )
 
         setup_es.indices.refresh()
@@ -297,11 +291,9 @@ class TestViews(APITestMixin):
     def test_filter_by_contact_id(self, setup_es):
         """Tests filtering interaction by contact id."""
         contacts = ContactFactory.create_batch(10)
-
-        contact_iter = iter(contacts)
         InteractionFactory.create_batch(
-            10,
-            contact=factory.LazyFunction(lambda: next(contact_iter))
+            len(contacts),
+            contact=factory.Iterator(contacts)
         )
 
         setup_es.indices.refresh()
@@ -330,10 +322,9 @@ class TestViews(APITestMixin):
             first_name=factory.LazyFunction(name_str),
             last_name=factory.LazyFunction(name_str)
         )
-        contact_iter = iter(contacts)
         InteractionFactory.create_batch(
-            10,
-            contact=factory.LazyFunction(lambda: next(contact_iter))
+            len(contacts),
+            contact=factory.Iterator(contacts)
         )
         setup_es.indices.refresh()
 
@@ -357,10 +348,9 @@ class TestViews(APITestMixin):
     def test_filter_by_dit_adviser_id(self, setup_es):
         """Tests filtering interaction by dit adviser id."""
         advisers = AdviserFactory.create_batch(10)
-        adviser_iter = iter(advisers)
         InteractionFactory.create_batch(
-            10,
-            dit_adviser=factory.LazyFunction(lambda: next(adviser_iter))
+            len(advisers),
+            dit_adviser=factory.Iterator(advisers)
         )
 
         setup_es.indices.refresh()
@@ -390,11 +380,9 @@ class TestViews(APITestMixin):
             first_name=factory.LazyFunction(name_str),
             last_name=factory.LazyFunction(name_str)
         )
-
-        adviser_iter = iter(advisers)
         InteractionFactory.create_batch(
-            10,
-            dit_adviser=factory.LazyFunction(lambda: next(adviser_iter))
+            len(advisers),
+            dit_adviser=factory.Iterator(advisers)
         )
 
         setup_es.indices.refresh()
