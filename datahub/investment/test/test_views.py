@@ -28,7 +28,8 @@ from datahub.investment.models import (
 )
 from datahub.investment.test.factories import (
     ActiveInvestmentProjectFactory, AssignPMInvestmentProjectFactory,
-    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
+    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
+    VerifyWinInvestmentProjectFactory, WonInvestmentProjectFactory
 )
 from datahub.oauth.scopes import Scope
 
@@ -578,7 +579,7 @@ class TestUnifiedViews(APITestMixin):
 
     def test_change_stage_verify_win_failure(self):
         """Tests moving a partially complete project to the 'Verify win' stage."""
-        project = ActiveInvestmentProjectFactory()
+        project = ActiveInvestmentProjectFactory(number_new_jobs=1)
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'stage': {
@@ -634,6 +635,42 @@ class TestUnifiedViews(APITestMixin):
         }
         response = self.api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
+
+    def test_change_stage_to_won(self):
+        """Tests moving a complete project to the 'Won' stage."""
+        project = VerifyWinInvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.won.value.id
+            }
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['stage'] == {
+            'id': constants.InvestmentProjectStage.won.value.id,
+            'name': constants.InvestmentProjectStage.won.value.name,
+        }
+        assert response_data['status'] == 'won'
+
+    def test_revert_stage_to_verify_win(self):
+        """Tests moving a complete project from the 'Won' stage to 'Verify win'."""
+        project = WonInvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.verify_win.value.id
+            }
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['stage'] == {
+            'id': constants.InvestmentProjectStage.verify_win.value.id,
+            'name': constants.InvestmentProjectStage.verify_win.value.name,
+        }
+        assert response_data['status'] == 'ongoing'
 
     def test_invalid_state_validation(self):
         """Tests validation when a project that is in an invalid state.
