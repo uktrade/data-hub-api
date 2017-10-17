@@ -1,10 +1,8 @@
 from collections import Counter
 from datetime import datetime
-from functools import partial
 
 import factory
 import pytest
-from django.utils.crypto import get_random_string
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -260,10 +258,7 @@ class TestViews(APITestMixin):
 
     def test_filter_by_company_name(self, setup_es):
         """Tests filtering interaction by company name."""
-        companies = CompanyFactory.create_batch(
-            10,
-            name=factory.LazyFunction(partial(get_random_string, 16))
-        )
+        companies = CompanyFactory.create_batch(10)
         InteractionFactory.create_batch(
             len(companies),
             company=factory.Iterator(companies)
@@ -315,13 +310,7 @@ class TestViews(APITestMixin):
 
     def test_filter_by_contact_name(self, setup_es):
         """Tests filtering interaction by contact name."""
-        name_str = partial(get_random_string, 16)
-
-        contacts = ContactFactory.create_batch(
-            10,
-            first_name=factory.LazyFunction(name_str),
-            last_name=factory.LazyFunction(name_str)
-        )
+        contacts = ContactFactory.create_batch(10)
         InteractionFactory.create_batch(
             len(contacts),
             contact=factory.Iterator(contacts)
@@ -374,12 +363,7 @@ class TestViews(APITestMixin):
 
     def test_filter_by_dit_adviser_name(self, setup_es):
         """Tests filtering interaction by dit adviser name."""
-        name_str = partial(get_random_string, 16)
-        advisers = AdviserFactory.create_batch(
-            10,
-            first_name=factory.LazyFunction(name_str),
-            last_name=factory.LazyFunction(name_str)
-        )
+        advisers = AdviserFactory.create_batch(10)
         InteractionFactory.create_batch(
             len(advisers),
             dit_adviser=factory.Iterator(advisers)
