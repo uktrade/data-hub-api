@@ -368,7 +368,7 @@ class TestInteractionV3(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'is_event': ['This field cannot be specified for an interaction.'],
+            'is_event': ['This field is only valid for service deliveries.'],
             'event': ['This field is only valid for event service deliveries.'],
         }
 
@@ -396,7 +396,7 @@ class TestInteractionV3(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'communication_channel': ['This field cannot be specified for a service delivery.'],
+            'communication_channel': ['This field is only valid for interactions.'],
         }
 
     @freeze_time('2017-04-18 13:25:30.986208+00:00')

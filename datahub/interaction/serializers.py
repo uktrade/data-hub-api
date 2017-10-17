@@ -19,10 +19,10 @@ class InteractionSerializer(serializers.ModelSerializer):
 
     default_error_messages = {
         'invalid_for_interaction': ugettext_lazy(
-            'This field cannot be specified for an interaction.'
+            'This field is only valid for service deliveries.'
         ),
         'invalid_for_service_delivery': ugettext_lazy(
-            'This field cannot be specified for a service delivery.'
+            'This field is only valid for interactions.'
         ),
         'invalid_for_non_event': ugettext_lazy(
             'This field is only valid for event service deliveries.'
@@ -49,7 +49,8 @@ class InteractionSerializer(serializers.ModelSerializer):
         """
         Removes the semi-virtual field is_event from the data.
 
-        This is removed because the value is inferred from the event field during serialisation.
+        This is removed because the value is not stored; it is instead inferred from contents
+        of the the event field during serialisation.
         """
         if 'is_event' in data:
             del data['is_event']
