@@ -22,7 +22,7 @@ from datahub.omis.quote.models import Quote
 
 from . import validators
 from .constants import DEFAULT_HOURLY_RATE, OrderStatus, VATStatus
-from .manager import OrderQuerySet
+from .managers import OrderQuerySet
 from .signals import quote_generated
 from .utils import populate_billing_data
 

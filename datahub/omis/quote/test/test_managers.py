@@ -14,9 +14,9 @@ pytestmark = pytest.mark.django_db
 class TestQuoteManager:
     """Tests for the Quote Manager."""
 
-    @mock.patch('datahub.omis.quote.manager.calculate_quote_expiry_date')
-    @mock.patch('datahub.omis.quote.manager.generate_quote_reference')
-    @mock.patch('datahub.omis.quote.manager.generate_quote_content')
+    @mock.patch('datahub.omis.quote.managers.calculate_quote_expiry_date')
+    @mock.patch('datahub.omis.quote.managers.generate_quote_reference')
+    @mock.patch('datahub.omis.quote.managers.generate_quote_content')
     def test_create_from_order_commit_true(
         self,
         mocked_generate_quote_content,
@@ -46,9 +46,9 @@ class TestQuoteManager:
         assert quote.created_by == by
         assert quote.expires_on == expiry_date
 
-    @mock.patch('datahub.omis.quote.manager.calculate_quote_expiry_date')
-    @mock.patch('datahub.omis.quote.manager.generate_quote_reference')
-    @mock.patch('datahub.omis.quote.manager.generate_quote_content')
+    @mock.patch('datahub.omis.quote.managers.calculate_quote_expiry_date')
+    @mock.patch('datahub.omis.quote.managers.generate_quote_reference')
+    @mock.patch('datahub.omis.quote.managers.generate_quote_content')
     def test_create_from_order_commit_false(
         self,
         mocked_generate_quote_content,
