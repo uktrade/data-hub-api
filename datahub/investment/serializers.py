@@ -5,7 +5,9 @@ from rest_framework import serializers
 import datahub.metadata.models as meta_models
 from datahub.company.models import Company, Contact
 from datahub.company.serializers import NestedAdviserField
+from datahub.core.constants import InvestmentProjectStage
 from datahub.core.serializers import NestedRelatedField
+from datahub.core.validate_utils import DataCombiner
 from datahub.investment.models import (InvestmentProject, InvestmentProjectTeamMember,
                                        IProjectDocument)
 from datahub.investment.validate import validate
@@ -74,7 +76,27 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
 
         if errors:
             raise serializers.ValidationError(errors)
+
+        self._update_status(data)
+
         return data
+
+    def _update_status(self, data):
+        """Updates the project status when the stage changes to or from Won."""
+        old_stage = self.instance.stage if self.instance else None
+        new_stage = data.get('stage')
+
+        if not new_stage or new_stage == old_stage:
+            return
+
+        combiner = DataCombiner(instance=self.instance, update_data=data)
+        new_status = combiner.get_value('status')
+
+        if str(new_stage.id) == InvestmentProjectStage.won.value.id:
+            data['status'] = InvestmentProject.STATUSES.won
+        elif (old_stage and str(old_stage.id) == InvestmentProjectStage.won.value.id and
+                new_status == InvestmentProject.STATUSES.won):
+            data['status'] = InvestmentProject.STATUSES.ongoing
 
     class Meta:
         model = InvestmentProject
