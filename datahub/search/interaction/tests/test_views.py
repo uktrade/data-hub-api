@@ -1,5 +1,7 @@
 from collections import Counter
+from functools import partial
 
+import factory
 import pytest
 from django.utils.crypto import get_random_string
 from freezegun import freeze_time
@@ -184,15 +186,12 @@ class TestViews(APITestMixin):
 
     def test_filter_by_kind(self, setup_es):
         """Tests filtering interaction by kind."""
-        service_deliveries = []
+        InteractionFactory.create_batch(10, kind=Interaction.KINDS.interaction),
+        service_deliveries = InteractionFactory.create_batch(
+            10,
+            kind=Interaction.KINDS.service_delivery
+        )
 
-        for _ in range(10):
-            InteractionFactory(
-                kind=Interaction.KINDS.interaction,
-            )
-            service_deliveries.append(InteractionFactory(
-                kind=Interaction.KINDS.service_delivery,
-            ))
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
@@ -214,10 +213,11 @@ class TestViews(APITestMixin):
     def test_filter_by_company_id(self, setup_es):
         """Tests filtering interaction by company id."""
         companies = CompanyFactory.create_batch(10)
-        for company in companies:
-            InteractionFactory(
-                company=company
-            )
+        company_iter = iter(companies)
+        InteractionFactory.create_batch(
+            10,
+            company=factory.LazyFunction(lambda: next(company_iter))
+        )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
@@ -237,10 +237,16 @@ class TestViews(APITestMixin):
 
     def test_filter_by_company_name(self, setup_es):
         """Tests filtering interaction by company name."""
-        companies = []
-        for i in range(10):
-            companies.append(CompanyFactory(name=get_random_string(16)))
-            InteractionFactory(company=companies[i])
+        companies = CompanyFactory.create_batch(
+            10,
+            name=factory.LazyFunction(partial(get_random_string, 16))
+        )
+
+        company_iter = iter(companies)
+        InteractionFactory.create_batch(
+            10,
+            company=factory.LazyFunction(lambda: next(company_iter))
+        )
 
         setup_es.indices.refresh()
 
@@ -264,10 +270,13 @@ class TestViews(APITestMixin):
     def test_filter_by_contact_id(self, setup_es):
         """Tests filtering interaction by contact id."""
         contacts = ContactFactory.create_batch(10)
-        for contact in contacts:
-            InteractionFactory(
-                contact=contact
-            )
+
+        contact_iter = iter(contacts)
+        InteractionFactory.create_batch(
+            10,
+            contact=factory.LazyFunction(lambda: next(contact_iter))
+        )
+
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
@@ -287,15 +296,18 @@ class TestViews(APITestMixin):
 
     def test_filter_by_contact_name(self, setup_es):
         """Tests filtering interaction by contact name."""
-        contacts = []
-        for i in range(10):
-            contacts.append(ContactFactory(
-                first_name=get_random_string(16),
-                last_name=get_random_string(16),
-            ))
-            InteractionFactory(
-                contact=contacts[i]
-            )
+        name_str = partial(get_random_string, 16)
+
+        contacts = ContactFactory.create_batch(
+            10,
+            first_name=factory.LazyFunction(name_str),
+            last_name=factory.LazyFunction(name_str)
+        )
+        contact_iter = iter(contacts)
+        InteractionFactory.create_batch(
+            10,
+            contact=factory.LazyFunction(lambda: next(contact_iter))
+        )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
@@ -315,17 +327,49 @@ class TestViews(APITestMixin):
         assert any(result['contact']['id'] == str(contacts[5].id) for result in results)
         assert any(result['contact']['name'] == contacts[5].name for result in results)
 
+    def test_filter_by_dit_adviser_id(self, setup_es):
+        """Tests filtering interaction by dit adviser id."""
+        advisers = AdviserFactory.create_batch(10)
+        adviser_iter = iter(advisers)
+        InteractionFactory.create_batch(
+            10,
+            dit_adviser=factory.LazyFunction(lambda: next(adviser_iter))
+        )
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:interaction')
+        request_data = {
+            'dit_adviser': advisers[5].id
+        }
+        response = self.api_client.post(url, request_data, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+
+        assert response_data['count'] == 1
+
+        results = response_data['results']
+
+        assert results[0]['dit_adviser']['id'] == str(advisers[5].id)
+        assert results[0]['dit_adviser']['name'] == advisers[5].name
+
     def test_filter_by_dit_adviser_name(self, setup_es):
         """Tests filtering interaction by dit adviser name."""
-        advisers = []
-        for i in range(10):
-            advisers.append(AdviserFactory(
-                first_name=get_random_string(16),
-                last_name=get_random_string(16),
-            ))
-            InteractionFactory(
-                dit_adviser=advisers[i]
-            )
+        name_str = partial(get_random_string, 16)
+        advisers = AdviserFactory.create_batch(
+            10,
+            first_name=factory.LazyFunction(name_str),
+            last_name=factory.LazyFunction(name_str)
+        )
+
+        adviser_iter = iter(advisers)
+        InteractionFactory.create_batch(
+            10,
+            dit_adviser=factory.LazyFunction(lambda: next(adviser_iter))
+        )
+
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
@@ -347,12 +391,10 @@ class TestViews(APITestMixin):
 
     def test_filter_by_dit_team(self, setup_es):
         """Tests filtering interaction by dit team."""
+        InteractionFactory.create_batch(5, dit_team_id=constants.Team.crm.value.id)
         dit_team_id = constants.Team.td_events_healthcare.value.id
-        for _ in range(5):
-            InteractionFactory(dit_team_id=constants.Team.crm.value.id)
-            InteractionFactory(
-                dit_team_id=dit_team_id
-            )
+        InteractionFactory.create_batch(5, dit_team_id=dit_team_id)
+
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
@@ -372,14 +414,15 @@ class TestViews(APITestMixin):
 
     def test_filter_by_communication_channel(self, setup_es):
         """Tests filtering interaction by interaction type."""
+        InteractionFactory.create_batch(
+            5,
+            communication_channel_id=constants.InteractionType.email_website.value.id
+        )
         communication_channel_id = constants.InteractionType.social_media.value.id
-        for _ in range(5):
-            InteractionFactory(
-                communication_channel_id=constants.InteractionType.email_website.value.id
-            )
-            InteractionFactory(
-                communication_channel_id=communication_channel_id
-            )
+        InteractionFactory.create_batch(
+            5,
+            communication_channel_id=communication_channel_id
+        )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
@@ -401,14 +444,15 @@ class TestViews(APITestMixin):
 
     def test_filter_by_service(self, setup_es):
         """Tests filtering interaction by service."""
+        InteractionFactory.create_batch(
+            5,
+            service_id=constants.Service.trade_enquiry.value.id
+        )
         service_id = constants.Service.account_management.value.id
-        for _ in range(5):
-            InteractionFactory(
-                service_id=constants.Service.trade_enquiry.value.id
-            )
-            InteractionFactory(
-                service_id=service_id
-            )
+        InteractionFactory.create_batch(
+            5,
+            service_id=service_id
+        )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
