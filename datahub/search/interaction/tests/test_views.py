@@ -1,4 +1,5 @@
 from collections import Counter
+from datetime import datetime
 from functools import partial
 
 import factory
@@ -35,7 +36,6 @@ def interactions(setup_es):
     yield data
 
 
-@pytest.mark.usefixtures('interactions')
 class TestViews(APITestMixin):
     """Tests interaction search views."""
 
@@ -53,7 +53,7 @@ class TestViews(APITestMixin):
         expected_ids = Counter(str(interaction.id) for interaction in interactions)
         assert Counter([item['id'] for item in response_data['results']]) == expected_ids
 
-    def test_limit(self):
+    def test_limit(self, interactions):
         """Tests that results can be limited."""
         url = reverse('api-v3:search:interaction')
 
@@ -66,7 +66,7 @@ class TestViews(APITestMixin):
         response_data = response.json()
         assert len(response_data['results']) == 1
 
-    def test_offset(self):
+    def test_offset(self, interactions):
         """Tests that results can be offset."""
         url = reverse('api-v3:search:interaction')
 
@@ -78,6 +78,33 @@ class TestViews(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert len(response_data['results']) == 4
+
+    def test_default_sort(self, setup_es):
+        """Tests default sorting of results by date (descending)."""
+        url = reverse('api-v3:search:interaction')
+
+        dates = (
+            datetime(2017, 2, 4, 13, 15, 0),
+            datetime(2017, 1, 4, 11, 23, 10),
+            datetime(2017, 9, 29, 3, 25, 15),
+            datetime(2017, 7, 5, 11, 44, 33),
+            datetime(2017, 2, 1, 18, 15, 1),
+        )
+        date_iter = iter(dates)
+        InteractionFactory.create_batch(
+            len(dates),
+            date=factory.LazyFunction(lambda: next(date_iter))
+        )
+        setup_es.indices.refresh()
+
+        response = self.api_client.post(url, {}, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        sorted_dates = sorted(dates, reverse=True)
+        expected_dates = [d.isoformat() for d in sorted_dates]
+        assert response_data['count'] == len(dates)
+        assert [item['date'] for item in response_data['results']] == expected_dates
 
     def test_sort_by_subject_asc(self, interactions):
         """Tests sorting of results by subject (ascending)."""
@@ -111,7 +138,7 @@ class TestViews(APITestMixin):
         expected_subjects = list(sorted(subjects, key=lambda s: s.lower(), reverse=True))
         assert [item['subject'] for item in response_data['results']] == expected_subjects
 
-    def test_sort_by_invalid_field(self):
+    def test_sort_by_invalid_field(self, setup_es):
         """Tests attempting to sort by an invalid field and direction."""
         url = reverse('api-v3:search:interaction')
 
