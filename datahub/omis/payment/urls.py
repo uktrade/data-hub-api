@@ -7,7 +7,10 @@ from .views import PaymentViewSet, PublicPaymentViewSet
 internal_frontend_urls = [
     url(
         r'^order/(?P<order_pk>[0-9a-z-]{36})/payment$',
-        PaymentViewSet.as_view({'get': 'list'}),
+        PaymentViewSet.as_view({
+            'get': 'list',
+            'post': 'create_list'
+        }),
         name='collection'
     ),
 ]
