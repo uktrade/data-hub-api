@@ -15,7 +15,7 @@ pytestmark = pytest.mark.django_db
 class TestPaymentManager:
     """Tests for the Payment Manager."""
 
-    @mock.patch('datahub.omis.payment.manager.generate_datetime_based_reference')
+    @mock.patch('datahub.omis.payment.managers.generate_datetime_based_reference')
     def test_create_from_order(
         self,
         mocked_generate_datetime_based_reference

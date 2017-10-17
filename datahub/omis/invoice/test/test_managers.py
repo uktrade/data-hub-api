@@ -13,8 +13,8 @@ pytestmark = pytest.mark.django_db
 class TestInvoiceManager:
     """Tests for the Invoice Manager."""
 
-    @mock.patch('datahub.omis.invoice.manager.calculate_payment_due_date')
-    @mock.patch('datahub.omis.invoice.manager.generate_datetime_based_reference')
+    @mock.patch('datahub.omis.invoice.managers.calculate_payment_due_date')
+    @mock.patch('datahub.omis.invoice.managers.generate_datetime_based_reference')
     def test_create_from_order(
         self,
         mocked_generate_datetime_based_reference,

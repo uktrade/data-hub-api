@@ -6,7 +6,7 @@ from django.db import models
 from datahub.core.models import BaseModel
 
 from .constants import PaymentMethod
-from .manager import PaymentManager
+from .managers import PaymentManager
 
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
