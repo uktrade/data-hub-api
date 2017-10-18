@@ -6,11 +6,13 @@ from datetime import date
 import factory
 from django.utils.timezone import now
 
-from datahub.company.test.factories import AdviserFactory, CompanyFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import (
-    InvestmentProjectStage, InvestmentType, ReferralSourceActivity, Sector
+    InvestmentBusinessActivity, InvestmentProjectStage, InvestmentStrategicDriver,
+    InvestmentType, ReferralSourceActivity, SalaryRange, Sector, UKRegion
 )
 from datahub.core.test.factories import to_many_field
+from datahub.investment.models import InvestmentProject
 
 
 class InvestmentProjectFactory(factory.django.DjangoModelFactory):
@@ -38,10 +40,12 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     @to_many_field
     def business_activities(self):
         """Add support for setting business_activities."""
+        return [InvestmentBusinessActivity.retail.value.id]
 
     @to_many_field
     def client_contacts(self):
         """Add support for setting client_contacts."""
+        return [ContactFactory().pk, ContactFactory().pk]
 
     @to_many_field
     def competitor_countries(self):
@@ -55,8 +59,63 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     def uk_region_locations(self):
         """Add support for setting uk_region_locations."""
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'investment.InvestmentProject'
+
+
+class AssignPMInvestmentProjectFactory(InvestmentProjectFactory):
+    """Investment project in the Assign PM stage."""
+
+    stage_id = InvestmentProjectStage.assign_pm.value.id
+    client_cannot_provide_total_investment = False
+    total_investment = 100
+    number_new_jobs = 0
+    client_considering_other_countries = False
+    client_requirements = factory.Faker('text')
+    site_decided = False
+
+    @to_many_field
+    def strategic_drivers(self):
+        """Add support for setting strategic_drivers."""
+        return [InvestmentStrategicDriver.access_to_market.value.id]
+
+    @to_many_field
+    def uk_region_locations(self):
+        """Add support for setting uk_region_locations."""
+        return [UKRegion.england.value.id]
+
+
+class ActiveInvestmentProjectFactory(AssignPMInvestmentProjectFactory):
+    """Investment project in the Active stage."""
+
+    stage_id = InvestmentProjectStage.active.value.id
+    project_assurance_adviser = factory.SubFactory(AdviserFactory)
+    project_manager = factory.SubFactory(AdviserFactory)
+
+
+class VerifyWinInvestmentProjectFactory(ActiveInvestmentProjectFactory):
+    """Investment project in the Verify win stage."""
+
+    stage_id = InvestmentProjectStage.verify_win.value.id
+    client_cannot_provide_foreign_investment = False
+    foreign_equity_investment = 100
+    government_assistance = False
+    number_safeguarded_jobs = 0
+    r_and_d_budget = True
+    non_fdi_r_and_d_budget = False
+    new_tech_to_uk = True
+    export_revenue = True
+    address_line_1 = factory.Faker('street_address')
+    address_line_2 = factory.Faker('city')
+    address_line_postcode = factory.Faker('postcode')
+    average_salary_id = SalaryRange.below_25000.value.id
+
+
+class WonInvestmentProjectFactory(VerifyWinInvestmentProjectFactory):
+    """Investment project in the Won stage."""
+
+    stage_id = InvestmentProjectStage.won.value.id
+    status = InvestmentProject.STATUSES.won
 
 
 class InvestmentProjectTeamMemberFactory(factory.django.DjangoModelFactory):
@@ -66,5 +125,5 @@ class InvestmentProjectTeamMemberFactory(factory.django.DjangoModelFactory):
     adviser = factory.SubFactory(AdviserFactory)
     role = factory.Sequence(lambda n: f'role {n}')
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'investment.InvestmentProjectTeamMember'

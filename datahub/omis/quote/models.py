@@ -6,7 +6,7 @@ from django.utils.timezone import now
 
 from datahub.core.models import BaseModel
 
-from .manager import QuoteManager
+from .managers import QuoteManager
 
 
 class Quote(BaseModel):

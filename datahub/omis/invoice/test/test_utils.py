@@ -3,13 +3,21 @@ import pytest
 from dateutil.parser import parse as dateutil_parse
 from freezegun import freeze_time
 
+from datahub.omis.core.utils import generate_datetime_based_reference
+
 from .factories import InvoiceFactory
-from ..utils import calculate_payment_due_date, generate_invoice_number
+from ..models import Invoice
+from ..utils import calculate_payment_due_date
 
 
 @pytest.mark.django_db
 class TestGenerateInvoiceNumber:
-    """Tests for the generate_invoice_number logic."""
+    """
+    Tests for generating the invoice number using `generate_datetime_based_reference`.
+
+    These are really extra tests just to make sure things work as expected as the main
+    logic is been tested by the generic generate_datetime_based_reference tests.
+    """
 
     def test_first_invoice_number_of_the_day(self):
         """Test that the first invoice number of the day is generated as expected."""
@@ -25,7 +33,7 @@ class TestGenerateInvoiceNumber:
                 InvoiceFactory()
 
         with freeze_time('2017-02-01 13:00:00'):
-            invoice_number = generate_invoice_number()
+            invoice_number = generate_datetime_based_reference(Invoice, field='invoice_number')
 
         assert invoice_number == '201702010001'
 
@@ -47,23 +55,9 @@ class TestGenerateInvoiceNumber:
                 InvoiceFactory()
 
         with freeze_time('2017-02-01 13:00:00'):
-            invoice_number = generate_invoice_number()
+            invoice_number = generate_datetime_based_reference(Invoice, field='invoice_number')
 
         assert invoice_number == '201702010004'
-
-    def test_invoice_collision(self):
-        """
-        Test that if the invoice number has already been used,
-        the next available one is generated.
-        """
-        with freeze_time('2017-01-01 13:00:00'):
-            InvoiceFactory(invoice_number='201702010001')
-            InvoiceFactory(invoice_number='201702010002')
-
-        with freeze_time('2017-02-01 13:00:00'):
-            invoice_number = generate_invoice_number()
-
-        assert invoice_number == '201702010003'
 
 
 class TestCalculatePaymentDueDate:

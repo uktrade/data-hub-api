@@ -6,6 +6,6 @@ from .models import MyDisableableModel
 class MyDisableableModelSerializer(serializers.ModelSerializer):
     """Serialiser for MyDisableableModel."""
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = MyDisableableModel
         fields = '__all__'

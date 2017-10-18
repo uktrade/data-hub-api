@@ -36,7 +36,7 @@ class QuoteSerializer(serializers.ModelSerializer):
         order.generate_quote(by=current_user, commit=commit)
         return order.quote
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = Quote
         fields = [
             'created_on',
@@ -62,7 +62,7 @@ class PublicQuoteSerializer(serializers.ModelSerializer):
         self.instance = order.quote
         return self.instance
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = Quote
         fields = [
             'created_on',

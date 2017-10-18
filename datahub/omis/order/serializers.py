@@ -46,7 +46,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     billing_address_country = NestedRelatedField(Country, required=False, allow_null=True)
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = Order
         fields = (
             'id',
@@ -192,7 +192,7 @@ class PublicOrderSerializer(serializers.ModelSerializer):
     contact = NestedRelatedField(Contact)
     billing_address_country = NestedRelatedField(Country)
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = Order
         fields = (
             'public_token',
@@ -286,7 +286,7 @@ class SubscribedAdviserSerializer(serializers.Serializer):
     name = serializers.CharField(read_only=True)
     dit_team = NestedRelatedField(Team, read_only=True)
 
-    class Meta:  # noqa: D101
+    class Meta:
         list_serializer_class = SubscribedAdviserListSerializer
 
 
@@ -402,7 +402,7 @@ class OrderAssigneeSerializer(serializers.ModelSerializer):
     estimated_time = serializers.IntegerField(required=False)
     is_lead = serializers.BooleanField(required=False)
 
-    class Meta:  # noqa: D101
+    class Meta:
         list_serializer_class = OrderAssigneeListSerializer
         model = OrderAssignee
         fields = [

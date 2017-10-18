@@ -37,5 +37,5 @@ class EventFactory(factory.django.DjangoModelFactory):
     def related_programmes(self):  # noqa: D102
         return [Programme.great_branded.value.id]
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'event.Event'

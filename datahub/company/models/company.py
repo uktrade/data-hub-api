@@ -30,7 +30,7 @@ class CompanyAbstract(models.Model):
     )
     registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
-    class Meta:  # noqa: D101
+    class Meta:
         abstract = True
 
     def __str__(self):
@@ -124,7 +124,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         related_name='one_list_owned_companies'
     )
 
-    class Meta:  # noqa: D101
+    class Meta:
         verbose_name_plural = 'companies'
 
     @property
@@ -213,5 +213,5 @@ class CompaniesHouseCompany(CompanyAbstract):
         """Admin displayed human readable name."""
         return self.name
 
-    class Meta:  # noqa: D101
+    class Meta:
         verbose_name_plural = 'Companies House companies'

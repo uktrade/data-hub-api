@@ -14,6 +14,6 @@ class Market(DisableableModel):
     )
     manager_email = models.EmailField(blank=True)
 
-    class Meta:  # noqa: D101
+    class Meta:
         verbose_name = 'OMIS Market'
         verbose_name_plural = 'OMIS Markets'
