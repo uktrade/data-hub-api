@@ -596,9 +596,9 @@ class TestUnifiedViews(APITestMixin):
             'non_fdi_r_and_d_budget': ['This field is required.'],
             'new_tech_to_uk': ['This field is required.'],
             'export_revenue': ['This field is required.'],
-            'address_line_1': ['This field is required.'],
-            'address_line_2': ['This field is required.'],
-            'address_line_postcode': ['This field is required.'],
+            'address_1': ['This field is required.'],
+            'address_2': ['This field is required.'],
+            'address_postcode': ['This field is required.'],
             'average_salary': ['This field is required.'],
             'client_cannot_provide_foreign_investment': ['This field is required.'],
             'foreign_equity_investment': ['This field is required.'],
@@ -622,9 +622,9 @@ class TestUnifiedViews(APITestMixin):
             associated_non_fdi_r_and_d_project=InvestmentProjectFactory(),
             new_tech_to_uk=True,
             export_revenue=True,
-            address_line_1='12 London Road',
-            address_line_2='London',
-            address_line_postcode='SW1A 2AA',
+            address_1='12 London Road',
+            address_2='London',
+            address_postcode='SW1A 2AA',
             average_salary_id=constants.SalaryRange.below_25000.value.id
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
@@ -769,7 +769,7 @@ class TestUnifiedViews(APITestMixin):
         project = InvestmentProjectFactory(
             client_requirements='client reqs',
             site_decided=True,
-            address_line_1='address 1',
+            address_1='address 1',
             client_considering_other_countries=True,
             competitor_countries=countries,
             strategic_drivers=strategic_drivers,
@@ -786,7 +786,7 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['client_considering_other_countries'] is True
         assert response_data['requirements_complete'] is True
         assert response_data['uk_company_decided'] is False
-        assert response_data['address_line_1'] == 'address 1'
+        assert response_data['address_1'] == 'address 1'
         assert sorted(country['id'] for country in response_data[
             'competitor_countries']) == sorted(countries)
         assert sorted(driver['id'] for driver in response_data[
@@ -796,12 +796,12 @@ class TestUnifiedViews(APITestMixin):
         """Test successfully partially updating a requirements object."""
         project = InvestmentProjectFactory(client_requirements='client reqs',
                                            site_decided=True,
-                                           address_line_1='address 1')
+                                           address_1='address 1')
         url = reverse('api-v3:investment:investment-item',
                       kwargs={'pk': project.pk})
         request_data = {
-            'address_line_1': 'address 1 new',
-            'address_line_2': 'address 2 new'
+            'address_1': 'address 1 new',
+            'address_2': 'address 2 new'
         }
         response = self.api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
@@ -809,8 +809,8 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['requirements_complete'] is False
         assert response_data['client_requirements'] == 'client reqs'
         assert response_data['site_decided'] is True
-        assert response_data['address_line_1'] == 'address 1 new'
-        assert response_data['address_line_2'] == 'address 2 new'
+        assert response_data['address_1'] == 'address 1 new'
+        assert response_data['address_2'] == 'address 2 new'
 
     def test_get_team_success(self):
         """Test successfully getting a project requirements object."""

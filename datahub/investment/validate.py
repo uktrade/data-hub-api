@@ -35,9 +35,9 @@ VALIDATION_MAPPING = {
     'non_fdi_r_and_d_budget': Stage.verify_win.value,
     'new_tech_to_uk': Stage.verify_win.value,
     'export_revenue': Stage.verify_win.value,
-    'address_line_1': Stage.verify_win.value,
-    'address_line_2': Stage.verify_win.value,
-    'address_line_postcode': Stage.verify_win.value,
+    'address_1': Stage.verify_win.value,
+    'address_2': Stage.verify_win.value,
+    'address_postcode': Stage.verify_win.value,
 }
 
 CondValRule = namedtuple('CondValRule', ('field', 'condition', 'stage'))
