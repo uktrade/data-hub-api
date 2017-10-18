@@ -24,12 +24,12 @@ class Migration(migrations.Migration):
         ),
         migrations.RenameField(
             model_name='investmentproject',
-            old_name='address_line_3',
+            old_name='address_line_postcode',
             new_name='address_postcode',
         ),
         migrations.RenameField(
             model_name='investmentproject',
-            old_name='address_line_postcode',
+            old_name='address_line_3',
             new_name='address_town',
         ),
     ]
