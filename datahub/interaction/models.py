@@ -70,11 +70,18 @@ class Interaction(BaseModel):
         on_delete=models.CASCADE
     )
 
+    @property
+    def is_event(self):
+        """Whether this service delivery is for an event."""
+        if self.kind == self.KINDS.service_delivery:
+            return bool(self.event)
+        return None
+
     def __str__(self):
         """Human-readable representation."""
         return self.subject
 
-    class Meta:  # noqa: D101
+    class Meta:
         indexes = [
             models.Index(fields=['-date', '-created_on']),
         ]

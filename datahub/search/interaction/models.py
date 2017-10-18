@@ -1,5 +1,7 @@
+from operator import attrgetter
+
 from django.conf import settings
-from elasticsearch_dsl import Date, DocType, Keyword
+from elasticsearch_dsl import Boolean, Date, DocType, Keyword
 
 from datahub.search import dict_utils, dsl_utils
 from datahub.search.models import MapDBModelToDict
@@ -13,12 +15,13 @@ class Interaction(DocType, MapDBModelToDict):
     date = Date()
     company = dsl_utils.id_name_partial_mapping('company')
     contact = dsl_utils.contact_or_adviser_partial_mapping('contact')
+    is_event = Boolean()
     event = dsl_utils.id_name_partial_mapping('event')
     service = dsl_utils.id_name_mapping()
-    subject = dsl_utils.SortableCaseInsensitiveKeywordString(copy_to='subject_english')
-    subject_english = dsl_utils.EnglishString()
+    subject = dsl_utils.SortableCaseInsensitiveKeywordText(copy_to='subject_english')
+    subject_english = dsl_utils.EnglishText()
     dit_adviser = dsl_utils.contact_or_adviser_partial_mapping('dit_adviser')
-    notes = dsl_utils.EnglishString()
+    notes = dsl_utils.EnglishText()
     dit_team = dsl_utils.id_name_mapping()
     communication_channel = dsl_utils.id_name_mapping()
     investment_project = dsl_utils.id_name_mapping()
@@ -37,7 +40,9 @@ class Interaction(DocType, MapDBModelToDict):
         'investment_project': dict_utils.id_name_dict,
     }
 
-    COMPUTED_MAPPINGS = {}
+    COMPUTED_MAPPINGS = {
+        'is_event': attrgetter('is_event')
+    }
 
     IGNORED_FIELDS = (
         'created_by',

@@ -14,7 +14,8 @@ from .companieshouse import *
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
-ROOT_DIR = environ.Path(__file__) - 2
+CONFIG_DIR = environ.Path(__file__) - 2
+ROOT_DIR = CONFIG_DIR - 1
 
 env = environ.Env()
 
@@ -88,7 +89,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [(ROOT_DIR - 1)('templates')],
+        'DIRS': [(ROOT_DIR)('templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -150,14 +151,9 @@ OAUTH2_PROVIDER = {
 
 LANGUAGE_CODE = 'en-gb'
 USE_L10N = True
-PUBLIC_ROOT = str(ROOT_DIR('public'))
-STATIC_ROOT = str(ROOT_DIR('staticfiles'))
+PUBLIC_ROOT = str(CONFIG_DIR('public'))
+STATIC_ROOT = str(CONFIG_DIR('staticfiles'))
 STATIC_URL = '/static/'
-
-# Extra places for collectstatic to find static files.
-STATICFILES_DIRS = (
-    str(ROOT_DIR.path('static')),
-)
 
 # DRF
 REST_FRAMEWORK = {

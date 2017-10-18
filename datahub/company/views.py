@@ -92,7 +92,7 @@ class ContactAuditViewSet(AuditViewSet):
 class AdviserFilter(FilterSet):
     """Adviser filter."""
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = Advisor
         fields = dict(
             first_name=['exact', 'icontains'],

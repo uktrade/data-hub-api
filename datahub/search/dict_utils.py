@@ -80,3 +80,15 @@ def company_dict(obj):
         'id': str(obj.id),
         'company_number': obj.company_number,
     }
+
+
+def investment_project_dict(obj):
+    """Creates dictionary from an investment project containing id, name and project_code."""
+    if obj is None:
+        return None
+
+    return {
+        'id': str(obj.id),
+        'name': obj.name,
+        'project_code': obj.project_code,
+    }

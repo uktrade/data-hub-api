@@ -24,7 +24,7 @@ class InteractionFactory(factory.django.DjangoModelFactory):
     created_on = now()
     communication_channel_id = constants.InteractionType.face_to_face.value.id
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'interaction.Interaction'
 
 
@@ -36,7 +36,7 @@ class ServiceDeliveryFactory(factory.django.DjangoModelFactory):
     modified_by = factory.SubFactory(AdviserFactory)
     company = factory.SubFactory(CompanyFactory)
     contact = factory.SubFactory(ContactFactory)
-    event = factory.SubFactory(EventFactory)
+    event = None
     subject = factory.Faker('sentence', nb_words=8)
     date = now()
     notes = factory.Faker('paragraph', nb_sentences=10)
@@ -45,5 +45,11 @@ class ServiceDeliveryFactory(factory.django.DjangoModelFactory):
     dit_team_id = constants.Team.healthcare_uk.value.id
     created_on = now()
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'interaction.Interaction'
+
+
+class EventServiceDeliveryFactory(ServiceDeliveryFactory):
+    """Event service delivery factory."""
+
+    event = factory.SubFactory(EventFactory)

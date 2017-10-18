@@ -15,5 +15,5 @@ class DocumentFactory(factory.django.DjangoModelFactory):
     path = factory.Sequence(lambda n: f'projects/doc{n}.txt')
     uploaded_on = factory.LazyFunction(datetime.now)
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'documents.Document'

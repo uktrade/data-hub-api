@@ -17,7 +17,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 class IProjectAbstract(models.Model):
     """The core part of an investment project."""
 
-    class Meta:  # noqa: D101
+    class Meta:
         abstract = True
 
     PRIORITIES = Choices(
@@ -31,10 +31,12 @@ class IProjectAbstract(models.Model):
         ('delayed', 'Delayed'),
         ('lost', 'Lost'),
         ('abandoned', 'Abandoned'),
+        ('won', 'Won'),
     )
 
     name = models.CharField(max_length=MAX_LENGTH)
     description = models.TextField()
+    anonymous_description = models.TextField(blank=True)
     nda_signed = models.BooleanField()
     estimated_land_date = models.DateField()
     investment_type = models.ForeignKey(
@@ -160,7 +162,7 @@ class IProjectAbstract(models.Model):
 class IProjectValueAbstract(models.Model):
     """The value part of an investment project."""
 
-    class Meta:  # noqa: D101
+    class Meta:
         abstract = True
 
     fdi_value = models.ForeignKey(
@@ -184,7 +186,13 @@ class IProjectValueAbstract(models.Model):
     )
     number_safeguarded_jobs = models.IntegerField(null=True, blank=True)
     r_and_d_budget = models.NullBooleanField()
-    non_fdi_r_and_d_budget = models.NullBooleanField()
+    non_fdi_r_and_d_budget = models.NullBooleanField(
+        verbose_name='has associated non-FDI R&D project'
+    )
+    associated_non_fdi_r_and_d_project = models.ForeignKey(
+        'InvestmentProject', related_name='+', null=True, blank=True, on_delete=models.SET_NULL,
+        verbose_name='associated non-FDI R&D project',
+    )
     new_tech_to_uk = models.NullBooleanField()
     export_revenue = models.NullBooleanField()
 
@@ -192,7 +200,7 @@ class IProjectValueAbstract(models.Model):
 class IProjectRequirementsAbstract(models.Model):
     """The requirements part of an investment project."""
 
-    class Meta:  # noqa: D101
+    class Meta:
         abstract = True
 
     client_requirements = models.TextField(blank=True, null=True)
@@ -220,7 +228,7 @@ class IProjectRequirementsAbstract(models.Model):
 class IProjectTeamAbstract(models.Model):
     """The team part of an investment project."""
 
-    class Meta:  # noqa: D101
+    class Meta:
         abstract = True
 
     project_manager = models.ForeignKey(
@@ -276,7 +284,7 @@ class InvestmentProjectTeamMember(models.Model):
         """Human-readable representation."""
         return f'{self.investment_project} – {self.adviser} – {self.role}'
 
-    class Meta:  # noqa: D101
+    class Meta:
         unique_together = (('investment_project', 'adviser'),)
 
 
@@ -332,7 +340,7 @@ class IProjectDocument(BaseModel, ArchivableModel):
         """Generate pre-signed upload URL."""
         return self.document.generate_signed_upload_url()
 
-    class Meta:  # noqa: D101
+    class Meta:
         verbose_name = 'investment project document'
         verbose_name_plural = 'investment project documents'
         unique_together = (
