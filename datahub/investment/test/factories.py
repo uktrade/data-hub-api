@@ -105,9 +105,9 @@ class VerifyWinInvestmentProjectFactory(ActiveInvestmentProjectFactory):
     non_fdi_r_and_d_budget = False
     new_tech_to_uk = True
     export_revenue = True
-    address_line_1 = factory.Faker('street_address')
-    address_line_2 = factory.Faker('city')
-    address_line_postcode = factory.Faker('postcode')
+    address_1 = factory.Faker('street_address')
+    address_2 = factory.Faker('city')
+    address_postcode = factory.Faker('postcode')
     average_salary_id = SalaryRange.below_25000.value.id
 
 

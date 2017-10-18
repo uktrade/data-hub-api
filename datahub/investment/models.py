@@ -206,10 +206,10 @@ class IProjectRequirementsAbstract(models.Model):
     client_requirements = models.TextField(blank=True, null=True)
     # site_decided is deprecated; will be removed
     site_decided = models.NullBooleanField()
-    address_line_1 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
-    address_line_2 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
-    address_line_3 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
-    address_line_postcode = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
+    address_1 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
+    address_2 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
+    address_town = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
+    address_postcode = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
     client_considering_other_countries = models.NullBooleanField()
 
     uk_company_decided = models.NullBooleanField()
