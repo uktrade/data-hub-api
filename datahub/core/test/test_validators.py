@@ -7,8 +7,8 @@ from rest_framework.exceptions import ValidationError
 
 from datahub.core.validate_utils import DataCombiner
 from datahub.core.validators import (
-    AnyOfValidator, Condition, RequiredUnlessAlreadyBlankValidator, RulesBasedValidator,
-    ValidationRule
+    AnyOfValidator, ConditionalRule, RequiredUnlessAlreadyBlankValidator, Rule,
+    RulesBasedValidator,
 )
 
 
@@ -41,24 +41,28 @@ def test_any_of_all():
     ({'colour': 'red'}, 'colour', eq, ('red',), True),
     ({'colour': 'red'}, 'colour', eq, ('blue',), False),
 ))
-def test_validation_condition(data, field, op, args, res):
+def test_rule(data, field, op, args, res):
     """Tests ValidationCondition for various cases."""
     combiner = Mock(spec_set=DataCombiner, get_value=lambda field_: data[field_])
-    condition = Condition(field, op, args)
+    condition = Rule(field, op, args)
     assert condition(combiner) == res
 
 
-@pytest.mark.parametrize('data,field,op,condition,res', (
-    ({'colour': 'red', 'valid': True}, 'valid', bool, lambda x: True, True),
-    ({'colour': 'red', 'valid': False}, 'valid', bool, lambda x: True, False),
-    ({'colour': 'red', 'valid': True}, 'valid', bool, lambda x: False, True),
-    ({'colour': 'red', 'valid': False}, 'valid', bool, lambda x: False, True),
+@pytest.mark.parametrize('rule_res,when_res,res', (
+    (True, True, True),
+    (False, True, False),
+    (True, False, True),
+    (False, False, True),
 ))
-def test_validation_rule(data, field, op, condition, res):
+def test_conditional_rule(rule_res, when_res, res):
     """Tests ValidationRule for various cases."""
-    combiner = Mock(spec_set=DataCombiner, get_value=lambda field_: data[field_])
-    rule = ValidationRule(
-        'error_key', field, op, condition=condition
+    combiner = Mock(spec_set=DataCombiner)
+    rule = Mock(spec_set=Rule)
+    rule.return_value = rule_res
+    condition = Mock(spec=Rule)
+    condition.return_value = when_res
+    rule = ConditionalRule(
+        'error_key', rule, when=condition
     )
     assert rule(combiner) == res
 
