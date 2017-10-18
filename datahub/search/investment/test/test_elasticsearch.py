@@ -91,10 +91,28 @@ def test_get_basic_search_query():
                         }
                     }, {
                         'nested': {
+                            'path': 'company',
+                            'query': {
+                                'match': {
+                                    'company.name_trigram': 'test'
+                                }
+                            }
+                        }
+                    }, {
+                        'nested': {
                             'path': 'contact',
                             'query': {
                                 'match': {
                                     'contact.name': 'test'
+                                }
+                            }
+                        }
+                    }, {
+                        'nested': {
+                            'path': 'contact',
+                            'query': {
+                                'match': {
+                                    'contact.name_trigram': 'test'
                                 }
                             }
                         }
@@ -165,6 +183,10 @@ def test_get_basic_search_query():
                             }
                         }
                     }, {
+                        'match': {
+                            'reference': 'test'
+                        }
+                    }, {
                         'nested': {
                             'path': 'registered_address_country',
                             'query': {
@@ -211,6 +233,10 @@ def test_get_basic_search_query():
                                     'teams.name': 'test'
                                 }
                             }
+                        }
+                    }, {
+                        'match': {
+                            'total_cost_string': 'test'
                         }
                     }, {
                         'nested': {

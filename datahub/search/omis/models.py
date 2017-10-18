@@ -12,8 +12,8 @@ class Order(DocType, MapDBModelToDict):
     id = Keyword()
     reference = dsl_utils.SortableCaseInsensitiveKeywordText()
     status = dsl_utils.SortableCaseInsensitiveKeywordText()
-    company = dsl_utils.id_name_mapping()
-    contact = dsl_utils.contact_or_adviser_mapping('contact')
+    company = dsl_utils.id_name_partial_mapping('company')
+    contact = dsl_utils.contact_or_adviser_partial_mapping('contact')
     created_by = dsl_utils.contact_or_adviser_mapping('created_by')
     created_on = Date()
     modified_on = Date()
@@ -35,7 +35,8 @@ class Order(DocType, MapDBModelToDict):
     net_cost = Integer(index=False)
     subtotal_cost = Integer(index=False)
     vat_cost = Integer(index=False)
-    total_cost = Integer()
+    total_cost_string = Keyword()
+    total_cost = Integer(copy_to=['total_cost_string'])
 
     billing_contact_name = Text()
     billing_email = dsl_utils.SortableCaseInsensitiveKeywordText()
@@ -78,7 +79,12 @@ class Order(DocType, MapDBModelToDict):
         'payments',
     )
 
-    SEARCH_FIELDS = []
+    SEARCH_FIELDS = (
+        'reference',
+        'contact.name_trigram',
+        'company.name_trigram',
+        'total_cost_string',
+    )
 
     class Meta:
         """Default document meta data."""
