@@ -40,7 +40,7 @@ class TestSearch(APITestMixin):
         contact = response.data['results'][0]
         assert contact['address_country']['id'] == united_kingdom_id
 
-    def test_filter_contact(self, setup_es, setup_data):
+    def test_filter_contact(self, setup_es):
         """Tests matching contact using multiple filters."""
         contact = ContactFactory(address_same_as_company=True)
         company = contact.company
@@ -72,7 +72,7 @@ class TestSearch(APITestMixin):
         assert contact['company_uk_region']['id'] == company.uk_region_id
         assert contact['company_sector']['id'] == company.sector_id
 
-    def test_filter_without_uk_region(self, setup_es, setup_data):
+    def test_filter_without_uk_region(self, setup_es):
         """Tests matching contact without uk_region using multiple filters."""
         company = CompanyFactory(
             registered_address_country_id=Country.united_states.value.id,
@@ -106,7 +106,7 @@ class TestSearch(APITestMixin):
         assert contact['company_uk_region'] is None
         assert contact['company_sector']['id'] == company.sector_id
 
-    def test_search_contact_by_partial_company_name(self, setup_es, setup_data):
+    def test_search_contact_by_partial_company_name(self, setup_es):
         """Tests filtering by partially matching company name."""
         contact = ContactFactory()
         company = contact.company
@@ -139,7 +139,7 @@ class TestSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data['results']) > 0
 
-    def test_search_contact_sort_by_last_name_desc(self, setup_es, setup_data):
+    def test_search_contact_sort_by_last_name_desc(self, setup_es):
         """Tests sorting in descending order."""
         ContactFactory(first_name='test_name', last_name='abcdef')
         ContactFactory(first_name='test_name', last_name='bcdefg')
@@ -163,7 +163,7 @@ class TestSearch(APITestMixin):
                 'bcdefg',
                 'abcdef'] == [contact['last_name'] for contact in response.data['results']]
 
-    def test_search_contact_sort_by_company_sector_desc(self, setup_es, setup_data):
+    def test_search_contact_sort_by_company_sector_desc(self, setup_es):
         """Tests sorting by company_sector in descending order."""
         company1 = CompanyFactory(
             sector_id=Sector.renewable_energy_wind.value.id,
@@ -219,7 +219,7 @@ class TestBasicSearch(APITestMixin):
         assert response.data['results'][0]['last_name'] in term
         assert [{'count': 1, 'entity': 'contact'}] == response.data['aggregations']
 
-    def test_basic_search_contact_notes(self, setup_es, setup_data):
+    def test_basic_search_contact_notes(self, setup_es):
         """Tests basic aggregate contacts query with EnglishString in notes."""
         contact = ContactFactory(
             notes='We have discussed exporting',
@@ -257,7 +257,7 @@ class TestBasicSearch(APITestMixin):
         sector_name = Sector.aerospace_assembly_aircraft.value.name
         assert sector_name == response.data['results'][0]['company_sector']['name']
 
-    def test_search_contact_has_sector_updated(self, setup_es, setup_data):
+    def test_search_contact_has_sector_updated(self, setup_es):
         """Tests if contact has a correct sector after company update."""
         contact = ContactFactory(first_name='sector_update')
 
@@ -281,7 +281,7 @@ class TestBasicSearch(APITestMixin):
         sector_name = Sector.renewable_energy_wind.value.name
         assert sector_name == response.data['results'][0]['company_sector']['name']
 
-    def test_search_contact_has_company_trading_address_updated(self, setup_es, setup_data):
+    def test_search_contact_has_company_trading_address_updated(self, setup_es):
         """Tests if contact has a correct address after company trading address update."""
         contact = ContactFactory(
             address_same_as_company=True
@@ -319,7 +319,7 @@ class TestBasicSearch(APITestMixin):
         country = contact.company.trading_address_country.name
         assert country == result['address_country']['name']
 
-    def test_search_contact_has_company_registered_address_updated(self, setup_es, setup_data):
+    def test_search_contact_has_company_registered_address_updated(self, setup_es):
         """Tests if contact has a correct address after company registered address update."""
         contact = ContactFactory(
             address_same_as_company=True
@@ -359,7 +359,7 @@ class TestBasicSearch(APITestMixin):
         country = contact.company.registered_address_country.name
         assert country == result['address_country']['name']
 
-    def test_search_contact_has_own_address(self, setup_es, setup_data):
+    def test_search_contact_has_own_address(self, setup_es):
         """Tests if contact can have its own address."""
         address = {
             'address_same_as_company': False,
