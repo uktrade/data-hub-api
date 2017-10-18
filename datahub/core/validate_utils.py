@@ -47,3 +47,8 @@ class DataCombiner:
 def is_blank(value):
     """Returns True if a value is considered empty or blank."""
     return value in (None, '') or (isinstance(value, Sequence) and len(value) == 0)
+
+
+def is_not_blank(value):
+    """Returns True if a value is not considered empty or blank."""
+    return not is_blank(value)
