@@ -264,7 +264,7 @@ def test_validate_verify_win_instance_failure():
         'new_tech_to_uk': 'This field is required.',
         'export_revenue': 'This field is required.',
         'address_1': 'This field is required.',
-        'address_2': 'This field is required.',
+        'address_town': 'This field is required.',
         'address_postcode': 'This field is required.',
         'average_salary': 'This field is required.',
         'client_cannot_provide_foreign_investment': 'This field is required.',
@@ -328,7 +328,7 @@ def test_validate_verify_win_instance_with_cond_fields():
         new_tech_to_uk=True,
         export_revenue=True,
         address_1='12 London Road',
-        address_2='London',
+        address_town='London',
         address_postcode='SW1A 2AA',
         average_salary_id=constants.SalaryRange.below_25000.value.id
     )
