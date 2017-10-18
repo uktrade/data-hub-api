@@ -217,6 +217,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `OMIS_NOTIFICATION_API_KEY`  | Yes | |
 | `OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL`  | No | |
 | `OMIS_PUBLIC_BASE_URL`  | Yes | |
+| `SENTRY_ENVIRONMENT`  | Yes | Value for the environment tag in Sentry. |
 | `WEB_CONCURRENCY` | No | Number of Gunicorn workers (set automatically by Heroku, otherwise defaults to 1). |
 
 
