@@ -36,7 +36,7 @@ VALIDATION_MAPPING = {
     'new_tech_to_uk': Stage.verify_win.value,
     'export_revenue': Stage.verify_win.value,
     'address_1': Stage.verify_win.value,
-    'address_2': Stage.verify_win.value,
+    'address_town': Stage.verify_win.value,
     'address_postcode': Stage.verify_win.value,
 }
 
