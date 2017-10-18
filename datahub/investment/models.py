@@ -31,6 +31,7 @@ class IProjectAbstract(models.Model):
         ('delayed', 'Delayed'),
         ('lost', 'Lost'),
         ('abandoned', 'Abandoned'),
+        ('won', 'Won'),
     )
 
     name = models.CharField(max_length=MAX_LENGTH)
