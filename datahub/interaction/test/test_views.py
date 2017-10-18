@@ -1,4 +1,5 @@
 from datetime import date
+
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -7,7 +8,9 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.core.constants import InteractionType, Service, Team
 from datahub.core.test_utils import APITestMixin
 from datahub.event.test.factories import EventFactory
-from datahub.interaction.test.factories import InteractionFactory
+from datahub.interaction.test.factories import (
+    EventServiceDeliveryFactory, InteractionFactory, ServiceDeliveryFactory
+)
 from datahub.investment.test.factories import InvestmentProjectFactory
 
 
@@ -49,6 +52,7 @@ class TestInteractionV3(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': 'interaction',
+            'is_event': None,
             'communication_channel': {
                 'id': InteractionType.face_to_face.value.id,
                 'name': InteractionType.face_to_face.value.name
@@ -97,8 +101,8 @@ class TestInteractionV3(APITestMixin):
         }
 
     @freeze_time('2017-04-18 13:25:30.986208+00:00')
-    def test_add_service_delivery_with_event(self):
-        """Test add new service delivery with an event."""
+    def test_add_event_service_delivery(self):
+        """Test adding a new event service delivery."""
         adviser = AdviserFactory()
         company = CompanyFactory()
         contact = ContactFactory()
@@ -106,6 +110,7 @@ class TestInteractionV3(APITestMixin):
         url = reverse('api-v3:interaction:collection')
         request_data = {
             'kind': 'service_delivery',
+            'is_event': True,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -123,6 +128,7 @@ class TestInteractionV3(APITestMixin):
         assert response_data == {
             'id': response_data['id'],
             'kind': 'service_delivery',
+            'is_event': True,
             'communication_channel': None,
             'subject': 'whatever',
             'date': '2017-04-18',
@@ -170,15 +176,43 @@ class TestInteractionV3(APITestMixin):
             'modified_on': '2017-04-18T13:25:30.986208'
         }
 
-    @freeze_time('2017-04-18 13:25:30.986208+00:00')
-    def test_add_service_delivery_without_event(self):
-        """Test add new service delivery without an event."""
+    def test_add_event_service_delivery_missing_event(self):
+        """Test adding a new event service delivery without specifying an event."""
         adviser = AdviserFactory()
         company = CompanyFactory()
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         request_data = {
             'kind': 'service_delivery',
+            'is_event': True,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': adviser.pk,
+            'notes': 'hello',
+            'company': company.pk,
+            'contact': contact.pk,
+            'event': None,
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id
+        }
+        response = self.api_client.post(url, request_data, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'event': ['This field is required.']
+        }
+
+    @freeze_time('2017-04-18 13:25:30.986208+00:00')
+    def test_add_non_event_service_delivery(self):
+        """Test adding a new non-event service delivery."""
+        adviser = AdviserFactory()
+        company = CompanyFactory()
+        contact = ContactFactory()
+        url = reverse('api-v3:interaction:collection')
+        request_data = {
+            'kind': 'service_delivery',
+            'is_event': False,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -194,6 +228,7 @@ class TestInteractionV3(APITestMixin):
         response_data = response.json()
         assert response_data == {
             'id': response_data['id'],
+            'is_event': False,
             'kind': 'service_delivery',
             'communication_channel': None,
             'subject': 'whatever',
@@ -237,6 +272,34 @@ class TestInteractionV3(APITestMixin):
             },
             'created_on': '2017-04-18T13:25:30.986208',
             'modified_on': '2017-04-18T13:25:30.986208'
+        }
+
+    def test_add_non_event_service_delivery_with_event(self):
+        """Test add new non-event service delivery with an event specified."""
+        adviser = AdviserFactory()
+        company = CompanyFactory()
+        contact = ContactFactory()
+        event = EventFactory()
+        url = reverse('api-v3:interaction:collection')
+        request_data = {
+            'kind': 'service_delivery',
+            'is_event': False,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': adviser.pk,
+            'event': event.pk,
+            'notes': 'hello',
+            'company': company.pk,
+            'contact': contact.pk,
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id
+        }
+        response = self.api_client.post(url, request_data, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'event': ['This field is only valid for event service deliveries.']
         }
 
     def test_add_interaction_project_missing_fields(self):
@@ -289,6 +352,7 @@ class TestInteractionV3(APITestMixin):
         url = reverse('api-v3:interaction:collection')
         request_data = {
             'kind': 'interaction',
+            'is_event': False,
             'communication_channel': InteractionType.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -304,7 +368,8 @@ class TestInteractionV3(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'event': ['This field cannot be specified for an interaction.'],
+            'is_event': ['This field is only valid for service deliveries.'],
+            'event': ['This field is only valid for event service deliveries.'],
         }
 
     def test_add_service_delivery_with_interaction_fields(self):
@@ -315,6 +380,7 @@ class TestInteractionV3(APITestMixin):
         url = reverse('api-v3:interaction:collection')
         request_data = {
             'kind': 'service_delivery',
+            'is_event': True,
             'communication_channel': InteractionType.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -330,7 +396,7 @@ class TestInteractionV3(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'communication_channel': ['This field cannot be specified for a service delivery.'],
+            'communication_channel': ['This field is only valid for interactions.'],
         }
 
     @freeze_time('2017-04-18 13:25:30.986208+00:00')
@@ -397,6 +463,40 @@ class TestInteractionV3(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['subject'] == 'I am another subject'
+
+    def test_change_non_event_service_delivery_to_event(self):
+        """Test making a non-event service delivery an event service delivery."""
+        service_delivery = ServiceDeliveryFactory()
+        event = EventFactory()
+
+        url = reverse('api-v3:interaction:item', kwargs={'pk': service_delivery.pk})
+        response = self.api_client.patch(url, {
+            'is_event': True,
+            'event': event.pk
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['is_event'] is True
+        assert response_data['event'] == {
+            'id': str(event.pk),
+            'name': event.name,
+        }
+
+    def test_change_event_service_delivery_to_non_event(self):
+        """Test making an event service delivery a non-event service delivery."""
+        service_delivery = EventServiceDeliveryFactory()
+
+        url = reverse('api-v3:interaction:item', kwargs={'pk': service_delivery.pk})
+        response = self.api_client.patch(url, {
+            'is_event': False,
+            'event': None
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['is_event'] is False
+        assert response_data['event'] is None
 
     def test_date_validation(self):
         """Test validation when an invalid date is provided."""

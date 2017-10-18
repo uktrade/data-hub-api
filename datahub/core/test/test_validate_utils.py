@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, Mock
 
 import pytest
 
-from datahub.core.validate_utils import DataCombiner, is_blank
+from datahub.core.validate_utils import DataCombiner, is_blank, is_not_blank
 
 
 @pytest.mark.parametrize('value,blank', (
@@ -17,6 +17,20 @@ from datahub.core.validate_utils import DataCombiner, is_blank
 def test_is_blank(value, blank):
     """Tests is_blank() for various values."""
     assert is_blank(value) == blank
+
+
+@pytest.mark.parametrize('value,blank', (
+    (None, False),
+    ('', False),
+    ([], False),
+    (0, True),
+    (2323, True),
+    ('dfdf', True),
+    ([1234], True),
+))
+def test_is_not_blank(value, blank):
+    """Tests is_not_blank() for various values."""
+    assert is_not_blank(value) == blank
 
 
 class TestDataCombiner:
