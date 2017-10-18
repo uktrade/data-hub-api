@@ -542,7 +542,7 @@
     project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
     uk_company: a73efeba-8499-11e6-ae22-56b6b6499611
     address_1: 10 Eastings Road
-    address_2: London
+    address_town: London
     address_postcode: W1 2AA
 
 
@@ -591,7 +591,7 @@
     project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
     uk_company: a73efeba-8499-11e6-ae22-56b6b6499611
     address_1: 10 Eastings Road
-    address_2: London
+    address_town: London
     address_postcode: W1 2AA
 
 - model: interaction.interaction
