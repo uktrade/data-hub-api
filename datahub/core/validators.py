@@ -1,4 +1,4 @@
-from typing import Callable, NamedTuple, Sequence
+from typing import Callable, Sequence
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -107,12 +107,25 @@ class RequiredUnlessAlreadyBlankValidator:
         return f'{self.__class__.__name__}(*{self.fields!r})'
 
 
-class Condition(NamedTuple):
-    """Validation condition."""
+class Rule:
+    """Simple operator-based rule for a field."""
 
-    field: str
-    operator: Callable
-    operator_extra_args: Sequence = ()
+    def __init__(self,
+                 field: str,
+                 operator_: Callable,
+                 operator_extra_args: Sequence = ()):
+        """
+        Initialises a validation rule.
+
+        :param field:     The name of the field the rule applies to.
+        :param operator_: Callable that returns a truthy or falsey value (indicating whether the
+                          value is valid). Will be called with the field value as the first
+                          argument.
+        :param operator_extra_args: Arguments provided to operator_ (after the field value).
+        """
+        self.field = field
+        self.operator = operator_
+        self.operator_extra_args = operator_extra_args
 
     def __call__(self, combiner):
         """Test whether the condition is True or False."""
@@ -120,28 +133,24 @@ class Condition(NamedTuple):
         return self.operator(value, *self.operator_extra_args)
 
 
-class ValidationRule:
-    """Validation rule."""
+class ConditionalRule:
+    """A rule that is only checked when a condition is met."""
 
     def __init__(self,
                  error_key: str,
-                 field: str,
-                 operator_: Callable,
-                 condition: Condition = None):
+                 rule: Rule,
+                 when: Rule=None):
         """
         Initialises a validation rule.
 
         :param error_key: The key of the error message associated with this rule.
-        :param field:     The name of the field the rule applies to.
-        :param operator_: Callable that returns a truthy or falsey value (indicating whether the
-                          value is valid). Will be called with the field value as the first
-                          argument.
-        :param condition: Optional conditional rule to check before applying this rule.
+        :param rule:      Rule that must pass.
+        :param when:      Optional conditional rule to check before applying this rule.
                           If the condition evaluates to False, validation passes.
         """
         self.error_key = error_key
-        self.condition = condition
-        self.rule = Condition(field, operator_)
+        self.rule = rule
+        self.condition = when
 
     def __call__(self, combiner):
         """Test whether the rule passes or fails."""
@@ -153,8 +162,8 @@ class ValidationRule:
     def __repr__(self):
         """Returns the Python representation of this object."""
         return (
-            f'{self.__class__.__name__}({self.error_key!r}, {self.rule.field!r}, '
-            f'{self.rule.operator!r}, condition={self.condition!r})'
+            f'{self.__class__.__name__}({self.error_key!r}, {self.rule!r}, '
+            f'condition={self.condition!r})'
         )
 
 
@@ -165,7 +174,7 @@ class RulesBasedValidator:
     Validation is performed using rules (instances of ValidationRule).
     """
 
-    def __init__(self, *rules: ValidationRule):
+    def __init__(self, *rules: ConditionalRule):
         """
         Initialises the validator with rules.
         """
