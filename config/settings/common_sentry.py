@@ -48,5 +48,6 @@ LOGGING = {
 
 RAVEN_CONFIG = {
     'dsn': env('DJANGO_SENTRY_DSN'),
-    'include_paths': ['datahub']
+    'include_paths': ['datahub'],
+    'environment': env('SENTRY_ENVIRONMENT'),
 }
