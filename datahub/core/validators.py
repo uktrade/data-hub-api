@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
+from functools import partial
 from operator import eq
-from typing import Any, Callable, Sequence
+from typing import Any, Callable
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -140,8 +141,7 @@ class OperatorRule(BaseRule):
 
     def __init__(self,
                  field: str,
-                 operator_: Callable,
-                 operator_extra_args: Sequence = ()):
+                 operator_: Callable):
         """
         Initialises the rule.
 
@@ -149,16 +149,14 @@ class OperatorRule(BaseRule):
         :param operator_: Callable that returns a truthy or falsey value (indicating whether the
                           value is valid). Will be called with the field value as the first
                           argument.
-        :param operator_extra_args: Arguments provided to operator_ (after the field value).
         """
         super().__init__(field)
         self._operator = operator_
-        self._operator_extra_args = operator_extra_args
 
     def __call__(self, combiner) -> bool:
         """Test whether the rule passes or fails."""
         value = combiner.get_value(self.field)
-        return self._operator(value, *self._operator_extra_args)
+        return self._operator(value)
 
 
 class EqualsRule(OperatorRule):
@@ -171,7 +169,7 @@ class EqualsRule(OperatorRule):
         :param field: The name of the field the rule applies to.
         :param value: Value to test equality with.
         """
-        super().__init__(field, eq, (value,))
+        super().__init__(field, partial(eq, value))
 
 
 class ConditionalRule:

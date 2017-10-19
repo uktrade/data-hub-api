@@ -1,4 +1,3 @@
-from operator import eq
 from types import SimpleNamespace
 from unittest.mock import Mock
 
@@ -37,14 +36,14 @@ def test_any_of_all():
     validator({'field_a': Mock(), 'field_b': Mock()})
 
 
-@pytest.mark.parametrize('data,field,op,args,res', (
-    ({'colour': 'red'}, 'colour', eq, ('red',), True),
-    ({'colour': 'red'}, 'colour', eq, ('blue',), False),
+@pytest.mark.parametrize('data,field,op,res', (
+    ({'colour': 'red'}, 'colour', lambda val: val == 'red', True),
+    ({'colour': 'red'}, 'colour', lambda val: val == 'blue', False),
 ))
-def test_operator_rule(data, field, op, args, res):
+def test_operator_rule(data, field, op, res):
     """Tests ValidationCondition for various cases."""
     combiner = Mock(spec_set=DataCombiner, get_value=lambda field_: data[field_])
-    condition = OperatorRule(field, op, args)
+    condition = OperatorRule(field, op)
     assert condition(combiner) == res
 
 
