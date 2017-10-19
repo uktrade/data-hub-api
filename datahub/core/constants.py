@@ -446,12 +446,6 @@ class Team(Enum):
     crm = Constant('crm', 'a7f924aa-9698-e211-a939-e4115bead28a')
 
 
-class ServiceDeliveryStatus(Enum):
-    """Service delivery status."""
-
-    offered = Constant('Offered', '45329c18-6095-e211-a939-e4115bead28a')
-
-
 class HeadquarterType(Enum):
     """Headquarter type."""
 

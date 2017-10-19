@@ -11,7 +11,6 @@ from datahub.investment import urls as investment_urls
 from datahub.leads import urls as leads_urls
 from datahub.omis import urls as omis_urls
 from datahub.search import urls as search_urls
-from datahub.v2.urls import urlpatterns as v2_urlpatterns
 
 
 # API V1
@@ -20,11 +19,6 @@ router_v1 = routers.SimpleRouter()
 router_v1.register(r'adviser', company_views.AdviserReadOnlyViewSetV1)
 
 v1_urls = router_v1.urls
-
-
-# API V2
-
-v2_urls = v2_urlpatterns
 
 
 # API V3

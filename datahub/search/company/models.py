@@ -86,7 +86,6 @@ class Company(DocType, MapDBModelToDict):
         'modified_by',
         'orders',
         'rght',
-        'servicedeliverys',
         'tree_id'
     )
 
