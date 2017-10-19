@@ -7,7 +7,7 @@ from rest_framework.exceptions import ValidationError
 
 from datahub.core.validate_utils import DataCombiner
 from datahub.core.validators import (
-    AnyOfValidator, ConditionalRule, RequiredUnlessAlreadyBlankValidator, Rule,
+    AnyOfValidator, ConditionalRule, EqualsRule, OperatorRule, RequiredUnlessAlreadyBlankValidator,
     RulesBasedValidator,
 )
 
@@ -41,10 +41,21 @@ def test_any_of_all():
     ({'colour': 'red'}, 'colour', eq, ('red',), True),
     ({'colour': 'red'}, 'colour', eq, ('blue',), False),
 ))
-def test_rule(data, field, op, args, res):
+def test_operator_rule(data, field, op, args, res):
     """Tests ValidationCondition for various cases."""
     combiner = Mock(spec_set=DataCombiner, get_value=lambda field_: data[field_])
-    condition = Rule(field, op, args)
+    condition = OperatorRule(field, op, args)
+    assert condition(combiner) == res
+
+
+@pytest.mark.parametrize('data,field,test_value,res', (
+    ({'colour': 'red'}, 'colour', 'red', True),
+    ({'colour': 'red'}, 'colour', 'blue', False),
+))
+def test_equals_rule(data, field, test_value, res):
+    """Tests ValidationCondition for various cases."""
+    combiner = Mock(spec_set=DataCombiner, get_value=lambda field_: data[field_])
+    condition = EqualsRule(field, test_value)
     assert condition(combiner) == res
 
 
@@ -57,9 +68,9 @@ def test_rule(data, field, op, args, res):
 def test_conditional_rule(rule_res, when_res, res):
     """Tests ValidationRule for various cases."""
     combiner = Mock(spec_set=DataCombiner)
-    rule = Mock(spec_set=Rule)
+    rule = Mock(spec_set=OperatorRule)
     rule.return_value = rule_res
-    condition = Mock(spec=Rule)
+    condition = Mock(spec=OperatorRule)
     condition.return_value = when_res
     rule = ConditionalRule(rule, when=condition)
     assert rule(combiner) == res
