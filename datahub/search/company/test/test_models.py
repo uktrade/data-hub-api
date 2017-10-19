@@ -21,7 +21,7 @@ def test_company_dbmodel_to_dict(setup_es):
             'archived_reason', 'archived_by', 'name',
             'registered_address_1', 'registered_address_2',
             'registered_address_town', 'registered_address_county',
-            'registered_address_postcode', 'company_number', 'alias',
+            'registered_address_postcode', 'company_number', 'trading_name',
             'employee_range', 'turnover_range', 'account_manager',
             'description', 'website', 'trading_address_1',
             'trading_address_2', 'trading_address_town',
