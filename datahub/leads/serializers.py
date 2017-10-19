@@ -62,7 +62,7 @@ class BusinessLeadSerializer(serializers.ModelSerializer):
 
         return data
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = BusinessLead
         fields = (
             'id',

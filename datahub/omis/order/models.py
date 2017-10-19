@@ -16,11 +16,13 @@ from datahub.core.models import (
 from datahub.metadata.models import Country, Sector, Team
 from datahub.omis.core.utils import generate_reference
 from datahub.omis.invoice.models import Invoice
+from datahub.omis.payment.models import Payment
+from datahub.omis.payment.validators import ReconcilablePaymentsValidator
 from datahub.omis.quote.models import Quote
 
 from . import validators
 from .constants import DEFAULT_HOURLY_RATE, OrderStatus, VATStatus
-from .manager import OrderQuerySet
+from .managers import OrderQuerySet
 from .signals import quote_generated
 from .utils import populate_billing_data
 
@@ -55,7 +57,7 @@ class HourlyRate(BaseConstantModel):
         ]
     )
 
-    class Meta(BaseConstantModel.Meta):  # noqa: D101
+    class Meta(BaseConstantModel.Meta):
         db_table = 'omis-order_hourlyrate'
 
 
@@ -356,6 +358,45 @@ class Order(BaseModel):
         self.status = OrderStatus.quote_accepted
         self.save()
 
+    @transaction.atomic
+    def mark_as_paid(self, by, payments_data):
+        """
+        Mark an order as "Paid".
+
+        :param by: the adviser who created the record
+        :param payments_data: list of payments data.
+            Each item should at least contain `amount` and `received_on`
+            e.g. [
+                {
+                    'amount': 1000,
+                    'received_on': ...
+                },
+                {
+                    'amount': 1001,
+                    'received_on': ...
+                }
+            ]
+        """
+        for order_validator in [
+            validators.OrderInStatusValidator(
+                allowed_statuses=(
+                    OrderStatus.quote_accepted,
+                )
+            )
+        ]:
+            order_validator.set_instance(self)
+            order_validator()
+
+        for payment_validator in [ReconcilablePaymentsValidator()]:
+            payment_validator.set_order(self)
+            payment_validator(data=payments_data)
+
+        for data in payments_data:
+            Payment.objects.create_from_order(self, by, data)
+
+        self.status = OrderStatus.paid
+        self.save()
+
 
 class OrderSubscriber(BaseModel):
     """
@@ -374,7 +415,7 @@ class OrderSubscriber(BaseModel):
         """Human-readable representation"""
         return f'{self.order} – {self.adviser}'
 
-    class Meta:  # noqa: D101
+    class Meta:
         ordering = ['created_on']
         unique_together = (
             ('order', 'adviser'),
@@ -396,7 +437,7 @@ class OrderAssignee(BaseModel):
     estimated_time = models.IntegerField(default=0, help_text='Estimated time in minutes.')
     is_lead = models.BooleanField(default=False)
 
-    class Meta:  # noqa: D101
+    class Meta:
         ordering = ['created_on']
         unique_together = (
             ('order', 'adviser'),

@@ -104,7 +104,7 @@ Dependencies:
 8. Make sure you have Elasticsearch running locally. If you don't, you can run one in Docker:
 
     ```shell
-    docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" elasticsearch:2.3
+    docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" elasticsearch:5.5
     ```
 
 9.  Configure and populate the db:
@@ -158,8 +158,8 @@ To give access to the [internal front end](https://github.com/uktrade/data-hub-f
     * Client type: Confidential
     * Authorization grant type: Resource owner password-based
 
-1. Define the required scopes for the app by adding a new record in the 
-[OAuth application scopes](http://localhost:8000/admin/oauth/oauthapplicationscope/) 
+1. Define the required scopes for the app by adding a new record in the
+[OAuth application scopes](http://localhost:8000/admin/oauth/oauthapplicationscope/)
 page with these details:
     * Application: The application just created
     * Scope: `internal-front-end`
@@ -168,15 +168,15 @@ page with these details:
 
 ## Granting access to machine-to-machine clients
 
-To give access to a machine-to-machine client that doesn't require user authentication: 
+To give access to a machine-to-machine client that doesn't require user authentication:
 
 1. Log into the [Django admin applications page](http://localhost:8000/admin/oauth2_provider/application/) and add a new OAuth application with these details:
 
     * Client type: Confidential
     * Authorization grant type: Client credentials
 
-1. Define the required scopes for the app by adding a new record in the 
-[OAuth application scopes](http://localhost:8000/admin/oauth/oauthapplicationscope/) 
+1. Define the required scopes for the app by adding a new record in the
+[OAuth application scopes](http://localhost:8000/admin/oauth/oauthapplicationscope/)
 page with these details:
     * Application: The application just created
     * Scope: The required scopes
@@ -217,6 +217,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `OMIS_NOTIFICATION_API_KEY`  | Yes | |
 | `OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL`  | No | |
 | `OMIS_PUBLIC_BASE_URL`  | Yes | |
+| `SENTRY_ENVIRONMENT`  | Yes | Value for the environment tag in Sentry. |
 | `WEB_CONCURRENCY` | No | Number of Gunicorn workers (set automatically by Heroku, otherwise defaults to 1). |
 
 
@@ -224,7 +225,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 
 If using Docker, remember to run these commands inside your container by prefixing them with `docker-compose run leeloo`.
 
-### CDMS authentication 
+### CDMS authentication
 Enable CDMS login for users (use this to let a CDMS user log in):
 
 ```shell

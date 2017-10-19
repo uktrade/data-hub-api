@@ -14,5 +14,5 @@ class TeamSerializer(serializers.Serializer):
     uk_region = NestedRelatedField(UKRegion, read_only=True)
     country = NestedRelatedField(Country, read_only=True)
 
-    class Meta:  # noqa: D101
+    class Meta:
         fields = '__all__'

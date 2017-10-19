@@ -18,7 +18,7 @@ services:
       DJANGO_SETTINGS_MODULE: config.settings.local
       COV_TOKEN: ${COV_TOKEN}
       ES_INDEX: test_index
-      ES_URL: http://es:9200
+      ES5_URL: http://es:9200
       CDMS_AUTH_URL: http://example.com
       AWS_DEFAULT_REGION: eu-west-2
       AWS_ACCESS_KEY_ID: foo

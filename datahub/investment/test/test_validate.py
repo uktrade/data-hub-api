@@ -1,10 +1,7 @@
-from datetime import date
-
 import pytest
 
 from datahub.company.test.factories import AdviserFactory, ContactFactory
 from datahub.core import constants
-from datahub.investment.models import InvestmentProject
 from datahub.investment.serializers import (
     IProjectRequirementsSerializer, IProjectSummarySerializer, IProjectTeamSerializer,
     IProjectValueSerializer
@@ -34,86 +31,6 @@ def test_validate_project_instance_success():
         client_contacts=[ContactFactory().id, ContactFactory().id]
     )
     errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
-    assert not errors
-
-
-def test_validate_project_status_delayed_failure():
-    """Tests validating a project with status delayed and missing reason."""
-    project = InvestmentProjectFactory(
-        client_contacts=[ContactFactory().id, ContactFactory().id],
-        status=InvestmentProject.STATUSES.delayed
-
-    )
-    errors = validate(instance=project)
-    assert errors == {
-        'reason_delayed': 'This field is required.'
-    }
-
-
-def test_validate_project_status_delayed_success():
-    """Tests validating a project with status delayed and reason given."""
-    project = InvestmentProjectFactory(
-        client_contacts=[ContactFactory().id, ContactFactory().id],
-        status=InvestmentProject.STATUSES.delayed,
-        reason_delayed='Problems getting planning permission.'
-
-    )
-    errors = validate(instance=project)
-    assert not errors
-
-
-def test_validate_project_status_abandoned_failure():
-    """Tests validating a project with status abandoned and no reason/date given."""
-    project = InvestmentProjectFactory(
-        client_contacts=[ContactFactory().id, ContactFactory().id],
-        status=InvestmentProject.STATUSES.abandoned
-
-    )
-    errors = validate(instance=project)
-    assert errors == {
-        'reason_abandoned': 'This field is required.',
-        'date_abandoned': 'This field is required.'
-    }
-
-
-def test_validate_project_status_abandoned_success():
-    """Tests validating a project with status abandoned and reason/date given."""
-    project = InvestmentProjectFactory(
-        client_contacts=[ContactFactory().id, ContactFactory().id],
-        status=InvestmentProject.STATUSES.abandoned,
-        date_abandoned=date(2019, 1, 1),
-        reason_abandoned='No longer viable.'
-
-    )
-    errors = validate(instance=project)
-    assert not errors
-
-
-def test_validate_project_status_lost_failure():
-    """Tests validating a project with status lost and no reason/date/country given."""
-    project = InvestmentProjectFactory(
-        client_contacts=[ContactFactory().id, ContactFactory().id],
-        status=InvestmentProject.STATUSES.lost
-
-    )
-    errors = validate(instance=project)
-    assert errors == {
-        'reason_lost': 'This field is required.',
-        'date_lost': 'This field is required.',
-        'country_lost_to': 'This field is required.',
-    }
-
-
-def test_validate_project_status_lost_success():
-    """Tests validating a project with status lost and reason/date/country given."""
-    project = InvestmentProjectFactory(
-        client_contacts=[ContactFactory().id, ContactFactory().id],
-        status=InvestmentProject.STATUSES.lost,
-        reason_lost='Lower set-up costs.',
-        date_lost=date(2019, 1, 1),
-        country_lost_to_id=constants.Country.japan.value.id
-    )
-    errors = validate(instance=project)
     assert not errors
 
 
@@ -361,15 +278,28 @@ def test_validate_verify_win_instance_cond_validation():
         stage_id=constants.InvestmentProjectStage.verify_win.value.id,
         client_cannot_provide_total_investment=True,
         client_cannot_provide_foreign_investment=True,
+        non_fdi_r_and_d_budget=False,
         number_new_jobs=0
     )
     errors = validate(instance=project)
     assert 'total_investment' not in errors
     assert 'foreign_equity_investment' not in errors
     assert 'average_salary' not in errors
+    assert 'associated_non_fdi_r_and_d_project' not in errors
 
 
-def test_validate_verify_win_instance_success():
+def test_validate_verify_win_instance_cond_validation_failure():
+    """Tests conditional validation for associated non-FDI R&D projects in the verify win stage."""
+    project = InvestmentProjectFactory(
+        stage_id=constants.InvestmentProjectStage.verify_win.value.id,
+        non_fdi_r_and_d_budget=True,
+    )
+    errors = validate(instance=project)
+    assert 'associated_non_fdi_r_and_d_project' in errors
+    assert errors['associated_non_fdi_r_and_d_project'] == 'This field is required.'
+
+
+def test_validate_verify_win_instance_with_cond_fields():
     """Tests validation for the verify win stage for a complete project instance."""
     adviser = AdviserFactory()
     strategic_drivers = [
@@ -394,6 +324,7 @@ def test_validate_verify_win_instance_success():
         number_safeguarded_jobs=0,
         r_and_d_budget=True,
         non_fdi_r_and_d_budget=True,
+        associated_non_fdi_r_and_d_project=InvestmentProjectFactory(),
         new_tech_to_uk=True,
         export_revenue=True,
         address_line_1='12 London Road',
