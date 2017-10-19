@@ -1,4 +1,6 @@
-from typing import Callable, Sequence
+from abc import ABC, abstractmethod
+from operator import eq
+from typing import Any, Callable, Sequence
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -107,7 +109,33 @@ class RequiredUnlessAlreadyBlankValidator:
         return f'{self.__class__.__name__}(*{self.fields!r})'
 
 
-class Rule:
+class AbstractRule(ABC):
+    """Abstract base class for rules."""
+
+    @property
+    @abstractmethod
+    def field(self) -> str:
+        """Field the rule applies to."""
+
+    @abstractmethod
+    def __call__(self, combiner) -> bool:
+        """Evaluates the rule."""
+
+
+class BaseRule(AbstractRule):
+    """Base class for rules."""
+
+    def __init__(self, field: str):
+        """Sets the field name."""
+        self._field = field
+
+    @property
+    def field(self):
+        """Field the rule applies to."""
+        return self._field
+
+
+class OperatorRule(BaseRule):
     """Simple operator-based rule for a field."""
 
     def __init__(self,
@@ -115,7 +143,7 @@ class Rule:
                  operator_: Callable,
                  operator_extra_args: Sequence = ()):
         """
-        Initialises a validation rule.
+        Initialises the rule.
 
         :param field:     The name of the field the rule applies to.
         :param operator_: Callable that returns a truthy or falsey value (indicating whether the
@@ -123,28 +151,39 @@ class Rule:
                           argument.
         :param operator_extra_args: Arguments provided to operator_ (after the field value).
         """
-        self.field = field
-        self.operator = operator_
-        self.operator_extra_args = operator_extra_args
+        super().__init__(field)
+        self._operator = operator_
+        self._operator_extra_args = operator_extra_args
 
-    def __call__(self, combiner):
-        """Test whether the condition is True or False."""
+    def __call__(self, combiner) -> bool:
+        """Test whether the rule passes or fails."""
         value = combiner.get_value(self.field)
-        return self.operator(value, *self.operator_extra_args)
+        return self._operator(value, *self._operator_extra_args)
+
+
+class EqualsRule(OperatorRule):
+    """Equals operator-based rule for a field."""
+
+    def __init__(self, field: str, value: Any):
+        """
+        Initialises the rule.
+
+        :param field: The name of the field the rule applies to.
+        :param value: Value to test equality with.
+        """
+        super().__init__(field, eq, (value,))
 
 
 class ConditionalRule:
     """A rule that is only checked when a condition is met."""
 
-    def __init__(self,
-                 rule: Rule,
-                 when: Rule=None):
+    def __init__(self, rule: AbstractRule, when: AbstractRule=None):
         """
-        Initialises a validation rule.
+        Initialises then rule.
 
-        :param rule:      Rule that must pass.
-        :param when:      Optional conditional rule to check before applying this rule.
-                          If the condition evaluates to False, validation passes.
+        :param rule: Rule that must pass.
+        :param when: Optional conditional rule to check before applying this rule.
+                     If the condition evaluates to False, validation passes.
         """
         self._rule = rule
         self._condition = when
@@ -154,7 +193,7 @@ class ConditionalRule:
         """The field that is being validated."""
         return self._rule.field
 
-    def __call__(self, combiner):
+    def __call__(self, combiner) -> bool:
         """Test whether the rule passes or fails."""
         if self._condition and not self._condition(combiner):
             return True
@@ -173,8 +212,8 @@ class ValidationRule(ConditionalRule):
 
     def __init__(self,
                  error_key: str,
-                 rule: Rule,
-                 when: Rule=None):
+                 rule: OperatorRule,
+                 when: OperatorRule=None):
         """
         Initialises a validation rule.
 
