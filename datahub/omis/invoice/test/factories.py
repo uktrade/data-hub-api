@@ -19,5 +19,5 @@ class InvoiceFactory(factory.django.DjangoModelFactory):
     invoice_vat_number = constants.DIT_VAT_NUMBER
     payment_due_date = factory.Faker('future_date')
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'omis-invoice.Invoice'

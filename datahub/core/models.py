@@ -21,7 +21,7 @@ class BaseModel(models.Model):
         related_name='+'
     )
 
-    class Meta:  # noqa: D101
+    class Meta:
         abstract = True
 
 
@@ -36,7 +36,7 @@ class ArchivableModel(models.Model):
         on_delete=models.SET_NULL, related_name='+'
     )
 
-    class Meta:  # noqa: D101
+    class Meta:
         abstract = True
 
     def archive(self, user, reason=None):
@@ -67,7 +67,7 @@ class DisableableModel(models.Model):
             return False
         return self.disabled_on <= date_on
 
-    class Meta:  # noqa: D101
+    class Meta:
         abstract = True
 
 
@@ -77,7 +77,7 @@ class BaseConstantModel(DisableableModel):
     id = models.UUIDField(primary_key=True)
     name = models.TextField(blank=True)
 
-    class Meta:  # noqa: D101
+    class Meta:
         abstract = True
         ordering = ('name', )
 
@@ -92,6 +92,6 @@ class BaseOrderedConstantModel(BaseConstantModel):
     # Uses a float to make reordering easier
     order = models.FloatField(default=0.0)
 
-    class Meta:  # noqa: D101
+    class Meta:
         abstract = True
         ordering = ('order', )

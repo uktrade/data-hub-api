@@ -10,6 +10,6 @@ class DocumentSerializer(serializers.ModelSerializer):
     in other document use-specific scenarios.
     """
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = models.Document
         fields = '__all__'

@@ -73,7 +73,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
         """
         return OrderAssigneeFactory.create_batch(1, order=self)
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'order.Order'
 
 
@@ -98,6 +98,12 @@ class OrderWithAcceptedQuoteFactory(OrderFactory):
     status = OrderStatus.quote_accepted
 
 
+class OrderPaidFactory(OrderWithAcceptedQuoteFactory):
+    """Factory for orders marked as paid."""
+
+    status = OrderStatus.paid
+
+
 class OrderSubscriberFactory(factory.django.DjangoModelFactory):
     """Order Subscriber factory."""
 
@@ -105,7 +111,7 @@ class OrderSubscriberFactory(factory.django.DjangoModelFactory):
     order = factory.SubFactory(OrderFactory)
     adviser = factory.SubFactory(AdviserFactory)
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'order.OrderSubscriber'
 
 
@@ -117,7 +123,7 @@ class OrderAssigneeFactory(factory.django.DjangoModelFactory):
     adviser = factory.SubFactory(AdviserFactory)
     estimated_time = factory.Faker('random_int', min=10, max=100)
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'order.OrderAssignee'
 
 
@@ -126,5 +132,5 @@ class HourlyRateFactory(factory.django.DjangoModelFactory):
 
     id = factory.LazyFunction(uuid.uuid4)
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'order.HourlyRate'

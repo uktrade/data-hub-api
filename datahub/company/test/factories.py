@@ -10,15 +10,15 @@ class AdviserFactory(factory.django.DjangoModelFactory):
     """Adviser factory."""
 
     id = factory.LazyFunction(uuid.uuid4)
-    first_name = factory.Sequence(lambda n: f'name {n}')
-    last_name = factory.Sequence(lambda n: f'surname {n}')
+    first_name = factory.Faker('first_name')
+    last_name = factory.Faker('last_name')
     dit_team_id = constants.Team.healthcare_uk.value.id
     email = factory.Sequence(lambda n: f'foo-{n}@bar.com')
     contact_email = factory.Faker('email')
     telephone_number = factory.Faker('phone_number')
     date_joined = now()
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'company.Advisor'
         django_get_or_create = ('email', )
 
@@ -29,7 +29,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     id = factory.LazyFunction(uuid.uuid4)
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SubFactory(AdviserFactory)
-    name = factory.Sequence(lambda n: f'name{n}')
+    name = factory.Faker('company')
     registered_address_1 = factory.Sequence(lambda n: f'{n} Foo st.')
     registered_address_town = 'London'
     registered_address_country_id = constants.Country.united_kingdom.value.id
@@ -42,7 +42,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     uk_region_id = constants.UKRegion.england.value.id
     created_on = now()
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'company.Company'
 
 
@@ -56,7 +56,7 @@ class CompaniesHouseCompanyFactory(factory.django.DjangoModelFactory):
     registered_address_country_id = constants.Country.italy.value.id
     incorporation_date = now()
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'company.CompaniesHouseCompany'
         django_get_or_create = ('company_number', )
 
@@ -68,8 +68,8 @@ class ContactFactory(factory.django.DjangoModelFactory):
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SubFactory(AdviserFactory)
     title_id = constants.Title.wing_commander.value.id
-    first_name = factory.Sequence(lambda n: f'name {n}')
-    last_name = factory.Sequence(lambda n: f'surname {n}')
+    first_name = factory.Faker('first_name')
+    last_name = factory.Faker('last_name')
     company = factory.SubFactory(CompanyFactory)
     email = 'foo@bar.com'
     primary = True
@@ -79,5 +79,5 @@ class ContactFactory(factory.django.DjangoModelFactory):
     created_on = now()
     contactable_by_email = True
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'company.Contact'

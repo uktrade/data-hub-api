@@ -9,7 +9,7 @@ class ApplicationFactory(factory.django.DjangoModelFactory):
     client_type = Application.CLIENT_CONFIDENTIAL
     authorization_grant_type = Application.GRANT_CLIENT_CREDENTIALS
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = Application
 
 
@@ -18,7 +18,7 @@ class OAuthApplicationScopeFactory(factory.django.DjangoModelFactory):
 
     application = factory.SubFactory(ApplicationFactory)
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = 'oauth.OAuthApplicationScope'
 
 
@@ -28,5 +28,5 @@ class AccessTokenFactory(factory.django.DjangoModelFactory):
     token = factory.Faker('password', length=20)
     expires = factory.Faker('date_time_between', start_date='+1d', end_date='+7d')
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = AccessToken

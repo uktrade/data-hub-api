@@ -6,6 +6,7 @@ from rest_framework import serializers
 from datahub.company.models import Company, Contact
 from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
+from datahub.core.validate_utils import is_blank, is_not_blank
 from datahub.core.validators import AnyOfValidator, Condition, RulesBasedValidator, ValidationRule
 from datahub.event.models import Event
 from datahub.investment.models import InvestmentProject
@@ -18,10 +19,13 @@ class InteractionSerializer(serializers.ModelSerializer):
 
     default_error_messages = {
         'invalid_for_interaction': ugettext_lazy(
-            'This field cannot be specified for an interaction.'
+            'This field is only valid for service deliveries.'
         ),
         'invalid_for_service_delivery': ugettext_lazy(
-            'This field cannot be specified for a service delivery.'
+            'This field is only valid for interactions.'
+        ),
+        'invalid_for_non_event': ugettext_lazy(
+            'This field is only valid for event service deliveries.'
         ),
     }
 
@@ -33,21 +37,26 @@ class InteractionSerializer(serializers.ModelSerializer):
     communication_channel = NestedRelatedField(
         CommunicationChannel, required=False, allow_null=True
     )
+    is_event = serializers.NullBooleanField(required=False)
     event = NestedRelatedField(Event, required=False, allow_null=True)
     investment_project = NestedRelatedField(
         InvestmentProject, required=False, allow_null=True, extra_fields=('name', 'project_code')
     )
     modified_by = NestedAdviserField(read_only=True)
     service = NestedRelatedField(Service)
-    # Added for backwards compatibility. Will be removed once the front end is updated.
-    interaction_type = NestedRelatedField(
-        CommunicationChannel,
-        source='communication_channel',
-        required=False,
-        allow_null=True
-    )
 
-    class Meta:  # noqa: D101
+    def validate(self, data):
+        """
+        Removes the semi-virtual field is_event from the data.
+
+        This is removed because the value is not stored; it is instead inferred from contents
+        of the the event field during serialisation.
+        """
+        if 'is_event' in data:
+            del data['is_event']
+        return data
+
+    class Meta:
         model = Interaction
         extra_kwargs = {
             # Date is a datetime in the model, but only the date component is used
@@ -55,8 +64,6 @@ class InteractionSerializer(serializers.ModelSerializer):
             # behave like a date field without changing the schema and breaking the
             # v1 API.
             'date': {'format': '%Y-%m-%d', 'input_formats': ['%Y-%m-%d']},
-            # Temporarily set a default for kind for backwards compatibility
-            'kind': {'default': Interaction.KINDS.interaction},
         }
         fields = (
             'id',
@@ -65,6 +72,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             'created_on',
             'created_by',
             'event',
+            'is_event',
             'kind',
             'modified_by',
             'modified_on',
@@ -72,7 +80,6 @@ class InteractionSerializer(serializers.ModelSerializer):
             'dit_adviser',
             'dit_team',
             'communication_channel',
-            'interaction_type',
             'investment_project',
             'service',
             'subject',
@@ -92,6 +99,22 @@ class InteractionSerializer(serializers.ModelSerializer):
                 ValidationRule(
                     'invalid_for_interaction', 'event', not_,
                     condition=Condition('kind', eq, (Interaction.KINDS.interaction,))
+                ),
+                ValidationRule(
+                    'invalid_for_interaction', 'is_event', is_blank,
+                    condition=Condition('kind', eq, (Interaction.KINDS.interaction,))
+                ),
+                ValidationRule(
+                    'required', 'is_event', is_not_blank,
+                    condition=Condition('kind', eq, (Interaction.KINDS.service_delivery,))
+                ),
+                ValidationRule(
+                    'required', 'event', bool,
+                    condition=Condition('is_event', bool)
+                ),
+                ValidationRule(
+                    'invalid_for_non_event', 'event', not_,
+                    condition=Condition('is_event', not_)
                 ),
             )
         ]

@@ -27,7 +27,9 @@ from datahub.investment.models import (
     InvestmentProject, InvestmentProjectTeamMember, IProjectDocument
 )
 from datahub.investment.test.factories import (
-    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
+    ActiveInvestmentProjectFactory, AssignPMInvestmentProjectFactory,
+    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
+    VerifyWinInvestmentProjectFactory, WonInvestmentProjectFactory
 )
 from datahub.oauth.scopes import Scope
 
@@ -106,6 +108,7 @@ class TestUnifiedViews(APITestMixin):
         request_data = {
             'name': 'project name',
             'description': 'project description',
+            'anonymous_description': 'project anon description',
             'nda_signed': False,
             'estimated_land_date': '2020-12-12',
             'project_shareable': False,
@@ -152,6 +155,7 @@ class TestUnifiedViews(APITestMixin):
         response_data = response.json()
         assert response_data['name'] == request_data['name']
         assert response_data['description'] == request_data['description']
+        assert response_data['anonymous_description'] == request_data['anonymous_description']
         assert response_data['nda_signed'] == request_data['nda_signed']
         assert response_data['estimated_land_date'] == request_data['estimated_land_date']
         assert response_data['project_shareable'] == request_data['project_shareable']
@@ -252,8 +256,7 @@ class TestUnifiedViews(APITestMixin):
 
     def test_get_project_success(self):
         """Test successfully getting a project."""
-        contacts = [str(ContactFactory().id), str(ContactFactory().id)]
-        project = InvestmentProjectFactory(client_contacts=contacts)
+        project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
@@ -287,8 +290,11 @@ class TestUnifiedViews(APITestMixin):
             'id': str(client_relationship_manager.dit_team.id),
             'name': client_relationship_manager.dit_team.name
         }
+        expected_client_contact_ids = sorted(
+            [str(contact.id) for contact in project.client_contacts.all()]
+        )
         assert sorted(contact['id'] for contact in response_data[
-            'client_contacts']) == sorted(contacts)
+            'client_contacts']) == expected_client_contact_ids
 
     def test_get_project_no_investor_and_crm(self):
         """
@@ -310,9 +316,7 @@ class TestUnifiedViews(APITestMixin):
 
     def test_get_project_status(self):
         """Test getting project status fields."""
-        contacts = [ContactFactory().id, ContactFactory().id]
         project = InvestmentProjectFactory(
-            client_contacts=contacts,
             status=InvestmentProject.STATUSES.lost,
             reason_delayed='Problems getting planning permission.',
             date_abandoned=date(2019, 1, 1),
@@ -391,9 +395,7 @@ class TestUnifiedViews(APITestMixin):
 
     def test_patch_project_conditional_failure(self):
         """Test updating a project w/ missing conditionally required value."""
-        project = InvestmentProjectFactory(
-            client_contacts=[ContactFactory().id, ContactFactory().id]
-        )
+        project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'investment_type': {
@@ -452,9 +454,7 @@ class TestUnifiedViews(APITestMixin):
 
     def test_patch_project_success(self):
         """Test successfully partially updating a project."""
-        project = InvestmentProjectFactory(
-            client_contacts=[ContactFactory().id, ContactFactory().id]
-        )
+        project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         new_contact = ContactFactory()
         request_data = {
@@ -518,7 +518,6 @@ class TestUnifiedViews(APITestMixin):
             constants.InvestmentStrategicDriver.access_to_market.value.id
         ]
         project = InvestmentProjectFactory(
-            client_contacts=[ContactFactory().id, ContactFactory().id],
             client_cannot_provide_total_investment=False,
             total_investment=100,
             number_new_jobs=0,
@@ -539,9 +538,7 @@ class TestUnifiedViews(APITestMixin):
 
     def test_change_stage_active_failure(self):
         """Tests moving an incomplete project to the Active stage."""
-        project = InvestmentProjectFactory(
-            client_contacts=[ContactFactory().id, ContactFactory().id]
-        )
+        project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'stage': {
@@ -567,21 +564,9 @@ class TestUnifiedViews(APITestMixin):
     def test_change_stage_active_success(self):
         """Tests moving a complete project to the Active stage."""
         adviser = AdviserFactory()
-        strategic_drivers = [
-            constants.InvestmentStrategicDriver.access_to_market.value.id
-        ]
-        project = InvestmentProjectFactory(
-            client_contacts=[ContactFactory().id, ContactFactory().id],
-            client_cannot_provide_total_investment=False,
-            total_investment=100,
-            number_new_jobs=0,
-            client_considering_other_countries=False,
-            client_requirements='client reqs',
-            site_decided=False,
-            strategic_drivers=strategic_drivers,
-            uk_region_locations=[constants.UKRegion.england.value.id],
+        project = AssignPMInvestmentProjectFactory(
             project_assurance_adviser=adviser,
-            project_manager=adviser
+            project_manager=adviser,
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
@@ -594,23 +579,7 @@ class TestUnifiedViews(APITestMixin):
 
     def test_change_stage_verify_win_failure(self):
         """Tests moving a partially complete project to the 'Verify win' stage."""
-        adviser = AdviserFactory()
-        strategic_drivers = [
-            constants.InvestmentStrategicDriver.access_to_market.value.id
-        ]
-        project = InvestmentProjectFactory(
-            client_contacts=[ContactFactory().id, ContactFactory().id],
-            client_cannot_provide_total_investment=False,
-            total_investment=100,
-            number_new_jobs=10,
-            client_considering_other_countries=False,
-            client_requirements='client reqs',
-            site_decided=False,
-            strategic_drivers=strategic_drivers,
-            uk_region_locations=[constants.UKRegion.england.value.id],
-            project_assurance_adviser=adviser,
-            project_manager=adviser
-        )
+        project = ActiveInvestmentProjectFactory(number_new_jobs=1)
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'stage': {
@@ -637,28 +606,20 @@ class TestUnifiedViews(APITestMixin):
 
     def test_change_stage_verify_win_success(self):
         """Tests moving a complete project to the 'Verify win' stage."""
-        adviser = AdviserFactory()
         strategic_drivers = [
             constants.InvestmentStrategicDriver.access_to_market.value.id
         ]
-        project = InvestmentProjectFactory(
-            client_contacts=[ContactFactory().id, ContactFactory().id],
-            client_cannot_provide_total_investment=False,
-            total_investment=100,
+        project = ActiveInvestmentProjectFactory(
             client_cannot_provide_foreign_investment=False,
             foreign_equity_investment=200,
-            number_new_jobs=10,
-            client_considering_other_countries=False,
             client_requirements='client reqs',
-            site_decided=False,
             strategic_drivers=strategic_drivers,
             uk_region_locations=[constants.UKRegion.england.value.id],
-            project_assurance_adviser=adviser,
-            project_manager=adviser,
             government_assistance=False,
             number_safeguarded_jobs=0,
             r_and_d_budget=True,
             non_fdi_r_and_d_budget=True,
+            associated_non_fdi_r_and_d_project=InvestmentProjectFactory(),
             new_tech_to_uk=True,
             export_revenue=True,
             address_line_1='12 London Road',
@@ -674,6 +635,42 @@ class TestUnifiedViews(APITestMixin):
         }
         response = self.api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
+
+    def test_change_stage_to_won(self):
+        """Tests moving a complete project to the 'Won' stage."""
+        project = VerifyWinInvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.won.value.id
+            }
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['stage'] == {
+            'id': constants.InvestmentProjectStage.won.value.id,
+            'name': constants.InvestmentProjectStage.won.value.name,
+        }
+        assert response_data['status'] == 'won'
+
+    def test_revert_stage_to_verify_win(self):
+        """Tests moving a complete project from the 'Won' stage to 'Verify win'."""
+        project = WonInvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.verify_win.value.id
+            }
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['stage'] == {
+            'id': constants.InvestmentProjectStage.verify_win.value.id,
+            'name': constants.InvestmentProjectStage.verify_win.value.name,
+        }
+        assert response_data['status'] == 'ongoing'
 
     def test_invalid_state_validation(self):
         """Tests validation when a project that is in an invalid state.
@@ -734,6 +731,7 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['number_safeguarded_jobs'] == 10
         assert response_data['r_and_d_budget'] is False
         assert response_data['non_fdi_r_and_d_budget'] is False
+        assert response_data['associated_non_fdi_r_and_d_project'] is None
         assert response_data['new_tech_to_uk'] is False
         assert response_data['export_revenue'] is True
         assert response_data['value_complete'] is True

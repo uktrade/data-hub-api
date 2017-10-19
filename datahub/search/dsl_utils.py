@@ -1,23 +1,23 @@
 from functools import partial
-from elasticsearch_dsl import Keyword, Nested, String
+from elasticsearch_dsl import Keyword, Nested, Text
 
-SortableCaseInsensitiveKeywordString = partial(
-    String,
+SortableCaseInsensitiveKeywordText = partial(
+    Text,
     analyzer='lowercase_keyword_analyzer',
     fielddata=True
 )
-TrigramString = partial(String, analyzer='trigram_analyzer', fielddata=True)
-EnglishString = partial(String, analyzer='english_analyzer')
-SortableString = partial(String, fielddata=True)
+TrigramText = partial(Text, analyzer='trigram_analyzer', fielddata=True)
+EnglishText = partial(Text, analyzer='english_analyzer')
+SortableText = partial(Text, fielddata=True)
 
 
 def contact_or_adviser_mapping(field, include_dit_team=False):
     """Mapping for Adviser/Contact fields."""
     props = {
         'id': Keyword(),
-        'first_name': SortableCaseInsensitiveKeywordString(),
-        'last_name': SortableCaseInsensitiveKeywordString(),
-        'name': SortableCaseInsensitiveKeywordString(),
+        'first_name': SortableCaseInsensitiveKeywordText(),
+        'last_name': SortableCaseInsensitiveKeywordText(),
+        'name': SortableCaseInsensitiveKeywordText(),
     }
 
     if include_dit_team:
@@ -29,10 +29,10 @@ def contact_or_adviser_partial_mapping(field):
     """Mapping for Adviser/Contact fields that allows partial matching."""
     props = {
         'id': Keyword(),
-        'first_name': SortableCaseInsensitiveKeywordString(),
-        'last_name': SortableCaseInsensitiveKeywordString(),
-        'name': SortableCaseInsensitiveKeywordString(copy_to=f'{field}.name_trigram'),
-        'name_trigram': TrigramString(),
+        'first_name': SortableCaseInsensitiveKeywordText(),
+        'last_name': SortableCaseInsensitiveKeywordText(),
+        'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+        'name_trigram': TrigramText(),
     }
     return Nested(properties=props)
 
@@ -41,7 +41,7 @@ def id_name_mapping():
     """Mapping for id name fields."""
     return Nested(properties={
         'id': Keyword(),
-        'name': SortableCaseInsensitiveKeywordString(),
+        'name': SortableCaseInsensitiveKeywordText(),
     })
 
 
@@ -49,8 +49,8 @@ def id_name_partial_mapping(field):
     """Mapping for id name fields."""
     return Nested(properties={
         'id': Keyword(),
-        'name': SortableCaseInsensitiveKeywordString(copy_to=f'{field}.name_trigram'),
-        'name_trigram': TrigramString(),
+        'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+        'name_trigram': TrigramText(),
     })
 
 
@@ -58,7 +58,7 @@ def id_uri_mapping():
     """Mapping for id uri fields."""
     return Nested(properties={
         'id': Keyword(),
-        'uri': SortableCaseInsensitiveKeywordString()
+        'uri': SortableCaseInsensitiveKeywordText()
     })
 
 
@@ -66,5 +66,14 @@ def company_mapping():
     """Mapping for id company_number fields."""
     return Nested(properties={
         'id': Keyword(),
-        'company_number': SortableCaseInsensitiveKeywordString()
+        'company_number': SortableCaseInsensitiveKeywordText()
+    })
+
+
+def investment_project_mapping():
+    """Mapping for investment project relations."""
+    return Nested(properties={
+        'id': Keyword(),
+        'name': SortableCaseInsensitiveKeywordText(),
+        'project_code': SortableCaseInsensitiveKeywordText(),
     })

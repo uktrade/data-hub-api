@@ -5,7 +5,9 @@ from rest_framework import serializers
 import datahub.metadata.models as meta_models
 from datahub.company.models import Company, Contact
 from datahub.company.serializers import NestedAdviserField
+from datahub.core.constants import InvestmentProjectStage
 from datahub.core.serializers import NestedRelatedField
+from datahub.core.validate_utils import DataCombiner
 from datahub.investment.models import (InvestmentProject, InvestmentProjectTeamMember,
                                        IProjectDocument)
 from datahub.investment.validate import validate
@@ -74,9 +76,29 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
 
         if errors:
             raise serializers.ValidationError(errors)
+
+        self._update_status(data)
+
         return data
 
-    class Meta:  # noqa: D101
+    def _update_status(self, data):
+        """Updates the project status when the stage changes to or from Won."""
+        old_stage = self.instance.stage if self.instance else None
+        new_stage = data.get('stage')
+
+        if not new_stage or new_stage == old_stage:
+            return
+
+        combiner = DataCombiner(instance=self.instance, update_data=data)
+        new_status = combiner.get_value('status')
+
+        if str(new_stage.id) == InvestmentProjectStage.won.value.id:
+            data['status'] = InvestmentProject.STATUSES.won
+        elif (old_stage and str(old_stage.id) == InvestmentProjectStage.won.value.id and
+                new_status == InvestmentProject.STATUSES.won):
+            data['status'] = InvestmentProject.STATUSES.ongoing
+
+    class Meta:
         model = InvestmentProject
         fields = (
             'id',
@@ -84,6 +106,7 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
             'name',
             'project_code',
             'description',
+            'anonymous_description',
             'nda_signed',
             'estimated_land_date',
             'actual_land_date',
@@ -150,6 +173,9 @@ class IProjectValueSerializer(serializers.ModelSerializer):
         allow_null=True
     )
     value_complete = serializers.SerializerMethodField()
+    associated_non_fdi_r_and_d_project = NestedRelatedField(
+        InvestmentProject, required=False, allow_null=True, extra_fields=('name', 'project_code')
+    )
 
     def get_value_complete(self, instance):
         """Whether the value fields required to move to the next stage are complete."""
@@ -157,7 +183,7 @@ class IProjectValueSerializer(serializers.ModelSerializer):
             instance=instance, fields=IProjectValueSerializer.Meta.fields, next_stage=True
         )
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = InvestmentProject
         fields = (
             'fdi_value',
@@ -171,6 +197,7 @@ class IProjectValueSerializer(serializers.ModelSerializer):
             'number_safeguarded_jobs',
             'r_and_d_budget',
             'non_fdi_r_and_d_budget',
+            'associated_non_fdi_r_and_d_project',
             'new_tech_to_uk',
             'export_revenue',
             'value_complete',
@@ -196,7 +223,7 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
             instance=instance, fields=IProjectRequirementsSerializer.Meta.fields, next_stage=True
         )
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = InvestmentProject
         fields = (
             'client_requirements',
@@ -221,7 +248,7 @@ class IProjectTeamMemberSerializer(serializers.ModelSerializer):
     investment_project = NestedRelatedField(InvestmentProject)
     adviser = NestedAdviserField()
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = InvestmentProjectTeamMember
         fields = ('investment_project', 'adviser', 'role')
 
@@ -235,7 +262,7 @@ class NestedIProjectTeamMemberSerializer(serializers.ModelSerializer):
 
     adviser = NestedAdviserField()
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = InvestmentProjectTeamMember
         fields = ('adviser', 'role')
 
@@ -256,7 +283,7 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
             instance=instance, fields=IProjectTeamSerializer.Meta.fields, next_stage=True
         )
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = InvestmentProject
         fields = (
             'project_manager',
@@ -272,7 +299,7 @@ class IProjectSerializer(IProjectSummarySerializer, IProjectValueSerializer,
                          IProjectRequirementsSerializer, IProjectTeamSerializer):
     """Serialiser for investment projects, used with the new unified investment endpoint."""
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = InvestmentProject
         fields = (
             IProjectSummarySerializer.Meta.fields
@@ -290,7 +317,7 @@ class IProjectDocumentSerializer(serializers.ModelSerializer):
         InvestmentProject,
     )
 
-    class Meta:  # noqa: D101
+    class Meta:
         model = IProjectDocument
         fields = (
             'id',

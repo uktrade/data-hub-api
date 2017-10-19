@@ -184,7 +184,6 @@ class TestSearch(APITestMixin):
         }, format='json')
 
         assert response.status_code == status.HTTP_200_OK
-        print(response.data['results'])
         assert response.data['count'] == 6
         assert len(response.data['results']) == 6
 
