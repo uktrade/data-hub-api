@@ -15,18 +15,36 @@ pytestmark = pytest.mark.django_db
 @pytest.fixture
 def setup_data():
     """Sets up the data and makes the ES client available."""
-    ContactFactory(first_name='abc', last_name='defg')
-    ContactFactory(first_name='first', last_name='last')
+    ContactFactory(
+        first_name='abc',
+        last_name='defg',
+        company=CompanyFactory(name='name0')
+    )
+    ContactFactory(
+        first_name='first',
+        last_name='last',
+        company=CompanyFactory(name='name1')
+    )
     InvestmentProjectFactory(
         name='abc defg',
         description='investmentproject1',
-        estimated_land_date=datetime.datetime(2011, 6, 13, 9, 44, 31, 62870)
+        estimated_land_date=datetime.datetime(2011, 6, 13, 9, 44, 31, 62870),
+        project_manager=AdviserFactory(first_name='name 0', last_name='surname 0'),
+        project_assurance_adviser=AdviserFactory(first_name='name 1', last_name='surname 1'),
+        investor_company=CompanyFactory(name='name3'),
+        client_relationship_manager=AdviserFactory(first_name='name 2', last_name='surname 2'),
+        referral_source_adviser=AdviserFactory(first_name='name 3', last_name='surname 3'),
+        client_contacts=[]
     )
     InvestmentProjectFactory(
         description='investmentproject2',
         estimated_land_date=datetime.datetime(2057, 6, 13, 9, 44, 31, 62870),
-        project_manager=AdviserFactory(),
-        project_assurance_adviser=AdviserFactory(),
+        project_manager=AdviserFactory(first_name='name 4', last_name='surname 4'),
+        project_assurance_adviser=AdviserFactory(first_name='name 5', last_name='surname 5'),
+        investor_company=CompanyFactory(name='name4'),
+        client_relationship_manager=AdviserFactory(first_name='name 6', last_name='surname 6'),
+        referral_source_adviser=AdviserFactory(first_name='name 7', last_name='surname 7'),
+        client_contacts=[]
     )
 
     country_uk = constants.Country.united_kingdom.value.id
