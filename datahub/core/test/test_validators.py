@@ -61,14 +61,12 @@ def test_conditional_rule(rule_res, when_res, res):
     rule.return_value = rule_res
     condition = Mock(spec=Rule)
     condition.return_value = when_res
-    rule = ConditionalRule(
-        'error_key', rule, when=condition
-    )
+    rule = ConditionalRule(rule, when=condition)
     assert rule(combiner) == res
 
 
 def _make_stub_rule(field, return_value):
-    return Mock(return_value=return_value, error_key='error', rule=Mock(field=field))
+    return Mock(return_value=return_value, field=field, error_key='error')
 
 
 class TestRulesBasedValidator:

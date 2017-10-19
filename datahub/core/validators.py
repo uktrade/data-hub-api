@@ -137,6 +137,41 @@ class ConditionalRule:
     """A rule that is only checked when a condition is met."""
 
     def __init__(self,
+                 rule: Rule,
+                 when: Rule=None):
+        """
+        Initialises a validation rule.
+
+        :param rule:      Rule that must pass.
+        :param when:      Optional conditional rule to check before applying this rule.
+                          If the condition evaluates to False, validation passes.
+        """
+        self._rule = rule
+        self._condition = when
+
+    @property
+    def field(self):
+        """The field that is being validated."""
+        return self._rule.field
+
+    def __call__(self, combiner):
+        """Test whether the rule passes or fails."""
+        if self._condition and not self._condition(combiner):
+            return True
+
+        return self._rule(combiner)
+
+    def __repr__(self):
+        """Returns the Python representation of this object."""
+        return (
+            f'{self.__class__.__name__}({self._rule!r}, when={self._condition!r})'
+        )
+
+
+class ValidationRule(ConditionalRule):
+    """A rule that is only checked when a condition is met."""
+
+    def __init__(self,
                  error_key: str,
                  rule: Rule,
                  when: Rule=None):
@@ -148,22 +183,14 @@ class ConditionalRule:
         :param when:      Optional conditional rule to check before applying this rule.
                           If the condition evaluates to False, validation passes.
         """
+        super().__init__(rule, when=when)
         self.error_key = error_key
-        self.rule = rule
-        self.condition = when
-
-    def __call__(self, combiner):
-        """Test whether the rule passes or fails."""
-        if self.condition and not self.condition(combiner):
-            return True
-
-        return self.rule(combiner)
 
     def __repr__(self):
         """Returns the Python representation of this object."""
         return (
-            f'{self.__class__.__name__}({self.error_key!r}, {self.rule!r}, '
-            f'condition={self.condition!r})'
+            f'{self.__class__.__name__}({self.error_key!r}, {self._rule!r}, '
+            f'when={self._condition!r})'
         )
 
 
@@ -174,7 +201,7 @@ class RulesBasedValidator:
     Validation is performed using rules (instances of ValidationRule).
     """
 
-    def __init__(self, *rules: ConditionalRule):
+    def __init__(self, *rules: ValidationRule):
         """
         Initialises the validator with rules.
         """
@@ -191,7 +218,7 @@ class RulesBasedValidator:
         combiner = DataCombiner(instance=self._serializer.instance, update_data=data)
         for rule in self._rules:
             if not rule(combiner):
-                errors[rule.rule.field] = self._serializer.error_messages[rule.error_key]
+                errors[rule.field] = self._serializer.error_messages[rule.error_key]
 
         if errors:
             raise serializers.ValidationError(errors)

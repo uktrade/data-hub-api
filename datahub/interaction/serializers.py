@@ -7,7 +7,7 @@ from datahub.company.models import Company, Contact
 from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import is_blank, is_not_blank
-from datahub.core.validators import AnyOfValidator, ConditionalRule, Rule, RulesBasedValidator
+from datahub.core.validators import AnyOfValidator, Rule, RulesBasedValidator, ValidationRule
 from datahub.event.models import Event
 from datahub.investment.models import InvestmentProject
 from datahub.metadata.models import Service, Team
@@ -88,38 +88,39 @@ class InteractionSerializer(serializers.ModelSerializer):
         validators = [
             AnyOfValidator('company', 'investment_project'),
             RulesBasedValidator(
-                ConditionalRule(
+                ValidationRule(
                     'required',
                     Rule('communication_channel', bool),
                     when=Rule('kind', eq, (Interaction.KINDS.interaction,)),
                 ),
-                ConditionalRule(
+                ValidationRule(
                     'invalid_for_service_delivery',
                     Rule('communication_channel', not_),
                     when=Rule('kind', eq, (Interaction.KINDS.service_delivery,)),
                 ),
-                ConditionalRule(
+                ValidationRule(
                     'invalid_for_interaction',
                     Rule('event', not_),
                     when=Rule('kind', eq, (Interaction.KINDS.interaction,)),
                 ),
-                ConditionalRule(
+                ValidationRule(
                     'invalid_for_interaction',
                     Rule('is_event', is_blank),
                     when=Rule('kind', eq, (Interaction.KINDS.interaction,)),
                 ),
-                ConditionalRule(
+                ValidationRule(
                     'required',
                     Rule('is_event', is_not_blank),
                     when=Rule('kind', eq, (Interaction.KINDS.service_delivery,)),
                 ),
-                ConditionalRule(
+                ValidationRule(
                     'required',
                     Rule('event', bool),
                     when=Rule('is_event', bool),
                 ),
-                ConditionalRule(
-                    'invalid_for_non_event', Rule('event', not_),
+                ValidationRule(
+                    'invalid_for_non_event',
+                    Rule('event', not_),
                     when=Rule('is_event', not_),
                 ),
             )
