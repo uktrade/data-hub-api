@@ -22,21 +22,15 @@ def test_get_search_term_query():
                     }
                 }, {
                     'match_phrase': {
-                        'id': {
-                            'query': 'hello'
-                        }
+                        'id': 'hello'
                     }
                 }, {
                     'match': {
-                        'name': {
-                            'query': 'hello'
-                        }
+                        'name': 'hello'
                     }
                 }, {
                     'match_phrase': {
-                        'name_trigram': {
-                            'query': 'hello'
-                        }
+                        'name_trigram': 'hello'
                     }
                 }, {
                     'nested': {
