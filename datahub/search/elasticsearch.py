@@ -19,7 +19,13 @@ lowercase_keyword_analyzer = analysis.CustomAnalyzer(
 )
 
 # Trigram tokenizer enables us to support partial matching
-trigram = analysis.tokenizer('trigram', 'nGram', min_gram=3, max_gram=3)
+trigram = analysis.tokenizer(
+    'trigram',
+    'nGram',
+    min_gram=3,
+    max_gram=3,
+    token_chars=('letter', 'digit',)
+)
 
 # Filters out "-" so that t-shirt and tshirt can be matched
 special_chars = analysis.char_filter('special_chars', 'mapping', mappings=('-=>',))
