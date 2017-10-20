@@ -228,10 +228,10 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
         fields = (
             'client_requirements',
             'site_decided',  # deprecated; will be removed
-            'address_line_1',
-            'address_line_2',
-            'address_line_3',
-            'address_line_postcode',
+            'address_1',
+            'address_2',
+            'address_town',
+            'address_postcode',
             'competitor_countries',
             'uk_region_locations',
             'strategic_drivers',
