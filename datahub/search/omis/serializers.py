@@ -10,4 +10,5 @@ class SearchOrderSerializer(SearchSerializer):
         'created_on',
         'modified_on',
         'delivery_date',
+        'payment_due_date',
     )
