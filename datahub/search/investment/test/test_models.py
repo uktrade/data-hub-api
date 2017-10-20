@@ -18,6 +18,7 @@ def test_investment_project_to_dict(setup_es):
         'client_contacts',
         'client_relationship_manager',
         'investor_company',
+        'investor_company_country',
         'investment_type',
         'stage',
         'referral_source_activity',
