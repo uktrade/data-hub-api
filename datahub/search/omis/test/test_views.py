@@ -1,4 +1,5 @@
 import pytest
+from dateutil.parser import parse as dateutil_parse
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -28,7 +29,8 @@ def setup_data(setup_es):
             status=OrderStatus.draft,
             company=company,
             contact=contact,
-            discount_value=0
+            discount_value=0,
+            delivery_date=dateutil_parse('2018-01-01').date()
         )
         OrderSubscriberFactory(
             order=order,
@@ -50,7 +52,8 @@ def setup_data(setup_es):
             status=OrderStatus.quote_awaiting_acceptance,
             company=company,
             contact=contact,
-            discount_value=0
+            discount_value=0,
+            delivery_date=dateutil_parse('2018-02-01').date()
         )
         OrderSubscriberFactory(
             order=order,
@@ -157,6 +160,30 @@ class TestSearchOrder(APITestMixin):
             (  # search by company name partial
                 {'company_name': 'Venus'},
                 ['ref2']
+            ),
+            (  # sort by created_on ASC
+                {'sortby': 'created_on:asc'},
+                ['ref1', 'ref2']
+            ),
+            (  # sort by created_on DESC
+                {'sortby': 'created_on:desc'},
+                ['ref2', 'ref1']
+            ),
+            (  # sort by modified_on ASC
+                {'sortby': 'modified_on:asc'},
+                ['ref1', 'ref2']
+            ),
+            (  # sort by modified_on DESC
+                {'sortby': 'modified_on:desc'},
+                ['ref2', 'ref1']
+            ),
+            (  # sort by delivery_date ASC
+                {'sortby': 'delivery_date:asc'},
+                ['ref1', 'ref2']
+            ),
+            (  # sort by delivery_date DESC
+                {'sortby': 'delivery_date:desc'},
+                ['ref2', 'ref1']
             ),
         )
     )
