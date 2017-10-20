@@ -541,9 +541,9 @@
     project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
     project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
     uk_company: a73efeba-8499-11e6-ae22-56b6b6499611
-    address_line_1: 10 Eastings Road
-    address_line_2: London
-    address_line_postcode: W1 2AA
+    address_1: 10 Eastings Road
+    address_town: London
+    address_postcode: W1 2AA
 
 
 - model: investment.investmentproject
@@ -590,9 +590,9 @@
     project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
     project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
     uk_company: a73efeba-8499-11e6-ae22-56b6b6499611
-    address_line_1: 10 Eastings Road
-    address_line_2: London
-    address_line_postcode: W1 2AA
+    address_1: 10 Eastings Road
+    address_town: London
+    address_postcode: W1 2AA
 
 - model: interaction.interaction
   pk: 94d03877-fceb-44a0-8813-17b727d2e7f6
