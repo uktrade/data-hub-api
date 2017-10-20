@@ -182,7 +182,7 @@ def test_get_basic_search_query():
                         }
                     }, {
                         'match': {
-                            'reference': 'test'
+                            'reference_trigram': 'test'
                         }
                     }, {
                         'nested': {
@@ -222,6 +222,10 @@ def test_get_basic_search_query():
                     }, {
                         'match': {
                             'subject_english': 'test'
+                        }
+                    }, {
+                        'match': {
+                            'subtotal_cost_string': 'test'
                         }
                     }, {
                         'nested': {
