@@ -20,7 +20,8 @@ class SearchInvestmentProjectParams:
         'investment_type',
         'investor_company',
         'sector',
-        'stage'
+        'stage',
+        'status',
     )
 
     REMAP_FIELDS = {
