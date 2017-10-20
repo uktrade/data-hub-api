@@ -224,6 +224,12 @@ def test_mapping(setup_es):
                 },
                 'reference': {
                     'analyzer': 'lowercase_keyword_analyzer',
+                    'copy_to': ['reference_trigram'],
+                    'fielddata': True,
+                    'type': 'text'
+                },
+                'reference_trigram': {
+                    'analyzer': 'trigram_analyzer',
                     'fielddata': True,
                     'type': 'text'
                 },
@@ -294,8 +300,11 @@ def test_mapping(setup_es):
                     },
                     'type': 'nested'
                 },
+                'subtotal_cost_string': {
+                    'type': 'keyword'
+                },
                 'subtotal_cost': {
-                    'index': False,
+                    'copy_to': ['subtotal_cost_string'],
                     'type': 'integer'
                 },
                 'total_cost_string': {

@@ -20,6 +20,7 @@ class SearchOrderParams:
         'status',
         'reference',
         'total_cost',
+        'subtotal_cost',
         'contact_name',
         'company_name',
     ]
@@ -30,6 +31,7 @@ class SearchOrderParams:
         'assigned_to_team': 'assignees.dit_team.id',
         'contact_name': 'contact.name_trigram',
         'company_name': 'company.name_trigram',
+        'reference': 'reference_trigram',
     }
 
 
