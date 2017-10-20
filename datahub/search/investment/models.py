@@ -68,8 +68,8 @@ class InvestmentProject(DocType, MapDBModelToDict):
     referral_source_advisor = dsl_utils.contact_or_adviser_mapping('referral_source_advisor')
     sector = dsl_utils.id_name_mapping()
     average_salary = dsl_utils.id_name_mapping()
-    date_lost = Date(),
-    date_abandoned = Date(),
+    date_lost = Date()
+    date_abandoned = Date()
 
     MAPPINGS = {
         'id': str,
