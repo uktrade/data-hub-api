@@ -68,6 +68,7 @@ def test_investment_project_to_dict(setup_es):
         'new_tech_to_uk',
         'export_revenue',
         'client_requirements',
+        'uk_region_locations',
         'site_decided',
         'address_1',
         'address_2',

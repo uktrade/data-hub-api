@@ -48,6 +48,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
     associated_non_fdi_r_and_d_project = dsl_utils.investment_project_mapping()
     new_tech_to_uk = Boolean()
     export_revenue = Boolean()
+    uk_region_locations = dsl_utils.id_name_mapping()
     site_decided = Boolean()
     nda_signed = Boolean()
     government_assistance = Boolean()
@@ -85,6 +86,9 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'fdi_value': dict_utils.id_name_dict,
         'intermediate_company': dict_utils.id_name_dict,
         'investor_company': dict_utils.id_name_dict,
+        'uk_region_locations': lambda col: [
+            dict_utils.id_name_dict(c) for c in col.all()
+        ],
         'uk_company': dict_utils.id_name_dict,
         'investment_type': dict_utils.id_name_dict,
         'associated_non_fdi_r_and_d_project': dict_utils.investment_project_dict,
@@ -122,7 +126,6 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'investmentprojectcode',
         'modified_by',
         'strategic_drivers',
-        'uk_region_locations'
     )
 
     SEARCH_FIELDS = [
