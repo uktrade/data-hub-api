@@ -392,11 +392,11 @@ class TestMarkOrderAsPaid:
                 payments_data=[
                     {
                         'amount': 1,
-                        'received_on': dateutil_parse('2017-01-01 13:00:00')
+                        'received_on': dateutil_parse('2017-01-01').date()
                     },
                     {
                         'amount': order.total_cost - 1,
-                        'received_on': dateutil_parse('2017-01-02 13:00:00')
+                        'received_on': dateutil_parse('2017-01-02').date()
                     },
                 ]
             )
@@ -408,8 +408,8 @@ class TestMarkOrderAsPaid:
         assert list(
             order.payments.order_by('received_on').values_list('amount', 'received_on')
         ) == [
-            (1, dateutil_parse('2017-01-01 13:00:00')),
-            (order.total_cost - 1, dateutil_parse('2017-01-02 13:00:00')),
+            (1, dateutil_parse('2017-01-01').date()),
+            (order.total_cost - 1, dateutil_parse('2017-01-02').date()),
         ]
 
     @pytest.mark.parametrize(
@@ -445,7 +445,7 @@ class TestMarkOrderAsPaid:
                     by=None,
                     payments_data=[{
                         'amount': order.total_cost,
-                        'received_on': dateutil_parse('2017-01-02 13:00:00')
+                        'received_on': dateutil_parse('2017-01-02').date()
                     }]
                 )
 
@@ -464,7 +464,7 @@ class TestMarkOrderAsPaid:
                 payments_data=[
                     {
                         'amount': order.total_cost - 1,
-                        'received_on': dateutil_parse('2017-01-02 13:00:00')
+                        'received_on': dateutil_parse('2017-01-02').date()
                     }
                 ]
             )
