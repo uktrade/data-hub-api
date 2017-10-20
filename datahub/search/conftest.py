@@ -50,6 +50,7 @@ def setup_es(setup_es_indexes):
         body={'query': {'match_all': {}}},
         ignore=(409,)
     )
+    setup_es_indexes.indices.refresh()
 
 
 def create_test_index(client, index):
