@@ -23,6 +23,7 @@ class SearchInvestmentProjectParams:
         'sector',
         'stage',
         'status',
+        'uk_region_location',
     )
 
     REMAP_FIELDS = {
@@ -32,6 +33,7 @@ class SearchInvestmentProjectParams:
         'investor_company_country': 'investor_company_country.id',
         'sector': 'sector.id',
         'stage': 'stage.id',
+        'uk_region_location': 'uk_region_locations.id',
     }
 
 
