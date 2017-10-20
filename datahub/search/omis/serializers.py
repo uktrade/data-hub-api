@@ -8,4 +8,6 @@ class SearchOrderSerializer(SearchSerializer):
 
     SORT_BY_FIELDS = (
         'created_on',
+        'modified_on',
+        'delivery_date',
     )
