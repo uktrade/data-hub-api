@@ -19,8 +19,8 @@ def client(request):
     return client
 
 
-@fixture
-def setup_es(client):
+@fixture(scope='session')
+def setup_es_indexes(client):
     """Sets up ES and makes the client available."""
     create_test_index(client, settings.ES_INDEX)
 
@@ -38,6 +38,18 @@ def setup_es(client):
 
     for search_app in get_search_apps():
         search_app.disconnect_signals()
+
+
+@fixture
+def setup_es(setup_es_indexes):
+    """Sets up ES and deletes all the records after each run."""
+    yield setup_es_indexes
+
+    setup_es_indexes.delete_by_query(
+        settings.ES_INDEX,
+        body={'query': {'match_all': {}}},
+        ignore=(409,)
+    )
 
 
 def create_test_index(client, index):

@@ -106,9 +106,15 @@ def test_mapping(setup_es):
                         },
                         'name': {
                             'analyzer': 'lowercase_keyword_analyzer',
+                            'copy_to': ['company.name_trigram'],
                             'fielddata': True,
                             'type': 'text'
-                        }
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        },
                     },
                     'type': 'nested'
                 },
@@ -129,9 +135,15 @@ def test_mapping(setup_es):
                         },
                         'name': {
                             'analyzer': 'lowercase_keyword_analyzer',
+                            'copy_to': ['contact.name_trigram'],
                             'fielddata': True,
                             'type': 'text'
-                        }
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        },
                     },
                     'type': 'nested'
                 },
@@ -286,7 +298,11 @@ def test_mapping(setup_es):
                     'index': False,
                     'type': 'integer'
                 },
+                'total_cost_string': {
+                    'type': 'keyword'
+                },
                 'total_cost': {
+                    'copy_to': ['total_cost_string'],
                     'type': 'integer'
                 },
                 'vat_cost': {
