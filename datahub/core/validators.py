@@ -1,4 +1,7 @@
-from typing import Callable, NamedTuple, Sequence
+from abc import ABC, abstractmethod
+from functools import partial
+from operator import eq
+from typing import Any, Callable
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -107,54 +110,124 @@ class RequiredUnlessAlreadyBlankValidator:
         return f'{self.__class__.__name__}(*{self.fields!r})'
 
 
-class Condition(NamedTuple):
-    """Validation condition."""
+class AbstractRule(ABC):
+    """Abstract base class for rules."""
 
-    field: str
-    operator: Callable
-    operator_extra_args: Sequence = ()
+    @property
+    @abstractmethod
+    def field(self) -> str:
+        """Field the rule applies to."""
 
-    def __call__(self, combiner):
-        """Test whether the condition is True or False."""
-        value = combiner.get_value(self.field)
-        return self.operator(value, *self.operator_extra_args)
+    @abstractmethod
+    def __call__(self, combiner) -> bool:
+        """Evaluates the rule."""
 
 
-class ValidationRule:
-    """Validation rule."""
+class BaseRule(AbstractRule):
+    """Base class for rules."""
+
+    def __init__(self, field: str):
+        """Sets the field name."""
+        self._field = field
+
+    @property
+    def field(self):
+        """Field the rule applies to."""
+        return self._field
+
+
+class OperatorRule(BaseRule):
+    """Simple operator-based rule for a field."""
 
     def __init__(self,
-                 error_key: str,
                  field: str,
-                 operator_: Callable,
-                 condition: Condition = None):
+                 operator_: Callable):
         """
-        Initialises a validation rule.
+        Initialises the rule.
 
-        :param error_key: The key of the error message associated with this rule.
         :param field:     The name of the field the rule applies to.
         :param operator_: Callable that returns a truthy or falsey value (indicating whether the
                           value is valid). Will be called with the field value as the first
                           argument.
-        :param condition: Optional conditional rule to check before applying this rule.
-                          If the condition evaluates to False, validation passes.
         """
-        self.error_key = error_key
-        self.condition = condition
-        self.rule = Condition(field, operator_)
+        super().__init__(field)
+        self._operator = operator_
 
-    def __call__(self, combiner):
+    def __call__(self, combiner) -> bool:
         """Test whether the rule passes or fails."""
-        if self.condition and not self.condition(combiner):
+        value = combiner.get_value(self.field)
+        return self._operator(value)
+
+
+class EqualsRule(OperatorRule):
+    """Equals operator-based rule for a field."""
+
+    def __init__(self, field: str, value: Any):
+        """
+        Initialises the rule.
+
+        :param field: The name of the field the rule applies to.
+        :param value: Value to test equality with.
+        """
+        super().__init__(field, partial(eq, value))
+
+
+class ConditionalRule:
+    """A rule that is only checked when a condition is met."""
+
+    def __init__(self, rule: AbstractRule, when: AbstractRule=None):
+        """
+        Initialises then rule.
+
+        :param rule: Rule that must pass.
+        :param when: Optional conditional rule to check before applying this rule.
+                     If the condition evaluates to False, validation passes.
+        """
+        self._rule = rule
+        self._condition = when
+
+    @property
+    def field(self):
+        """The field that is being validated."""
+        return self._rule.field
+
+    def __call__(self, combiner) -> bool:
+        """Test whether the rule passes or fails."""
+        if self._condition and not self._condition(combiner):
             return True
 
-        return self.rule(combiner)
+        return self._rule(combiner)
 
     def __repr__(self):
         """Returns the Python representation of this object."""
         return (
-            f'{self.__class__.__name__}({self.error_key!r}, {self.rule.field!r}, '
-            f'{self.rule.operator!r}, condition={self.condition!r})'
+            f'{self.__class__.__name__}({self._rule!r}, when={self._condition!r})'
+        )
+
+
+class ValidationRule(ConditionalRule):
+    """A rule that is only checked when a condition is met."""
+
+    def __init__(self,
+                 error_key: str,
+                 rule: OperatorRule,
+                 when: OperatorRule=None):
+        """
+        Initialises a validation rule.
+
+        :param error_key: The key of the error message associated with this rule.
+        :param rule:      Rule that must pass.
+        :param when:      Optional conditional rule to check before applying this rule.
+                          If the condition evaluates to False, validation passes.
+        """
+        super().__init__(rule, when=when)
+        self.error_key = error_key
+
+    def __repr__(self):
+        """Returns the Python representation of this object."""
+        return (
+            f'{self.__class__.__name__}({self.error_key!r}, {self._rule!r}, '
+            f'when={self._condition!r})'
         )
 
 
@@ -182,7 +255,7 @@ class RulesBasedValidator:
         combiner = DataCombiner(instance=self._serializer.instance, update_data=data)
         for rule in self._rules:
             if not rule(combiner):
-                errors[rule.rule.field] = self._serializer.error_messages[rule.error_key]
+                errors[rule.field] = self._serializer.error_messages[rule.error_key]
 
         if errors:
             raise serializers.ValidationError(errors)
