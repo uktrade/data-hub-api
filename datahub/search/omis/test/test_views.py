@@ -23,14 +23,15 @@ def setup_data(setup_es):
         company = CompanyFactory(name='Mercury trading')
         contact = ContactFactory(company=company, first_name='John', last_name='Doe')
         order = OrderFactory(
-            reference='ref1',
+            reference='abcd',
             primary_market_id=constants.Country.japan.value.id,
             assignees=[],
             status=OrderStatus.draft,
             company=company,
             contact=contact,
             discount_value=0,
-            delivery_date=dateutil_parse('2018-01-01').date()
+            delivery_date=dateutil_parse('2018-01-01').date(),
+            vat_verified=False
         )
         OrderSubscriberFactory(
             order=order,
@@ -46,14 +47,15 @@ def setup_data(setup_es):
         company = CompanyFactory(name='Venus Ltd')
         contact = ContactFactory(company=company, first_name='Jenny', last_name='Cakeman')
         order = OrderFactory(
-            reference='ref2',
+            reference='efgh',
             primary_market_id=constants.Country.france.value.id,
             assignees=[],
             status=OrderStatus.quote_awaiting_acceptance,
             company=company,
             contact=contact,
             discount_value=0,
-            delivery_date=dateutil_parse('2018-02-01').date()
+            delivery_date=dateutil_parse('2018-02-01').date(),
+            vat_verified=False
         )
         OrderSubscriberFactory(
             order=order,
@@ -76,15 +78,15 @@ class TestSearchOrder(APITestMixin):
         (
             (  # no filter => return all records
                 {},
-                ['ref2', 'ref1']
+                ['efgh', 'abcd']
             ),
             (  # pagination
                 {'limit': 1, 'offset': 1},
-                ['ref1']
+                ['abcd']
             ),
             (  # filter by primary market
                 {'primary_market': constants.Country.france.value.id},
-                ['ref2']
+                ['efgh']
             ),
             (  # invalid market => no results
                 {'primary_market': 'invalid'},
@@ -95,95 +97,111 @@ class TestSearchOrder(APITestMixin):
                     'created_on_before': '2017-02-02',
                     'created_on_after': '2017-02-01'
                 },
-                ['ref2']
+                ['efgh']
             ),
             (  # filter by created_on_before only
                 {'created_on_before': '2017-01-15'},
-                ['ref1']
+                ['abcd']
             ),
             (  # filter by created_on_after only
                 {'created_on_after': '2017-01-15'},
-                ['ref2']
+                ['efgh']
             ),
             (  # filter by status
                 {'status': 'quote_awaiting_acceptance'},
-                ['ref2']
+                ['efgh']
             ),
             (  # invalid status => no results
                 {'status': 'invalid'},
                 []
             ),
             (  # search by reference
-                {'original_query': 'ref2'},
-                ['ref2']
+                {'original_query': 'efgh'},
+                ['efgh']
+            ),
+            (  # search by reference partial
+                {'original_query': 'efg'},
+                ['efgh']
             ),
             (  # search by contact name exact
                 {'original_query': 'Jenny Cakeman'},
-                ['ref2']
+                ['efgh']
             ),
             (  # search by contact name partial
                 {'original_query': 'Jenny Cakem'},
-                ['ref2']
+                ['efgh']
             ),
             (  # search by company name exact
                 {'original_query': 'Venus Ltd'},
-                ['ref2']
+                ['efgh']
             ),
             (  # search by company name partial
                 {'original_query': 'Venus'},
-                ['ref2']
+                ['efgh']
+            ),
+            (  # search by subtotal_cost
+                {'original_query': '2000'},
+                ['efgh']
             ),
             (  # search by total_cost
-                {'original_query': '2000'},
-                ['ref2']
+                {'original_query': '2400'},
+                ['efgh']
             ),
             (  # search by reference
-                {'reference': 'ref2'},
-                ['ref2']
+                {'reference': 'efgh'},
+                ['efgh']
             ),
-            (  # search by reference
-                {'total_cost': 2000},
-                ['ref2']
+            (  # search by reference partial
+                {'reference': 'efg'},
+                ['efgh']
+            ),
+            (  # search by subtotal_cost
+                {'subtotal_cost': 2000},
+                ['efgh']
+            ),
+            (  # search by total_cost
+                {'total_cost': 2400},
+                ['efgh']
             ),
             (  # search by contact name exact
                 {'contact_name': 'Jenny Cakeman'},
-                ['ref2']
+                ['efgh']
             ),
             (  # search by contact name partial
                 {'contact_name': 'Jenny Cakem'},
-                ['ref2']
+                ['efgh']
             ),
             (  # search by company name exact
                 {'company_name': 'Venus Ltd'},
-                ['ref2']
+                ['efgh']
             ),
             (  # search by company name partial
                 {'company_name': 'Venus'},
-                ['ref2']
+                ['efgh']
             ),
             (  # sort by created_on ASC
                 {'sortby': 'created_on:asc'},
-                ['ref1', 'ref2']
+                ['abcd', 'efgh']
             ),
             (  # sort by created_on DESC
                 {'sortby': 'created_on:desc'},
-                ['ref2', 'ref1']
+                ['efgh', 'abcd']
             ),
             (  # sort by modified_on ASC
                 {'sortby': 'modified_on:asc'},
-                ['ref1', 'ref2']
+                ['abcd', 'efgh']
             ),
             (  # sort by modified_on DESC
                 {'sortby': 'modified_on:desc'},
-                ['ref2', 'ref1']
+                ['efgh', 'abcd']
             ),
             (  # sort by delivery_date ASC
                 {'sortby': 'delivery_date:asc'},
-                ['ref1', 'ref2']
+                ['abcd', 'efgh']
             ),
             (  # sort by delivery_date DESC
                 {'sortby': 'delivery_date:desc'},
-                ['ref2', 'ref1']
+                ['efgh', 'abcd']
             ),
         )
     )
@@ -212,7 +230,7 @@ class TestSearchOrder(APITestMixin):
 
     def test_filter_by_assigned_to_assignee_adviser(self, setup_data):
         """Test that results can be filtered by assignee."""
-        assignee = Order.objects.get(reference='ref2').assignees.first()
+        assignee = Order.objects.get(reference='efgh').assignees.first()
 
         url = reverse('api-v3:search:order')
 
@@ -222,11 +240,11 @@ class TestSearchOrder(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()['results']) == 1
-        assert response.json()['results'][0]['reference'] == 'ref2'
+        assert response.json()['results'][0]['reference'] == 'efgh'
 
     def test_filter_by_assigned_to_assignee_adviser_team(self, setup_data):
         """Test that results can be filtered by the assignee's team."""
-        assignee = Order.objects.get(reference='ref2').assignees.first()
+        assignee = Order.objects.get(reference='efgh').assignees.first()
 
         url = reverse('api-v3:search:order')
 
@@ -236,7 +254,7 @@ class TestSearchOrder(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()['results']) == 1
-        assert response.json()['results'][0]['reference'] == 'ref2'
+        assert response.json()['results'][0]['reference'] == 'efgh'
 
 
 class TestGlobalSearch(APITestMixin):
@@ -247,31 +265,39 @@ class TestGlobalSearch(APITestMixin):
         (
             (  # no filter => return all records
                 '',
-                ['ref1', 'ref2']
+                ['abcd', 'efgh']
             ),
             (  # search by reference
-                'ref2',
-                ['ref2']
+                'efgh',
+                ['efgh']
+            ),
+            (  # search by reference partial
+                'efg',
+                ['efgh']
             ),
             (  # search by contact name exact
                 'Jenny Cakeman',
-                ['ref2']
+                ['efgh']
             ),
             (  # search by contact name partial
                 'Jenny Cakem',
-                ['ref2']
+                ['efgh']
             ),
             (  # search by company name exact
                 'Venus Ltd',
-                ['ref2']
+                ['efgh']
             ),
             (  # search by company name partial
                 'Venus',
-                ['ref2']
+                ['efgh']
+            ),
+            (  # search by subtotal_cost
+                '2000',
+                ['efgh']
             ),
             (  # search by total_cost
-                '2000',
-                ['ref2']
+                '2400',
+                ['efgh']
             ),
         )
     )
