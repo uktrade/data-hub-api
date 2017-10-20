@@ -109,9 +109,7 @@ class TestUnifiedViews(APITestMixin):
             'name': 'project name',
             'description': 'project description',
             'anonymous_description': 'project anon description',
-            'nda_signed': False,
             'estimated_land_date': '2020-12-12',
-            'project_shareable': False,
             'quotable_as_public_case_study': True,
             'likelihood_of_landing': 60,
             'priority': '1_low',
@@ -156,9 +154,9 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['name'] == request_data['name']
         assert response_data['description'] == request_data['description']
         assert response_data['anonymous_description'] == request_data['anonymous_description']
-        assert response_data['nda_signed'] == request_data['nda_signed']
+        assert response_data['nda_signed'] is False
         assert response_data['estimated_land_date'] == request_data['estimated_land_date']
-        assert response_data['project_shareable'] == request_data['project_shareable']
+        assert response_data['project_shareable'] is True
         assert (response_data['quotable_as_public_case_study'] ==
                 request_data['quotable_as_public_case_study'])
         assert response_data['likelihood_of_landing'] == request_data['likelihood_of_landing']
@@ -194,8 +192,6 @@ class TestUnifiedViews(APITestMixin):
             'investor_company': ['This field is required.'],
             'investment_type': ['This field is required.'],
             'name': ['This field is required.'],
-            'nda_signed': ['This field is required.'],
-            'project_shareable': ['This field is required.'],
             'referral_source_activity': ['This field is required.'],
             'referral_source_adviser': ['This field is required.'],
             'sector': ['This field is required.']
@@ -213,8 +209,6 @@ class TestUnifiedViews(APITestMixin):
             'investor_company': None,
             'investment_type': None,
             'name': None,
-            'nda_signed': None,
-            'project_shareable': None,
             'referral_source_activity': None,
             'referral_source_adviser': None,
             'sector': None
@@ -231,8 +225,6 @@ class TestUnifiedViews(APITestMixin):
             'investor_company': ['This field may not be null.'],
             'investment_type': ['This field may not be null.'],
             'name': ['This field may not be null.'],
-            'nda_signed': ['This field may not be null.'],
-            'project_shareable': ['This field may not be null.'],
             'referral_source_activity': ['This field may not be null.'],
             'referral_source_adviser': ['This field may not be null.'],
             'sector': ['This field may not be null.']
@@ -350,9 +342,7 @@ class TestUnifiedViews(APITestMixin):
         request_data = {
             'name': 'project name',
             'description': 'project description',
-            'nda_signed': False,
             'estimated_land_date': '2020-12-12',
-            'project_shareable': False,
             'investment_type': {
                 'id': constants.InvestmentType.fdi.value.id
             },
