@@ -3,7 +3,7 @@ import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import AdviserFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
 from datahub.investment.models import InvestmentProject
@@ -20,12 +20,18 @@ def setup_data():
         name='abc defg',
         description='investmentproject1',
         estimated_land_date=datetime.datetime(2011, 6, 13, 9, 44, 31, 62870),
+        investor_company=CompanyFactory(
+            registered_address_country_id=constants.Country.united_states.value.id
+        ),
         status=InvestmentProject.STATUSES.ongoing,
     )
     InvestmentProjectFactory(
         name='delayed project',
         description='investmentproject2',
         estimated_land_date=datetime.datetime(2057, 6, 13, 9, 44, 31, 62870),
+        investor_company=CompanyFactory(
+            registered_address_country_id=constants.Country.japan.value.id
+        ),
         project_manager=AdviserFactory(),
         project_assurance_adviser=AdviserFactory(),
         fdi_value_id=constants.FDIValue.higher.value.id,
@@ -85,6 +91,21 @@ class TestSearch(APITestMixin):
 
         response = self.api_client.post(url, {
             'status': 'delayed',
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['name'] == 'delayed project'
+
+    def test_search_investment_project_investor_country(self, setup_es, setup_data):
+        """Tests investor company country filter."""
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:investment_project')
+
+        response = self.api_client.post(url, {
+            'investor_company_country': constants.Country.japan.value.id,
         }, format='json')
 
         assert response.status_code == status.HTTP_200_OK

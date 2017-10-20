@@ -19,6 +19,7 @@ class SearchInvestmentProjectParams:
         'estimated_land_date_before',
         'investment_type',
         'investor_company',
+        'investor_company_country',
         'sector',
         'stage',
         'status',
@@ -28,6 +29,7 @@ class SearchInvestmentProjectParams:
         'client_relationship_manager': 'client_relationship_manager.id',
         'investment_type': 'investment_type.id',
         'investor_company': 'investor_company.id',
+        'investor_company_country': 'investor_company_country.id',
         'sector': 'sector.id',
         'stage': 'stage.id',
     }

@@ -38,6 +38,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
     intermediate_company = dsl_utils.id_name_mapping()
     uk_company = dsl_utils.id_name_mapping()
     investor_company = dsl_utils.id_name_mapping()
+    investor_company_country = dsl_utils.id_name_mapping()
     investment_type = dsl_utils.id_name_mapping()
     name = dsl_utils.SortableText()
     name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
@@ -103,6 +104,12 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'project_manager': dict_utils.contact_or_adviser_dict,
         'project_assurance_adviser': dict_utils.contact_or_adviser_dict,
         'country_lost_to': dict_utils.id_name_dict,
+    }
+
+    COMPUTED_MAPPINGS = {
+        'investor_company_country': dict_utils.computed_nested_id_name_dict(
+            'investor_company.registered_address_country'
+        ),
     }
 
     IGNORED_FIELDS = (
