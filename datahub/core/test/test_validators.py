@@ -1,4 +1,3 @@
-from operator import eq
 from types import SimpleNamespace
 from unittest.mock import Mock
 
@@ -7,8 +6,8 @@ from rest_framework.exceptions import ValidationError
 
 from datahub.core.validate_utils import DataCombiner
 from datahub.core.validators import (
-    AnyOfValidator, Condition, RequiredUnlessAlreadyBlankValidator, RulesBasedValidator,
-    ValidationRule
+    AnyOfValidator, ConditionalRule, EqualsRule, OperatorRule, RequiredUnlessAlreadyBlankValidator,
+    RulesBasedValidator,
 )
 
 
@@ -37,34 +36,47 @@ def test_any_of_all():
     validator({'field_a': Mock(), 'field_b': Mock()})
 
 
-@pytest.mark.parametrize('data,field,op,args,res', (
-    ({'colour': 'red'}, 'colour', eq, ('red',), True),
-    ({'colour': 'red'}, 'colour', eq, ('blue',), False),
+@pytest.mark.parametrize('data,field,op,res', (
+    ({'colour': 'red'}, 'colour', lambda val: val == 'red', True),
+    ({'colour': 'red'}, 'colour', lambda val: val == 'blue', False),
 ))
-def test_validation_condition(data, field, op, args, res):
+def test_operator_rule(data, field, op, res):
     """Tests ValidationCondition for various cases."""
     combiner = Mock(spec_set=DataCombiner, get_value=lambda field_: data[field_])
-    condition = Condition(field, op, args)
+    condition = OperatorRule(field, op)
     assert condition(combiner) == res
 
 
-@pytest.mark.parametrize('data,field,op,condition,res', (
-    ({'colour': 'red', 'valid': True}, 'valid', bool, lambda x: True, True),
-    ({'colour': 'red', 'valid': False}, 'valid', bool, lambda x: True, False),
-    ({'colour': 'red', 'valid': True}, 'valid', bool, lambda x: False, True),
-    ({'colour': 'red', 'valid': False}, 'valid', bool, lambda x: False, True),
+@pytest.mark.parametrize('data,field,test_value,res', (
+    ({'colour': 'red'}, 'colour', 'red', True),
+    ({'colour': 'red'}, 'colour', 'blue', False),
 ))
-def test_validation_rule(data, field, op, condition, res):
-    """Tests ValidationRule for various cases."""
+def test_equals_rule(data, field, test_value, res):
+    """Tests ValidationCondition for various cases."""
     combiner = Mock(spec_set=DataCombiner, get_value=lambda field_: data[field_])
-    rule = ValidationRule(
-        'error_key', field, op, condition=condition
-    )
+    condition = EqualsRule(field, test_value)
+    assert condition(combiner) == res
+
+
+@pytest.mark.parametrize('rule_res,when_res,res', (
+    (True, True, True),
+    (False, True, False),
+    (True, False, True),
+    (False, False, True),
+))
+def test_conditional_rule(rule_res, when_res, res):
+    """Tests ValidationRule for various cases."""
+    combiner = Mock(spec_set=DataCombiner)
+    rule = Mock(spec_set=OperatorRule)
+    rule.return_value = rule_res
+    condition = Mock(spec=OperatorRule)
+    condition.return_value = when_res
+    rule = ConditionalRule(rule, when=condition)
     assert rule(combiner) == res
 
 
 def _make_stub_rule(field, return_value):
-    return Mock(return_value=return_value, error_key='error', rule=Mock(field=field))
+    return Mock(return_value=return_value, field=field, error_key='error')
 
 
 class TestRulesBasedValidator:
