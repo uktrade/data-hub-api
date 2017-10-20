@@ -7,7 +7,7 @@ from ..models import Contact as ESContact
 pytestmark = pytest.mark.django_db
 
 
-def test_contact_dbmodel_to_dict():
+def test_contact_dbmodel_to_dict(setup_es):
     """Tests conversion of db model to dict."""
     contact = ContactFactory()
 
@@ -28,7 +28,7 @@ def test_contact_dbmodel_to_dict():
     assert set(result.keys()) == keys
 
 
-def test_contact_dbmodels_to_es_documents():
+def test_contact_dbmodels_to_es_documents(setup_es):
     """Tests conversion of db models to Elasticsearch documents."""
     contacts = ContactFactory.create_batch(2)
 
@@ -37,7 +37,7 @@ def test_contact_dbmodels_to_es_documents():
     assert len(list(result)) == len(contacts)
 
 
-def test_contact_dbmodels_to_es_documents_without_country():
+def test_contact_dbmodels_to_es_documents_without_country(setup_es):
     """
     Tests conversion of db models to Elasticsearch documents when
     country is None.

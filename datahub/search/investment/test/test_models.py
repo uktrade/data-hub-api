@@ -7,7 +7,7 @@ from ..models import InvestmentProject as ESInvestmentProject
 pytestmark = pytest.mark.django_db
 
 
-def test_investment_project_to_dict():
+def test_investment_project_to_dict(setup_es):
     """Tests conversion of db model to dict."""
     project = InvestmentProjectFactory()
     result = ESInvestmentProject.dbmodel_to_dict(project)
@@ -93,7 +93,7 @@ def test_investment_project_to_dict():
     assert set(result.keys()) == keys
 
 
-def test_investment_project_dbmodels_to_es_documents():
+def test_investment_project_dbmodels_to_es_documents(setup_es):
     """Tests conversion of db models to Elasticsearch documents."""
     projects = InvestmentProjectFactory.create_batch(2)
 

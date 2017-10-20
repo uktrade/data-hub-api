@@ -9,7 +9,7 @@ from ..models import Order as ESOrder
 pytestmark = pytest.mark.django_db
 
 
-def test_order_to_dict():
+def test_order_to_dict(setup_es):
     """Test converting an order to dict."""
     order = OrderFactory()
     OrderSubscriberFactory.create_batch(2, order=order)
@@ -109,7 +109,7 @@ def test_order_to_dict():
     }
 
 
-def test_orders_to_es_documents():
+def test_orders_to_es_documents(setup_es):
     """Test converting 2 orders to Elasticsearch documents."""
     orders = OrderFactory.create_batch(2)
 
