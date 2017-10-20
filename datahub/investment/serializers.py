@@ -21,7 +21,6 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
     investment_type = NestedRelatedField(meta_models.InvestmentType)
     stage = NestedRelatedField(meta_models.InvestmentProjectStage, required=False)
     country_lost_to = NestedRelatedField(meta_models.Country, required=False, allow_null=True)
-    project_shareable = serializers.BooleanField(required=True)
     investor_company = NestedRelatedField(Company, required=True, allow_null=False)
     investor_company_country = NestedRelatedField(
         meta_models.Country, read_only=True
@@ -156,8 +155,9 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
         # DRF defaults to required=False even though this field is
         # non-nullable
         extra_kwargs = {
-            'nda_signed': {'required': True},
+            'nda_signed': {'default': False},
             'likelihood_of_landing': {'min_value': 0, 'max_value': 100},
+            'project_shareable': {'default': True},
             'archived': {'read_only': True},
             'archived_on': {'read_only': True},
             'archived_reason': {'read_only': True}
