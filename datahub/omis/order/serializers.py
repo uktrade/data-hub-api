@@ -88,6 +88,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'billing_address_county',
             'billing_address_postcode',
             'billing_address_country',
+            'archived_documents_url_path',
         )
         read_only_fields = (
             'id',
@@ -108,6 +109,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'subtotal_cost',
             'vat_cost',
             'total_cost',
+            'archived_documents_url_path',
         )
         validators = (
             ContactWorksAtCompanyValidator(),

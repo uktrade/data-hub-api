@@ -219,6 +219,10 @@ class Order(BaseModel):
         blank=True, editable=False,
         help_text='Legacy field. Can DIT speak to the contacts?'
     )
+    archived_documents_url_path = models.CharField(
+        max_length=MAX_LENGTH, blank=True,
+        help_text='Legacy field. Link to the archived documents for this order.'
+    )
 
     objects = OrderQuerySet.as_manager()
 
