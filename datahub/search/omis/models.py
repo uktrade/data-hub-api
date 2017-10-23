@@ -84,6 +84,7 @@ class Order(DocType, MapDBModelToDict):
         'public_token',
         'invoice',
         'payments',
+        'archived_documents_url_path',
     )
 
     SEARCH_FIELDS = (
