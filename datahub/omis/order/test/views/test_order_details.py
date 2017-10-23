@@ -131,6 +131,7 @@ class TestAddOrderDetails(APITestMixin):
                 'id': str(Country.united_kingdom.value.id),
                 'name': Country.united_kingdom.value.name
             },
+            'archived_documents_url_path': '',
         }
 
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
@@ -304,6 +305,7 @@ class TestAddOrderDetails(APITestMixin):
                 'further_info': 'lorem ipsum',
                 'existing_agents': 'lorem ipsum',
                 'permission_to_approach_contacts': 'lorem ipsum',
+                'archived_documents_url_path': '/documents/123',
             },
             format='json'
         )
@@ -313,6 +315,7 @@ class TestAddOrderDetails(APITestMixin):
         assert response.json()['further_info'] == ''
         assert response.json()['existing_agents'] == ''
         assert response.json()['permission_to_approach_contacts'] == ''
+        assert response.json()['archived_documents_url_path'] == ''
 
     @pytest.mark.parametrize(
         'vat_status',
@@ -516,6 +519,7 @@ class TestChangeOrderDetails(APITestMixin):
                 'id': str(Country.united_kingdom.value.id),
                 'name': Country.united_kingdom.value.name
             },
+            'archived_documents_url_path': '',
         }
 
     def test_fails_if_contact_not_from_company(self):
@@ -708,6 +712,7 @@ class TestChangeOrderDetails(APITestMixin):
                 'subtotal_cost': 99999,
                 'vat_cost': 99999,
                 'total_cost': 99999,
+                'archived_documents_url_path': '/documents/123'
             },
             format='json'
         )
@@ -726,6 +731,7 @@ class TestChangeOrderDetails(APITestMixin):
         assert response.json()['subtotal_cost'] != 99999
         assert response.json()['vat_cost'] != 99999
         assert response.json()['total_cost'] != 99999
+        assert not response.json()['archived_documents_url_path']
 
     @pytest.mark.parametrize(
         'disallowed_status', (
@@ -817,7 +823,9 @@ class TestViewOrderDetails(APITestMixin):
 
     def test_get(self):
         """Test getting an existing order."""
-        order = OrderFactory()
+        order = OrderFactory(
+            archived_documents_url_path='/documents/123'
+        )
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
         response = self.api_client.get(url)
@@ -889,6 +897,7 @@ class TestViewOrderDetails(APITestMixin):
                 'id': str(order.billing_address_country.pk),
                 'name': order.billing_address_country.name
             },
+            'archived_documents_url_path': order.archived_documents_url_path
         }
 
     def test_not_found(self):
