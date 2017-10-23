@@ -14,26 +14,21 @@ def test_get_basic_search_query():
                     {
                         'match_phrase': {
                             'name_keyword': {
-                                'query': 'test', 'boost': 2
+                                'query': 'test',
+                                'boost': 2
                             }
                         }
                     }, {
                         'match_phrase': {
-                            'id': {
-                                'query': 'test'
-                            }
+                            'id': 'test'
                         }
                     }, {
                         'match': {
-                            'name': {
-                                'query': 'test'
-                            }
+                            'name': 'test'
                         }
                     }, {
                         'match_phrase': {
-                            'name_trigram': {
-                                'query': 'test'
-                            }
+                            'name_trigram': 'test'
                         }
                     }, {
                         'match': {
@@ -91,7 +86,7 @@ def test_get_basic_search_query():
                         'nested': {
                             'path': 'company',
                             'query': {
-                                'match': {
+                                'match_phrase': {
                                     'company.name_trigram': 'test'
                                 }
                             }
@@ -109,7 +104,7 @@ def test_get_basic_search_query():
                         'nested': {
                             'path': 'contact',
                             'query': {
-                                'match': {
+                                'match_phrase': {
                                     'contact.name_trigram': 'test'
                                 }
                             }
@@ -181,7 +176,7 @@ def test_get_basic_search_query():
                             }
                         }
                     }, {
-                        'match': {
+                        'match_phrase': {
                             'reference_trigram': 'test'
                         }
                     }, {
@@ -252,6 +247,14 @@ def test_get_basic_search_query():
                     }, {
                         'match': {
                             'trading_address_town': 'test'
+                        }
+                    }, {
+                        'match_phrase': {
+                            'trading_name_keyword': 'test'
+                        }
+                    }, {
+                        'match_phrase': {
+                            'trading_name_trigram': 'test'
                         }
                     }, {
                         'nested': {
@@ -346,21 +349,23 @@ def test_limited_get_search_by_entity_query():
                                     }
                                 }, {
                                     'match_phrase': {
-                                        'id': {
-                                            'query': 'test'
-                                        }
+                                        'id': 'test'
                                     }
                                 }, {
                                     'match': {
-                                        'name': {
-                                            'query': 'test'
-                                        }
+                                        'name': 'test'
                                     }
                                 }, {
                                     'match_phrase': {
-                                        'name_trigram': {
-                                            'query': 'test'
-                                        }
+                                        'name_trigram': 'test'
+                                    }
+                                }, {
+                                    'match_phrase': {
+                                        'trading_name_keyword': 'test'
+                                    }
+                                }, {
+                                    'match_phrase': {
+                                        'trading_name_trigram': 'test'
                                     }
                                 }, {
                                     'nested': {
