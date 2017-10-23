@@ -36,7 +36,8 @@ def test_get_basic_search_query():
                         }
                     }, {
                         'match': {
-                            'address_2': 'test'}
+                            'address_2': 'test'
+                        }
                     }, {
                         'nested': {
                             'path': 'address_country',
