@@ -39,6 +39,7 @@ class Order(DocType, MapDBModelToDict):
     vat_cost = Integer(index=False)
     total_cost_string = Keyword()
     total_cost = Integer(copy_to=['total_cost_string'])
+    payment_due_date = Date()
 
     billing_contact_name = Text()
     billing_email = dsl_utils.SortableCaseInsensitiveKeywordText()
@@ -65,6 +66,10 @@ class Order(DocType, MapDBModelToDict):
             dict_utils.contact_or_adviser_dict(c.adviser, include_dit_team=True) for c in col.all()
         ],
         'billing_address_country': dict_utils.id_name_dict,
+    }
+
+    COMPUTED_MAPPINGS = {
+        'payment_due_date': lambda x: x.invoice.payment_due_date if x.invoice else None,
     }
 
     IGNORED_FIELDS = (

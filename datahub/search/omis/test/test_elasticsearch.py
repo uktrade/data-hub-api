@@ -2,7 +2,7 @@ import pytest
 from django.conf import settings
 from elasticsearch_dsl import Mapping
 
-from datahub.omis.order.test.factories import OrderFactory
+from datahub.omis.order.test.factories import OrderFactory, OrderWithAcceptedQuoteFactory
 
 from .. import OrderSearchApp
 from ..models import Order as ESOrder
@@ -205,6 +205,9 @@ def test_mapping(setup_es):
                     'index': False,
                     'type': 'integer'
                 },
+                'payment_due_date': {
+                    'type': 'date'
+                },
                 'po_number': {
                     'index': False,
                     'type': 'keyword'
@@ -335,9 +338,14 @@ def test_mapping(setup_es):
     }
 
 
-def test_indexed_doc(setup_es):
+@pytest.mark.parametrize(
+    'Factory',  # noqa: N803
+    (OrderFactory, OrderWithAcceptedQuoteFactory)
+)
+def test_indexed_doc(Factory, setup_es):
     """Test the ES data of an indexed order."""
-    order = OrderFactory()
+    order = Factory()
+    invoice = order.invoice
 
     doc = ESOrder.es_document(order)
     elasticsearch.bulk(actions=(doc, ), chunk_size=1)
@@ -426,6 +434,7 @@ def test_indexed_doc(setup_es):
             'vat_number': order.vat_number,
             'vat_verified': order.vat_verified,
             'net_cost': order.net_cost,
+            'payment_due_date': None if not invoice else invoice.payment_due_date.isoformat(),
             'subtotal_cost': order.subtotal_cost,
             'vat_cost': order.vat_cost,
             'total_cost': order.total_cost,

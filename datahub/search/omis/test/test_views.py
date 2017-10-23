@@ -9,8 +9,10 @@ from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.models import Order
-from datahub.omis.order.test.factories import OrderAssigneeFactory, OrderFactory, \
-    OrderSubscriberFactory
+from datahub.omis.order.test.factories import (
+    OrderAssigneeFactory, OrderFactory,
+    OrderSubscriberFactory, OrderWithAcceptedQuoteFactory
+)
 
 
 pytestmark = pytest.mark.django_db
@@ -46,7 +48,7 @@ def setup_data(setup_es):
     with freeze_time('2017-02-01 13:00:00'):
         company = CompanyFactory(name='Venus Ltd')
         contact = ContactFactory(company=company, first_name='Jenny', last_name='Cakeman')
-        order = OrderFactory(
+        order = OrderWithAcceptedQuoteFactory(
             reference='efgh',
             primary_market_id=constants.Country.france.value.id,
             assignees=[],
@@ -201,6 +203,14 @@ class TestSearchOrder(APITestMixin):
             ),
             (  # sort by delivery_date DESC
                 {'sortby': 'delivery_date:desc'},
+                ['efgh', 'abcd']
+            ),
+            (  # sort by payment_due_date ASC
+                {'sortby': 'payment_due_date:asc'},
+                ['abcd', 'efgh']
+            ),
+            (  # sort by payment_due_date DESC
+                {'sortby': 'payment_due_date:desc'},
                 ['efgh', 'abcd']
             ),
         )
