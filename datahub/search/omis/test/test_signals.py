@@ -2,8 +2,10 @@ import pytest
 
 from django.conf import settings
 
-from datahub.omis.order.test.factories import OrderAssigneeFactory, OrderFactory, \
-    OrderSubscriberFactory
+from datahub.omis.order.test.factories import (
+    OrderAssigneeFactory, OrderFactory,
+    OrderSubscriberFactory, OrderWithOpenQuoteFactory
+)
 
 from .. import OrderSearchApp
 
@@ -36,6 +38,32 @@ def test_updating_order_updates_es(setup_es):
         id=order.pk
     )
     assert result['_source']['description'] == new_description
+
+
+def test_accepting_quote_updates_es(setup_es):
+    """
+    Test that when a quote is accepted and the invoice created, the payment_due_date field
+    in ES gets updated.
+    """
+    order = OrderWithOpenQuoteFactory()
+    setup_es.indices.refresh()
+
+    result = setup_es.get(
+        index=settings.ES_INDEX,
+        doc_type=OrderSearchApp.name,
+        id=order.pk
+    )
+    assert not result['_source']['payment_due_date']
+
+    order.accept_quote(by=None)
+    setup_es.indices.refresh()
+
+    result = setup_es.get(
+        index=settings.ES_INDEX,
+        doc_type=OrderSearchApp.name,
+        id=order.pk
+    )
+    assert result['_source']['payment_due_date'] == order.invoice.payment_due_date.isoformat()
 
 
 def test_adding_subscribers_syncs_order_to_es(setup_es):
