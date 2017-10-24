@@ -23,7 +23,6 @@ from .serializers import (
 class OrderViewSet(CoreViewSetV3):
     """Order ViewSet"""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope, CrudPermission)
     required_scopes = (Scope.internal_front_end,)
     serializer_class = OrderSerializer
     queryset = Order.objects.select_related(
@@ -75,7 +74,6 @@ class PublicOrderViewSet(CoreViewSetV3):
 
     lookup_field = 'public_token'
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope, CrudPermission)
     required_scopes = (Scope.public_omis_front_end,)
     serializer_class = PublicOrderSerializer
     queryset = Order.objects.publicly_accessible(

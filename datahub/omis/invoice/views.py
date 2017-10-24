@@ -14,7 +14,6 @@ from .serializers import InvoiceSerializer
 class BaseInvoiceViewSet(BaseNestedOrderViewSet):
     """Base Invoice ViewSet."""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope, CrudPermission)
     queryset = Invoice.objects.none()
     serializer_class = InvoiceSerializer
 
