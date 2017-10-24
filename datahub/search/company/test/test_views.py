@@ -60,6 +60,26 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['trading_address_country']['id'] == united_states_id
 
+    def test_multiple_trading_address_country_filter(self, setup_data):
+        """Tests multiple trading address countries filter."""
+        term = 'abc defg'
+
+        url = reverse('api-v3:search:company')
+        united_states_id = constants.Country.united_states.value.id
+        united_kingdom_id = constants.Country.united_kingdom.value.id
+
+        response = self.api_client.post(url, {
+            'original_query': term,
+            'trading_address_country': [united_states_id, united_kingdom_id],
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert len(response.data['results']) == 2
+        country_ids = {result['trading_address_country']['id']
+                       for result in response.data['results']}
+        assert country_ids == {united_kingdom_id, united_states_id}
+
     def test_trading_name_filter(self, setup_es):
         """Tests detailed company search."""
         trading_name = 'Hello World'
@@ -79,6 +99,16 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['id'] == str(company.id)
         assert response.data['results'][0]['trading_name'] == company.alias
+
+    def test_null_filter(self, setup_es):
+        """Tests filter with null value."""
+        url = reverse('api-v3:search:company')
+
+        response = self.api_client.post(url, {
+            'uk_region': None,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_company_search_paging(self, setup_data):
         """Tests pagination of results."""

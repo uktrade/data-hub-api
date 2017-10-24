@@ -91,10 +91,6 @@ class TestSearchOrder(APITestMixin):
                 {'primary_market': constants.Country.france.value.id},
                 ['efgh']
             ),
-            (  # invalid market => no results
-                {'primary_market': 'invalid'},
-                []
-            ),
             (  # filter by a range of date for created_on
                 {
                     'created_on_before': '2017-02-02',
@@ -252,7 +248,21 @@ class TestSearchOrder(APITestMixin):
         }, format='json')
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {'non_field_errors': 'Date(s) in incorrect format.'}
+        assert response.json() == {'created_on_before': ['Date is in incorrect format.']}
+
+    def test_incorrect_primary_market_raise_validation_error(self, setup_data):
+        """
+        Test that if the primary_market is not in a valid format,
+        then the API return a validation error.
+        """
+        url = reverse('api-v3:search:order')
+
+        response = self.api_client.post(url, {
+            'primary_market': 'invalid',
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {'primary_market': ['String can not be parsed as UUID.']}
 
     def test_filter_by_assigned_to_assignee_adviser(self, setup_data):
         """Test that results can be filtered by assignee."""
