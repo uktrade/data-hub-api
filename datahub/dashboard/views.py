@@ -1,3 +1,4 @@
+from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -10,6 +11,7 @@ from .serializers import IntelligentHomepageSerializer, LimitParamSerializer
 
 class IntelligentHomepageView(APIView):
     """Return the data for the intelligent homepage."""
+    permission_classes = (IsAuthenticatedOrTokenHasScope,)
 
     required_scopes = (Scope.internal_front_end,)
     http_method_names = ['get']

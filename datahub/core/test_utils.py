@@ -3,6 +3,7 @@ from secrets import token_hex
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.test.client import Client
 from django.utils.timezone import now
 from oauth2_provider.models import AccessToken, Application
@@ -26,6 +27,9 @@ def get_test_user():
         )
         test_user.set_password('password')
         test_user.save()
+        test_user.user_permissions.set(Permission.objects.all())
+        # Because permissions are cached we need to refetch user
+        test_user = user_model.objects.get(email='Testo@Useri.com')
     return test_user
 
 
