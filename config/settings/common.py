@@ -172,7 +172,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'oauth2_provider.contrib.rest_framework.IsAuthenticatedOrTokenHasScope',
-        'datahub.permissions.CrudPermission',
+        'datahub.core.permissions.CrudPermission',
     ],
     'ORDERING_PARAM': 'sortby'
 }

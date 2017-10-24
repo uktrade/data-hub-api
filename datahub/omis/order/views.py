@@ -7,8 +7,6 @@ from rest_framework.views import APIView
 
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.oauth.scopes import Scope
-from datahub.permissions import CrudPermission
-
 from .models import Order
 from .serializers import (
     CancelOrderSerializer,
