@@ -22,7 +22,6 @@ from .serializers import (
 class CompanyViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     """Company view set V3."""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope, CrudPermission)
     required_scopes = (Scope.internal_front_end,)
     serializer_class = CompanySerializer
     queryset = Company.objects.select_related(
@@ -59,7 +58,6 @@ class CompaniesHouseCompanyViewSet(
         mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     """Companies House company read-only GET only views."""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope, CrudPermission)
     required_scopes = (Scope.internal_front_end,)
     serializer_class = CompaniesHouseCompanySerializer
     queryset = CompaniesHouseCompany.objects.select_related('registered_address_country').all()
@@ -69,7 +67,6 @@ class CompaniesHouseCompanyViewSet(
 class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     """Contact ViewSet v3."""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope, CrudPermission)
     required_scopes = (Scope.internal_front_end,)
     serializer_class = ContactSerializer
     queryset = get_contact_queryset()
@@ -110,7 +107,6 @@ class AdviserReadOnlyViewSetV1(
         mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     """Adviser GET only views."""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope, CrudPermission)
     required_scopes = (Scope.internal_front_end,)
     serializer_class = AdviserSerializer
     queryset = Advisor.objects.select_related(

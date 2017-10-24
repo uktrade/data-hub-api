@@ -28,7 +28,6 @@ class BasePaymentViewSet(BaseNestedOrderViewSet):
 class PaymentViewSet(BasePaymentViewSet):
     """Payment ViewSet."""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope, CrudPermission)
     required_scopes = (Scope.internal_front_end,)
 
     def create_list(self, request, *args, **kwargs):

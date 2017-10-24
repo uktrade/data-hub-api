@@ -45,7 +45,6 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
 
     This replaces the previous project, value, team and requirements endpoints.
     """
-    permission_classes = (IsAuthenticatedOrTokenHasScope, CrudPermission)
     required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectSerializer
     queryset = InvestmentProject.objects.select_related(
@@ -130,7 +129,6 @@ class IProjectModifiedSinceViewSet(IProjectViewSet):
 class IProjectTeamMembersViewSet(CoreViewSetV3):
     """Investment project team member views."""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope, CrudPermission)
     required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectTeamMemberSerializer
     lookup_field = 'adviser_id'
@@ -180,7 +178,6 @@ class IProjectTeamMembersViewSet(CoreViewSetV3):
 class IProjectDocumentViewSet(CoreViewSetV3):
     """Investment Project Documents ViewSet."""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope, CrudPermission)
     required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectDocumentSerializer
     queryset = IProjectDocument.objects.all()
