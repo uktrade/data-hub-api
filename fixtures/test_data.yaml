@@ -143,7 +143,7 @@
   fields:
     first_name: Johnny
     last_name: Cakeman
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611  # Venus Ltd
     primary: false
     telephone_countrycode: +44
     telephone_number: 67890123432
@@ -163,7 +163,7 @@
   fields:
     first_name: Jenny
     last_name: Cakeman
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611  # Venus Ltd
     primary: true
     telephone_countrycode: +44
     telephone_number: 67890123432
@@ -172,6 +172,43 @@
     contactable_by_dit: true
     contactable_by_dit_partners: true
     contactable_by_email: true
+    contactable_by_phone: false
+    notes: This is a dummy contact for testing
+
+- model: company.contact
+  pk: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+  fields:
+    first_name: Dean
+    last_name: Cox
+    company: 0fb3379c-341c-4da4-b825-bf8d47b26baa  # Lambda plc
+    primary: true
+    telephone_countrycode: +33
+    telephone_number: 6 39 15 95 29
+    email: dean@cox.com
+    address_same_as_company: true
+    contactable_by_dit: true
+    contactable_by_dit_partners: true
+    contactable_by_email: true
+    contactable_by_phone: false
+    notes: This is a dummy contact for testing
+
+- model: company.contact
+  pk: 048f2edc-e7ed-4881-b1cc-29142a80238a
+  fields:
+    first_name: Georgina
+    last_name: Clark
+    company: 0fb3379c-341c-4da4-b825-bf8d47b26baa  # Lambda plc
+    primary: false
+    telephone_countrycode: +33
+    telephone_number: 6 72 83 69 66
+    email: georgina@clark.com
+    address_1: 7 chemin
+    address_town: Lefevre
+    address_postcode: 15404
+    address_country: 82756b9a-5d95-e211-a939-e4115bead28a
+    contactable_by_dit: false
+    contactable_by_dit_partners: false
+    contactable_by_email: false
     contactable_by_phone: false
     notes: This is a dummy contact for testing
 
