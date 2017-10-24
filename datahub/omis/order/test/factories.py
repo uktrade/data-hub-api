@@ -98,6 +98,14 @@ class OrderWithAcceptedQuoteFactory(OrderFactory):
     status = OrderStatus.quote_accepted
 
 
+class OrderCompleteFactory(OrderWithAcceptedQuoteFactory):
+    """Factory for orders marked as paid."""
+
+    status = OrderStatus.complete
+    completed_on = factory.Faker('date_time')
+    completed_by = factory.SubFactory(AdviserFactory)
+
+
 class OrderPaidFactory(OrderWithAcceptedQuoteFactory):
     """Factory for orders marked as paid."""
 

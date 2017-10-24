@@ -132,6 +132,8 @@ class TestAddOrderDetails(APITestMixin):
                 'name': Country.united_kingdom.value.name
             },
             'archived_documents_url_path': '',
+            'completed_by': None,
+            'completed_on': None,
         }
 
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
@@ -520,6 +522,8 @@ class TestChangeOrderDetails(APITestMixin):
                 'name': Country.united_kingdom.value.name
             },
             'archived_documents_url_path': '',
+            'completed_by': None,
+            'completed_on': None,
         }
 
     def test_fails_if_contact_not_from_company(self):
@@ -712,7 +716,9 @@ class TestChangeOrderDetails(APITestMixin):
                 'subtotal_cost': 99999,
                 'vat_cost': 99999,
                 'total_cost': 99999,
-                'archived_documents_url_path': '/documents/123'
+                'archived_documents_url_path': '/documents/123',
+                'completed_by': order.created_by.pk,
+                'completed_on': now().isoformat(),
             },
             format='json'
         )
@@ -732,6 +738,8 @@ class TestChangeOrderDetails(APITestMixin):
         assert response.json()['vat_cost'] != 99999
         assert response.json()['total_cost'] != 99999
         assert not response.json()['archived_documents_url_path']
+        assert not response.json()['completed_by']
+        assert not response.json()['completed_on']
 
     @pytest.mark.parametrize(
         'disallowed_status', (
@@ -897,7 +905,9 @@ class TestViewOrderDetails(APITestMixin):
                 'id': str(order.billing_address_country.pk),
                 'name': order.billing_address_country.name
             },
-            'archived_documents_url_path': order.archived_documents_url_path
+            'archived_documents_url_path': order.archived_documents_url_path,
+            'completed_by': None,
+            'completed_on': None,
         }
 
     def test_not_found(self):

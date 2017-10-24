@@ -4,6 +4,7 @@ from django.db import models
 from rest_framework.exceptions import ValidationError
 
 from datahub.core.validate_utils import DataCombiner
+from datahub.core.validators import AbstractRule, BaseRule
 from datahub.omis.core.exceptions import Conflict
 
 from .constants import VATStatus
@@ -370,3 +371,45 @@ class AddressValidator:
         errors = self._validate_fields(data_combined)
         if errors:
             raise ValidationError(errors)
+
+
+class OrderInStatusRule(AbstractRule):
+    """Rule for checking that an order is in the expected state."""
+
+    def __init__(self, order_status):
+        """Initialise the rule."""
+        self.order_status = order_status
+
+    @property
+    def field(self):
+        """Field property not needed."""
+        return None
+
+    def __call__(self, combiner):
+        """Check that order is in the expected state."""
+        order = combiner.serializer.context['order']
+        return order.status == self.order_status
+
+
+class AssigneeExistsRule(BaseRule):
+    """Rule for checking that the adviser (value) is assigned to the order."""
+
+    def __call__(self, combiner):
+        """Check that the adviser (value) is an order assignee."""
+        order = combiner.serializer.context['order']
+        value = combiner.get_value(self.field)
+
+        return order.assignees.filter(adviser=value).exists()
+
+
+class ForceDeleteRule(BaseRule):
+    """Rule for checking that the force_delete flag has the expected value."""
+
+    def __init__(self, field, value):
+        """Initialise the rule."""
+        super().__init__(field)
+        self.value = value
+
+    def __call__(self, combiner):
+        """Check that the force_delete flag has the expected value."""
+        return combiner.serializer.context.get('force_delete', False) == self.value
