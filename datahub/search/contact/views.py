@@ -1,3 +1,6 @@
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
+
 from datahub.oauth.scopes import Scope
 from .models import Contact
 from .serializers import SearchContactSerializer
@@ -26,9 +29,13 @@ class SearchContactParams:
     }
 
 
-class SearchContactAPIView(SearchContactParams, SearchAPIView):
+class SearchContactAPIView(SearchContactParams, SearchAPIView, PermissionRequiredMixin):
     """Filtered contact search view."""
+    permission_required = 'company.read_contact'
+    permission_classes = (IsAuthenticatedOrTokenHasScope,)
 
 
-class SearchContactExportAPIView(SearchContactParams, SearchExportAPIView):
+class SearchContactExportAPIView(SearchContactParams, SearchExportAPIView, PermissionRequiredMixin):
     """Filtered contact search export view."""
+    permission_required = 'company.read_contact'
+    permission_classes = (IsAuthenticatedOrTokenHasScope,)

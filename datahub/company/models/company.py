@@ -126,6 +126,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
 
     class Meta:
         verbose_name_plural = 'companies'
+        permissions = (("read_company", "Can read company"),)
 
     @property
     def uk_based(self):
@@ -215,3 +216,4 @@ class CompaniesHouseCompany(CompanyAbstract):
 
     class Meta:
         verbose_name_plural = 'Companies House companies'
+        permissions = (("read_companieshousecompany", "Can read company house company"),)

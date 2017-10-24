@@ -1,9 +1,11 @@
+from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
 from rest_framework.response import Response
 
 from datahub.oauth.scopes import Scope
 from datahub.omis.order.models import Order
 from datahub.omis.order.views import BaseNestedOrderViewSet
+from datahub.permissions import CrudPermission
 
 from .models import Payment
 from .serializers import PaymentSerializer
@@ -26,6 +28,7 @@ class BasePaymentViewSet(BaseNestedOrderViewSet):
 class PaymentViewSet(BasePaymentViewSet):
     """Payment ViewSet."""
 
+    permission_classes = (IsAuthenticatedOrTokenHasScope, CrudPermission)
     required_scopes = (Scope.internal_front_end,)
 
     def create_list(self, request, *args, **kwargs):

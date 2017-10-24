@@ -1,4 +1,5 @@
 from django.http import Http404
+from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -6,6 +7,7 @@ from rest_framework.views import APIView
 
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.oauth.scopes import Scope
+from datahub.permissions import CrudPermission
 
 from .models import Order
 from .serializers import (
@@ -21,6 +23,7 @@ from .serializers import (
 class OrderViewSet(CoreViewSetV3):
     """Order ViewSet"""
 
+    permission_classes = (IsAuthenticatedOrTokenHasScope, CrudPermission)
     required_scopes = (Scope.internal_front_end,)
     serializer_class = OrderSerializer
     queryset = Order.objects.select_related(
@@ -72,6 +75,7 @@ class PublicOrderViewSet(CoreViewSetV3):
 
     lookup_field = 'public_token'
 
+    permission_classes = (IsAuthenticatedOrTokenHasScope, CrudPermission)
     required_scopes = (Scope.public_omis_front_end,)
     serializer_class = PublicOrderSerializer
     queryset = Order.objects.publicly_accessible(
@@ -85,6 +89,7 @@ class PublicOrderViewSet(CoreViewSetV3):
 class SubscriberListView(APIView):
     """API View for advisers subscribed to an order."""
 
+    permission_classes = (IsAuthenticatedOrTokenHasScope,)
     required_scopes = (Scope.internal_front_end,)
 
     def get_order(self, order_pk):
@@ -138,6 +143,7 @@ class SubscriberListView(APIView):
 class AssigneeView(APIView):
     """API View for advisers assigned to an order."""
 
+    permission_classes = (IsAuthenticatedOrTokenHasScope,)
     FORCE_DELETE_PARAM = 'force-delete'
     required_scopes = (Scope.internal_front_end,)
 

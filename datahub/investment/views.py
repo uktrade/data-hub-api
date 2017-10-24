@@ -5,6 +5,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters import IsoDateTimeFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
+from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
 from rest_framework.filters import OrderingFilter
 from rest_framework.pagination import BasePagination
@@ -23,6 +24,7 @@ from datahub.investment.serializers import (
     UploadStatusSerializer
 )
 from datahub.oauth.scopes import Scope
+from datahub.permissions import CrudPermission
 
 _team_member_queryset = InvestmentProjectTeamMember.objects.select_related('adviser')
 
@@ -43,7 +45,7 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
 
     This replaces the previous project, value, team and requirements endpoints.
     """
-
+    permission_classes = (IsAuthenticatedOrTokenHasScope, CrudPermission)
     required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectSerializer
     queryset = InvestmentProject.objects.select_related(
@@ -128,6 +130,7 @@ class IProjectModifiedSinceViewSet(IProjectViewSet):
 class IProjectTeamMembersViewSet(CoreViewSetV3):
     """Investment project team member views."""
 
+    permission_classes = (IsAuthenticatedOrTokenHasScope, CrudPermission)
     required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectTeamMemberSerializer
     lookup_field = 'adviser_id'
@@ -177,6 +180,7 @@ class IProjectTeamMembersViewSet(CoreViewSetV3):
 class IProjectDocumentViewSet(CoreViewSetV3):
     """Investment Project Documents ViewSet."""
 
+    permission_classes = (IsAuthenticatedOrTokenHasScope, CrudPermission)
     required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectDocumentSerializer
     queryset = IProjectDocument.objects.all()

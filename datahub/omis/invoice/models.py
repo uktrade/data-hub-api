@@ -35,6 +35,9 @@ class Invoice(BaseModel):
 
     objects = InvoiceManager()
 
+    class Meta:
+        permissions = (('read_invoice', 'Can read invoice'),)
+
     def __str__(self):
         """Human-readable representation"""
         return self.invoice_number

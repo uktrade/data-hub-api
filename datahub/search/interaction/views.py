@@ -1,3 +1,5 @@
+from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
+
 from datahub.oauth.scopes import Scope
 from .models import Interaction
 from .serializers import SearchInteractionSerializer
@@ -41,7 +43,11 @@ class SearchInteractionParams:
 
 class SearchInteractionAPIView(SearchInteractionParams, SearchAPIView):
     """Filtered interaction search view."""
+    permission_required = 'interaction.read_interaction'
+    permission_classes = (IsAuthenticatedOrTokenHasScope,)
 
 
 class SearchInteractionExportAPIView(SearchInteractionParams, SearchExportAPIView):
     """Filtered interaction search export view."""
+    permission_required = 'company.read_company'
+    permission_classes = (IsAuthenticatedOrTokenHasScope,)
