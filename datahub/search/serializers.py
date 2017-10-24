@@ -1,6 +1,52 @@
+from uuid import UUID
+
+from dateutil.parser import parse as dateutil_parse
 from rest_framework import serializers
 from rest_framework.settings import api_settings
+
 from datahub.search.elasticsearch import MAX_RESULTS
+
+
+class DateTimeyField(serializers.Field):
+    """String Date time field."""
+
+    default_error_messages = {
+        'invalid': 'Date is in incorrect format.'
+    }
+
+    def to_internal_value(self, data):
+        """Parses data into datetime."""
+        try:
+            data = dateutil_parse(data)
+        except ValueError:
+            self.fail('invalid', value=data)
+        return data
+
+
+class SingleOrListField(serializers.ListField):
+    """Field can be single instance or list."""
+
+    def to_internal_value(self, data):
+        """If data is str, creates a list."""
+        if isinstance(data, str):
+            data = [data]
+        return super().to_internal_value(data)
+
+
+class StringUUIDField(serializers.Field):
+    """String UUID field."""
+
+    default_error_messages = {
+        'invalid': 'String can not be parsed as UUID.'
+    }
+
+    def to_internal_value(self, data):
+        """Checks if data is UUID."""
+        try:
+            UUID(hex=data)
+        except ValueError:
+            self.fail('invalid', value=data)
+        return data
 
 
 class LimitOffsetSerializer(serializers.Serializer):

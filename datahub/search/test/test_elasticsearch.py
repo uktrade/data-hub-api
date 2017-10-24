@@ -81,7 +81,7 @@ def test_remap_sort_field():
 
 def test_date_range_fields():
     """Tests date range fields."""
-    now = '2017-06-13T09:44:31.062870'
+    now = datetime.datetime(2017, 6, 13, 9, 44, 31, 62870)
     fields = {
         'estimated_land_date_after': now,
         'estimated_land_date_before': now,
@@ -95,8 +95,8 @@ def test_date_range_fields():
     }
     assert ranges == {
         'estimated_land_date': {
-            'gte': datetime.datetime(2017, 6, 13, 9, 44, 31, 62870),
-            'lte': datetime.datetime(2017, 6, 13, 9, 44, 31, 62870)
+            'gte': now,
+            'lte': now
         }
     }
 
