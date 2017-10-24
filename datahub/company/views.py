@@ -2,7 +2,6 @@
 from django.db.models import Prefetch
 from django_filters import FilterSet
 from django_filters.rest_framework import DjangoFilterBackend
-from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import mixins, viewsets
 from rest_framework.filters import OrderingFilter
 
@@ -11,7 +10,6 @@ from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.investment.queryset import get_slim_investment_project_queryset
 from datahub.oauth.scopes import Scope
-from datahub.permissions import CrudPermission
 from .models import Advisor, CompaniesHouseCompany, Company, Contact
 from .queryset import get_contact_queryset
 from .serializers import (

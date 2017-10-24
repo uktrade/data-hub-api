@@ -5,7 +5,6 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters import IsoDateTimeFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
-from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
 from rest_framework.filters import OrderingFilter
 from rest_framework.pagination import BasePagination
@@ -24,7 +23,6 @@ from datahub.investment.serializers import (
     UploadStatusSerializer
 )
 from datahub.oauth.scopes import Scope
-from datahub.permissions import CrudPermission
 
 _team_member_queryset = InvestmentProjectTeamMember.objects.select_related('adviser')
 
