@@ -1,7 +1,7 @@
 import pytest
 
 from datahub.omis.order.test.factories import (
-    OrderAssigneeFactory, OrderFactory,
+    OrderAssigneeFactory, OrderCompleteFactory, OrderFactory,
     OrderSubscriberFactory, OrderWithAcceptedQuoteFactory
 )
 
@@ -12,7 +12,7 @@ pytestmark = pytest.mark.django_db
 
 @pytest.mark.parametrize(
     'Factory',  # noqa: N803
-    (OrderFactory, OrderWithAcceptedQuoteFactory)
+    (OrderCompleteFactory, OrderFactory, OrderWithAcceptedQuoteFactory)
 )
 def test_order_to_dict(Factory, setup_es):
     """Test converting an order to dict."""
@@ -113,6 +113,13 @@ def test_order_to_dict(Factory, setup_es):
             'id': str(order.billing_address_country.pk),
             'name': order.billing_address_country.name
         },
+        'completed_by': {
+            'id': str(order.completed_by.pk),
+            'first_name': order.completed_by.first_name,
+            'last_name': order.completed_by.last_name,
+            'name': order.completed_by.name
+        } if order.completed_by else None,
+        'completed_on': order.completed_on,
     }
 
 

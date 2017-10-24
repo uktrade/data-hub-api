@@ -10,7 +10,7 @@ class DataCombiner:
     will only contain data for fields being updated).
     """
 
-    def __init__(self, instance, update_data):
+    def __init__(self, instance, update_data, serializer=None):
         """Initialises the combiner."""
         if instance is None and update_data is None:
             raise TypeError('One of instance and update_data must be provided '
@@ -21,6 +21,7 @@ class DataCombiner:
 
         self.instance = instance
         self.data = update_data
+        self.serializer = serializer
 
     def get_value(self, field_name):
         """Returns the value of a standard field."""

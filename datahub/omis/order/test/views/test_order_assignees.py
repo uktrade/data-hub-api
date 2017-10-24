@@ -5,7 +5,7 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import APITestMixin
 
-from ..factories import OrderAssigneeFactory, OrderFactory
+from ..factories import OrderAssigneeFactory, OrderFactory, OrderPaidFactory
 from ...constants import OrderStatus
 from ...models import OrderAssignee
 from ...views import AssigneeView
@@ -59,6 +59,7 @@ class TestGetOrderAssignees(APITestMixin):
                     'name': adviser.name
                 },
                 'estimated_time': (120 * i),
+                'actual_time': None,
                 'is_lead': False
             }
             for i, adviser in enumerate(advisers[:2])
@@ -75,8 +76,14 @@ class TestGetOrderAssignees(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-class TestChangeOrderAssignees(APITestMixin):
-    """Tests related to changing who is assigned to an order."""
+class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
+    """
+    Tests related to changing who is assigned to an order when the order is in draft.
+
+    - assignees can be added, removed and partially changed
+    - only `estimated_time` and `is_lead` can be set/changed
+    - `actual_time` cannot be set at this stage
+    """
 
     def test_add_change(self):
         """
@@ -106,16 +113,12 @@ class TestChangeOrderAssignees(APITestMixin):
         if I pass the following data:
             [
                 {
-                    "adviser": {
-                        "id": 1
-                    },
+                    "adviser": {"id": 1},
                     "estimated_time": 200,
                     "is_lead": false
                 },
                 {
-                    "adviser": {
-                        "id": 3
-                    },
+                    "adviser": {"id": 3},
                     "estimated_time": 250,
                     "is_lead": true
                 },
@@ -151,16 +154,12 @@ class TestChangeOrderAssignees(APITestMixin):
             url,
             [
                 {
-                    'adviser': {
-                        'id': adviser1.id,
-                    },
+                    'adviser': {'id': adviser1.id},
                     'estimated_time': 200,
                     'is_lead': False
                 },
                 {
-                    'adviser': {
-                        'id': adviser3.id,
-                    },
+                    'adviser': {'id': adviser3.id},
                     'estimated_time': 250,
                     'is_lead': True
                 }
@@ -178,6 +177,7 @@ class TestChangeOrderAssignees(APITestMixin):
                     'name': adviser1.name,
                 },
                 'estimated_time': 200,
+                'actual_time': None,
                 'is_lead': False
             },
             {
@@ -188,6 +188,7 @@ class TestChangeOrderAssignees(APITestMixin):
                     'name': adviser2.name,
                 },
                 'estimated_time': assignee2.estimated_time,
+                'actual_time': None,
                 'is_lead': False
             },
             {
@@ -198,6 +199,7 @@ class TestChangeOrderAssignees(APITestMixin):
                     'name': adviser3.name,
                 },
                 'estimated_time': 250,
+                'actual_time': None,
                 'is_lead': True
             },
         ]
@@ -244,18 +246,14 @@ class TestChangeOrderAssignees(APITestMixin):
                 },
             ]
 
-        if I pass the following data:
+        if I pass the following data with force_delete True:
             [
                 {
-                    "adviser": {
-                        "id": 1
-                    },
+                    "adviser": {"id": 1},
                     "estimated_time": 200
                 },
                 {
-                    "adviser": {
-                        "id": 3
-                    },
+                    "adviser": {"id": 3},
                     "estimated_time": 250
                 },
             ]
@@ -279,15 +277,11 @@ class TestChangeOrderAssignees(APITestMixin):
             f'{url}?{AssigneeView.FORCE_DELETE_PARAM}=1',
             [
                 {
-                    'adviser': {
-                        'id': adviser1.id,
-                    },
+                    'adviser': {'id': adviser1.id},
                     'estimated_time': 200
                 },
                 {
-                    'adviser': {
-                        'id': adviser3.id,
-                    },
+                    'adviser': {'id': adviser3.id},
                     'estimated_time': 250
                 }
             ],
@@ -327,11 +321,7 @@ class TestChangeOrderAssignees(APITestMixin):
         if I pass the following data:
             [
                 {
-                    "adviser": {
-                        "id": 1,
-                        "first_name": "Joe",
-                        "last_name": "Doe",
-                    },
+                    "adviser": {"id": 1},
                     "estimated_time": 100,
                     "is_lead": true
                 },
@@ -359,9 +349,7 @@ class TestChangeOrderAssignees(APITestMixin):
             url,
             [
                 {
-                    'adviser': {
-                        'id': adviser1.id,
-                    },
+                    'adviser': {'id': adviser1.id},
                     'estimated_time': assignee1.estimated_time,
                     'is_lead': assignee1.is_lead
                 }
@@ -375,7 +363,7 @@ class TestChangeOrderAssignees(APITestMixin):
         assert assignee1.created_by == created_by
         assert assignee1.modified_by == created_by
 
-    def test_validation_error_doesnt_commit_changes(self):
+    def test_400_doesnt_commit_changes(self):
         """
         Tests that:
         Given an order with the following assignees:
@@ -403,21 +391,15 @@ class TestChangeOrderAssignees(APITestMixin):
         if I pass the following data:
             [
                 {
-                    "adviser": {
-                        "id": 1
-                    },
+                    "adviser": {"id": 1},
                     "estimated_time": 200
                 },
                 {
-                    "adviser": {
-                        "id": 3
-                    },
+                    "adviser": {"id": 3},
                     "estimated_time": 250
                 },
                 {
-                    "adviser": {
-                        "id": non-existent
-                    },
+                    "adviser": {"id": non-existent},
                     "estimated_time": 250
                 },
             ]
@@ -443,23 +425,17 @@ class TestChangeOrderAssignees(APITestMixin):
             url,
             [
                 {
-                    'adviser': {
-                        'id': adviser1.id,
-                    },
+                    'adviser': {'id': adviser1.id},
                     'estimated_time': 200,
                     'is_lead': False
                 },
                 {
-                    'adviser': {
-                        'id': adviser3.id,
-                    },
+                    'adviser': {'id': adviser3.id},
                     'estimated_time': 250,
                     'is_lead': True
                 },
                 {
-                    'adviser': {
-                        'id': '00000000-0000-0000-0000-000000000000',
-                    },
+                    'adviser': {'id': '00000000-0000-0000-0000-000000000000'},
                     'estimated_time': 300
                 },
             ],
@@ -497,23 +473,17 @@ class TestChangeOrderAssignees(APITestMixin):
         Given an order with the following assignees:
             [
                 {
-                    "adviser": {
-                        "id": 1
-                    },
+                    "adviser": {"id": 1},
                     ...
                     "is_lead": true
                 },
                 {
-                    "adviser": {
-                        "id": 2
-                    },
+                    "adviser": {"id": 2},
                     ...
                     "is_lead": false
                 },
                 {
-                    "adviser": {
-                        "id": 3
-                    },
+                    "adviser": {"id": 3},
                     ...
                     "is_lead": false
                 },
@@ -522,21 +492,15 @@ class TestChangeOrderAssignees(APITestMixin):
         if I pass the following data:
             [
                 {
-                    "adviser": {
-                        "id": 2
-                    },
+                    "adviser": {"id": 2},
                     "is_lead": true
                 },
                 {
-                    "adviser": {
-                        "id": 3
-                    },
+                    "adviser": {"id": 3},
                     "estimated_time": 0
                 },
                 {
-                    "adviser": {
-                        "id": 4
-                    },
+                    "adviser": {"id": 4},
                     "estimated_time": 0
                 },
             ]
@@ -562,21 +526,15 @@ class TestChangeOrderAssignees(APITestMixin):
             url,
             [
                 {
-                    'adviser': {
-                        'id': adviser2.id,
-                    },
+                    'adviser': {'id': adviser2.id},
                     'is_lead': True
                 },
                 {
-                    'adviser': {
-                        'id': adviser3.id,
-                    },
+                    'adviser': {'id': adviser3.id},
                     'estimated_time': 0
                 },
                 {
-                    'adviser': {
-                        'id': adviser4.id,
-                    },
+                    'adviser': {'id': adviser4.id},
                     'estimated_time': 0
                 },
             ],
@@ -590,12 +548,11 @@ class TestChangeOrderAssignees(APITestMixin):
         'disallowed_status', (
             OrderStatus.quote_awaiting_acceptance,
             OrderStatus.quote_accepted,
-            OrderStatus.paid,
             OrderStatus.complete,
             OrderStatus.cancelled,
         )
     )
-    def test_409_if_order_not_in_draft(self, disallowed_status):
+    def test_409_if_order_not_in_allowed_status(self, disallowed_status):
         """
         Test that if the order is not in one of the allowed statuses, the endpoint
         returns 409.
@@ -609,9 +566,7 @@ class TestChangeOrderAssignees(APITestMixin):
         response = self.api_client.patch(
             url,
             [{
-                'adviser': {
-                    'id': AdviserFactory().id,
-                }
+                'adviser': {'id': AdviserFactory().id}
             }],
             format='json'
         )
@@ -622,4 +577,291 @@ class TestChangeOrderAssignees(APITestMixin):
                 'The action cannot be performed '
                 f'in the current status {OrderStatus[disallowed_status]}.'
             )
+        }
+
+    def test_400_if_actual_time_changed(self):
+        """
+        Test that the `actual_time` field cannot be set when the order is in draft.
+        """
+        order = OrderFactory(assignees=[])
+        OrderAssigneeFactory(order=order, estimated_time=100, is_lead=True)
+        assignee2 = OrderAssigneeFactory(order=order, estimated_time=250, is_lead=False)
+
+        url = reverse(
+            'api-v3:omis:order:assignee',
+            kwargs={'order_pk': order.id}
+        )
+        response = self.api_client.patch(
+            url,
+            [
+                {
+                    'adviser': {'id': assignee2.adviser.id},
+                    'actual_time': 200,
+                },
+            ],
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == [
+            {
+                'actual_time': [
+                    'This field cannot be changed at this stage.'
+                ]
+            }
+        ]
+
+
+class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
+    """
+    Tests related to changing order assignees when order in paid.
+
+    - assignees cannot be added or removed
+    - `estimated_time` and `is_lead` cannot be changed
+    - only `actual_time` can be set at this stage
+    """
+
+    def test_set_actual_time(self):
+        """
+        Tests that:
+        Given an order with the following assignees:
+            [
+                {
+                    "adviser": {"id": 1},
+                    "estimated_time": 100,
+                    "is_lead": true
+                },
+                {
+                    "adviser": {"id": 2},
+                    "estimated_time": 250,
+                    "is_lead": false
+                },
+            ]
+
+        if I pass the following data:
+            [
+                {
+                    "adviser": {"id": 2},
+                    "actual_time": 220
+                },
+            ]
+
+        then:
+            adviser 2 gets updated
+        """
+        order = OrderPaidFactory(assignees=[])
+        assignee1 = OrderAssigneeFactory(order=order, estimated_time=100, is_lead=True)
+        assignee2 = OrderAssigneeFactory(order=order, estimated_time=250, is_lead=False)
+
+        url = reverse(
+            'api-v3:omis:order:assignee',
+            kwargs={'order_pk': order.id}
+        )
+        response = self.api_client.patch(
+            url,
+            [
+                {
+                    'adviser': {'id': assignee2.adviser.id},
+                    'actual_time': 220
+                },
+            ],
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == [
+            {
+                'adviser': {
+                    'id': str(assignee1.adviser.id),
+                    'first_name': assignee1.adviser.first_name,
+                    'last_name': assignee1.adviser.last_name,
+                    'name': assignee1.adviser.name,
+                },
+                'estimated_time': assignee1.estimated_time,
+                'actual_time': None,
+                'is_lead': assignee1.is_lead
+            },
+            {
+                'adviser': {
+                    'id': str(assignee2.adviser.id),
+                    'first_name': assignee2.adviser.first_name,
+                    'last_name': assignee2.adviser.last_name,
+                    'name': assignee2.adviser.name,
+                },
+                'estimated_time': assignee2.estimated_time,
+                'actual_time': 220,
+                'is_lead': assignee2.is_lead
+            }
+        ]
+
+    def test_400_if_readonly_fields_changed(self):
+        """
+        Tests that:
+        Given an order with the following assignees:
+            [
+                {
+                    "adviser": {"id": 1},
+                    "estimated_time": 100,
+                    "is_lead": true
+                },
+                {
+                    "adviser": {"id": 2},
+                    "estimated_time": 250,
+                    "is_lead": false
+                },
+            ]
+
+        if I pass the following data:
+            [
+                {
+                    "adviser": {"id": 1},
+                    "estimated_time": 120
+                },
+                {
+                    "adviser": {"id": 2},
+                    "is_lead": true
+                },
+            ]
+
+        then:
+            the response returns a validation error as `estimated_time` and `is_lead`
+            cannot be changed when order.status is paid.
+        """
+        order = OrderPaidFactory(assignees=[])
+        assignee1, assignee2 = OrderAssigneeFactory.create_batch(2, order=order)
+
+        url = reverse(
+            'api-v3:omis:order:assignee',
+            kwargs={'order_pk': order.id}
+        )
+        response = self.api_client.patch(
+            url,
+            [
+                {
+                    'adviser': {'id': assignee1.adviser.id},
+                    'estimated_time': 120
+                },
+                {
+                    'adviser': {'id': assignee2.adviser.id},
+                    'is_lead': True
+                },
+            ],
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == [
+            {
+                'estimated_time': [
+                    'This field cannot be changed at this stage.'
+                ]
+            },
+            {
+                'is_lead': [
+                    'This field cannot be changed at this stage.'
+                ]
+            },
+        ]
+
+    def test_400_if_assignee_added(self):
+        """
+        Tests that:
+        Given an order with the following assignees:
+            [
+                {
+                    "adviser": {"id": 1},
+                    "estimated_time": 100,
+                    "is_lead": true
+                },
+                {
+                    "adviser": {"id": 2},
+                    "estimated_time": 250,
+                    "is_lead": false
+                },
+            ]
+
+        if I pass the following data:
+            [
+                {
+                    "adviser": {"id": 3},
+                },
+            ]
+
+        then:
+            the response returns a validation error as no more assignees can be added.
+        """
+        order = OrderPaidFactory()
+
+        url = reverse(
+            'api-v3:omis:order:assignee',
+            kwargs={'order_pk': order.id}
+        )
+        response = self.api_client.patch(
+            url,
+            [
+                {
+                    'adviser': {'id': AdviserFactory().id},
+                },
+            ],
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == [
+            {
+                'adviser': [
+                    'You cannot add any more assignees at this stage.'
+                ]
+            }
+        ]
+
+    def test_400_if_assignee_deleted(self):
+        """
+        Tests that:
+        Given an order with the following assignees:
+            [
+                {
+                    "adviser": {"id": 1},
+                    "estimated_time": 100,
+                    "is_lead": true
+                },
+                {
+                    "adviser": {"id": 2},
+                    "estimated_time": 250,
+                    "is_lead": false
+                },
+            ]
+
+        if I pass the following data with force_delete == True
+            [
+                {
+                    "adviser": {"id": 1},
+                },
+            ]
+
+        then:
+            the response returns a validation error as no assignee can be deleted.
+        """
+        order = OrderPaidFactory(assignees=[])
+        assignee = OrderAssigneeFactory(order=order)
+
+        url = reverse(
+            'api-v3:omis:order:assignee',
+            kwargs={'order_pk': order.id}
+        )
+        response = self.api_client.patch(
+            f'{url}?{AssigneeView.FORCE_DELETE_PARAM}=1',
+            [
+                {
+                    'adviser': {'id': assignee.adviser.id},
+                },
+            ],
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'non_field_errors': [
+                'You cannot delete any assignees at this stage.'
+            ]
         }

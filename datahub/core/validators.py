@@ -252,7 +252,11 @@ class RulesBasedValidator:
         Called by DRF.
         """
         errors = {}
-        combiner = DataCombiner(instance=self._serializer.instance, update_data=data)
+        combiner = DataCombiner(
+            instance=self._serializer.instance,
+            update_data=data,
+            serializer=self._serializer
+        )
         for rule in self._rules:
             if not rule(combiner):
                 errors[rule.field] = self._serializer.error_messages[rule.error_key]
