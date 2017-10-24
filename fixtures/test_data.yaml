@@ -3,7 +3,7 @@
   fields:
     company_number: 99919
     name: Mercury Ltd
-    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    business_type: 6f75408b-03e7-e611-bca1-e4115bead28a  # Private Limited Company
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     export_to_countries:
