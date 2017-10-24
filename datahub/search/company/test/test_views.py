@@ -63,7 +63,7 @@ class TestSearch(APITestMixin):
     def test_trading_name_filter(self, setup_es):
         """Tests detailed company search."""
         trading_name = 'Hello World'
-        CompanyFactory(
+        company = CompanyFactory(
             alias=trading_name
         )
         setup_es.indices.refresh()
@@ -77,7 +77,8 @@ class TestSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
-        assert response.data['results'][0]['trading_name'] == trading_name
+        assert response.data['results'][0]['id'] == str(company.id)
+        assert response.data['results'][0]['trading_name'] == company.alias
 
     def test_company_search_paging(self, setup_data):
         """Tests pagination of results."""
