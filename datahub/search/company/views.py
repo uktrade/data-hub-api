@@ -13,7 +13,7 @@ class SearchCompanyParams:
 
     FILTER_FIELDS = (
         'account_manager',
-        'alias',
+        'trading_name',
         'description',
         'export_to_country',
         'future_interest_country',
@@ -27,6 +27,7 @@ class SearchCompanyParams:
     )
 
     REMAP_FIELDS = {
+        'trading_name': 'trading_name_trigram',
         'account_manager': 'account_manager.id',
         'export_to_country': 'export_to_countries.id',
         'future_interest_country': 'future_interest_countries.id',
