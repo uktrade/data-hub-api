@@ -6,7 +6,7 @@ from rest_framework.exceptions import ValidationError
 
 from datahub.company.models import Advisor, Company, Contact
 from datahub.company.serializers import NestedAdviserField
-from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
+from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import DataCombiner, is_blank
 from datahub.core.validators import OperatorRule, RulesBasedValidator, ValidationRule
 from datahub.metadata.models import Country, Sector, Team
@@ -22,12 +22,6 @@ from .validators import (
     OrderInStatusValidator,
     ReadonlyAfterCreationValidator,
 )
-
-
-class ServiceTypeSerializer(ConstantModelSerializer):
-    """Service Type DRF serializer"""
-
-    disabled_on = serializers.ReadOnlyField()
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -97,6 +91,9 @@ class OrderSerializer(serializers.ModelSerializer):
             'archived_documents_url_path',
             'completed_by',
             'completed_on',
+            'cancelled_by',
+            'cancelled_on',
+            'cancellation_reason',
         )
         read_only_fields = (
             'id',
@@ -120,6 +117,9 @@ class OrderSerializer(serializers.ModelSerializer):
             'archived_documents_url_path',
             'completed_by',
             'completed_on',
+            'cancelled_by',
+            'cancelled_on',
+            'cancellation_reason',
         )
         validators = (
             ContactWorksAtCompanyValidator(),

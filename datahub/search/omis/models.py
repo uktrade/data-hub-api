@@ -42,6 +42,9 @@ class Order(DocType, MapDBModelToDict):
     payment_due_date = Date()
     completed_by = dsl_utils.contact_or_adviser_mapping('completed_by')
     completed_on = Date()
+    cancelled_by = dsl_utils.contact_or_adviser_mapping('cancelled_by')
+    cancelled_on = Date()
+    cancellation_reason = dsl_utils.id_name_mapping()
 
     billing_contact_name = Text()
     billing_email = dsl_utils.SortableCaseInsensitiveKeywordText()
@@ -69,6 +72,8 @@ class Order(DocType, MapDBModelToDict):
         ],
         'billing_address_country': dict_utils.id_name_dict,
         'completed_by': dict_utils.contact_or_adviser_dict,
+        'cancelled_by': dict_utils.contact_or_adviser_dict,
+        'cancellation_reason': dict_utils.id_name_dict,
     }
 
     COMPUTED_MAPPINGS = {
