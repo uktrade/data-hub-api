@@ -153,7 +153,9 @@
     address_postcode: NE28 5JB
     address_country: 80756b9a-5d95-e211-a939-e4115bead28a
     contactable_by_dit: false
-    contactable_by_dit_partners: false
+    contactable_by_uk_dit_partners: false
+    contactable_by_overseas_dit_partners: false
+    accepts_dit_email_marketing: false
     contactable_by_email: false
     contactable_by_phone: false
     notes: This is a dummy contact for testing
@@ -170,7 +172,9 @@
     email: jenny@cakeman.com
     address_same_as_company: true
     contactable_by_dit: true
-    contactable_by_dit_partners: true
+    contactable_by_uk_dit_partners: true
+    contactable_by_overseas_dit_partners: true
+    accepts_dit_email_marketing: true
     contactable_by_email: true
     contactable_by_phone: false
     notes: This is a dummy contact for testing
@@ -187,7 +191,9 @@
     email: dean@cox.com
     address_same_as_company: true
     contactable_by_dit: true
-    contactable_by_dit_partners: true
+    contactable_by_uk_dit_partners: true
+    contactable_by_overseas_dit_partners: true
+    accepts_dit_email_marketing: true
     contactable_by_email: true
     contactable_by_phone: false
     notes: This is a dummy contact for testing
@@ -207,7 +213,9 @@
     address_postcode: 15404
     address_country: 82756b9a-5d95-e211-a939-e4115bead28a
     contactable_by_dit: false
-    contactable_by_dit_partners: false
+    contactable_by_uk_dit_partners: false
+    contactable_by_overseas_dit_partners: false
+    accepts_dit_email_marketing: false
     contactable_by_email: false
     contactable_by_phone: false
     notes: This is a dummy contact for testing
