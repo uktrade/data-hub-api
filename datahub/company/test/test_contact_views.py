@@ -51,8 +51,10 @@ class TestAddContact(APITestMixin):
             },
             'address_postcode': 'SW1A1AA',
             'notes': 'lorem ipsum',
-            'contactable_by_dit': False,
-            'contactable_by_dit_partners': False,
+            'contactable_by_dit': True,
+            'contactable_by_uk_dit_partners': True,
+            'contactable_by_overseas_dit_partners': True,
+            'accepts_dit_email_marketing': True,
             'contactable_by_email': True,
             'contactable_by_phone': True
         }, format='json')
@@ -94,8 +96,10 @@ class TestAddContact(APITestMixin):
             },
             'address_postcode': 'SW1A1AA',
             'notes': 'lorem ipsum',
-            'contactable_by_dit': False,
-            'contactable_by_dit_partners': False,
+            'contactable_by_dit': True,
+            'contactable_by_uk_dit_partners': True,
+            'contactable_by_overseas_dit_partners': True,
+            'accepts_dit_email_marketing': True,
             'contactable_by_email': True,
             'contactable_by_phone': True,
             'archived': False,
@@ -163,7 +167,9 @@ class TestAddContact(APITestMixin):
         assert not response_data['address_postcode']
         assert not response_data['notes']
         assert not response_data['contactable_by_dit']
-        assert not response_data['contactable_by_dit_partners']
+        assert not response_data['contactable_by_uk_dit_partners']
+        assert not response_data['contactable_by_overseas_dit_partners']
+        assert not response_data['accepts_dit_email_marketing']
         assert response_data['contactable_by_email']
         assert response_data['contactable_by_phone']
 
@@ -313,7 +319,9 @@ class TestEditContact(APITestMixin):
                 address_postcode='SW1A1AA',
                 notes='lorem ipsum',
                 contactable_by_dit=False,
-                contactable_by_dit_partners=False,
+                contactable_by_uk_dit_partners=False,
+                contactable_by_overseas_dit_partners=False,
+                accepts_dit_email_marketing=False,
                 contactable_by_email=True,
                 contactable_by_phone=True
             )
@@ -362,7 +370,9 @@ class TestEditContact(APITestMixin):
             'address_postcode': 'SW1A1AA',
             'notes': 'lorem ipsum',
             'contactable_by_dit': False,
-            'contactable_by_dit_partners': False,
+            'contactable_by_uk_dit_partners': False,
+            'contactable_by_overseas_dit_partners': False,
+            'accepts_dit_email_marketing': False,
             'contactable_by_email': True,
             'contactable_by_phone': True,
             'archived': False,
@@ -456,7 +466,9 @@ class TestViewContact(APITestMixin):
             address_postcode='SW1A1AA',
             notes='lorem ipsum',
             contactable_by_dit=False,
-            contactable_by_dit_partners=False,
+            contactable_by_uk_dit_partners=False,
+            contactable_by_overseas_dit_partners=False,
+            accepts_dit_email_marketing=False,
             contactable_by_email=True,
             contactable_by_phone=True
         )
@@ -501,7 +513,9 @@ class TestViewContact(APITestMixin):
             'address_postcode': 'SW1A1AA',
             'notes': 'lorem ipsum',
             'contactable_by_dit': False,
-            'contactable_by_dit_partners': False,
+            'contactable_by_uk_dit_partners': False,
+            'contactable_by_overseas_dit_partners': False,
+            'accepts_dit_email_marketing': False,
             'contactable_by_email': True,
             'contactable_by_phone': True,
             'archived': False,
