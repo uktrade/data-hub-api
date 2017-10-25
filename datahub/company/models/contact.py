@@ -52,8 +52,14 @@ class Contact(ArchivableModel, BaseModel):
     telephone_alternative = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     email_alternative = models.EmailField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
+
+    # Marketing preferences
     contactable_by_dit = models.BooleanField(default=False)
-    contactable_by_dit_partners = models.BooleanField(default=False)
+    contactable_by_uk_dit_partners = models.BooleanField(default=False)
+    contactable_by_overseas_dit_partners = models.BooleanField(default=False)
+    accepts_dit_email_marketing = models.BooleanField(default=False)
+
+    # Contact mode preferences
     contactable_by_email = models.BooleanField(default=True)
     contactable_by_phone = models.BooleanField(default=True)
 
