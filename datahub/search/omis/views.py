@@ -23,6 +23,7 @@ class SearchOrderParams:
         'subtotal_cost',
         'contact_name',
         'company_name',
+        'company',
     ]
 
     REMAP_FIELDS = {
@@ -31,6 +32,7 @@ class SearchOrderParams:
         'assigned_to_team': 'assignees.dit_team.id',
         'contact_name': 'contact.name_trigram',
         'company_name': 'company.name_trigram',
+        'company': 'company.id',
         'reference': 'reference_trigram',
     }
 
