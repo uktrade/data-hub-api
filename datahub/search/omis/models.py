@@ -40,6 +40,8 @@ class Order(DocType, MapDBModelToDict):
     total_cost_string = Keyword()
     total_cost = Integer(copy_to=['total_cost_string'])
     payment_due_date = Date()
+    completed_by = dsl_utils.contact_or_adviser_mapping('completed_by')
+    completed_on = Date()
 
     billing_contact_name = Text()
     billing_email = dsl_utils.SortableCaseInsensitiveKeywordText()
@@ -66,6 +68,7 @@ class Order(DocType, MapDBModelToDict):
             dict_utils.contact_or_adviser_dict(c.adviser, include_dit_team=True) for c in col.all()
         ],
         'billing_address_country': dict_utils.id_name_dict,
+        'completed_by': dict_utils.contact_or_adviser_dict,
     }
 
     COMPUTED_MAPPINGS = {
