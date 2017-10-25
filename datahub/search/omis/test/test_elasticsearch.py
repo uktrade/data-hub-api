@@ -2,7 +2,9 @@ import pytest
 from django.conf import settings
 from elasticsearch_dsl import Mapping
 
-from datahub.omis.order.test.factories import OrderFactory, OrderWithAcceptedQuoteFactory
+from datahub.omis.order.test.factories import (
+    OrderCompleteFactory, OrderFactory, OrderWithAcceptedQuoteFactory
+)
 
 from .. import OrderSearchApp
 from ..models import Order as ESOrder
@@ -332,7 +334,33 @@ def test_mapping(setup_es):
                 'vat_verified': {
                     'index': False,
                     'type': 'boolean'
-                }
+                },
+                'completed_by': {
+                    'properties': {
+                        'first_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        },
+                        'id': {
+                            'type': 'keyword'
+                        },
+                        'last_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        }
+                    },
+                    'type': 'nested'
+                },
+                'completed_on': {
+                    'type': 'date'
+                },
             }
         }
     }
@@ -340,7 +368,7 @@ def test_mapping(setup_es):
 
 @pytest.mark.parametrize(
     'Factory',  # noqa: N803
-    (OrderFactory, OrderWithAcceptedQuoteFactory)
+    (OrderFactory, OrderWithAcceptedQuoteFactory, OrderCompleteFactory)
 )
 def test_indexed_doc(Factory, setup_es):
     """Test the ES data of an indexed order."""
@@ -450,5 +478,12 @@ def test_indexed_doc(Factory, setup_es):
                 'id': str(order.billing_address_country.pk),
                 'name': order.billing_address_country.name
             },
+            'completed_by': {
+                'id': str(order.completed_by.pk),
+                'first_name': order.completed_by.first_name,
+                'last_name': order.completed_by.last_name,
+                'name': order.completed_by.name
+            } if order.completed_by else None,
+            'completed_on': order.completed_on.isoformat() if order.completed_on else None,
         }
     }
