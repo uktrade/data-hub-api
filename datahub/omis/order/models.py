@@ -61,6 +61,10 @@ class HourlyRate(BaseConstantModel):
         db_table = 'omis-order_hourlyrate'
 
 
+class CancellationReason(BaseOrderedConstantModel):
+    """Reasons for cancelling an order."""
+
+
 class Order(BaseModel):
     """
     Details regarding an OMIS Order.
@@ -205,6 +209,20 @@ class Order(BaseModel):
     completed_on = models.DateTimeField(null=True, blank=True)
     completed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
+
+    cancelled_on = models.DateTimeField(null=True, blank=True)
+    cancelled_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
+    cancellation_reason = models.ForeignKey(
+        CancellationReason,
         null=True, blank=True,
         on_delete=models.SET_NULL,
         related_name='+'
