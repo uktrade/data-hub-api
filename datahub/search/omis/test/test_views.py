@@ -4,6 +4,7 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.models import Company
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
@@ -226,6 +227,21 @@ class TestSearchOrder(APITestMixin):
         assert [
             item['reference'] for item in response.json()['results']
         ] == results
+
+    def test_filter_by_company_id(self, setup_data):
+        """Test that orders can be filtered by company id."""
+        url = reverse('api-v3:search:order')
+
+        response = self.api_client.post(
+            url, {
+                'company': Company.objects.get(name='Venus Ltd').pk
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()['results']) == 1
+        assert response.json()['results'][0]['reference'] == 'efgh'
 
     def test_incorrect_dates_raise_validation_error(self, setup_data):
         """Test that if the dates are not in a valid format, the API return a validation error."""
