@@ -13,17 +13,43 @@ def test_contact_dbmodel_to_dict(setup_es):
 
     result = ESContact.dbmodel_to_dict(contact)
 
-    keys = {'id', 'title', 'company', 'created_on',
-            'modified_on', 'archived', 'archived_on',
-            'archived_reason', 'archived_by', 'first_name',
-            'last_name', 'job_title', 'adviser', 'primary',
-            'telephone_countrycode', 'telephone_number',
-            'email', 'address_same_as_company', 'address_1',
-            'address_2', 'address_town', 'address_county',
-            'address_country', 'address_postcode', 'telephone_alternative',
-            'email_alternative', 'notes', 'contactable_by_dit',
-            'contactable_by_dit_partners', 'contactable_by_email',
-            'contactable_by_phone', 'company_sector', 'company_uk_region'}
+    keys = {
+        'id',
+        'title',
+        'company',
+        'created_on',
+        'modified_on',
+        'archived',
+        'archived_on',
+        'archived_reason',
+        'archived_by',
+        'first_name',
+        'last_name',
+        'job_title',
+        'adviser',
+        'primary',
+        'telephone_countrycode',
+        'telephone_number',
+        'email',
+        'address_same_as_company',
+        'address_1',
+        'address_2',
+        'address_town',
+        'address_county',
+        'address_country',
+        'address_postcode',
+        'telephone_alternative',
+        'email_alternative',
+        'notes',
+        'contactable_by_dit',
+        'contactable_by_uk_dit_partners',
+        'contactable_by_overseas_dit_partners',
+        'accepts_dit_email_marketing',
+        'contactable_by_email',
+        'contactable_by_phone',
+        'company_sector',
+        'company_uk_region'
+    }
 
     assert set(result.keys()) == keys
 
