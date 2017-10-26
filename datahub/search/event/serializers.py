@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from ..serializers import (
-    DateTimeyField,
+    RelaxedDateTimeField,
     SearchSerializer,
     SingleOrListField,
     StringUUIDField,
@@ -13,15 +13,15 @@ class SearchEventSerializer(SearchSerializer):
 
     address_country = SingleOrListField(child=StringUUIDField(), required=False)
     disabled_on_exists = serializers.BooleanField(required=False)
-    disabled_on_after = DateTimeyField(required=False)
-    disabled_on_before = DateTimeyField(required=False)
+    disabled_on_after = RelaxedDateTimeField(required=False)
+    disabled_on_before = RelaxedDateTimeField(required=False)
     event_type = SingleOrListField(child=StringUUIDField(), required=False)
     lead_team = SingleOrListField(child=StringUUIDField(), required=False)
     name = serializers.CharField(required=False)
     organiser = SingleOrListField(child=StringUUIDField(), required=False)
     organiser_name = serializers.CharField(required=False)
-    start_date_after = DateTimeyField(required=False)
-    start_date_before = DateTimeyField(required=False)
+    start_date_after = RelaxedDateTimeField(required=False)
+    start_date_before = RelaxedDateTimeField(required=False)
     teams = SingleOrListField(child=StringUUIDField(), required=False)
     uk_region = SingleOrListField(child=StringUUIDField(), required=False)
 

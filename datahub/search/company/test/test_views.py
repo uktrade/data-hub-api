@@ -109,6 +109,7 @@ class TestSearch(APITestMixin):
         }, format='json')
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {'uk_region': ['This field may not be null.']}
 
     def test_company_search_paging(self, setup_data):
         """Tests pagination of results."""

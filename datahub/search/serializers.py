@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from dateutil.parser import parse as dateutil_parse
 from rest_framework import serializers
 from rest_framework.settings import api_settings
@@ -7,8 +5,14 @@ from rest_framework.settings import api_settings
 from datahub.search.elasticsearch import MAX_RESULTS
 
 
-class DateTimeyField(serializers.Field):
-    """String Date time field."""
+class RelaxedDateTimeField(serializers.Field):
+    """
+    Relaxed DateTime field.
+
+    Front end uses free text field for data filters, that's why
+    we need to accept date/datetime in various different formats.
+    DRF DateTimeField doesn't offer that flexibility.
+    """
 
     default_error_messages = {
         'invalid': 'Date is in incorrect format.'
@@ -33,20 +37,20 @@ class SingleOrListField(serializers.ListField):
         return super().to_internal_value(data)
 
 
-class StringUUIDField(serializers.Field):
-    """String UUID field."""
+class StringUUIDField(serializers.UUIDField):
+    """
+    String UUID field.
 
-    default_error_messages = {
-        'invalid': 'String can not be parsed as UUID.'
-    }
+    We can't use UUID in ES queries, that's why we need to convert them back to string.
+    """
 
     def to_internal_value(self, data):
-        """Checks if data is UUID."""
-        try:
-            UUID(hex=data)
-        except ValueError:
-            self.fail('invalid', value=data)
-        return data
+        """
+        Converts string to UUID and then back to string,
+        to ensure that string is valid UUID.
+        """
+        uuid = super().to_internal_value(data)
+        return str(uuid)
 
 
 class LimitOffsetSerializer(serializers.Serializer):
