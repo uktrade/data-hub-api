@@ -1,8 +1,8 @@
 import pytest
 
 from datahub.omis.order.test.factories import (
-    OrderAssigneeFactory, OrderCompleteFactory, OrderFactory,
-    OrderSubscriberFactory, OrderWithAcceptedQuoteFactory
+    OrderAssigneeFactory, OrderCancelledFactory, OrderCompleteFactory,
+    OrderFactory, OrderSubscriberFactory, OrderWithAcceptedQuoteFactory
 )
 
 from ..models import Order as ESOrder
@@ -12,7 +12,7 @@ pytestmark = pytest.mark.django_db
 
 @pytest.mark.parametrize(
     'Factory',  # noqa: N803
-    (OrderCompleteFactory, OrderFactory, OrderWithAcceptedQuoteFactory)
+    (OrderCancelledFactory, OrderCompleteFactory, OrderFactory, OrderWithAcceptedQuoteFactory)
 )
 def test_order_to_dict(Factory, setup_es):
     """Test converting an order to dict."""
@@ -120,6 +120,17 @@ def test_order_to_dict(Factory, setup_es):
             'name': order.completed_by.name
         } if order.completed_by else None,
         'completed_on': order.completed_on,
+        'cancelled_by': {
+            'id': str(order.cancelled_by.pk),
+            'first_name': order.cancelled_by.first_name,
+            'last_name': order.cancelled_by.last_name,
+            'name': order.cancelled_by.name
+        } if order.cancelled_by else None,
+        'cancelled_on': order.cancelled_on,
+        'cancellation_reason': {
+            'id': str(order.cancellation_reason.pk),
+            'name': order.cancellation_reason.name
+        } if order.cancellation_reason else None,
     }
 
 

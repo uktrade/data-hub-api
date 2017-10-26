@@ -3,7 +3,8 @@ from django.conf import settings
 from elasticsearch_dsl import Mapping
 
 from datahub.omis.order.test.factories import (
-    OrderCompleteFactory, OrderFactory, OrderWithAcceptedQuoteFactory
+    OrderCancelledFactory, OrderCompleteFactory,
+    OrderFactory, OrderWithAcceptedQuoteFactory
 )
 
 from .. import OrderSearchApp
@@ -361,6 +362,45 @@ def test_mapping(setup_es):
                 'completed_on': {
                     'type': 'date'
                 },
+                'cancelled_by': {
+                    'properties': {
+                        'first_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        },
+                        'id': {
+                            'type': 'keyword'
+                        },
+                        'last_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        }
+                    },
+                    'type': 'nested'
+                },
+                'cancelled_on': {
+                    'type': 'date'
+                },
+                'cancellation_reason': {
+                    'properties': {
+                        'id': {
+                            'type': 'keyword'
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        }
+                    },
+                    'type': 'nested'
+                },
             }
         }
     }
@@ -368,7 +408,7 @@ def test_mapping(setup_es):
 
 @pytest.mark.parametrize(
     'Factory',  # noqa: N803
-    (OrderFactory, OrderWithAcceptedQuoteFactory, OrderCompleteFactory)
+    (OrderFactory, OrderWithAcceptedQuoteFactory, OrderCancelledFactory, OrderCompleteFactory)
 )
 def test_indexed_doc(Factory, setup_es):
     """Test the ES data of an indexed order."""
@@ -485,5 +525,16 @@ def test_indexed_doc(Factory, setup_es):
                 'name': order.completed_by.name
             } if order.completed_by else None,
             'completed_on': order.completed_on.isoformat() if order.completed_on else None,
+            'cancelled_by': {
+                'id': str(order.cancelled_by.pk),
+                'first_name': order.cancelled_by.first_name,
+                'last_name': order.cancelled_by.last_name,
+                'name': order.cancelled_by.name
+            } if order.cancelled_by else None,
+            'cancelled_on': order.cancelled_on.isoformat() if order.cancelled_on else None,
+            'cancellation_reason': {
+                'id': str(order.cancellation_reason.pk),
+                'name': order.cancellation_reason.name
+            } if order.cancellation_reason else None,
         }
     }

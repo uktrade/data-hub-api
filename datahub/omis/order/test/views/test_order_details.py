@@ -1,3 +1,4 @@
+import uuid
 import pytest
 from dateutil.parser import parse as dateutil_parse
 from django.utils.timezone import now
@@ -134,6 +135,9 @@ class TestAddOrderDetails(APITestMixin):
             'archived_documents_url_path': '',
             'completed_by': None,
             'completed_on': None,
+            'cancelled_by': None,
+            'cancelled_on': None,
+            'cancellation_reason': None,
         }
 
     @freeze_time('2017-04-18 13:00:00.000000+00:00')
@@ -524,6 +528,9 @@ class TestChangeOrderDetails(APITestMixin):
             'archived_documents_url_path': '',
             'completed_by': None,
             'completed_on': None,
+            'cancelled_by': None,
+            'cancelled_on': None,
+            'cancellation_reason': None,
         }
 
     def test_fails_if_contact_not_from_company(self):
@@ -719,6 +726,11 @@ class TestChangeOrderDetails(APITestMixin):
                 'archived_documents_url_path': '/documents/123',
                 'completed_by': order.created_by.pk,
                 'completed_on': now().isoformat(),
+                'cancelled_by': order.created_by.pk,
+                'cancelled_on': now().isoformat(),
+                'cancellation_reason': {
+                    'id': uuid.uuid4()
+                }
             },
             format='json'
         )
@@ -740,6 +752,9 @@ class TestChangeOrderDetails(APITestMixin):
         assert not response.json()['archived_documents_url_path']
         assert not response.json()['completed_by']
         assert not response.json()['completed_on']
+        assert not response.json()['cancelled_by']
+        assert not response.json()['cancelled_on']
+        assert not response.json()['cancellation_reason']
 
     @pytest.mark.parametrize(
         'disallowed_status', (
@@ -908,6 +923,9 @@ class TestViewOrderDetails(APITestMixin):
             'archived_documents_url_path': order.archived_documents_url_path,
             'completed_by': None,
             'completed_on': None,
+            'cancelled_by': None,
+            'cancelled_on': None,
+            'cancellation_reason': None,
         }
 
     def test_not_found(self):

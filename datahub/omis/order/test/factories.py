@@ -14,7 +14,7 @@ from datahub.omis.quote.test.factories import (
 )
 
 from ..constants import OrderStatus, VATStatus
-from ..models import ServiceType
+from ..models import CancellationReason, ServiceType
 
 
 class OrderFactory(factory.django.DjangoModelFactory):
@@ -104,6 +104,15 @@ class OrderCompleteFactory(OrderWithAcceptedQuoteFactory):
     status = OrderStatus.complete
     completed_on = factory.Faker('date_time')
     completed_by = factory.SubFactory(AdviserFactory)
+
+
+class OrderCancelledFactory(OrderWithAcceptedQuoteFactory):
+    """Factory for cancelled orders."""
+
+    status = OrderStatus.cancelled
+    cancelled_on = factory.Faker('date_time')
+    cancelled_by = factory.SubFactory(AdviserFactory)
+    cancellation_reason = factory.LazyFunction(CancellationReason.objects.first)
 
 
 class OrderPaidFactory(OrderWithAcceptedQuoteFactory):
