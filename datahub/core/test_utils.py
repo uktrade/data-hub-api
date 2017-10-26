@@ -10,10 +10,11 @@ from oauth2_provider.models import AccessToken, Application
 from rest_framework.fields import DateField, DateTimeField
 from rest_framework.test import APIClient
 
+from datahub.metadata.models import Team
 from datahub.oauth.scopes import Scope
 
 
-def get_test_user():
+def get_test_user(team=None):
     """Return the test user."""
     user_model = get_user_model()
     try:
@@ -25,11 +26,13 @@ def get_test_user():
             email='Testo@Useri.com',
             date_joined=now(),
         )
+        if team is None:
+            test_user.dit_team = Team.objects.filter(role__team_role_groups__name='DIT_staff').first()
+        else:
+            test_user.dit_team = team
+
         test_user.set_password('password')
         test_user.save()
-        test_user.user_permissions.set(Permission.objects.all())
-        # Because permissions are cached we need to refetch user
-        test_user = user_model.objects.get(email='Testo@Useri.com')
     return test_user
 
 

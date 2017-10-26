@@ -4,6 +4,7 @@ import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth.models import Permission
 from pyquery import PyQuery
 
 logger = logging.getLogger(__name__)
@@ -44,8 +45,9 @@ class CDMSUserBackend(ModelBackend):
             # Run the default password hasher once to reduce the timing
             # difference between an existing and a non-existing user (#20760).
             user_model().set_password(password)
+            return None
         else:
-            if self.user_can_authenticate(user):
+            if user.use_cdms_auth:
                 auth_result = self.validate_cdms_credentials(user, username, password)
                 if auth_result is True:
                     # user authenticated via CDMS
@@ -54,7 +56,6 @@ class CDMSUserBackend(ModelBackend):
                     # ensure user can use django backend to auth, in case CDMS fails
                     user.is_active = True
                     user.save()
-
                     return user
 
                 if auth_result is False:
@@ -63,14 +64,15 @@ class CDMSUserBackend(ModelBackend):
                     # swill allow user in
                     user.set_unusable_password()
                     user.save()
+                    return None
 
-                # When auth_result is None, fallback to django auth by returning None
-
-        return None
+        # When auth_result is None, fallback to django auth by returning None
+        # If user is not cdms user, use the default ModelBackend authenticate
+        return super().authenticate(request, username, password, **kwargs)
 
     def user_can_authenticate(self, user):
         """Reject users that are not whitelisted."""
-        return user.use_cdms_auth
+        return user.use_cdms_auth or super().user_can_authenticate(user)
 
     def _cdms_login(self, url, username, password, user_agent=None):
         """
@@ -147,3 +149,30 @@ class CDMSUserBackend(ModelBackend):
         assert form_action != html_parser('form').attr('action')
 
         return resp
+
+
+class TeamModelPermissionsBackend(CDMSUserBackend):
+
+    def _get_team_permissions(self, user_obj):
+        groups = user_obj.dit_team.role.team_role_groups.all()
+        return Permission.objects.filter(group__in=groups)
+
+    def get_team_permissions(self, user_obj, obj=None):
+        """
+        Returns a set of permission strings the user `user_obj` has from the
+        teams they belong to based on groups associated to team roles.
+        """
+        return self._get_permissions(user_obj, obj, 'team')
+
+    def get_all_permissions(self, user_obj, obj=None):
+        """
+        Because of using cache in the parent class, its hard to extend using super()
+        so the code is slightly duplicated
+        """
+        if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
+            return set()
+        if not hasattr(user_obj, '_perm_cache'):
+            user_obj._perm_cache = self.get_user_permissions(user_obj)
+            user_obj._perm_cache.update(self.get_group_permissions(user_obj))
+            user_obj._perm_cache.update(self.get_team_permissions(user_obj))
+        return user_obj._perm_cache

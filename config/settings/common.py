@@ -136,8 +136,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'company.Advisor'
 AUTHENTICATION_BACKENDS = [
-    'datahub.core.auth.CDMSUserBackend',
-    'django.contrib.auth.backends.ModelBackend'
+    'datahub.core.auth.TeamModelPermissionsBackend'
 ]
 
 # django-oauth-toolkit settings

@@ -1,4 +1,6 @@
+from django.contrib.auth.models import Group
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 from datahub.core.models import BaseConstantModel, BaseOrderedConstantModel
 
@@ -54,8 +56,14 @@ class Role(BaseConstantModel):
 
 class TeamRole(BaseConstantModel):
     """Team role."""
-
-    pass
+    team_role_groups = models.ManyToManyField(
+        Group,
+        verbose_name=_('Team role permission groups'),
+        blank=True,
+        help_text=_('Permission groups associated with this team.'),
+        related_name="teamrole_set",
+        related_query_name="team_role",
+    )
 
 
 class Team(BaseConstantModel):
