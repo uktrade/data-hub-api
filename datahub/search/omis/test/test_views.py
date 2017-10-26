@@ -15,7 +15,6 @@ from datahub.omis.order.test.factories import (
     OrderSubscriberFactory, OrderWithAcceptedQuoteFactory
 )
 
-
 pytestmark = pytest.mark.django_db
 
 
@@ -262,7 +261,7 @@ class TestSearchOrder(APITestMixin):
         }, format='json')
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {'primary_market': ['String can not be parsed as UUID.']}
+        assert response.json() == {'primary_market': ['"invalid" is not a valid UUID.']}
 
     def test_filter_by_assigned_to_assignee_adviser(self, setup_data):
         """Test that results can be filtered by assignee."""

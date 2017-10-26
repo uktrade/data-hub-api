@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from ..serializers import (
-    DateTimeyField,
+    RelaxedDateTimeField,
     SearchSerializer,
     SingleOrListField,
     StringUUIDField,
@@ -12,8 +12,8 @@ class SearchOrderSerializer(SearchSerializer):
     """Serialiser used to validate OMIS search POST bodies."""
 
     primary_market = SingleOrListField(child=StringUUIDField(), required=False)
-    created_on_before = DateTimeyField(required=False)
-    created_on_after = DateTimeyField(required=False)
+    created_on_before = RelaxedDateTimeField(required=False)
+    created_on_after = RelaxedDateTimeField(required=False)
     assigned_to_adviser = SingleOrListField(child=StringUUIDField(), required=False)
     assigned_to_team = SingleOrListField(child=StringUUIDField(), required=False)
     status = SingleOrListField(child=serializers.CharField(), required=False)
