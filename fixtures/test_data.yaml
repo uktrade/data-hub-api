@@ -157,7 +157,7 @@
     contactable_by_overseas_dit_partners: false
     accepts_dit_email_marketing: false
     contactable_by_email: false
-    contactable_by_phone: false
+    contactable_by_phone: true
     notes: This is a dummy contact for testing
 
 - model: company.contact
@@ -217,7 +217,7 @@
     contactable_by_overseas_dit_partners: false
     accepts_dit_email_marketing: false
     contactable_by_email: false
-    contactable_by_phone: false
+    contactable_by_phone: true
     notes: This is a dummy contact for testing
 
 - model: interaction.interaction
