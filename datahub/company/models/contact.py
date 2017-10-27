@@ -64,7 +64,7 @@ class Contact(ArchivableModel, BaseModel):
     contactable_by_phone = models.BooleanField(default=True)
 
     class Meta:
-        permissions = (("read_contact", "Can read contact"),)
+        permissions = (('read_contact', 'Can read contact'),)
 
     @cached_property
     def name(self):

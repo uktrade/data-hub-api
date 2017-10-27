@@ -11,6 +11,7 @@ from .serializers import IntelligentHomepageSerializer, LimitParamSerializer
 
 class IntelligentHomepageView(APIView):
     """Return the data for the intelligent homepage."""
+
     permission_classes = (IsAuthenticatedOrTokenHasScope,)
 
     required_scopes = (Scope.internal_front_end,)

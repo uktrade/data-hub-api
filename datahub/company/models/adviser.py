@@ -115,4 +115,4 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
             models.Index(fields=['first_name', 'last_name']),
         ]
         verbose_name = 'adviser'
-        permissions = (("read_advisor", "Can read advisor"),)
+        permissions = (('read_advisor', 'Can read advisor'),)

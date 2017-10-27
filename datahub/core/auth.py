@@ -152,6 +152,7 @@ class CDMSUserBackend(ModelBackend):
 
 
 class TeamModelPermissionsBackend(CDMSUserBackend):
+    """Extension of CDMSUserBackend to include a team based permissions for user"""
 
     def _get_team_permissions(self, user_obj):
         groups = user_obj.dit_team.role.team_role_groups.all()

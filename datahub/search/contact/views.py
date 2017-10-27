@@ -31,11 +31,15 @@ class SearchContactParams:
 
 class SearchContactAPIView(SearchContactParams, SearchAPIView, PermissionRequiredMixin):
     """Filtered contact search view."""
+
     permission_required = 'company.read_contact'
     permission_classes = (IsAuthenticatedOrTokenHasScope,)
 
 
-class SearchContactExportAPIView(SearchContactParams, SearchExportAPIView, PermissionRequiredMixin):
+class SearchContactExportAPIView(SearchContactParams,
+                                 SearchExportAPIView,
+                                 PermissionRequiredMixin):
     """Filtered contact search export view."""
+
     permission_required = 'company.read_contact'
     permission_classes = (IsAuthenticatedOrTokenHasScope,)

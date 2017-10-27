@@ -43,6 +43,7 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
 
     This replaces the previous project, value, team and requirements endpoints.
     """
+
     required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectSerializer
     queryset = InvestmentProject.objects.select_related(
