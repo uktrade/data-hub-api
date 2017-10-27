@@ -2,6 +2,7 @@ from unittest import mock
 
 import pytest
 import requests
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.timezone import now
 from oauth2_provider.models import Application
@@ -57,7 +58,17 @@ def get_cdms_user():
     return get_or_create_user(
         email='cdms@user.com',
         last_name='Useri',
-        first_name='CDMS'
+        first_name='CDMS',
+    )
+
+
+def get_cdms_user_with_password():
+    """Shortcut to create cdms user."""
+    return get_or_create_user(
+        email='cdms@user.com',
+        last_name='Useri',
+        first_name='CDMS',
+        password='password',
     )
 
 
@@ -100,7 +111,61 @@ def test_invalid_cdms_credentials(auth_mock, settings, live_server):
 
 @pytest.mark.liveserver
 @mock.patch('datahub.core.auth.CDMSUserBackend._cdms_login')
-def test_cdms_returns_500(mocked_login, live_server):
+def test_cdms_returns_500_with_hash(mocked_login, live_server):
+    """Test login when CDMS is not available."""
+    mocked_login.side_effect = requests.RequestException
+    cdms_user = get_cdms_user_with_password()
+    application, _ = Application.objects.get_or_create(
+        user=cdms_user,
+        client_type=Application.CLIENT_CONFIDENTIAL,
+        authorization_grant_type=Application.GRANT_PASSWORD,
+        name='Test auth client'
+    )
+    url = live_server + reverse('token')
+    auth = requests.auth.HTTPBasicAuth(application.client_id, application.client_secret)
+    response = requests.post(
+        url,
+        data={
+            'grant_type': 'password',
+            'username': cdms_user.email,
+            'password': 'password'
+        },
+        auth=auth
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert '"token_type": "Bearer"' in response.text
+
+
+@pytest.mark.liveserver
+@mock.patch('datahub.core.auth.CDMSUserBackend._cdms_login')
+def test_cdms_returns_500_with_hash_wrong_password(mocked_login, live_server):
+    """Test login when CDMS is not available."""
+    mocked_login.side_effect = requests.RequestException
+    cdms_user = get_cdms_user_with_password()
+    application, _ = Application.objects.get_or_create(
+        user=cdms_user,
+        client_type=Application.CLIENT_CONFIDENTIAL,
+        authorization_grant_type=Application.GRANT_PASSWORD,
+        name='Test auth client'
+    )
+    url = live_server + reverse('token')
+    auth = requests.auth.HTTPBasicAuth(application.client_id, application.client_secret)
+    response = requests.post(
+        url,
+        data={
+            'grant_type': 'password',
+            'username': cdms_user.email,
+            'password': 'wrong_password'
+        },
+        auth=auth
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert 'Invalid credentials given' in response.text
+
+
+@pytest.mark.liveserver
+@mock.patch('datahub.core.auth.CDMSUserBackend._cdms_login')
+def test_cdms_returns_500_no_hash(mocked_login, live_server):
     """Test login when CDMS is not available."""
     mocked_login.side_effect = requests.RequestException
     cdms_user = get_cdms_user()
@@ -121,8 +186,7 @@ def test_cdms_returns_500(mocked_login, live_server):
         },
         auth=auth
     )
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
-    assert 'Invalid credentials given' in response.text
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 @pytest.mark.liveserver
@@ -331,6 +395,7 @@ def test_submit_form():
             test2='test2_val',
             injected='param',
         ),
+        timeout=settings.CDMS_AUTH_TIMEOUT,
     )
 
 
