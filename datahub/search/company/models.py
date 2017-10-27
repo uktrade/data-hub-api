@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from django.conf import settings
 from elasticsearch_dsl import Boolean, Date, DocType, Keyword, Text
 
@@ -11,7 +13,9 @@ class Company(DocType, MapDBModelToDict):
 
     id = Keyword()
     account_manager = dsl_utils.contact_or_adviser_mapping('account_manager')
-    alias = dsl_utils.SortableText()
+    trading_name = dsl_utils.SortableText(copy_to=['trading_name_keyword', 'trading_name_trigram'])
+    trading_name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
+    trading_name_trigram = dsl_utils.TrigramText()
     archived = Boolean()
     archived_by = dsl_utils.contact_or_adviser_mapping('archived_by')
     contacts = dsl_utils.contact_or_adviser_mapping('contacts')
@@ -51,6 +55,10 @@ class Company(DocType, MapDBModelToDict):
     export_to_countries = dsl_utils.id_name_mapping()
     future_interest_countries = dsl_utils.id_name_mapping()
 
+    COMPUTED_MAPPINGS = {
+        'trading_name': attrgetter('alias')
+    }
+
     MAPPINGS = {
         'companies_house_data': dict_utils.company_dict,
         'account_manager': dict_utils.contact_or_adviser_dict,
@@ -75,6 +83,7 @@ class Company(DocType, MapDBModelToDict):
     }
 
     IGNORED_FIELDS = (
+        'alias',
         'business_leads',
         'children',
         'created_by',
@@ -86,11 +95,12 @@ class Company(DocType, MapDBModelToDict):
         'modified_by',
         'orders',
         'rght',
-        'servicedeliverys',
         'tree_id'
     )
 
     SEARCH_FIELDS = [
+        'trading_name_keyword',
+        'trading_name_trigram',
         'classification.name',
         'export_to_countries.name',
         'future_interest_countries.name',

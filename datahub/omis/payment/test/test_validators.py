@@ -18,8 +18,8 @@ class TestReconcilablePaymentsValidator:
 
         try:
             validator([
-                {'amount': 600, 'received_on': dateutil_parse('2017-01-01 13:00:00')},
-                {'amount': 400, 'received_on': dateutil_parse('2017-01-01 13:00:00')},
+                {'amount': 600, 'received_on': dateutil_parse('2017-01-01').date()},
+                {'amount': 400, 'received_on': dateutil_parse('2017-01-01').date()},
             ])
         except Exception:
             pytest.fail('Should not raise a validator error.')
@@ -33,8 +33,8 @@ class TestReconcilablePaymentsValidator:
 
         try:
             validator([
-                {'amount': 1000, 'received_on': dateutil_parse('2017-01-01 13:00:00')},
-                {'amount': 1, 'received_on': dateutil_parse('2017-01-01 13:00:00')},
+                {'amount': 1000, 'received_on': dateutil_parse('2017-01-01').date()},
+                {'amount': 1, 'received_on': dateutil_parse('2017-01-01').date()},
             ])
         except Exception:
             pytest.fail('Should not raise a validator error.')
@@ -48,8 +48,8 @@ class TestReconcilablePaymentsValidator:
 
         with pytest.raises(ValidationError) as exc:
             validator([
-                {'amount': 998, 'received_on': dateutil_parse('2017-01-01 13:00:00')},
-                {'amount': 1, 'received_on': dateutil_parse('2017-01-01 13:00:00')},
+                {'amount': 998, 'received_on': dateutil_parse('2017-01-01').date()},
+                {'amount': 1, 'received_on': dateutil_parse('2017-01-01').date()},
             ])
 
         assert exc.value.detail == {

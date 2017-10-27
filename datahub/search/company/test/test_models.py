@@ -7,7 +7,7 @@ from ..models import Company as ESCompany
 pytestmark = pytest.mark.django_db
 
 
-def test_company_dbmodel_to_dict():
+def test_company_dbmodel_to_dict(setup_es):
     """Tests conversion of db model to dict."""
     company = CompanyFactory()
 
@@ -21,7 +21,7 @@ def test_company_dbmodel_to_dict():
             'archived_reason', 'archived_by', 'name',
             'registered_address_1', 'registered_address_2',
             'registered_address_town', 'registered_address_county',
-            'registered_address_postcode', 'company_number', 'alias',
+            'registered_address_postcode', 'company_number', 'trading_name',
             'employee_range', 'turnover_range', 'account_manager',
             'description', 'website', 'trading_address_1',
             'trading_address_2', 'trading_address_town',
@@ -32,7 +32,7 @@ def test_company_dbmodel_to_dict():
     assert set(result.keys()) == keys
 
 
-def test_company_dbmodels_to_es_documents():
+def test_company_dbmodels_to_es_documents(setup_es):
     """Tests conversion of db models to Elasticsearch documents."""
     companies = CompanyFactory.create_batch(2)
 

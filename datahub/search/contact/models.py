@@ -37,7 +37,9 @@ class Contact(DocType, MapDBModelToDict):
     notes = dsl_utils.EnglishText()
     job_title = dsl_utils.SortableCaseInsensitiveKeywordText()
     contactable_by_dit = Boolean()
-    contactable_by_dit_partners = Boolean()
+    contactable_by_uk_dit_partners = Boolean()
+    contactable_by_overseas_dit_partners = Boolean()
+    accepts_dit_email_marketing = Boolean()
     contactable_by_email = Boolean()
     contactable_by_phone = Boolean()
     address_country = dsl_utils.id_name_mapping()
@@ -72,7 +74,6 @@ class Contact(DocType, MapDBModelToDict):
         'investment_projects',
         'modified_by',
         'orders',
-        'servicedeliverys'
     )
 
     SEARCH_FIELDS = [

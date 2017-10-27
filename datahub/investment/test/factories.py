@@ -23,7 +23,6 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     modified_by = factory.SubFactory(AdviserFactory)
     name = factory.Sequence(lambda n: f'name {n}')
     description = factory.Sequence(lambda n: f'desc {n}')
-    nda_signed = False
     estimated_land_date = date(2020, 1, 1)
     investment_type_id = InvestmentType.commitment_to_invest.value.id
     referral_source_activity_id = ReferralSourceActivity.cold_call.value.id
@@ -33,7 +32,6 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     investor_company = factory.SubFactory(CompanyFactory)
     client_relationship_manager = factory.SubFactory(AdviserFactory)
     referral_source_adviser = factory.SubFactory(AdviserFactory)
-    project_shareable = False
     likelihood_of_landing = 90
     created_on = now()
 
@@ -105,9 +103,9 @@ class VerifyWinInvestmentProjectFactory(ActiveInvestmentProjectFactory):
     non_fdi_r_and_d_budget = False
     new_tech_to_uk = True
     export_revenue = True
-    address_line_1 = factory.Faker('street_address')
-    address_line_2 = factory.Faker('city')
-    address_line_postcode = factory.Faker('postcode')
+    address_1 = factory.Faker('street_address')
+    address_town = factory.Faker('city')
+    address_postcode = factory.Faker('postcode')
     average_salary_id = SalaryRange.below_25000.value.id
 
 

@@ -16,10 +16,12 @@ from ..constants import OrderStatus, VATStatus
 from ..models import Order
 from ..validators import (
     AddressValidator,
+    AssigneeExistsRule,
     AssigneesFilledInValidator,
     ContactWorksAtCompanyValidator,
     NoOtherActiveQuoteExistsValidator,
     OrderDetailsFilledInValidator,
+    OrderInStatusRule,
     OrderInStatusValidator,
     ReadonlyAfterCreationValidator,
     VATValidator,
@@ -715,3 +717,35 @@ class TestAddressValidator:
         validator = AddressValidator()
         assert not validator.lazy
         assert validator.fields_mapping == validator.DEFAULT_FIELDS_MAPPING
+
+
+@pytest.mark.parametrize(
+    'order_status,expected_status,res',
+    (
+        (OrderStatus.draft, OrderStatus.draft, True),
+        (OrderStatus.draft, OrderStatus.paid, False),
+    )
+)
+def test_order_in_status_rule(order_status, expected_status, res):
+    """Tests for OrderInStatusRule."""
+    order = mock.Mock(status=order_status)
+    combiner = mock.Mock()
+    combiner.serializer.context = {'order': order}
+
+    rule = OrderInStatusRule(expected_status)
+    assert rule(combiner) == res
+
+
+@pytest.mark.parametrize(
+    'assignee_exists',
+    (True, False)
+)
+def test_assignee_exists_rule(assignee_exists):
+    """Tests for AssigneeExistsRule."""
+    order = mock.Mock()
+    order.assignees.filter().exists.return_value = assignee_exists
+    combiner = mock.Mock()
+    combiner.serializer.context = {'order': order}
+
+    rule = AssigneeExistsRule('adviser')
+    assert rule(combiner) == assignee_exists

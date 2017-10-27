@@ -38,6 +38,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
     intermediate_company = dsl_utils.id_name_mapping()
     uk_company = dsl_utils.id_name_mapping()
     investor_company = dsl_utils.id_name_mapping()
+    investor_company_country = dsl_utils.id_name_mapping()
     investment_type = dsl_utils.id_name_mapping()
     name = dsl_utils.SortableText()
     name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
@@ -47,19 +48,17 @@ class InvestmentProject(DocType, MapDBModelToDict):
     associated_non_fdi_r_and_d_project = dsl_utils.investment_project_mapping()
     new_tech_to_uk = Boolean()
     export_revenue = Boolean()
+    uk_region_locations = dsl_utils.id_name_mapping()
     site_decided = Boolean()
-    nda_signed = Boolean()
     government_assistance = Boolean()
     client_cannot_provide_total_investment = Boolean()
     total_investment = Double()
     foreign_equity_investment = Double()
     number_new_jobs = Integer()
     non_fdi_type = dsl_utils.id_name_mapping()
-    not_shareable_reason = Text()
     operations_commenced_documents = dsl_utils.id_uri_mapping()
     stage = dsl_utils.id_name_mapping()
     project_code = dsl_utils.SortableCaseInsensitiveKeywordText()
-    project_shareable = Boolean()
     referral_source_activity = dsl_utils.id_name_mapping()
     referral_source_activity_marketing = dsl_utils.id_name_mapping()
     referral_source_activity_website = dsl_utils.id_name_mapping()
@@ -67,8 +66,8 @@ class InvestmentProject(DocType, MapDBModelToDict):
     referral_source_advisor = dsl_utils.contact_or_adviser_mapping('referral_source_advisor')
     sector = dsl_utils.id_name_mapping()
     average_salary = dsl_utils.id_name_mapping()
-    date_lost = Date(),
-    date_abandoned = Date(),
+    date_lost = Date()
+    date_abandoned = Date()
 
     MAPPINGS = {
         'id': str,
@@ -84,6 +83,9 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'fdi_value': dict_utils.id_name_dict,
         'intermediate_company': dict_utils.id_name_dict,
         'investor_company': dict_utils.id_name_dict,
+        'uk_region_locations': lambda col: [
+            dict_utils.id_name_dict(c) for c in col.all()
+        ],
         'uk_company': dict_utils.id_name_dict,
         'investment_type': dict_utils.id_name_dict,
         'associated_non_fdi_r_and_d_project': dict_utils.investment_project_dict,
@@ -105,6 +107,12 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'country_lost_to': dict_utils.id_name_dict,
     }
 
+    COMPUTED_MAPPINGS = {
+        'investor_company_country': dict_utils.computed_nested_id_name_dict(
+            'investor_company.registered_address_country'
+        ),
+    }
+
     IGNORED_FIELDS = (
         'cdms_project_code',
         'client_considering_other_countries',
@@ -115,7 +123,6 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'investmentprojectcode',
         'modified_by',
         'strategic_drivers',
-        'uk_region_locations'
     )
 
     SEARCH_FIELDS = [

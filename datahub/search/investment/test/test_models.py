@@ -7,7 +7,7 @@ from ..models import InvestmentProject as ESInvestmentProject
 pytestmark = pytest.mark.django_db
 
 
-def test_investment_project_to_dict():
+def test_investment_project_to_dict(setup_es):
     """Tests conversion of db model to dict."""
     project = InvestmentProjectFactory()
     result = ESInvestmentProject.dbmodel_to_dict(project)
@@ -18,6 +18,7 @@ def test_investment_project_to_dict():
         'client_contacts',
         'client_relationship_manager',
         'investor_company',
+        'investor_company_country',
         'investment_type',
         'stage',
         'referral_source_activity',
@@ -33,10 +34,7 @@ def test_investment_project_to_dict():
         'name',
         'description',
         'anonymous_description',
-        'nda_signed',
         'estimated_land_date',
-        'project_shareable',
-        'not_shareable_reason',
         'actual_land_date',
         'approved_commitment_to_invest',
         'approved_fdi',
@@ -67,11 +65,12 @@ def test_investment_project_to_dict():
         'new_tech_to_uk',
         'export_revenue',
         'client_requirements',
+        'uk_region_locations',
         'site_decided',
-        'address_line_1',
-        'address_line_2',
-        'address_line_3',
-        'address_line_postcode',
+        'address_1',
+        'address_2',
+        'address_town',
+        'address_postcode',
         'uk_company_decided',
         'uk_company',
         'project_manager',
@@ -93,7 +92,7 @@ def test_investment_project_to_dict():
     assert set(result.keys()) == keys
 
 
-def test_investment_project_dbmodels_to_es_documents():
+def test_investment_project_dbmodels_to_es_documents(setup_es):
     """Tests conversion of db models to Elasticsearch documents."""
     projects = InvestmentProjectFactory.create_batch(2)
 

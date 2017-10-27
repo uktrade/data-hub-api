@@ -3,7 +3,7 @@
   fields:
     company_number: 99919
     name: Mercury Ltd
-    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    business_type: 6f75408b-03e7-e611-bca1-e4115bead28a  # Private Limited Company
     employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
     turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
     export_to_countries:
@@ -143,7 +143,7 @@
   fields:
     first_name: Johnny
     last_name: Cakeman
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611  # Venus Ltd
     primary: false
     telephone_countrycode: +44
     telephone_number: 67890123432
@@ -153,9 +153,11 @@
     address_postcode: NE28 5JB
     address_country: 80756b9a-5d95-e211-a939-e4115bead28a
     contactable_by_dit: false
-    contactable_by_dit_partners: false
+    contactable_by_uk_dit_partners: false
+    contactable_by_overseas_dit_partners: false
+    accepts_dit_email_marketing: false
     contactable_by_email: false
-    contactable_by_phone: false
+    contactable_by_phone: true
     notes: This is a dummy contact for testing
 
 - model: company.contact
@@ -163,16 +165,59 @@
   fields:
     first_name: Jenny
     last_name: Cakeman
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611  # Venus Ltd
     primary: true
     telephone_countrycode: +44
     telephone_number: 67890123432
     email: jenny@cakeman.com
     address_same_as_company: true
     contactable_by_dit: true
-    contactable_by_dit_partners: true
+    contactable_by_uk_dit_partners: true
+    contactable_by_overseas_dit_partners: true
+    accepts_dit_email_marketing: true
     contactable_by_email: true
     contactable_by_phone: false
+    notes: This is a dummy contact for testing
+
+- model: company.contact
+  pk: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+  fields:
+    first_name: Dean
+    last_name: Cox
+    company: 0fb3379c-341c-4da4-b825-bf8d47b26baa  # Lambda plc
+    primary: true
+    telephone_countrycode: +33
+    telephone_number: 6 39 15 95 29
+    email: dean@cox.com
+    address_same_as_company: true
+    contactable_by_dit: true
+    contactable_by_uk_dit_partners: true
+    contactable_by_overseas_dit_partners: true
+    accepts_dit_email_marketing: true
+    contactable_by_email: true
+    contactable_by_phone: false
+    notes: This is a dummy contact for testing
+
+- model: company.contact
+  pk: 048f2edc-e7ed-4881-b1cc-29142a80238a
+  fields:
+    first_name: Georgina
+    last_name: Clark
+    company: 0fb3379c-341c-4da4-b825-bf8d47b26baa  # Lambda plc
+    primary: false
+    telephone_countrycode: +33
+    telephone_number: 6 72 83 69 66
+    email: georgina@clark.com
+    address_1: 7 chemin
+    address_town: Lefevre
+    address_postcode: 15404
+    address_country: 82756b9a-5d95-e211-a939-e4115bead28a
+    contactable_by_dit: false
+    contactable_by_uk_dit_partners: false
+    contactable_by_overseas_dit_partners: false
+    accepts_dit_email_marketing: false
+    contactable_by_email: false
+    contactable_by_phone: true
     notes: This is a dummy contact for testing
 
 - model: interaction.interaction
@@ -239,26 +284,6 @@
     created_by: e83a608e-84a4-11e6-ae22-56b6b6499611
     modified_by: e83a608e-84a4-11e6-ae22-56b6b6499611
 
-- model: interaction.servicedelivery
-  pk: cbd85bc2-d17a-4c7c-9bfe-622d6e77201a
-  fields:
-    subject: Provided beta service
-    date: 2017-06-05
-    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
-    contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
-    service: f56eb92b-3499-e211-a939-e4115bead28a
-    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
-    notes: This is a dummy service delivery for testing
-    service_offer: f6576bae-efb6-4ffc-8d50-80cfaee3be40
-    dit_team: 8248318c-9698-e211-a939-e4115bead28a
-    status: 47329c18-6095-e211-a939-e4115bead28a
-
-- model: interaction.serviceoffer
-  pk: f6576bae-efb6-4ffc-8d50-80cfaee3be40
-  fields:
-    service: f56eb92b-3499-e211-a939-e4115bead28a
-    dit_team: 8248318c-9698-e211-a939-e4115bead28a
-
 - model: investment.investmentproject
   pk: 721e2a04-21c3-4172-a321-4368463a4b2d
   fields:
@@ -266,11 +291,8 @@
     description: This is a dummy investment project for testing
     stage: c9864359-fb1a-4646-a4c1-97d10189fc03  # Assign PM
     status: ongoing
-    nda_signed: false
     estimated_land_date: 2020-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
-    project_shareable: false
-    not_shareable_reason: Commercially sensitive
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -302,11 +324,8 @@
     description: This is a dummy investment project for testing
     stage: 8a320cc9-ae2e-443e-9d26-2f36452c2ced  # Prospect
     status: ongoing
-    nda_signed: false
     estimated_land_date: 2020-01-01
     investment_type: 9c364e64-2b28-401b-b2df-50e08b0bca44  # Non-FDI
-    project_shareable: true
-    not_shareable_reason: ''
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -325,11 +344,8 @@
     description: This is a dummy investment project for testing
     stage: 8a320cc9-ae2e-443e-9d26-2f36452c2ced  # Prospect
     status: ongoing
-    nda_signed: false
     estimated_land_date: 2020-01-01
     investment_type: 031269ab-b7ec-40e9-8a4e-7371404f0622  # Commitment to invest
-    project_shareable: false
-    not_shareable_reason: Commercially sensitive
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -348,11 +364,8 @@
     description: This is a dummy investment project for testing
     stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8  # Active
     status: ongoing
-    nda_signed: false
     estimated_land_date: 2020-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
-    project_shareable: false
-    not_shareable_reason: Commercially sensitive
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -402,11 +415,8 @@
     stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8  # Active
     status: delayed
     reason_delayed: Waiting on materials.
-    nda_signed: false
     estimated_land_date: 2020-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
-    project_shareable: false
-    not_shareable_reason: Commercially sensitive
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -443,11 +453,8 @@
     status: abandoned
     reason_abandoned: Not economically viable
     date_abandoned: 2018-01-01
-    nda_signed: false
     estimated_land_date: 2020-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
-    project_shareable: false
-    not_shareable_reason: Commercially sensitive
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -485,11 +492,8 @@
     date_lost: 2018-01-01
     reason_lost: Low demand.
     country_lost_to: 0950bdb8-5d95-e211-a939-e4115bead28a
-    nda_signed: false
     estimated_land_date: 2020-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
-    project_shareable: false
-    not_shareable_reason: Commercially sensitive
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -524,11 +528,8 @@
     description: This is a dummy investment project for testing
     stage: 49b8f6f3-0c50-4150-a965-2c974f3149e3  # Verify win
     status: ongoing
-    nda_signed: false
     estimated_land_date: 2020-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
-    project_shareable: false
-    not_shareable_reason: Commercially sensitive
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -561,9 +562,9 @@
     project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
     project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
     uk_company: a73efeba-8499-11e6-ae22-56b6b6499611
-    address_line_1: 10 Eastings Road
-    address_line_2: London
-    address_line_postcode: W1 2AA
+    address_1: 10 Eastings Road
+    address_town: London
+    address_postcode: W1 2AA
 
 
 - model: investment.investmentproject
@@ -573,11 +574,8 @@
     description: This is a dummy investment project for testing
     stage: 945ea6d1-eee3-4f5b-9144-84a75b71b8e6  # Won
     status: ongoing
-    nda_signed: false
     estimated_land_date: 2020-01-01
     investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
-    project_shareable: false
-    not_shareable_reason: Commercially sensitive
     investor_company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     client_contacts:
       - 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -610,9 +608,9 @@
     project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
     project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
     uk_company: a73efeba-8499-11e6-ae22-56b6b6499611
-    address_line_1: 10 Eastings Road
-    address_line_2: London
-    address_line_postcode: W1 2AA
+    address_1: 10 Eastings Road
+    address_town: London
+    address_postcode: W1 2AA
 
 - model: interaction.interaction
   pk: 94d03877-fceb-44a0-8813-17b727d2e7f6

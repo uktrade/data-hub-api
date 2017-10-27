@@ -40,7 +40,7 @@ class Payment(BaseModel):
         choices=PaymentMethod,
         default=PaymentMethod.bacs
     )
-    received_on = models.DateTimeField()
+    received_on = models.DateField()
 
     # card payments
     cardholder_name = models.CharField(max_length=MAX_LENGTH, blank=True)

@@ -109,9 +109,7 @@ class TestUnifiedViews(APITestMixin):
             'name': 'project name',
             'description': 'project description',
             'anonymous_description': 'project anon description',
-            'nda_signed': False,
             'estimated_land_date': '2020-12-12',
-            'project_shareable': False,
             'quotable_as_public_case_study': True,
             'likelihood_of_landing': 60,
             'priority': '1_low',
@@ -156,9 +154,7 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['name'] == request_data['name']
         assert response_data['description'] == request_data['description']
         assert response_data['anonymous_description'] == request_data['anonymous_description']
-        assert response_data['nda_signed'] == request_data['nda_signed']
         assert response_data['estimated_land_date'] == request_data['estimated_land_date']
-        assert response_data['project_shareable'] == request_data['project_shareable']
         assert (response_data['quotable_as_public_case_study'] ==
                 request_data['quotable_as_public_case_study'])
         assert response_data['likelihood_of_landing'] == request_data['likelihood_of_landing']
@@ -194,8 +190,6 @@ class TestUnifiedViews(APITestMixin):
             'investor_company': ['This field is required.'],
             'investment_type': ['This field is required.'],
             'name': ['This field is required.'],
-            'nda_signed': ['This field is required.'],
-            'project_shareable': ['This field is required.'],
             'referral_source_activity': ['This field is required.'],
             'referral_source_adviser': ['This field is required.'],
             'sector': ['This field is required.']
@@ -213,8 +207,6 @@ class TestUnifiedViews(APITestMixin):
             'investor_company': None,
             'investment_type': None,
             'name': None,
-            'nda_signed': None,
-            'project_shareable': None,
             'referral_source_activity': None,
             'referral_source_adviser': None,
             'sector': None
@@ -231,8 +223,6 @@ class TestUnifiedViews(APITestMixin):
             'investor_company': ['This field may not be null.'],
             'investment_type': ['This field may not be null.'],
             'name': ['This field may not be null.'],
-            'nda_signed': ['This field may not be null.'],
-            'project_shareable': ['This field may not be null.'],
             'referral_source_activity': ['This field may not be null.'],
             'referral_source_adviser': ['This field may not be null.'],
             'sector': ['This field may not be null.']
@@ -265,7 +255,6 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['name'] == project.name
         assert response_data['description'] == project.description
         assert response_data['likelihood_of_landing'] == project.likelihood_of_landing
-        assert response_data['nda_signed'] == project.nda_signed
         assert response_data['project_code'] == project.project_code
         assert response_data['estimated_land_date'] == str(project.estimated_land_date)
         assert response_data['investment_type']['id'] == str(project.investment_type.id)
@@ -350,9 +339,7 @@ class TestUnifiedViews(APITestMixin):
         request_data = {
             'name': 'project name',
             'description': 'project description',
-            'nda_signed': False,
             'estimated_land_date': '2020-12-12',
-            'project_shareable': False,
             'investment_type': {
                 'id': constants.InvestmentType.fdi.value.id
             },
@@ -596,9 +583,9 @@ class TestUnifiedViews(APITestMixin):
             'non_fdi_r_and_d_budget': ['This field is required.'],
             'new_tech_to_uk': ['This field is required.'],
             'export_revenue': ['This field is required.'],
-            'address_line_1': ['This field is required.'],
-            'address_line_2': ['This field is required.'],
-            'address_line_postcode': ['This field is required.'],
+            'address_1': ['This field is required.'],
+            'address_town': ['This field is required.'],
+            'address_postcode': ['This field is required.'],
             'average_salary': ['This field is required.'],
             'client_cannot_provide_foreign_investment': ['This field is required.'],
             'foreign_equity_investment': ['This field is required.'],
@@ -622,9 +609,9 @@ class TestUnifiedViews(APITestMixin):
             associated_non_fdi_r_and_d_project=InvestmentProjectFactory(),
             new_tech_to_uk=True,
             export_revenue=True,
-            address_line_1='12 London Road',
-            address_line_2='London',
-            address_line_postcode='SW1A 2AA',
+            address_1='12 London Road',
+            address_town='London',
+            address_postcode='SW1A 2AA',
             average_salary_id=constants.SalaryRange.below_25000.value.id
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
@@ -769,7 +756,7 @@ class TestUnifiedViews(APITestMixin):
         project = InvestmentProjectFactory(
             client_requirements='client reqs',
             site_decided=True,
-            address_line_1='address 1',
+            address_1='address 1',
             client_considering_other_countries=True,
             competitor_countries=countries,
             strategic_drivers=strategic_drivers,
@@ -786,7 +773,7 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['client_considering_other_countries'] is True
         assert response_data['requirements_complete'] is True
         assert response_data['uk_company_decided'] is False
-        assert response_data['address_line_1'] == 'address 1'
+        assert response_data['address_1'] == 'address 1'
         assert sorted(country['id'] for country in response_data[
             'competitor_countries']) == sorted(countries)
         assert sorted(driver['id'] for driver in response_data[
@@ -796,12 +783,12 @@ class TestUnifiedViews(APITestMixin):
         """Test successfully partially updating a requirements object."""
         project = InvestmentProjectFactory(client_requirements='client reqs',
                                            site_decided=True,
-                                           address_line_1='address 1')
+                                           address_1='address 1')
         url = reverse('api-v3:investment:investment-item',
                       kwargs={'pk': project.pk})
         request_data = {
-            'address_line_1': 'address 1 new',
-            'address_line_2': 'address 2 new'
+            'address_1': 'address 1 new',
+            'address_2': 'address 2 new'
         }
         response = self.api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
@@ -809,8 +796,8 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['requirements_complete'] is False
         assert response_data['client_requirements'] == 'client reqs'
         assert response_data['site_decided'] is True
-        assert response_data['address_line_1'] == 'address 1 new'
-        assert response_data['address_line_2'] == 'address 2 new'
+        assert response_data['address_1'] == 'address 1 new'
+        assert response_data['address_2'] == 'address 2 new'
 
     def test_get_team_success(self):
         """Test successfully getting a project requirements object."""

@@ -1,28 +1,39 @@
 import pytest
+from dateutil.parser import parse as dateutil_parse
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import AdviserFactory
+from datahub.company.models import Company
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.models import Order
-from datahub.omis.order.test.factories import OrderAssigneeFactory, OrderFactory, \
-    OrderSubscriberFactory
+from datahub.omis.order.test.factories import (
+    OrderAssigneeFactory, OrderFactory,
+    OrderSubscriberFactory, OrderWithAcceptedQuoteFactory
+)
 
 pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def setup_data():
+def setup_data(setup_es):
     """Sets up data for the tests."""
     with freeze_time('2017-01-01 13:00:00'):
+        company = CompanyFactory(name='Mercury trading')
+        contact = ContactFactory(company=company, first_name='John', last_name='Doe')
         order = OrderFactory(
-            reference='ref1',
+            reference='abcd',
             primary_market_id=constants.Country.japan.value.id,
             assignees=[],
-            status=OrderStatus.draft
+            status=OrderStatus.draft,
+            company=company,
+            contact=contact,
+            discount_value=0,
+            delivery_date=dateutil_parse('2018-01-01').date(),
+            vat_verified=False
         )
         OrderSubscriberFactory(
             order=order,
@@ -30,15 +41,23 @@ def setup_data():
         )
         OrderAssigneeFactory(
             order=order,
-            adviser=AdviserFactory(dit_team_id=constants.Team.tees_valley_lep.value.id)
+            adviser=AdviserFactory(dit_team_id=constants.Team.tees_valley_lep.value.id),
+            estimated_time=60
         )
 
     with freeze_time('2017-02-01 13:00:00'):
-        order = OrderFactory(
-            reference='ref2',
+        company = CompanyFactory(name='Venus Ltd')
+        contact = ContactFactory(company=company, first_name='Jenny', last_name='Cakeman')
+        order = OrderWithAcceptedQuoteFactory(
+            reference='efgh',
             primary_market_id=constants.Country.france.value.id,
             assignees=[],
-            status=OrderStatus.quote_awaiting_acceptance
+            status=OrderStatus.quote_awaiting_acceptance,
+            company=company,
+            contact=contact,
+            discount_value=0,
+            delivery_date=dateutil_parse('2018-02-01').date(),
+            vat_verified=False
         )
         OrderSubscriberFactory(
             order=order,
@@ -46,8 +65,11 @@ def setup_data():
         )
         OrderAssigneeFactory(
             order=order,
-            adviser=AdviserFactory(dit_team_id=constants.Team.food_from_britain.value.id)
+            adviser=AdviserFactory(dit_team_id=constants.Team.food_from_britain.value.id),
+            estimated_time=120
         )
+
+        setup_es.indices.refresh()
 
 
 class TestSearchOrder(APITestMixin):
@@ -58,49 +80,139 @@ class TestSearchOrder(APITestMixin):
         (
             (  # no filter => return all records
                 {},
-                ['ref2', 'ref1']
+                ['efgh', 'abcd']
             ),
             (  # pagination
                 {'limit': 1, 'offset': 1},
-                ['ref1']
+                ['abcd']
             ),
             (  # filter by primary market
                 {'primary_market': constants.Country.france.value.id},
-                ['ref2']
-            ),
-            (  # invalid market => no results
-                {'primary_market': 'invalid'},
-                []
+                ['efgh']
             ),
             (  # filter by a range of date for created_on
                 {
                     'created_on_before': '2017-02-02',
                     'created_on_after': '2017-02-01'
                 },
-                ['ref2']
+                ['efgh']
             ),
             (  # filter by created_on_before only
                 {'created_on_before': '2017-01-15'},
-                ['ref1']
+                ['abcd']
             ),
             (  # filter by created_on_after only
                 {'created_on_after': '2017-01-15'},
-                ['ref2']
+                ['efgh']
             ),
             (  # filter by status
                 {'status': 'quote_awaiting_acceptance'},
-                ['ref2']
+                ['efgh']
             ),
             (  # invalid status => no results
                 {'status': 'invalid'},
                 []
             ),
+            (  # search by reference
+                {'original_query': 'efgh'},
+                ['efgh']
+            ),
+            (  # search by reference partial
+                {'original_query': 'efg'},
+                ['efgh']
+            ),
+            (  # search by contact name exact
+                {'original_query': 'Jenny Cakeman'},
+                ['efgh']
+            ),
+            (  # search by contact name partial
+                {'original_query': 'Jenny Cakem'},
+                ['efgh']
+            ),
+            (  # search by company name exact
+                {'original_query': 'Venus Ltd'},
+                ['efgh']
+            ),
+            (  # search by company name partial
+                {'original_query': 'Venus'},
+                ['efgh']
+            ),
+            (  # search by subtotal_cost
+                {'original_query': '2000'},
+                ['efgh']
+            ),
+            (  # search by total_cost
+                {'original_query': '2400'},
+                ['efgh']
+            ),
+            (  # search by reference
+                {'reference': 'efgh'},
+                ['efgh']
+            ),
+            (  # search by reference partial
+                {'reference': 'efg'},
+                ['efgh']
+            ),
+            (  # search by subtotal_cost
+                {'subtotal_cost': 2000},
+                ['efgh']
+            ),
+            (  # search by total_cost
+                {'total_cost': 2400},
+                ['efgh']
+            ),
+            (  # search by contact name exact
+                {'contact_name': 'Jenny Cakeman'},
+                ['efgh']
+            ),
+            (  # search by contact name partial
+                {'contact_name': 'Jenny Cakem'},
+                ['efgh']
+            ),
+            (  # search by company name exact
+                {'company_name': 'Venus Ltd'},
+                ['efgh']
+            ),
+            (  # search by company name partial
+                {'company_name': 'Venus'},
+                ['efgh']
+            ),
+            (  # sort by created_on ASC
+                {'sortby': 'created_on:asc'},
+                ['abcd', 'efgh']
+            ),
+            (  # sort by created_on DESC
+                {'sortby': 'created_on:desc'},
+                ['efgh', 'abcd']
+            ),
+            (  # sort by modified_on ASC
+                {'sortby': 'modified_on:asc'},
+                ['abcd', 'efgh']
+            ),
+            (  # sort by modified_on DESC
+                {'sortby': 'modified_on:desc'},
+                ['efgh', 'abcd']
+            ),
+            (  # sort by delivery_date ASC
+                {'sortby': 'delivery_date:asc'},
+                ['abcd', 'efgh']
+            ),
+            (  # sort by delivery_date DESC
+                {'sortby': 'delivery_date:desc'},
+                ['efgh', 'abcd']
+            ),
+            (  # sort by payment_due_date ASC
+                {'sortby': 'payment_due_date:asc'},
+                ['abcd', 'efgh']
+            ),
+            (  # sort by payment_due_date DESC
+                {'sortby': 'payment_due_date:desc'},
+                ['efgh', 'abcd']
+            ),
         )
     )
-    def test_search(self, setup_es, setup_data, data, results):
+    def test_search(self, setup_data, data, results):
         """Test search results."""
-        setup_es.indices.refresh()
-
         url = reverse('api-v3:search:order')
 
         response = self.api_client.post(url, data, format='json')
@@ -111,10 +223,23 @@ class TestSearchOrder(APITestMixin):
             item['reference'] for item in response.json()['results']
         ] == results
 
-    def test_incorrect_dates_raise_validation_error(self, setup_es, setup_data):
-        """Test that if the dates are not in a valid format, the API return a validation error."""
-        setup_es.indices.refresh()
+    def test_filter_by_company_id(self, setup_data):
+        """Test that orders can be filtered by company id."""
+        url = reverse('api-v3:search:order')
 
+        response = self.api_client.post(
+            url, {
+                'company': Company.objects.get(name='Venus Ltd').pk
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()['results']) == 1
+        assert response.json()['results'][0]['reference'] == 'efgh'
+
+    def test_incorrect_dates_raise_validation_error(self, setup_data):
+        """Test that if the dates are not in a valid format, the API return a validation error."""
         url = reverse('api-v3:search:order')
 
         response = self.api_client.post(url, {
@@ -122,13 +247,25 @@ class TestSearchOrder(APITestMixin):
         }, format='json')
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {'non_field_errors': 'Date(s) in incorrect format.'}
+        assert response.json() == {'created_on_before': ['Date is in incorrect format.']}
 
-    def test_filter_by_assigned_to_assignee_adviser(self, setup_es, setup_data):
+    def test_incorrect_primary_market_raise_validation_error(self, setup_data):
+        """
+        Test that if the primary_market is not in a valid format,
+        then the API return a validation error.
+        """
+        url = reverse('api-v3:search:order')
+
+        response = self.api_client.post(url, {
+            'primary_market': 'invalid',
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {'primary_market': ['"invalid" is not a valid UUID.']}
+
+    def test_filter_by_assigned_to_assignee_adviser(self, setup_data):
         """Test that results can be filtered by assignee."""
-        setup_es.indices.refresh()
-
-        assignee = Order.objects.get(reference='ref2').assignees.first()
+        assignee = Order.objects.get(reference='efgh').assignees.first()
 
         url = reverse('api-v3:search:order')
 
@@ -138,13 +275,11 @@ class TestSearchOrder(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()['results']) == 1
-        assert response.json()['results'][0]['reference'] == 'ref2'
+        assert response.json()['results'][0]['reference'] == 'efgh'
 
-    def test_filter_by_assigned_to_assignee_adviser_team(self, setup_es, setup_data):
+    def test_filter_by_assigned_to_assignee_adviser_team(self, setup_data):
         """Test that results can be filtered by the assignee's team."""
-        setup_es.indices.refresh()
-
-        assignee = Order.objects.get(reference='ref2').assignees.first()
+        assignee = Order.objects.get(reference='efgh').assignees.first()
 
         url = reverse('api-v3:search:order')
 
@@ -154,4 +289,65 @@ class TestSearchOrder(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()['results']) == 1
-        assert response.json()['results'][0]['reference'] == 'ref2'
+        assert response.json()['results'][0]['reference'] == 'efgh'
+
+
+class TestGlobalSearch(APITestMixin):
+    """Test global search for orders."""
+
+    @pytest.mark.parametrize(
+        'term,results',
+        (
+            (  # no filter => return all records
+                '',
+                ['abcd', 'efgh']
+            ),
+            (  # search by reference
+                'efgh',
+                ['efgh']
+            ),
+            (  # search by reference partial
+                'efg',
+                ['efgh']
+            ),
+            (  # search by contact name exact
+                'Jenny Cakeman',
+                ['efgh']
+            ),
+            (  # search by contact name partial
+                'Jenny Cakem',
+                ['efgh']
+            ),
+            (  # search by company name exact
+                'Venus Ltd',
+                ['efgh']
+            ),
+            (  # search by company name partial
+                'Venus',
+                ['efgh']
+            ),
+            (  # search by subtotal_cost
+                '2000',
+                ['efgh']
+            ),
+            (  # search by total_cost
+                '2400',
+                ['efgh']
+            ),
+        )
+    )
+    def test_search(self, setup_data, term, results):
+        """Test search results."""
+        url = reverse('api-v3:search:basic')
+
+        response = self.api_client.get(url, {
+            'term': term,
+            'sortby': 'created_on:asc',
+            'entity': 'order'
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()['results']) == len(results)
+        assert [
+            item['reference'] for item in response.json()['results']
+        ] == results

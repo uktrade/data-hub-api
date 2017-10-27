@@ -1,11 +1,17 @@
+from datahub.core.serializers import ConstantModelSerializer
 from datahub.metadata.registry import registry
 
 from . import models
-from .serializers import ServiceTypeSerializer
 
 
 registry.register(
     metadata_id='order-service-type',
     model=models.ServiceType,
-    serializer=ServiceTypeSerializer
+    serializer=ConstantModelSerializer
+)
+
+registry.register(
+    metadata_id='order-cancellation-reason',
+    model=models.CancellationReason,
+    serializer=ConstantModelSerializer
 )

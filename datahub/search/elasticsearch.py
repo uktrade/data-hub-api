@@ -1,7 +1,6 @@
 from collections import defaultdict
 from itertools import chain
 
-import dateutil.parser
 from django.conf import settings
 from elasticsearch.helpers import bulk as es_bulk
 from elasticsearch_dsl import analysis, Index, Search
@@ -19,7 +18,13 @@ lowercase_keyword_analyzer = analysis.CustomAnalyzer(
 )
 
 # Trigram tokenizer enables us to support partial matching
-trigram = analysis.tokenizer('trigram', 'nGram', min_gram=3, max_gram=3)
+trigram = analysis.tokenizer(
+    'trigram',
+    'nGram',
+    min_gram=3,
+    max_gram=3,
+    token_chars=('letter', 'digit',)
+)
 
 # Filters out "-" so that t-shirt and tshirt can be matched
 special_chars = analysis.char_filter('special_chars', 'mapping', mappings=('-=>',))
@@ -90,6 +95,14 @@ def configure_index(index_name, settings=None):
         index.create()
 
 
+def get_query_type_for_field(field):
+    """Gets query type depending on field suffix."""
+    if any(field.endswith(suffix) for suffix in ('_keyword', '_trigram',)):
+        return 'match_phrase'
+
+    return 'match'
+
+
 def get_search_term_query(term, fields=None):
     """Returns search term query."""
     if term == '':
@@ -99,15 +112,17 @@ def get_search_term_query(term, fields=None):
         # Promote exact name match
         MatchPhrase(name_keyword={'query': term, 'boost': 2}),
         # Exact match by id
-        MatchPhrase(id={'query': term}),
+        MatchPhrase(id=term),
         # Match similar name
-        Match(name={'query': term}),
+        Match(name=term),
         # Partial match name
-        MatchPhrase(name_trigram={'query': term}),
+        MatchPhrase(name_trigram=term),
     ]
 
     if fields:
-        should_query.extend([get_field_query('match', field, term) for field in fields])
+        should_query.extend([
+            get_field_query(get_query_type_for_field(field), field, term) for field in fields
+        ])
 
     return Q('bool', should=should_query)
 
@@ -174,7 +189,7 @@ def get_basic_search_query(term, entities=None, field_order=None, offset=0, limi
 
 def get_term_or_match_query(field, value):
     """Gets term or match query."""
-    kind = 'match' if field.endswith('_trigram') else 'term'
+    kind = 'match_phrase' if field.endswith('_trigram') else 'term'
 
     return get_field_query(kind, field, value)
 
@@ -281,9 +296,9 @@ def date_range_fields(fields):
             range_key = k[:k.rindex('_')]
 
             if k.endswith('_before'):
-                ranges[range_key]['lte'] = dateutil.parser.parse(fields[k])
+                ranges[range_key]['lte'] = fields[k]
             if k.endswith('_after'):
-                ranges[range_key]['gte'] = dateutil.parser.parse(fields[k])
+                ranges[range_key]['gte'] = fields[k]
 
             continue
 

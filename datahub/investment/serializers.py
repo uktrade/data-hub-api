@@ -21,7 +21,6 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
     investment_type = NestedRelatedField(meta_models.InvestmentType)
     stage = NestedRelatedField(meta_models.InvestmentProjectStage, required=False)
     country_lost_to = NestedRelatedField(meta_models.Country, required=False, allow_null=True)
-    project_shareable = serializers.BooleanField(required=True)
     investor_company = NestedRelatedField(Company, required=True, allow_null=False)
     investor_company_country = NestedRelatedField(
         meta_models.Country, read_only=True
@@ -107,11 +106,8 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
             'project_code',
             'description',
             'anonymous_description',
-            'nda_signed',
             'estimated_land_date',
             'actual_land_date',
-            'project_shareable',
-            'not_shareable_reason',
             'quotable_as_public_case_study',
             'likelihood_of_landing',
             'priority',
@@ -156,7 +152,6 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
         # DRF defaults to required=False even though this field is
         # non-nullable
         extra_kwargs = {
-            'nda_signed': {'required': True},
             'likelihood_of_landing': {'min_value': 0, 'max_value': 100},
             'archived': {'read_only': True},
             'archived_on': {'read_only': True},
@@ -228,10 +223,10 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
         fields = (
             'client_requirements',
             'site_decided',  # deprecated; will be removed
-            'address_line_1',
-            'address_line_2',
-            'address_line_3',
-            'address_line_postcode',
+            'address_1',
+            'address_2',
+            'address_town',
+            'address_postcode',
             'competitor_countries',
             'uk_region_locations',
             'strategic_drivers',

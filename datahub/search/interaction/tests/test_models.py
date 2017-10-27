@@ -7,7 +7,7 @@ from datahub.search.interaction.models import Interaction
 pytestmark = pytest.mark.django_db
 
 
-def test_interaction_to_dict():
+def test_interaction_to_dict(setup_es):
     """Test converting an interaction to a dict."""
     interaction = InteractionFactory(
         investment_project=InvestmentProjectFactory()
@@ -60,7 +60,7 @@ def test_interaction_to_dict():
     }
 
 
-def test_interactions_to_es_documents():
+def test_interactions_to_es_documents(setup_es):
     """Test converting 2 orders to Elasticsearch documents."""
     interactions = InteractionFactory.create_batch(2)
 

@@ -6,8 +6,8 @@ from datetime import datetime
 from django.http import StreamingHttpResponse
 from django.utils.text import slugify
 from rest_framework.exceptions import ValidationError
+from rest_framework.fields import empty
 from rest_framework.response import Response
-from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 
 from datahub.oauth.scopes import Scope
@@ -96,22 +96,35 @@ class SearchAPIView(APIView):
 
     http_method_names = ('post',)
 
-    def get_filtering_data(self, request):
+    def get_filtering_data(self, validated_data):
         """Return (filters, date ranges) to be used to query ES."""
         filters = {
-            self.REMAP_FIELDS.get(field, field): request.data[field]
+            self.REMAP_FIELDS.get(field, field): validated_data[field]
             for field in self.FILTER_FIELDS
-            if field in request.data
+            if field in validated_data
         }
+        return elasticsearch.date_range_fields(filters)
 
-        try:
-            filters, ranges = elasticsearch.date_range_fields(filters)
-        except ValueError:
-            raise ValidationError({
-                api_settings.NON_FIELD_ERRORS_KEY: 'Date(s) in incorrect format.'
-            })
+    def validate_data(self, data):
+        """Validate and clean data."""
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
 
-        return filters, ranges
+        # prepare default values
+        cleaned_data = {
+            k: v.default for k, v in serializer.fields.items()
+            if v.default is not empty
+        }
+        if serializer.DEFAULT_ORDERING:
+            cleaned_data['sortby'] = serializer.DEFAULT_ORDERING
+
+        # update with validated data
+        cleaned_data.update({
+            k: v for k, v in validated_data.items()
+            if k in data
+        })
+        return cleaned_data
 
     def post(self, request, format=None):
         """Performs search."""
@@ -123,11 +136,8 @@ class SearchAPIView(APIView):
                     and legacy_query_param not in request.data:
                 data[legacy_query_param] = request.query_params[legacy_query_param]
 
-        serializer = self.serializer_class(data=data)
-        serializer.is_valid(raise_exception=True)
-        validated_data = serializer.validated_data
-
-        filters, ranges = self.get_filtering_data(request)
+        validated_data = self.validate_data(data)
+        filters, ranges = self.get_filtering_data(validated_data)
 
         aggregations = (self.REMAP_FIELDS.get(field, field) for field in self.FILTER_FIELDS) \
             if self.include_aggregations else None
@@ -222,11 +232,9 @@ class SearchExportAPIView(SearchAPIView):
 
     def post(self, request, format=None):
         """Performs search and returns CSV file."""
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        validated_data = serializer.validated_data
+        validated_data = self.validate_data(request.data)
 
-        filters, ranges = self.get_filtering_data(request)
+        filters, ranges = self.get_filtering_data(validated_data)
 
         results = elasticsearch.get_search_by_entity_query(
             entity=self.entity,
