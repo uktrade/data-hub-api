@@ -37,7 +37,6 @@ class IProjectAbstract(models.Model):
     name = models.CharField(max_length=MAX_LENGTH)
     description = models.TextField()
     anonymous_description = models.TextField(blank=True)
-    nda_signed = models.BooleanField()
     estimated_land_date = models.DateField()
     investment_type = models.ForeignKey(
         'metadata.InvestmentType', on_delete=models.PROTECT,
@@ -46,8 +45,6 @@ class IProjectAbstract(models.Model):
 
     cdms_project_code = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     quotable_as_public_case_study = models.NullBooleanField()
-    project_shareable = models.NullBooleanField()
-    not_shareable_reason = models.TextField(blank=True, null=True)
     actual_land_date = models.DateField(blank=True, null=True)
     likelihood_of_landing = models.IntegerField(blank=True, null=True)
     priority = models.CharField(max_length=MAX_LENGTH, choices=PRIORITIES, blank=True, null=True)
