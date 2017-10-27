@@ -92,6 +92,7 @@ class Order(DocType, MapDBModelToDict):
         'public_token',
         'invoice',
         'payments',
+        'refunds',
         'archived_documents_url_path',
     )
 
