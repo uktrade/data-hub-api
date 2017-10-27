@@ -1,7 +1,6 @@
 from collections import defaultdict
 from itertools import chain
 
-import dateutil.parser
 from django.conf import settings
 from elasticsearch.helpers import bulk as es_bulk
 from elasticsearch_dsl import analysis, Index, Search
@@ -297,9 +296,9 @@ def date_range_fields(fields):
             range_key = k[:k.rindex('_')]
 
             if k.endswith('_before'):
-                ranges[range_key]['lte'] = dateutil.parser.parse(fields[k])
+                ranges[range_key]['lte'] = fields[k]
             if k.endswith('_after'):
-                ranges[range_key]['gte'] = dateutil.parser.parse(fields[k])
+                ranges[range_key]['gte'] = fields[k]
 
             continue
 

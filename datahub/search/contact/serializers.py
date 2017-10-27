@@ -1,8 +1,19 @@
-from ..serializers import SearchSerializer
+from rest_framework import serializers
+
+from ..serializers import (
+    SearchSerializer,
+    SingleOrListField,
+    StringUUIDField,
+)
 
 
 class SearchContactSerializer(SearchSerializer):
     """Serialiser used to validate contact search POST bodies."""
+
+    company_name = serializers.CharField(required=False)
+    company_sector = SingleOrListField(child=StringUUIDField(), required=False)
+    company_uk_region = SingleOrListField(child=StringUUIDField(), required=False)
+    address_country = SingleOrListField(child=StringUUIDField(), required=False)
 
     SORT_BY_FIELDS = (
         'address_country.name',

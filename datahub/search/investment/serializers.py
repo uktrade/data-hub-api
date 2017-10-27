@@ -1,8 +1,26 @@
-from ..serializers import SearchSerializer
+from rest_framework import serializers
+
+from ..serializers import (
+    RelaxedDateTimeField,
+    SearchSerializer,
+    SingleOrListField,
+    StringUUIDField,
+)
 
 
 class SearchInvestmentProjectSerializer(SearchSerializer):
     """Serialiser used to validate investment project search POST bodies."""
+
+    client_relationship_manager = SingleOrListField(child=StringUUIDField(), required=False)
+    estimated_land_date_after = RelaxedDateTimeField(required=False)
+    estimated_land_date_before = RelaxedDateTimeField(required=False)
+    investment_type = SingleOrListField(child=StringUUIDField(), required=False)
+    investor_company = SingleOrListField(child=StringUUIDField(), required=False)
+    investor_company_country = SingleOrListField(child=StringUUIDField(), required=False)
+    sector = SingleOrListField(child=StringUUIDField(), required=False)
+    stage = SingleOrListField(child=StringUUIDField(), required=False)
+    status = serializers.CharField(required=False)
+    uk_region_location = SingleOrListField(child=StringUUIDField(), required=False)
 
     SORT_BY_FIELDS = (
         'actual_land_date',
