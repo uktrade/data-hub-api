@@ -5,7 +5,7 @@ from django.db import models
 
 from datahub.core.models import BaseModel
 
-from .constants import PaymentMethod
+from .constants import PaymentMethod, RefundStatus
 from .managers import PaymentManager
 
 
@@ -68,6 +68,74 @@ class Payment(BaseModel):
     )
 
     objects = PaymentManager()
+
+    class Meta:
+        ordering = ('created_on', )
+
+    def __str__(self):
+        """Human-readable representation"""
+        return self.reference
+
+
+class Refund(BaseModel):
+    """Details of a refund."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    order = models.ForeignKey(
+        'order.Order',
+        on_delete=models.CASCADE,
+        related_name="%(class)ss",  # noqa: Q000
+    )
+    reference = models.CharField(max_length=100)
+    status = models.CharField(max_length=100, choices=RefundStatus)
+
+    requested_on = models.DateTimeField()
+    requested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True,
+        on_delete=models.PROTECT,
+        related_name='+'
+    )
+    refund_reason = models.TextField(blank=True)
+    requested_amount = models.PositiveIntegerField()
+
+    level1_approved_on = models.DateTimeField(blank=True, null=True)
+    level1_approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True,
+        on_delete=models.PROTECT,
+        related_name='+'
+    )
+    level1_approval_notes = models.TextField(blank=True)
+
+    level2_approved_on = models.DateTimeField(blank=True, null=True)
+    level2_approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True,
+        on_delete=models.PROTECT,
+        related_name='+'
+    )
+    level2_approval_notes = models.TextField(blank=True)
+
+    method = models.CharField(
+        max_length=100,
+        null=True, blank=True,
+        choices=PaymentMethod
+    )
+    net_amount = models.PositiveIntegerField(null=True, blank=True)
+    vat_amount = models.PositiveIntegerField(null=True, blank=True)
+    total_amount = models.PositiveIntegerField(null=True, blank=True)
+
+    rejection_reason = models.TextField(blank=True)
+
+    # legacy fields
+    payment = models.ForeignKey(
+        Payment,
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
+    additional_reference = models.CharField(max_length=100, blank=True)
 
     class Meta:
         ordering = ('created_on', )
