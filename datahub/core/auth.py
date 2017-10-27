@@ -1,8 +1,12 @@
+import logging
+
 import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from pyquery import PyQuery
+
+logger = logging.getLogger(__name__)
 
 
 class CDMSInvalidCredentialsError(RuntimeError):
@@ -12,7 +16,7 @@ class CDMSInvalidCredentialsError(RuntimeError):
 class CDMSUserBackend(ModelBackend):
     """Model backend that authenticates against CDMS and checks for whitelisting."""
 
-    def validate_cdms_credentials(self, username, password):
+    def validate_cdms_credentials(self, user, username, password):
         """Authenticate CDMS user/adviser using cdms login page."""
         try:
             return self._cdms_login(
@@ -20,8 +24,12 @@ class CDMSUserBackend(ModelBackend):
                 username=username,
                 password=password,
             ) is True  # No errors in the process assume success
-        except requests.RequestException:
-            return None  # Communication with CDMS failed
+        except requests.RequestException as exc:
+            logging.exception('Connection error when communicating with CDMS auth server')
+            if user.has_usable_password():
+                # Indicate that the cached password should be used if there is one
+                return None
+            raise
         except (CDMSInvalidCredentialsError, AssertionError):
             return False  # Invalid credentials
 
@@ -38,7 +46,7 @@ class CDMSUserBackend(ModelBackend):
             user_model().set_password(password)
         else:
             if self.user_can_authenticate(user):
-                auth_result = self.validate_cdms_credentials(username, password)
+                auth_result = self.validate_cdms_credentials(user, username, password)
                 if auth_result is True:
                     # user authenticated via CDMS
                     # cache passwd hash for backup auth
@@ -84,7 +92,7 @@ class CDMSUserBackend(ModelBackend):
             session.headers.update({'User-Agent': user_agent})
         # 1. get login page
         # url = '{}/?whr={}'.format(CDMS_BASE_URL, CDMS_ADFS_URL)
-        resp = session.get(url)
+        resp = session.get(url, timeout=settings.CDMS_AUTH_TIMEOUT)
         assert resp.ok
 
         html_parser = PyQuery(resp.text)
@@ -130,7 +138,7 @@ class CDMSUserBackend(ModelBackend):
         data.update(params or {})
 
         url = url or form_action
-        resp = session.post(url, data)
+        resp = session.post(url, data, timeout=settings.CDMS_AUTH_TIMEOUT)
 
         if not resp.ok:
             raise CDMSInvalidCredentialsError()
