@@ -5,6 +5,7 @@ from datetime import datetime
 
 from django.http import StreamingHttpResponse
 from django.utils.text import slugify
+from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import empty
 from rest_framework.response import Response
@@ -21,7 +22,7 @@ EntitySearch = namedtuple('EntitySearch', ['model', 'name'])
 
 class SearchBasicAPIView(APIView):
     """Aggregate all entities search view."""
-    permission_classes = ()
+    permission_classes = (IsAuthenticatedOrTokenHasScope,)
 
     required_scopes = (Scope.internal_front_end,)
     http_method_names = ('get',)
@@ -86,7 +87,7 @@ class SearchBasicAPIView(APIView):
 
 class SearchAPIView(APIView):
     """Filtered search view."""
-    permission_classes = ()
+    permission_classes = (IsAuthenticatedOrTokenHasScope,)
     FILTER_FIELDS = []
     REMAP_FIELDS = {}
 
