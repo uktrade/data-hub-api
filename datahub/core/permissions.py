@@ -1,16 +1,4 @@
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import DjangoModelPermissions
-
-
-def method_permission_required(perm):
-    def wrap(f):
-        def wrapped_f(self, request, *args, **kwargs):
-            if request.user.has_perm(perm):
-                return f(self, request, *args, **kwargs)
-            else:
-                raise PermissionDenied
-        return wrapped_f
-    return wrap
 
 
 class CrudPermission(DjangoModelPermissions):
