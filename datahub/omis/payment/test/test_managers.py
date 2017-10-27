@@ -28,7 +28,7 @@ class TestPaymentManager:
         attrs = {
             'transaction_reference': 'lorem ipsum',
             'amount': 1001,
-            'received_on': dateutil_parse('2017-01-01 13:00:00')
+            'received_on': dateutil_parse('2017-01-01').date()
         }
         payment = Payment.objects.create_from_order(
             order=order, by=by, attrs=attrs

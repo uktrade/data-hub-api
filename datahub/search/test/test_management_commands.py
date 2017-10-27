@@ -31,7 +31,7 @@ def test_batch_rows():
 
 @mock.patch('datahub.search.management.commands.sync_es.bulk')
 @mock.patch('datahub.search.management.commands.sync_es.get_datasets')
-def test_sync_dataset(get_datasets, bulk):
+def test_sync_dataset(get_datasets, bulk, setup_es):
     """Tests syncing dataset up to Elasticsearch."""
     get_datasets.return_value = (
         DataSet([CompanyFactory(), CompanyFactory()], ESCompany),

@@ -18,12 +18,22 @@ class SearchOrderParams:
         'assigned_to_adviser',
         'assigned_to_team',
         'status',
+        'reference',
+        'total_cost',
+        'subtotal_cost',
+        'contact_name',
+        'company_name',
+        'company',
     ]
 
     REMAP_FIELDS = {
         'primary_market': 'primary_market.id',
         'assigned_to_adviser': 'assignees.id',
         'assigned_to_team': 'assignees.dit_team.id',
+        'contact_name': 'contact.name_trigram',
+        'company_name': 'company.name_trigram',
+        'company': 'company.id',
+        'reference': 'reference_trigram',
     }
 
 

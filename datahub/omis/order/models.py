@@ -61,6 +61,10 @@ class HourlyRate(BaseConstantModel):
         db_table = 'omis-order_hourlyrate'
 
 
+class CancellationReason(BaseOrderedConstantModel):
+    """Reasons for cancelling an order."""
+
+
 class Order(BaseModel):
     """
     Details regarding an OMIS Order.
@@ -202,6 +206,28 @@ class Order(BaseModel):
         related_name='+'
     )
 
+    completed_on = models.DateTimeField(null=True, blank=True)
+    completed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
+
+    cancelled_on = models.DateTimeField(null=True, blank=True)
+    cancelled_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
+    cancellation_reason = models.ForeignKey(
+        CancellationReason,
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
+
     # legacy fields, only meant to be used in readonly mode as reference
     product_info = models.TextField(
         blank=True, editable=False,
@@ -218,6 +244,10 @@ class Order(BaseModel):
     permission_to_approach_contacts = models.TextField(
         blank=True, editable=False,
         help_text='Legacy field. Can DIT speak to the contacts?'
+    )
+    archived_documents_url_path = models.CharField(
+        max_length=MAX_LENGTH, blank=True,
+        help_text='Legacy field. Link to the archived documents for this order.'
     )
 
     objects = OrderQuerySet.as_manager()
@@ -434,7 +464,16 @@ class OrderAssignee(BaseModel):
     team = models.ForeignKey(Team, blank=True, null=True, on_delete=models.SET_NULL)
     country = models.ForeignKey(Country, blank=True, null=True, on_delete=models.SET_NULL)
 
-    estimated_time = models.IntegerField(default=0, help_text='Estimated time in minutes.')
+    estimated_time = models.IntegerField(
+        default=0,
+        validators=(MinValueValidator(0),),
+        help_text='Estimated time in minutes.',
+    )
+    actual_time = models.IntegerField(
+        blank=True, null=True,
+        validators=(MinValueValidator(0),),
+        help_text='Actual time in minutes.'
+    )
     is_lead = models.BooleanField(default=False)
 
     class Meta:

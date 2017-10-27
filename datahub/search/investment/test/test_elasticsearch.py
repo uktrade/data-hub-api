@@ -21,21 +21,15 @@ def test_get_basic_search_query():
                         }
                     }, {
                         'match_phrase': {
-                            'id': {
-                                'query': 'test'
-                            }
+                            'id': 'test'
                         }
                     }, {
                         'match': {
-                            'name': {
-                                'query': 'test'
-                            }
+                            'name': 'test'
                         }
                     }, {
                         'match_phrase': {
-                            'name_trigram': {
-                                'query': 'test'
-                            }
+                            'name_trigram': 'test'
                         }
                     }, {
                         'match': {
@@ -91,10 +85,28 @@ def test_get_basic_search_query():
                         }
                     }, {
                         'nested': {
+                            'path': 'company',
+                            'query': {
+                                'match_phrase': {
+                                    'company.name_trigram': 'test'
+                                }
+                            }
+                        }
+                    }, {
+                        'nested': {
                             'path': 'contact',
                             'query': {
                                 'match': {
                                     'contact.name': 'test'
+                                }
+                            }
+                        }
+                    }, {
+                        'nested': {
+                            'path': 'contact',
+                            'query': {
+                                'match_phrase': {
+                                    'contact.name_trigram': 'test'
                                 }
                             }
                         }
@@ -165,6 +177,10 @@ def test_get_basic_search_query():
                             }
                         }
                     }, {
+                        'match_phrase': {
+                            'reference_trigram': 'test'
+                        }
+                    }, {
                         'nested': {
                             'path': 'registered_address_country',
                             'query': {
@@ -204,6 +220,10 @@ def test_get_basic_search_query():
                             'subject_english': 'test'
                         }
                     }, {
+                        'match': {
+                            'subtotal_cost_string': 'test'
+                        }
+                    }, {
                         'nested': {
                             'path': 'teams',
                             'query': {
@@ -211,6 +231,10 @@ def test_get_basic_search_query():
                                     'teams.name': 'test'
                                 }
                             }
+                        }
+                    }, {
+                        'match': {
+                            'total_cost_string': 'test'
                         }
                     }, {
                         'nested': {
@@ -224,6 +248,14 @@ def test_get_basic_search_query():
                     }, {
                         'match': {
                             'trading_address_town': 'test'
+                        }
+                    }, {
+                        'match_phrase': {
+                            'trading_name_keyword': 'test'
+                        }
+                    }, {
+                        'match_phrase': {
+                            'trading_name_trigram': 'test'
                         }
                     }, {
                         'nested': {
@@ -319,21 +351,15 @@ def test_limited_get_search_by_entity_query():
                                     }
                                 }, {
                                     'match_phrase': {
-                                        'id': {
-                                            'query': 'test'
-                                        }
+                                        'id': 'test'
                                     }
                                 }, {
                                     'match': {
-                                        'name': {
-                                            'query': 'test'
-                                        }
+                                        'name': 'test'
                                     }
                                 }, {
                                     'match_phrase': {
-                                        'name_trigram': {
-                                            'query': 'test'
-                                        }
+                                        'name_trigram': 'test'
                                     }
                                 }, {
                                     'nested': {

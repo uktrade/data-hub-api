@@ -80,12 +80,12 @@ class TestCreatePayments(APITestMixin):
                 {
                     'transaction_reference': 'some ref1',
                     'amount': 1,
-                    'received_on': '2017-04-20T13:00'
+                    'received_on': '2017-04-20'
                 },
                 {
                     'transaction_reference': 'some ref2',
                     'amount': order.total_cost - 1,
-                    'received_on': '2017-04-21T13:00'
+                    'received_on': '2017-04-21'
                 }
             ],
             format='json'
@@ -100,7 +100,7 @@ class TestCreatePayments(APITestMixin):
                 'additional_reference': '',
                 'amount': 1,
                 'method': PaymentMethod.bacs,
-                'received_on': '2017-04-20T13:00:00'
+                'received_on': '2017-04-20'
             },
             {
                 'created_on': '2017-04-25T13:00:00',
@@ -109,7 +109,7 @@ class TestCreatePayments(APITestMixin):
                 'additional_reference': '',
                 'amount': order.total_cost - 1,
                 'method': PaymentMethod.bacs,
-                'received_on': '2017-04-21T13:00:00'
+                'received_on': '2017-04-21'
             }
         ]
 
@@ -126,11 +126,11 @@ class TestCreatePayments(APITestMixin):
             [
                 {
                     'amount': 1,
-                    'received_on': '2017-04-20T13:00'
+                    'received_on': '2017-04-20'
                 },
                 {
                     'amount': order.total_cost - 2,
-                    'received_on': '2017-04-21T13:00'
+                    'received_on': '2017-04-21'
                 }
             ],
             format='json'
@@ -153,10 +153,10 @@ class TestCreatePayments(APITestMixin):
             [
                 {
                     'amount': 1,
-                    'received_on': '2017-04-20T13:00'
+                    'received_on': '2017-04-20'
                 },
                 {
-                    'received_on': '2017-04-21T13:00'
+                    'received_on': '2017-04-21'
                 },
                 {
                     'amount': order.total_cost - 1
@@ -184,11 +184,11 @@ class TestCreatePayments(APITestMixin):
             [
                 {
                     'amount': order.total_cost,
-                    'received_on': '2017-04-20T13:00'
+                    'received_on': '2017-04-20'
                 },
                 {
                     'amount': 1,
-                    'received_on': '2017-04-21T13:00'
+                    'received_on': '2017-04-21'
                 }
             ],
             format='json'

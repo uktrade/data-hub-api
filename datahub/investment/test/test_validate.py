@@ -263,9 +263,9 @@ def test_validate_verify_win_instance_failure():
         'non_fdi_r_and_d_budget': 'This field is required.',
         'new_tech_to_uk': 'This field is required.',
         'export_revenue': 'This field is required.',
-        'address_line_1': 'This field is required.',
-        'address_line_2': 'This field is required.',
-        'address_line_postcode': 'This field is required.',
+        'address_1': 'This field is required.',
+        'address_town': 'This field is required.',
+        'address_postcode': 'This field is required.',
         'average_salary': 'This field is required.',
         'client_cannot_provide_foreign_investment': 'This field is required.',
         'foreign_equity_investment': 'This field is required.',
@@ -327,9 +327,9 @@ def test_validate_verify_win_instance_with_cond_fields():
         associated_non_fdi_r_and_d_project=InvestmentProjectFactory(),
         new_tech_to_uk=True,
         export_revenue=True,
-        address_line_1='12 London Road',
-        address_line_2='London',
-        address_line_postcode='SW1A 2AA',
+        address_1='12 London Road',
+        address_town='London',
+        address_postcode='SW1A 2AA',
         average_salary_id=constants.SalaryRange.below_25000.value.id
     )
     errors = validate(instance=project)

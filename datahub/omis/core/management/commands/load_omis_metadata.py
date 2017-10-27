@@ -16,6 +16,7 @@ class Command(BaseCommand):
             'loaddata',
             *[
                 METADATA_FIXTURE_DIR / 'service_types.yaml',
+                METADATA_FIXTURE_DIR / 'cancellation_reasons.yaml',
             ]
         )
         call_command('load_initial_omis_markets')

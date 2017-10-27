@@ -1,12 +1,14 @@
 from django.utils.timezone import now
 
+from django.utils.translation import ugettext_lazy
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from datahub.company.models import Advisor, Company, Contact
 from datahub.company.serializers import NestedAdviserField
-from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
-from datahub.core.validate_utils import DataCombiner
+from datahub.core.serializers import NestedRelatedField
+from datahub.core.validate_utils import DataCombiner, is_blank
+from datahub.core.validators import OperatorRule, RulesBasedValidator, ValidationRule
 from datahub.metadata.models import Country, Sector, Team
 
 from datahub.omis.market.models import Market
@@ -14,16 +16,12 @@ from .constants import OrderStatus, VATStatus
 from .models import Order, OrderAssignee, OrderSubscriber, ServiceType
 from .validators import (
     AddressValidator,
+    AssigneeExistsRule,
     ContactWorksAtCompanyValidator,
+    OrderInStatusRule,
     OrderInStatusValidator,
-    ReadonlyAfterCreationValidator
+    ReadonlyAfterCreationValidator,
 )
-
-
-class ServiceTypeSerializer(ConstantModelSerializer):
-    """Service Type DRF serializer"""
-
-    disabled_on = serializers.ReadOnlyField()
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -45,6 +43,8 @@ class OrderSerializer(serializers.ModelSerializer):
     delivery_date = serializers.DateField(required=False, allow_null=True)
 
     billing_address_country = NestedRelatedField(Country, required=False, allow_null=True)
+
+    completed_by = NestedRelatedField(Advisor, read_only=True)
 
     class Meta:
         model = Order
@@ -88,6 +88,12 @@ class OrderSerializer(serializers.ModelSerializer):
             'billing_address_county',
             'billing_address_postcode',
             'billing_address_country',
+            'archived_documents_url_path',
+            'completed_by',
+            'completed_on',
+            'cancelled_by',
+            'cancelled_on',
+            'cancellation_reason',
         )
         read_only_fields = (
             'id',
@@ -108,6 +114,12 @@ class OrderSerializer(serializers.ModelSerializer):
             'subtotal_cost',
             'vat_cost',
             'total_cost',
+            'archived_documents_url_path',
+            'completed_by',
+            'completed_on',
+            'cancelled_by',
+            'cancelled_on',
+            'cancellation_reason',
         )
         validators = (
             ContactWorksAtCompanyValidator(),
@@ -218,6 +230,7 @@ class PublicOrderSerializer(serializers.ModelSerializer):
             'billing_address_county',
             'billing_address_postcode',
             'billing_address_country',
+            'completed_on',
         )
         read_only_fields = fields
 
@@ -294,18 +307,38 @@ class OrderAssigneeListSerializer(serializers.ListSerializer):
     """DRF List serializer for OrderAssignee(s)."""
 
     default_validators = [
-        OrderInStatusValidator(allowed_statuses=(OrderStatus.draft,))
+        OrderInStatusValidator(
+            allowed_statuses=(
+                OrderStatus.draft,
+                OrderStatus.paid,
+            )
+        )
     ]
 
     def validate(self, data):
-        """Validates the list of assignees."""
+        """Validate the list of assignees."""
         self.validate_only_one_lead(data)
+        self.validate_force_delete(data)
+        return data
+
+    def validate_force_delete(self, data):
+        """Validate that assignees cannot be deleted if the order.status == paid."""
+        order = self.context['order']
+        force_delete = self.context['force_delete']
+
+        if order.status == OrderStatus.paid and force_delete:
+            raise ValidationError('You cannot delete any assignees at this stage.')
         return data
 
     def validate_only_one_lead(self, data):
-        """Validates that only one assignee can be marked as lead."""
+        """
+        If the order is in draft, validate that only one assignee can be marked as lead.
+        """
         order = self.context['order']
         force_delete = self.context['force_delete']
+
+        if order.status != OrderStatus.draft:
+            return
 
         existing_assignees = dict(order.assignees.values_list('adviser_id', 'is_lead'))
 
@@ -399,8 +432,18 @@ class OrderAssigneeSerializer(serializers.ModelSerializer):
     """DRF serializer for an adviser assigned to an order."""
 
     adviser = NestedAdviserField(required=True, allow_null=False)
-    estimated_time = serializers.IntegerField(required=False)
+    estimated_time = serializers.IntegerField(required=False, min_value=0)
+    actual_time = serializers.IntegerField(required=False, allow_null=True, min_value=0)
     is_lead = serializers.BooleanField(required=False)
+
+    default_error_messages = {
+        'readonly': ugettext_lazy(
+            'This field cannot be changed at this stage.'
+        ),
+        'creation_disallowed': ugettext_lazy(
+            'You cannot add any more assignees at this stage.'
+        ),
+    }
 
     class Meta:
         list_serializer_class = OrderAssigneeListSerializer
@@ -408,8 +451,38 @@ class OrderAssigneeSerializer(serializers.ModelSerializer):
         fields = [
             'adviser',
             'estimated_time',
+            'actual_time',
             'is_lead',
         ]
+        validators = (
+            RulesBasedValidator(
+                # can't be changed when in draft
+                ValidationRule(
+                    'readonly',
+                    OperatorRule('actual_time', is_blank),
+                    when=OrderInStatusRule(OrderStatus.draft)
+                ),
+
+                # can't be changed when in paid
+                ValidationRule(
+                    'readonly',
+                    OperatorRule('estimated_time', is_blank),
+                    when=OrderInStatusRule(OrderStatus.paid)
+                ),
+                # can't be changed when in paid
+                ValidationRule(
+                    'readonly',
+                    OperatorRule('is_lead', is_blank),
+                    when=OrderInStatusRule(OrderStatus.paid)
+                ),
+                # make sure that no new assignee is added
+                ValidationRule(
+                    'creation_disallowed',
+                    AssigneeExistsRule('adviser'),
+                    when=OrderInStatusRule(OrderStatus.paid)
+                ),
+            ),
+        )
 
     def delete(self, instance):
         """Deletes the instance."""

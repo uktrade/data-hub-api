@@ -1,7 +1,8 @@
 import pytest
 
 from datahub.omis.order.test.factories import (
-    OrderAssigneeFactory, OrderFactory, OrderSubscriberFactory
+    OrderAssigneeFactory, OrderCancelledFactory, OrderCompleteFactory,
+    OrderFactory, OrderSubscriberFactory, OrderWithAcceptedQuoteFactory
 )
 
 from ..models import Order as ESOrder
@@ -9,9 +10,14 @@ from ..models import Order as ESOrder
 pytestmark = pytest.mark.django_db
 
 
-def test_order_to_dict():
+@pytest.mark.parametrize(
+    'Factory',  # noqa: N803
+    (OrderCancelledFactory, OrderCompleteFactory, OrderFactory, OrderWithAcceptedQuoteFactory)
+)
+def test_order_to_dict(Factory, setup_es):
     """Test converting an order to dict."""
-    order = OrderFactory()
+    order = Factory()
+    invoice = order.invoice
     OrderSubscriberFactory.create_batch(2, order=order)
     OrderAssigneeFactory.create_batch(2, order=order)
 
@@ -91,6 +97,7 @@ def test_order_to_dict():
         'vat_number': order.vat_number,
         'vat_verified': order.vat_verified,
         'net_cost': order.net_cost,
+        'payment_due_date': None if not invoice else invoice.payment_due_date,
         'subtotal_cost': order.subtotal_cost,
         'vat_cost': order.vat_cost,
         'total_cost': order.total_cost,
@@ -106,10 +113,28 @@ def test_order_to_dict():
             'id': str(order.billing_address_country.pk),
             'name': order.billing_address_country.name
         },
+        'completed_by': {
+            'id': str(order.completed_by.pk),
+            'first_name': order.completed_by.first_name,
+            'last_name': order.completed_by.last_name,
+            'name': order.completed_by.name
+        } if order.completed_by else None,
+        'completed_on': order.completed_on,
+        'cancelled_by': {
+            'id': str(order.cancelled_by.pk),
+            'first_name': order.cancelled_by.first_name,
+            'last_name': order.cancelled_by.last_name,
+            'name': order.cancelled_by.name
+        } if order.cancelled_by else None,
+        'cancelled_on': order.cancelled_on,
+        'cancellation_reason': {
+            'id': str(order.cancellation_reason.pk),
+            'name': order.cancellation_reason.name
+        } if order.cancellation_reason else None,
     }
 
 
-def test_orders_to_es_documents():
+def test_orders_to_es_documents(setup_es):
     """Test converting 2 orders to Elasticsearch documents."""
     orders = OrderFactory.create_batch(2)
 

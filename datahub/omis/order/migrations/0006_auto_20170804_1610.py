@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('created_on', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modified_on', models.DateTimeField(auto_now=True, null=True)),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('estimated_time', models.IntegerField(default=0, help_text='Estimated time in minutes.')),
+                ('estimated_time', models.IntegerField(default=0, help_text='Estimated time in minutes.', validators=[django.core.validators.MinValueValidator(0)])),
                 ('is_lead', models.BooleanField(default=False)),
                 ('adviser', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to=settings.AUTH_USER_MODEL)),
                 ('country', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.Country')),

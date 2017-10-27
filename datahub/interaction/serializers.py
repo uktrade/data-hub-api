@@ -1,4 +1,4 @@
-from operator import eq, not_
+from operator import not_
 
 from django.utils.translation import ugettext_lazy
 from rest_framework import serializers
@@ -7,7 +7,9 @@ from datahub.company.models import Company, Contact
 from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import is_blank, is_not_blank
-from datahub.core.validators import AnyOfValidator, Condition, RulesBasedValidator, ValidationRule
+from datahub.core.validators import (
+    AnyOfValidator, EqualsRule, OperatorRule, RulesBasedValidator, ValidationRule
+)
 from datahub.event.models import Event
 from datahub.investment.models import InvestmentProject
 from datahub.metadata.models import Service, Team
@@ -89,32 +91,39 @@ class InteractionSerializer(serializers.ModelSerializer):
             AnyOfValidator('company', 'investment_project'),
             RulesBasedValidator(
                 ValidationRule(
-                    'required', 'communication_channel', bool,
-                    condition=Condition('kind', eq, (Interaction.KINDS.interaction,))
+                    'required',
+                    OperatorRule('communication_channel', bool),
+                    when=EqualsRule('kind', Interaction.KINDS.interaction),
                 ),
                 ValidationRule(
-                    'invalid_for_service_delivery', 'communication_channel', not_,
-                    condition=Condition('kind', eq, (Interaction.KINDS.service_delivery,))
+                    'invalid_for_service_delivery',
+                    OperatorRule('communication_channel', not_),
+                    when=EqualsRule('kind', Interaction.KINDS.service_delivery),
                 ),
                 ValidationRule(
-                    'invalid_for_interaction', 'event', not_,
-                    condition=Condition('kind', eq, (Interaction.KINDS.interaction,))
+                    'invalid_for_interaction',
+                    OperatorRule('event', not_),
+                    when=EqualsRule('kind', Interaction.KINDS.interaction),
                 ),
                 ValidationRule(
-                    'invalid_for_interaction', 'is_event', is_blank,
-                    condition=Condition('kind', eq, (Interaction.KINDS.interaction,))
+                    'invalid_for_interaction',
+                    OperatorRule('is_event', is_blank),
+                    when=EqualsRule('kind', Interaction.KINDS.interaction),
                 ),
                 ValidationRule(
-                    'required', 'is_event', is_not_blank,
-                    condition=Condition('kind', eq, (Interaction.KINDS.service_delivery,))
+                    'required',
+                    OperatorRule('is_event', is_not_blank),
+                    when=EqualsRule('kind', Interaction.KINDS.service_delivery),
                 ),
                 ValidationRule(
-                    'required', 'event', bool,
-                    condition=Condition('is_event', bool)
+                    'required',
+                    OperatorRule('event', bool),
+                    when=OperatorRule('is_event', bool),
                 ),
                 ValidationRule(
-                    'invalid_for_non_event', 'event', not_,
-                    condition=Condition('is_event', not_)
+                    'invalid_for_non_event',
+                    OperatorRule('event', not_),
+                    when=OperatorRule('is_event', not_),
                 ),
             )
         ]

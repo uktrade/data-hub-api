@@ -10,10 +10,11 @@ class Order(DocType, MapDBModelToDict):
     """Elasticsearch representation of Order model."""
 
     id = Keyword()
-    reference = dsl_utils.SortableCaseInsensitiveKeywordText()
+    reference = dsl_utils.SortableCaseInsensitiveKeywordText(copy_to='reference_trigram')
+    reference_trigram = dsl_utils.TrigramText()
     status = dsl_utils.SortableCaseInsensitiveKeywordText()
-    company = dsl_utils.id_name_mapping()
-    contact = dsl_utils.contact_or_adviser_mapping('contact')
+    company = dsl_utils.id_name_partial_mapping('company')
+    contact = dsl_utils.contact_or_adviser_partial_mapping('contact')
     created_by = dsl_utils.contact_or_adviser_mapping('created_by')
     created_on = Date()
     modified_on = Date()
@@ -33,9 +34,17 @@ class Order(DocType, MapDBModelToDict):
     vat_number = Keyword(index=False)
     vat_verified = Boolean(index=False)
     net_cost = Integer(index=False)
-    subtotal_cost = Integer(index=False)
+    subtotal_cost_string = Keyword()
+    subtotal_cost = Integer(copy_to=['subtotal_cost_string'])
     vat_cost = Integer(index=False)
-    total_cost = Integer()
+    total_cost_string = Keyword()
+    total_cost = Integer(copy_to=['total_cost_string'])
+    payment_due_date = Date()
+    completed_by = dsl_utils.contact_or_adviser_mapping('completed_by')
+    completed_on = Date()
+    cancelled_by = dsl_utils.contact_or_adviser_mapping('cancelled_by')
+    cancelled_on = Date()
+    cancellation_reason = dsl_utils.id_name_mapping()
 
     billing_contact_name = Text()
     billing_email = dsl_utils.SortableCaseInsensitiveKeywordText()
@@ -62,6 +71,13 @@ class Order(DocType, MapDBModelToDict):
             dict_utils.contact_or_adviser_dict(c.adviser, include_dit_team=True) for c in col.all()
         ],
         'billing_address_country': dict_utils.id_name_dict,
+        'completed_by': dict_utils.contact_or_adviser_dict,
+        'cancelled_by': dict_utils.contact_or_adviser_dict,
+        'cancellation_reason': dict_utils.id_name_dict,
+    }
+
+    COMPUTED_MAPPINGS = {
+        'payment_due_date': lambda x: x.invoice.payment_due_date if x.invoice else None,
     }
 
     IGNORED_FIELDS = (
@@ -76,9 +92,16 @@ class Order(DocType, MapDBModelToDict):
         'public_token',
         'invoice',
         'payments',
+        'archived_documents_url_path',
     )
 
-    SEARCH_FIELDS = []
+    SEARCH_FIELDS = (
+        'reference_trigram',
+        'contact.name_trigram',
+        'company.name_trigram',
+        'total_cost_string',
+        'subtotal_cost_string',
+    )
 
     class Meta:
         """Default document meta data."""
