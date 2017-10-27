@@ -48,7 +48,7 @@ class Event(BaseModel, DisableableModel):
         return self.name
 
     class Meta:
-        permissions = (("read_event", "Can read event"),)
+        permissions = (('read_event', 'Can read event'),)
 
 
 class Programme(BaseConstantModel):

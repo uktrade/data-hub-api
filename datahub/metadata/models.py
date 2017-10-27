@@ -56,13 +56,14 @@ class Role(BaseConstantModel):
 
 class TeamRole(BaseConstantModel):
     """Team role."""
+
     team_role_groups = models.ManyToManyField(
         Group,
         verbose_name=_('Team role permission groups'),
         blank=True,
         help_text=_('Permission groups associated with this team.'),
-        related_name="teamrole_set",
-        related_query_name="team_role",
+        related_name='teamrole_set',
+        related_query_name='team_role',
     )
 
 

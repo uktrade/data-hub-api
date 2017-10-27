@@ -280,7 +280,7 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
         return f'{company_name} – {self.name}'
 
     class Meta:
-        permissions = (("read_investmentproject", "Can read investment project"),)
+        permissions = (('read_investmentproject', 'Can read investment project'),)
 
 
 class InvestmentProjectTeamMember(models.Model):
@@ -303,7 +303,8 @@ class InvestmentProjectTeamMember(models.Model):
 
     class Meta:
         unique_together = (('investment_project', 'adviser'),)
-        permissions = (('read_investmentprojectteammember', 'Can read investment project team member'),)
+        permissions = (('read_investmentprojectteammember',
+                        'Can read investment project team member'),)
 
 
 class InvestmentProjectCode(models.Model):

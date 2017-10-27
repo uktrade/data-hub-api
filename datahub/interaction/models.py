@@ -85,4 +85,4 @@ class Interaction(BaseModel):
         indexes = [
             models.Index(fields=['-date', '-created_on']),
         ]
-        permissions = (("read_interaction", "Can read interaction"),)
+        permissions = (('read_interaction', 'Can read interaction'),)

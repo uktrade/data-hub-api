@@ -43,11 +43,13 @@ class SearchInteractionParams:
 
 class SearchInteractionAPIView(SearchInteractionParams, SearchAPIView):
     """Filtered interaction search view."""
+
     permission_required = 'interaction.read_interaction'
     permission_classes = (IsAuthenticatedOrTokenHasScope,)
 
 
 class SearchInteractionExportAPIView(SearchInteractionParams, SearchExportAPIView):
     """Filtered interaction search export view."""
+
     permission_required = 'company.read_company'
     permission_classes = (IsAuthenticatedOrTokenHasScope,)

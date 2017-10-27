@@ -22,6 +22,7 @@ EntitySearch = namedtuple('EntitySearch', ['model', 'name'])
 
 class SearchBasicAPIView(APIView):
     """Aggregate all entities search view."""
+
     permission_classes = (IsAuthenticatedOrTokenHasScope,)
 
     required_scopes = (Scope.internal_front_end,)
@@ -87,6 +88,7 @@ class SearchBasicAPIView(APIView):
 
 class SearchAPIView(APIView):
     """Filtered search view."""
+
     permission_classes = (IsAuthenticatedOrTokenHasScope,)
     FILTER_FIELDS = []
     REMAP_FIELDS = {}

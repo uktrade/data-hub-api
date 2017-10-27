@@ -2,15 +2,16 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
-from datahub.metadata.models import Team
 from datahub.core.test_utils import APITestMixin, get_test_user
 from datahub.event.test.factories import EventFactory
+from datahub.metadata.models import Team
 
 
 class TestAdviserPermissions(APITestMixin):
     """User permissions test case."""
 
     def test_adviser_list_view(self):
+        """User different permissions for LEP team role user."""
         team = Team.objects.filter(role__team_role_groups__name='LEP').first()
         self._user = get_test_user(team=team)
 
@@ -39,5 +40,3 @@ class TestAdviserPermissions(APITestMixin):
 
         response = self.api_client.get(url_dashboard)
         assert response.status_code == status.HTTP_200_OK
-
-

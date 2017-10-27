@@ -43,12 +43,13 @@ class SearchEventParams:
 
 class SearchEventAPIView(SearchEventParams, SearchAPIView):
     """Filtered event search view."""
+
     permission_required = 'event.read_event'
     permission_classes = (IsAuthenticatedOrTokenHasScope,)
 
 
 class SearchEventExportAPIView(SearchEventParams, SearchExportAPIView):
     """Filtered event search export view."""
+
     permission_required = 'event.read_event'
     permission_classes = (IsAuthenticatedOrTokenHasScope,)
-    

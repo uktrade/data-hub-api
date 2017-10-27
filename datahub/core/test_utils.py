@@ -3,7 +3,6 @@ from secrets import token_hex
 
 import pytest
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Permission
 from django.test.client import Client
 from django.utils.timezone import now
 from oauth2_provider.models import AccessToken, Application
@@ -27,7 +26,9 @@ def get_test_user(team=None):
             date_joined=now(),
         )
         if team is None:
-            test_user.dit_team = Team.objects.filter(role__team_role_groups__name='DIT_staff').first()
+            test_user.dit_team = Team.objects.filter(
+                role__team_role_groups__name='DIT_staff'
+            ).first()
         else:
             test_user.dit_team = team
 
