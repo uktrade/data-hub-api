@@ -154,9 +154,7 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['name'] == request_data['name']
         assert response_data['description'] == request_data['description']
         assert response_data['anonymous_description'] == request_data['anonymous_description']
-        assert response_data['nda_signed'] is False
         assert response_data['estimated_land_date'] == request_data['estimated_land_date']
-        assert response_data['project_shareable'] is True
         assert (response_data['quotable_as_public_case_study'] ==
                 request_data['quotable_as_public_case_study'])
         assert response_data['likelihood_of_landing'] == request_data['likelihood_of_landing']
@@ -257,7 +255,6 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['name'] == project.name
         assert response_data['description'] == project.description
         assert response_data['likelihood_of_landing'] == project.likelihood_of_landing
-        assert response_data['nda_signed'] == project.nda_signed
         assert response_data['project_code'] == project.project_code
         assert response_data['estimated_land_date'] == str(project.estimated_land_date)
         assert response_data['investment_type']['id'] == str(project.investment_type.id)
