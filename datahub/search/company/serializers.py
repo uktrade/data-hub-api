@@ -1,12 +1,29 @@
-from ..serializers import SearchSerializer
+from rest_framework import serializers
+
+from ..serializers import (
+    SearchSerializer,
+    SingleOrListField,
+    StringUUIDField,
+)
 
 
 class SearchCompanySerializer(SearchSerializer):
     """Serialiser used to validate company search POST bodies."""
 
+    account_manager = SingleOrListField(child=StringUUIDField(), required=False)
+    trading_name = serializers.CharField(required=False)
+    description = serializers.CharField(required=False)
+    export_to_country = SingleOrListField(child=StringUUIDField(), required=False)
+    future_interest_country = SingleOrListField(child=StringUUIDField(), required=False)
+    name = serializers.CharField(required=False)
+    sector = SingleOrListField(child=StringUUIDField(), required=False)
+    trading_address_country = SingleOrListField(child=StringUUIDField(), required=False)
+    uk_based = serializers.BooleanField(required=False)
+    uk_region = serializers.BooleanField(required=False)
+
     SORT_BY_FIELDS = (
         'account_manager.name',
-        'alias',
+        'trading_name',
         'archived',
         'archived_by',
         'business_type.name',
