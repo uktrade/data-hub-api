@@ -7,3 +7,10 @@ PaymentMethod = Choices(
     ('cheque', 'Cheque'),
     ('manual', 'Manual'),
 )
+
+
+RefundStatus = Choices(
+    ('requested', 'Requested'),
+    ('approved', 'Approved and Paid'),
+    ('rejected', 'Rejected'),
+)
