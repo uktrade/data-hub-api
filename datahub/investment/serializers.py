@@ -106,11 +106,8 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
             'project_code',
             'description',
             'anonymous_description',
-            'nda_signed',
             'estimated_land_date',
             'actual_land_date',
-            'project_shareable',
-            'not_shareable_reason',
             'quotable_as_public_case_study',
             'likelihood_of_landing',
             'priority',
@@ -155,9 +152,7 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
         # DRF defaults to required=False even though this field is
         # non-nullable
         extra_kwargs = {
-            'nda_signed': {'default': False},
             'likelihood_of_landing': {'min_value': 0, 'max_value': 100},
-            'project_shareable': {'default': True},
             'archived': {'read_only': True},
             'archived_on': {'read_only': True},
             'archived_reason': {'read_only': True}
