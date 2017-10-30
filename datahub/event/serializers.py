@@ -13,8 +13,6 @@ class EventSerializer(serializers.ModelSerializer):
 
     default_error_messages = {
         'lead_team_not_in_teams': ugettext_lazy('Lead team must be in teams array.'),
-        'end_date_without_start_date': ugettext_lazy('Cannot have an end date without a start '
-                                                     'date.'),
         'end_date_before_start_date': ugettext_lazy('End date cannot be before start date.'),
         'uk_region_non_uk_country': ugettext_lazy('Cannot specify a UK region for a non-UK '
                                                   'country.')
