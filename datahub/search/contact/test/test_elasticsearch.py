@@ -175,6 +175,10 @@ def test_get_basic_search_query():
                             }
                         }
                     }, {
+                        'match': {
+                            'project_code': 'test'
+                        }
+                    }, {
                         'match_phrase': {
                             'reference_trigram': 'test'
                         }

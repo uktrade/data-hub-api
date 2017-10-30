@@ -14,45 +14,48 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def setup_data():
+def setup_data(setup_es):
     """Sets up data for the tests."""
-    InvestmentProjectFactory(
-        name='abc defg',
-        description='investmentproject1',
-        estimated_land_date=datetime.datetime(2011, 6, 13, 9, 44, 31, 62870),
-        investor_company=CompanyFactory(
-            registered_address_country_id=constants.Country.united_states.value.id
+    investment_projects = [
+        InvestmentProjectFactory(
+            name='abc defg',
+            description='investmentproject1',
+            estimated_land_date=datetime.datetime(2011, 6, 13, 9, 44, 31, 62870),
+            investor_company=CompanyFactory(
+                registered_address_country_id=constants.Country.united_states.value.id
+            ),
+            status=InvestmentProject.STATUSES.ongoing,
+            uk_region_locations=[
+                constants.UKRegion.east_midlands.value.id,
+                constants.UKRegion.isle_of_man.value.id,
+            ]
         ),
-        status=InvestmentProject.STATUSES.ongoing,
-        uk_region_locations=[
-            constants.UKRegion.east_midlands.value.id,
-            constants.UKRegion.isle_of_man.value.id,
-        ]
-    )
-    InvestmentProjectFactory(
-        name='delayed project',
-        description='investmentproject2',
-        estimated_land_date=datetime.datetime(2057, 6, 13, 9, 44, 31, 62870),
-        investor_company=CompanyFactory(
-            registered_address_country_id=constants.Country.japan.value.id
-        ),
-        project_manager=AdviserFactory(),
-        project_assurance_adviser=AdviserFactory(),
-        fdi_value_id=constants.FDIValue.higher.value.id,
-        status=InvestmentProject.STATUSES.delayed,
-        uk_region_locations=[
-            constants.UKRegion.north_west.value.id,
-        ]
-    )
+        InvestmentProjectFactory(
+            name='delayed project',
+            description='investmentproject2',
+            estimated_land_date=datetime.datetime(2057, 6, 13, 9, 44, 31, 62870),
+            investor_company=CompanyFactory(
+                registered_address_country_id=constants.Country.japan.value.id
+            ),
+            project_manager=AdviserFactory(),
+            project_assurance_adviser=AdviserFactory(),
+            fdi_value_id=constants.FDIValue.higher.value.id,
+            status=InvestmentProject.STATUSES.delayed,
+            uk_region_locations=[
+                constants.UKRegion.north_west.value.id,
+            ]
+        )
+    ]
+    setup_es.indices.refresh()
+
+    yield investment_projects
 
 
 class TestSearch(APITestMixin):
     """Tests search views."""
 
-    def test_search_investment_project_json(self, setup_es, setup_data):
+    def test_search_investment_project_json(self, setup_data):
         """Tests detailed investment project search."""
-        setup_es.indices.refresh()
-
         url = reverse('api-v3:search:investment_project')
 
         response = self.api_client.post(url, {
@@ -64,10 +67,8 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['name'] == 'abc defg'
 
-    def test_search_investment_project_date_json(self, setup_es, setup_data):
+    def test_search_investment_project_date_json(self, setup_data):
         """Tests detailed investment project search."""
-        setup_es.indices.refresh()
-
         url = reverse('api-v3:search:investment_project')
 
         response = self.api_client.post(url, {
@@ -78,10 +79,8 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
 
-    def test_search_investment_project_invalid_date_json(self, setup_es, setup_data):
+    def test_search_investment_project_invalid_date_json(self, setup_data):
         """Tests detailed investment project search."""
-        setup_es.indices.refresh()
-
         url = reverse('api-v3:search:investment_project')
 
         response = self.api_client.post(url, {
@@ -90,10 +89,8 @@ class TestSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_search_investment_project_status(self, setup_es, setup_data):
+    def test_search_investment_project_status(self, setup_data):
         """Tests investment project search status filter."""
-        setup_es.indices.refresh()
-
         url = reverse('api-v3:search:investment_project')
 
         response = self.api_client.post(url, {
@@ -105,10 +102,8 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['name'] == 'delayed project'
 
-    def test_search_investment_project_investor_country(self, setup_es, setup_data):
+    def test_search_investment_project_investor_country(self, setup_data):
         """Tests investor company country filter."""
-        setup_es.indices.refresh()
-
         url = reverse('api-v3:search:investment_project')
 
         response = self.api_client.post(url, {
@@ -120,10 +115,8 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['name'] == 'delayed project'
 
-    def test_search_investment_project_uk_region_location(self, setup_es, setup_data):
+    def test_search_investment_project_uk_region_location(self, setup_data):
         """Tests uk_region_location filter."""
-        setup_es.indices.refresh()
-
         url = reverse('api-v3:search:investment_project')
 
         response = self.api_client.post(url, {
@@ -135,17 +128,15 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['name'] == 'abc defg'
 
-    def test_search_investment_project_no_filters(self, setup_es, setup_data):
+    def test_search_investment_project_no_filters(self, setup_data):
         """Tests case where there is no filters provided."""
-        setup_es.indices.refresh()
-
         url = reverse('api-v3:search:investment_project')
         response = self.api_client.post(url, {})
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data['results']) > 0
 
-    def test_search_investment_project_multiple_filters(self, setup_es, setup_data):
+    def test_search_investment_project_multiple_filters(self, setup_es):
         """Tests multiple filters in investment project search.
         We make sure that out of provided investment projects, we will
         receive only those that match our filter.
@@ -219,7 +210,7 @@ class TestSearch(APITestMixin):
             for investment_project in response.data['results']
         }
 
-    def test_search_investment_project_aggregates(self, setup_es, setup_data):
+    def test_search_investment_project_aggregates(self, setup_es):
         """Tests aggregates in investment project search."""
         url = reverse('api-v3:search:investment_project')
 
@@ -264,10 +255,8 @@ class TestSearch(APITestMixin):
 class TestBasicSearch(APITestMixin):
     """Tests basic search view."""
 
-    def test_investment_projects(self, setup_es, setup_data):
+    def test_investment_projects(self, setup_data):
         """Tests basic aggregate investment project query."""
-        setup_es.indices.refresh()
-
         term = 'abc defg'
 
         url = reverse('api-v3:search:basic')
@@ -280,3 +269,17 @@ class TestBasicSearch(APITestMixin):
         assert response.data['count'] == 1
         assert response.data['results'][0]['name'] == term
         assert [{'count': 1, 'entity': 'investment_project'}] == response.data['aggregations']
+
+    def test_project_code_search(self, setup_data):
+        """Tests basic search query for project code."""
+        investment_project = setup_data[0]
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': investment_project.project_code,
+            'entity': 'investment_project'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert response.data['results'][0]['project_code'] == investment_project.project_code
