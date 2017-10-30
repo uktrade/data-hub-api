@@ -12,7 +12,10 @@ from datahub.core.constants import Country, Sector
 from datahub.core.test_utils import APITestMixin
 from datahub.omis.market.models import Market
 
-from ..factories import OrderFactory
+from ..factories import (
+    OrderAssigneeCompleteFactory, OrderAssigneeFactory,
+    OrderFactory, OrderPaidFactory
+)
 
 from ...constants import OrderStatus, VATStatus
 from ...models import ServiceType
@@ -842,6 +845,79 @@ class TestChangeOrderDetails(APITestMixin):
             'billing_address_town': ['This field is required.'],
             'billing_address_postcode': ['This field is required.'],
             'billing_address_country': ['This field is required.'],
+        }
+
+
+class TestMarkOrderAsComplete(APITestMixin):
+    """Test cases for marking an order as complete."""
+
+    @freeze_time('2017-04-18 13:00')
+    @pytest.mark.parametrize(
+        'allowed_status',
+        (OrderStatus.paid,)
+    )
+    def test_ok_if_order_in_allowed_status(self, allowed_status):
+        """Test changing an existing order."""
+        order = OrderPaidFactory(status=allowed_status, assignees=[])
+        OrderAssigneeCompleteFactory(order=order)
+
+        url = reverse('api-v3:omis:order:complete', kwargs={'pk': order.pk})
+        response = self.api_client.post(url, {}, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['status'] == OrderStatus.complete
+        assert response.json()['completed_on'] == dateutil_parse('2017-04-18 13:00').isoformat()
+        assert response.json()['completed_by'] == {
+            'id': str(self.user.pk),
+            'name': self.user.name
+        }
+
+        order.refresh_from_db()
+        assert order.status == OrderStatus.complete
+        assert order.completed_on == dateutil_parse('2017-04-18 13:00')
+        assert order.completed_by == self.user
+
+    @pytest.mark.parametrize(
+        'disallowed_status',
+        (
+            OrderStatus.draft,
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.quote_accepted,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_409_if_order_not_in_allowed_status(self, disallowed_status):
+        """
+        Test that if the order is in a disallowed status, the order cannot be marked as complete.
+        """
+        order = OrderPaidFactory(status=disallowed_status, assignees=[])
+        OrderAssigneeCompleteFactory(order=order)
+
+        url = reverse('api-v3:omis:order:complete', kwargs={'pk': order.pk})
+        response = self.api_client.post(url, {}, format='json')
+
+        assert response.status_code == status.HTTP_409_CONFLICT
+        order.refresh_from_db()
+        assert order.status == disallowed_status
+
+    def test_400_if_not_all_actual_time_set(self):
+        """
+        Test that if not all assignee actual time fields have been set,
+        a validation error is raised and the call fails.
+        """
+        order = OrderPaidFactory(status=OrderStatus.paid, assignees=[])
+        OrderAssigneeCompleteFactory(order=order)
+        OrderAssigneeFactory(order=order)
+
+        url = reverse('api-v3:omis:order:complete', kwargs={'pk': order.pk})
+        response = self.api_client.post(url, {}, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'non_field_errors': (
+                'You must set the actual time for all assignees to complete this order.'
+            )
         }
 
 

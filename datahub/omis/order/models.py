@@ -430,6 +430,32 @@ class Order(BaseModel):
         self.paid_on = max(item['received_on'] for item in payments_data)
         self.save()
 
+    @transaction.atomic
+    def complete(self, by):
+        """
+        Complete an order.
+
+        :param by: the adviser who marked the order as complete
+        """
+        for order_validator in [
+            validators.OrderInStatusValidator(
+                allowed_statuses=(
+                    OrderStatus.paid,
+                )
+            )
+        ]:
+            order_validator.set_instance(self)
+            order_validator()
+
+        for complete_validator in [validators.CompletableOrderValidator()]:
+            complete_validator.set_order(self)
+            complete_validator()
+
+        self.status = OrderStatus.complete
+        self.completed_on = now()
+        self.completed_by = by
+        self.save()
+
 
 class OrderSubscriber(BaseModel):
     """

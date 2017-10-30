@@ -2,6 +2,7 @@ from collections import defaultdict
 from django.db import models
 
 from rest_framework.exceptions import ValidationError
+from rest_framework.settings import api_settings
 
 from datahub.core.validate_utils import DataCombiner
 from datahub.core.validators import AbstractRule, BaseRule
@@ -294,6 +295,30 @@ class OrderInStatusValidator:
             raise Conflict(
                 self.message.format(self.instance.get_status_display())
             )
+
+
+class CompletableOrderValidator:
+    """
+    Validator which checks that the order can be completed, that is,
+    all the assignees have their actual_time field set.
+    """
+
+    message = 'You must set the actual time for all assignees to complete this order.'
+
+    def __init__(self):
+        """Initialise the object."""
+        self.order = None
+
+    def set_order(self, order):
+        """Set the order attr to the selected one."""
+        self.order = order
+
+    def __call__(self):
+        """Validate that the actual_time field for all the assignees is set."""
+        if any(assignee.actual_time is None for assignee in self.order.assignees.all()):
+            raise ValidationError({
+                api_settings.NON_FIELD_ERRORS_KEY: self.message
+            })
 
 
 class AddressValidator:
