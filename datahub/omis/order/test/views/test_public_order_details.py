@@ -79,6 +79,7 @@ class TestViewPublicOrderDetails(APITestMixin):
                 'id': str(order.billing_address_country.pk),
                 'name': order.billing_address_country.name
             },
+            'paid_on': None,
             'completed_on': None,
         }
 
