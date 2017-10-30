@@ -4,7 +4,8 @@ from elasticsearch_dsl import Mapping
 
 from datahub.omis.order.test.factories import (
     OrderCancelledFactory, OrderCompleteFactory,
-    OrderFactory, OrderWithAcceptedQuoteFactory
+    OrderFactory, OrderPaidFactory,
+    OrderWithAcceptedQuoteFactory
 )
 
 from .. import OrderSearchApp
@@ -336,6 +337,9 @@ def test_mapping(setup_es):
                     'index': False,
                     'type': 'boolean'
                 },
+                'paid_on': {
+                    'type': 'date'
+                },
                 'completed_by': {
                     'properties': {
                         'first_name': {
@@ -408,7 +412,13 @@ def test_mapping(setup_es):
 
 @pytest.mark.parametrize(
     'Factory',  # noqa: N803
-    (OrderFactory, OrderWithAcceptedQuoteFactory, OrderCancelledFactory, OrderCompleteFactory)
+    (
+        OrderFactory,
+        OrderWithAcceptedQuoteFactory,
+        OrderCancelledFactory,
+        OrderCompleteFactory,
+        OrderPaidFactory,
+    )
 )
 def test_indexed_doc(Factory, setup_es):
     """Test the ES data of an indexed order."""
@@ -518,6 +528,7 @@ def test_indexed_doc(Factory, setup_es):
                 'id': str(order.billing_address_country.pk),
                 'name': order.billing_address_country.name
             },
+            'paid_on': order.paid_on.isoformat() if order.paid_on else None,
             'completed_by': {
                 'id': str(order.completed_by.pk),
                 'first_name': order.completed_by.first_name,
