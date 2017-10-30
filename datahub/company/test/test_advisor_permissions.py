@@ -1,3 +1,4 @@
+import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -10,33 +11,21 @@ from datahub.metadata.models import Team
 class TestAdviserPermissions(APITestMixin):
     """User permissions test case."""
 
-    def test_adviser_list_view(self):
+    @pytest.mark.parametrize('factory,reverse_url, expected_status',
+         (
+            (lambda *args: None, 'dashboard:intelligent-homepage', status.HTTP_200_OK),
+            (AdviserFactory, 'api-v1:advisor-list', status.HTTP_200_OK),
+            (CompanyFactory, 'api-v3:company:collection', status.HTTP_200_OK),
+            (ContactFactory, 'api-v3:contact:list', status.HTTP_200_OK),
+            (EventFactory, 'api-v3:event:collection', status.HTTP_403_FORBIDDEN)
+         ))
+    def test_adviser_list_view(self, factory, reverse_url, expected_status):
         """User different permissions for LEP team role user."""
         team = Team.objects.filter(role__team_role_groups__name='LEP').first()
         self._user = get_test_user(team=team)
 
-        url_dashboard = reverse('dashboard:intelligent-homepage')
-        AdviserFactory()
-        url_adviser_list = reverse('api-v1:advisor-list')
-        CompanyFactory()
-        CompanyFactory()
-        url_companies = reverse('api-v3:company:collection')
-        ContactFactory()
-        url_contacts = reverse('api-v3:contact:list')
-        EventFactory()
-        url_events = reverse('api-v3:event:collection')
+        url = reverse(reverse_url)
+        factory()
 
-        response = self.api_client.get(url_adviser_list)
-        assert response.status_code == status.HTTP_200_OK
-
-        response = self.api_client.get(url_companies)
-        assert response.status_code == status.HTTP_200_OK
-
-        response = self.api_client.get(url_contacts)
-        assert response.status_code == status.HTTP_200_OK
-
-        response = self.api_client.get(url_events)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
-        response = self.api_client.get(url_dashboard)
-        assert response.status_code == status.HTTP_200_OK
+        response = self.api_client.get(url)
+        assert response.status_code == expected_status
