@@ -17,6 +17,7 @@ class EventFactory(factory.django.DjangoModelFactory):
     name = factory.Faker('text')
     event_type_id = EventType.seminar.value.id
     start_date = factory.Faker('date')
+    end_date = factory.LazyAttribute(lambda event: event.start_date)
     location_type_id = LocationType.hq.value.id
     address_1 = factory.Faker('text')
     address_2 = factory.Faker('text')

@@ -100,6 +100,7 @@ class TestCreateEventView(APITestMixin):
     def test_create_minimal_success(self):
         """Tests successfully creating an event with only the required fields."""
         url = reverse('api-v3:event:collection')
+
         request_data = {
             'name': 'Grand exhibition',
             'event_type': EventType.seminar.value.id,
@@ -107,6 +108,8 @@ class TestCreateEventView(APITestMixin):
             'address_town': 'New York',
             'address_country': Country.united_states.value.id,
             'service': Service.trade_enquiry.value.id,
+            'start_date': '2010-09-12',
+            'end_date': '2010-09-12',
         }
         response = self.api_client.post(url, format='json', data=request_data)
 
@@ -119,8 +122,8 @@ class TestCreateEventView(APITestMixin):
                 'id': EventType.seminar.value.id,
                 'name': EventType.seminar.value.name,
             },
-            'start_date': None,
-            'end_date': None,
+            'start_date': '2010-09-12',
+            'end_date': '2010-09-12',
             'location_type': None,
             'notes': '',
             'address_1': 'Grand Court Exhibition Centre',
@@ -230,6 +233,7 @@ class TestCreateEventView(APITestMixin):
         url = reverse('api-v3:event:collection')
         request_data = {
             'name': 'Grand exhibition',
+            'end_date': '2010-09-12',
             'event_type': EventType.seminar.value.id,
             'address_1': 'Grand Court Exhibition Centre',
             'address_town': 'London',
@@ -238,6 +242,7 @@ class TestCreateEventView(APITestMixin):
             'lead_team': Team.crm.value.id,
             'teams': [Team.healthcare_uk.value.id],
             'service': Service.trade_enquiry.value.id,
+            'start_date': '2010-09-12',
         }
         response = self.api_client.post(url, format='json', data=request_data)
 
@@ -252,11 +257,13 @@ class TestCreateEventView(APITestMixin):
         url = reverse('api-v3:event:collection')
         request_data = {
             'name': 'Grand exhibition',
+            'end_date': '2010-09-12',
             'event_type': EventType.seminar.value.id,
             'address_1': 'Grand Court Exhibition Centre',
             'address_town': 'London',
             'address_country': Country.united_kingdom.value.id,
             'service': Service.trade_enquiry.value.id,
+            'start_date': '2010-09-12',
         }
         response = self.api_client.post(url, format='json', data=request_data)
 
@@ -272,11 +279,13 @@ class TestCreateEventView(APITestMixin):
         request_data = {
             'name': 'Grand exhibition',
             'event_type': EventType.seminar.value.id,
+            'end_date': '2010-09-12',
             'address_1': 'Grand Court Exhibition Centre',
             'address_town': 'London',
             'address_country': Country.united_states.value.id,
             'uk_region': UKRegion.east_of_england.value.id,
             'service': Service.trade_enquiry.value.id,
+            'start_date': '2010-09-12',
         }
         response = self.api_client.post(url, format='json', data=request_data)
 
@@ -304,7 +313,7 @@ class TestCreateEventView(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'end_date': ['Cannot have an end date without a start date.']
+            'start_date': ['This field is required.']
         }
 
     def test_create_end_date_before_start_date(self):
@@ -341,9 +350,11 @@ class TestCreateEventView(APITestMixin):
             'address_1': ['This field is required.'],
             'address_country': ['This field is required.'],
             'address_town': ['This field is required.'],
+            'end_date': ['This field is required.'],
             'event_type': ['This field is required.'],
             'name': ['This field is required.'],
             'service': ['This field is required.'],
+            'start_date': ['This field is required.'],
         }
 
     def test_create_blank_failure(self):
@@ -353,9 +364,11 @@ class TestCreateEventView(APITestMixin):
             'address_1': '',
             'address_country': None,
             'address_town': '',
+            'end_date': '',
             'event_type': None,
             'name': '',
             'service': None,
+            'start_date': '',
         }
         response = self.api_client.post(url, format='json', data=request_data)
 
@@ -365,9 +378,13 @@ class TestCreateEventView(APITestMixin):
             'address_1': ['This field may not be blank.'],
             'address_country': ['This field may not be null.'],
             'address_town': ['This field may not be blank.'],
+            'end_date':
+                ['Date has wrong format. Use one of these formats instead: YYYY[-MM[-DD]].'],
             'event_type': ['This field may not be null.'],
             'name': ['This field may not be blank.'],
             'service': ['This field may not be null.'],
+            'start_date':
+                ['Date has wrong format. Use one of these formats instead: YYYY[-MM[-DD]].'],
         }
 
 
