@@ -79,9 +79,6 @@
   fields:
     name: DIT_staff
     permissions:
-    - [add_logentry, admin, logentry]
-    - [change_logentry, admin, logentry]
-    - [delete_logentry, admin, logentry]
     - [add_group, auth, group]
     - [change_group, auth, group]
     - [delete_group, auth, group]
