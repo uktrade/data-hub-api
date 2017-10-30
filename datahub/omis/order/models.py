@@ -206,6 +206,8 @@ class Order(BaseModel):
         related_name='+'
     )
 
+    paid_on = models.DateTimeField(null=True, blank=True)
+
     completed_on = models.DateTimeField(null=True, blank=True)
     completed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -425,6 +427,7 @@ class Order(BaseModel):
             Payment.objects.create_from_order(self, by, data)
 
         self.status = OrderStatus.paid
+        self.paid_on = max(item['received_on'] for item in payments_data)
         self.save()
 
 

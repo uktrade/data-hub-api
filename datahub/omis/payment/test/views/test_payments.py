@@ -1,6 +1,7 @@
 import uuid
 from operator import itemgetter
 import pytest
+from dateutil.parser import parse as dateutil_parse
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -112,6 +113,9 @@ class TestCreatePayments(APITestMixin):
                 'received_on': '2017-04-21'
             }
         ]
+        order.refresh_from_db()
+        assert order.status == OrderStatus.paid
+        assert order.paid_on == dateutil_parse('2017-04-21')
 
     def test_400_if_amounts_less_than_total_cost(self):
         """

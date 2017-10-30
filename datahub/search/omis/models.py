@@ -40,6 +40,7 @@ class Order(DocType, MapDBModelToDict):
     total_cost_string = Keyword()
     total_cost = Integer(copy_to=['total_cost_string'])
     payment_due_date = Date()
+    paid_on = Date()
     completed_by = dsl_utils.contact_or_adviser_mapping('completed_by')
     completed_on = Date()
     cancelled_by = dsl_utils.contact_or_adviser_mapping('cancelled_by')

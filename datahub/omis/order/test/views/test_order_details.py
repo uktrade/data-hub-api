@@ -133,6 +133,7 @@ class TestAddOrderDetails(APITestMixin):
                 'name': Country.united_kingdom.value.name
             },
             'archived_documents_url_path': '',
+            'paid_on': None,
             'completed_by': None,
             'completed_on': None,
             'cancelled_by': None,
@@ -526,6 +527,7 @@ class TestChangeOrderDetails(APITestMixin):
                 'name': Country.united_kingdom.value.name
             },
             'archived_documents_url_path': '',
+            'paid_on': None,
             'completed_by': None,
             'completed_on': None,
             'cancelled_by': None,
@@ -724,6 +726,7 @@ class TestChangeOrderDetails(APITestMixin):
                 'vat_cost': 99999,
                 'total_cost': 99999,
                 'archived_documents_url_path': '/documents/123',
+                'paid_on': now().isoformat(),
                 'completed_by': order.created_by.pk,
                 'completed_on': now().isoformat(),
                 'cancelled_by': order.created_by.pk,
@@ -750,6 +753,7 @@ class TestChangeOrderDetails(APITestMixin):
         assert response.json()['vat_cost'] != 99999
         assert response.json()['total_cost'] != 99999
         assert not response.json()['archived_documents_url_path']
+        assert not response.json()['paid_on']
         assert not response.json()['completed_by']
         assert not response.json()['completed_on']
         assert not response.json()['cancelled_by']
@@ -921,6 +925,7 @@ class TestViewOrderDetails(APITestMixin):
                 'name': order.billing_address_country.name
             },
             'archived_documents_url_path': order.archived_documents_url_path,
+            'paid_on': None,
             'completed_by': None,
             'completed_on': None,
             'cancelled_by': None,

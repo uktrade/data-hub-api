@@ -118,6 +118,7 @@ class OrderCancelledFactory(OrderWithAcceptedQuoteFactory):
 class OrderPaidFactory(OrderWithAcceptedQuoteFactory):
     """Factory for orders marked as paid."""
 
+    paid_on = factory.Faker('date_time')
     status = OrderStatus.paid
 
 

@@ -405,6 +405,7 @@ class TestMarkOrderAsPaid:
 
         order.refresh_from_db()
         assert order.status == OrderStatus.paid
+        assert order.paid_on == dateutil_parse('2017-01-02')
         assert list(
             order.payments.order_by('received_on').values_list('amount', 'received_on')
         ) == [
@@ -451,6 +452,7 @@ class TestMarkOrderAsPaid:
 
             order.refresh_from_db()
             assert order.status == OrderStatus.quote_accepted
+            assert not order.paid_on
             assert not Payment.objects.count()
 
     def test_validation_error_if_amounts_less_then_total_cost(self):
