@@ -66,8 +66,8 @@ class CDMSUserBackend(ModelBackend):
                     user.save()
                     return None
 
-        # When auth_result is None, fallback to django auth by returning None
-        # If user is not cdms user, use the default ModelBackend authenticate
+        # If cdms connection fails, fall back to local password check
+        # or If user is not cdms user, use the default ModelBackend authenticate
         return super().authenticate(request, username, password, **kwargs)
 
     def user_can_authenticate(self, user):
