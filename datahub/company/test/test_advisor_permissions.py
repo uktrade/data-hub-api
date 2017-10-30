@@ -12,13 +12,13 @@ class TestAdviserPermissions(APITestMixin):
     """User permissions test case."""
 
     @pytest.mark.parametrize('factory,reverse_url, expected_status',
-         (
+        (
             (lambda *args: None, 'dashboard:intelligent-homepage', status.HTTP_200_OK),
             (AdviserFactory, 'api-v1:advisor-list', status.HTTP_200_OK),
             (CompanyFactory, 'api-v3:company:collection', status.HTTP_200_OK),
             (ContactFactory, 'api-v3:contact:list', status.HTTP_200_OK),
             (EventFactory, 'api-v3:event:collection', status.HTTP_403_FORBIDDEN)
-         ))
+        ))
     def test_adviser_list_view(self, factory, reverse_url, expected_status):
         """User different permissions for LEP team role user."""
         team = Team.objects.filter(role__team_role_groups__name='LEP').first()
