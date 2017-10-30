@@ -19,7 +19,7 @@ class EventSerializer(serializers.ModelSerializer):
         'uk_region_non_uk_country': ugettext_lazy('Cannot specify a UK region for a non-UK '
                                                   'country.')
     }
-    end_date = serializers.DateField(required=False, allow_null=True)
+    end_date = serializers.DateField()
     event_type = NestedRelatedField('event.EventType')
     location_type = NestedRelatedField('event.LocationType', required=False, allow_null=True)
     organiser = NestedAdviserField(required=False, allow_null=True)
@@ -31,16 +31,7 @@ class EventSerializer(serializers.ModelSerializer):
         'event.Programme', many=True, required=False, allow_empty=True
     )
     service = NestedRelatedField('metadata.Service')
-    start_date = serializers.DateField(required=False, allow_null=True)
-
-    def __init__(self, *args, **kwargs):
-        """Makes start_date and end_date fields required when creating an Event."""
-        super().__init__(*args, **kwargs)
-
-        if not self.instance:
-            for field in ('start_date', 'end_date', ):
-                self.fields[field].required = True
-                self.fields[field].allow_null = True
+    start_date = serializers.DateField()
 
     def validate(self, data):
         """Performs cross-field validation."""
