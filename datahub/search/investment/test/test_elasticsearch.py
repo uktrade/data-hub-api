@@ -177,6 +177,10 @@ def test_get_basic_search_query():
                             }
                         }
                     }, {
+                        'match': {
+                            'project_code': 'test'
+                        }
+                    }, {
                         'match_phrase': {
                             'reference_trigram': 'test'
                         }
@@ -387,6 +391,10 @@ def test_limited_get_search_by_entity_query():
                                                 'investor_company.name': 'test'
                                             }
                                         }
+                                    }
+                                }, {
+                                    'match': {
+                                        'project_code': 'test'
                                     }
                                 }, {
                                     'nested': {
