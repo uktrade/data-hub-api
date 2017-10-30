@@ -487,8 +487,8 @@ class TestUpdateEventView(APITestMixin):
         response_data = _get_canonical_response_data(response)
         assert response_data['lead_team']['id'] == Team.healthcare_uk.value.id
 
-    def test_patch_no_end_date_no_original_end_date(self):
-        """Test updating an event's lead team."""
+    def test_patch_null_end_date_failure(self):
+        """Test updating an event's end date with null."""
         event = EventFactory(end_date=None)
         url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
 
@@ -498,8 +498,8 @@ class TestUpdateEventView(APITestMixin):
         response = self.api_client.patch(url, request_data, format='json')
 
         response_data = response.json()
-        assert response.status_code == status.HTTP_200_OK
-        assert response_data['end_date'] is None
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response_data['end_date'] == ['This field may not be null.']
 
     def test_patch_lead_team_failure(self):
         """Test updating an event's lead team to an invalid team."""
