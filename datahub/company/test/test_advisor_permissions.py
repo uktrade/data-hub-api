@@ -11,7 +11,8 @@ from datahub.metadata.models import Team
 class TestAdviserPermissions(APITestMixin):
     """User permissions test case."""
 
-    @pytest.mark.parametrize('factory,reverse_url, expected_status',
+    @pytest.mark.parametrize(
+        'factory,reverse_url, expected_status',
         (
             (lambda *args: None, 'dashboard:intelligent-homepage', status.HTTP_200_OK),
             (AdviserFactory, 'api-v1:advisor-list', status.HTTP_200_OK),
