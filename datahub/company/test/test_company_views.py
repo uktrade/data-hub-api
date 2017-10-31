@@ -570,4 +570,4 @@ class TestCHCompany(APITestMixin):
         url = reverse('api-v3:ch-company:collection')
         response = self.api_client.post(url)
 
-        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+        assert response.status_code == status.HTTP_403_FORBIDDEN

@@ -74,9 +74,3 @@ import.sh
 # docker things
 docker-volumes/
 .env
-
-# Pycharm
-.idea/
-
-#pyenv 
-.python-version

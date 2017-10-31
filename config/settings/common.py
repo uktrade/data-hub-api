@@ -136,7 +136,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'company.Advisor'
 AUTHENTICATION_BACKENDS = [
-    'datahub.core.auth.TeamModelPermissionsBackend'
+    'datahub.core.auth.backends.TeamModelPermissionsBackend'
 ]
 
 # django-oauth-toolkit settings
@@ -171,7 +171,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'oauth2_provider.contrib.rest_framework.IsAuthenticatedOrTokenHasScope',
-        'datahub.core.permissions.CrudPermission',
+        'datahub.core.permissions.DjangoCrudPermission',
     ],
     'ORDERING_PARAM': 'sortby'
 }
