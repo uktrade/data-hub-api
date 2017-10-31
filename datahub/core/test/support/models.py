@@ -19,3 +19,9 @@ class EmptyModel(models.Model):
 
 class MyDisableableModel(DisableableModel):
     """Simple DisableableModel."""
+
+
+class PermissionModel(models.Model):
+
+    class Meta:
+        permissions = (('read_permission', 'Can read permission'),)
