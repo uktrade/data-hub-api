@@ -96,8 +96,8 @@ class TestInteractionV3(APITestMixin):
                 'last_name': self.user.last_name,
                 'name': self.user.name
             },
-            'created_on': '2017-04-18T13:25:30.986208',
-            'modified_on': '2017-04-18T13:25:30.986208'
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z'
         }
 
     @freeze_time('2017-04-18 13:25:30.986208+00:00')
@@ -172,8 +172,8 @@ class TestInteractionV3(APITestMixin):
                 'last_name': self.user.last_name,
                 'name': self.user.name
             },
-            'created_on': '2017-04-18T13:25:30.986208',
-            'modified_on': '2017-04-18T13:25:30.986208'
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z'
         }
 
     def test_add_event_service_delivery_missing_event(self):
@@ -270,8 +270,8 @@ class TestInteractionV3(APITestMixin):
                 'last_name': self.user.last_name,
                 'name': self.user.name
             },
-            'created_on': '2017-04-18T13:25:30.986208',
-            'modified_on': '2017-04-18T13:25:30.986208'
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z'
         }
 
     def test_add_non_event_service_delivery_with_event(self):
@@ -423,8 +423,8 @@ class TestInteractionV3(APITestMixin):
         response_data = response.json()
         assert response_data['dit_adviser']['id'] == str(adviser.pk)
         assert response_data['investment_project']['id'] == str(project.pk)
-        assert response_data['modified_on'] == '2017-04-18T13:25:30.986208'
-        assert response_data['created_on'] == '2017-04-18T13:25:30.986208'
+        assert response_data['modified_on'] == '2017-04-18T13:25:30.986208Z'
+        assert response_data['created_on'] == '2017-04-18T13:25:30.986208Z'
 
     def test_add_interaction_no_entity(self):
         """Test add new interaction without a contact, company or

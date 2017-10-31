@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 from secrets import token_hex
 
 import pytest
@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.test.client import Client
 from django.utils.timezone import now
 from oauth2_provider.models import AccessToken, Application
+from rest_framework.fields import DateField, DateTimeField
 from rest_framework.test import APIClient
 
 from datahub.oauth.scopes import Scope
@@ -91,7 +92,7 @@ class APITestMixin:
                 user=self.user,
                 application=self.get_application(grant_type),
                 token=token_hex(16),
-                expires=datetime.datetime.now() + datetime.timedelta(hours=1),
+                expires=now() + timedelta(hours=1),
                 scope=scope
             )
         return self._tokens[scope]
@@ -131,3 +132,14 @@ def synchronous_executor_submit(fn, *args, **kwargs):
 def synchronous_transaction_on_commit(fn):
     """During a test run a transaction is never committed, so we have to improvise."""
     fn()
+
+
+def format_date_or_datetime(value):
+    """
+    Formats a date or datetime using DRF fields.
+
+    This is for use in tests when comparing dates and datetimes with JSON-formatted values.
+    """
+    if isinstance(value, datetime):
+        return DateTimeField().to_representation(value)
+    return DateField().to_representation(value)

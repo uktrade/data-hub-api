@@ -1,6 +1,5 @@
-from datetime import datetime
-
 from django.contrib.admin import helpers
+from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -51,7 +50,7 @@ class TestEventAdmin(AdminTestMixin):
         for _ in range(5):
             events.append(
                 EventFactory(
-                    disabled_on=datetime.utcnow()
+                    disabled_on=now()
                 )
             )
 
