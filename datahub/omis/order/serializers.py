@@ -89,6 +89,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'billing_address_postcode',
             'billing_address_country',
             'archived_documents_url_path',
+            'paid_on',
             'completed_by',
             'completed_on',
             'cancelled_by',
@@ -115,6 +116,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'vat_cost',
             'total_cost',
             'archived_documents_url_path',
+            'paid_on',
             'completed_by',
             'completed_on',
             'cancelled_by',
@@ -196,6 +198,13 @@ class OrderSerializer(serializers.ModelSerializer):
         data = self._reset_vat_fields_if_necessary(data)
         return data
 
+    def complete(self):
+        """Mark an order as complete."""
+        self.instance.complete(
+            by=self.context['current_user']
+        )
+        return self.instance
+
 
 class PublicOrderSerializer(serializers.ModelSerializer):
     """DRF serializer for public facing API."""
@@ -230,6 +239,7 @@ class PublicOrderSerializer(serializers.ModelSerializer):
             'billing_address_county',
             'billing_address_postcode',
             'billing_address_country',
+            'paid_on',
             'completed_on',
         )
         read_only_fields = fields

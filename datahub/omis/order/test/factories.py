@@ -118,6 +118,7 @@ class OrderCancelledFactory(OrderWithAcceptedQuoteFactory):
 class OrderPaidFactory(OrderWithAcceptedQuoteFactory):
     """Factory for orders marked as paid."""
 
+    paid_on = factory.Faker('date_time')
     status = OrderStatus.paid
 
 
@@ -142,6 +143,12 @@ class OrderAssigneeFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'order.OrderAssignee'
+
+
+class OrderAssigneeCompleteFactory(OrderAssigneeFactory):
+    """Order Assignee factory with actual time set."""
+
+    actual_time = factory.Faker('random_int', min=10, max=100)
 
 
 class HourlyRateFactory(factory.django.DjangoModelFactory):

@@ -17,8 +17,10 @@ from datahub.omis.payment.models import Payment
 from datahub.omis.quote.models import Quote
 
 from .factories import (
+    OrderAssigneeCompleteFactory,
     OrderAssigneeFactory,
     OrderFactory,
+    OrderPaidFactory,
     OrderWithAcceptedQuoteFactory,
     OrderWithOpenQuoteFactory,
 )
@@ -273,7 +275,7 @@ class TestReopen:
         try:
             order.reopen(by=AdviserFactory())
         except Exception:
-            pytest.fail('Should not raise a validator error.')
+            pytest.fail('Should not raise any exception.')
 
         assert order.status == OrderStatus.draft
 
@@ -330,7 +332,7 @@ class TestAcceptQuote:
         try:
             order.accept_quote(by=contact)
         except Exception:
-            pytest.fail('Should not raise a validator error.')
+            pytest.fail('Should not raise any exception.')
 
         order.refresh_from_db()
         assert order.status == OrderStatus.quote_accepted
@@ -401,10 +403,11 @@ class TestMarkOrderAsPaid:
                 ]
             )
         except Exception:
-            pytest.fail('Should not raise a validator error.')
+            pytest.fail('Should not raise any exception.')
 
         order.refresh_from_db()
         assert order.status == OrderStatus.paid
+        assert order.paid_on == dateutil_parse('2017-01-02')
         assert list(
             order.payments.order_by('received_on').values_list('amount', 'received_on')
         ) == [
@@ -451,6 +454,7 @@ class TestMarkOrderAsPaid:
 
             order.refresh_from_db()
             assert order.status == OrderStatus.quote_accepted
+            assert not order.paid_on
             assert not Payment.objects.count()
 
     def test_validation_error_if_amounts_less_then_total_cost(self):
@@ -468,6 +472,82 @@ class TestMarkOrderAsPaid:
                     }
                 ]
             )
+
+
+class TestCompleteOrder:
+    """Tests for when an order is marked as complete."""
+
+    @pytest.mark.parametrize(
+        'allowed_status',
+        (OrderStatus.paid,)
+    )
+    def test_ok_if_order_in_allowed_status(self, allowed_status):
+        """
+        Test that the order can be marked as complete if it's in one of the allowed statuses.
+        """
+        order = OrderPaidFactory(status=allowed_status, assignees=[])
+        OrderAssigneeCompleteFactory(order=order)
+        adviser = AdviserFactory()
+
+        try:
+            with freeze_time('2018-07-12 13:00'):
+                order.complete(by=adviser)
+        except Exception:
+            pytest.fail('Should not raise any exception.')
+
+        order.refresh_from_db()
+        assert order.status == OrderStatus.complete
+        assert order.completed_on == dateutil_parse('2018-07-12 13:00')
+        assert order.completed_by == adviser
+
+    @pytest.mark.parametrize(
+        'disallowed_status',
+        (
+            OrderStatus.draft,
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.quote_accepted,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
+        """
+        Test that if the order is in a disallowed status, the order cannot be marked as complete.
+        """
+        order = OrderFactory(status=disallowed_status)
+        with pytest.raises(Conflict):
+            order.complete(by=None)
+
+        assert order.status == disallowed_status
+
+    def test_atomicity(self):
+        """
+        Test that if there's a problem with saving the order, nothing gets saved.
+        """
+        order = OrderPaidFactory(assignees=[])
+        OrderAssigneeCompleteFactory(order=order)
+        with mock.patch.object(order, 'save') as mocked_save:
+            mocked_save.side_effect = Exception()
+
+            with pytest.raises(Exception):
+                order.complete(by=None)
+
+            order.refresh_from_db()
+            assert order.status == OrderStatus.paid
+            assert not order.completed_on
+            assert not order.completed_by
+
+    def test_validation_error_if_not_all_actual_time_set(self):
+        """
+        Test that if not all assignee actual time fields have been set,
+        a validation error is raised and the call fails.
+        """
+        order = OrderPaidFactory(assignees=[])
+        OrderAssigneeCompleteFactory(order=order)
+        OrderAssigneeFactory(order=order)
+
+        with pytest.raises(ValidationError):
+            order.complete(by=None)
 
 
 class TestOrderAssignee:

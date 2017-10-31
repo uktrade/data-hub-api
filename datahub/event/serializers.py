@@ -13,13 +13,11 @@ class EventSerializer(serializers.ModelSerializer):
 
     default_error_messages = {
         'lead_team_not_in_teams': ugettext_lazy('Lead team must be in teams array.'),
-        'end_date_without_start_date': ugettext_lazy('Cannot have an end date without a start '
-                                                     'date.'),
         'end_date_before_start_date': ugettext_lazy('End date cannot be before start date.'),
         'uk_region_non_uk_country': ugettext_lazy('Cannot specify a UK region for a non-UK '
                                                   'country.')
     }
-
+    end_date = serializers.DateField()
     event_type = NestedRelatedField('event.EventType')
     location_type = NestedRelatedField('event.LocationType', required=False, allow_null=True)
     organiser = NestedAdviserField(required=False, allow_null=True)
@@ -31,6 +29,7 @@ class EventSerializer(serializers.ModelSerializer):
         'event.Programme', many=True, required=False, allow_empty=True
     )
     service = NestedRelatedField('metadata.Service')
+    start_date = serializers.DateField()
 
     def validate(self, data):
         """Performs cross-field validation."""
@@ -63,14 +62,12 @@ class EventSerializer(serializers.ModelSerializer):
 
     def _validate_dates(self, combiner):
         errors = {}
+
         start_date = combiner.get_value('start_date')
         end_date = combiner.get_value('end_date')
 
-        if end_date:
-            if not start_date:
-                errors['end_date'] = self.error_messages['end_date_without_start_date']
-            elif end_date < start_date:
-                errors['end_date'] = self.error_messages['end_date_before_start_date']
+        if start_date and end_date and end_date < start_date:
+            errors['end_date'] = self.error_messages['end_date_before_start_date']
 
         return errors
 
