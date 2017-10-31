@@ -18,6 +18,7 @@ from ..validators import (
     AddressValidator,
     AssigneeExistsRule,
     AssigneesFilledInValidator,
+    CompletableOrderValidator,
     ContactWorksAtCompanyValidator,
     NoOtherActiveQuoteExistsValidator,
     OrderDetailsFilledInValidator,
@@ -589,6 +590,47 @@ class TestVATValidator:
             validator(data)
         except Exception:
             pytest.fail('Should not raise a validator error.')
+
+
+class TestCompletableOrderValidator:
+    """Tests for the CompletableOrderValidator."""
+
+    def test_ok_with_all_actual_time_fields_set(self):
+        """
+        Test that the validation succeeds when all assignee.actual_time fields are set.
+        """
+        order = mock.MagicMock()
+        order.assignees.all.return_value = (
+            mock.MagicMock(actual_time=100), mock.MagicMock(actual_time=0)
+        )
+        validator = CompletableOrderValidator()
+        validator.set_order(order)
+
+        try:
+            validator()
+        except Exception:
+            pytest.fail('Should not raise a validator error.')
+
+    def test_fails_if_not_all_actual_time_fields_set(self):
+        """
+        Test that the validation fails if not all assignee.actual_time fields are set.
+        """
+        order = mock.MagicMock()
+        order.assignees.all.return_value = (
+            mock.MagicMock(actual_time=100), mock.MagicMock(actual_time=None)
+        )
+        validator = CompletableOrderValidator()
+        validator.set_order(order)
+
+        with pytest.raises(ValidationError) as exc:
+            validator()
+
+        assert exc.value.detail == {
+            'non_field_errors': (
+                'You must set the actual time for all assignees '
+                'to complete this order.'
+            )
+        }
 
 
 class TestAddressValidator:

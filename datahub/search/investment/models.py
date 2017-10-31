@@ -129,6 +129,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'business_activities.name',
         'intermediate_company.name',
         'investor_company.name',
+        'project_code',
         'sector.name',
         'uk_company.name',
     ]

@@ -206,6 +206,8 @@ class Order(BaseModel):
         related_name='+'
     )
 
+    paid_on = models.DateTimeField(null=True, blank=True)
+
     completed_on = models.DateTimeField(null=True, blank=True)
     completed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -425,6 +427,33 @@ class Order(BaseModel):
             Payment.objects.create_from_order(self, by, data)
 
         self.status = OrderStatus.paid
+        self.paid_on = max(item['received_on'] for item in payments_data)
+        self.save()
+
+    @transaction.atomic
+    def complete(self, by):
+        """
+        Complete an order.
+
+        :param by: the adviser who marked the order as complete
+        """
+        for order_validator in [
+            validators.OrderInStatusValidator(
+                allowed_statuses=(
+                    OrderStatus.paid,
+                )
+            )
+        ]:
+            order_validator.set_instance(self)
+            order_validator()
+
+        for complete_validator in [validators.CompletableOrderValidator()]:
+            complete_validator.set_order(self)
+            complete_validator()
+
+        self.status = OrderStatus.complete
+        self.completed_on = now()
+        self.completed_by = by
         self.save()
 
 
