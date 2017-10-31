@@ -216,4 +216,4 @@ class CompaniesHouseCompany(CompanyAbstract):
 
     class Meta:
         verbose_name_plural = 'Companies House companies'
-        permissions = (('read_companieshousecompany', 'Can read company house company'),)
+        permissions = (('read_companieshousecompany', 'Can read companies house companies'),)

@@ -1,7 +1,7 @@
 from rest_framework.permissions import DjangoModelPermissions
 
 
-class CrudPermission(DjangoModelPermissions):
+class DjangoCrudPermission(DjangoModelPermissions):
     """Extension of Permission class to include read permissions"""
 
     perms_map = DjangoModelPermissions.perms_map

@@ -355,7 +355,7 @@ class IProjectDocument(BaseModel, ArchivableModel):
         unique_together = (
             ('project', 'doc_type', 'filename'),
         )
-        permissions = (('read_iprojectdocument', 'Can read project document'),)
+        permissions = (('read_iprojectdocument', 'Can read investment project document'),)
 
     @property
     def signed_url(self):
