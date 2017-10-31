@@ -145,6 +145,12 @@ class OrderAssigneeFactory(factory.django.DjangoModelFactory):
         model = 'order.OrderAssignee'
 
 
+class OrderAssigneeCompleteFactory(OrderAssigneeFactory):
+    """Order Assignee factory with actual time set."""
+
+    actual_time = factory.Faker('random_int', min=10, max=100)
+
+
 class HourlyRateFactory(factory.django.DjangoModelFactory):
     """HourlyRate factory."""
 

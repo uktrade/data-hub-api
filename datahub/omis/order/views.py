@@ -1,5 +1,6 @@
 from django.http import Http404
 
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -25,6 +26,19 @@ class OrderViewSet(CoreViewSetV3):
         'contact',
         'primary_market',
     )
+
+    def complete(self, request, *args, **kwargs):
+        """Complete an order."""
+        serializer = self.get_serializer(self.get_object())
+        serializer.complete()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def get_serializer_context(self):
+        """Extra context provided to the serializer class."""
+        return {
+            **super().get_serializer_context(),
+            'current_user': self.request.user,
+        }
 
 
 class PublicOrderViewSet(CoreViewSetV3):
