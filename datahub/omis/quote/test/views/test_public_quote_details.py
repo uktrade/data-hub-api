@@ -6,7 +6,7 @@ from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.oauth.scopes import Scope
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import OrderFactory, OrderWithOpenQuoteFactory
@@ -46,9 +46,9 @@ class TestPublicGetQuote(APITestMixin):
         quote = order.quote
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
-            'created_on': quote.created_on.isoformat(),
+            'created_on': format_date_or_datetime(quote.created_on),
             'cancelled_on': None,
-            'accepted_on': quote.accepted_on.isoformat(),
+            'accepted_on': format_date_or_datetime(quote.accepted_on),
             'expires_on': quote.expires_on.isoformat(),
             'content': quote.content
         }
@@ -73,8 +73,8 @@ class TestPublicGetQuote(APITestMixin):
         quote = order.quote
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
-            'created_on': quote.created_on.isoformat(),
-            'cancelled_on': quote.cancelled_on.isoformat(),
+            'created_on': format_date_or_datetime(quote.created_on),
+            'cancelled_on': format_date_or_datetime(quote.cancelled_on),
             'accepted_on': None,
             'expires_on': quote.expires_on.isoformat(),
             'content': quote.content
@@ -242,13 +242,13 @@ class TestAcceptOrder(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        with freeze_time('2017-07-12 13:00') as mocked_now:
+        with freeze_time('2017-07-12 13:00'):
             response = client.post(url, format='json')
 
             assert response.status_code == status.HTTP_200_OK
             assert response.json() == {
-                'created_on': quote.created_on.isoformat(),
-                'accepted_on': mocked_now().isoformat(),
+                'created_on': format_date_or_datetime(quote.created_on),
+                'accepted_on': format_date_or_datetime(now()),
                 'cancelled_on': None,
                 'expires_on': quote.expires_on.isoformat(),
                 'content': quote.content
@@ -256,4 +256,4 @@ class TestAcceptOrder(APITestMixin):
 
             quote.refresh_from_db()
             assert quote.is_accepted()
-            assert quote.accepted_on == mocked_now()
+            assert quote.accepted_on == now()

@@ -2,6 +2,7 @@
 
 from datetime import datetime
 
+from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -9,7 +10,7 @@ from rest_framework.reverse import reverse
 from datahub.core.test_utils import APITestMixin
 from datahub.leads.test.factories import BusinessLeadFactory
 
-FROZEN_TIME = '2017-04-18T13:25:30.986208'
+FROZEN_TIME = '2017-04-18T13:25:30.986208Z'
 
 
 class TestBusinessLeadViews(APITestMixin):
@@ -184,7 +185,7 @@ class TestBusinessLeadViews(APITestMixin):
         """Tests unarchiving a business lead."""
         lead = BusinessLeadFactory(
             created_by=self.user, archived=True, archived_by=self.user,
-            archived_reason='unarchive test', archived_on=datetime(2016, 1, 1)
+            archived_reason='unarchive test', archived_on=datetime(2016, 1, 1, tzinfo=utc)
         )
         url = reverse('api-v3:business-leads:unarchive-lead-item', kwargs={
             'pk': lead.pk

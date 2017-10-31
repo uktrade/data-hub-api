@@ -225,7 +225,7 @@
   fields:
     kind: interaction
     subject: Provided alpha service
-    date: 2017-06-01
+    date: '2017-06-01T00:00:00Z'
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
@@ -239,7 +239,7 @@
   fields:
     kind: interaction
     subject: Discussed exports event
-    date: 2017-06-03
+    date: '2017-06-03T00:00:00Z'
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
@@ -253,7 +253,7 @@
   fields:
     kind: service_delivery
     subject: Provided beta service
-    date: 2017-06-05
+    date: '2017-06-05T00:00:00Z'
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     event: ~
@@ -271,7 +271,7 @@
   fields:
     kind: service_delivery
     subject: Attended gamma event
-    date: 2017-09-05
+    date: '2017-09-05T00:00:00Z'
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contact: 9b1138ab-ec7b-497f-b8c3-27fed21694ef
     event: bda12a57-433c-4a0c-a7ce-5ebd080e09e8
@@ -616,7 +616,7 @@
   pk: 94d03877-fceb-44a0-8813-17b727d2e7f6
   fields:
     kind: interaction
-    date: 2017-06-03
+    date: '2017-06-03T00:00:00Z'
     investment_project: 721e2a04-21c3-4172-a321-4368463a4b2d
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
@@ -630,7 +630,7 @@
   pk: 0dcb3748-c097-4f20-b84f-0114bbb1a8e0
   fields:
     kind: interaction
-    date: 2017-06-05
+    date: '2017-06-05T00:00:00Z'
     investment_project: 721e2a04-21c3-4172-a321-4368463a4b2d
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a

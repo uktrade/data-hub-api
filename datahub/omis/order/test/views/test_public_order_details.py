@@ -4,7 +4,7 @@ from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.oauth.scopes import Scope
 from datahub.omis.quote.test.factories import QuoteFactory
 
@@ -50,7 +50,7 @@ class TestViewPublicOrderDetails(APITestMixin):
             'public_token': order.public_token,
             'reference': order.reference,
             'status': order.status,
-            'created_on': order.created_on.isoformat(),
+            'created_on': format_date_or_datetime(order.created_on),
             'company': {
                 'id': str(order.company.pk),
                 'name': order.company.name,

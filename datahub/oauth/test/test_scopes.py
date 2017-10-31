@@ -3,6 +3,7 @@ from unittest import mock
 
 import pytest
 from django.test.utils import override_settings
+from django.utils.timezone import utc
 from factory import Faker
 from oauth2_provider.models import Application
 from rest_framework import HTTP_HEADER_ENCODING, status
@@ -121,7 +122,7 @@ class TestOAuthViewScope(APITestMixin):
         application = self.get_application(grant_type=grant_type)
         access_token = AccessTokenFactory(application=application,
                                           scope=TestScope.test_scope_1,
-                                          expires=Faker('past_datetime'))
+                                          expires=Faker('past_datetime', tzinfo=utc))
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION=f'bearer {access_token.token}')
         url = reverse('test-disableable-collection')

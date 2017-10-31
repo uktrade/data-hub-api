@@ -27,19 +27,19 @@
   fields: {name: Training, disabled_on: null, order: 900.0}
 - model: order.servicetype
   pk: 57c9b720-40b5-433f-9d3c-9137fb758bed
-  fields: {name: Event group, disabled_on: !!timestamp '2017-10-24 11:00:00.000000', order: 1000.0}
+  fields: {name: Event group, disabled_on: '2017-10-24T11:00:00.000000Z', order: 1000.0}
 - model: order.servicetype
   pk: 50f9539f-d750-4836-b929-67c82051bcdb
-  fields: {name: Event solo, disabled_on: !!timestamp '2017-10-24 11:00:00.000000', order: 1100.0}
+  fields: {name: Event solo, disabled_on: '2017-10-24T11:00:00.000000Z', order: 1100.0}
 - model: order.servicetype
   pk: 9766ff17-398e-4156-9426-9687378fedff
-  fields: {name: Market selection service request, disabled_on: !!timestamp '2017-10-24 11:00:00.000000', order: 1200.0}
+  fields: {name: Market selection service request, disabled_on: '2017-10-24T11:00:00.000000Z', order: 1200.0}
 - model: order.servicetype
   pk: 622aedd8-8936-4e62-99f2-2b8bb3783166
-  fields: {name: Strategic offer, disabled_on: !!timestamp '2017-10-24 11:00:00.000000', order: 1300.0}
+  fields: {name: Strategic offer, disabled_on: '2017-10-24T11:00:00.000000Z', order: 1300.0}
 - model: order.servicetype
   pk: 66b57a5b-ca6e-4d6e-9941-4a6e7f9aa3ae
-  fields: {name: Subscription, disabled_on: !!timestamp '2017-10-24 11:00:00.000000', order: 1400.0}
+  fields: {name: Subscription, disabled_on: '2017-10-24T11:00:00.000000Z', order: 1400.0}
 - model: order.servicetype
   pk: 80beb270-c1ce-40a3-8ad4-20a569a7bca0
-  fields: {name: Retainer, disabled_on: !!timestamp '2017-10-24 11:00:00.000000', order: 1500.0}
+  fields: {name: Retainer, disabled_on: '2017-10-24T11:00:00.000000Z', order: 1500.0}

@@ -5,6 +5,7 @@ import factory
 import pytest
 from dateutil.parser import parse as dateutil_parse
 from django.utils.crypto import get_random_string
+from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework.exceptions import ValidationError
 
@@ -288,12 +289,12 @@ class TestReopen:
 
         adviser = AdviserFactory()
 
-        with freeze_time('2017-07-12 13:00') as mocked_now:
+        with freeze_time('2017-07-12 13:00'):
             order.reopen(by=adviser)
 
             assert order.quote.is_cancelled()
             assert order.quote.cancelled_by == adviser
-            assert order.quote.cancelled_on == mocked_now()
+            assert order.quote.cancelled_on == now()
             assert order.status == OrderStatus.draft
 
     @pytest.mark.parametrize(
@@ -407,7 +408,7 @@ class TestMarkOrderAsPaid:
 
         order.refresh_from_db()
         assert order.status == OrderStatus.paid
-        assert order.paid_on == dateutil_parse('2017-01-02')
+        assert order.paid_on == dateutil_parse('2017-01-02T00:00:00Z')
         assert list(
             order.payments.order_by('received_on').values_list('amount', 'received_on')
         ) == [
@@ -497,7 +498,7 @@ class TestCompleteOrder:
 
         order.refresh_from_db()
         assert order.status == OrderStatus.complete
-        assert order.completed_on == dateutil_parse('2018-07-12 13:00')
+        assert order.completed_on == dateutil_parse('2018-07-12 13:00Z')
         assert order.completed_by == adviser
 
     @pytest.mark.parametrize(

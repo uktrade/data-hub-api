@@ -1,12 +1,13 @@
 import secrets
 import uuid
+from datetime import datetime, time
 from functools import partial
 
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
 from django.utils.crypto import get_random_string
-from django.utils.timezone import now
+from django.utils.timezone import now, utc
 
 from datahub.company.models import Advisor, Company, Contact
 from datahub.core.models import (
@@ -427,7 +428,8 @@ class Order(BaseModel):
             Payment.objects.create_from_order(self, by, data)
 
         self.status = OrderStatus.paid
-        self.paid_on = max(item['received_on'] for item in payments_data)
+        max_received_on = max(item['received_on'] for item in payments_data)
+        self.paid_on = datetime.combine(date=max_received_on, time=time(tzinfo=utc))
         self.save()
 
     @transaction.atomic
