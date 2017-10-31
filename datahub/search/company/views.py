@@ -1,5 +1,3 @@
-from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
-
 from datahub.oauth.scopes import Scope
 from .models import Company
 from .serializers import SearchCompanySerializer
@@ -44,11 +42,9 @@ class SearchCompanyAPIView(SearchCompanyParams, SearchAPIView):
     """Filtered company search view."""
 
     permission_required = 'company.read_company'
-    permission_classes = (IsAuthenticatedOrTokenHasScope,)
 
 
 class SearchCompanyExportAPIView(SearchCompanyParams, SearchExportAPIView):
     """Filtered company search export view."""
 
     permission_required = 'company.read_company'
-    permission_classes = (IsAuthenticatedOrTokenHasScope,)
