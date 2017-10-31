@@ -364,11 +364,11 @@ class TestCreateEventView(APITestMixin):
             'address_1': '',
             'address_country': None,
             'address_town': '',
-            'end_date': '',
+            'end_date': None,
             'event_type': None,
             'name': '',
             'service': None,
-            'start_date': '',
+            'start_date': None,
         }
         response = self.api_client.post(url, format='json', data=request_data)
 
@@ -378,13 +378,11 @@ class TestCreateEventView(APITestMixin):
             'address_1': ['This field may not be blank.'],
             'address_country': ['This field may not be null.'],
             'address_town': ['This field may not be blank.'],
-            'end_date':
-                ['Date has wrong format. Use one of these formats instead: YYYY[-MM[-DD]].'],
+            'end_date': ['This field may not be null.'],
             'event_type': ['This field may not be null.'],
             'name': ['This field may not be blank.'],
             'service': ['This field may not be null.'],
-            'start_date':
-                ['Date has wrong format. Use one of these formats instead: YYYY[-MM[-DD]].'],
+            'start_date': ['This field may not be null.'],
         }
 
 
