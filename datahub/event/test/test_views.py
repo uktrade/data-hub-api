@@ -5,13 +5,23 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import Country, Service, Team, UKRegion
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, get_test_user
 from datahub.event.constants import EventType, LocationType, Programme
 from datahub.event.test.factories import EventFactory
+from datahub.metadata.test.factories import TeamFactory
 
 
 class TestGetEventView(APITestMixin):
     """Get single event view tests."""
+
+    def test_event_details_no_permissions(self):
+        """Should return 403"""
+        event = EventFactory()
+        team = TeamFactory()
+        self._user = get_test_user(team=team)
+        url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_get(self):
         """Test getting a single event."""
@@ -81,6 +91,14 @@ class TestGetEventView(APITestMixin):
 
 class TestListEventView(APITestMixin):
     """List events view tests."""
+
+    def test_event_list_no_permissions(self):
+        """Should return 403"""
+        team = TeamFactory()
+        self._user = get_test_user(team=team)
+        url = reverse('api-v3:event:collection')
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_list(self):
         """Tests listing events."""

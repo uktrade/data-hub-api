@@ -18,7 +18,7 @@ from reversion.models import Version
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import (
-    APITestMixin, format_date_or_datetime, synchronous_executor_submit,
+    APITestMixin, format_date_or_datetime, get_test_user, synchronous_executor_submit,
     synchronous_transaction_on_commit
 )
 from datahub.core.utils import executor
@@ -32,11 +32,20 @@ from datahub.investment.test.factories import (
     InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
     VerifyWinInvestmentProjectFactory, WonInvestmentProjectFactory
 )
+from datahub.metadata.test.factories import TeamFactory
 from datahub.oauth.scopes import Scope
 
 
 class TestUnifiedViews(APITestMixin):
     """Tests for the unified investment views."""
+
+    def test_investments_no_permissions(self):
+        """Should return 403"""
+        team = TeamFactory()
+        self._user = get_test_user(team=team)
+        url = reverse('api-v3:investment:investment-collection')
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_list_projects_success(self):
         """Test successfully listing projects."""
