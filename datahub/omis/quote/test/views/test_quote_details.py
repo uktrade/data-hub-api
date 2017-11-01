@@ -90,7 +90,7 @@ class TestCreatePreviewOrder(APITestMixin):
             ('delivery_date', None),
         )
     )
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     def test_400_if_incomplete_order(self, quote_view_name, field, value):
         """If the order is incomplete, the quote cannot be generated."""
         order = OrderFactory(**{field: value})
@@ -107,7 +107,7 @@ class TestCreatePreviewOrder(APITestMixin):
         }
 
     @pytest.mark.parametrize('quote_view_name', ('detail', 'preview'))
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     def test_400_if_expiry_date_passed(self, quote_view_name):
         """
         If the generated quote expiry date is in the past because the delivery date
@@ -131,7 +131,7 @@ class TestCreatePreviewOrder(APITestMixin):
             ]
         }
 
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     @pytest.mark.parametrize(
         'OrderFactoryClass',  # noqa: N803
         (OrderFactory, OrderWithCancelledQuoteFactory)
@@ -186,7 +186,7 @@ class TestCreatePreviewOrder(APITestMixin):
         assert not order.quote
         assert not Quote.objects.count()
 
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     @pytest.mark.parametrize(
         'OrderFactoryClass',  # noqa: N803
         (OrderFactory, OrderWithCancelledQuoteFactory)

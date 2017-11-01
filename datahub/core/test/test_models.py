@@ -18,7 +18,7 @@ class TestDisableableModel:
 
     def test_was_disabled(self):
         """If disabled_on < date_on, return True."""
-        disabled_on = dateutil_parse('2017-01-01 12:00:00Z')
+        disabled_on = dateutil_parse('2017-01-01T12:00:00Z')
         date_on = dateutil_parse('2017-01-01T13:00:00Z')
 
         obj = MyDisableableModel(disabled_on=disabled_on)
@@ -26,7 +26,7 @@ class TestDisableableModel:
 
     def test_wasnt_disabled(self):
         """If disabled_on > date_on, return False."""
-        disabled_on = dateutil_parse('2017-01-01 14:00:00Z')
+        disabled_on = dateutil_parse('2017-01-01T14:00:00Z')
         date_on = dateutil_parse('2017-01-01T13:00:00Z')
 
         obj = MyDisableableModel(disabled_on=disabled_on)

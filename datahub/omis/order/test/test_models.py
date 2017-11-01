@@ -47,7 +47,7 @@ class OrderWithRandomReferenceFactory(OrderFactory):
 class TestOrderGenerateReference:
     """Tests for the generate reference logic."""
 
-    @freeze_time('2017-07-12 13:00:00.000000+00:00')
+    @freeze_time('2017-07-12 13:00:00.000000')
     @mock.patch('datahub.omis.order.models.get_random_string')
     def test_generates_reference_if_doesnt_exist(self, mock_get_random_string):
         """
@@ -65,7 +65,7 @@ class TestOrderGenerateReference:
         order = OrderWithRandomPublicTokenFactory()
         assert order.reference == 'CBA321/17'
 
-    @freeze_time('2017-07-12 13:00:00.000000+00:00')
+    @freeze_time('2017-07-12 13:00:00.000000')
     @mock.patch('datahub.omis.order.models.get_random_string')
     def test_doesnt_generate_reference_if_present(self, mock_get_random_string):
         """
@@ -83,7 +83,7 @@ class TestOrderGenerateReference:
         order = OrderWithRandomPublicTokenFactory()
         assert order.reference == 'CBA321/17'
 
-    @freeze_time('2017-07-12 13:00:00.000000+00:00')
+    @freeze_time('2017-07-12 13:00:00.000000')
     @mock.patch('datahub.omis.order.models.get_random_string')
     def test_cannot_generate_reference(self, mock_get_random_string):
         """
@@ -498,7 +498,7 @@ class TestCompleteOrder:
 
         order.refresh_from_db()
         assert order.status == OrderStatus.complete
-        assert order.completed_on == dateutil_parse('2018-07-12 13:00Z')
+        assert order.completed_on == dateutil_parse('2018-07-12T13:00Z')
         assert order.completed_by == adviser
 
     @pytest.mark.parametrize(

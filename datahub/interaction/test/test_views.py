@@ -26,7 +26,7 @@ class TestInteractionV3(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['id'] == str(interaction.pk)
 
-    @freeze_time('2017-04-18 13:25:30.986208+00:00')
+    @freeze_time('2017-04-18 13:25:30.986208')
     def test_add_interaction(self):
         """Test add new interaction."""
         adviser = AdviserFactory()
@@ -100,7 +100,7 @@ class TestInteractionV3(APITestMixin):
             'modified_on': '2017-04-18T13:25:30.986208Z'
         }
 
-    @freeze_time('2017-04-18 13:25:30.986208+00:00')
+    @freeze_time('2017-04-18 13:25:30.986208')
     def test_add_event_service_delivery(self):
         """Test adding a new event service delivery."""
         adviser = AdviserFactory()
@@ -203,7 +203,7 @@ class TestInteractionV3(APITestMixin):
             'event': ['This field is required.']
         }
 
-    @freeze_time('2017-04-18 13:25:30.986208+00:00')
+    @freeze_time('2017-04-18 13:25:30.986208')
     def test_add_non_event_service_delivery(self):
         """Test adding a new non-event service delivery."""
         adviser = AdviserFactory()
@@ -399,7 +399,7 @@ class TestInteractionV3(APITestMixin):
             'communication_channel': ['This field is only valid for interactions.'],
         }
 
-    @freeze_time('2017-04-18 13:25:30.986208+00:00')
+    @freeze_time('2017-04-18 13:25:30.986208')
     def test_add_interaction_project(self):
         """Test add new interaction for an investment project."""
         project = InvestmentProjectFactory()

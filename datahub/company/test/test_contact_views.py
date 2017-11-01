@@ -19,7 +19,7 @@ pytestmark = pytest.mark.django_db
 class TestAddContact(APITestMixin):
     """Add contact test case."""
 
-    @freeze_time('2017-04-18 13:25:30.986208+00:00')
+    @freeze_time('2017-04-18 13:25:30.986208')
     def test_with_manual_address(self):
         """Test add with manual address."""
         company = CompanyFactory()
@@ -294,7 +294,7 @@ class TestEditContact(APITestMixin):
 
     def test_patch(self):
         """Test that it successfully patch an existing contact."""
-        with freeze_time('2017-04-18 13:25:30.986208+00:00'):
+        with freeze_time('2017-04-18 13:25:30.986208'):
             company = CompanyFactory()
 
             contact = ContactFactory(
@@ -327,7 +327,7 @@ class TestEditContact(APITestMixin):
             )
 
         url = reverse('api-v3:contact:detail', kwargs={'pk': contact.pk})
-        with freeze_time('2017-04-19 13:25:30.986208+00:00'):
+        with freeze_time('2017-04-19 13:25:30.986208'):
             response = self.api_client.patch(url, {
                 'first_name': 'New Oratio',
             }, format='json')
@@ -439,7 +439,7 @@ class TestArchiveContact(APITestMixin):
 class TestViewContact(APITestMixin):
     """View contact test case."""
 
-    @freeze_time('2017-04-18 13:25:30.986208+00:00')
+    @freeze_time('2017-04-18 13:25:30.986208')
     def test_view(self):
         """Test view."""
         company = CompanyFactory()
