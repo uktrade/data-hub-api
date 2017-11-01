@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('order', '0027_hourlyrate_disabled_on'),
+        ('order', '0001_squashed_0030_cancellation'),
     ]
 
     operations = [
