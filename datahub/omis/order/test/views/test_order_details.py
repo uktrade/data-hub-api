@@ -28,7 +28,7 @@ pytestmark = pytest.mark.django_db
 class TestAddOrderDetails(APITestMixin):
     """Add Order details test case."""
 
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     def test_success_complete(self):
         """Test a successful call to create an Order with all possible fields."""
         company = CompanyFactory()
@@ -144,7 +144,7 @@ class TestAddOrderDetails(APITestMixin):
             'cancellation_reason': None,
         }
 
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     def test_success_minimal(self):
         """Test a successful call to create an Order without optional fields."""
         company = CompanyFactory()
@@ -424,7 +424,7 @@ class TestAddOrderDetails(APITestMixin):
 class TestChangeOrderDetails(APITestMixin):
     """Change Order details test case."""
 
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     def test_success(self):
         """Test changing an existing order."""
         order = OrderFactory(vat_status=VATStatus.outside_eu)
@@ -851,7 +851,7 @@ class TestChangeOrderDetails(APITestMixin):
 class TestMarkOrderAsComplete(APITestMixin):
     """Test cases for marking an order as complete."""
 
-    @freeze_time('2017-04-18 13:00Z')
+    @freeze_time('2017-04-18 13:00')
     @pytest.mark.parametrize(
         'allowed_status',
         (OrderStatus.paid,)
@@ -864,7 +864,7 @@ class TestMarkOrderAsComplete(APITestMixin):
         url = reverse('api-v3:omis:order:complete', kwargs={'pk': order.pk})
         response = self.api_client.post(url, {}, format='json')
 
-        expected_completed_on = dateutil_parse('2017-04-18 13:00Z')
+        expected_completed_on = dateutil_parse('2017-04-18T13:00Z')
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['status'] == OrderStatus.complete
         assert response.json()['completed_on'] == format_date_or_datetime(expected_completed_on)
