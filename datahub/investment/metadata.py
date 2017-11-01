@@ -1,5 +1,16 @@
 from datahub.investment import models
+from datahub.metadata.fixtures import Fixture
 from datahub.metadata.registry import registry
+
+
+class InvestmentFixtures(Fixture):
+    """Metadata fixtures (for the loadmetadata command)."""
+
+    files = [
+        'fixtures/investor_types.yaml',
+        'fixtures/involvements.yaml',
+        'fixtures/specific_programmes.yaml',
+    ]
 
 
 registry.register(
