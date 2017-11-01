@@ -65,6 +65,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
     referral_source_activity_event = dsl_utils.SortableCaseInsensitiveKeywordText()
     referral_source_advisor = dsl_utils.contact_or_adviser_mapping('referral_source_advisor')
     sector = dsl_utils.id_name_mapping()
+    status = dsl_utils.SortableCaseInsensitiveKeywordText()
     average_salary = dsl_utils.id_name_mapping()
     date_lost = Date()
     date_abandoned = Date()
