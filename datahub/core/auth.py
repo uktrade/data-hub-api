@@ -25,7 +25,7 @@ class CDMSUserBackend(ModelBackend):
                 password=password,
             ) is True  # No errors in the process assume success
         except requests.RequestException as exc:
-            logging.exception('Connection error when communicating with CDMS auth server')
+            logger.exception('Connection error when communicating with CDMS auth server')
             if user.has_usable_password():
                 # Indicate that the cached password should be used if there is one
                 return None
