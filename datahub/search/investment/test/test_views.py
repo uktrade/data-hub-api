@@ -20,7 +20,7 @@ def setup_data(setup_es):
         InvestmentProjectFactory(
             name='abc defg',
             description='investmentproject1',
-            estimated_land_date=datetime.datetime(2011, 6, 13, 9, 44, 31, 62870),
+            estimated_land_date=datetime.date(2011, 6, 13),
             investor_company=CompanyFactory(
                 registered_address_country_id=constants.Country.united_states.value.id
             ),
@@ -33,7 +33,7 @@ def setup_data(setup_es):
         InvestmentProjectFactory(
             name='delayed project',
             description='investmentproject2',
-            estimated_land_date=datetime.datetime(2057, 6, 13, 9, 44, 31, 62870),
+            estimated_land_date=datetime.date(2057, 6, 13),
             investor_company=CompanyFactory(
                 registered_address_country_id=constants.Country.japan.value.id
             ),
@@ -48,7 +48,7 @@ def setup_data(setup_es):
         InvestmentProjectFactory(
             name='won project',
             description='investmentproject3',
-            estimated_land_date=datetime.datetime(2057, 6, 13, 9, 44, 31, 62870),
+            estimated_land_date=datetime.date(2027, 9, 13),
             investor_company=CompanyFactory(
                 registered_address_country_id=constants.Country.united_kingdom.value.id
             ),
