@@ -9,7 +9,7 @@ from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core.auth import backends as auth_backends
+from datahub.core import auth as auth_backends
 
 pytestmark = pytest.mark.django_db
 

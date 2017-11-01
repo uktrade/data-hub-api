@@ -24,4 +24,4 @@ class MyDisableableModel(DisableableModel):
 class PermissionModel(models.Model):
 
     class Meta:
-        permissions = (('read_permission', 'Can read permission'),)
+        permissions = (('read_permissionmodel', 'Can read permission'),)
