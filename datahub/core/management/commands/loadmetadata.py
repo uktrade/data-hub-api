@@ -9,6 +9,7 @@ from datahub.metadata.fixtures import Fixture
 SOURCE_ROOT = PurePath(__file__).parents[4]
 SHARED_METADATA_FIXTURE_DIR = SOURCE_ROOT / 'fixtures' / 'metadata'
 EVENTS_FIXTURE_DIR = SOURCE_ROOT / 'datahub' / 'event' / 'fixtures'
+INVESTMENTS_FIXTURE_DIR = SOURCE_ROOT / 'datahub' / 'investment' / 'fixtures'
 
 SHARED_FIXTURES = (
     SHARED_METADATA_FIXTURE_DIR / 'companies.yaml',
@@ -29,6 +30,12 @@ EVENTS_FIXTURES = (
     EVENTS_FIXTURE_DIR / 'event_types.yaml',
 )
 
+INVESTMENTS_FIXTURES = (
+    INVESTMENTS_FIXTURE_DIR / 'investor_types.yaml',
+    INVESTMENTS_FIXTURE_DIR / 'involvements.yaml',
+    INVESTMENTS_FIXTURE_DIR / 'specific_programmes.yaml',
+)
+
 
 class Command(BaseCommand):
     """Loads all the metadata fixtures."""
@@ -47,5 +54,6 @@ class Command(BaseCommand):
             'loaddata',
             *SHARED_FIXTURES,
             *EVENTS_FIXTURES,
+            *INVESTMENTS_FIXTURES,
             *registered_fixtures,
         )

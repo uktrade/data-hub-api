@@ -1,0 +1,6 @@
+- model: investment.investortype
+  pk: e6a01052-8c36-4a32-b5b9-fc2be4b34408
+  fields: {name: "New Investor"}
+- model: investment.investortype
+  pk: 40e33f91-f565-4b89-8e18-cfefae192245
+  fields: {name: "Existing Investor"}
