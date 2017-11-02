@@ -9,6 +9,8 @@ from datahub.oauth.scopes import Scope
 
 from .models import Order
 from .serializers import (
+    CancelOrderSerializer,
+    CompleteOrderSerializer,
     OrderAssigneeSerializer,
     OrderSerializer,
     PublicOrderSerializer,
@@ -29,9 +31,33 @@ class OrderViewSet(CoreViewSetV3):
 
     def complete(self, request, *args, **kwargs):
         """Complete an order."""
-        serializer = self.get_serializer(self.get_object())
-        serializer.complete()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        instance = self.get_object()
+        serializer = CompleteOrderSerializer(
+            instance,
+            data={},
+            context=self.get_serializer_context()
+        )
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.complete()
+        return Response(
+            self.get_serializer(instance=instance).data,
+            status=status.HTTP_200_OK
+        )
+
+    def cancel(self, request, *args, **kwargs):
+        """Cancel an order."""
+        instance = self.get_object()
+        serializer = CancelOrderSerializer(
+            instance,
+            data=request.data,
+            context=self.get_serializer_context()
+        )
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.cancel()
+        return Response(
+            self.get_serializer(instance=instance).data,
+            status=status.HTTP_200_OK
+        )
 
     def get_serializer_context(self):
         """Extra context provided to the serializer class."""
