@@ -458,6 +458,31 @@ class Order(BaseModel):
         self.completed_by = by
         self.save()
 
+    @transaction.atomic
+    def cancel(self, by, reason):
+        """
+        Cancel an order.
+
+        :param by: the adviser who cancelled the order
+        :param reason: CancellationReason
+        """
+        for order_validator in [
+            validators.OrderInStatusValidator(
+                allowed_statuses=(
+                    OrderStatus.draft,
+                    OrderStatus.quote_awaiting_acceptance,
+                )
+            )
+        ]:
+            order_validator.set_instance(self)
+            order_validator()
+
+        self.status = OrderStatus.cancelled
+        self.cancelled_on = now()
+        self.cancelled_by = by
+        self.cancellation_reason = reason
+        self.save()
+
 
 class OrderSubscriber(BaseModel):
     """

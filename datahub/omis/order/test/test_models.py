@@ -27,6 +27,7 @@ from .factories import (
 )
 
 from ..constants import OrderStatus
+from ..models import CancellationReason
 
 
 pytestmark = pytest.mark.django_db
@@ -273,10 +274,7 @@ class TestReopen:
         """
         order = OrderFactory(status=allowed_status)
 
-        try:
-            order.reopen(by=AdviserFactory())
-        except Exception:
-            pytest.fail('Should not raise any exception.')
+        order.reopen(by=AdviserFactory())
 
         assert order.status == OrderStatus.draft
 
@@ -330,10 +328,7 @@ class TestAcceptQuote:
         order = OrderWithOpenQuoteFactory(status=allowed_status)
         contact = ContactFactory()
 
-        try:
-            order.accept_quote(by=contact)
-        except Exception:
-            pytest.fail('Should not raise any exception.')
+        order.accept_quote(by=contact)
 
         order.refresh_from_db()
         assert order.status == OrderStatus.quote_accepted
@@ -389,22 +384,19 @@ class TestMarkOrderAsPaid:
         order = OrderWithAcceptedQuoteFactory(status=allowed_status)
         adviser = AdviserFactory()
 
-        try:
-            order.mark_as_paid(
-                by=adviser,
-                payments_data=[
-                    {
-                        'amount': 1,
-                        'received_on': dateutil_parse('2017-01-01').date()
-                    },
-                    {
-                        'amount': order.total_cost - 1,
-                        'received_on': dateutil_parse('2017-01-02').date()
-                    },
-                ]
-            )
-        except Exception:
-            pytest.fail('Should not raise any exception.')
+        order.mark_as_paid(
+            by=adviser,
+            payments_data=[
+                {
+                    'amount': 1,
+                    'received_on': dateutil_parse('2017-01-01').date()
+                },
+                {
+                    'amount': order.total_cost - 1,
+                    'received_on': dateutil_parse('2017-01-02').date()
+                },
+            ]
+        )
 
         order.refresh_from_db()
         assert order.status == OrderStatus.paid
@@ -490,11 +482,8 @@ class TestCompleteOrder:
         OrderAssigneeCompleteFactory(order=order)
         adviser = AdviserFactory()
 
-        try:
-            with freeze_time('2018-07-12 13:00'):
-                order.complete(by=adviser)
-        except Exception:
-            pytest.fail('Should not raise any exception.')
+        with freeze_time('2018-07-12 13:00'):
+            order.complete(by=adviser)
 
         order.refresh_from_db()
         assert order.status == OrderStatus.complete
@@ -549,6 +538,71 @@ class TestCompleteOrder:
 
         with pytest.raises(ValidationError):
             order.complete(by=None)
+
+
+class TestCancelOrder:
+    """Tests for when an order is cancelled."""
+
+    @pytest.mark.parametrize(
+        'allowed_status',
+        (OrderStatus.draft, OrderStatus.quote_awaiting_acceptance)
+    )
+    def test_ok_if_order_in_allowed_status(self, allowed_status):
+        """
+        Test that the order can be cancelled if it's in one of the allowed statuses.
+        """
+        reason = CancellationReason.objects.order_by('?').first()
+        order = OrderFactory(status=allowed_status)
+        adviser = AdviserFactory()
+
+        with freeze_time('2018-07-12 13:00'):
+            order.cancel(by=adviser, reason=reason)
+
+        order.refresh_from_db()
+        assert order.status == OrderStatus.cancelled
+        assert order.cancelled_on == dateutil_parse('2018-07-12T13:00Z')
+        assert order.cancellation_reason == reason
+        assert order.cancelled_by == adviser
+
+    @pytest.mark.parametrize(
+        'disallowed_status',
+        (
+            OrderStatus.quote_accepted,
+            OrderStatus.paid,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
+        """
+        Test that if the order is in a disallowed status, the order cannot be cancelled.
+        """
+        reason = CancellationReason.objects.order_by('?').first()
+        order = OrderFactory(status=disallowed_status)
+
+        with pytest.raises(Conflict):
+            order.cancel(by=None, reason=reason)
+
+        assert order.status == disallowed_status
+
+    def test_atomicity(self):
+        """
+        Test that if there's a problem with saving the order, nothing gets saved.
+        """
+        reason = CancellationReason.objects.order_by('?').first()
+        order = OrderFactory(status=OrderStatus.draft)
+
+        with mock.patch.object(order, 'save') as mocked_save:
+            mocked_save.side_effect = Exception()
+
+            with pytest.raises(Exception):
+                order.cancel(by=None, reason=reason)
+
+            order.refresh_from_db()
+            assert order.status == OrderStatus.draft
+            assert not order.cancellation_reason
+            assert not order.cancelled_on
+            assert not order.cancelled_by
 
 
 class TestOrderAssignee:
