@@ -201,6 +201,14 @@ class OrderSerializer(serializers.ModelSerializer):
         data = self._reset_vat_fields_if_necessary(data)
         return data
 
+
+class CompleteOrderSerializer(OrderSerializer):
+    """DRF serializer for marking an order as complete."""
+
+    class Meta:
+        model = Order
+        fields = ()
+
     def complete(self):
         """Mark an order as complete."""
         self.instance.complete(
