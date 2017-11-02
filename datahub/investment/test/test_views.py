@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 import reversion
-from django.utils.timezone import now
+from django.utils.timezone import now, utc
 from freezegun import freeze_time
 from oauth2_provider.models import Application
 from rest_framework import status
@@ -18,7 +18,8 @@ from reversion.models import Version
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import (
-    APITestMixin, synchronous_executor_submit, synchronous_transaction_on_commit
+    APITestMixin, format_date_or_datetime, synchronous_executor_submit,
+    synchronous_transaction_on_commit
 )
 from datahub.core.utils import executor
 from datahub.documents.av_scan import virus_scan_document
@@ -932,8 +933,8 @@ class TestModifiedSinceView(APITestMixin):
 
     def test_get_all(self):
         """Test that all results are returned if no filter value is provided."""
-        InvestmentProjectFactory.create_batch(4, modified_on=datetime(2017, 1, 1))
-        InvestmentProjectFactory.create_batch(5, modified_on=datetime(2018, 1, 1))
+        InvestmentProjectFactory.create_batch(4, modified_on=datetime(2017, 1, 1, tzinfo=utc))
+        InvestmentProjectFactory.create_batch(5, modified_on=datetime(2018, 1, 1, tzinfo=utc))
         url = reverse('api-v3:investment:investment-modified-since-collection')
         client = self.create_api_client(
             scope=Scope.mi,
@@ -1134,7 +1135,7 @@ class TestAuditLogView(APITestMixin):
 
     def test_audit_log_view(self):
         """Test retrieval of audit log."""
-        initial_datetime = datetime.utcnow()
+        initial_datetime = now()
         with reversion.create_revision():
             iproject = InvestmentProjectFactory(
                 description='Initial desc',
@@ -1144,7 +1145,7 @@ class TestAuditLogView(APITestMixin):
             reversion.set_date_created(initial_datetime)
             reversion.set_user(self.user)
 
-        changed_datetime = datetime.utcnow()
+        changed_datetime = now()
         with reversion.create_revision():
             iproject.description = 'New desc'
             iproject.save()
@@ -1168,7 +1169,8 @@ class TestAuditLogView(APITestMixin):
         assert entry['id'] == version_id
         assert entry['user']['name'] == self.user.name, 'Valid user captured'
         assert entry['comment'] == 'Changed', 'Comments can be set manually'
-        assert entry['timestamp'] == changed_datetime.isoformat(), 'TS can be set manually'
+        assert entry['timestamp'] == format_date_or_datetime(changed_datetime), \
+            'TS can be set manually'
         assert entry['changes']['description'] == ['Initial desc', 'New desc'], \
             'Changes are reflected'
         assert not {'created_on', 'created_by', 'modified_on', 'modified_by'} & entry[

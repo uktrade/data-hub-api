@@ -9,7 +9,7 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.constants import Country, Sector
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.omis.market.models import Market
 
 from ..factories import (
@@ -28,7 +28,7 @@ pytestmark = pytest.mark.django_db
 class TestAddOrderDetails(APITestMixin):
     """Add Order details test case."""
 
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     def test_success_complete(self):
         """Test a successful call to create an Order with all possible fields."""
         company = CompanyFactory()
@@ -73,12 +73,12 @@ class TestAddOrderDetails(APITestMixin):
             'id': response.json()['id'],
             'reference': response.json()['reference'],
             'status': OrderStatus.draft,
-            'created_on': '2017-04-18T13:00:00',
+            'created_on': '2017-04-18T13:00:00Z',
             'created_by': {
                 'id': str(self.user.pk),
                 'name': self.user.name
             },
-            'modified_on': '2017-04-18T13:00:00',
+            'modified_on': '2017-04-18T13:00:00Z',
             'modified_by': {
                 'id': str(self.user.pk),
                 'name': self.user.name
@@ -144,7 +144,7 @@ class TestAddOrderDetails(APITestMixin):
             'cancellation_reason': None,
         }
 
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     def test_success_minimal(self):
         """Test a successful call to create an Order without optional fields."""
         company = CompanyFactory()
@@ -424,7 +424,7 @@ class TestAddOrderDetails(APITestMixin):
 class TestChangeOrderDetails(APITestMixin):
     """Change Order details test case."""
 
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     def test_success(self):
         """Test changing an existing order."""
         order = OrderFactory(vat_status=VATStatus.outside_eu)
@@ -467,12 +467,12 @@ class TestChangeOrderDetails(APITestMixin):
             'id': str(order.pk),
             'reference': order.reference,
             'status': OrderStatus.draft,
-            'created_on': '2017-04-18T13:00:00',
+            'created_on': '2017-04-18T13:00:00Z',
             'created_by': {
                 'id': str(order.created_by.pk),
                 'name': order.created_by.name
             },
-            'modified_on': '2017-04-18T13:00:00',
+            'modified_on': '2017-04-18T13:00:00Z',
             'modified_by': {
                 'id': str(self.user.pk),
                 'name': self.user.name
@@ -654,10 +654,10 @@ class TestChangeOrderDetails(APITestMixin):
         """
         disabled_in_jan, disabled_in_feb = ServiceType.objects.all()[:2]
 
-        disabled_in_jan.disabled_on = dateutil_parse('2017-01-10 11:00:00')
+        disabled_in_jan.disabled_on = dateutil_parse('2017-01-10T11:00:00Z')
         disabled_in_jan.save()
 
-        disabled_in_feb.disabled_on = dateutil_parse('2017-02-01 11:00:00')
+        disabled_in_feb.disabled_on = dateutil_parse('2017-02-01T11:00:00Z')
         disabled_in_feb.save()
 
         order = OrderFactory(service_types=[disabled_in_jan])
@@ -693,7 +693,7 @@ class TestChangeOrderDetails(APITestMixin):
         with freeze_time('2017-01-01'):
             order = OrderFactory(primary_market_id=country.pk)
 
-        market.disabled_on = dateutil_parse('2017-02-01')
+        market.disabled_on = dateutil_parse('2017-02-01T00:00:00Z')
         market.save()
 
         with freeze_time('2017-03-01'):
@@ -864,9 +864,10 @@ class TestMarkOrderAsComplete(APITestMixin):
         url = reverse('api-v3:omis:order:complete', kwargs={'pk': order.pk})
         response = self.api_client.post(url, {}, format='json')
 
+        expected_completed_on = dateutil_parse('2017-04-18T13:00Z')
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['status'] == OrderStatus.complete
-        assert response.json()['completed_on'] == dateutil_parse('2017-04-18 13:00').isoformat()
+        assert response.json()['completed_on'] == format_date_or_datetime(expected_completed_on)
         assert response.json()['completed_by'] == {
             'id': str(self.user.pk),
             'name': self.user.name
@@ -874,7 +875,7 @@ class TestMarkOrderAsComplete(APITestMixin):
 
         order.refresh_from_db()
         assert order.status == OrderStatus.complete
-        assert order.completed_on == dateutil_parse('2017-04-18 13:00')
+        assert order.completed_on == expected_completed_on
         assert order.completed_by == self.user
 
     @pytest.mark.parametrize(
@@ -938,12 +939,12 @@ class TestViewOrderDetails(APITestMixin):
             'id': str(order.pk),
             'reference': order.reference,
             'status': OrderStatus.draft,
-            'created_on': order.created_on.isoformat(),
+            'created_on': format_date_or_datetime(order.created_on),
             'created_by': {
                 'id': str(order.created_by.pk),
                 'name': order.created_by.name
             },
-            'modified_on': order.modified_on.isoformat(),
+            'modified_on': format_date_or_datetime(order.modified_on),
             'modified_by': {
                 'id': str(order.modified_by.pk),
                 'name': order.modified_by.name

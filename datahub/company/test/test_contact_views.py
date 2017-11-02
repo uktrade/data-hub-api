@@ -9,7 +9,7 @@ from rest_framework.reverse import reverse
 from reversion.models import Version
 
 from datahub.core import constants
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from .factories import CompanyFactory, ContactFactory
 
 # mark the whole module for db use
@@ -19,7 +19,7 @@ pytestmark = pytest.mark.django_db
 class TestAddContact(APITestMixin):
     """Add contact test case."""
 
-    @freeze_time('2017-04-18 13:25:30.986208+00:00')
+    @freeze_time('2017-04-18 13:25:30.986208')
     def test_with_manual_address(self):
         """Test add with manual address."""
         company = CompanyFactory()
@@ -106,8 +106,8 @@ class TestAddContact(APITestMixin):
             'archived_by': None,
             'archived_on': None,
             'archived_reason': None,
-            'created_on': '2017-04-18T13:25:30.986208',
-            'modified_on': '2017-04-18T13:25:30.986208',
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z',
         }
 
     def test_with_address_same_as_company(self):
@@ -294,7 +294,7 @@ class TestEditContact(APITestMixin):
 
     def test_patch(self):
         """Test that it successfully patch an existing contact."""
-        with freeze_time('2017-04-18 13:25:30.986208+00:00'):
+        with freeze_time('2017-04-18 13:25:30.986208'):
             company = CompanyFactory()
 
             contact = ContactFactory(
@@ -327,7 +327,7 @@ class TestEditContact(APITestMixin):
             )
 
         url = reverse('api-v3:contact:detail', kwargs={'pk': contact.pk})
-        with freeze_time('2017-04-19 13:25:30.986208+00:00'):
+        with freeze_time('2017-04-19 13:25:30.986208'):
             response = self.api_client.patch(url, {
                 'first_name': 'New Oratio',
             }, format='json')
@@ -379,8 +379,8 @@ class TestEditContact(APITestMixin):
             'archived_by': None,
             'archived_on': None,
             'archived_reason': None,
-            'created_on': '2017-04-18T13:25:30.986208',
-            'modified_on': '2017-04-19T13:25:30.986208',
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-19T13:25:30.986208Z',
         }
 
 
@@ -439,7 +439,7 @@ class TestArchiveContact(APITestMixin):
 class TestViewContact(APITestMixin):
     """View contact test case."""
 
-    @freeze_time('2017-04-18 13:25:30.986208+00:00')
+    @freeze_time('2017-04-18 13:25:30.986208')
     def test_view(self):
         """Test view."""
         company = CompanyFactory()
@@ -522,8 +522,8 @@ class TestViewContact(APITestMixin):
             'archived_by': None,
             'archived_on': None,
             'archived_reason': None,
-            'created_on': '2017-04-18T13:25:30.986208',
-            'modified_on': '2017-04-18T13:25:30.986208',
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z',
         }
 
 
@@ -617,7 +617,7 @@ class TestAuditLogView(APITestMixin):
         assert entry['id'] == version_id
         assert entry['user']['name'] == self.user.name
         assert entry['comment'] == 'Changed'
-        assert entry['timestamp'] == changed_datetime.isoformat()
+        assert entry['timestamp'] == format_date_or_datetime(changed_datetime)
         assert entry['changes']['notes'] == ['Initial notes', 'New notes']
         assert not {'created_on', 'created_by', 'modified_on', 'modified_by'} & entry[
             'changes'].keys()

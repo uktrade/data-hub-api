@@ -6,7 +6,7 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import (
     OrderFactory, OrderPaidFactory, OrderWithAcceptedQuoteFactory
@@ -30,13 +30,13 @@ class TestGetPayments(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [
             {
-                'created_on': payment.created_on.isoformat(),
+                'created_on': format_date_or_datetime(payment.created_on),
                 'reference': payment.reference,
                 'transaction_reference': payment.transaction_reference,
                 'additional_reference': payment.additional_reference,
                 'amount': payment.amount,
                 'method': payment.method,
-                'received_on': payment.received_on.isoformat()
+                'received_on': payment.received_on.isoformat(),
             }
             for payment in order.payments.all()
         ]
@@ -95,7 +95,7 @@ class TestCreatePayments(APITestMixin):
         response_items = sorted(response.json(), key=itemgetter('transaction_reference'))
         assert response_items == [
             {
-                'created_on': '2017-04-25T13:00:00',
+                'created_on': '2017-04-25T13:00:00Z',
                 'reference': '201704250001',
                 'transaction_reference': 'some ref1',
                 'additional_reference': '',
@@ -104,7 +104,7 @@ class TestCreatePayments(APITestMixin):
                 'received_on': '2017-04-20'
             },
             {
-                'created_on': '2017-04-25T13:00:00',
+                'created_on': '2017-04-25T13:00:00Z',
                 'reference': '201704250002',
                 'transaction_reference': 'some ref2',
                 'additional_reference': '',
@@ -115,7 +115,7 @@ class TestCreatePayments(APITestMixin):
         ]
         order.refresh_from_db()
         assert order.status == OrderStatus.paid
-        assert order.paid_on == dateutil_parse('2017-04-21')
+        assert order.paid_on == dateutil_parse('2017-04-21T00:00:00Z')
 
     def test_400_if_amounts_less_than_total_cost(self):
         """

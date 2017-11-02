@@ -12,7 +12,7 @@ from datahub.company.test.factories import CompaniesHouseCompanyFactory, Company
 from datahub.core.constants import (
     BusinessType, CompanyClassification, Country, HeadquarterType, Sector, UKRegion
 )
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.investment.test.factories import InvestmentProjectFactory
 
 
@@ -533,7 +533,7 @@ class TestAuditLogView(APITestMixin):
         assert entry['id'] == version_id
         assert entry['user']['name'] == self.user.name
         assert entry['comment'] == 'Changed'
-        assert entry['timestamp'] == changed_datetime.isoformat()
+        assert entry['timestamp'] == format_date_or_datetime(changed_datetime)
         assert entry['changes']['description'] == ['Initial desc', 'New desc']
         assert not {'created_on', 'created_by', 'modified_on', 'modified_by'} & entry[
             'changes'].keys()

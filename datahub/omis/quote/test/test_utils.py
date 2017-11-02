@@ -44,7 +44,7 @@ class TestGenerateQuoteReference:
 class TestGenerateQuoteContent:
     """Tests for the generate_quote_content logic."""
 
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     def test_content(self):
         """Test that the quote content is populated as expected."""
         hourly_rate = HourlyRateFactory(rate_value=1250, vat_value=Decimal(17.5))
@@ -81,7 +81,7 @@ class TestGenerateQuoteContent:
 class TestCalculateQuoteExpiryDate:
     """Tests for the calculate_quote_expiry_date logic."""
 
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     def test_with_delivery_date_in_far_future(self):
         """
         Now = 18/04/2017
@@ -95,7 +95,7 @@ class TestCalculateQuoteExpiryDate:
         expiry_date = calculate_quote_expiry_date(order)
         assert expiry_date == dateutil_parse('2017-05-18').date()
 
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     def test_with_close_delivery_date(self):
         """
         Now = 18/04/2017
@@ -109,7 +109,7 @@ class TestCalculateQuoteExpiryDate:
         expiry_date = calculate_quote_expiry_date(order)
         assert expiry_date == dateutil_parse('2017-04-20').date()
 
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     def test_with_too_close_delivery_date(self):
         """
         Now = 18/04/2017
