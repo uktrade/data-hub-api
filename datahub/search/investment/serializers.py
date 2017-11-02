@@ -19,7 +19,7 @@ class SearchInvestmentProjectSerializer(SearchSerializer):
     investor_company_country = SingleOrListField(child=StringUUIDField(), required=False)
     sector = SingleOrListField(child=StringUUIDField(), required=False)
     stage = SingleOrListField(child=StringUUIDField(), required=False)
-    status = serializers.CharField(required=False)
+    status = SingleOrListField(child=serializers.CharField(), required=False)
     uk_region_location = SingleOrListField(child=StringUUIDField(), required=False)
 
     SORT_BY_FIELDS = (
