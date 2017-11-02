@@ -20,7 +20,7 @@ def setup_data(setup_es):
         InvestmentProjectFactory(
             name='abc defg',
             description='investmentproject1',
-            estimated_land_date=datetime.datetime(2011, 6, 13, 9, 44, 31, 62870),
+            estimated_land_date=datetime.date(2011, 6, 13),
             investor_company=CompanyFactory(
                 registered_address_country_id=constants.Country.united_states.value.id
             ),
@@ -33,7 +33,7 @@ def setup_data(setup_es):
         InvestmentProjectFactory(
             name='delayed project',
             description='investmentproject2',
-            estimated_land_date=datetime.datetime(2057, 6, 13, 9, 44, 31, 62870),
+            estimated_land_date=datetime.date(2057, 6, 13),
             investor_company=CompanyFactory(
                 registered_address_country_id=constants.Country.japan.value.id
             ),
@@ -41,6 +41,21 @@ def setup_data(setup_es):
             project_assurance_adviser=AdviserFactory(),
             fdi_value_id=constants.FDIValue.higher.value.id,
             status=InvestmentProject.STATUSES.delayed,
+            uk_region_locations=[
+                constants.UKRegion.north_west.value.id,
+            ]
+        ),
+        InvestmentProjectFactory(
+            name='won project',
+            description='investmentproject3',
+            estimated_land_date=datetime.date(2027, 9, 13),
+            investor_company=CompanyFactory(
+                registered_address_country_id=constants.Country.united_kingdom.value.id
+            ),
+            project_manager=AdviserFactory(),
+            project_assurance_adviser=AdviserFactory(),
+            fdi_value_id=constants.FDIValue.higher.value.id,
+            status=InvestmentProject.STATUSES.won,
             uk_region_locations=[
                 constants.UKRegion.north_west.value.id,
             ]
@@ -94,13 +109,14 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:investment_project')
 
         response = self.api_client.post(url, {
-            'status': 'delayed',
+            'status': ['delayed', 'won'],
         }, format='json')
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-        assert len(response.data['results']) == 1
-        assert response.data['results'][0]['name'] == 'delayed project'
+        assert response.data['count'] == 2
+        assert len(response.data['results']) == 2
+        statuses = {result['status'] for result in response.data['results']}
+        assert statuses == {'delayed', 'won'}
 
     def test_search_investment_project_investor_country(self, setup_data):
         """Tests investor company country filter."""
