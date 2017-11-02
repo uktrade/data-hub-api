@@ -18,7 +18,7 @@ from ..factories import (
 )
 
 from ...constants import OrderStatus, VATStatus
-from ...models import ServiceType
+from ...models import CancellationReason, ServiceType
 
 
 # mark the whole module for db use
@@ -857,7 +857,7 @@ class TestMarkOrderAsComplete(APITestMixin):
         (OrderStatus.paid,)
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
-        """Test changing an existing order."""
+        """Test marking an order as complete."""
         order = OrderPaidFactory(status=allowed_status, assignees=[])
         OrderAssigneeCompleteFactory(order=order)
 
@@ -920,6 +920,108 @@ class TestMarkOrderAsComplete(APITestMixin):
                 'You must set the actual time for all assignees to complete this order.'
             )
         }
+
+
+class TestCancelOrder(APITestMixin):
+    """Test cases for cancelling an order."""
+
+    @freeze_time('2017-04-18 13:00')
+    @pytest.mark.parametrize(
+        'allowed_status',
+        (OrderStatus.draft, OrderStatus.quote_awaiting_acceptance,)
+    )
+    def test_ok_if_order_in_allowed_status(self, allowed_status):
+        """Test cancelling an order."""
+        reason = CancellationReason.objects.order_by('?').first()
+        order = OrderFactory(status=allowed_status)
+
+        url = reverse('api-v3:omis:order:cancel', kwargs={'pk': order.pk})
+        response = self.api_client.post(
+            url,
+            {
+                'cancellation_reason': {
+                    'id': reason.pk
+                }
+            },
+            format='json'
+        )
+
+        expected_cancelled_on = dateutil_parse('2017-04-18T13:00Z')
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['status'] == OrderStatus.cancelled
+        assert response.json()['cancelled_on'] == format_date_or_datetime(expected_cancelled_on)
+        assert response.json()['cancellation_reason'] == {
+            'id': str(reason.pk),
+            'name': reason.name
+        }
+        assert response.json()['cancelled_by'] == {
+            'id': str(self.user.pk),
+            'name': self.user.name
+        }
+
+        order.refresh_from_db()
+        assert order.status == OrderStatus.cancelled
+        assert order.cancelled_on == expected_cancelled_on
+        assert order.cancellation_reason == reason
+        assert order.cancelled_by == self.user
+
+    @pytest.mark.parametrize(
+        'disallowed_status',
+        (
+            OrderStatus.quote_accepted,
+            OrderStatus.paid,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_409_if_order_not_in_allowed_status(self, disallowed_status):
+        """
+        Test that if the order is in a disallowed status, the order cannot be cancelled.
+        """
+        reason = CancellationReason.objects.order_by('?').first()
+        order = OrderFactory(status=disallowed_status)
+
+        url = reverse('api-v3:omis:order:cancel', kwargs={'pk': order.pk})
+        response = self.api_client.post(
+            url,
+            {
+                'cancellation_reason': {
+                    'id': reason.pk
+                }
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_409_CONFLICT
+        order.refresh_from_db()
+        assert order.status == disallowed_status
+
+    @pytest.mark.parametrize(
+        'data,errors',
+        (
+            (
+                {},
+                {'cancellation_reason': ['This field is required.']}
+            ),
+            (
+                {'cancellation_reason': {'id': '2f68875c-35a5-4c3d-8160-9ddc104260c2'}},
+                {'cancellation_reason': [
+                    'Invalid pk "2f68875c-35a5-4c3d-8160-9ddc104260c2" - object does not exist.'
+                ]}
+            )
+        )
+    )
+    def test_validation_errors(self, data, errors):
+        """
+        Test that if cancellation_reason is invalid, the endpoint returns 400.
+        """
+        order = OrderFactory(status=OrderStatus.draft)
+
+        url = reverse('api-v3:omis:order:cancel', kwargs={'pk': order.pk})
+        response = self.api_client.post(url, data, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == errors
 
 
 class TestViewOrderDetails(APITestMixin):

@@ -13,7 +13,7 @@ from datahub.metadata.models import Country, Sector, Team
 
 from datahub.omis.market.models import Market
 from .constants import OrderStatus, VATStatus
-from .models import Order, OrderAssignee, OrderSubscriber, ServiceType
+from .models import CancellationReason, Order, OrderAssignee, OrderSubscriber, ServiceType
 from .validators import (
     AddressValidator,
     AssigneeExistsRule,
@@ -45,6 +45,9 @@ class OrderSerializer(serializers.ModelSerializer):
     billing_address_country = NestedRelatedField(Country, required=False, allow_null=True)
 
     completed_by = NestedRelatedField(Advisor, read_only=True)
+
+    cancellation_reason = NestedRelatedField(CancellationReason, read_only=True)
+    cancelled_by = NestedRelatedField(Advisor, read_only=True)
 
     class Meta:
         model = Order
@@ -202,6 +205,24 @@ class OrderSerializer(serializers.ModelSerializer):
         """Mark an order as complete."""
         self.instance.complete(
             by=self.context['current_user']
+        )
+        return self.instance
+
+
+class CancelOrderSerializer(OrderSerializer):
+    """DRF serializer for cancelling an order."""
+
+    cancellation_reason = NestedRelatedField(CancellationReason)
+
+    class Meta:
+        model = Order
+        fields = ('cancellation_reason',)
+
+    def cancel(self):
+        """Cancel an order."""
+        self.instance.cancel(
+            by=self.context['current_user'],
+            reason=self.validated_data['cancellation_reason']
         )
         return self.instance
 
