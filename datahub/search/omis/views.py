@@ -1,3 +1,4 @@
+from datahub.core.permissions import UserHasPermissions
 from datahub.oauth.scopes import Scope
 from .models import Order
 from .serializers import SearchOrderSerializer
@@ -39,3 +40,6 @@ class SearchOrderParams:
 
 class SearchOrderAPIView(SearchOrderParams, SearchAPIView):
     """Filtered order search view."""
+
+    permission_classes = SearchAPIView.permission_classes + (UserHasPermissions,)
+    permission_required = 'order.read_order'

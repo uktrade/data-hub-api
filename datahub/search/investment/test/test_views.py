@@ -5,10 +5,10 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core import constants
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, get_test_user
 from datahub.investment.models import InvestmentProject
 from datahub.investment.test.factories import InvestmentProjectFactory
-
+from datahub.metadata.test.factories import TeamFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -68,6 +68,14 @@ def setup_data(setup_es):
 
 class TestSearch(APITestMixin):
     """Tests search views."""
+
+    def test_investment_project_search_no_permissions(self):
+        """Should return 403"""
+        team = TeamFactory()
+        self._user = get_test_user(team=team)
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_search_investment_project_json(self, setup_data):
         """Tests detailed investment project search."""

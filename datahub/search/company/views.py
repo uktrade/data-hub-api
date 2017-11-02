@@ -1,3 +1,4 @@
+from datahub.core.permissions import UserHasPermissions
 from datahub.oauth.scopes import Scope
 from .models import Company
 from .serializers import SearchCompanySerializer
@@ -41,10 +42,12 @@ class SearchCompanyParams:
 class SearchCompanyAPIView(SearchCompanyParams, SearchAPIView):
     """Filtered company search view."""
 
+    permission_classes = SearchAPIView.permission_classes + (UserHasPermissions, )
     permission_required = 'company.read_company'
 
 
 class SearchCompanyExportAPIView(SearchCompanyParams, SearchExportAPIView):
     """Filtered company search export view."""
 
+    permission_classes = SearchAPIView.permission_classes + (UserHasPermissions,)
     permission_required = 'company.read_company'

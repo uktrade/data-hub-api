@@ -1,7 +1,6 @@
 from functools import wraps
 
 import factory
-from django.contrib.auth.models import Group
 
 
 def to_many_field(wrapped_func):
@@ -56,6 +55,7 @@ def to_many_field(wrapped_func):
 
 class GroupFactory(factory.django.DjangoModelFactory):
     """Group factory."""
+
     name = factory.Faker('name')
 
     class Meta:

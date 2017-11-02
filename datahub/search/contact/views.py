@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
+from datahub.core.permissions import UserHasPermissions
 from datahub.oauth.scopes import Scope
 from .models import Contact
 from .serializers import SearchContactSerializer
@@ -31,6 +32,7 @@ class SearchContactParams:
 class SearchContactAPIView(SearchContactParams, SearchAPIView, PermissionRequiredMixin):
     """Filtered contact search view."""
 
+    permission_classes = SearchAPIView.permission_classes + (UserHasPermissions,)
     permission_required = 'company.read_contact'
 
 
@@ -39,4 +41,5 @@ class SearchContactExportAPIView(SearchContactParams,
                                  PermissionRequiredMixin):
     """Filtered contact search export view."""
 
+    permission_classes = SearchAPIView.permission_classes + (UserHasPermissions,)
     permission_required = 'company.read_contact'

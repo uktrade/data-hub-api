@@ -1,3 +1,4 @@
+from datahub.core.permissions import UserHasPermissions
 from datahub.oauth.scopes import Scope
 from .models import Interaction
 from .serializers import SearchInteractionSerializer
@@ -42,10 +43,12 @@ class SearchInteractionParams:
 class SearchInteractionAPIView(SearchInteractionParams, SearchAPIView):
     """Filtered interaction search view."""
 
+    permission_classes = SearchAPIView.permission_classes + (UserHasPermissions,)
     permission_required = 'interaction.read_interaction'
 
 
 class SearchInteractionExportAPIView(SearchInteractionParams, SearchExportAPIView):
     """Filtered interaction search export view."""
 
-    permission_required = 'company.read_company'
+    permission_classes = SearchAPIView.permission_classes + (UserHasPermissions,)
+    permission_required = 'interaction.read_interaction'
