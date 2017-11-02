@@ -20,6 +20,11 @@ internal_frontend_urls = [
         OrderViewSet.as_view({'post': 'complete'}),
         name='complete'
     ),
+    url(
+        r'^order/(?P<pk>[0-9a-z-]{36})/cancel$',
+        OrderViewSet.as_view({'post': 'cancel'}),
+        name='cancel'
+    ),
 
     url(
         r'^order/(?P<order_pk>[0-9a-z-]{36})/subscriber-list$',
