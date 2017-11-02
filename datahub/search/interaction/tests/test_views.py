@@ -10,9 +10,10 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, get_test_user
 from datahub.interaction.models import Interaction
 from datahub.interaction.test.factories import InteractionFactory, ServiceDeliveryFactory
+from datahub.metadata.test.factories import TeamFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -37,6 +38,14 @@ def interactions(setup_es):
 
 class TestViews(APITestMixin):
     """Tests interaction search views."""
+
+    def test_interaction_search_no_permissions(self):
+        """Should return 403"""
+        team = TeamFactory()
+        self._user = get_test_user(team=team)
+        url = reverse('api-v3:search:interaction')
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_get_all(self, interactions):
         """

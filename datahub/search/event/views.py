@@ -1,5 +1,4 @@
-from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
-
+from datahub.core.permissions import UserHasPermissions
 from datahub.oauth.scopes import Scope
 from .models import Event
 from .serializers import SearchEventSerializer
@@ -44,12 +43,12 @@ class SearchEventParams:
 class SearchEventAPIView(SearchEventParams, SearchAPIView):
     """Filtered event search view."""
 
+    permission_classes = SearchAPIView.permission_classes + (UserHasPermissions,)
     permission_required = 'event.read_event'
-    permission_classes = (IsAuthenticatedOrTokenHasScope,)
 
 
 class SearchEventExportAPIView(SearchEventParams, SearchExportAPIView):
     """Filtered event search export view."""
 
+    permission_classes = SearchAPIView.permission_classes + (UserHasPermissions,)
     permission_required = 'event.read_event'
-    permission_classes = (IsAuthenticatedOrTokenHasScope,)

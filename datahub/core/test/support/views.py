@@ -19,6 +19,7 @@ class MyDisableableModelViewset(CoreViewSetV3):
 
 class PermissionModelViewset(CoreViewSetV3):
     """PermissionModel view set."""
+
     serializer_class = PermissionModelSerializer
     required_scopes = ()
     queryset = PermissionModel.objects.all()

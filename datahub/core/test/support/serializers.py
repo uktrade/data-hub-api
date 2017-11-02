@@ -4,6 +4,8 @@ from .models import MyDisableableModel
 
 
 class PermissionModelSerializer(serializers.ModelSerializer):
+    """Serialiser for PermissionModel."""
+
     class Meta:
         model = PermissionModel
         fields = '__all__'

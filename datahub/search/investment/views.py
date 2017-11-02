@@ -1,3 +1,4 @@
+from datahub.core.permissions import UserHasPermissions
 from datahub.oauth.scopes import Scope
 from .models import InvestmentProject
 from .serializers import SearchInvestmentProjectSerializer
@@ -40,6 +41,12 @@ class SearchInvestmentProjectParams:
 class SearchInvestmentProjectAPIView(SearchInvestmentProjectParams, SearchAPIView):
     """Filtered investment project search view."""
 
+    permission_classes = SearchAPIView.permission_classes + (UserHasPermissions,)
+    permission_required = 'investment.read_investmentproject'
+
 
 class SearchInvestmentProjectExportAPIView(SearchInvestmentProjectParams, SearchExportAPIView):
     """Filtered investment project search export view."""
+
+    permission_classes = SearchAPIView.permission_classes + (UserHasPermissions,)
+    permission_required = 'investment.read_investmentproject'
