@@ -83,7 +83,7 @@ def get_django_user():
 
 
 @pytest.mark.liveserver
-@mock.patch('datahub.core.auth.backends.CDMSUserBackend.validate_cdms_credentials')
+@mock.patch('datahub.core.auth.CDMSUserBackend.validate_cdms_credentials')
 def test_invalid_cdms_credentials(auth_mock, settings, live_server):
     """Test login invalid cdms credentials."""
     auth_mock.return_value = False
@@ -110,7 +110,7 @@ def test_invalid_cdms_credentials(auth_mock, settings, live_server):
 
 
 @pytest.mark.liveserver
-@mock.patch('datahub.core.auth.backends.CDMSUserBackend._cdms_login')
+@mock.patch('datahub.core.auth.CDMSUserBackend._cdms_login')
 def test_cdms_returns_500_with_hash(mocked_login, live_server):
     """Test login when CDMS is not available."""
     mocked_login.side_effect = requests.RequestException
@@ -137,7 +137,7 @@ def test_cdms_returns_500_with_hash(mocked_login, live_server):
 
 
 @pytest.mark.liveserver
-@mock.patch('datahub.core.auth.backends.CDMSUserBackend._cdms_login')
+@mock.patch('datahub.core.auth.CDMSUserBackend._cdms_login')
 def test_cdms_returns_500_with_hash_wrong_password(mocked_login, live_server):
     """Test login when CDMS is not available."""
     mocked_login.side_effect = requests.RequestException
@@ -164,7 +164,7 @@ def test_cdms_returns_500_with_hash_wrong_password(mocked_login, live_server):
 
 
 @pytest.mark.liveserver
-@mock.patch('datahub.core.auth.backends.CDMSUserBackend._cdms_login')
+@mock.patch('datahub.core.auth.CDMSUserBackend._cdms_login')
 def test_cdms_returns_500_no_hash(mocked_login, live_server):
     """Test login when CDMS is not available."""
     mocked_login.side_effect = requests.RequestException
@@ -190,7 +190,7 @@ def test_cdms_returns_500_no_hash(mocked_login, live_server):
 
 
 @pytest.mark.liveserver
-@mock.patch('datahub.core.auth.backends.CDMSUserBackend.validate_cdms_credentials')
+@mock.patch('datahub.core.auth.CDMSUserBackend.validate_cdms_credentials')
 def test_valid_cdms_credentials(auth_mock, live_server):
     """Test login valid cdms credentials."""
     auth_mock.return_value = True
@@ -219,7 +219,7 @@ def test_valid_cdms_credentials(auth_mock, live_server):
 
 
 @pytest.mark.liveserver
-@mock.patch('datahub.core.auth.backends.CDMSUserBackend.validate_cdms_credentials')
+@mock.patch('datahub.core.auth.CDMSUserBackend.validate_cdms_credentials')
 def test_valid_cdms_credentials_case_insensitive_email(auth_mock, live_server):
     """Test login valid cdms credentials."""
     auth_mock.return_value = True
@@ -252,7 +252,7 @@ def test_valid_cdms_credentials_case_insensitive_email(auth_mock, live_server):
 
 
 @pytest.mark.liveserver
-@mock.patch('datahub.core.auth.backends.CDMSUserBackend.validate_cdms_credentials')
+@mock.patch('datahub.core.auth.CDMSUserBackend.validate_cdms_credentials')
 def test_valid_cdms_credentials_and_cdms_communication_fails(auth_mock, live_server):
     """Test login valid cdms credentials when CDMS communication fails."""
     auth_mock.return_value = None
@@ -281,7 +281,7 @@ def test_valid_cdms_credentials_and_cdms_communication_fails(auth_mock, live_ser
 
 
 @pytest.mark.liveserver
-@mock.patch('datahub.core.auth.backends.CDMSUserBackend.validate_cdms_credentials')
+@mock.patch('datahub.core.auth.CDMSUserBackend.validate_cdms_credentials')
 def test_password_changed_in_cdms(auth_mock, live_server):
     """Test passwd changed in CDMS results in failed auth."""
     auth_mock.return_value = False
@@ -310,7 +310,7 @@ def test_password_changed_in_cdms(auth_mock, live_server):
 
 
 @pytest.mark.liveserver
-@mock.patch('datahub.core.auth.backends.CDMSUserBackend.validate_cdms_credentials')
+@mock.patch('datahub.core.auth.CDMSUserBackend.validate_cdms_credentials')
 def test_valid_cdms_credentials_user_not_whitelisted(auth_mock, live_server):
     """Test login valid cdms credentials, but user not whitelisted."""
     auth_mock.return_value = True
@@ -339,7 +339,7 @@ def test_valid_cdms_credentials_user_not_whitelisted(auth_mock, live_server):
 
 
 @pytest.mark.liveserver
-@mock.patch('datahub.core.auth.backends.CDMSUserBackend.validate_cdms_credentials')
+@mock.patch('datahub.core.auth.CDMSUserBackend.validate_cdms_credentials')
 def test_valid_django_user(auth_mock, live_server):
     """Test login valid Django credentials."""
     auth_mock.return_value = False
