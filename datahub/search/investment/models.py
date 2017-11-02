@@ -40,6 +40,9 @@ class InvestmentProject(DocType, MapDBModelToDict):
     investor_company = dsl_utils.id_name_mapping()
     investor_company_country = dsl_utils.id_name_mapping()
     investment_type = dsl_utils.id_name_mapping()
+    investor_type = dsl_utils.id_name_mapping()
+    level_of_involvement = dsl_utils.id_name_mapping()
+    specific_programme = dsl_utils.id_name_mapping()
     name = dsl_utils.SortableText()
     name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
     name_trigram = dsl_utils.TrigramText()
@@ -84,6 +87,9 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'fdi_value': dict_utils.id_name_dict,
         'intermediate_company': dict_utils.id_name_dict,
         'investor_company': dict_utils.id_name_dict,
+        'investor_type': dict_utils.id_name_dict,
+        'level_of_involvement': dict_utils.id_name_dict,
+        'specific_programme': dict_utils.id_name_dict,
         'uk_region_locations': lambda col: [
             dict_utils.id_name_dict(c) for c in col.all()
         ],

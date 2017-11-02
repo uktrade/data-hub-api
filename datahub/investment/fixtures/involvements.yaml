@@ -1,0 +1,72 @@
+- model: investment.involvement
+  pk: 95a1636e-16d3-4d40-8bec-d2f6d3c50acb
+  fields: {name: "FDI Hub + Post + LEP"}
+- model: investment.involvement
+  pk: 22d6539d-5620-4686-ab66-7a02464708d1
+  fields: {name: "FDI Hub + HQ + LEP"}
+- model: investment.involvement
+  pk: 10294eb7-774b-4b2f-a0e9-17393e6622f4
+  fields: {name: "FDI Hub + HQ + Post + LEP"}
+- model: investment.involvement
+  pk: ab4ec9c1-273f-4deb-8c89-fc18fe29c3a2
+  fields: {name: "HQ + LEP"}
+- model: investment.involvement
+  pk: ab9af9e4-dbac-4148-b954-d6a9c3543e57
+  fields: {name: "Post + LEP"}
+- model: investment.involvement
+  pk: 6524f6b5-270a-4b60-ae7a-61da4abaf2b7
+  fields: {name: "HQ + Post + LEP"}
+- model: investment.involvement
+  pk: 5e7285a0-0127-41d3-abb2-92d9d581a1b8
+  fields: {name: "LEP Only"}
+- model: investment.involvement
+  pk: 2032d5e1-5b30-429c-ad33-133273c8e09b
+  fields: {name: "FDI Hub + LEP"}
+- model: investment.involvement
+  pk: 72022b74-0023-49ca-9f1f-e6a85dfe6446
+  fields: {name: "FDI Hub Only"}
+- model: investment.involvement
+  pk: 67c2814c-6355-42f8-9caf-b37546a412bd
+  fields: {name: "FDI Hub + Post"}
+- model: investment.involvement
+  pk: 71cf220a-1e1d-46dd-94ad-f4829859253d
+  fields: {name: "FDI Hub + HQ"}
+- model: investment.involvement
+  pk: 6a80b362-c383-4e3b-9841-09043940e1d5
+  fields: {name: "FDI Hub + Post + HQ"}
+- model: investment.involvement
+  pk: 742089ee-ca88-4623-8ed3-b0649ed56482
+  fields: {name: "FDI Hub + Region"}
+- model: investment.involvement
+  pk: 34ac567c-8736-4e85-a669-d54d41566537
+  fields: {name: "FDI Hub + Post + Reg"}
+- model: investment.involvement
+  pk: 385c2025-75a4-47dc-9a1f-04397e856687
+  fields: {name: "FDI Hub + HQ + Reg"}
+- model: investment.involvement
+  pk: d32454da-1895-48a8-a4cd-83cb44fd2707
+  fields: {name: "FDI Hub + HQ + Post + Reg"}
+- model: investment.involvement
+  pk: 945f13e9-9a27-4921-8d2d-8daf5a4c59a8
+  fields: {name: "No Involvement"}
+- model: investment.involvement
+  pk: bb68ba20-ef54-472d-9a1e-309c1eaa79c4
+  fields: {name: "HQ and Post Only"}
+- model: investment.involvement
+  pk: 1a01c63b-26ad-46eb-b8aa-c925c2395ec9
+  fields: {name: "Post Only"}
+- model: investment.involvement
+  pk: 9c22137d-648e-4ecb-8fe7-652ac6a4f53a
+  fields: {name: "HQ Only"}
+- model: investment.involvement
+  pk: 08f23f2d-82d3-4dd0-bc48-ebec55b482df
+  fields: {name: "Region Only"}
+- model: investment.involvement
+  pk: 79257b9b-e095-4144-ac65-136fd69cb025
+  fields: {name: "HQ and Region"}
+- model: investment.involvement
+  pk: 5277c9c4-42a4-4663-bd49-28ac6685e146
+  fields: {name: "Post and Region"}
+- model: investment.involvement
+  pk: acc4f814-42ec-48db-b14d-1336ae78c1f2
+  fields: {name: "HQ, Post and Region"}
