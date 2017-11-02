@@ -26,7 +26,7 @@ class TestInteractionV3(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['id'] == str(interaction.pk)
 
-    @freeze_time('2017-04-18 13:25:30.986208+00:00')
+    @freeze_time('2017-04-18 13:25:30.986208')
     def test_add_interaction(self):
         """Test add new interaction."""
         adviser = AdviserFactory()
@@ -96,11 +96,11 @@ class TestInteractionV3(APITestMixin):
                 'last_name': self.user.last_name,
                 'name': self.user.name
             },
-            'created_on': '2017-04-18T13:25:30.986208',
-            'modified_on': '2017-04-18T13:25:30.986208'
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z'
         }
 
-    @freeze_time('2017-04-18 13:25:30.986208+00:00')
+    @freeze_time('2017-04-18 13:25:30.986208')
     def test_add_event_service_delivery(self):
         """Test adding a new event service delivery."""
         adviser = AdviserFactory()
@@ -172,8 +172,8 @@ class TestInteractionV3(APITestMixin):
                 'last_name': self.user.last_name,
                 'name': self.user.name
             },
-            'created_on': '2017-04-18T13:25:30.986208',
-            'modified_on': '2017-04-18T13:25:30.986208'
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z'
         }
 
     def test_add_event_service_delivery_missing_event(self):
@@ -203,7 +203,7 @@ class TestInteractionV3(APITestMixin):
             'event': ['This field is required.']
         }
 
-    @freeze_time('2017-04-18 13:25:30.986208+00:00')
+    @freeze_time('2017-04-18 13:25:30.986208')
     def test_add_non_event_service_delivery(self):
         """Test adding a new non-event service delivery."""
         adviser = AdviserFactory()
@@ -270,8 +270,8 @@ class TestInteractionV3(APITestMixin):
                 'last_name': self.user.last_name,
                 'name': self.user.name
             },
-            'created_on': '2017-04-18T13:25:30.986208',
-            'modified_on': '2017-04-18T13:25:30.986208'
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z'
         }
 
     def test_add_non_event_service_delivery_with_event(self):
@@ -399,7 +399,7 @@ class TestInteractionV3(APITestMixin):
             'communication_channel': ['This field is only valid for interactions.'],
         }
 
-    @freeze_time('2017-04-18 13:25:30.986208+00:00')
+    @freeze_time('2017-04-18 13:25:30.986208')
     def test_add_interaction_project(self):
         """Test add new interaction for an investment project."""
         project = InvestmentProjectFactory()
@@ -423,8 +423,8 @@ class TestInteractionV3(APITestMixin):
         response_data = response.json()
         assert response_data['dit_adviser']['id'] == str(adviser.pk)
         assert response_data['investment_project']['id'] == str(project.pk)
-        assert response_data['modified_on'] == '2017-04-18T13:25:30.986208'
-        assert response_data['created_on'] == '2017-04-18T13:25:30.986208'
+        assert response_data['modified_on'] == '2017-04-18T13:25:30.986208Z'
+        assert response_data['created_on'] == '2017-04-18T13:25:30.986208Z'
 
     def test_add_interaction_no_entity(self):
         """Test add new interaction without a contact, company or

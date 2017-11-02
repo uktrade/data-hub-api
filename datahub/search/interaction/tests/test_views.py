@@ -3,6 +3,7 @@ from datetime import datetime
 
 import factory
 import pytest
+from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -82,11 +83,11 @@ class TestViews(APITestMixin):
         url = reverse('api-v3:search:interaction')
 
         dates = (
-            datetime(2017, 2, 4, 13, 15, 0),
-            datetime(2017, 1, 4, 11, 23, 10),
-            datetime(2017, 9, 29, 3, 25, 15),
-            datetime(2017, 7, 5, 11, 44, 33),
-            datetime(2017, 2, 1, 18, 15, 1),
+            datetime(2017, 2, 4, 13, 15, 0, tzinfo=utc),
+            datetime(2017, 1, 4, 11, 23, 10, tzinfo=utc),
+            datetime(2017, 9, 29, 3, 25, 15, tzinfo=utc),
+            datetime(2017, 7, 5, 11, 44, 33, tzinfo=utc),
+            datetime(2017, 2, 1, 18, 15, 1, tzinfo=utc),
         )
         InteractionFactory.create_batch(
             len(dates),

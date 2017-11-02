@@ -7,7 +7,7 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.models import Order
 from datahub.omis.order.test.factories import (
@@ -90,7 +90,7 @@ class TestCreatePreviewOrder(APITestMixin):
             ('delivery_date', None),
         )
     )
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     def test_400_if_incomplete_order(self, quote_view_name, field, value):
         """If the order is incomplete, the quote cannot be generated."""
         order = OrderFactory(**{field: value})
@@ -107,7 +107,7 @@ class TestCreatePreviewOrder(APITestMixin):
         }
 
     @pytest.mark.parametrize('quote_view_name', ('detail', 'preview'))
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     def test_400_if_expiry_date_passed(self, quote_view_name):
         """
         If the generated quote expiry date is in the past because the delivery date
@@ -131,7 +131,7 @@ class TestCreatePreviewOrder(APITestMixin):
             ]
         }
 
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     @pytest.mark.parametrize(
         'OrderFactoryClass',  # noqa: N803
         (OrderFactory, OrderWithCancelledQuoteFactory)
@@ -150,7 +150,7 @@ class TestCreatePreviewOrder(APITestMixin):
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == {
             'content': order.quote.content,
-            'created_on': '2017-04-18T13:00:00',
+            'created_on': '2017-04-18T13:00:00Z',
             'created_by': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
@@ -186,7 +186,7 @@ class TestCreatePreviewOrder(APITestMixin):
         assert not order.quote
         assert not Quote.objects.count()
 
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     @pytest.mark.parametrize(
         'OrderFactoryClass',  # noqa: N803
         (OrderFactory, OrderWithCancelledQuoteFactory)
@@ -234,7 +234,7 @@ class TestGetQuote(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
-            'created_on': quote.created_on.isoformat(),
+            'created_on': format_date_or_datetime(quote.created_on),
             'created_by': {
                 'id': str(quote.created_by.pk),
                 'first_name': quote.created_by.first_name,
@@ -338,14 +338,14 @@ class TestCancelOrder(APITestMixin):
 
             assert response.status_code == status.HTTP_200_OK
             assert response.json() == {
-                'created_on': quote.created_on.isoformat(),
+                'created_on': format_date_or_datetime(quote.created_on),
                 'created_by': {
                     'id': str(quote.created_by.pk),
                     'first_name': quote.created_by.first_name,
                     'last_name': quote.created_by.last_name,
                     'name': quote.created_by.name
                 },
-                'cancelled_on': mocked_now().isoformat(),
+                'cancelled_on': format_date_or_datetime(mocked_now()),
                 'cancelled_by': {
                     'id': str(self.user.pk),
                     'first_name': self.user.first_name,

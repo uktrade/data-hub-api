@@ -2,7 +2,7 @@ import datetime
 import uuid
 import factory
 
-from django.utils.timezone import now
+from django.utils.timezone import now, utc
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import Country, Sector
@@ -102,7 +102,7 @@ class OrderCompleteFactory(OrderWithAcceptedQuoteFactory):
     """Factory for orders marked as paid."""
 
     status = OrderStatus.complete
-    completed_on = factory.Faker('date_time')
+    completed_on = factory.Faker('date_time', tzinfo=utc)
     completed_by = factory.SubFactory(AdviserFactory)
 
 
@@ -110,7 +110,7 @@ class OrderCancelledFactory(OrderWithAcceptedQuoteFactory):
     """Factory for cancelled orders."""
 
     status = OrderStatus.cancelled
-    cancelled_on = factory.Faker('date_time')
+    cancelled_on = factory.Faker('date_time', tzinfo=utc)
     cancelled_by = factory.SubFactory(AdviserFactory)
     cancellation_reason = factory.LazyFunction(CancellationReason.objects.first)
 
@@ -118,7 +118,7 @@ class OrderCancelledFactory(OrderWithAcceptedQuoteFactory):
 class OrderPaidFactory(OrderWithAcceptedQuoteFactory):
     """Factory for orders marked as paid."""
 
-    paid_on = factory.Faker('date_time')
+    paid_on = factory.Faker('date_time', tzinfo=utc)
     status = OrderStatus.paid
 
 

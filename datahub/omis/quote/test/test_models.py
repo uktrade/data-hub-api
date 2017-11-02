@@ -24,11 +24,11 @@ class TestCancelQuote:
 
         adviser = AdviserFactory()
 
-        with freeze_time('2017-07-12 13:00') as mocked_now:
+        with freeze_time('2017-07-12 13:00'):
             quote.cancel(by=adviser)
 
             quote.refresh_from_db()
-            assert quote.cancelled_on == mocked_now()
+            assert quote.cancelled_on == now()
             assert quote.cancelled_by == adviser
 
     def test_cancel_already_cancelled_quote(self):
@@ -76,11 +76,11 @@ class TestAcceptQuote:
 
         contact = ContactFactory()
 
-        with freeze_time('2017-07-12 13:00') as mocked_now:
+        with freeze_time('2017-07-12 13:00'):
             quote.accept(by=contact)
 
             quote.refresh_from_db()
-            assert quote.accepted_on == mocked_now()
+            assert quote.accepted_on == now()
             assert quote.accepted_by == contact
 
     def test_accept_already_accepted_quote(self):

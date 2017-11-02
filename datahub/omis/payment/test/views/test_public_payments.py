@@ -4,7 +4,7 @@ from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.oauth.scopes import Scope
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import OrderFactory, OrderPaidFactory
@@ -43,7 +43,7 @@ class TestPublicGetPayments(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [
             {
-                'created_on': payment.created_on.isoformat(),
+                'created_on': format_date_or_datetime(payment.created_on),
                 'reference': payment.reference,
                 'transaction_reference': payment.transaction_reference,
                 'additional_reference': payment.additional_reference,

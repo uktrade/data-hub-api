@@ -1,4 +1,5 @@
 import factory
+from django.utils.timezone import utc
 from oauth2_provider.models import AccessToken, Application
 
 
@@ -26,7 +27,7 @@ class AccessTokenFactory(factory.django.DjangoModelFactory):
     """AccessToken factory."""
 
     token = factory.Faker('password', length=20)
-    expires = factory.Faker('date_time_between', start_date='+1d', end_date='+7d')
+    expires = factory.Faker('date_time_between', start_date='+1d', end_date='+7d', tzinfo=utc)
 
     class Meta:
         model = AccessToken

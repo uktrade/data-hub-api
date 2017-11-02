@@ -1,9 +1,9 @@
 import functools
-from datetime import datetime
 
 from django.contrib import admin
 from django.contrib.admin import DateFieldListFilter, helpers
 from django.template.response import TemplateResponse
+from django.utils.timezone import now
 
 from datahub.core.admin import BaseModelVersionAdmin, DisabledOnFilter
 from datahub.event.models import Event, EventType, LocationType, Programme
@@ -93,7 +93,7 @@ class EventAdmin(BaseModelVersionAdmin):
     )
     def disable_selected(self, request, queryset):
         """Disables selected objects."""
-        return queryset.update(disabled_on=datetime.utcnow())
+        return queryset.update(disabled_on=now())
 
     disable_selected.short_description = 'Disable selected events'
 

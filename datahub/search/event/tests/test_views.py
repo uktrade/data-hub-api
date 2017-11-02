@@ -1,6 +1,7 @@
 import datetime
 
 import pytest
+from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -196,7 +197,7 @@ class TestSearch(APITestMixin):
         """Tests disabled_on filter."""
         url = reverse('api-v3:search:event')
 
-        current_datetime = datetime.datetime.utcnow()
+        current_datetime = now()
         EventFactory.create_batch(5)
         EventFactory.create_batch(5, disabled_on=current_datetime)
 
@@ -217,7 +218,7 @@ class TestSearch(APITestMixin):
         """Tests disabled_on is null filter."""
         url = reverse('api-v3:search:event')
 
-        current_datetime = datetime.datetime.utcnow()
+        current_datetime = now()
         EventFactory.create_batch(5)
         EventFactory.create_batch(5, disabled_on=current_datetime)
 
@@ -238,7 +239,7 @@ class TestSearch(APITestMixin):
         """Tests disabled_on is null filter."""
         url = reverse('api-v3:search:event')
 
-        current_datetime = datetime.datetime.utcnow()
+        current_datetime = now()
         EventFactory.create_batch(5)
         EventFactory.create_batch(5, disabled_on=current_datetime)
 
