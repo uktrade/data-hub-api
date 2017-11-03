@@ -95,168 +95,168 @@
   fields:
     disabled_on: null
     name: DSO
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 58329c18-6095-e211-a939-e4115bead28a
   fields:
     disabled_on: null
     name: UK IBC Office
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 5a329c18-6095-e211-a939-e4115bead28a
   fields:
     disabled_on: null
     name: DA
-    team_role_groups:
+    groups:
     - [DA]
 - model: metadata.teamrole
   pk: 5b329c18-6095-e211-a939-e4115bead28a
   fields:
     disabled_on: null
     name: Govt Office of Region
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 5c329c18-6095-e211-a939-e4115bead28a
   fields:
     disabled_on: null
     name: HQ Investment Team
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 5d329c18-6095-e211-a939-e4115bead28a
   fields:
     disabled_on: null
     name: International Trade Director
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 5e329c18-6095-e211-a939-e4115bead28a
   fields:
     disabled_on: null
     name: International Trade Team
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 5f329c18-6095-e211-a939-e4115bead28a
   fields:
     disabled_on: null
     name: Market Unit
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 60329c18-6095-e211-a939-e4115bead28a
   fields:
     disabled_on: null
     name: OGD
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 61329c18-6095-e211-a939-e4115bead28a
   fields:
     disabled_on: null
     name: Partner Organisation
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 62329c18-6095-e211-a939-e4115bead28a
   fields:
     disabled_on: null
     name: Post
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 63329c18-6095-e211-a939-e4115bead28a
   fields:
     disabled_on: null
     name: RDA
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 64329c18-6095-e211-a939-e4115bead28a
   fields:
     disabled_on: null
     name: Regional Investment Team
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 65329c18-6095-e211-a939-e4115bead28a
   fields:
     disabled_on: null
     name: Sector Team
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 66329c18-6095-e211-a939-e4115bead28a
   fields:
     disabled_on: null
     name: UKTI HQ Department
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 6f6a2be2-0fb3-e211-a646-e4115bead28a
   fields:
     disabled_on: null
     name: UK ASEAN (ABC) Office
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 7144b707-f816-e311-a78e-e4115bead28a
   fields:
     disabled_on: null
     name: British Chamber of Commerce Overseas
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 846cb21e-6095-e211-a939-e4115bead28a
   fields:
     disabled_on: null
     name: ATO
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 856cb21e-6095-e211-a939-e4115bead28a
   fields:
     disabled_on: null
     name: UKTI Group
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 866cb21e-6095-e211-a939-e4115bead28a
   fields:
     disabled_on: null
     name: Regional Overseas Office
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 876cb21e-6095-e211-a939-e4115bead28a
   fields:
     disabled_on: null
     name: BERR Business Relationship
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: 886cb21e-6095-e211-a939-e4115bead28a
   fields:
     disabled_on: null
     name: CBBC Office
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: b4e69e92-7c82-e311-8dfb-e4115bead28a
   fields:
     disabled_on: null
     name: Overseas Business Network (OBN)
-    team_role_groups:
+    groups:
     - [DIT_staff]
 - model: metadata.teamrole
   pk: b4fb1b54-5925-e511-b6bc-e4115bead28a
   fields:
     disabled_on: null
     name: Local Enterprise Partnership (LEP)
-    team_role_groups:
+    groups:
     - [LEP]
 - model: metadata.team
   pk: 00374ae0-9698-e211-a939-e4115bead28a
