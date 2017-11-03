@@ -21,7 +21,7 @@ class TestPermissions(APITestMixin):
         permission_group = GroupFactory()
         permission_group.permissions.add(permission)
         team = TeamFactory()
-        team.role.team_role_groups.add(permission_group)
+        team.role.groups.add(permission_group)
         self._user = get_test_user(team=team)
         token = self.get_token()
 
