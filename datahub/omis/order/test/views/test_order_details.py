@@ -50,6 +50,8 @@ class TestAddOrderDetails(APITestMixin):
                 ],
                 'description': 'Description test',
                 'contacts_not_to_approach': 'Contacts not to approach details',
+                'further_info': 'Additional notes',
+                'existing_agents': 'Contacts in the market',
                 'delivery_date': '2017-04-20',
                 'po_number': 'PO 123',
                 'vat_status': VATStatus.eu,
@@ -108,8 +110,8 @@ class TestAddOrderDetails(APITestMixin):
             'description': 'Description test',
             'contacts_not_to_approach': 'Contacts not to approach details',
             'product_info': '',
-            'further_info': '',
-            'existing_agents': '',
+            'further_info': 'Additional notes',
+            'existing_agents': 'Contacts in the market',
             'permission_to_approach_contacts': '',
             'delivery_date': '2017-04-20',
             'contact_email': '',
@@ -312,8 +314,6 @@ class TestAddOrderDetails(APITestMixin):
                 'contact': {'id': contact.pk},
                 'primary_market': {'id': country.id},
                 'product_info': 'lorem ipsum',
-                'further_info': 'lorem ipsum',
-                'existing_agents': 'lorem ipsum',
                 'permission_to_approach_contacts': 'lorem ipsum',
                 'archived_documents_url_path': '/documents/123',
             },
@@ -322,8 +322,6 @@ class TestAddOrderDetails(APITestMixin):
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json()['product_info'] == ''
-        assert response.json()['further_info'] == ''
-        assert response.json()['existing_agents'] == ''
         assert response.json()['permission_to_approach_contacts'] == ''
         assert response.json()['archived_documents_url_path'] == ''
 
@@ -443,6 +441,8 @@ class TestChangeOrderDetails(APITestMixin):
                 ],
                 'description': 'Updated description',
                 'contacts_not_to_approach': 'Updated contacts not to approach',
+                'further_info': 'Updated additional notes',
+                'existing_agents': 'Updated contacts in the market',
                 'delivery_date': '2017-04-21',
                 'po_number': 'NEW PO 321',
                 'vat_status': VATStatus.eu,
@@ -502,8 +502,8 @@ class TestChangeOrderDetails(APITestMixin):
             'description': 'Updated description',
             'contacts_not_to_approach': 'Updated contacts not to approach',
             'product_info': order.product_info,
-            'further_info': order.further_info,
-            'existing_agents': order.existing_agents,
+            'further_info': 'Updated additional notes',
+            'existing_agents': 'Updated contacts in the market',
             'permission_to_approach_contacts': order.permission_to_approach_contacts,
             'delivery_date': '2017-04-21',
             'contact_email': order.contact_email,
@@ -718,8 +718,6 @@ class TestChangeOrderDetails(APITestMixin):
             {
                 'status': OrderStatus.complete,
                 'product_info': 'Updated product info',
-                'further_info': 'Updated further info',
-                'existing_agents': 'Updated existing agents',
                 'permission_to_approach_contacts': 'Updated permission to approach contacts',
                 'contact_email': 'updated-email@email.com',
                 'contact_phone': '1234',
@@ -744,8 +742,6 @@ class TestChangeOrderDetails(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['status'] == OrderStatus.draft
         assert response.json()['product_info'] != 'Updated product info'
-        assert response.json()['further_info'] != 'Updated further info'
-        assert response.json()['existing_agents'] != 'Updated existing agents'
         assert response.json()['permission_to_approach_contacts'] != \
             'Updated permission to approach contacts'
         assert response.json()['contact_email'] != 'updated-email@email.com'

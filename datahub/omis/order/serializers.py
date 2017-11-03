@@ -39,6 +39,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
     description = serializers.CharField(allow_blank=True, required=False)
     contacts_not_to_approach = serializers.CharField(allow_blank=True, required=False)
+    further_info = serializers.CharField(allow_blank=True, required=False)
+    existing_agents = serializers.CharField(allow_blank=True, required=False)
 
     delivery_date = serializers.DateField(required=False, allow_null=True)
 
@@ -110,8 +112,6 @@ class OrderSerializer(serializers.ModelSerializer):
             'contact_email',
             'contact_phone',
             'product_info',
-            'further_info',
-            'existing_agents',
             'permission_to_approach_contacts',
             'discount_value',
             'net_cost',

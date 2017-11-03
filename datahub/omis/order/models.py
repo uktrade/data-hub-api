@@ -143,7 +143,15 @@ class Order(BaseModel):
     )
     contacts_not_to_approach = models.TextField(
         blank=True,
-        help_text='Are there contacts that DIT should not approach?'
+        help_text='Specific people or organisations the company does not want DIT to talk to.'
+    )
+    further_info = models.TextField(
+        blank=True,
+        help_text='Additional notes and useful information.'
+    )
+    existing_agents = models.TextField(
+        blank=True,
+        help_text='Contacts the company already has in the market.'
     )
 
     delivery_date = models.DateField(blank=True, null=True)
@@ -235,14 +243,6 @@ class Order(BaseModel):
     product_info = models.TextField(
         blank=True, editable=False,
         help_text='Legacy field. What is the product?'
-    )
-    further_info = models.TextField(
-        blank=True, editable=False,
-        help_text='Legacy field. Further information.'
-    )
-    existing_agents = models.TextField(
-        blank=True, editable=False,
-        help_text='Legacy field. Details of any existing agents.'
     )
     permission_to_approach_contacts = models.TextField(
         blank=True, editable=False,
