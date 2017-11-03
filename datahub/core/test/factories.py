@@ -60,3 +60,14 @@ class GroupFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'auth.Group'
+
+
+class PermissionFactory(factory.django.DjangoModelFactory):
+    """Permission Factory"""
+
+    name = factory.Faker('name')
+    codename = factory.Faker('codename')
+    content_type = factory.SubFactory()
+
+    class Meta:
+        model = 'auth.Permission'
