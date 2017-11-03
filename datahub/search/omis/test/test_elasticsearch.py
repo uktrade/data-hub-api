@@ -162,6 +162,13 @@ def test_mapping(setup_es):
                 'contacts_not_to_approach': {
                     'type': 'text'
                 },
+                'further_info': {
+                    'type': 'text'
+                },
+                'existing_agents': {
+                    'index': False,
+                    'type': 'text'
+                },
                 'created_by': {
                     'properties': {
                         'first_name': {
@@ -481,6 +488,8 @@ def test_indexed_doc(Factory, setup_es):
             'status': order.status,
             'description': order.description,
             'contacts_not_to_approach': order.contacts_not_to_approach,
+            'further_info': order.further_info,
+            'existing_agents': order.existing_agents,
             'delivery_date': order.delivery_date.isoformat(),
             'contact_email': order.contact_email,
             'contact_phone': order.contact_phone,

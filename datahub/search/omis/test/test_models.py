@@ -69,6 +69,8 @@ def test_order_to_dict(Factory, setup_es):
         'status': order.status,
         'description': order.description,
         'contacts_not_to_approach': order.contacts_not_to_approach,
+        'further_info': order.further_info,
+        'existing_agents': order.existing_agents,
         'delivery_date': order.delivery_date,
         'contact_email': order.contact_email,
         'contact_phone': order.contact_phone,
