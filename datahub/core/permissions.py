@@ -1,5 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
+from collections import defaultdict
 
 
 class DjangoCrudPermission(DjangoModelPermissions):
@@ -22,3 +23,14 @@ class UserHasPermissions(BasePermission):
         if not hasattr(view, 'permission_required'):
             raise ImproperlyConfigured()
         return request.user and request.user.has_perm(view.permission_required)
+
+
+def serialize_permissions(permissions):
+    formatted_permissions = defaultdict(lambda: defaultdict(list))
+    for perm in permissions:
+        app, action_model = perm.split('.')
+        action, model = action_model.split('_')
+        formatted_permissions[app][model].append(action)
+
+    return formatted_permissions
+
