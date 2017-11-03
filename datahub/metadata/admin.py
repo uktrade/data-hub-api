@@ -77,7 +77,7 @@ class TeamAdmin(MetadataAdmin):
 class TeamRoleAdmin(MetadataAdmin):
     """Team Admin."""
 
-    fields = ('name', 'team_role_groups')
+    fields = ('name', 'groups')
     list_display = ('name',)
     search_fields = ('name', 'pk')
-    filter_horizontal = ('team_role_groups',)
+    filter_horizontal = ('groups',)

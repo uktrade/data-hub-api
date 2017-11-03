@@ -27,7 +27,7 @@ def get_test_user(team=None):
         )
         if team is None:
             test_user.dit_team = Team.objects.filter(
-                role__team_role_groups__name='DIT_staff'
+                role__groups__name='DIT_staff'
             ).first()
         else:
             test_user.dit_team = team

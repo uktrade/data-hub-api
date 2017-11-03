@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='teamrole',
-            name='team_role_groups',
+            name='groups',
             field=models.ManyToManyField(blank=True, help_text='Permission groups associated with this team.', related_name='team_roles', related_query_name='team_roles', to='auth.Group', verbose_name='team role permission groups'),
         ),
     ]
