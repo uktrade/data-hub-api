@@ -76,6 +76,7 @@ class TestUnifiedViews(APITestMixin):
             'date_lost',
             'country_lost_to',
             'investor_company',
+            'investor_type',
             'investor_company_country',
             'intermediate_company',
             'level_of_involvement',
