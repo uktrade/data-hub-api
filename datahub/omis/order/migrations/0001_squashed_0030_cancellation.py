@@ -158,7 +158,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='order',
             name='contacts_not_to_approach',
-            field=models.TextField(blank=True, help_text='Are there contacts that DIT should not approach?'),
+            field=models.TextField(blank=True, help_text='Specific people or organisations the company does not want DIT to talk to.'),
         ),
         migrations.AddField(
             model_name='order',
@@ -168,12 +168,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='order',
             name='existing_agents',
-            field=models.TextField(blank=True, editable=False, help_text='Legacy field. Details of any existing agents.'),
+            field=models.TextField(blank=True, help_text='Contacts the company already has in the market.'),
         ),
         migrations.AddField(
             model_name='order',
             name='further_info',
-            field=models.TextField(blank=True, editable=False, help_text='Legacy field. Further information.'),
+            field=models.TextField(blank=True, help_text='Additional notes and useful information.'),
         ),
         migrations.AddField(
             model_name='order',
