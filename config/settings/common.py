@@ -142,10 +142,15 @@ AUTHENTICATION_BACKENDS = [
 
 # django-oauth-toolkit settings
 
+SSO_ENABLED = env.bool('SSO_ENABLED')
+
 OAUTH2_PROVIDER = {
     'SCOPES_BACKEND_CLASS': 'datahub.oauth.scopes.ApplicationScopesBackend',
 }
 
+if SSO_ENABLED:
+    OAUTH2_PROVIDER['RESOURCE_SERVER_INTROSPECTION_URL'] = env('RESOURCE_SERVER_INTROSPECTION_URL')
+    OAUTH2_PROVIDER['RESOURCE_SERVER_AUTH_TOKEN'] = env('RESOURCE_SERVER_AUTH_TOKEN')
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
