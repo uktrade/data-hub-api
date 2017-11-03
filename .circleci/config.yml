@@ -23,6 +23,9 @@ jobs:
       AWS_ACCESS_KEY_ID: foo
       AWS_SECRET_ACCESS_KEY: bar
       DOCUMENTS_BUCKET: baz
+      SSO_ENABLED: 'True'
+      RESOURCE_SERVER_INTROSPECTION_URL: http://sso/o/introspect/
+      RESOURCE_SERVER_AUTH_TOKEN: sso-token
 
     working_directory: ~/app
 

@@ -99,7 +99,7 @@ class APITestMixin:
 
     @property
     def api_client(self):
-        """An API client with internal-front-end scope."""
+        """An API client with data-hub:internal-front-end scope."""
         return self.create_api_client()
 
     def create_api_client(self, scope=Scope.internal_front_end, *additional_scopes,

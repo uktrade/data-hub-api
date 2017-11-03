@@ -16,7 +16,7 @@ app = Application.objects.create(
     client_type=Application.CLIENT_CONFIDENTIAL,
     authorization_grant_type=Application.GRANT_PASSWORD
 );
-OAuthApplicationScope.objects.create(application=app, scopes=['internal-front-end'])" | /app/manage.py shell
+OAuthApplicationScope.objects.create(application=app, scopes=['data-hub:internal-front-end'])" | /app/manage.py shell
 
 echo "from datahub.company.models import Advisor;
 Advisor.objects.create_user(
