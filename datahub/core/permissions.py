@@ -1,3 +1,4 @@
+from django.core.exceptions import ImproperlyConfigured
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
 
@@ -18,10 +19,6 @@ class UserHasPermissions(BasePermission):
         Return `True` if permission is granted or there is no
         required_permission set for view, `False` otherwise.
         """
-        if hasattr(view, 'permission_required'):
-            try:
-                return request.user.has_perm(view.permission_required)
-            except AttributeError:
-                return False
-        else:
-            return True
+        if not hasattr(view, 'permission_required'):
+            raise ImproperlyConfigured()
+        return request.user and request.user.has_perm(view.permission_required)
