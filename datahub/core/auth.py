@@ -156,7 +156,7 @@ class TeamModelPermissionsBackend(CDMSUserBackend):
 
     def _get_team_permissions(self, user_obj):
         """
-        This method is called by the ModelBackend _get_permissions() dynamicaly
+        This method is called by the ModelBackend _get_permissions() dynamically
         as part of aggregating user, group and team permissions
         """
         groups = user_obj.dit_team.role.team_role_groups.all()
