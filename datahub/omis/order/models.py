@@ -398,14 +398,16 @@ class Order(BaseModel):
 
         :param by: the adviser who created the record
         :param payments_data: list of payments data.
-            Each item should at least contain `amount` and `received_on`
+            Each item should at least contain `amount`, `received_on` and `method`
             e.g. [
                 {
                     'amount': 1000,
+                    'method': 'bacs',
                     'received_on': ...
                 },
                 {
                     'amount': 1001,
+                    'method': 'manual',
                     'received_on': ...
                 }
             ]

@@ -12,18 +12,21 @@ class PaymentListSerializer(serializers.ListSerializer):
         order = self.context['order']
         created_by = self.context['current_user']
 
-        # add bacs method
-        payments_data = [
-            {**data, 'method': PaymentMethod.bacs}
-            for data in validated_data
-        ]
-
-        order.mark_as_paid(created_by, payments_data)
+        order.mark_as_paid(created_by, validated_data)
         return list(order.payments.all())
 
 
 class PaymentSerializer(serializers.ModelSerializer):
     """Payment DRF serializer."""
+
+    method = serializers.ChoiceField(
+        choices=[
+            method
+            for method in PaymentMethod
+            if method[0] in ('bacs', 'manual')
+        ],
+        default=PaymentMethod.bacs
+    )
 
     class Meta:
         model = Payment
@@ -41,5 +44,4 @@ class PaymentSerializer(serializers.ModelSerializer):
             'created_on',
             'reference',
             'additional_reference',
-            'method',
         )
