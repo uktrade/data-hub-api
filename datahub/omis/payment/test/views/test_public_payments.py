@@ -4,7 +4,7 @@ from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core.test_utils import APITestMixin, format_date_or_datetime, get_test_user
+from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.oauth.scopes import Scope
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import OrderFactory, OrderPaidFactory
@@ -92,10 +92,6 @@ class TestPublicGetPayments(APITestMixin):
     def test_verbs_not_allowed(self, verb):
         """Test that makes sure the other verbs are not allowed."""
         order = OrderPaidFactory()
-
-        self._user = get_test_user()
-        self._user.is_superuser = True
-        self._user.save()
 
         url = reverse(
             'api-v3:omis-public:payment:collection',
