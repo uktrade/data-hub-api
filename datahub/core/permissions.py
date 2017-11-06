@@ -1,6 +1,6 @@
+from collections import defaultdict
 from django.core.exceptions import ImproperlyConfigured
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
-from collections import defaultdict
 
 
 class DjangoCrudPermission(DjangoModelPermissions):
@@ -26,6 +26,9 @@ class UserHasPermissions(BasePermission):
 
 
 def serialize_permissions(permissions):
+    """
+    Serialize permissions into simplified structure
+    """
     formatted_permissions = defaultdict(list)
     for perm in permissions:
         app, action_model = perm.split('.', 1)
@@ -34,4 +37,3 @@ def serialize_permissions(permissions):
         formatted_permissions[model].append(action)
 
     return formatted_permissions
-
