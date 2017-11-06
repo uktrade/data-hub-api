@@ -1,4 +1,3 @@
-from datahub.core.permissions import UserHasPermissions
 from datahub.oauth.scopes import Scope
 from .models import Interaction
 from .serializers import SearchInteractionSerializer
