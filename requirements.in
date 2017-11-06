@@ -44,7 +44,6 @@ werkzeug==0.12.2  # Required by runserver_plus - useful 4 local dev
 pip-tools==1.9.0
 
 # Code static analysis
-pep8==1.7.0
 flake8==3.4.1
 flake8-blind-except==0.1.1
 flake8-debugger==1.4.0
