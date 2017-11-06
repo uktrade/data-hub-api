@@ -29,17 +29,14 @@ class SearchContactParams:
     }
 
 
-class SearchContactAPIView(SearchContactParams, SearchAPIView, PermissionRequiredMixin):
+class SearchContactAPIView(SearchContactParams, SearchAPIView):
     """Filtered contact search view."""
 
-    permission_classes = SearchAPIView.permission_classes + (UserHasPermissions,)
     permission_required = 'company.read_contact'
 
 
 class SearchContactExportAPIView(SearchContactParams,
-                                 SearchExportAPIView,
-                                 PermissionRequiredMixin):
+                                 SearchExportAPIView):
     """Filtered contact search export view."""
 
-    permission_classes = SearchAPIView.permission_classes + (UserHasPermissions,)
     permission_required = 'company.read_contact'

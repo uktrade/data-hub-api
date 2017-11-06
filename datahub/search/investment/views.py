@@ -41,12 +41,10 @@ class SearchInvestmentProjectParams:
 class SearchInvestmentProjectAPIView(SearchInvestmentProjectParams, SearchAPIView):
     """Filtered investment project search view."""
 
-    permission_classes = SearchAPIView.permission_classes + (UserHasPermissions,)
     permission_required = 'investment.read_investmentproject'
 
 
 class SearchInvestmentProjectExportAPIView(SearchInvestmentProjectParams, SearchExportAPIView):
     """Filtered investment project search export view."""
 
-    permission_classes = SearchAPIView.permission_classes + (UserHasPermissions,)
     permission_required = 'investment.read_investmentproject'

@@ -42,12 +42,10 @@ class SearchCompanyParams:
 class SearchCompanyAPIView(SearchCompanyParams, SearchAPIView):
     """Filtered company search view."""
 
-    permission_classes = SearchAPIView.permission_classes + (UserHasPermissions, )
     permission_required = 'company.read_company'
 
 
 class SearchCompanyExportAPIView(SearchCompanyParams, SearchExportAPIView):
     """Filtered company search export view."""
 
-    permission_classes = SearchAPIView.permission_classes + (UserHasPermissions,)
     permission_required = 'company.read_company'
