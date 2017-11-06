@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core.test.factories import PermissionFactory, GroupFactory
+from datahub.core.test.factories import GroupFactory, PermissionFactory
 from datahub.core.test_utils import APITestMixin, get_test_user
 from datahub.metadata.test.factories import TeamFactory, TeamRoleFactory
 
