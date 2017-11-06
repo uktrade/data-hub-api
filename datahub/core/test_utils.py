@@ -97,7 +97,7 @@ class APITestMixin:
 
         if scope not in self._tokens:
             self._tokens[scope] = AccessToken.objects.create(
-                user=self.user,
+                user=None if grant_type == Application.GRANT_CLIENT_CREDENTIALS else self.user,
                 application=self.get_application(grant_type),
                 token=token_hex(16),
                 expires=now() + timedelta(hours=1),

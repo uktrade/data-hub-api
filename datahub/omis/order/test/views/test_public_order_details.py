@@ -4,7 +4,7 @@ from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core.test_utils import APITestMixin, format_date_or_datetime, get_test_user
+from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.oauth.scopes import Scope
 from datahub.omis.quote.test.factories import QuoteFactory
 
@@ -140,10 +140,6 @@ class TestViewPublicOrderDetails(APITestMixin):
             quote=QuoteFactory(),
             status=OrderStatus.quote_awaiting_acceptance
         )
-
-        self._user = get_test_user()
-        self._user.is_superuser = True
-        self._user.save()
 
         url = reverse(
             'api-v3:omis-public:order:detail',

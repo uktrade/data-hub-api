@@ -72,6 +72,7 @@ class PublicOrderViewSet(CoreViewSetV3):
 
     lookup_field = 'public_token'
 
+    permission_classes = (IsAuthenticatedOrTokenHasScope,)
     required_scopes = (Scope.public_omis_front_end,)
     serializer_class = PublicOrderSerializer
     queryset = Order.objects.publicly_accessible(
