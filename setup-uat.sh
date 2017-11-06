@@ -8,21 +8,24 @@ python /app/manage.py loadmetadata
 python /app/manage.py load_omis_metadata
 
 echo "import datetime
-from oauth2_provider.models import AccessToken
 from django.utils.timezone import now
+from oauth2_provider.models import AccessToken
 from datahub.company.models import Advisor
+
+dit_east_midlands_id = '9010dd28-9798-e211-a939-e4115bead28a'
 
 user = Advisor.objects.create_user(
     email='${QA_USER_EMAIL}',
     first_name='Circle',
-    last_name='Ci'
+    last_name='Ci',
+    dit_team_id=dit_east_midlands_id,
 )
 
 AccessToken.objects.create(
     user=user,
     token='${OAUTH2_DEV_TOKEN}',
     expires=now() + datetime.timedelta(days=1),
-    scope='data-hub:internal-front-end'
+    scope='data-hub:internal-front-end',
 )" | /app/manage.py shell
 
 python /app/manage.py loaddata /app/fixtures/test_ch_data.yaml
