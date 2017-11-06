@@ -17,7 +17,7 @@ FROZEN_TIME = '2017-04-18T13:25:30.986208Z'
 class TestBusinessLeadViews(APITestMixin):
     """Business lead views test case."""
 
-    def test_leads_no_permissions(self):
+    def test_no_permissions(self):
         """Should return 403"""
         team = TeamFactory()
         self._user = get_test_user(team=team)

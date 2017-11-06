@@ -16,8 +16,8 @@ class UserHasPermissions(BasePermission):
 
     def has_permission(self, request, view):
         """
-        Return `True` if permission is granted or there is no
-        required_permission set for view, `False` otherwise.
+        Return `True` if permission is granted `False` otherwise.
+        Raises ImproperlyConfigured if permission_required is not set on view
         """
         if not hasattr(view, 'permission_required'):
             raise ImproperlyConfigured()

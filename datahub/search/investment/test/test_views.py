@@ -69,7 +69,7 @@ def setup_data(setup_es):
 class TestSearch(APITestMixin):
     """Tests search views."""
 
-    def test_investment_project_search_no_permissions(self):
+    def test_investment_project_no_permissions(self):
         """Should return 403"""
         team = TeamFactory()
         self._user = get_test_user(team=team)
