@@ -76,7 +76,7 @@ def setup_data(setup_es):
 class TestSearchOrder(APITestMixin):
     """Test specific search for orders."""
 
-    def test_order_search_no_permissions(self):
+    def test_no_permissions(self):
         """Should return 403"""
         team = TeamFactory()
         self._user = get_test_user(team=team)

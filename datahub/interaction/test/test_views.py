@@ -18,7 +18,7 @@ from datahub.metadata.test.factories import TeamFactory
 class TestInteractionV3(APITestMixin):
     """Tests for v3 interaction views."""
 
-    def test_intereaction_no_permissions(self):
+    def test_interaction_no_permissions(self):
         """Should return 403"""
         interaction = InteractionFactory()
         team = TeamFactory()
