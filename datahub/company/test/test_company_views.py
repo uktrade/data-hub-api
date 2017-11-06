@@ -12,12 +12,21 @@ from datahub.company.test.factories import CompaniesHouseCompanyFactory, Company
 from datahub.core.constants import (
     BusinessType, CompanyClassification, Country, HeadquarterType, Sector, UKRegion
 )
-from datahub.core.test_utils import APITestMixin, format_date_or_datetime
+from datahub.core.test_utils import APITestMixin, format_date_or_datetime, get_test_user
 from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.metadata.test.factories import TeamFactory
 
 
 class TestCompany(APITestMixin):
     """Company test case."""
+
+    def test_companies_list_no_permissions(self):
+        """Should return 403"""
+        team = TeamFactory()
+        self._user = get_test_user(team=team)
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_list_companies(self):
         """List the companies."""
@@ -570,4 +579,4 @@ class TestCHCompany(APITestMixin):
         url = reverse('api-v3:ch-company:collection')
         response = self.api_client.post(url)
 
-        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+        assert response.status_code == status.HTTP_403_FORBIDDEN

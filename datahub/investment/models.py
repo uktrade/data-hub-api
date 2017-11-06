@@ -23,6 +23,7 @@ class IProjectAbstract(models.Model):
 
     class Meta:
         abstract = True
+        permissions = (('read_project', 'Can read project'),)
 
     PRIORITIES = Choices(
         ('1_low', 'low', 'Low'),
@@ -278,6 +279,9 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
         company_name = self.investor_company or 'No company'
         return f'{company_name} – {self.name}'
 
+    class Meta:
+        permissions = (('read_investmentproject', 'Can read investment project'),)
+
 
 class InvestmentProjectTeamMember(models.Model):
     """Intermediary M2M model for investment project team members.
@@ -299,6 +303,8 @@ class InvestmentProjectTeamMember(models.Model):
 
     class Meta:
         unique_together = (('investment_project', 'adviser'),)
+        permissions = (('read_investmentprojectteammember',
+                        'Can read investment project team member'),)
 
 
 class InvestmentProjectCode(models.Model):
@@ -343,6 +349,14 @@ class IProjectDocument(BaseModel, ArchivableModel):
     filename = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
     document = models.OneToOneField(Document, on_delete=models.PROTECT)
 
+    class Meta:
+        verbose_name = 'investment project document'
+        verbose_name_plural = 'investment project documents'
+        unique_together = (
+            ('project', 'doc_type', 'filename'),
+        )
+        permissions = (('read_iprojectdocument', 'Can read investment project document'),)
+
     @property
     def signed_url(self):
         """Generate pre-signed download URL."""
@@ -352,13 +366,6 @@ class IProjectDocument(BaseModel, ArchivableModel):
     def signed_upload_url(self):
         """Generate pre-signed upload URL."""
         return self.document.generate_signed_upload_url()
-
-    class Meta:
-        verbose_name = 'investment project document'
-        verbose_name_plural = 'investment project documents'
-        unique_together = (
-            ('project', 'doc_type', 'filename'),
-        )
 
     def delete(self, using=None, keep_parents=False):
         """Ensure document is removed when parent is being deleted."""

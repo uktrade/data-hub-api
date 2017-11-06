@@ -255,6 +255,9 @@ class Order(BaseModel):
 
     objects = OrderQuerySet.as_manager()
 
+    class Meta:
+        permissions = (('read_order', 'Can read order'),)
+
     def __str__(self):
         """Human-readable representation"""
         return self.reference
@@ -499,15 +502,15 @@ class OrderSubscriber(BaseModel):
         Advisor, on_delete=models.CASCADE, related_name='+'
     )
 
-    def __str__(self):
-        """Human-readable representation"""
-        return f'{self.order} – {self.adviser}'
-
     class Meta:
         ordering = ['created_on']
         unique_together = (
             ('order', 'adviser'),
         )
+
+    def __str__(self):
+        """Human-readable representation"""
+        return f'{self.order} – {self.adviser}'
 
 
 class OrderAssignee(BaseModel):

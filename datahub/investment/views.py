@@ -5,6 +5,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters import IsoDateTimeFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
+from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
 from rest_framework.filters import OrderingFilter
 from rest_framework.pagination import BasePagination
@@ -117,6 +118,7 @@ class _SinglePagePaginator(BasePagination):
 class IProjectModifiedSinceViewSet(IProjectViewSet):
     """View set for the modified-since endpoint (intended for use by Data Hub MI)."""
 
+    permission_classes = (IsAuthenticatedOrTokenHasScope,)
     required_scopes = (Scope.mi,)
     pagination_class = _SinglePagePaginator
 
