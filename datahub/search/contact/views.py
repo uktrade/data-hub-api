@@ -1,6 +1,3 @@
-from django.contrib.auth.mixins import PermissionRequiredMixin
-
-from datahub.core.permissions import UserHasPermissions
 from datahub.oauth.scopes import Scope
 from .models import Contact
 from .serializers import SearchContactSerializer
