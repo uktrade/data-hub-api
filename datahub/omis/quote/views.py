@@ -1,4 +1,5 @@
 from django.http import Http404
+from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -55,6 +56,7 @@ class QuoteViewSet(BaseQuoteViewSet):
 class PublicQuoteViewSet(BaseQuoteViewSet):
     """ViewSet for public facing API."""
 
+    permission_classes = (IsAuthenticatedOrTokenHasScope,)
     required_scopes = (Scope.public_omis_front_end,)
     serializer_class = PublicQuoteSerializer
 

@@ -71,6 +71,7 @@ class Payment(BaseModel):
 
     class Meta:
         ordering = ('created_on', )
+        permissions = (('read_payment', 'Can read payment'),)
 
     def __str__(self):
         """Human-readable representation"""

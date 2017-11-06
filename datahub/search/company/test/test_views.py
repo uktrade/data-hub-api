@@ -14,7 +14,8 @@ from datahub.company.models import Company
 from datahub.company.test.factories import (AdviserFactory, CompaniesHouseCompanyFactory,
                                             CompanyFactory, ContactFactory)
 from datahub.core import constants
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, get_test_user
+from datahub.metadata.test.factories import TeamFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -42,6 +43,14 @@ def setup_data(setup_es):
 
 class TestSearch(APITestMixin):
     """Tests search views."""
+
+    def test_company_search_no_permissions(self):
+        """Should return 403"""
+        team = TeamFactory()
+        self._user = get_test_user(team=team)
+        url = reverse('api-v3:search:company')
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_trading_address_country_filter(self, setup_data):
         """Tests trading address country filter."""

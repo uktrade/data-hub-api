@@ -1,6 +1,14 @@
 from rest_framework import serializers
-
+from datahub.core.test.support.models import PermissionModel
 from .models import MyDisableableModel
+
+
+class PermissionModelSerializer(serializers.ModelSerializer):
+    """Serialiser for PermissionModel."""
+
+    class Meta:
+        model = PermissionModel
+        fields = '__all__'
 
 
 class MyDisableableModelSerializer(serializers.ModelSerializer):

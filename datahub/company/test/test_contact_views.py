@@ -9,7 +9,8 @@ from rest_framework.reverse import reverse
 from reversion.models import Version
 
 from datahub.core import constants
-from datahub.core.test_utils import APITestMixin, format_date_or_datetime
+from datahub.core.test_utils import APITestMixin, format_date_or_datetime, get_test_user
+from datahub.metadata.test.factories import TeamFactory
 from .factories import CompanyFactory, ContactFactory
 
 # mark the whole module for db use
@@ -529,6 +530,14 @@ class TestViewContact(APITestMixin):
 
 class TestContactList(APITestMixin):
     """List/filter contacts test case."""
+
+    def test_contact_list_no_permissions(self):
+        """Should return 403"""
+        team = TeamFactory()
+        self._user = get_test_user(team=team)
+        url = reverse('api-v3:contact:list')
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_all(self):
         """Test getting all contacts"""
