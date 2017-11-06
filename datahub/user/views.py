@@ -13,6 +13,8 @@ def who_am_i(request):
     """Return the current user. This view is behind a login."""
     serializer = AdviserSerializer(request.user)
     data = serializer.data
+    data['team'] = request.user.dit_team.name
+    data['team_role'] = request.user.dit_team.role.name
 
     permissions = set()
     for backend in auth.get_backends():

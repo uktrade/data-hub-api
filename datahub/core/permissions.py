@@ -26,11 +26,12 @@ class UserHasPermissions(BasePermission):
 
 
 def serialize_permissions(permissions):
-    formatted_permissions = defaultdict(lambda: defaultdict(list))
+    formatted_permissions = defaultdict(list)
     for perm in permissions:
-        app, action_model = perm.split('.')
-        action, model = action_model.split('_')
-        formatted_permissions[app][model].append(action)
+        app, action_model = perm.split('.', 1)
+        action, model = action_model.split('_', 1)
+
+        formatted_permissions[model].append(action)
 
     return formatted_permissions
 
