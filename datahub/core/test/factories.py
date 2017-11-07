@@ -66,8 +66,8 @@ class GroupFactory(factory.django.DjangoModelFactory):
 class PermissionFactory(factory.django.DjangoModelFactory):
     """Permission Factory"""
 
-    name = factory.Faker('name')
-    codename = factory.Faker('name')
+    name = factory.Faker('word')
+    codename = factory.Faker('word')
     content_type = factory.Iterator(ContentType.objects.all())
 
     class Meta:
