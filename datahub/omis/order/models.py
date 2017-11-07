@@ -299,6 +299,12 @@ class Order(BaseModel):
             self.public_token = self.generate_public_token()
         return super().save(*args, **kwargs)
 
+    def get_lead_assignee(self):
+        """
+        :returns: lead OrderAssignee for this order is it exists, None otherwise
+        """
+        return self.assignees.filter(is_lead=True).first()
+
     def get_datahub_frontend_url(self):
         """Return the url to the Data Hub frontend order page."""
         return f'{settings.DATAHUB_FRONTEND_BASE_URL}/omis/{self.pk}'
