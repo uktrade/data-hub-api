@@ -22,9 +22,3 @@ class UserHasPermissions(BasePermission):
         if not hasattr(view, 'permission_required'):
             raise ImproperlyConfigured()
         return request.user and request.user.has_perm(view.permission_required)
-
-
-    """
-    """
-
-
