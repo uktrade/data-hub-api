@@ -50,3 +50,22 @@ class TestPermissions(APITestMixin):
         response = my_view(request)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_user_without_team_returns_403(self):
+        """
+        Tests view returns 403 for user without team and permission
+        """
+        self._user = get_test_user()
+        self._user.dit_team = None
+        self._user.save()
+
+        token = self.get_token()
+
+        request = factory.get('/', data={}, content_type='application/json',
+                              Authorization=f'Bearer {token}')
+        my_view = PermissionModelViewset.as_view(
+            actions={'get': 'list'}
+        )
+        response = my_view(request)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
