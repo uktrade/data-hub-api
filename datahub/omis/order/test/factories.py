@@ -71,7 +71,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
         If nothing specified when instantiating the object, the value returned by
         this method will be used by default.
         """
-        return OrderAssigneeFactory.create_batch(1, order=self)
+        return OrderAssigneeFactory.create_batch(1, order=self, is_lead=True)
 
     class Meta:
         model = 'order.Order'

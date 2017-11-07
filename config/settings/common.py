@@ -204,6 +204,9 @@ DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://loc
 
 # OMIS
 
+# given to clients and generally available
+OMIS_GENERIC_CONTACT_EMAIL = env('OMIS_GENERIC_CONTACT_EMAIL', default='')
+
 # if set, all the notifications will be sent to this address instead of the
 # intended recipient, useful for environments != live
 OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL = env(
