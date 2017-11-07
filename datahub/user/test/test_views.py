@@ -38,6 +38,4 @@ class TestUserView(APITestMixin):
         assert response.data['id'] == str(user_test.pk)
         assert response.data['team'] == team.name
         assert response.data['team_role'] == role.name
-        assert response.data.get('permissions') is not None
-        for model in (model_name_1, model_name_2):
-            assert action in response.data['permissions'][model]
+        assert response.data.get('permissions') == {model_name_1: [action], model_name_2: [action]}
