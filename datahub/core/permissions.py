@@ -22,3 +22,16 @@ class UserHasPermissions(BasePermission):
         if not hasattr(view, 'permission_required'):
             raise ImproperlyConfigured()
         return request.user and request.user.has_perm(view.permission_required)
+
+
+class IsLEPWithTeamAssociatedToIProject(BasePermission):
+    """
+    Check the investment project has a users team associated with it
+    """
+
+    def has_permission(self, request, view):
+        pass
+
+    def has_object_permission(self, request, view, object):
+        pass
+

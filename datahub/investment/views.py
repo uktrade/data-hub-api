@@ -13,6 +13,7 @@ from rest_framework.response import Response
 
 from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
+from datahub.core.permissions import IsLEPWithTeamAssociatedToIProject
 from datahub.core.utils import executor
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.documents.av_scan import virus_scan_document
@@ -117,7 +118,7 @@ class _SinglePagePaginator(BasePagination):
 class IProjectModifiedSinceViewSet(IProjectViewSet):
     """View set for the modified-since endpoint (intended for use by Data Hub MI)."""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope,)
+    permission_classes = (IsAuthenticatedOrTokenHasScope, IsLEPWithTeamAssociatedToIProject)
     required_scopes = (Scope.mi,)
     pagination_class = _SinglePagePaginator
 
