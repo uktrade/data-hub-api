@@ -3,7 +3,8 @@ from django.db import models
 from .utils import (
     calculate_quote_expiry_date,
     generate_quote_content,
-    generate_quote_reference
+    generate_quote_reference,
+    get_latest_terms_and_conditions
 )
 
 
@@ -23,7 +24,8 @@ class QuoteManager(models.Manager):
         quote = self.model(
             reference=generate_quote_reference(order),
             content=generate_quote_content(order, expires_on),
-            expires_on=expires_on
+            expires_on=expires_on,
+            terms_and_conditions=get_latest_terms_and_conditions()
         )
 
         if commit:
