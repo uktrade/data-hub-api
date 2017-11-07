@@ -1,6 +1,7 @@
 """Investment project models."""
 
 import uuid
+from itertools import chain
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -282,7 +283,17 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
         return f'{company_name} – {self.name}'
 
     class Meta:
-        permissions = (('read_investmentproject', 'Can read investment project'),)
+        permissions = (
+            ('read_investmentproject', 'Can read investment project'),
+            ('read_associated_investmentproject', 'Can read associated investment project'),
+        )
+
+    def get_associated_advisors(self):
+        """Get advisors that are associated with the IP."""
+        return chain(
+            [team_member.adviser for team_member in self.team_members.all()],
+            [self.created_by]
+        )
 
 
 class InvestmentProjectTeamMember(models.Model):
