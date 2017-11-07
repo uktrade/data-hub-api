@@ -124,6 +124,7 @@ class AssigneesFilledInValidator:
     """Validator which checks that the order has enough information about assignees."""
 
     no_assignees_message = 'You need to add at least one assignee.'
+    no_lead_assignee_message = 'You need to set a lead assignee.'
     no_estimated_time_message = 'The total estimated time cannot be zero.'
 
     def __init__(self):
@@ -139,6 +140,11 @@ class AssigneesFilledInValidator:
         if not self.instance.assignees.count():
             raise ValidationError({
                 'assignees': [self.no_assignees_message]
+            })
+
+        if not self.instance.assignees.filter(is_lead=True).count():
+            raise ValidationError({
+                'assignee_lead': [self.no_lead_assignee_message]
             })
 
         if not self.instance.assignees.aggregate(sum=models.Sum('estimated_time'))['sum']:
