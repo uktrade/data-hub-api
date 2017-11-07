@@ -1,45 +1,35 @@
-Quote date: {% now "j F Y" %}
+Date: {% now "j F Y" %}
 
-Dear {{order.contact.name}}
+# Quote for the Provision of an Overseas Market Introduction Service (“OMIS”): {{order.reference}} (the **Quote**)
 
-# Quote for the provision of an Overseas Market Introduction Service: {{order.reference}}
+We, the Department for International Trade (**DIT**) agree to provide you {{order.company.name}} of {{company_address}} with the Services on the terms set out in this Quote.
 
-## 1.	Proposed activities
-
-DIT {{order.primary_market}} will aim to provide {{order.company.name}} (“the Customer”) with the following –
+The **Services** are those described below:
 
 {{order.description}}
 
-## 2.	Charges
+DIT will deliver the Services on or before the **Delivery Date** which shall be {{order.delivery_date|date:"j F Y"}}.
 
-You shall pay DIT the Charge detailed below in the manner and at the times described in Section 4 below and in the Terms.
+In exchange for these Services you agree to pay the **Charges** which shall be £{{pound_pricing.subtotal_cost}} (excluding VAT) on or before the **Payment Date** which shall be the earliest of: the date 30 days from the date of the relevant invoice; or the date 10 days before the Delivery Date. The Payment Date will be specified on your invoice.
 
-Subtotal:   £{{pound_pricing.subtotal_cost}}
+All correspondence will be between our representatives set out below:
 
-VAT:        £{{pound_pricing.vat_cost}}
+The **DIT Contact** shall be {{lead_assignee.adviser.name}}. If you do not have contact details for the DIT Contact, please contact {{generic_contact_email}}.
 
-Total:      £{{pound_pricing.total_cost}}
+The **Customer Contact** shall be {{order.contact.name}} of {{order.company.name}}, {{company_address}} and {{contact_email}}.
 
-## 3.	Acceptance of quote and delivery date
+This Quote must be accepted by you by {{quote_expires_on|date:"j F Y"}}. Quotes that are not accepted by this date may be withdrawn by us. You accept that any delay in the acceptance of this Quote may impact on our ability to meet the Delivery Date.
 
-**Quote to be accepted by: {{expires_on|date:"j F Y"}}**
+You will be required to pay the Charges in full on or before the Payment Date unless otherwise agreed by us in writing.
 
-Work will commence on your acceptance of the Quote, Terms and Charges.  If acceptance is delayed for any reason, we may have to amend the delivery date for the Service.
+You should read the terms of the Quote, together with the terms and conditions annexed to this Quote, carefully to ensure that the DIT proposal meets your requirements. When you accept the Quote you agree to be bound by its terms as set out in this Quote and the terms and conditions annexed to it.
 
-**Delivery date: {{order.delivery_date|date:"j F Y"}}**
+Please confirm your acceptance of this Quote by:
 
-On acceptance of the Quote, Terms and Charges, your first agreed activity will be delivered by the date indicated above.  If there is a necessity to change this date you will be notified and a new date agreed.
+- indicating that you have read and accepted the terms and conditions annexed to this Quote and the Charges by ticking the box ‘I accept the Charges and the Terms and Conditions’; and
 
-When accepted on the system, neither the Order nor the Quote can be edited.  If you require any significant changes, please contact me to discuss.  This may require the Order to be cancelled and a new quote commissioned.
+- selecting ‘Accept quote’.
 
-## 4.	Payment
+If you would like to amend this quote in any way please contact the DIT Contact and we can discuss any changes and issue a revised quote if appropriate.
 
-Once you have agreed the Quote, Terms and Charges, DIT will contact you to collect the Charges.  You agree to pay the Charges in full within 30 days of the invoice (unless we agree a longer period with you in writing).  The first agreed activity cannot be delivered until payment of the Charges has been received.
-
-Payment can be made by a number of methods, of which details can be found on your invoice. You can view your invoice on the Website.
-
-## 5.	Terms and Conditions
-
-Your use of OMIS is subject to DIT’s OMIS terms & conditions (“the Terms”).  Please read these carefully, available on the Website, before accepting the Quote.  Such an acceptance will signify your agreement to be bound by these Terms.
-
-Do not hesitate to contact me direct or your International Trade Adviser (ITA), Scottish Development International (SDI), Welsh Government (WG) or Invest Northern Ireland (INI) adviser if you have any further questions about this service.  We look forward to hearing from you soon and working with you to help expand your business.
+Please contact {{lead_assignee.adviser.name}} if you have any further questions about this Quote. We look forward to hearing from you soon and working with you to help expand your business.

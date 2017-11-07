@@ -45,6 +45,35 @@ class OrderWithRandomReferenceFactory(OrderFactory):
     reference = factory.LazyFunction(get_random_string)
 
 
+class TestGetLeadAssignee:
+    """Tests for the get_lead_assignee() logic."""
+
+    def test_without_assignees(self):
+        """
+        Test that get_lead_assignee() returns None if there are no assignees.
+        """
+        order = OrderFactory(assignees=[])
+        assert not order.get_lead_assignee()
+
+    def test_without_lead_assignee(self):
+        """
+        Test that get_lead_assignee() returns None if there are assignees
+        but none of them is a lead.
+        """
+        order = OrderFactory(assignees=[])
+        OrderAssigneeFactory(order=order, is_lead=False)
+        assert not order.get_lead_assignee()
+
+    def test_with_lead_assignee(self):
+        """
+        Test that get_lead_assignee() returns the lead assignee if present.
+        """
+        order = OrderFactory(assignees=[])
+        lead_assignee = OrderAssigneeFactory(order=order, is_lead=True)
+        OrderAssigneeFactory(order=order, is_lead=False)
+        assert order.get_lead_assignee() == lead_assignee
+
+
 class TestOrderGenerateReference:
     """Tests for the generate reference logic."""
 
