@@ -159,9 +159,9 @@ class TeamModelPermissionsBackend(CDMSUserBackend):
         This method is called by the ModelBackend _get_permissions() dynamically
         as part of aggregating user, group and team permissions
         """
-        try:
+        if user_obj.dit_team and user_obj.dit_team.role:
             groups = user_obj.dit_team.role.groups.all()
-        except AttributeError:
+        else:
             groups = []
 
         return Permission.objects.filter(group__in=groups)
