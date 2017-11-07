@@ -1,18 +1,27 @@
 - model: event.eventtype
+  pk: 85f2f48f-0ecb-4a3a-b7d2-8106b8733769
+  fields: {disabled_on: null, name: "Account management"}
+- model: event.eventtype
   pk: 771f654d-e6b1-4fad-8a89-b6ac44147830
-  fields: {name: "Seminar"}
+  fields: {disabled_on: null, name: "Seminar"}
 - model: event.eventtype
   pk: 2fade471-e868-4ea9-b125-945eb90ae5d4
-  fields: {name: "Exhibition"}
+  fields: {disabled_on: null, name: "Exhibition"}
 - model: event.eventtype
   pk: 1889641d-a021-4b6a-bbbe-20f501b8fdf4
-  fields: {name: "Inward mission"}
+  fields: {disabled_on: null, name: "Inward mission"}
+- model: event.eventtype
+  pk: e49ef1b7-3b35-4138-9219-b201461d2eb9
+  fields: {disabled_on: null, name: "Legacy service"}
+- model: event.eventtype
+  pk: fac620b8-d4c3-45a6-9922-bd65f51ef59f
+  fields: {disabled_on: null, name: "MVS"}
 - model: event.eventtype
   pk: 6031f993-a689-49af-9a11-942a8413a779
-  fields: {name: "Outward mission"}
+  fields: {disabled_on: null, name: "Outward mission"}
+- model: event.eventtype
+  pk: 9c0fbb9b-f188-4dfa-9ee7-b3500ed7e8f4
+  fields: {disabled_on: null, name: "TPU - opportunity"}
 - model: event.eventtype
   pk: 91dbf298-84b3-4aa9-af7d-540721e5127c
-  fields: {name: "UK region local service"}
-- model: event.eventtype
-  pk: c100fb8c-8d44-4c40-b40a-3d8ae3e5de86
-  fields: {name: "Conference", disabled_on: '2017-10-02T10:51:46.671808Z'}
+  fields: {disabled_on: null, name: "UK region local service"}
