@@ -7,7 +7,9 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.investment.models import InvestmentProject
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.test.factories import (
+    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
+)
 from datahub.metadata.test.factories import TeamFactory
 
 pytestmark = pytest.mark.django_db
@@ -172,7 +174,6 @@ class TestSearch(APITestMixin):
         AND (stage = won OR stage = active)
         """
         url = reverse('api-v3:search:investment_project')
-
         investment_project1 = InvestmentProjectFactory(
             investment_type_id=constants.InvestmentType.fdi.value.id,
             stage_id=constants.InvestmentProjectStage.active.value.id
@@ -193,6 +194,84 @@ class TestSearch(APITestMixin):
         setup_es.indices.refresh()
 
         response = self.api_client.post(url, {
+            'investment_type': constants.InvestmentType.fdi.value.id,
+            'investor_company': [
+                investment_project1.investor_company.pk,
+                investment_project2.investor_company.pk,
+            ],
+            'stage': [
+                constants.InvestmentProjectStage.won.value.id,
+                constants.InvestmentProjectStage.active.value.id,
+            ],
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 2
+        assert len(response.data['results']) == 2
+
+        # checks if we only have investment projects with stages we filtered
+        assert {
+            constants.InvestmentProjectStage.active.value.id,
+            constants.InvestmentProjectStage.won.value.id
+        } == {
+            investment_project['stage']['id']
+            for investment_project in response.data['results']
+        }
+
+        # checks if we only have investment projects with investor companies we filtered
+        assert {
+            str(investment_project1.investor_company.pk),
+            str(investment_project2.investor_company.pk)
+        } == {
+            investment_project['investor_company']['id']
+            for investment_project in response.data['results']
+        }
+
+        # checks if we only have investment projects with fdi investment type
+        assert {
+            constants.InvestmentType.fdi.value.id
+        } == {
+            investment_project['investment_type']['id']
+            for investment_project in response.data['results']
+        }
+
+    def test_search_investment_project_associated_users_autofilter(self, setup_es):
+        """
+        Automatic filter to see only associated IP for a specific (leps) user
+        """
+        url = reverse('api-v3:search:investment_project')
+
+        team = TeamFactory()
+        request_user = create_test_user(
+            team=team,
+            permission_codenames=['read_all_investmentproject']
+        )
+        api_client = self.create_api_client(user=request_user)
+        adviser = AdviserFactory(dit_team=team)
+
+        investment_project1 = InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            stage_id=constants.InvestmentProjectStage.active.value.id
+        )
+        InvestmentProjectTeamMemberFactory(adviser=adviser,
+                                           investment_project=investment_project1)
+
+        investment_project2 = InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            stage_id=constants.InvestmentProjectStage.won.value.id,
+        )
+
+        InvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.won.value.id
+        )
+        InvestmentProjectFactory(
+            investment_type_id=constants.InvestmentType.fdi.value.id,
+            stage_id=constants.InvestmentProjectStage.prospect.value.id,
+        )
+
+        setup_es.indices.refresh()
+
+        response = api_client.post(url, {
             'investment_type': constants.InvestmentType.fdi.value.id,
             'investor_company': [
                 investment_project1.investor_company.pk,
