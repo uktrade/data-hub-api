@@ -23,7 +23,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
     client_relationship_manager = dsl_utils.id_name_mapping()
     project_manager = dsl_utils.contact_or_adviser_mapping('project_manager')
     project_assurance_adviser = dsl_utils.contact_or_adviser_mapping('project_assurance_adviser')
-    team_members = dsl_utils.contact_or_adviser_mapping('team_members')
+    team_members = dsl_utils.contact_or_adviser_mapping('team_members', include_dit_team=True)
     archived = Boolean()
     archived_reason = Text()
     archived_by = dsl_utils.contact_or_adviser_mapping('archived_by')
@@ -80,7 +80,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'client_contacts': lambda col: [dict_utils.contact_or_adviser_dict(c) for c in col.all()],
         'client_relationship_manager': dict_utils.id_name_dict,
         'team_members': lambda col: [
-            dict_utils.contact_or_adviser_dict(c.adviser) for c in col.all()
+            dict_utils.contact_or_adviser_dict(c.adviser, include_dit_team=True) for c in col.all()
         ],
         'fdi_type': dict_utils.id_name_dict,
         'fdi_type_documents': lambda col: [dict_utils.id_uri_dict(c) for c in col.all()],
@@ -141,6 +141,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'investor_company.name_trigram',
         'project_code_trigram',
         'sector.name_trigram',
+        'team_members.dit_team.id',
     )
 
     class Meta:
