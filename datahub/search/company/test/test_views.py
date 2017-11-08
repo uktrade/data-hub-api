@@ -386,6 +386,7 @@ class TestSearchExport(APITestMixin):
                 'turnover_range',
                 'uk_based',
                 'uk_region',
+                'vat_number',
                 'website'] == csv_file.fieldnames
 
         for row in rows:
