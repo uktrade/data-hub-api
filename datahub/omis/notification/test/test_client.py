@@ -2,10 +2,12 @@ from unittest import mock
 
 import pytest
 
+from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
 
 from notifications_python_client.errors import APIError
 
+from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import synchronous_executor_submit
 from datahub.omis.market.models import Market
 from datahub.omis.order.test.factories import OrderFactory, OrderWithOpenQuoteFactory
@@ -221,3 +223,35 @@ class TestNotifyQuoteGenerated:
         assert call_args['template_id'] == Template.quote_awaiting_acceptance_for_customer.value
         assert call_args['personalisation']['recipient name'] == order.contact.name
         assert call_args['personalisation']['embedded link'] == order.get_public_facing_url()
+
+
+@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+class TestNotifyAdviserAdded:
+    """Tests for the adviser_added logic."""
+
+    def test_adviser_notified(self):
+        """
+        Test that calling `adviser_added` sends an email notifying the adviser that
+        they have been added to the order.
+        """
+        order = OrderFactory()
+        adviser = AdviserFactory()
+        creator = AdviserFactory()
+
+        notify.client.reset_mock()
+
+        notify.adviser_added(
+            order=order,
+            adviser=adviser,
+            by=creator,
+            creation_date=dateutil_parse('2017-05-18')
+        )
+
+        assert notify.client.send_email_notification.called
+        call_args = notify.client.send_email_notification.call_args_list[0][1]
+        assert call_args['email_address'] == adviser.contact_email
+        assert call_args['template_id'] == Template.you_have_been_added_for_adviser.value
+
+        assert call_args['personalisation']['recipient name'] == adviser.name
+        assert call_args['personalisation']['creator'] == creator.name
+        assert call_args['personalisation']['creation date'] == '18/05/2017'

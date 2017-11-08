@@ -71,6 +71,7 @@ class Notify:
             'company name': order.company.name,
             'embedded link': order.get_datahub_frontend_url(),
             'primary market': order.primary_market.name,
+            'omis team email': settings.OMIS_GENERIC_CONTACT_EMAIL,
             **(data or {})
         }
 
@@ -151,6 +152,21 @@ class Notify:
                 {
                     'recipient name': order.contact.name,
                     'embedded link': order.get_public_facing_url(),
+                }
+            )
+        )
+
+    def adviser_added(self, order, adviser, by, creation_date):
+        """Send a notification when an adviser is added to an order."""
+        self._send_email(
+            email_address=adviser.get_current_email(),
+            template_id=Template.you_have_been_added_for_adviser.value,
+            personalisation=self._prepare_personalisation(
+                order,
+                {
+                    'recipient name': adviser.name,
+                    'creator': by.name,
+                    'creation date': creation_date.strftime('%d/%m/%Y')
                 }
             )
         )

@@ -108,7 +108,13 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
 
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Sends an email to this User."""
-        send_mail(subject, message, from_email, [self.email], **kwargs)
+        send_mail(subject, message, from_email, [self.get_current_email()], **kwargs)
+
+    def get_current_email(self):
+        """
+        :returns: the most up-to-date email address for this adviser.
+        """
+        return self.contact_email or self.email
 
     class Meta:
         indexes = [
