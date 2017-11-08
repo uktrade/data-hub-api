@@ -88,3 +88,12 @@ def calculate_quote_expiry_date(order):
             ]
         })
     return expiry_date
+
+
+def get_latest_terms_and_conditions():
+    """
+    :returns: the latest TermsAndConditions object if it exists, None otherwise.
+    """
+    from .models import TermsAndConditions
+
+    return TermsAndConditions.objects.order_by('-created_on').first()

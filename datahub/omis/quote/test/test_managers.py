@@ -4,7 +4,7 @@ from dateutil.parser import parse as dateutil_parse
 
 from datahub.company.test.factories import AdviserFactory
 
-from ..models import Quote
+from ..models import Quote, TermsAndConditions
 
 
 # mark the whole module for db use
@@ -45,6 +45,7 @@ class TestQuoteManager:
         assert quote.content == 'Quote content'
         assert quote.created_by == by
         assert quote.expires_on == expiry_date
+        assert quote.terms_and_conditions == TermsAndConditions.objects.first()
 
     @mock.patch('datahub.omis.quote.managers.calculate_quote_expiry_date')
     @mock.patch('datahub.omis.quote.managers.generate_quote_reference')
@@ -75,6 +76,7 @@ class TestQuoteManager:
         assert quote.content == 'Quote content'
         assert not quote.created_by
         assert quote.expires_on == expiry_date
+        assert quote.terms_and_conditions == TermsAndConditions.objects.first()
 
         with pytest.raises(Quote.DoesNotExist):
             quote.refresh_from_db()
