@@ -260,6 +260,7 @@ class CompanySerializer(serializers.ModelSerializer):
             'trading_name',
             'uk_based',
             'company_number',
+            'vat_number',
             'registered_address_1',
             'registered_address_2',
             'registered_address_town',

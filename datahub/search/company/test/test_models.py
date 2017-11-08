@@ -51,6 +51,7 @@ def test_company_dbmodel_to_dict(setup_es):
         'turnover_range',
         'uk_based',
         'uk_region',
+        'vat_number',
         'website',
     }
 

@@ -55,6 +55,7 @@ class TestCompany(APITestMixin):
             company_number=123,
             name='Bar ltd.',
             alias='Xyz trading',
+            vat_number='009485769',
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.id})
@@ -140,6 +141,7 @@ class TestCompany(APITestMixin):
                 'id': str(company.uk_region.id),
                 'name': company.uk_region.name,
             },
+            'vat_number': '009485769',
             'website': None
         }
 
