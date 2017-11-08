@@ -20,6 +20,8 @@ class SearchInteractionParams:
         'dit_adviser',
         'dit_adviser_name',
         'dit_team',
+        'date_after',
+        'date_before',
         'communication_channel',
         'investment_project',
         'service',
