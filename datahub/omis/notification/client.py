@@ -110,7 +110,7 @@ class Notify:
         if manager_email:
             self._send_email(
                 email_address=manager_email,
-                template_id=Template.order_created.value,
+                template_id=Template.order_created_for_post_manager.value,
                 personalisation=self._prepare_personalisation(
                     order,
                     {
@@ -140,12 +140,12 @@ class Notify:
 
     def quote_generated(self, order):
         """
-        Send a notification to the contact that a quote has just been created
+        Send a notification to the customer that a quote has just been created
         and needs to be accepted.
         """
         self._send_email(
             email_address=order.contact.email,
-            template_id=Template.quote_awaiting_acceptance_for_contact.value,
+            template_id=Template.quote_awaiting_acceptance_for_customer.value,
             personalisation=self._prepare_personalisation(
                 order,
                 {
