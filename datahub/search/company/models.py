@@ -24,6 +24,7 @@ class Company(DocType, MapDBModelToDict):
     business_type = dsl_utils.id_name_mapping()
     classification = dsl_utils.id_name_mapping()
     company_number = dsl_utils.SortableCaseInsensitiveKeywordText()
+    vat_number = Keyword(index=False)
     companies_house_data = dsl_utils.company_mapping()
     created_on = Date()
     description = dsl_utils.EnglishText()
