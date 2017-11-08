@@ -52,8 +52,9 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         'trading_address_town'
     )
 
-    company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    vat_number = models.CharField(max_length=MAX_LENGTH, blank=True)
     alias = models.CharField(
         max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name'
     )
