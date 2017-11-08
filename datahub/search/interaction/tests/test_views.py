@@ -3,6 +3,7 @@ from datetime import datetime
 
 import factory
 import pytest
+from dateutil.parser import parse as dateutil_parse
 from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
@@ -26,9 +27,18 @@ def interactions(setup_es):
         data.extend([
             InteractionFactory(subject='Exports meeting'),
             InteractionFactory(subject='a coffee'),
-            InteractionFactory(subject='Email about exhibition'),
-            InteractionFactory(subject='talking about cats'),
-            InteractionFactory(subject='Event at HQ'),
+            InteractionFactory(
+                subject='Email about exhibition',
+                date=dateutil_parse('2016-09-02T00:00:00Z')
+            ),
+            InteractionFactory(
+                subject='talking about cats',
+                date=dateutil_parse('2018-02-01T00:00:00Z')
+            ),
+            InteractionFactory(
+                subject='Event at HQ',
+                date=dateutil_parse('2018-01-01T00:00:00Z')
+            ),
         ])
 
     setup_es.indices.refresh()
@@ -480,3 +490,45 @@ class TestViews(APITestMixin):
         results = response_data['results']
         result_ids = {result['service']['id'] for result in results}
         assert result_ids == {str(service_id)}
+
+    @pytest.mark.parametrize(
+        'data,results',
+        (
+            (
+                {
+                    'date_after': '2017-12-01'
+                },
+                {
+                    'talking about cats',
+                    'Event at HQ',
+                }
+            ),
+            (
+                {
+                    'date_after': '2017-12-01',
+                    'date_before': '2018-01-02'
+                },
+                {
+                    'Event at HQ',
+                }
+            ),
+            (
+                {
+                    'date_before': '2017-01-01'
+                },
+                {
+                    'Email about exhibition',
+                }
+            ),
+        )
+    )
+    def test_filter_by_date(self, interactions, data, results):
+        """Tests filtering interaction by date."""
+        url = reverse('api-v3:search:interaction')
+        response = self.api_client.post(url, data, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        names = {result['subject'] for result in response_data['results']}
+        assert names == results
