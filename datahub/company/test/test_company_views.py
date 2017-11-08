@@ -54,27 +54,96 @@ class TestCompany(APITestMixin):
         company = CompanyFactory(
             company_number=123,
             name='Bar ltd.',
-            alias='Xyz trading'
+            alias='Xyz trading',
+            vat_number='009485769',
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.id})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['id'] == str(company.pk)
-        assert response.data['companies_house_data']
-        assert response.data['companies_house_data']['id'] == ch_company.id
-        assert response.data['name'] == ch_company.name
-        assert response.data['trading_name'] == company.alias
-        assert response.data['registered_address_1'] == ch_company.registered_address_1
-        assert response.data['registered_address_2'] is None
-        assert response.data['registered_address_town'] == ch_company.registered_address_town
-        assert response.data['registered_address_country'] == {
-            'name': ch_company.registered_address_country.name,
-            'id': str(ch_company.registered_address_country.pk)
+        assert response.json() == {
+            'id': str(company.pk),
+            'companies_house_data': {
+                'id': ch_company.id,
+                'company_number': '123',
+                'company_category': '',
+                'company_status': '',
+                'incorporation_date': '2017-11-08',
+                'name': 'Foo ltd.',
+                'registered_address_1': 'Hello st.',
+                'registered_address_2': None,
+                'registered_address_town': 'Fooland',
+                'registered_address_country': {
+                    'id': str(Country.united_states.value.id),
+                    'disabled_on': None,
+                    'name': ch_company.registered_address_country.name,
+                },
+                'registered_address_county': None,
+                'registered_address_postcode': None,
+                'sic_code_1': '',
+                'sic_code_2': '',
+                'sic_code_3': '',
+                'sic_code_4': '',
+                'uri': '',
+            },
+            'name': ch_company.name,
+            'trading_name': company.alias,
+            'registered_address_1': 'Hello st.',
+            'registered_address_2': None,
+            'registered_address_town': 'Fooland',
+            'registered_address_country': {
+                'id': str(Country.united_states.value.id),
+                'name': ch_company.registered_address_country.name,
+            },
+            'registered_address_county': None,
+            'registered_address_postcode': None,
+            'account_manager': None,
+            'archived': False,
+            'archived_by': None,
+            'archived_on': None,
+            'archived_reason': None,
+            'business_type': {
+                'id': str(company.business_type.id),
+                'name': company.business_type.name,
+            },
+            'children': [],
+            'classification': None,
+            'company_number': '123',
+            'contacts': [],
+            'created_on': format_date_or_datetime(company.created_on),
+            'description': None,
+            'employee_range': None,
+            'export_to_countries': [],
+            'future_interest_countries': [],
+            'headquarter_type': None,
+            'investment_projects_invested_in': [],
+            'investment_projects_invested_in_count': 0,
+            'modified_on': format_date_or_datetime(company.modified_on),
+            'one_list_account_owner': None,
+            'parent': None,
+            'sector': {
+                'id': str(company.sector.id),
+                'name': company.sector.name,
+            },
+            'trading_address_1': '2 Fake Lane',
+            'trading_address_2': None,
+            'trading_address_country': {
+                'id': str(company.trading_address_country.id),
+                'name': company.trading_address_country.name
+            },
+            'trading_address_county': None,
+            'trading_address_postcode': None,
+            'trading_address_town': 'Woodside',
+            'turnover_range': None,
+            'uk_based': True,
+            'uk_region': {
+                'id': str(company.uk_region.id),
+                'name': company.uk_region.name,
+            },
+            'vat_number': '009485769',
+            'website': None
         }
-        assert response.data['registered_address_county'] is None
-        assert response.data['registered_address_postcode'] is None
 
     def test_get_company_without_company_number(self):
         """Tests the company item view for a company without a company number.
