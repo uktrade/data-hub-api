@@ -7,6 +7,7 @@ class WhoAmISerializer(serializers.ModelSerializer):
     """Adviser serializer for that includes a permissions"""
 
     name = serializers.CharField()
+    permissions = serializers.SerializerMethodField()
 
     class Meta:
         model = Advisor
@@ -20,13 +21,14 @@ class WhoAmISerializer(serializers.ModelSerializer):
             'contact_email',
             'telephone_number',
             'dit_team',
+            'permissions',
         )
         depth = 2
 
-    def serialize_permissions(self, permissions):
+    def get_permissions(self, obj):
         """Serialize permissions into simplified structure."""
         formatted_permissions = {}
-        for perm in permissions:
+        for perm in obj.get_all_permissions():
             app, action_model = perm.split('.', 1)
             action, model = action_model.split('_', 1)
 
@@ -36,11 +38,3 @@ class WhoAmISerializer(serializers.ModelSerializer):
                 formatted_permissions[model] = [action]
 
         return formatted_permissions
-
-    @property
-    def data(self):
-        """Data property."""
-        ret = super().data
-        ret['permissions'] = self.serialize_permissions(self.instance.get_all_permissions())
-
-        return ret
