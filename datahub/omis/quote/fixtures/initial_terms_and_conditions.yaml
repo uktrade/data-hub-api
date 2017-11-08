@@ -1,0 +1,251 @@
+- model: omis-quote.termsandconditions
+  pk: c5920488-88dc-49f3-86c0-32e9b80bae82
+  fields: {
+    created_on: '2017-11-07T11:00:00.000000Z',
+    name: v1.0,
+    content: "**ANNEX\
+      \ 1**\n\n**TERMS &amp; CONDITIONS FOR DELIVERY OF DEPARTMENT FOR INTERNATIONAL\
+      \ TRADE OVERSEAS MARKET INTRODUCTION SERVICE**\n\n1. **INTERPRETATION**  \n\n\
+      \    1.1. In this Contract the following terms shall have the meaning given\
+      \ to them below:\n    \n    |  |  |\n    | - | - |\n    | **&quot;Contract&quot;**\
+      \ | means the Quote and these Terms and Conditions; |\n    | **&quot;Charges&quot;**\
+      \ | has the meaning given to it in the Quote; |\n    | **&quot;Customer&quot;**\
+      \ | the company or other legal entity to whom the Quote is addressed; |\n  \
+      \  | **&quot;Customer Contact&quot;** | has the meaning given to it in the Quote;\
+      \ |\n    | **&quot;Delivery Date&quot;** | has the meaning given to it in the\
+      \ Quote; |\n    | **&quot;DIT&quot;** | TheDepartment for International Trade\
+      \ (&quot;DIT&quot;), of King Charles Street, Whitehall, London, SW1A 2AH; |\n\
+      \    | **&quot;DIT Contact&quot;** | has the meaning given to it in the Quote;\
+      \ |\n    | **&quot;Force Majeure Event&quot;** | Has the meaning given to it\
+      \ in Clause 19; |\n    | **&quot;Parties&quot;** | the parties to this Contract\
+      \ being the Secretary of State for DIT and the Customer; |\n    | **&quot;OMIS&quot;**\
+      \ | The overseas market introduction services provided by DIT; |\n    | **&quot;Quote&quot;**\
+      \ | the terms of DIT&#39;s proposal set out in the  document to which these\
+      \ Terms and Conditions are annexed; |\n    | **&quot;Payment Date&quot;** |\
+      \ has the meaning given to it in the Quote; |\n    | **&quot;Services&quot;**\
+      \ | has the meaning given to it in the Quote; |\n    | **&quot;Terms and Conditions&quot;**\
+      \ | means these terms and conditions as amended from time to time; and |\n \
+      \   | **&quot;Website&quot;** | means the website based on the omis.trade.gov.uk\
+      \ domain, to which you were directed by an email from DIT, and on which the\
+      \ Quote was first presented to you. |\n\n2. **THE CONTRACT**  \n\n    2.1. The\
+      \ Quote, together with these Terms and Conditions, contains our offer to provide\
+      \ the Services. The offer contained in the Quote and the Terms and Conditions\
+      \ shall be deemed to be accepted by you on your acceptance of the Quote and\
+      \ a Contract formed.\n\n    2.2 This Contract is between yourselves and the\
+      \ Secretary of State for DIT. In these Terms and Conditions the expressions\
+      \ &#39;we&#39;, &#39;us&#39; and &#39;our&#39; refer to the Secretary of State\
+      \ for DIT and those acting on his behalf.  The expressions &#39;you&#39; and\
+      \ &#39;your&#39; refer to you, the Customer.\n\n    2.3. Where appropriate we\
+      \ may choose to provide the Services through a team based in the commercial\
+      \ sections of a British Embassy, Consulate or High Commission or the auspices\
+      \ of Scottish Development International, the Welsh Government or Invest Northern\
+      \ Ireland.\n\n    2.4. We will indicate who will be primarily responsible for\
+      \ delivering the Services in the DIT Contact section of the Quote, but we reserve\
+      \ the right to change the DIT Contact and/or any other member of DIT personnel\
+      \ involved in the provision of the services at any time.\n\n    2.5. References\
+      \ to &quot;Clauses&quot; are, unless otherwise provided, references to the clauses\
+      \ of these Terms and Conditions.\n\n    2.6. For the avoidance of doubt any\
+      \ reference to &quot;in writing&quot; in this Contract shall include email.\n\
+      \n3. **SERVICES**\n\n    3.1. We will provide you with the Services using reasonable\
+      \ care and skill.\n\n    3.2. We will deliver the Services to you on or before\
+      \ the Delivery Date. If it becomes necessary to change the Delivery Date we\
+      \ will notify you in writing and a new date will be agreed between the Parties.\n\
+      \n    3.3. Unless otherwise agreed in writing, we will not supply the Services\
+      \ until we have received payment of the Charges in full. You agree that we may\
+      \ extend the Delivery Dates to reflect any delay in our receiving payment from\
+      \ you.\n\n    3.4. Any amendments to the Services or Charges must be agreed\
+      \ by the Parties in writing.\n\n4. **CHARGES**\n\n    4.1. You agree to pay\
+      \ the Charges to us for the provision of the Services.\n\n    4.2. The Charges\
+      \ are exclusive of value added tax which will be payable by you at the prevailing\
+      \ rate, where applicable.\n\n    4.3. You agree to pay the Charges in full on\
+      \ or before the Payment Date or such other date as has been agreed by the Parties\
+      \ in writing.\n\n    4.4. Payment of the Charges will be made by one of the\
+      \ following methods:\n\n    **Credit or Debit Card**\n\n    4.4.1. You can make\
+      \ payment online by following the relevant link on the Website.\n\n    **Bank\
+      \ Transfer**\n\n    4.4.2. Payment by bank transfer must be made in sterling\
+      \ for the full amount stated on the invoice to DIT&#39;s bank account at National\
+      \ Westminster Bank - Account Name: DIT OMIS Service Account Number: 10014187\
+      \ Sort Code: 60-70-80.  SWIFT Address: NWBKGB2L and IBAN: GB57NWBK60708010014187.\n\
+      \n    4.4.3. You agree to pay any bank charges incurred with this transaction.\
+      \  You must quote the invoice number shown on the relevant invoice when arranging\
+      \ the payment and must send a copy of the payment remittance advice which must\
+      \ show the payment reference to your DIT Contact.\n\n    4.5. A VAT invoice\
+      \ will be available on the Website after your payment has been received (and\
+      \ cleared if necessary).  The VAT receipt can be printed from the relevant page.\n\
+      \n5. **NON-PAYMENT**\n\n    5.1. If we have not received full payment of the\
+      \ Charges by the Payment Date (or such other date as has been agreed in writing),\
+      \ we will begin action to recover the non-payment from you. We may, at our absolute\
+      \ discretion, withdraw your access to all DIT services (not limited to OMIS)\
+      \ until payment is received in full, including any interest to which DIT is\
+      \ entitled in respect of late payments under Clause 5.2.\n\n    5.2. If you\
+      \ fail to pay any undisputed Charges properly invoiced we will have the right\
+      \ to charge interest on the overdue amount at the applicable rate under the\
+      \ Late Payment of Commercial Debts (Interest) Act 1998, accruing on a daily\
+      \ basis from the due date up to the date of actual payment, whether before or\
+      \ after judgment.\n\n6. **CORRESPONDENCE**\n\n    6.1. Your Quote has a unique\
+      \ reference number which should always be quoted in correspondence.\n\n    6.2.\
+      \ We will address all correspondence and any notices issued under this Contract\
+      \ to the Customer Contact and you should address the same to the DIT Contact.\n\
+      \n    6.3. You will inform us immediately of any changes to the Customer Contact\
+      \ and we will inform you of any changes to the DIT Contact.\n\n7. **YOUR RIGHT\
+      \ TO CANCEL**\n\n    7.1. You may cancel the Services without incurring any\
+      \ liability by notifying us in writing at any time before you accept the Quote.\
+      \  Written notice of cancellation should be sent to the DIT Contact.\n\n8. **CROWN\
+      \ COPYRIGHT**\n\n    8.1. Any material that we produce for you in the course\
+      \ of delivering the Services will be Crown Copyright.\n\n    8.2. Under the\
+      \ terms of the open government licence (and subject to Clause 8.4 below) you\
+      \ may use and reuse the Crown copyright material free of charge and in any format\
+      \ or medium. Excluded from this permission are the HM Government, Department\
+      \ for International Trade, DIT and &quot;exporting is GREAT&quot;, names, logos\
+      \ and &quot;get-up&quot; (including our coat of arms) and all images and case\
+      \ studies that appear on the Website or any other DIT website. This means you\
+      \ must not reproduce them without our prior written approval.\n\n    8.3. If\
+      \ you have a question about the use of our intellectual property and Crown copyright,\
+      \ email the DIT brand team at brand@trade.gsi.gov.uk, with your contact details\
+      \ detailing how and why you wish to use the name or logo(s).\n\n    8.4. If\
+      \ you do re-use any Crown Copyright material you must acknowledge the source\
+      \ with the following attribution:\n\n    8.4.1. &quot;This information is provided\
+      \ by the Department for International Trade and used as permitted by the Open\
+      \ Government Licence v3.0&quot;\n\n    8.5. For more information, please follow\
+      \ this link\n\n    [http://www.nationalarchives.gov.uk/doc/open-government-licence](http://www.nationalarchives.gov.uk/doc/open-government-licence).\n\
+      \n    8.6. Enquiries about use and re-use of Crown copyright material should\
+      \ be sent to [psi@nationalarchives.gsi.gov.uk](mailto:psi@nationalarchives.gsi.gov.uk).\n\
+      \n    8.7. The ability for you to reproduce Crown copyright material in accordance\
+      \ with the instructions in this Clause does not extend to any material provided\
+      \ that is the copyright of a third party. Authorisation to reproduce such material\
+      \ has to be obtained by you from the copyright holder concerned.\n\n9. **PRIVACY\
+      \ AND DATA PROTECTION POLICY**\n\n    9.1. By accepting these Terms and Conditions\
+      \ you agree that we may collect your personal data in accordance with our privacy\
+      \ and cookies policy at [https://www.great.gov.uk/uk/privacy-policy/](https://www.great.gov.uk/uk/privacy-policy/).\n\
+      \n    9.2. We will not share your information with any other organisations for\
+      \ marketing, market research or commercial purposes.\n\n    9.3. We may pass\
+      \ on your personal information to third parties, including other government\
+      \ departments, where we have a legal obligation to do so.\n\n    9.4. We will\
+      \ process any personal data you provide to us in accordance with the Data Protection\
+      \ Act 1998 and will also comply with the Privacy and Electronic Communications\
+      \ (EC Directive) Regulations 2003 (&quot;Data Protection Legislation&quot;).\
+      \  Under Data Protection Legislation, we have a legal duty to protect any information\
+      \ we collect from you.  We use leading technologies and encryption software\
+      \ to safeguard your data, and keep strict security standards to prevent any\
+      \ authorised access to or disclosure of it.\n\n10. **CONFIDENTIALITY**\n\n \
+      \   10.1. Material provided by you to DIT or to its representatives and designated\
+      \ in writing by you as confidential will be used solely for the purpose for\
+      \ which it is provided and subject to Clause 10.2 shall not be disclosed to\
+      \ any person without your prior written consent.\n\n    10.2. Notwithstanding\
+      \ Clause 10.1, we may disclose your confidential information:\n\n    10.2.1.\
+      \ where disclosure is required by applicable law (including the Freedom of Information\
+      \ Act 2000) or by a court of competent jurisdiction;\n\n    10.2.2. on a confidential\
+      \ basis to our employees, agents, consultants, contractors and professional\
+      \ advisors to the extent necessary to perform our obligations under this Contract;\n\
+      \n    10.2.3. on a confidential basis to the Scottish Development International,\
+      \ the Welsh Assembly, Invest Northern Ireland or any central government body;\
+      \ or\n\n    10.2.4. to the extent that DIT (acting reasonably) deems disclosure\
+      \ necessary or appropriate in the course of carrying out its public functions.\n\
+      \n11. **FREEDOM OF INFORMATION**\n\n    11.1. You accept that any information\
+      \ held by us is subject to the provisions of the Freedom of Information Act\
+      \ 2000 and the Environmental Information Regulations 2004 which may require\
+      \ the release of such information by us. The release of information will be\
+      \ at our discretion and we may not always be able to consult with you before\
+      \ releasing information.\n\n12. **VIRUS PROTECTION**\n\n    12.1. We will make\
+      \ every effort to check and test the material we make available for you to access\
+      \ or download whilst we are providing you with the Services.  You acknowledge\
+      \ and agree that you will run an appropriate anti-virus programme on all materials\
+      \ downloaded from the internet, including from the Website.  We cannot accept\
+      \ responsibility for any loss, disruption or damage to your data or your computer\
+      \ system which may occur as a result of using material derived from the Website\
+      \ or sent to you by us electronically.\n\n13. **COMPLAINTS AND REFUNDS**\n\n\
+      \    13.1. If you wish to lodge a complaint or believe that a refund of any\
+      \ Charges is due you must contact the DIT Contact in the first instance and\
+      \ they will consider the request.\n\n    13.2. Refunds will be considered by\
+      \ DIT when you have paid for Services in advance of delivery and the Services\
+      \ are not subsequently delivered by us. Refunds are made at the discretion of\
+      \ DIT.\n\n    13.3. A request for a refund must be submitted within three months\
+      \ of the delivery of the relevant part of the Services and in any event within\
+      \ three months of the delivery of all the Services set out in the Quote or otherwise\
+      \ agreed between the Parties in writing.\n\n    13.4. If after discussing your\
+      \ case with your DIT Contract you are still dissatisfied with the service received,\
+      \ you can use our online feedback form on the DIT page at [gov.uk](http://www.gov.uk).\n\
+      \n    13.5. Payment of refunds of Charges paid by credit or debit card will\
+      \ be made direct to your card.  All non-card payments of Charges will be refunded\
+      \ by BACS and we will contact you to obtain the information we will need to\
+      \ effect the necessary transfer.\n\n14. **TERM AND TERMINATION**\n\n    14.1.\
+      \ The Contract will start on the date you accept the Quote and expire on the\
+      \ later of the date when:\n\n    14.1.1. all Services have been delivered; and\n\
+      \n    14.1.2. all Charges paid in full.\n\n    14.2. Either Party may terminate\
+      \ the Contract by giving the other Party 14 days&#39; written notice.\n\n  \
+      \  14.3. You will remain liable to pay all Charges due up to and including the\
+      \ date of termination.\n\n    14.4. Each Party shall be liable for its own costs\
+      \ arising on termination.\n\n15. **DISCLAIMER**\n\n    15.1. Nothing in this\
+      \ Clause 15 shall limit or exclude our liability for death or personal injury\
+      \ caused by our negligence, or the negligence of our employees or agents.\n\n\
+      \    15.2. We will make every effort to ensure that information provided by\
+      \ us in the course of delivering the Services is accurate but we accept no liability\
+      \ for any loss or damage caused to any person as a result of any errors, omissions\
+      \ or misleading statements in such information.\n\n    15.3. In the course of\
+      \ providing the Services DIT may offer to introduce you to third parties. DIT\
+      \ does not guarantee the participation of any third party in such introduction\
+      \ process. You acknowledge that the actions of any third party introduced to\
+      \ you in connection with these services are outside of DIT&#39;s control and\
+      \ that DIT does not accept any liability for the actions or omissions of that\
+      \ third party.\n\n    15.4. If you are interested in developing a relationship\
+      \ with any third party referred to in material provided by us you should undertake\
+      \ your own due diligence in respect of such third party and should not consider\
+      \ a reference in our material to be an endorsement by DIT of that third party\
+      \ or any goods or services provided by it.\n\n    15.5. You acknowledge and\
+      \ agree that we accept no liability for commercial arrangements entered into\
+      \ in connection with use of the Services, and we assume no responsibility for\
+      \ the success or failure of any such arrangements.\n\n    15.6. The identification\
+      \ by DIT of an export opportunity in any information provided to you does not\
+      \ indicate that such export opportunity is in compliance with export control\
+      \ legislation and it remains your responsibility to ensure that you comply with\
+      \ such export control legislation including the obtaining of relevant licences.\n\
+      \n    15.7. We shall not have any responsibility to any third party to whom\
+      \ materials produced by us are disclosed.  You agree to inform any recipient\
+      \ of the materials that should they choose to rely on any aspects of our work\
+      \ they will do so at their own risk and have no recourse to DIT.\n\n    15.8.\
+      \ We shall have no liability to you in the event that we are prevented from\
+      \ providing the Services to you by your act, omission or failure.\n\n    15.9.\
+      \ In no event shall we have any liability to you for:\n\n    15.9.1. loss of\
+      \ profits, sales, business or revenue;\n\n    15.9.2. business interruption;\n\
+      \n    15.9.3. loss of anticipated savings;\n\n    15.9.4. loss of business opportunity,\
+      \ goodwill or reputation; or\n\n    15.9.5. any indirect or consequential loss\
+      \ or damage.\n\n16. **LIMIT OF LIABILITY**\n\n    16.1. Subject to Clause 15.1\
+      \ the liability of each of the Parties under the Contract is capped at the value\
+      \ of the Charges.\n\n17. **AMENDMENTS TO THE TERMS AND CONDITIONS**\n\n    17.1.\
+      \ We reserve the right to amend the Terms and Conditions from time to time at\
+      \ our discretion.\n\n    17.2. Where the Terms and Conditions are amended we\
+      \ will notify you by email that an updated version of the Terms and Conditions\
+      \ is available and provide you with a link to a website where you can view the\
+      \ revised Terms and Conditions.\n\n    17.3. Unless you terminate the Contract\
+      \ under Clause 14 within 14 days of our email notification you will be deemed\
+      \ to have accepted the amended Terms and Conditions.\n\n18. **ENTIRE AGREEMENT**\n\
+      \n    18.1. The Contract contains the whole agreement between the Parties and\
+      \ supersedes and replaces any prior written or oral agreements, representations\
+      \ or understandings between them. The Parties confirm that they have not entered\
+      \ into the Contract on the basis of any representation that is not expressly\
+      \ incorporated into the Contract. Nothing in this clause shall exclude liability\
+      \ for fraud or fraudulent misrepresentation.\n\n19. **FORCE MAJEURE**\n\n  \
+      \  19.1. In this Clause a &quot;Force Majeure Event&quot; means an event beyond\
+      \ our reasonable control including but not limited to strikes, lock-outs or\
+      \ other industrial disputes (whether involving our workforce or any other party),\
+      \ failure of a utility service or transport network, act of God, war, riot,\
+      \ civil commotion, malicious damage, compliance with any law or governmental\
+      \ order, rule, regulation or direction, accident, breakdown of plant or machinery,\
+      \ fire, flood, storm or default of our suppliers or subcontractors.\n\n    19.2.\
+      \ We shall not be liable to you as a result of any delay or failure to perform\
+      \ the Services as a result of a Force Majeure Event.\n\n    19.3. If the Force\
+      \ Majeure Event prevents us from providing the Services for more than four weeks,\
+      \ either Party may terminate the Contract by written notice to the other Party.\
+      \  If notice of termination for a Force Majeure Event occurs we will refund\
+      \ any Charges paid by you in advance for any part of the Services that we have\
+      \ been unable to deliver as at the date notice of termination is given.\n\n\
+      20. **AGENCY**\n\n    20.1. The Agreement shall not constitute or imply any\
+      \ partnership, joint venture, agency, fiduciary relationship or other relationship\
+      \ between the Parties other than the contractual relationship expressly provided\
+      \ for in the Contract.\n\n21. **GOVERNING LAW AND JURISDICTION**\n\n    21.1.\
+      \ The Contract and any dispute or claim arising out of or in connection with\
+      \ it or its subject matter or formation (including non-contractual disputes\
+      \ or claims), shall be governed by, and construed in accordance with, English\
+      \ law, and the parties irrevocably submit to the exclusive jurisdiction of the\
+      \ courts of England and Wales."
+  }

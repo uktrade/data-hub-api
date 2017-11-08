@@ -15,7 +15,7 @@ from datahub.omis.order.test.factories import (
 )
 
 from ..factories import QuoteFactory
-from ...models import Quote
+from ...models import Quote, TermsAndConditions
 
 
 # mark the whole module for db use
@@ -150,6 +150,7 @@ class TestCreatePreviewOrder(APITestMixin):
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == {
             'content': order.quote.content,
+            'terms_and_conditions': TermsAndConditions.objects.first().content,
             'created_on': '2017-04-18T13:00:00Z',
             'created_by': {
                 'id': str(self.user.pk),
@@ -208,6 +209,7 @@ class TestCreatePreviewOrder(APITestMixin):
         assert order.reference in response.json()['content']
         assert response.json() == {
             'content': response.json()['content'],
+            'terms_and_conditions': TermsAndConditions.objects.first().content,
             'created_on': None,
             'created_by': None,
             'cancelled_on': None,
@@ -247,7 +249,21 @@ class TestGetQuote(APITestMixin):
             'accepted_by': None,
             'expires_on': quote.expires_on.isoformat(),
             'content': quote.content,
+            'terms_and_conditions': TermsAndConditions.objects.first().content,
         }
+
+    def test_get_without_ts_and_cs(self):
+        """Test a successful call to get a quote without Ts and Cs."""
+        order = OrderFactory(
+            quote=QuoteFactory(terms_and_conditions=None),
+            status=OrderStatus.quote_awaiting_acceptance
+        )
+
+        url = reverse('api-v3:omis:quote:detail', kwargs={'order_pk': order.pk})
+        response = self.api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['terms_and_conditions'] == ''
 
     def test_404_if_order_doesnt_exist(self):
         """Test that if the order doesn't exist, the endpoint returns 404."""
@@ -355,7 +371,8 @@ class TestCancelOrder(APITestMixin):
                 'accepted_on': None,
                 'accepted_by': None,
                 'expires_on': quote.expires_on.isoformat(),
-                'content': quote.content
+                'content': quote.content,
+                'terms_and_conditions': TermsAndConditions.objects.first().content,
             }
 
             quote.refresh_from_db()

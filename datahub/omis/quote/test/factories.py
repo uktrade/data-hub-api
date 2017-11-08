@@ -5,6 +5,8 @@ from django.utils.timezone import now
 
 from datahub.company.test.factories import AdviserFactory, ContactFactory
 
+from ..models import TermsAndConditions
+
 
 class QuoteFactory(factory.django.DjangoModelFactory):
     """Order factory."""
@@ -15,6 +17,7 @@ class QuoteFactory(factory.django.DjangoModelFactory):
     reference = factory.Faker('text', max_nb_chars=10)
     content = factory.Faker('text')
     expires_on = factory.Faker('future_date')
+    terms_and_conditions = factory.LazyFunction(TermsAndConditions.objects.first)
 
     class Meta:
         model = 'omis-quote.Quote'
