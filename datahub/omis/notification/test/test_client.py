@@ -84,7 +84,7 @@ class TestNotifyOnOrderCreated:
         assert notify.client.send_email_notification.called
         call_args = notify.client.send_email_notification.call_args_list[0][1]
         assert call_args['email_address'] == 'test@test.com'
-        assert call_args['template_id'] == Template.order_created.value
+        assert call_args['template_id'] == Template.order_created_for_post_manager.value
 
     def test_email_sent_to_omis_admin_if_no_manager(self):
         """
@@ -204,9 +204,9 @@ class TestNotifyOrderInfo:
 class TestNotifyQuoteGenerated:
     """Tests for the quote_generated logic."""
 
-    def test_contact_notified(self):
+    def test_customer_notified(self):
         """
-        Test that calling `quote_generated` sends an email notifying the contact that
+        Test that calling `quote_generated` sends an email notifying the customer that
         they have to accept the quote.
         """
         order = OrderWithOpenQuoteFactory()
@@ -218,6 +218,6 @@ class TestNotifyQuoteGenerated:
         assert notify.client.send_email_notification.called
         call_args = notify.client.send_email_notification.call_args_list[0][1]
         assert call_args['email_address'] == order.contact.email
-        assert call_args['template_id'] == Template.quote_awaiting_acceptance_for_contact.value
+        assert call_args['template_id'] == Template.quote_awaiting_acceptance_for_customer.value
         assert call_args['personalisation']['recipient name'] == order.contact.name
         assert call_args['personalisation']['embedded link'] == order.get_public_facing_url()
