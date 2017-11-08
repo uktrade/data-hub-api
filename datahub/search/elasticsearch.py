@@ -159,7 +159,14 @@ def get_sort_query(qs, field_order=None):
     return qs
 
 
-def get_basic_search_query(term, entities=None, field_order=None, offset=0, limit=100):
+def get_basic_search_query(
+        term,
+        entities=None,
+        field_order=None,
+        ignored_entities=(),
+        offset=0,
+        limit=100
+):
     """Performs basic search looking for name and then SEARCH_FIELDS in entity.
 
     Also returns number of results in other entities.
@@ -176,7 +183,10 @@ def get_basic_search_query(term, entities=None, field_order=None, offset=0, limi
     query = get_search_term_query(term, fields=fields)
     s = Search(index=settings.ES_INDEX).query(query)
     s = s.post_filter(
-        Q('bool', should=[Q('term', _type=entity._doc_type.name) for entity in entities])
+        Q('bool', should=[
+            Q('term', _type=entity._doc_type.name) for entity in entities
+            if entity._doc_type.name not in ignored_entities
+        ])
     )
 
     s = get_sort_query(s, field_order=field_order)
