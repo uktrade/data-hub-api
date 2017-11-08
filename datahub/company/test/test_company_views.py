@@ -75,7 +75,7 @@ class TestCompany(APITestMixin):
                 'registered_address_2': None,
                 'registered_address_town': 'Fooland',
                 'registered_address_country': {
-                    'id': str(Country.united_states.value.id),
+                    'id': str(ch_company.registered_address_country.id),
                     'disabled_on': None,
                     'name': ch_company.registered_address_country.name,
                 },
@@ -94,7 +94,7 @@ class TestCompany(APITestMixin):
             'registered_address_2': None,
             'registered_address_town': 'Fooland',
             'registered_address_country': {
-                'id': str(Country.united_states.value.id),
+                'id': str(ch_company.registered_address_country.id),
                 'name': ch_company.registered_address_country.name,
             },
             'registered_address_county': None,
@@ -131,7 +131,7 @@ class TestCompany(APITestMixin):
                 'id': str(company.sector.id),
                 'name': company.sector.name,
             },
-            'trading_address_1': '2 Fake Lane',
+            'trading_address_1': company.trading_address_1,
             'trading_address_2': None,
             'trading_address_country': {
                 'id': str(company.trading_address_country.id),

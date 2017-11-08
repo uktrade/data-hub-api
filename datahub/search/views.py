@@ -36,6 +36,10 @@ class SearchBasicAPIView(APIView):
 
     DEFAULT_ENTITY = 'company'
 
+    IGNORED_ENTITIES = (
+        'companieshousecompany',
+    )
+
     def __init__(self, *args, **kwargs):
         """Initialises self.entity_by_name dynamically."""
         super().__init__(*args, **kwargs)
@@ -73,6 +77,7 @@ class SearchBasicAPIView(APIView):
             term=term,
             entities=(self.entity_by_name[entity].model,),
             field_order=sortby,
+            ignored_entities=self.IGNORED_ENTITIES,
             offset=offset,
             limit=limit
         ).execute()
