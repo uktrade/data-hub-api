@@ -33,9 +33,37 @@ class TestUserView(APITestMixin):
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['name'] == user_test.name
-        assert response.data['first_name'] == user_test.first_name
-        assert response.data['id'] == str(user_test.pk)
-        assert response.data['team'] == team.name
-        assert response.data['team_role'] == role.name
-        assert response.data.get('permissions') == {model_name_1: [action], model_name_2: [action]}
+        assert response.json() == {
+            'id': str(user_test.id),
+            'name': user_test.name,
+            'last_login': None,
+            'first_name': user_test.first_name,
+            'last_name': user_test.last_name,
+            'email': user_test.email,
+            'contact_email': '',
+            'telephone_number': '',
+            'dit_team': {
+                'id': str(team.id),
+                'disabled_on': None,
+                'name': 'Test Team',
+                'role': {
+                    'id': str(role.id),
+                    'disabled_on': None,
+                    'name': 'Test Role',
+                    'groups': [group.id],
+                },
+                'uk_region': {
+                    'id': str(team.uk_region_id),
+                    'disabled_on': None,
+                    'name': 'East Midlands',
+                },
+                'country': {
+                    'id': str(team.country_id),
+                    'disabled_on': None,
+                    'name': 'France',
+                }
+            },
+            'permissions': {
+                model_name_1: [action],
+                model_name_2: [action],
+            }}
