@@ -55,6 +55,7 @@ class Company(DocType, MapDBModelToDict):
     website = Text()
     export_to_countries = dsl_utils.id_name_mapping()
     future_interest_countries = dsl_utils.id_name_mapping()
+    export_experience_category = dsl_utils.id_name_mapping()
 
     COMPUTED_MAPPINGS = {
         'trading_name': attrgetter('alias')
@@ -81,6 +82,7 @@ class Company(DocType, MapDBModelToDict):
         'uk_based': bool,
         'export_to_countries': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
         'future_interest_countries': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
+        'export_experience_category': dict_utils.id_name_dict,
     }
 
     IGNORED_FIELDS = (
