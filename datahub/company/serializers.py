@@ -5,7 +5,7 @@ from django.conf import settings
 from rest_framework import fields, serializers
 
 from datahub.company.models import (
-    Advisor, CompaniesHouseCompany, Company, Contact
+    Advisor, CompaniesHouseCompany, Company, Contact, ExportExperienceCategory
 )
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validators import RequiredUnlessAlreadyBlankValidator
@@ -251,6 +251,9 @@ class CompanySerializer(serializers.ModelSerializer):
     investment_projects_invested_in_count = serializers.IntegerField(
         source='investor_investment_projects.count', read_only=True
     )
+    export_experience_category = NestedRelatedField(
+        ExportExperienceCategory, required=False, allow_null=True
+    )
 
     class Meta:
         model = Company
@@ -297,7 +300,8 @@ class CompanySerializer(serializers.ModelSerializer):
             'turnover_range',
             'uk_region',
             'investment_projects_invested_in',
-            'investment_projects_invested_in_count'
+            'investment_projects_invested_in_count',
+            'export_experience_category',
         )
         extra_kwargs = {
             'archived': {'read_only': True},
