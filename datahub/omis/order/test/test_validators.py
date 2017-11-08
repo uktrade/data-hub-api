@@ -171,6 +171,21 @@ class TestAssigneesFilledInValidator:
             'assignees': ['You need to add at least one assignee.']
         }
 
+    def test_no_lead_assignee_fails(self):
+        """Test that the validation fails if there's no lead assignee."""
+        order = OrderFactory()
+        order.assignees.update(is_lead=False)
+
+        validator = AssigneesFilledInValidator()
+        validator.set_instance(order)
+
+        with pytest.raises(ValidationError) as exc:
+            validator()
+
+        assert exc.value.detail == {
+            'assignee_lead': ['You need to set a lead assignee.']
+        }
+
     def test_no_estimated_time_fails(self):
         """
         Test that the validation fails if the combined estimated time of the assignees
