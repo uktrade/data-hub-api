@@ -8,10 +8,14 @@ from django.utils.functional import cached_property
 
 from datahub.company.validators import RelaxedURLValidator
 from datahub.core import constants
-from datahub.core.models import ArchivableModel, BaseModel
+from datahub.core.models import ArchivableModel, BaseConstantModel, BaseModel
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
+
+class ExportExperienceCategory(BaseConstantModel):
+    """Export experience category."""
 
 
 class CompanyAbstract(models.Model):
@@ -123,6 +127,9 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     one_list_account_owner = models.ForeignKey(
         'Advisor', blank=True, null=True, on_delete=models.SET_NULL,
         related_name='one_list_owned_companies'
+    )
+    export_experience_category = models.ForeignKey(
+        ExportExperienceCategory, blank=True, null=True, on_delete=models.SET_NULL,
     )
 
     class Meta:

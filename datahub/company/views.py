@@ -28,6 +28,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'business_type',
         'classification',
         'employee_range',
+        'export_experience_category',
         'headquarter_type',
         'one_list_account_owner',
         'parent',
