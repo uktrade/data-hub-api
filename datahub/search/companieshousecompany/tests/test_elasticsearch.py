@@ -5,7 +5,7 @@ from elasticsearch_dsl import Mapping
 from datahub.company.test.factories import (
     CompaniesHouseCompanyFactory
 )
-
+from datahub.core.test_utils import format_date_or_datetime
 from .. import CompaniesHouseCompanySearchApp
 from ..models import CompaniesHouseCompany as ESCompaniesHouseCompany
 from ... import elasticsearch
@@ -157,6 +157,6 @@ def test_indexed_doc(setup_es):
             'sic_code_3': ch_company.sic_code_3,
             'sic_code_4': ch_company.sic_code_4,
             'uri': ch_company.uri,
-            'incorporation_date': ch_company.incorporation_date.isoformat(),
+            'incorporation_date': format_date_or_datetime(ch_company.incorporation_date),
         }
     }
