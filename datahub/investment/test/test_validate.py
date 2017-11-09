@@ -34,17 +34,6 @@ def test_validate_project_instance_success():
     assert not errors
 
 
-def test_validate_non_fdi_type():
-    """Tests non_fdi_type conditional validation."""
-    investment_type_id = constants.InvestmentType.non_fdi.value.id
-    project = InvestmentProjectFactory(
-        investment_type_id=investment_type_id
-    )
-    errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
-    assert 'non_fdi_type' in errors
-    assert 'fdi_type' not in errors
-
-
 def test_validate_fdi_type():
     """Tests fdi_type conditional validation."""
     investment_type_id = constants.InvestmentType.fdi.value.id
@@ -53,7 +42,6 @@ def test_validate_fdi_type():
     )
     errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
     assert 'fdi_type' in errors
-    assert 'non_fdi_type' not in errors
 
 
 def test_validate_business_activity_other_instance():

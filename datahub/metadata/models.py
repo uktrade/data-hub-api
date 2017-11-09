@@ -120,10 +120,6 @@ class FDIType(BaseConstantModel):
     """Investment type for foreign direct investments (for investment projects)."""
 
 
-class NonFDIType(BaseConstantModel):
-    """Investment type for non-foreign direct investments (for investment projects)."""
-
-
 class ReferralSourceActivity(BaseConstantModel):
     """Referral source activity type (for investment projects)."""
 

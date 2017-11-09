@@ -51,7 +51,6 @@ class SearchInvestmentProjectSerializer(SearchSerializer):
         'name',
         'new_tech_to_uk',
         'non_fdi_r_and_d_budget',
-        'non_fdi_type.name',
         'number_new_jobs',
         'project_assurance_adviser.name',
         'project_code',

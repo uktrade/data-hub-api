@@ -126,10 +126,6 @@ class IProjectAbstract(models.Model):
         'metadata.FDIType', related_name='investment_projects', null=True,
         blank=True, on_delete=models.SET_NULL
     )
-    non_fdi_type = models.ForeignKey(
-        'metadata.NonFDIType', related_name='investment_projects', null=True,
-        blank=True, on_delete=models.SET_NULL
-    )
     sector = models.ForeignKey(
         'metadata.Sector', related_name='+', null=True, blank=True,
         on_delete=models.SET_NULL
