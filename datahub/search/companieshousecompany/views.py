@@ -1,7 +1,7 @@
 from datahub.oauth.scopes import Scope
 from .models import CompaniesHouseCompany
 from .serializers import SearchCompaniesHouseCompanySerializer
-from ..views import SearchAPIView, SearchExportAPIView
+from ..views import SearchAPIView
 
 
 class SearchCompaniesHouseCompanyParams:
@@ -29,14 +29,5 @@ class SearchCompaniesHouseCompanyAPIView(
     SearchAPIView
 ):
     """Filtered company search view."""
-
-    permission_required = 'company.read_companieshousecompany'
-
-
-class SearchCompaniesHouseCompanyExportAPIView(
-    SearchCompaniesHouseCompanyParams,
-    SearchExportAPIView
-):
-    """Filtered company search export view."""
 
     permission_required = 'company.read_companieshousecompany'
