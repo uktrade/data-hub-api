@@ -54,7 +54,6 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
         meta_models.ReferralSourceMarketing, required=False, allow_null=True
     )
     fdi_type = NestedRelatedField(meta_models.FDIType, required=False, allow_null=True)
-    non_fdi_type = NestedRelatedField(meta_models.NonFDIType, required=False, allow_null=True)
     sector = NestedRelatedField(meta_models.Sector, required=True, allow_null=False)
     business_activities = NestedRelatedField(
         meta_models.InvestmentBusinessActivity, many=True, required=True,
@@ -150,7 +149,6 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
             'referral_source_activity_marketing',
             'referral_source_activity_event',
             'fdi_type',
-            'non_fdi_type',
             'sector',
             'business_activities',
             'other_business_activity',

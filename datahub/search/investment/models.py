@@ -58,7 +58,6 @@ class InvestmentProject(DocType, MapDBModelToDict):
     total_investment = Double()
     foreign_equity_investment = Double()
     number_new_jobs = Integer()
-    non_fdi_type = dsl_utils.id_name_mapping()
     operations_commenced_documents = dsl_utils.id_uri_mapping()
     stage = dsl_utils.id_name_mapping()
     project_code = dsl_utils.SortableCaseInsensitiveKeywordText()
@@ -96,7 +95,6 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'uk_company': dict_utils.id_name_dict,
         'investment_type': dict_utils.id_name_dict,
         'associated_non_fdi_r_and_d_project': dict_utils.investment_project_dict,
-        'non_fdi_type': dict_utils.id_name_dict,
         'operations_commenced_documents': lambda col: [
             dict_utils.id_uri_dict(c) for c in col.all()
         ],
