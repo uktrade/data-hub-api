@@ -1,3 +1,4 @@
+import itertools
 import warnings
 from logging import getLogger
 from unittest import mock
@@ -75,6 +76,15 @@ class Notify:
             **(data or {})
         }
 
+    def _get_all_advisers(self, order):
+        """
+        :returns: all advisers on the order
+        """
+        return itertools.chain(
+            (item.adviser for item in order.assignees.all()),
+            (item.adviser for item in order.subscribers.all())
+        )
+
     def order_info(self, order, what_happened, why, to_email=None, to_name=None):
         """
         Send a notification of type info related to the order `order`
@@ -144,6 +154,7 @@ class Notify:
         Send a notification to the customer that a quote has just been created
         and needs to be accepted.
         """
+        #  notify customer
         self._send_email(
             email_address=order.contact.email,
             template_id=Template.quote_sent_for_customer.value,
@@ -155,6 +166,16 @@ class Notify:
                 }
             )
         )
+
+        #  notify advisers
+        for adviser in self._get_all_advisers(order):
+            self._send_email(
+                email_address=adviser.get_current_email(),
+                template_id=Template.quote_sent_for_adviser.value,
+                personalisation=self._prepare_personalisation(
+                    order, {'recipient name': adviser.name}
+                )
+            )
 
     def adviser_added(self, order, adviser, by, creation_date):
         """Send a notification when an adviser is added to an order."""
