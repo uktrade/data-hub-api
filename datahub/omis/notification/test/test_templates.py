@@ -1,8 +1,10 @@
 from unittest import mock
 import pytest
 
+from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
 
+from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import synchronous_executor_submit
 from datahub.omis.market.models import Market
 from datahub.omis.order.test.factories import OrderFactory, OrderWithOpenQuoteFactory
@@ -32,7 +34,7 @@ class TestTemplates:
         """
         Test the order created template.
         If the template variables have been changed in GOV.UK notifications this
-        is going to raise an exception.
+        is going to raise HTTPError (400 - Bad Request).
         """
         settings.OMIS_NOTIFICATION_API_KEY = settings.OMIS_NOTIFICATION_TEST_API_KEY
         notify = Notify()
@@ -49,18 +51,18 @@ class TestTemplates:
         """
         Test the order info template.
         If the template variables have been changed in GOV.UK notifications this
-        is going to raise an exception.
+        is going to raise HTTPError (400 - Bad Request).
         """
         settings.OMIS_NOTIFICATION_API_KEY = settings.OMIS_NOTIFICATION_TEST_API_KEY
         notify = Notify()
 
         notify.order_info(OrderFactory(), what_happened='', why='')
 
-    def test_quote_awaiting_acceptance_for_contact(self, settings):
+    def test_quote_awaiting_acceptance_for_customer(self, settings):
         """
         Test the quote generated template.
         If the template variables have been changed in GOV.UK notifications this
-        is going to raise an exception.
+        is going to raise HTTPError (400 - Bad Request).
         """
         settings.OMIS_NOTIFICATION_API_KEY = settings.OMIS_NOTIFICATION_TEST_API_KEY
         notify = Notify()
@@ -68,3 +70,21 @@ class TestTemplates:
         order = OrderWithOpenQuoteFactory()
 
         notify.quote_generated(order)
+
+    def test_you_have_been_added_for_adviser(self, settings):
+        """
+        Test the notification for when an adviser is added to an order.
+        If the template variables have been changed in GOV.UK notifications this
+        is going to raise HTTPError (400 - Bad Request).
+        """
+        settings.OMIS_NOTIFICATION_API_KEY = settings.OMIS_NOTIFICATION_TEST_API_KEY
+        notify = Notify()
+
+        order = OrderFactory()
+
+        notify.adviser_added(
+            order=order,
+            adviser=AdviserFactory(),
+            by=AdviserFactory(),
+            creation_date=dateutil_parse('2017-05-18')
+        )

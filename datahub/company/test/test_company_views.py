@@ -69,7 +69,7 @@ class TestCompany(APITestMixin):
                 'company_number': '123',
                 'company_category': '',
                 'company_status': '',
-                'incorporation_date': '2017-11-08',
+                'incorporation_date': format_date_or_datetime(ch_company.incorporation_date),
                 'name': 'Foo ltd.',
                 'registered_address_1': 'Hello st.',
                 'registered_address_2': None,
