@@ -220,7 +220,7 @@ class TestNotifyQuoteGenerated:
         assert notify.client.send_email_notification.called
         call_args = notify.client.send_email_notification.call_args_list[0][1]
         assert call_args['email_address'] == order.contact.email
-        assert call_args['template_id'] == Template.quote_awaiting_acceptance_for_customer.value
+        assert call_args['template_id'] == Template.quote_sent_for_customer.value
         assert call_args['personalisation']['recipient name'] == order.contact.name
         assert call_args['personalisation']['embedded link'] == order.get_public_facing_url()
 

@@ -50,7 +50,7 @@ class TestNotifyPostQuoteGenerated:
 
         assert notify.client.send_email_notification.called
         call_args = notify.client.send_email_notification.call_args_list[0][1]
-        assert call_args['template_id'] == Template.quote_awaiting_acceptance_for_customer.value
+        assert call_args['template_id'] == Template.quote_sent_for_customer.value
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
