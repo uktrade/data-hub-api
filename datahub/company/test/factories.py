@@ -54,7 +54,7 @@ class CompaniesHouseCompanyFactory(factory.django.DjangoModelFactory):
     registered_address_1 = factory.Sequence(lambda n: f'{n} Bar st.')
     registered_address_town = 'Rome'
     registered_address_country_id = constants.Country.italy.value.id
-    incorporation_date = now()
+    incorporation_date = factory.Faker('date')
 
     class Meta:
         model = 'company.CompaniesHouseCompany'

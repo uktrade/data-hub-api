@@ -126,6 +126,7 @@ class OrderSubscriberFactory(factory.django.DjangoModelFactory):
     """Order Subscriber factory."""
 
     id = factory.LazyFunction(uuid.uuid4)
+    created_by = factory.SubFactory(AdviserFactory)
     order = factory.SubFactory(OrderFactory)
     adviser = factory.SubFactory(AdviserFactory)
 
@@ -137,6 +138,7 @@ class OrderAssigneeFactory(factory.django.DjangoModelFactory):
     """Order Assignee factory."""
 
     id = factory.LazyFunction(uuid.uuid4)
+    created_by = factory.SubFactory(AdviserFactory)
     order = factory.SubFactory(OrderFactory)
     adviser = factory.SubFactory(AdviserFactory)
     estimated_time = factory.Faker('random_int', min=10, max=100)
