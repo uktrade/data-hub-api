@@ -259,6 +259,7 @@ class CompanySerializer(serializers.ModelSerializer):
         model = Company
         fields = (
             'id',
+            'reference_code',
             'name',
             'trading_name',
             'uk_based',
