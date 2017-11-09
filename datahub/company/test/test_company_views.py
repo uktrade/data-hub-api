@@ -87,6 +87,7 @@ class TestCompany(APITestMixin):
                 'sic_code_4': '',
                 'uri': '',
             },
+            'reference_code': '',
             'name': ch_company.name,
             'trading_name': company.alias,
             'registered_address_1': 'Hello st.',
@@ -270,6 +271,24 @@ class TestCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['name'] == 'Acme'
+
+    def test_update_read_only_fields(self):
+        """Test company update."""
+        company = CompanyFactory(
+            name='Foo ltd.',
+            registered_address_1='Hello st.',
+            registered_address_town='Fooland',
+            registered_address_country_id=Country.united_states.value.id,
+            reference_code='ORG-345645'
+        )
+
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, format='json', data={
+            'reference_code': 'XYZ',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['reference_code'] == 'ORG-345645'
 
     def test_add_uk_company(self):
         """Test add new UK company."""
