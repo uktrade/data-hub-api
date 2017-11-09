@@ -58,9 +58,9 @@ class TestTemplates:
 
         notify.order_info(OrderFactory(), what_happened='', why='')
 
-    def test_quote_awaiting_acceptance_for_customer(self, settings):
+    def test_quote_sent(self, settings):
         """
-        Test the quote generated template.
+        Test templates of quote sent for customer and advisers.
         If the template variables have been changed in GOV.UK notifications this
         is going to raise HTTPError (400 - Bad Request).
         """
