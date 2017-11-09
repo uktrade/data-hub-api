@@ -42,15 +42,27 @@ class TestNotifyPostQuoteGenerated:
 
     def test_notify_on_quote_generated(self):
         """Test that a notification is triggered when a quote is generated."""
-        order = OrderFactory()
+        order = OrderFactory(assignees=[])
+        OrderAssigneeFactory.create_batch(1, order=order, is_lead=True)
+        OrderSubscriberFactory.create_batch(2, order=order)
 
         notify.client.reset_mock()
 
         order.generate_quote(by=None)
 
-        assert notify.client.send_email_notification.called
-        call_args = notify.client.send_email_notification.call_args_list[0][1]
-        assert call_args['template_id'] == Template.quote_awaiting_acceptance_for_customer.value
+        #  1 = customer, 3 = assignees/subscribers
+        assert len(notify.client.send_email_notification.call_args_list) == (3 + 1)
+
+        templates_called = [
+            data[1]['template_id']
+            for data in notify.client.send_email_notification.call_args_list
+        ]
+        assert templates_called == [
+            Template.quote_sent_for_customer.value,
+            Template.quote_sent_for_adviser.value,
+            Template.quote_sent_for_adviser.value,
+            Template.quote_sent_for_adviser.value,
+        ]
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)

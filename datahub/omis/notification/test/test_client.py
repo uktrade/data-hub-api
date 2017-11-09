@@ -1,3 +1,4 @@
+import itertools
 from unittest import mock
 
 import pytest
@@ -10,7 +11,10 @@ from notifications_python_client.errors import APIError
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import synchronous_executor_submit
 from datahub.omis.market.models import Market
-from datahub.omis.order.test.factories import OrderFactory, OrderWithOpenQuoteFactory
+from datahub.omis.order.test.factories import (
+    OrderAssigneeFactory, OrderFactory,
+    OrderSubscriberFactory, OrderWithOpenQuoteFactory
+)
 
 from ..client import notify, send_email
 from ..constants import Template
@@ -220,9 +224,39 @@ class TestNotifyQuoteGenerated:
         assert notify.client.send_email_notification.called
         call_args = notify.client.send_email_notification.call_args_list[0][1]
         assert call_args['email_address'] == order.contact.email
-        assert call_args['template_id'] == Template.quote_awaiting_acceptance_for_customer.value
+        assert call_args['template_id'] == Template.quote_sent_for_customer.value
         assert call_args['personalisation']['recipient name'] == order.contact.name
         assert call_args['personalisation']['embedded link'] == order.get_public_facing_url()
+
+    def test_advisers_notified(self):
+        """
+        Test that calling `quote_generated` sends an email to all advisers notifying them that
+        the quote has been sent.
+        """
+        order = OrderWithOpenQuoteFactory(assignees=[])
+        assignees = OrderAssigneeFactory.create_batch(2, order=order)
+        subscribers = OrderSubscriberFactory.create_batch(2, order=order)
+
+        notify.client.reset_mock()
+
+        notify.quote_generated(order)
+
+        assert notify.client.send_email_notification.called
+        # 1 = customer, 4 = assignees/subscribers
+        assert len(notify.client.send_email_notification.call_args_list) == (4 + 1)
+
+        calls_by_email = {
+            data['email_address']: {
+                'template_id': data['template_id'],
+                'personalisation': data['personalisation'],
+            }
+            for _, data in notify.client.send_email_notification.call_args_list
+        }
+        for item in itertools.chain(assignees, subscribers):
+            call = calls_by_email[item.adviser.get_current_email()]
+            assert call['template_id'] == Template.quote_sent_for_adviser.value
+            assert call['personalisation']['recipient name'] == item.adviser.name
+            assert call['personalisation']['embedded link'] == order.get_datahub_frontend_url()
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
