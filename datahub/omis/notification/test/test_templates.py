@@ -58,7 +58,7 @@ class TestTemplates:
 
         notify.order_info(OrderFactory(), what_happened='', why='')
 
-    def test_quote_awaiting_acceptance_for_customer(self, settings):
+    def test_quote_sent_for_customer(self, settings):
         """
         Test the quote generated template.
         If the template variables have been changed in GOV.UK notifications this

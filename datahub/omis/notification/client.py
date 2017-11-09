@@ -146,7 +146,7 @@ class Notify:
         """
         self._send_email(
             email_address=order.contact.email,
-            template_id=Template.quote_awaiting_acceptance_for_customer.value,
+            template_id=Template.quote_sent_for_customer.value,
             personalisation=self._prepare_personalisation(
                 order,
                 {
