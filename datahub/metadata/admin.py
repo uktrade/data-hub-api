@@ -11,7 +11,6 @@ MODELS_TO_REGISTER = (
     models.Role,
     models.InvestmentType,
     models.FDIType,
-    models.NonFDIType,
     models.ReferralSourceActivity,
     models.ReferralSourceMarketing,
     models.ReferralSourceWebsite,

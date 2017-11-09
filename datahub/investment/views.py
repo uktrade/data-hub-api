@@ -64,7 +64,6 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'referral_source_activity_website',
         'referral_source_activity_marketing',
         'fdi_type',
-        'non_fdi_type',
         'sector',
         'average_salary',
         'project_manager',

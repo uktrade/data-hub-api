@@ -30,7 +30,6 @@ class InvestmentSearchApp(SearchApp):
         'investment_type',
         'investmentprojectcode',
         'investor_company',
-        'non_fdi_type',
         'project_assurance_adviser',
         'project_manager',
         'referral_source_activity',
