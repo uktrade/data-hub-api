@@ -370,6 +370,7 @@ class TestSearchExport(APITestMixin):
                 'name',
                 'one_list_account_owner',
                 'parent',
+                'reference_code',
                 'registered_address_1',
                 'registered_address_2',
                 'registered_address_country',
