@@ -70,8 +70,6 @@ CONDITIONAL_VALIDATION_MAPPING = {
         CondValRule('referral_source_activity', Activity.website.value.id, Stage.prospect.value),
     'fdi_type':
         CondValRule('investment_type', InvestmentType.fdi.value.id, Stage.prospect.value),
-    'non_fdi_type':
-        CondValRule('investment_type', InvestmentType.non_fdi.value.id, Stage.prospect.value),
     'total_investment':
         CondValRule('client_cannot_provide_total_investment', not_, Stage.assign_pm.value),
     'competitor_countries':

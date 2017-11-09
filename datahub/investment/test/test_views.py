@@ -99,7 +99,6 @@ class TestUnifiedViews(APITestMixin):
             'referral_source_activity_marketing',
             'referral_source_activity_event',
             'fdi_type',
-            'non_fdi_type',
             'sector',
             'business_activities',
             'other_business_activity',
