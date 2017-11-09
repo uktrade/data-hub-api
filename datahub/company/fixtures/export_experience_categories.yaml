@@ -1,0 +1,18 @@
+- model: company.exportexperiencecategory
+  pk: b9b88464-6ffb-47e7-bb60-b1fc376bf949
+  fields: {disabled_on: null, name: "New exporter"}
+- model: company.exportexperiencecategory
+  pk: 52b160c9-40dc-4ed9-abb7-d787dd2d1871
+  fields: {disabled_on: null, name: "No exports in the last 12 months"}
+- model: company.exportexperiencecategory
+  pk: 01a283b1-0e43-434f-b447-5c475eeca52a
+  fields: {disabled_on: null, name: "Reactive"}
+- model: company.exportexperiencecategory
+  pk: 85ec7ed9-0113-429d-9ee9-626248eb5cf0
+  fields: {disabled_on: null, name: "Increasing export turnover"}
+- model: company.exportexperiencecategory
+  pk: 8b05e8c7-1812-46bf-bab7-a0096ab5689f
+  fields: {disabled_on: null, name: "Increasing export markets"}
+- model: company.exportexperiencecategory
+  pk: 73023b55-9568-4e3f-a134-53ec58451d3f
+  fields: {disabled_on: null, name: "Export growth"}

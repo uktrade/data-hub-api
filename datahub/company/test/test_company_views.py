@@ -114,6 +114,10 @@ class TestCompany(APITestMixin):
             'created_on': format_date_or_datetime(company.created_on),
             'description': None,
             'employee_range': None,
+            'export_experience_category': {
+                'id': str(company.export_experience_category.id),
+                'name': company.export_experience_category.name,
+            },
             'export_to_countries': [],
             'future_interest_countries': [],
             'headquarter_type': None,
@@ -142,7 +146,7 @@ class TestCompany(APITestMixin):
                 'name': company.uk_region.name,
             },
             'vat_number': '009485769',
-            'website': None
+            'website': None,
         }
 
     def test_get_company_without_company_number(self):

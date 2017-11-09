@@ -20,6 +20,7 @@ class CompanySearchApp(SearchApp):
         'classification',
         'contacts',
         'employee_range',
+        'export_experience_category',
         'export_to_countries',
         'future_interest_countries',
         'headquarter_type',
