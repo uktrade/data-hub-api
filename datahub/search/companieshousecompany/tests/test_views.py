@@ -36,7 +36,7 @@ def setup_data(setup_es):
 
 
 class TestSearchCompaniesHouseCompany(APITestMixin):
-    """Test specific search for companies house companys."""
+    """Test specific search for companies house companies."""
 
     def test_no_permissions(self):
         """Should return 403"""
