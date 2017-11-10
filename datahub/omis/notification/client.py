@@ -1,3 +1,4 @@
+import itertools
 import warnings
 from logging import getLogger
 from unittest import mock
@@ -71,8 +72,18 @@ class Notify:
             'company name': order.company.name,
             'embedded link': order.get_datahub_frontend_url(),
             'primary market': order.primary_market.name,
+            'omis team email': settings.OMIS_GENERIC_CONTACT_EMAIL,
             **(data or {})
         }
+
+    def _get_all_advisers(self, order):
+        """
+        :returns: all advisers on the order
+        """
+        return itertools.chain(
+            (item.adviser for item in order.assignees.all()),
+            (item.adviser for item in order.subscribers.all())
+        )
 
     def order_info(self, order, what_happened, why, to_email=None, to_name=None):
         """
@@ -110,7 +121,7 @@ class Notify:
         if manager_email:
             self._send_email(
                 email_address=manager_email,
-                template_id=Template.order_created.value,
+                template_id=Template.order_created_for_post_manager.value,
                 personalisation=self._prepare_personalisation(
                     order,
                     {
@@ -140,17 +151,71 @@ class Notify:
 
     def quote_generated(self, order):
         """
-        Send a notification to the contact that a quote has just been created
-        and needs to be accepted.
+        Send a notification to the customer and the advisers
+        that a quote has just been created and needs to be accepted.
         """
+        #  notify customer
         self._send_email(
-            email_address=order.contact.email,
-            template_id=Template.quote_awaiting_acceptance_for_contact.value,
+            email_address=order.get_current_contact_email(),
+            template_id=Template.quote_sent_for_customer.value,
             personalisation=self._prepare_personalisation(
                 order,
                 {
                     'recipient name': order.contact.name,
                     'embedded link': order.get_public_facing_url(),
+                }
+            )
+        )
+
+        #  notify advisers
+        for adviser in self._get_all_advisers(order):
+            self._send_email(
+                email_address=adviser.get_current_email(),
+                template_id=Template.quote_sent_for_adviser.value,
+                personalisation=self._prepare_personalisation(
+                    order, {'recipient name': adviser.name}
+                )
+            )
+
+    def order_cancelled(self, order):
+        """
+        Send a notification to the customer and the advisers
+        that the order has just been cancelled.
+        """
+        #  notify customer
+        self._send_email(
+            email_address=order.get_current_contact_email(),
+            template_id=Template.order_cancelled_for_customer.value,
+            personalisation=self._prepare_personalisation(
+                order,
+                {
+                    'recipient name': order.contact.name,
+                    'embedded link': order.get_public_facing_url(),
+                }
+            )
+        )
+
+        #  notify advisers
+        for adviser in self._get_all_advisers(order):
+            self._send_email(
+                email_address=adviser.get_current_email(),
+                template_id=Template.order_cancelled_for_adviser.value,
+                personalisation=self._prepare_personalisation(
+                    order, {'recipient name': adviser.name}
+                )
+            )
+
+    def adviser_added(self, order, adviser, by, creation_date):
+        """Send a notification when an adviser is added to an order."""
+        self._send_email(
+            email_address=adviser.get_current_email(),
+            template_id=Template.you_have_been_added_for_adviser.value,
+            personalisation=self._prepare_personalisation(
+                order,
+                {
+                    'recipient name': adviser.name,
+                    'creator': by.name,
+                    'creation date': creation_date.strftime('%d/%m/%Y')
                 }
             )
         )

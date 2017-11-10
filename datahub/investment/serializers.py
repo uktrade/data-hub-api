@@ -8,8 +8,14 @@ from datahub.company.serializers import NestedAdviserField
 from datahub.core.constants import InvestmentProjectStage
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import DataCombiner
-from datahub.investment.models import (InvestmentProject, InvestmentProjectTeamMember,
-                                       IProjectDocument)
+from datahub.investment.models import (
+    InvestmentProject,
+    InvestmentProjectTeamMember,
+    InvestorType,
+    Involvement,
+    IProjectDocument,
+    SpecificProgramme
+)
 from datahub.investment.validate import validate
 
 
@@ -25,7 +31,10 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
     investor_company_country = NestedRelatedField(
         meta_models.Country, read_only=True
     )
+    investor_type = NestedRelatedField(InvestorType, required=False, allow_null=True)
     intermediate_company = NestedRelatedField(Company, required=False, allow_null=True)
+    level_of_involvement = NestedRelatedField(Involvement, required=False, allow_null=True)
+    specific_programme = NestedRelatedField(SpecificProgramme, required=False, allow_null=True)
     client_contacts = NestedRelatedField(
         Contact, many=True, required=True, allow_null=False, allow_empty=False
     )
@@ -45,7 +54,6 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
         meta_models.ReferralSourceMarketing, required=False, allow_null=True
     )
     fdi_type = NestedRelatedField(meta_models.FDIType, required=False, allow_null=True)
-    non_fdi_type = NestedRelatedField(meta_models.NonFDIType, required=False, allow_null=True)
     sector = NestedRelatedField(meta_models.Sector, required=True, allow_null=False)
     business_activities = NestedRelatedField(
         meta_models.InvestmentBusinessActivity, many=True, required=True,
@@ -127,8 +135,11 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
             'date_lost',
             'country_lost_to',
             'investor_company',
+            'investor_type',
             'investor_company_country',
             'intermediate_company',
+            'level_of_involvement',
+            'specific_programme',
             'client_contacts',
             'client_relationship_manager',
             'client_relationship_manager_team',
@@ -138,7 +149,6 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
             'referral_source_activity_marketing',
             'referral_source_activity_event',
             'fdi_type',
-            'non_fdi_type',
             'sector',
             'business_activities',
             'other_business_activity',

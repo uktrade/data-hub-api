@@ -3,6 +3,7 @@ import uuid
 import factory
 from django.utils.timezone import now
 
+from datahub.company.models import ExportExperienceCategory
 from datahub.core import constants
 
 
@@ -40,6 +41,9 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     sector_id = constants.Sector.aerospace_assembly_aircraft.value.id
     archived = False
     uk_region_id = constants.UKRegion.england.value.id
+    export_experience_category = factory.LazyFunction(
+        ExportExperienceCategory.objects.order_by('?').first
+    )
     created_on = now()
 
     class Meta:
@@ -54,7 +58,7 @@ class CompaniesHouseCompanyFactory(factory.django.DjangoModelFactory):
     registered_address_1 = factory.Sequence(lambda n: f'{n} Bar st.')
     registered_address_town = 'Rome'
     registered_address_country_id = constants.Country.italy.value.id
-    incorporation_date = now()
+    incorporation_date = factory.Faker('past_date')
 
     class Meta:
         model = 'company.CompaniesHouseCompany'

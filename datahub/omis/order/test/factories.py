@@ -2,7 +2,7 @@ import datetime
 import uuid
 import factory
 
-from django.utils.timezone import now
+from django.utils.timezone import now, utc
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import Country, Sector
@@ -71,7 +71,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
         If nothing specified when instantiating the object, the value returned by
         this method will be used by default.
         """
-        return OrderAssigneeFactory.create_batch(1, order=self)
+        return OrderAssigneeFactory.create_batch(1, order=self, is_lead=True)
 
     class Meta:
         model = 'order.Order'
@@ -102,7 +102,7 @@ class OrderCompleteFactory(OrderWithAcceptedQuoteFactory):
     """Factory for orders marked as paid."""
 
     status = OrderStatus.complete
-    completed_on = factory.Faker('date_time')
+    completed_on = factory.Faker('date_time', tzinfo=utc)
     completed_by = factory.SubFactory(AdviserFactory)
 
 
@@ -110,7 +110,7 @@ class OrderCancelledFactory(OrderWithAcceptedQuoteFactory):
     """Factory for cancelled orders."""
 
     status = OrderStatus.cancelled
-    cancelled_on = factory.Faker('date_time')
+    cancelled_on = factory.Faker('date_time', tzinfo=utc)
     cancelled_by = factory.SubFactory(AdviserFactory)
     cancellation_reason = factory.LazyFunction(CancellationReason.objects.first)
 
@@ -118,7 +118,7 @@ class OrderCancelledFactory(OrderWithAcceptedQuoteFactory):
 class OrderPaidFactory(OrderWithAcceptedQuoteFactory):
     """Factory for orders marked as paid."""
 
-    paid_on = factory.Faker('date_time')
+    paid_on = factory.Faker('date_time', tzinfo=utc)
     status = OrderStatus.paid
 
 
@@ -126,6 +126,7 @@ class OrderSubscriberFactory(factory.django.DjangoModelFactory):
     """Order Subscriber factory."""
 
     id = factory.LazyFunction(uuid.uuid4)
+    created_by = factory.SubFactory(AdviserFactory)
     order = factory.SubFactory(OrderFactory)
     adviser = factory.SubFactory(AdviserFactory)
 
@@ -137,6 +138,7 @@ class OrderAssigneeFactory(factory.django.DjangoModelFactory):
     """Order Assignee factory."""
 
     id = factory.LazyFunction(uuid.uuid4)
+    created_by = factory.SubFactory(AdviserFactory)
     order = factory.SubFactory(OrderFactory)
     adviser = factory.SubFactory(AdviserFactory)
     estimated_time = factory.Faker('random_int', min=10, max=100)

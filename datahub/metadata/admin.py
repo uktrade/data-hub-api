@@ -9,10 +9,8 @@ MODELS_TO_REGISTER = (
     models.Country,
     models.Title,
     models.Role,
-    models.TeamRole,
     models.InvestmentType,
     models.FDIType,
-    models.NonFDIType,
     models.ReferralSourceActivity,
     models.ReferralSourceMarketing,
     models.ReferralSourceWebsite,
@@ -72,3 +70,13 @@ class TeamAdmin(MetadataAdmin):
     list_display = ('name', 'role')
     list_select_related = ('role',)
     search_fields = ('name', 'pk')
+
+
+@admin.register(models.TeamRole)
+class TeamRoleAdmin(MetadataAdmin):
+    """Team Admin."""
+
+    fields = ('name', 'groups')
+    list_display = ('name',)
+    search_fields = ('name', 'pk')
+    filter_horizontal = ('groups',)

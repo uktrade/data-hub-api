@@ -13,6 +13,9 @@ class QuoteSerializer(serializers.ModelSerializer):
     created_by = NestedAdviserField(read_only=True)
     cancelled_by = NestedAdviserField(read_only=True)
     accepted_by = NestedRelatedField(Contact, read_only=True)
+    terms_and_conditions = serializers.CharField(
+        source='terms_and_conditions.content', default=''
+    )
 
     def preview(self):
         """Same as create but without saving the changes."""
@@ -47,12 +50,17 @@ class QuoteSerializer(serializers.ModelSerializer):
             'accepted_by',
             'expires_on',
             'content',
+            'terms_and_conditions',
         ]
         read_only_fields = fields
 
 
 class PublicQuoteSerializer(serializers.ModelSerializer):
     """Public Quote DRF serializer."""
+
+    terms_and_conditions = serializers.CharField(
+        source='terms_and_conditions.content', default=''
+    )
 
     def accept(self):
         """Call `order.accept_quote` to accept this quote."""
@@ -70,5 +78,6 @@ class PublicQuoteSerializer(serializers.ModelSerializer):
             'accepted_on',
             'expires_on',
             'content',
+            'terms_and_conditions',
         ]
         read_only_fields = fields

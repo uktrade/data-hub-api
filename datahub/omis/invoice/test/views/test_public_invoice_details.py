@@ -4,7 +4,7 @@ from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.oauth.scopes import Scope
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import OrderFactory, OrderWithAcceptedQuoteFactory
@@ -43,7 +43,7 @@ class TestPublicGetInvoice(APITestMixin):
         invoice = order.invoice
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
-            'created_on': invoice.created_on.isoformat(),
+            'created_on': format_date_or_datetime(invoice.created_on),
 
             'invoice_number': invoice.invoice_number,
             'invoice_company_name': invoice.invoice_company_name,

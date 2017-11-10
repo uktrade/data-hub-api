@@ -27,6 +27,7 @@ DEBUG = env.bool('DEBUG')
 # PaaS, we can open ALLOWED_HOSTS
 ALLOWED_HOSTS = ['*']
 
+USE_TZ = True
 TIME_ZONE = 'Etc/UTC'
 
 # Application definition
@@ -135,16 +136,20 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'company.Advisor'
 AUTHENTICATION_BACKENDS = [
-    'datahub.core.auth.CDMSUserBackend',
-    'django.contrib.auth.backends.ModelBackend'
+    'datahub.core.auth.TeamModelPermissionsBackend'
 ]
 
 # django-oauth-toolkit settings
+
+SSO_ENABLED = env.bool('SSO_ENABLED')
 
 OAUTH2_PROVIDER = {
     'SCOPES_BACKEND_CLASS': 'datahub.oauth.scopes.ApplicationScopesBackend',
 }
 
+if SSO_ENABLED:
+    OAUTH2_PROVIDER['RESOURCE_SERVER_INTROSPECTION_URL'] = env('RESOURCE_SERVER_INTROSPECTION_URL')
+    OAUTH2_PROVIDER['RESOURCE_SERVER_AUTH_TOKEN'] = env('RESOURCE_SERVER_AUTH_TOKEN')
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
@@ -165,7 +170,8 @@ REST_FRAMEWORK = {
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication'
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'oauth2_provider.contrib.rest_framework.IsAuthenticatedOrTokenHasScope'
+        'oauth2_provider.contrib.rest_framework.IsAuthenticatedOrTokenHasScope',
+        'datahub.core.permissions.DjangoCrudPermission',
     ],
     'ORDERING_PARAM': 'sortby'
 }
@@ -197,6 +203,9 @@ AV_SERVICE_URL = env('AV_SERVICE_URL', default=None)
 DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://localhost:3000')
 
 # OMIS
+
+# given to clients and generally available
+OMIS_GENERIC_CONTACT_EMAIL = env('OMIS_GENERIC_CONTACT_EMAIL', default='')
 
 # if set, all the notifications will be sent to this address instead of the
 # intended recipient, useful for environments != live

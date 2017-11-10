@@ -5,10 +5,10 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core import constants
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, get_test_user
 from datahub.investment.models import InvestmentProject
 from datahub.investment.test.factories import InvestmentProjectFactory
-
+from datahub.metadata.test.factories import TeamFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -20,7 +20,7 @@ def setup_data(setup_es):
         InvestmentProjectFactory(
             name='abc defg',
             description='investmentproject1',
-            estimated_land_date=datetime.datetime(2011, 6, 13, 9, 44, 31, 62870),
+            estimated_land_date=datetime.date(2011, 6, 13),
             investor_company=CompanyFactory(
                 registered_address_country_id=constants.Country.united_states.value.id
             ),
@@ -33,7 +33,7 @@ def setup_data(setup_es):
         InvestmentProjectFactory(
             name='delayed project',
             description='investmentproject2',
-            estimated_land_date=datetime.datetime(2057, 6, 13, 9, 44, 31, 62870),
+            estimated_land_date=datetime.date(2057, 6, 13),
             investor_company=CompanyFactory(
                 registered_address_country_id=constants.Country.japan.value.id
             ),
@@ -41,6 +41,21 @@ def setup_data(setup_es):
             project_assurance_adviser=AdviserFactory(),
             fdi_value_id=constants.FDIValue.higher.value.id,
             status=InvestmentProject.STATUSES.delayed,
+            uk_region_locations=[
+                constants.UKRegion.north_west.value.id,
+            ]
+        ),
+        InvestmentProjectFactory(
+            name='won project',
+            description='investmentproject3',
+            estimated_land_date=datetime.date(2027, 9, 13),
+            investor_company=CompanyFactory(
+                registered_address_country_id=constants.Country.united_kingdom.value.id
+            ),
+            project_manager=AdviserFactory(),
+            project_assurance_adviser=AdviserFactory(),
+            fdi_value_id=constants.FDIValue.higher.value.id,
+            status=InvestmentProject.STATUSES.won,
             uk_region_locations=[
                 constants.UKRegion.north_west.value.id,
             ]
@@ -53,6 +68,14 @@ def setup_data(setup_es):
 
 class TestSearch(APITestMixin):
     """Tests search views."""
+
+    def test_investment_project_no_permissions(self):
+        """Should return 403"""
+        team = TeamFactory()
+        self._user = get_test_user(team=team)
+        url = reverse('api-v3:search:investment_project')
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_search_investment_project_json(self, setup_data):
         """Tests detailed investment project search."""
@@ -94,13 +117,14 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:investment_project')
 
         response = self.api_client.post(url, {
-            'status': 'delayed',
+            'status': ['delayed', 'won'],
         }, format='json')
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-        assert len(response.data['results']) == 1
-        assert response.data['results'][0]['name'] == 'delayed project'
+        assert response.data['count'] == 2
+        assert len(response.data['results']) == 2
+        statuses = {result['status'] for result in response.data['results']}
+        assert statuses == {'delayed', 'won'}
 
     def test_search_investment_project_investor_country(self, setup_data):
         """Tests investor company country filter."""

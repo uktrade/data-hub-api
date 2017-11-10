@@ -9,7 +9,7 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.constants import Country, Sector
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.omis.market.models import Market
 
 from ..factories import (
@@ -18,7 +18,7 @@ from ..factories import (
 )
 
 from ...constants import OrderStatus, VATStatus
-from ...models import ServiceType
+from ...models import CancellationReason, ServiceType
 
 
 # mark the whole module for db use
@@ -28,7 +28,7 @@ pytestmark = pytest.mark.django_db
 class TestAddOrderDetails(APITestMixin):
     """Add Order details test case."""
 
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     def test_success_complete(self):
         """Test a successful call to create an Order with all possible fields."""
         company = CompanyFactory()
@@ -50,6 +50,8 @@ class TestAddOrderDetails(APITestMixin):
                 ],
                 'description': 'Description test',
                 'contacts_not_to_approach': 'Contacts not to approach details',
+                'further_info': 'Additional notes',
+                'existing_agents': 'Contacts in the market',
                 'delivery_date': '2017-04-20',
                 'po_number': 'PO 123',
                 'vat_status': VATStatus.eu,
@@ -73,12 +75,12 @@ class TestAddOrderDetails(APITestMixin):
             'id': response.json()['id'],
             'reference': response.json()['reference'],
             'status': OrderStatus.draft,
-            'created_on': '2017-04-18T13:00:00',
+            'created_on': '2017-04-18T13:00:00Z',
             'created_by': {
                 'id': str(self.user.pk),
                 'name': self.user.name
             },
-            'modified_on': '2017-04-18T13:00:00',
+            'modified_on': '2017-04-18T13:00:00Z',
             'modified_by': {
                 'id': str(self.user.pk),
                 'name': self.user.name
@@ -108,8 +110,8 @@ class TestAddOrderDetails(APITestMixin):
             'description': 'Description test',
             'contacts_not_to_approach': 'Contacts not to approach details',
             'product_info': '',
-            'further_info': '',
-            'existing_agents': '',
+            'further_info': 'Additional notes',
+            'existing_agents': 'Contacts in the market',
             'permission_to_approach_contacts': '',
             'delivery_date': '2017-04-20',
             'contact_email': '',
@@ -144,7 +146,7 @@ class TestAddOrderDetails(APITestMixin):
             'cancellation_reason': None,
         }
 
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     def test_success_minimal(self):
         """Test a successful call to create an Order without optional fields."""
         company = CompanyFactory()
@@ -312,8 +314,6 @@ class TestAddOrderDetails(APITestMixin):
                 'contact': {'id': contact.pk},
                 'primary_market': {'id': country.id},
                 'product_info': 'lorem ipsum',
-                'further_info': 'lorem ipsum',
-                'existing_agents': 'lorem ipsum',
                 'permission_to_approach_contacts': 'lorem ipsum',
                 'archived_documents_url_path': '/documents/123',
             },
@@ -322,8 +322,6 @@ class TestAddOrderDetails(APITestMixin):
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json()['product_info'] == ''
-        assert response.json()['further_info'] == ''
-        assert response.json()['existing_agents'] == ''
         assert response.json()['permission_to_approach_contacts'] == ''
         assert response.json()['archived_documents_url_path'] == ''
 
@@ -424,7 +422,7 @@ class TestAddOrderDetails(APITestMixin):
 class TestChangeOrderDetails(APITestMixin):
     """Change Order details test case."""
 
-    @freeze_time('2017-04-18 13:00:00.000000+00:00')
+    @freeze_time('2017-04-18 13:00:00.000000')
     def test_success(self):
         """Test changing an existing order."""
         order = OrderFactory(vat_status=VATStatus.outside_eu)
@@ -443,6 +441,8 @@ class TestChangeOrderDetails(APITestMixin):
                 ],
                 'description': 'Updated description',
                 'contacts_not_to_approach': 'Updated contacts not to approach',
+                'further_info': 'Updated additional notes',
+                'existing_agents': 'Updated contacts in the market',
                 'delivery_date': '2017-04-21',
                 'po_number': 'NEW PO 321',
                 'vat_status': VATStatus.eu,
@@ -467,12 +467,12 @@ class TestChangeOrderDetails(APITestMixin):
             'id': str(order.pk),
             'reference': order.reference,
             'status': OrderStatus.draft,
-            'created_on': '2017-04-18T13:00:00',
+            'created_on': '2017-04-18T13:00:00Z',
             'created_by': {
                 'id': str(order.created_by.pk),
                 'name': order.created_by.name
             },
-            'modified_on': '2017-04-18T13:00:00',
+            'modified_on': '2017-04-18T13:00:00Z',
             'modified_by': {
                 'id': str(self.user.pk),
                 'name': self.user.name
@@ -502,8 +502,8 @@ class TestChangeOrderDetails(APITestMixin):
             'description': 'Updated description',
             'contacts_not_to_approach': 'Updated contacts not to approach',
             'product_info': order.product_info,
-            'further_info': order.further_info,
-            'existing_agents': order.existing_agents,
+            'further_info': 'Updated additional notes',
+            'existing_agents': 'Updated contacts in the market',
             'permission_to_approach_contacts': order.permission_to_approach_contacts,
             'delivery_date': '2017-04-21',
             'contact_email': order.contact_email,
@@ -654,10 +654,10 @@ class TestChangeOrderDetails(APITestMixin):
         """
         disabled_in_jan, disabled_in_feb = ServiceType.objects.all()[:2]
 
-        disabled_in_jan.disabled_on = dateutil_parse('2017-01-10 11:00:00')
+        disabled_in_jan.disabled_on = dateutil_parse('2017-01-10T11:00:00Z')
         disabled_in_jan.save()
 
-        disabled_in_feb.disabled_on = dateutil_parse('2017-02-01 11:00:00')
+        disabled_in_feb.disabled_on = dateutil_parse('2017-02-01T11:00:00Z')
         disabled_in_feb.save()
 
         order = OrderFactory(service_types=[disabled_in_jan])
@@ -693,7 +693,7 @@ class TestChangeOrderDetails(APITestMixin):
         with freeze_time('2017-01-01'):
             order = OrderFactory(primary_market_id=country.pk)
 
-        market.disabled_on = dateutil_parse('2017-02-01')
+        market.disabled_on = dateutil_parse('2017-02-01T00:00:00Z')
         market.save()
 
         with freeze_time('2017-03-01'):
@@ -718,8 +718,6 @@ class TestChangeOrderDetails(APITestMixin):
             {
                 'status': OrderStatus.complete,
                 'product_info': 'Updated product info',
-                'further_info': 'Updated further info',
-                'existing_agents': 'Updated existing agents',
                 'permission_to_approach_contacts': 'Updated permission to approach contacts',
                 'contact_email': 'updated-email@email.com',
                 'contact_phone': '1234',
@@ -744,8 +742,6 @@ class TestChangeOrderDetails(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['status'] == OrderStatus.draft
         assert response.json()['product_info'] != 'Updated product info'
-        assert response.json()['further_info'] != 'Updated further info'
-        assert response.json()['existing_agents'] != 'Updated existing agents'
         assert response.json()['permission_to_approach_contacts'] != \
             'Updated permission to approach contacts'
         assert response.json()['contact_email'] != 'updated-email@email.com'
@@ -857,16 +853,17 @@ class TestMarkOrderAsComplete(APITestMixin):
         (OrderStatus.paid,)
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
-        """Test changing an existing order."""
+        """Test marking an order as complete."""
         order = OrderPaidFactory(status=allowed_status, assignees=[])
         OrderAssigneeCompleteFactory(order=order)
 
         url = reverse('api-v3:omis:order:complete', kwargs={'pk': order.pk})
         response = self.api_client.post(url, {}, format='json')
 
+        expected_completed_on = dateutil_parse('2017-04-18T13:00Z')
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['status'] == OrderStatus.complete
-        assert response.json()['completed_on'] == dateutil_parse('2017-04-18 13:00').isoformat()
+        assert response.json()['completed_on'] == format_date_or_datetime(expected_completed_on)
         assert response.json()['completed_by'] == {
             'id': str(self.user.pk),
             'name': self.user.name
@@ -874,7 +871,7 @@ class TestMarkOrderAsComplete(APITestMixin):
 
         order.refresh_from_db()
         assert order.status == OrderStatus.complete
-        assert order.completed_on == dateutil_parse('2017-04-18 13:00')
+        assert order.completed_on == expected_completed_on
         assert order.completed_by == self.user
 
     @pytest.mark.parametrize(
@@ -921,6 +918,108 @@ class TestMarkOrderAsComplete(APITestMixin):
         }
 
 
+class TestCancelOrder(APITestMixin):
+    """Test cases for cancelling an order."""
+
+    @freeze_time('2017-04-18 13:00')
+    @pytest.mark.parametrize(
+        'allowed_status',
+        (OrderStatus.draft, OrderStatus.quote_awaiting_acceptance,)
+    )
+    def test_ok_if_order_in_allowed_status(self, allowed_status):
+        """Test cancelling an order."""
+        reason = CancellationReason.objects.order_by('?').first()
+        order = OrderFactory(status=allowed_status)
+
+        url = reverse('api-v3:omis:order:cancel', kwargs={'pk': order.pk})
+        response = self.api_client.post(
+            url,
+            {
+                'cancellation_reason': {
+                    'id': reason.pk
+                }
+            },
+            format='json'
+        )
+
+        expected_cancelled_on = dateutil_parse('2017-04-18T13:00Z')
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['status'] == OrderStatus.cancelled
+        assert response.json()['cancelled_on'] == format_date_or_datetime(expected_cancelled_on)
+        assert response.json()['cancellation_reason'] == {
+            'id': str(reason.pk),
+            'name': reason.name
+        }
+        assert response.json()['cancelled_by'] == {
+            'id': str(self.user.pk),
+            'name': self.user.name
+        }
+
+        order.refresh_from_db()
+        assert order.status == OrderStatus.cancelled
+        assert order.cancelled_on == expected_cancelled_on
+        assert order.cancellation_reason == reason
+        assert order.cancelled_by == self.user
+
+    @pytest.mark.parametrize(
+        'disallowed_status',
+        (
+            OrderStatus.quote_accepted,
+            OrderStatus.paid,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_409_if_order_not_in_allowed_status(self, disallowed_status):
+        """
+        Test that if the order is in a disallowed status, the order cannot be cancelled.
+        """
+        reason = CancellationReason.objects.order_by('?').first()
+        order = OrderFactory(status=disallowed_status)
+
+        url = reverse('api-v3:omis:order:cancel', kwargs={'pk': order.pk})
+        response = self.api_client.post(
+            url,
+            {
+                'cancellation_reason': {
+                    'id': reason.pk
+                }
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_409_CONFLICT
+        order.refresh_from_db()
+        assert order.status == disallowed_status
+
+    @pytest.mark.parametrize(
+        'data,errors',
+        (
+            (
+                {},
+                {'cancellation_reason': ['This field is required.']}
+            ),
+            (
+                {'cancellation_reason': {'id': '2f68875c-35a5-4c3d-8160-9ddc104260c2'}},
+                {'cancellation_reason': [
+                    'Invalid pk "2f68875c-35a5-4c3d-8160-9ddc104260c2" - object does not exist.'
+                ]}
+            )
+        )
+    )
+    def test_validation_errors(self, data, errors):
+        """
+        Test that if cancellation_reason is invalid, the endpoint returns 400.
+        """
+        order = OrderFactory(status=OrderStatus.draft)
+
+        url = reverse('api-v3:omis:order:cancel', kwargs={'pk': order.pk})
+        response = self.api_client.post(url, data, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == errors
+
+
 class TestViewOrderDetails(APITestMixin):
     """View order details test case."""
 
@@ -938,12 +1037,12 @@ class TestViewOrderDetails(APITestMixin):
             'id': str(order.pk),
             'reference': order.reference,
             'status': OrderStatus.draft,
-            'created_on': order.created_on.isoformat(),
+            'created_on': format_date_or_datetime(order.created_on),
             'created_by': {
                 'id': str(order.created_by.pk),
                 'name': order.created_by.name
             },
-            'modified_on': order.modified_on.isoformat(),
+            'modified_on': format_date_or_datetime(order.modified_on),
             'modified_by': {
                 'id': str(order.modified_by.pk),
                 'name': order.modified_by.name

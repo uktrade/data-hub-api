@@ -20,6 +20,8 @@ class SearchInteractionParams:
         'dit_adviser',
         'dit_adviser_name',
         'dit_team',
+        'date_after',
+        'date_before',
         'communication_channel',
         'investment_project',
         'service',
@@ -42,6 +44,10 @@ class SearchInteractionParams:
 class SearchInteractionAPIView(SearchInteractionParams, SearchAPIView):
     """Filtered interaction search view."""
 
+    permission_required = 'interaction.read_interaction'
+
 
 class SearchInteractionExportAPIView(SearchInteractionParams, SearchExportAPIView):
     """Filtered interaction search export view."""
+
+    permission_required = 'interaction.read_interaction'

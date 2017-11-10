@@ -71,7 +71,7 @@ class TestCalculatePaymentDueDate:
         Therefore payment due date = 18/05/2017 (after 30 days)
         """
         quote = mock.MagicMock(
-            accepted_on=dateutil_parse('2017-04-18 13:00')
+            accepted_on=dateutil_parse('2017-04-18T13:00Z')
         )
         order = mock.MagicMock(
             delivery_date=dateutil_parse('2017-06-20').date(),
@@ -88,7 +88,7 @@ class TestCalculatePaymentDueDate:
         Therefore payment due date = 24/04/2017 (delivery date - 14 days)
         """
         quote = mock.MagicMock(
-            accepted_on=dateutil_parse('2017-04-18 13:00')
+            accepted_on=dateutil_parse('2017-04-18T13:00Z')
         )
         order = mock.MagicMock(
             delivery_date=dateutil_parse('2017-05-08').date(),

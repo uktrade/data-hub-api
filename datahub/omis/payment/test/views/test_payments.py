@@ -6,7 +6,7 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import (
     OrderFactory, OrderPaidFactory, OrderWithAcceptedQuoteFactory
@@ -30,13 +30,13 @@ class TestGetPayments(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [
             {
-                'created_on': payment.created_on.isoformat(),
+                'created_on': format_date_or_datetime(payment.created_on),
                 'reference': payment.reference,
                 'transaction_reference': payment.transaction_reference,
                 'additional_reference': payment.additional_reference,
                 'amount': payment.amount,
                 'method': payment.method,
-                'received_on': payment.received_on.isoformat()
+                'received_on': payment.received_on.isoformat(),
             }
             for payment in order.payments.all()
         ]
@@ -86,6 +86,7 @@ class TestCreatePayments(APITestMixin):
                 {
                     'transaction_reference': 'some ref2',
                     'amount': order.total_cost - 1,
+                    'method': PaymentMethod.manual,
                     'received_on': '2017-04-21'
                 }
             ],
@@ -95,85 +96,77 @@ class TestCreatePayments(APITestMixin):
         response_items = sorted(response.json(), key=itemgetter('transaction_reference'))
         assert response_items == [
             {
-                'created_on': '2017-04-25T13:00:00',
+                'created_on': '2017-04-25T13:00:00Z',
                 'reference': '201704250001',
                 'transaction_reference': 'some ref1',
                 'additional_reference': '',
                 'amount': 1,
-                'method': PaymentMethod.bacs,
+                'method': PaymentMethod.bacs,  # bacs is the default one
                 'received_on': '2017-04-20'
             },
             {
-                'created_on': '2017-04-25T13:00:00',
+                'created_on': '2017-04-25T13:00:00Z',
                 'reference': '201704250002',
                 'transaction_reference': 'some ref2',
                 'additional_reference': '',
                 'amount': order.total_cost - 1,
-                'method': PaymentMethod.bacs,
+                'method': PaymentMethod.manual,
                 'received_on': '2017-04-21'
             }
         ]
         order.refresh_from_db()
         assert order.status == OrderStatus.paid
-        assert order.paid_on == dateutil_parse('2017-04-21')
+        assert order.paid_on == dateutil_parse('2017-04-21T00:00:00Z')
 
-    def test_400_if_amounts_less_than_total_cost(self):
-        """
-        Test that if the sum of the amounts is less than order.total_cost,
-        the endpoint returns 400.
-        """
-        order = OrderWithAcceptedQuoteFactory()
-
-        url = reverse('api-v3:omis:payment:collection', kwargs={'order_pk': order.pk})
-        response = self.api_client.post(
-            url,
-            [
+    @pytest.mark.parametrize(
+        'data,errors',
+        (
+            # amount != from order total cost
+            (
+                [
+                    {'amount': 1, 'received_on': '2017-04-20', 'method': PaymentMethod.bacs},
+                    {'amount': 0, 'received_on': '2017-04-21', 'method': PaymentMethod.bacs}
+                ],
                 {
-                    'amount': 1,
-                    'received_on': '2017-04-20'
-                },
-                {
-                    'amount': order.total_cost - 2,
-                    'received_on': '2017-04-21'
+                    'non_field_errors': (
+                        'The sum of the amounts has to be equal or greater than the order total.'
+                    )
                 }
-            ],
-            format='json'
-        )
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {
-            'non_field_errors': (
-                'The sum of the amounts has to be equal or '
-                'greater than the order total.'
+            ),
+            # required fields
+            (
+                [
+                    {'amount': 1, 'received_on': '2017-04-20', 'method': PaymentMethod.bacs},
+                    {'received_on': '2017-04-21', 'method': PaymentMethod.bacs},
+                    {'amount': 0, 'method': PaymentMethod.bacs}
+                ],
+                [
+                    {},
+                    {'amount': ['This field is required.']},
+                    {'received_on': ['This field is required.']}
+                ]
+            ),
+            # payment method not allowed
+            (
+                [
+                    {'amount': 1, 'received_on': '2017-04-20', 'method': PaymentMethod.card},
+                    {'amount': 1, 'received_on': '2017-04-20', 'method': PaymentMethod.cheque},
+                ],
+                [
+                    {'method': ['"card" is not a valid choice.']},
+                    {'method': ['"cheque" is not a valid choice.']}
+                ]
             )
-        }
-
-    def test_400_generic_validation(self):
-        """Test generic validation errors."""
+        )
+    )
+    def test_400_validation(self, data, errors):
+        """Test validation errors."""
         order = OrderWithAcceptedQuoteFactory()
 
         url = reverse('api-v3:omis:payment:collection', kwargs={'order_pk': order.pk})
-        response = self.api_client.post(
-            url,
-            [
-                {
-                    'amount': 1,
-                    'received_on': '2017-04-20'
-                },
-                {
-                    'received_on': '2017-04-21'
-                },
-                {
-                    'amount': order.total_cost - 1
-                }
-            ],
-            format='json'
-        )
+        response = self.api_client.post(url, data, format='json')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == [
-            {},
-            {'amount': ['This field is required.']},
-            {'received_on': ['This field is required.']}
-        ]
+        assert response.json() == errors
 
     def test_ok_if_amounts_greater_than_total_cost(self):
         """
@@ -188,10 +181,12 @@ class TestCreatePayments(APITestMixin):
             [
                 {
                     'amount': order.total_cost,
+                    'method': PaymentMethod.bacs,
                     'received_on': '2017-04-20'
                 },
                 {
                     'amount': 1,
+                    'method': PaymentMethod.bacs,
                     'received_on': '2017-04-21'
                 }
             ],

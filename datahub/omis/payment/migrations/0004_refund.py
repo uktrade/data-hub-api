@@ -12,7 +12,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('order', '0001_squashed_0030_cancellation'),
         ('omis-payment', '0003_auto_20171019_1639'),
     ]
 

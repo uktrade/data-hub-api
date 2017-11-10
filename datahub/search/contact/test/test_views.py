@@ -5,7 +5,8 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.constants import Country, Sector, UKRegion
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, get_test_user
+from datahub.metadata.test.factories import TeamFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -19,6 +20,14 @@ def setup_data():
 
 class TestSearch(APITestMixin):
     """Tests search views."""
+
+    def test_company_search_no_permissions(self):
+        """Should return 403"""
+        team = TeamFactory()
+        self._user = get_test_user(team=team)
+        url = reverse('api-v3:search:contact')
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_search_contact(self, setup_es, setup_data):
         """Tests detailed contact search."""

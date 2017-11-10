@@ -8,7 +8,11 @@ from django.db import models, transaction
 from model_utils import Choices
 
 from datahub.core.constants import InvestmentProjectStage
-from datahub.core.models import ArchivableModel, BaseModel
+from datahub.core.models import (
+    ArchivableModel,
+    BaseConstantModel,
+    BaseModel,
+)
 from datahub.documents.models import Document
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -19,6 +23,7 @@ class IProjectAbstract(models.Model):
 
     class Meta:
         abstract = True
+        permissions = (('read_project', 'Can read project'),)
 
     PRIORITIES = Choices(
         ('1_low', 'low', 'Low'),
@@ -77,8 +82,20 @@ class IProjectAbstract(models.Model):
         'company.Company', related_name='investor_investment_projects',
         null=True, blank=True, on_delete=models.CASCADE
     )
+    investor_type = models.ForeignKey(
+        'investment.InvestorType', related_name='+',
+        null=True, blank=True, on_delete=models.SET_NULL
+    )
     intermediate_company = models.ForeignKey(
         'company.Company', related_name='intermediate_investment_projects',
+        null=True, blank=True, on_delete=models.SET_NULL
+    )
+    level_of_involvement = models.ForeignKey(
+        'investment.Involvement', related_name='+',
+        null=True, blank=True, on_delete=models.SET_NULL
+    )
+    specific_programme = models.ForeignKey(
+        'investment.SpecificProgramme', related_name='+',
         null=True, blank=True, on_delete=models.SET_NULL
     )
     client_contacts = models.ManyToManyField(
@@ -107,10 +124,6 @@ class IProjectAbstract(models.Model):
     referral_source_activity_event = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
     fdi_type = models.ForeignKey(
         'metadata.FDIType', related_name='investment_projects', null=True,
-        blank=True, on_delete=models.SET_NULL
-    )
-    non_fdi_type = models.ForeignKey(
-        'metadata.NonFDIType', related_name='investment_projects', null=True,
         blank=True, on_delete=models.SET_NULL
     )
     sector = models.ForeignKey(
@@ -262,6 +275,9 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
         company_name = self.investor_company or 'No company'
         return f'{company_name} – {self.name}'
 
+    class Meta:
+        permissions = (('read_investmentproject', 'Can read investment project'),)
+
 
 class InvestmentProjectTeamMember(models.Model):
     """Intermediary M2M model for investment project team members.
@@ -283,6 +299,8 @@ class InvestmentProjectTeamMember(models.Model):
 
     class Meta:
         unique_together = (('investment_project', 'adviser'),)
+        permissions = (('read_investmentprojectteammember',
+                        'Can read investment project team member'),)
 
 
 class InvestmentProjectCode(models.Model):
@@ -327,6 +345,14 @@ class IProjectDocument(BaseModel, ArchivableModel):
     filename = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
     document = models.OneToOneField(Document, on_delete=models.PROTECT)
 
+    class Meta:
+        verbose_name = 'investment project document'
+        verbose_name_plural = 'investment project documents'
+        unique_together = (
+            ('project', 'doc_type', 'filename'),
+        )
+        permissions = (('read_iprojectdocument', 'Can read investment project document'),)
+
     @property
     def signed_url(self):
         """Generate pre-signed download URL."""
@@ -336,13 +362,6 @@ class IProjectDocument(BaseModel, ArchivableModel):
     def signed_upload_url(self):
         """Generate pre-signed upload URL."""
         return self.document.generate_signed_upload_url()
-
-    class Meta:
-        verbose_name = 'investment project document'
-        verbose_name_plural = 'investment project documents'
-        unique_together = (
-            ('project', 'doc_type', 'filename'),
-        )
 
     def delete(self, using=None, keep_parents=False):
         """Ensure document is removed when parent is being deleted."""
@@ -367,3 +386,15 @@ class IProjectDocument(BaseModel, ArchivableModel):
             investment_doc.save()
 
         return investment_doc
+
+
+class SpecificProgramme(BaseConstantModel):
+    """Specific Investment Programmes."""
+
+
+class InvestorType(BaseConstantModel):
+    """Investor Types."""
+
+
+class Involvement(BaseConstantModel):
+    """Level of Involvements."""

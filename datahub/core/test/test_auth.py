@@ -9,7 +9,7 @@ from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core import auth
+from datahub.core import auth as auth_backends
 
 pytestmark = pytest.mark.django_db
 
@@ -382,7 +382,7 @@ def test_submit_form():
     </form>
     '''
 
-    resp = auth.CDMSUserBackend._submit_form(
+    resp = auth_backends.CDMSUserBackend._submit_form(
         session_mock,
         source,
         params={'injected': 'param'},
@@ -411,8 +411,8 @@ def test_submit_form_unauthenticated():
     </form>
     '''
 
-    with pytest.raises(auth.CDMSInvalidCredentialsError):
-        auth.CDMSUserBackend._submit_form(
+    with pytest.raises(auth_backends.CDMSInvalidCredentialsError):
+        auth_backends.CDMSUserBackend._submit_form(
             session_mock,
             source,
             params={'injected': 'param'},

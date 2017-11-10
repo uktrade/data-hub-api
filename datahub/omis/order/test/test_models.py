@@ -5,6 +5,7 @@ import factory
 import pytest
 from dateutil.parser import parse as dateutil_parse
 from django.utils.crypto import get_random_string
+from django.utils.timezone import now
 from freezegun import freeze_time
 from rest_framework.exceptions import ValidationError
 
@@ -26,6 +27,7 @@ from .factories import (
 )
 
 from ..constants import OrderStatus
+from ..models import CancellationReason
 
 
 pytestmark = pytest.mark.django_db
@@ -43,10 +45,39 @@ class OrderWithRandomReferenceFactory(OrderFactory):
     reference = factory.LazyFunction(get_random_string)
 
 
+class TestGetLeadAssignee:
+    """Tests for the get_lead_assignee() logic."""
+
+    def test_without_assignees(self):
+        """
+        Test that get_lead_assignee() returns None if there are no assignees.
+        """
+        order = OrderFactory(assignees=[])
+        assert not order.get_lead_assignee()
+
+    def test_without_lead_assignee(self):
+        """
+        Test that get_lead_assignee() returns None if there are assignees
+        but none of them is a lead.
+        """
+        order = OrderFactory(assignees=[])
+        OrderAssigneeFactory(order=order, is_lead=False)
+        assert not order.get_lead_assignee()
+
+    def test_with_lead_assignee(self):
+        """
+        Test that get_lead_assignee() returns the lead assignee if present.
+        """
+        order = OrderFactory(assignees=[])
+        lead_assignee = OrderAssigneeFactory(order=order, is_lead=True)
+        OrderAssigneeFactory(order=order, is_lead=False)
+        assert order.get_lead_assignee() == lead_assignee
+
+
 class TestOrderGenerateReference:
     """Tests for the generate reference logic."""
 
-    @freeze_time('2017-07-12 13:00:00.000000+00:00')
+    @freeze_time('2017-07-12 13:00:00.000000')
     @mock.patch('datahub.omis.order.models.get_random_string')
     def test_generates_reference_if_doesnt_exist(self, mock_get_random_string):
         """
@@ -64,7 +95,7 @@ class TestOrderGenerateReference:
         order = OrderWithRandomPublicTokenFactory()
         assert order.reference == 'CBA321/17'
 
-    @freeze_time('2017-07-12 13:00:00.000000+00:00')
+    @freeze_time('2017-07-12 13:00:00.000000')
     @mock.patch('datahub.omis.order.models.get_random_string')
     def test_doesnt_generate_reference_if_present(self, mock_get_random_string):
         """
@@ -82,7 +113,7 @@ class TestOrderGenerateReference:
         order = OrderWithRandomPublicTokenFactory()
         assert order.reference == 'CBA321/17'
 
-    @freeze_time('2017-07-12 13:00:00.000000+00:00')
+    @freeze_time('2017-07-12 13:00:00.000000')
     @mock.patch('datahub.omis.order.models.get_random_string')
     def test_cannot_generate_reference(self, mock_get_random_string):
         """
@@ -272,10 +303,7 @@ class TestReopen:
         """
         order = OrderFactory(status=allowed_status)
 
-        try:
-            order.reopen(by=AdviserFactory())
-        except Exception:
-            pytest.fail('Should not raise any exception.')
+        order.reopen(by=AdviserFactory())
 
         assert order.status == OrderStatus.draft
 
@@ -288,12 +316,12 @@ class TestReopen:
 
         adviser = AdviserFactory()
 
-        with freeze_time('2017-07-12 13:00') as mocked_now:
+        with freeze_time('2017-07-12 13:00'):
             order.reopen(by=adviser)
 
             assert order.quote.is_cancelled()
             assert order.quote.cancelled_by == adviser
-            assert order.quote.cancelled_on == mocked_now()
+            assert order.quote.cancelled_on == now()
             assert order.status == OrderStatus.draft
 
     @pytest.mark.parametrize(
@@ -329,10 +357,7 @@ class TestAcceptQuote:
         order = OrderWithOpenQuoteFactory(status=allowed_status)
         contact = ContactFactory()
 
-        try:
-            order.accept_quote(by=contact)
-        except Exception:
-            pytest.fail('Should not raise any exception.')
+        order.accept_quote(by=contact)
 
         order.refresh_from_db()
         assert order.status == OrderStatus.quote_accepted
@@ -388,26 +413,23 @@ class TestMarkOrderAsPaid:
         order = OrderWithAcceptedQuoteFactory(status=allowed_status)
         adviser = AdviserFactory()
 
-        try:
-            order.mark_as_paid(
-                by=adviser,
-                payments_data=[
-                    {
-                        'amount': 1,
-                        'received_on': dateutil_parse('2017-01-01').date()
-                    },
-                    {
-                        'amount': order.total_cost - 1,
-                        'received_on': dateutil_parse('2017-01-02').date()
-                    },
-                ]
-            )
-        except Exception:
-            pytest.fail('Should not raise any exception.')
+        order.mark_as_paid(
+            by=adviser,
+            payments_data=[
+                {
+                    'amount': 1,
+                    'received_on': dateutil_parse('2017-01-01').date()
+                },
+                {
+                    'amount': order.total_cost - 1,
+                    'received_on': dateutil_parse('2017-01-02').date()
+                },
+            ]
+        )
 
         order.refresh_from_db()
         assert order.status == OrderStatus.paid
-        assert order.paid_on == dateutil_parse('2017-01-02')
+        assert order.paid_on == dateutil_parse('2017-01-02T00:00:00Z')
         assert list(
             order.payments.order_by('received_on').values_list('amount', 'received_on')
         ) == [
@@ -489,15 +511,12 @@ class TestCompleteOrder:
         OrderAssigneeCompleteFactory(order=order)
         adviser = AdviserFactory()
 
-        try:
-            with freeze_time('2018-07-12 13:00'):
-                order.complete(by=adviser)
-        except Exception:
-            pytest.fail('Should not raise any exception.')
+        with freeze_time('2018-07-12 13:00'):
+            order.complete(by=adviser)
 
         order.refresh_from_db()
         assert order.status == OrderStatus.complete
-        assert order.completed_on == dateutil_parse('2018-07-12 13:00')
+        assert order.completed_on == dateutil_parse('2018-07-12T13:00Z')
         assert order.completed_by == adviser
 
     @pytest.mark.parametrize(
@@ -548,6 +567,71 @@ class TestCompleteOrder:
 
         with pytest.raises(ValidationError):
             order.complete(by=None)
+
+
+class TestCancelOrder:
+    """Tests for when an order is cancelled."""
+
+    @pytest.mark.parametrize(
+        'allowed_status',
+        (OrderStatus.draft, OrderStatus.quote_awaiting_acceptance)
+    )
+    def test_ok_if_order_in_allowed_status(self, allowed_status):
+        """
+        Test that the order can be cancelled if it's in one of the allowed statuses.
+        """
+        reason = CancellationReason.objects.order_by('?').first()
+        order = OrderFactory(status=allowed_status)
+        adviser = AdviserFactory()
+
+        with freeze_time('2018-07-12 13:00'):
+            order.cancel(by=adviser, reason=reason)
+
+        order.refresh_from_db()
+        assert order.status == OrderStatus.cancelled
+        assert order.cancelled_on == dateutil_parse('2018-07-12T13:00Z')
+        assert order.cancellation_reason == reason
+        assert order.cancelled_by == adviser
+
+    @pytest.mark.parametrize(
+        'disallowed_status',
+        (
+            OrderStatus.quote_accepted,
+            OrderStatus.paid,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
+        """
+        Test that if the order is in a disallowed status, the order cannot be cancelled.
+        """
+        reason = CancellationReason.objects.order_by('?').first()
+        order = OrderFactory(status=disallowed_status)
+
+        with pytest.raises(Conflict):
+            order.cancel(by=None, reason=reason)
+
+        assert order.status == disallowed_status
+
+    def test_atomicity(self):
+        """
+        Test that if there's a problem with saving the order, nothing gets saved.
+        """
+        reason = CancellationReason.objects.order_by('?').first()
+        order = OrderFactory(status=OrderStatus.draft)
+
+        with mock.patch.object(order, 'save') as mocked_save:
+            mocked_save.side_effect = Exception()
+
+            with pytest.raises(Exception):
+                order.cancel(by=None, reason=reason)
+
+            order.refresh_from_db()
+            assert order.status == OrderStatus.draft
+            assert not order.cancellation_reason
+            assert not order.cancelled_on
+            assert not order.cancelled_by
 
 
 class TestOrderAssignee:

@@ -1,4 +1,6 @@
+from django.contrib.auth.models import Group
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 from datahub.core.models import BaseConstantModel, BaseOrderedConstantModel
 
@@ -55,7 +57,14 @@ class Role(BaseConstantModel):
 class TeamRole(BaseConstantModel):
     """Team role."""
 
-    pass
+    groups = models.ManyToManyField(
+        Group,
+        verbose_name=_('team role permission groups'),
+        blank=True,
+        help_text=_('Permission groups associated with this team.'),
+        related_name='team_roles',
+        related_query_name='team_roles',
+    )
 
 
 class Team(BaseConstantModel):
@@ -109,10 +118,6 @@ class InvestmentType(BaseConstantModel):
 
 class FDIType(BaseConstantModel):
     """Investment type for foreign direct investments (for investment projects)."""
-
-
-class NonFDIType(BaseConstantModel):
-    """Investment type for non-foreign direct investments (for investment projects)."""
 
 
 class ReferralSourceActivity(BaseConstantModel):

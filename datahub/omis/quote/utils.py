@@ -1,6 +1,7 @@
 from datetime import timedelta
 from pathlib import PurePath
 
+from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.crypto import get_random_string
 from django.utils.timezone import now
@@ -35,12 +36,28 @@ def generate_quote_content(order, expires_on):
     """
     :returns: the content of the quote populated with the given order details.
     """
+    company = order.company.companies_house_data or order.company
+
     return render_to_string(
         QUOTE_TEMPLATE,
         {
             'order': order,
             'pound_pricing': get_pricing_from_order(order, in_pence=False),
-            'expires_on': expires_on,
+            'quote_expires_on': expires_on,
+            'company_address': ', '.join(
+                field for field in (
+                    company.registered_address_1,
+                    company.registered_address_2,
+                    company.registered_address_county,
+                    company.registered_address_town,
+                    company.registered_address_postcode,
+                    getattr(company.registered_address_country, 'name', None)
+                )
+                if field
+            ),
+            'contact_email': order.contact_email or order.contact.email,
+            'generic_contact_email': settings.OMIS_GENERIC_CONTACT_EMAIL,
+            'lead_assignee': order.get_lead_assignee()
         }
     )
 
@@ -71,3 +88,12 @@ def calculate_quote_expiry_date(order):
             ]
         })
     return expiry_date
+
+
+def get_latest_terms_and_conditions():
+    """
+    :returns: the latest TermsAndConditions object if it exists, None otherwise.
+    """
+    from .models import TermsAndConditions
+
+    return TermsAndConditions.objects.order_by('-created_on').first()

@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 import reversion
-from django.utils.timezone import now
+from django.utils.timezone import now, utc
 from freezegun import freeze_time
 from oauth2_provider.models import Application
 from rest_framework import status
@@ -18,7 +18,8 @@ from reversion.models import Version
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import (
-    APITestMixin, synchronous_executor_submit, synchronous_transaction_on_commit
+    APITestMixin, format_date_or_datetime, get_test_user, synchronous_executor_submit,
+    synchronous_transaction_on_commit
 )
 from datahub.core.utils import executor
 from datahub.documents.av_scan import virus_scan_document
@@ -31,11 +32,20 @@ from datahub.investment.test.factories import (
     InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
     VerifyWinInvestmentProjectFactory, WonInvestmentProjectFactory
 )
+from datahub.metadata.test.factories import TeamFactory
 from datahub.oauth.scopes import Scope
 
 
 class TestUnifiedViews(APITestMixin):
     """Tests for the unified investment views."""
+
+    def test_investments_no_permissions(self):
+        """Should return 403"""
+        team = TeamFactory()
+        self._user = get_test_user(team=team)
+        url = reverse('api-v3:investment:investment-collection')
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_list_projects_success(self):
         """Test successfully listing projects."""
@@ -47,6 +57,94 @@ class TestUnifiedViews(APITestMixin):
         response_data = response.json()
         assert response_data['count'] == 1
         assert response_data['results'][0]['id'] == str(project.id)
+        assert response_data['results'][0].keys() == {
+            'id',
+            'incomplete_fields',
+            'name',
+            'project_code',
+            'investment_type',
+            'description',
+            'anonymous_description',
+            'estimated_land_date',
+            'actual_land_date',
+            'quotable_as_public_case_study',
+            'likelihood_of_landing',
+            'priority',
+            'approved_commitment_to_invest',
+            'approved_fdi',
+            'approved_good_value',
+            'approved_high_value',
+            'approved_landed',
+            'approved_non_fdi',
+            'stage',
+            'status',
+            'reason_delayed',
+            'reason_abandoned',
+            'date_abandoned',
+            'reason_lost',
+            'date_lost',
+            'country_lost_to',
+            'investor_company',
+            'investor_type',
+            'investor_company_country',
+            'intermediate_company',
+            'level_of_involvement',
+            'specific_programme',
+            'client_contacts',
+            'client_relationship_manager',
+            'client_relationship_manager_team',
+            'referral_source_adviser',
+            'referral_source_activity',
+            'referral_source_activity_website',
+            'referral_source_activity_marketing',
+            'referral_source_activity_event',
+            'fdi_type',
+            'sector',
+            'business_activities',
+            'other_business_activity',
+            'archived',
+            'archived_on',
+            'archived_reason',
+            'archived_by',
+            'created_on',
+            'modified_on',
+            'fdi_value',
+            'total_investment',
+            'foreign_equity_investment',
+            'government_assistance',
+            'some_new_jobs',
+            'number_new_jobs',
+            'will_new_jobs_last_two_years',
+            'average_salary',
+            'number_safeguarded_jobs',
+            'r_and_d_budget',
+            'non_fdi_r_and_d_budget',
+            'associated_non_fdi_r_and_d_project',
+            'new_tech_to_uk',
+            'export_revenue',
+            'value_complete',
+            'client_cannot_provide_total_investment',
+            'client_cannot_provide_foreign_investment',
+            'client_requirements',
+            'site_decided',
+            'address_1',
+            'address_2',
+            'address_town',
+            'address_postcode',
+            'competitor_countries',
+            'uk_region_locations',
+            'strategic_drivers',
+            'client_considering_other_countries',
+            'uk_company_decided',
+            'uk_company',
+            'requirements_complete',
+            'project_manager',
+            'project_assurance_adviser',
+            'project_manager_team',
+            'project_assurance_team',
+            'team_complete',
+            'team_members'
+        }
 
     def test_list_is_sorted_by_created_on_desc(self):
         """Test list is sorted by created on desc."""
@@ -932,8 +1030,8 @@ class TestModifiedSinceView(APITestMixin):
 
     def test_get_all(self):
         """Test that all results are returned if no filter value is provided."""
-        InvestmentProjectFactory.create_batch(4, modified_on=datetime(2017, 1, 1))
-        InvestmentProjectFactory.create_batch(5, modified_on=datetime(2018, 1, 1))
+        InvestmentProjectFactory.create_batch(4, modified_on=datetime(2017, 1, 1, tzinfo=utc))
+        InvestmentProjectFactory.create_batch(5, modified_on=datetime(2018, 1, 1, tzinfo=utc))
         url = reverse('api-v3:investment:investment-modified-since-collection')
         client = self.create_api_client(
             scope=Scope.mi,
@@ -1134,7 +1232,7 @@ class TestAuditLogView(APITestMixin):
 
     def test_audit_log_view(self):
         """Test retrieval of audit log."""
-        initial_datetime = datetime.utcnow()
+        initial_datetime = now()
         with reversion.create_revision():
             iproject = InvestmentProjectFactory(
                 description='Initial desc',
@@ -1144,7 +1242,7 @@ class TestAuditLogView(APITestMixin):
             reversion.set_date_created(initial_datetime)
             reversion.set_user(self.user)
 
-        changed_datetime = datetime.utcnow()
+        changed_datetime = now()
         with reversion.create_revision():
             iproject.description = 'New desc'
             iproject.save()
@@ -1168,7 +1266,8 @@ class TestAuditLogView(APITestMixin):
         assert entry['id'] == version_id
         assert entry['user']['name'] == self.user.name, 'Valid user captured'
         assert entry['comment'] == 'Changed', 'Comments can be set manually'
-        assert entry['timestamp'] == changed_datetime.isoformat(), 'TS can be set manually'
+        assert entry['timestamp'] == format_date_or_datetime(changed_datetime), \
+            'TS can be set manually'
         assert entry['changes']['description'] == ['Initial desc', 'New desc'], \
             'Changes are reflected'
         assert not {'created_on', 'created_by', 'modified_on', 'modified_by'} & entry[

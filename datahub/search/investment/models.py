@@ -40,6 +40,9 @@ class InvestmentProject(DocType, MapDBModelToDict):
     investor_company = dsl_utils.id_name_mapping()
     investor_company_country = dsl_utils.id_name_mapping()
     investment_type = dsl_utils.id_name_mapping()
+    investor_type = dsl_utils.id_name_mapping()
+    level_of_involvement = dsl_utils.id_name_mapping()
+    specific_programme = dsl_utils.id_name_mapping()
     name = dsl_utils.SortableText()
     name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
     name_trigram = dsl_utils.TrigramText()
@@ -55,7 +58,6 @@ class InvestmentProject(DocType, MapDBModelToDict):
     total_investment = Double()
     foreign_equity_investment = Double()
     number_new_jobs = Integer()
-    non_fdi_type = dsl_utils.id_name_mapping()
     operations_commenced_documents = dsl_utils.id_uri_mapping()
     stage = dsl_utils.id_name_mapping()
     project_code = dsl_utils.SortableCaseInsensitiveKeywordText()
@@ -65,6 +67,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
     referral_source_activity_event = dsl_utils.SortableCaseInsensitiveKeywordText()
     referral_source_advisor = dsl_utils.contact_or_adviser_mapping('referral_source_advisor')
     sector = dsl_utils.id_name_mapping()
+    status = dsl_utils.SortableCaseInsensitiveKeywordText()
     average_salary = dsl_utils.id_name_mapping()
     date_lost = Date()
     date_abandoned = Date()
@@ -83,13 +86,15 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'fdi_value': dict_utils.id_name_dict,
         'intermediate_company': dict_utils.id_name_dict,
         'investor_company': dict_utils.id_name_dict,
+        'investor_type': dict_utils.id_name_dict,
+        'level_of_involvement': dict_utils.id_name_dict,
+        'specific_programme': dict_utils.id_name_dict,
         'uk_region_locations': lambda col: [
             dict_utils.id_name_dict(c) for c in col.all()
         ],
         'uk_company': dict_utils.id_name_dict,
         'investment_type': dict_utils.id_name_dict,
         'associated_non_fdi_r_and_d_project': dict_utils.investment_project_dict,
-        'non_fdi_type': dict_utils.id_name_dict,
         'operations_commenced_documents': lambda col: [
             dict_utils.id_uri_dict(c) for c in col.all()
         ],

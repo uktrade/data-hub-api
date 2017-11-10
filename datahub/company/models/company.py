@@ -8,10 +8,14 @@ from django.utils.functional import cached_property
 
 from datahub.company.validators import RelaxedURLValidator
 from datahub.core import constants
-from datahub.core.models import ArchivableModel, BaseModel
+from datahub.core.models import ArchivableModel, BaseConstantModel, BaseModel
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
+
+class ExportExperienceCategory(BaseConstantModel):
+    """Export experience category."""
 
 
 class CompanyAbstract(models.Model):
@@ -52,8 +56,10 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         'trading_address_town'
     )
 
-    company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    reference_code = models.CharField(max_length=MAX_LENGTH, blank=True, editable=False)
+    company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    vat_number = models.CharField(max_length=MAX_LENGTH, blank=True)
     alias = models.CharField(
         max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name'
     )
@@ -123,9 +129,13 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         'Advisor', blank=True, null=True, on_delete=models.SET_NULL,
         related_name='one_list_owned_companies'
     )
+    export_experience_category = models.ForeignKey(
+        ExportExperienceCategory, blank=True, null=True, on_delete=models.SET_NULL,
+    )
 
     class Meta:
         verbose_name_plural = 'companies'
+        permissions = (('read_company', 'Can read company'),)
 
     @property
     def uk_based(self):
@@ -215,3 +225,4 @@ class CompaniesHouseCompany(CompanyAbstract):
 
     class Meta:
         verbose_name_plural = 'Companies House companies'
+        permissions = (('read_companieshousecompany', 'Can read companies house companies'),)
