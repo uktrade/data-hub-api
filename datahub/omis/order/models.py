@@ -24,7 +24,7 @@ from datahub.omis.quote.models import Quote
 from . import validators
 from .constants import DEFAULT_HOURLY_RATE, OrderStatus, VATStatus
 from .managers import OrderQuerySet
-from .signals import quote_generated
+from .signals import order_cancelled, quote_generated
 from .utils import populate_billing_data
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -262,6 +262,12 @@ class Order(BaseModel):
         """Human-readable representation"""
         return self.reference
 
+    def get_current_contact_email(self):
+        """
+        :returns: the most up-to-date email address for the contact
+        """
+        return self.contact_email or self.contact.email
+
     @classmethod
     def generate_reference(cls):
         """
@@ -493,6 +499,9 @@ class Order(BaseModel):
         self.cancelled_by = by
         self.cancellation_reason = reason
         self.save()
+
+        # send signal
+        order_cancelled.send(sender=self.__class__, order=self)
 
 
 class OrderSubscriber(BaseModel):
