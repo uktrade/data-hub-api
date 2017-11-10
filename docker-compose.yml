@@ -19,7 +19,6 @@ services:
       COV_TOKEN: ${COV_TOKEN}
       ES_INDEX: test_index
       ES5_URL: http://es:9200
-      CDMS_AUTH_URL: http://example.com
       AWS_DEFAULT_REGION: eu-west-2
       AWS_ACCESS_KEY_ID: foo
       AWS_SECRET_ACCESS_KEY: bar
