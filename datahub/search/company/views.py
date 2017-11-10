@@ -27,6 +27,7 @@ class SearchCompanyParams:
     )
 
     REMAP_FIELDS = {
+        'name': 'name_trigram',
         'trading_name': 'trading_name_trigram',
         'account_manager': 'account_manager.id',
         'export_to_country': 'export_to_countries.id',

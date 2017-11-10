@@ -25,11 +25,13 @@ def setup_data(setup_es):
     """Sets up data for the tests."""
     country_uk = constants.Country.united_kingdom.value.id
     country_us = constants.Country.united_states.value.id
+    uk_region = constants.UKRegion.south_east.value.id
     CompanyFactory(
         name='abc defg ltd',
         trading_address_1='1 Fake Lane',
         trading_address_town='Downtown',
-        trading_address_country_id=country_uk
+        trading_address_country_id=country_uk,
+        uk_region_id=uk_region,
     )
     CompanyFactory(
         name='abc defg us ltd',
@@ -54,13 +56,10 @@ class TestSearch(APITestMixin):
 
     def test_trading_address_country_filter(self, setup_data):
         """Tests trading address country filter."""
-        term = 'abc defg'
-
         url = reverse('api-v3:search:company')
         united_states_id = constants.Country.united_states.value.id
 
         response = self.api_client.post(url, {
-            'original_query': term,
             'trading_address_country': united_states_id,
         })
 
@@ -68,6 +67,20 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['trading_address_country']['id'] == united_states_id
+
+    def test_uk_region_filter(self, setup_data):
+        """Tests uk region filter."""
+        url = reverse('api-v3:search:company')
+        uk_region = constants.UKRegion.south_east.value.id
+
+        response = self.api_client.post(url, {
+            'uk_region': uk_region,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['uk_region']['id'] == uk_region
 
     def test_multiple_trading_address_country_filter(self, setup_data):
         """Tests multiple trading address countries filter."""
@@ -108,6 +121,53 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['id'] == str(company.id)
         assert response.data['results'][0]['trading_name'] == company.alias
+
+    @pytest.mark.parametrize(
+        'company_name,search_name,match',
+        (
+            ('abcdefghijk', 'abc', True),
+            ('abcdefghijk', 'bcd', True),
+            ('abcdefghijk', 'hij', True),
+            ('abcdefghijk', 'cdefgh', True),
+            ('abcdefghijk', 'bcde', True),
+            ('abcdefghijk', 'hijk', True),
+            ('abcdefghijk', 'abcdefghijk', True),
+            ('abcdefghijk', 'abc xyz', False),
+            ('abcdefghijk', 'ab', False),
+            ('abcdefghijk', 'cats', False),
+            ('abcdefghijk', 'xyz', False),
+            ('abcdefghijk', 'abd', False),
+            ('abcdefghijk', 'abdeghk', False),
+            ('Pallas Hiding', 'pallas', True),
+            ('Pallas Hiding', 'hid', True),
+            ('Pallas Hiding', 'las', True),
+            ('Pallas Hiding', 'Pallas Hiding', True),
+            ('Pallas Hiding', 'Pallas Hid', True),
+            ('Pallas Hiding', 'Pallas Hi', True),
+        )
+    )
+    def test_name_filter_match(self, setup_es, company_name, search_name, match):
+        """Tests company name partial search."""
+        company = CompanyFactory(
+            name=company_name
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:company')
+
+        response = self.api_client.post(url, {
+            'name': search_name,
+        })
+        assert response.status_code == status.HTTP_200_OK
+
+        if match:
+            assert response.data['count'] == 1
+            assert len(response.data['results']) == 1
+            assert response.data['results'][0]['id'] == str(company.id)
+            assert response.data['results'][0]['name'] == company.name
+        else:
+            assert response.data['count'] == 0
+            assert len(response.data['results']) == 0
 
     def test_null_filter(self, setup_es):
         """Tests filter with null value."""
