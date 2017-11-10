@@ -1,6 +1,8 @@
 from django.core.exceptions import ImproperlyConfigured
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
+from datahub.investment.models import InvestmentProject
+
 
 class DjangoCrudPermission(DjangoModelPermissions):
     """Extension of Permission class to include read permissions"""
@@ -24,14 +26,43 @@ class UserHasPermissions(BasePermission):
         return request.user and request.user.has_perm(view.permission_required)
 
 
-class IsLEPWithTeamAssociatedToIProject(BasePermission):
+class UserObjectAssociationCheck:
+    """Base association check class."""
+
+    _action2method = {
+        'list': 'read',
+        'detail': 'read',
+        'retrieve': 'read',
+        'destroy': 'delete',
+        'destroy_all': 'delete',
+        'partial_update': 'change',
+    }
+
+    def action_2_method(self, action):
+        """Change ViewSet action to permissions method."""
+        return self._action2method.get(action, action)
+
+    def is_associated(self, request, view, obj):
+        """Check for connection."""
+        return True
+
+    def check_condition(self, request, view):
+        """Check if condition should be applied."""
+        return
+
+    class Meta:
+        abstract = True
+
+
+class IsAssociatedToObjectPermission(BasePermission, UserObjectAssociationCheck):
     """
     Check the investment project has a users team associated with it
     """
 
-    def has_permission(self, request, view):
-        pass
+    base_permission = None
 
-    def has_object_permission(self, request, view, object):
-        pass
-
+    def has_object_permission(self, request, view, obj):
+        """Check for object permissions."""
+        if self.check_condition(request, view):
+            return self.is_associated(request, view, obj)
+        return True

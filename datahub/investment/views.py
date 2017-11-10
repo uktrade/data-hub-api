@@ -13,13 +13,14 @@ from rest_framework.response import Response
 
 from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
-from datahub.core.permissions import IsLEPWithTeamAssociatedToIProject
 from datahub.core.utils import executor
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.documents.av_scan import virus_scan_document
+from datahub.investment.filters import IsTeamAssociatedToInvestmentProjectFilter
 from datahub.investment.models import (
     InvestmentProject, InvestmentProjectTeamMember, IProjectDocument
 )
+from datahub.investment.permissions import IsTeamAssociatedToInvestmentProjectPermission
 from datahub.investment.serializers import (
     IProjectDocumentSerializer, IProjectSerializer, IProjectTeamMemberSerializer,
     UploadStatusSerializer
@@ -46,6 +47,8 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     This replaces the previous project, value, team and requirements endpoints.
     """
 
+    permission_classes = CoreViewSetV3.permission_classes.copy() + \
+        [IsTeamAssociatedToInvestmentProjectPermission]
     required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectSerializer
     queryset = InvestmentProject.objects.select_related(
@@ -79,7 +82,9 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'strategic_drivers',
         Prefetch('team_members', queryset=_team_member_queryset),
     )
-    filter_backends = (DjangoFilterBackend, OrderingFilter,)
+    filter_backends = (DjangoFilterBackend,
+                       OrderingFilter,
+                       IsTeamAssociatedToInvestmentProjectFilter)
     filter_fields = ('investor_company_id',)
     ordering = ('-created_on',)
 
@@ -118,7 +123,8 @@ class _SinglePagePaginator(BasePagination):
 class IProjectModifiedSinceViewSet(IProjectViewSet):
     """View set for the modified-since endpoint (intended for use by Data Hub MI)."""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope, IsLEPWithTeamAssociatedToIProject)
+    permission_classes = (IsAuthenticatedOrTokenHasScope,
+                          IsTeamAssociatedToInvestmentProjectPermission)
     required_scopes = (Scope.mi,)
     pagination_class = _SinglePagePaginator
 
