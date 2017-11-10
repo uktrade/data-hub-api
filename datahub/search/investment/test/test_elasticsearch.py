@@ -93,6 +93,10 @@ def test_get_basic_search_query():
                             }
                         }
                     }, {
+                        'match': {
+                            'company_number': 'test'
+                        }
+                    }, {
                         'nested': {
                             'path': 'contact',
                             'query': {
