@@ -449,7 +449,7 @@
   pk: 00d616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:25:29Z'
     name: BERR - Business Relationship
     role: 876cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -457,7 +457,7 @@
   pk: 012a3959-9798-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:10:52Z'
     name: DSO RD Central 1
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -593,7 +593,7 @@
   pk: 03d616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:10:53Z'
     name: DSO RD Central 2
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -601,7 +601,7 @@
   pk: 0448318c-9698-e211-a939-e4115bead28a
 - fields:
     country: 9f5f66a0-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:25:05Z'
     name: British Consulate Adelaide
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -617,7 +617,7 @@
   pk: 047c51d4-9698-e211-a939-e4115bead28a
 - fields:
     country: 83756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:09Z'
     name: British Consulate General Stuttgart Germany
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -714,7 +714,7 @@
   pk: 06d616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:25:30Z'
     name: East of England Development Agency
     role: 63329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -722,7 +722,7 @@
   pk: 072a3959-9798-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:10:54Z'
     name: DSO RD Central 3
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -771,7 +771,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: IG - Specialists - Advanced Manufacturing
+    name: Advanced Manufacturing Sector
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -842,7 +842,7 @@
   pk: 0a362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:10:55Z'
     name: DSO RD Central Director & PA
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -866,7 +866,7 @@
   pk: 0a7e43ce-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-06T15:39:56Z'
     name: ST - Director - Advanced Manufacturing
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -978,7 +978,7 @@
   pk: 0d362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:11:23Z'
     name: DSO RD Central Military Advisers
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -1018,7 +1018,7 @@
   pk: 0d7e43ce-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-06T15:40:19Z'
     name: ST - Advanced Manufacturing - Support Team
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -1066,7 +1066,7 @@
   pk: 0f374ae0-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:57Z'
     name: ChinaLink
     role: 846cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1082,7 +1082,7 @@
   pk: 0fd616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:07Z'
     name: British Chambers of Commerce (BCC)
     role: 61329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1090,7 +1090,7 @@
   pk: 10362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:30:27Z'
     name: DSO RD West 1
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -1154,7 +1154,7 @@
   pk: 11f12898-9698-e211-a939-e4115bead28a
 - fields:
     country: 86756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:19Z'
     name: UKTI Office Seville Spain
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1186,7 +1186,7 @@
   pk: 13362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:12:12Z'
     name: DSO RD East Military Advisers
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -1226,7 +1226,7 @@
   pk: 137e43ce-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-06T16:09:01Z'
     name: ST - Advanced Manufacturing - ICT
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -1306,7 +1306,7 @@
   pk: 15d616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:25:33Z'
     name: International Trade Team Business Link North Manchester (Wigan, Bolton,
       Bury, Oldham and Rochdale)
     role: 5e329c18-6095-e211-a939-e4115bead28a
@@ -1323,7 +1323,7 @@
   pk: 16362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-29T11:27:04Z'
     name: DSO RD West 2
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -1331,7 +1331,7 @@
   pk: 1648318c-9698-e211-a939-e4115bead28a
 - fields:
     country: 716a9ab2-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:04Z'
     name: British Embassy Tehran Iran
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1363,7 +1363,7 @@
   pk: 16841eb0-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:45Z'
     name: SG1 - High Value Opportunities Programme
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1371,7 +1371,7 @@
   pk: 175a60f2-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:42Z'
     name: IG 1 - Director & PA
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1459,7 +1459,7 @@
   pk: 18e84437-5a25-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:28Z'
     name: UKTI Deputy Chief Executive & PA
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1467,7 +1467,7 @@
   pk: 19362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:30:32Z'
     name: DSO RD West Director & Outer Office
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -1475,7 +1475,7 @@
   pk: 1948318c-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:27Z'
     name: BERR BR2 - Construction
     role: 876cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1523,7 +1523,7 @@
   pk: 19c2abaa-f54e-e411-985c-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:45Z'
     name: SG1 - Director & PA SG1 Infrastructure Projects
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1531,7 +1531,7 @@
   pk: 1a5a60f2-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:43Z'
     name: IG 1 - Russia, Turkey, Kazakhstan, Caucasus
     role: 5f329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1603,7 +1603,7 @@
   pk: 1be2bd39-8025-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:28Z'
     name: SG5 - Director & PA SG5 Energy/Advanced Engineering
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1611,7 +1611,7 @@
   pk: 1be765fe-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-29T14:23:29Z'
     name: DSO RD West 3
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -1619,7 +1619,7 @@
   pk: 1c48318c-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:28Z'
     name: BERR BR2 - Europe & International Business Relations
     role: 876cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1659,7 +1659,7 @@
   pk: 1c841eb0-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:44Z'
     name: IG 1 - Directorate Co-ordinators
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1683,7 +1683,7 @@
   pk: 1d8433c8-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:24:25Z'
     name: UKTI
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1691,7 +1691,7 @@
   pk: 1dd5fa3a-9798-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-11-13T15:55:57Z'
     name: SRM - Managing Director & PA
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -1723,7 +1723,7 @@
   pk: 1ed616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:28Z'
     name: SG5 - Energy Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1731,7 +1731,7 @@
   pk: 1ee765fe-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:12:33Z'
     name: DSO RD East Military Advisers
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -1739,7 +1739,7 @@
   pk: 1f48318c-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:29Z'
     name: 'BERR BR2 - Electronics & IT Services '
     role: 876cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1763,7 +1763,7 @@
   pk: 1f7c51d4-9698-e211-a939-e4115bead28a
 - fields:
     country: a56ee1ca-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:09Z'
     name: British Trade and Cultural Office Kaohsiung Taiwan
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1787,7 +1787,7 @@
   pk: 1ff430cd-82c3-e211-a646-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:47Z'
     name: SG2 - Agri-Food and Retail Sector Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1795,7 +1795,7 @@
   pk: 205a60f2-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:44Z'
     name: IG 1 - Middle East
     role: 5f329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1819,7 +1819,7 @@
   pk: 20f12898-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-11-06T11:43:03Z'
     name: SRM - Cross Cutting Sectors and Relationship Management Team
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -1843,7 +1843,7 @@
   pk: 21d616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:29Z'
     name: SG5 - Advanced Engineering Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1851,7 +1851,7 @@
   pk: 21e765fe-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:30Z'
     name: BG - Business Partnerships
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1859,7 +1859,7 @@
   pk: 22362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:12:11Z'
     name: DSO RD East Director & Outer Office
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -1899,7 +1899,7 @@
   pk: 22841eb0-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:47Z'
     name: SG2 - Education and Skills Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1907,7 +1907,7 @@
   pk: 235a60f2-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:45Z'
     name: IG 1 - Africa
     role: 5f329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1971,7 +1971,7 @@
   pk: 24d616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:30Z'
     name: BG - Universities Liaison
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -1979,7 +1979,7 @@
   pk: 25362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:29:21Z'
     name: DSO RD East 1
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -2011,7 +2011,7 @@
   pk: 257c51d4-9698-e211-a939-e4115bead28a
 - fields:
     country: 83756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:10Z'
     name: British Trade Office Leipzig Germany
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2035,7 +2035,7 @@
   pk: 259199aa-0653-e611-af02-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:45Z'
     name: IG 1 - Brazil, Mexico, Latin America
     role: 5f329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2115,7 +2115,7 @@
   pk: 28421f86-8025-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:12:10Z'
     name: DSO RD East 3
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -2163,7 +2163,7 @@
   pk: 28f7d0de-2f50-e311-a56a-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-05T20:57:14Z'
     name: DSO - RD 1E
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -2195,7 +2195,7 @@
   pk: 29cd87be-c191-e511-a84e-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-05T20:38:35Z'
     name: DSO - RD 1B
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -2259,7 +2259,7 @@
   pk: 2b288578-6525-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:31Z'
     name: BG - Local & Sub-National Policy
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2267,7 +2267,7 @@
   pk: 2b362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:31Z'
     name: SG1 - Low Carbon Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2347,7 +2347,7 @@
   pk: 2d4049e6-9698-e211-a939-e4115bead28a
 - fields:
     country: 81756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:25:23Z'
     name: British Midlands Chicago Office
     role: 866cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2363,7 +2363,7 @@
   pk: 2dd616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:32Z'
     name: BG - Venture Capital Unit
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2379,7 +2379,7 @@
   pk: 2e48318c-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:32Z'
     name: SG1 - Global Infrastructure & Cross-Sector Projects Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2443,7 +2443,7 @@
   pk: 2f4a754c-0753-e611-af02-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:50Z'
     name: SG2 - Financial Services Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2515,7 +2515,7 @@
   pk: 31133952-1353-e611-af02-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:33Z'
     name: BG - Strategic Relationship Unit
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2531,7 +2531,7 @@
   pk: 3148318c-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:32Z'
     name: SG1 - High Value Opportunities (HVO) Activities
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2635,7 +2635,7 @@
   pk: 334049e6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:25:25Z'
     name: IIG - Inward Investment Group
     role: 856cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2651,7 +2651,7 @@
   pk: 33d616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:33Z'
     name: BG - Fiscal Stimulus Initiative
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2667,7 +2667,7 @@
   pk: 3448318c-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:33Z'
     name: SG1 - Environment & Water Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2691,7 +2691,7 @@
   pk: 347c51d4-9698-e211-a939-e4115bead28a
 - fields:
     country: 300be5c4-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:10Z'
     name: British Consulate General Gothenburg
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2699,7 +2699,7 @@
   pk: 347e43ce-9698-e211-a939-e4115bead28a
 - fields:
     country: 786a9ab2-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:03Z'
     name: British Embassy Office Almaty Kazakhstan
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2763,7 +2763,7 @@
   pk: 36d616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:34Z'
     name: BG - Global Partnerships
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2779,7 +2779,7 @@
   pk: 3748318c-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:33Z'
     name: SG1 - Ports Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2835,7 +2835,7 @@
   pk: 3809f185-5f25-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:56Z'
     name: IG 2 - Director & PA
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2907,7 +2907,7 @@
   pk: 394049e6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-05T22:18:04Z'
     name: DSO - Head - Business Development - SME Team
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -2931,7 +2931,7 @@
   pk: 39d616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:34Z'
     name: BG - Operations and Services
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2940,14 +2940,14 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: ITFG - E-Business Operational Support Team
+    name: Digital Data Hub - Live Service
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
   pk: 3a48318c-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:34Z'
     name: SG1 - Global Sports Projects
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2955,7 +2955,7 @@
   pk: 3a6743ec-9698-e211-a939-e4115bead28a
 - fields:
     country: b05f66a0-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:05Z'
     name: British Consulate Belo Horizonte Brazil
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2963,7 +2963,7 @@
   pk: 3a6e1abc-9698-e211-a939-e4115bead28a
 - fields:
     country: 1c50bdb8-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:12Z'
     name: British Trade Office and Consulate Christchurch New Zealand
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -2971,7 +2971,7 @@
   pk: 3a7c51d4-9698-e211-a939-e4115bead28a
 - fields:
     country: 310be5c4-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:11Z'
     name: British Consulate General Zurich Switzerland
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3027,7 +3027,7 @@
   pk: 3baa1c21-0953-e611-af02-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2016-07-26T12:58:18Z'
     name: Invest Bristol and Bath
     role: b4fb1b54-5925-e511-b6bc-e4115bead28a
     uk_region: 894cd12a-6095-e211-a939-e4115bead28a
@@ -3067,7 +3067,7 @@
   pk: 3cd616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:35Z'
     name: BG - Director International Services & PS
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3075,7 +3075,7 @@
   pk: 3d362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-05T22:30:48Z'
     name: ITFG - Director ITFG & PA
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -3083,7 +3083,7 @@
   pk: 3d48318c-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:35Z'
     name: SG1 - Railways Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3091,7 +3091,7 @@
   pk: 3d6743ec-9698-e211-a939-e4115bead28a
 - fields:
     country: b05f66a0-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:06Z'
     name: British Consulate General Curitiba Brazil
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3123,7 +3123,7 @@
   pk: 3d841eb0-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:23:44Z'
     name: BERR Priority Projects Directorate
     role: 876cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3139,7 +3139,7 @@
   pk: 3def1649-8854-e611-af02-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:57Z'
     name: IG 2 - Asia Pacific
     role: 5f329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3219,7 +3219,7 @@
   pk: 3ff47a07-002c-e311-a78e-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:36Z'
     name: BG - High Growth Markets Programme
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3227,7 +3227,7 @@
   pk: 40362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:22Z'
     name: ITFG - Management Support Team
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3235,7 +3235,7 @@
   pk: 4048318c-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:35Z'
     name: SG1 - Power Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3283,7 +3283,7 @@
   pk: 409ed722-9798-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:25:49Z'
     name: One NorthEast
     role: 63329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3331,7 +3331,7 @@
   pk: 42374ae0-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-11-18T13:56:04Z'
     name: IG - Tech City - Chief Executive
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -3363,7 +3363,7 @@
   pk: 42d616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:36Z'
     name: BG - FTSE 100 Programme
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3372,14 +3372,14 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: ITFG - Finance Team
+    name: DIT Finance & Corporate Services
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
   pk: 4348318c-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:36Z'
     name: SG1 - Airports Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3427,7 +3427,7 @@
   pk: 439ed722-9798-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:03Z'
     name: SG3 - ICT Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3435,7 +3435,7 @@
   pk: 43a963f8-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:58Z'
     name: 'IG 2 - South East Asia '
     role: 5f329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3443,7 +3443,7 @@
   pk: 4426910a-9798-e211-a939-e4115bead28a
 - fields:
     country: 82756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:25:49Z'
     name: British Consulate General Marseille France
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3523,7 +3523,7 @@
   pk: 45d616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:37Z'
     name: BG - Executive Support
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3539,7 +3539,7 @@
   pk: 4648318c-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:36Z'
     name: SG1 - Construction Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3587,7 +3587,7 @@
   pk: 469ed722-9798-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:03Z'
     name: SG3 - Sector Champions Unit
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3595,7 +3595,7 @@
   pk: 46a963f8-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:59Z'
     name: IG 2 - China Markets Unit
     role: 5f329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3699,7 +3699,7 @@
   pk: 492aca01-8425-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:37Z'
     name: BG - Strategy & Networks
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3715,7 +3715,7 @@
   pk: 4948318c-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:37Z'
     name: SG1 - Environment Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3731,7 +3731,7 @@
   pk: 496e1abc-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-05T21:09:40Z'
     name: DSO - RD 2B
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -3763,7 +3763,7 @@
   pk: 49841eb0-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:23:45Z'
     name: BERR - Europe, International Trade and Development
     role: 876cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3771,7 +3771,7 @@
   pk: 499ed722-9798-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:23:00Z'
     name: IG 2 - South Asia Unit
     role: 5f329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3859,7 +3859,7 @@
   pk: 4bd616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:38Z'
     name: BG - Investment Change
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3867,7 +3867,7 @@
   pk: 4c362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:22Z'
     name: SG - Post Challenge Fund
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -3875,7 +3875,7 @@
   pk: 4c48318c-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2014-06-19T19:08:50Z'
     name: Low Carbon Activities
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -3948,7 +3948,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: DSO Cyber Security Export Team
+    name: DSO Cyber Security Team
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -4027,7 +4027,7 @@
   pk: 4ed616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:39Z'
     name: BG - Deputy Director for Investment - Strategy
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4035,7 +4035,7 @@
   pk: 4f362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:23Z'
     name: Global Value Chains
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4075,7 +4075,7 @@
   pk: 4f841eb0-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:23:00Z'
     name: IG Emerging Markets Fund
     role: 5f329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4099,7 +4099,7 @@
   pk: 50f12898-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-11-18T13:55:24Z'
     name: IG - GEP Dealmakers
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -4123,7 +4123,7 @@
   pk: 51d616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:39Z'
     name: BG - Deputy Director for Investment - Projects
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4131,7 +4131,7 @@
   pk: 52362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:24Z'
     name: SG - Group Finance & Liaison Services
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4179,7 +4179,7 @@
   pk: 53118022-4818-e611-9bdc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:57Z'
     name: SG2 - Creative and Media Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4243,7 +4243,7 @@
   pk: 54d616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:40Z'
     name: BG - New Technology Investment & Entrepreneurship
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4259,7 +4259,7 @@
   pk: 553c7f61-7625-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:24Z'
     name: SG - Managing Director & PA
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4307,7 +4307,7 @@
   pk: 55d78f3a-1453-e611-af02-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:58Z'
     name: SG2 - Director & PA SG2 Service Industries
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4339,7 +4339,7 @@
   pk: 56f12898-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:20Z'
     name: BERR BR1 - Aerospace, Marine & Defence
     role: 876cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4379,7 +4379,7 @@
   pk: 58251317-1653-e611-af02-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:40Z'
     name: BG - Business Analysis
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4435,7 +4435,7 @@
   pk: 58edaf4d-6625-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-05T21:52:40Z'
     name: DSO - Business Development - Exportability
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -4443,7 +4443,7 @@
   pk: 590d9e0c-1fad-e211-a646-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-06T08:36:05Z'
     name: DSO - Business Development - Key Account Management
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -4451,7 +4451,7 @@
   pk: 591712a1-20ad-e211-a646-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-05T20:56:58Z'
     name: DSO - RD 1D
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -4459,7 +4459,7 @@
   pk: 59225eb2-26ad-e211-a646-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-06T08:45:30Z'
     name: DSO - Business Development - Events
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -4475,7 +4475,7 @@
   pk: 59546e6a-5b25-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:58Z'
     name: SG2 - Regionally Devolved Sectors, Aid Funded Business and BDV Units
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4491,7 +4491,7 @@
   pk: 5985d416-0353-e611-af02-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-06T08:26:44Z'
     name: DSO Business Development - Market Analysis
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -4499,7 +4499,7 @@
   pk: 59b14ffc-1aad-e211-a646-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:21Z'
     name: BERR BR2 - Chemicals
     role: 876cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4531,7 +4531,7 @@
   pk: 5b0ba029-0653-e611-af02-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:41Z'
     name: BG - Projects Team 2
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4539,7 +4539,7 @@
   pk: 5b362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2014-06-19T19:07:06Z'
     name: Britain Open for Business (BOFB)
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -4571,7 +4571,7 @@
   pk: 5b841eb0-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:59Z'
     name: SG2 - Aid Funded Business Service
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4595,7 +4595,7 @@
   pk: 5cf66306-9243-e611-af01-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:21Z'
     name: DTI - Construction Unit
     role: 876cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4643,7 +4643,7 @@
   pk: 5e2f39ac-1953-e611-af02-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:42Z'
     name: BG - Country Specialists
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4731,7 +4731,7 @@
   pk: 602b971d-5df6-e511-888e-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2016-07-25T07:42:08Z'
     name: Regenerate Pennine Lancashire
     role: b4fb1b54-5925-e511-b6bc-e4115bead28a
     uk_region: 824cd12a-6095-e211-a939-e4115bead28a
@@ -4739,7 +4739,7 @@
   pk: 6032ee57-f14d-e611-af02-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:22Z'
     name: DTI - Consumer Goods and Services Unit
     role: 876cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4771,7 +4771,7 @@
   pk: 60d616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:42Z'
     name: BG - Projects Team 1
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4811,7 +4811,7 @@
   pk: 61841eb0-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:09Z'
     name: SG3 - Life Sciences Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4819,7 +4819,7 @@
   pk: 61a963f8-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:00Z'
     name: SG3 - Healthcare Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4859,7 +4859,7 @@
   pk: 63d616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:43Z'
     name: BG - Projects Team 3
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4883,7 +4883,7 @@
   pk: 646e1abc-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:24:56Z'
     name: Department of Trade and Industry (DTI)
     role: 61329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4907,7 +4907,7 @@
   pk: 64e0d3b1-fbf2-e411-bcbe-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:23:13Z'
     name: IG 3 - Caribbean & Australasia
     role: 5f329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4915,7 +4915,7 @@
   pk: 64f7b410-9798-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:01Z'
     name: 'SG3 - ICT Team : Communications & Broadcasting'
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4947,7 +4947,7 @@
   pk: 65e7039f-f189-e411-a839-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:23Z'
     name: DTI - Software and Computer Services
     role: 876cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -4979,7 +4979,7 @@
   pk: 66d616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:43Z'
     name: BG - Projects Team 4
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5011,7 +5011,7 @@
   pk: 67841eb0-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:10Z'
     name: SG3 - Resource Unit SG3
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5019,7 +5019,7 @@
   pk: 67a963f8-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:23:14Z'
     name: IG 3 - Director & PA
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5027,7 +5027,7 @@
   pk: 67f7b410-9798-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:01Z'
     name: 'SG3 - ICT Team : Digital Entertainment'
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5059,7 +5059,7 @@
   pk: 68b4cbaa-2f50-e311-a56a-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:24Z'
     name: BERR BR1 - Automotive
     role: 876cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5107,7 +5107,7 @@
   pk: 6a2dffd7-4463-e311-8255-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:44Z'
     name: BG - Projects Team 5
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5131,7 +5131,7 @@
   pk: 6a6e1abc-9698-e211-a939-e4115bead28a
 - fields:
     country: a46ee1ca-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:03Z'
     name: British Trade Office Aleppo Syria
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5139,7 +5139,7 @@
   pk: 6a841eb0-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:10Z'
     name: SG3 - ICT Team - OLD SERVICE PROVIDER
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5147,7 +5147,7 @@
   pk: 6aa963f8-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:23:14Z'
     name: IG 3 - North America & Japan
     role: 5f329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5211,7 +5211,7 @@
   pk: 6d841eb0-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:11Z'
     name: SG3 - Director & PA SG3 High Tech Sectors
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5219,7 +5219,7 @@
   pk: 6da963f8-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:23:15Z'
     name: IG 3 - Europe
     role: 5f329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5251,7 +5251,7 @@
   pk: 6eff40b1-cfe9-e511-8ffa-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:24Z'
     name: BERR BR1 - Sustainable Development & Regulation
     role: 876cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5299,7 +5299,7 @@
   pk: 70362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:44Z'
     name: SG1 - Large Scale Research Facilities
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5323,7 +5323,7 @@
   pk: 70841eb0-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2014-08-28T15:44:28Z'
     name: SG4 - Regional Challenge Fund
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -5347,7 +5347,7 @@
   pk: 72095a3c-8325-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:25Z'
     name: DTI - Materials and Engineering Unit
     role: 876cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5379,7 +5379,7 @@
   pk: 72d616b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:46Z'
     name: BG - Science & Innovation Team
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5387,7 +5387,7 @@
   pk: 73362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2015-04-01T13:50:06Z'
     name: Marketing -  Digital
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5451,7 +5451,7 @@
   pk: 7510dd28-9798-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:25Z'
     name: BERR BR1 - Bioscience
     role: 876cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5459,7 +5459,7 @@
   pk: 754049e6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:46Z'
     name: BG - Sales 3
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5483,7 +5483,7 @@
   pk: 76841eb0-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:23:17Z'
     name: BG - Briefing Tours
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5555,7 +5555,7 @@
   pk: 78ac4641-1653-e611-af02-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:23:26Z'
     name: BG - Regional Directorate HQ Team
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5571,7 +5571,7 @@
   pk: 78da65cc-8825-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:47Z'
     name: BG - Sales 1
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5587,7 +5587,7 @@
   pk: 796e1abc-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-05T20:49:27Z'
     name: DSO - RD 1C
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -5595,7 +5595,7 @@
   pk: 7987ca94-25ad-e211-a646-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-05T22:09:04Z'
     name: DSO - Director - RD2
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -5619,7 +5619,7 @@
   pk: 7af924aa-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:24:00Z'
     name: Somerset International Trade Team
     role: 5e329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5643,7 +5643,7 @@
   pk: 7bc40cdb-cfe9-e511-8ffa-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:48Z'
     name: BG - Operational Support
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5699,7 +5699,7 @@
   pk: 7e220ed4-f84d-e311-a56a-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:27Z'
     name: BERR BR2 - Retail
     role: 876cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5715,7 +5715,7 @@
   pk: 7e4d24c2-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:48Z'
     name: BG - Investment Policy Section
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5763,7 +5763,7 @@
   pk: 81d1fd91-23c0-e511-88b6-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:49Z'
     name: BG - Global Entrepreneur Programme
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5771,7 +5771,7 @@
   pk: 82362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:26Z'
     name: Marketing - Marketing Team
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5803,7 +5803,7 @@
   pk: 828faef2-5f25-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:15Z'
     name: SG4 - Enquiry Unit
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5843,7 +5843,7 @@
   pk: 844d24c2-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:49Z'
     name: BG - PCRU
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5859,7 +5859,7 @@
   pk: 853720af-0453-e611-af02-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:27Z'
     name: Marketing - Press Office
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5891,7 +5891,7 @@
   pk: 85c88c98-1153-e611-af02-e4115bead28a
 - fields:
     country: 83756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:12Z'
     name: British Consulate General Frankfurt Germany
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5931,7 +5931,7 @@
   pk: 87fd164a-0a4e-e311-a56a-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:50Z'
     name: BG - Director for Investment
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5939,7 +5939,7 @@
   pk: 88362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:27Z'
     name: Marketing - Online Communications Team
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5963,7 +5963,7 @@
   pk: 8880da16-d80e-e611-9bdc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:16Z'
     name: SG4 - Director & PA SG4 TAP/Enquiry Service
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -5995,7 +5995,7 @@
   pk: 88e8bf5b-5e25-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:23:20Z'
     name: International Trade Director and Central Team East Midlands
     role: 5d329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -6011,7 +6011,7 @@
   pk: 895777af-bcd6-e411-bbc1-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2015-01-12T10:43:44Z'
     name: DSO - Director - Business Development - Support to Business
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -6019,7 +6019,7 @@
   pk: 896da161-1dad-e211-a646-e4115bead28a
 - fields:
     country: 81756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:13Z'
     name: British Consulate Denver
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -6083,7 +6083,7 @@
   pk: 8a6f9803-6125-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:50Z'
     name: BG - Managing Director & PA
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -6107,7 +6107,7 @@
   pk: 8b65239e-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:17Z'
     name: SG5 - Oil and Gas Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -6171,7 +6171,7 @@
   pk: 8d7b8a94-5e25-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:51Z'
     name: BG - Sales 2
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -6203,7 +6203,7 @@
   pk: 8ea5c796-1026-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:22:17Z'
     name: SG5 - Aerospace Team
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -6252,7 +6252,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: Marketing - Trade Campaign Team
+    name: Marketing Campaigns
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
   model: metadata.team
@@ -6299,7 +6299,7 @@
   pk: 934d24c2-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:52Z'
     name: XXX IIG - Americas Section
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -6331,7 +6331,7 @@
   pk: 9560f354-1853-e611-af02-e4115bead28a
 - fields:
     country: 81756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:13Z'
     name: British Consulate Seattle
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -6379,7 +6379,7 @@
   pk: 9700a898-1e63-e311-8255-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:52Z'
     name: XXX IIG - Europe Section
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -6395,7 +6395,7 @@
   pk: 9748318c-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:55Z'
     name: 'Montgomery International '
     role: 846cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -6411,7 +6411,7 @@
   pk: 98607510-6725-e511-b6bc-e4115bead28a
 - fields:
     country: 81756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:14Z'
     name: British Consulate Dallas USA
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -6475,7 +6475,7 @@
   pk: 99a87d50-c576-e311-8dfb-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-05T22:04:29Z'
     name: DSO - Director - RD1
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -6491,7 +6491,7 @@
   pk: 9a03012b-e6f6-e311-8a2b-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:53Z'
     name: XXX IIG - Asia Pacific Africa Section
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -6563,7 +6563,7 @@
   pk: 9c4d24c2-9698-e211-a939-e4115bead28a
 - fields:
     country: null
-    disabled_on: null
+    disabled_on: '2013-03-31T16:24:07Z'
     name: TEST SERVICE PROVIDER 8 NOV
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -6571,7 +6571,7 @@
   pk: 9c79fd34-9798-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:53Z'
     name: XXX IIG - Senior Management
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -6579,7 +6579,7 @@
   pk: 9d362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:23:40Z'
     name: 'University of Warwick Science Park Limited:  West Midlands R & D Innovation
       & Internationalisation Direct Support'
     role: 66329c18-6095-e211-a939-e4115bead28a
@@ -6596,7 +6596,7 @@
   pk: 9d48318c-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:24:34Z'
     name: East of England Development Agency (EEDA) - Invest
     role: 64329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -6693,14 +6693,14 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Financial & Professional Business Services
+    name: Events - Financial & Professional Business Services
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
   pk: a0362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:12Z'
     name: 'Coventry University Enterprises Limited : Soft Landing Zone R & D Programme'
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -6764,7 +6764,7 @@
   pk: a24d24c2-9698-e211-a939-e4115bead28a
 - fields:
     country: null
-    disabled_on: null
+    disabled_on: '2013-03-31T16:24:09Z'
     name: CRM Date/Time Test
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -6773,14 +6773,14 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Education
+    name: Events - Education
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
   pk: a3362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:23:41Z'
     name: 'Daresbury Science and Innovation Campus Limited: Advanced R & D Investments
       in the North West'
     role: 66329c18-6095-e211-a939-e4115bead28a
@@ -6789,7 +6789,7 @@
   pk: a33ade1c-9798-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2015-03-30T21:56:05Z'
     name: Marketing - Head of External Relations
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -6862,7 +6862,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Technology, Innovation and Events - Science and Innovation
+    name: Technology, Innovation and Events - Science and Innovation
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -6870,14 +6870,14 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Services
+    name: Events - Services
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
   pk: a6362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-06T17:45:00Z'
     name: Marketing - Operations Team
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -6934,7 +6934,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Technology, Innovation and Events - Technology Partnerships
+    name: Technology, Innovation and Events - Technology Partnerships
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -6950,7 +6950,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Creative Industries
+    name: Events - Creative Industries
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -7022,7 +7022,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Technology, Innovation and Events - Open to Export
+    name: Technology, Innovation and Events - Open to Export
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -7030,14 +7030,14 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Retail
+    name: Events - Retail
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
   pk: ac362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:23:43Z'
     name: BG - Tech City
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -7054,7 +7054,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: Financial Services Organisation (FSO)
+    name: Financial & Professional Sector
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -7077,7 +7077,7 @@
   pk: adf924aa-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:24:01Z'
     name: South Yorkshire International Trade Centre
     role: 5e329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -7094,7 +7094,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events Delivery & Performance
+    name: Events Delivery & Performance
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -7102,7 +7102,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Large Events Support
+    name: Events - Large Events Support
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -7157,7 +7157,7 @@
   pk: b0f924aa-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:24:01Z'
     name: International Trade Team Business Link Humber
     role: 5e329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -7181,7 +7181,7 @@
   pk: b1a278a0-d373-e411-a72b-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:23:38Z'
     name: BG - R & D Programme
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -7190,7 +7190,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - BDV
+    name: Events - BDV
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -7198,7 +7198,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Rapid Response
+    name: Events - Rapid Response
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -7245,7 +7245,7 @@
   pk: b3f924aa-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:24:02Z'
     name: International Trade Team Business Link West Yorkshire
     role: 5e329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -7262,7 +7262,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Markets
+    name: Events - Markets
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -7278,7 +7278,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Large Events
+    name: Events - Large Events
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -7318,14 +7318,14 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Infrastructure and Life Science - Low Carbon Env Water
+    name: Events - Infrastructure and Life Science - Low Carbon Env Water
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
   pk: b6f924aa-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:24:02Z'
     name: International Trade Team Business Link York and North Yorkshire
     role: 5e329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -7349,7 +7349,7 @@
   pk: b779fd34-9798-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:23:39Z'
     name: 'PERA : East Midlands Enhanced R & D Potential in International Markets'
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -7358,7 +7358,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Technology, Innovation and Events
+    name: Technology, Innovation and Events
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -7374,7 +7374,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Venture Capital
+    name: Events - Venture Capital
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -7421,7 +7421,7 @@
   pk: b8d95b56-7e25-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-05T21:56:29Z'
     name: DSO Director - Business Development - Events
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -7437,7 +7437,7 @@
   pk: b91ac816-7f25-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-05T21:01:31Z'
     name: DSO - Deputy Director - RD 1
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -7445,7 +7445,7 @@
   pk: b9339f1c-23ad-e211-a646-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-05T21:14:16Z'
     name: DSO - RD 2C
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -7462,7 +7462,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Sport
+    name: Events - Sport
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -7477,7 +7477,7 @@
   pk: ba2b032f-9798-e211-a939-e4115bead28a
 - fields:
     country: null
-    disabled_on: null
+    disabled_on: '2013-03-31T16:24:13Z'
     name: CRM Date Test Service Provider
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -7485,7 +7485,7 @@
   pk: ba79fd34-9798-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:23:40Z'
     name: 'RTC North : North East R & D Collaboration Project'
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -7502,14 +7502,14 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Energy
+    name: Events - Energy
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
   pk: bb362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:23:43Z'
     name: BERR - Business Environment Unit
     role: 876cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -7541,7 +7541,7 @@
   pk: bc9e3952-6725-e511-b6bc-e4115bead28a
 - fields:
     country: 86756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2016-02-17T09:32:19Z'
     name: British Consulate Las Palmas Spain
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -7550,7 +7550,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Infrastructure & Life Sciences
+    name: Events - Infrastructure & Life Sciences
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -7573,7 +7573,7 @@
   pk: bd2b032f-9798-e211-a939-e4115bead28a
 - fields:
     country: null
-    disabled_on: null
+    disabled_on: '2013-03-31T16:24:13Z'
     name: Andrew's Test Service Provider
     role: 65329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -7590,7 +7590,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Advanced Manufacturing
+    name: Events - Advanced Manufacturing
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -7605,7 +7605,7 @@
   pk: be3ade1c-9798-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:24:41Z'
     name: Association of British Insurers (ABI)
     role: 61329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -7629,7 +7629,7 @@
   pk: bf4e1cda-f14d-e611-af02-e4115bead28a
 - fields:
     country: 81756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:16Z'
     name: British Trade and Investment Office Phoenix
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -7637,7 +7637,7 @@
   pk: bfdb4cda-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:58Z'
     name: TD - Events - Key Events
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -7662,14 +7662,14 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Advanced Engineering
+    name: Events - Advanced Engineering
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
   pk: c1362a92-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2015-01-21T10:15:23Z'
     name: Government Office London
     role: 5b329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -7694,7 +7694,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Infrastructure
+    name: Events - Infrastructure
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -7718,7 +7718,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Agrifood
+    name: Events - Agrifood
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -7765,7 +7765,7 @@
   pk: c5db4cda-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:24:15Z'
     name: BERR BRE - Better Regulations Executive
     role: 876cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -7790,7 +7790,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Consumer Goods
+    name: Events - Consumer Goods
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -7861,7 +7861,7 @@
   pk: c8f924aa-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-05T21:33:41Z'
     name: DSO - RD 3
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -7894,7 +7894,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Marine
+    name: Events - Marine
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -7942,7 +7942,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD Events - Advanced Manufacturing - Support
+    name: Events - Advanced Manufacturing - Support
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -7965,7 +7965,7 @@
   pk: cd65239e-9698-e211-a939-e4115bead28a
 - fields:
     country: 86756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2016-02-17T09:38:00Z'
     name: British Consulate Malaga Spain
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -7973,7 +7973,7 @@
   pk: cedb4cda-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:24:17Z'
     name: ETG - Communications and Training Team
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -7990,7 +7990,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Planning and Procurement
+    name: Events - Planning and Procurement
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -8013,7 +8013,7 @@
   pk: d065239e-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:45:26Z'
     name: DSO Key Account Management
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 864cd12a-6095-e211-a939-e4115bead28a
@@ -8030,7 +8030,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - ICT
+    name: Events - ICT
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -8085,7 +8085,7 @@
   pk: d365239e-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:40:33Z'
     name: DSO Senior Military Adviser Team
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -8101,7 +8101,7 @@
   pk: d4db4cda-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:00Z'
     name: TD - Infr and Healthcare - Life Sciences
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -8134,7 +8134,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Technology, Innovation and Events - Venture Capital Unit
+    name: Technology, Innovation and Events - Venture Capital Unit
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -8157,7 +8157,7 @@
   pk: d665239e-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:08:05Z'
     name: DSO Managing Director & Outer Office
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -8174,7 +8174,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Transport
+    name: Events - Transport
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -8205,7 +8205,7 @@
   pk: d835f7a3-7d25-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:57Z'
     name: Communications & Information Technology Association (formerly Telecommunications
       Industry Association)(Ceased trading 31 May 2007)
     role: 846cb21e-6095-e211-a939-e4115bead28a
@@ -8270,7 +8270,7 @@
   pk: d965239e-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-05T21:56:03Z'
     name: DSO - Deputy Director - RD2
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -8287,14 +8287,14 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: DSO Policy and Resources
+    name: DSO Operations Directorate
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
   pk: da47318c-9698-e211-a939-e4115bead28a
 - fields:
     country: b46ee1ca-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2014-07-23T11:13:48Z'
     name: OBN - British Business Group - Dubai
     role: b4e69e92-7c82-e311-8dfb-e4115bead28a
     uk_region: null
@@ -8302,7 +8302,7 @@
   pk: daa63617-0417-e311-a78e-e4115bead28a
 - fields:
     country: 85756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:17Z'
     name: British Consulate Nagoya Japan
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -8319,7 +8319,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Healthcare
+    name: Events - Healthcare
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -8382,7 +8382,7 @@
   pk: dc65239e-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-05T22:11:10Z'
     name: DSO EM Exhibitions
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -8399,7 +8399,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Construction
+    name: Events - Construction
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -8414,7 +8414,7 @@
   pk: de7a1ca4-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:54Z'
     name: Mobile Data Association
     role: 846cb21e-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -8446,7 +8446,7 @@
   pk: e0153626-fb16-e311-a78e-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:43:28Z'
     name: DSO EM Events Planning
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -8463,7 +8463,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: TD - Events - Open to Export
+    name: Events - Open to Export
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -8526,7 +8526,7 @@
   pk: e303aa28-0553-e611-af02-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:42:07Z'
     name: DSO Business Development Outer Office
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -8542,7 +8542,7 @@
   pk: e3db4cda-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2014-06-19T19:10:10Z'
     name: TD - Low Carbon Activities
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -8598,7 +8598,7 @@
   pk: e565239e-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:44:54Z'
     name: DSO Industrial Participation Unit
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -8607,14 +8607,14 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: IG - Global Accounts - Adv Man - Auto, Rail MEPE
+    name: Automotive Sector
     role: 5c329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
   pk: e6b89ab2-fa4d-e311-a56a-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:01Z'
     name: TD - Innovation Specialists
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -8686,7 +8686,7 @@
   pk: e8ef63d4-7a25-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-06T08:13:23Z'
     name: DSO - Business Development - SME Team
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -8694,7 +8694,7 @@
   pk: e9469310-20ad-e211-a646-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2014-06-12T13:52:30Z'
     name: DSO Business Development Market Analysis
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -8719,7 +8719,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: DSO Head Office
+    name: DSO Senior Management Team
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -8782,7 +8782,7 @@
   pk: ebf4d516-1a63-e311-8255-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:43:29Z'
     name: DSO EM Inward Visits
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -8862,7 +8862,7 @@
   pk: eee8cc29-fa4d-e311-a56a-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:09:12Z'
     name: DSO Mid Sized Businesses
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -8918,7 +8918,7 @@
   pk: f0f02898-9698-e211-a939-e4115bead28a
 - fields:
     country: 85756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:18Z'
     name: British Trade Promotion Office Fukuoka Japan
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -8926,7 +8926,7 @@
   pk: f1364ae0-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:20:56Z'
     name: TD - Managing Director and PA - Service Delivery
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -9015,7 +9015,7 @@
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
-    name: DSO Export Support Team (Larkhill)
+    name: DSO Export Support Team
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 894cd12a-6095-e211-a939-e4115bead28a
   model: metadata.team
@@ -9110,7 +9110,7 @@
   pk: f80532c3-5b25-e511-b6bc-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-05T21:51:10Z'
     name: DSO Director Business Development
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -9158,7 +9158,7 @@
   pk: f98333c8-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2017-11-05T21:59:23Z'
     name: DSO - Business Development - Mid Sized Businesses
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -9174,7 +9174,7 @@
   pk: f9f02898-9698-e211-a939-e4115bead28a
 - fields:
     country: 0e50bdb8-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:18Z'
     name: British Trade Office Villahermosa Mexico
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -9198,7 +9198,7 @@
   pk: fad516b6-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:25:28Z'
     name: ETG - Director's Office
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -9206,7 +9206,7 @@
   pk: fb293959-9798-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-05-27T16:40:05Z'
     name: DSO Security Directorate
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -9214,7 +9214,7 @@
   pk: fb47318c-9698-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:25:03Z'
     name: UKTI Marketing Team (Investment)
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -9222,7 +9222,7 @@
   pk: fb69f64c-9798-e211-a939-e4115bead28a
 - fields:
     country: 83756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:08Z'
     name: British Consulate General Hamburg Germany
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -9358,7 +9358,7 @@
   pk: fdff3278-fcf2-e411-bcbe-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:25:28Z'
     name: ETG - E-Business Programme
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -9366,7 +9366,7 @@
   pk: fe293959-9798-e211-a939-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-06-03T14:49:34Z'
     name: DSO Business Support - Small Business Unit
     role: 57329c18-6095-e211-a939-e4115bead28a
     uk_region: 874cd12a-6095-e211-a939-e4115bead28a
@@ -9398,7 +9398,7 @@
   pk: fe8bac67-e208-e411-8a2b-e4115bead28a
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:01Z'
     name: ST - Infrastructure and Life Science - Transport
     role: 66329c18-6095-e211-a939-e4115bead28a
     uk_region: null
@@ -9414,7 +9414,7 @@
   pk: ff7a1ca4-9698-e211-a939-e4115bead28a
 - fields:
     country: 6f6a9ab2-5d95-e211-a939-e4115bead28a
-    disabled_on: null
+    disabled_on: '2013-03-31T16:21:07Z'
     name: Business Information Centre Bhopal India
     role: 62329c18-6095-e211-a939-e4115bead28a
     uk_region: null
