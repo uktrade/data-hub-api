@@ -23,8 +23,6 @@ def create_default_hourlyrate(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    replaces = [('order', '0001_initial'), ('order', '0002_auto_20170719_1529'), ('order', '0003_auto_20170721_1014'), ('order', '0004_order_sector'), ('order', '0005_created_modified_by'), ('order', '0006_auto_20170804_1610'), ('order', '0007_auto_20170807_1124'), ('order', '0008_added_service_type'), ('order', '0009_order_service_types'), ('order', '0010_order_extra_fields'), ('order', '0011_add_delivery_date'), ('order', '0012_contact-email-phone'), ('order', '0013_order_quote'), ('order', '0014_order_status'), ('order', '0015_order_po_number'), ('order', '0016_hourlyrate'), ('order', '0017_hourly_rate_default'), ('order', '0018_order_hourly_rate'), ('order', '0019_auto_20170912_1023'), ('order', '0020_auto_20170912_1351'), ('order', '0021_pricing-fields'), ('order', '0022_public_token'), ('order', '0023_populate_public_token'), ('order', '0024_public_token_unique_required'), ('order', '0025_billing_address'), ('order', '0026_order_invoice'), ('order', '0027_hourlyrate_disabled_on'), ('order', '0028_order_archived_documents_url_path'), ('order', '0029_completion'), ('order', '0030_cancellation')]
-
     initial = True
 
     dependencies = [
@@ -160,7 +158,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='order',
             name='contacts_not_to_approach',
-            field=models.TextField(blank=True, help_text='Are there contacts that DIT should not approach?'),
+            field=models.TextField(blank=True, help_text='Specific people or organisations the company does not want DIT to talk to.'),
         ),
         migrations.AddField(
             model_name='order',
@@ -170,12 +168,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='order',
             name='existing_agents',
-            field=models.TextField(blank=True, editable=False, help_text='Legacy field. Details of any existing agents.'),
+            field=models.TextField(blank=True, help_text='Contacts the company already has in the market.'),
         ),
         migrations.AddField(
             model_name='order',
             name='further_info',
-            field=models.TextField(blank=True, editable=False, help_text='Legacy field. Further information.'),
+            field=models.TextField(blank=True, help_text='Additional notes and useful information.'),
         ),
         migrations.AddField(
             model_name='order',

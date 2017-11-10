@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from ..serializers import (
+    RelaxedDateTimeField,
     SearchSerializer,
     SingleOrListField,
     StringUUIDField,
@@ -15,6 +16,8 @@ class SearchInteractionSerializer(SearchSerializer):
     company_name = serializers.CharField(required=False)
     contact = SingleOrListField(child=StringUUIDField(), required=False)
     contact_name = serializers.CharField(required=False)
+    date_after = RelaxedDateTimeField(required=False)
+    date_before = RelaxedDateTimeField(required=False)
     dit_adviser = SingleOrListField(child=StringUUIDField(), required=False)
     dit_adviser_name = serializers.CharField(required=False)
     dit_team = SingleOrListField(child=StringUUIDField(), required=False)

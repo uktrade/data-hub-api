@@ -14,7 +14,8 @@ def test_get_basic_search_query():
                     {
                         'match_phrase': {
                             'name_keyword': {
-                                'query': 'test', 'boost': 2
+                                'query': 'test',
+                                'boost': 2
                             }
                         }
                     }, {
@@ -89,6 +90,10 @@ def test_get_basic_search_query():
                                     'company.name_trigram': 'test'
                                 }
                             }
+                        }
+                    }, {
+                        'match': {
+                            'company_number': 'test'
                         }
                     }, {
                         'nested': {

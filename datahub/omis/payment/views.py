@@ -1,10 +1,10 @@
+from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
 from rest_framework.response import Response
 
 from datahub.oauth.scopes import Scope
 from datahub.omis.order.models import Order
 from datahub.omis.order.views import BaseNestedOrderViewSet
-
 from .models import Payment
 from .serializers import PaymentSerializer
 
@@ -44,6 +44,7 @@ class PaymentViewSet(BasePaymentViewSet):
 class PublicPaymentViewSet(BasePaymentViewSet):
     """ViewSet for public facing API."""
 
+    permission_classes = (IsAuthenticatedOrTokenHasScope,)
     required_scopes = (Scope.public_omis_front_end,)
 
     order_lookup_field = 'public_token'

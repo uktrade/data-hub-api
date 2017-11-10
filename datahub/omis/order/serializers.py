@@ -13,7 +13,7 @@ from datahub.metadata.models import Country, Sector, Team
 
 from datahub.omis.market.models import Market
 from .constants import OrderStatus, VATStatus
-from .models import Order, OrderAssignee, OrderSubscriber, ServiceType
+from .models import CancellationReason, Order, OrderAssignee, OrderSubscriber, ServiceType
 from .validators import (
     AddressValidator,
     AssigneeExistsRule,
@@ -39,12 +39,17 @@ class OrderSerializer(serializers.ModelSerializer):
 
     description = serializers.CharField(allow_blank=True, required=False)
     contacts_not_to_approach = serializers.CharField(allow_blank=True, required=False)
+    further_info = serializers.CharField(allow_blank=True, required=False)
+    existing_agents = serializers.CharField(allow_blank=True, required=False)
 
     delivery_date = serializers.DateField(required=False, allow_null=True)
 
     billing_address_country = NestedRelatedField(Country, required=False, allow_null=True)
 
     completed_by = NestedRelatedField(Advisor, read_only=True)
+
+    cancellation_reason = NestedRelatedField(CancellationReason, read_only=True)
+    cancelled_by = NestedRelatedField(Advisor, read_only=True)
 
     class Meta:
         model = Order
@@ -107,8 +112,6 @@ class OrderSerializer(serializers.ModelSerializer):
             'contact_email',
             'contact_phone',
             'product_info',
-            'further_info',
-            'existing_agents',
             'permission_to_approach_contacts',
             'discount_value',
             'net_cost',
@@ -198,10 +201,36 @@ class OrderSerializer(serializers.ModelSerializer):
         data = self._reset_vat_fields_if_necessary(data)
         return data
 
+
+class CompleteOrderSerializer(OrderSerializer):
+    """DRF serializer for marking an order as complete."""
+
+    class Meta:
+        model = Order
+        fields = ()
+
     def complete(self):
         """Mark an order as complete."""
         self.instance.complete(
             by=self.context['current_user']
+        )
+        return self.instance
+
+
+class CancelOrderSerializer(OrderSerializer):
+    """DRF serializer for cancelling an order."""
+
+    cancellation_reason = NestedRelatedField(CancellationReason)
+
+    class Meta:
+        model = Order
+        fields = ('cancellation_reason',)
+
+    def cancel(self):
+        """Cancel an order."""
+        self.instance.cancel(
+            by=self.context['current_user'],
+            reason=self.validated_data['cancellation_reason']
         )
         return self.instance
 

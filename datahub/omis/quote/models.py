@@ -9,12 +9,44 @@ from datahub.core.models import BaseModel
 from .managers import QuoteManager
 
 
+class TermsAndConditions(models.Model):
+    """
+    Terms an conditions for the quote.
+
+    When a quote is created, the latest (-created_on:first) version of
+    terms and conditions should be used.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    created_on = models.DateTimeField(
+        db_index=True, auto_now_add=True
+    )
+    name = models.CharField(
+        max_length=100,
+        help_text='Only used internally.'
+    )
+    content = models.TextField()
+
+    class Meta:
+        ordering = ('-created_on', )
+
+    def __str__(self):
+        """Human-readable representation"""
+        return self.name
+
+
 class Quote(BaseModel):
     """Details of a quote."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     reference = models.CharField(max_length=100)
     content = models.TextField()
+    terms_and_conditions = models.ForeignKey(
+        TermsAndConditions,
+        null=True, blank=True,
+        on_delete=models.PROTECT,
+        related_name='+'
+    )
 
     cancelled_on = models.DateTimeField(null=True, blank=True)
     cancelled_by = models.ForeignKey(
@@ -35,6 +67,9 @@ class Quote(BaseModel):
     expires_on = models.DateField()
 
     objects = QuoteManager()
+
+    class Meta:
+        permissions = (('read_quote', 'Can read quote'),)
 
     def cancel(self, by):
         """

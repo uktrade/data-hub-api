@@ -19,7 +19,7 @@ class SearchInvestmentProjectSerializer(SearchSerializer):
     investor_company_country = SingleOrListField(child=StringUUIDField(), required=False)
     sector = SingleOrListField(child=StringUUIDField(), required=False)
     stage = SingleOrListField(child=StringUUIDField(), required=False)
-    status = serializers.CharField(required=False)
+    status = SingleOrListField(child=serializers.CharField(), required=False)
     uk_region_location = SingleOrListField(child=StringUUIDField(), required=False)
 
     SORT_BY_FIELDS = (
@@ -51,7 +51,6 @@ class SearchInvestmentProjectSerializer(SearchSerializer):
         'name',
         'new_tech_to_uk',
         'non_fdi_r_and_d_budget',
-        'non_fdi_type.name',
         'number_new_jobs',
         'project_assurance_adviser.name',
         'project_code',

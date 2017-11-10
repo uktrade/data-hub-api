@@ -22,6 +22,8 @@ class Order(DocType, MapDBModelToDict):
     sector = dsl_utils.id_name_mapping()
     description = dsl_utils.EnglishText()
     contacts_not_to_approach = Text()
+    further_info = Text()
+    existing_agents = Text(index=False)
     delivery_date = Date()
     service_types = dsl_utils.id_name_mapping()
     contact_email = dsl_utils.SortableCaseInsensitiveKeywordText()
@@ -84,8 +86,6 @@ class Order(DocType, MapDBModelToDict):
     IGNORED_FIELDS = (
         'modified_by',
         'product_info',
-        'further_info',
-        'existing_agents',
         'permission_to_approach_contacts',
         'quote',
         'hourly_rate',

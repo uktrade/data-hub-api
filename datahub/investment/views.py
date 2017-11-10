@@ -5,6 +5,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters import IsoDateTimeFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
+from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
 from rest_framework.filters import OrderingFilter
 from rest_framework.pagination import BasePagination
@@ -51,7 +52,10 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'investment_type',
         'stage',
         'investor_company',
+        'investor_type',
         'intermediate_company',
+        'level_of_involvement',
+        'specific_programme',
         'uk_company',
         'investmentprojectcode',
         'client_relationship_manager',
@@ -60,7 +64,6 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'referral_source_activity_website',
         'referral_source_activity_marketing',
         'fdi_type',
-        'non_fdi_type',
         'sector',
         'average_salary',
         'project_manager',
@@ -114,6 +117,7 @@ class _SinglePagePaginator(BasePagination):
 class IProjectModifiedSinceViewSet(IProjectViewSet):
     """View set for the modified-since endpoint (intended for use by Data Hub MI)."""
 
+    permission_classes = (IsAuthenticatedOrTokenHasScope,)
     required_scopes = (Scope.mi,)
     pagination_class = _SinglePagePaginator
 

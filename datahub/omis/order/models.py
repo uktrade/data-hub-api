@@ -1,12 +1,13 @@
 import secrets
 import uuid
+from datetime import datetime, time
 from functools import partial
 
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
 from django.utils.crypto import get_random_string
-from django.utils.timezone import now
+from django.utils.timezone import now, utc
 
 from datahub.company.models import Advisor, Company, Contact
 from datahub.core.models import (
@@ -23,7 +24,7 @@ from datahub.omis.quote.models import Quote
 from . import validators
 from .constants import DEFAULT_HOURLY_RATE, OrderStatus, VATStatus
 from .managers import OrderQuerySet
-from .signals import quote_generated
+from .signals import order_cancelled, quote_generated
 from .utils import populate_billing_data
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -142,7 +143,15 @@ class Order(BaseModel):
     )
     contacts_not_to_approach = models.TextField(
         blank=True,
-        help_text='Are there contacts that DIT should not approach?'
+        help_text='Specific people or organisations the company does not want DIT to talk to.'
+    )
+    further_info = models.TextField(
+        blank=True,
+        help_text='Additional notes and useful information.'
+    )
+    existing_agents = models.TextField(
+        blank=True,
+        help_text='Contacts the company already has in the market.'
     )
 
     delivery_date = models.DateField(blank=True, null=True)
@@ -235,14 +244,6 @@ class Order(BaseModel):
         blank=True, editable=False,
         help_text='Legacy field. What is the product?'
     )
-    further_info = models.TextField(
-        blank=True, editable=False,
-        help_text='Legacy field. Further information.'
-    )
-    existing_agents = models.TextField(
-        blank=True, editable=False,
-        help_text='Legacy field. Details of any existing agents.'
-    )
     permission_to_approach_contacts = models.TextField(
         blank=True, editable=False,
         help_text='Legacy field. Can DIT speak to the contacts?'
@@ -254,9 +255,18 @@ class Order(BaseModel):
 
     objects = OrderQuerySet.as_manager()
 
+    class Meta:
+        permissions = (('read_order', 'Can read order'),)
+
     def __str__(self):
         """Human-readable representation"""
         return self.reference
+
+    def get_current_contact_email(self):
+        """
+        :returns: the most up-to-date email address for the contact
+        """
+        return self.contact_email or self.contact.email
 
     @classmethod
     def generate_reference(cls):
@@ -294,6 +304,12 @@ class Order(BaseModel):
         if not self.public_token:
             self.public_token = self.generate_public_token()
         return super().save(*args, **kwargs)
+
+    def get_lead_assignee(self):
+        """
+        :returns: lead OrderAssignee for this order is it exists, None otherwise
+        """
+        return self.assignees.filter(is_lead=True).first()
 
     def get_datahub_frontend_url(self):
         """Return the url to the Data Hub frontend order page."""
@@ -397,14 +413,16 @@ class Order(BaseModel):
 
         :param by: the adviser who created the record
         :param payments_data: list of payments data.
-            Each item should at least contain `amount` and `received_on`
+            Each item should at least contain `amount`, `received_on` and `method`
             e.g. [
                 {
                     'amount': 1000,
+                    'method': 'bacs',
                     'received_on': ...
                 },
                 {
                     'amount': 1001,
+                    'method': 'manual',
                     'received_on': ...
                 }
             ]
@@ -427,7 +445,8 @@ class Order(BaseModel):
             Payment.objects.create_from_order(self, by, data)
 
         self.status = OrderStatus.paid
-        self.paid_on = max(item['received_on'] for item in payments_data)
+        max_received_on = max(item['received_on'] for item in payments_data)
+        self.paid_on = datetime.combine(date=max_received_on, time=time(tzinfo=utc))
         self.save()
 
     @transaction.atomic
@@ -456,6 +475,34 @@ class Order(BaseModel):
         self.completed_by = by
         self.save()
 
+    @transaction.atomic
+    def cancel(self, by, reason):
+        """
+        Cancel an order.
+
+        :param by: the adviser who cancelled the order
+        :param reason: CancellationReason
+        """
+        for order_validator in [
+            validators.OrderInStatusValidator(
+                allowed_statuses=(
+                    OrderStatus.draft,
+                    OrderStatus.quote_awaiting_acceptance,
+                )
+            )
+        ]:
+            order_validator.set_instance(self)
+            order_validator()
+
+        self.status = OrderStatus.cancelled
+        self.cancelled_on = now()
+        self.cancelled_by = by
+        self.cancellation_reason = reason
+        self.save()
+
+        # send signal
+        order_cancelled.send(sender=self.__class__, order=self)
+
 
 class OrderSubscriber(BaseModel):
     """
@@ -470,15 +517,15 @@ class OrderSubscriber(BaseModel):
         Advisor, on_delete=models.CASCADE, related_name='+'
     )
 
-    def __str__(self):
-        """Human-readable representation"""
-        return f'{self.order} – {self.adviser}'
-
     class Meta:
         ordering = ['created_on']
         unique_together = (
             ('order', 'adviser'),
         )
+
+    def __str__(self):
+        """Human-readable representation"""
+        return f'{self.order} – {self.adviser}'
 
 
 class OrderAssignee(BaseModel):

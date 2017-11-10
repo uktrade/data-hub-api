@@ -6,16 +6,26 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import InteractionType, Service, Team
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, get_test_user
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import (
     EventServiceDeliveryFactory, InteractionFactory, ServiceDeliveryFactory
 )
 from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.metadata.test.factories import TeamFactory
 
 
 class TestInteractionV3(APITestMixin):
     """Tests for v3 interaction views."""
+
+    def test_interaction_no_permissions(self):
+        """Should return 403"""
+        interaction = InteractionFactory()
+        team = TeamFactory()
+        self._user = get_test_user(team=team)
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_interaction_detail_view(self):
         """Interaction detail view."""
@@ -26,7 +36,7 @@ class TestInteractionV3(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['id'] == str(interaction.pk)
 
-    @freeze_time('2017-04-18 13:25:30.986208+00:00')
+    @freeze_time('2017-04-18 13:25:30.986208')
     def test_add_interaction(self):
         """Test add new interaction."""
         adviser = AdviserFactory()
@@ -96,11 +106,11 @@ class TestInteractionV3(APITestMixin):
                 'last_name': self.user.last_name,
                 'name': self.user.name
             },
-            'created_on': '2017-04-18T13:25:30.986208',
-            'modified_on': '2017-04-18T13:25:30.986208'
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z'
         }
 
-    @freeze_time('2017-04-18 13:25:30.986208+00:00')
+    @freeze_time('2017-04-18 13:25:30.986208')
     def test_add_event_service_delivery(self):
         """Test adding a new event service delivery."""
         adviser = AdviserFactory()
@@ -172,8 +182,8 @@ class TestInteractionV3(APITestMixin):
                 'last_name': self.user.last_name,
                 'name': self.user.name
             },
-            'created_on': '2017-04-18T13:25:30.986208',
-            'modified_on': '2017-04-18T13:25:30.986208'
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z'
         }
 
     def test_add_event_service_delivery_missing_event(self):
@@ -203,7 +213,7 @@ class TestInteractionV3(APITestMixin):
             'event': ['This field is required.']
         }
 
-    @freeze_time('2017-04-18 13:25:30.986208+00:00')
+    @freeze_time('2017-04-18 13:25:30.986208')
     def test_add_non_event_service_delivery(self):
         """Test adding a new non-event service delivery."""
         adviser = AdviserFactory()
@@ -270,8 +280,8 @@ class TestInteractionV3(APITestMixin):
                 'last_name': self.user.last_name,
                 'name': self.user.name
             },
-            'created_on': '2017-04-18T13:25:30.986208',
-            'modified_on': '2017-04-18T13:25:30.986208'
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z'
         }
 
     def test_add_non_event_service_delivery_with_event(self):
@@ -399,7 +409,7 @@ class TestInteractionV3(APITestMixin):
             'communication_channel': ['This field is only valid for interactions.'],
         }
 
-    @freeze_time('2017-04-18 13:25:30.986208+00:00')
+    @freeze_time('2017-04-18 13:25:30.986208')
     def test_add_interaction_project(self):
         """Test add new interaction for an investment project."""
         project = InvestmentProjectFactory()
@@ -423,8 +433,8 @@ class TestInteractionV3(APITestMixin):
         response_data = response.json()
         assert response_data['dit_adviser']['id'] == str(adviser.pk)
         assert response_data['investment_project']['id'] == str(project.pk)
-        assert response_data['modified_on'] == '2017-04-18T13:25:30.986208'
-        assert response_data['created_on'] == '2017-04-18T13:25:30.986208'
+        assert response_data['modified_on'] == '2017-04-18T13:25:30.986208Z'
+        assert response_data['created_on'] == '2017-04-18T13:25:30.986208Z'
 
     def test_add_interaction_no_entity(self):
         """Test add new interaction without a contact, company or

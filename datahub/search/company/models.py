@@ -24,6 +24,7 @@ class Company(DocType, MapDBModelToDict):
     business_type = dsl_utils.id_name_mapping()
     classification = dsl_utils.id_name_mapping()
     company_number = dsl_utils.SortableCaseInsensitiveKeywordText()
+    vat_number = Keyword(index=False)
     companies_house_data = dsl_utils.company_mapping()
     created_on = Date()
     description = dsl_utils.EnglishText()
@@ -35,6 +36,7 @@ class Company(DocType, MapDBModelToDict):
     name_trigram = dsl_utils.TrigramText()
     one_list_account_owner = dsl_utils.contact_or_adviser_mapping('one_list_account_owner')
     parent = dsl_utils.id_name_mapping()
+    reference_code = dsl_utils.SortableCaseInsensitiveKeywordText()
     registered_address_1 = Text()
     registered_address_2 = Text()
     registered_address_country = dsl_utils.id_name_mapping()
@@ -54,6 +56,7 @@ class Company(DocType, MapDBModelToDict):
     website = Text()
     export_to_countries = dsl_utils.id_name_mapping()
     future_interest_countries = dsl_utils.id_name_mapping()
+    export_experience_category = dsl_utils.id_name_mapping()
 
     COMPUTED_MAPPINGS = {
         'trading_name': attrgetter('alias')
@@ -80,6 +83,7 @@ class Company(DocType, MapDBModelToDict):
         'uk_based': bool,
         'export_to_countries': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
         'future_interest_countries': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
+        'export_experience_category': dict_utils.id_name_dict,
     }
 
     IGNORED_FIELDS = (

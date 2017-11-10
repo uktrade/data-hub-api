@@ -6,12 +6,13 @@ from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.oauth.scopes import Scope
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import OrderFactory, OrderWithOpenQuoteFactory
 
 from ..factories import QuoteFactory
+from ...models import TermsAndConditions
 
 
 class TestPublicGetQuote(APITestMixin):
@@ -46,12 +47,33 @@ class TestPublicGetQuote(APITestMixin):
         quote = order.quote
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
-            'created_on': quote.created_on.isoformat(),
+            'created_on': format_date_or_datetime(quote.created_on),
             'cancelled_on': None,
-            'accepted_on': quote.accepted_on.isoformat(),
+            'accepted_on': format_date_or_datetime(quote.accepted_on),
             'expires_on': quote.expires_on.isoformat(),
-            'content': quote.content
+            'content': quote.content,
+            'terms_and_conditions': TermsAndConditions.objects.first().content,
         }
+
+    def test_get_without_ts_and_cs(self):
+        """Test a successful call to get a quote without Ts and Cs."""
+        order = OrderFactory(
+            quote=QuoteFactory(accepted_on=now(), terms_and_conditions=None),
+            status=OrderStatus.quote_accepted
+        )
+
+        url = reverse(
+            'api-v3:omis-public:quote:detail',
+            kwargs={'public_token': order.public_token}
+        )
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
+        response = client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['terms_and_conditions'] == ''
 
     def test_get_draft_with_cancelled_quote(self):
         """Test getting a cancelled quote with order in draft is allowed."""
@@ -73,11 +95,12 @@ class TestPublicGetQuote(APITestMixin):
         quote = order.quote
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
-            'created_on': quote.created_on.isoformat(),
-            'cancelled_on': quote.cancelled_on.isoformat(),
+            'created_on': format_date_or_datetime(quote.created_on),
+            'cancelled_on': format_date_or_datetime(quote.cancelled_on),
             'accepted_on': None,
             'expires_on': quote.expires_on.isoformat(),
-            'content': quote.content
+            'content': quote.content,
+            'terms_and_conditions': TermsAndConditions.objects.first().content,
         }
 
     def test_404_if_order_doesnt_exist(self):
@@ -242,18 +265,19 @@ class TestAcceptOrder(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        with freeze_time('2017-07-12 13:00') as mocked_now:
+        with freeze_time('2017-07-12 13:00'):
             response = client.post(url, format='json')
 
             assert response.status_code == status.HTTP_200_OK
             assert response.json() == {
-                'created_on': quote.created_on.isoformat(),
-                'accepted_on': mocked_now().isoformat(),
+                'created_on': format_date_or_datetime(quote.created_on),
+                'accepted_on': format_date_or_datetime(now()),
                 'cancelled_on': None,
                 'expires_on': quote.expires_on.isoformat(),
-                'content': quote.content
+                'content': quote.content,
+                'terms_and_conditions': TermsAndConditions.objects.first().content,
             }
 
             quote.refresh_from_db()
             assert quote.is_accepted()
-            assert quote.accepted_on == mocked_now()
+            assert quote.accepted_on == now()

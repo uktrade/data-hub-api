@@ -151,20 +151,13 @@ flake8
 
 ## Granting access to the front end
 
-To give access to the [internal front end](https://github.com/uktrade/data-hub-frontend):
+The [internal front end](https://github.com/uktrade/data-hub-frontend) uses single sign-on. You should configure Leeloo as follows to use with the front end:
 
-1. Log into the [Django admin applications page](http://localhost:8000/admin/oauth2_provider/application/) and add a new OAuth application with these details:
+* `SSO_ENABLED`: `True`
+* `RESOURCE_SERVER_INTROSPECTION_URL`: URL of the [RFC 7662](https://tools.ietf.org/html/rfc7662) introspection endpoint (should be the same server the front end is using). This is provided by a [Staff SSO](https://github.com/uktrade/staff-sso) instance.
+* `RESOURCE_SERVER_AUTH_TOKEN`: Access token for the introspection server.
 
-    * Client type: Confidential
-    * Authorization grant type: Resource owner password-based
-
-1. Define the required scopes for the app by adding a new record in the
-[OAuth application scopes](http://localhost:8000/admin/oauth/oauthapplicationscope/)
-page with these details:
-    * Application: The application just created
-    * Scope: `internal-front-end`
-
-1. Add the client ID and secret to the front-end environment variables
+The token should have the `data-hub:internal-front-end` scope. django-oauth-toolkit will create a user corresponding to the token if one does not already exist.
 
 ## Granting access to machine-to-machine clients
 
@@ -217,7 +210,10 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `OMIS_NOTIFICATION_API_KEY`  | Yes | |
 | `OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL`  | No | |
 | `OMIS_PUBLIC_BASE_URL`  | Yes | |
+| `RESOURCE_SERVER_INTROSPECTION_URL` | If SSO enabled | RFC 7662 token introspection URL used for signle sign-on |
+| `RESOURCE_SERVER_AUTH_TOKEN` | If SSO enabled | Access token for RFC 7662 token introspection server |
 | `SENTRY_ENVIRONMENT`  | Yes | Value for the environment tag in Sentry. |
+| `SSO_ENABLED` | Yes | Whether single sign-on via RFC 7662 token introspection is enabled |
 | `WEB_CONCURRENCY` | No | Number of Gunicorn workers (set automatically by Heroku, otherwise defaults to 1). |
 
 

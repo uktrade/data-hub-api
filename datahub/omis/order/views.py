@@ -1,4 +1,5 @@
 from django.http import Http404
+from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -6,9 +7,10 @@ from rest_framework.views import APIView
 
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.oauth.scopes import Scope
-
 from .models import Order
 from .serializers import (
+    CancelOrderSerializer,
+    CompleteOrderSerializer,
     OrderAssigneeSerializer,
     OrderSerializer,
     PublicOrderSerializer,
@@ -29,9 +31,33 @@ class OrderViewSet(CoreViewSetV3):
 
     def complete(self, request, *args, **kwargs):
         """Complete an order."""
-        serializer = self.get_serializer(self.get_object())
-        serializer.complete()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        instance = self.get_object()
+        serializer = CompleteOrderSerializer(
+            instance,
+            data={},
+            context=self.get_serializer_context()
+        )
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.complete()
+        return Response(
+            self.get_serializer(instance=instance).data,
+            status=status.HTTP_200_OK
+        )
+
+    def cancel(self, request, *args, **kwargs):
+        """Cancel an order."""
+        instance = self.get_object()
+        serializer = CancelOrderSerializer(
+            instance,
+            data=request.data,
+            context=self.get_serializer_context()
+        )
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.cancel()
+        return Response(
+            self.get_serializer(instance=instance).data,
+            status=status.HTTP_200_OK
+        )
 
     def get_serializer_context(self):
         """Extra context provided to the serializer class."""
@@ -46,6 +72,7 @@ class PublicOrderViewSet(CoreViewSetV3):
 
     lookup_field = 'public_token'
 
+    permission_classes = (IsAuthenticatedOrTokenHasScope,)
     required_scopes = (Scope.public_omis_front_end,)
     serializer_class = PublicOrderSerializer
     queryset = Order.objects.publicly_accessible(
@@ -59,6 +86,7 @@ class PublicOrderViewSet(CoreViewSetV3):
 class SubscriberListView(APIView):
     """API View for advisers subscribed to an order."""
 
+    permission_classes = (IsAuthenticatedOrTokenHasScope,)
     required_scopes = (Scope.internal_front_end,)
 
     def get_order(self, order_pk):
@@ -112,6 +140,7 @@ class SubscriberListView(APIView):
 class AssigneeView(APIView):
     """API View for advisers assigned to an order."""
 
+    permission_classes = (IsAuthenticatedOrTokenHasScope,)
     FORCE_DELETE_PARAM = 'force-delete'
     required_scopes = (Scope.internal_front_end,)
 

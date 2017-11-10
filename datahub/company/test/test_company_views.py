@@ -12,12 +12,21 @@ from datahub.company.test.factories import CompaniesHouseCompanyFactory, Company
 from datahub.core.constants import (
     BusinessType, CompanyClassification, Country, HeadquarterType, Sector, UKRegion
 )
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, format_date_or_datetime, get_test_user
 from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.metadata.test.factories import TeamFactory
 
 
 class TestCompany(APITestMixin):
     """Company test case."""
+
+    def test_companies_list_no_permissions(self):
+        """Should return 403"""
+        team = TeamFactory()
+        self._user = get_test_user(team=team)
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_list_companies(self):
         """List the companies."""
@@ -45,27 +54,101 @@ class TestCompany(APITestMixin):
         company = CompanyFactory(
             company_number=123,
             name='Bar ltd.',
-            alias='Xyz trading'
+            alias='Xyz trading',
+            vat_number='009485769',
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.id})
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['id'] == str(company.pk)
-        assert response.data['companies_house_data']
-        assert response.data['companies_house_data']['id'] == ch_company.id
-        assert response.data['name'] == ch_company.name
-        assert response.data['trading_name'] == company.alias
-        assert response.data['registered_address_1'] == ch_company.registered_address_1
-        assert response.data['registered_address_2'] is None
-        assert response.data['registered_address_town'] == ch_company.registered_address_town
-        assert response.data['registered_address_country'] == {
-            'name': ch_company.registered_address_country.name,
-            'id': str(ch_company.registered_address_country.pk)
+        assert response.json() == {
+            'id': str(company.pk),
+            'companies_house_data': {
+                'id': ch_company.id,
+                'company_number': '123',
+                'company_category': '',
+                'company_status': '',
+                'incorporation_date': format_date_or_datetime(ch_company.incorporation_date),
+                'name': 'Foo ltd.',
+                'registered_address_1': 'Hello st.',
+                'registered_address_2': None,
+                'registered_address_town': 'Fooland',
+                'registered_address_country': {
+                    'id': str(ch_company.registered_address_country.id),
+                    'disabled_on': None,
+                    'name': ch_company.registered_address_country.name,
+                },
+                'registered_address_county': None,
+                'registered_address_postcode': None,
+                'sic_code_1': '',
+                'sic_code_2': '',
+                'sic_code_3': '',
+                'sic_code_4': '',
+                'uri': '',
+            },
+            'reference_code': '',
+            'name': ch_company.name,
+            'trading_name': company.alias,
+            'registered_address_1': 'Hello st.',
+            'registered_address_2': None,
+            'registered_address_town': 'Fooland',
+            'registered_address_country': {
+                'id': str(ch_company.registered_address_country.id),
+                'name': ch_company.registered_address_country.name,
+            },
+            'registered_address_county': None,
+            'registered_address_postcode': None,
+            'account_manager': None,
+            'archived': False,
+            'archived_by': None,
+            'archived_on': None,
+            'archived_reason': None,
+            'business_type': {
+                'id': str(company.business_type.id),
+                'name': company.business_type.name,
+            },
+            'children': [],
+            'classification': None,
+            'company_number': '123',
+            'contacts': [],
+            'created_on': format_date_or_datetime(company.created_on),
+            'description': None,
+            'employee_range': None,
+            'export_experience_category': {
+                'id': str(company.export_experience_category.id),
+                'name': company.export_experience_category.name,
+            },
+            'export_to_countries': [],
+            'future_interest_countries': [],
+            'headquarter_type': None,
+            'investment_projects_invested_in': [],
+            'investment_projects_invested_in_count': 0,
+            'modified_on': format_date_or_datetime(company.modified_on),
+            'one_list_account_owner': None,
+            'parent': None,
+            'sector': {
+                'id': str(company.sector.id),
+                'name': company.sector.name,
+            },
+            'trading_address_1': company.trading_address_1,
+            'trading_address_2': None,
+            'trading_address_country': {
+                'id': str(company.trading_address_country.id),
+                'name': company.trading_address_country.name
+            },
+            'trading_address_county': None,
+            'trading_address_postcode': None,
+            'trading_address_town': 'Woodside',
+            'turnover_range': None,
+            'uk_based': True,
+            'uk_region': {
+                'id': str(company.uk_region.id),
+                'name': company.uk_region.name,
+            },
+            'vat_number': '009485769',
+            'website': None,
         }
-        assert response.data['registered_address_county'] is None
-        assert response.data['registered_address_postcode'] is None
 
     def test_get_company_without_company_number(self):
         """Tests the company item view for a company without a company number.
@@ -188,6 +271,24 @@ class TestCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['name'] == 'Acme'
+
+    def test_update_read_only_fields(self):
+        """Test company update."""
+        company = CompanyFactory(
+            name='Foo ltd.',
+            registered_address_1='Hello st.',
+            registered_address_town='Fooland',
+            registered_address_country_id=Country.united_states.value.id,
+            reference_code='ORG-345645'
+        )
+
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, format='json', data={
+            'reference_code': 'XYZ',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['reference_code'] == 'ORG-345645'
 
     def test_add_uk_company(self):
         """Test add new UK company."""
@@ -533,7 +634,7 @@ class TestAuditLogView(APITestMixin):
         assert entry['id'] == version_id
         assert entry['user']['name'] == self.user.name
         assert entry['comment'] == 'Changed'
-        assert entry['timestamp'] == changed_datetime.isoformat()
+        assert entry['timestamp'] == format_date_or_datetime(changed_datetime)
         assert entry['changes']['description'] == ['Initial desc', 'New desc']
         assert not {'created_on', 'created_by', 'modified_on', 'modified_by'} & entry[
             'changes'].keys()
@@ -570,4 +671,4 @@ class TestCHCompany(APITestMixin):
         url = reverse('api-v3:ch-company:collection')
         response = self.api_client.post(url)
 
-        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+        assert response.status_code == status.HTTP_403_FORBIDDEN
