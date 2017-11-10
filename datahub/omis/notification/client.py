@@ -151,12 +151,12 @@ class Notify:
 
     def quote_generated(self, order):
         """
-        Send a notification to the customer that a quote has just been created
-        and needs to be accepted.
+        Send a notification to the customer and the advisers
+        that a quote has just been created and needs to be accepted.
         """
         #  notify customer
         self._send_email(
-            email_address=order.contact.email,
+            email_address=order.get_current_contact_email(),
             template_id=Template.quote_sent_for_customer.value,
             personalisation=self._prepare_personalisation(
                 order,
@@ -172,6 +172,34 @@ class Notify:
             self._send_email(
                 email_address=adviser.get_current_email(),
                 template_id=Template.quote_sent_for_adviser.value,
+                personalisation=self._prepare_personalisation(
+                    order, {'recipient name': adviser.name}
+                )
+            )
+
+    def order_cancelled(self, order):
+        """
+        Send a notification to the customer and the advisers
+        that the order has just been cancelled.
+        """
+        #  notify customer
+        self._send_email(
+            email_address=order.get_current_contact_email(),
+            template_id=Template.order_cancelled_for_customer.value,
+            personalisation=self._prepare_personalisation(
+                order,
+                {
+                    'recipient name': order.contact.name,
+                    'embedded link': order.get_public_facing_url(),
+                }
+            )
+        )
+
+        #  notify advisers
+        for adviser in self._get_all_advisers(order):
+            self._send_email(
+                email_address=adviser.get_current_email(),
+                template_id=Template.order_cancelled_for_adviser.value,
                 personalisation=self._prepare_personalisation(
                     order, {'recipient name': adviser.name}
                 )
