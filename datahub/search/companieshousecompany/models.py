@@ -21,11 +21,11 @@ class CompaniesHouseCompany(DocType, MapDBModelToDict):
     company_number = dsl_utils.SortableCaseInsensitiveKeywordText()
     company_category = dsl_utils.SortableCaseInsensitiveKeywordText()
     company_status = dsl_utils.SortableCaseInsensitiveKeywordText()
-    sic_code_1 = dsl_utils.SortableCaseInsensitiveKeywordText()
-    sic_code_2 = dsl_utils.SortableCaseInsensitiveKeywordText()
-    sic_code_3 = dsl_utils.SortableCaseInsensitiveKeywordText()
-    sic_code_4 = dsl_utils.SortableCaseInsensitiveKeywordText()
-    uri = dsl_utils.SortableCaseInsensitiveKeywordText()
+    sic_code_1 = Text()
+    sic_code_2 = Text()
+    sic_code_3 = Text()
+    sic_code_4 = Text()
+    uri = Text()
     incorporation_date = Date()
 
     MAPPINGS = {
