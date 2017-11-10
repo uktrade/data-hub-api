@@ -2,10 +2,6 @@ tests:
 	docker-compose build
 	docker-compose run leeloo bash tests.sh
 
-tests-auth:
-	docker-compose build
-	docker-compose run leeloo bash tests-auth.sh
-
 flake8:
 	docker-compose build
 	docker-compose run leeloo flake8

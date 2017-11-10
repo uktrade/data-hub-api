@@ -18,7 +18,6 @@ jobs:
       DJANGO_SETTINGS_MODULE: config.settings.local
       ES_INDEX: test_index
       ES5_URL: http://localhost:9200
-      CDMS_AUTH_URL: http://example.com
       AWS_DEFAULT_REGION: eu-west-2
       AWS_ACCESS_KEY_ID: foo
       AWS_SECRET_ACCESS_KEY: bar
@@ -57,7 +56,6 @@ jobs:
           name: Run tests
           command: |
             set -xu
-            ./tests-auth.sh
             ./tests.sh
 
       - run:
