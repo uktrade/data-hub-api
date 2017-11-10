@@ -87,28 +87,18 @@ def test_mapping(setup_es):
                     'type': 'text'
                 },
                 'sic_code_1': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'fielddata': True,
                     'type': 'text'
                 },
                 'sic_code_2': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'fielddata': True,
                     'type': 'text'
                 },
                 'sic_code_3': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'fielddata': True,
                     'type': 'text'
                 },
                 'sic_code_4': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'fielddata': True,
                     'type': 'text'
                 },
                 'uri': {
-                    'analyzer': 'lowercase_keyword_analyzer',
-                    'fielddata': True,
                     'type': 'text'
                 }
             }

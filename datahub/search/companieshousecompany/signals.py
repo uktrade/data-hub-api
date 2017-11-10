@@ -1,36 +1,15 @@
-from django.db import transaction
-from django.db.models.signals import post_save
-
-from datahub.company.models import CompaniesHouseCompany as DBCompaniesHouseCompany
-
-from .models import CompaniesHouseCompany as ESCompaniesHouseCompany
-from ..signals import sync_es
-
-
-def companieshousecompany_sync_es(sender, instance, **kwargs):
-    """Sync companies house company to the Elasticsearch."""
-    transaction.on_commit(
-        lambda: sync_es(
-            ESCompaniesHouseCompany,
-            DBCompaniesHouseCompany,
-            str(instance.pk)
-        )
-    )
+"""
+Signals for companieshousecompany are not connected, because the data will only
+change via sync_ch command. After syncing Companies House data, sync_es command
+should be issued to sync db with Elasticsearch.
+"""
 
 
 def connect_signals():
     """Connect signals for ES sync."""
-    post_save.connect(
-        companieshousecompany_sync_es,
-        sender=DBCompaniesHouseCompany,
-        dispatch_uid='companieshousecompany_sync_es'
-    )
+    pass
 
 
 def disconnect_signals():
     """Disconnect signals from ES sync."""
-    post_save.disconnect(
-        companieshousecompany_sync_es,
-        sender=DBCompaniesHouseCompany,
-        dispatch_uid='companieshousecompany_sync_es'
-    )
+    pass

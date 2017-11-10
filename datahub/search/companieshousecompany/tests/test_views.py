@@ -3,9 +3,14 @@ from dateutil.parser import parse as dateutil_parse
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.models import CompaniesHouseCompany as DBCompaniesHouseCompany
 from datahub.company.test.factories import CompaniesHouseCompanyFactory
 from datahub.core.test_utils import APITestMixin, get_test_user
 from datahub.metadata.test.factories import TeamFactory
+from datahub.search.companieshousecompany.models import (
+    CompaniesHouseCompany as ESCompaniesHouseCompany
+)
+from datahub.search.signals import sync_es
 
 pytestmark = pytest.mark.django_db
 
@@ -13,24 +18,29 @@ pytestmark = pytest.mark.django_db
 @pytest.fixture
 def setup_data(setup_es):
     """Sets up data for the tests."""
-    CompaniesHouseCompanyFactory(
-        name='Pallas',
-        company_number='111',
-        incorporation_date=dateutil_parse('2012-09-12T00:00:00Z'),
-        company_status='jumping',
+    companies = (
+        CompaniesHouseCompanyFactory(
+            name='Pallas',
+            company_number='111',
+            incorporation_date=dateutil_parse('2012-09-12T00:00:00Z'),
+            company_status='jumping',
+        ),
+        CompaniesHouseCompanyFactory(
+            name='Jaguarundi',
+            company_number='222',
+            incorporation_date=dateutil_parse('2015-09-12T00:00:00Z'),
+            company_status='sleeping',
+        ),
+        CompaniesHouseCompanyFactory(
+            name='Cheetah',
+            company_number='333',
+            incorporation_date=dateutil_parse('2016-09-12T00:00:00Z'),
+            company_status='purring',
+        ),
     )
-    CompaniesHouseCompanyFactory(
-        name='Jaguarundi',
-        company_number='222',
-        incorporation_date=dateutil_parse('2015-09-12T00:00:00Z'),
-        company_status='sleeping',
-    )
-    CompaniesHouseCompanyFactory(
-        name='Cheetah',
-        company_number='333',
-        incorporation_date=dateutil_parse('2016-09-12T00:00:00Z'),
-        company_status='purring',
-    )
+
+    for company in companies:
+        sync_es(ESCompaniesHouseCompany, DBCompaniesHouseCompany, company.pk)
 
     setup_es.indices.refresh()
 
@@ -54,11 +64,16 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
                 ['111', '222', '333']
             ),
             (  # pagination
-                {'limit': 1, 'offset': 1},
+                {
+                    'limit': 1,
+                    'offset': 1
+                },
                 ['222']
             ),
             (  # company number filter
-                {'company_number': '222'},
+                {
+                    'company_number': '222'
+                },
                 ['222'],
             ),
             (  # incorporation date filter
