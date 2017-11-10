@@ -47,6 +47,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='investmentproject',
             name='status',
-            field=models.CharField(choices=[('ongoing', 'Ongoing'), ('delayed', 'Delayed'), ('lost', 'Lost'), ('abandoned', 'Abandoned'), ('won', 'Won')], default='ongoing', max_length=255),
+            field=models.CharField(choices=[('ongoing', 'Ongoing'), ('delayed', 'Delayed'), ('dormant', 'Dormant'), ('lost', 'Lost'), ('abandoned', 'Abandoned'), ('won', 'Won')], default='ongoing', max_length=255),
         ),
     ]
