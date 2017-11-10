@@ -20,6 +20,9 @@
   pk: 6031f993-a689-49af-9a11-942a8413a779
   fields: {disabled_on: null, name: "Outward mission"}
 - model: event.eventtype
+  pk: ef7faeb4-46e1-4afc-aac7-387cf7161374
+  fields: {disabled_on: null, name: "Post local service"}
+- model: event.eventtype
   pk: 9c0fbb9b-f188-4dfa-9ee7-b3500ed7e8f4
   fields: {disabled_on: null, name: "TPU - opportunity"}
 - model: event.eventtype
