@@ -34,6 +34,7 @@ class IProjectAbstract(models.Model):
     STATUSES = Choices(
         ('ongoing', 'Ongoing'),
         ('delayed', 'Delayed'),
+        ('dormant', 'Dormant'),
         ('lost', 'Lost'),
         ('abandoned', 'Abandoned'),
         ('won', 'Won'),
