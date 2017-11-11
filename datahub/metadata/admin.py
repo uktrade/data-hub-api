@@ -3,23 +3,24 @@ from django.contrib import admin
 from datahub.core.admin import DisabledOnFilter
 from . import models
 
-MODELS_TO_REGISTER = (
+
+MODELS_TO_REGISTER_DISABLEABLE = (
     models.BusinessType,
-    models.Sector,
+    models.CompanyClassification,
     models.Country,
-    models.Title,
-    models.Role,
-    models.InvestmentType,
     models.FDIType,
+    models.FDIValue,
+    models.HeadquarterType,
+    models.InvestmentBusinessActivity,
+    models.InvestmentStrategicDriver,
+    models.InvestmentType,
     models.ReferralSourceActivity,
     models.ReferralSourceMarketing,
     models.ReferralSourceWebsite,
-    models.InvestmentBusinessActivity,
-    models.InvestmentStrategicDriver
-)
-
-MODELS_TO_REGISTER_DISABLEABLE = (
+    models.Role,
+    models.Sector,
     models.Service,
+    models.Title,
     models.UKRegion,
 )
 
@@ -29,16 +30,6 @@ MODELS_TO_REGISTER_WITH_ORDER = (
     models.SalaryRange,
     models.InvestmentProjectStage
 )
-
-
-@admin.register(*MODELS_TO_REGISTER)
-class MetadataAdmin(admin.ModelAdmin):
-    """Custom Metadata Admin."""
-
-    fields = ('name',)
-    list_display = ('name',)
-    readonly_fields = ('id',)
-    search_fields = ('name', 'pk')
 
 
 @admin.register(*MODELS_TO_REGISTER_DISABLEABLE)
@@ -56,27 +47,30 @@ class DisableableMetadataAdmin(admin.ModelAdmin):
 class OrderedMetadataAdmin(admin.ModelAdmin):
     """Admin for ordered metadata models."""
 
-    fields = ('name', 'order',)
-    list_display = ('name', 'order',)
+    fields = ('name', 'order', 'disabled_on',)
+    list_display = ('name', 'order', 'disabled_on',)
     readonly_fields = ('id',)
     search_fields = ('name', 'pk')
+    list_filter = (DisabledOnFilter,)
 
 
 @admin.register(models.Team)
-class TeamAdmin(MetadataAdmin):
+class TeamAdmin(admin.ModelAdmin):
     """Team Admin."""
 
-    fields = ('name', 'country', 'uk_region', 'role')
-    list_display = ('name', 'role')
+    fields = ('name', 'country', 'uk_region', 'role', 'disabled_on',)
+    list_display = ('name', 'role', 'disabled_on',)
     list_select_related = ('role',)
     search_fields = ('name', 'pk')
+    list_filter = (DisabledOnFilter,)
 
 
 @admin.register(models.TeamRole)
-class TeamRoleAdmin(MetadataAdmin):
+class TeamRoleAdmin(admin.ModelAdmin):
     """Team Admin."""
 
-    fields = ('name', 'groups')
-    list_display = ('name',)
+    fields = ('name', 'groups', 'disabled_on',)
+    list_display = ('name', 'disabled_on',)
     search_fields = ('name', 'pk')
     filter_horizontal = ('groups',)
+    list_filter = (DisabledOnFilter,)
