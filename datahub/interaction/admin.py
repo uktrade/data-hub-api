@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from datahub.core.admin import BaseModelVersionAdmin
+from datahub.core.admin import BaseModelVersionAdmin, DisabledOnFilter
 from .models import CommunicationChannel, Interaction
 
 
@@ -8,10 +8,11 @@ from .models import CommunicationChannel, Interaction
 class MetadataAdmin(admin.ModelAdmin):
     """Communication channel admin."""
 
-    fields = ('name', )
-    list_display = ('name', )
+    fields = ('name', 'disabled_on', )
+    list_display = ('name', 'disabled_on', )
     readonly_fields = ('id',)
     search_fields = ('name', 'pk')
+    list_filter = (DisabledOnFilter,)
 
 
 @admin.register(Interaction)
