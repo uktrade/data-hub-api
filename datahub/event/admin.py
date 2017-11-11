@@ -109,10 +109,11 @@ class EventAdmin(BaseModelVersionAdmin):
 
 
 @admin.register(EventType, LocationType, Programme)
-class MetadataAdmin(admin.ModelAdmin):
-    """Admin for metadata models."""
+class DisableableMetadataAdmin(admin.ModelAdmin):
+    """Custom Disableable Metadata Admin."""
 
-    fields = ('name',)
-    list_display = ('name',)
+    fields = ('name', 'disabled_on',)
+    list_display = ('name', 'disabled_on',)
     readonly_fields = ('id',)
     search_fields = ('name', 'pk')
+    list_filter = (DisabledOnFilter,)
