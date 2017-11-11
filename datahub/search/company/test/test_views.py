@@ -82,6 +82,70 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['uk_region']['id'] == uk_region
 
+    @pytest.mark.parametrize(
+        'country,match',
+        (
+            (constants.Country.cayman_islands.value.id, True),
+            (constants.Country.montserrat.value.id, True),
+            (constants.Country.st_helena.value.id, False),
+            (constants.Country.anguilla.value.id, False),
+        )
+    )
+    def test_composite_country_filter(self, setup_es, country, match):
+        """Tests composite country filter."""
+        company = CompanyFactory(
+            trading_address_country_id=constants.Country.cayman_islands.value.id,
+            registered_address_country_id=constants.Country.montserrat.value.id,
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:company')
+
+        response = self.api_client.post(url, {
+            'country': country,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        if match:
+            assert response.data['count'] == 1
+            assert len(response.data['results']) == 1
+            assert response.data['results'][0]['id'] == str(company.id)
+        else:
+            assert response.data['count'] == 0
+            assert len(response.data['results']) == 0
+
+    @pytest.mark.parametrize(
+        'name,match',
+        (
+            ('whiskers', True),
+            ('house lion', True),
+            ('tiger', False),
+            ('panda', False),
+        )
+    )
+    def test_composite_name_filter(self, setup_es, name, match):
+        """Tests composite name filter."""
+        company = CompanyFactory(
+            name='whiskers and tabby',
+            alias='house lion and moggie',
+        )
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:company')
+
+        response = self.api_client.post(url, {
+            'name': name,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        if match:
+            assert response.data['count'] == 1
+            assert len(response.data['results']) == 1
+            assert response.data['results'][0]['id'] == str(company.id)
+        else:
+            assert response.data['count'] == 0
+            assert len(response.data['results']) == 0
+
     def test_multiple_trading_address_country_filter(self, setup_data):
         """Tests multiple trading address countries filter."""
         term = 'abc defg'
@@ -101,26 +165,6 @@ class TestSearch(APITestMixin):
         country_ids = {result['trading_address_country']['id']
                        for result in response.data['results']}
         assert country_ids == {united_kingdom_id, united_states_id}
-
-    def test_trading_name_filter(self, setup_es):
-        """Tests detailed company search."""
-        trading_name = 'Hello World'
-        company = CompanyFactory(
-            alias=trading_name
-        )
-        setup_es.indices.refresh()
-
-        url = reverse('api-v3:search:company')
-
-        response = self.api_client.post(url, {
-            'trading_name': trading_name,
-        })
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-        assert len(response.data['results']) == 1
-        assert response.data['results'][0]['id'] == str(company.id)
-        assert response.data['results'][0]['trading_name'] == company.alias
 
     @pytest.mark.parametrize(
         'company_name,search_name,match',

@@ -99,6 +99,10 @@ class SearchAPIView(APIView):
     FILTER_FIELDS = []
     REMAP_FIELDS = {}
 
+    # creates "or" query with a list of fields for given filter name
+    # filter must exist in FILTER_FIELDS
+    COMPOSITE_FILTERS = {}
+
     serializer_class = SearchSerializer
     entity = None
 
@@ -156,6 +160,7 @@ class SearchAPIView(APIView):
             entity=self.entity,
             term=validated_data['original_query'],
             filters=filters,
+            composite_filters=self.COMPOSITE_FILTERS,
             ranges=ranges,
             field_order=validated_data['sortby'],
             aggregations=aggregations,
