@@ -1,27 +1,84 @@
 - model: event.programme
   pk: 77a6e4a3-72b7-4bb7-8ab7-29d346565cb9
-  fields: {name: "E-Exporting"}
+  fields: {disabled_on: null, name: E-Exporting}
 - model: event.programme
   pk: 3117da1b-ac76-4b03-af7e-2487d931491c
-  fields: {name: "Great Branded"}
+  fields: {disabled_on: null, name: GREAT Branded}
 - model: event.programme
   pk: 1abe5563-6482-41d8-b566-6a9ee9e37c5f
-  fields: {name: "Great Challenge Fund"}
+  fields: {disabled_on: null, name: GREAT Challenge Fund}
 - model: event.programme
   pk: 1870d2da-de4f-4adc-baff-e16ec90e4059
-  fields: {name: "Great Funded"}
+  fields: {disabled_on: null, name: GREAT Funded}
 - model: event.programme
   pk: d352a68f-aaf4-4c43-b39d-9bca67a8322e
-  fields: {name: "Grown in Britain"}
+  fields: {disabled_on: null, name: Grown in Britain}
 - model: event.programme
   pk: f5b8a49d-05fe-4715-aba6-b4e78269973a
-  fields: {name: "HVO Specialist Contribution"}
+  fields: {disabled_on: null, name: HVO Specialist Contribution}
 - model: event.programme
   pk: f7394a8d-ea0f-4538-a53c-f76e27fec29c
-  fields: {name: "Northern Powerhouse"}
+  fields: {disabled_on: null, name: Northern Powerhouse}
 - model: event.programme
   pk: 7b6a903e-393a-4157-ae06-ae551da3b5b9
-  fields: {name: "Olympics 2012 Legacy"}
+  fields: {disabled_on: null, name: Olympics 2012 Legacy}
 - model: event.programme
   pk: c2218e83-3fe0-44b8-ab3f-8d1799747e6f
-  fields: {name: "Web Based Exporting"}
+  fields: {disabled_on: null, name: Web Based Exporting}
+- model: event.programme
+  pk: 6fc4aa2a-6931-e711-8a1f-e4115bead28a
+  fields: {disabled_on: null, name: OW UK Cap List}
+- model: event.programme
+  pk: 058dde7c-19d5-e311-8a2b-e4115bead28a
+  fields: {disabled_on: null, name: CEN Energy}
+- model: event.programme
+  pk: e2d2e2bd-19d5-e311-8a2b-e4115bead28a
+  fields: {disabled_on: '2015-06-11T09:59:03Z', name: CEN Life Science}
+- model: event.programme
+  pk: cad5df2e-1ad5-e311-8a2b-e4115bead28a
+  fields: {disabled_on: null, name: CEN Services}
+- model: event.programme
+  pk: fc4e3b82-3efa-e311-8a2b-e4115bead28a
+  fields: {disabled_on: null, name: GREAT Weeks}
+- model: event.programme
+  pk: 75c43286-f64e-e411-985c-e4115bead28a
+  fields: {disabled_on: null, name: Offshore Wind Investment Organisation}
+- model: event.programme
+  pk: 440e56d9-ea32-e611-9bdc-e4115bead28a
+  fields: {disabled_on: null, name: GREAT British House Rio}
+- model: event.programme
+  pk: c20da599-2a52-e511-9d3c-e4115bead28a
+  fields: {disabled_on: null, name: Shakespeare Lives}
+- model: event.programme
+  pk: a7c7efad-6c6e-e511-9d3c-e4115bead28a
+  fields: {disabled_on: null, name: Exporting is GREAT (EiG)}
+- model: event.programme
+  pk: e2a8be20-7a54-e311-a33a-e4115bead28a
+  fields: {disabled_on: null, name: Aid Funded Business Service (AFBS)}
+- model: event.programme
+  pk: fb4b21d4-ada2-e311-a3d5-e4115bead28a
+  fields: {disabled_on: null, name: Events Alliance}
+- model: event.programme
+  pk: e2f4378b-c452-e311-a56a-e4115bead28a
+  fields: {disabled_on: null, name: Innovation Programme}
+- model: event.programme
+  pk: 0b99e54e-bbb0-e211-a646-e4115bead28a
+  fields: {disabled_on: null, name: Catalyst Members Activities}
+- model: event.programme
+  pk: 043a3eb4-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Low Carbon Initiative}
+- model: event.programme
+  pk: 083a3eb4-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Britain Open for Business}
+- model: event.programme
+  pk: 9a6532c1-a53e-e611-af01-e4115bead28a
+  fields: {disabled_on: null, name: Midlands Engine}
+- model: event.programme
+  pk: 1ad284a8-5034-e511-b6bc-e4115bead28a
+  fields: {disabled_on: null, name: International Festival for Business 2016}
+- model: event.programme
+  pk: 86132a11-42e3-e411-bbc1-e4115bead28a
+  fields: {disabled_on: null, name: Export Growth Service}
+- model: event.programme
+  pk: b86f3771-a784-e611-be23-e4115bead28a
+  fields: {disabled_on: null, name: HVO Team Specialist contribution}
