@@ -1,34 +1,149 @@
 # ReferralSourceActivity
 - model: metadata.referralsourceactivity
   pk: 0c4f8e74-d34f-4aca-b764-a44cdc2d0087
-  fields: {name: "Cold call"}
+  fields: {disabled_on: null, name: "Cold call"}
 - model: metadata.referralsourceactivity
   pk: 7d98f3a6-3e3f-40ac-a6f3-3f0c251ec1d2
-  fields: {name: "Direct enquiry"}
+  fields: {disabled_on: null, name: "Direct enquiry"}
 - model: metadata.referralsourceactivity
   pk: 3816a95b-6a76-4ad0-8ae9-b0d7e7d2b79c
-  fields: {name: "Event"}
+  fields: {disabled_on: null, name: "Event"}
 - model: metadata.referralsourceactivity
   pk: 0acf0e68-e09e-4e5d-92b6-e72e5a5c7ea4
-  fields: {name: "Marketing"}
+  fields: {disabled_on: null, name: "Marketing"}
 - model: metadata.referralsourceactivity
   pk: e95cddb3-9407-4c8a-b5a6-2616117b0aae
-  fields: {name: "Multiplier"}
+  fields: {disabled_on: null, name: "Multiplier"}
 - model: metadata.referralsourceactivity
   pk: aba8f653-264f-48d8-950e-07f9c418c7b0
-  fields: {name: "None"}
+  fields: {disabled_on: null, name: "None"}
 - model: metadata.referralsourceactivity
   pk: 318e6e9e-2a0e-4e4b-a495-c48aeee4b996
-  fields: {name: "Other"}
+  fields: {disabled_on: null, name: "Other"}
 - model: metadata.referralsourceactivity
   pk: 668e999c-a669-4d9b-bfbf-6275ceed86da
-  fields: {name: "Relationship management activity"}
+  fields: {disabled_on: null, name: "Relationship management activity"}
 - model: metadata.referralsourceactivity
   pk: c03c4043-18b4-4463-a36b-a1af1b35f95d
-  fields: {name: "Personal reference"}
+  fields: {disabled_on: null, name: "Personal reference"}
 - model: metadata.referralsourceactivity
   pk: 812b2f62-fe62-4cc8-b69c-58f3e2ebac17
-  fields: {name: "Website"}
+  fields: {disabled_on: null, name: "Website"}
+# The following values (up to EY EIM) were imported from CDMS for the data migration
+- model: metadata.referralsourceactivity
+  pk: e0d48e78-b7d6-e311-8a2b-e4115bead28a
+  fields: {disabled_on: null, name: LEP}
+- model: metadata.referralsourceactivity
+  pk: 500ae611-9c12-e611-9bdc-e4115bead28a
+  fields: {disabled_on: null, name: IST Business Development}
+- model: metadata.referralsourceactivity
+  pk: 30f1723b-9c12-e611-9bdc-e4115bead28a
+  fields: {disabled_on: null, name: Multiplier via IST Business Development}
+- model: metadata.referralsourceactivity
+  pk: 645a5d75-828a-e311-a3d5-e4115bead28a
+  fields: {disabled_on: null, name: In Market FDI Contractor (Russia)}
+- model: metadata.referralsourceactivity
+  pk: 30968389-828a-e311-a3d5-e4115bead28a
+  fields: {disabled_on: null, name: In Market FDI Contractor (Gulf)}
+- model: metadata.referralsourceactivity
+  pk: 808e3698-828a-e311-a3d5-e4115bead28a
+  fields: {disabled_on: null, name: In Market FDI Contractor (Latin America)}
+- model: metadata.referralsourceactivity
+  pk: 405b92a5-828a-e311-a3d5-e4115bead28a
+  fields: {disabled_on: null, name: In Market FDI Contractor (Central Europe)}
+- model: metadata.referralsourceactivity
+  pk: ceb61fa0-acaa-e311-a3d5-e4115bead28a
+  fields: {disabled_on: null, name: UK Region}
+- model: metadata.referralsourceactivity
+  pk: f0c5e43a-5748-e311-a56a-e4115bead28a
+  fields: {disabled_on: '2014-12-16T14:03:32Z', name: Growth Accelerator}
+- model: metadata.referralsourceactivity
+  pk: e97c9641-5748-e311-a56a-e4115bead28a
+  fields: {disabled_on: '2014-12-16T14:03:32Z', name: Manufacturing Advisory Service (MAS)}
+- model: metadata.referralsourceactivity
+  pk: 3020d154-5748-e311-a56a-e4115bead28a
+  fields: {disabled_on: null, name: Technology Strategy Board}
+- model: metadata.referralsourceactivity
+  pk: 50509a5e-5748-e311-a56a-e4115bead28a
+  fields: {disabled_on: null, name: UK Export Finance (UKEF)}
+- model: metadata.referralsourceactivity
+  pk: a8c966ff-59ae-e211-a646-e4115bead28a
+  fields: {disabled_on: '2014-12-17T09:37:19Z', name: BIS Manufacturing Advice Service (MAS)}
+- model: metadata.referralsourceactivity
+  pk: 8625f971-2c85-e411-a839-e4115bead28a
+  fields: {disabled_on: null, name: Business Growth Service}
+- model: metadata.referralsourceactivity
+  pk: 240782c0-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Chamber of Commerce}
+- model: metadata.referralsourceactivity
+  pk: 250782c0-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Bank}
+- model: metadata.referralsourceactivity
+  pk: 260782c0-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Trade Association}
+- model: metadata.referralsourceactivity
+  pk: 280782c0-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: FDI Hub}
+- model: metadata.referralsourceactivity
+  pk: 290782c0-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: SG Sector Champions}
+- model: metadata.referralsourceactivity
+  pk: 2b0782c0-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: HQ}
+- model: metadata.referralsourceactivity
+  pk: 2d0782c0-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Trade Journal}
+- model: metadata.referralsourceactivity
+  pk: 69bb9fc6-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Agency Visit}
+- model: metadata.referralsourceactivity
+  pk: 6cbb9fc6-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Post}
+- model: metadata.referralsourceactivity
+  pk: 6ebb9fc6-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Science and Tech}
+- model: metadata.referralsourceactivity
+  pk: 6fbb9fc6-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Aftercare}
+- model: metadata.referralsourceactivity
+  pk: 71bb9fc6-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Devolved Administration (DA)}
+- model: metadata.referralsourceactivity
+  pk: 72bb9fc6-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: UKTI Enquiry Unit}
+- model: metadata.referralsourceactivity
+  pk: 73bb9fc6-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Exhibition}
+- model: metadata.referralsourceactivity
+  pk: 63582a51-5e73-e611-af73-e4115bead28a
+  fields: {disabled_on: null, name: Barclays Bank}
+- model: metadata.referralsourceactivity
+  pk: 51e609e0-61df-e411-bbc1-e4115bead28a
+  fields: {disabled_on: null, name: Merger Market + ONS + Press Report}
+- model: metadata.referralsourceactivity
+  pk: 6e2c3b23-62df-e411-bbc1-e4115bead28a
+  fields: {disabled_on: null, name: Merger Market + ONS+ Press Report + LEP}
+- model: metadata.referralsourceactivity
+  pk: 17e6d330-62df-e411-bbc1-e4115bead28a
+  fields: {disabled_on: null, name: Merger Market + ONS+ Press Report + Post}
+- model: metadata.referralsourceactivity
+  pk: 14b7ac76-62df-e411-bbc1-e4115bead28a
+  fields: {disabled_on: null, name: Merger Market + Press Report + LEP}
+- model: metadata.referralsourceactivity
+  pk: 8425fe1b-63df-e411-bbc1-e4115bead28a
+  fields: {disabled_on: null, name: Merger Market + Press Report + Post}
+- model: metadata.referralsourceactivity
+  pk: 414bd940-63df-e411-bbc1-e4115bead28a
+  fields: {disabled_on: null, name: Press Report + LEP}
+- model: metadata.referralsourceactivity
+  pk: 39794782-63df-e411-bbc1-e4115bead28a
+  fields: {disabled_on: null, name: Press Report + Post}
+- model: metadata.referralsourceactivity
+  pk: 86cbf18d-ffef-e411-bcbe-e4115bead28a
+  fields: {disabled_on: null, name: FT FDI Markets}
+- model: metadata.referralsourceactivity
+  pk: ff7bcab4-ffef-e411-bcbe-e4115bead28a
+  fields: {disabled_on: null, name: EY EIM}
 
 
 # ReferralSourceWebsite
