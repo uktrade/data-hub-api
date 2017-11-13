@@ -1,8 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
-from datahub.investment.models import InvestmentProject
-
 
 class DjangoCrudPermission(DjangoModelPermissions):
     """Extension of Permission class to include read permissions"""

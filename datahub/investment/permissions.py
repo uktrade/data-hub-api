@@ -1,6 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured
 
-from datahub.core.permissions import UserObjectAssociationCheck, IsAssociatedToObjectPermission
+from datahub.core.permissions import IsAssociatedToObjectPermission, UserObjectAssociationCheck
 from datahub.investment.models import InvestmentProject
 
 
