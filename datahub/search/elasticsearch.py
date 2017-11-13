@@ -95,14 +95,6 @@ def configure_index(index_name, settings=None):
         index.create()
 
 
-def get_query_type_for_field(field):
-    """Gets query type depending on field suffix."""
-    if any(field.endswith(suffix) for suffix in ('_keyword', '_trigram',)):
-        return 'match_phrase'
-
-    return 'match'
-
-
 def get_search_term_query(term, fields=None):
     """Returns search term query."""
     if term == '':
@@ -121,7 +113,7 @@ def get_search_term_query(term, fields=None):
 
     if fields:
         should_query.extend([
-            get_field_query(get_query_type_for_field(field), field, term) for field in fields
+            get_field_query(field, term) for field in fields
         ])
 
     return Q('bool', should=should_query)
@@ -197,20 +189,24 @@ def get_basic_search_query(
     return s[offset:offset + limit]
 
 
-def get_term_or_match_query(field, value):
-    """Gets term or match query."""
-    kind = 'match_phrase' if field.endswith('_trigram') else 'term'
+def _get_field_query(field, value):
+    """Gets field query depending on field suffix."""
+    if any(field.endswith(suffix) for suffix in ('.id', '_keyword', '_trigram')):
+        return Q('match_phrase', **{field: value})
 
-    return get_field_query(kind, field, value)
+    if field.endswith('_exists'):
+        return get_exists_query(field, value)
+
+    return Q('match', **{field: value})
 
 
-def get_field_query(kind, field, value):
-    """Gets match query."""
-    match = Q(kind, **{field: value})
+def get_field_query(field, value):
+    """Gets field query."""
+    query = _get_field_query(field, value)
     if '.' not in field:
-        return match
+        return query
 
-    return Q('nested', path=field.rsplit('.', maxsplit=1)[0], query=match)
+    return Q('nested', path=field.rsplit('.', maxsplit=1)[0], query=query)
 
 
 def get_exists_query(field, value):
@@ -242,8 +238,27 @@ def apply_aggs_query(search, aggregates):
         search_aggs.bucket(aggregate, 'terms', field=aggregate)
 
 
+def get_filter_query(key, value):
+    """Gets filter query."""
+    must_filter = []
+
+    if isinstance(value, list):
+        # perform "or" query
+        must_filter.append(
+            Q('bool',
+              should=[get_field_query(key, v) for v in value],
+              minimum_should_match=1
+              )
+        )
+    else:
+        must_filter.append(get_field_query(key, value))
+
+    return must_filter
+
+
 def get_search_by_entity_query(term=None,
                                filters=None,
+                               composite_filters=None,
                                entity=None,
                                ranges=None,
                                field_order=None,
@@ -258,18 +273,25 @@ def get_search_by_entity_query(term=None,
 
     if filters:
         for k, v in filters.items():
-            if isinstance(v, list):
-                # perform "or" query
-                must_filter.append(
-                    Q('bool',
-                      should=[get_term_or_match_query(k, value) for value in v],
-                      minimum_should_match=1
-                      )
+            if composite_filters and k in composite_filters:
+                # creates a "composite filter" - builds "or" query for given
+                # list of fields
+                should = list(
+                    chain.from_iterable(
+                        get_filter_query(ck, v) for ck in composite_filters[k]
+                    )
                 )
-            elif k.endswith('_exists'):
-                must_filter.append(get_exists_query(k, v))
+                must_filter.append(
+                    Q(
+                        'bool',
+                        should=should,
+                        minimum_should_match=1
+                    )
+                )
             else:
-                must_filter.append(get_term_or_match_query(k, v))
+                must_filter.extend(
+                    get_filter_query(k, v)
+                )
 
     if ranges:
         must_filter.extend([Q('range', **{k: v}) for k, v in ranges.items()])
