@@ -140,7 +140,6 @@ To run the tests:
 
 ```shell
 bash tests.sh
-bash tests-auth.sh
 ```
 
 To run the linter:
@@ -190,7 +189,6 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `AWS_DEFAULT_REGION` | No | [Default region used by boto3.](http://boto3.readthedocs.io/en/latest/guide/configuration.html#environment-variable-configuration) |
 | `AWS_SECRET_ACCESS_KEY` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
 | `BULK_CREATE_BATCH_SIZE`  | No | Used when loading Companies House records (default=5000). |
-| `CDMS_AUTH_URL`  | Yes | |
 | `DATABASE_URL`  | Yes | PostgreSQL server URL (with embedded credentials). |
 | `DATAHUB_FRONTEND_BASE_URL`  | Yes | |
 | `DATAHUB_SECRET`  | Yes | |
@@ -221,18 +219,6 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 
 If using Docker, remember to run these commands inside your container by prefixing them with `docker-compose run leeloo`.
 
-### CDMS authentication
-Enable CDMS login for users (use this to let a CDMS user log in):
-
-```shell
-./manage.py manageusers test@bar.com foo@bar.com --enable
-```
-
-Disable CDMS login for users:
-
-```shell
-./manage.py manageusers test@bar.com foo@bar.com --disable
-```
 ### Database
 
 Apply migrations:

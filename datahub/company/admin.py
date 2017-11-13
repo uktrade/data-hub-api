@@ -82,7 +82,6 @@ class AdviserAdmin(BaseModelVersionAdmin, UserAdmin):
         }),
         ('Permissions', {
             'fields': (
-                'use_cdms_auth',
                 'is_active',
                 'is_staff',
                 'is_superuser',
@@ -103,20 +102,7 @@ class AdviserAdmin(BaseModelVersionAdmin, UserAdmin):
             'fields': ('email', 'password1', 'password2'),
         }),
     )
-    list_display = ('email', 'first_name', 'last_name', 'is_staff', 'use_cdms_auth')
+    list_display = ('email', 'first_name', 'last_name', 'is_staff',)
     search_fields = ('first_name', 'last_name', 'email')
-    ordering = ('email', 'use_cdms_auth')
-    list_filter = ('use_cdms_auth',)
+    ordering = ('email',)
     actions = ['enable_users', 'disable_users']
-
-    def enable_users(self, request, queryset):
-        """Enable users for login."""
-        queryset.update(use_cdms_auth=True)
-
-    enable_users.short_description = 'Enable users'
-
-    def disable_users(self, request, queryset):
-        """Disable users for login."""
-        queryset.update(use_cdms_auth=False)
-
-    disable_users.short_description = 'Disable users.'
