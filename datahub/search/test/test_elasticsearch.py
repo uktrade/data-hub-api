@@ -36,7 +36,7 @@ def test_get_search_term_query():
                     'nested': {
                         'path': 'country',
                         'query': {
-                            'match': {
+                            'match_phrase': {
                                 'country.id': 'hello'
                             }
                         }

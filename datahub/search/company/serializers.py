@@ -18,8 +18,9 @@ class SearchCompanySerializer(SearchSerializer):
     name = serializers.CharField(required=False)
     sector = SingleOrListField(child=StringUUIDField(), required=False)
     trading_address_country = SingleOrListField(child=StringUUIDField(), required=False)
+    country = SingleOrListField(child=StringUUIDField(), required=False)
     uk_based = serializers.BooleanField(required=False)
-    uk_region = serializers.BooleanField(required=False)
+    uk_region = SingleOrListField(child=StringUUIDField(), required=False)
 
     SORT_BY_FIELDS = (
         'account_manager.name',
