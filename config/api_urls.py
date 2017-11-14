@@ -10,6 +10,7 @@ from datahub.interaction import urls as interaction_urls
 from datahub.investment import urls as investment_urls
 from datahub.leads import urls as leads_urls
 from datahub.omis import urls as omis_urls
+from datahub.ping import urls as status_urls
 from datahub.search import urls as search_urls
 
 
@@ -32,6 +33,7 @@ v3_urls = [
     url(r'^', include((investment_urls, 'investment'), namespace='investment')),
     url(r'^', include((leads_urls, 'business-leads'), namespace='business-leads')),
     url(r'^', include((search_urls, 'search'), namespace='search')),
+    url(r'^', include((status_urls, 'status'), namespace='status')),
     url(r'^omis/', include((omis_urls.internal_frontend_urls, 'omis'), namespace='omis')),
     url(
         r'^omis/public/',
