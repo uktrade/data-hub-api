@@ -1,69 +1,75 @@
 - model: investment.specificprogramme
   pk: f3f97ed2-550a-4385-86b8-3abd93515fa6
-  fields: {name: "FDI (Capital Only)"}
+  fields: {disabled_on: null, name: "FDI (Capital Only)"}
 - model: investment.specificprogramme
   pk: 20f5cf2f-8bd1-4700-920f-dea429b8c616
-  fields: {name: "SRM Programme"}
+  fields: {disabled_on: null, name: "SRM Programme"}
 - model: investment.specificprogramme
   pk: 8803a907-a9be-4fce-9482-b9bd3dece344
-  fields: {name: "Innovation Gateway"}
+  fields: {disabled_on: null, name: "Innovation Gateway"}
 - model: investment.specificprogramme
   pk: 1c91dd94-cae4-4ea4-b37e-8ef88cb10e7f
-  fields: {name: "Space"}
+  fields: {disabled_on: null, name: "Space"}
 - model: investment.specificprogramme
   pk: 6513f918-4263-4516-8abb-8e4a6a4de857
-  fields: {name: "Advanced Engineering Supply Chain"}
+  fields: {disabled_on: null, name: "Advanced Engineering Supply Chain"}
 - model: investment.specificprogramme
   pk: 7ecf2ca9-c502-4468-9caf-60d879c159c8
-  fields: {name: "Regeneration Investment Organisation (RIO)"}
+  fields: {disabled_on: null, name: "Regeneration Investment Organisation (RIO)"}
 - model: investment.specificprogramme
   pk: 26881936-6823-4ad7-a6e0-41fb9f714dab
-  fields: {name: "GREAT Investors Programme"}
+  fields: {disabled_on: null, name: "GREAT Investors Programme"}
 - model: investment.specificprogramme
   pk: ca8bd4cd-0c6b-4afd-b010-d5b38376c0fc
-  fields: {name: "HQ-UK"}
+  fields: {disabled_on: null, name: "HQ-UK"}
 - model: investment.specificprogramme
   pk: ba042912-cd42-41b3-b813-b9f26a913331
-  fields: {name: "Screen Production Investment"}
+  fields: {disabled_on: null, name: "Screen Production Investment"}
 - model: investment.specificprogramme
   pk: 7d413abc-185a-4cf9-8e74-e0df245c21ba
-  fields: {name: "Invest in GREAT Britain"}
+  fields: {disabled_on: null, name: "Invest in GREAT Britain"}
 - model: investment.specificprogramme
   pk: 973656fa-3b9a-4766-b650-f30a5e3c0ecc
-  fields: {name: "No Specific Programme"}
+  fields: {disabled_on: null, name: "No Specific Programme"}
 - model: investment.specificprogramme
   pk: 8ab7f9de-c440-4866-b985-4f58f409851f
-  fields: {name: "Infrastructure Investment"}
+  fields: {disabled_on: null, name: "Infrastructure Investment"}
 - model: investment.specificprogramme
   pk: 6ff1edff-133e-4cb0-9ddc-992a10633731
-  fields: {name: "II&I Programme"}
+  fields: {disabled_on: null, name: "II&I Programme"}
 - model: investment.specificprogramme
   pk: 58b96ea4-f954-41fb-941a-25a6dc903961
-  fields: {name: "Global Entrepreneur Programme"}
+  fields: {disabled_on: null, name: "Global Entrepreneur Programme"}
 - model: investment.specificprogramme
   pk: 0f5186d2-6140-4c46-8b89-3a3f02f19953
-  fields: {name: "Venture / Equity Capital"}
+  fields: {disabled_on: null, name: "Venture / Equity Capital"}
 - model: investment.specificprogramme
   pk: 451a3d68-cda3-44aa-89a3-8a734f0c9861
-  fields: {name: "Graduate Entrepreneur Programme"}
+  fields: {disabled_on: null, name: "Graduate Entrepreneur Programme"}
 - model: investment.specificprogramme
   pk: 45d67b36-e4cc-438b-a885-f69d37fcc265
-  fields: {name: "Sirius (Graduate Entrepreneurs)"}
+  fields: {disabled_on: null, name: "Sirius (Graduate Entrepreneurs)"}
 - model: investment.specificprogramme
   pk: 7f3e083f-ce79-4789-a82b-d90dd210d7d2
-  fields: {name: "R&D Partnership (Non-FDI)"}
+  fields: {disabled_on: null, name: "R&D Partnership (Non-FDI)"}
 - model: investment.specificprogramme
   pk: d75e2106-181e-44f6-a721-0165ee9dfc6d
-  fields: {name: "R&D Collaboration (Non-FDI)"}
+  fields: {disabled_on: null, name: "R&D Collaboration (Non-FDI)"}
 - model: investment.specificprogramme
   pk: d22f27bf-346f-48bd-aa71-d8852b7d667a
-  fields: {name: "Business Partnership (Non-FDI)"}
+  fields: {disabled_on: null, name: "Business Partnership (Non-FDI)"}
 - model: investment.specificprogramme
   pk: 08db990f-4263-46f0-9a82-09d8d7340ad7
-  fields: {name: "Contract Research (Non-FDI)"}
+  fields: {disabled_on: null, name: "Contract Research (Non-FDI)"}
 - model: investment.specificprogramme
   pk: 1f5844dd-d530-4aa0-b8ee-028ef66beba5
-  fields: {name: "University Collaboration (Non-FDI)"}
+  fields: {disabled_on: null, name: "University Collaboration (Non-FDI)"}
 - model: investment.specificprogramme
   pk: 114ff85e-d23d-4aee-b3e1-705f5445dd12
-  fields: {name: "R&D Prog (Obsolete)"}
+  fields: {disabled_on: null, name: "R&D Prog (Obsolete)"}
+- model: investment.specificprogramme
+  pk: 3361bea5-7c50-e411-985c-e4115bead28a
+  fields: {disabled_on: "2015-03-02T08:57:06Z", name: "Emerging Markets Contract (Gulf)"}
+- model: investment.specificprogramme
+  pk: a7dd7b74-7c50-e411-985c-e4115bead28a
+  fields: {disabled_on: "2015-03-02T08:57:05Z", name: "Emerging Markets Contract (Russia)"}

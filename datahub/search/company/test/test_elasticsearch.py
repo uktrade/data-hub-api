@@ -466,7 +466,7 @@ def test_limited_get_search_by_entity_query():
                         'bool': {
                             'should': [
                                 {
-                                    'term': {
+                                    'match': {
                                         'address_town': 'Woodside'
                                     }
                                 }
@@ -480,7 +480,7 @@ def test_limited_get_search_by_entity_query():
                                     'nested': {
                                         'path': 'trading_address_country',
                                         'query': {
-                                            'term': {
+                                            'match_phrase': {
                                                 'trading_address_country.id':
                                                     '80756b9a-5d95-e211-a939-e4115bead28a'
                                             }
