@@ -5,7 +5,8 @@ from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import synchronous_executor_submit
 from datahub.omis.order.models import CancellationReason
 from datahub.omis.order.test.factories import (
-    OrderAssigneeFactory, OrderFactory, OrderSubscriberFactory
+    OrderAssigneeFactory, OrderFactory,
+    OrderSubscriberFactory, OrderWithOpenQuoteFactory
 )
 
 from ..client import notify
@@ -64,6 +65,35 @@ class TestNotifyPostQuoteGenerated:
             Template.quote_sent_for_adviser.value,
             Template.quote_sent_for_adviser.value,
             Template.quote_sent_for_adviser.value,
+        ]
+
+
+@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+class TestNotifyPostQuoteAccepted:
+    """Tests for notifications sent when a quote is accepted."""
+
+    def test_notify_on_quote_accepted(self):
+        """Test that a notification is triggered when a quote is accepted."""
+        order = OrderWithOpenQuoteFactory(assignees=[])
+        OrderAssigneeFactory.create_batch(1, order=order, is_lead=True)
+        OrderSubscriberFactory.create_batch(2, order=order)
+
+        notify.client.reset_mock()
+
+        order.accept_quote(by=None)
+
+        #  1 = customer, 3 = assignees/subscribers
+        assert len(notify.client.send_email_notification.call_args_list) == (3 + 1)
+
+        templates_called = [
+            data[1]['template_id']
+            for data in notify.client.send_email_notification.call_args_list
+        ]
+        assert templates_called == [
+            Template.quote_accepted_for_customer.value,
+            Template.quote_accepted_for_adviser.value,
+            Template.quote_accepted_for_adviser.value,
+            Template.quote_accepted_for_adviser.value,
         ]
 
 

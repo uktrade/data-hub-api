@@ -7,7 +7,9 @@ from django.conf import settings
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import synchronous_executor_submit
 from datahub.omis.market.models import Market
-from datahub.omis.order.test.factories import OrderFactory, OrderWithOpenQuoteFactory
+from datahub.omis.order.test.factories import (
+    OrderFactory, OrderPaidFactory, OrderWithOpenQuoteFactory
+)
 
 from ..client import Notify
 
@@ -70,6 +72,19 @@ class TestTemplates:
         order = OrderWithOpenQuoteFactory()
 
         notify.quote_generated(order)
+
+    def test_quote_accepted(self, settings):
+        """
+        Test templates of quote accepted for customer and advisers.
+        If the template variables have been changed in GOV.UK notifications this
+        is going to raise HTTPError (400 - Bad Request).
+        """
+        settings.OMIS_NOTIFICATION_API_KEY = settings.OMIS_NOTIFICATION_TEST_API_KEY
+        notify = Notify()
+
+        order = OrderPaidFactory()
+
+        notify.quote_accepted(order)
 
     def test_you_have_been_added_for_adviser(self, settings):
         """

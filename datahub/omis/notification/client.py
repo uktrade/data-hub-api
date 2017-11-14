@@ -177,6 +177,34 @@ class Notify:
                 )
             )
 
+    def quote_accepted(self, order):
+        """
+        Send a notification to the customer and the advisers
+        that a quote has just been accepted.
+        """
+        #  notify customer
+        self._send_email(
+            email_address=order.get_current_contact_email(),
+            template_id=Template.quote_accepted_for_customer.value,
+            personalisation=self._prepare_personalisation(
+                order,
+                {
+                    'recipient name': order.contact.name,
+                    'embedded link': order.get_public_facing_url(),
+                }
+            )
+        )
+
+        #  notify advisers
+        for adviser in self._get_all_advisers(order):
+            self._send_email(
+                email_address=adviser.get_current_email(),
+                template_id=Template.quote_accepted_for_adviser.value,
+                personalisation=self._prepare_personalisation(
+                    order, {'recipient name': adviser.name}
+                )
+            )
+
     def order_cancelled(self, order):
         """
         Send a notification to the customer and the advisers
