@@ -103,14 +103,53 @@ def test_mapping(setup_es):
                     'fielddata': True,
                     'type': 'text'
                 },
-                'company': {
+                'cancellation_reason': {
                     'properties': {
                         'id': {
                             'type': 'keyword'
                         },
                         'name': {
                             'analyzer': 'lowercase_keyword_analyzer',
-                            'copy_to': ['company.name_trigram'],
+                            'fielddata': True,
+                            'type': 'text'
+                        }
+                    },
+                    'type': 'nested'
+                },
+                'cancelled_by': {
+                    'properties': {
+                        'first_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        },
+                        'id': {
+                            'type': 'keyword'
+                        },
+                        'last_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        }
+                    },
+                    'type': 'nested'
+                },
+                'cancelled_on': {
+                    'type': 'date'
+                },
+                'company': {
+                    'properties': {
+                        'id': {
+                            'type': 'keyword'
+                        },
+                        'name': {
+                            'copy_to': ['global_search', 'company.name_trigram'],
+                            'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
                             'type': 'text'
                         },
@@ -118,9 +157,35 @@ def test_mapping(setup_es):
                             'analyzer': 'trigram_analyzer',
                             'fielddata': True,
                             'type': 'text'
-                        },
+                        }
                     },
                     'type': 'nested'
+                },
+                'completed_by': {
+                    'properties': {
+                        'first_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        },
+                        'id': {
+                            'type': 'keyword'
+                        },
+                        'last_name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        }
+                    },
+                    'type': 'nested'
+                },
+                'completed_on': {
+                    'type': 'date'
                 },
                 'contact': {
                     'properties': {
@@ -138,8 +203,8 @@ def test_mapping(setup_es):
                             'type': 'text'
                         },
                         'name': {
+                            'copy_to': ['global_search', 'contact.name_trigram'],
                             'analyzer': 'lowercase_keyword_analyzer',
-                            'copy_to': ['contact.name_trigram'],
                             'fielddata': True,
                             'type': 'text'
                         },
@@ -147,7 +212,7 @@ def test_mapping(setup_es):
                             'analyzer': 'trigram_analyzer',
                             'fielddata': True,
                             'type': 'text'
-                        },
+                        }
                     },
                     'type': 'nested'
                 },
@@ -160,13 +225,6 @@ def test_mapping(setup_es):
                     'type': 'keyword'
                 },
                 'contacts_not_to_approach': {
-                    'type': 'text'
-                },
-                'further_info': {
-                    'type': 'text'
-                },
-                'existing_agents': {
-                    'index': False,
                     'type': 'text'
                 },
                 'created_by': {
@@ -206,6 +264,17 @@ def test_mapping(setup_es):
                     'index': False,
                     'type': 'integer'
                 },
+                'existing_agents': {
+                    'index': False,
+                    'type': 'text'
+                },
+                'further_info': {
+                    'type': 'text'
+                },
+                'global_search': {
+                    'analyzer': 'trigram_analyzer',
+                    'type': 'text'
+                },
                 'id': {
                     'type': 'keyword'
                 },
@@ -215,6 +284,9 @@ def test_mapping(setup_es):
                 'net_cost': {
                     'index': False,
                     'type': 'integer'
+                },
+                'paid_on': {
+                    'type': 'date'
                 },
                 'payment_due_date': {
                     'type': 'date'
@@ -237,8 +309,8 @@ def test_mapping(setup_es):
                     'type': 'nested'
                 },
                 'reference': {
+                    'copy_to': ['reference_trigram', 'global_search'],
                     'analyzer': 'lowercase_keyword_analyzer',
-                    'copy_to': ['reference_trigram'],
                     'fielddata': True,
                     'type': 'text'
                 },
@@ -314,19 +386,19 @@ def test_mapping(setup_es):
                     },
                     'type': 'nested'
                 },
-                'subtotal_cost_string': {
-                    'type': 'keyword'
-                },
                 'subtotal_cost': {
                     'copy_to': ['subtotal_cost_string'],
                     'type': 'integer'
                 },
-                'total_cost_string': {
+                'subtotal_cost_string': {
                     'type': 'keyword'
                 },
                 'total_cost': {
                     'copy_to': ['total_cost_string'],
                     'type': 'integer'
+                },
+                'total_cost_string': {
+                    'type': 'keyword'
                 },
                 'vat_cost': {
                     'index': False,
@@ -343,75 +415,7 @@ def test_mapping(setup_es):
                 'vat_verified': {
                     'index': False,
                     'type': 'boolean'
-                },
-                'paid_on': {
-                    'type': 'date'
-                },
-                'completed_by': {
-                    'properties': {
-                        'first_name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text'
-                        },
-                        'id': {
-                            'type': 'keyword'
-                        },
-                        'last_name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text'
-                        },
-                        'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text'
-                        }
-                    },
-                    'type': 'nested'
-                },
-                'completed_on': {
-                    'type': 'date'
-                },
-                'cancelled_by': {
-                    'properties': {
-                        'first_name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text'
-                        },
-                        'id': {
-                            'type': 'keyword'
-                        },
-                        'last_name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text'
-                        },
-                        'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text'
-                        }
-                    },
-                    'type': 'nested'
-                },
-                'cancelled_on': {
-                    'type': 'date'
-                },
-                'cancellation_reason': {
-                    'properties': {
-                        'id': {
-                            'type': 'keyword'
-                        },
-                        'name': {
-                            'analyzer': 'lowercase_keyword_analyzer',
-                            'fielddata': True,
-                            'type': 'text'
-                        }
-                    },
-                    'type': 'nested'
-                },
+                }
             }
         }
     }

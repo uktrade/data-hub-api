@@ -26,11 +26,24 @@ def test_get_search_term_query():
                     }
                 }, {
                     'match': {
-                        'name': 'hello'
+                        'name': {
+                            'query': 'hello',
+                            'operator': 'and'
+                        }
                     }
                 }, {
-                    'match_phrase': {
-                        'name_trigram': 'hello'
+                    'match': {
+                        'name_trigram': {
+                            'query': 'hello',
+                            'operator': 'and'
+                        }
+                    }
+                }, {
+                    'match': {
+                        'global_search': {
+                            'query': 'hello',
+                            'operator': 'and'
+                        }
                     }
                 }, {
                     'nested': {
@@ -43,7 +56,10 @@ def test_get_search_term_query():
                     }
                 }, {
                     'match': {
-                        'sector': 'hello'
+                        'sector': {
+                            'query': 'hello',
+                            'operator': 'and'
+                        }
                     }
                 }
             ]

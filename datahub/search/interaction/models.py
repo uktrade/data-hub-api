@@ -11,18 +11,45 @@ class Interaction(DocType, MapDBModelToDict):
     """Elasticsearch representation of Interaction model."""
 
     id = Keyword()
+    global_search = dsl_utils.TrigramText()
     kind = Keyword()
     date = Date()
-    company = dsl_utils.id_name_partial_mapping('company')
-    contact = dsl_utils.contact_or_adviser_partial_mapping('contact')
+    company = dsl_utils.id_name_partial_mapping(
+        'company',
+        name_params={
+            'copy_to': 'global_search'
+        }
+    )
+    contact = dsl_utils.contact_or_adviser_partial_mapping(
+        'contact',
+        name_params={
+            'copy_to': 'global_search'
+        }
+    )
     is_event = Boolean()
-    event = dsl_utils.id_name_partial_mapping('event')
+    event = dsl_utils.id_name_partial_mapping(
+        'event',
+        name_params={
+            'copy_to': 'global_search'
+        }
+    )
     service = dsl_utils.id_name_mapping()
-    subject = dsl_utils.SortableCaseInsensitiveKeywordText(copy_to='subject_english')
+    subject = dsl_utils.SortableCaseInsensitiveKeywordText(
+        copy_to=['subject_english', 'global_search']
+    )
     subject_english = dsl_utils.EnglishText()
-    dit_adviser = dsl_utils.contact_or_adviser_partial_mapping('dit_adviser')
+    dit_adviser = dsl_utils.contact_or_adviser_partial_mapping(
+        'dit_adviser',
+        name_params={
+            'copy_to': 'global_search'
+        }
+    )
     notes = dsl_utils.EnglishText()
-    dit_team = dsl_utils.id_name_mapping()
+    dit_team = dsl_utils.id_name_mapping(
+        name_params={
+            'copy_to': 'global_search'
+        }
+    )
     communication_channel = dsl_utils.id_name_mapping()
     investment_project = dsl_utils.id_name_mapping()
     created_on = Date()
@@ -49,15 +76,6 @@ class Interaction(DocType, MapDBModelToDict):
         'modified_by',
         'archived_documents_url_path',
     )
-
-    SEARCH_FIELDS = [
-        'subject',
-        'subject_english',
-        'company.name',
-        'contact.name',
-        'dit_team.name',
-        'notes'
-    ]
 
     class Meta:
         """Default document meta data."""

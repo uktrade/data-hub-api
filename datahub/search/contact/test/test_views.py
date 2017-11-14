@@ -306,25 +306,6 @@ class TestBasicSearch(APITestMixin):
         assert response.data['results'][0]['last_name'] in term
         assert [{'count': 1, 'entity': 'contact'}] == response.data['aggregations']
 
-    def test_basic_search_contact_notes(self, setup_es):
-        """Tests basic aggregate contacts query with EnglishString in notes."""
-        contact = ContactFactory(
-            notes='We have discussed exporting',
-        )
-        setup_es.indices.refresh()
-
-        term = 'exports'
-
-        url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': term,
-            'entity': 'contact'
-        })
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-        assert response.data['results'][0]['notes'] == contact.notes
-
     def test_search_contact_has_sector(self, setup_es, setup_data):
         """Tests if contact has a sector."""
         ContactFactory(first_name='sector_testing')

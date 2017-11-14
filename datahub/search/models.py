@@ -1,6 +1,6 @@
 from collections import namedtuple
-from django.conf import settings
 
+from django.conf import settings
 
 DataSet = namedtuple('DataSet', ('queryset', 'es_model',))
 

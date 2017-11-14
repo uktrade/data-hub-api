@@ -181,8 +181,8 @@ class TestSearch(APITestMixin):
             ('abcdefghijk', 'cats', False),
             ('abcdefghijk', 'xyz', False),
             # support typos
-            ('abcdefghijk', 'abd', True),
-            ('abcdefghijk', 'abdeghk', True),
+            ('abcdefghijk', 'abd', False),
+            ('abcdefghijk', 'abdeghk', False),
             ('abcdefghijk', 'abdeklx', False),
             ('abcdefghijk', 'abcfgzghijk', False),
             ('Pallas Hiding', 'pallas', True),
