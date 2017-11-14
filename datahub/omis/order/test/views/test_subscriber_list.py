@@ -55,7 +55,11 @@ class TestGetSubscriberList(APITestMixin):
                 'name': adviser.name,
                 'dit_team': {
                     'id': str(adviser.dit_team.id),
-                    'name': adviser.dit_team.name
+                    'name': adviser.dit_team.name,
+                    'uk_region': {
+                        'id': str(adviser.dit_team.uk_region.pk),
+                        'name': adviser.dit_team.uk_region.name
+                    }
                 }
             }
             for adviser in advisers[:2]
