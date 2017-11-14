@@ -10,7 +10,7 @@ from datahub.interaction import urls as interaction_urls
 from datahub.investment import urls as investment_urls
 from datahub.leads import urls as leads_urls
 from datahub.omis import urls as omis_urls
-from datahub.ping import urls as status_urls
+from datahub.status import urls as status_urls
 from datahub.search import urls as search_urls
 
 
