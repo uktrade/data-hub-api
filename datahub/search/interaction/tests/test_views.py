@@ -80,6 +80,8 @@ class TestViews(APITestMixin):
         }
         response = self.api_client.post(url, request_data, format='json')
 
+        print(response.data)
+
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert len(response_data['results']) == 1
