@@ -3,7 +3,7 @@ from django.dispatch import receiver
 
 from datahub.omis.notification.client import notify
 from datahub.omis.order.models import Order, OrderAssignee, OrderSubscriber
-from datahub.omis.order.signals import order_cancelled, quote_generated
+from datahub.omis.order.signals import order_cancelled, quote_accepted, quote_generated
 
 
 @receiver(post_save, sender=Order, dispatch_uid='notify_post_save_order')
@@ -20,6 +20,12 @@ def notify_post_save_order(sender, instance, created, raw=False, **kwargs):
 def notify_post_quote_generated(sender, order, **kwargs):
     """Notify people that a quote has been generated."""
     notify.quote_generated(order)
+
+
+@receiver(quote_accepted, sender=Order, dispatch_uid='notify_post_quote_accepted')
+def notify_post_quote_accepted(sender, order, **kwargs):
+    """Notify people that a quote has been accepted."""
+    notify.quote_accepted(order)
 
 
 @receiver(order_cancelled, sender=Order, dispatch_uid='notify_post_order_cancelled')
