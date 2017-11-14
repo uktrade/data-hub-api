@@ -3,8 +3,15 @@
 from django.contrib import admin
 
 from datahub.core.admin import BaseModelVersionAdmin
-from datahub.investment.models import (InvestmentProject, InvestmentProjectTeamMember,
-                                       IProjectDocument)
+from datahub.core.admin import DisabledOnFilter
+from datahub.investment.models import (
+    InvestmentProject,
+    InvestmentProjectTeamMember,
+    InvestorType,
+    Involvement,
+    IProjectDocument,
+    SpecificProgramme,
+)
 
 
 @admin.register(InvestmentProject)
@@ -56,3 +63,18 @@ class IProjectDocumentAdmin(admin.ModelAdmin):
         'modified_by',
     )
     date_hierarchy = 'created_on'
+
+
+@admin.register(
+    InvestorType,
+    Involvement,
+    SpecificProgramme,
+)
+class DisableableMetadataAdmin(admin.ModelAdmin):
+    """Custom Disableable Metadata Admin."""
+
+    fields = ('name', 'disabled_on',)
+    list_display = ('name', 'disabled_on',)
+    readonly_fields = ('id',)
+    search_fields = ('name', 'pk')
+    list_filter = (DisabledOnFilter,)

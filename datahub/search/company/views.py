@@ -13,12 +13,12 @@ class SearchCompanyParams:
 
     FILTER_FIELDS = (
         'account_manager',
-        'trading_name',
         'description',
         'export_to_country',
         'future_interest_country',
         'name',
         'sector',
+        'country',
         'trading_address_country',
         'trading_address_postcode',
         'trading_address_town',
@@ -27,7 +27,6 @@ class SearchCompanyParams:
     )
 
     REMAP_FIELDS = {
-        'trading_name': 'trading_name_trigram',
         'account_manager': 'account_manager.id',
         'export_to_country': 'export_to_countries.id',
         'future_interest_country': 'future_interest_countries.id',
@@ -35,6 +34,11 @@ class SearchCompanyParams:
         'registered_address_country': 'address_country.id',
         'trading_address_country': 'trading_address_country.id',
         'uk_region': 'uk_region.id',
+    }
+
+    COMPOSITE_FILTERS = {
+        'name': ['name_trigram', 'trading_name_trigram'],
+        'country': ['trading_address_country.id', 'registered_address_country.id'],
     }
 
 
