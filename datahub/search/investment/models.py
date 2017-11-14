@@ -10,6 +10,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
     """Elasticsearch representation of InvestmentProject."""
 
     id = Keyword()
+    global_search = dsl_utils.TrigramText()
     approved_commitment_to_invest = Boolean()
     approved_fdi = Boolean()
     approved_good_value = Boolean()
@@ -36,16 +37,26 @@ class InvestmentProject(DocType, MapDBModelToDict):
     fdi_type_documents = dsl_utils.id_uri_mapping()
     fdi_value = dsl_utils.id_name_mapping()
     intermediate_company = dsl_utils.id_name_mapping()
-    uk_company = dsl_utils.id_name_mapping()
-    investor_company = dsl_utils.id_name_mapping()
+    uk_company = dsl_utils.id_name_mapping(
+        name_params={
+            'copy_to': 'global_search'
+        }
+    )
+    investor_company = dsl_utils.id_name_mapping(
+        name_params={
+            'copy_to': 'global_search'
+        }
+    )
     investor_company_country = dsl_utils.id_name_mapping()
     investment_type = dsl_utils.id_name_mapping()
     investor_type = dsl_utils.id_name_mapping()
     level_of_involvement = dsl_utils.id_name_mapping()
     specific_programme = dsl_utils.id_name_mapping()
-    name = dsl_utils.SortableText()
+    name = dsl_utils.SortableText(
+        copy_to='global_search'
+    )
     name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
-    name_trigram = dsl_utils.TrigramText()
+    name_trigram = dsl_utils.SortableTrigramText()
     r_and_d_budget = Boolean()
     non_fdi_r_and_d_budget = Boolean()
     associated_non_fdi_r_and_d_project = dsl_utils.investment_project_mapping()
@@ -60,13 +71,19 @@ class InvestmentProject(DocType, MapDBModelToDict):
     number_new_jobs = Integer()
     operations_commenced_documents = dsl_utils.id_uri_mapping()
     stage = dsl_utils.id_name_mapping()
-    project_code = dsl_utils.SortableCaseInsensitiveKeywordText()
+    project_code = dsl_utils.SortableCaseInsensitiveKeywordText(
+        copy_to='global_search'
+    )
     referral_source_activity = dsl_utils.id_name_mapping()
     referral_source_activity_marketing = dsl_utils.id_name_mapping()
     referral_source_activity_website = dsl_utils.id_name_mapping()
     referral_source_activity_event = dsl_utils.SortableCaseInsensitiveKeywordText()
     referral_source_advisor = dsl_utils.contact_or_adviser_mapping('referral_source_advisor')
-    sector = dsl_utils.id_name_mapping()
+    sector = dsl_utils.id_name_mapping(
+        name_params={
+            'copy_to': 'global_search'
+        }
+    )
     status = dsl_utils.SortableCaseInsensitiveKeywordText()
     average_salary = dsl_utils.id_name_mapping()
     date_lost = Date()
@@ -130,15 +147,6 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'strategic_drivers',
         'archived_documents_url_path',
     )
-
-    SEARCH_FIELDS = [
-        'business_activities.name',
-        'intermediate_company.name',
-        'investor_company.name',
-        'project_code',
-        'sector.name',
-        'uk_company.name',
-    ]
 
     class Meta:
         """Default document meta data."""

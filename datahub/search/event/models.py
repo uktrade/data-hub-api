@@ -9,9 +9,10 @@ class Event(DocType, MapDBModelToDict):
     """Elasticsearch representation of Event model."""
 
     id = Keyword()
-    name = dsl_utils.SortableText(copy_to=['name_keyword', 'name_trigram'])
+    global_search = dsl_utils.TrigramText()
+    name = dsl_utils.SortableText(copy_to=['name_keyword', 'name_trigram', 'global_search'])
     name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
-    name_trigram = dsl_utils.TrigramText()
+    name_trigram = dsl_utils.SortableTrigramText()
     event_type = dsl_utils.id_name_mapping()
     start_date = Date()
     end_date = Date()
@@ -21,13 +22,18 @@ class Event(DocType, MapDBModelToDict):
     address_town = dsl_utils.SortableCaseInsensitiveKeywordText()
     address_county = dsl_utils.SortableCaseInsensitiveKeywordText()
     address_postcode = Text()
-    address_country = dsl_utils.id_name_mapping()
-    uk_region = dsl_utils.id_name_mapping()
+    address_country = dsl_utils.id_name_mapping(name_params={'copy_to': 'global_search'})
+    uk_region = dsl_utils.id_name_mapping(name_params={'copy_to': 'global_search'})
     notes = dsl_utils.EnglishText()
-    organiser = dsl_utils.contact_or_adviser_partial_mapping('organiser')
+    organiser = dsl_utils.contact_or_adviser_partial_mapping(
+        'organiser',
+        name_params={
+            'copy_to': 'global_search'
+        }
+    )
     lead_team = dsl_utils.id_name_mapping()
-    teams = dsl_utils.id_name_mapping()
-    related_programmes = dsl_utils.id_name_mapping()
+    teams = dsl_utils.id_name_mapping(name_params={'copy_to': 'global_search'})
+    related_programmes = dsl_utils.id_name_mapping(name_params={'copy_to': 'global_search'})
     service = dsl_utils.id_name_mapping()
     disabled_on = Date()
 
@@ -51,14 +57,6 @@ class Event(DocType, MapDBModelToDict):
         'modified_by',
         'interactions',
         'archived_documents_url_path',
-    )
-
-    SEARCH_FIELDS = (
-        'name',
-        'organiser.name',
-        'related_programmes.name',
-        'address_country.name',
-        'teams.name',
     )
 
     class Meta:

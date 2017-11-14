@@ -12,10 +12,16 @@ class Company(DocType, MapDBModelToDict):
     """Elasticsearch representation of Company model."""
 
     id = Keyword()
+    global_search = dsl_utils.TrigramText()
     account_manager = dsl_utils.contact_or_adviser_mapping('account_manager')
-    trading_name = dsl_utils.SortableText(copy_to=['trading_name_keyword', 'trading_name_trigram'])
+    trading_name = dsl_utils.SortableText(
+        copy_to=[
+            'trading_name_keyword',
+            'trading_name_trigram',
+            'global_search']
+    )
     trading_name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
-    trading_name_trigram = dsl_utils.TrigramText()
+    trading_name_trigram = dsl_utils.SortableTrigramText()
     archived = Boolean()
     archived_by = dsl_utils.contact_or_adviser_mapping('archived_by')
     contacts = dsl_utils.contact_or_adviser_mapping('contacts')
@@ -23,7 +29,9 @@ class Company(DocType, MapDBModelToDict):
     archived_reason = Text()
     business_type = dsl_utils.id_name_mapping()
     classification = dsl_utils.id_name_mapping()
-    company_number = dsl_utils.SortableCaseInsensitiveKeywordText()
+    company_number = dsl_utils.SortableCaseInsensitiveKeywordText(
+        copy_to='global_search'
+    )
     vat_number = Keyword(index=False)
     companies_house_data = dsl_utils.company_mapping()
     created_on = Date()
@@ -31,27 +39,33 @@ class Company(DocType, MapDBModelToDict):
     employee_range = dsl_utils.id_name_mapping()
     headquarter_type = dsl_utils.id_name_mapping()
     modified_on = Date()
-    name = dsl_utils.SortableText(copy_to=['name_keyword', 'name_trigram'])
+    name = dsl_utils.SortableText(copy_to=['name_keyword', 'name_trigram', 'global_search'])
     name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
-    name_trigram = dsl_utils.TrigramText()
+    name_trigram = dsl_utils.SortableTrigramText()
     one_list_account_owner = dsl_utils.contact_or_adviser_mapping('one_list_account_owner')
     parent = dsl_utils.id_name_mapping()
-    reference_code = dsl_utils.SortableCaseInsensitiveKeywordText()
+    reference_code = dsl_utils.SortableCaseInsensitiveKeywordText(
+        copy_to='global_search'
+    )
     registered_address_1 = Text()
     registered_address_2 = Text()
-    registered_address_country = dsl_utils.id_name_mapping()
+    registered_address_country = dsl_utils.id_name_mapping(
+        name_params={
+            'copy_to': 'global_search'
+        }
+    )
     registered_address_county = Text()
-    registered_address_postcode = Text()
+    registered_address_postcode = Text(copy_to='global_search')
     registered_address_town = dsl_utils.SortableCaseInsensitiveKeywordText()
-    sector = dsl_utils.id_name_mapping()
+    sector = dsl_utils.id_name_mapping(name_params={'copy_to': 'global_search'})
     trading_address_1 = Text()
     trading_address_2 = Text()
-    trading_address_country = dsl_utils.id_name_mapping()
+    trading_address_country = dsl_utils.id_name_mapping(name_params={'copy_to': 'global_search'})
     trading_address_county = Text()
-    trading_address_postcode = Text()
+    trading_address_postcode = Text(copy_to='global_search')
     trading_address_town = dsl_utils.SortableCaseInsensitiveKeywordText()
     turnover_range = dsl_utils.id_name_mapping()
-    uk_region = dsl_utils.id_name_mapping()
+    uk_region = dsl_utils.id_name_mapping(name_params={'copy_to': 'global_search'})
     uk_based = Boolean()
     website = Text()
     export_to_countries = dsl_utils.id_name_mapping()
@@ -102,21 +116,6 @@ class Company(DocType, MapDBModelToDict):
         'tree_id',
         'archived_documents_url_path',
     )
-
-    SEARCH_FIELDS = [
-        'trading_name_keyword',
-        'trading_name_trigram',
-        'classification.name',
-        'export_to_countries.name',
-        'future_interest_countries.name',
-        'registered_address_country.name',
-        'registered_address_town',
-        'sector.name',
-        'trading_address_country.name',
-        'trading_address_town',
-        'uk_region.name',
-        'website'
-    ]
 
     class Meta:
         """Default document meta data."""

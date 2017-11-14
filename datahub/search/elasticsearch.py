@@ -64,6 +64,12 @@ english_analyzer = analysis.CustomAnalyzer(
     ]
 )
 
+lowercase_analyzer = analysis.CustomAnalyzer(
+    'lowercase_analyzer',
+    tokenizer='standard',
+    filter=('lowercase',)
+)
+
 
 def configure_connection():
     """Configure Elasticsearch default connection."""
@@ -79,6 +85,7 @@ ANALYZERS = (
     lowercase_keyword_analyzer,
     trigram_analyzer,
     english_analyzer,
+    lowercase_analyzer,
 )
 
 
@@ -110,11 +117,16 @@ def get_search_term_query(term, fields=None):
             'query': term,
             'operator': 'and',
         }),
-        # Partial match name
+        # Partial matching
         Match(name_trigram={
             'query': term,
             'operator': 'and',
-            'fuzziness': 1
+        }),
+        # "Global search" for cross field matching
+        # We can't use MultiMatch, because of nested fields
+        Match(global_search={
+            'query': term,
+            'operator': 'and',
         }),
     ]
 
@@ -208,9 +220,10 @@ def _get_field_query(field, value):
         'query': value,
         'operator': 'and',
     }
+    """
     if field.endswith('_trigram'):
         field_query['fuzziness'] = 1
-
+    """
     return Q('match', **{field: field_query})
 
 

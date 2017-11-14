@@ -26,6 +26,7 @@ def test_mapping(setup_es):
                     'type': 'text'
                 },
                 'company_number': {
+                    'copy_to': ['global_search'],
                     'analyzer': 'lowercase_keyword_analyzer',
                     'fielddata': True,
                     'type': 'text'
@@ -33,6 +34,10 @@ def test_mapping(setup_es):
                 'company_status': {
                     'analyzer': 'lowercase_keyword_analyzer',
                     'fielddata': True,
+                    'type': 'text'
+                },
+                'global_search': {
+                    'analyzer': 'trigram_analyzer',
                     'type': 'text'
                 },
                 'id': {
