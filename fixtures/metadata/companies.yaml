@@ -20,9 +20,6 @@
 - model: metadata.companyclassification
   pk: 572dfefe-cd1d-e611-9bdc-e4115bead28a
   fields: {name: 'Tier D - POST Identified/Managed'}
-- model: metadata.companyclassification
-  pk: 572dfefe-cd1d-e611-9bdc-e4115bead28a
-  fields: {name: 'Tier D - POST Identified/Managed'}
 
 # headquarter type
 - model: metadata.headquartertype
