@@ -177,6 +177,12 @@ The currently defined scopes can be found in [`datahub/oauth/scopes.py`](https:/
 
 [Further information about the available grant types can be found in the OAuthLib docs](http://oauthlib.readthedocs.io/en/stable/oauth2/grants/grants.html).
 
+## Releasing and versioning
+
+Versions follow [semantic versioning](http://semver.org/).
+
+Releases should be tagged with the version number with a v prefix e.g. `v0.7.0` (take care to always include the patch component of the version number even when it is 0). 
+
 ## Deployment
 
 Leeloo can run on any Heroku-style platform. Configuration is performed via the following environment variables:

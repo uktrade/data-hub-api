@@ -1,6 +1,10 @@
 from django.http import HttpResponse
 from rest_framework import status
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.response import Response
 
+
+import datahub
 from .services import services_to_check
 
 PINGDOM_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
@@ -31,3 +35,13 @@ def ping(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content_type='text/xml'
         )
+
+
+@api_view()
+@authentication_classes([])
+@permission_classes([])
+def version(request):
+    """View that returns the package's version number."""
+    return Response({
+        'version': datahub.__version__
+    })

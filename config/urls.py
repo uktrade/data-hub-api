@@ -3,7 +3,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from oauth2_provider.views import TokenView
 
-from datahub.ping.views import ping
+from datahub.status.views import ping
 from datahub.user.views import who_am_i
 
 from . import api_urls

@@ -59,3 +59,4 @@ gevent==1.2.2
 raven==6.3.0
 requests==2.18.4
 requests_toolbelt==0.8.0
+setuptools_scm
