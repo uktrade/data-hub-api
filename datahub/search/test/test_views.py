@@ -114,6 +114,8 @@ class TestSearch(APITestMixin):
             'entity': 'company'
         })
 
+        print(response.data)
+
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 4
 
@@ -171,14 +173,12 @@ class TestSearch(APITestMixin):
         })
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 4
+        assert response.data['count'] == 2
 
         # order of relevance
         assert [
             't-shirt',
             'tshirt',
-            'electronic shirt',
-            't and e and a'
         ] == [company['name'] for company in response.data['results']]
 
     def test_search_id_match(self, setup_es, setup_data):

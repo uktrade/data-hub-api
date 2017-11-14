@@ -106,9 +106,16 @@ def get_search_term_query(term, fields=None):
         # Exact match by id
         MatchPhrase(id=term),
         # Match similar name
-        Match(name=term),
+        Match(name={
+            'query': term,
+            'operator': 'and',
+        }),
         # Partial match name
-        MatchPhrase(name_trigram=term),
+        Match(name_trigram={
+            'query': term,
+            'operator': 'and',
+            'fuzziness': 1
+        }),
     ]
 
     if fields:
@@ -191,13 +198,20 @@ def get_basic_search_query(
 
 def _get_field_query(field, value):
     """Gets field query depending on field suffix."""
-    if any(field.endswith(suffix) for suffix in ('.id', '_keyword', '_trigram')):
+    if any(field.endswith(suffix) for suffix in ('.id', '_keyword')):
         return Q('match_phrase', **{field: value})
 
     if field.endswith('_exists'):
         return get_exists_query(field, value)
 
-    return Q('match', **{field: value})
+    field_query = {
+        'query': value,
+        'operator': 'and',
+    }
+    if field.endswith('_trigram'):
+        field_query['fuzziness'] = 1
+
+    return Q('match', **{field: field_query})
 
 
 def get_field_query(field, value):

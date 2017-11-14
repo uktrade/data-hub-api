@@ -270,7 +270,7 @@ class TestSearch(APITestMixin):
 
         setup_es.indices.refresh()
 
-        term = '61409aa1fd47d4a5 332de23cbf59a36f'
+        term = '61409aa1fd47d4a5'
 
         url = reverse('api-v3:search:contact')
         response = self.api_client.post(url, {
