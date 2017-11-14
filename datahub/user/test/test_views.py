@@ -64,6 +64,6 @@ class TestUserView(APITestMixin):
                 }
             },
             'permissions': {
-                model_name_1: [action],
-                model_name_2: [action],
+                model_name_1: {action: True},
+                model_name_2: {action: True},
             }}
