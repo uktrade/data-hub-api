@@ -11,7 +11,7 @@ class CheckDatabase:
     def check(self):
         """Perform the check."""
         try:
-            Company.objects.all().count()
+            Company.objects.all().exists()
             return True, ''
         except DatabaseError as e:
             return False, e
