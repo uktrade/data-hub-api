@@ -1,3 +1,4 @@
+# auth.group
 - fields:
     name: LEP
     permissions:
@@ -247,6 +248,9 @@
       - order
       - ordersubscriber
   model: auth.group
+
+
+# metadata.teamrole
 - fields:
     disabled_on: null
     groups:
@@ -374,14 +378,14 @@
   model: metadata.teamrole
   pk: 846cb21e-6095-e211-a939-e4115bead28a
 - fields:
-    disabled_on: null
+    disabled_on: '2013-03-25T15:24Z'
     groups:
     - - DIT_staff
     name: UKTI Group
   model: metadata.teamrole
   pk: 856cb21e-6095-e211-a939-e4115bead28a
 - fields:
-    disabled_on: null
+    disabled_on: '2013-03-25T15:24Z'
     groups:
     - - DIT_staff
     name: Regional Overseas Office
@@ -415,6 +419,9 @@
     name: Local Enterprise Partnership (LEP)
   model: metadata.teamrole
   pk: b4fb1b54-5925-e511-b6bc-e4115bead28a
+
+
+# metadata.team
 - fields:
     country: 80756b9a-5d95-e211-a939-e4115bead28a
     disabled_on: null
