@@ -327,6 +327,21 @@ class SubscribedAdviserListSerializer(serializers.ListSerializer):
             )
 
 
+class TeamWithRegionSerializer(serializers.ModelSerializer):
+    """DRF serializer for teams with region."""
+
+    uk_region = NestedRelatedField(Team, read_only=True)
+
+    class Meta:
+        model = Team
+        fields = (
+            'id',
+            'name',
+            'uk_region',
+        )
+        read_only_fields = fields
+
+
 class SubscribedAdviserSerializer(serializers.Serializer):
     """
     DRF serializer for an adviser subscribed to an order.
@@ -336,7 +351,7 @@ class SubscribedAdviserSerializer(serializers.Serializer):
     first_name = serializers.CharField(read_only=True)
     last_name = serializers.CharField(read_only=True)
     name = serializers.CharField(read_only=True)
-    dit_team = NestedRelatedField(Team, read_only=True)
+    dit_team = TeamWithRegionSerializer(read_only=True)
 
     class Meta:
         list_serializer_class = SubscribedAdviserListSerializer
