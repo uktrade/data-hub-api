@@ -33,8 +33,8 @@ class WhoAmISerializer(serializers.ModelSerializer):
             action, model = action_model.split('_', 1)
 
             if model in formatted_permissions:
-                formatted_permissions[model].append(action)
+                formatted_permissions[model][action] = True
             else:
-                formatted_permissions[model] = [action]
+                formatted_permissions[model] = {action: True}
 
         return formatted_permissions
