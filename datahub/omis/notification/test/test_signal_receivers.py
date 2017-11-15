@@ -1,12 +1,14 @@
 from unittest import mock
 import pytest
+from dateutil.parser import parse as dateutil_parse
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import synchronous_executor_submit
 from datahub.omis.order.models import CancellationReason
 from datahub.omis.order.test.factories import (
     OrderAssigneeCompleteFactory, OrderAssigneeFactory, OrderFactory,
-    OrderPaidFactory, OrderSubscriberFactory, OrderWithOpenQuoteFactory
+    OrderPaidFactory, OrderSubscriberFactory,
+    OrderWithAcceptedQuoteFactory, OrderWithOpenQuoteFactory
 )
 
 from ..client import notify
@@ -184,4 +186,41 @@ class TestNotifyPostOrderCompleted:
             Template.order_completed_for_adviser.value,
             Template.order_completed_for_adviser.value,
             Template.order_completed_for_adviser.value,
+        ]
+
+
+@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+class TestNofityPostOrderPaid:
+    """Tests for notifications sent when an order is marked as paid."""
+
+    def test_notify_on_order_paid(self):
+        """Test that a notification is triggered when an order is marked as paid."""
+        order = OrderWithAcceptedQuoteFactory(assignees=[])
+        OrderAssigneeFactory.create_batch(1, order=order)
+        OrderSubscriberFactory.create_batch(2, order=order)
+
+        notify.client.reset_mock()
+
+        order.mark_as_paid(
+            by=AdviserFactory(),
+            payments_data=[
+                {
+                    'amount': order.total_cost,
+                    'received_on': dateutil_parse('2017-01-02').date()
+                },
+            ]
+        )
+
+        #  1 = customer, 3 = assignees/subscribers
+        assert len(notify.client.send_email_notification.call_args_list) == (3 + 1)
+
+        templates_called = [
+            data[1]['template_id']
+            for data in notify.client.send_email_notification.call_args_list
+        ]
+        assert templates_called == [
+            Template.order_paid_for_customer.value,
+            Template.order_paid_for_adviser.value,
+            Template.order_paid_for_adviser.value,
+            Template.order_paid_for_adviser.value,
         ]
