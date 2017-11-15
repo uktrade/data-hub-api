@@ -24,7 +24,9 @@ from datahub.omis.quote.models import Quote
 from . import validators
 from .constants import DEFAULT_HOURLY_RATE, OrderStatus, VATStatus
 from .managers import OrderQuerySet
-from .signals import order_cancelled, quote_accepted, quote_generated
+from .signals import (
+    order_cancelled, order_completed, quote_accepted, quote_generated
+)
 from .utils import populate_billing_data
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -477,6 +479,9 @@ class Order(BaseModel):
         self.completed_on = now()
         self.completed_by = by
         self.save()
+
+        # send signal
+        order_completed.send(sender=self.__class__, order=self)
 
     @transaction.atomic
     def cancel(self, by, reason):
