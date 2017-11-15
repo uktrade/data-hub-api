@@ -79,7 +79,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'client_contacts': lambda col: [dict_utils.contact_or_adviser_dict(c) for c in col.all()],
         'client_relationship_manager': dict_utils.id_name_dict,
         'team_members': lambda col: [
-            dict_utils.contact_or_adviser_dict(c.adviser) for c in col.all()
+            dict_utils.contact_or_adviser_dict(c.adviser, include_dit_team=True) for c in col.all()
         ],
         'fdi_type': dict_utils.id_name_dict,
         'fdi_type_documents': lambda col: [dict_utils.id_uri_dict(c) for c in col.all()],
@@ -137,6 +137,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'project_code',
         'sector.name',
         'uk_company.name',
+        'team_members.dit_team.id',
     ]
 
     class Meta:

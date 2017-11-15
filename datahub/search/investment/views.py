@@ -1,3 +1,5 @@
+from datahub.investment.permissions import UserTeamInvestmentProjectAssociationCheck, \
+    IsTeamAssociatedToInvestmentProjectPermission
 from datahub.oauth.scopes import Scope
 from .models import InvestmentProject
 from .serializers import SearchInvestmentProjectSerializer
@@ -24,6 +26,7 @@ class SearchInvestmentProjectParams:
         'stage',
         'status',
         'uk_region_location',
+        'team_members.dit_team.id',
     )
 
     REMAP_FIELDS = {
@@ -37,9 +40,11 @@ class SearchInvestmentProjectParams:
     }
 
 
-class SearchInvestmentProjectAPIView(SearchInvestmentProjectParams, SearchAPIView):
+class SearchInvestmentProjectAPIView(UserTeamInvestmentProjectAssociationCheck,
+                                     SearchInvestmentProjectParams,
+                                     SearchAPIView):
     """Filtered investment project search view."""
-
+    permission_classes = SearchAPIView.permission_classes + (IsTeamAssociatedToInvestmentProjectPermission,)
     permission_required = 'investment.read_investmentproject'
 
 
