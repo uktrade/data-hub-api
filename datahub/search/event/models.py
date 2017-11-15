@@ -50,6 +50,7 @@ class Event(DocType, MapDBModelToDict):
         'created_by',
         'modified_by',
         'interactions',
+        'archived_documents_url_path',
     )
 
     SEARCH_FIELDS = (

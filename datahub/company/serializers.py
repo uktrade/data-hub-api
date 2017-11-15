@@ -121,11 +121,15 @@ class ContactSerializer(serializers.ModelSerializer):
             'contactable_by_email',
             'contactable_by_phone',
             'archived',
+            'archived_documents_url_path',
             'archived_on',
             'archived_reason',
             'archived_by',
             'created_on',
             'modified_on'
+        )
+        read_only_fields = (
+            'archived_documents_url_path',
         )
 
 
@@ -274,6 +278,7 @@ class CompanySerializer(serializers.ModelSerializer):
             'created_on',
             'modified_on',
             'archived',
+            'archived_documents_url_path',
             'archived_on',
             'archived_reason',
             'archived_by',
@@ -304,9 +309,10 @@ class CompanySerializer(serializers.ModelSerializer):
             'investment_projects_invested_in_count',
             'export_experience_category',
         )
-        extra_kwargs = {
-            'archived': {'read_only': True},
-            'archived_on': {'read_only': True},
-            'archived_reason': {'read_only': True}
-        }
+        read_only_fields = (
+            'archived',
+            'archived_documents_url_path',
+            'archived_on',
+            'archived_reason',
+        )
         validators = [RequiredUnlessAlreadyBlankValidator('sector', 'business_type')]

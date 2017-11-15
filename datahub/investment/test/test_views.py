@@ -106,6 +106,7 @@ class TestUnifiedViews(APITestMixin):
             'archived_on',
             'archived_reason',
             'archived_by',
+            'archived_documents_url_path',
             'created_on',
             'modified_on',
             'fdi_value',
@@ -996,6 +997,20 @@ class TestUnifiedViews(APITestMixin):
         }
         assert response_data['team_members'] == []
         assert response_data['team_complete'] is True
+
+    def test_update_read_only_fields(self):
+        """Test updating read-only fields."""
+        project = InvestmentProjectFactory(
+            archived_documents_url_path='old_path',
+        )
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        response = self.api_client.patch(url, format='json', data={
+            'archived_documents_url_path': 'new_path'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['archived_documents_url_path'] == 'old_path'
 
 
 class TestModifiedSinceView(APITestMixin):
