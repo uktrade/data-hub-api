@@ -8,7 +8,8 @@ from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import synchronous_executor_submit
 from datahub.omis.market.models import Market
 from datahub.omis.order.test.factories import (
-    OrderFactory, OrderPaidFactory, OrderWithOpenQuoteFactory
+    OrderCompleteFactory, OrderFactory,
+    OrderPaidFactory, OrderWithOpenQuoteFactory
 )
 
 from ..client import Notify
@@ -116,3 +117,16 @@ class TestTemplates:
         order = OrderWithOpenQuoteFactory()
 
         notify.order_cancelled(order)
+
+    def test_order_completed(self, settings):
+        """
+        Test templates of order completed for advisers.
+        If the template variables have been changed in GOV.UK notifications this
+        is going to raise HTTPError (400 - Bad Request).
+        """
+        settings.OMIS_NOTIFICATION_API_KEY = settings.OMIS_NOTIFICATION_TEST_API_KEY
+        notify = Notify()
+
+        order = OrderCompleteFactory()
+
+        notify.order_completed(order)
