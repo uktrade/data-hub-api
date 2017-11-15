@@ -38,6 +38,7 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     client_relationship_manager = factory.SubFactory(AdviserFactory)
     referral_source_adviser = factory.SubFactory(AdviserFactory)
     likelihood_of_landing = 90
+    archived_documents_url_path = factory.Faker('uri_path')
     created_on = now()
 
     @to_many_field

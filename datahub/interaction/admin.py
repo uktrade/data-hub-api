@@ -43,6 +43,9 @@ class InteractionAdmin(BaseModelVersionAdmin):
         'created_by',
         'modified_by',
     )
+    readonly_fields = (
+        'archived_documents_url_path',
+    )
     list_select_related = (
         'company',
         'contact',

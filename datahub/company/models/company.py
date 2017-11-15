@@ -132,6 +132,10 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     export_experience_category = models.ForeignKey(
         ExportExperienceCategory, blank=True, null=True, on_delete=models.SET_NULL,
     )
+    archived_documents_url_path = models.CharField(
+        max_length=MAX_LENGTH, blank=True,
+        help_text='Legacy field. File browser path to the archived documents for this company.'
+    )
 
     class Meta:
         verbose_name_plural = 'companies'

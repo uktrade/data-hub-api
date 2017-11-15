@@ -44,6 +44,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     export_experience_category = factory.LazyFunction(
         ExportExperienceCategory.objects.order_by('?').first
     )
+    archived_documents_url_path = factory.Faker('uri_path')
     created_on = now()
 
     class Meta:
@@ -82,6 +83,7 @@ class ContactFactory(factory.django.DjangoModelFactory):
     address_same_as_company = True
     created_on = now()
     contactable_by_email = True
+    archived_documents_url_path = factory.Faker('uri_path')
 
     class Meta:
         model = 'company.Contact'

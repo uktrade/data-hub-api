@@ -94,6 +94,7 @@ class TestInteractionV3(APITestMixin):
                 'name': Team.healthcare_uk.value.name,
             },
             'investment_project': None,
+            'archived_documents_url_path': '',
             'created_by': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
@@ -170,6 +171,7 @@ class TestInteractionV3(APITestMixin):
                 'name': Team.healthcare_uk.value.name,
             },
             'investment_project': None,
+            'archived_documents_url_path': '',
             'created_by': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
@@ -268,6 +270,7 @@ class TestInteractionV3(APITestMixin):
                 'name': Team.healthcare_uk.value.name,
             },
             'investment_project': None,
+            'archived_documents_url_path': '',
             'created_by': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
@@ -473,6 +476,20 @@ class TestInteractionV3(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['subject'] == 'I am another subject'
+
+    def test_update_read_only_fields(self):
+        """Test updating read-only fields."""
+        interaction = InteractionFactory(
+            archived_documents_url_path='old_path',
+        )
+
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        response = self.api_client.patch(url, format='json', data={
+            'archived_documents_url_path': 'new_path'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['archived_documents_url_path'] == 'old_path'
 
     def test_change_non_event_service_delivery_to_event(self):
         """Test making a non-event service delivery an event service delivery."""
