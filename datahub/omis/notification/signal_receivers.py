@@ -4,7 +4,8 @@ from django.dispatch import receiver
 from datahub.omis.notification.client import notify
 from datahub.omis.order.models import Order, OrderAssignee, OrderSubscriber
 from datahub.omis.order.signals import (
-    order_cancelled, order_completed, quote_accepted, quote_generated
+    order_cancelled, order_completed, order_paid,
+    quote_accepted, quote_generated
 )
 
 
@@ -40,6 +41,12 @@ def notify_post_order_cancelled(sender, order, **kwargs):
 def notify_post_order_completed(sender, order, **kwargs):
     """Notify people that an order has been marked as completed."""
     notify.order_completed(order)
+
+
+@receiver(order_paid, sender=Order, dispatch_uid='notify_post_order_paid')
+def notify_post_order_paid(sender, order, **kwargs):
+    """Notify people that an order has been marked as paid."""
+    notify.order_paid(order)
 
 
 @receiver(post_save, sender=OrderAssignee, dispatch_uid='notify_post_save_assignee')
