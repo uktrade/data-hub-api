@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='company',
             name='reference_code',
-            field=models.CharField(blank=True, editable=False, max_length=255),
+            field=models.CharField(blank=True, max_length=255),
         ),
     ]
