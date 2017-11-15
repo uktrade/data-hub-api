@@ -24,6 +24,7 @@ class CompanyAdmin(BaseModelVersionAdmin):
     )
     readonly_fields = (
         'archived_documents_url_path',
+        'reference_code',
     )
 
 
