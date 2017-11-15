@@ -156,6 +156,29 @@ class TestGenerateQuoteContent:
 
         assert 'ch 1, ch 2, ch county, Bath, BA1 0AA, United Kingdom' in content
 
+    @freeze_time('2017-04-18 13:00:00.000000')
+    def test_pricing_format(self):
+        """Test that the pricing is formatted as expected (xx.yy)"""
+        hourly_rate = HourlyRateFactory(rate_value=1250, vat_value=Decimal(20))
+        order = OrderFactory(
+            discount_value=0,
+            hourly_rate=hourly_rate,
+            assignees=[],
+            vat_status=VATStatus.uk
+        )
+        OrderAssigneeFactory(
+            order=order,
+            estimated_time=120,
+            is_lead=True
+        )
+
+        content = generate_quote_content(
+            order=order,
+            expires_on=dateutil_parse('2017-05-18').date()
+        )
+
+        assert '25.00' in content
+
 
 class TestCalculateQuoteExpiryDate:
     """Tests for the calculate_quote_expiry_date logic."""

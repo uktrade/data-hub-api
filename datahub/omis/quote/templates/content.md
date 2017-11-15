@@ -10,7 +10,7 @@ The **Services** are those described below:
 
 DIT will deliver the Services on or before the **Delivery Date** which shall be {{order.delivery_date|date:"j F Y"}}.
 
-In exchange for these Services you agree to pay the **Charges** which shall be £{{pound_pricing.subtotal_cost}} (excluding VAT) on or before the **Payment Date** which shall be the earliest of: the date 30 days from the date of the relevant invoice; or the date 10 days before the Delivery Date. The Payment Date will be specified on your invoice.
+In exchange for these Services you agree to pay the **Charges** which shall be £{{pound_pricing.subtotal_cost|floatformat:2}} (excluding VAT) on or before the **Payment Date** which shall be the earliest of: the date 30 days from the date of the relevant invoice; or the date 10 days before the Delivery Date. The Payment Date will be specified on your invoice.
 
 All correspondence will be between our representatives set out below:
 
