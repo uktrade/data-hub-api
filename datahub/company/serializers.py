@@ -314,5 +314,6 @@ class CompanySerializer(serializers.ModelSerializer):
             'archived_documents_url_path',
             'archived_on',
             'archived_reason',
+            'reference_code',
         )
         validators = [RequiredUnlessAlreadyBlankValidator('sector', 'business_type')]
