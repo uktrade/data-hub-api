@@ -5,7 +5,8 @@ from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import synchronous_executor_submit
 from datahub.omis.order.models import CancellationReason
 from datahub.omis.order.test.factories import (
-    OrderAssigneeFactory, OrderFactory, OrderSubscriberFactory
+    OrderAssigneeCompleteFactory, OrderAssigneeFactory, OrderFactory,
+    OrderPaidFactory, OrderSubscriberFactory, OrderWithOpenQuoteFactory
 )
 
 from ..client import notify
@@ -68,6 +69,35 @@ class TestNotifyPostQuoteGenerated:
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+class TestNotifyPostQuoteAccepted:
+    """Tests for notifications sent when a quote is accepted."""
+
+    def test_notify_on_quote_accepted(self):
+        """Test that a notification is triggered when a quote is accepted."""
+        order = OrderWithOpenQuoteFactory(assignees=[])
+        OrderAssigneeFactory.create_batch(1, order=order, is_lead=True)
+        OrderSubscriberFactory.create_batch(2, order=order)
+
+        notify.client.reset_mock()
+
+        order.accept_quote(by=None)
+
+        #  1 = customer, 3 = assignees/subscribers
+        assert len(notify.client.send_email_notification.call_args_list) == (3 + 1)
+
+        templates_called = [
+            data[1]['template_id']
+            for data in notify.client.send_email_notification.call_args_list
+        ]
+        assert templates_called == [
+            Template.quote_accepted_for_customer.value,
+            Template.quote_accepted_for_adviser.value,
+            Template.quote_accepted_for_adviser.value,
+            Template.quote_accepted_for_adviser.value,
+        ]
+
+
+@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
 class TestNofityPostSaveOrderAdviser:
     """Tests for notifications sent when an adviser is added to an order."""
 
@@ -126,4 +156,32 @@ class TestNofityPostOrderCancelled:
             Template.order_cancelled_for_adviser.value,
             Template.order_cancelled_for_adviser.value,
             Template.order_cancelled_for_adviser.value,
+        ]
+
+
+@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+class TestNotifyPostOrderCompleted:
+    """Tests for notifications sent when an order marked as completed."""
+
+    def test_notify_on_order_completed(self):
+        """Test that a notification is triggered when an order is marked as completed."""
+        order = OrderPaidFactory(assignees=[])
+        OrderAssigneeCompleteFactory.create_batch(1, order=order, is_lead=True)
+        OrderSubscriberFactory.create_batch(2, order=order)
+
+        notify.client.reset_mock()
+
+        order.complete(by=None)
+
+        #  3 = assignees/subscribers
+        assert len(notify.client.send_email_notification.call_args_list) == 3
+
+        templates_called = [
+            data[1]['template_id']
+            for data in notify.client.send_email_notification.call_args_list
+        ]
+        assert templates_called == [
+            Template.order_completed_for_adviser.value,
+            Template.order_completed_for_adviser.value,
+            Template.order_completed_for_adviser.value,
         ]

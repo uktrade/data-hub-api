@@ -23,6 +23,7 @@ class InteractionFactory(factory.django.DjangoModelFactory):
     dit_team_id = constants.Team.healthcare_uk.value.id
     created_on = now()
     communication_channel_id = constants.InteractionType.face_to_face.value.id
+    archived_documents_url_path = factory.Faker('uri_path')
 
     class Meta:
         model = 'interaction.Interaction'
@@ -43,6 +44,7 @@ class ServiceDeliveryFactory(factory.django.DjangoModelFactory):
     dit_adviser = factory.SubFactory(AdviserFactory)
     service_id = constants.Service.trade_enquiry.value.id
     dit_team_id = constants.Team.healthcare_uk.value.id
+    archived_documents_url_path = factory.Faker('uri_path')
     created_on = now()
 
     class Meta:

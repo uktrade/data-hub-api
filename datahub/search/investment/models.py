@@ -128,6 +128,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'investmentprojectcode',
         'modified_by',
         'strategic_drivers',
+        'archived_documents_url_path',
     )
 
     SEARCH_FIELDS = [

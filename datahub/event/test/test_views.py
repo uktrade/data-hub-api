@@ -55,6 +55,7 @@ class TestGetEventView(APITestMixin):
                 'id': str(event.address_country.id),
                 'name': event.address_country.name,
             },
+            'archived_documents_url_path': event.archived_documents_url_path,
             'uk_region': {
                 'id': UKRegion.east_of_england.value.id,
                 'name': UKRegion.east_of_england.value.name,
@@ -162,6 +163,7 @@ class TestCreateEventView(APITestMixin):
                 'id': Service.trade_enquiry.value.id,
                 'name': Service.trade_enquiry.value.name,
             },
+            'archived_documents_url_path': '',
         }
 
     def test_create_maximal_success(self):
@@ -244,6 +246,7 @@ class TestCreateEventView(APITestMixin):
                 'id': Service.trade_enquiry.value.id,
                 'name': Service.trade_enquiry.value.name,
             },
+            'archived_documents_url_path': '',
         }
 
     def test_create_lead_team_not_in_teams(self):
@@ -487,6 +490,7 @@ class TestUpdateEventView(APITestMixin):
                 'id': Service.account_management.value.id,
                 'name': Service.account_management.value.name,
             },
+            'archived_documents_url_path': event.archived_documents_url_path,
         }
 
     def test_patch_lead_team_success(self):
@@ -532,6 +536,20 @@ class TestUpdateEventView(APITestMixin):
         assert response_data == {
             'lead_team': ['Lead team must be in teams array.']
         }
+
+    def test_update_read_only_fields(self):
+        """Test updating read-only fields."""
+        event = EventFactory(
+            archived_documents_url_path='old_path',
+        )
+
+        url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
+        response = self.api_client.patch(url, format='json', data={
+            'archived_documents_url_path': 'new_path'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['archived_documents_url_path'] == 'old_path'
 
 
 def _get_canonical_response_data(response):

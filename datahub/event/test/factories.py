@@ -29,6 +29,7 @@ class EventFactory(factory.django.DjangoModelFactory):
     organiser = factory.SubFactory(AdviserFactory)
     lead_team_id = Team.crm.value.id
     service_id = Service.trade_enquiry.value.id
+    archived_documents_url_path = factory.Faker('uri_path')
 
     @to_many_field
     def teams(self):  # noqa: D102

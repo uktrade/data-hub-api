@@ -6,6 +6,8 @@ from model_utils import Choices
 
 from datahub.core.models import BaseConstantModel, BaseModel
 
+MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
 
 class CommunicationChannel(BaseConstantModel):
     """Communication channel/mode of communication."""
@@ -20,7 +22,7 @@ class Interaction(BaseModel):
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    kind = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH, choices=KINDS)
+    kind = models.CharField(max_length=MAX_LENGTH, choices=KINDS)
     date = models.DateTimeField()
     company = models.ForeignKey(
         'company.Company',
@@ -68,6 +70,10 @@ class Interaction(BaseModel):
         null=True,
         blank=True,
         on_delete=models.CASCADE
+    )
+    archived_documents_url_path = models.CharField(
+        max_length=MAX_LENGTH, blank=True,
+        help_text='Legacy field. File browser path to the archived documents for this interaction.'
     )
 
     @property

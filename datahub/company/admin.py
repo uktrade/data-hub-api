@@ -22,6 +22,9 @@ class CompanyAdmin(BaseModelVersionAdmin):
         'created_by',
         'modified_by',
     )
+    readonly_fields = (
+        'archived_documents_url_path',
+    )
 
 
 @admin.register(Contact)
@@ -39,6 +42,9 @@ class ContactAdmin(BaseModelVersionAdmin):
         'archived_by',
         'created_by',
         'modified_by',
+    )
+    readonly_fields = (
+        'archived_documents_url_path',
     )
 
 

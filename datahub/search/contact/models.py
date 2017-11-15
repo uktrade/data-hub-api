@@ -74,6 +74,7 @@ class Contact(DocType, MapDBModelToDict):
         'investment_projects',
         'modified_by',
         'orders',
+        'archived_documents_url_path',
     )
 
     SEARCH_FIELDS = [
