@@ -14,3 +14,5 @@ class Template(Enum):
     quote_accepted_for_customer = 'fbd023bd-d043-4a5b-857a-ffd1d81ca5a5'
     quote_accepted_for_adviser = 'd7b7f327-f814-4eed-9130-0a2ef988691f'
     order_completed_for_adviser = 'a76f3841-bf70-40e7-9aa0-fd83f3dcc03c'
+    order_paid_for_customer = 'a6bc0d8a-a183-4345-9945-81e71aac4b3b'
+    order_paid_for_adviser = 'd41e9cb2-b412-44cf-9000-a1e34d996f16'

@@ -262,5 +262,33 @@ class Notify:
                 )
             )
 
+    def order_paid(self, order):
+        """
+        Send a notification to the customer and the advisers
+        that the order has just been marked as paid.
+        """
+        #  notify customer
+        self._send_email(
+            email_address=order.get_current_contact_email(),
+            template_id=Template.order_paid_for_customer.value,
+            personalisation=self._prepare_personalisation(
+                order,
+                {
+                    'recipient name': order.contact.name,
+                    'embedded link': order.get_public_facing_url(),
+                }
+            )
+        )
+
+        #  notify advisers
+        for adviser in self._get_all_advisers(order):
+            self._send_email(
+                email_address=adviser.get_current_email(),
+                template_id=Template.order_paid_for_adviser.value,
+                personalisation=self._prepare_personalisation(
+                    order, {'recipient name': adviser.name}
+                )
+            )
+
 
 notify = Notify()

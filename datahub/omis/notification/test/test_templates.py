@@ -130,3 +130,16 @@ class TestTemplates:
         order = OrderCompleteFactory()
 
         notify.order_completed(order)
+
+    def test_order_paid(self, settings):
+        """
+        Test templates of order paid for customer and advisers.
+        If the template variables have been changed in GOV.UK notifications this
+        is going to raise HTTPError (400 - Bad Request).
+        """
+        settings.OMIS_NOTIFICATION_API_KEY = settings.OMIS_NOTIFICATION_TEST_API_KEY
+        notify = Notify()
+
+        order = OrderPaidFactory()
+
+        notify.order_paid(order)

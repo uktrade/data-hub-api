@@ -25,7 +25,8 @@ from . import validators
 from .constants import DEFAULT_HOURLY_RATE, OrderStatus, VATStatus
 from .managers import OrderQuerySet
 from .signals import (
-    order_cancelled, order_completed, quote_accepted, quote_generated
+    order_cancelled, order_completed, order_paid,
+    quote_accepted, quote_generated
 )
 from .utils import populate_billing_data
 
@@ -453,6 +454,9 @@ class Order(BaseModel):
         max_received_on = max(item['received_on'] for item in payments_data)
         self.paid_on = datetime.combine(date=max_received_on, time=time(tzinfo=utc))
         self.save()
+
+        # send signal
+        order_paid.send(sender=self.__class__, order=self)
 
     @transaction.atomic
     def complete(self, by):
