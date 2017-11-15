@@ -33,6 +33,9 @@ class InvestmentProjectAdmin(BaseModelVersionAdmin):
         'created_by',
         'modified_by',
     )
+    readonly_fields = (
+        'archived_documents_url_path',
+    )
 
 
 @admin.register(InvestmentProjectTeamMember)

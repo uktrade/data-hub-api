@@ -42,6 +42,10 @@ class Event(BaseModel, DisableableModel):
     service = models.ForeignKey(
         'metadata.Service', null=True, blank=True, on_delete=models.PROTECT
     )
+    archived_documents_url_path = models.CharField(
+        max_length=MAX_LENGTH, blank=True,
+        help_text='Legacy field. File browser path to the archived documents for this event.'
+    )
 
     def __str__(self):
         """Human-readable representation"""

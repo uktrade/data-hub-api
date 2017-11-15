@@ -52,6 +52,10 @@ class Contact(ArchivableModel, BaseModel):
     telephone_alternative = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     email_alternative = models.EmailField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
+    archived_documents_url_path = models.CharField(
+        max_length=MAX_LENGTH, blank=True,
+        help_text='Legacy field. File browser path to the archived documents for this contact.'
+    )
 
     # Marketing preferences
     contactable_by_dit = models.BooleanField(default=False)

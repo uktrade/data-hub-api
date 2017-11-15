@@ -47,6 +47,7 @@ class Interaction(DocType, MapDBModelToDict):
     IGNORED_FIELDS = (
         'created_by',
         'modified_by',
+        'archived_documents_url_path',
     )
 
     SEARCH_FIELDS = [

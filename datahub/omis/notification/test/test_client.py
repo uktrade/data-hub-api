@@ -12,8 +12,8 @@ from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import synchronous_executor_submit
 from datahub.omis.market.models import Market
 from datahub.omis.order.test.factories import (
-    OrderAssigneeFactory, OrderFactory,
-    OrderSubscriberFactory, OrderWithOpenQuoteFactory
+    OrderAssigneeCompleteFactory, OrderAssigneeFactory, OrderCompleteFactory,
+    OrderFactory, OrderPaidFactory, OrderSubscriberFactory, OrderWithOpenQuoteFactory
 )
 
 from ..client import notify, send_email
@@ -260,6 +260,59 @@ class TestNotifyQuoteGenerated:
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+class TestNotifyQuoteAccepted:
+    """Tests for the quote_accepted logic."""
+
+    def test_customer_notified(self):
+        """
+        Test that calling `quote_accepted` sends an email notifying the customer that
+        they have accepted the quote.
+        """
+        order = OrderPaidFactory()
+
+        notify.client.reset_mock()
+
+        notify.quote_accepted(order)
+
+        assert notify.client.send_email_notification.called
+        call_args = notify.client.send_email_notification.call_args_list[0][1]
+        assert call_args['email_address'] == order.contact_email
+        assert call_args['template_id'] == Template.quote_accepted_for_customer.value
+        assert call_args['personalisation']['recipient name'] == order.contact.name
+        assert call_args['personalisation']['embedded link'] == order.get_public_facing_url()
+
+    def test_advisers_notified(self):
+        """
+        Test that calling `quote_accepted` sends an email to all advisers notifying them that
+        the quote has been accepted.
+        """
+        order = OrderPaidFactory(assignees=[])
+        assignees = OrderAssigneeFactory.create_batch(2, order=order)
+        subscribers = OrderSubscriberFactory.create_batch(2, order=order)
+
+        notify.client.reset_mock()
+
+        notify.quote_accepted(order)
+
+        assert notify.client.send_email_notification.called
+        # 1 = customer, 4 = assignees/subscribers
+        assert len(notify.client.send_email_notification.call_args_list) == (4 + 1)
+
+        calls_by_email = {
+            data['email_address']: {
+                'template_id': data['template_id'],
+                'personalisation': data['personalisation'],
+            }
+            for _, data in notify.client.send_email_notification.call_args_list
+        }
+        for item in itertools.chain(assignees, subscribers):
+            call = calls_by_email[item.adviser.get_current_email()]
+            assert call['template_id'] == Template.quote_accepted_for_adviser.value
+            assert call['personalisation']['recipient name'] == item.adviser.name
+            assert call['personalisation']['embedded link'] == order.get_datahub_frontend_url()
+
+
+@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
 class TestNotifyOrderCancelled:
     """Tests for the order_cancelled logic."""
 
@@ -342,3 +395,38 @@ class TestNotifyAdviserAdded:
         assert call_args['personalisation']['recipient name'] == adviser.name
         assert call_args['personalisation']['creator'] == creator.name
         assert call_args['personalisation']['creation date'] == '18/05/2017'
+
+
+@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+class TestNotifyOrderCompleted:
+    """Tests for the order_completed logic."""
+
+    def test_advisers_notified(self):
+        """
+        Test that calling `order_completed` sends an email to all advisers
+        notifying them that the order has been marked as completed.
+        """
+        order = OrderCompleteFactory(assignees=[])
+        assignees = OrderAssigneeCompleteFactory.create_batch(2, order=order)
+        subscribers = OrderSubscriberFactory.create_batch(2, order=order)
+
+        notify.client.reset_mock()
+
+        notify.order_completed(order)
+
+        assert notify.client.send_email_notification.called
+        # 4 = assignees/subscribers
+        assert len(notify.client.send_email_notification.call_args_list) == 4
+
+        calls_by_email = {
+            data['email_address']: {
+                'template_id': data['template_id'],
+                'personalisation': data['personalisation'],
+            }
+            for _, data in notify.client.send_email_notification.call_args_list
+        }
+        for item in itertools.chain(assignees, subscribers):
+            call = calls_by_email[item.adviser.get_current_email()]
+            assert call['template_id'] == Template.order_completed_for_adviser.value
+            assert call['personalisation']['recipient name'] == item.adviser.name
+            assert call['personalisation']['embedded link'] == order.get_datahub_frontend_url()

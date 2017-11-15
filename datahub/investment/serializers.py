@@ -153,6 +153,7 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
             'business_activities',
             'other_business_activity',
             'archived',
+            'archived_documents_url_path',
             'archived_on',
             'archived_reason',
             'archived_by',
@@ -163,10 +164,13 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
         # non-nullable
         extra_kwargs = {
             'likelihood_of_landing': {'min_value': 0, 'max_value': 100},
-            'archived': {'read_only': True},
-            'archived_on': {'read_only': True},
-            'archived_reason': {'read_only': True}
         }
+        read_only_fields = (
+            'archived',
+            'archived_on',
+            'archived_reason',
+            'archived_documents_url_path',
+        )
 
 
 class IProjectValueSerializer(serializers.ModelSerializer):
@@ -313,6 +317,7 @@ class IProjectSerializer(IProjectSummarySerializer, IProjectValueSerializer,
             + IProjectTeamSerializer.Meta.fields
         )
         extra_kwargs = IProjectSummarySerializer.Meta.extra_kwargs
+        read_only_fields = IProjectSummarySerializer.Meta.read_only_fields
 
 
 class IProjectDocumentSerializer(serializers.ModelSerializer):

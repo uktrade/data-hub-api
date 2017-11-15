@@ -99,7 +99,8 @@ class Company(DocType, MapDBModelToDict):
         'modified_by',
         'orders',
         'rght',
-        'tree_id'
+        'tree_id',
+        'archived_documents_url_path',
     )
 
     SEARCH_FIELDS = [
