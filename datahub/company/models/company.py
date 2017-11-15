@@ -57,7 +57,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    reference_code = models.CharField(max_length=MAX_LENGTH, blank=True, editable=False)
+    reference_code = models.CharField(max_length=MAX_LENGTH, blank=True)
     company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     vat_number = models.CharField(max_length=MAX_LENGTH, blank=True)
     alias = models.CharField(
