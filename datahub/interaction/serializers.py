@@ -86,6 +86,10 @@ class InteractionSerializer(serializers.ModelSerializer):
             'service',
             'subject',
             'notes',
+            'archived_documents_url_path',
+        )
+        read_only_fields = (
+            'archived_documents_url_path',
         )
         validators = [
             AnyOfValidator('company', 'investment_project'),

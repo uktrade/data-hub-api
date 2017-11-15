@@ -234,6 +234,11 @@ class IProjectRequirementsAbstract(models.Model):
         'metadata.InvestmentStrategicDriver',
         related_name='investment_projects', blank=True
     )
+    archived_documents_url_path = models.CharField(
+        max_length=MAX_LENGTH, blank=True,
+        help_text='Legacy field. File browser path to the archived documents for this '
+                  'investment project.'
+    )
 
 
 class IProjectTeamAbstract(models.Model):
