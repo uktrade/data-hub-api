@@ -105,6 +105,7 @@ class TestAddContact(APITestMixin):
             'contactable_by_phone': True,
             'archived': False,
             'archived_by': None,
+            'archived_documents_url_path': '',
             'archived_on': None,
             'archived_reason': None,
             'created_on': '2017-04-18T13:25:30.986208Z',
@@ -378,11 +379,26 @@ class TestEditContact(APITestMixin):
             'contactable_by_phone': True,
             'archived': False,
             'archived_by': None,
+            'archived_documents_url_path': contact.archived_documents_url_path,
             'archived_on': None,
             'archived_reason': None,
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-19T13:25:30.986208Z',
         }
+
+    def test_update_read_only_fields(self):
+        """Test updating read-only fields."""
+        contact = ContactFactory(
+            archived_documents_url_path='old_path',
+        )
+
+        url = reverse('api-v3:contact:detail', kwargs={'pk': contact.pk})
+        response = self.api_client.patch(url, format='json', data={
+            'archived_documents_url_path': 'new_path'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['archived_documents_url_path'] == 'old_path'
 
 
 class TestArchiveContact(APITestMixin):
@@ -521,6 +537,7 @@ class TestViewContact(APITestMixin):
             'contactable_by_phone': True,
             'archived': False,
             'archived_by': None,
+            'archived_documents_url_path': contact.archived_documents_url_path,
             'archived_on': None,
             'archived_reason': None,
             'created_on': '2017-04-18T13:25:30.986208Z',

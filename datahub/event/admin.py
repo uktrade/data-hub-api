@@ -74,7 +74,10 @@ class EventAdmin(BaseModelVersionAdmin):
         DisabledOnFilter,
         ('start_date', DateFieldListFilter),
     )
-    readonly_fields = ('id',)
+    readonly_fields = (
+        'id',
+        'archived_documents_url_path',
+    )
     search_fields = ('name', 'pk')
 
     raw_id_fields = (

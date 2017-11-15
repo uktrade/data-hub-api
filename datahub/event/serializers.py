@@ -98,6 +98,7 @@ class EventSerializer(serializers.ModelSerializer):
             'address_county',
             'address_postcode',
             'address_town',
+            'archived_documents_url_path',
             'uk_region',
             'end_date',
             'event_type',
@@ -111,4 +112,7 @@ class EventSerializer(serializers.ModelSerializer):
             'start_date',
             'teams',
             'service',
+        )
+        read_only_fields = (
+            'archived_documents_url_path',
         )
