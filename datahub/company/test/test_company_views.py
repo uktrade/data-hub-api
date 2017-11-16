@@ -566,6 +566,8 @@ class TestCompany(APITestMixin):
             ('www.google.com', 'http://www.google.com'),
             ('http://www.google.com', 'http://www.google.com'),
             ('https://www.google.com', 'https://www.google.com'),
+            ('', ''),
+            (None, None),
         )
     )
     def test_get_company_with_website(self, input_website, expected_website):
@@ -584,6 +586,8 @@ class TestCompany(APITestMixin):
             ('www.google.com', 'http://www.google.com'),
             ('http://www.google.com', 'http://www.google.com'),
             ('https://www.google.com', 'https://www.google.com'),
+            ('', ''),
+            (None, None),
         )
     )
     def test_add_company_with_website(self, input_website, expected_website):
