@@ -39,23 +39,22 @@ class TestCompany(APITestMixin):
         assert response.data['count'] == 2
 
     def test_get_company_with_company_number(self):
-        """Tests the company item view for a company with a company number.
-
-        Checks that the registered name and registered address are coming from
-        CH data.
-        """
+        """Tests the company item view for a company with a company number."""
         ch_company = CompaniesHouseCompanyFactory(
             company_number=123,
-            name='Foo ltd.',
-            registered_address_1='Hello st.',
+            name='Foo Ltd',
+            registered_address_1='Hello St',
             registered_address_town='Fooland',
             registered_address_country_id=Country.united_states.value.id
         )
         company = CompanyFactory(
             company_number=123,
-            name='Bar ltd.',
+            name='Bar Ltd',
             alias='Xyz trading',
             vat_number='009485769',
+            registered_address_1='Goodbye St',
+            registered_address_town='Barland',
+            registered_address_country_id=Country.united_kingdom.value.id
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.id})
@@ -70,17 +69,17 @@ class TestCompany(APITestMixin):
                 'company_category': '',
                 'company_status': '',
                 'incorporation_date': format_date_or_datetime(ch_company.incorporation_date),
-                'name': 'Foo ltd.',
-                'registered_address_1': 'Hello st.',
+                'name': 'Foo Ltd',
+                'registered_address_1': 'Hello St',
                 'registered_address_2': None,
                 'registered_address_town': 'Fooland',
+                'registered_address_county': None,
+                'registered_address_postcode': None,
                 'registered_address_country': {
                     'id': str(ch_company.registered_address_country.id),
                     'disabled_on': None,
                     'name': ch_company.registered_address_country.name,
                 },
-                'registered_address_county': None,
-                'registered_address_postcode': None,
                 'sic_code_1': '',
                 'sic_code_2': '',
                 'sic_code_3': '',
@@ -88,17 +87,17 @@ class TestCompany(APITestMixin):
                 'uri': '',
             },
             'reference_code': '',
-            'name': ch_company.name,
-            'trading_name': company.alias,
-            'registered_address_1': 'Hello st.',
+            'name': 'Bar Ltd',
+            'trading_name': 'Xyz trading',
+            'registered_address_1': 'Goodbye St',
             'registered_address_2': None,
-            'registered_address_town': 'Fooland',
-            'registered_address_country': {
-                'id': str(ch_company.registered_address_country.id),
-                'name': ch_company.registered_address_country.name,
-            },
+            'registered_address_town': 'Barland',
             'registered_address_county': None,
             'registered_address_postcode': None,
+            'registered_address_country': {
+                'id': str(Country.united_kingdom.value.id),
+                'name': Country.united_kingdom.value.name,
+            },
             'account_manager': None,
             'archived': False,
             'archived_by': None,
@@ -272,6 +271,46 @@ class TestCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['name'] == 'Acme'
+
+    def test_update_company_with_company_number(self):
+        """
+        Test updating a company that has a corresponding Companies House record.
+
+        Updates to the name and registered address should be allowed.
+        """
+        CompaniesHouseCompanyFactory(
+            company_number=123,
+            name='Foo Ltd',
+            registered_address_1='Hello St',
+            registered_address_town='Fooland',
+            registered_address_country_id=Country.united_states.value.id
+        )
+        company = CompanyFactory(
+            company_number=123,
+            name='Bar Ltd',
+            alias='Xyz trading',
+            vat_number='009485769',
+            registered_address_1='Goodbye St',
+            registered_address_town='Barland',
+            registered_address_country_id=Country.united_kingdom.value.id
+        )
+
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+
+        update_data = {
+            'name': 'New name',
+            'registered_address_1': 'New address 1',
+            'registered_address_town': 'New town',
+            'registered_address_country': Country.united_states.value.id,
+        }
+
+        response = self.api_client.patch(url, format='json', data=update_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['name'] == update_data['name']
+        assert response.data['registered_address_1'] == update_data['registered_address_1']
+        assert response.data['registered_address_town'] == update_data['registered_address_town']
+        assert response.data['registered_address_country']['id'] == Country.united_states.value.id
 
     def test_update_read_only_fields(self):
         """Test updating read-only fields."""
