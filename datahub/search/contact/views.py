@@ -12,6 +12,7 @@ class SearchContactParams:
     serializer_class = SearchContactSerializer
 
     FILTER_FIELDS = (
+        'name',
         'company_name',
         'company_sector',
         'company_uk_region',
@@ -19,6 +20,7 @@ class SearchContactParams:
     )
 
     REMAP_FIELDS = {
+        'name': 'name_trigram',
         'company_name': 'company.name_trigram',
         'company_sector': 'company_sector.id',
         'company_uk_region': 'company_uk_region.id',
