@@ -19,36 +19,6 @@ def notify_post_save_order(sender, instance, created, raw=False, **kwargs):
         notify.order_created(instance)
 
 
-@receiver(quote_generated, sender=Order, dispatch_uid='notify_post_quote_generated')
-def notify_post_quote_generated(sender, order, **kwargs):
-    """Notify people that a quote has been generated."""
-    notify.quote_generated(order)
-
-
-@receiver(quote_accepted, sender=Order, dispatch_uid='notify_post_quote_accepted')
-def notify_post_quote_accepted(sender, order, **kwargs):
-    """Notify people that a quote has been accepted."""
-    notify.quote_accepted(order)
-
-
-@receiver(order_cancelled, sender=Order, dispatch_uid='notify_post_order_cancelled')
-def notify_post_order_cancelled(sender, order, **kwargs):
-    """Notify people that an order has been cancelled."""
-    notify.order_cancelled(order)
-
-
-@receiver(order_completed, sender=Order, dispatch_uid='notify_post_order_completed')
-def notify_post_order_completed(sender, order, **kwargs):
-    """Notify people that an order has been marked as completed."""
-    notify.order_completed(order)
-
-
-@receiver(order_paid, sender=Order, dispatch_uid='notify_post_order_paid')
-def notify_post_order_paid(sender, order, **kwargs):
-    """Notify people that an order has been marked as paid."""
-    notify.order_paid(order)
-
-
 @receiver(post_save, sender=OrderAssignee, dispatch_uid='notify_post_save_assignee')
 @receiver(post_save, sender=OrderSubscriber, dispatch_uid='notify_post_save_subscriber')
 def notify_post_save_order_adviser(sender, instance, created, raw=False, **kwargs):
@@ -63,3 +33,33 @@ def notify_post_save_order_adviser(sender, instance, created, raw=False, **kwarg
             by=instance.created_by,
             creation_date=instance.created_on
         )
+
+
+@receiver(order_paid, sender=Order, dispatch_uid='notify_post_order_paid')
+def notify_post_order_paid(sender, order, **kwargs):
+    """Notify people that an order has been marked as paid."""
+    notify.order_paid(order)
+
+
+@receiver(order_completed, sender=Order, dispatch_uid='notify_post_order_completed')
+def notify_post_order_completed(sender, order, **kwargs):
+    """Notify people that an order has been marked as completed."""
+    notify.order_completed(order)
+
+
+@receiver(order_cancelled, sender=Order, dispatch_uid='notify_post_order_cancelled')
+def notify_post_order_cancelled(sender, order, **kwargs):
+    """Notify people that an order has been cancelled."""
+    notify.order_cancelled(order)
+
+
+@receiver(quote_generated, sender=Order, dispatch_uid='notify_post_quote_generated')
+def notify_post_quote_generated(sender, order, **kwargs):
+    """Notify people that a quote has been generated."""
+    notify.quote_generated(order)
+
+
+@receiver(quote_accepted, sender=Order, dispatch_uid='notify_post_quote_accepted')
+def notify_post_quote_accepted(sender, order, **kwargs):
+    """Notify people that a quote has been accepted."""
+    notify.quote_accepted(order)
