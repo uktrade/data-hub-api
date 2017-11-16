@@ -1,3 +1,5 @@
+import html
+import re
 from datetime import timedelta
 from pathlib import PurePath
 
@@ -14,6 +16,23 @@ from .constants import QUOTE_EXPIRY_DAYS_BEFORE_DELIVERY, QUOTE_EXPIRY_DAYS_FROM
 
 
 QUOTE_TEMPLATE = PurePath(__file__).parent / 'templates/content.md'
+
+
+def escape_markdown(content):
+    """
+    Escape markdown characters so that when it's interpreted
+    the converted text is not a valid markdown text.
+    """
+    # escape all markdown chars (e.g. replace * with \*)
+    content = re.sub(r'([~_\*#\(\)\[\]`\-\+\\])', r'\\\1', content)
+
+    # replace consecutive spaces/tabs/new lines with one space only
+    content = re.sub(r'\s+', r' ', content)
+
+    # escape html
+    content = html.escape(content)
+
+    return content
 
 
 def generate_quote_reference(order):
@@ -37,27 +56,34 @@ def generate_quote_content(order, expires_on):
     :returns: the content of the quote populated with the given order details.
     """
     company = order.company.companies_house_data or order.company
+    company_address = ', '.join(
+        field for field in (
+            company.registered_address_1,
+            company.registered_address_2,
+            company.registered_address_county,
+            company.registered_address_town,
+            company.registered_address_postcode,
+            getattr(company.registered_address_country, 'name', None)
+        )
+        if field
+    )
+    pricing = get_pricing_from_order(order, in_pence=False)
+    lead_assignee = order.get_lead_assignee()
 
     return render_to_string(
         QUOTE_TEMPLATE,
         {
-            'order': order,
-            'pound_pricing': get_pricing_from_order(order, in_pence=False),
+            'order_reference': escape_markdown(order.reference),
+            'company_name': escape_markdown(order.company.name),
+            'order_description': escape_markdown(order.description),
+            'order_delivery_date': order.delivery_date,
+            'subtotal_cost': pricing.subtotal_cost,
             'quote_expires_on': expires_on,
-            'company_address': ', '.join(
-                field for field in (
-                    company.registered_address_1,
-                    company.registered_address_2,
-                    company.registered_address_county,
-                    company.registered_address_town,
-                    company.registered_address_postcode,
-                    getattr(company.registered_address_country, 'name', None)
-                )
-                if field
-            ),
+            'company_address': escape_markdown(company_address),
+            'contact_name': escape_markdown(order.contact.name),
             'contact_email': order.contact_email or order.contact.email,
             'generic_contact_email': settings.OMIS_GENERIC_CONTACT_EMAIL,
-            'lead_assignee': order.get_lead_assignee()
+            'lead_assignee_name': escape_markdown(lead_assignee.adviser.name)
         }
     )
 
