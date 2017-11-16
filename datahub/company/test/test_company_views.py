@@ -294,6 +294,25 @@ class TestCompany(APITestMixin):
         assert response.data['reference_code'] == 'ORG-345645'
         assert response.data['archived_documents_url_path'] == 'old_path'
 
+    def test_long_trading_name(self):
+        """Test that providing a long trading name doesn't return a 500."""
+        company = CompanyFactory(
+            name='Foo ltd.',
+            registered_address_1='Hello st.',
+            registered_address_town='Fooland',
+            registered_address_country_id=Country.united_states.value.id
+        )
+
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, format='json', data={
+            'trading_name': 'a' * 600,
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'trading_name': ['Ensure this field has no more than 255 characters.']
+        }
+
     def test_add_uk_company(self):
         """Test add new UK company."""
         url = reverse('api-v3:company:collection')
