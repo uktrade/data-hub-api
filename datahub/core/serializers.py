@@ -112,7 +112,7 @@ class RelaxedURLField(serializers.URLField):
 
     @staticmethod
     def _fix_missing_url_scheme(value):
-        if '://' not in value:
+        if value and '://' not in value:
             return f'http://{value}'
         return value
 
