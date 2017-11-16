@@ -282,7 +282,10 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
         return f'{company_name} – {self.name}'
 
     class Meta:
-        permissions = (('read_investmentproject', 'Can read investment project'),)
+        permissions = (
+            ('read_investmentproject', 'Can read investment project'),
+            ('read_associated_investmentproject', 'Can read associated investment project'),
+        )
 
 
 class InvestmentProjectTeamMember(models.Model):

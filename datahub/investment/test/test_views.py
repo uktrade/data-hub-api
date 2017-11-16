@@ -8,6 +8,7 @@ from unittest.mock import patch
 
 import pytest
 import reversion
+from django.contrib.auth.models import Permission
 from django.utils.timezone import now, utc
 from freezegun import freeze_time
 from oauth2_provider.models import Application
@@ -46,6 +47,70 @@ class TestUnifiedViews(APITestMixin):
         url = reverse('api-v3:investment:investment-collection')
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_lep_user_sees_only_his_teams_ip(self):
+        """Investment projects collection filtered to only associated to users team."""
+        team = TeamFactory()
+        team_others = TeamFactory()
+        adviser_1 = AdviserFactory(dit_team_id=team.id)
+        adviser_2 = AdviserFactory(dit_team_id=team_others.id)
+        permission_1 = Permission.objects.get(codename='read_associated_investmentproject')
+        permission_2 = Permission.objects.get(codename='read_investmentproject')
+        self._user = get_test_user(team=team)
+        self._user.user_permissions.add(permission_1, permission_2)
+
+        iproject_1 = InvestmentProjectFactory()
+        iproject_2 = InvestmentProjectFactory()
+
+        InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
+        InvestmentProjectTeamMemberFactory(adviser=adviser_2, investment_project=iproject_2)
+
+        url = reverse('api-v3:investment:investment-collection')
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['id'] == str(iproject_1.id)
+        assert response.data['results'][0]['name'] == iproject_1.name
+
+    def test_lep_user_cannot_see_ip_details_if_not_associated(self):
+        """Not associated IP details is not shown to LEP user."""
+        team = TeamFactory()
+        adviser_1 = AdviserFactory(dit_team_id=team.id)
+
+        permission_1 = Permission.objects.get(codename='read_associated_investmentproject')
+        permission_2 = Permission.objects.get(codename='read_investmentproject')
+        self._user = get_test_user()
+        self._user.user_permissions.add(permission_1, permission_2)
+
+        iproject_1 = InvestmentProjectFactory()
+        InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': iproject_1.pk})
+        response = self.api_client.get(url)
+
+        # Because of how the filtering and permission check is handled in django,
+        # filtering cause 404 to be returned, rather than 403
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_lep_user_can_see_ip_details_if_associated(self):
+        """Associated IP details is displayed to LEP user."""
+        team = TeamFactory()
+        adviser_1 = AdviserFactory(dit_team_id=team.id)
+
+        permission_1 = Permission.objects.get(codename='read_associated_investmentproject')
+        permission_2 = Permission.objects.get(codename='read_investmentproject')
+        self._user = get_test_user(team=team)
+        self._user.user_permissions.add(permission_1, permission_2)
+
+        iproject_1 = InvestmentProjectFactory()
+        InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': iproject_1.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
 
     def test_list_projects_success(self):
         """Test successfully listing projects."""
