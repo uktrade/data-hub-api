@@ -138,6 +138,23 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['company']['name'] == company.name
 
+    def test_search_contact_by_partial_name(self, setup_es):
+        """Tests filtering by partially matching name."""
+        contact = ContactFactory(first_name='abcdef')
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:contact')
+
+        response = self.api_client.post(url, {
+            'name': 'abc',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['first_name'] == contact.first_name
+
     def test_company_name_trigram_filter(self, setup_es):
         """Tests edge case of partially matching company name."""
         company = CompanyFactory(name='United States')
