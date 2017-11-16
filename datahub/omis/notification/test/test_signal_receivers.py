@@ -224,3 +224,32 @@ class TestNotifyPostQuoteAccepted:
             Template.quote_accepted_for_adviser.value,
             Template.quote_accepted_for_adviser.value,
         ]
+
+
+@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+class TestNotifyPostQuoteCancelled:
+    """Tests for notifications sent when a quote is cancelled."""
+
+    def test_notify_on_quote_cancelled(self):
+        """Test that a notification is triggered when a quote is cancelled."""
+        order = OrderWithOpenQuoteFactory(assignees=[])
+        OrderAssigneeFactory.create_batch(1, order=order)
+        OrderSubscriberFactory.create_batch(2, order=order)
+
+        notify.client.reset_mock()
+
+        order.reopen(by=AdviserFactory())
+
+        #  1 = customer, 3 = assignees/subscribers
+        assert len(notify.client.send_email_notification.call_args_list) == (3 + 1)
+
+        templates_called = [
+            data[1]['template_id']
+            for data in notify.client.send_email_notification.call_args_list
+        ]
+        assert templates_called == [
+            Template.quote_cancelled_for_customer.value,
+            Template.quote_cancelled_for_adviser.value,
+            Template.quote_cancelled_for_adviser.value,
+            Template.quote_cancelled_for_adviser.value,
+        ]

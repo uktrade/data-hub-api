@@ -26,7 +26,7 @@ from .constants import DEFAULT_HOURLY_RATE, OrderStatus, VATStatus
 from .managers import OrderQuerySet
 from .signals import (
     order_cancelled, order_completed, order_paid,
-    quote_accepted, quote_generated
+    quote_accepted, quote_cancelled, quote_generated
 )
 from .utils import populate_billing_data
 
@@ -385,6 +385,9 @@ class Order(BaseModel):
 
         self.status = OrderStatus.draft
         self.save()
+
+        # send signal
+        quote_cancelled.send(sender=self.__class__, order=self, by=by)
 
     @transaction.atomic
     def accept_quote(self, by):

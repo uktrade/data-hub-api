@@ -5,7 +5,7 @@ from datahub.omis.notification.client import notify
 from datahub.omis.order.models import Order, OrderAssignee, OrderSubscriber
 from datahub.omis.order.signals import (
     order_cancelled, order_completed, order_paid,
-    quote_accepted, quote_generated
+    quote_accepted, quote_cancelled, quote_generated
 )
 
 
@@ -63,3 +63,9 @@ def notify_post_quote_generated(sender, order, **kwargs):
 def notify_post_quote_accepted(sender, order, **kwargs):
     """Notify people that a quote has been accepted."""
     notify.quote_accepted(order)
+
+
+@receiver(quote_cancelled, sender=Order, dispatch_uid='notify_post_quote_cancelled')
+def notify_post_quote_cancelled(sender, order, by, **kwargs):
+    """Notify people that a quote has been cancelled."""
+    notify.quote_cancelled(order, by)

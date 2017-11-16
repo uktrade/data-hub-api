@@ -19,3 +19,5 @@ class Template(Enum):
     quote_sent_for_adviser = '77157de5-43b3-4988-a4e9-c6073c18be47'
     quote_accepted_for_customer = 'fbd023bd-d043-4a5b-857a-ffd1d81ca5a5'
     quote_accepted_for_adviser = 'd7b7f327-f814-4eed-9130-0a2ef988691f'
+    quote_cancelled_for_customer = '86dd03cd-53b6-41b2-9eed-c3d2f6a0fda1'
+    quote_cancelled_for_adviser = 'a36fff71-e62b-4d51-a374-4cdf3e50ac47'

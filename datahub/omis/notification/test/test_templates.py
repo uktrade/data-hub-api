@@ -143,3 +143,16 @@ class TestTemplates:
         order = OrderPaidFactory()
 
         notify.quote_accepted(order)
+
+    def test_quote_cancelled(self, settings):
+        """
+        Test templates of quote cancelled for customer and advisers.
+        If the template variables have been changed in GOV.UK notifications this
+        is going to raise HTTPError (400 - Bad Request).
+        """
+        settings.OMIS_NOTIFICATION_API_KEY = settings.OMIS_NOTIFICATION_TEST_API_KEY
+        notify = Notify()
+
+        order = OrderWithOpenQuoteFactory()
+
+        notify.quote_cancelled(order, by=AdviserFactory())
