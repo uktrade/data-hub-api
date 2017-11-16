@@ -37,6 +37,8 @@ def contact_or_adviser_partial_mapping(field, name_params=None):
             name_params['copy_to'].append(copy_to)
         else:
             name_params['copy_to'] = [name_params['copy_to'], copy_to]
+    else:
+        name_params['copy_to'] = copy_to
 
     props = {
         'id': Keyword(),
@@ -70,6 +72,8 @@ def id_name_partial_mapping(field, name_params=None):
             name_params['copy_to'].append(copy_to)
         else:
             name_params['copy_to'] = [name_params['copy_to'], copy_to]
+    else:
+        name_params['copy_to'] = copy_to
 
     return Nested(properties={
         'id': Keyword(),
