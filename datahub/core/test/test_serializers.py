@@ -114,6 +114,7 @@ def test_nested_rel_field_to_choices_limit():
             ('www.google.com', 'http://www.google.com'),
             ('http://www.google.com', 'http://www.google.com'),
             ('https://www.google.com', 'https://www.google.com'),
+            ('', ''),
         )
     )
     def test_url_field_input(self, input_website, expected_website):
@@ -125,6 +126,7 @@ def test_nested_rel_field_to_choices_limit():
             ('www.google.com', 'http://www.google.com'),
             ('http://www.google.com', 'http://www.google.com'),
             ('https://www.google.com', 'https://www.google.com'),
+            ('', ''),
         )
     )
     def test_url_field_output(self, input_website, expected_website):
