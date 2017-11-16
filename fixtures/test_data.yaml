@@ -224,6 +224,52 @@
     contactable_by_phone: true
     notes: This is a dummy contact for testing
     modified_on: '2017-04-05T00:00:00Z'
+    
+- model: company.contact
+  pk: 6791d583-7a52-418f-a0d3-d8d527f20d43
+  fields:
+    first_name: Benjamina
+    last_name: Clarksoon
+    company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd  # Mars Exports Ltd
+    primary: false
+    telephone_countrycode: +1
+    telephone_number: 5551212
+    email: benjamina@clarksoon.com
+    address_1: 7 usa drive
+    address_town: washington
+    address_postcode: ne38 0px
+    address_country: 81756b9a-5d95-e211-a939-e4115bead28a
+    contactable_by_dit: false
+    contactable_by_uk_dit_partners: false
+    contactable_by_overseas_dit_partners: false
+    accepts_dit_email_marketing: false
+    contactable_by_email: false
+    contactable_by_phone: true
+    notes: This is a dummy contact for testing
+    modified_on: '2016-04-05T00:00:00Z'
+    
+- model: company.contact
+  pk: 7d43f9a2-868f-4d85-8e5f-631e5a8c9a3b
+  fields:
+    first_name: Mark
+    last_name: Halomi
+    company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd  # Mars Exports Ltd
+    primary: false
+    telephone_countrycode: +1
+    telephone_number: 45457676
+    email: mark@halomi.com
+    address_1: 24 sunny beach place
+    address_town: california
+    address_postcode: 90001
+    address_country: 81756b9a-5d95-e211-a939-e4115bead28a
+    contactable_by_dit: false
+    contactable_by_uk_dit_partners: false
+    contactable_by_overseas_dit_partners: false
+    accepts_dit_email_marketing: false
+    contactable_by_email: false
+    contactable_by_phone: true
+    notes: This is a dummy contact for testing
+    modified_on: '2017-03-05T00:00:00Z'
 
 - model: interaction.interaction
   pk: 236b656c-ae26-43ca-bb51-c72d553383f3
