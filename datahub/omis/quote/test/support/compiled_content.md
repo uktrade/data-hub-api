@@ -2,11 +2,11 @@ Date: 18 April 2017
 
 # Quote for the Provision of an Overseas Market Introduction Service (“OMIS”): ABC123 (the **Quote**)
 
-We, the Department for International Trade (**DIT**) agree to provide you My Coorp of line 1, line 2, County, London, SW1A 1AA, United Kingdom with the Services on the terms set out in this Quote.
+We, the Department for International Trade (**DIT**) agree to provide you My \*Coorp of line 1, \*line 2, County, London, SW1A 1AA, United Kingdom with the Services on the terms set out in this Quote.
 
 The **Services** are those described below:
 
-lorem ipsum
+lorem \*ipsum
 
 DIT will deliver the Services on or before the **Delivery Date** which shall be 20 June 2017.
 
@@ -14,9 +14,9 @@ In exchange for these Services you agree to pay the **Charges** which shall be �
 
 All correspondence will be between our representatives set out below:
 
-The **DIT Contact** shall be Foo Bar. If you do not have contact details for the DIT Contact, please contact omis@example.com.
+The **DIT Contact** shall be Foo \*Bar. If you do not have contact details for the DIT Contact, please contact omis@example.com.
 
-The **Customer Contact** shall be John Doe of My Coorp, line 1, line 2, County, London, SW1A 1AA, United Kingdom and contact-email@mycoorp.com.
+The **Customer Contact** shall be John \*Doe of My \*Coorp, line 1, \*line 2, County, London, SW1A 1AA, United Kingdom and contact-email@mycoorp.com.
 
 This Quote must be accepted by you by 18 May 2017. Quotes that are not accepted by this date may be withdrawn by us. You accept that any delay in the acceptance of this Quote may impact on our ability to meet the Delivery Date.
 
@@ -32,4 +32,4 @@ Please confirm your acceptance of this Quote by:
 
 If you would like to amend this quote in any way please contact the DIT Contact and we can discuss any changes and issue a revised quote if appropriate.
 
-Please contact Foo Bar if you have any further questions about this Quote. We look forward to hearing from you soon and working with you to help expand your business.
+Please contact Foo \*Bar if you have any further questions about this Quote. We look forward to hearing from you soon and working with you to help expand your business.
