@@ -10,6 +10,10 @@ def correct_website_urls(apps, schema_editor):
     Company = apps.get_model('company', 'Company')
     Company.objects.exclude(
         website__contains='://'
+    ).exclude(
+        website__isnull=True
+    ).exclude(
+        website=''
     ).update(
         website=Concat(models.Value('http://'), 'website')
     )
