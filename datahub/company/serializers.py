@@ -1,13 +1,14 @@
 from functools import partial
 
 from django.conf import settings
+from django.db import models
 
 from rest_framework import fields, serializers
 
 from datahub.company.models import (
     Advisor, CompaniesHouseCompany, Company, Contact, ExportExperienceCategory
 )
-from datahub.core.serializers import NestedRelatedField
+from datahub.core.serializers import NestedRelatedField, RelaxedURLField
 from datahub.core.validators import RequiredUnlessAlreadyBlankValidator
 from datahub.interaction.models import Interaction
 from datahub.metadata import models as meta_models
@@ -258,6 +259,12 @@ class CompanySerializer(serializers.ModelSerializer):
     export_experience_category = NestedRelatedField(
         ExportExperienceCategory, required=False, allow_null=True
     )
+
+    # Use our RelaxedURLField instead to automatically fix URLs without a scheme
+    serializer_field_mapping = {
+        **serializers.ModelSerializer.serializer_field_mapping,
+        models.URLField: RelaxedURLField,
+    }
 
     class Meta:
         model = Company

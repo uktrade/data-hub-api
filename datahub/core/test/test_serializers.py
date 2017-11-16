@@ -5,7 +5,7 @@ import pytest
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.exceptions import ValidationError
 
-from datahub.core.serializers import NestedRelatedField
+from datahub.core.serializers import NestedRelatedField, RelaxedURLField
 
 
 def test_nested_rel_field_to_internal_dict():
@@ -108,3 +108,25 @@ def test_nested_rel_field_to_choices_limit():
     field = NestedRelatedField(model)
     assert (list(field.get_choices(1).items()) == [(str(instance.id),
                                                     str(instance))])
+
+    @pytest.mark.parametrize(
+        'input_website,expected_website', (
+            ('www.google.com', 'http://www.google.com'),
+            ('http://www.google.com', 'http://www.google.com'),
+            ('https://www.google.com', 'https://www.google.com'),
+        )
+    )
+    def test_url_field_input(self, input_website, expected_website):
+        """Tests that RelaxedURLField prepends http:// when one is not provided."""
+        assert RelaxedURLField().run_validation(input_website) == expected_website
+
+    @pytest.mark.parametrize(
+        'input_website,expected_website', (
+            ('www.google.com', 'http://www.google.com'),
+            ('http://www.google.com', 'http://www.google.com'),
+            ('https://www.google.com', 'https://www.google.com'),
+        )
+    )
+    def test_url_field_output(self, input_website, expected_website):
+        """Tests that RelaxedURLField prepends http:// when one is not stored."""
+        assert RelaxedURLField().to_representation(input_website) == expected_website

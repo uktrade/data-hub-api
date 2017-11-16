@@ -99,6 +99,24 @@ class NestedRelatedField(serializers.RelatedField):
         )
 
 
+class RelaxedURLField(serializers.URLField):
+    """URLField subclass that prepends http:// to input and output when a scheme is not present."""
+
+    def to_internal_value(self, data):
+        """Converts a user-provided value to an internal value."""
+        return super().to_internal_value(self._fix_missing_url_scheme(data))
+
+    def to_representation(self, value):
+        """Converts a stored value to the external representation."""
+        return super().to_representation(self._fix_missing_url_scheme(value))
+
+    @staticmethod
+    def _fix_missing_url_scheme(value):
+        if '://' not in value:
+            return f'http://{value}'
+        return value
+
+
 def _value_for_json(val):
     """Returns a JSON-serialisable version of a value."""
     if isinstance(val, UUID):
