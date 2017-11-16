@@ -206,7 +206,7 @@ class CompanySerializer(serializers.ModelSerializer):
         model=meta_models.Country, field_class=NestedRelatedField
     )
     trading_name = serializers.CharField(
-        source='alias', required=False, allow_null=True, allow_blank=True
+        source='alias', required=False, allow_null=True, allow_blank=True, max_length=MAX_LENGTH
     )
     trading_address_country = NestedRelatedField(
         meta_models.Country, required=False, allow_null=True
