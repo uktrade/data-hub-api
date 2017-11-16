@@ -149,6 +149,91 @@ class Notify:
 
             self.order_info(**data)
 
+    def adviser_added(self, order, adviser, by, creation_date):
+        """Send a notification when an adviser is added to an order."""
+        self._send_email(
+            email_address=adviser.get_current_email(),
+            template_id=Template.you_have_been_added_for_adviser.value,
+            personalisation=self._prepare_personalisation(
+                order,
+                {
+                    'recipient name': adviser.name,
+                    'creator': by.name,
+                    'creation date': creation_date.strftime('%d/%m/%Y')
+                }
+            )
+        )
+
+    def order_paid(self, order):
+        """
+        Send a notification to the customer and the advisers
+        that the order has just been marked as paid.
+        """
+        #  notify customer
+        self._send_email(
+            email_address=order.get_current_contact_email(),
+            template_id=Template.order_paid_for_customer.value,
+            personalisation=self._prepare_personalisation(
+                order,
+                {
+                    'recipient name': order.contact.name,
+                    'embedded link': order.get_public_facing_url(),
+                }
+            )
+        )
+
+        #  notify advisers
+        for adviser in self._get_all_advisers(order):
+            self._send_email(
+                email_address=adviser.get_current_email(),
+                template_id=Template.order_paid_for_adviser.value,
+                personalisation=self._prepare_personalisation(
+                    order, {'recipient name': adviser.name}
+                )
+            )
+
+    def order_completed(self, order):
+        """
+        Send a notification to the advisers that the order has
+        just been marked as completed.
+        """
+        for adviser in self._get_all_advisers(order):
+            self._send_email(
+                email_address=adviser.get_current_email(),
+                template_id=Template.order_completed_for_adviser.value,
+                personalisation=self._prepare_personalisation(
+                    order, {'recipient name': adviser.name}
+                )
+            )
+
+    def order_cancelled(self, order):
+        """
+        Send a notification to the customer and the advisers
+        that the order has just been cancelled.
+        """
+        #  notify customer
+        self._send_email(
+            email_address=order.get_current_contact_email(),
+            template_id=Template.order_cancelled_for_customer.value,
+            personalisation=self._prepare_personalisation(
+                order,
+                {
+                    'recipient name': order.contact.name,
+                    'embedded link': order.get_public_facing_url(),
+                }
+            )
+        )
+
+        #  notify advisers
+        for adviser in self._get_all_advisers(order):
+            self._send_email(
+                email_address=adviser.get_current_email(),
+                template_id=Template.order_cancelled_for_adviser.value,
+                personalisation=self._prepare_personalisation(
+                    order, {'recipient name': adviser.name}
+                )
+            )
+
     def quote_generated(self, order):
         """
         Send a notification to the customer and the advisers
@@ -200,91 +285,6 @@ class Notify:
             self._send_email(
                 email_address=adviser.get_current_email(),
                 template_id=Template.quote_accepted_for_adviser.value,
-                personalisation=self._prepare_personalisation(
-                    order, {'recipient name': adviser.name}
-                )
-            )
-
-    def order_cancelled(self, order):
-        """
-        Send a notification to the customer and the advisers
-        that the order has just been cancelled.
-        """
-        #  notify customer
-        self._send_email(
-            email_address=order.get_current_contact_email(),
-            template_id=Template.order_cancelled_for_customer.value,
-            personalisation=self._prepare_personalisation(
-                order,
-                {
-                    'recipient name': order.contact.name,
-                    'embedded link': order.get_public_facing_url(),
-                }
-            )
-        )
-
-        #  notify advisers
-        for adviser in self._get_all_advisers(order):
-            self._send_email(
-                email_address=adviser.get_current_email(),
-                template_id=Template.order_cancelled_for_adviser.value,
-                personalisation=self._prepare_personalisation(
-                    order, {'recipient name': adviser.name}
-                )
-            )
-
-    def adviser_added(self, order, adviser, by, creation_date):
-        """Send a notification when an adviser is added to an order."""
-        self._send_email(
-            email_address=adviser.get_current_email(),
-            template_id=Template.you_have_been_added_for_adviser.value,
-            personalisation=self._prepare_personalisation(
-                order,
-                {
-                    'recipient name': adviser.name,
-                    'creator': by.name,
-                    'creation date': creation_date.strftime('%d/%m/%Y')
-                }
-            )
-        )
-
-    def order_completed(self, order):
-        """
-        Send a notification to the advisers that the order has
-        just been marked as completed.
-        """
-        for adviser in self._get_all_advisers(order):
-            self._send_email(
-                email_address=adviser.get_current_email(),
-                template_id=Template.order_completed_for_adviser.value,
-                personalisation=self._prepare_personalisation(
-                    order, {'recipient name': adviser.name}
-                )
-            )
-
-    def order_paid(self, order):
-        """
-        Send a notification to the customer and the advisers
-        that the order has just been marked as paid.
-        """
-        #  notify customer
-        self._send_email(
-            email_address=order.get_current_contact_email(),
-            template_id=Template.order_paid_for_customer.value,
-            personalisation=self._prepare_personalisation(
-                order,
-                {
-                    'recipient name': order.contact.name,
-                    'embedded link': order.get_public_facing_url(),
-                }
-            )
-        )
-
-        #  notify advisers
-        for adviser in self._get_all_advisers(order):
-            self._send_email(
-                email_address=adviser.get_current_email(),
-                template_id=Template.order_paid_for_adviser.value,
                 personalisation=self._prepare_personalisation(
                     order, {'recipient name': adviser.name}
                 )
