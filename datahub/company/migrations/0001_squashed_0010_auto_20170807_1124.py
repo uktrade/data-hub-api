@@ -3,7 +3,6 @@
 from __future__ import unicode_literals
 
 import datahub.company.models.adviser
-import datahub.company.validators
 from django.conf import settings
 import django.contrib.postgres.fields.citext
 import django.contrib.postgres.operations
@@ -93,7 +92,7 @@ class Migration(migrations.Migration):
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('alias', models.CharField(blank=True, help_text='Trading name', max_length=255, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
-                ('website', models.CharField(blank=True, max_length=255, null=True, validators=[datahub.company.validators.RelaxedURLValidator])),
+                ('website', models.CharField(blank=True, max_length=255, null=True)),
                 ('trading_address_1', models.CharField(blank=True, max_length=255, null=True)),
                 ('trading_address_2', models.CharField(blank=True, max_length=255, null=True)),
                 ('trading_address_town', models.CharField(blank=True, max_length=255, null=True)),
