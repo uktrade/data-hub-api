@@ -10,6 +10,8 @@ from ..serializers import (
 class SearchContactSerializer(SearchSerializer):
     """Serialiser used to validate contact search POST bodies."""
 
+    name = serializers.CharField(required=False)
+    company = SingleOrListField(child=StringUUIDField(), required=False)
     company_name = serializers.CharField(required=False)
     company_sector = SingleOrListField(child=StringUUIDField(), required=False)
     company_uk_region = SingleOrListField(child=StringUUIDField(), required=False)
@@ -22,6 +24,7 @@ class SearchContactSerializer(SearchSerializer):
         'address_town',
         'adviser.name',
         'archived',
+        'archived_on',
         'archived_by.name',
         'company.name',
         'contactable_by_dit',

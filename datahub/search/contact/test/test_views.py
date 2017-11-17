@@ -155,6 +155,24 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['first_name'] == contact.first_name
 
+    def test_search_contact_by_company_id(self, setup_es):
+        """Tests filtering by company id."""
+        company = CompanyFactory()
+        ContactFactory(company=company)
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:contact')
+
+        response = self.api_client.post(url, {
+            'company': company.id,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['company']['id'] == str(company.id)
+
     def test_company_name_trigram_filter(self, setup_es):
         """Tests edge case of partially matching company name."""
         company = CompanyFactory(name='United States')
