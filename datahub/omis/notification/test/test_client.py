@@ -239,6 +239,30 @@ class TestNotifyAdviserAdded:
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+class TestNotifyAdviserRemoved:
+    """Tests for the adviser_removed logic."""
+
+    def test_adviser_notified(self):
+        """
+        Test that calling `adviser_removed` sends an email notifying the adviser that
+        they have been removed from the order.
+        """
+        order = OrderFactory()
+        adviser = AdviserFactory()
+
+        notify.client.reset_mock()
+
+        notify.adviser_removed(order=order, adviser=adviser)
+
+        assert notify.client.send_email_notification.called
+        call_args = notify.client.send_email_notification.call_args_list[0][1]
+        assert call_args['email_address'] == adviser.contact_email
+        assert call_args['template_id'] == Template.you_have_been_removed_for_adviser.value
+
+        assert call_args['personalisation']['recipient name'] == adviser.name
+
+
+@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
 class TestNotifyOrderPaid:
     """Tests for the order_paid logic."""
 

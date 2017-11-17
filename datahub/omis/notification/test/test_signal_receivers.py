@@ -3,7 +3,9 @@ import pytest
 from dateutil.parser import parse as dateutil_parse
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.core.test_utils import synchronous_executor_submit
+from datahub.core.test_utils import (
+    synchronous_executor_submit, synchronous_transaction_on_commit
+)
 from datahub.omis.order.models import CancellationReason
 from datahub.omis.order.test.factories import (
     OrderAssigneeCompleteFactory, OrderAssigneeFactory, OrderFactory,
@@ -18,6 +20,7 @@ pytestmark = pytest.mark.django_db
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
 class TestNotifyPostSaveOrder:
     """Tests for notifications sent when an order is saved/updated."""
 
@@ -42,6 +45,7 @@ class TestNotifyPostSaveOrder:
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
 class TestNofityPostSaveOrderAdviser:
     """Tests for notifications sent when an adviser is added to an order."""
 
@@ -75,6 +79,45 @@ class TestNofityPostSaveOrderAdviser:
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+class TestNofityPostDeleteOrderAdviser:
+    """Tests for notifications sent when an adviser is removed from an order."""
+
+    def test_notify_on_order_assignee_deleted(self):
+        """
+        Test that a notification is sent to the adviser when they get removed from an order.
+        """
+        order = OrderFactory(assignees=[])
+        assignee = OrderAssigneeFactory(order=order)
+
+        notify.client.reset_mock()
+
+        order.assignees.all().delete()
+
+        assert notify.client.send_email_notification.called
+        call_args = notify.client.send_email_notification.call_args_list[0][1]
+        assert call_args['email_address'] == assignee.adviser.contact_email
+        assert call_args['template_id'] == Template.you_have_been_removed_for_adviser.value
+
+    def test_notify_on_order_subscriber_deleted(self):
+        """
+        Test that a notification is sent to the adviser when they get removed from an order.
+        """
+        order = OrderFactory(assignees=[])
+        subscriber = OrderSubscriberFactory(order=order)
+
+        notify.client.reset_mock()
+
+        order.subscribers.all().delete()
+
+        assert notify.client.send_email_notification.called
+        call_args = notify.client.send_email_notification.call_args_list[0][1]
+        assert call_args['email_address'] == subscriber.adviser.contact_email
+        assert call_args['template_id'] == Template.you_have_been_removed_for_adviser.value
+
+
+@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
 class TestNofityPostOrderPaid:
     """Tests for notifications sent when an order is marked as paid."""
 
@@ -112,6 +155,7 @@ class TestNofityPostOrderPaid:
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
 class TestNotifyPostOrderCompleted:
     """Tests for notifications sent when an order marked as completed."""
 
@@ -140,6 +184,7 @@ class TestNotifyPostOrderCompleted:
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
 class TestNofityPostOrderCancelled:
     """Tests for notifications sent when an order is cancelled."""
 
@@ -169,6 +214,7 @@ class TestNofityPostOrderCancelled:
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
 class TestNotifyPostQuoteGenerated:
     """Tests for notifications sent when a quote is generated."""
 
@@ -198,6 +244,7 @@ class TestNotifyPostQuoteGenerated:
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
 class TestNotifyPostQuoteAccepted:
     """Tests for notifications sent when a quote is accepted."""
 
@@ -227,6 +274,7 @@ class TestNotifyPostQuoteAccepted:
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
 class TestNotifyPostQuoteCancelled:
     """Tests for notifications sent when a quote is cancelled."""
 
