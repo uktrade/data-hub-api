@@ -10,6 +10,7 @@ from ..serializers import (
 class SearchContactSerializer(SearchSerializer):
     """Serialiser used to validate contact search POST bodies."""
 
+    archived = serializers.BooleanField(required=False)
     name = serializers.CharField(required=False)
     company = SingleOrListField(child=StringUUIDField(), required=False)
     company_name = serializers.CharField(required=False)

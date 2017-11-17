@@ -18,6 +18,7 @@ class SearchContactParams:
         'company_sector',
         'company_uk_region',
         'address_country',
+        'archived',
     )
 
     REMAP_FIELDS = {
