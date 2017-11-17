@@ -8,7 +8,16 @@ from datahub.search.models import MapDBModelToDict
 
 
 class Interaction(DocType, MapDBModelToDict):
-    """Elasticsearch representation of Interaction model."""
+    """Elasticsearch representation of Interaction model.
+
+    Following fields are copied to "global_search":
+    - company.name
+    - contact.name
+    - event.name
+    - subject
+    - dit_adviser.name
+    - dit_team.name
+    """
 
     id = Keyword()
     global_search = dsl_utils.TrigramText()

@@ -7,7 +7,13 @@ from ..models import MapDBModelToDict
 
 
 class Order(DocType, MapDBModelToDict):
-    """Elasticsearch representation of Order model."""
+    """Elasticsearch representation of Order model.
+
+    Following fields are copied to "global_search":
+    - reference
+    - company.name
+    - contact.name
+    """
 
     id = Keyword()
     global_search = dsl_utils.TrigramText()
