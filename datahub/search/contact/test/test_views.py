@@ -158,6 +158,28 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['first_name'] == contact.first_name
 
+    @pytest.mark.parametrize(
+        'archived', (
+            True,
+            False,
+        )
+    )
+    def test_search_contact_by_archived(self, setup_es, setup_data, archived):
+        """Tests filtering by archived."""
+        ContactFactory.create_batch(5, archived=True)
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:contact')
+
+        response = self.api_client.post(url, {
+            'archived': archived,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] > 0
+        assert all(result['archived'] == archived for result in response.data['results'])
+
     def test_search_contact_by_company_id(self, setup_es, setup_data):
         """Tests filtering by company id."""
         company = CompanyFactory()
