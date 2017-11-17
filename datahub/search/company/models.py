@@ -9,7 +9,17 @@ from ..models import MapDBModelToDict
 
 
 class Company(DocType, MapDBModelToDict):
-    """Elasticsearch representation of Company model."""
+    """Elasticsearch representation of Company model.
+
+    Following fields are copied to "global_search":
+    - company_number
+    - name
+    - reference_code
+    - registered_address_country.name
+    - sector.name
+    - trading_address_country.name
+    - uk_region.name
+    """
 
     id = Keyword()
     global_search = dsl_utils.TrigramText()

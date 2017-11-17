@@ -6,7 +6,16 @@ from datahub.search.models import MapDBModelToDict
 
 
 class Event(DocType, MapDBModelToDict):
-    """Elasticsearch representation of Event model."""
+    """Elasticsearch representation of Event model.
+
+    Following fields are copied to "global_search":
+    - name
+    - address_country.name
+    - uk_region.name
+    - organiser.name
+    - teams.name
+    - related_programmes.name
+    """
 
     id = Keyword()
     global_search = dsl_utils.TrigramText()

@@ -7,7 +7,15 @@ from ..models import MapDBModelToDict
 
 
 class Contact(DocType, MapDBModelToDict):
-    """Elasticsearch representation of Contact model."""
+    """Elasticsearch representation of Contact model.
+
+    Following fields are copied to "global_search":
+    - first_name
+    - last_name
+    - email
+    - email_alternative
+    - company.name
+    """
 
     id = Keyword()
     global_search = dsl_utils.TrigramText()

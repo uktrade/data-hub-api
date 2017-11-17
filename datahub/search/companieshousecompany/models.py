@@ -6,11 +6,20 @@ from datahub.search.models import MapDBModelToDict
 
 
 class CompaniesHouseCompany(DocType, MapDBModelToDict):
-    """Elasticsearch representation of CompaniesHouseCompany model."""
+    """Elasticsearch representation of CompaniesHouseCompany model.
+
+    Following fields are copied to "global_search":
+    - company_number
+    - name
+    """
 
     id = Keyword()
     global_search = dsl_utils.TrigramText()
-    name = dsl_utils.SortableText(copy_to=['name_keyword', 'name_trigram'])
+    name = dsl_utils.SortableText(
+        copy_to=[
+            'name_keyword', 'name_trigram', 'global_search'
+        ]
+    )
     name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
     name_trigram = dsl_utils.SortableTrigramText()
     registered_address_1 = Text()

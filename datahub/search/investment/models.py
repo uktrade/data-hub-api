@@ -7,7 +7,15 @@ from ..models import MapDBModelToDict
 
 
 class InvestmentProject(DocType, MapDBModelToDict):
-    """Elasticsearch representation of InvestmentProject."""
+    """Elasticsearch representation of InvestmentProject.
+
+    Following fields are copied to "global_search":
+    - name
+    - uk_company.name
+    - investor_company.name
+    - project_code
+    - sector.name
+    """
 
     id = Keyword()
     global_search = dsl_utils.TrigramText()
