@@ -9,11 +9,22 @@ from datahub.search.elasticsearch import bulk
 from ...apps import get_search_apps
 
 
-def get_datasets():
-    """Returns datasets that will be synchronised with Elasticsearch."""
+def get_datasets(models=None):
+    """
+    Returns datasets that will be synchronised with Elasticsearch.
+
+    :param models: list of search app names to index, None for all
+    """
+    search_apps = get_search_apps()
+
+    # if models empty, assume all models
+    if not models:
+        models = [search_app.name for search_app in search_apps]
+
     return [
         search_app.get_dataset()
-        for search_app in get_search_apps()
+        for search_app in search_apps
+        if search_app.name in models
     ]
 
 
@@ -74,10 +85,21 @@ class Command(BaseCommand):
             default=600,
             help='Batch size - number of rows processed at a time',
         )
+        parser.add_argument(
+            '--model',
+            dest='model',
+            action='append',
+            choices=[search_app.name for search_app in get_search_apps()],
+            help='Search model to import. If empty, it imports all',
+        )
 
     def handle(self, *args, **options):
         """Handle."""
         root_logger = getLogger()
         root_logger.setLevel(WARNING)
 
-        sync_es(batch_size=options['batch_size'], datasets=get_datasets(), stdout=self.stdout)
+        sync_es(
+            batch_size=options['batch_size'],
+            datasets=get_datasets(options['model']),
+            stdout=self.stdout
+        )

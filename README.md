@@ -248,6 +248,18 @@ Resync all Elasticsearch records:
 ./manage.py sync_es
 ```
 
+You can resync only specific models by using the `--model=` argument.
+
+```shell
+./manage.py sync_es --model=company --model=contact
+```
+
+For more details including all the available choices:
+
+```shell
+./manage.py sync_es --help
+```
+
 ### Companies House
 
 Update Companies House records:
