@@ -1,4 +1,6 @@
-from django.db.models.signals import post_save
+from functools import partial
+from django.db import transaction
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
 from datahub.omis.notification.client import notify
@@ -33,6 +35,20 @@ def notify_post_save_order_adviser(sender, instance, created, raw=False, **kwarg
             by=instance.created_by,
             creation_date=instance.created_on
         )
+
+
+@receiver(post_delete, sender=OrderAssignee, dispatch_uid='notify_post_delete_assignee')
+@receiver(post_delete, sender=OrderSubscriber, dispatch_uid='notify_post_delete_subscriber')
+def notify_post_delete_order_adviser(sender, instance, **kwargs):
+    """
+    Notify people that they have been removed from the order.
+
+    Note that `instance` is no longer in the database at this point,
+    so be very careful what you do with it.
+    """
+    transaction.on_commit(
+        partial(notify.adviser_removed, order=instance.order, adviser=instance.adviser)
+    )
 
 
 @receiver(order_paid, sender=Order, dispatch_uid='notify_post_order_paid')
