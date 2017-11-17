@@ -14,8 +14,11 @@ pytestmark = pytest.mark.django_db
 @pytest.fixture
 def setup_data():
     """Sets up data for the tests."""
-    ContactFactory(first_name='abc', last_name='defg')
-    ContactFactory(first_name='first', last_name='last')
+    contacts = [
+        ContactFactory(first_name='abc', last_name='defg'),
+        ContactFactory(first_name='first', last_name='last')
+    ]
+    yield contacts
 
 
 class TestSearch(APITestMixin):
@@ -115,7 +118,7 @@ class TestSearch(APITestMixin):
         assert contact['company_uk_region'] is None
         assert contact['company_sector']['id'] == company.sector_id
 
-    def test_search_contact_by_partial_company_name(self, setup_es):
+    def test_search_contact_by_partial_company_name(self, setup_es, setup_data):
         """Tests filtering by partially matching company name."""
         contact = ContactFactory()
         company = contact.company
@@ -138,22 +141,62 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['company']['name'] == company.name
 
-    def test_search_contact_by_partial_name(self, setup_es):
+    def test_search_contact_by_partial_name(self, setup_es, setup_data):
         """Tests filtering by partially matching name."""
-        contact = ContactFactory(first_name='abcdef')
+        contact = ContactFactory(first_name='xyzxyz')
 
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:contact')
 
         response = self.api_client.post(url, {
-            'name': 'abc',
+            'name': 'xyz',
         })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['first_name'] == contact.first_name
+
+    @pytest.mark.parametrize(
+        'archived', (
+            True,
+            False,
+        )
+    )
+    def test_search_contact_by_archived(self, setup_es, setup_data, archived):
+        """Tests filtering by archived."""
+        ContactFactory.create_batch(5, archived=True)
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:contact')
+
+        response = self.api_client.post(url, {
+            'archived': archived,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] > 0
+        assert all(result['archived'] == archived for result in response.data['results'])
+
+    def test_search_contact_by_company_id(self, setup_es, setup_data):
+        """Tests filtering by company id."""
+        company = CompanyFactory()
+        ContactFactory(company=company)
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:contact')
+
+        response = self.api_client.post(url, {
+            'company': company.id,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['company']['id'] == str(company.id)
 
     def test_company_name_trigram_filter(self, setup_es):
         """Tests edge case of partially matching company name."""
