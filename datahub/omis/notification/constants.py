@@ -8,6 +8,7 @@ class Template(Enum):
 
     order_created_for_post_manager = '335f5402-f610-43ef-bfcf-e196215b3cf1'
     you_have_been_added_for_adviser = '1c631f72-4d33-41f5-ba9b-12862b5b273a'
+    you_have_been_removed_for_adviser = '07668530-2dc1-4dde-9a12-9144fc303eb7'
 
     order_paid_for_customer = 'a6bc0d8a-a183-4345-9945-81e71aac4b3b'
     order_paid_for_adviser = 'd41e9cb2-b412-44cf-9000-a1e34d996f16'

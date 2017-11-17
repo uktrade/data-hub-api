@@ -164,6 +164,16 @@ class Notify:
             )
         )
 
+    def adviser_removed(self, order, adviser):
+        """Send a notification when an adviser is removed from an order."""
+        self._send_email(
+            email_address=adviser.get_current_email(),
+            template_id=Template.you_have_been_removed_for_adviser.value,
+            personalisation=self._prepare_personalisation(
+                order, {'recipient name': adviser.name}
+            )
+        )
+
     def order_paid(self, order):
         """
         Send a notification to the customer and the advisers
