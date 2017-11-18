@@ -47,7 +47,7 @@ def test_mapping(setup_es):
                     'type': 'date'
                 },
                 'name': {
-                    'copy_to': ['name_keyword', 'name_trigram'],
+                    'copy_to': ['name_keyword', 'name_trigram', 'global_search'],
                     'fielddata': True,
                     'type': 'text'
                 },
