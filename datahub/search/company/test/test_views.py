@@ -327,6 +327,34 @@ class TestBasicSearch(APITestMixin):
         assert response.data['results'][0]['trading_name'] == term
         assert [{'count': 1, 'entity': 'company'}] == response.data['aggregations']
 
+    @pytest.mark.parametrize(
+        'field,value,term,match',
+        (
+            ('trading_address_postcode', 'SW1A 1AA', 'SW1A 1AA', True),
+            ('trading_address_postcode', 'SW1A 1AA', 'SW1A 1AB', False),
+            ('registered_address_postcode', 'SW1A 1AA', 'SW1A 1AA', True),
+            ('registered_address_postcode', 'SW1A 1AA', 'SW1A 1AB', False),
+        )
+    )
+    def test_search_in_field(self, setup_es, field, value, term, match):
+        """Tests basic aggregate companies query."""
+        CompanyFactory()
+        CompanyFactory(**{field: value})
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': term,
+            'entity': 'company'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        if match:
+            assert response.data['count'] == 1
+            assert response.data['results'][0][field] == value
+        else:
+            assert response.data['count'] == 0
+
     def test_no_results(self, setup_data):
         """Tests case where there should be no results."""
         term = 'there-should-be-no-match'
