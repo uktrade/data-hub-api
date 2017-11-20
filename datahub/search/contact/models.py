@@ -7,18 +7,9 @@ from ..models import MapDBModelToDict
 
 
 class Contact(DocType, MapDBModelToDict):
-    """Elasticsearch representation of Contact model.
-
-    Following fields are copied to "global_search":
-    - first_name
-    - last_name
-    - email
-    - email_alternative
-    - company.name
-    """
+    """Elasticsearch representation of Contact model."""
 
     id = Keyword()
-    global_search = dsl_utils.TrigramText()
     archived = Boolean()
     archived_on = Date()
     archived_reason = Text()
@@ -27,14 +18,13 @@ class Contact(DocType, MapDBModelToDict):
     name = dsl_utils.SortableText()
     name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
     # field is being aggregated
-    name_trigram = dsl_utils.SortableTrigramText()
+    name_trigram = dsl_utils.TrigramText()
     title = dsl_utils.id_name_mapping()
     first_name = dsl_utils.SortableText(
         copy_to=[
             'name',
             'name_keyword',
             'name_trigram',
-            'global_search'
         ]
     )
     last_name = dsl_utils.SortableText(
@@ -42,12 +32,11 @@ class Contact(DocType, MapDBModelToDict):
             'name',
             'name_keyword',
             'name_trigram',
-            'global_search',
         ])
     primary = Boolean()
     telephone_countrycode = Keyword()
     telephone_number = Keyword()
-    email = dsl_utils.SortableCaseInsensitiveKeywordText(copy_to='global_search')
+    email = dsl_utils.SortableCaseInsensitiveKeywordText()
     address_same_as_company = Boolean()
     address_1 = Text()
     address_2 = Text()
@@ -55,7 +44,7 @@ class Contact(DocType, MapDBModelToDict):
     address_county = dsl_utils.SortableCaseInsensitiveKeywordText()
     address_postcode = Text()
     telephone_alternative = Text()
-    email_alternative = Text(copy_to='global_search')
+    email_alternative = Text()
     notes = dsl_utils.EnglishText()
     job_title = dsl_utils.SortableCaseInsensitiveKeywordText()
     contactable_by_dit = Boolean()
@@ -67,10 +56,7 @@ class Contact(DocType, MapDBModelToDict):
     address_country = dsl_utils.id_name_mapping()
     adviser = dsl_utils.contact_or_adviser_mapping('adviser')
     archived_by = dsl_utils.contact_or_adviser_mapping('archived_by')
-    company = dsl_utils.id_name_partial_mapping(
-        'company',
-        name_params={'copy_to': 'global_search'},
-    )
+    company = dsl_utils.id_name_partial_mapping('company')
     company_sector = dsl_utils.id_name_mapping()
     company_uk_region = dsl_utils.id_name_mapping()
 
@@ -100,6 +86,14 @@ class Contact(DocType, MapDBModelToDict):
         'modified_by',
         'orders',
         'archived_documents_url_path',
+    )
+
+    SEARCH_FIELDS = (
+        'name',
+        'name_trigram',
+        'email',
+        'email_alternative',
+        'company.name',
     )
 
     class Meta:

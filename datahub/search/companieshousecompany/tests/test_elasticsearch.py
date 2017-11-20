@@ -26,7 +26,6 @@ def test_mapping(setup_es):
                     'type': 'text'
                 },
                 'company_number': {
-                    'copy_to': ['global_search'],
                     'analyzer': 'lowercase_keyword_analyzer',
                     'fielddata': True,
                     'type': 'text'
@@ -36,10 +35,6 @@ def test_mapping(setup_es):
                     'fielddata': True,
                     'type': 'text'
                 },
-                'global_search': {
-                    'analyzer': 'trigram_analyzer',
-                    'type': 'text'
-                },
                 'id': {
                     'type': 'keyword'
                 },
@@ -47,7 +42,7 @@ def test_mapping(setup_es):
                     'type': 'date'
                 },
                 'name': {
-                    'copy_to': ['name_keyword', 'name_trigram', 'global_search'],
+                    'copy_to': ['name_keyword', 'name_trigram'],
                     'fielddata': True,
                     'type': 'text'
                 },
@@ -58,7 +53,6 @@ def test_mapping(setup_es):
                 },
                 'name_trigram': {
                     'analyzer': 'trigram_analyzer',
-                    'fielddata': True,
                     'type': 'text'
                 },
                 'registered_address_1': {
@@ -68,6 +62,7 @@ def test_mapping(setup_es):
                     'type': 'text'
                 },
                 'registered_address_country': {
+                    'include_in_parent': True,
                     'properties': {
                         'id': {
                             'type': 'keyword'
@@ -84,8 +79,12 @@ def test_mapping(setup_es):
                     'type': 'text'
                 },
                 'registered_address_postcode': {
-                    'type': 'text',
-                    'copy_to': ['global_search'],
+                    'copy_to': ['registered_address_postcode_trigram'],
+                    'type': 'text'
+                },
+                'registered_address_postcode_trigram': {
+                    'analyzer': 'trigram_analyzer',
+                    'type': 'text'
                 },
                 'registered_address_town': {
                     'analyzer': 'lowercase_keyword_analyzer',

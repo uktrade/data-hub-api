@@ -25,41 +25,11 @@ def test_get_search_term_query():
                         'id': 'hello'
                     }
                 }, {
-                    'match': {
-                        'name': {
-                            'query': 'hello',
-                            'operator': 'and'
-                        }
-                    }
-                }, {
-                    'match': {
-                        'name_trigram': {
-                            'query': 'hello',
-                            'operator': 'and'
-                        }
-                    }
-                }, {
-                    'match': {
-                        'global_search': {
-                            'query': 'hello',
-                            'operator': 'and'
-                        }
-                    }
-                }, {
-                    'nested': {
-                        'path': 'country',
-                        'query': {
-                            'match_phrase': {
-                                'country.id': 'hello'
-                            }
-                        }
-                    }
-                }, {
-                    'match': {
-                        'sector': {
-                            'query': 'hello',
-                            'operator': 'and'
-                        }
+                    'multi_match': {
+                        'query': 'hello',
+                        'fields': ('country.id', 'sector'),
+                        'type': 'cross_fields',
+                        'operator': 'and'
                     }
                 }
             ]

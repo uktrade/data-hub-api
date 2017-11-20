@@ -9,28 +9,15 @@ from ..models import MapDBModelToDict
 
 
 class Company(DocType, MapDBModelToDict):
-    """Elasticsearch representation of Company model.
-
-    Following fields are copied to "global_search":
-    - company_number
-    - name
-    - reference_code
-    - registered_address_country.name
-    - registered_address_postcode
-    - sector.name
-    - trading_address_country.name
-    - trading_address_postcode
-    - uk_region.name
-    """
+    """Elasticsearch representation of Company model."""
 
     id = Keyword()
-    global_search = dsl_utils.TrigramText()
     account_manager = dsl_utils.contact_or_adviser_mapping('account_manager')
     trading_name = dsl_utils.SortableText(
         copy_to=[
             'trading_name_keyword',
             'trading_name_trigram',
-            'global_search']
+        ]
     )
     trading_name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
     trading_name_trigram = dsl_utils.SortableTrigramText()
@@ -41,9 +28,7 @@ class Company(DocType, MapDBModelToDict):
     archived_reason = Text()
     business_type = dsl_utils.id_name_mapping()
     classification = dsl_utils.id_name_mapping()
-    company_number = dsl_utils.SortableCaseInsensitiveKeywordText(
-        copy_to='global_search'
-    )
+    company_number = dsl_utils.SortableCaseInsensitiveKeywordText()
     vat_number = Keyword(index=False)
     companies_house_data = dsl_utils.company_mapping()
     created_on = Date()
@@ -51,33 +36,39 @@ class Company(DocType, MapDBModelToDict):
     employee_range = dsl_utils.id_name_mapping()
     headquarter_type = dsl_utils.id_name_mapping()
     modified_on = Date()
-    name = dsl_utils.SortableText(copy_to=['name_keyword', 'name_trigram', 'global_search'])
+    name = dsl_utils.SortableText(copy_to=['name_keyword', 'name_trigram'])
     name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
-    name_trigram = dsl_utils.SortableTrigramText()
+    name_trigram = dsl_utils.TrigramText()
     one_list_account_owner = dsl_utils.contact_or_adviser_mapping('one_list_account_owner')
     parent = dsl_utils.id_name_mapping()
-    reference_code = dsl_utils.SortableCaseInsensitiveKeywordText(
-        copy_to='global_search'
-    )
+    reference_code = dsl_utils.SortableCaseInsensitiveKeywordText()
     registered_address_1 = Text()
     registered_address_2 = Text()
-    registered_address_country = dsl_utils.id_name_mapping(
-        name_params={
-            'copy_to': 'global_search'
-        }
+    registered_address_country = dsl_utils.id_name_partial_mapping(
+        'registered_address_country'
     )
     registered_address_county = Text()
-    registered_address_postcode = Text(copy_to='global_search')
+    registered_address_postcode = Text(
+        copy_to=[
+            'registered_address_postcode_trigram'
+        ]
+    )
+    registered_address_postcode_trigram = dsl_utils.TrigramText()
     registered_address_town = dsl_utils.SortableCaseInsensitiveKeywordText()
-    sector = dsl_utils.id_name_mapping(name_params={'copy_to': 'global_search'})
+    sector = dsl_utils.id_name_partial_mapping('sector')
     trading_address_1 = Text()
     trading_address_2 = Text()
-    trading_address_country = dsl_utils.id_name_mapping(name_params={'copy_to': 'global_search'})
+    trading_address_country = dsl_utils.id_name_partial_mapping(
+        'trading_address_country'
+    )
     trading_address_county = Text()
-    trading_address_postcode = Text(copy_to='global_search')
+    trading_address_postcode = Text(
+        copy_to=['trading_address_postcode_trigram']
+    )
+    trading_address_postcode_trigram = dsl_utils.TrigramText()
     trading_address_town = dsl_utils.SortableCaseInsensitiveKeywordText()
     turnover_range = dsl_utils.id_name_mapping()
-    uk_region = dsl_utils.id_name_mapping(name_params={'copy_to': 'global_search'})
+    uk_region = dsl_utils.id_name_mapping()
     uk_based = Boolean()
     website = Text()
     export_to_countries = dsl_utils.id_name_mapping()
@@ -127,6 +118,27 @@ class Company(DocType, MapDBModelToDict):
         'rght',
         'tree_id',
         'archived_documents_url_path',
+    )
+
+    SEARCH_FIELDS = (
+        'name',
+        'name_trigram',
+        'company_number',
+        'trading_name',
+        'trading_name_trigram',
+        'reference_code',
+        'registered_address_country.name',
+        'registered_address_country.name_trigram',
+        'registered_address_postcode',
+        'registered_address_postcode_trigram',
+        'sector.name',
+        'sector.name_trigram',
+        'trading_address_country.name',
+        'trading_address_country.name_trigram',
+        'trading_address_postcode',
+        'trading_address_postcode_trigram',
+        'uk_region.name',
+        'uk_region.name_trigram'
     )
 
     class Meta:

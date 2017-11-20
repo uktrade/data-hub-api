@@ -7,36 +7,14 @@ from ..models import MapDBModelToDict
 
 
 class Order(DocType, MapDBModelToDict):
-    """Elasticsearch representation of Order model.
-
-    Following fields are copied to "global_search":
-    - reference
-    - company.name
-    - contact.name
-    """
+    """Elasticsearch representation of Order model."""
 
     id = Keyword()
-    global_search = dsl_utils.TrigramText()
-    reference = dsl_utils.SortableCaseInsensitiveKeywordText(
-        copy_to=[
-            'reference_trigram',
-            'global_search',
-        ]
-    )
-    reference_trigram = dsl_utils.SortableTrigramText()
+    reference = dsl_utils.SortableCaseInsensitiveKeywordText(copy_to=['reference_trigram'])
+    reference_trigram = dsl_utils.TrigramText()
     status = dsl_utils.SortableCaseInsensitiveKeywordText()
-    company = dsl_utils.id_name_partial_mapping(
-        'company',
-        name_params={
-            'copy_to': 'global_search'
-        }
-    )
-    contact = dsl_utils.contact_or_adviser_partial_mapping(
-        'contact',
-        name_params={
-            'copy_to': 'global_search'
-        }
-    )
+    company = dsl_utils.id_name_partial_mapping('company')
+    contact = dsl_utils.contact_or_adviser_partial_mapping('contact')
     created_by = dsl_utils.contact_or_adviser_mapping('created_by')
     created_on = Date()
     modified_on = Date()
@@ -120,6 +98,13 @@ class Order(DocType, MapDBModelToDict):
     )
 
     SEARCH_FIELDS = (
+        'reference',
+        'reference_trigram',
+        'company.name',
+        'company.name_trigram',
+        'contact.name',
+        'contact.name_trigram',
+
         'total_cost_string',
         'subtotal_cost_string',
     )
