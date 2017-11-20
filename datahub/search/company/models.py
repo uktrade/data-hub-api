@@ -16,8 +16,10 @@ class Company(DocType, MapDBModelToDict):
     - name
     - reference_code
     - registered_address_country.name
+    - registered_address_postcode
     - sector.name
     - trading_address_country.name
+    - trading_address_postcode
     - uk_region.name
     """
 

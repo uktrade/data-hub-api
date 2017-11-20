@@ -84,7 +84,8 @@ def test_mapping(setup_es):
                     'type': 'text'
                 },
                 'registered_address_postcode': {
-                    'type': 'text'
+                    'type': 'text',
+                    'copy_to': ['global_search'],
                 },
                 'registered_address_town': {
                     'analyzer': 'lowercase_keyword_analyzer',

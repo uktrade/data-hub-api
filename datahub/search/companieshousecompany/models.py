@@ -11,6 +11,7 @@ class CompaniesHouseCompany(DocType, MapDBModelToDict):
     Following fields are copied to "global_search":
     - company_number
     - name
+    - registered_address_postcode
     """
 
     id = Keyword()
@@ -26,7 +27,7 @@ class CompaniesHouseCompany(DocType, MapDBModelToDict):
     registered_address_2 = Text()
     registered_address_town = dsl_utils.SortableCaseInsensitiveKeywordText()
     registered_address_county = Text()
-    registered_address_postcode = Text()
+    registered_address_postcode = Text(copy_to=['global_search'])
     registered_address_country = dsl_utils.id_name_mapping()
     company_number = dsl_utils.SortableCaseInsensitiveKeywordText(
         copy_to=['global_search']
