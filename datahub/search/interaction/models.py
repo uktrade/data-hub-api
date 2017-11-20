@@ -8,57 +8,23 @@ from datahub.search.models import MapDBModelToDict
 
 
 class Interaction(DocType, MapDBModelToDict):
-    """Elasticsearch representation of Interaction model.
-
-    Following fields are copied to "global_search":
-    - company.name
-    - contact.name
-    - event.name
-    - subject
-    - dit_adviser.name
-    - dit_team.name
-    """
+    """Elasticsearch representation of Interaction model."""
 
     id = Keyword()
-    global_search = dsl_utils.TrigramText()
     kind = Keyword()
     date = Date()
-    company = dsl_utils.id_name_partial_mapping(
-        'company',
-        name_params={
-            'copy_to': 'global_search'
-        }
-    )
-    contact = dsl_utils.contact_or_adviser_partial_mapping(
-        'contact',
-        name_params={
-            'copy_to': 'global_search'
-        }
-    )
+    company = dsl_utils.id_name_partial_mapping('company')
+    contact = dsl_utils.contact_or_adviser_partial_mapping('contact')
     is_event = Boolean()
-    event = dsl_utils.id_name_partial_mapping(
-        'event',
-        name_params={
-            'copy_to': 'global_search'
-        }
-    )
+    event = dsl_utils.id_name_partial_mapping('event')
     service = dsl_utils.id_name_mapping()
     subject = dsl_utils.SortableCaseInsensitiveKeywordText(
-        copy_to=['subject_english', 'global_search']
+        copy_to=['subject_english']
     )
     subject_english = dsl_utils.EnglishText()
-    dit_adviser = dsl_utils.contact_or_adviser_partial_mapping(
-        'dit_adviser',
-        name_params={
-            'copy_to': 'global_search'
-        }
-    )
+    dit_adviser = dsl_utils.contact_or_adviser_partial_mapping('dit_adviser')
     notes = dsl_utils.EnglishText()
-    dit_team = dsl_utils.id_name_mapping(
-        name_params={
-            'copy_to': 'global_search'
-        }
-    )
+    dit_team = dsl_utils.id_name_partial_mapping('dit_team')
     communication_channel = dsl_utils.id_name_mapping()
     investment_project = dsl_utils.id_name_mapping()
     created_on = Date()
@@ -84,6 +50,20 @@ class Interaction(DocType, MapDBModelToDict):
         'created_by',
         'modified_by',
         'archived_documents_url_path',
+    )
+
+    SEARCH_FIELDS = (
+        'company.name',
+        'company.name_trigram',
+        'contact.name',
+        'contact.name_trigram',
+        'event.name',
+        'event.name_trigram',
+        'subject_english',
+        'dit_adviser.name',
+        'dit_adviser.name_trigram',
+        'dit_team.name',
+        'dit_team.name_trigram',
     )
 
     class Meta:

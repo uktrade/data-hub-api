@@ -18,68 +18,54 @@ def contact_or_adviser_mapping(field, include_dit_team=False):
         'id': Keyword(),
         'first_name': SortableCaseInsensitiveKeywordText(),
         'last_name': SortableCaseInsensitiveKeywordText(),
-        'name': SortableCaseInsensitiveKeywordText(),
+        'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+        'name_trigram': TrigramText(),
     }
 
     if include_dit_team:
         props['dit_team'] = id_name_mapping()
-    return Nested(properties=props)
+    return Nested(
+        properties=props,
+        include_in_parent=True,
+    )
 
 
-def contact_or_adviser_partial_mapping(field, name_params=None):
+def contact_or_adviser_partial_mapping(field):
     """Mapping for Adviser/Contact fields that allows partial matching."""
-    if not name_params:
-        name_params = {}
-
-    copy_to = f'{field}.name_trigram'
-    if 'copy_to' in name_params:
-        if isinstance(name_params['copy_to'], list):
-            name_params['copy_to'].append(copy_to)
-        else:
-            name_params['copy_to'] = [name_params['copy_to'], copy_to]
-    else:
-        name_params['copy_to'] = copy_to
-
     props = {
         'id': Keyword(),
         'first_name': SortableCaseInsensitiveKeywordText(),
         'last_name': SortableCaseInsensitiveKeywordText(),
-        'name': SortableCaseInsensitiveKeywordText(**name_params),
-        'name_trigram': SortableTrigramText(),
+        'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+        'name_trigram': TrigramText(),
     }
-    return Nested(properties=props)
+    return Nested(
+        properties=props,
+        include_in_parent=True,
+    )
 
 
-def id_name_mapping(name_params=None):
+def id_name_mapping():
     """Mapping for id name fields."""
-    if not name_params:
-        name_params = {}
+    return Nested(
+        properties={
+            'id': Keyword(),
+            'name': SortableCaseInsensitiveKeywordText(),
+        },
+        include_in_parent=True,
+    )
 
-    return Nested(properties={
-        'id': Keyword(),
-        'name': SortableCaseInsensitiveKeywordText(**name_params),
-    })
 
-
-def id_name_partial_mapping(field, name_params=None):
+def id_name_partial_mapping(field):
     """Mapping for id name fields."""
-    if not name_params:
-        name_params = {}
-
-    copy_to = f'{field}.name_trigram'
-    if 'copy_to' in name_params:
-        if isinstance(name_params['copy_to'], list):
-            name_params['copy_to'].append(copy_to)
-        else:
-            name_params['copy_to'] = [name_params['copy_to'], copy_to]
-    else:
-        name_params['copy_to'] = copy_to
-
-    return Nested(properties={
-        'id': Keyword(),
-        'name': SortableCaseInsensitiveKeywordText(**name_params),
-        'name_trigram': SortableTrigramText(),
-    })
+    return Nested(
+        properties={
+            'id': Keyword(),
+            'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+            'name_trigram': TrigramText(),
+        },
+        include_in_parent=True,
+    )
 
 
 def id_uri_mapping():

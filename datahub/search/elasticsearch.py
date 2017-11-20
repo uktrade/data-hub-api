@@ -5,7 +5,7 @@ from django.conf import settings
 from elasticsearch.helpers import bulk as es_bulk
 from elasticsearch_dsl import analysis, Index, Search
 from elasticsearch_dsl.connections import connections
-from elasticsearch_dsl.query import Match, MatchPhrase, Q
+from elasticsearch_dsl.query import MatchPhrase, MultiMatch, Q
 
 from .apps import get_search_apps
 
@@ -112,28 +112,14 @@ def get_search_term_query(term, fields=None):
         MatchPhrase(name_keyword={'query': term, 'boost': 2}),
         # Exact match by id
         MatchPhrase(id=term),
-        # Match similar name
-        Match(name={
-            'query': term,
-            'operator': 'and',
-        }),
-        # Partial matching
-        Match(name_trigram={
-            'query': term,
-            'operator': 'and',
-        }),
-        # "Global search" for cross field matching
-        # We can't use MultiMatch, because of nested fields
-        Match(global_search={
-            'query': term,
-            'operator': 'and',
-        }),
+        # Cross match fields
+        MultiMatch(
+            query=term,
+            fields=fields,
+            type='cross_fields',
+            operator='and',
+        )
     ]
-
-    if fields:
-        should_query.extend([
-            get_field_query(field, term) for field in fields
-        ])
 
     return Q('bool', should=should_query)
 
@@ -220,10 +206,6 @@ def _get_field_query(field, value):
         'query': value,
         'operator': 'and',
     }
-    """
-    if field.endswith('_trigram'):
-        field_query['fuzziness'] = 1
-    """
     return Q('match', **{field: field_query})
 
 

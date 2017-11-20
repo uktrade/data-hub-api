@@ -23,8 +23,10 @@ def test_mapping(setup_es):
         'order': {
             'properties': {
                 'assignees': {
+                    'include_in_parent': True,
                     'properties': {
                         'dit_team': {
+                            'include_in_parent': True,
                             'properties': {
                                 'id': {
                                     'type': 'keyword'
@@ -51,8 +53,13 @@ def test_mapping(setup_es):
                             'type': 'text'
                         },
                         'name': {
+                            'copy_to': ['assignees.name_trigram'],
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
+                            'type': 'text'
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
                             'type': 'text'
                         }
                     },
@@ -65,6 +72,7 @@ def test_mapping(setup_es):
                     'type': 'text'
                 },
                 'billing_address_country': {
+                    'include_in_parent': True,
                     'properties': {
                         'id': {
                             'type': 'keyword'
@@ -104,6 +112,7 @@ def test_mapping(setup_es):
                     'type': 'text'
                 },
                 'cancellation_reason': {
+                    'include_in_parent': True,
                     'properties': {
                         'id': {
                             'type': 'keyword'
@@ -117,6 +126,7 @@ def test_mapping(setup_es):
                     'type': 'nested'
                 },
                 'cancelled_by': {
+                    'include_in_parent': True,
                     'properties': {
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
@@ -132,8 +142,13 @@ def test_mapping(setup_es):
                             'type': 'text'
                         },
                         'name': {
+                            'copy_to': ['cancelled_by.name_trigram'],
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
+                            'type': 'text'
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
                             'type': 'text'
                         }
                     },
@@ -143,25 +158,26 @@ def test_mapping(setup_es):
                     'type': 'date'
                 },
                 'company': {
+                    'include_in_parent': True,
                     'properties': {
                         'id': {
                             'type': 'keyword'
                         },
                         'name': {
-                            'copy_to': ['global_search', 'company.name_trigram'],
+                            'copy_to': ['company.name_trigram'],
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
                             'type': 'text'
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
-                            'fielddata': True,
                             'type': 'text'
                         }
                     },
                     'type': 'nested'
                 },
                 'completed_by': {
+                    'include_in_parent': True,
                     'properties': {
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
@@ -177,8 +193,13 @@ def test_mapping(setup_es):
                             'type': 'text'
                         },
                         'name': {
+                            'copy_to': ['completed_by.name_trigram'],
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
+                            'type': 'text'
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
                             'type': 'text'
                         }
                     },
@@ -188,6 +209,7 @@ def test_mapping(setup_es):
                     'type': 'date'
                 },
                 'contact': {
+                    'include_in_parent': True,
                     'properties': {
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
@@ -203,14 +225,13 @@ def test_mapping(setup_es):
                             'type': 'text'
                         },
                         'name': {
-                            'copy_to': ['global_search', 'contact.name_trigram'],
+                            'copy_to': ['contact.name_trigram'],
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
                             'type': 'text'
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
-                            'fielddata': True,
                             'type': 'text'
                         }
                     },
@@ -228,6 +249,7 @@ def test_mapping(setup_es):
                     'type': 'text'
                 },
                 'created_by': {
+                    'include_in_parent': True,
                     'properties': {
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
@@ -243,8 +265,13 @@ def test_mapping(setup_es):
                             'type': 'text'
                         },
                         'name': {
+                            'copy_to': ['created_by.name_trigram'],
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
+                            'type': 'text'
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
                             'type': 'text'
                         }
                     },
@@ -271,10 +298,6 @@ def test_mapping(setup_es):
                 'further_info': {
                     'type': 'text'
                 },
-                'global_search': {
-                    'analyzer': 'trigram_analyzer',
-                    'type': 'text'
-                },
                 'id': {
                     'type': 'keyword'
                 },
@@ -296,6 +319,7 @@ def test_mapping(setup_es):
                     'type': 'keyword'
                 },
                 'primary_market': {
+                    'include_in_parent': True,
                     'properties': {
                         'id': {
                             'type': 'keyword'
@@ -309,17 +333,17 @@ def test_mapping(setup_es):
                     'type': 'nested'
                 },
                 'reference': {
-                    'copy_to': ['reference_trigram', 'global_search'],
+                    'copy_to': ['reference_trigram'],
                     'analyzer': 'lowercase_keyword_analyzer',
                     'fielddata': True,
                     'type': 'text'
                 },
                 'reference_trigram': {
                     'analyzer': 'trigram_analyzer',
-                    'fielddata': True,
                     'type': 'text'
                 },
                 'sector': {
+                    'include_in_parent': True,
                     'properties': {
                         'id': {
                             'type': 'keyword'
@@ -333,6 +357,7 @@ def test_mapping(setup_es):
                     'type': 'nested'
                 },
                 'service_types': {
+                    'include_in_parent': True,
                     'properties': {
                         'id': {
                             'type': 'keyword'
@@ -351,8 +376,10 @@ def test_mapping(setup_es):
                     'type': 'text'
                 },
                 'subscribers': {
+                    'include_in_parent': True,
                     'properties': {
                         'dit_team': {
+                            'include_in_parent': True,
                             'properties': {
                                 'id': {
                                     'type': 'keyword'
@@ -379,8 +406,13 @@ def test_mapping(setup_es):
                             'type': 'text'
                         },
                         'name': {
+                            'copy_to': ['subscribers.name_trigram'],
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
+                            'type': 'text'
+                        },
+                        'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
                             'type': 'text'
                         }
                     },
