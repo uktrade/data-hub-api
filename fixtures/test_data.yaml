@@ -32,6 +32,7 @@
     uk_region: 824cd12a-6095-e211-a939-e4115bead28a
     description: This is a dummy company for testing
     reference_code: ORG-10096257
+    archived_documents_url_path: '/documents/123'
 
 - model: company.company
   pk: 731bdcc1-f685-4c8e-bd66-b356b2c16995
