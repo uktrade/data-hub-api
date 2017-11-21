@@ -60,7 +60,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
     number_new_jobs = Integer()
     operations_commenced_documents = dsl_utils.id_uri_mapping()
     stage = dsl_utils.id_name_mapping()
-    project_code = dsl_utils.SortableCaseInsensitiveKeywordText(copy_to='project_code')
+    project_code = dsl_utils.SortableCaseInsensitiveKeywordText(copy_to='project_code_trigram')
     project_code_trigram = dsl_utils.TrigramText()
     referral_source_activity = dsl_utils.id_name_mapping()
     referral_source_activity_marketing = dsl_utils.id_name_mapping()
