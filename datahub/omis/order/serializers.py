@@ -289,7 +289,14 @@ class SubscribedAdviserListSerializer(serializers.ListSerializer):
     """DRF List serializer for OrderSubscriber(s)."""
 
     default_validators = [
-        OrderInStatusValidator(allowed_statuses=(OrderStatus.draft,))
+        OrderInStatusValidator(
+            allowed_statuses=(
+                OrderStatus.draft,
+                OrderStatus.quote_awaiting_acceptance,
+                OrderStatus.quote_accepted,
+                OrderStatus.paid,
+            )
+        )
     ]
 
     def save(self, **kwargs):
