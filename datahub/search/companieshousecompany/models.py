@@ -39,7 +39,6 @@ class CompaniesHouseCompany(DocType, MapDBModelToDict):
     }
 
     SEARCH_FIELDS = (
-        'name',
         'name_trigram',
         'company_number',
         'registered_address_postcode_trigram',

@@ -98,13 +98,9 @@ class Order(DocType, MapDBModelToDict):
     )
 
     SEARCH_FIELDS = (
-        'reference',
         'reference_trigram',
-        'company.name',
         'company.name_trigram',
-        'contact.name',
         'contact.name_trigram',
-
         'total_cost_string',
         'subtotal_cost_string',
     )

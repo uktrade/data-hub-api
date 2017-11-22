@@ -55,19 +55,12 @@ class Event(DocType, MapDBModelToDict):
     )
 
     SEARCH_FIELDS = (
-        'name',
         'name_trigram',
-        'address_country.name',
         'address_country.name_trigram',
-        'address_postcode',
         'address_postcode_trigram',
-        'uk_region.name',
         'uk_region.name_trigram',
-        'organiser.name',
         'organiser.name_trigram',
-        'teams.name',
         'teams.name_trigram',
-        'related_programmes.name',
         'related_programmes.name_trigram',
     )
 
