@@ -9,7 +9,7 @@
   fields: {name: Market research, disabled_on: null, order: 300.0}
 - model: order.servicetype
   pk: 8b48de3d-0066-4d98-991e-f79594bf55c0
-  fields: {name: Mission, disabled_on: null, order: 400.0}
+  fields: {name: Mission or Visit Programme, disabled_on: null, order: 400.0}
 - model: order.servicetype
   pk: c7915c75-cf29-42cf-99db-2acb75b96a78
   fields: {name: Validated contacts, disabled_on: null, order: 500.0}
