@@ -196,7 +196,7 @@ class SearchAPIView(APIView):
 class SearchExportAPIView(SearchAPIView):
     """Returns CSV file with all search results."""
 
-    IGNORED_SUFFIXES = ('_trigram', '_keyword',)
+    IGNORED_SUFFIXES = ('_trigram', '_keyword')
 
     def _clean_fieldnames(self, fieldnames):
         """Remove special fields from the export."""

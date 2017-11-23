@@ -18,11 +18,13 @@ class Interaction(DocType, MapDBModelToDict):
     is_event = Boolean()
     event = dsl_utils.id_name_partial_mapping('event')
     service = dsl_utils.id_name_mapping()
-    subject = dsl_utils.SortableCaseInsensitiveKeywordText(copy_to='subject_english')
+    subject = dsl_utils.SortableCaseInsensitiveKeywordText(
+        copy_to=['subject_english']
+    )
     subject_english = dsl_utils.EnglishText()
     dit_adviser = dsl_utils.contact_or_adviser_partial_mapping('dit_adviser')
     notes = dsl_utils.EnglishText()
-    dit_team = dsl_utils.id_name_mapping()
+    dit_team = dsl_utils.id_name_partial_mapping('dit_team')
     communication_channel = dsl_utils.id_name_mapping()
     investment_project = dsl_utils.id_name_mapping()
     created_on = Date()
@@ -50,14 +52,14 @@ class Interaction(DocType, MapDBModelToDict):
         'archived_documents_url_path',
     )
 
-    SEARCH_FIELDS = [
-        'subject',
+    SEARCH_FIELDS = (
+        'company.name_trigram',
+        'contact.name_trigram',
+        'event.name_trigram',
         'subject_english',
-        'company.name',
-        'contact.name',
-        'dit_team.name',
-        'notes'
-    ]
+        'dit_adviser.name_trigram',
+        'dit_team.name_trigram',
+    )
 
     class Meta:
         """Default document meta data."""

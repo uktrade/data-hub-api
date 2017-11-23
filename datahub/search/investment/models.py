@@ -36,14 +36,14 @@ class InvestmentProject(DocType, MapDBModelToDict):
     fdi_type_documents = dsl_utils.id_uri_mapping()
     fdi_value = dsl_utils.id_name_mapping()
     intermediate_company = dsl_utils.id_name_mapping()
-    uk_company = dsl_utils.id_name_mapping()
-    investor_company = dsl_utils.id_name_mapping()
+    uk_company = dsl_utils.id_name_partial_mapping('uk_company')
+    investor_company = dsl_utils.id_name_partial_mapping('investor_company')
     investor_company_country = dsl_utils.id_name_mapping()
     investment_type = dsl_utils.id_name_mapping()
     investor_type = dsl_utils.id_name_mapping()
     level_of_involvement = dsl_utils.id_name_mapping()
     specific_programme = dsl_utils.id_name_mapping()
-    name = dsl_utils.SortableText()
+    name = dsl_utils.SortableText(copy_to=['name_keyword', 'name_trigram'])
     name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
     name_trigram = dsl_utils.TrigramText()
     r_and_d_budget = Boolean()
@@ -60,13 +60,14 @@ class InvestmentProject(DocType, MapDBModelToDict):
     number_new_jobs = Integer()
     operations_commenced_documents = dsl_utils.id_uri_mapping()
     stage = dsl_utils.id_name_mapping()
-    project_code = dsl_utils.SortableCaseInsensitiveKeywordText()
+    project_code = dsl_utils.SortableCaseInsensitiveKeywordText(copy_to='project_code_trigram')
+    project_code_trigram = dsl_utils.TrigramText()
     referral_source_activity = dsl_utils.id_name_mapping()
     referral_source_activity_marketing = dsl_utils.id_name_mapping()
     referral_source_activity_website = dsl_utils.id_name_mapping()
     referral_source_activity_event = dsl_utils.SortableCaseInsensitiveKeywordText()
     referral_source_advisor = dsl_utils.contact_or_adviser_mapping('referral_source_advisor')
-    sector = dsl_utils.id_name_mapping()
+    sector = dsl_utils.id_name_partial_mapping('sector')
     status = dsl_utils.SortableCaseInsensitiveKeywordText()
     average_salary = dsl_utils.id_name_mapping()
     date_lost = Date()
@@ -131,14 +132,13 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'archived_documents_url_path',
     )
 
-    SEARCH_FIELDS = [
-        'business_activities.name',
-        'intermediate_company.name',
-        'investor_company.name',
-        'project_code',
-        'sector.name',
-        'uk_company.name',
-    ]
+    SEARCH_FIELDS = (
+        'name_trigram',
+        'uk_company.name_trigram',
+        'investor_company.name_trigram',
+        'project_code_trigram',
+        'sector.name_trigram',
+    )
 
     class Meta:
         """Default document meta data."""

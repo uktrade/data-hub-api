@@ -9,14 +9,19 @@ class CompaniesHouseCompany(DocType, MapDBModelToDict):
     """Elasticsearch representation of CompaniesHouseCompany model."""
 
     id = Keyword()
-    name = dsl_utils.SortableText(copy_to=['name_keyword', 'name_trigram'])
+    name = dsl_utils.SortableText(
+        copy_to=[
+            'name_keyword', 'name_trigram'
+        ]
+    )
     name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
     name_trigram = dsl_utils.TrigramText()
     registered_address_1 = Text()
     registered_address_2 = Text()
     registered_address_town = dsl_utils.SortableCaseInsensitiveKeywordText()
     registered_address_county = Text()
-    registered_address_postcode = Text()
+    registered_address_postcode = Text(copy_to='registered_address_postcode_trigram')
+    registered_address_postcode_trigram = dsl_utils.TrigramText()
     registered_address_country = dsl_utils.id_name_mapping()
     company_number = dsl_utils.SortableCaseInsensitiveKeywordText()
     company_category = dsl_utils.SortableCaseInsensitiveKeywordText()
@@ -33,9 +38,11 @@ class CompaniesHouseCompany(DocType, MapDBModelToDict):
         'registered_address_country': dict_utils.id_name_dict,
     }
 
-    SEARCH_FIELDS = [
+    SEARCH_FIELDS = (
+        'name_trigram',
         'company_number',
-    ]
+        'registered_address_postcode_trigram',
+    )
 
     class Meta:
         """Default document meta data."""

@@ -5,7 +5,7 @@ from django.conf import settings
 from elasticsearch.helpers import bulk as es_bulk
 from elasticsearch_dsl import analysis, Index, Search
 from elasticsearch_dsl.connections import connections
-from elasticsearch_dsl.query import Match, MatchPhrase, Q
+from elasticsearch_dsl.query import MatchPhrase, MultiMatch, Q
 
 from .apps import get_search_apps
 
@@ -64,6 +64,12 @@ english_analyzer = analysis.CustomAnalyzer(
     ]
 )
 
+lowercase_analyzer = analysis.CustomAnalyzer(
+    'lowercase_analyzer',
+    tokenizer='standard',
+    filter=('lowercase',)
+)
+
 
 def configure_connection():
     """Configure Elasticsearch default connection."""
@@ -79,6 +85,7 @@ ANALYZERS = (
     lowercase_keyword_analyzer,
     trigram_analyzer,
     english_analyzer,
+    lowercase_analyzer,
 )
 
 
@@ -105,16 +112,14 @@ def get_search_term_query(term, fields=None):
         MatchPhrase(name_keyword={'query': term, 'boost': 2}),
         # Exact match by id
         MatchPhrase(id=term),
-        # Match similar name
-        Match(name=term),
-        # Partial match name
-        MatchPhrase(name_trigram=term),
+        # Cross match fields
+        MultiMatch(
+            query=term,
+            fields=fields,
+            type='cross_fields',
+            operator='and',
+        )
     ]
-
-    if fields:
-        should_query.extend([
-            get_field_query(field, term) for field in fields
-        ])
 
     return Q('bool', should=should_query)
 
@@ -191,13 +196,17 @@ def get_basic_search_query(
 
 def _get_field_query(field, value):
     """Gets field query depending on field suffix."""
-    if any(field.endswith(suffix) for suffix in ('.id', '_keyword', '_trigram')):
+    if any(field.endswith(suffix) for suffix in ('.id', '_keyword')):
         return Q('match_phrase', **{field: value})
 
     if field.endswith('_exists'):
         return get_exists_query(field, value)
 
-    return Q('match', **{field: value})
+    field_query = {
+        'query': value,
+        'operator': 'and',
+    }
+    return Q('match', **{field: field_query})
 
 
 def get_field_query(field, value):
