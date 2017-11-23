@@ -115,14 +115,13 @@ class TestSearch(APITestMixin):
         })
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 4
+        assert response.data['count'] == 3
 
         # results are in order of relevance if sortby is not applied
         assert [
             'The Advisory',
             'The Advisory Group',
             'The Risk Advisory Group',
-            'The Advisories'
         ] == [company['name'] for company in response.data['results']]
 
     def test_search_partial_match(self, setup_es, setup_data):
@@ -171,14 +170,12 @@ class TestSearch(APITestMixin):
         })
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 4
+        assert response.data['count'] == 2
 
         # order of relevance
         assert [
             't-shirt',
             'tshirt',
-            'electronic shirt',
-            't and e and a'
         ] == [company['name'] for company in response.data['results']]
 
     def test_search_id_match(self, setup_es, setup_data):
@@ -348,33 +345,6 @@ class TestSearch(APITestMixin):
         assert [('Ether 1', 1000),
                 ('Ether 2', None)] == [(investment['name'], investment['total_investment'],)
                                        for investment in response.data['results']]
-
-    def test_search_contact_by_country_case_insensitive(self, setup_es, setup_data):
-        """Tests detailed contact search."""
-        ContactFactory(
-            first_name='John',
-            last_name='Doe',
-            address_same_as_company=False,
-            address_1='Happy Lane',
-            address_town='Happy Town',
-            address_country_id=constants.Country.united_states.value.id,
-        )
-
-        setup_es.indices.refresh()
-
-        term = 'united states'
-
-        url = reverse('api-v3:search:basic')
-
-        response = self.api_client.get(url, {
-            'term': term,
-            'entity': 'contact',
-        })
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-        assert len(response.data['results']) == 1
-        assert response.data['results'][0]['address_country']['name'] == 'United States'
 
     def test_basic_search_aggregations(self, setup_es, setup_data):
         """Tests basic aggregate query."""
