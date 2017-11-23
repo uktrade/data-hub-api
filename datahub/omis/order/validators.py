@@ -407,9 +407,9 @@ class AddressValidator:
 class OrderInStatusRule(AbstractRule):
     """Rule for checking that an order is in the expected state."""
 
-    def __init__(self, order_status):
+    def __init__(self, order_statuses):
         """Initialise the rule."""
-        self.order_status = order_status
+        self.order_statuses = order_statuses
 
     @property
     def field(self):
@@ -419,18 +419,7 @@ class OrderInStatusRule(AbstractRule):
     def __call__(self, combiner):
         """Check that order is in the expected state."""
         order = combiner.serializer.context['order']
-        return order.status == self.order_status
-
-
-class AssigneeExistsRule(BaseRule):
-    """Rule for checking that the adviser (value) is assigned to the order."""
-
-    def __call__(self, combiner):
-        """Check that the adviser (value) is an order assignee."""
-        order = combiner.serializer.context['order']
-        value = combiner.get_value(self.field)
-
-        return order.assignees.filter(adviser=value).exists()
+        return order.status in self.order_statuses
 
 
 class ForceDeleteRule(BaseRule):
