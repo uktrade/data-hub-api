@@ -20,7 +20,7 @@ class Company(DocType, MapDBModelToDict):
         ]
     )
     trading_name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
-    trading_name_trigram = dsl_utils.SortableTrigramText()
+    trading_name_trigram = dsl_utils.TrigramText()
     archived = Boolean()
     archived_by = dsl_utils.contact_or_adviser_mapping('archived_by')
     contacts = dsl_utils.contact_or_adviser_mapping('contacts')
