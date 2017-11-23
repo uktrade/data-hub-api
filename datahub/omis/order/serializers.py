@@ -16,7 +16,6 @@ from .constants import OrderStatus, VATStatus
 from .models import CancellationReason, Order, OrderAssignee, OrderSubscriber, ServiceType
 from .validators import (
     AddressValidator,
-    AssigneeExistsRule,
     ContactWorksAtCompanyValidator,
     OrderInStatusRule,
     OrderInStatusValidator,
@@ -371,6 +370,8 @@ class OrderAssigneeListSerializer(serializers.ListSerializer):
         OrderInStatusValidator(
             allowed_statuses=(
                 OrderStatus.draft,
+                OrderStatus.quote_awaiting_acceptance,
+                OrderStatus.quote_accepted,
                 OrderStatus.paid,
             )
         )
@@ -387,7 +388,7 @@ class OrderAssigneeListSerializer(serializers.ListSerializer):
         order = self.context['order']
         force_delete = self.context['force_delete']
 
-        if order.status == OrderStatus.paid and force_delete:
+        if order.status != OrderStatus.draft and force_delete:
             raise ValidationError('You cannot delete any assignees at this stage.')
         return data
 
@@ -501,9 +502,6 @@ class OrderAssigneeSerializer(serializers.ModelSerializer):
         'readonly': ugettext_lazy(
             'This field cannot be changed at this stage.'
         ),
-        'creation_disallowed': ugettext_lazy(
-            'You cannot add any more assignees at this stage.'
-        ),
     }
 
     class Meta:
@@ -517,30 +515,42 @@ class OrderAssigneeSerializer(serializers.ModelSerializer):
         ]
         validators = (
             RulesBasedValidator(
-                # can't be changed when in draft
+                # can't be changed when in draft, quote_awaiting_acceptance or quote_accepted
                 ValidationRule(
                     'readonly',
                     OperatorRule('actual_time', is_blank),
-                    when=OrderInStatusRule(OrderStatus.draft)
+                    when=OrderInStatusRule(
+                        [
+                            OrderStatus.draft,
+                            OrderStatus.quote_awaiting_acceptance,
+                            OrderStatus.quote_accepted,
+                        ]
+                    )
                 ),
 
-                # can't be changed when in paid
+                # can't be changed when in quote_awaiting_acceptance, quote_accepted or paid
                 ValidationRule(
                     'readonly',
                     OperatorRule('estimated_time', is_blank),
-                    when=OrderInStatusRule(OrderStatus.paid)
+                    when=OrderInStatusRule(
+                        [
+                            OrderStatus.quote_awaiting_acceptance,
+                            OrderStatus.quote_accepted,
+                            OrderStatus.paid,
+                        ]
+                    )
                 ),
-                # can't be changed when in paid
+                # can't be changed when in quote_awaiting_acceptance, quote_accepted or paid
                 ValidationRule(
                     'readonly',
                     OperatorRule('is_lead', is_blank),
-                    when=OrderInStatusRule(OrderStatus.paid)
-                ),
-                # make sure that no new assignee is added
-                ValidationRule(
-                    'creation_disallowed',
-                    AssigneeExistsRule('adviser'),
-                    when=OrderInStatusRule(OrderStatus.paid)
+                    when=OrderInStatusRule(
+                        [
+                            OrderStatus.quote_awaiting_acceptance,
+                            OrderStatus.quote_accepted,
+                            OrderStatus.paid,
+                        ]
+                    )
                 ),
             ),
         )
