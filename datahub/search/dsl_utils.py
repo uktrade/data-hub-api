@@ -6,7 +6,8 @@ SortableCaseInsensitiveKeywordText = partial(
     analyzer='lowercase_keyword_analyzer',
     fielddata=True
 )
-TrigramText = partial(Text, analyzer='trigram_analyzer', fielddata=True)
+TrigramText = partial(Text, analyzer='trigram_analyzer')
+SortableTrigramText = partial(Text, analyzer='trigram_analyzer', fielddata=True)
 EnglishText = partial(Text, analyzer='english_analyzer')
 SortableText = partial(Text, fielddata=True)
 
@@ -17,12 +18,16 @@ def contact_or_adviser_mapping(field, include_dit_team=False):
         'id': Keyword(),
         'first_name': SortableCaseInsensitiveKeywordText(),
         'last_name': SortableCaseInsensitiveKeywordText(),
-        'name': SortableCaseInsensitiveKeywordText(),
+        'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+        'name_trigram': TrigramText(),
     }
 
     if include_dit_team:
         props['dit_team'] = id_name_mapping()
-    return Nested(properties=props)
+    return Nested(
+        properties=props,
+        include_in_parent=True,
+    )
 
 
 def contact_or_adviser_partial_mapping(field):
@@ -34,24 +39,33 @@ def contact_or_adviser_partial_mapping(field):
         'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
         'name_trigram': TrigramText(),
     }
-    return Nested(properties=props)
+    return Nested(
+        properties=props,
+        include_in_parent=True,
+    )
 
 
 def id_name_mapping():
     """Mapping for id name fields."""
-    return Nested(properties={
-        'id': Keyword(),
-        'name': SortableCaseInsensitiveKeywordText(),
-    })
+    return Nested(
+        properties={
+            'id': Keyword(),
+            'name': SortableCaseInsensitiveKeywordText(),
+        },
+        include_in_parent=True,
+    )
 
 
 def id_name_partial_mapping(field):
     """Mapping for id name fields."""
-    return Nested(properties={
-        'id': Keyword(),
-        'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
-        'name_trigram': TrigramText(),
-    })
+    return Nested(
+        properties={
+            'id': Keyword(),
+            'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+            'name_trigram': TrigramText(),
+        },
+        include_in_parent=True,
+    )
 
 
 def id_uri_mapping():

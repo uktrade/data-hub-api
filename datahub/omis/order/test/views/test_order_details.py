@@ -225,7 +225,7 @@ class TestAddOrderDetails(APITestMixin):
             'primary_market': ['This field is required.'],
         }
 
-    @freeze_time('2017-10-25 11:00:00.000000')
+    @freeze_time('2017-11-23 11:00:00.000000')
     def test_fails_if_service_type_disabled(self):
         """Test that if a service type specified is disabled, the creation fails."""
         company = CompanyFactory()
@@ -618,7 +618,7 @@ class TestChangeOrderDetails(APITestMixin):
             ],
         }
 
-    @freeze_time('2017-10-25 11:00:00.000000')
+    @freeze_time('2017-11-23 11:00:00.000000')
     def test_fails_if_service_type_disabled(self):
         """Test that if a service type specified is disabled, the update fails."""
         order = OrderFactory()

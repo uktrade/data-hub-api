@@ -20,8 +20,19 @@ class Contact(DocType, MapDBModelToDict):
     # field is being aggregated
     name_trigram = dsl_utils.TrigramText()
     title = dsl_utils.id_name_mapping()
-    first_name = dsl_utils.SortableText(copy_to=['name', 'name_keyword', 'name_trigram'])
-    last_name = dsl_utils.SortableText(copy_to=['name', 'name_keyword', 'name_trigram'])
+    first_name = dsl_utils.SortableText(
+        copy_to=[
+            'name',
+            'name_keyword',
+            'name_trigram',
+        ]
+    )
+    last_name = dsl_utils.SortableText(
+        copy_to=[
+            'name',
+            'name_keyword',
+            'name_trigram',
+        ])
     primary = Boolean()
     telephone_countrycode = Keyword()
     telephone_number = Keyword()
@@ -77,16 +88,12 @@ class Contact(DocType, MapDBModelToDict):
         'archived_documents_url_path',
     )
 
-    SEARCH_FIELDS = [
-        'address_1',
-        'address_2',
-        'address_country.name',
-        'address_county',
-        'address_town',
-        'company.name',
+    SEARCH_FIELDS = (
+        'name_trigram',
         'email',
-        'notes'
-    ]
+        'email_alternative',
+        'company.name_trigram',
+    )
 
     class Meta:
         """Default document meta data."""

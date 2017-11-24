@@ -13,7 +13,12 @@ class Company(DocType, MapDBModelToDict):
 
     id = Keyword()
     account_manager = dsl_utils.contact_or_adviser_mapping('account_manager')
-    trading_name = dsl_utils.SortableText(copy_to=['trading_name_keyword', 'trading_name_trigram'])
+    trading_name = dsl_utils.SortableText(
+        copy_to=[
+            'trading_name_keyword',
+            'trading_name_trigram',
+        ]
+    )
     trading_name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
     trading_name_trigram = dsl_utils.TrigramText()
     archived = Boolean()
@@ -39,16 +44,28 @@ class Company(DocType, MapDBModelToDict):
     reference_code = dsl_utils.SortableCaseInsensitiveKeywordText()
     registered_address_1 = Text()
     registered_address_2 = Text()
-    registered_address_country = dsl_utils.id_name_mapping()
+    registered_address_country = dsl_utils.id_name_partial_mapping(
+        'registered_address_country'
+    )
     registered_address_county = Text()
-    registered_address_postcode = Text()
+    registered_address_postcode = Text(
+        copy_to=[
+            'registered_address_postcode_trigram'
+        ]
+    )
+    registered_address_postcode_trigram = dsl_utils.TrigramText()
     registered_address_town = dsl_utils.SortableCaseInsensitiveKeywordText()
-    sector = dsl_utils.id_name_mapping()
+    sector = dsl_utils.id_name_partial_mapping('sector')
     trading_address_1 = Text()
     trading_address_2 = Text()
-    trading_address_country = dsl_utils.id_name_mapping()
+    trading_address_country = dsl_utils.id_name_partial_mapping(
+        'trading_address_country'
+    )
     trading_address_county = Text()
-    trading_address_postcode = Text()
+    trading_address_postcode = Text(
+        copy_to=['trading_address_postcode_trigram']
+    )
+    trading_address_postcode_trigram = dsl_utils.TrigramText()
     trading_address_town = dsl_utils.SortableCaseInsensitiveKeywordText()
     turnover_range = dsl_utils.id_name_mapping()
     uk_region = dsl_utils.id_name_mapping()
@@ -103,20 +120,18 @@ class Company(DocType, MapDBModelToDict):
         'archived_documents_url_path',
     )
 
-    SEARCH_FIELDS = [
-        'trading_name_keyword',
+    SEARCH_FIELDS = (
+        'name_trigram',
+        'company_number',
         'trading_name_trigram',
-        'classification.name',
-        'export_to_countries.name',
-        'future_interest_countries.name',
-        'registered_address_country.name',
-        'registered_address_town',
-        'sector.name',
-        'trading_address_country.name',
-        'trading_address_town',
-        'uk_region.name',
-        'website'
-    ]
+        'reference_code',
+        'registered_address_country.name_trigram',
+        'registered_address_postcode_trigram',
+        'sector.name_trigram',
+        'trading_address_country.name_trigram',
+        'trading_address_postcode_trigram',
+        'uk_region.name_trigram'
+    )
 
     class Meta:
         """Default document meta data."""
