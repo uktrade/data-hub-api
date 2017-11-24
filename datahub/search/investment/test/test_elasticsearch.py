@@ -16,7 +16,8 @@ def test_get_basic_search_query():
                     {
                         'match_phrase': {
                             'name_keyword': {
-                                'query': 'test', 'boost': 2
+                                'query': 'test',
+                                'boost': 2
                             }
                         }
                     }, {
@@ -24,268 +25,41 @@ def test_get_basic_search_query():
                             'id': 'test'
                         }
                     }, {
-                        'match': {
-                            'name': 'test'
-                        }
-                    }, {
-                        'match_phrase': {
-                            'name_trigram': 'test'
-                        }
-                    }, {
-                        'match': {
-                            'address_1': 'test'
-                        }
-                    }, {
-                        'match': {
-                            'address_2': 'test'
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'address_country',
-                            'query': {
-                                'match': {
-                                    'address_country.name': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'match': {
-                            'address_county': 'test'
-                        }
-                    }, {
-                        'match': {
-                            'address_town': 'test'
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'business_activities',
-                            'query': {
-                                'match': {
-                                    'business_activities.name': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'classification',
-                            'query': {
-                                'match': {
-                                    'classification.name': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'company',
-                            'query': {
-                                'match': {
-                                    'company.name': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'company',
-                            'query': {
-                                'match_phrase': {
-                                    'company.name_trigram': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'match': {
-                            'company_number': 'test'
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'contact',
-                            'query': {
-                                'match': {
-                                    'contact.name': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'contact',
-                            'query': {
-                                'match_phrase': {
-                                    'contact.name_trigram': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'dit_team',
-                            'query': {
-                                'match': {
-                                    'dit_team.name': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'match': {
-                            'email': 'test'
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'export_to_countries',
-                            'query': {
-                                'match': {
-                                    'export_to_countries.name': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'future_interest_countries',
-                            'query': {
-                                'match': {
-                                    'future_interest_countries.name': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'intermediate_company',
-                            'query': {
-                                'match': {
-                                    'intermediate_company.name': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'investor_company',
-                            'query': {
-                                'match': {
-                                    'investor_company.name': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'match': {
-                            'name': 'test'
-                        }
-                    }, {
-                        'match': {
-                            'notes': 'test'
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'organiser',
-                            'query': {
-                                'match': {
-                                    'organiser.name': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'match': {
-                            'project_code': 'test'
-                        }
-                    }, {
-                        'match_phrase': {
-                            'reference_trigram': 'test'
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'registered_address_country',
-                            'query': {
-                                'match': {
-                                    'registered_address_country.name': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'match': {
-                            'registered_address_town': 'test'
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'related_programmes',
-                            'query': {
-                                'match': {
-                                    'related_programmes.name': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'sector',
-                            'query': {
-                                'match': {
-                                    'sector.name': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'match': {
-                            'subject': 'test'
-                        }
-                    }, {
-                        'match': {
-                            'subject_english': 'test'
-                        }
-                    }, {
-                        'match': {
-                            'subtotal_cost_string': 'test'
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'teams',
-                            'query': {
-                                'match': {
-                                    'teams.name': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'match': {
-                            'total_cost_string': 'test'
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'trading_address_country',
-                            'query': {
-                                'match': {
-                                    'trading_address_country.name': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'match': {
-                            'trading_address_town': 'test'
-                        }
-                    }, {
-                        'match_phrase': {
-                            'trading_name_keyword': 'test'
-                        }
-                    }, {
-                        'match_phrase': {
-                            'trading_name_trigram': 'test'
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'uk_company',
-                            'query': {
-                                'match': {
-                                    'uk_company.name': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'nested': {
-                            'path': 'uk_region',
-                            'query': {
-                                'match': {
-                                    'uk_region.name': 'test'
-                                }
-                            }
-                        }
-                    }, {
-                        'match': {
-                            'website': 'test'
+                        'multi_match': {
+                            'query': 'test',
+                            'fields': [
+                                'address_country.name_trigram',
+                                'address_postcode_trigram',
+                                'company.name_trigram',
+                                'company_number',
+                                'contact.name_trigram',
+                                'dit_adviser.name_trigram',
+                                'dit_team.name_trigram',
+                                'email',
+                                'email_alternative',
+                                'event.name_trigram',
+                                'investor_company.name_trigram',
+                                'name_trigram',
+                                'organiser.name_trigram',
+                                'project_code_trigram',
+                                'reference_code',
+                                'reference_trigram',
+                                'registered_address_country.name_trigram',
+                                'registered_address_postcode_trigram',
+                                'related_programmes.name_trigram',
+                                'sector.name_trigram',
+                                'subject_english',
+                                'subtotal_cost_string',
+                                'teams.name_trigram',
+                                'total_cost_string',
+                                'trading_address_country.name_trigram',
+                                'trading_address_postcode_trigram',
+                                'trading_name_trigram',
+                                'uk_company.name_trigram',
+                                'uk_region.name_trigram'
+                            ],
+                            'type': 'cross_fields',
+                            'operator': 'and'
                         }
                     }
                 ]
@@ -362,61 +136,17 @@ def test_limited_get_search_by_entity_query():
                                         'id': 'test'
                                     }
                                 }, {
-                                    'match': {
-                                        'name': 'test'
-                                    }
-                                }, {
-                                    'match_phrase': {
-                                        'name_trigram': 'test'
-                                    }
-                                }, {
-                                    'nested': {
-                                        'path': 'business_activities',
-                                        'query': {
-                                            'match': {
-                                                'business_activities.name': 'test'
-                                            }
-                                        }
-                                    }
-                                }, {
-                                    'nested': {
-                                        'path': 'intermediate_company',
-                                        'query': {
-                                            'match': {
-                                                'intermediate_company.name': 'test'
-                                            }
-                                        }
-                                    }
-                                }, {
-                                    'nested': {
-                                        'path': 'investor_company',
-                                        'query': {
-                                            'match': {
-                                                'investor_company.name': 'test'
-                                            }
-                                        }
-                                    }
-                                }, {
-                                    'match': {
-                                        'project_code': 'test'
-                                    }
-                                }, {
-                                    'nested': {
-                                        'path': 'sector',
-                                        'query': {
-                                            'match': {
-                                                'sector.name': 'test'
-                                            }
-                                        }
-                                    }
-                                }, {
-                                    'nested': {
-                                        'path': 'uk_company',
-                                        'query': {
-                                            'match': {
-                                                'uk_company.name': 'test'
-                                            }
-                                        }
+                                    'multi_match': {
+                                        'query': 'test',
+                                        'fields': (
+                                            'name_trigram',
+                                            'uk_company.name_trigram',
+                                            'investor_company.name_trigram',
+                                            'project_code_trigram',
+                                            'sector.name_trigram'
+                                        ),
+                                        'type': 'cross_fields',
+                                        'operator': 'and'
                                     }
                                 }
                             ]
@@ -427,34 +157,47 @@ def test_limited_get_search_by_entity_query():
         },
         'post_filter': {
             'bool': {
-                'must': [{
-                    'bool': {
-                        'should': [{'match': {'address_town': 'Woodside'}}],
-                        'minimum_should_match': 1
-                    }
-                }, {
-                    'bool': {
-                        'should': [{
-                            'nested': {
-                                'path': 'trading_address_country',
-                                'query': {
-                                    'match_phrase': {
-                                        'trading_address_country.id':
-                                        '80756b9a-5d95-e211-a939-e4115bead28a'
+                'must': [
+                    {
+                        'bool': {
+                            'should': [
+                                {
+                                    'match': {
+                                        'address_town': {
+                                            'query': 'Woodside',
+                                            'operator': 'and'
+                                        }
                                     }
                                 }
+                            ],
+                            'minimum_should_match': 1
+                        }
+                    }, {
+                        'bool': {
+                            'should': [
+                                {
+                                    'nested': {
+                                        'path': 'trading_address_country',
+                                        'query': {
+                                            'match_phrase': {
+                                                'trading_address_country.id':
+                                                    '80756b9a-5d95-e211-a939-e4115bead28a'
+                                            }
+                                        }
+                                    }
+                                }
+                            ],
+                            'minimum_should_match': 1
+                        }
+                    }, {
+                        'range': {
+                            'estimated_land_date': {
+                                'gte': '2017-06-13T09:44:31.062870',
+                                'lte': '2017-06-13T09:44:31.062870'
                             }
-                        }],
-                        'minimum_should_match': 1
-                    }
-                }, {
-                    'range': {
-                        'estimated_land_date': {
-                            'gte': '2017-06-13T09:44:31.062870',
-                            'lte': '2017-06-13T09:44:31.062870'
                         }
                     }
-                }]
+                ]
             }
         },
         'from': 5,

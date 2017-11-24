@@ -28,3 +28,18 @@
 - model: event.eventtype
   pk: 91dbf298-84b3-4aa9-af7d-540721e5127c
   fields: {disabled_on: null, name: "UK region local service"}
+- model: event.eventtype
+  pk: 48afd8d0-5d95-e211-a939-e4115bead28a
+  fields: {disabled_on: '2017-11-24T00:00:00Z', name: "Awayday"}
+- model: event.eventtype
+  pk: 49afd8d0-5d95-e211-a939-e4115bead28a
+  fields: {disabled_on: '2017-11-24T00:00:00Z', name: "Course"}
+- model: event.eventtype
+  pk: 4cafd8d0-5d95-e211-a939-e4115bead28a
+  fields: {disabled_on: '2017-11-24T00:00:00Z', name: "Meeting"}
+- model: event.eventtype
+  pk: 4eafd8d0-5d95-e211-a939-e4115bead28a
+  fields: {disabled_on: '2017-11-24T00:00:00Z', name: "Reception"}
+- model: event.eventtype
+  pk: 50afd8d0-5d95-e211-a939-e4115bead28a
+  fields: {disabled_on: '2017-11-24T00:00:00Z', name: "Social"}

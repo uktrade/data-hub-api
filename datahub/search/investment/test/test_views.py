@@ -28,7 +28,7 @@ def setup_data(setup_es):
             uk_region_locations=[
                 constants.UKRegion.east_midlands.value.id,
                 constants.UKRegion.isle_of_man.value.id,
-            ]
+            ],
         ),
         InvestmentProjectFactory(
             name='delayed project',
@@ -43,7 +43,7 @@ def setup_data(setup_es):
             status=InvestmentProject.STATUSES.delayed,
             uk_region_locations=[
                 constants.UKRegion.north_west.value.id,
-            ]
+            ],
         ),
         InvestmentProjectFactory(
             name='won project',
@@ -58,7 +58,7 @@ def setup_data(setup_es):
             status=InvestmentProject.STATUSES.won,
             uk_region_locations=[
                 constants.UKRegion.north_west.value.id,
-            ]
+            ],
         )
     ]
     setup_es.indices.refresh()

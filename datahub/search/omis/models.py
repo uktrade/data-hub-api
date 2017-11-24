@@ -10,7 +10,7 @@ class Order(DocType, MapDBModelToDict):
     """Elasticsearch representation of Order model."""
 
     id = Keyword()
-    reference = dsl_utils.SortableCaseInsensitiveKeywordText(copy_to='reference_trigram')
+    reference = dsl_utils.SortableCaseInsensitiveKeywordText(copy_to=['reference_trigram'])
     reference_trigram = dsl_utils.TrigramText()
     status = dsl_utils.SortableCaseInsensitiveKeywordText()
     company = dsl_utils.id_name_partial_mapping('company')
@@ -99,8 +99,8 @@ class Order(DocType, MapDBModelToDict):
 
     SEARCH_FIELDS = (
         'reference_trigram',
-        'contact.name_trigram',
         'company.name_trigram',
+        'contact.name_trigram',
         'total_cost_string',
         'subtotal_cost_string',
     )

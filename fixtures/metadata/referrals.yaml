@@ -144,6 +144,15 @@
 - model: metadata.referralsourceactivity
   pk: ff7bcab4-ffef-e411-bcbe-e4115bead28a
   fields: {disabled_on: null, name: EY EIM}
+- model: metadata.referralsourceactivity
+  pk: 70bb9fc6-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Intl Tech Promoter}
+- model: metadata.referralsourceactivity
+  pk: 6dbb9fc6-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: '2017-11-24T00:00:00Z', name: RDA}
+- model: metadata.referralsourceactivity
+  pk: 300782c0-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: '2017-11-24T00:00:00Z', name: SBS Website}
 
 
 # ReferralSourceWebsite

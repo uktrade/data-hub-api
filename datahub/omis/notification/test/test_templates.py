@@ -33,6 +33,17 @@ class TestTemplates:
     not strictly mandatory.
     """
 
+    def test_order_info(self, settings):
+        """
+        Test the order info template.
+        If the template variables have been changed in GOV.UK notifications this
+        is going to raise HTTPError (400 - Bad Request).
+        """
+        settings.OMIS_NOTIFICATION_API_KEY = settings.OMIS_NOTIFICATION_TEST_API_KEY
+        notify = Notify()
+
+        notify.order_info(OrderFactory(), what_happened='', why='')
+
     def test_order_created(self, settings):
         """
         Test the order created template.
@@ -50,16 +61,75 @@ class TestTemplates:
 
         notify.order_created(order)
 
-    def test_order_info(self, settings):
+    def test_you_have_been_added_for_adviser(self, settings):
         """
-        Test the order info template.
+        Test the notification for when an adviser is added to an order.
         If the template variables have been changed in GOV.UK notifications this
         is going to raise HTTPError (400 - Bad Request).
         """
         settings.OMIS_NOTIFICATION_API_KEY = settings.OMIS_NOTIFICATION_TEST_API_KEY
         notify = Notify()
 
-        notify.order_info(OrderFactory(), what_happened='', why='')
+        order = OrderFactory()
+
+        notify.adviser_added(
+            order=order,
+            adviser=AdviserFactory(),
+            by=AdviserFactory(),
+            creation_date=dateutil_parse('2017-05-18')
+        )
+
+    def test_you_have_been_removed_for_adviser(self, settings):
+        """
+        Test the notification for when an adviser is removed from an order.
+        If the template variables have been changed in GOV.UK notifications this
+        is going to raise HTTPError (400 - Bad Request).
+        """
+        settings.OMIS_NOTIFICATION_API_KEY = settings.OMIS_NOTIFICATION_TEST_API_KEY
+        notify = Notify()
+
+        order = OrderFactory()
+
+        notify.adviser_removed(order=order, adviser=AdviserFactory())
+
+    def test_order_paid(self, settings):
+        """
+        Test templates of order paid for customer and advisers.
+        If the template variables have been changed in GOV.UK notifications this
+        is going to raise HTTPError (400 - Bad Request).
+        """
+        settings.OMIS_NOTIFICATION_API_KEY = settings.OMIS_NOTIFICATION_TEST_API_KEY
+        notify = Notify()
+
+        order = OrderPaidFactory()
+
+        notify.order_paid(order)
+
+    def test_order_completed(self, settings):
+        """
+        Test templates of order completed for advisers.
+        If the template variables have been changed in GOV.UK notifications this
+        is going to raise HTTPError (400 - Bad Request).
+        """
+        settings.OMIS_NOTIFICATION_API_KEY = settings.OMIS_NOTIFICATION_TEST_API_KEY
+        notify = Notify()
+
+        order = OrderCompleteFactory()
+
+        notify.order_completed(order)
+
+    def test_order_cancelled(self, settings):
+        """
+        Test templates of order cancelled for customer and advisers.
+        If the template variables have been changed in GOV.UK notifications this
+        is going to raise HTTPError (400 - Bad Request).
+        """
+        settings.OMIS_NOTIFICATION_API_KEY = settings.OMIS_NOTIFICATION_TEST_API_KEY
+        notify = Notify()
+
+        order = OrderWithOpenQuoteFactory()
+
+        notify.order_cancelled(order)
 
     def test_quote_sent(self, settings):
         """
@@ -87,27 +157,9 @@ class TestTemplates:
 
         notify.quote_accepted(order)
 
-    def test_you_have_been_added_for_adviser(self, settings):
+    def test_quote_cancelled(self, settings):
         """
-        Test the notification for when an adviser is added to an order.
-        If the template variables have been changed in GOV.UK notifications this
-        is going to raise HTTPError (400 - Bad Request).
-        """
-        settings.OMIS_NOTIFICATION_API_KEY = settings.OMIS_NOTIFICATION_TEST_API_KEY
-        notify = Notify()
-
-        order = OrderFactory()
-
-        notify.adviser_added(
-            order=order,
-            adviser=AdviserFactory(),
-            by=AdviserFactory(),
-            creation_date=dateutil_parse('2017-05-18')
-        )
-
-    def test_order_cancelled(self, settings):
-        """
-        Test templates of order cancelled for customer and advisers.
+        Test templates of quote cancelled for customer and advisers.
         If the template variables have been changed in GOV.UK notifications this
         is going to raise HTTPError (400 - Bad Request).
         """
@@ -116,17 +168,4 @@ class TestTemplates:
 
         order = OrderWithOpenQuoteFactory()
 
-        notify.order_cancelled(order)
-
-    def test_order_completed(self, settings):
-        """
-        Test templates of order completed for advisers.
-        If the template variables have been changed in GOV.UK notifications this
-        is going to raise HTTPError (400 - Bad Request).
-        """
-        settings.OMIS_NOTIFICATION_API_KEY = settings.OMIS_NOTIFICATION_TEST_API_KEY
-        notify = Notify()
-
-        order = OrderCompleteFactory()
-
-        notify.order_completed(order)
+        notify.quote_cancelled(order, by=AdviserFactory())

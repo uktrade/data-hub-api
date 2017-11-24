@@ -25,25 +25,11 @@ def test_get_search_term_query():
                         'id': 'hello'
                     }
                 }, {
-                    'match': {
-                        'name': 'hello'
-                    }
-                }, {
-                    'match_phrase': {
-                        'name_trigram': 'hello'
-                    }
-                }, {
-                    'nested': {
-                        'path': 'country',
-                        'query': {
-                            'match_phrase': {
-                                'country.id': 'hello'
-                            }
-                        }
-                    }
-                }, {
-                    'match': {
-                        'sector': 'hello'
+                    'multi_match': {
+                        'query': 'hello',
+                        'fields': ('country.id', 'sector'),
+                        'type': 'cross_fields',
+                        'operator': 'and'
                     }
                 }
             ]
