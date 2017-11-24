@@ -85,9 +85,9 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
     - `actual_time` cannot be set at this stage
     """
 
-    def test_add_change(self):
+    def test_ok_if_assignee_added_or_changed(self):
         """
-        Tests that:
+        Test that assignees can be added and/or changed.
         Given an order with the following assignees:
             [
                 {
@@ -221,9 +221,9 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
         assert assignee3.created_by == self.user
         assert assignee3.modified_by == self.user
 
-    def test_remove(self):
+    def test_ok_if_assignee_removed(self):
         """
-        Tests that:
+        Test that assignees can be removed passing the `force_delete` flag.
         Given an order with the following assignees:
             [
                 {
@@ -294,7 +294,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
 
     def test_without_changing_any_values(self):
         """
-        Tests that if I patch an assignee without changing any values,
+        Test that if I patch an assignee without changing any values,
         the db record doesn't get changed (and therefore modified_by stays the same).
         Given an order with the following assignees:
             [
@@ -365,7 +365,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
 
     def test_400_doesnt_commit_changes(self):
         """
-        Tests that:
+        Test that in case of errors, changes are not saved.
         Given an order with the following assignees:
             [
                 {
@@ -465,9 +465,41 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
         assert assignee1.estimated_time == 100
         assert assignee1.is_lead
 
+    def test_400_if_readonly_fields_changed(self):
+        """
+        Test that the `actual_time` field cannot be set when the order is in draft.
+        """
+        order = OrderFactory(assignees=[])
+        OrderAssigneeFactory(order=order, estimated_time=100, is_lead=True)
+        assignee2 = OrderAssigneeFactory(order=order, estimated_time=250, is_lead=False)
+
+        url = reverse(
+            'api-v3:omis:order:assignee',
+            kwargs={'order_pk': order.id}
+        )
+        response = self.api_client.patch(
+            url,
+            [
+                {
+                    'adviser': {'id': assignee2.adviser.id},
+                    'actual_time': 200,
+                },
+            ],
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == [
+            {
+                'actual_time': [
+                    'This field cannot be changed at this stage.'
+                ]
+            }
+        ]
+
     def test_only_one_lead_allowed(self):
         """
-        Tests that only one lead is allowed and you have to set the old lead to False
+        Test that only one lead is allowed and you have to set the old lead to False
         if you want to promote a different adviser.
 
         Given an order with the following assignees:
@@ -546,8 +578,6 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
 
     @pytest.mark.parametrize(
         'disallowed_status', (
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted,
             OrderStatus.complete,
             OrderStatus.cancelled,
         )
@@ -579,13 +609,47 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
             )
         }
 
-    def test_400_if_actual_time_changed(self):
+
+class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
+    """
+    Tests related to changing order assignees when order is paid.
+
+    - assignees can be added
+    - assignees cannot be removed
+    - `estimated_time` and `is_lead` cannot be changed
+    - only `actual_time` can be set at this stage
+    """
+
+    def test_ok_if_assignee_added(self):
         """
-        Test that the `actual_time` field cannot be set when the order is in draft.
+        Test that assignees can be added.
+        Given an order with the following assignees:
+            [
+                {
+                    "adviser": {"id": 1},
+                    "estimated_time": 100,
+                    "is_lead": true
+                },
+                {
+                    "adviser": {"id": 2},
+                    "estimated_time": 250,
+                    "is_lead": false
+                },
+            ]
+
+        if I pass the following data:
+            [
+                {
+                    "adviser": {"id": 3},
+                    "actual_time": 100
+                },
+            ]
+
+        then:
+            the adviser is added.
         """
-        order = OrderFactory(assignees=[])
-        OrderAssigneeFactory(order=order, estimated_time=100, is_lead=True)
-        assignee2 = OrderAssigneeFactory(order=order, estimated_time=250, is_lead=False)
+        order = OrderPaidFactory()
+        new_adviser = AdviserFactory()
 
         url = reverse(
             'api-v3:omis:order:assignee',
@@ -595,35 +659,70 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
             url,
             [
                 {
-                    'adviser': {'id': assignee2.adviser.id},
-                    'actual_time': 200,
+                    'adviser': {'id': new_adviser.id},
+                    'actual_time': 100
+                },
+            ],
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert str(new_adviser.id) in [item['adviser']['id'] for item in response.json()]
+
+    def test_400_if_assignee_deleted(self):
+        """
+        Test that assignees cannot be deleted at this stage.
+        Given an order with the following assignees:
+            [
+                {
+                    "adviser": {"id": 1},
+                    "estimated_time": 100,
+                    "is_lead": true
+                },
+                {
+                    "adviser": {"id": 2},
+                    "estimated_time": 250,
+                    "is_lead": false
+                },
+            ]
+
+        if I pass the following data with force_delete == True
+            [
+                {
+                    "adviser": {"id": 1},
+                },
+            ]
+
+        then:
+            the response returns a validation error as no assignee can be deleted.
+        """
+        order = OrderPaidFactory(assignees=[])
+        assignee = OrderAssigneeFactory(order=order)
+
+        url = reverse(
+            'api-v3:omis:order:assignee',
+            kwargs={'order_pk': order.id}
+        )
+        response = self.api_client.patch(
+            f'{url}?{AssigneeView.FORCE_DELETE_PARAM}=1',
+            [
+                {
+                    'adviser': {'id': assignee.adviser.id},
                 },
             ],
             format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == [
-            {
-                'actual_time': [
-                    'This field cannot be changed at this stage.'
-                ]
-            }
-        ]
-
-
-class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
-    """
-    Tests related to changing order assignees when order in paid.
-
-    - assignees cannot be added or removed
-    - `estimated_time` and `is_lead` cannot be changed
-    - only `actual_time` can be set at this stage
-    """
+        assert response.json() == {
+            'non_field_errors': [
+                'You cannot delete any assignees at this stage.'
+            ]
+        }
 
     def test_set_actual_time(self):
         """
-        Tests that:
+        Test that actual_time for any assignee can be set.
         Given an order with the following assignees:
             [
                 {
@@ -694,41 +793,19 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
             }
         ]
 
-    def test_400_if_readonly_fields_changed(self):
+    @pytest.mark.parametrize(
+        'data',
+        (
+            {'estimated_time': 100},
+            {'is_lead': True},
+        )
+    )
+    def test_400_if_readonly_fields_changed(self, data):
         """
-        Tests that:
-        Given an order with the following assignees:
-            [
-                {
-                    "adviser": {"id": 1},
-                    "estimated_time": 100,
-                    "is_lead": true
-                },
-                {
-                    "adviser": {"id": 2},
-                    "estimated_time": 250,
-                    "is_lead": false
-                },
-            ]
-
-        if I pass the following data:
-            [
-                {
-                    "adviser": {"id": 1},
-                    "estimated_time": 120
-                },
-                {
-                    "adviser": {"id": 2},
-                    "is_lead": true
-                },
-            ]
-
-        then:
-            the response returns a validation error as `estimated_time` and `is_lead`
-            cannot be changed when order.status is paid.
+        Test that estimated_time and is_lead cannot be set at this stage.
         """
         order = OrderPaidFactory(assignees=[])
-        assignee1, assignee2 = OrderAssigneeFactory.create_batch(2, order=order)
+        assignee = OrderAssigneeFactory(order=order)
 
         url = reverse(
             'api-v3:omis:order:assignee',
@@ -738,12 +815,8 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
             url,
             [
                 {
-                    'adviser': {'id': assignee1.adviser.id},
-                    'estimated_time': 120
-                },
-                {
-                    'adviser': {'id': assignee2.adviser.id},
-                    'is_lead': True
+                    'adviser': {'id': assignee.adviser.id},
+                    **data
                 },
             ],
             format='json'
@@ -752,20 +825,73 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == [
             {
-                'estimated_time': [
+                list(data)[0]: [
                     'This field cannot be changed at this stage.'
                 ]
-            },
-            {
-                'is_lead': [
-                    'This field cannot be changed at this stage.'
-                ]
-            },
+            }
         ]
 
-    def test_400_if_assignee_added(self):
+    @pytest.mark.parametrize(
+        'data',
+        (
+            {'estimated_time': 100},
+            {'is_lead': True},
+        )
+    )
+    def test_400_if_assignee_added_with_extra_field(self, data):
         """
-        Tests that:
+        Test that estimated_time and is_lead cannot be set at this stage
+        even when adding a new assignee.
+        """
+        order = OrderPaidFactory()
+        new_adviser = AdviserFactory()
+
+        url = reverse(
+            'api-v3:omis:order:assignee',
+            kwargs={'order_pk': order.id}
+        )
+        response = self.api_client.patch(
+            url,
+            [
+                {
+                    'adviser': {
+                        'id': new_adviser.id,
+                    },
+                    **data
+                },
+            ],
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == [
+            {
+                list(data)[0]: [
+                    'This field cannot be changed at this stage.'
+                ]
+            }
+        ]
+
+
+class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
+    """
+    Tests related to changing order assignees when order is in
+    quote_awaiting_acceptance or quote_accepted.
+
+    - assignees can be added
+    - assignees cannot be removed
+    - `estimated_time`, `actual_time` and `is_lead` cannot be changed
+    """
+
+    @pytest.mark.parametrize(
+        'order_status', (
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.quote_accepted
+        )
+    )
+    def test_ok_if_assignee_added(self, order_status):
+        """
+        Test that an assignee can be added.
         Given an order with the following assignees:
             [
                 {
@@ -788,9 +914,10 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
             ]
 
         then:
-            the response returns a validation error as no more assignees can be added.
+            the adviser is added
         """
-        order = OrderPaidFactory()
+        order = OrderFactory(status=order_status)
+        new_adviser = AdviserFactory()
 
         url = reverse(
             'api-v3:omis:order:assignee',
@@ -800,24 +927,24 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
             url,
             [
                 {
-                    'adviser': {'id': AdviserFactory().id},
+                    'adviser': {'id': new_adviser.id},
                 },
             ],
             format='json'
         )
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == [
-            {
-                'adviser': [
-                    'You cannot add any more assignees at this stage.'
-                ]
-            }
-        ]
+        assert response.status_code == status.HTTP_200_OK
+        assert str(new_adviser.id) in [item['adviser']['id'] for item in response.json()]
 
-    def test_400_if_assignee_deleted(self):
+    @pytest.mark.parametrize(
+        'order_status', (
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.quote_accepted
+        )
+    )
+    def test_400_if_assignee_deleted(self, order_status):
         """
-        Tests that:
+        Test that assignees cannot be deleted.
         Given an order with the following assignees:
             [
                 {
@@ -842,7 +969,7 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
         then:
             the response returns a validation error as no assignee can be deleted.
         """
-        order = OrderPaidFactory(assignees=[])
+        order = OrderFactory(status=order_status, assignees=[])
         assignee = OrderAssigneeFactory(order=order)
 
         url = reverse(
@@ -865,3 +992,93 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
                 'You cannot delete any assignees at this stage.'
             ]
         }
+
+    @pytest.mark.parametrize(
+        'order_status', (
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.quote_accepted
+        )
+    )
+    @pytest.mark.parametrize(
+        'data', (
+            {'estimated_time': 100},
+            {'actual_time': 100},
+            {'is_lead': True},
+        )
+    )
+    def test_400_if_readonly_fields_changed(self, order_status, data):
+        """
+        Test that estimated_time, actual_time and is_lead cannot be set
+        at this stage.
+        """
+        order = OrderFactory(status=order_status, assignees=[])
+        assignee = OrderAssigneeFactory(order=order)
+
+        url = reverse(
+            'api-v3:omis:order:assignee',
+            kwargs={'order_pk': order.id}
+        )
+        response = self.api_client.patch(
+            url,
+            [
+                {
+                    'adviser': {'id': assignee.adviser.id},
+                    **data
+                },
+            ],
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == [
+            {
+                list(data)[0]: [
+                    'This field cannot be changed at this stage.'
+                ]
+            },
+        ]
+
+    @pytest.mark.parametrize(
+        'order_status', (
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.quote_accepted
+        )
+    )
+    @pytest.mark.parametrize(
+        'data', (
+            {'estimated_time': 100},
+            {'actual_time': 100},
+            {'is_lead': True},
+        )
+    )
+    def test_400_if_assignee_added_with_extra_field(self, order_status, data):
+        """
+        Test that estimated_time, actual_time and is_lead cannot be set
+        at this stage even when adding a new adviser.
+        """
+        order = OrderFactory(status=order_status)
+        new_adviser = AdviserFactory()
+
+        url = reverse(
+            'api-v3:omis:order:assignee',
+            kwargs={'order_pk': order.id}
+        )
+        response = self.api_client.patch(
+            url,
+            [
+                {
+                    'adviser': {'id': new_adviser.id},
+                    **data
+                },
+            ],
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == [
+            {
+                list(data)[0]: [
+                    'This field cannot be changed at this stage.'
+                ]
+            },
+        ]

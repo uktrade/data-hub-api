@@ -600,7 +600,36 @@ class TestCompany(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json()[field] is None
 
-    def test_add_company_with_website_without_scheme(self):
+    @pytest.mark.parametrize(
+        'input_website,expected_website', (
+            ('www.google.com', 'http://www.google.com'),
+            ('http://www.google.com', 'http://www.google.com'),
+            ('https://www.google.com', 'https://www.google.com'),
+            ('', ''),
+            (None, None),
+        )
+    )
+    def test_get_company_with_website(self, input_website, expected_website):
+        """Test add new company with trading_address."""
+        company = CompanyFactory(
+            website=input_website
+        )
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['website'] == expected_website
+
+    @pytest.mark.parametrize(
+        'input_website,expected_website', (
+            ('www.google.com', 'http://www.google.com'),
+            ('http://www.google.com', 'http://www.google.com'),
+            ('https://www.google.com', 'https://www.google.com'),
+            ('', ''),
+            (None, None),
+        )
+    )
+    def test_add_company_with_website(self, input_website, expected_website):
         """Test add new company with trading_address."""
         url = reverse('api-v3:company:collection')
         response = self.api_client.post(url, format='json', data={
@@ -616,11 +645,11 @@ class TestCompany(APITestMixin):
             'trading_address_1': '1 Hello st.',
             'trading_address_town': 'Dublin',
             'uk_region': {'id': UKRegion.england.value.id},
-            'website': 'www.google.com',
+            'website': input_website,
         })
 
         assert response.status_code == status.HTTP_201_CREATED
-        assert response.data['website'] == 'www.google.com'
+        assert response.json()['website'] == expected_website
 
     def test_archive_company_no_reason(self):
         """Test company archive."""

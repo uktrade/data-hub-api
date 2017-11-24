@@ -53,7 +53,6 @@ def test_mapping(setup_es):
                 },
                 'name_trigram': {
                     'analyzer': 'trigram_analyzer',
-                    'fielddata': True,
                     'type': 'text'
                 },
                 'registered_address_1': {
@@ -63,6 +62,7 @@ def test_mapping(setup_es):
                     'type': 'text'
                 },
                 'registered_address_country': {
+                    'include_in_parent': True,
                     'properties': {
                         'id': {
                             'type': 'keyword'
@@ -79,6 +79,11 @@ def test_mapping(setup_es):
                     'type': 'text'
                 },
                 'registered_address_postcode': {
+                    'copy_to': ['registered_address_postcode_trigram'],
+                    'type': 'text'
+                },
+                'registered_address_postcode_trigram': {
+                    'analyzer': 'trigram_analyzer',
                     'type': 'text'
                 },
                 'registered_address_town': {

@@ -3,7 +3,6 @@ import uuid
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.functional import cached_property
 
 from datahub.core.models import ArchivableModel, BaseModel
 from datahub.metadata import models as metadata_models
@@ -70,9 +69,9 @@ class Contact(ArchivableModel, BaseModel):
     class Meta:
         permissions = (('read_contact', 'Can read contact'),)
 
-    @cached_property
+    @property
     def name(self):
-        """Need this for ES."""
+        """Full name."""
         return f'{self.first_name} {self.last_name}'
 
     def __str__(self):
