@@ -6,7 +6,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.functional import cached_property
 
-from datahub.company.validators import RelaxedURLValidator
 from datahub.core import constants
 from datahub.core.models import ArchivableModel, BaseConstantModel, BaseModel
 from datahub.metadata import models as metadata_models
@@ -57,7 +56,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    reference_code = models.CharField(max_length=MAX_LENGTH, blank=True, editable=False)
+    reference_code = models.CharField(max_length=MAX_LENGTH, blank=True)
     company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     vat_number = models.CharField(max_length=MAX_LENGTH, blank=True)
     alias = models.CharField(
@@ -94,9 +93,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         related_name='company_future_interest_countries'
     )
     description = models.TextField(blank=True, null=True)
-    website = models.CharField(
-        max_length=MAX_LENGTH, validators=[RelaxedURLValidator], blank=True, null=True
-    )
+    website = models.URLField(max_length=MAX_LENGTH, blank=True, null=True)
     uk_region = models.ForeignKey(
         metadata_models.UKRegion, blank=True, null=True,
         on_delete=models.SET_NULL

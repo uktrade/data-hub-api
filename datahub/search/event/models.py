@@ -20,14 +20,15 @@ class Event(DocType, MapDBModelToDict):
     address_2 = Text()
     address_town = dsl_utils.SortableCaseInsensitiveKeywordText()
     address_county = dsl_utils.SortableCaseInsensitiveKeywordText()
-    address_postcode = Text()
-    address_country = dsl_utils.id_name_mapping()
-    uk_region = dsl_utils.id_name_mapping()
+    address_postcode = Text(copy_to='address_postcode_trigram')
+    address_postcode_trigram = dsl_utils.TrigramText()
+    address_country = dsl_utils.id_name_partial_mapping('address_country')
+    uk_region = dsl_utils.id_name_partial_mapping('uk_region')
     notes = dsl_utils.EnglishText()
     organiser = dsl_utils.contact_or_adviser_partial_mapping('organiser')
     lead_team = dsl_utils.id_name_mapping()
-    teams = dsl_utils.id_name_mapping()
-    related_programmes = dsl_utils.id_name_mapping()
+    teams = dsl_utils.id_name_partial_mapping('teams')
+    related_programmes = dsl_utils.id_name_partial_mapping('related_programmes')
     service = dsl_utils.id_name_mapping()
     disabled_on = Date()
 
@@ -54,11 +55,13 @@ class Event(DocType, MapDBModelToDict):
     )
 
     SEARCH_FIELDS = (
-        'name',
-        'organiser.name',
-        'related_programmes.name',
-        'address_country.name',
-        'teams.name',
+        'name_trigram',
+        'address_country.name_trigram',
+        'address_postcode_trigram',
+        'uk_region.name_trigram',
+        'organiser.name_trigram',
+        'teams.name_trigram',
+        'related_programmes.name_trigram',
     )
 
     class Meta:

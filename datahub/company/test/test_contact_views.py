@@ -69,6 +69,7 @@ class TestAddContact(APITestMixin):
             },
             'first_name': 'Oratio',
             'last_name': 'Nelson',
+            'name': 'Oratio Nelson',
             'job_title': constants.Role.owner.value.name,
             'company': {
                 'id': str(company.pk),
@@ -343,6 +344,7 @@ class TestEditContact(APITestMixin):
             },
             'first_name': 'New Oratio',
             'last_name': 'Nelson',
+            'name': 'New Oratio Nelson',
             'job_title': constants.Role.owner.value.name,
             'company': {
                 'id': str(company.pk),
@@ -501,6 +503,7 @@ class TestViewContact(APITestMixin):
             },
             'first_name': 'Oratio',
             'last_name': 'Nelson',
+            'name': 'Oratio Nelson',
             'job_title': constants.Role.owner.value.name,
             'company': {
                 'id': str(company.pk),

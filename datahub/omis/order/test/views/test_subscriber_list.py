@@ -100,7 +100,15 @@ class TestChangeSubscriberList(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert {adv['id'] for adv in response.json()} == {str(adv.id) for adv in advisers}
 
-    def test_change_existing_list(self):
+    @pytest.mark.parametrize(
+        'allowed_status', (
+            OrderStatus.draft,
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.quote_accepted,
+            OrderStatus.paid,
+        )
+    )
+    def test_change_existing_list(self, allowed_status):
         """
         Test that calling PUT with a different list of advisers completely changes
         the subscriber list:
@@ -109,7 +117,7 @@ class TestChangeSubscriberList(APITestMixin):
         - existing advisers will be kept
         """
         previous_advisers = AdviserFactory.create_batch(2)
-        order = OrderFactory()
+        order = OrderFactory(status=allowed_status)
         subscriptions = [
             OrderSubscriberFactory(order=order, adviser=adviser)
             for adviser in previous_advisers
@@ -136,12 +144,20 @@ class TestChangeSubscriberList(APITestMixin):
         # check that the id of the existing subscription didn't change
         assert order.subscribers.filter(id=subscriptions[1].id).exists()
 
-    def test_remove_all(self):
+    @pytest.mark.parametrize(
+        'allowed_status', (
+            OrderStatus.draft,
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.quote_accepted,
+            OrderStatus.paid,
+        )
+    )
+    def test_remove_all(self, allowed_status):
         """
         Test that calling PUT with an empty list, removes all the subscribers.
         """
         advisers = AdviserFactory.create_batch(2)
-        order = OrderFactory()
+        order = OrderFactory(status=allowed_status)
         for adviser in advisers:
             OrderSubscriberFactory(order=order, adviser=adviser)
 
@@ -180,14 +196,11 @@ class TestChangeSubscriberList(APITestMixin):
 
     @pytest.mark.parametrize(
         'disallowed_status', (
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted,
-            OrderStatus.paid,
             OrderStatus.complete,
             OrderStatus.cancelled,
         )
     )
-    def test_409_if_order_not_in_draft(self, disallowed_status):
+    def test_409_if_order_in_disallowed_status(self, disallowed_status):
         """
         Test that if the order is not in one of the allowed statuses, the endpoint
         returns 409.
