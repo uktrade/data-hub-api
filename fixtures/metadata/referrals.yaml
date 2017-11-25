@@ -29,19 +29,33 @@
 - model: metadata.referralsourceactivity
   pk: 812b2f62-fe62-4cc8-b69c-58f3e2ebac17
   fields: {disabled_on: null, name: "Website"}
-# The following values (up to EY EIM) were imported from CDMS for the data migration
+# The following values were needed for the data migration but they got moved to
+# other metadata tables at last minute.
+# TODO: check that no records link to these referralsourceactivity records and
+# if so, remove them from referralsourceactivity and only keep them in the
+# other tables.
 - model: metadata.referralsourceactivity
   pk: e0d48e78-b7d6-e311-8a2b-e4115bead28a
   fields: {disabled_on: null, name: LEP}
 - model: metadata.referralsourceactivity
-  pk: 500ae611-9c12-e611-9bdc-e4115bead28a
-  fields: {disabled_on: null, name: IST Business Development}
+  pk: 3020d154-5748-e311-a56a-e4115bead28a
+  fields: {disabled_on: null, name: Technology Strategy Board}
 - model: metadata.referralsourceactivity
-  pk: 30f1723b-9c12-e611-9bdc-e4115bead28a
-  fields: {disabled_on: null, name: Multiplier via IST Business Development}
+  pk: 71bb9fc6-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Devolved Administration (DA)}
+- model: metadata.referralsourceactivity
+  pk: 73bb9fc6-5f95-e211-a939-e4115bead28a
+  fields: {disabled_on: null, name: Exhibition}
 - model: metadata.referralsourceactivity
   pk: 645a5d75-828a-e311-a3d5-e4115bead28a
   fields: {disabled_on: null, name: In Market FDI Contractor (Russia)}
+- model: metadata.referralsourceactivity
+  pk: 30f1723b-9c12-e611-9bdc-e4115bead28a
+  fields: {disabled_on: null, name: Multiplier via IST Business Development}
+# The following values (up to EY EIM) were imported from CDMS for the data migration
+- model: metadata.referralsourceactivity
+  pk: 500ae611-9c12-e611-9bdc-e4115bead28a
+  fields: {disabled_on: null, name: IST Business Development}
 - model: metadata.referralsourceactivity
   pk: 30968389-828a-e311-a3d5-e4115bead28a
   fields: {disabled_on: null, name: In Market FDI Contractor (Gulf)}
@@ -60,9 +74,6 @@
 - model: metadata.referralsourceactivity
   pk: e97c9641-5748-e311-a56a-e4115bead28a
   fields: {disabled_on: '2014-12-16T14:03:32Z', name: Manufacturing Advisory Service (MAS)}
-- model: metadata.referralsourceactivity
-  pk: 3020d154-5748-e311-a56a-e4115bead28a
-  fields: {disabled_on: null, name: Technology Strategy Board}
 - model: metadata.referralsourceactivity
   pk: 50509a5e-5748-e311-a56a-e4115bead28a
   fields: {disabled_on: null, name: UK Export Finance (UKEF)}
@@ -106,14 +117,8 @@
   pk: 6fbb9fc6-5f95-e211-a939-e4115bead28a
   fields: {disabled_on: null, name: Aftercare}
 - model: metadata.referralsourceactivity
-  pk: 71bb9fc6-5f95-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Devolved Administration (DA)}
-- model: metadata.referralsourceactivity
   pk: 72bb9fc6-5f95-e211-a939-e4115bead28a
   fields: {disabled_on: null, name: UKTI Enquiry Unit}
-- model: metadata.referralsourceactivity
-  pk: 73bb9fc6-5f95-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Exhibition}
 - model: metadata.referralsourceactivity
   pk: 63582a51-5e73-e611-af73-e4115bead28a
   fields: {disabled_on: null, name: Barclays Bank}
@@ -171,6 +176,19 @@
 - model: metadata.referralsourcewebsite
   pk: 072241d4-22d0-4657-8d8e-1848a0519b0a
   fields: {name: "Other website"}
+# The following values were imported from CDMS for the data migration
+- model: metadata.referralsourcewebsite
+  pk: 71bb9fc6-5f95-e211-a939-e4115bead28a
+  fields: {name: "Devolved Administration (DA)"}
+- model: metadata.referralsourcewebsite
+  pk: 73bb9fc6-5f95-e211-a939-e4115bead28a
+  fields: {name: "Exhibition"}
+- model: metadata.referralsourcewebsite
+  pk: 645a5d75-828a-e311-a3d5-e4115bead28a
+  fields: {name: "In Market FDI Contractor (Russia)"}
+- model: metadata.referralsourcewebsite
+  pk: 30f1723b-9c12-e611-9bdc-e4115bead28a
+  fields: {name: "Multiplier via IST Business Development"}
 
 
 # ReferralSourceMarketing
@@ -195,3 +213,10 @@
 - model: metadata.referralsourcemarketing
   pk: c28d95c6-f094-4f97-b372-38815829a0f0
   fields: {name: "Television/radio"}
+# The following values were imported from CDMS for the data migration
+- model: metadata.referralsourcemarketing
+  pk: e0d48e78-b7d6-e311-8a2b-e4115bead28a
+  fields: {name: "LEP"}
+- model: metadata.referralsourcemarketing
+  pk: 3020d154-5748-e311-a56a-e4115bead28a
+  fields: {name: "Technology Strategy Board"}
