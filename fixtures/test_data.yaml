@@ -162,6 +162,7 @@
     contactable_by_phone: true
     notes: This is a dummy contact for testing
     modified_on: '2017-06-05T00:00:00Z'
+    archived_documents_url_path: '/documents/123'
 
 - model: company.contact
   pk: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -225,7 +226,7 @@
     contactable_by_phone: true
     notes: This is a dummy contact for testing
     modified_on: '2017-04-05T00:00:00Z'
-    
+
 - model: company.contact
   pk: 6791d583-7a52-418f-a0d3-d8d527f20d43
   fields:
@@ -248,7 +249,7 @@
     contactable_by_phone: true
     notes: This is a dummy contact for testing
     modified_on: '2016-04-05T00:00:00Z'
-    
+
 - model: company.contact
   pk: 7d43f9a2-868f-4d85-8e5f-631e5a8c9a3b
   fields:
@@ -335,6 +336,7 @@
     investment_project: ~
     created_by: e83a608e-84a4-11e6-ae22-56b6b6499611
     modified_by: e83a608e-84a4-11e6-ae22-56b6b6499611
+    archived_documents_url_path: '/documents/123'
 
 - model: investment.investmentproject
   pk: 721e2a04-21c3-4172-a321-4368463a4b2d
@@ -407,6 +409,7 @@
     sector: 034be3be-5329-e511-b6bc-e4115bead28a
     business_activities:
       - a2dbd807-ae52-421c-8d1d-88adfc7a506b
+    archived_documents_url_path: '/documents/123'
 
 - model: investment.investmentproject
   pk: 18750b26-a8c3-41b2-8d3a-fb0b930c2270
@@ -739,3 +742,4 @@
     related_programmes:
       - d352a68f-aaf4-4c43-b39d-9bca67a8322e
     service: ccf9b82b-3499-e211-a939-e4115bead28a
+    archived_documents_url_path: '/documents/123'
