@@ -17,6 +17,7 @@ class SearchContactSerializer(SearchSerializer):
     company_sector = SingleOrListField(child=StringUUIDField(), required=False)
     company_uk_region = SingleOrListField(child=StringUUIDField(), required=False)
     address_country = SingleOrListField(child=StringUUIDField(), required=False)
+    created_by = SingleOrListField(child=StringUUIDField(), required=False)
 
     SORT_BY_FIELDS = (
         'address_country.name',
