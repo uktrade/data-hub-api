@@ -18,6 +18,7 @@ class SearchContactParams:
         'company_sector',
         'company_uk_region',
         'created_by',
+        'created_on_exists',
         'address_country',
         'archived',
     )

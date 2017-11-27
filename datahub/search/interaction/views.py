@@ -17,6 +17,7 @@ class SearchInteractionParams:
         'company_name',
         'contact',
         'contact_name',
+        'created_on_exists',
         'dit_adviser',
         'dit_adviser_name',
         'dit_team',
