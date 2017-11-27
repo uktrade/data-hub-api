@@ -3,7 +3,7 @@ import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import CompanyFactory, ContactFactory
+from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import Country, Sector, UKRegion
 from datahub.core.test_utils import APITestMixin, get_test_user
 from datahub.metadata.test.factories import TeamFactory
@@ -197,6 +197,24 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['company']['id'] == str(company.id)
+
+    def test_search_contact_by_created_by(self, setup_es, setup_data):
+        """Tests filtering by created_by."""
+        adviser = AdviserFactory()
+        ContactFactory(created_by=adviser)
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:contact')
+
+        response = self.api_client.post(url, {
+            'created_by': adviser.id,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['created_by']['id'] == str(adviser.id)
 
     def test_company_name_trigram_filter(self, setup_es):
         """Tests edge case of partially matching company name."""
