@@ -15,7 +15,7 @@ unversioned_urls = [
     url(r'^metadata/', include('datahub.metadata.urls')),
     url(r'^token/$', TokenView.as_view(), name='token'),
     url(r'^whoami/$', who_am_i, name='who_am_i'),
-    url(r'^dashboard/', include(('datahub.dashboard.urls', 'dashboard'), namespace='dashboard'))
+    url(r'^dashboard/', include(('datahub.search.dashboard.urls', 'dashboard'), namespace='dashboard'))
 ]
 
 urlpatterns = [

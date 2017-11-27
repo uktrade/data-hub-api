@@ -18,6 +18,7 @@ class SearchInteractionSerializer(SearchSerializer):
     contact_name = serializers.CharField(required=False)
     date_after = RelaxedDateTimeField(required=False)
     date_before = RelaxedDateTimeField(required=False)
+    created_on_exists = serializers.BooleanField(required=False)
     dit_adviser = SingleOrListField(child=StringUUIDField(), required=False)
     dit_adviser_name = serializers.CharField(required=False)
     dit_team = SingleOrListField(child=StringUUIDField(), required=False)
