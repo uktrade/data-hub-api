@@ -180,6 +180,34 @@ class TestSearch(APITestMixin):
         assert response.data['count'] > 0
         assert all(result['archived'] == archived for result in response.data['results'])
 
+    @pytest.mark.parametrize(
+        'created_on_exists',
+        (True, False)
+    )
+    def test_filter_by_created_on_exists(self, setup_es, created_on_exists):
+        """Tests filtering contact by created_on exists."""
+        ContactFactory.create_batch(3)
+        no_created_on = ContactFactory.create_batch(3)
+        for contact in no_created_on:
+            contact.created_on = None
+            contact.save()
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:contact')
+        request_data = {
+            'created_on_exists': created_on_exists,
+        }
+        response = self.api_client.post(url, request_data, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        results = response_data['results']
+        assert response_data['count'] == 3
+        assert all((not result['created_on'] is None) == created_on_exists
+                   for result in results)
+
     def test_search_contact_by_company_id(self, setup_es, setup_data):
         """Tests filtering by company id."""
         company = CompanyFactory()
