@@ -6,7 +6,7 @@ from datahub.oauth.scopes import Scope
 from datahub.search.contact.models import Contact
 from datahub.search.elasticsearch import get_search_by_entity_query, limit_search_query
 from datahub.search.interaction.models import Interaction
-from .serializers import LimitParamSerializer
+from .serializers import HomepageSerializer
 
 
 class IntelligentHomepageView(APIView):
@@ -20,7 +20,7 @@ class IntelligentHomepageView(APIView):
     def get(self, request, format=None):
         """Implement GET method."""
         user = request.user
-        serializer = LimitParamSerializer(data=request.GET)
+        serializer = HomepageSerializer(data=request.GET)
         serializer.is_valid(raise_exception=True)
         limit = serializer.validated_data['limit']
 
@@ -29,6 +29,7 @@ class IntelligentHomepageView(APIView):
             entity=Interaction,
             filters={
                 'dit_adviser.id': user.id,
+                'created_on_exists': True,
             },
             field_order='created_on:desc',
         )
@@ -43,6 +44,7 @@ class IntelligentHomepageView(APIView):
             entity=Contact,
             filters={
                 'created_by.id': user.id,
+                'created_on_exists': True,
             },
             field_order='created_on:desc',
         )
@@ -54,6 +56,6 @@ class IntelligentHomepageView(APIView):
 
         response = {
             'interactions': [interaction.to_dict() for interaction in interactions.hits],
-            'contacts': [contact.to_dict() for contact in contacts],
+            'contacts': [contact.to_dict() for contact in contacts.hits],
         }
         return Response(data=response)
