@@ -36,7 +36,6 @@ class SearchContactSerializer(SearchSerializer):
         'contactable_by_email',
         'contactable_by_phone',
         'created_on',
-        'created_by.name',
         'email',
         'first_name',
         'id',
