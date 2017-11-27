@@ -12,7 +12,7 @@ from datahub.interaction.test.factories import InteractionFactory
 class TestDashboard(APITestMixin):
     """Dashboard test case."""
 
-    def test_intelligent_homepage(self):
+    def test_intelligent_homepage(self, setup_es):
         """Intelligent homepage."""
         datetimes = [datetime(year, 1, 1) for year in range(2015, 2030)]
         interactions = []
@@ -23,10 +23,13 @@ class TestDashboard(APITestMixin):
                 interactions.append(InteractionFactory(dit_adviser=self.user))
                 contacts.append(ContactFactory(created_by=self.user))
 
+        setup_es.indices.refresh()
+
         url = reverse('dashboard:intelligent-homepage')
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
+
         response_data = response.json()
         resp_contacts = response_data['contacts']
 
@@ -44,13 +47,17 @@ class TestDashboard(APITestMixin):
         assert isinstance(resp_interaction['company'], dict)
         assert resp_interaction['company']['name'] == interactions[-1].company.name
 
-    def test_intelligent_homepage_limit(self):
+    def test_intelligent_homepage_limit(self, setup_es):
         """Test the limit param."""
         InteractionFactory.create_batch(15, dit_adviser=self.user)
         ContactFactory.create_batch(15, created_by=self.user)
 
+        setup_es.indices.refresh()
+
         url = reverse('dashboard:intelligent-homepage')
-        response = self.api_client.get(url, data={'limit': 10})
+        response = self.api_client.get(url, data={
+            'limit': 10
+        })
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
