@@ -18,6 +18,7 @@ def test_contact_dbmodel_to_dict(setup_es):
         'title',
         'company',
         'created_on',
+        'created_by',
         'modified_on',
         'archived',
         'archived_on',
