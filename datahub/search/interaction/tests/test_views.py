@@ -355,6 +355,34 @@ class TestViews(APITestMixin):
         assert any(result['contact']['id'] == str(contacts[5].id) for result in results)
         assert any(result['contact']['name'] == contacts[5].name for result in results)
 
+    @pytest.mark.parametrize(
+        'created_on_exists',
+        (True, False)
+    )
+    def test_filter_by_created_on_exists(self, setup_es, created_on_exists):
+        """Tests filtering interaction by created_on exists."""
+        InteractionFactory.create_batch(3)
+        no_created_on = InteractionFactory.create_batch(3)
+        for interaction in no_created_on:
+            interaction.created_on = None
+            interaction.save()
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:interaction')
+        request_data = {
+            'created_on_exists': created_on_exists,
+        }
+        response = self.api_client.post(url, request_data, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        results = response_data['results']
+        assert response_data['count'] == 3
+        assert all((not result['created_on'] is None) == created_on_exists
+                   for result in results)
+
     def test_filter_by_dit_adviser_id(self, setup_es):
         """Tests filtering interaction by dit adviser id."""
         advisers = AdviserFactory.create_batch(10)
