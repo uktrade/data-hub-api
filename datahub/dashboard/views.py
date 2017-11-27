@@ -2,11 +2,11 @@ from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOr
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from datahub.company.queryset import get_contact_queryset
-from datahub.interaction.queryset import get_interaction_queryset
 from datahub.oauth.scopes import Scope
-
-from .serializers import IntelligentHomepageSerializer, LimitParamSerializer
+from datahub.search.contact.models import Contact
+from datahub.search.elasticsearch import get_search_by_entity_query, limit_search_query
+from datahub.search.interaction.models import Interaction
+from .serializers import LimitParamSerializer
 
 
 class IntelligentHomepageView(APIView):
@@ -16,11 +16,6 @@ class IntelligentHomepageView(APIView):
 
     required_scopes = (Scope.internal_front_end,)
     http_method_names = ['get']
-    interaction_queryset = get_interaction_queryset().select_related(
-        'contact__company',
-        'investment_project__investor_company',
-    )
-    contact_queryset = get_contact_queryset()
 
     def get(self, request, format=None):
         """Implement GET method."""
@@ -29,26 +24,36 @@ class IntelligentHomepageView(APIView):
         serializer.is_valid(raise_exception=True)
         limit = serializer.validated_data['limit']
 
-        interactions = _filter_queryset(
-            self.interaction_queryset.filter(dit_adviser=user),
-            limit
+        interactions_query = get_search_by_entity_query(
+            term='',
+            entity=Interaction,
+            filters={
+                'dit_adviser.id': user.id,
+            },
+            field_order='created_on:desc',
         )
+        interactions = limit_search_query(
+            interactions_query,
+            offset=0,
+            limit=limit,
+        ).execute()
 
-        contacts = _filter_queryset(
-            self.contact_queryset.filter(created_by=user),
-            limit
+        contacts_query = get_search_by_entity_query(
+            term='',
+            entity=Contact,
+            filters={
+                'created_by.id': user.id,
+            },
+            field_order='created_on:desc',
         )
+        contacts = limit_search_query(
+            contacts_query,
+            offset=0,
+            limit=limit,
+        ).execute()
 
-        serializer = IntelligentHomepageSerializer({
-            'interactions': interactions,
-            'contacts': contacts
-        })
-        return Response(data=serializer.data)
-
-
-def _filter_queryset(queryset, limit):
-    return queryset.exclude(
-        created_on=None
-    ).order_by(
-        '-created_on'
-    )[:limit]
+        response = {
+            'interactions': [interaction.to_dict() for interaction in interactions.hits],
+            'contacts': [contact.to_dict() for contact in contacts],
+        }
+        return Response(data=response)
