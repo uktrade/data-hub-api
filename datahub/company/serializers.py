@@ -2,7 +2,6 @@ from functools import partial
 
 from django.conf import settings
 from django.db import models
-
 from rest_framework import serializers
 
 from datahub.company.models import (
@@ -10,9 +9,7 @@ from datahub.company.models import (
 )
 from datahub.core.serializers import NestedRelatedField, RelaxedURLField
 from datahub.core.validators import RequiredUnlessAlreadyBlankValidator
-from datahub.interaction.models import Interaction
 from datahub.metadata import models as meta_models
-
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -36,25 +33,6 @@ class AdviserSerializer(serializers.ModelSerializer):
             'dit_team',
         )
         depth = 1
-
-
-class NestedContactSerializer(serializers.ModelSerializer):
-    """Nested Contact serializer."""
-
-    adviser = AdviserSerializer()
-
-    class Meta:
-        model = Contact
-        depth = 1
-        fields = '__all__'
-
-
-class NestedInteractionSerializer(serializers.ModelSerializer):
-    """Nested Interaction Serializer."""
-
-    class Meta:
-        model = Interaction
-        fields = '__all__'
 
 
 class CompaniesHouseCompanySerializer(serializers.ModelSerializer):
