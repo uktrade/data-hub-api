@@ -17,6 +17,7 @@ class SearchContactParams:
         'company_name',
         'company_sector',
         'company_uk_region',
+        'created_by',
         'address_country',
         'archived',
     )
@@ -28,6 +29,7 @@ class SearchContactParams:
         'company_sector': 'company_sector.id',
         'company_uk_region': 'company_uk_region.id',
         'address_country': 'address_country.id',
+        'created_by': 'created_by.id',
     }
 
 
