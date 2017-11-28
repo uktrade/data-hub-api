@@ -39,6 +39,8 @@ class CompaniesHouseCompany(DocType, MapDBModelToDict):
     }
 
     SEARCH_FIELDS = (
+        # to match names like A & B
+        'name',
         'name_trigram',
         'company_number',
         'registered_address_postcode_trigram',

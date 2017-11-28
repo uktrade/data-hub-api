@@ -190,6 +190,8 @@ class TestSearch(APITestMixin):
             ('Pallas Hiding', 'Pallas Hiding', True),
             ('Pallas Hiding', 'Pallas Hid', True),
             ('Pallas Hiding', 'Pallas Hi', True),
+            ('A & B', 'A & B', True),
+            ('A&B Properties Limited', 'a&b', True)
         )
     )
     def test_name_filter_match(self, setup_es, company_name, search_name, match):
