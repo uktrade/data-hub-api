@@ -31,11 +31,14 @@ class SearchEventParams:
         'address_country': 'address_country.id',
         'event_type': 'event_type.id',
         'lead_team': 'lead_team.id',
-        'name': 'name_trigram',
         'organiser': 'organiser.id',
-        'organiser_name': 'organiser.name_trigram',
         'teams': 'teams.id',
         'uk_region': 'uk_region.id',
+    }
+
+    COMPOSITE_FILTERS = {
+        'name': ['name', 'name_trigram'],
+        'organiser_name': ['organiser.name', 'organiser.name_trigram'],
     }
 
 

@@ -121,8 +121,10 @@ class Company(DocType, MapDBModelToDict):
     )
 
     SEARCH_FIELDS = (
+        'name',
         'name_trigram',
         'company_number',
+        'trading_name',
         'trading_name_trigram',
         'reference_code',
         'registered_address_country.name_trigram',
