@@ -139,7 +139,6 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'uk_company.name_trigram',
         'investor_company.name',
         'investor_company.name_trigram',
-        'project_code',
         'project_code_trigram',
         'sector.name_trigram',
     )
