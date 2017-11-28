@@ -46,7 +46,6 @@ def test_get_basic_search_query():
                                 'name',
                                 'name_trigram',
                                 'organiser.name_trigram',
-                                'project_code',
                                 'project_code_trigram',
                                 'reference_code',
                                 'reference_trigram',

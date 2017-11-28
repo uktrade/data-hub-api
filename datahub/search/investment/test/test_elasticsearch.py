@@ -48,7 +48,6 @@ def test_get_basic_search_query():
                                 'name',
                                 'name_trigram',
                                 'organiser.name_trigram',
-                                'project_code',
                                 'project_code_trigram',
                                 'reference_code',
                                 'reference_trigram',
@@ -157,7 +156,6 @@ def test_limited_get_search_by_entity_query():
                                             'uk_company.name_trigram',
                                             'investor_company.name',
                                             'investor_company.name_trigram',
-                                            'project_code',
                                             'project_code_trigram',
                                             'sector.name_trigram'
                                         ),
