@@ -72,6 +72,21 @@ class TestSendEmail:
 class TestNotifyOrderInfo:
     """Tests for generic notifications related to an order."""
 
+    def test_without_primary_market(self):
+        """
+        Test that calling `order_info` without primary market
+        (in case of some legacy orders), uses a placeholder for the market.
+        """
+        order = OrderFactory(primary_market_id=None)
+
+        notify.client.reset_mock()
+
+        notify.order_info(order, what_happened='something happened', why='to inform you')
+
+        assert notify.client.send_email_notification.called
+        call_args = notify.client.send_email_notification.call_args_list[0][1]
+        assert call_args['personalisation']['primary market'] == 'Unknown market'
+
     def test_with_recipient_email_and_name(self):
         """
         Test that calling `order_info` with recipient email and name sends an email
