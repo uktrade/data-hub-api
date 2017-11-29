@@ -67,11 +67,16 @@ class Notify:
 
     def _prepare_personalisation(self, order, data=None):
         """Prepare the personalisation data with common values."""
+        if order.primary_market:
+            primary_market = order.primary_market.name
+        else:
+            primary_market = 'Unknown market'
+
         return {
             'order ref': order.reference,
             'company name': order.company.name,
             'embedded link': order.get_datahub_frontend_url(),
-            'primary market': order.primary_market.name,
+            'primary market': primary_market,
             'omis team email': settings.OMIS_GENERIC_CONTACT_EMAIL,
             **(data or {})
         }
