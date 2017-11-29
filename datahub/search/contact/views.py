@@ -24,13 +24,24 @@ class SearchContactParams:
     )
 
     REMAP_FIELDS = {
-        'name': 'name_trigram',
         'company': 'company.id',
-        'company_name': 'company.name_trigram',
         'company_sector': 'company_sector.id',
         'company_uk_region': 'company_uk_region.id',
         'address_country': 'address_country.id',
         'created_by': 'created_by.id',
+    }
+
+    COMPOSITE_FILTERS = {
+        'name': [
+            'name',
+            'name_trigram'
+        ],
+        'company_name': [
+            'company.name',
+            'company.name_trigram',
+            'company.trading_name',
+            'company.trading_name_trigram',
+        ],
     }
 
 

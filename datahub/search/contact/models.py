@@ -90,9 +90,11 @@ class Contact(DocType, MapDBModelToDict):
     )
 
     SEARCH_FIELDS = (
+        'name',
         'name_trigram',
         'email',
         'email_alternative',
+        'company.name',
         'company.name_trigram',
     )
 

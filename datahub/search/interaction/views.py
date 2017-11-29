@@ -31,14 +31,28 @@ class SearchInteractionParams:
     REMAP_FIELDS = {
         'company': 'company.id',
         'contact': 'contact.id',
-        'company_name': 'company.name_trigram',
-        'contact_name': 'contact.name_trigram',
         'dit_adviser': 'dit_adviser.id',
-        'dit_adviser_name': 'dit_adviser.name_trigram',
         'dit_team': 'dit_team.id',
         'communication_channel': 'communication_channel.id',
         'investment_project': 'investment_project.id',
         'service': 'service.id',
+    }
+
+    COMPOSITE_FILTERS = {
+        'contact_name': [
+            'contact.name',
+            'contact.name_trigram'
+        ],
+        'company_name': [
+            'company.name',
+            'company.name_trigram',
+            'company.trading_name',
+            'company.trading_name_trigram',
+        ],
+        'dit_adviser_name': [
+            'dit_adviser.name',
+            'dit_adviser.name_trigram'
+        ],
     }
 
 

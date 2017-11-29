@@ -53,11 +53,16 @@ class Interaction(DocType, MapDBModelToDict):
     )
 
     SEARCH_FIELDS = (
+        'company.name',
         'company.name_trigram',
+        'contact.name',
         'contact.name_trigram',
+        'event.name',
         'event.name_trigram',
         'subject_english',
+        'dit_adviser.name',
         'dit_adviser.name_trigram',
+        'dit_team.name',
         'dit_team.name_trigram',
     )
 
