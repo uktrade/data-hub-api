@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django.conf import settings
 from django.db import models
 from django.utils.timezone import now
@@ -74,7 +76,7 @@ class DisableableModel(models.Model):
 class BaseConstantModel(DisableableModel):
     """Constant tables for FKs."""
 
-    id = models.UUIDField(primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid4)
     name = models.TextField(blank=True)
 
     class Meta:
