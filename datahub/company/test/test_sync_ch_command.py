@@ -33,7 +33,7 @@ def test_column_filtering():
     """Test filtering and date parse."""
     test_dict = dict(irrelevant=True, incorporation_date='12/03/1999')
 
-    result = sync_ch.filter_irrelevant_ch_columns(test_dict)
+    result = sync_ch.transform_ch_row(test_dict)
 
     assert set(result.keys()) > set(settings.CH_RELEVANT_FIELDS)
     assert result['incorporation_date'] == date(1999, 3, 12)
@@ -47,7 +47,18 @@ def test_unzip_and_csv_read_on_the_fly():
         with sync_ch.open_ch_zipped_csv(f) as csv_reader:
             result = list(csv_reader)
 
-            assert len(result) == 5
+            assert len(result) == 201
+
+
+@pytest.mark.parametrize('row,num_results', (
+    ({'company_category': 'Private Limited Company'}, 1),
+    ({'company_category': 'public limited company'}, 1),
+    ({'company_category': 'registered society'}, 0),
+))
+def test_process_row_company_filtering(row, num_results):
+    """Tests filtering of companies with an irrelevant type."""
+    processed = list(sync_ch.process_row(row))
+    assert len(processed) == num_results
 
 
 @pytest.mark.django_db
@@ -61,4 +72,5 @@ def test_full_ch_sync(file_list_mock, settings):
 
     sync_ch.sync_ch(tmp_file_creator=lambda: open(fixture_loc, 'rb'))
 
-    assert CompaniesHouseCompany.objects.count() == 4
+    # Two companies with irrelevant types excluded
+    assert CompaniesHouseCompany.objects.count() == 198
