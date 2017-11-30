@@ -37,7 +37,7 @@ class SearchCompanyParams:
     }
 
     COMPOSITE_FILTERS = {
-        'name': ['name_trigram', 'trading_name_trigram'],
+        'name': ['name', 'name_trigram', 'trading_name_trigram'],
         'country': ['trading_address_country.id', 'registered_address_country.id'],
     }
 

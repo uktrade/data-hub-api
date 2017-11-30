@@ -757,6 +757,18 @@ class TestCHCompany(APITestMixin):
         response_data = response.json()
         assert response_data['company_number'] == ch_company.company_number
 
+    def test_get_ch_company_alphanumeric(self):
+        """Test retrieving a single CH company where the company number contains letters."""
+        CompaniesHouseCompanyFactory(company_number='SC00001234')
+        url = reverse(
+            'api-v3:ch-company:item', kwargs={'company_number': 'SC00001234'}
+        )
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['company_number'] == 'SC00001234'
+
     def test_ch_company_cannot_be_written(self):
         """Test CH company POST is not allowed."""
         url = reverse('api-v3:ch-company:collection')

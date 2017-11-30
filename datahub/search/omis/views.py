@@ -30,10 +30,21 @@ class SearchOrderParams:
         'primary_market': 'primary_market.id',
         'assigned_to_adviser': 'assignees.id',
         'assigned_to_team': 'assignees.dit_team.id',
-        'contact_name': 'contact.name_trigram',
-        'company_name': 'company.name_trigram',
         'company': 'company.id',
         'reference': 'reference_trigram',
+    }
+
+    COMPOSITE_FILTERS = {
+        'contact_name': [
+            'contact.name',
+            'contact.name_trigram'
+        ],
+        'company_name': [
+            'company.name',
+            'company.name_trigram',
+            'company.trading_name',
+            'company.trading_name_trigram',
+        ],
     }
 
 

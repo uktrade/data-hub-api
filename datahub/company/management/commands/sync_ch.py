@@ -13,11 +13,68 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import connection, reset_queries, transaction
 from lxml import etree
+from raven.contrib.django.raven_compat.models import client
 
 from datahub.company.models import CompaniesHouseCompany
 from datahub.core.utils import slice_iterable_into_chunks, stream_to_file_pointer
 
 logger = getLogger(__name__)
+
+# Mapping used by is_relevant_company_type() to determine which companies should be loaded
+COMPANY_CATEGORY_RELEVANCY_MAPPING = {
+    'community interest company': True,
+    'european public limited-liability company (se)': True,
+    # Address not available
+    'industrial and provident society': False,
+    # Address not available
+    'investment company with variable capital': False,
+    # Address not available
+    'investment company with variable capital (securities)': False,
+    # Address not available
+    'investment company with variable capital(umbrella)': False,
+    'limited liability partnership': True,
+    'limited partnership': True,
+    'old public company': True,
+    # Foreign and other irrelevant companies
+    'other company type': False,
+    "pri/lbg/nsc (private, limited by guarantee, no share capital, use of 'limited' exemption)":
+        True,
+    'pri/ltd by guar/nsc (private, limited by guarantee, no share capital)': True,
+    'priv ltd sect. 30 (private limited company, section 30 of the companies act)': True,
+    'private limited company': True,
+    'private unlimited': True,
+    'private unlimited company': True,
+    'public limited company': True,
+    # Address not available
+    'registered society': False,
+    # Address not available
+    'royal charter company': False,
+    # Scottish qualifying partnership, generally have a foreign address
+    'scottish partnership': False,
+}
+
+
+def is_relevant_company_type(row):
+    """
+    Returns whether the company is of a relevant type (and should be loaded to our database).
+
+    This is used to filter out companies that are not relevant for how we use Companies House
+    data, such as foreign companies or companies where Companies House does not maintain address
+    records.
+
+    This is done using the CompanyCategory column in the source data, as this proved to be the
+    most reliable way. (The prefix used in the company number also gives useful information about
+    the type of company, but this is not used here. RegAddress.Country and CountryOfOrigin are
+    not entirely reliable for detecting foreign companies.)
+    """
+    is_relevant = COMPANY_CATEGORY_RELEVANCY_MAPPING.get(row['company_category'].lower())
+    if is_relevant is None:
+        message = (f'Unknown Companies House company category {row["company_category"]} '
+                   f'encountered. Update the company category relevancy mapping to indicate if '
+                   f'it should be loaded.')
+        logger.warning(message)
+        client.captureMessage(message)
+    return is_relevant
 
 
 def get_ch_latest_dump_file_list(url, selector='.omega a'):
@@ -37,7 +94,7 @@ def get_ch_latest_dump_file_list(url, selector='.omega a'):
     return result
 
 
-def filter_irrelevant_ch_columns(row):
+def transform_ch_row(row):
     """Filter out the irrelevant fields from a CH data row and normalize the data."""
     ret = {}
     for name in settings.CH_RELEVANT_FIELDS:
@@ -51,7 +108,7 @@ def filter_irrelevant_ch_columns(row):
     except (TypeError, ValueError):
         ret['incorporation_date'] = None
 
-    # bad hacks
+    # Foreign companies are excluded, so we normalise the country to UK
     ret['registered_address_country_id'] = settings.CH_UNITED_KINGDOM_COUNTRY_ID
 
     return ret
@@ -81,7 +138,16 @@ def iter_ch_csv_from_url(url, tmp_file_creator):
         with open_ch_zipped_csv(tf) as csv_reader:
             next(csv_reader)  # skip the csv header
             for row in csv_reader:
-                yield filter_irrelevant_ch_columns(row)
+                yield from process_row(row)
+
+
+def process_row(row):
+    """Processes a CH row, yielding a transformed row if the row should be loaded"""
+    with client.context:
+        client.context.merge({'record': row})
+
+        if is_relevant_company_type(row):
+            yield transform_ch_row(row)
 
 
 def sync_ch(tmp_file_creator, endpoint=None, truncate_first=False):

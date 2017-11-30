@@ -36,6 +36,7 @@ class TestAdviser(APITestMixin):
         assert result['last_name'] == adviser.last_name
         assert result['telephone_number'] == adviser.telephone_number
         assert result['contact_email'] == adviser.contact_email
+        assert result['is_active'] == adviser.is_active
 
     def test_adviser_list_view_default_sort_order(self):
         """Test default sorting."""
