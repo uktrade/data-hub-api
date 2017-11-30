@@ -24,6 +24,7 @@ class AdviserSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'name',
+            'is_active',
             'last_login',
             'first_name',
             'last_name',
