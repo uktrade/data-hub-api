@@ -1,11 +1,10 @@
 from django.contrib import admin
 
-from datahub.core.admin import DisabledOnFilter
+from datahub.core.admin import DisabledOnFilter, ReadOnlyAdmin
 from . import models
 
 
 MODELS_TO_REGISTER_DISABLEABLE = (
-    models.BusinessType,
     models.CompanyClassification,
     models.Country,
     models.FDIType,
@@ -13,7 +12,6 @@ MODELS_TO_REGISTER_DISABLEABLE = (
     models.HeadquarterType,
     models.InvestmentBusinessActivity,
     models.InvestmentStrategicDriver,
-    models.InvestmentType,
     models.ReferralSourceActivity,
     models.ReferralSourceMarketing,
     models.ReferralSourceWebsite,
@@ -28,7 +26,12 @@ MODELS_TO_REGISTER_WITH_ORDER = (
     models.EmployeeRange,
     models.TurnoverRange,
     models.SalaryRange,
-    models.InvestmentProjectStage
+)
+
+MODELS_TO_REGISTER_READ_ONLY = (
+    models.BusinessType,
+    models.InvestmentType,
+    models.InvestmentProjectStage,
 )
 
 
@@ -39,6 +42,15 @@ class DisableableMetadataAdmin(admin.ModelAdmin):
     fields = ('id', 'name', 'disabled_on',)
     list_display = ('name', 'disabled_on',)
     readonly_fields = ('id',)
+    search_fields = ('name', 'pk')
+    list_filter = (DisabledOnFilter,)
+
+
+@admin.register(*MODELS_TO_REGISTER_READ_ONLY)
+class ReadOnlyMetadataAdmin(ReadOnlyAdmin):
+    """Admin for metadata models that shouldn't be edited."""
+
+    list_display = ('name', 'disabled_on',)
     search_fields = ('name', 'pk')
     list_filter = (DisabledOnFilter,)
 
