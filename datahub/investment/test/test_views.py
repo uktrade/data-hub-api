@@ -58,10 +58,9 @@ class TestListView(APITestMixin):
         team_others = TeamFactory()
         adviser_1 = AdviserFactory(dit_team_id=team.id)
         adviser_2 = AdviserFactory(dit_team_id=team_others.id)
-        permission_1 = Permission.objects.get(codename='read_associated_investmentproject')
-        permission_2 = Permission.objects.get(codename='read_investmentproject')
+        permission = Permission.objects.get(codename='read_associated_investmentproject')
         self._user = get_test_user(team=team)
-        self._user.user_permissions.add(permission_1, permission_2)
+        self._user.user_permissions.add(permission)
 
         iproject_1 = InvestmentProjectFactory()
         iproject_2 = InvestmentProjectFactory()
@@ -80,13 +79,13 @@ class TestListView(APITestMixin):
 
     def test_lep_user_cannot_see_ip_details_if_not_associated(self):
         """Not associated IP details is not shown to LEP user."""
-        team = TeamFactory()
-        adviser_1 = AdviserFactory(dit_team_id=team.id)
+        team_requester = TeamFactory()
+        team_associated = TeamFactory()
+        adviser_1 = AdviserFactory(dit_team_id=team_associated.id)
 
-        permission_1 = Permission.objects.get(codename='read_associated_investmentproject')
-        permission_2 = Permission.objects.get(codename='read_investmentproject')
-        self._user = get_test_user()
-        self._user.user_permissions.add(permission_1, permission_2)
+        permission = Permission.objects.get(codename='read_associated_investmentproject')
+        self._user = get_test_user(team=team_requester)
+        self._user.user_permissions.add(permission)
 
         iproject_1 = InvestmentProjectFactory()
         InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
@@ -94,8 +93,6 @@ class TestListView(APITestMixin):
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': iproject_1.pk})
         response = self.api_client.get(url)
 
-        # Because of how the filtering and permission check is handled in django,
-        # filtering cause 404 to be returned, rather than 403
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_lep_user_can_see_ip_details_if_associated(self):
@@ -103,10 +100,9 @@ class TestListView(APITestMixin):
         team = TeamFactory()
         adviser_1 = AdviserFactory(dit_team_id=team.id)
 
-        permission_1 = Permission.objects.get(codename='read_associated_investmentproject')
-        permission_2 = Permission.objects.get(codename='read_investmentproject')
+        permission = Permission.objects.get(codename='read_associated_investmentproject')
         self._user = get_test_user(team=team)
-        self._user.user_permissions.add(permission_1, permission_2)
+        self._user.user_permissions.add(permission)
 
         iproject_1 = InvestmentProjectFactory()
         InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
@@ -121,10 +117,9 @@ class TestListView(APITestMixin):
         team = TeamFactory()
         adviser_1 = AdviserFactory(dit_team_id=team.id)
 
-        permission_1 = Permission.objects.get(codename='read_associated_investmentproject')
-        permission_2 = Permission.objects.get(codename='read_investmentproject')
+        permission = Permission.objects.get(codename='read_associated_investmentproject')
         self._user = get_test_user(team=team)
-        self._user.user_permissions.add(permission_1, permission_2)
+        self._user.user_permissions.add(permission)
 
         iproject_1 = InvestmentProjectFactory(created_by=adviser_1)
 
