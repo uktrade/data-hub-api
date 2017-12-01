@@ -288,11 +288,11 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
             ('read_associated_investmentproject', 'Can read associated investment project'),
         )
 
-    def get_associated_advisors(self):
-        """Get advisors that are associated with the IP."""
+    def get_associated_advisers(self):
+        """Get the advisers associated with the project."""
         return chain(
-            [team_member.adviser for team_member in self.team_members.all()],
-            [self.created_by]
+            (team_member.adviser for team_member in self.team_members.all()),
+            (self.created_by,)
         )
 
 

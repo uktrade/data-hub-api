@@ -24,10 +24,10 @@ class UserHasPermissions(BasePermission):
         return request.user and request.user.has_perm(view.permission_required)
 
 
-class UserObjectAssociationCheck:
+class ObjectAssociationCheckerBase:
     """Base association check class."""
 
-    _action_to_method = {
+    _action_to_method_mapping = {
         'list': 'read',
         'detail': 'read',
         'retrieve': 'read',
@@ -36,31 +36,26 @@ class UserObjectAssociationCheck:
         'partial_update': 'change',
     }
 
-    def action_to_method(self, action):
+    def get_method_for_view_action(self, action):
         """Change ViewSet action to permissions method."""
-        return self._action_to_method.get(action, action)
+        return self._action_to_method_mapping.get(action, action)
 
     def is_associated(self, request, view, obj):
         """Check for connection."""
         return True
 
-    def check_condition(self, request, view):
-        """Check if condition should be applied."""
+    def should_apply_restrictions(self, request, view):
+        """Check if restrictions should be applied."""
         return False
 
-    class Meta:
-        abstract = True
 
-
-class IsAssociatedToObjectPermission(BasePermission, UserObjectAssociationCheck):
-    """
-    Check the investment project has a users team associated with it
-    """
+class IsAssociatedToObjectPermission(BasePermission, ObjectAssociationCheckerBase):
+    """Permission that checks if an object is associated to the user"""
 
     base_permission = None
 
     def has_object_permission(self, request, view, obj):
         """Check for object permissions."""
-        if self.check_condition(request, view):
+        if self.should_apply_restrictions(request, view):
             return self.is_associated(request, view, obj)
         return True

@@ -16,11 +16,11 @@ from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.utils import executor
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.documents.av_scan import virus_scan_document
-from datahub.investment.filters import IsTeamAssociatedToInvestmentProjectFilter
+from datahub.investment.filters import IsAssociatedToInvestmentProjectFilter
 from datahub.investment.models import (
     InvestmentProject, InvestmentProjectTeamMember, IProjectDocument
 )
-from datahub.investment.permissions import IsTeamAssociatedToInvestmentProjectPermission
+from datahub.investment.permissions import IsAssociatedToInvestmentProjectPermission
 from datahub.investment.serializers import (
     IProjectDocumentSerializer, IProjectSerializer, IProjectTeamMemberSerializer,
     UploadStatusSerializer
@@ -47,8 +47,8 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     This replaces the previous project, value, team and requirements endpoints.
     """
 
-    permission_classes = CoreViewSetV3.permission_classes.copy() + \
-        [IsTeamAssociatedToInvestmentProjectPermission]
+    permission_classes = (CoreViewSetV3.permission_classes
+                          + [IsAssociatedToInvestmentProjectPermission])
     required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectSerializer
     queryset = InvestmentProject.objects.select_related(
@@ -84,7 +84,7 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     )
     filter_backends = (DjangoFilterBackend,
                        OrderingFilter,
-                       IsTeamAssociatedToInvestmentProjectFilter)
+                       IsAssociatedToInvestmentProjectFilter)
     filter_fields = ('investor_company_id',)
     ordering = ('-created_on',)
 
