@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.contrib import admin
 from reversion.admin import VersionAdmin
 
@@ -57,3 +59,39 @@ class BaseModelVersionAdmin(ConfigurableVersionAdmin):
     """
 
     reversion_excluded_fields = ('created_on', 'created_by', 'modified_on', 'modified_by')
+
+
+class ReadOnlyAdmin(admin.ModelAdmin):
+    """ModelAdmin subclass that makes models viewable but not editable."""
+
+    def has_add_permission(self, request, obj=None):
+        """
+        Gets whether the user can add new objects for this model.
+
+        Always returns False.
+        """
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        """
+        Gets whether the user can delete objects for this model.
+
+        Always returns False.
+        """
+        return False
+
+    def get_readonly_fields(self, request, obj=None):
+        """
+        Gets the read-only fields for this model.
+
+        Always returns all fields.
+        """
+        # OrderedDict used instead of set to preserve order
+        readonly_fields = list(OrderedDict.fromkeys(
+            [field.name for field in self.opts.local_fields] +
+            [field.name for field in self.opts.local_many_to_many]
+        ))
+
+        if 'is_submitted' in readonly_fields:
+            readonly_fields.remove('is_submitted')
+        return readonly_fields

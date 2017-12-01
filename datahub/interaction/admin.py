@@ -8,7 +8,7 @@ from .models import CommunicationChannel, Interaction
 class MetadataAdmin(admin.ModelAdmin):
     """Communication channel admin."""
 
-    fields = ('name', 'disabled_on', )
+    fields = ('id', 'name', 'disabled_on', )
     list_display = ('name', 'disabled_on', )
     readonly_fields = ('id',)
     search_fields = ('name', 'pk')
