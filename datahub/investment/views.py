@@ -16,11 +16,12 @@ from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.utils import executor
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.documents.av_scan import virus_scan_document
-from datahub.investment.filters import IsAssociatedToInvestmentProjectFilter
 from datahub.investment.models import (
     InvestmentProject, InvestmentProjectTeamMember, IProjectDocument
 )
-from datahub.investment.permissions import IsAssociatedToInvestmentProjectPermission
+from datahub.investment.permissions import (
+    IsAssociatedToInvestmentProjectFilter, IsAssociatedToInvestmentProjectPermission
+)
 from datahub.investment.serializers import (
     IProjectDocumentSerializer, IProjectSerializer, IProjectTeamMemberSerializer,
     UploadStatusSerializer
