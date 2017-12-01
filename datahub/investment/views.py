@@ -20,7 +20,8 @@ from datahub.investment.models import (
     InvestmentProject, InvestmentProjectTeamMember, IProjectDocument
 )
 from datahub.investment.permissions import (
-    IsAssociatedToInvestmentProjectFilter, IsAssociatedToInvestmentProjectPermission
+    InvestmentProjectModelPermissions, IsAssociatedToInvestmentProjectFilter,
+    IsAssociatedToInvestmentProjectPermission
 )
 from datahub.investment.serializers import (
     IProjectDocumentSerializer, IProjectSerializer, IProjectTeamMemberSerializer,
@@ -48,8 +49,8 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     This replaces the previous project, value, team and requirements endpoints.
     """
 
-    permission_classes = (CoreViewSetV3.permission_classes
-                          + [IsAssociatedToInvestmentProjectPermission])
+    permission_classes = (IsAuthenticatedOrTokenHasScope, InvestmentProjectModelPermissions,
+                          IsAssociatedToInvestmentProjectPermission)
     required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectSerializer
     queryset = InvestmentProject.objects.select_related(
