@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from datahub.core.admin import BaseModelVersionAdmin, DisabledOnFilter
+from datahub.core.admin import BaseModelVersionAdmin, DisabledOnFilter, ReadOnlyAdmin
 from .models import Advisor, CompaniesHouseCompany, Company, Contact, ExportExperienceCategory
 
 
@@ -61,20 +61,10 @@ class ContactAdmin(BaseModelVersionAdmin):
 
 
 @admin.register(CompaniesHouseCompany)
-class CHCompany(admin.ModelAdmin):
+class CHCompany(ReadOnlyAdmin):
     """Companies House company admin."""
 
     search_fields = ['name', 'company_number']
-
-    def get_readonly_fields(self, request, obj=None):
-        """All fields readonly."""
-        readonly_fields = list(set(
-            [field.name for field in self.opts.local_fields] +
-            [field.name for field in self.opts.local_many_to_many]
-        ))
-        if 'is_submitted' in readonly_fields:
-            readonly_fields.remove('is_submitted')
-        return readonly_fields
 
 
 @admin.register(Advisor)
