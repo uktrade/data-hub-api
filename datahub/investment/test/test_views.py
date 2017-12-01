@@ -52,7 +52,7 @@ class TestListView(APITestMixin):
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_lep_user_sees_only_his_teams_ip(self):
+    def test_lep_user_sees_only_their_teams_projects(self):
         """Investment projects collection filtered to only associated to users team."""
         team = TeamFactory()
         team_others = TeamFactory()
@@ -116,7 +116,7 @@ class TestListView(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
 
-    def test_lep_user_can_see_ip_details_if_associated_throu_team_of_created_by(self):
+    def test_lep_user_can_see_ip_details_if_associated_through_team_of_created_by(self):
         """Associated IP details is displayed to LEP user."""
         team = TeamFactory()
         adviser_1 = AdviserFactory(dit_team_id=team.id)

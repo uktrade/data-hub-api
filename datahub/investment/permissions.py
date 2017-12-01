@@ -1,10 +1,7 @@
-from django.core.exceptions import ImproperlyConfigured
-
-from datahub.core.permissions import IsAssociatedToObjectPermission, UserObjectAssociationCheck
-from datahub.investment.models import InvestmentProject
+from datahub.core.permissions import IsAssociatedToObjectPermission, ObjectAssociationCheckerBase
 
 
-class UserTeamInvestmentProjectAssociationCheck(UserObjectAssociationCheck):
+class InvestmentProjectAssociationChecker(ObjectAssociationCheckerBase):
     """
     Association check class for checking connection of user and
     InvestmentProject through the user's team.
@@ -14,19 +11,15 @@ class UserTeamInvestmentProjectAssociationCheck(UserObjectAssociationCheck):
 
     def is_associated(self, request, view, obj):
         """Check for connection."""
-        if not isinstance(obj, InvestmentProject):
-            raise ImproperlyConfigured(f'{self} needs to be used on InvestmentProject view')
         return any(request.user.dit_team_id == user.dit_team_id
-                   for user in obj.get_associated_advisors())
+                   for user in obj.get_associated_advisers())
 
-    def check_condition(self, request, view):
-        """Check if condition should be applied."""
-        method = self.action_to_method(view.action)
+    def should_apply_restrictions(self, request, view):
+        """Check if restrictions should be applied."""
+        method = self.get_method_for_view_action(view.action)
         return request.user.has_perm(self.base_permission_template.format(method=method))
 
 
-class IsTeamAssociatedToInvestmentProjectPermission(IsAssociatedToObjectPermission,
-                                                    UserTeamInvestmentProjectAssociationCheck):
-    """Permission based on UserTeamInvestmentProjectAssociationCheck."""
-
-    pass
+class IsAssociatedToInvestmentProjectPermission(IsAssociatedToObjectPermission,
+                                                InvestmentProjectAssociationChecker):
+    """Permission based on InvestmentProjectAssociationChecker."""
