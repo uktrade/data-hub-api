@@ -96,7 +96,7 @@ class TestListView(APITestMixin):
 
         # Because of how the filtering and permission check is handled in django,
         # filtering cause 404 to be returned, rather than 403
-        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_lep_user_can_see_ip_details_if_associated(self):
         """Associated IP details is displayed to LEP user."""
