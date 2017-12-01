@@ -25,8 +25,14 @@ def interactions(setup_es):
     data = []
     with freeze_time('2017-01-01 13:00:00'):
         data.extend([
-            InteractionFactory(subject='Exports meeting'),
-            InteractionFactory(subject='a coffee'),
+            InteractionFactory(
+                subject='Exports meeting',
+                date=dateutil_parse('2017-10-30T00:00:00Z')
+            ),
+            InteractionFactory(
+                subject='a coffee',
+                date=dateutil_parse('2017-04-05T00:00:00Z')
+            ),
             InteractionFactory(
                 subject='Email about exhibition',
                 date=dateutil_parse('2016-09-02T00:00:00Z')
