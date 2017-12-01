@@ -2,6 +2,16 @@ from django.core.exceptions import ImproperlyConfigured
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
 
+_ACTION_TO_METHOD_MAPPING = {
+    'list': 'read',
+    'detail': 'read',
+    'retrieve': 'read',
+    'destroy': 'delete',
+    'destroy_all': 'delete',
+    'partial_update': 'change',
+}
+
+
 class DjangoCrudPermission(DjangoModelPermissions):
     """Extension of Permission class to include read permissions"""
 
@@ -27,19 +37,6 @@ class UserHasPermissions(BasePermission):
 class ObjectAssociationCheckerBase:
     """Base association check class."""
 
-    _action_to_method_mapping = {
-        'list': 'read',
-        'detail': 'read',
-        'retrieve': 'read',
-        'destroy': 'delete',
-        'destroy_all': 'delete',
-        'partial_update': 'change',
-    }
-
-    def get_method_for_view_action(self, action):
-        """Change ViewSet action to permissions method."""
-        return self._action_to_method_mapping.get(action, action)
-
     def is_associated(self, request, view, obj):
         """Check for connection."""
         return True
@@ -59,3 +56,8 @@ class IsAssociatedToObjectPermission(BasePermission, ObjectAssociationCheckerBas
         if self.should_apply_restrictions(request, view):
             return self.is_associated(request, view, obj)
         return True
+
+
+def get_method_for_view_action(action):
+    """Change ViewSet action to permissions method."""
+    return _ACTION_TO_METHOD_MAPPING.get(action, action)

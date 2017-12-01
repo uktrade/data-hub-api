@@ -1,7 +1,9 @@
 from django.db.models.query_utils import Q
 from rest_framework.filters import BaseFilterBackend
 
-from datahub.core.permissions import IsAssociatedToObjectPermission, ObjectAssociationCheckerBase
+from datahub.core.permissions import (
+    get_method_for_view_action, IsAssociatedToObjectPermission, ObjectAssociationCheckerBase
+)
 
 
 class InvestmentProjectAssociationChecker(ObjectAssociationCheckerBase):
@@ -19,7 +21,7 @@ class InvestmentProjectAssociationChecker(ObjectAssociationCheckerBase):
 
     def should_apply_restrictions(self, request, view):
         """Check if restrictions should be applied."""
-        method = self.get_method_for_view_action(view.action)
+        method = get_method_for_view_action(view.action)
         return request.user.has_perm(self.base_permission_template.format(method=method))
 
 
