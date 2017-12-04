@@ -52,82 +52,6 @@ class TestListView(APITestMixin):
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_lep_user_sees_only_their_teams_projects(self):
-        """Investment projects collection filtered to only associated to users team."""
-        team = TeamFactory()
-        team_others = TeamFactory()
-        adviser_1 = AdviserFactory(dit_team_id=team.id)
-        adviser_2 = AdviserFactory(dit_team_id=team_others.id)
-        permission = Permission.objects.get(codename='read_associated_investmentproject')
-        self._user = get_test_user(team=team)
-        self._user.user_permissions.add(permission)
-
-        iproject_1 = InvestmentProjectFactory()
-        iproject_2 = InvestmentProjectFactory()
-
-        InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
-        InvestmentProjectTeamMemberFactory(adviser=adviser_2, investment_project=iproject_2)
-
-        url = reverse('api-v3:investment:investment-collection')
-        response = self.api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-        assert len(response.data['results']) == 1
-        assert response.data['results'][0]['id'] == str(iproject_1.id)
-        assert response.data['results'][0]['name'] == iproject_1.name
-
-    def test_lep_user_cannot_see_ip_details_if_not_associated(self):
-        """Not associated IP details is not shown to LEP user."""
-        team_requester = TeamFactory()
-        team_associated = TeamFactory()
-        adviser_1 = AdviserFactory(dit_team_id=team_associated.id)
-
-        permission = Permission.objects.get(codename='read_associated_investmentproject')
-        self._user = get_test_user(team=team_requester)
-        self._user.user_permissions.add(permission)
-
-        iproject_1 = InvestmentProjectFactory()
-        InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
-
-        url = reverse('api-v3:investment:investment-item', kwargs={'pk': iproject_1.pk})
-        response = self.api_client.get(url)
-
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
-    def test_lep_user_can_see_ip_details_if_associated(self):
-        """Associated IP details is displayed to LEP user."""
-        team = TeamFactory()
-        adviser_1 = AdviserFactory(dit_team_id=team.id)
-
-        permission = Permission.objects.get(codename='read_associated_investmentproject')
-        self._user = get_test_user(team=team)
-        self._user.user_permissions.add(permission)
-
-        iproject_1 = InvestmentProjectFactory()
-        InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
-
-        url = reverse('api-v3:investment:investment-item', kwargs={'pk': iproject_1.pk})
-        response = self.api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-
-    def test_lep_user_can_see_ip_details_if_associated_through_team_of_created_by(self):
-        """Associated IP details is displayed to LEP user."""
-        team = TeamFactory()
-        adviser_1 = AdviserFactory(dit_team_id=team.id)
-
-        permission = Permission.objects.get(codename='read_associated_investmentproject')
-        self._user = get_test_user(team=team)
-        self._user.user_permissions.add(permission)
-
-        iproject_1 = InvestmentProjectFactory(created_by=adviser_1)
-
-        url = reverse('api-v3:investment:investment-item', kwargs={'pk': iproject_1.pk})
-        response = self.api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-
     def test_list_projects_success(self):
         """Test successfully listing projects."""
         project = InvestmentProjectFactory()
@@ -268,6 +192,59 @@ class TestListView(APITestMixin):
         response_data = response.json()
         assert response_data['count'] == 1
         assert response_data['results'][0]['id'] == str(project.id)
+
+    @pytest.mark.parametrize('permissions', (
+        ('read_investmentproject',),
+        ('read_associated_investmentproject', 'read_investmentproject'),
+    ))
+    def test_non_restricted_user_can_see_all_projects(self, permissions):
+        """Test that normal users can see all projects."""
+        team = TeamFactory()
+        team_others = TeamFactory()
+        adviser_1 = AdviserFactory(dit_team_id=team.id)
+        adviser_2 = AdviserFactory(dit_team_id=team_others.id)
+
+        _create_user(self, team, permissions)
+
+        iproject_1 = InvestmentProjectFactory()
+        iproject_2 = InvestmentProjectFactory()
+
+        InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
+        InvestmentProjectTeamMemberFactory(adviser=adviser_2, investment_project=iproject_2)
+
+        url = reverse('api-v3:investment:investment-collection')
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 2
+        assert {str(iproject_1.pk), str(iproject_2.pk)} == {
+            result['id'] for result in response_data['results']
+        }
+
+    def test_restricted_users_cannot_see_other_teams_projects(self):
+        """Tests that restricted users can only see their team's projects."""
+        team = TeamFactory()
+        team_others = TeamFactory()
+        adviser_1 = AdviserFactory(dit_team_id=team.id)
+        adviser_2 = AdviserFactory(dit_team_id=team_others.id)
+
+        _create_user(self, team, ['read_associated_investmentproject'])
+
+        iproject_1 = InvestmentProjectFactory()
+        iproject_2 = InvestmentProjectFactory()
+
+        InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
+        InvestmentProjectTeamMemberFactory(adviser=adviser_2, investment_project=iproject_2)
+
+        url = reverse('api-v3:investment:investment-collection')
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['id'] == str(iproject_1.id)
+        assert response.data['results'][0]['name'] == iproject_1.name
 
 
 class TestCreateView(APITestMixin):
@@ -725,6 +702,70 @@ class TestRetrieveView(APITestMixin):
             'strategic_drivers',
             'uk_region_locations',
         ))
+
+    def test_restricted_user_cannot_see_project_if_not_associated(self):
+        """Tests that a restricted user cannot view another team's project."""
+        team_requester = TeamFactory()
+        team_associated = TeamFactory()
+        adviser_1 = AdviserFactory(dit_team_id=team_associated.id)
+
+        _create_user(self, team_requester, ['read_associated_investmentproject'])
+
+        iproject_1 = InvestmentProjectFactory()
+        InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': iproject_1.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @pytest.mark.parametrize('permissions', (
+        ('read_investmentproject',),
+        ('read_associated_investmentproject', 'read_investmentproject'),
+    ))
+    def test_non_restricted_user_can_see_project_if_not_associated(self, permissions):
+        """Tests that non-restricted users can access projects they aren't associated with."""
+        team_requester = TeamFactory()
+        team_associated = TeamFactory()
+        adviser_1 = AdviserFactory(dit_team_id=team_associated.id)
+
+        _create_user(self, team_requester, permissions)
+
+        iproject_1 = InvestmentProjectFactory()
+        InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': iproject_1.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_restricted_user_can_see_project_if_associated(self):
+        """Tests that restricted users can see a project associated to them via a team member."""
+        team = TeamFactory()
+        adviser_1 = AdviserFactory(dit_team_id=team.id)
+        _create_user(self, team, ['read_associated_investmentproject'])
+
+        iproject_1 = InvestmentProjectFactory()
+        InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': iproject_1.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_restricted_user_can_see_project_if_in_created_by_team(self):
+        """Tests that restricted users can see a project when in the team of the creator."""
+        team = TeamFactory()
+        adviser_1 = AdviserFactory(dit_team_id=team.id)
+
+        _create_user(self, team, ['read_associated_investmentproject'])
+
+        iproject_1 = InvestmentProjectFactory(created_by=adviser_1)
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': iproject_1.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
 
 
 class TestPartialUpdateView(APITestMixin):
@@ -1678,3 +1719,11 @@ class TestDocumentViews(APITestMixin):
 def test_view_set_name(view_set):
     """Test that the view name is a string."""
     assert isinstance(view_set().get_view_name(), str)
+
+
+def _create_user(test_instance, team, permissions):
+    test_instance._user = get_test_user(team=team)
+    for permission in permissions:
+        test_instance._user.user_permissions.add(
+            Permission.objects.get(codename=permission)
+        )
