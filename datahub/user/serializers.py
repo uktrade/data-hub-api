@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 from rest_framework import serializers
 
 from datahub.company.models.adviser import Advisor
@@ -28,11 +26,12 @@ class WhoAmISerializer(serializers.ModelSerializer):
 
     def get_permissions(self, obj):
         """Serialize permissions into simplified structure."""
-        formatted_permissions = defaultdict(dict)
+        formatted_permissions = {}
         for perm in obj.get_all_permissions():
             _, action_model = perm.split('.', 1)
             action, model = action_model.split('_', 1)
 
-            formatted_permissions[model][action] = True
+            model_dict = formatted_permissions.setdefault(model, {})
+            model_dict[action] = True
 
         return formatted_permissions
