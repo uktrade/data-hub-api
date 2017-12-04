@@ -29,10 +29,7 @@
     - - add_investmentproject
       - investment
       - investmentproject
-    - - change_investmentproject
-      - investment
-      - investmentproject
-    - - read_investmentproject
+    - - change_associated_investmentproject
       - investment
       - investmentproject
     - - read_associated_investmentproject
@@ -114,10 +111,10 @@
     - - add_investmentproject
       - investment
       - investmentproject
-    - - change_investmentproject
+    - - change_associated_investmentproject
       - investment
       - investmentproject
-    - - read_investmentproject
+    - - read_associated_investmentproject
       - investment
       - investmentproject
   model: auth.group
