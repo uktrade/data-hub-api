@@ -1158,6 +1158,86 @@ class TestPartialUpdateView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived_documents_url_path'] == 'old_path'
 
+    def test_restricted_user_cannot_update_project_if_not_associated(self):
+        """Tests that a restricted user cannot update another team's project."""
+        team_requester = TeamFactory()
+        team_associated = TeamFactory()
+        adviser = AdviserFactory(dit_team_id=team_associated.id)
+
+        _create_user(self, team_requester, ['change_associated_investmentproject'])
+
+        project = InvestmentProjectFactory(name='old name')
+        InvestmentProjectTeamMemberFactory(adviser=adviser, investment_project=project)
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        response = self.api_client.patch(url, {
+            'name': 'new name'
+        })
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @pytest.mark.parametrize('permissions', (
+        ('change_investmentproject',),
+        ('change_associated_investmentproject', 'change_investmentproject'),
+    ))
+    def test_non_restricted_user_can_update_project_if_not_associated(self, permissions):
+        """Tests that non-restricted users can update projects they aren't associated with."""
+        team_requester = TeamFactory()
+        team_associated = TeamFactory()
+        adviser = AdviserFactory(dit_team_id=team_associated.id)
+
+        _create_user(self, team_requester, permissions)
+
+        project = InvestmentProjectFactory(name='old name')
+        InvestmentProjectTeamMemberFactory(adviser=adviser, investment_project=project)
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        response = self.api_client.patch(url, {
+            'name': 'new name'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['name'] == 'new name'
+
+    def test_restricted_user_can_update_project_if_associated(self):
+        """
+        Tests that restricted users can update a project associated to them via a team member.
+        """
+        team = TeamFactory()
+        adviser = AdviserFactory(dit_team_id=team.id)
+        _create_user(self, team, ['change_associated_investmentproject'])
+
+        project = InvestmentProjectFactory(name='old name')
+        InvestmentProjectTeamMemberFactory(adviser=adviser, investment_project=project)
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        response = self.api_client.patch(url, {
+            'name': 'new name'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['name'] == 'new name'
+
+    def test_restricted_user_can_update_project_if_in_created_by_team(self):
+        """Tests that restricted users can update a project when in the team of the creator."""
+        team = TeamFactory()
+        adviser = AdviserFactory(dit_team_id=team.id)
+
+        _create_user(self, team, ['change_associated_investmentproject'])
+
+        project = InvestmentProjectFactory(name='old name', created_by=adviser)
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        response = self.api_client.patch(url, {
+            'name': 'new name'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['name'] == 'new name'
+
 
 class TestModifiedSinceView(APITestMixin):
     """Tests for the modified-since view."""

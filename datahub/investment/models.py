@@ -286,6 +286,7 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
         permissions = (
             ('read_investmentproject', 'Can read investment project'),
             ('read_associated_investmentproject', 'Can read associated investment project'),
+            ('change_associated_investmentproject', 'Can change associated investment project'),
         )
 
     def get_associated_advisers(self):
