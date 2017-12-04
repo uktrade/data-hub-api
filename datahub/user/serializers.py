@@ -27,13 +27,5 @@ class WhoAmISerializer(serializers.ModelSerializer):
         depth = 2
 
     def get_permissions(self, obj):
-        """Serialize permissions into simplified structure."""
-        formatted_permissions = {}
-        for perm in obj.get_all_permissions():
-            _, action_model = perm.split('.', 1)
-            action, model = action_model.split('_', 1)
-
-            model_dict = formatted_permissions.setdefault(model, {})
-            model_dict[action] = True
-
-        return formatted_permissions
+        """Serialize permissions."""
+        return obj.get_all_permissions()
