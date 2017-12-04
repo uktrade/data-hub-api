@@ -1,4 +1,5 @@
 import factory
+from django.utils.timezone import utc
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
@@ -15,7 +16,7 @@ class InteractionFactory(factory.django.DjangoModelFactory):
     company = factory.SubFactory(CompanyFactory)
     contact = factory.SubFactory(ContactFactory)
     subject = factory.Faker('sentence', nb_words=8)
-    date = factory.Faker('past_date', start_date='-5y')
+    date = factory.Faker('past_datetime', start_date='-5y', tzinfo=utc)
     notes = factory.Faker('paragraph', nb_sentences=10)
     dit_adviser = factory.SubFactory(AdviserFactory)
     service_id = constants.Service.trade_enquiry.value.id
@@ -37,7 +38,7 @@ class ServiceDeliveryFactory(factory.django.DjangoModelFactory):
     contact = factory.SubFactory(ContactFactory)
     event = None
     subject = factory.Faker('sentence', nb_words=8)
-    date = factory.Faker('past_date', start_date='-5y')
+    date = factory.Faker('past_datetime', start_date='-5y', tzinfo=utc)
     notes = factory.Faker('paragraph', nb_sentences=10)
     dit_adviser = factory.SubFactory(AdviserFactory)
     service_id = constants.Service.trade_enquiry.value.id
