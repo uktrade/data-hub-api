@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from rest_framework import serializers
 
 from datahub.company.models.adviser import Advisor
@@ -6,7 +8,6 @@ from datahub.company.models.adviser import Advisor
 class WhoAmISerializer(serializers.ModelSerializer):
     """Adviser serializer for that includes a permissions"""
 
-    name = serializers.CharField()
     permissions = serializers.SerializerMethodField()
 
     class Meta:
@@ -27,14 +28,11 @@ class WhoAmISerializer(serializers.ModelSerializer):
 
     def get_permissions(self, obj):
         """Serialize permissions into simplified structure."""
-        formatted_permissions = {}
+        formatted_permissions = defaultdict(dict)
         for perm in obj.get_all_permissions():
-            app, action_model = perm.split('.', 1)
+            _, action_model = perm.split('.', 1)
             action, model = action_model.split('_', 1)
 
-            if model in formatted_permissions:
-                formatted_permissions[model][action] = True
-            else:
-                formatted_permissions[model] = {action: True}
+            formatted_permissions[model][action] = True
 
         return formatted_permissions
