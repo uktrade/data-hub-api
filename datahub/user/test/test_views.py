@@ -44,22 +44,17 @@ class TestUserView(APITestMixin):
             'telephone_number': '',
             'dit_team': {
                 'id': str(team.id),
-                'disabled_on': None,
                 'name': 'Test Team',
                 'role': {
                     'id': str(role.id),
-                    'disabled_on': None,
                     'name': 'Test Role',
-                    'groups': [group.id],
                 },
                 'uk_region': {
                     'id': str(team.uk_region_id),
-                    'disabled_on': None,
                     'name': 'East Midlands',
                 },
                 'country': {
                     'id': str(team.country_id),
-                    'disabled_on': None,
                     'name': 'France',
                 }
             },
