@@ -1,3 +1,5 @@
+import factory
+from django.contrib.contenttypes.models import ContentType
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -11,12 +13,22 @@ class TestUserView(APITestMixin):
 
     def test_who_am_i_authenticated(self):
         """Who am I."""
-        action = 'read'
-        model_name_1 = 'lorem'
-        model_name_2 = 'ipsum'
+        permissions = [
+            'read_lorem',
+            'read_ipsum',
+            'add_cats',
+        ]
+        content_type = ContentType.objects.first()
 
-        team_permission = PermissionFactory(codename=f'{action}_{model_name_1}')
-        user_permission = PermissionFactory(codename=f'{action}_{model_name_2}')
+        team_permission = PermissionFactory(
+            codename=permissions[0],
+            content_type=content_type
+        )
+        user_permissions = PermissionFactory.create_batch(
+            2,
+            codename=factory.Iterator(permissions[1:]),
+            content_type=content_type
+        )
 
         group = GroupFactory()
         group.permissions.add(team_permission)
@@ -27,7 +39,7 @@ class TestUserView(APITestMixin):
         team.role.groups.add(group)
 
         user_test = get_test_user(team=team)
-        user_test.user_permissions.add(user_permission)
+        user_test.user_permissions.set(user_permissions)
 
         url = reverse('who_am_i')
         response = self.api_client.get(url)
@@ -58,7 +70,7 @@ class TestUserView(APITestMixin):
                     'name': 'France',
                 }
             },
-            'permissions': {
-                model_name_1: {action: True},
-                model_name_2: {action: True},
-            }}
+            'permissions': [
+                f'{content_type.app_label}.{permission}' for permission in permissions
+            ]
+        }
