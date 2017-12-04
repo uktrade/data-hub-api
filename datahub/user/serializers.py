@@ -1,12 +1,14 @@
 from rest_framework import serializers
 
 from datahub.company.models.adviser import Advisor
+from datahub.metadata.serializers import TeamSerializer
 
 
 class WhoAmISerializer(serializers.ModelSerializer):
     """Adviser serializer for that includes a permissions"""
 
     permissions = serializers.SerializerMethodField()
+    dit_team = TeamSerializer(read_only=True)
 
     class Meta:
         model = Advisor
