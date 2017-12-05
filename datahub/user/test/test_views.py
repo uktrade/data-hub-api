@@ -13,25 +13,21 @@ class TestUserView(APITestMixin):
 
     def test_who_am_i_authenticated(self):
         """Who am I."""
-        permissions = [
+        permission_names = [
             'read_lorem',
             'read_ipsum',
             'add_cats',
         ]
         content_type = ContentType.objects.first()
 
-        team_permission = PermissionFactory(
-            codename=permissions[0],
-            content_type=content_type
-        )
-        user_permissions = PermissionFactory.create_batch(
-            2,
-            codename=factory.Iterator(permissions[1:]),
+        permissions = PermissionFactory.create_batch(
+            len(permission_names),
+            codename=factory.Iterator(permission_names),
             content_type=content_type
         )
 
         group = GroupFactory()
-        group.permissions.add(team_permission)
+        group.permissions.add(permissions[0])
 
         role = TeamRoleFactory(name='Test Role')
 
@@ -39,13 +35,24 @@ class TestUserView(APITestMixin):
         team.role.groups.add(group)
 
         user_test = get_test_user(team=team)
-        user_test.user_permissions.set(user_permissions)
+        user_test.user_permissions.set(permissions[1:])
 
         url = reverse('who_am_i')
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
+
+        response_data = response.json()
+        if 'permissions' in response_data:
+            response_data['permissions'].sort()
+
+        serialized_permissions = [
+            f'{permission.content_type.app_label}.{permission.codename}'
+            for permission in permissions
+        ]
+        serialized_permissions.sort()
+
+        assert response_data == {
             'id': str(user_test.id),
             'name': user_test.name,
             'last_login': None,
@@ -70,7 +77,5 @@ class TestUserView(APITestMixin):
                     'name': 'France',
                 }
             },
-            'permissions': [
-                f'{content_type.app_label}.{permission}' for permission in permissions
-            ]
+            'permissions': serialized_permissions
         }
