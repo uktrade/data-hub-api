@@ -28,6 +28,7 @@ from datahub.investment import views
 from datahub.investment.models import (
     InvestmentProject, InvestmentProjectTeamMember, IProjectDocument
 )
+from datahub.investment.permissions import Permissions
 from datahub.investment.test.factories import (
     ActiveInvestmentProjectFactory, AssignPMInvestmentProjectFactory,
     InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
@@ -194,8 +195,8 @@ class TestListView(APITestMixin):
         assert response_data['results'][0]['id'] == str(project.id)
 
     @pytest.mark.parametrize('permissions', (
-        ('read_investmentproject',),
-        ('read_associated_investmentproject', 'read_investmentproject'),
+        (Permissions.read_all,),
+        (Permissions.read_associated, Permissions.read_all),
     ))
     def test_non_restricted_user_can_see_all_projects(self, permissions):
         """Test that normal users can see all projects."""
@@ -229,7 +230,7 @@ class TestListView(APITestMixin):
         adviser_1 = AdviserFactory(dit_team_id=team.id)
         adviser_2 = AdviserFactory(dit_team_id=team_others.id)
 
-        _create_user(self, team, ['read_associated_investmentproject'])
+        _create_user(self, team, [Permissions.read_associated])
 
         iproject_1 = InvestmentProjectFactory()
         iproject_2 = InvestmentProjectFactory()
@@ -709,7 +710,7 @@ class TestRetrieveView(APITestMixin):
         team_associated = TeamFactory()
         adviser_1 = AdviserFactory(dit_team_id=team_associated.id)
 
-        _create_user(self, team_requester, ['read_associated_investmentproject'])
+        _create_user(self, team_requester, [Permissions.read_associated])
 
         iproject_1 = InvestmentProjectFactory()
         InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
@@ -720,8 +721,8 @@ class TestRetrieveView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize('permissions', (
-        ('read_investmentproject',),
-        ('read_associated_investmentproject', 'read_investmentproject'),
+        (Permissions.read_all,),
+        (Permissions.read_associated, Permissions.read_all),
     ))
     def test_non_restricted_user_can_see_project_if_not_associated(self, permissions):
         """Tests that non-restricted users can access projects they aren't associated with."""
@@ -743,7 +744,7 @@ class TestRetrieveView(APITestMixin):
         """Tests that restricted users can see a project associated to them via a team member."""
         team = TeamFactory()
         adviser_1 = AdviserFactory(dit_team_id=team.id)
-        _create_user(self, team, ['read_associated_investmentproject'])
+        _create_user(self, team, [Permissions.read_associated])
 
         iproject_1 = InvestmentProjectFactory()
         InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
@@ -758,7 +759,7 @@ class TestRetrieveView(APITestMixin):
         team = TeamFactory()
         adviser_1 = AdviserFactory(dit_team_id=team.id)
 
-        _create_user(self, team, ['read_associated_investmentproject'])
+        _create_user(self, team, [Permissions.read_associated])
 
         iproject_1 = InvestmentProjectFactory(created_by=adviser_1)
 
@@ -1164,7 +1165,7 @@ class TestPartialUpdateView(APITestMixin):
         team_associated = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team_associated.id)
 
-        _create_user(self, team_requester, ['change_associated_investmentproject'])
+        _create_user(self, team_requester, [Permissions.change_associated])
 
         project = InvestmentProjectFactory(name='old name')
         InvestmentProjectTeamMemberFactory(adviser=adviser, investment_project=project)
@@ -1177,8 +1178,8 @@ class TestPartialUpdateView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize('permissions', (
-        ('change_investmentproject',),
-        ('change_associated_investmentproject', 'change_investmentproject'),
+        (Permissions.change_all,),
+        (Permissions.change_all, Permissions.change_associated),
     ))
     def test_non_restricted_user_can_update_project_if_not_associated(self, permissions):
         """Tests that non-restricted users can update projects they aren't associated with."""
@@ -1206,7 +1207,7 @@ class TestPartialUpdateView(APITestMixin):
         """
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
-        _create_user(self, team, ['change_associated_investmentproject'])
+        _create_user(self, team, [Permissions.change_associated])
 
         project = InvestmentProjectFactory(name='old name')
         InvestmentProjectTeamMemberFactory(adviser=adviser, investment_project=project)
@@ -1225,7 +1226,7 @@ class TestPartialUpdateView(APITestMixin):
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
 
-        _create_user(self, team, ['change_associated_investmentproject'])
+        _create_user(self, team, [Permissions.change_associated])
 
         project = InvestmentProjectFactory(name='old name', created_by=adviser)
 

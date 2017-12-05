@@ -2,13 +2,16 @@ from django.core.exceptions import ImproperlyConfigured
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
 
-_ACTION_TO_METHOD_MAPPING = {
+_VIEW_TO_ACTION_MAPPING = {
+    'create': 'add',
     'list': 'read',
     'detail': 'read',
     'retrieve': 'read',
     'destroy': 'delete',
     'destroy_all': 'delete',
     'partial_update': 'change',
+    'archive': 'change',
+    'unarchive': 'change',
 }
 
 
@@ -58,6 +61,6 @@ class IsAssociatedToObjectPermission(BasePermission, ObjectAssociationCheckerBas
         return True
 
 
-def get_method_for_view_action(action):
-    """Change ViewSet action to permissions method."""
-    return _ACTION_TO_METHOD_MAPPING.get(action, action)
+def get_model_action_for_view_action(method):
+    """Gets the model action corresponding to a view action."""
+    return _VIEW_TO_ACTION_MAPPING[method]

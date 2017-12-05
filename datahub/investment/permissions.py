@@ -1,58 +1,60 @@
 from django.db.models.query_utils import Q
-from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.filters import BaseFilterBackend
 from rest_framework.permissions import BasePermission
 
 from datahub.core.permissions import (
-    get_method_for_view_action, IsAssociatedToObjectPermission, ObjectAssociationCheckerBase
+    get_model_action_for_view_action,
+    IsAssociatedToObjectPermission,
+    ObjectAssociationCheckerBase
 )
+from datahub.core.utils import StrEnum
+
+
+class Permissions(StrEnum):
+    """Permission codename constants."""
+
+    read_all = 'read_all_investmentproject'
+    read_associated = 'read_associated_investmentproject'
+    change_all = 'change_all_investmentproject'
+    change_associated = 'change_associated_investmentproject'
+    add = 'add_investmentproject'
+    delete = 'delete_investmentproject'
+
+
+class PermissionTemplates(StrEnum):
+    """Permission codename templates."""
+
+    all = '{app_label}.{action}_all_{model_name}'
+    associated = '{app_label}.{action}_associated_{model_name}'
+    standard = '{app_label}.{action}_{model_name}'
 
 
 class InvestmentProjectModelPermissions(BasePermission):
     """
     Custom permissions class for investment views.
 
-    This differs from the standard DjangoModelPermissions class in that users are required to have
-    any one of the permissions in the values of perms_map, rather than all of the permissions in
-    each value.
+    This differs from the standard DjangoModelPermissions class in that:
+    - the permissions mapping is based on view/model actions rather than HTTP methods
+    - the user only needs to have one the permissions corresponding to each action, rather than
+      all of them
     """
 
-    perms_map = {
-        'GET': (
-            '{app_label}.read_{model_name}',
-            '{app_label}.read_associated_{model_name}'
+    permission_mapping = {
+        'add': (
+            PermissionTemplates.standard,
         ),
-        'OPTIONS': (),
-        'HEAD': (),
-        'POST': (
-            '{app_label}.add_{model_name}',
+        'read': (
+            PermissionTemplates.all,
+            PermissionTemplates.associated,
         ),
-        'PUT': (
-            '{app_label}.change_{model_name}',
-            '{app_label}.change_associated_{model_name}'
+        'change': (
+            PermissionTemplates.all,
+            PermissionTemplates.associated,
         ),
-        'PATCH': (
-            '{app_label}.change_{model_name}',
-            '{app_label}.change_associated_{model_name}'
-        ),
-        'DELETE': (
-            '{app_label}.delete_{model_name}',
+        'delete': (
+            PermissionTemplates.standard,
         ),
     }
-
-    def get_required_permissions(self, method, model_cls):
-        """
-        Returns the permissions that a user should have one of for a particular method.
-        """
-        format_kwargs = {
-            'app_label': model_cls._meta.app_label,
-            'model_name': model_cls._meta.model_name
-        }
-
-        if method not in self.perms_map:
-            raise MethodNotAllowed(method)
-
-        return [perm.format(**format_kwargs) for perm in self.perms_map[method]]
 
     def has_permission(self, request, view):
         """Returns whether the user has permission for a view."""
@@ -60,9 +62,23 @@ class InvestmentProjectModelPermissions(BasePermission):
             return False
 
         model = view.get_queryset().model
-        perms = self.get_required_permissions(request.method, model)
+        perms = self._get_required_permissions(view, model)
 
         return any(request.user.has_perm(perm) for perm in perms)
+
+    def _get_required_permissions(self, view, model_cls):
+        """
+        Returns the permissions that a user should have one of for a particular method.
+        """
+        action = get_model_action_for_view_action(view.action)
+
+        format_kwargs = {
+            'app_label': model_cls._meta.app_label,
+            'model_name': model_cls._meta.model_name,
+            'action': action
+        }
+
+        return [perm.format(**format_kwargs) for perm in self.permission_mapping[action]]
 
 
 class InvestmentProjectAssociationChecker(ObjectAssociationCheckerBase):
@@ -71,9 +87,7 @@ class InvestmentProjectAssociationChecker(ObjectAssociationCheckerBase):
     InvestmentProject through the user's team.
     """
 
-    restricted_methods = {'read', 'change'}
-    associated_permission_template = 'investment.{method}_associated_investmentproject'
-    all_permission_template = 'investment.{method}_investmentproject'
+    restricted_actions = {'read', 'change'}
 
     def is_associated(self, request, view, obj):
         """Check for connection."""
@@ -82,14 +96,25 @@ class InvestmentProjectAssociationChecker(ObjectAssociationCheckerBase):
 
     def should_apply_restrictions(self, request, view):
         """Check if restrictions should be applied."""
-        method = get_method_for_view_action(view.action)
-        if method not in self.restricted_methods:
+        action = get_model_action_for_view_action(view.action)
+        if action not in self.restricted_actions:
             return False
 
-        if request.user.has_perm(self.all_permission_template.format(method=method)):
+        model = view.get_queryset().model
+
+        format_kwargs = {
+            'app_label': model._meta.app_label,
+            'model_name': model._meta.model_name,
+            'action': action
+        }
+
+        if request.user.has_perm(PermissionTemplates.all.format(**format_kwargs)):
             return False
 
-        return request.user.has_perm(self.associated_permission_template.format(method=method))
+        if request.user.has_perm(PermissionTemplates.associated.format(**format_kwargs)):
+            return True
+
+        raise RuntimeError('User does not have any relevant investment project permissions.')
 
 
 class IsAssociatedToInvestmentProjectPermission(IsAssociatedToObjectPermission,

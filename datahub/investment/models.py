@@ -15,6 +15,7 @@ from datahub.core.models import (
     BaseModel,
 )
 from datahub.documents.models import Document
+from datahub.investment.permissions import Permissions
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -24,7 +25,6 @@ class IProjectAbstract(models.Model):
 
     class Meta:
         abstract = True
-        permissions = (('read_project', 'Can read project'),)
 
     PRIORITIES = Choices(
         ('1_low', 'low', 'Low'),
@@ -284,9 +284,14 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
 
     class Meta:
         permissions = (
-            ('read_investmentproject', 'Can read investment project'),
-            ('read_associated_investmentproject', 'Can read associated investment project'),
-            ('change_associated_investmentproject', 'Can change associated investment project'),
+            (Permissions.read_all, 'Can read all investment project'),
+            (Permissions.read_associated, 'Can read associated investment project'),
+            (Permissions.change_associated, 'Can change associated investment project'),
+        )
+        default_permissions = (
+            'add',
+            'change_all',
+            'delete',
         )
 
     def get_associated_advisers(self):
