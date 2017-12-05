@@ -59,7 +59,8 @@ class TestGenerateQuoteContent:
             registered_address_town='London',
             registered_address_county='County',
             registered_address_postcode='SW1A 1AA',
-            registered_address_country_id=Country.united_kingdom.value.id
+            registered_address_country_id=Country.united_kingdom.value.id,
+            company_number=CompaniesHouseCompanyFactory().company_number
         )
         contact = ContactFactory(
             company=company,
@@ -122,40 +123,6 @@ class TestGenerateQuoteContent:
         )
 
         assert 'line 1, London, SW1A 1AA' in content
-
-    @freeze_time('2017-04-18 13:00:00.000000')
-    def test_with_ch_address(self):
-        """
-        Test that if the company has a companies house record attached,
-        its registered address is used instead.
-        """
-        ch_company = CompaniesHouseCompanyFactory(
-            registered_address_1='ch 1',
-            registered_address_2='ch 2',
-            registered_address_town='Bath',
-            registered_address_county='ch county',
-            registered_address_postcode='BA1 0AA',
-            registered_address_country_id=Country.united_kingdom.value.id
-        )
-        company = CompanyFactory(
-            registered_address_1='line 1',
-            registered_address_2='line 2',
-            registered_address_town='London',
-            registered_address_county='County',
-            registered_address_postcode='SW1A 1AA',
-            registered_address_country_id=Country.united_kingdom.value.id,
-            company_number=ch_company.company_number
-        )
-        order = OrderFactory(
-            company=company,
-            contact=ContactFactory(company=company)
-        )
-        content = generate_quote_content(
-            order=order,
-            expires_on=dateutil_parse('2017-05-18').date()
-        )
-
-        assert 'ch 1, ch 2, ch county, Bath, BA1 0AA, United Kingdom' in content
 
     @freeze_time('2017-04-18 13:00:00.000000')
     def test_pricing_format(self):
