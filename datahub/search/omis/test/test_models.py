@@ -110,6 +110,7 @@ def test_order_to_dict(Factory, setup_es):
         'subtotal_cost': order.subtotal_cost,
         'vat_cost': order.vat_cost,
         'total_cost': order.total_cost,
+        'billing_company_name': order.billing_company_name,
         'billing_contact_name': order.billing_contact_name,
         'billing_email': order.billing_email,
         'billing_phone': order.billing_phone,
