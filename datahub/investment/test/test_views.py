@@ -1517,8 +1517,15 @@ class TestTeamMemberViews(APITestMixin):
 class TestAuditLogView(APITestMixin):
     """Tests for the audit log view."""
 
-    def test_audit_log_view(self):
-        """Test retrieval of audit log."""
+    @pytest.mark.parametrize('permissions', (
+        (Permissions.read_all,),
+        (Permissions.read_associated, Permissions.read_all),
+    ))
+    def test_audit_log_non_restricted_user(self, permissions):
+        """Test retrieval of audit log for a non-restricted user."""
+        team = TeamFactory()
+        _create_user(self, team, permissions)
+
         initial_datetime = now()
         with reversion.create_revision():
             iproject = InvestmentProjectFactory(
@@ -1559,6 +1566,67 @@ class TestAuditLogView(APITestMixin):
             'Changes are reflected'
         assert not {'created_on', 'created_by', 'modified_on', 'modified_by'} & entry[
             'changes'].keys()
+
+    def test_audit_log_restricted_user_associated_project(self):
+        """Test retrieval of audit log for a restricted user and an associated project."""
+        team = TeamFactory()
+        adviser = AdviserFactory(dit_team_id=team.id)
+        _create_user(self, team, [Permissions.read_associated])
+
+        initial_datetime = now()
+        with reversion.create_revision():
+            iproject = InvestmentProjectFactory(
+                description='Initial desc',
+                created_by=adviser,
+            )
+
+            reversion.set_comment('Initial')
+            reversion.set_date_created(initial_datetime)
+            reversion.set_user(self.user)
+
+        changed_datetime = now()
+        with reversion.create_revision():
+            iproject.description = 'New desc'
+            iproject.save()
+
+            reversion.set_comment('Changed')
+            reversion.set_date_created(changed_datetime)
+            reversion.set_user(self.user)
+
+        versions = Version.objects.get_for_object(iproject)
+        version_id = versions[0].id
+        url = reverse('api-v3:investment:audit-item',
+                      kwargs={'pk': iproject.pk})
+
+        response = self.api_client.get(url)
+        response_data = response.json()['results']
+
+        # No need to test the whole response
+        assert len(response_data) == 1, 'Only one entry in audit log'
+        entry = response_data[0]
+
+        assert entry['id'] == version_id
+        assert entry['user']['name'] == self.user.name, 'Valid user captured'
+        assert entry['comment'] == 'Changed', 'Comments can be set manually'
+        assert entry['timestamp'] == format_date_or_datetime(changed_datetime), \
+            'TS can be set manually'
+        assert entry['changes']['description'] == ['Initial desc', 'New desc'], \
+            'Changes are reflected'
+        assert not {'created_on', 'created_by', 'modified_on', 'modified_by'} & entry[
+            'changes'].keys()
+
+    def test_audit_log_restricted_user_non_associated_project(self):
+        """Test retrieval of audit log for a restricted user and a non-associated project."""
+        team = TeamFactory()
+        _create_user(self, team, [Permissions.read_associated])
+
+        iproject = InvestmentProjectFactory(
+            description='Initial desc',
+        )
+        url = reverse('api-v3:investment:audit-item', kwargs={'pk': iproject.pk})
+
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 class TestArchiveViews(APITestMixin):
