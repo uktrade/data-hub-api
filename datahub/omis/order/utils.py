@@ -11,6 +11,7 @@ def populate_billing_data(order):
 
     # get default and current order values of billing details
     default_billing_details = {
+        'billing_company_name': company.name,
         'billing_contact_name': contact.name,
         'billing_email': contact.email,
         'billing_phone': contact.telephone_number,

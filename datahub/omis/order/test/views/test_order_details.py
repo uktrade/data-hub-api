@@ -125,6 +125,7 @@ class TestAddOrderDetails(APITestMixin):
             'subtotal_cost': 0,
             'vat_cost': 0,
             'total_cost': 0,
+            'billing_company_name': '',
             'billing_contact_name': 'Billing contact name',
             'billing_email': 'billing@example.com',
             'billing_phone': '00112233',
@@ -179,6 +180,7 @@ class TestAddOrderDetails(APITestMixin):
         assert response.json()['subtotal_cost'] == 0
         assert response.json()['vat_cost'] == 0
         assert response.json()['total_cost'] == 0
+        assert response.json()['billing_company_name'] == ''
         assert response.json()['billing_contact_name'] == ''
         assert response.json()['billing_email'] == ''
         assert response.json()['billing_phone'] == ''
@@ -517,6 +519,7 @@ class TestChangeOrderDetails(APITestMixin):
             'subtotal_cost': order.subtotal_cost,
             'vat_cost': order.vat_cost,
             'total_cost': order.total_cost,
+            'billing_company_name': order.billing_company_name,
             'billing_contact_name': 'Billing contact name',
             'billing_email': 'billing@example.com',
             'billing_phone': '00112233',
@@ -734,7 +737,8 @@ class TestChangeOrderDetails(APITestMixin):
                 'cancelled_on': now().isoformat(),
                 'cancellation_reason': {
                     'id': uuid.uuid4()
-                }
+                },
+                'billing_company_name': 'New Corp',
             },
             format='json'
         )
@@ -758,6 +762,7 @@ class TestChangeOrderDetails(APITestMixin):
         assert not response.json()['cancelled_by']
         assert not response.json()['cancelled_on']
         assert not response.json()['cancellation_reason']
+        assert response.json()['billing_company_name'] != 'New Corp'
 
     @pytest.mark.parametrize(
         'disallowed_status', (
@@ -1087,6 +1092,7 @@ class TestViewOrderDetails(APITestMixin):
             'subtotal_cost': order.subtotal_cost,
             'vat_cost': order.vat_cost,
             'total_cost': order.total_cost,
+            'billing_company_name': order.billing_company_name,
             'billing_contact_name': order.billing_contact_name,
             'billing_email': order.billing_email,
             'billing_phone': order.billing_phone,
