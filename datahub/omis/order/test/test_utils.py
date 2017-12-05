@@ -37,6 +37,7 @@ class CompaniesHouseWithRegAddressFactory(CompaniesHouseCompanyFactory):
 class OrderWithoutBillingDataFactory(OrderFactory):
     """Factory for order without billing fields."""
 
+    billing_company_name = ''
     billing_contact_name = ''
     billing_email = ''
     billing_phone = ''
@@ -55,7 +56,7 @@ class TestPopulateBillingData:
         'CHFactory',  # noqa: N803
         (
             lambda: None,
-            CompaniesHouseWithRegAddressFactory
+            CompaniesHouseWithRegAddressFactory,
         )
     )
     def test_with_empty_order(self, CHFactory):
@@ -87,6 +88,7 @@ class TestPopulateBillingData:
         # should be the CH registered address
         # otherwise it should be the DH company registered address
         expected_company = ch_company or company
+        assert order.billing_company_name == expected_company.name
         assert order.billing_address_1 == expected_company.registered_address_1
         assert order.billing_address_2 == expected_company.registered_address_2
         assert order.billing_address_town == expected_company.registered_address_town
@@ -125,6 +127,7 @@ class TestPopulateBillingData:
     @pytest.mark.parametrize(
         'order_field,order_value',
         (
+            ('billing_company_name', 'My Corp'),
             ('billing_contact_name', 'Another John'),
             ('billing_email', 'another-email@example.com'),
             ('billing_phone', '99 001122'),
@@ -136,6 +139,7 @@ class TestPopulateBillingData:
         it does not get overridden.
         """
         billing_details = {
+            'billing_company_name': '',
             'billing_contact_name': '',
             'billing_email': '',
             'billing_phone': '',

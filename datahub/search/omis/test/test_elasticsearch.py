@@ -101,6 +101,9 @@ def test_mapping(setup_es):
                 'billing_contact_name': {
                     'type': 'text'
                 },
+                'billing_company_name': {
+                    'type': 'text'
+                },
                 'billing_email': {
                     'analyzer': 'lowercase_keyword_analyzer',
                     'fielddata': True,
@@ -561,6 +564,7 @@ def test_indexed_doc(Factory, setup_es):
             'subtotal_cost': order.subtotal_cost,
             'vat_cost': order.vat_cost,
             'total_cost': order.total_cost,
+            'billing_company_name': order.billing_company_name,
             'billing_contact_name': order.billing_contact_name,
             'billing_email': order.billing_email,
             'billing_phone': order.billing_phone,
