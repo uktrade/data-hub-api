@@ -83,6 +83,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'subtotal_cost',
             'vat_cost',
             'total_cost',
+            'billing_company_name',
             'billing_contact_name',
             'billing_email',
             'billing_phone',
@@ -124,6 +125,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'cancelled_by',
             'cancelled_on',
             'cancellation_reason',
+            'billing_company_name',
         )
         validators = (
             ContactWorksAtCompanyValidator(),
@@ -261,6 +263,7 @@ class PublicOrderSerializer(serializers.ModelSerializer):
             'subtotal_cost',
             'vat_cost',
             'total_cost',
+            'billing_company_name',
             'billing_contact_name',
             'billing_email',
             'billing_phone',

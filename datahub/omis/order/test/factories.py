@@ -45,6 +45,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
     vat_status = VATStatus.eu
     vat_number = '0123456789'
     vat_verified = True
+    billing_company_name = factory.LazyAttribute(lambda o: o.company.name)
     billing_contact_name = factory.Faker('name')
     billing_email = factory.Faker('email')
     billing_phone = '+44 (0)444 123456'

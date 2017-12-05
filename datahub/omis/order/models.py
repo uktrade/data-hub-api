@@ -202,6 +202,7 @@ class Order(BaseModel):
         default=0, help_text='Subtotal + VAT cost in pence.'
     )
 
+    billing_company_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     billing_contact_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     billing_email = models.EmailField(max_length=MAX_LENGTH, blank=True)
     billing_phone = models.CharField(max_length=150, blank=True)

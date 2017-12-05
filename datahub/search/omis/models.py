@@ -49,6 +49,7 @@ class Order(DocType, MapDBModelToDict):
     cancelled_on = Date()
     cancellation_reason = dsl_utils.id_name_mapping()
 
+    billing_company_name = Text()
     billing_contact_name = Text()
     billing_email = dsl_utils.SortableCaseInsensitiveKeywordText()
     billing_phone = dsl_utils.SortableCaseInsensitiveKeywordText()
