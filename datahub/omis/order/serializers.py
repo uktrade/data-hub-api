@@ -239,6 +239,7 @@ class CancelOrderSerializer(OrderSerializer):
 class PublicOrderSerializer(serializers.ModelSerializer):
     """DRF serializer for public facing API."""
 
+    primary_market = NestedRelatedField(Country)
     company = NestedRelatedField(Company)
     contact = NestedRelatedField(Contact)
     billing_address_country = NestedRelatedField(Country)
@@ -252,6 +253,7 @@ class PublicOrderSerializer(serializers.ModelSerializer):
             'created_on',
             'company',
             'contact',
+            'primary_market',
             'contact_email',
             'contact_phone',
             'vat_status',
