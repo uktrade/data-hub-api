@@ -37,6 +37,11 @@ class IProjectAuditViewSet(AuditViewSet):
 
     required_scopes = (Scope.internal_front_end,)
     queryset = InvestmentProject.objects.all()
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        InvestmentProjectModelPermissions,
+        IsAssociatedToInvestmentProjectPermission,
+    )
 
     def get_view_name(self):
         """Returns the view set name for the DRF UI."""
