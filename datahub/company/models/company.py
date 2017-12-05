@@ -16,6 +16,9 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 class ExportExperienceCategory(BaseConstantModel):
     """Export experience category."""
 
+    class Meta(BaseConstantModel.Meta):
+        verbose_name_plural = 'export experience categories'
+
 
 class CompanyAbstract(models.Model):
     """Share as much as possible in the company representation."""

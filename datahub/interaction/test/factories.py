@@ -1,5 +1,5 @@
 import factory
-from django.utils.timezone import now
+from django.utils.timezone import utc
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
@@ -16,12 +16,11 @@ class InteractionFactory(factory.django.DjangoModelFactory):
     company = factory.SubFactory(CompanyFactory)
     contact = factory.SubFactory(ContactFactory)
     subject = factory.Faker('sentence', nb_words=8)
-    date = now()
+    date = factory.Faker('past_datetime', start_date='-5y', tzinfo=utc)
     notes = factory.Faker('paragraph', nb_sentences=10)
     dit_adviser = factory.SubFactory(AdviserFactory)
     service_id = constants.Service.trade_enquiry.value.id
     dit_team_id = constants.Team.healthcare_uk.value.id
-    created_on = now()
     communication_channel_id = constants.InteractionType.face_to_face.value.id
     archived_documents_url_path = factory.Faker('uri_path')
 
@@ -39,13 +38,12 @@ class ServiceDeliveryFactory(factory.django.DjangoModelFactory):
     contact = factory.SubFactory(ContactFactory)
     event = None
     subject = factory.Faker('sentence', nb_words=8)
-    date = now()
+    date = factory.Faker('past_datetime', start_date='-5y', tzinfo=utc)
     notes = factory.Faker('paragraph', nb_sentences=10)
     dit_adviser = factory.SubFactory(AdviserFactory)
     service_id = constants.Service.trade_enquiry.value.id
     dit_team_id = constants.Team.healthcare_uk.value.id
     archived_documents_url_path = factory.Faker('uri_path')
-    created_on = now()
 
     class Meta:
         model = 'interaction.Interaction'
