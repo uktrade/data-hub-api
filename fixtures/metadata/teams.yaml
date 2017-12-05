@@ -175,10 +175,10 @@
     - - add_investmentproject
       - investment
       - investmentproject
-    - - change_investmentproject
+    - - change_all_investmentproject
       - investment
       - investmentproject
-    - - read_investmentproject
+    - - read_all_investmentproject
       - investment
       - investmentproject
     - - add_investmentprojectcode
