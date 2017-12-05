@@ -36,8 +36,12 @@ from datahub.metadata.test.factories import TeamFactory
 from datahub.oauth.scopes import Scope
 
 
-class TestUnifiedViews(APITestMixin):
-    """Tests for the unified investment views."""
+class TestListView(APITestMixin):
+    """
+    Tests for the investment project list view.
+
+    These cover GET /v3/investment
+    """
 
     def test_investments_no_permissions(self):
         """Should return 403"""
@@ -187,6 +191,14 @@ class TestUnifiedViews(APITestMixin):
         response_data = response.json()
         assert response_data['count'] == 1
         assert response_data['results'][0]['id'] == str(project.id)
+
+
+class TestCreateView(APITestMixin):
+    """
+    Tests for the investment project create view.
+
+    These cover POST /v3/investment
+    """
 
     def test_create_project_complete_success(self):
         """Test successfully creating a project."""
@@ -343,6 +355,67 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['business_activities'] == ['This list may not be empty.']
         assert response_data['client_contacts'] == ['This list may not be empty.']
 
+    def test_create_project_conditional_failure(self):
+        """Test creating a project w/ missing conditionally required value."""
+        contacts = [ContactFactory(), ContactFactory()]
+        investor_company = CompanyFactory()
+        intermediate_company = CompanyFactory()
+        adviser = AdviserFactory()
+        url = reverse('api-v3:investment:investment-collection')
+        aerospace_id = constants.Sector.aerospace_assembly_aircraft.value.id
+        retail_business_activity_id = constants.InvestmentBusinessActivity.retail.value.id
+        request_data = {
+            'name': 'project name',
+            'description': 'project description',
+            'estimated_land_date': '2020-12-12',
+            'investment_type': {
+                'id': constants.InvestmentType.fdi.value.id
+            },
+            'stage': {
+                'id': constants.InvestmentProjectStage.prospect.value.id
+            },
+            'business_activities': [{
+                'id': retail_business_activity_id
+            }],
+            'client_contacts': [{
+                'id': str(contacts[0].id)
+            }, {
+                'id': str(contacts[1].id)
+            }],
+            'client_relationship_manager': {
+                'id': str(adviser.id)
+            },
+            'investor_company': {
+                'id': str(investor_company.id)
+            },
+            'intermediate_company': {
+                'id': str(intermediate_company.id)
+            },
+            'referral_source_activity': {
+                'id': constants.ReferralSourceActivity.cold_call.value.id
+            },
+            'referral_source_adviser': {
+                'id': str(adviser.id)
+            },
+            'sector': {
+                'id': str(aerospace_id)
+            }
+        }
+        response = self.api_client.post(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'fdi_type': ['This field is required.']
+        }
+
+
+class TestRetrieveView(APITestMixin):
+    """
+    Tests for the investment project retrieve view.
+
+    These cover GET /v3/investment/<id>
+    """
+
     def test_get_project_success(self):
         """Test successfully getting a project."""
         project = InvestmentProjectFactory()
@@ -426,58 +499,163 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['date_lost'] == project.date_lost.isoformat()
         assert response_data['country_lost_to']['id'] == constants.Country.japan.value.id
 
-    def test_create_project_conditional_failure(self):
-        """Test creating a project w/ missing conditionally required value."""
-        contacts = [ContactFactory(), ContactFactory()]
-        investor_company = CompanyFactory()
-        intermediate_company = CompanyFactory()
-        adviser = AdviserFactory()
-        url = reverse('api-v3:investment:investment-collection')
-        aerospace_id = constants.Sector.aerospace_assembly_aircraft.value.id
-        retail_business_activity_id = constants.InvestmentBusinessActivity.retail.value.id
-        request_data = {
-            'name': 'project name',
-            'description': 'project description',
-            'estimated_land_date': '2020-12-12',
-            'investment_type': {
-                'id': constants.InvestmentType.fdi.value.id
-            },
-            'stage': {
-                'id': constants.InvestmentProjectStage.prospect.value.id
-            },
-            'business_activities': [{
-                'id': retail_business_activity_id
-            }],
-            'client_contacts': [{
-                'id': str(contacts[0].id)
-            }, {
-                'id': str(contacts[1].id)
-            }],
-            'client_relationship_manager': {
-                'id': str(adviser.id)
-            },
-            'investor_company': {
-                'id': str(investor_company.id)
-            },
-            'intermediate_company': {
-                'id': str(intermediate_company.id)
-            },
-            'referral_source_activity': {
-                'id': constants.ReferralSourceActivity.cold_call.value.id
-            },
-            'referral_source_adviser': {
-                'id': str(adviser.id)
-            },
-            'sector': {
-                'id': str(aerospace_id)
-            }
-        }
-        response = self.api_client.post(url, data=request_data, format='json')
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+    def test_get_value_success(self):
+        """Test successfully getting a project value object."""
+        higher_value = constants.FDIValue.higher.value
+        project = InvestmentProjectFactory(
+            fdi_value_id=higher_value.id,
+            client_cannot_provide_foreign_investment=False,
+            client_cannot_provide_total_investment=False,
+            total_investment=100,
+            foreign_equity_investment=100,
+            government_assistance=True,
+            some_new_jobs=False,
+            number_new_jobs=0,
+            will_new_jobs_last_two_years=False,
+            number_safeguarded_jobs=10,
+            r_and_d_budget=False,
+            non_fdi_r_and_d_budget=False,
+            new_tech_to_uk=False,
+            export_revenue=True
+        )
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert response_data == {
-            'fdi_type': ['This field is required.']
+        assert response_data['fdi_value']['id'] == higher_value.id
+        assert response_data['client_cannot_provide_foreign_investment'] is False
+        assert response_data['client_cannot_provide_total_investment'] is False
+        assert response_data['total_investment'] == '100'
+        assert response_data['foreign_equity_investment'] == '100'
+        assert response_data['government_assistance'] is True
+        assert response_data['total_investment'] == '100'
+        assert response_data['some_new_jobs'] is False
+        assert response_data['number_new_jobs'] == 0
+        assert response_data['will_new_jobs_last_two_years'] is False
+        assert response_data['number_safeguarded_jobs'] == 10
+        assert response_data['r_and_d_budget'] is False
+        assert response_data['non_fdi_r_and_d_budget'] is False
+        assert response_data['associated_non_fdi_r_and_d_project'] is None
+        assert response_data['new_tech_to_uk'] is False
+        assert response_data['export_revenue'] is True
+        assert response_data['value_complete'] is True
+
+    def test_get_requirements_success(self):
+        """Test successfully getting a project requirements object."""
+        countries = [
+            constants.Country.united_kingdom.value.id,
+            constants.Country.united_states.value.id
+        ]
+        strategic_drivers = [
+            constants.InvestmentStrategicDriver.access_to_market.value.id
+        ]
+        uk_region_locations = [constants.UKRegion.england.value.id]
+        project = InvestmentProjectFactory(
+            client_requirements='client reqs',
+            site_decided=True,
+            address_1='address 1',
+            client_considering_other_countries=True,
+            competitor_countries=countries,
+            strategic_drivers=strategic_drivers,
+            uk_company_decided=False,
+            uk_region_locations=uk_region_locations
+        )
+        url = reverse('api-v3:investment:investment-item',
+                      kwargs={'pk': project.pk})
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['client_requirements'] == 'client reqs'
+        assert response_data['site_decided'] is True
+        assert response_data['client_considering_other_countries'] is True
+        assert response_data['requirements_complete'] is True
+        assert response_data['uk_company_decided'] is False
+        assert response_data['address_1'] == 'address 1'
+        assert sorted(country['id'] for country in response_data[
+            'competitor_countries']) == sorted(countries)
+        assert sorted(driver['id'] for driver in response_data[
+            'strategic_drivers']) == sorted(strategic_drivers)
+
+    def test_get_team_success(self):
+        """Test successfully getting a project requirements object."""
+        crm_team = constants.Team.crm.value
+        huk_team = constants.Team.healthcare_uk.value
+        pm_adviser = AdviserFactory(dit_team_id=crm_team.id)
+        pa_adviser = AdviserFactory(dit_team_id=huk_team.id)
+        project = InvestmentProjectFactory(
+            project_manager_id=pm_adviser.id,
+            project_assurance_adviser_id=pa_adviser.id
+        )
+        url = reverse('api-v3:investment:investment-item',
+                      kwargs={'pk': project.pk})
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+
+        assert response_data['project_manager'] == {
+            'id': str(pm_adviser.pk),
+            'first_name': pm_adviser.first_name,
+            'last_name': pm_adviser.last_name,
+            'name': pm_adviser.name
         }
+        assert response_data['project_assurance_adviser'] == {
+            'id': str(pa_adviser.pk),
+            'first_name': pa_adviser.first_name,
+            'last_name': pa_adviser.last_name,
+            'name': pa_adviser.name,
+        }
+        assert response_data['project_manager_team'] == {
+            'id': str(crm_team.id),
+            'name': crm_team.name
+        }
+        assert response_data['project_assurance_team'] == {
+            'id': str(huk_team.id),
+            'name': huk_team.name
+        }
+        assert response_data['team_members'] == []
+        assert response_data['team_complete'] is True
+
+    def test_get_team_empty(self):
+        """Test successfully getting an empty project requirements object."""
+        project = InvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.assign_pm.value.id
+        )
+        url = reverse('api-v3:investment:investment-item',
+                      kwargs={'pk': project.pk})
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['project_manager'] is None
+        assert response_data['project_assurance_adviser'] is None
+        assert response_data['project_manager_team'] is None
+        assert response_data['project_assurance_team'] is None
+        assert response_data['team_members'] == []
+        assert response_data['team_complete'] is False
+
+    def test_incomplete_fields_prospect(self):
+        """Tests moving an incomplete project to the Assign PM stage."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert Counter(response_data['incomplete_fields']) == Counter((
+            'client_cannot_provide_total_investment',
+            'number_new_jobs',
+            'total_investment',
+            'client_considering_other_countries',
+            'client_requirements',
+            'strategic_drivers',
+            'uk_region_locations',
+        ))
+
+
+class TestPartialUpdateView(APITestMixin):
+    """
+    Tests for the investment project partial update view.
+
+    These cover PATCH /v3/investment/<id>
+    """
 
     def test_patch_project_conditional_failure(self):
         """Test updating a project w/ missing conditionally required value."""
@@ -557,23 +735,6 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['description'] == request_data['description']
         assert len(response_data['client_contacts']) == 1
         assert response_data['client_contacts'][0]['id'] == str(new_contact.id)
-
-    def test_incomplete_fields_prospect(self):
-        """Tests moving an incomplete project to the Assign PM stage."""
-        project = InvestmentProjectFactory()
-        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
-        response = self.api_client.get(url)
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert Counter(response_data['incomplete_fields']) == Counter((
-            'client_cannot_provide_total_investment',
-            'number_new_jobs',
-            'total_investment',
-            'client_considering_other_countries',
-            'client_requirements',
-            'strategic_drivers',
-            'uk_region_locations',
-        ))
 
     def test_change_stage_assign_pm_failure(self):
         """Tests moving an incomplete project to the Assign PM stage."""
@@ -781,47 +942,6 @@ class TestUnifiedViews(APITestMixin):
             'project_manager': ['This field is required.'],
         }
 
-    def test_get_value_success(self):
-        """Test successfully getting a project value object."""
-        higher_value = constants.FDIValue.higher.value
-        project = InvestmentProjectFactory(
-            fdi_value_id=higher_value.id,
-            client_cannot_provide_foreign_investment=False,
-            client_cannot_provide_total_investment=False,
-            total_investment=100,
-            foreign_equity_investment=100,
-            government_assistance=True,
-            some_new_jobs=False,
-            number_new_jobs=0,
-            will_new_jobs_last_two_years=False,
-            number_safeguarded_jobs=10,
-            r_and_d_budget=False,
-            non_fdi_r_and_d_budget=False,
-            new_tech_to_uk=False,
-            export_revenue=True
-        )
-        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
-        response = self.api_client.get(url)
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['fdi_value']['id'] == higher_value.id
-        assert response_data['client_cannot_provide_foreign_investment'] is False
-        assert response_data['client_cannot_provide_total_investment'] is False
-        assert response_data['total_investment'] == '100'
-        assert response_data['foreign_equity_investment'] == '100'
-        assert response_data['government_assistance'] is True
-        assert response_data['total_investment'] == '100'
-        assert response_data['some_new_jobs'] is False
-        assert response_data['number_new_jobs'] == 0
-        assert response_data['will_new_jobs_last_two_years'] is False
-        assert response_data['number_safeguarded_jobs'] == 10
-        assert response_data['r_and_d_budget'] is False
-        assert response_data['non_fdi_r_and_d_budget'] is False
-        assert response_data['associated_non_fdi_r_and_d_project'] is None
-        assert response_data['new_tech_to_uk'] is False
-        assert response_data['export_revenue'] is True
-        assert response_data['value_complete'] is True
-
     def test_patch_value_success(self):
         """Test successfully partially updating a project value object."""
         salary_id = constants.SalaryRange.below_25000.value.id
@@ -842,42 +962,6 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['value_complete'] is False
         assert response_data['average_salary']['id'] == salary_id
 
-    def test_get_requirements_success(self):
-        """Test successfully getting a project requirements object."""
-        countries = [
-            constants.Country.united_kingdom.value.id,
-            constants.Country.united_states.value.id
-        ]
-        strategic_drivers = [
-            constants.InvestmentStrategicDriver.access_to_market.value.id
-        ]
-        uk_region_locations = [constants.UKRegion.england.value.id]
-        project = InvestmentProjectFactory(
-            client_requirements='client reqs',
-            site_decided=True,
-            address_1='address 1',
-            client_considering_other_countries=True,
-            competitor_countries=countries,
-            strategic_drivers=strategic_drivers,
-            uk_company_decided=False,
-            uk_region_locations=uk_region_locations
-        )
-        url = reverse('api-v3:investment:investment-item',
-                      kwargs={'pk': project.pk})
-        response = self.api_client.get(url)
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['client_requirements'] == 'client reqs'
-        assert response_data['site_decided'] is True
-        assert response_data['client_considering_other_countries'] is True
-        assert response_data['requirements_complete'] is True
-        assert response_data['uk_company_decided'] is False
-        assert response_data['address_1'] == 'address 1'
-        assert sorted(country['id'] for country in response_data[
-            'competitor_countries']) == sorted(countries)
-        assert sorted(driver['id'] for driver in response_data[
-            'strategic_drivers']) == sorted(strategic_drivers)
-
     def test_patch_requirements_success(self):
         """Test successfully partially updating a requirements object."""
         project = InvestmentProjectFactory(client_requirements='client reqs',
@@ -897,62 +981,6 @@ class TestUnifiedViews(APITestMixin):
         assert response_data['site_decided'] is True
         assert response_data['address_1'] == 'address 1 new'
         assert response_data['address_2'] == 'address 2 new'
-
-    def test_get_team_success(self):
-        """Test successfully getting a project requirements object."""
-        crm_team = constants.Team.crm.value
-        huk_team = constants.Team.healthcare_uk.value
-        pm_adviser = AdviserFactory(dit_team_id=crm_team.id)
-        pa_adviser = AdviserFactory(dit_team_id=huk_team.id)
-        project = InvestmentProjectFactory(
-            project_manager_id=pm_adviser.id,
-            project_assurance_adviser_id=pa_adviser.id
-        )
-        url = reverse('api-v3:investment:investment-item',
-                      kwargs={'pk': project.pk})
-        response = self.api_client.get(url)
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-
-        assert response_data['project_manager'] == {
-            'id': str(pm_adviser.pk),
-            'first_name': pm_adviser.first_name,
-            'last_name': pm_adviser.last_name,
-            'name': pm_adviser.name
-        }
-        assert response_data['project_assurance_adviser'] == {
-            'id': str(pa_adviser.pk),
-            'first_name': pa_adviser.first_name,
-            'last_name': pa_adviser.last_name,
-            'name': pa_adviser.name,
-        }
-        assert response_data['project_manager_team'] == {
-            'id': str(crm_team.id),
-            'name': crm_team.name
-        }
-        assert response_data['project_assurance_team'] == {
-            'id': str(huk_team.id),
-            'name': huk_team.name
-        }
-        assert response_data['team_members'] == []
-        assert response_data['team_complete'] is True
-
-    def test_get_team_empty(self):
-        """Test successfully getting an empty project requirements object."""
-        project = InvestmentProjectFactory(
-            stage_id=constants.InvestmentProjectStage.assign_pm.value.id
-        )
-        url = reverse('api-v3:investment:investment-item',
-                      kwargs={'pk': project.pk})
-        response = self.api_client.get(url)
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['project_manager'] is None
-        assert response_data['project_assurance_adviser'] is None
-        assert response_data['project_manager_team'] is None
-        assert response_data['project_assurance_team'] is None
-        assert response_data['team_members'] == []
-        assert response_data['team_complete'] is False
 
     def test_patch_team_success(self):
         """Test successfully partially updating a requirements object."""

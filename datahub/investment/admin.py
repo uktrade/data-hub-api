@@ -76,7 +76,7 @@ class IProjectDocumentAdmin(admin.ModelAdmin):
 class DisableableMetadataAdmin(admin.ModelAdmin):
     """Custom Disableable Metadata Admin."""
 
-    fields = ('name', 'disabled_on',)
+    fields = ('id', 'name', 'disabled_on',)
     list_display = ('name', 'disabled_on',)
     readonly_fields = ('id',)
     search_fields = ('name', 'pk')
