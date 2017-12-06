@@ -91,6 +91,7 @@ class _ModifiedOnFilter(FilterSet):
     """Filter set for the modified-since view."""
 
     time = IsoDateTimeFilter(name='modified_on', lookup_expr='gte')
+    until = IsoDateTimeFilter(name='modified_on', lookup_expr='lte')
 
     class Meta:
         model = InvestmentProject
