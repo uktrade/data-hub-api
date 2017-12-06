@@ -117,21 +117,27 @@ class InvestmentProjectAssociationChecker(ObjectAssociationCheckerBase):
         raise RuntimeError('User does not have any relevant investment project permissions.')
 
 
-class IsAssociatedToInvestmentProjectPermission(IsAssociatedToObjectPermission,
-                                                InvestmentProjectAssociationChecker):
+class IsAssociatedToInvestmentProjectPermission(IsAssociatedToObjectPermission):
     """Permission based on InvestmentProjectAssociationChecker."""
 
+    checker_class = InvestmentProjectAssociationChecker
 
-class IsAssociatedToInvestmentProjectFilter(BaseFilterBackend,
-                                            InvestmentProjectAssociationChecker):
+
+class IsAssociatedToInvestmentProjectFilter(BaseFilterBackend):
     """Filter for LEPs users to see only associated InvestmentProjects"""
 
     actions_to_filter = {'list'}
 
+    def __init__(self):
+        """Initialise the instance."""
+        self.checker = InvestmentProjectAssociationChecker()
+
     def filter_queryset(self, request, queryset, view):
-        """Filtering the queryset for LEPs users for InvestmentProjects"""
+        """Filters the queryset for restricted users."""
         view_should_be_filtered = view.action in self.actions_to_filter
-        restrictions_are_active = self.should_apply_restrictions(request=request, view=view)
+        restrictions_are_active = self.checker.should_apply_restrictions(
+            request=request, view=view
+        )
 
         if view_should_be_filtered and restrictions_are_active:
             query = Q()

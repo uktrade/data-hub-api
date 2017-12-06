@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+
 from django.core.exceptions import ImproperlyConfigured
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
@@ -37,27 +39,31 @@ class UserHasPermissions(BasePermission):
         return request.user and request.user.has_perm(view.permission_required)
 
 
-class ObjectAssociationCheckerBase:
+class ObjectAssociationCheckerBase(ABC):
     """Base association check class."""
 
+    @abstractmethod
     def is_associated(self, request, view, obj):
         """Check for connection."""
-        return True
 
+    @abstractmethod
     def should_apply_restrictions(self, request, view):
         """Check if restrictions should be applied."""
-        return False
 
 
-class IsAssociatedToObjectPermission(BasePermission, ObjectAssociationCheckerBase):
+class IsAssociatedToObjectPermission(BasePermission):
     """Permission that checks if an object is associated to the user"""
 
-    base_permission = None
+    checker_class = None
+
+    def __init__(self):
+        """Initialise the instance."""
+        self.checker = self.checker_class()
 
     def has_object_permission(self, request, view, obj):
         """Check for object permissions."""
-        if self.should_apply_restrictions(request, view):
-            return self.is_associated(request, view, obj)
+        if self.checker.should_apply_restrictions(request, view):
+            return self.checker.is_associated(request, view, obj)
         return True
 
 
