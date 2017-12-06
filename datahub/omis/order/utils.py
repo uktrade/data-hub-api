@@ -6,8 +6,7 @@ def populate_billing_data(order):
     :returns: order with billing_* fields filled in
     """
     contact = order.contact
-    # use CH address if it exists or fall back to DH company instead
-    company = order.company.companies_house_data or order.company
+    company = order.company
 
     # get default and current order values of billing details
     default_billing_details = {
