@@ -134,8 +134,11 @@ class IsAssociatedToInvestmentProjectFilter(BaseFilterBackend,
         restrictions_are_active = self.should_apply_restrictions(request=request, view=view)
 
         if view_should_be_filtered and restrictions_are_active:
-            return queryset.filter(
-                Q(team_members__adviser__dit_team=request.user.dit_team)
-                | Q(created_by__dit_team=request.user.dit_team)
-            )
+            query = Q()
+            for field in queryset.model.ASSOCIATED_ADVISER_TO_ONE_FIELDS:
+                query |= Q(**{f'{field}__dit_team': request.user.dit_team})
+
+            for field, subfield in queryset.model.ASSOCIATED_ADVISER_TO_MANY_FIELDS:
+                query |= Q(**{f'{field}__{subfield}__dit_team': request.user.dit_team})
+            return queryset.filter(query)
         return queryset
