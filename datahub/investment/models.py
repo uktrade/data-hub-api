@@ -275,6 +275,17 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
                         IProjectTeamAbstract, BaseModel):
     """An investment project."""
 
+    ASSOCIATED_ADVISER_TO_ONE_FIELDS = (
+        'created_by',
+        'client_relationship_manager',
+        'project_manager',
+        'project_assurance_adviser',
+    )
+
+    ASSOCIATED_ADVISER_TO_MANY_FIELDS = (
+        ('team_members', 'adviser'),
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
     def __str__(self):
@@ -297,9 +308,21 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
     def get_associated_advisers(self):
         """Get the advisers associated with the project."""
         return chain(
-            (team_member.adviser for team_member in self.team_members.all()),
-            (self.created_by,)
+            self._get_associated_to_one_advisers(),
+            self._get_associated_to_many_advisers(),
         )
+
+    def _get_associated_to_one_advisers(self):
+        advisers = (getattr(self, field) for field in self.ASSOCIATED_ADVISER_TO_ONE_FIELDS)
+        return filter(None, advisers)
+
+    def _get_associated_to_many_advisers(self):
+        for field_name, subfield_name in self.ASSOCIATED_ADVISER_TO_MANY_FIELDS:
+            field_instance = getattr(self, field_name)
+            for item in field_instance.all():
+                adviser = getattr(item, subfield_name)
+                if adviser:
+                    yield adviser
 
 
 class InvestmentProjectTeamMember(models.Model):

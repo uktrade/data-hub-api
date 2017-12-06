@@ -227,25 +227,33 @@ class TestListView(APITestMixin):
         """Tests that restricted users can only see their team's projects."""
         team = TeamFactory()
         team_others = TeamFactory()
-        adviser_1 = AdviserFactory(dit_team_id=team.id)
-        adviser_2 = AdviserFactory(dit_team_id=team_others.id)
+        adviser_other = AdviserFactory(dit_team_id=team_others.id)
+        adviser_same_team = AdviserFactory(dit_team_id=team.id)
 
         _create_user(self, team, [Permissions.read_associated])
 
-        iproject_1 = InvestmentProjectFactory()
-        iproject_2 = InvestmentProjectFactory()
+        project_other = InvestmentProjectFactory()
+        project_1 = InvestmentProjectFactory()
+        project_2 = InvestmentProjectFactory(created_by=adviser_same_team)
+        project_3 = InvestmentProjectFactory(client_relationship_manager=adviser_same_team)
+        project_4 = InvestmentProjectFactory(project_manager=adviser_same_team)
+        project_5 = InvestmentProjectFactory(project_assurance_adviser=adviser_same_team)
 
-        InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
-        InvestmentProjectTeamMemberFactory(adviser=adviser_2, investment_project=iproject_2)
+        InvestmentProjectTeamMemberFactory(adviser=adviser_other, investment_project=project_other)
+        InvestmentProjectTeamMemberFactory(adviser=adviser_same_team, investment_project=project_1)
 
         url = reverse('api-v3:investment:investment-collection')
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-        assert len(response.data['results']) == 1
-        assert response.data['results'][0]['id'] == str(iproject_1.id)
-        assert response.data['results'][0]['name'] == iproject_1.name
+        response_data = response.json()
+        assert response_data['count'] == 5
+
+        results = response_data['results']
+        expected_ids = {str(project_1.id), str(project_2.id), str(project_3.id),
+                        str(project_4.id), str(project_5.id)}
+
+        assert {result['id'] for result in results} == expected_ids
 
 
 class TestCreateView(APITestMixin):
