@@ -40,28 +40,46 @@ class UserHasPermissions(BasePermission):
 
 
 class ObjectAssociationCheckerBase(ABC):
-    """Base association check class."""
+    """
+    Base class for object association checkers.
+
+    Derived classes are used to determine whether a user is associated with a particular object,
+    and whether access to a particular object for the current request should be restricted to
+    users associated with the object.
+
+    For example, this is used with investment projects to restrict certain third-party
+    organisations so that they can only access projects they are associated with.
+    """
 
     @abstractmethod
-    def is_associated(self, request, view, obj):
-        """Check for connection."""
+    def is_associated(self, request, view, obj) -> bool:
+        """Checks whether the user is associated with a particular object."""
 
     @abstractmethod
-    def should_apply_restrictions(self, request, view):
-        """Check if restrictions should be applied."""
+    def should_apply_restrictions(self, request, view) -> bool:
+        """
+        Checks whether a request should be restricted to objects that the user is associated with.
+        """
 
 
 class IsAssociatedToObjectPermission(BasePermission):
-    """Permission that checks if an object is associated to the user"""
+    """
+    DRF permission class that checks if an object is associated to the user.
+
+    To use, derive from this class and override the checker_class class attribute. It should
+    point at a class derived from ObjectAssociationCheckerBase.
+    """
 
     checker_class = None
 
     def __init__(self):
-        """Initialise the instance."""
+        """Initialises the instance."""
         self.checker = self.checker_class()
 
     def has_object_permission(self, request, view, obj):
-        """Check for object permissions."""
+        """
+        Determines whether the user has permission for the specified object, using checker_class.
+        """
         if self.checker.should_apply_restrictions(request, view):
             return self.checker.is_associated(request, view, obj)
         return True
