@@ -8,10 +8,18 @@ from ..serializers import (
 )
 
 
+class NestedDisabledFilterSerializer(serializers.Serializer):
+    """Serialiser used to validate disabled_on filter."""
+
+    exists = serializers.BooleanField(required=False)
+    after = RelaxedDateTimeField(required=False)
+    before = RelaxedDateTimeField(required=False)
+
 class SearchEventSerializer(SearchSerializer):
     """Serialiser used to validate Event search POST bodies."""
 
     address_country = SingleOrListField(child=StringUUIDField(), required=False)
+    disabled_on = NestedDisabledFilterSerializer(required=False)
     disabled_on_exists = serializers.BooleanField(required=False)
     disabled_on_after = RelaxedDateTimeField(required=False)
     disabled_on_before = RelaxedDateTimeField(required=False)

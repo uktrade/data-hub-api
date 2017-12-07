@@ -265,6 +265,11 @@ def get_filter_query(key, value):
     return must_filter
 
 
+def get_range_queries(ranges):
+    """Gets range queries."""
+    return [Q('range', **{k: v}) for k, v in ranges.items()]
+
+
 def get_search_by_entity_query(term=None,
                                filters=None,
                                composite_filters=None,
@@ -282,20 +287,30 @@ def get_search_by_entity_query(term=None,
 
     if filters:
         for k, v in filters.items():
+            should_filters = None
             if composite_filters and k in composite_filters:
-                # creates a "composite filter" - builds "or" query for given
-                # list of fields
-                should = list(
-                    chain.from_iterable(
-                        get_filter_query(ck, v) for ck in composite_filters[k]
-                    )
-                )
+                # process composite filters
+                should_filters = (get_filter_query(ck, v) for ck in composite_filters[k])
+            elif isinstance(filters[k], dict):
+                # process nested or query
+                all_nested_filters = {
+                    f'{k}_{nested_k}': nested_v
+                    for nested_k, nested_v in filters[k].items()
+                }
+
+                nested_filters, nested_ranges = date_range_fields(all_nested_filters)
+                should_filters = [
+                    get_filter_query(nested_k, nested_v)
+                    for nested_k, nested_v in nested_filters.items()
+                ]
+                if nested_ranges:
+                    should_filters.append(get_range_queries(nested_ranges))
+
+            if should_filters:
+                # builds "or" query for given list of fields
+                should = list(chain.from_iterable(should_filters))
                 must_filter.append(
-                    Q(
-                        'bool',
-                        should=should,
-                        minimum_should_match=1
-                    )
+                    Q('bool', should=should, minimum_should_match=1)
                 )
             else:
                 must_filter.extend(
@@ -303,7 +318,7 @@ def get_search_by_entity_query(term=None,
                 )
 
     if ranges:
-        must_filter.extend([Q('range', **{k: v}) for k, v in ranges.items()])
+        must_filter.extend(get_range_queries(ranges))
 
     s = Search(index=settings.ES_INDEX).query('bool', must=query)
     s = get_sort_query(s, field_order=field_order)

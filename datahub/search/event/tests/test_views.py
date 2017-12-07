@@ -1,7 +1,7 @@
 import datetime
 
 import pytest
-from django.utils.timezone import now
+from django.utils.timezone import now, utc
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -200,6 +200,89 @@ class TestSearch(APITestMixin):
         for teams in event_teams:
             team_ids = {team['id'] for team in teams}
             assert len(team_ids.intersection({str(team_a.id), str(team_c.id)})) > 0
+
+    def test_search_event_nested_disabled_on_after_or_none(self, setup_es):
+        """Tests nested disabled_on filter."""
+        url = reverse('api-v3:search:event')
+
+        current_datetime = now()
+        old_datetime = datetime.datetime(2000, 9, 12, 1, 2, 3, tzinfo=utc)
+        EventFactory.create_batch(2)
+        EventFactory.create_batch(3, disabled_on=old_datetime)
+        EventFactory.create_batch(5, disabled_on=current_datetime)
+
+        setup_es.indices.refresh()
+
+        response = self.api_client.post(url, {
+            'disabled_on': {
+                'exists': False,
+                'after': current_datetime,
+            },
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 7
+        assert len(response.data['results']) == 7
+
+        disabled_ons = [result['disabled_on'] for result in response.data['results']]
+        assert all(disabled_on is None or disabled_on == current_datetime.isoformat()
+                   for disabled_on in disabled_ons
+                   )
+
+    def test_search_event_nested_disabled_on_before_or_none(self, setup_es):
+        """Tests nested disabled_on filter."""
+        url = reverse('api-v3:search:event')
+
+        current_datetime = now()
+        old_datetime = datetime.datetime(2000, 9, 12, 1, 2, 3, tzinfo=utc)
+        EventFactory.create_batch(2)
+        EventFactory.create_batch(3, disabled_on=old_datetime)
+        EventFactory.create_batch(5, disabled_on=current_datetime)
+
+        setup_es.indices.refresh()
+
+        response = self.api_client.post(url, {
+            'disabled_on': {
+                'exists': False,
+                'before': old_datetime,
+            },
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 5
+        assert len(response.data['results']) == 5
+
+        disabled_ons = [result['disabled_on'] for result in response.data['results']]
+        assert all(disabled_on is None or disabled_on == old_datetime.isoformat()
+                   for disabled_on in disabled_ons
+                   )
+
+    def test_search_event_nested_disabled_on_exists(self, setup_es):
+        """Tests nested disabled_on filter."""
+        url = reverse('api-v3:search:event')
+
+        current_datetime = now()
+        old_datetime = datetime.datetime(2000, 9, 12, 1, 2, 3, tzinfo=utc)
+        EventFactory.create_batch(2)
+        EventFactory.create_batch(3, disabled_on=old_datetime)
+        EventFactory.create_batch(5, disabled_on=current_datetime)
+
+        setup_es.indices.refresh()
+
+        response = self.api_client.post(url, {
+            'disabled_on': {
+                'exists': True,
+                # nested is an or query so this will be effectively ignored
+                'before': old_datetime,
+            },
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 8
+        assert len(response.data['results']) == 8
+
+        disabled_ons = [result['disabled_on'] for result in response.data['results']]
+        assert all(disabled_on is not None for disabled_on in disabled_ons)
 
     def test_search_event_disabled_on(self, setup_es):
         """Tests disabled_on filter."""
