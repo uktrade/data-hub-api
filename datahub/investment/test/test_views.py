@@ -1044,6 +1044,14 @@ class TestPartialUpdateView(APITestMixin):
 class TestModifiedSinceView(APITestMixin):
     """Tests for the modified-since view."""
 
+    def _make_request(self, data=None):
+        url = reverse('api-v3:investment:investment-modified-since-collection')
+        client = self.create_api_client(
+            scope=Scope.mi,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
+        return client.get(url, data=data)
+
     @pytest.mark.parametrize(
         'timestamp,num_results', (
             (datetime(2017, 12, 31), 5),
@@ -1058,13 +1066,55 @@ class TestModifiedSinceView(APITestMixin):
         with freeze_time(datetime(2018, 1, 1)):
             InvestmentProjectFactory.create_batch(5)
 
-        url = reverse('api-v3:investment:investment-modified-since-collection')
-        client = self.create_api_client(
-            scope=Scope.mi,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS
-        )
-        response = client.get(url, data={
+        response = self._make_request({
             'time': timestamp.isoformat()
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == num_results
+
+    @pytest.mark.parametrize(
+        'timestamp,num_results', (
+            (datetime(2016, 12, 31), 0),
+            (datetime(2017, 1, 2), 4),
+            (datetime(2018, 1, 2), 9),
+        )
+    )
+    def test_get_modified_until_filter(self, timestamp: datetime, num_results: int):
+        """Test the that results are correctly filtered."""
+        with freeze_time(datetime(2017, 1, 1)):
+            InvestmentProjectFactory.create_batch(4)
+        with freeze_time(datetime(2018, 1, 1)):
+            InvestmentProjectFactory.create_batch(5)
+
+        response = self._make_request({
+            'until': timestamp.isoformat()
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == num_results
+
+    @pytest.mark.parametrize(
+        'from_,until,num_results', (
+            (datetime(2016, 12, 31), datetime(2017, 1, 3), 4),
+            (datetime(2018, 1, 1), datetime(2018, 1, 2), 5),
+            (datetime(2017, 1, 1), datetime(2018, 1, 1), 9),
+            (datetime(2017, 3, 1), datetime(2017, 3, 2), 0),
+        )
+    )
+    def test_get_modified_from_and_modified_until_filter(
+            self, from_: datetime, until: datetime, num_results: int):
+        """Test the that results are correctly filtered."""
+        with freeze_time(datetime(2017, 1, 1)):
+            InvestmentProjectFactory.create_batch(4)
+        with freeze_time(datetime(2018, 1, 1)):
+            InvestmentProjectFactory.create_batch(5)
+
+        response = self._make_request({
+            'time': from_.isoformat(),
+            'until': until.isoformat()
         })
 
         assert response.status_code == status.HTTP_200_OK
@@ -1075,12 +1125,7 @@ class TestModifiedSinceView(APITestMixin):
         """Test that all results are returned if no filter value is provided."""
         InvestmentProjectFactory.create_batch(4, modified_on=datetime(2017, 1, 1, tzinfo=utc))
         InvestmentProjectFactory.create_batch(5, modified_on=datetime(2018, 1, 1, tzinfo=utc))
-        url = reverse('api-v3:investment:investment-modified-since-collection')
-        client = self.create_api_client(
-            scope=Scope.mi,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS
-        )
-        response = client.get(url)
+        response = self._make_request()
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
