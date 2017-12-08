@@ -15,6 +15,7 @@ class NestedDisabledFilterSerializer(serializers.Serializer):
     after = RelaxedDateTimeField(required=False)
     before = RelaxedDateTimeField(required=False)
 
+
 class SearchEventSerializer(SearchSerializer):
     """Serialiser used to validate Event search POST bodies."""
 
