@@ -50,6 +50,10 @@ def test_order_to_dict(Factory, setup_es):
             'id': str(order.sector.pk),
             'name': order.sector.name
         },
+        'uk_region': {
+            'id': str(order.uk_region.pk),
+            'name': order.uk_region.name
+        },
         'service_types': [
             {
                 'id': str(service_type.pk),
