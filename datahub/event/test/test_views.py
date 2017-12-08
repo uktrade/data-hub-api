@@ -5,7 +5,7 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import Country, Service, Team, UKRegion
-from datahub.core.test_utils import APITestMixin, get_test_user
+from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.event.constants import EventType, LocationType, Programme
 from datahub.event.test.factories import EventFactory
 from datahub.metadata.test.factories import TeamFactory
@@ -17,10 +17,10 @@ class TestGetEventView(APITestMixin):
     def test_event_details_no_permissions(self):
         """Should return 403"""
         event = EventFactory()
-        team = TeamFactory()
-        self._user = get_test_user(team=team)
+        user = create_test_user(team=TeamFactory())
+        api_client = self.create_api_client(user=user)
         url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
-        response = self.api_client.get(url)
+        response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_get(self):
@@ -95,10 +95,10 @@ class TestListEventView(APITestMixin):
 
     def test_event_list_no_permissions(self):
         """Should return 403"""
-        team = TeamFactory()
-        self._user = get_test_user(team=team)
+        user = create_test_user(team=TeamFactory())
+        api_client = self.create_api_client(user=user)
         url = reverse('api-v3:event:collection')
-        response = self.api_client.get(url)
+        response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_list(self):

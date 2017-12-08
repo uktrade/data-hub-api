@@ -5,7 +5,7 @@ from rest_framework.reverse import reverse
 
 from datahub.company.models import CompaniesHouseCompany as DBCompaniesHouseCompany
 from datahub.company.test.factories import CompaniesHouseCompanyFactory
-from datahub.core.test_utils import APITestMixin, get_test_user
+from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.companieshousecompany.models import (
     CompaniesHouseCompany as ESCompaniesHouseCompany
@@ -50,10 +50,10 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
 
     def test_no_permissions(self):
         """Should return 403"""
-        team = TeamFactory()
-        self._user = get_test_user(team=team)
+        user = create_test_user(team=TeamFactory())
+        api_client = self.create_api_client(user=user)
         url = reverse('api-v3:search:companieshousecompany')
-        response = self.api_client.get(url)
+        response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize(
