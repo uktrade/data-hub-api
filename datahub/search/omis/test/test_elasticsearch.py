@@ -359,6 +359,20 @@ def test_mapping(setup_es):
                     },
                     'type': 'nested'
                 },
+                'uk_region': {
+                    'include_in_parent': True,
+                    'properties': {
+                        'id': {
+                            'type': 'keyword'
+                        },
+                        'name': {
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        }
+                    },
+                    'type': 'nested'
+                },
                 'service_types': {
                     'include_in_parent': True,
                     'properties': {
@@ -513,6 +527,10 @@ def test_indexed_doc(Factory, setup_es):
             'sector': {
                 'id': str(order.sector.pk),
                 'name': order.sector.name
+            },
+            'uk_region': {
+                'id': str(order.uk_region.pk),
+                'name': order.uk_region.name
             },
             'service_types': [
                 {

@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
-from datahub.core.constants import Country, Sector
+from datahub.core.constants import Country, Sector, UKRegion
 from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.omis.market.models import Market
 
@@ -34,6 +34,7 @@ class TestAddOrderDetails(APITestMixin):
         company = CompanyFactory()
         contact = ContactFactory(company=company)
         country = Country.france.value
+        uk_region = UKRegion.jersey.value
         sector = Sector.aerospace_assembly_aircraft.value
         service_type = ServiceType.objects.filter(disabled_on__isnull=True).first()
 
@@ -45,6 +46,7 @@ class TestAddOrderDetails(APITestMixin):
                 'contact': {'id': contact.pk},
                 'primary_market': {'id': country.id},
                 'sector': {'id': sector.id},
+                'uk_region': {'id': uk_region.id},
                 'service_types': [
                     {'id': service_type.pk},
                 ],
@@ -100,6 +102,10 @@ class TestAddOrderDetails(APITestMixin):
             'sector': {
                 'id': sector.id,
                 'name': sector.name
+            },
+            'uk_region': {
+                'id': uk_region.id,
+                'name': uk_region.name
             },
             'service_types': [
                 {
@@ -167,6 +173,10 @@ class TestAddOrderDetails(APITestMixin):
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json()['sector'] is None
+        assert response.json()['uk_region'] == {  # populated automatically from the company
+            'id': str(company.uk_region.id),
+            'name': company.uk_region.name
+        }
         assert response.json()['service_types'] == []
         assert response.json()['description'] == ''
         assert response.json()['contacts_not_to_approach'] == ''
@@ -427,9 +437,13 @@ class TestChangeOrderDetails(APITestMixin):
     @freeze_time('2017-04-18 13:00:00.000000')
     def test_success(self):
         """Test changing an existing order."""
-        order = OrderFactory(vat_status=VATStatus.outside_eu)
+        order = OrderFactory(
+            vat_status=VATStatus.outside_eu,
+            uk_region_id=UKRegion.alderney.value.id
+        )
         new_contact = ContactFactory(company=order.company)
         new_sector = Sector.renewable_energy_wind.value
+        new_uk_region = UKRegion.channel_islands.value
         new_service_type = ServiceType.objects.filter(disabled_on__isnull=True).first()
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
@@ -438,6 +452,7 @@ class TestChangeOrderDetails(APITestMixin):
             {
                 'contact': {'id': new_contact.pk},
                 'sector': {'id': new_sector.id},
+                'uk_region': {'id': new_uk_region.id},
                 'service_types': [
                     {'id': str(new_service_type.pk)},
                 ],
@@ -495,6 +510,10 @@ class TestChangeOrderDetails(APITestMixin):
                 'id': new_sector.id,
                 'name': new_sector.name
             },
+            'uk_region': {
+                'id': new_uk_region.id,
+                'name': new_uk_region.name
+            },
             'service_types': [
                 {
                     'id': str(new_service_type.pk),
@@ -540,6 +559,28 @@ class TestChangeOrderDetails(APITestMixin):
             'cancelled_on': None,
             'cancellation_reason': None,
         }
+
+    @freeze_time('2017-04-18 13:00:00.000000')
+    def test_uk_region_not_populated_on_change(self):
+        """
+        Test that if order.uk_region is None,
+        it doesn't get populated automatically on change.
+        """
+        order = OrderFactory(
+            vat_status=VATStatus.outside_eu,
+            uk_region_id=None
+        )
+        assert not order.uk_region
+        assert order.company.uk_region
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(
+            url, {'description': 'Updated description'}, format='json'
+        )
+
+        order.refresh_from_db()
+        assert response.status_code == status.HTTP_200_OK
+        assert not response.json()['uk_region']
 
     def test_fails_if_contact_not_from_company(self):
         """
@@ -1067,6 +1108,10 @@ class TestViewOrderDetails(APITestMixin):
             'sector': {
                 'id': str(order.sector.id),
                 'name': order.sector.name
+            },
+            'uk_region': {
+                'id': str(order.uk_region.id),
+                'name': order.uk_region.name
             },
             'service_types': [
                 {

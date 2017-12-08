@@ -63,6 +63,10 @@ class TestViewPublicOrderDetails(APITestMixin):
                 'id': str(order.primary_market.id),
                 'name': order.primary_market.name
             },
+            'uk_region': {
+                'id': str(order.uk_region.id),
+                'name': order.uk_region.name
+            },
             'contact_email': order.contact_email,
             'contact_phone': order.contact_phone,
             'vat_status': order.vat_status,
