@@ -19,6 +19,10 @@ from datahub.documents.av_scan import virus_scan_document
 from datahub.investment.models import (
     InvestmentProject, InvestmentProjectTeamMember, IProjectDocument
 )
+from datahub.investment.permissions import (
+    InvestmentProjectModelPermissions, IsAssociatedToInvestmentProjectFilter,
+    IsAssociatedToInvestmentProjectPermission
+)
 from datahub.investment.serializers import (
     IProjectDocumentSerializer, IProjectSerializer, IProjectTeamMemberSerializer,
     UploadStatusSerializer
@@ -33,6 +37,11 @@ class IProjectAuditViewSet(AuditViewSet):
 
     required_scopes = (Scope.internal_front_end,)
     queryset = InvestmentProject.objects.all()
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        InvestmentProjectModelPermissions,
+        IsAssociatedToInvestmentProjectPermission,
+    )
 
     def get_view_name(self):
         """Returns the view set name for the DRF UI."""
@@ -45,6 +54,8 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     This replaces the previous project, value, team and requirements endpoints.
     """
 
+    permission_classes = (IsAuthenticatedOrTokenHasScope, InvestmentProjectModelPermissions,
+                          IsAssociatedToInvestmentProjectPermission)
     required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectSerializer
     queryset = InvestmentProject.objects.select_related(
@@ -78,7 +89,9 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'strategic_drivers',
         Prefetch('team_members', queryset=_team_member_queryset),
     )
-    filter_backends = (DjangoFilterBackend, OrderingFilter,)
+    filter_backends = (DjangoFilterBackend,
+                       OrderingFilter,
+                       IsAssociatedToInvestmentProjectFilter)
     filter_fields = ('investor_company_id',)
     ordering = ('-created_on',)
 

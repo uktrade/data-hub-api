@@ -6,7 +6,9 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core import constants
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.investment.test.factories import (
+    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -98,3 +100,33 @@ def test_project_assurance_team_valid():
     adviser = AdviserFactory(dit_team_id=huk_team.id)
     project = InvestmentProjectFactory(project_assurance_adviser_id=adviser.id)
     assert str(project.project_assurance_team.id) == huk_team.id
+
+
+@pytest.mark.parametrize('field', (
+    'client_relationship_manager',
+    'project_assurance_adviser',
+    'project_manager',
+    'created_by',
+))
+def test_associated_advisers_specific_roles(field):
+    """Tests that get_associated_advisers() includes advisers in specific roles."""
+    adviser = AdviserFactory()
+    factory_kwargs = {
+        field: adviser
+    }
+    project = InvestmentProjectFactory(**factory_kwargs)
+    assert adviser in tuple(project.get_associated_advisers())
+
+
+def test_associated_advisers_team_members():
+    """Tests that get_associated_advisers() includes team members."""
+    adviser = AdviserFactory()
+    project = InvestmentProjectFactory()
+    InvestmentProjectTeamMemberFactory(investment_project=project, adviser=adviser)
+    assert adviser in tuple(project.get_associated_advisers())
+
+
+def test_associated_advisers_no_none():
+    """Tests that get_associated_advisers() does not include None."""
+    project = InvestmentProjectFactory(client_relationship_manager_id=None)
+    assert None not in tuple(project.get_associated_advisers())
