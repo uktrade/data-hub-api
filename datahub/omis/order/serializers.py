@@ -9,7 +9,7 @@ from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import DataCombiner, is_blank
 from datahub.core.validators import OperatorRule, RulesBasedValidator, ValidationRule
-from datahub.metadata.models import Country, Sector, Team
+from datahub.metadata.models import Country, Sector, Team, UKRegion
 
 from datahub.omis.market.models import Market
 from .constants import OrderStatus, VATStatus
@@ -33,6 +33,7 @@ class OrderSerializer(serializers.ModelSerializer):
     contact = NestedRelatedField(Contact)
     primary_market = NestedRelatedField(Country)
     sector = NestedRelatedField(Sector, required=False, allow_null=True)
+    uk_region = NestedRelatedField(UKRegion, required=False, allow_null=True)
 
     service_types = NestedRelatedField(ServiceType, many=True, required=False)
 
@@ -64,6 +65,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'contact',
             'primary_market',
             'sector',
+            'uk_region',
             'service_types',
             'description',
             'contacts_not_to_approach',
@@ -202,6 +204,14 @@ class OrderSerializer(serializers.ModelSerializer):
         data = self._reset_vat_fields_if_necessary(data)
         return data
 
+    def create(self, validated_data):
+        """
+        Populate `uk_region` during the order creation if not otherwise specified.
+        """
+        if 'uk_region' not in validated_data:
+            validated_data['uk_region'] = validated_data['company'].uk_region
+        return super().create(validated_data)
+
 
 class CompleteOrderSerializer(OrderSerializer):
     """DRF serializer for marking an order as complete."""
@@ -240,6 +250,7 @@ class PublicOrderSerializer(serializers.ModelSerializer):
     """DRF serializer for public facing API."""
 
     primary_market = NestedRelatedField(Country)
+    uk_region = NestedRelatedField(UKRegion)
     company = NestedRelatedField(Company)
     contact = NestedRelatedField(Contact)
     billing_address_country = NestedRelatedField(Country)
@@ -254,6 +265,7 @@ class PublicOrderSerializer(serializers.ModelSerializer):
             'company',
             'contact',
             'primary_market',
+            'uk_region',
             'contact_email',
             'contact_phone',
             'vat_status',

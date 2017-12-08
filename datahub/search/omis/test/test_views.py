@@ -28,6 +28,7 @@ def setup_data(setup_es):
         order = OrderFactory(
             reference='abcd',
             primary_market_id=constants.Country.japan.value.id,
+            uk_region_id=constants.UKRegion.channel_islands.value.id,
             assignees=[],
             status=OrderStatus.draft,
             company=company,
@@ -52,6 +53,7 @@ def setup_data(setup_es):
         order = OrderWithAcceptedQuoteFactory(
             reference='efgh',
             primary_market_id=constants.Country.france.value.id,
+            uk_region_id=constants.UKRegion.east_midlands.value.id,
             assignees=[],
             status=OrderStatus.quote_awaiting_acceptance,
             company=company,
@@ -97,6 +99,10 @@ class TestSearchOrder(APITestMixin):
             ),
             (  # filter by primary market
                 {'primary_market': constants.Country.france.value.id},
+                ['efgh']
+            ),
+            (  # filter by uk region
+                {'uk_region': constants.UKRegion.east_midlands.value.id},
                 ['efgh']
             ),
             (  # filter by a range of date for created_on
