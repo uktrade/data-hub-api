@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.core.test.factories import GroupFactory, PermissionFactory
-from datahub.core.test_utils import APITestMixin, get_test_user
+from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.metadata.test.factories import TeamFactory, TeamRoleFactory
 
 
@@ -34,11 +34,12 @@ class TestUserView(APITestMixin):
         team = TeamFactory(name='Test Team', role=role)
         team.role.groups.add(group)
 
-        user_test = get_test_user(team=team)
+        user_test = create_test_user(team=team)
         user_test.user_permissions.set(permissions[1:])
+        api_client = self.create_api_client(user=user_test)
 
         url = reverse('who_am_i')
-        response = self.api_client.get(url)
+        response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -59,8 +60,8 @@ class TestUserView(APITestMixin):
             'first_name': user_test.first_name,
             'last_name': user_test.last_name,
             'email': user_test.email,
-            'contact_email': '',
-            'telephone_number': '',
+            'contact_email': user_test.contact_email,
+            'telephone_number': user_test.telephone_number,
             'dit_team': {
                 'id': str(team.id),
                 'name': 'Test Team',
