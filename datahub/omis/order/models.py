@@ -14,7 +14,7 @@ from datahub.core.models import (
     BaseConstantModel, BaseModel, BaseOrderedConstantModel
 )
 
-from datahub.metadata.models import Country, Sector, Team
+from datahub.metadata.models import Country, Sector, Team, UKRegion
 from datahub.omis.core.utils import generate_reference
 from datahub.omis.invoice.models import Invoice
 from datahub.omis.payment.models import Payment
@@ -131,6 +131,12 @@ class Order(BaseModel):
     sector = models.ForeignKey(
         Sector,
         related_name='+',
+        null=True, blank=True,
+        on_delete=models.SET_NULL
+    )
+    uk_region = models.ForeignKey(
+        UKRegion,
+        related_name="%(class)ss",  # noqa: Q000
         null=True, blank=True,
         on_delete=models.SET_NULL
     )
