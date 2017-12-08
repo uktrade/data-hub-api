@@ -2,8 +2,7 @@
 
 from django.contrib import admin
 
-from datahub.core.admin import BaseModelVersionAdmin
-from datahub.core.admin import DisabledOnFilter
+from datahub.core.admin import BaseModelVersionAdmin, custom_change_permission, DisabledOnFilter
 from datahub.investment.models import (
     InvestmentProject,
     InvestmentProjectTeamMember,
@@ -12,9 +11,11 @@ from datahub.investment.models import (
     IProjectDocument,
     SpecificProgramme,
 )
+from datahub.investment.permissions import Permissions
 
 
 @admin.register(InvestmentProject)
+@custom_change_permission(Permissions.change_all)
 class InvestmentProjectAdmin(BaseModelVersionAdmin):
     """Investment project admin."""
 

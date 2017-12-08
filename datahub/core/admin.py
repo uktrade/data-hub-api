@@ -95,3 +95,30 @@ class ReadOnlyAdmin(admin.ModelAdmin):
         if 'is_submitted' in readonly_fields:
             readonly_fields.remove('is_submitted')
         return readonly_fields
+
+
+def custom_change_permission(permission_codename):
+    """
+    Decorator that allows a custom change permission to be used with ModelAdmin subclasses.
+
+    Usage example::
+
+        @admin.register(InvestmentProject)
+        @custom_change_permission('change_all_investmentproject')
+        class InvestmentProjectAdmin(admin.ModelAdmin):
+            pass
+    """
+    def decorator(admin_cls):
+        admin_cls.has_change_permission = _make_admin_permission_getter(permission_codename)
+        return admin_cls
+
+    return decorator
+
+
+def _make_admin_permission_getter(codename):
+    def _has_permission(self, request, obj=None):
+        app_label = self.opts.app_label
+        qualified_name = f'{app_label}.{codename}'
+        return request.user.has_perm(qualified_name)
+
+    return _has_permission
