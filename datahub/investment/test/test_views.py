@@ -1978,6 +1978,6 @@ def test_view_set_name(view_set):
 
 
 def _create_user_and_api_client(test_instance, team, permissions):
-    user = create_test_user(team=team, permissions=permissions)
+    user = create_test_user(team=team, permission_codenames=permissions)
     api_client = test_instance.create_api_client(user=user)
     return user, api_client

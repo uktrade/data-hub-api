@@ -35,16 +35,14 @@ def get_default_test_user():
     return test_user
 
 
-def create_test_user(team=None, permissions=()):
+def create_test_user(team=None, permission_codenames=()):
     """Return the test user."""
     # Because AdviserFactory sets dit_team_id, passing dit_team to it doesn't work
     dit_team_id = team.id if team else None
     user = AdviserFactory(dit_team_id=dit_team_id)
 
-    for permission in permissions:
-        user.user_permissions.add(
-            Permission.objects.get(codename=permission)
-        )
+    permissions = Permission.objects.filter(codename__in=permission_codenames)
+    user.user_permissions.set(permissions)
 
     return user
 
