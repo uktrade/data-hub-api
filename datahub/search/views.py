@@ -110,14 +110,14 @@ class SearchAPIView(APIView):
 
     http_method_names = ('post',)
 
-    def get_filtering_data(self, validated_data):
-        """Return (filters, date ranges) to be used to query ES."""
+    def _get_filter_data(self, validated_data):
+        """Returns filter data."""
         filters = {
             self.REMAP_FIELDS.get(field, field): validated_data[field]
             for field in self.FILTER_FIELDS
             if field in validated_data
         }
-        return elasticsearch.date_range_fields(filters)
+        return filters
 
     def validate_data(self, data):
         """Validate and clean data."""
@@ -151,7 +151,7 @@ class SearchAPIView(APIView):
                 data[legacy_query_param] = request.query_params[legacy_query_param]
 
         validated_data = self.validate_data(data)
-        filters, ranges = self.get_filtering_data(validated_data)
+        filter_data = self._get_filter_data(validated_data)
 
         aggregations = (self.REMAP_FIELDS.get(field, field) for field in self.FILTER_FIELDS) \
             if self.include_aggregations else None
@@ -159,9 +159,8 @@ class SearchAPIView(APIView):
         query = elasticsearch.get_search_by_entity_query(
             entity=self.entity,
             term=validated_data['original_query'],
-            filters=filters,
+            filter_data=filter_data,
             composite_filters=self.COMPOSITE_FILTERS,
-            ranges=ranges,
             field_order=validated_data['sortby'],
             aggregations=aggregations,
         )
@@ -248,14 +247,12 @@ class SearchExportAPIView(SearchAPIView):
     def post(self, request, format=None):
         """Performs search and returns CSV file."""
         validated_data = self.validate_data(request.data)
-
-        filters, ranges = self.get_filtering_data(validated_data)
+        filter_data = self._get_filter_data(validated_data)
 
         results = elasticsearch.get_search_by_entity_query(
             entity=self.entity,
             term=validated_data['original_query'],
-            filters=filters,
-            ranges=ranges,
+            filter_data=filter_data,
             field_order=validated_data['sortby'],
         )
 
