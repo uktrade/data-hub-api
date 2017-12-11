@@ -13,7 +13,6 @@ class NestedDisabledOnOrFilterSerializer(serializers.Serializer):
 
     exists = serializers.BooleanField(required=False)
     after = RelaxedDateTimeField(required=False)
-    before = RelaxedDateTimeField(required=False)
 
 
 class SearchEventSerializer(SearchSerializer):
@@ -27,8 +26,6 @@ class SearchEventSerializer(SearchSerializer):
     address_country = SingleOrListField(child=StringUUIDField(), required=False)
     disabled_on = NestedDisabledOnOrFilterSerializer(required=False)
     disabled_on_exists = serializers.BooleanField(required=False)
-    disabled_on_after = RelaxedDateTimeField(required=False)
-    disabled_on_before = RelaxedDateTimeField(required=False)
     event_type = SingleOrListField(child=StringUUIDField(), required=False)
     lead_team = SingleOrListField(child=StringUUIDField(), required=False)
     name = serializers.CharField(required=False)
