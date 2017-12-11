@@ -62,15 +62,15 @@ class InvestmentProjectModelPermissions(BasePermission):
             return False
 
         model = view.get_queryset().model
-        perms = self._get_required_permissions(view, model)
+        perms = self._get_required_permissions(request, view, model)
 
         return any(request.user.has_perm(perm) for perm in perms)
 
-    def _get_required_permissions(self, view, model_cls):
+    def _get_required_permissions(self, request, view, model_cls):
         """
         Returns the permissions that a user should have one of for a particular method.
         """
-        action = get_model_action_for_view_action(view.action)
+        action = get_model_action_for_view_action(request.method, view.action)
 
         format_kwargs = {
             'app_label': model_cls._meta.app_label,
@@ -96,7 +96,7 @@ class InvestmentProjectAssociationChecker(ObjectAssociationCheckerBase):
 
     def should_apply_restrictions(self, request, view):
         """Check if restrictions should be applied."""
-        action = get_model_action_for_view_action(view.action)
+        action = get_model_action_for_view_action(request.method, view.action)
         if action not in self.restricted_actions:
             return False
 
