@@ -20,14 +20,23 @@ class InvestmentProject(DocType, MapDBModelToDict):
     actual_land_date_documents = dsl_utils.id_uri_mapping()
     business_activities = dsl_utils.id_name_mapping()
     client_contacts = dsl_utils.contact_or_adviser_mapping('client_contacts')
-    client_relationship_manager = dsl_utils.id_name_mapping()
-    project_manager = dsl_utils.contact_or_adviser_mapping('project_manager')
-    project_assurance_adviser = dsl_utils.contact_or_adviser_mapping('project_assurance_adviser')
+    client_relationship_manager = dsl_utils.contact_or_adviser_mapping(
+        'client_relationship_manager', include_dit_team=True
+    )
+    project_manager = dsl_utils.contact_or_adviser_mapping(
+        'project_manager', include_dit_team=True
+    )
+    project_assurance_adviser = dsl_utils.contact_or_adviser_mapping(
+        'project_assurance_adviser', include_dit_team=True
+    )
     team_members = dsl_utils.contact_or_adviser_mapping('team_members', include_dit_team=True)
     archived = Boolean()
     archived_reason = Text()
     archived_by = dsl_utils.contact_or_adviser_mapping('archived_by')
     created_on = Date()
+    created_by = dsl_utils.contact_or_adviser_mapping(
+        'created_by', include_dit_team=True
+    )
     modified_on = Date()
     description = dsl_utils.EnglishText()
     anonymous_description = dsl_utils.EnglishText()
@@ -78,7 +87,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'actual_land_date_documents': lambda col: [dict_utils.id_uri_dict(c) for c in col.all()],
         'business_activities': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
         'client_contacts': lambda col: [dict_utils.contact_or_adviser_dict(c) for c in col.all()],
-        'client_relationship_manager': dict_utils.id_name_dict,
+        'client_relationship_manager': dict_utils.adviser_dict_with_team,
         'team_members': lambda col: [
             dict_utils.contact_or_adviser_dict(c.adviser, include_dit_team=True) for c in col.all()
         ],
@@ -108,9 +117,10 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'project_code': str,
         'average_salary': dict_utils.id_name_dict,
         'archived_by': dict_utils.contact_or_adviser_dict,
-        'project_manager': dict_utils.contact_or_adviser_dict,
-        'project_assurance_adviser': dict_utils.contact_or_adviser_dict,
+        'project_manager': dict_utils.adviser_dict_with_team,
+        'project_assurance_adviser': dict_utils.adviser_dict_with_team,
         'country_lost_to': dict_utils.id_name_dict,
+        'created_by': dict_utils.adviser_dict_with_team,
     }
 
     COMPUTED_MAPPINGS = {
@@ -123,7 +133,6 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'cdms_project_code',
         'client_considering_other_countries',
         'competitor_countries',
-        'created_by',
         'documents',
         'interactions',
         'investmentprojectcode',

@@ -144,8 +144,9 @@ class IsAssociatedToInvestmentProjectFilter(BaseFilterBackend):
             for field in queryset.model.ASSOCIATED_ADVISER_TO_ONE_FIELDS:
                 query |= Q(**{f'{field}__dit_team': request.user.dit_team})
 
-            for field, subfield in queryset.model.ASSOCIATED_ADVISER_TO_MANY_FIELDS:
-                query |= Q(**{f'{field}__{subfield}__dit_team': request.user.dit_team})
+            for field in queryset.model.ASSOCIATED_ADVISER_TO_MANY_FIELDS:
+                full_field_name = f'{field.field_name}__{field.subfield_name}__dit_team'
+                query |= Q(**{full_field_name: request.user.dit_team})
             return queryset.filter(query)
         return queryset
 
