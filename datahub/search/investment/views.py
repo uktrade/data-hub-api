@@ -1,5 +1,9 @@
+from oauth2_provider.contrib.rest_framework import IsAuthenticatedOrTokenHasScope
+
+from datahub.investment.models import InvestmentProject as DBInvestmentProject
 from datahub.investment.permissions import (
-    InvestmentProjectAssociationChecker, IsAssociatedToInvestmentProjectPermission, Permissions
+    InvestmentProjectAssociationChecker, InvestmentProjectModelPermissions,
+    IsAssociatedToInvestmentProjectPermission, Permissions
 )
 from datahub.oauth.scopes import Scope
 from .models import InvestmentProject
@@ -10,8 +14,15 @@ from ..views import SearchAPIView, SearchExportAPIView
 class SearchInvestmentProjectParams:
     """Search investment project params."""
 
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        InvestmentProjectModelPermissions,
+        IsAssociatedToInvestmentProjectPermission
+    )
+    permission_required = f'investment.{Permissions.read_all}'
     required_scopes = (Scope.internal_front_end,)
     entity = InvestmentProject
+    model = DBInvestmentProject
     serializer_class = SearchInvestmentProjectSerializer
 
     include_aggregations = True
@@ -27,7 +38,6 @@ class SearchInvestmentProjectParams:
         'stage',
         'status',
         'uk_region_location',
-        'team_members.dit_team.id',
     )
 
     REMAP_FIELDS = {
@@ -40,18 +50,24 @@ class SearchInvestmentProjectParams:
         'uk_region_location': 'uk_region_locations.id',
     }
 
+    def get_permission_filter_args(self):
+        """Gets permission filter arguments."""
+        checker = InvestmentProjectAssociationChecker()
 
-class SearchInvestmentProjectAPIView(InvestmentProjectAssociationChecker,
-                                     SearchInvestmentProjectParams,
-                                     SearchAPIView):
+        if not checker.should_apply_restrictions(self.request, self):
+            return None
+
+        dit_team_id = self.request.user.dit_team_id if self.request.user else None
+        filters = {
+            'team_members.dit_team.id': str(dit_team_id)
+        }
+
+        return filters
+
+
+class SearchInvestmentProjectAPIView(SearchInvestmentProjectParams, SearchAPIView):
     """Filtered investment project search view."""
-
-    permission_classes = SearchAPIView.permission_classes + (
-        IsAssociatedToInvestmentProjectPermission,)
-    permission_required = f'investment.{Permissions.read_all}'
 
 
 class SearchInvestmentProjectExportAPIView(SearchInvestmentProjectParams, SearchExportAPIView):
     """Filtered investment project search export view."""
-
-    permission_required = f'investment.{Permissions.read_all}'

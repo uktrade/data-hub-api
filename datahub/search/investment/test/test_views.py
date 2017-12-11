@@ -244,7 +244,7 @@ class TestSearch(APITestMixin):
         team = TeamFactory()
         request_user = create_test_user(
             team=team,
-            permission_codenames=['read_all_investmentproject']
+            permission_codenames=['read_associated_investmentproject']
         )
         api_client = self.create_api_client(user=request_user)
         adviser = AdviserFactory(dit_team=team)

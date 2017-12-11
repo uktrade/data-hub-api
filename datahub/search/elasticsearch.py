@@ -331,9 +331,23 @@ def _get_must_filter_query(filters, composite_filters, ranges):
     return must_filter
 
 
+def _get_permission_filter(permission_filters=None):
+    if not permission_filters:
+        return None
+
+    permission_subqueries = [_get_filter_query(k, v) for k, v in permission_filters.items()]
+    permission_query = Q(
+        'bool',
+        should=permission_subqueries,
+        minimum_should_match=1
+    )
+    return permission_query
+
+
 def get_search_by_entity_query(term=None,
                                filter_data=None,
                                composite_filters=None,
+                               permission_filters=None,
                                entity=None,
                                field_order=None,
                                aggregations=None):
@@ -346,6 +360,10 @@ def get_search_by_entity_query(term=None,
 
     # document must match all filters in the list (and)
     must_filter = _get_must_filter_query(filters, composite_filters, ranges)
+
+    permission_query = _get_permission_filter(permission_filters)
+    if permission_query:
+        must_filter.append(permission_query)
 
     s = Search(index=settings.ES_INDEX).query('bool', must=query)
     s = _get_sort_query(s, field_order=field_order)
