@@ -249,25 +249,84 @@ def apply_aggs_query(search, aggregates):
 
 def get_filter_query(key, value):
     """Gets filter query."""
-    must_filter = []
-
     if isinstance(value, list):
         # perform "or" query
-        must_filter.append(
-            Q('bool',
-              should=[get_field_query(key, v) for v in value],
-              minimum_should_match=1
-              )
-        )
-    else:
-        must_filter.append(get_field_query(key, value))
+        should_filter = [
+            get_field_query(key, v) for v in value
+        ]
+        return Q('bool', should=should_filter, minimum_should_match=1)
 
-    return must_filter
+    return get_field_query(key, value)
+
+
+def get_filter_queries(filters):
+    """Gets filter queries."""
+    return [
+        get_filter_query(k, v)
+        for k, v in filters.items()
+    ]
 
 
 def get_range_queries(ranges):
     """Gets range queries."""
-    return [Q('range', **{k: v}) for k, v in ranges.items()]
+    return [
+        Q('range', **{k: v})
+        for k, v in ranges.items()
+    ]
+
+
+def get_composite_filters(composite_filters, value):
+    """Gets queries for composite filters."""
+    return [
+        get_filter_query(composite_filter, value)
+        for composite_filter in composite_filters
+    ]
+
+
+def get_nested_filters(field_name, nested_filters):
+    """Gets queries for nested filters."""
+    normalised_nested_filters = {
+        f'{field_name}_{k}': v
+        for k, v in nested_filters.items()
+    }
+
+    filters, ranges = split_date_range_fields(normalised_nested_filters)
+    should_filters = get_filter_queries(filters)
+
+    if ranges:
+        should_filters.extend(get_range_queries(ranges))
+    return should_filters
+
+
+def get_must_filter_query(filters, composite_filters, ranges):
+    """Gets "and" filter query."""
+    must_filter = []
+
+    if filters:
+        for k, v in filters.items():
+            should_filters = None
+
+            # get nested "or" filters
+            if composite_filters and k in composite_filters:
+                # process composite filters
+                should_filters = get_composite_filters(composite_filters[k], v)
+            elif isinstance(v, dict):
+                should_filters = get_nested_filters(k, v)
+
+            if should_filters:
+                # builds "or" query for given list of fields
+                must_filter.append(
+                    Q('bool', should=should_filters, minimum_should_match=1)
+                )
+            else:
+                must_filter.append(
+                    get_filter_query(k, v)
+                )
+
+    if ranges:
+        must_filter.extend(get_range_queries(ranges))
+
+    return must_filter
 
 
 def get_search_by_entity_query(term=None,
@@ -283,42 +342,7 @@ def get_search_by_entity_query(term=None,
         query.append(get_search_term_query(term, fields=entity.SEARCH_FIELDS))
 
     # document must match all filters in the list (and)
-    must_filter = []
-
-    if filters:
-        for k, v in filters.items():
-            should_filters = None
-            if composite_filters and k in composite_filters:
-                # process composite filters
-                should_filters = (get_filter_query(ck, v) for ck in composite_filters[k])
-            elif isinstance(filters[k], dict):
-                # process nested or query
-                all_nested_filters = {
-                    f'{k}_{nested_k}': nested_v
-                    for nested_k, nested_v in filters[k].items()
-                }
-
-                nested_filters, nested_ranges = date_range_fields(all_nested_filters)
-                should_filters = [
-                    get_filter_query(nested_k, nested_v)
-                    for nested_k, nested_v in nested_filters.items()
-                ]
-                if nested_ranges:
-                    should_filters.append(get_range_queries(nested_ranges))
-
-            if should_filters:
-                # builds "or" query for given list of fields
-                should = list(chain.from_iterable(should_filters))
-                must_filter.append(
-                    Q('bool', should=should, minimum_should_match=1)
-                )
-            else:
-                must_filter.extend(
-                    get_filter_query(k, v)
-                )
-
-    if ranges:
-        must_filter.extend(get_range_queries(ranges))
+    must_filter = get_must_filter_query(filters, composite_filters, ranges)
 
     s = Search(index=settings.ES_INDEX).query('bool', must=query)
     s = get_sort_query(s, field_order=field_order)
@@ -342,7 +366,7 @@ def bulk(actions=None, chunk_size=None, **kwargs):
     return es_bulk(connections.get_connection(), actions=actions, chunk_size=chunk_size, **kwargs)
 
 
-def date_range_fields(fields):
+def split_date_range_fields(fields):
     """Finds and format range fields."""
     filters = {}
     ranges = defaultdict(dict)
