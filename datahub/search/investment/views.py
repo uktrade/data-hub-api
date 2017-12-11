@@ -57,10 +57,16 @@ class SearchInvestmentProjectParams:
         if not checker.should_apply_restrictions(self.request, self):
             return None
 
-        dit_team_id = self.request.user.dit_team_id if self.request.user else None
+        dit_team_id = str(self.request.user.dit_team_id) if self.request.user else None
         filters = {
-            'team_members.dit_team.id': str(dit_team_id)
+            f'{field}.dit_team.id': dit_team_id
+            for field in DBInvestmentProject.ASSOCIATED_ADVISER_TO_ONE_FIELDS
         }
+
+        filters.update({
+            f'{field.es_field_name}.dit_team.id': dit_team_id
+            for field in DBInvestmentProject.ASSOCIATED_ADVISER_TO_MANY_FIELDS
+        })
 
         return filters
 

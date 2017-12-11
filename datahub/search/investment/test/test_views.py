@@ -235,83 +235,45 @@ class TestSearch(APITestMixin):
             for investment_project in response.data['results']
         }
 
-    def test_search_investment_project_associated_users_autofilter(self, setup_es):
+    def test_restricted_users_cannot_see_other_teams_projects(self, setup_es):
         """
         Automatic filter to see only associated IP for a specific (leps) user
         """
         url = reverse('api-v3:search:investment_project')
 
         team = TeamFactory()
+        team_other = TeamFactory()
+        adviser_other = AdviserFactory(dit_team_id=team_other.id)
+        adviser_same_team = AdviserFactory(dit_team_id=team.id)
         request_user = create_test_user(
             team=team,
             permission_codenames=['read_associated_investmentproject']
         )
         api_client = self.create_api_client(user=request_user)
-        adviser = AdviserFactory(dit_team=team)
 
-        investment_project1 = InvestmentProjectFactory(
-            investment_type_id=constants.InvestmentType.fdi.value.id,
-            stage_id=constants.InvestmentProjectStage.active.value.id
-        )
-        InvestmentProjectTeamMemberFactory(adviser=adviser,
-                                           investment_project=investment_project1)
+        project_other = InvestmentProjectFactory()
+        project_1 = InvestmentProjectFactory()
+        project_2 = InvestmentProjectFactory(created_by=adviser_same_team)
+        project_3 = InvestmentProjectFactory(client_relationship_manager=adviser_same_team)
+        project_4 = InvestmentProjectFactory(project_manager=adviser_same_team)
+        project_5 = InvestmentProjectFactory(project_assurance_adviser=adviser_same_team)
 
-        investment_project2 = InvestmentProjectFactory(
-            investment_type_id=constants.InvestmentType.fdi.value.id,
-            stage_id=constants.InvestmentProjectStage.won.value.id,
-        )
-
-        InvestmentProjectFactory(
-            stage_id=constants.InvestmentProjectStage.won.value.id
-        )
-        InvestmentProjectFactory(
-            investment_type_id=constants.InvestmentType.fdi.value.id,
-            stage_id=constants.InvestmentProjectStage.prospect.value.id,
-        )
+        InvestmentProjectTeamMemberFactory(adviser=adviser_other, investment_project=project_other)
+        InvestmentProjectTeamMemberFactory(adviser=adviser_same_team, investment_project=project_1)
 
         setup_es.indices.refresh()
 
-        response = api_client.post(url, {
-            'investment_type': constants.InvestmentType.fdi.value.id,
-            'investor_company': [
-                investment_project1.investor_company.pk,
-                investment_project2.investor_company.pk,
-            ],
-            'stage': [
-                constants.InvestmentProjectStage.won.value.id,
-                constants.InvestmentProjectStage.active.value.id,
-            ],
-        }, format='json')
+        response = api_client.post(url, {}, format='json')
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 2
-        assert len(response.data['results']) == 2
+        response_data = response.json()
+        assert response_data['count'] == 5
 
-        # checks if we only have investment projects with stages we filtered
-        assert {
-            constants.InvestmentProjectStage.active.value.id,
-            constants.InvestmentProjectStage.won.value.id
-        } == {
-            investment_project['stage']['id']
-            for investment_project in response.data['results']
-        }
+        results = response_data['results']
+        expected_ids = {str(project_1.id), str(project_2.id), str(project_3.id),
+                        str(project_4.id), str(project_5.id)}
 
-        # checks if we only have investment projects with investor companies we filtered
-        assert {
-            str(investment_project1.investor_company.pk),
-            str(investment_project2.investor_company.pk)
-        } == {
-            investment_project['investor_company']['id']
-            for investment_project in response.data['results']
-        }
-
-        # checks if we only have investment projects with fdi investment type
-        assert {
-            constants.InvestmentType.fdi.value.id
-        } == {
-            investment_project['investment_type']['id']
-            for investment_project in response.data['results']
-        }
+        assert {result['id'] for result in results} == expected_ids
 
     def test_search_investment_project_aggregates(self, setup_es):
         """Tests aggregates in investment project search."""

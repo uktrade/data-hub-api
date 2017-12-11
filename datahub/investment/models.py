@@ -2,6 +2,7 @@
 
 import uuid
 from itertools import chain
+from typing import NamedTuple
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -270,6 +271,12 @@ class IProjectTeamAbstract(models.Model):
         return None
 
 
+class _AssociatedToManyField(NamedTuple):
+    field_name: str
+    subfield_name: str
+    es_field_name: str
+
+
 class InvestmentProject(ArchivableModel, IProjectAbstract,
                         IProjectValueAbstract, IProjectRequirementsAbstract,
                         IProjectTeamAbstract, BaseModel):
@@ -283,7 +290,9 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
     )
 
     ASSOCIATED_ADVISER_TO_MANY_FIELDS = (
-        ('team_members', 'adviser'),
+        _AssociatedToManyField(
+            field_name='team_members', subfield_name='adviser', es_field_name='team_members'
+        ),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -317,10 +326,10 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
         return filter(None, advisers)
 
     def _get_associated_to_many_advisers(self):
-        for field_name, subfield_name in self.ASSOCIATED_ADVISER_TO_MANY_FIELDS:
-            field_instance = getattr(self, field_name)
+        for field in self.ASSOCIATED_ADVISER_TO_MANY_FIELDS:
+            field_instance = getattr(self, field.field_name)
             for item in field_instance.all():
-                adviser = getattr(item, subfield_name)
+                adviser = getattr(item, field.subfield_name)
                 if adviser:
                     yield adviser
 
