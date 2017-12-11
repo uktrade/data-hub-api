@@ -74,7 +74,7 @@ def test_date_range_fields():
         'adviser.id': 1234,
     }
 
-    filters, ranges = elasticsearch.date_range_fields(fields)
+    filters, ranges = elasticsearch.split_date_range_fields(fields)
 
     assert filters == {
         'adviser.id': 1234

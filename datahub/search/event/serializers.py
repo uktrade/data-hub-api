@@ -8,7 +8,7 @@ from ..serializers import (
 )
 
 
-class NestedDisabledFilterSerializer(serializers.Serializer):
+class NestedDisabledOnOrFilterSerializer(serializers.Serializer):
     """Serialiser used to validate disabled_on filter."""
 
     exists = serializers.BooleanField(required=False)
@@ -17,10 +17,15 @@ class NestedDisabledFilterSerializer(serializers.Serializer):
 
 
 class SearchEventSerializer(SearchSerializer):
-    """Serialiser used to validate Event search POST bodies."""
+    """Serialiser used to validate Event search POST bodies.
+
+    Nested disabled_on filters use "or" operator. For example if you want to
+    find events that were disabled after certain date, but also those that
+    have not been disabled.
+    """
 
     address_country = SingleOrListField(child=StringUUIDField(), required=False)
-    disabled_on = NestedDisabledFilterSerializer(required=False)
+    disabled_on = NestedDisabledOnOrFilterSerializer(required=False)
     disabled_on_exists = serializers.BooleanField(required=False)
     disabled_on_after = RelaxedDateTimeField(required=False)
     disabled_on_before = RelaxedDateTimeField(required=False)
