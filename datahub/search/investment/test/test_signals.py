@@ -18,7 +18,7 @@ def test_investment_project_auto_sync_to_es(setup_es):
 
     result = elasticsearch.get_search_by_entity_query(
         term='',
-        filters={'name': test_name},
+        filter_data={'name': test_name},
         entity=InvestmentProject
     ).execute()
 
@@ -35,7 +35,7 @@ def test_investment_project_auto_updates_to_es(setup_es):
 
     result = elasticsearch.get_search_by_entity_query(
         term='',
-        filters={'name': new_test_name},
+        filter_data={'name': new_test_name},
         entity=InvestmentProject
     ).execute()
 
