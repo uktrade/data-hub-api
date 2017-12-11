@@ -14,6 +14,7 @@ _VIEW_TO_ACTION_MAPPING = {
     'partial_update': 'change',
     'archive': 'change',
     'unarchive': 'change',
+    'metadata': 'read',
 }
 
 
@@ -85,6 +86,9 @@ class IsAssociatedToObjectPermission(BasePermission):
         return True
 
 
-def get_model_action_for_view_action(method):
+def get_model_action_for_view_action(http_method, view_action):
     """Gets the model action corresponding to a view action."""
-    return _VIEW_TO_ACTION_MAPPING[method]
+    if http_method == 'OPTIONS':
+        return 'read'
+
+    return _VIEW_TO_ACTION_MAPPING[view_action]
