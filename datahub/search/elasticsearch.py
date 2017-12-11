@@ -102,7 +102,7 @@ def configure_index(index_name, settings=None):
         index.create()
 
 
-def get_search_term_query(term, fields=None):
+def _get_search_term_query(term, fields=None):
     """Returns search term query."""
     if term == '':
         return Q('match_all')
@@ -124,7 +124,7 @@ def get_search_term_query(term, fields=None):
     return Q('bool', should=should_query)
 
 
-def remap_sort_field(field):
+def _remap_sort_field(field):
     """Replaces fields to aliases suitable for sorting."""
     name_map = {
         'name': 'name_keyword',
@@ -132,7 +132,7 @@ def remap_sort_field(field):
     return name_map.get(field, field)
 
 
-def get_sort_query(qs, field_order=None):
+def _get_sort_query(qs, field_order=None):
     """Attaches sort query."""
     if field_order is None:
         return qs
@@ -151,7 +151,7 @@ def get_sort_query(qs, field_order=None):
         sort_params['nested_path'] = tokens[0].split('.', 1)[0]
 
     qs = qs.sort({
-        remap_sort_field(tokens[0]): sort_params
+        _remap_sort_field(tokens[0]): sort_params
     })
     return qs
 
@@ -177,7 +177,7 @@ def get_basic_search_query(
     # and the same query is always generated with the same inputs
     fields = sorted(fields)
 
-    query = get_search_term_query(term, fields=fields)
+    query = _get_search_term_query(term, fields=fields)
     s = Search(index=settings.ES_INDEX).query(query)
     s = s.post_filter(
         Q('bool', should=[
@@ -186,7 +186,7 @@ def get_basic_search_query(
         ])
     )
 
-    s = get_sort_query(s, field_order=field_order)
+    s = _get_sort_query(s, field_order=field_order)
     s.aggs.bucket(
         'count_by_type', 'terms', field='_type'
     )
@@ -194,13 +194,13 @@ def get_basic_search_query(
     return s[offset:offset + limit]
 
 
-def _get_field_query(field, value):
+def _get_basic_field_query(field, value):
     """Gets field query depending on field suffix."""
     if any(field.endswith(suffix) for suffix in ('.id', '_keyword')):
         return Q('match_phrase', **{field: value})
 
     if field.endswith('_exists'):
-        return get_exists_query(field, value)
+        return _get_exists_query(field, value)
 
     field_query = {
         'query': value,
@@ -209,16 +209,16 @@ def _get_field_query(field, value):
     return Q('match', **{field: field_query})
 
 
-def get_field_query(field, value):
+def _get_field_query(field, value):
     """Gets field query."""
-    query = _get_field_query(field, value)
+    query = _get_basic_field_query(field, value)
     if '.' not in field:
         return query
 
     return Q('nested', path=field.rsplit('.', maxsplit=1)[0], query=query)
 
 
-def get_exists_query(field, value):
+def _get_exists_query(field, value):
     """Gets exists query."""
     real_field = field[:field.rindex('_')]
 
@@ -229,7 +229,7 @@ def get_exists_query(field, value):
     return Q('bool', **query)
 
 
-def apply_aggs_query(search, aggregates):
+def _apply_aggs_query(search, aggregates):
     """Applies aggregates query to the search."""
     for aggregate in aggregates:
         # skip range and "search" filters as we can't aggregate them
@@ -247,27 +247,27 @@ def apply_aggs_query(search, aggregates):
         search_aggs.bucket(aggregate, 'terms', field=aggregate)
 
 
-def get_filter_query(key, value):
+def _get_filter_query(key, value):
     """Gets filter query."""
     if isinstance(value, list):
         # perform "or" query
         should_filter = [
-            get_field_query(key, v) for v in value
+            _get_field_query(key, v) for v in value
         ]
         return Q('bool', should=should_filter, minimum_should_match=1)
 
-    return get_field_query(key, value)
+    return _get_field_query(key, value)
 
 
-def get_filter_queries(filters):
+def _get_filter_queries(filters):
     """Gets filter queries."""
     return [
-        get_filter_query(k, v)
+        _get_filter_query(k, v)
         for k, v in filters.items()
     ]
 
 
-def get_range_queries(ranges):
+def _get_range_queries(ranges):
     """Gets range queries."""
     return [
         Q('range', **{k: v})
@@ -275,56 +275,58 @@ def get_range_queries(ranges):
     ]
 
 
-def get_composite_filters(composite_filters, value):
+def _get_composite_filters(composite_filters, value):
     """Gets queries for composite filters."""
     return [
-        get_filter_query(composite_filter, value)
+        _get_filter_query(composite_filter, value)
         for composite_filter in composite_filters
     ]
 
 
-def get_nested_filters(field_name, nested_filters):
+def _get_nested_filters(field_name, nested_filters):
     """Gets queries for nested filters."""
     normalised_nested_filters = {
         f'{field_name}_{k}': v
         for k, v in nested_filters.items()
     }
 
-    filters, ranges = split_date_range_fields(normalised_nested_filters)
-    should_filters = get_filter_queries(filters)
+    filters, ranges = _split_date_range_fields(normalised_nested_filters)
+    should_filters = _get_filter_queries(filters)
 
     if ranges:
-        should_filters.extend(get_range_queries(ranges))
+        should_filters.extend(_get_range_queries(ranges))
     return should_filters
 
 
-def get_must_filter_query(filters, composite_filters, ranges):
+def _get_must_filter_query(filters, composite_filters, ranges):
     """Gets "and" filter query."""
+    if filters is None:
+        filters = {}
+
     must_filter = []
 
-    if filters:
-        for k, v in filters.items():
-            should_filters = None
+    for k, v in filters.items():
+        should_filters = None
 
-            # get nested "or" filters
-            if composite_filters and k in composite_filters:
-                # process composite filters
-                should_filters = get_composite_filters(composite_filters[k], v)
-            elif isinstance(v, dict):
-                should_filters = get_nested_filters(k, v)
+        # get nested "or" filters
+        if composite_filters and k in composite_filters:
+            # process composite filters
+            should_filters = _get_composite_filters(composite_filters[k], v)
+        elif isinstance(v, dict):
+            should_filters = _get_nested_filters(k, v)
 
-            if should_filters:
-                # builds "or" query for given list of fields
-                must_filter.append(
-                    Q('bool', should=should_filters, minimum_should_match=1)
-                )
-            else:
-                must_filter.append(
-                    get_filter_query(k, v)
-                )
+        if should_filters:
+            # builds "or" query for given list of fields
+            must_filter.append(
+                Q('bool', should=should_filters, minimum_should_match=1)
+            )
+        else:
+            must_filter.append(
+                _get_filter_query(k, v)
+            )
 
     if ranges:
-        must_filter.extend(get_range_queries(ranges))
+        must_filter.extend(_get_range_queries(ranges))
 
     return must_filter
 
@@ -339,18 +341,18 @@ def get_search_by_entity_query(term=None,
     """Perform filtered search for given terms in given entity."""
     query = [Q('term', _type=entity._doc_type.name)]
     if term != '':
-        query.append(get_search_term_query(term, fields=entity.SEARCH_FIELDS))
+        query.append(_get_search_term_query(term, fields=entity.SEARCH_FIELDS))
 
     # document must match all filters in the list (and)
-    must_filter = get_must_filter_query(filters, composite_filters, ranges)
+    must_filter = _get_must_filter_query(filters, composite_filters, ranges)
 
     s = Search(index=settings.ES_INDEX).query('bool', must=query)
-    s = get_sort_query(s, field_order=field_order)
+    s = _get_sort_query(s, field_order=field_order)
 
     s = s.post_filter('bool', must=must_filter)
 
     if aggregations:
-        apply_aggs_query(s, aggregations)
+        _apply_aggs_query(s, aggregations)
 
     return s
 
@@ -366,7 +368,7 @@ def bulk(actions=None, chunk_size=None, **kwargs):
     return es_bulk(connections.get_connection(), actions=actions, chunk_size=chunk_size, **kwargs)
 
 
-def split_date_range_fields(fields):
+def _split_date_range_fields(fields):
     """Finds and format range fields."""
     filters = {}
     ranges = defaultdict(dict)

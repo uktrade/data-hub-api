@@ -117,7 +117,7 @@ class SearchAPIView(APIView):
             for field in self.FILTER_FIELDS
             if field in validated_data
         }
-        return elasticsearch.split_date_range_fields(filters)
+        return elasticsearch._split_date_range_fields(filters)
 
     def validate_data(self, data):
         """Validate and clean data."""
