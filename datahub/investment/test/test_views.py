@@ -8,7 +8,6 @@ from unittest.mock import patch
 
 import pytest
 import reversion
-from django.contrib.auth.models import Permission
 from django.utils.timezone import now, utc
 from freezegun import freeze_time
 from oauth2_provider.models import Application
@@ -19,7 +18,7 @@ from reversion.models import Version
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import (
-    APITestMixin, format_date_or_datetime, get_test_user, synchronous_executor_submit,
+    APITestMixin, create_test_user, format_date_or_datetime, synchronous_executor_submit,
     synchronous_transaction_on_commit
 )
 from datahub.core.utils import executor
@@ -47,10 +46,10 @@ class TestListView(APITestMixin):
 
     def test_investments_no_permissions(self):
         """Should return 403"""
-        team = TeamFactory()
-        self._user = get_test_user(team=team)
+        user = create_test_user(team=TeamFactory())
         url = reverse('api-v3:investment:investment-collection')
-        response = self.api_client.get(url)
+        api_client = self.create_api_client(user=user)
+        response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_list_projects_success(self):
@@ -205,7 +204,7 @@ class TestListView(APITestMixin):
         adviser_1 = AdviserFactory(dit_team_id=team.id)
         adviser_2 = AdviserFactory(dit_team_id=team_others.id)
 
-        _create_user(self, team, permissions)
+        _, api_client = _create_user_and_api_client(self, team, permissions)
 
         iproject_1 = InvestmentProjectFactory()
         iproject_2 = InvestmentProjectFactory()
@@ -214,7 +213,7 @@ class TestListView(APITestMixin):
         InvestmentProjectTeamMemberFactory(adviser=adviser_2, investment_project=iproject_2)
 
         url = reverse('api-v3:investment:investment-collection')
-        response = self.api_client.get(url)
+        response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -230,7 +229,7 @@ class TestListView(APITestMixin):
         adviser_other = AdviserFactory(dit_team_id=team_others.id)
         adviser_same_team = AdviserFactory(dit_team_id=team.id)
 
-        _create_user(self, team, [Permissions.read_associated])
+        _, api_client = _create_user_and_api_client(self, team, [Permissions.read_associated])
 
         project_other = InvestmentProjectFactory()
         project_1 = InvestmentProjectFactory()
@@ -243,7 +242,7 @@ class TestListView(APITestMixin):
         InvestmentProjectTeamMemberFactory(adviser=adviser_same_team, investment_project=project_1)
 
         url = reverse('api-v3:investment:investment-collection')
-        response = self.api_client.get(url)
+        response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -718,13 +717,15 @@ class TestRetrieveView(APITestMixin):
         team_associated = TeamFactory()
         adviser_1 = AdviserFactory(dit_team_id=team_associated.id)
 
-        _create_user(self, team_requester, [Permissions.read_associated])
+        _, api_client = _create_user_and_api_client(
+            self, team_requester, [Permissions.read_associated]
+        )
 
         iproject_1 = InvestmentProjectFactory()
         InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': iproject_1.pk})
-        response = self.api_client.get(url)
+        response = api_client.get(url)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -738,13 +739,13 @@ class TestRetrieveView(APITestMixin):
         team_associated = TeamFactory()
         adviser_1 = AdviserFactory(dit_team_id=team_associated.id)
 
-        _create_user(self, team_requester, permissions)
+        _, api_client = _create_user_and_api_client(self, team_requester, permissions)
 
         iproject_1 = InvestmentProjectFactory()
         InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': iproject_1.pk})
-        response = self.api_client.get(url)
+        response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -752,13 +753,13 @@ class TestRetrieveView(APITestMixin):
         """Tests that restricted users can see a project associated to them via a team member."""
         team = TeamFactory()
         adviser_1 = AdviserFactory(dit_team_id=team.id)
-        _create_user(self, team, [Permissions.read_associated])
+        _, api_client = _create_user_and_api_client(self, team, [Permissions.read_associated])
 
         iproject_1 = InvestmentProjectFactory()
         InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': iproject_1.pk})
-        response = self.api_client.get(url)
+        response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -767,12 +768,12 @@ class TestRetrieveView(APITestMixin):
         team = TeamFactory()
         adviser_1 = AdviserFactory(dit_team_id=team.id)
 
-        _create_user(self, team, [Permissions.read_associated])
+        _, api_client = _create_user_and_api_client(self, team, [Permissions.read_associated])
 
         iproject_1 = InvestmentProjectFactory(created_by=adviser_1)
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': iproject_1.pk})
-        response = self.api_client.get(url)
+        response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -1173,13 +1174,15 @@ class TestPartialUpdateView(APITestMixin):
         team_associated = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team_associated.id)
 
-        _create_user(self, team_requester, [Permissions.change_associated])
+        _, api_client = _create_user_and_api_client(
+            self, team_requester, [Permissions.change_associated]
+        )
 
         project = InvestmentProjectFactory(name='old name')
         InvestmentProjectTeamMemberFactory(adviser=adviser, investment_project=project)
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
-        response = self.api_client.patch(url, {
+        response = api_client.patch(url, {
             'name': 'new name'
         })
 
@@ -1195,13 +1198,13 @@ class TestPartialUpdateView(APITestMixin):
         team_associated = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team_associated.id)
 
-        _create_user(self, team_requester, permissions)
+        _, api_client = _create_user_and_api_client(self, team_requester, permissions)
 
         project = InvestmentProjectFactory(name='old name')
         InvestmentProjectTeamMemberFactory(adviser=adviser, investment_project=project)
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
-        response = self.api_client.patch(url, {
+        response = api_client.patch(url, {
             'name': 'new name'
         })
 
@@ -1215,13 +1218,15 @@ class TestPartialUpdateView(APITestMixin):
         """
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
-        _create_user(self, team, [Permissions.change_associated])
+        _, api_client = _create_user_and_api_client(
+            self, team, [Permissions.change_associated]
+        )
 
         project = InvestmentProjectFactory(name='old name')
         InvestmentProjectTeamMemberFactory(adviser=adviser, investment_project=project)
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
-        response = self.api_client.patch(url, {
+        response = api_client.patch(url, {
             'name': 'new name'
         })
 
@@ -1234,12 +1239,14 @@ class TestPartialUpdateView(APITestMixin):
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
 
-        _create_user(self, team, [Permissions.change_associated])
+        _, api_client = _create_user_and_api_client(
+            self, team, [Permissions.change_associated]
+        )
 
         project = InvestmentProjectFactory(name='old name', created_by=adviser)
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
-        response = self.api_client.patch(url, {
+        response = api_client.patch(url, {
             'name': 'new name'
         })
 
@@ -1532,7 +1539,7 @@ class TestAuditLogView(APITestMixin):
     def test_audit_log_non_restricted_user(self, permissions):
         """Test retrieval of audit log for a non-restricted user."""
         team = TeamFactory()
-        _create_user(self, team, permissions)
+        user, api_client = _create_user_and_api_client(self, team, permissions)
 
         initial_datetime = now()
         with reversion.create_revision():
@@ -1542,7 +1549,7 @@ class TestAuditLogView(APITestMixin):
 
             reversion.set_comment('Initial')
             reversion.set_date_created(initial_datetime)
-            reversion.set_user(self.user)
+            reversion.set_user(user)
 
         changed_datetime = now()
         with reversion.create_revision():
@@ -1551,14 +1558,14 @@ class TestAuditLogView(APITestMixin):
 
             reversion.set_comment('Changed')
             reversion.set_date_created(changed_datetime)
-            reversion.set_user(self.user)
+            reversion.set_user(user)
 
         versions = Version.objects.get_for_object(iproject)
         version_id = versions[0].id
         url = reverse('api-v3:investment:audit-item',
                       kwargs={'pk': iproject.pk})
 
-        response = self.api_client.get(url)
+        response = api_client.get(url)
         response_data = response.json()['results']
 
         # No need to test the whole response
@@ -1566,7 +1573,7 @@ class TestAuditLogView(APITestMixin):
         entry = response_data[0]
 
         assert entry['id'] == version_id
-        assert entry['user']['name'] == self.user.name, 'Valid user captured'
+        assert entry['user']['name'] == user.name, 'Valid user captured'
         assert entry['comment'] == 'Changed', 'Comments can be set manually'
         assert entry['timestamp'] == format_date_or_datetime(changed_datetime), \
             'TS can be set manually'
@@ -1579,7 +1586,7 @@ class TestAuditLogView(APITestMixin):
         """Test retrieval of audit log for a restricted user and an associated project."""
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
-        _create_user(self, team, [Permissions.read_associated])
+        user, api_client = _create_user_and_api_client(self, team, [Permissions.read_associated])
 
         initial_datetime = now()
         with reversion.create_revision():
@@ -1590,7 +1597,7 @@ class TestAuditLogView(APITestMixin):
 
             reversion.set_comment('Initial')
             reversion.set_date_created(initial_datetime)
-            reversion.set_user(self.user)
+            reversion.set_user(user)
 
         changed_datetime = now()
         with reversion.create_revision():
@@ -1599,14 +1606,14 @@ class TestAuditLogView(APITestMixin):
 
             reversion.set_comment('Changed')
             reversion.set_date_created(changed_datetime)
-            reversion.set_user(self.user)
+            reversion.set_user(user)
 
         versions = Version.objects.get_for_object(iproject)
         version_id = versions[0].id
         url = reverse('api-v3:investment:audit-item',
                       kwargs={'pk': iproject.pk})
 
-        response = self.api_client.get(url)
+        response = api_client.get(url)
         response_data = response.json()['results']
 
         # No need to test the whole response
@@ -1614,7 +1621,7 @@ class TestAuditLogView(APITestMixin):
         entry = response_data[0]
 
         assert entry['id'] == version_id
-        assert entry['user']['name'] == self.user.name, 'Valid user captured'
+        assert entry['user']['name'] == user.name, 'Valid user captured'
         assert entry['comment'] == 'Changed', 'Comments can be set manually'
         assert entry['timestamp'] == format_date_or_datetime(changed_datetime), \
             'TS can be set manually'
@@ -1626,14 +1633,14 @@ class TestAuditLogView(APITestMixin):
     def test_audit_log_restricted_user_non_associated_project(self):
         """Test retrieval of audit log for a restricted user and a non-associated project."""
         team = TeamFactory()
-        _create_user(self, team, [Permissions.read_associated])
+        _, api_client = _create_user_and_api_client(self, team, [Permissions.read_associated])
 
         iproject = InvestmentProjectFactory(
             description='Initial desc',
         )
         url = reverse('api-v3:investment:audit-item', kwargs={'pk': iproject.pk})
 
-        response = self.api_client.get(url)
+        response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
@@ -1647,49 +1654,53 @@ class TestArchiveViews(APITestMixin):
     def test_archive_project_non_restricted_user(self, permissions):
         """Tests archiving a project for a non-restricted user."""
         team = TeamFactory()
-        _create_user(self, team, permissions)
+        user, api_client = _create_user_and_api_client(self, team, permissions)
 
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:archive-item',
                       kwargs={'pk': project.pk})
-        response = self.api_client.post(url, format='json', data={
+        response = api_client.post(url, format='json', data={
             'reason': 'archive reason'
         })
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['archived'] is True
-        assert response_data['archived_by']['id'] == str(self.user.pk)
+        assert response_data['archived_by']['id'] == str(user.pk)
         assert response_data['archived_reason'] == 'archive reason'
 
     def test_archive_project_restricted_user_associated_project(self):
         """Tests archiving a project for a restricted user."""
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
-        _create_user(self, team, [Permissions.change_associated])
+        user, api_client = _create_user_and_api_client(
+            self, team, [Permissions.change_associated]
+        )
 
         project = InvestmentProjectFactory(created_by=adviser)
         url = reverse('api-v3:investment:archive-item',
                       kwargs={'pk': project.pk})
-        response = self.api_client.post(url, format='json', data={
+        response = api_client.post(url, format='json', data={
             'reason': 'archive reason'
         })
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['archived'] is True
-        assert response_data['archived_by']['id'] == str(self.user.pk)
+        assert response_data['archived_by']['id'] == str(user.pk)
         assert response_data['archived_reason'] == 'archive reason'
 
     def test_archive_project_restricted_user_non_associated_project(self):
         """Test that a restricted user cannot archive a non-associated project."""
         team = TeamFactory()
-        _create_user(self, team, [Permissions.change_associated])
+        _, api_client = _create_user_and_api_client(
+            self, team, [Permissions.change_associated]
+        )
 
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:archive-item',
                       kwargs={'pk': project.pk})
-        response = self.api_client.post(url, format='json', data={
+        response = api_client.post(url, format='json', data={
             'reason': 'archive reason'
         })
 
@@ -1742,14 +1753,14 @@ class TestArchiveViews(APITestMixin):
     def test_unarchive_project_non_restricted_user(self, permissions):
         """Tests unarchiving a project for a non-restricted user."""
         team = TeamFactory()
-        _create_user(self, team, permissions)
+        _, api_client = _create_user_and_api_client(self, team, permissions)
 
         project = InvestmentProjectFactory(
             archived=True, archived_reason='reason'
         )
         url = reverse('api-v3:investment:unarchive-item',
                       kwargs={'pk': project.pk})
-        response = self.api_client.post(url)
+        response = api_client.post(url)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -1761,7 +1772,9 @@ class TestArchiveViews(APITestMixin):
         """Tests unarchiving a project for a restricted user and associated project."""
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
-        _create_user(self, team, [Permissions.change_associated])
+        _, api_client = _create_user_and_api_client(
+            self, team, [Permissions.change_associated]
+        )
 
         project = InvestmentProjectFactory(
             archived=True,
@@ -1770,7 +1783,7 @@ class TestArchiveViews(APITestMixin):
         )
         url = reverse('api-v3:investment:unarchive-item',
                       kwargs={'pk': project.pk})
-        response = self.api_client.post(url)
+        response = api_client.post(url)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -1782,7 +1795,9 @@ class TestArchiveViews(APITestMixin):
         """Test that a restricted user cannot unarchive a non-associated project."""
         team = TeamFactory()
         AdviserFactory(dit_team_id=team.id)
-        _create_user(self, team, [Permissions.change_associated])
+        _, api_client = _create_user_and_api_client(
+            self, team, [Permissions.change_associated]
+        )
 
         project = InvestmentProjectFactory(
             archived=True,
@@ -1790,7 +1805,7 @@ class TestArchiveViews(APITestMixin):
         )
         url = reverse('api-v3:investment:unarchive-item',
                       kwargs={'pk': project.pk})
-        response = self.api_client.post(url)
+        response = api_client.post(url)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -1962,9 +1977,7 @@ def test_view_set_name(view_set):
     assert isinstance(view_set().get_view_name(), str)
 
 
-def _create_user(test_instance, team, permissions):
-    test_instance._user = get_test_user(team=team)
-    for permission in permissions:
-        test_instance._user.user_permissions.add(
-            Permission.objects.get(codename=permission)
-        )
+def _create_user_and_api_client(test_instance, team, permissions):
+    user = create_test_user(team=team, permission_codenames=permissions)
+    api_client = test_instance.create_api_client(user=user)
+    return user, api_client

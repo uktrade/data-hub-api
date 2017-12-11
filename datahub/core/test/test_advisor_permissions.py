@@ -4,7 +4,7 @@ from rest_framework.test import APIRequestFactory
 
 from datahub.core.test.factories import GroupFactory
 from datahub.core.test.support.views import PermissionModelViewset
-from datahub.core.test_utils import APITestMixin, get_test_user
+from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.metadata.test.factories import TeamFactory
 
 factory = APIRequestFactory()
@@ -22,8 +22,8 @@ class TestPermissions(APITestMixin):
         permission_group.permissions.add(permission)
         team = TeamFactory()
         team.role.groups.add(permission_group)
-        self._user = get_test_user(team=team)
-        token = self.get_token()
+        user = create_test_user(team=team)
+        token = self.get_token(user=user)
 
         request = factory.get('/', data={}, content_type='application/json',
                               Authorization=f'Bearer {token}')
@@ -38,9 +38,8 @@ class TestPermissions(APITestMixin):
         """
         Tests view returns 403
         """
-        team = TeamFactory()
-        self._user = get_test_user(team=team)
-        token = self.get_token()
+        user = create_test_user(team=TeamFactory())
+        token = self.get_token(user=user)
 
         request = factory.get('/', data={}, content_type='application/json',
                               Authorization=f'Bearer {token}')
@@ -55,11 +54,9 @@ class TestPermissions(APITestMixin):
         """
         Tests view returns 403 for user without team and permission
         """
-        self._user = get_test_user()
-        self._user.dit_team = None
-        self._user.save()
+        user = create_test_user()
 
-        token = self.get_token()
+        token = self.get_token(user=user)
 
         request = factory.get('/', data={}, content_type='application/json',
                               Authorization=f'Bearer {token}')
