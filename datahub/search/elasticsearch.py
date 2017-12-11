@@ -332,16 +332,17 @@ def _get_must_filter_query(filters, composite_filters, ranges):
 
 
 def get_search_by_entity_query(term=None,
-                               filters=None,
+                               filter_data=None,
                                composite_filters=None,
                                entity=None,
-                               ranges=None,
                                field_order=None,
                                aggregations=None):
     """Perform filtered search for given terms in given entity."""
     query = [Q('term', _type=entity._doc_type.name)]
     if term != '':
         query.append(_get_search_term_query(term, fields=entity.SEARCH_FIELDS))
+
+    filters, ranges = _split_date_range_fields(filter_data)
 
     # document must match all filters in the list (and)
     must_filter = _get_must_filter_query(filters, composite_filters, ranges)

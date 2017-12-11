@@ -27,7 +27,7 @@ class IntelligentHomepageView(APIView):
         interactions_query = get_search_by_entity_query(
             term='',
             entity=Interaction,
-            filters={
+            filter_data={
                 'dit_adviser.id': user.id,
                 'created_on_exists': True,
             },
@@ -42,7 +42,7 @@ class IntelligentHomepageView(APIView):
         contacts_query = get_search_by_entity_query(
             term='',
             entity=Contact,
-            filters={
+            filter_data={
                 'created_by.id': user.id,
                 'created_on_exists': True,
             },
