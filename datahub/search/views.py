@@ -119,6 +119,14 @@ class SearchAPIView(APIView):
         }
         return filters
 
+    def get_permission_filter_args(self) -> dict:
+        """
+        Gets filter arguments used to enforce permissions.
+
+        Results much match at least one of the rules in the dict returned.
+        """
+        return {}
+
     def validate_data(self, data):
         """Validate and clean data."""
         serializer = self.serializer_class(data=data)
@@ -152,6 +160,7 @@ class SearchAPIView(APIView):
 
         validated_data = self.validate_data(data)
         filter_data = self._get_filter_data(validated_data)
+        permission_filters = self.get_permission_filter_args()
 
         aggregations = (self.REMAP_FIELDS.get(field, field) for field in self.FILTER_FIELDS) \
             if self.include_aggregations else None
@@ -161,6 +170,7 @@ class SearchAPIView(APIView):
             term=validated_data['original_query'],
             filter_data=filter_data,
             composite_filters=self.COMPOSITE_FILTERS,
+            permission_filters=permission_filters,
             field_order=validated_data['sortby'],
             aggregations=aggregations,
         )
