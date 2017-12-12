@@ -7,6 +7,7 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.investment.models import InvestmentProject
+from datahub.investment.permissions import Permissions
 from datahub.investment.test.factories import (
     InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
 )
@@ -235,10 +236,41 @@ class TestSearch(APITestMixin):
             for investment_project in response.data['results']
         }
 
+    @pytest.mark.parametrize('permissions', (
+        (Permissions.read_all,),
+        (Permissions.read_associated, Permissions.read_all),
+    ))
+    def test_non_restricted_user_can_see_all_projects(self, permissions):
+        """Test that normal users can see all projects."""
+        team = TeamFactory()
+        team_others = TeamFactory()
+        adviser_1 = AdviserFactory(dit_team_id=team.id)
+        adviser_2 = AdviserFactory(dit_team_id=team_others.id)
+
+        request_user = create_test_user(
+            team=team,
+            permission_codenames=permissions,
+        )
+        api_client = self.create_api_client(user=request_user)
+
+        iproject_1 = InvestmentProjectFactory()
+        iproject_2 = InvestmentProjectFactory()
+
+        InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
+        InvestmentProjectTeamMemberFactory(adviser=adviser_2, investment_project=iproject_2)
+
+        url = reverse('api-v3:investment:investment-collection')
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 2
+        assert {str(iproject_1.pk), str(iproject_2.pk)} == {
+            result['id'] for result in response_data['results']
+        }
+
     def test_restricted_users_cannot_see_other_teams_projects(self, setup_es):
-        """
-        Automatic filter to see only associated IP for a specific (leps) user
-        """
+        """Test that restricted users cannot see other teams' projects."""
         url = reverse('api-v3:search:investment_project')
 
         team = TeamFactory()
@@ -274,6 +306,30 @@ class TestSearch(APITestMixin):
                         str(project_4.id), str(project_5.id)}
 
         assert {result['id'] for result in results} == expected_ids
+
+    def test_restricted_user_with_no_team_cannot_see_projects(self, setup_es):
+        """
+        Checks that a restricted user that doesn't have a team cannot view projects associated
+        with other advisers that don't have teams.
+        """
+        url = reverse('api-v3:search:investment_project')
+
+        adviser_other = AdviserFactory(dit_team_id=None)
+        request_user = create_test_user(
+            permission_codenames=['read_associated_investmentproject']
+        )
+        api_client = self.create_api_client(user=request_user)
+
+        InvestmentProjectFactory()
+        InvestmentProjectFactory(created_by=adviser_other)
+
+        setup_es.indices.refresh()
+
+        response = api_client.post(url, {}, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 0
 
     def test_search_investment_project_aggregates(self, setup_es):
         """Tests aggregates in investment project search."""
