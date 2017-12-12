@@ -1,6 +1,7 @@
 """Investment project models."""
 
 import uuid
+from itertools import chain
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -14,6 +15,7 @@ from datahub.core.models import (
     BaseModel,
 )
 from datahub.documents.models import Document
+from datahub.investment.permissions import Permissions
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -23,7 +25,6 @@ class IProjectAbstract(models.Model):
 
     class Meta:
         abstract = True
-        permissions = (('read_project', 'Can read project'),)
 
     PRIORITIES = Choices(
         ('1_low', 'low', 'Low'),
@@ -274,6 +275,17 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
                         IProjectTeamAbstract, BaseModel):
     """An investment project."""
 
+    ASSOCIATED_ADVISER_TO_ONE_FIELDS = (
+        'created_by',
+        'client_relationship_manager',
+        'project_manager',
+        'project_assurance_adviser',
+    )
+
+    ASSOCIATED_ADVISER_TO_MANY_FIELDS = (
+        ('team_members', 'adviser'),
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
     def __str__(self):
@@ -282,7 +294,35 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
         return f'{company_name} – {self.name}'
 
     class Meta:
-        permissions = (('read_investmentproject', 'Can read investment project'),)
+        permissions = (
+            (Permissions.read_all, 'Can read all investment project'),
+            (Permissions.read_associated, 'Can read associated investment project'),
+            (Permissions.change_associated, 'Can change associated investment project'),
+        )
+        default_permissions = (
+            'add',
+            'change_all',
+            'delete',
+        )
+
+    def get_associated_advisers(self):
+        """Get the advisers associated with the project."""
+        return chain(
+            self._get_associated_to_one_advisers(),
+            self._get_associated_to_many_advisers(),
+        )
+
+    def _get_associated_to_one_advisers(self):
+        advisers = (getattr(self, field) for field in self.ASSOCIATED_ADVISER_TO_ONE_FIELDS)
+        return filter(None, advisers)
+
+    def _get_associated_to_many_advisers(self):
+        for field_name, subfield_name in self.ASSOCIATED_ADVISER_TO_MANY_FIELDS:
+            field_instance = getattr(self, field_name)
+            for item in field_instance.all():
+                adviser = getattr(item, subfield_name)
+                if adviser:
+                    yield adviser
 
 
 class InvestmentProjectTeamMember(models.Model):

@@ -14,7 +14,7 @@ from datahub.core.models import (
     BaseConstantModel, BaseModel, BaseOrderedConstantModel
 )
 
-from datahub.metadata.models import Country, Sector, Team
+from datahub.metadata.models import Country, Sector, Team, UKRegion
 from datahub.omis.core.utils import generate_reference
 from datahub.omis.invoice.models import Invoice
 from datahub.omis.payment.models import Payment
@@ -134,6 +134,12 @@ class Order(BaseModel):
         null=True, blank=True,
         on_delete=models.SET_NULL
     )
+    uk_region = models.ForeignKey(
+        UKRegion,
+        related_name="%(class)ss",  # noqa: Q000
+        null=True, blank=True,
+        on_delete=models.SET_NULL
+    )
 
     service_types = models.ManyToManyField(
         ServiceType,
@@ -202,6 +208,7 @@ class Order(BaseModel):
         default=0, help_text='Subtotal + VAT cost in pence.'
     )
 
+    billing_company_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     billing_contact_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     billing_email = models.EmailField(max_length=MAX_LENGTH, blank=True)
     billing_phone = models.CharField(max_length=150, blank=True)

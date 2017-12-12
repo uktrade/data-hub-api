@@ -14,7 +14,7 @@ from datahub.company.models import Company
 from datahub.company.test.factories import (AdviserFactory, CompaniesHouseCompanyFactory,
                                             CompanyFactory, ContactFactory)
 from datahub.core import constants
-from datahub.core.test_utils import APITestMixin, get_test_user
+from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.metadata.test.factories import TeamFactory
 
 pytestmark = pytest.mark.django_db
@@ -48,10 +48,10 @@ class TestSearch(APITestMixin):
 
     def test_company_search_no_permissions(self):
         """Should return 403"""
-        team = TeamFactory()
-        self._user = get_test_user(team=team)
+        user = create_test_user(team=TeamFactory())
+        api_client = self.create_api_client(user=user)
         url = reverse('api-v3:search:company')
-        response = self.api_client.get(url)
+        response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_trading_address_country_filter(self, setup_data):
@@ -249,13 +249,13 @@ class TestSearch(APITestMixin):
         assert response.data['count'] > 1
         assert len(response.data['results']) == 1
 
-    @mock.patch('datahub.search.views.elasticsearch.apply_aggs_query')
-    def test_company_search_no_aggregations(self, apply_aggs_query, setup_data):
+    @mock.patch('datahub.search.views.elasticsearch._apply_aggs_query')
+    def test_company_search_no_aggregations(self, _apply_aggs_query, setup_data):
         """Tests if no aggregation occurs."""
         url = reverse('api-v3:search:company')
         response = self.api_client.post(url)
 
-        assert apply_aggs_query.call_count == 0
+        assert _apply_aggs_query.call_count == 0
 
         assert response.status_code == status.HTTP_200_OK
         assert 'aggregations' not in response.data

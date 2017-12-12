@@ -13,9 +13,8 @@ class SearchEventParams:
 
     FILTER_FIELDS = (
         'address_country',
+        'disabled_on',
         'disabled_on_exists',
-        'disabled_on_after',
-        'disabled_on_before',
         'event_type',
         'lead_team',
         'name',

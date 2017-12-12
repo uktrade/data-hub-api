@@ -3,38 +3,48 @@ from secrets import token_hex
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.test.client import Client
 from django.utils.timezone import now
 from oauth2_provider.models import AccessToken, Application
 from rest_framework.fields import DateField, DateTimeField
 from rest_framework.test import APIClient
 
+from datahub.company.test.factories import AdviserFactory
 from datahub.metadata.models import Team
 from datahub.oauth.scopes import Scope
 
 
-def get_test_user(team=None):
+def get_default_test_user():
     """Return the test user."""
     user_model = get_user_model()
     try:
         test_user = user_model.objects.get(email='Testo@Useri.com')
     except user_model.DoesNotExist:
+        team = Team.objects.filter(
+            role__groups__name='DIT_staff'
+        ).first()
         test_user = user_model(
             first_name='Testo',
             last_name='Useri',
             email='Testo@Useri.com',
             date_joined=now(),
+            dit_team=team,
         )
-        if team is None:
-            test_user.dit_team = Team.objects.filter(
-                role__groups__name='DIT_staff'
-            ).first()
-        else:
-            test_user.dit_team = team
-
-        test_user.set_password('password')
         test_user.save()
     return test_user
+
+
+def create_test_user(team=None, permission_codenames=()):
+    """Return the test user."""
+    # Because AdviserFactory sets dit_team_id, passing dit_team to it doesn't work
+    dit_team_id = team.id if team else None
+    user = AdviserFactory(dit_team_id=dit_team_id)
+
+    permissions = Permission.objects.filter(codename__in=permission_codenames)
+    user.user_permissions.set(permissions)
+
+    return user
 
 
 def get_admin_user(password=None):
@@ -85,25 +95,29 @@ class APITestMixin:
     def user(self):
         """Return the user."""
         if not hasattr(self, '_user'):
-            self._user = get_test_user()
+            self._user = get_default_test_user()
         return self._user
 
-    def get_token(self, *scopes, grant_type=Application.GRANT_PASSWORD):
+    def get_token(self, *scopes, grant_type=Application.GRANT_PASSWORD, user=None):
         """Get access token for user test."""
         if not hasattr(self, '_tokens'):
             self._tokens = {}
 
+        if user is None and grant_type != Application.GRANT_CLIENT_CREDENTIALS:
+            user = self.user
+
         scope = ' '.join(scopes)
 
-        if scope not in self._tokens:
-            self._tokens[scope] = AccessToken.objects.create(
-                user=None if grant_type == Application.GRANT_CLIENT_CREDENTIALS else self.user,
+        token_cache_key = (user.email if user else None, scope)
+        if token_cache_key not in self._tokens:
+            self._tokens[token_cache_key] = AccessToken.objects.create(
+                user=user,
                 application=self.get_application(grant_type),
                 token=token_hex(16),
                 expires=now() + timedelta(hours=1),
                 scope=scope
             )
-        return self._tokens[scope]
+        return self._tokens[token_cache_key]
 
     @property
     def api_client(self):
@@ -111,9 +125,9 @@ class APITestMixin:
         return self.create_api_client()
 
     def create_api_client(self, scope=Scope.internal_front_end, *additional_scopes,
-                          grant_type=Application.GRANT_PASSWORD):
+                          grant_type=Application.GRANT_PASSWORD, user=None):
         """Creates an API client associated with an OAuth token with the specified scope."""
-        token = self.get_token(scope, *additional_scopes, grant_type=grant_type)
+        token = self.get_token(scope, *additional_scopes, grant_type=grant_type, user=user)
         client = APIClient()
         client.credentials(Authorization=f'Bearer {token}')
         return client

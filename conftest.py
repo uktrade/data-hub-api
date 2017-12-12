@@ -1,7 +1,10 @@
 import factory
 import pytest
+from botocore.stub import Stubber
 from django.core.management import call_command
 from pytest_django.lazy_django import skip_if_no_django
+
+from datahub.core.utils import get_s3_client
 
 
 @pytest.fixture(scope='session')
@@ -36,3 +39,11 @@ def api_client():
 
     from rest_framework.test import APIClient
     return APIClient()
+
+
+@pytest.fixture()
+def s3_stubber():
+    """S3 stubber using the botocore Stubber class"""
+    s3_client = get_s3_client()
+    with Stubber(s3_client) as s3_stubber:
+        yield s3_stubber

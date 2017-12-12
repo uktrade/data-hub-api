@@ -102,20 +102,15 @@ def test_get_basic_search_query():
 def test_limited_get_search_by_entity_query():
     """Tests search by entity."""
     date = '2017-06-13T09:44:31.062870'
-    filters = {
+    filter_data = {
         'address_town': ['Woodside'],
         'trading_address_country.id': ['80756b9a-5d95-e211-a939-e4115bead28a'],
-    }
-    ranges = {
-        'estimated_land_date': {
-            'gte': date,
-            'lte': date
-        }
+        'estimated_land_date_after': date,
+        'estimated_land_date_before': date,
     }
     query = elasticsearch.get_search_by_entity_query(
         term='test',
-        filters=filters,
-        ranges=ranges,
+        filter_data=filter_data,
         entity=ESInvestmentProject,
     )
     query = elasticsearch.limit_search_query(

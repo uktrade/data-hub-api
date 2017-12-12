@@ -13,6 +13,7 @@ class SearchOrderParams:
 
     FILTER_FIELDS = [
         'primary_market',
+        'uk_region',
         'created_on_before',
         'created_on_after',
         'assigned_to_adviser',
@@ -28,6 +29,7 @@ class SearchOrderParams:
 
     REMAP_FIELDS = {
         'primary_market': 'primary_market.id',
+        'uk_region': 'uk_region.id',
         'assigned_to_adviser': 'assignees.id',
         'assigned_to_team': 'assignees.dit_team.id',
         'company': 'company.id',

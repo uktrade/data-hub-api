@@ -5,7 +5,7 @@ import factory
 from django.utils.timezone import now, utc
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
-from datahub.core.constants import Country, Sector
+from datahub.core.constants import Country, Sector, UKRegion
 from datahub.core.test.factories import to_many_field
 
 from datahub.omis.invoice.test.factories import InvoiceFactory
@@ -27,6 +27,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
     contact = factory.LazyAttribute(lambda o: ContactFactory(company=o.company))
     primary_market_id = Country.france.value.id
     sector_id = Sector.aerospace_assembly_aircraft.value.id
+    uk_region_id = UKRegion.england.value.id
     description = factory.Faker('text')
     contacts_not_to_approach = factory.Faker('text')
     product_info = factory.Faker('text')
@@ -45,6 +46,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
     vat_status = VATStatus.eu
     vat_number = '0123456789'
     vat_verified = True
+    billing_company_name = factory.LazyAttribute(lambda o: o.company.name)
     billing_contact_name = factory.Faker('name')
     billing_email = factory.Faker('email')
     billing_phone = '+44 (0)444 123456'

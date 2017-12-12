@@ -55,7 +55,7 @@ def generate_quote_content(order, expires_on):
     """
     :returns: the content of the quote populated with the given order details.
     """
-    company = order.company.companies_house_data or order.company
+    company = order.company
     company_address = ', '.join(
         field for field in (
             company.registered_address_1,

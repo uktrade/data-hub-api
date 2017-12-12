@@ -59,6 +59,14 @@ class TestViewPublicOrderDetails(APITestMixin):
                 'id': str(order.contact.pk),
                 'name': order.contact.name
             },
+            'primary_market': {
+                'id': str(order.primary_market.id),
+                'name': order.primary_market.name
+            },
+            'uk_region': {
+                'id': str(order.uk_region.id),
+                'name': order.uk_region.name
+            },
             'contact_email': order.contact_email,
             'contact_phone': order.contact_phone,
             'vat_status': order.vat_status,
@@ -70,6 +78,7 @@ class TestViewPublicOrderDetails(APITestMixin):
             'subtotal_cost': order.subtotal_cost,
             'vat_cost': order.vat_cost,
             'total_cost': order.total_cost,
+            'billing_company_name': order.billing_company_name,
             'billing_contact_name': order.billing_contact_name,
             'billing_email': order.billing_email,
             'billing_phone': order.billing_phone,
