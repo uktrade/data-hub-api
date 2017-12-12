@@ -1281,7 +1281,7 @@ class TestModifiedSinceView(APITestMixin):
             InvestmentProjectFactory.create_batch(5)
 
         response = self._make_request({
-            'time': timestamp.isoformat()
+            'modified_on__gte': timestamp.isoformat()
         })
 
         assert response.status_code == status.HTTP_200_OK
@@ -1303,7 +1303,7 @@ class TestModifiedSinceView(APITestMixin):
             InvestmentProjectFactory.create_batch(5)
 
         response = self._make_request({
-            'until': timestamp.isoformat()
+            'modified_on__lte': timestamp.isoformat()
         })
 
         assert response.status_code == status.HTTP_200_OK
@@ -1327,8 +1327,8 @@ class TestModifiedSinceView(APITestMixin):
             InvestmentProjectFactory.create_batch(5)
 
         response = self._make_request({
-            'time': from_.isoformat(),
-            'until': until.isoformat()
+            'modified_on__gte': from_.isoformat(),
+            'modified_on__lte': until.isoformat()
         })
 
         assert response.status_code == status.HTTP_200_OK
