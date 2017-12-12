@@ -62,6 +62,7 @@ LOCAL_APPS = [
     'datahub.oauth',
     'datahub.search.apps.SearchConfig',
     'datahub.user',
+    'datahub.dbmaintenance',
     'datahub.omis.core',
     'datahub.omis.order',
     'datahub.omis.market',

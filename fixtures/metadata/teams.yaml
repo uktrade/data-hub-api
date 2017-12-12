@@ -26,6 +26,15 @@
     - - read_contact
       - company
       - contact
+    - - add_investmentproject
+      - investment
+      - investmentproject
+    - - change_associated_investmentproject
+      - investment
+      - investmentproject
+    - - read_associated_investmentproject
+      - investment
+      - investmentproject
   model: auth.group
 - fields:
     name: DA
@@ -99,6 +108,15 @@
     - - delete_ordersubscriber
       - order
       - ordersubscriber
+    - - add_investmentproject
+      - investment
+      - investmentproject
+    - - change_associated_investmentproject
+      - investment
+      - investmentproject
+    - - read_associated_investmentproject
+      - investment
+      - investmentproject
   model: auth.group
 - fields:
     name: DIT_staff
@@ -157,10 +175,10 @@
     - - add_investmentproject
       - investment
       - investmentproject
-    - - change_investmentproject
+    - - change_all_investmentproject
       - investment
       - investmentproject
-    - - read_investmentproject
+    - - read_all_investmentproject
       - investment
       - investmentproject
     - - add_investmentprojectcode

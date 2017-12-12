@@ -1,6 +1,7 @@
 from functools import wraps
 
 import factory
+from django.contrib.contenttypes.models import ContentType
 
 
 def to_many_field(wrapped_func):
@@ -60,3 +61,14 @@ class GroupFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'auth.Group'
+
+
+class PermissionFactory(factory.django.DjangoModelFactory):
+    """Permission Factory"""
+
+    name = factory.Faker('word')
+    codename = factory.Faker('word')
+    content_type = factory.Iterator(ContentType.objects.all())
+
+    class Meta:
+        model = 'auth.Permission'

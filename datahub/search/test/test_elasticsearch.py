@@ -8,7 +8,7 @@ from .. import elasticsearch
 
 def test_get_search_term_query():
     """Tests search term query."""
-    query = elasticsearch.get_search_term_query('hello', fields=('country.id', 'sector'))
+    query = elasticsearch._get_search_term_query('hello', fields=('country.id', 'sector'))
 
     assert query.to_dict() == {
         'bool': {
@@ -62,7 +62,7 @@ def test_remap_sort_field():
     }
 
     for key, value in fields.items():
-        assert elasticsearch.remap_sort_field(key) == value
+        assert elasticsearch._remap_sort_field(key) == value
 
 
 def test_date_range_fields():
@@ -74,7 +74,7 @@ def test_date_range_fields():
         'adviser.id': 1234,
     }
 
-    filters, ranges = elasticsearch.date_range_fields(fields)
+    filters, ranges = elasticsearch._split_date_range_fields(fields)
 
     assert filters == {
         'adviser.id': 1234

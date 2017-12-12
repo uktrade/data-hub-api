@@ -6,7 +6,7 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import InteractionType, Service, Team
-from datahub.core.test_utils import APITestMixin, get_test_user
+from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import (
     EventServiceDeliveryFactory, InteractionFactory, ServiceDeliveryFactory
@@ -21,10 +21,10 @@ class TestInteractionV3(APITestMixin):
     def test_interaction_no_permissions(self):
         """Should return 403"""
         interaction = InteractionFactory()
-        team = TeamFactory()
-        self._user = get_test_user(team=team)
+        user = create_test_user(team=TeamFactory())
+        api_client = self.create_api_client(user=user)
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        response = self.api_client.get(url)
+        response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_interaction_detail_view(self):

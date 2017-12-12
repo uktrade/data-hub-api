@@ -239,6 +239,7 @@ class TestGenerateQuote:
         )
         order = OrderFactory(
             company=company,
+            billing_company_name='',
             billing_contact_name='',
             billing_email='',
             billing_phone='',
@@ -262,6 +263,7 @@ class TestGenerateQuote:
         assert order.status == OrderStatus.quote_awaiting_acceptance
 
         # billing fields populated
+        assert order.billing_company_name == company.name
         assert order.billing_contact_name == order.contact.name
         assert order.billing_email == order.contact.email
         assert order.billing_phone == order.contact.telephone_number

@@ -21,22 +21,15 @@ class CompanyWithRegAddressFactory(CompanyFactory):
     registered_address_county = factory.Faker('text')
     registered_address_postcode = factory.Faker('text')
     registered_address_country_id = constants.Country.japan.value.id
-
-
-class CompaniesHouseWithRegAddressFactory(CompaniesHouseCompanyFactory):
-    """Factory for a companies house model with all registered address filled in."""
-
-    registered_address_1 = factory.Faker('text')
-    registered_address_2 = factory.Faker('text')
-    registered_address_town = factory.Faker('text')
-    registered_address_county = factory.Faker('text')
-    registered_address_postcode = factory.Faker('text')
-    registered_address_country_id = constants.Country.japan.value.id
+    company_number = factory.LazyFunction(
+        lambda: CompaniesHouseCompanyFactory().company_number
+    )
 
 
 class OrderWithoutBillingDataFactory(OrderFactory):
     """Factory for order without billing fields."""
 
+    billing_company_name = ''
     billing_contact_name = ''
     billing_email = ''
     billing_phone = ''
@@ -51,27 +44,13 @@ class OrderWithoutBillingDataFactory(OrderFactory):
 class TestPopulateBillingData:
     """Tests for the populate_billing_data logic."""
 
-    @pytest.mark.parametrize(
-        'CHFactory',  # noqa: N803
-        (
-            lambda: None,
-            CompaniesHouseWithRegAddressFactory
-        )
-    )
-    def test_with_empty_order(self, CHFactory):
+    def test_with_empty_order(self):
         """
         Test that an order without any of the billing fields filled in is populated
         with the company/contact details.
-
-        If the company is linked to a companies house record, the billing address
-        should be the companies house registered address.
-        Otherwise it should be the Data Hub company registered address.
         """
         contact = ContactFactory()
-        ch_company = CHFactory()
-        company = CompanyWithRegAddressFactory(
-            company_number=None if not ch_company else ch_company.company_number
-        )
+        company = CompanyWithRegAddressFactory()
         order = OrderWithoutBillingDataFactory(
             company=company,
             contact=contact
@@ -83,16 +62,13 @@ class TestPopulateBillingData:
         assert order.billing_email == contact.email
         assert order.billing_phone == contact.telephone_number
 
-        # if the company is linked to a companies house record, the billing address
-        # should be the CH registered address
-        # otherwise it should be the DH company registered address
-        expected_company = ch_company or company
-        assert order.billing_address_1 == expected_company.registered_address_1
-        assert order.billing_address_2 == expected_company.registered_address_2
-        assert order.billing_address_town == expected_company.registered_address_town
-        assert order.billing_address_county == expected_company.registered_address_county
-        assert order.billing_address_postcode == expected_company.registered_address_postcode
-        assert order.billing_address_country == expected_company.registered_address_country
+        assert order.billing_company_name == company.name
+        assert order.billing_address_1 == company.registered_address_1
+        assert order.billing_address_2 == company.registered_address_2
+        assert order.billing_address_town == company.registered_address_town
+        assert order.billing_address_county == company.registered_address_county
+        assert order.billing_address_postcode == company.registered_address_postcode
+        assert order.billing_address_country == company.registered_address_country
 
     def test_with_null_values(self):
         """
@@ -125,6 +101,7 @@ class TestPopulateBillingData:
     @pytest.mark.parametrize(
         'order_field,order_value',
         (
+            ('billing_company_name', 'My Corp'),
             ('billing_contact_name', 'Another John'),
             ('billing_email', 'another-email@example.com'),
             ('billing_phone', '99 001122'),
@@ -136,6 +113,7 @@ class TestPopulateBillingData:
         it does not get overridden.
         """
         billing_details = {
+            'billing_company_name': '',
             'billing_contact_name': '',
             'billing_email': '',
             'billing_phone': '',

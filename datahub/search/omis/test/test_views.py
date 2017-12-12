@@ -7,7 +7,7 @@ from rest_framework.reverse import reverse
 from datahub.company.models import Company
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
-from datahub.core.test_utils import APITestMixin, get_test_user
+from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.models import Order
@@ -28,6 +28,7 @@ def setup_data(setup_es):
         order = OrderFactory(
             reference='abcd',
             primary_market_id=constants.Country.japan.value.id,
+            uk_region_id=constants.UKRegion.channel_islands.value.id,
             assignees=[],
             status=OrderStatus.draft,
             company=company,
@@ -52,6 +53,7 @@ def setup_data(setup_es):
         order = OrderWithAcceptedQuoteFactory(
             reference='efgh',
             primary_market_id=constants.Country.france.value.id,
+            uk_region_id=constants.UKRegion.east_midlands.value.id,
             assignees=[],
             status=OrderStatus.quote_awaiting_acceptance,
             company=company,
@@ -78,10 +80,10 @@ class TestSearchOrder(APITestMixin):
 
     def test_no_permissions(self):
         """Should return 403"""
-        team = TeamFactory()
-        self._user = get_test_user(team=team)
+        user = create_test_user(team=TeamFactory())
+        api_client = self.create_api_client(user=user)
         url = reverse('api-v3:search:order')
-        response = self.api_client.get(url)
+        response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize(
@@ -97,6 +99,10 @@ class TestSearchOrder(APITestMixin):
             ),
             (  # filter by primary market
                 {'primary_market': constants.Country.france.value.id},
+                ['efgh']
+            ),
+            (  # filter by uk region
+                {'uk_region': constants.UKRegion.east_midlands.value.id},
                 ['efgh']
             ),
             (  # filter by a range of date for created_on
