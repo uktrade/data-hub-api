@@ -157,21 +157,24 @@ def _get_sort_query(qs, field_order=None):
 
 
 def _get_global_permission_query(permission_filters_by_entity=None):
-    if not permission_filters_by_entity:
+    if permission_filters_by_entity is None:
         return None
 
     subqueries = _get_global_permission_subqueries(permission_filters_by_entity)
     return Bool(
-        must=list(subqueries),
+        should=list(subqueries),
     )
 
 
 def _get_global_permission_subqueries(permission_filters_by_entity):
-    for entity, filter_args in permission_filters_by_entity:
+    for entity, filter_args in permission_filters_by_entity.items():
+        query = Term(_type=entity)
         entity_condition = _get_entity_permission_query(filter_args)
-        entity_match = Term(_type=entity._doc_type.name)
 
-        yield entity_condition | ~entity_match
+        if entity_condition is not None:
+            query &= entity_condition
+
+        yield query
 
 
 def get_basic_search_query(
@@ -186,6 +189,11 @@ def get_basic_search_query(
     """Performs basic search looking for name and then SEARCH_FIELDS in entity.
 
     Also returns number of results in other entities.
+
+    :param permission_filters_by_entity: List of pairs of entities and corresponding permission
+                                         filters. Only entities in this list are included in the
+                                         results, and those are entities are also filtered using
+                                         the corresponding permission filters.
     """
     limit = _clip_limit(offset, limit)
 
@@ -373,7 +381,12 @@ def get_search_by_entity_query(term=None,
                                entity=None,
                                field_order=None,
                                aggregations=None):
-    """Perform filtered search for given terms in given entity."""
+    """
+    Perform filtered search for given terms in given entity.
+
+    :param permission_filters: dict of field names and values. These represent rules that records
+                               must match one of to be included in the results.
+    """
     query = [Q('term', _type=entity._doc_type.name)]
     if term != '':
         query.append(_get_search_term_query(term, fields=entity.SEARCH_FIELDS))

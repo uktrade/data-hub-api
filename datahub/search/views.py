@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from datahub.oauth.scopes import Scope
 from . import elasticsearch
 from .apps import get_search_apps
-from .permissions import SearchAppPermissions
+from .permissions import has_permissions_for_app, SearchAppPermissions
 from .serializers import SearchSerializer
 from .utils import Echo
 
@@ -76,7 +76,7 @@ class SearchBasicAPIView(APIView):
         results = elasticsearch.get_basic_search_query(
             term=term,
             entities=(self.entity_by_name[entity].model,),
-            permission_filters_by_entity=_get_permission_filters(request),
+            permission_filters_by_entity=dict(_get_permission_filters(request)),
             field_order=sortby,
             ignored_entities=self.IGNORED_ENTITIES,
             offset=offset,
@@ -101,9 +101,11 @@ def _get_permission_filters(request):
     Only entities that the user has access are returned.
     """
     for app in get_search_apps():
+        if not has_permissions_for_app(request, app):
+            continue
+
         filter_args = app.get_permission_filters(request)
-        if filter_args:
-            yield (app.ESModel, filter_args)
+        yield (app.ESModel._doc_type.name, filter_args)
 
 
 class SearchAPIView(APIView):

@@ -6,8 +6,12 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, create_test_user
+from datahub.event.test.factories import EventFactory
+from datahub.interaction.test.factories import InteractionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.metadata.test.factories import TeamFactory
+from datahub.omis.order.test.factories import OrderFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -370,3 +374,47 @@ class TestSearch(APITestMixin):
                         {'count': 1, 'entity': 'contact'},
                         {'count': 1, 'entity': 'investment_project'}]
         assert all(aggregation in response.data['aggregations'] for aggregation in aggregations)
+
+    @pytest.mark.parametrize('permission,permission_entity', (
+        ('read_company', 'company'),
+        ('read_contact', 'contact'),
+        ('read_event', 'event'),
+        ('read_interaction', 'interaction'),
+        ('read_all_investmentproject', 'investment_project'),
+        ('read_associated_investmentproject', 'investment_project'),
+        ('read_order', 'order'),
+    ))
+    @pytest.mark.parametrize('entity', (
+        'company',
+        'contact',
+        'event',
+        'interaction',
+        'investment_project',
+        'order',
+    ))
+    def test_basic_search_permissions(self, setup_es, permission, permission_entity, entity):
+        """Tests model permissions enforcement in basic search."""
+        user = create_test_user(team=TeamFactory(), permission_codenames=[permission])
+        api_client = self.create_api_client(user=user)
+
+        InvestmentProjectFactory(created_by=user)
+        CompanyFactory()
+        ContactFactory()
+        EventFactory()
+        InteractionFactory()
+        OrderFactory()
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:basic')
+        response = api_client.get(url, {
+            'term': '',
+            'entity': entity,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert (response_data['count'] == 0) == (permission_entity != entity)
+
+        assert len(response_data['aggregations']) == 1
+        assert response_data['aggregations'][0]['entity'] == permission_entity
