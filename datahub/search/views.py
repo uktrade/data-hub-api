@@ -11,10 +11,10 @@ from rest_framework.fields import empty
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from datahub.core.permissions import UserHasPermissions
 from datahub.oauth.scopes import Scope
 from . import elasticsearch
 from .apps import get_search_apps
+from .permissions import SearchAppPermissions
 from .serializers import SearchSerializer
 from .utils import Echo
 
@@ -110,7 +110,7 @@ class SearchAPIView(APIView):
     """Filtered search view."""
 
     search_app = None
-    permission_classes = (IsAuthenticatedOrTokenHasScope, UserHasPermissions)
+    permission_classes = (IsAuthenticatedOrTokenHasScope, SearchAppPermissions)
     FILTER_FIELDS = []
     REMAP_FIELDS = {}
 

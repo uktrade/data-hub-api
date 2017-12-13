@@ -1,8 +1,3 @@
-from oauth2_provider.contrib.rest_framework import IsAuthenticatedOrTokenHasScope
-
-from datahub.investment.permissions import (
-    InvestmentProjectModelPermissions, IsAssociatedToInvestmentProjectPermission
-)
 from datahub.oauth.scopes import Scope
 from .models import InvestmentProject
 from .serializers import SearchInvestmentProjectSerializer
@@ -12,11 +7,6 @@ from ..views import SearchAPIView, SearchExportAPIView
 class SearchInvestmentProjectParams:
     """Search investment project params."""
 
-    permission_classes = (
-        IsAuthenticatedOrTokenHasScope,
-        InvestmentProjectModelPermissions,
-        IsAssociatedToInvestmentProjectPermission
-    )
     required_scopes = (Scope.internal_front_end,)
     entity = InvestmentProject
     serializer_class = SearchInvestmentProjectSerializer

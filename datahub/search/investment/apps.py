@@ -5,7 +5,7 @@ from datahub.investment.models import (
     InvestmentProject as DBInvestmentProject,
     InvestmentProjectTeamMember as DBInvestmentProjectTeamMember
 )
-from datahub.investment.permissions import InvestmentProjectAssociationChecker
+from datahub.investment.permissions import InvestmentProjectAssociationChecker, Permissions
 
 from .models import InvestmentProject
 from .views import SearchInvestmentProjectAPIView, SearchInvestmentProjectExportAPIView
@@ -20,6 +20,10 @@ class InvestmentSearchApp(SearchApp):
     ESModel = InvestmentProject
     view = SearchInvestmentProjectAPIView
     export_view = SearchInvestmentProjectExportAPIView
+    permission_required = (
+        f'investment.{Permissions.read_all}',
+        f'investment.{Permissions.read_associated}'
+    )
     queryset = DBInvestmentProject.objects.prefetch_related(
         'archived_by',
         'average_salary',

@@ -13,6 +13,7 @@ class CompanySearchApp(SearchApp):
     ESModel = Company
     view = SearchCompanyAPIView
     export_view = SearchCompanyExportAPIView
+    permission_required = ('company.read_company',)
     queryset = DBCompany.objects.prefetch_related(
         'account_manager',
         'archived_by',

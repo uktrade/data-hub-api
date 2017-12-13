@@ -48,11 +48,7 @@ class SearchContactParams:
 class SearchContactAPIView(SearchContactParams, SearchAPIView):
     """Filtered contact search view."""
 
-    permission_required = 'company.read_contact'
-
 
 class SearchContactExportAPIView(SearchContactParams,
                                  SearchExportAPIView):
     """Filtered contact search export view."""
-
-    permission_required = 'company.read_contact'

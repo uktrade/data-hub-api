@@ -27,6 +27,7 @@ class SearchApp:
     view = None
     export_view = None
     queryset = None
+    permission_required = None
 
     def __init__(self, mod):
         """Create this search app without initialising any ES config."""
