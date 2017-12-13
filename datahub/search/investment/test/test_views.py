@@ -486,3 +486,29 @@ class TestBasicSearch(APITestMixin):
                         str(project_4.id), str(project_5.id)}
 
         assert {result['id'] for result in results} == expected_ids
+
+    def test_global_restricted_user_with_no_team_cannot_see_projects(self, setup_es):
+        """
+        Checks that a restricted user that doesn't have a team cannot view projects associated
+        with other advisers that don't have teams.
+        """
+        adviser_other = AdviserFactory(dit_team_id=None)
+        request_user = create_test_user(
+            permission_codenames=['read_associated_investmentproject']
+        )
+        api_client = self.create_api_client(user=request_user)
+
+        InvestmentProjectFactory()
+        InvestmentProjectFactory(created_by=adviser_other)
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:basic')
+        response = api_client.get(url, data={
+            'term': '',
+            'entity': 'investment_project'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 0

@@ -72,7 +72,8 @@ class SearchApp:
         """
         Gets filter arguments used to enforce permissions.
 
-        Results much match at least one of the rules in the dict returned.
+        The returned dict containes rules in the form of field names and values. Results much
+        match at least one of these rules.
         """
         return None
 
