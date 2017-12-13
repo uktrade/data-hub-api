@@ -1,5 +1,5 @@
 from django.db import transaction
-from django.db.models.signals import post_save
+from django.db.models.signals import post_delete, post_save
 
 from datahub.investment.models import (
     InvestmentProject as DBInvestmentProject,
@@ -15,10 +15,8 @@ def investment_project_sync_es(sender, instance, **kwargs):
     def sync_es_wrapper():
         if isinstance(instance, InvestmentProjectTeamMember):
             pk = instance.investment_project.pk
-        elif isinstance(instance, DBInvestmentProject):
-            pk = instance.pk
         else:
-            return False
+            pk = instance.pk
 
         sync_es(
             ESInvestmentProject,
@@ -39,7 +37,12 @@ def connect_signals():
     post_save.connect(
         investment_project_sync_es,
         sender=InvestmentProjectTeamMember,
-        dispatch_uid='investment_project_sync_es'
+        dispatch_uid='investment_project_team_member_save_sync_es'
+    )
+    post_delete.connect(
+        investment_project_sync_es,
+        sender=InvestmentProjectTeamMember,
+        dispatch_uid='investment_project_team_member_delete_sync_es'
     )
 
 
@@ -53,5 +56,10 @@ def disconnect_signals():
     post_save.disconnect(
         investment_project_sync_es,
         sender=InvestmentProjectTeamMember,
-        dispatch_uid='investment_project_sync_es'
+        dispatch_uid='investment_project_team_member_save_sync_es'
+    )
+    post_delete.disconnect(
+        investment_project_sync_es,
+        sender=InvestmentProjectTeamMember,
+        dispatch_uid='investment_project_team_member_delete_sync_es'
     )
