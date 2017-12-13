@@ -1,5 +1,6 @@
 from functools import lru_cache
 from importlib import import_module
+from typing import Optional
 
 from django.apps import AppConfig
 from django.conf import settings
@@ -65,6 +66,14 @@ class SearchApp:
         queryset = self.get_queryset()
 
         return DataSet(queryset, self.ESModel)
+
+    def get_permission_filters(self, request) -> Optional[dict]:
+        """
+        Gets filter arguments used to enforce permissions.
+
+        Results much match at least one of the rules in the dict returned.
+        """
+        return None
 
 
 @lru_cache(maxsize=None)

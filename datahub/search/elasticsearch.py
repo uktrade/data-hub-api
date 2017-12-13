@@ -5,7 +5,7 @@ from django.conf import settings
 from elasticsearch.helpers import bulk as es_bulk
 from elasticsearch_dsl import analysis, Index, Search
 from elasticsearch_dsl.connections import connections
-from elasticsearch_dsl.query import MatchPhrase, MultiMatch, Q
+from elasticsearch_dsl.query import Bool, MatchPhrase, MultiMatch, Q, Term
 
 from .apps import get_search_apps
 
@@ -156,9 +156,28 @@ def _get_sort_query(qs, field_order=None):
     return qs
 
 
+def _get_global_permission_query(permission_filters_by_entity=None):
+    if not permission_filters_by_entity:
+        return None
+
+    subqueries = _get_global_permission_subqueries(permission_filters_by_entity)
+    return Bool(
+        must=list(subqueries),
+    )
+
+
+def _get_global_permission_subqueries(permission_filters_by_entity):
+    for entity, filter_args in permission_filters_by_entity:
+        entity_condition = _get_entity_permission_query(filter_args)
+        entity_match = Term(_type=entity._doc_type.name)
+
+        yield entity_condition | ~entity_match
+
+
 def get_basic_search_query(
         term,
         entities=None,
+        permission_filters_by_entity=None,
         field_order=None,
         ignored_entities=(),
         offset=0,
@@ -179,6 +198,11 @@ def get_basic_search_query(
 
     query = _get_search_term_query(term, fields=fields)
     s = Search(index=settings.ES_INDEX).query(query)
+
+    permission_query = _get_global_permission_query(permission_filters_by_entity)
+    if permission_query:
+        s = s.filter(permission_query)
+
     s = s.post_filter(
         Q('bool', should=[
             Q('term', _type=entity._doc_type.name) for entity in entities
@@ -331,17 +355,15 @@ def _get_must_filter_query(filters, composite_filters, ranges):
     return must_filter
 
 
-def _get_permission_filter(permission_filters=None):
+def _get_entity_permission_query(permission_filters=None):
     if not permission_filters:
         return None
 
-    permission_subqueries = [_get_filter_query(k, v) for k, v in permission_filters.items()]
-    permission_query = Q(
-        'bool',
-        should=permission_subqueries,
-        minimum_should_match=1
+    subqueries = [Term(**{field: value}) for field, value in permission_filters.items()]
+
+    return Bool(
+        should=subqueries
     )
-    return permission_query
 
 
 def get_search_by_entity_query(term=None,
@@ -361,11 +383,12 @@ def get_search_by_entity_query(term=None,
     # document must match all filters in the list (and)
     must_filter = _get_must_filter_query(filters, composite_filters, ranges)
 
-    permission_query = _get_permission_filter(permission_filters)
-    if permission_query:
-        must_filter.append(permission_query)
-
     s = Search(index=settings.ES_INDEX).query('bool', must=query)
+
+    permission_query = _get_entity_permission_query(permission_filters)
+    if permission_query:
+        s = s.filter(permission_query)
+
     s = _get_sort_query(s, field_order=field_order)
 
     s = s.post_filter('bool', must=must_filter)

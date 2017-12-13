@@ -1,9 +1,7 @@
 from oauth2_provider.contrib.rest_framework import IsAuthenticatedOrTokenHasScope
 
-from datahub.investment.models import InvestmentProject as DBInvestmentProject
 from datahub.investment.permissions import (
-    InvestmentProjectAssociationChecker, InvestmentProjectModelPermissions,
-    IsAssociatedToInvestmentProjectPermission, Permissions
+    InvestmentProjectModelPermissions, IsAssociatedToInvestmentProjectPermission
 )
 from datahub.oauth.scopes import Scope
 from .models import InvestmentProject
@@ -19,10 +17,8 @@ class SearchInvestmentProjectParams:
         InvestmentProjectModelPermissions,
         IsAssociatedToInvestmentProjectPermission
     )
-    permission_required = f'investment.{Permissions.read_all}'
     required_scopes = (Scope.internal_front_end,)
     entity = InvestmentProject
-    model = DBInvestmentProject
     serializer_class = SearchInvestmentProjectSerializer
 
     include_aggregations = True
@@ -49,26 +45,6 @@ class SearchInvestmentProjectParams:
         'stage': 'stage.id',
         'uk_region_location': 'uk_region_locations.id',
     }
-
-    def get_permission_filter_args(self):
-        """Gets permission filter arguments."""
-        checker = InvestmentProjectAssociationChecker()
-
-        if not checker.should_apply_restrictions(self.request, self):
-            return None
-
-        dit_team_id = str(self.request.user.dit_team_id) if self.request.user else None
-        filters = {
-            f'{field}.dit_team.id': dit_team_id
-            for field in DBInvestmentProject.ASSOCIATED_ADVISER_TO_ONE_FIELDS
-        }
-
-        filters.update({
-            f'{field.es_field_name}.dit_team.id': dit_team_id
-            for field in DBInvestmentProject.ASSOCIATED_ADVISER_TO_MANY_FIELDS
-        })
-
-        return filters
 
 
 class SearchInvestmentProjectAPIView(SearchInvestmentProjectParams, SearchAPIView):

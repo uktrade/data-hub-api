@@ -276,6 +276,20 @@ def test_mapping(setup_es):
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
                             'type': 'text'
+                        },
+                        'dit_team': {
+                            'include_in_parent': True,
+                            'properties': {
+                                'id': {
+                                    'type': 'keyword'
+                                },
+                                'name': {
+                                    'analyzer': 'lowercase_keyword_analyzer',
+                                    'fielddata': True,
+                                    'type': 'text'
+                                }
+                            },
+                            'type': 'nested'
                         }
                     },
                     'type': 'nested'
@@ -508,7 +522,11 @@ def test_indexed_doc(Factory, setup_es):
                 'id': str(order.created_by.pk),
                 'first_name': order.created_by.first_name,
                 'last_name': order.created_by.last_name,
-                'name': order.created_by.name
+                'name': order.created_by.name,
+                'dit_team': {
+                    'id': str(order.created_by.dit_team.id),
+                    'name': order.created_by.dit_team.name
+                }
             },
             'company': {
                 'id': str(order.company.pk),
