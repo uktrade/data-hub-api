@@ -89,18 +89,16 @@ class InvestmentProjectAssociationChecker(ObjectAssociationCheckerBase):
 
     restricted_actions = {'read', 'change'}
 
-    def is_associated(self, request, view, obj):
+    def is_associated(self, request, obj):
         """Check for connection."""
         return any(request.user.dit_team_id == user.dit_team_id
                    for user in obj.get_associated_advisers())
 
-    def should_apply_restrictions(self, request, view):
+    def should_apply_restrictions(self, request, view_action, model):
         """Check if restrictions should be applied."""
-        action = get_model_action_for_view_action(request.method, view.action)
+        action = get_model_action_for_view_action(request.method, view_action)
         if action not in self.restricted_actions:
             return False
-
-        model = _get_model_for_view(view)
 
         format_kwargs = {
             'app_label': model._meta.app_label,
@@ -136,7 +134,7 @@ class IsAssociatedToInvestmentProjectFilter(BaseFilterBackend):
         """Filters the queryset for restricted users."""
         view_should_be_filtered = view.action in self.actions_to_filter
         restrictions_are_active = self.checker.should_apply_restrictions(
-            request=request, view=view
+            request, view.action, queryset.model
         )
 
         if view_should_be_filtered and restrictions_are_active:
@@ -152,4 +150,8 @@ class IsAssociatedToInvestmentProjectFilter(BaseFilterBackend):
 
 
 def _get_model_for_view(view):
-    return getattr(view, 'model', None) or view.get_queryset().model
+    if hasattr(view, 'search_app'):
+        queryset = view.search_app.queryset
+    else:
+        queryset = view.get_queryset()
+    return queryset.model

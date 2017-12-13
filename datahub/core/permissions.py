@@ -53,11 +53,11 @@ class ObjectAssociationCheckerBase(ABC):
     """
 
     @abstractmethod
-    def is_associated(self, request, view, obj) -> bool:
+    def is_associated(self, request, obj) -> bool:
         """Checks whether the user is associated with a particular object."""
 
     @abstractmethod
-    def should_apply_restrictions(self, request, view) -> bool:
+    def should_apply_restrictions(self, request, view_action, model) -> bool:
         """
         Checks whether a request should be restricted to objects that the user is associated with.
         """
@@ -81,8 +81,8 @@ class IsAssociatedToObjectPermission(BasePermission):
         """
         Determines whether the user has permission for the specified object, using checker_class.
         """
-        if self.checker.should_apply_restrictions(request, view):
-            return self.checker.is_associated(request, view, obj)
+        if self.checker.should_apply_restrictions(request, view.action, view.get_queryset().model):
+            return self.checker.is_associated(request, obj)
         return True
 
 

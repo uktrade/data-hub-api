@@ -240,7 +240,7 @@ class TestSearch(APITestMixin):
         (Permissions.read_all,),
         (Permissions.read_associated, Permissions.read_all),
     ))
-    def test_non_restricted_user_can_see_all_projects(self, permissions):
+    def test_non_restricted_user_can_see_all_projects(self, setup_es, permissions):
         """Test that normal users can see all projects."""
         team = TeamFactory()
         team_others = TeamFactory()
@@ -259,8 +259,10 @@ class TestSearch(APITestMixin):
         InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
         InvestmentProjectTeamMemberFactory(adviser=adviser_2, investment_project=iproject_2)
 
-        url = reverse('api-v3:investment:investment-collection')
-        response = api_client.get(url)
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:investment_project')
+        response = api_client.post(url, {}, format='json')
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -404,3 +406,83 @@ class TestBasicSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
         assert response.data['results'][0]['project_code'] == investment_project.project_code
+
+    @pytest.mark.parametrize('permissions', (
+        (Permissions.read_all,),
+        (Permissions.read_associated, Permissions.read_all),
+    ))
+    def test_global_non_restricted_user_can_see_all_projects(self, setup_es, permissions):
+        """Test that normal users can see all projects."""
+        team = TeamFactory()
+        team_others = TeamFactory()
+        adviser_1 = AdviserFactory(dit_team_id=team.id)
+        adviser_2 = AdviserFactory(dit_team_id=team_others.id)
+
+        request_user = create_test_user(
+            team=team,
+            permission_codenames=permissions,
+        )
+        api_client = self.create_api_client(user=request_user)
+
+        iproject_1 = InvestmentProjectFactory()
+        iproject_2 = InvestmentProjectFactory()
+
+        InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
+        InvestmentProjectTeamMemberFactory(adviser=adviser_2, investment_project=iproject_2)
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:basic')
+        response = api_client.get(url, data={
+            'term': '',
+            'entity': 'investment_project'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 2
+        assert {str(iproject_1.pk), str(iproject_2.pk)} == {
+            result['id'] for result in response_data['results']
+        }
+
+    def test_global_restricted_users_cannot_see_other_teams_projects(self, setup_es):
+        """
+        Automatic filter to see only associated IP for a specific (leps) user
+        """
+        team = TeamFactory()
+        team_other = TeamFactory()
+        adviser_other = AdviserFactory(dit_team_id=team_other.id)
+        adviser_same_team = AdviserFactory(dit_team_id=team.id)
+        request_user = create_test_user(
+            team=team,
+            permission_codenames=['read_associated_investmentproject']
+        )
+        api_client = self.create_api_client(user=request_user)
+
+        project_other = InvestmentProjectFactory()
+        project_1 = InvestmentProjectFactory()
+        project_2 = InvestmentProjectFactory(created_by=adviser_same_team)
+        project_3 = InvestmentProjectFactory(client_relationship_manager=adviser_same_team)
+        project_4 = InvestmentProjectFactory(project_manager=adviser_same_team)
+        project_5 = InvestmentProjectFactory(project_assurance_adviser=adviser_same_team)
+
+        InvestmentProjectTeamMemberFactory(adviser=adviser_other, investment_project=project_other)
+        InvestmentProjectTeamMemberFactory(adviser=adviser_same_team, investment_project=project_1)
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:basic')
+        response = api_client.get(url, data={
+            'term': '',
+            'entity': 'investment_project'
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 5
+
+        results = response_data['results']
+        expected_ids = {str(project_1.id), str(project_2.id), str(project_3.id),
+                        str(project_4.id), str(project_5.id)}
+
+        assert {result['id'] for result in results} == expected_ids

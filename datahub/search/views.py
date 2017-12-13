@@ -76,6 +76,7 @@ class SearchBasicAPIView(APIView):
         results = elasticsearch.get_basic_search_query(
             term=term,
             entities=(self.entity_by_name[entity].model,),
+            permission_filters_by_entity=_get_permission_filters(request),
             field_order=sortby,
             ignored_entities=self.IGNORED_ENTITIES,
             offset=offset,
@@ -92,9 +93,23 @@ class SearchBasicAPIView(APIView):
         return Response(data=response)
 
 
+def _get_permission_filters(request):
+    """
+    Gets the permissions filters that should be applied to each search entity (to enforce
+    permissions).
+
+    Only entities that the user has access are returned.
+    """
+    for app in get_search_apps():
+        filter_args = app.get_permission_filters(request)
+        if filter_args:
+            yield (app.ESModel, filter_args)
+
+
 class SearchAPIView(APIView):
     """Filtered search view."""
 
+    search_app = None
     permission_classes = (IsAuthenticatedOrTokenHasScope, UserHasPermissions)
     FILTER_FIELDS = []
     REMAP_FIELDS = {}
@@ -118,14 +133,6 @@ class SearchAPIView(APIView):
             if field in validated_data
         }
         return filters
-
-    def get_permission_filter_args(self) -> dict:
-        """
-        Gets filter arguments used to enforce permissions.
-
-        Results much match at least one of the rules in the dict returned.
-        """
-        return {}
 
     def validate_data(self, data):
         """Validate and clean data."""
@@ -160,7 +167,7 @@ class SearchAPIView(APIView):
 
         validated_data = self.validate_data(data)
         filter_data = self._get_filter_data(validated_data)
-        permission_filters = self.get_permission_filter_args()
+        permission_filters = self.search_app.get_permission_filters(request)
 
         aggregations = (self.REMAP_FIELDS.get(field, field) for field in self.FILTER_FIELDS) \
             if self.include_aggregations else None
