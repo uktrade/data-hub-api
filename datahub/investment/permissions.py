@@ -61,7 +61,7 @@ class InvestmentProjectModelPermissions(BasePermission):
         if not request.user or not request.user.is_authenticated:
             return False
 
-        model = _get_model_for_view(view)
+        model = view.get_queryset().model
         perms = self._get_required_permissions(request, view, model)
 
         return any(request.user.has_perm(perm) for perm in perms)
@@ -147,11 +147,3 @@ class IsAssociatedToInvestmentProjectFilter(BaseFilterBackend):
                 query |= Q(**{full_field_name: request.user.dit_team})
             return queryset.filter(query)
         return queryset
-
-
-def _get_model_for_view(view):
-    if hasattr(view, 'search_app'):
-        queryset = view.search_app.queryset
-    else:
-        queryset = view.get_queryset()
-    return queryset.model

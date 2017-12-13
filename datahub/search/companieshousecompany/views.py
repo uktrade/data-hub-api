@@ -29,5 +29,3 @@ class SearchCompaniesHouseCompanyAPIView(
     SearchAPIView
 ):
     """Filtered company search view."""
-
-    permission_required = 'company.read_companieshousecompany'

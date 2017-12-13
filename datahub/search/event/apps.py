@@ -11,6 +11,7 @@ class EventSearchApp(SearchApp):
     ESModel = Event
     view = SearchEventAPIView
     export_view = SearchEventExportAPIView
+    permission_required = ('event.read_event',)
     queryset = DBEvent.objects.prefetch_related(
         'address_country',
         'event_type',

@@ -10,6 +10,7 @@ class CompaniesHouseCompanySearchApp(SearchApp):
     name = 'companieshousecompany'
     ESModel = CompaniesHouseCompany
     view = SearchCompaniesHouseCompanyAPIView
+    permission_required = ('company.read_companieshousecompany',)
     queryset = DBCompaniesHouseCompany.objects.prefetch_related(
         'registered_address_country',
     )
