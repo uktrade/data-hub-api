@@ -144,7 +144,7 @@ def test_simulate(s3_stubber):
     object_key = 'test_key'
     csv_content = f"""id,investor_company_id,intermediate_company_id,uk_company_id,uk_company_decided
 {investment_projects[0].id},{file_companies[0].pk},{file_companies[1].pk},{file_companies[2].pk},1
-{investment_projects[0].id},{file_companies[0].pk},{file_companies[1].pk},{file_companies[2].pk},1
+{investment_projects[1].id},{file_companies[0].pk},{file_companies[1].pk},{file_companies[2].pk},1
 """
     s3_stubber.add_response(
         'get_object',
