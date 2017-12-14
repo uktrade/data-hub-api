@@ -25,7 +25,7 @@ class Command(CSVBaseCommand):
     def _parse_company_id(self, company_id):
         """
         :param company_id: string representing uuid of the company
-        :return: instance of UUID or None otherwise
+        :return: instance of UUID or None
         """
         if not company_id or company_id.lower().strip() == 'null':
             return None
@@ -84,7 +84,7 @@ class Command(CSVBaseCommand):
 
         company_ids = [
             company_id for company_id in
-            [investor_company_id, intermediate_company_id, uk_company_id]
+            (investor_company_id, intermediate_company_id, uk_company_id,)
             if company_id is not None
         ]
         if not self._can_update(company_ids):
