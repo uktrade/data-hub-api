@@ -24,9 +24,8 @@ class Command(CSVBaseCommand):
 
     def _parse_company_id(self, company_id):
         """
-        :param company_id: uuid of the company
-        :return: instance of Company with id == company_id if it exists,
-            None otherwise
+        :param company_id: string representing uuid of the company
+        :return: instance of UUID or None otherwise
         """
         if not company_id or company_id.lower().strip() == 'null':
             return None
@@ -54,7 +53,11 @@ class Command(CSVBaseCommand):
                 investment_project.uk_company_decided != uk_company_decided)
 
     def _can_update(self, company_ids):
-        """Check if given list of company_ids exists."""
+        """Check if given list of company_ids exists.
+
+        :param: company_ids: list of company ids
+        :return: True if can update, otherwise False
+        """
         return (
             Company.objects.values_list('id').filter(id__in=company_ids).count() ==
             len(company_ids)
