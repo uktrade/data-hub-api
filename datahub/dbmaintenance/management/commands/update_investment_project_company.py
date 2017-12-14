@@ -1,6 +1,5 @@
 import uuid
 
-from datahub.company.models import Company
 from datahub.investment.models import InvestmentProject
 from ..base import CSVBaseCommand
 
@@ -33,9 +32,9 @@ class Command(CSVBaseCommand):
 
     def _should_update(self,
                        investment_project,
-                       investor_company,
-                       intermediate_company,
-                       uk_company,
+                       investor_company_id,
+                       intermediate_company_id,
+                       uk_company_id,
                        uk_company_decided):
         """
         Checks if Investment project should be updated.
@@ -47,21 +46,10 @@ class Command(CSVBaseCommand):
         :param uk_company_decided: Boolean
         :return: True if investment project needs to be updated
         """
-        return (investment_project.investor_company != investor_company or
-                investment_project.intermediate_company != intermediate_company or
-                investment_project.uk_company != uk_company or
+        return (investment_project.investor_company_id != investor_company_id or
+                investment_project.intermediate_company_id != intermediate_company_id or
+                investment_project.uk_company_id != uk_company_id or
                 investment_project.uk_company_decided != uk_company_decided)
-
-    def _can_update(self, company_ids):
-        """Check if given list of company_ids exists.
-
-        :param: company_ids: list of company ids
-        :return: True if can update, otherwise False
-        """
-        return (
-            Company.objects.values_list('id').filter(id__in=company_ids).count() ==
-            len(company_ids)
-        )
 
     def get_uk_company_decided(self, uk_company_decided):
         """
@@ -81,14 +69,6 @@ class Command(CSVBaseCommand):
         intermediate_company_id = self._parse_company_id(row['intermediate_company_id'])
         uk_company_id = self._parse_company_id(row['uk_company_id'])
         uk_company_decided = self.get_uk_company_decided(row['uk_company_decided'])
-
-        company_ids = [
-            company_id for company_id in
-            (investor_company_id, intermediate_company_id, uk_company_id,)
-            if company_id is not None
-        ]
-        if not self._can_update(company_ids):
-            raise ValueError('Companies not found.')
 
         if self._should_update(
             investment_project,
