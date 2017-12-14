@@ -1,4 +1,4 @@
-from functools import lru_cache
+import uuid
 
 from datahub.company.models import Company
 from datahub.investment.models import InvestmentProject
@@ -22,8 +22,7 @@ class Command(CSVBaseCommand):
             help='If True it only simulates the command without saving the changes.',
         )
 
-    @lru_cache(maxsize=None)
-    def get_company(self, company_id):
+    def _parse_company_id(self, company_id):
         """
         :param company_id: uuid of the company
         :return: instance of Company with id == company_id if it exists,
@@ -31,7 +30,7 @@ class Command(CSVBaseCommand):
         """
         if not company_id or company_id.lower().strip() == 'null':
             return None
-        return Company.objects.get(id=company_id)
+        return uuid.UUID(company_id)
 
     def _should_update(self,
                        investment_project,
@@ -54,6 +53,13 @@ class Command(CSVBaseCommand):
                 investment_project.uk_company != uk_company or
                 investment_project.uk_company_decided != uk_company_decided)
 
+    def _can_update(self, company_ids):
+        """Check if given list of company_ids exists."""
+        return (
+            Company.objects.values_list('id').filter(id__in=company_ids).count() ==
+            len(company_ids)
+        )
+
     def get_uk_company_decided(self, uk_company_decided):
         """
         :param uk_company_decided: string containing either '1' or '0'
@@ -68,21 +74,29 @@ class Command(CSVBaseCommand):
     def _process_row(self, row, simulate=False, **options):
         """Process one single row."""
         investment_project = InvestmentProject.objects.get(pk=row['id'])
-        investor_company = self.get_company(row['investor_company_id'])
-        intermediate_company = self.get_company(row['intermediate_company_id'])
-        uk_company = self.get_company(row['uk_company_id'])
+        investor_company_id = self._parse_company_id(row['investor_company_id'])
+        intermediate_company_id = self._parse_company_id(row['intermediate_company_id'])
+        uk_company_id = self._parse_company_id(row['uk_company_id'])
         uk_company_decided = self.get_uk_company_decided(row['uk_company_decided'])
+
+        company_ids = [
+            company_id for company_id in
+            [investor_company_id, intermediate_company_id, uk_company_id]
+            if company_id is not None
+        ]
+        if not self._can_update(company_ids):
+            raise ValueError('Companies not found.')
 
         if self._should_update(
             investment_project,
-            investor_company,
-            intermediate_company,
-            uk_company,
+            investor_company_id,
+            intermediate_company_id,
+            uk_company_id,
             uk_company_decided,
         ):
-            investment_project.investor_company = investor_company
-            investment_project.intermediate_company = intermediate_company
-            investment_project.uk_company = uk_company
+            investment_project.investor_company_id = investor_company_id
+            investment_project.intermediate_company_id = intermediate_company_id
+            investment_project.uk_company_id = uk_company_id
             investment_project.uk_company_decided = uk_company_decided
             if not simulate:
                 investment_project.save(
