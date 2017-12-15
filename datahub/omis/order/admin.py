@@ -1,51 +1,111 @@
 from django.contrib import admin
+from django.template.defaultfilters import date as date_filter, time as time_filter
+from django.utils.html import format_html_join
+from django.utils.safestring import mark_safe
 
-from .models import Order, OrderAssignee, OrderSubscriber
+from datahub.core.admin import ReadOnlyAdmin
+
+from .models import Order
 
 
 @admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
+class OrderAdmin(ReadOnlyAdmin):
     """Admin for orders."""
 
+    list_display = ('reference', 'company', 'status', 'created_on', 'modified_on')
     search_fields = ('reference',)
-    readonly_fields = (
-        'id',
-        'net_cost',
-        'subtotal_cost',
-        'vat_cost',
-        'total_cost',
+    list_filter = ('status',)
+
+    fields = (
+        'id', 'reference', 'created', 'modified',
+        'public_token', 'public_facing_url',
+        'company', 'contact', 'contact_email', 'contact_phone',
+        'primary_market', 'sector', 'uk_region',
+        'status', 'paid_on', 'completed', 'cancelled',
+        'service_types', 'description', 'contacts_not_to_approach',
+        'further_info', 'existing_agents',
+        'product_info', 'permission_to_approach_contacts',
+        'delivery_date', 'po_number', 'hourly_rate', 'discount',
+        'vat_status', 'vat_number', 'vat_verified',
+        'net_cost', 'subtotal_cost', 'vat_cost', 'total_cost',
+        'billing_company_name', 'billing_contact_name',
+        'billing_email', 'billing_phone',
+        'billing_address_1', 'billing_address_2',
+        'billing_address_town', 'billing_address_county',
+        'billing_address_postcode', 'billing_address_country',
+        'archived_documents_url_path',
+        'uk_advisers', 'post_advisers'
     )
-    raw_id_fields = (
-        'created_by',
-        'modified_by',
-        'company',
-        'contact',
-        'quote',
-        'invoice',
-        'sector',
-    )
+    readonly_fields = fields
 
+    def _get_description_for_timed_event(self, event_on, event_by):
+        return (
+            f'on {date_filter(event_on)} '
+            f'at {time_filter(event_on)} '
+            f'by {event_by or "Unknown"}'
+        )
 
-@admin.register(OrderSubscriber)
-class OrderSubscriberAdmin(admin.ModelAdmin):
-    """Admin for order subscribers."""
+    def created(self, order):
+        """:returns: created on/by details."""
+        return self._get_description_for_timed_event(order.created_on, order.created_by)
 
-    raw_id_fields = (
-        'created_by',
-        'modified_by',
-        'order',
-        'adviser',
-    )
+    def modified(self, order):
+        """:returns: modified on/by details."""
+        return self._get_description_for_timed_event(order.modified_on, order.modified_by)
 
+    def completed(self, order):
+        """:returns: completed on/by details."""
+        if not order.completed_on and not order.completed_by:
+            return ''
+        return self._get_description_for_timed_event(order.completed_on, order.completed_by)
 
-@admin.register(OrderAssignee)
-class OrderAssigneeAdmin(admin.ModelAdmin):
-    """Admin for order assignees."""
+    def cancelled(self, order):
+        """:returns: cancelled on/by/why details."""
+        if not order.cancelled_on and not order.cancelled_by and not order.cancellation_reason:
+            return ''
+        description = self._get_description_for_timed_event(
+            order.cancelled_on, order.cancelled_by
+        )
 
-    raw_id_fields = (
-        'created_by',
-        'modified_by',
-        'order',
-        'adviser',
-        'team',
-    )
+        return f'{description} because "{order.cancellation_reason}"'
+
+    def public_facing_url(self, order):
+        """
+        :returns: read-only and clickable URL to the public facing OMIS page
+        """
+        url = order.get_public_facing_url()
+        return f'<a href="{url}">{url}<a>'
+    public_facing_url.allow_tags = True
+
+    def discount(self, order):
+        """
+        :returns: details of any discount applied
+        """
+        if not order.discount_value and not order.discount_label:
+            return ''
+        return f'{order.discount_value} pence - {order.discount_label}'
+
+    def uk_advisers(self, order):
+        """
+        :returns: descriptive list of advisers subscribed to the order
+        """
+        return format_html_join(
+            '', '<p>{0}</p>',
+            ((sub.adviser.name,) for sub in order.subscribers.all())
+        )
+    uk_advisers.allow_tags = True
+
+    def post_advisers(self, order):
+        """
+        :returns: descriptive list of advisers assigned to the order
+        """
+        return format_html_join(
+            '', '<p>{0} {1}- estimated time {2} mins - actual time {3} mins</p>',
+            ((
+                assignee.adviser.name,
+                '(lead) ' if assignee.is_lead else '',
+                assignee.estimated_time or mark_safe('<i>unknown</i>'),
+                assignee.actual_time or mark_safe('<i>unknown</i>')
+            ) for assignee in order.assignees.all())
+        )
+    post_advisers.allow_tags = True
