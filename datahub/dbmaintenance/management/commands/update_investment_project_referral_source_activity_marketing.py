@@ -66,10 +66,10 @@ class Command(CSVBaseCommand):
         :return: True if investment project needs to be updated
         """
         return (
-            investment_project.referral_source_activity !=
-            referral_source_activity or
-            investment_project.referral_source_activity_marketing !=
-            referral_source_activity_marketing
+            investment_project.referral_source_activity_id !=
+            referral_source_activity.id or
+            investment_project.referral_source_activity_marketing_id !=
+            referral_source_activity_marketing.id
         )
 
     def _process_row(self, row, simulate=False, **options):
