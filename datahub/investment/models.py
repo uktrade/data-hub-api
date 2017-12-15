@@ -1,8 +1,8 @@
 """Investment project models."""
 
 import uuid
+from collections import namedtuple
 from itertools import chain
-from typing import NamedTuple
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -286,10 +286,9 @@ class IProjectTeamAbstract(models.Model):
         return None
 
 
-class _AssociatedToManyField(NamedTuple):
-    field_name: str
-    subfield_name: str
-    es_field_name: str
+_AssociatedToManyField = namedtuple(
+    '_AssociatedToManyField', ('field_name', 'subfield_name', 'es_field_name')
+)
 
 
 class InvestmentProject(ArchivableModel, IProjectAbstract,
