@@ -12,6 +12,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
     invoice_address_country = NestedRelatedField(Country)
 
     billing_contact_name = serializers.ReadOnlyField(source='order.billing_contact_name')
+    billing_company_name = serializers.ReadOnlyField(source='order.billing_company_name')
     billing_address_1 = serializers.ReadOnlyField(source='order.billing_address_1')
     billing_address_2 = serializers.ReadOnlyField(source='order.billing_address_2')
     billing_address_county = serializers.ReadOnlyField(source='order.billing_address_county')
@@ -35,6 +36,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
             'invoice_vat_number',
             'payment_due_date',
             'billing_contact_name',
+            'billing_company_name',
             'billing_address_1',
             'billing_address_2',
             'billing_address_county',
