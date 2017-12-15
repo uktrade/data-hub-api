@@ -2,6 +2,7 @@ from io import BytesIO
 
 import pytest
 from django.core.management import call_command
+from reversion.models import Version
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
@@ -170,3 +171,38 @@ def test_simulate(s3_stubber):
     assert investment_projects[1].intermediate_company == companies[1]
     assert investment_projects[1].uk_company == companies[2]
     assert investment_projects[1].uk_company_decided is True
+
+
+def test_audit_log(s3_stubber):
+    """Test that the audit log is being created."""
+    investment_project = InvestmentProjectFactory()
+    file_companies = CompanyFactory.create_batch(3)
+
+    bucket = 'test_bucket'
+    object_key = 'test_key'
+    csv_content = f"""id,investor_company_id,intermediate_company_id,uk_company_id,uk_company_decided
+{investment_project.id},{file_companies[0].pk},{file_companies[1].pk},{file_companies[2].pk},1
+"""
+    s3_stubber.add_response(
+        'get_object',
+        {
+            'Body': BytesIO(bytes(csv_content, encoding='utf-8'))
+        },
+        expected_params={
+            'Bucket': bucket,
+            'Key': object_key
+        }
+    )
+
+    call_command('update_investment_project_company', bucket, object_key)
+
+    investment_project.refresh_from_db()
+
+    assert investment_project.investor_company == file_companies[0]
+    assert investment_project.intermediate_company == file_companies[1]
+    assert investment_project.uk_company == file_companies[2]
+    assert investment_project.uk_company_decided is True
+
+    versions = Version.objects.get_for_object(investment_project)
+    assert len(versions) == 1
+    assert versions[0].revision.comment == 'Companies data migration.'

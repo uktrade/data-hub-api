@@ -1,5 +1,7 @@
 from functools import lru_cache
 
+import reversion
+
 from datahub.investment.models import InvestmentProject
 from datahub.metadata.models import Sector
 from ..base import CSVBaseCommand
@@ -56,8 +58,10 @@ class Command(CSVBaseCommand):
         ):
             investment_project.sector = new_sector
             if not simulate:
-                investment_project.save(
-                    update_fields=(
-                        'sector',
+                with reversion.create_revision():
+                    investment_project.save(
+                        update_fields=(
+                            'sector',
+                        )
                     )
-                )
+                    reversion.set_comment('Sector migration.')
