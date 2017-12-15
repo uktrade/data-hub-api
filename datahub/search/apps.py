@@ -1,6 +1,5 @@
 from functools import lru_cache
 from importlib import import_module
-from typing import Optional
 
 from django.apps import AppConfig
 from django.conf import settings
@@ -17,6 +16,9 @@ SEARCH_APPS = [
     'datahub.search.interaction.InteractionSearchApp',
     'datahub.search.omis.OrderSearchApp',
 ]
+
+
+EXCLUDE_ALL = object()
 
 
 class SearchApp:
@@ -68,12 +70,14 @@ class SearchApp:
 
         return DataSet(queryset, self.ESModel)
 
-    def get_permission_filters(self, request) -> Optional[dict]:
+    def get_permission_filters(self, request):
         """
         Gets filter arguments used to enforce permissions.
 
         The returned dict contains rules in the form of field names and values. Results must
         match at least one of these rules.
+
+        Can also return EXCLUDE_ALL when no results should be returned.
         """
         return None
 

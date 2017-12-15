@@ -5,11 +5,18 @@ from django.conf import settings
 from elasticsearch.helpers import bulk as es_bulk
 from elasticsearch_dsl import analysis, Index, Search
 from elasticsearch_dsl.connections import connections
-from elasticsearch_dsl.query import Bool, MatchPhrase, MultiMatch, Q, Term
+from elasticsearch_dsl.query import Bool, MatchPhrase, MultiMatch, Q, Query, Term
 
-from .apps import get_search_apps
+from .apps import EXCLUDE_ALL, get_search_apps
 
 MAX_RESULTS = 10000
+
+
+class MatchNone(Query):
+    """match_none query. This isn't defined in the Elasticsearch DSL library."""
+
+    name = 'match_none'
+
 
 lowercase_keyword_analyzer = analysis.CustomAnalyzer(
     'lowercase_keyword_analyzer',
@@ -366,6 +373,9 @@ def _get_must_filter_query(filters, composite_filters, ranges):
 def _get_entity_permission_query(permission_filters=None):
     if not permission_filters:
         return None
+
+    if permission_filters is EXCLUDE_ALL:
+        return MatchNone()
 
     subqueries = [Term(**{field: value}) for field, value in permission_filters.items()]
 

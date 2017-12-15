@@ -6,8 +6,7 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin, create_test_user
-from datahub.investment.models import InvestmentProject
-from datahub.investment.permissions import Permissions
+from datahub.investment.models import InvestmentProject, Permissions
 from datahub.investment.test.factories import (
     InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
 )
@@ -311,8 +310,8 @@ class TestSearch(APITestMixin):
 
     def test_restricted_user_with_no_team_cannot_see_projects(self, setup_es):
         """
-        Checks that a restricted user that doesn't have a team cannot view projects associated
-        with other advisers that don't have teams.
+        Checks that a restricted user that doesn't have a team cannot view any projects (in
+        particular projects associated with other advisers that don't have teams).
         """
         url = reverse('api-v3:search:investment_project')
 
