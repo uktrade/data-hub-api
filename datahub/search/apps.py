@@ -72,7 +72,7 @@ class SearchApp:
         """
         Gets filter arguments used to enforce permissions.
 
-        The returned dict containes rules in the form of field names and values. Results much
+        The returned dict contains rules in the form of field names and values. Results must
         match at least one of these rules.
         """
         return None
