@@ -36,3 +36,43 @@ class TeamFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'metadata.Team'
+
+
+class ReferralSourceActivityFactory(factory.django.DjangoModelFactory):
+    """ReferralSourceActivity factory."""
+
+    id = factory.LazyFunction(uuid.uuid4)
+    name = factory.Sequence(lambda n: f'name {n}')
+
+    class Meta:
+        model = 'metadata.ReferralSourceActivity'
+
+
+class ReferralSourceWebsiteFactory(factory.django.DjangoModelFactory):
+    """ReferralSourceWebsite factory."""
+
+    id = factory.LazyFunction(uuid.uuid4)
+    name = factory.Sequence(lambda n: f'name {n}')
+
+    class Meta:
+        model = 'metadata.ReferralSourceWebsite'
+
+
+class ReferralSourceMarketingFactory(factory.django.DjangoModelFactory):
+    """ReferralSourceMarketing factory."""
+
+    id = factory.LazyFunction(uuid.uuid4)
+    name = factory.Sequence(lambda n: f'name {n}')
+
+    class Meta:
+        model = 'metadata.ReferralSourceMarketing'
+
+
+class SectorFactory(factory.django.DjangoModelFactory):
+    """Sector factory."""
+
+    id = factory.LazyFunction(uuid.uuid4)
+    name = factory.Sequence(lambda n: f'name {n}')
+
+    class Meta:
+        model = 'metadata.Sector'
