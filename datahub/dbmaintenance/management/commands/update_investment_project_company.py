@@ -1,4 +1,5 @@
 import uuid
+import reversion
 
 from datahub.investment.models import InvestmentProject
 from ..base import CSVBaseCommand
@@ -82,11 +83,13 @@ class Command(CSVBaseCommand):
             investment_project.uk_company_id = uk_company_id
             investment_project.uk_company_decided = uk_company_decided
             if not simulate:
-                investment_project.save(
-                    update_fields=(
-                        'investor_company',
-                        'intermediate_company',
-                        'uk_company',
-                        'uk_company_decided',
+                with reversion.create_revision():
+                    investment_project.save(
+                        update_fields=(
+                            'investor_company',
+                            'intermediate_company',
+                            'uk_company',
+                            'uk_company_decided',
+                        )
                     )
-                )
+                    reversion.set_comment('Companies data migration.')

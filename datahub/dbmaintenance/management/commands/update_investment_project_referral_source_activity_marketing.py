@@ -1,5 +1,7 @@
 from functools import lru_cache
 
+import reversion
+
 from datahub.investment.models import InvestmentProject
 from datahub.metadata.models import ReferralSourceActivity, ReferralSourceMarketing
 from ..base import CSVBaseCommand
@@ -93,9 +95,11 @@ class Command(CSVBaseCommand):
                 referral_source_activity_marketing
 
             if not simulate:
-                investment_project.save(
-                    update_fields=(
-                        'referral_source_activity',
-                        'referral_source_activity_marketing',
+                with reversion.create_revision():
+                    investment_project.save(
+                        update_fields=(
+                            'referral_source_activity',
+                            'referral_source_activity_marketing',
+                        )
                     )
-                )
+                    reversion.set_comment('ReferralSourceActivityMarketing migration.')

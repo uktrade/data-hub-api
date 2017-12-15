@@ -2,6 +2,7 @@ from io import BytesIO
 
 import pytest
 from django.core.management import call_command
+from reversion.models import Version
 
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import SectorFactory
@@ -93,3 +94,35 @@ def test_simulate(s3_stubber):
 
     assert investment_projects[0].sector == old_sectors[0]
     assert investment_projects[1].sector == old_sectors[1]
+
+
+def test_audit_log(s3_stubber):
+    """Test that audit log is being created."""
+    new_sector = SectorFactory()
+    investment_project = InvestmentProjectFactory()
+    old_sector = investment_project.sector
+
+    bucket = 'test_bucket'
+    object_key = 'test_key'
+    csv_content = f"""id,old_sector,new_sector
+{investment_project.id},{old_sector.id},{new_sector.id}
+"""
+    s3_stubber.add_response(
+        'get_object',
+        {
+            'Body': BytesIO(bytes(csv_content, encoding='utf-8'))
+        },
+        expected_params={
+            'Bucket': bucket,
+            'Key': object_key
+        }
+    )
+
+    call_command('update_investment_project_sector', bucket, object_key)
+
+    investment_project.refresh_from_db()
+
+    assert investment_project.sector == new_sector
+    versions = Version.objects.get_for_object(investment_project)
+    assert len(versions) == 1
+    assert versions[0].revision.comment == 'Sector migration.'
