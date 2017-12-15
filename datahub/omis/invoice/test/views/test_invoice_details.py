@@ -36,6 +36,7 @@ class TestGetInvoice(APITestMixin):
             'payment_due_date': invoice.payment_due_date.isoformat(),
 
             'billing_contact_name': order.billing_contact_name,
+            'billing_company_name': order.billing_company_name,
             'billing_address_1': order.billing_address_1,
             'billing_address_2': order.billing_address_2,
             'billing_address_county': order.billing_address_county,
