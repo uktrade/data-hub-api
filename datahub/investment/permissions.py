@@ -8,17 +8,7 @@ from datahub.core.permissions import (
     ObjectAssociationCheckerBase
 )
 from datahub.core.utils import StrEnum
-
-
-class Permissions(StrEnum):
-    """Permission codename constants."""
-
-    read_all = 'read_all_investmentproject'
-    read_associated = 'read_associated_investmentproject'
-    change_all = 'change_all_investmentproject'
-    change_associated = 'change_associated_investmentproject'
-    add = 'add_investmentproject'
-    delete = 'delete_investmentproject'
+from datahub.investment.models import InvestmentProject
 
 
 class PermissionTemplates(StrEnum):
@@ -91,6 +81,9 @@ class InvestmentProjectAssociationChecker(ObjectAssociationCheckerBase):
 
     def is_associated(self, request, obj):
         """Check for connection."""
+        if self.should_exclude_all(request):
+            return False
+
         return any(request.user.dit_team_id == user.dit_team_id
                    for user in obj.get_associated_advisers())
 
@@ -114,6 +107,11 @@ class InvestmentProjectAssociationChecker(ObjectAssociationCheckerBase):
 
         raise RuntimeError('User does not have any relevant investment project permissions.')
 
+    @staticmethod
+    def should_exclude_all(request):
+        """Get whether all results should be filtered out (when restrictions are active)."""
+        return not (request.user and request.user.dit_team_id)
+
 
 class IsAssociatedToInvestmentProjectPermission(IsAssociatedToObjectPermission):
     """Permission based on InvestmentProjectAssociationChecker."""
@@ -122,7 +120,7 @@ class IsAssociatedToInvestmentProjectPermission(IsAssociatedToObjectPermission):
 
 
 class IsAssociatedToInvestmentProjectFilter(BaseFilterBackend):
-    """Filter for LEPs users to see only associated InvestmentProjects"""
+    """Filter for LEPs users to see only associated InvestmentProjects."""
 
     actions_to_filter = {'list'}
 
@@ -137,13 +135,39 @@ class IsAssociatedToInvestmentProjectFilter(BaseFilterBackend):
             request, view.action, queryset.model
         )
 
-        if view_should_be_filtered and restrictions_are_active:
-            query = Q()
-            for field in queryset.model.ASSOCIATED_ADVISER_TO_ONE_FIELDS:
-                query |= Q(**{f'{field}__dit_team': request.user.dit_team})
+        if not (view_should_be_filtered and restrictions_are_active):
+            return queryset
 
-            for field in queryset.model.ASSOCIATED_ADVISER_TO_MANY_FIELDS:
-                full_field_name = f'{field.field_name}__{field.subfield_name}__dit_team'
-                query |= Q(**{full_field_name: request.user.dit_team})
-            return queryset.filter(query)
-        return queryset
+        if self.checker.should_exclude_all(request):
+            return queryset.none()
+
+        to_one_filters, to_many_filters = get_association_filters(request.user.dit_team_id)
+
+        query = Q()
+        for field, value in to_one_filters:
+            query |= Q(**{f'{field}__dit_team_id': value})
+
+        for field, value in to_many_filters:
+            full_field_name = f'{field.field_name}__{field.subfield_name}__dit_team_id'
+            query |= Q(**{full_field_name: value})
+        return queryset.filter(query)
+
+
+def get_association_filters(dit_team_id):
+    """
+    Gets a list of rules that can be used to restrict a query set to associated projects.
+
+    Two lists of rules are returned – one for to-one fields, one for to-many fields.
+
+    The rules are a list of field name and value pairs. Objects must match one of these rules
+    to be considered an associated project.
+    """
+    if dit_team_id is None:
+        raise ValueError('dit_team_id cannot be None.')
+
+    to_one_fields, to_many_fields = InvestmentProject.get_association_fields()
+
+    to_one_filters = [(field, dit_team_id) for field in to_one_fields]
+    to_many_filters = [(field, dit_team_id) for field in to_many_fields]
+
+    return to_one_filters, to_many_filters

@@ -3,14 +3,17 @@ from django.db.models import Prefetch
 
 from datahub.investment.models import (
     InvestmentProject as DBInvestmentProject,
-    InvestmentProjectTeamMember as DBInvestmentProjectTeamMember
+    InvestmentProjectTeamMember as DBInvestmentProjectTeamMember,
+    Permissions
 )
-from datahub.investment.permissions import InvestmentProjectAssociationChecker, Permissions
+from datahub.investment.permissions import (
+    get_association_filters, InvestmentProjectAssociationChecker
+)
 
 from .models import InvestmentProject
 from .views import SearchInvestmentProjectAPIView, SearchInvestmentProjectExportAPIView
 
-from ..apps import SearchApp
+from ..apps import EXCLUDE_ALL, SearchApp
 
 
 class InvestmentSearchApp(SearchApp):
@@ -66,15 +69,15 @@ class InvestmentSearchApp(SearchApp):
         if not checker.should_apply_restrictions(request, 'list', DBInvestmentProject):
             return None
 
-        dit_team_id = str(request.user.dit_team_id) if request.user else None
-        filters = {
-            f'{field}.dit_team.id': dit_team_id
-            for field in DBInvestmentProject.ASSOCIATED_ADVISER_TO_ONE_FIELDS
-        }
+        if checker.should_exclude_all(request):
+            return EXCLUDE_ALL
 
+        dit_team_id = request.user.dit_team_id
+        to_one_filters, to_many_filters = get_association_filters(dit_team_id)
+
+        filters = {f'{field}.dit_team.id': value for field, value in to_one_filters}
         filters.update({
-            f'{field.es_field_name}.dit_team.id': dit_team_id
-            for field in DBInvestmentProject.ASSOCIATED_ADVISER_TO_MANY_FIELDS
+            f'{field.es_field_name}.dit_team.id': value for field, value in to_many_filters
         })
 
         return filters
