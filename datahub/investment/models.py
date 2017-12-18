@@ -1,6 +1,7 @@
 """Investment project models."""
 
 import uuid
+from collections import namedtuple
 from itertools import chain
 
 from django.conf import settings
@@ -14,10 +15,25 @@ from datahub.core.models import (
     BaseConstantModel,
     BaseModel,
 )
+from datahub.core.utils import StrEnum
 from datahub.documents.models import Document
-from datahub.investment.permissions import Permissions
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
+
+class Permissions(StrEnum):
+    """
+    Permission codename constants.
+
+    (Defined here rather than in permissions to avoid an import of that module.)
+    """
+
+    read_all = 'read_all_investmentproject'
+    read_associated = 'read_associated_investmentproject'
+    change_all = 'change_all_investmentproject'
+    change_associated = 'change_associated_investmentproject'
+    add = 'add_investmentproject'
+    delete = 'delete_investmentproject'
 
 
 class IProjectAbstract(models.Model):
@@ -270,20 +286,27 @@ class IProjectTeamAbstract(models.Model):
         return None
 
 
+_AssociatedToManyField = namedtuple(
+    '_AssociatedToManyField', ('field_name', 'subfield_name', 'es_field_name')
+)
+
+
 class InvestmentProject(ArchivableModel, IProjectAbstract,
                         IProjectValueAbstract, IProjectRequirementsAbstract,
                         IProjectTeamAbstract, BaseModel):
     """An investment project."""
 
-    ASSOCIATED_ADVISER_TO_ONE_FIELDS = (
+    _ASSOCIATED_ADVISER_TO_ONE_FIELDS = (
         'created_by',
         'client_relationship_manager',
         'project_manager',
         'project_assurance_adviser',
     )
 
-    ASSOCIATED_ADVISER_TO_MANY_FIELDS = (
-        ('team_members', 'adviser'),
+    _ASSOCIATED_ADVISER_TO_MANY_FIELDS = (
+        _AssociatedToManyField(
+            field_name='team_members', subfield_name='adviser', es_field_name='team_members'
+        ),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -312,15 +335,25 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
             self._get_associated_to_many_advisers(),
         )
 
+    @classmethod
+    def get_association_fields(cls):
+        """
+        Gets a list of to-one association fields, and to-many association fields.
+
+        These are used (as part of permissions) to determine if an adviser's team is associated
+        with a project.
+        """
+        return cls._ASSOCIATED_ADVISER_TO_ONE_FIELDS, cls._ASSOCIATED_ADVISER_TO_MANY_FIELDS
+
     def _get_associated_to_one_advisers(self):
-        advisers = (getattr(self, field) for field in self.ASSOCIATED_ADVISER_TO_ONE_FIELDS)
+        advisers = (getattr(self, field) for field in self._ASSOCIATED_ADVISER_TO_ONE_FIELDS)
         return filter(None, advisers)
 
     def _get_associated_to_many_advisers(self):
-        for field_name, subfield_name in self.ASSOCIATED_ADVISER_TO_MANY_FIELDS:
-            field_instance = getattr(self, field_name)
+        for field in self._ASSOCIATED_ADVISER_TO_MANY_FIELDS:
+            field_instance = getattr(self, field.field_name)
             for item in field_instance.all():
-                adviser = getattr(item, subfield_name)
+                adviser = getattr(item, field.subfield_name)
                 if adviser:
                     yield adviser
 

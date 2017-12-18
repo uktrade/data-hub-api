@@ -18,6 +18,9 @@ SEARCH_APPS = [
 ]
 
 
+EXCLUDE_ALL = object()
+
+
 class SearchApp:
     """Used to configure ES search modules to be used within Data Hub."""
 
@@ -26,6 +29,7 @@ class SearchApp:
     view = None
     export_view = None
     queryset = None
+    permission_required = None
 
     def __init__(self, mod):
         """Create this search app without initialising any ES config."""
@@ -65,6 +69,17 @@ class SearchApp:
         queryset = self.get_queryset()
 
         return DataSet(queryset, self.ESModel)
+
+    def get_permission_filters(self, request):
+        """
+        Gets filter arguments used to enforce permissions.
+
+        The returned dict contains rules in the form of field names and values. Results must
+        match at least one of these rules.
+
+        Can also return EXCLUDE_ALL when no results should be returned.
+        """
+        return None
 
 
 @lru_cache(maxsize=None)

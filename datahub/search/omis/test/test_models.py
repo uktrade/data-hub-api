@@ -66,7 +66,11 @@ def test_order_to_dict(Factory, setup_es):
             'id': str(order.created_by.pk),
             'first_name': order.created_by.first_name,
             'last_name': order.created_by.last_name,
-            'name': order.created_by.name
+            'name': order.created_by.name,
+            'dit_team': {
+                'id': str(order.created_by.dit_team.id),
+                'name': order.created_by.dit_team.name
+            }
         },
         'modified_on': order.modified_on,
         'reference': order.reference,

@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 
-from django.core.exceptions import ImproperlyConfigured
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
 
@@ -25,21 +24,6 @@ class DjangoCrudPermission(DjangoModelPermissions):
     perms_map['GET'].append('%(app_label)s.read_%(model_name)s')
 
 
-class UserHasPermissions(BasePermission):
-    """
-    Check the permission_required on view against User Permissions
-    """
-
-    def has_permission(self, request, view):
-        """
-        Return `True` if permission is granted `False` otherwise.
-        Raises ImproperlyConfigured if permission_required is not set on view
-        """
-        if not hasattr(view, 'permission_required'):
-            raise ImproperlyConfigured()
-        return request.user and request.user.has_perm(view.permission_required)
-
-
 class ObjectAssociationCheckerBase(ABC):
     """
     Base class for object association checkers.
@@ -53,11 +37,11 @@ class ObjectAssociationCheckerBase(ABC):
     """
 
     @abstractmethod
-    def is_associated(self, request, view, obj) -> bool:
+    def is_associated(self, request, obj) -> bool:
         """Checks whether the user is associated with a particular object."""
 
     @abstractmethod
-    def should_apply_restrictions(self, request, view) -> bool:
+    def should_apply_restrictions(self, request, view_action, model) -> bool:
         """
         Checks whether a request should be restricted to objects that the user is associated with.
         """
@@ -81,8 +65,8 @@ class IsAssociatedToObjectPermission(BasePermission):
         """
         Determines whether the user has permission for the specified object, using checker_class.
         """
-        if self.checker.should_apply_restrictions(request, view):
-            return self.checker.is_associated(request, view, obj)
+        if self.checker.should_apply_restrictions(request, view.action, view.get_queryset().model):
+            return self.checker.is_associated(request, obj)
         return True
 
 
