@@ -11,10 +11,10 @@ from rest_framework.fields import empty
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from datahub.core.permissions import UserHasPermissions
 from datahub.oauth.scopes import Scope
 from . import elasticsearch
 from .apps import get_search_apps
+from .permissions import has_permissions_for_app, SearchAppPermissions
 from .serializers import SearchSerializer
 from .utils import Echo
 
@@ -76,6 +76,7 @@ class SearchBasicAPIView(APIView):
         results = elasticsearch.get_basic_search_query(
             term=term,
             entities=(self.entity_by_name[entity].model,),
+            permission_filters_by_entity=dict(_get_permission_filters(request)),
             field_order=sortby,
             ignored_entities=self.IGNORED_ENTITIES,
             offset=offset,
@@ -92,10 +93,26 @@ class SearchBasicAPIView(APIView):
         return Response(data=response)
 
 
+def _get_permission_filters(request):
+    """
+    Gets the permissions filters that should be applied to each search entity (to enforce
+    permissions).
+
+    Only entities that the user has access are returned.
+    """
+    for app in get_search_apps():
+        if not has_permissions_for_app(request, app):
+            continue
+
+        filter_args = app.get_permission_filters(request)
+        yield (app.ESModel._doc_type.name, filter_args)
+
+
 class SearchAPIView(APIView):
     """Filtered search view."""
 
-    permission_classes = (IsAuthenticatedOrTokenHasScope, UserHasPermissions)
+    search_app = None
+    permission_classes = (IsAuthenticatedOrTokenHasScope, SearchAppPermissions)
     FILTER_FIELDS = []
     REMAP_FIELDS = {}
 
@@ -152,6 +169,7 @@ class SearchAPIView(APIView):
 
         validated_data = self.validate_data(data)
         filter_data = self._get_filter_data(validated_data)
+        permission_filters = self.search_app.get_permission_filters(request)
 
         aggregations = (self.REMAP_FIELDS.get(field, field) for field in self.FILTER_FIELDS) \
             if self.include_aggregations else None
@@ -161,6 +179,7 @@ class SearchAPIView(APIView):
             term=validated_data['original_query'],
             filter_data=filter_data,
             composite_filters=self.COMPOSITE_FILTERS,
+            permission_filters=permission_filters,
             field_order=validated_data['sortby'],
             aggregations=aggregations,
         )

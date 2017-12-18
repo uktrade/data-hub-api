@@ -13,6 +13,7 @@ class ContactSearchApp(SearchApp):
     ESModel = Contact
     view = SearchContactAPIView
     export_view = SearchContactExportAPIView
+    permission_required = ('company.read_contact',)
     queryset = DBContact.objects.prefetch_related(
         'title',
         'company',

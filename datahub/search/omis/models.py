@@ -15,7 +15,7 @@ class Order(DocType, MapDBModelToDict):
     status = dsl_utils.SortableCaseInsensitiveKeywordText()
     company = dsl_utils.id_name_partial_mapping('company')
     contact = dsl_utils.contact_or_adviser_partial_mapping('contact')
-    created_by = dsl_utils.contact_or_adviser_mapping('created_by')
+    created_by = dsl_utils.contact_or_adviser_mapping('created_by', include_dit_team=True)
     created_on = Date()
     modified_on = Date()
     primary_market = dsl_utils.id_name_mapping()
@@ -65,7 +65,7 @@ class Order(DocType, MapDBModelToDict):
         'id': str,
         'company': dict_utils.id_name_dict,
         'contact': dict_utils.contact_or_adviser_dict,
-        'created_by': dict_utils.contact_or_adviser_dict,
+        'created_by': dict_utils.adviser_dict_with_team,
         'primary_market': dict_utils.id_name_dict,
         'sector': dict_utils.id_name_dict,
         'uk_region': dict_utils.id_name_dict,
