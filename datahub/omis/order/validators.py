@@ -8,7 +8,7 @@ from datahub.core.validate_utils import DataCombiner
 from datahub.core.validators import AbstractRule, BaseRule
 from datahub.omis.core.exceptions import Conflict
 
-from .constants import VATStatus
+from .constants import OrderStatus, VATStatus
 
 
 class ContactWorksAtCompanyValidator:
@@ -325,6 +325,26 @@ class CompletableOrderValidator:
             raise ValidationError({
                 api_settings.NON_FIELD_ERRORS_KEY: self.message
             })
+
+
+class CancellableOrderValidator(OrderInStatusValidator):
+    """Validator which checks that the order can be cancelled."""
+
+    def __init__(self, force=False):
+        """
+        :param force: if True, cancelling an order in quote accepted or paid
+            is allowed.
+        """
+        allowed_statuses = [
+            OrderStatus.draft,
+            OrderStatus.quote_awaiting_acceptance,
+        ]
+        if force:
+            allowed_statuses += [
+                OrderStatus.quote_accepted,
+                OrderStatus.paid,
+            ]
+        super().__init__(allowed_statuses, order_required=True)
 
 
 class AddressValidator:

@@ -1,11 +1,68 @@
+from functools import update_wrapper
+from django import forms
+from django.conf.urls import url
 from django.contrib import admin
+from django.contrib import messages
+from django.contrib.admin.exceptions import SuspiciousOperation
+from django.contrib.admin.options import IS_POPUP_VAR
+from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
+from django.contrib.admin.utils import quote, unquote
+from django.core.exceptions import PermissionDenied
+from django.db import router, transaction
+from django.http import HttpResponseRedirect
 from django.template.defaultfilters import date as date_filter, time as time_filter
-from django.utils.html import format_html_join
+from django.template.response import TemplateResponse
+from django.urls import reverse
+from django.utils.decorators import method_decorator
+from django.utils.encoding import force_text
+from django.utils.html import format_html, format_html_join
+from django.utils.http import urlquote
 from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import csrf_protect
 
 from datahub.core.admin import ReadOnlyAdmin
+from datahub.omis.core.exceptions import Conflict
 
-from .models import Order
+from . import validators
+from .models import CancellationReason, Order
+
+
+csrf_protect_m = method_decorator(csrf_protect)
+
+
+class CancelOrderForm(forms.Form):
+    """Admin form to cancel an order."""
+
+    reason = forms.ModelChoiceField(
+        queryset=CancellationReason.objects.filter(disabled_on__isnull=True)
+    )
+
+    def __init__(self, order, *args, **kwargs):
+        """Initiate the form with an instance of the order."""
+        self.order = order
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        """Validate the form."""
+        cleaned_data = super().clean()
+
+        validator = validators.CancellableOrderValidator(force=True)
+        validator.set_instance(self.order)
+        try:
+            validator()
+        except Conflict as e:
+            raise forms.ValidationError(e)
+
+        return cleaned_data
+
+    def cancel(self, by):
+        """Cancel the order after validating the data."""
+        self.order.cancel(
+            by=by,
+            reason=self.cleaned_data['reason'],
+            force=True
+        )
 
 
 @admin.register(Order)
@@ -109,3 +166,92 @@ class OrderAdmin(ReadOnlyAdmin):
             ) for assignee in order.assignees.all())
         )
     post_advisers.allow_tags = True
+
+    def get_urls(self):
+        """Extend the standard get_urls by adding extra urls."""
+        urls = super().get_urls()
+
+        def wrap(view):
+            def wrapper(*args, **kwargs):
+                return self.admin_site.admin_view(view)(*args, **kwargs)
+            wrapper.model_admin = self
+            return update_wrapper(wrapper, view)
+
+        info = self.model._meta.app_label, self.model._meta.model_name
+        return [
+            url(r'^(.+)/cancel/$', wrap(self.cancel_order_view), name='%s_%s_cancel' % info),
+        ] + urls
+
+    @csrf_protect_m
+    def cancel_order_view(self, request, object_id, extra_context=None):
+        """Admin view for cancelling an order."""
+        if (IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET):
+            raise SuspiciousOperation('Action not allowed in popup')
+
+        with transaction.atomic(using=router.db_for_write(self.model)):
+            opts = self.model._meta
+            obj = self.get_object(request, unquote(object_id))
+
+            if not self.has_change_permission(request, obj):
+                raise PermissionDenied
+
+            if obj is None:
+                return self._get_obj_does_not_exist_redirect(request, opts, object_id)
+
+            if request.POST:
+                form = CancelOrderForm(obj, request.POST)
+
+                if form.is_valid():
+                    self.log_change(
+                        request,
+                        obj,
+                        f'Cancelled because {form.cleaned_data["reason"].name}.'
+                    )
+                    form.cancel(by=request.user)
+                    return self.response_cancel(request, obj)
+            else:
+                form = CancelOrderForm(obj)
+
+            context = dict(
+                self.admin_site.each_context(request),
+                title=_('Are you sure?'),
+                object_name=force_text(opts.verbose_name),
+                object=obj,
+                opts=opts,
+                app_label=opts.app_label,
+                preserved_filters=self.get_preserved_filters(request),
+                form=form,
+                is_popup=False,
+                is_popup_var=IS_POPUP_VAR,
+                media=self.media,
+            )
+            context.update(extra_context or {})
+
+            request.current_app = self.admin_site.name
+            return TemplateResponse(request, 'admin/order/cancel_confirmation.html', context)
+
+    def response_cancel(self, request, obj):
+        """Determine the HttpResponse for the cancel_order_view stage."""
+        opts = self.model._meta
+
+        msg_dict = {
+            'name': force_text(opts.verbose_name),
+            'obj': format_html('<a href="{0}">{1}</a>', urlquote(request.path), obj),
+        }
+        msg = format_html(
+            _('The {name} "{obj}" was cancelled successfully.'),
+            **msg_dict
+        )
+        self.message_user(request, msg, messages.SUCCESS)
+
+        preserved_filters = self.get_preserved_filters(request)
+        redirect_url = reverse(
+            'admin:%s_%s_change' % (opts.app_label, opts.model_name),
+            args=(quote(obj._get_pk_val()),),
+            current_app=self.admin_site.name,
+        )
+        redirect_url = add_preserved_filters(
+            {'preserved_filters': preserved_filters, 'opts': opts},
+            redirect_url
+        )
+        return HttpResponseRedirect(redirect_url)

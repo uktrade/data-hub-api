@@ -82,7 +82,7 @@ class AdminTestMixin:
         if not user:
             user = self.user
         client = Client()
-        client.login(username=user.email, password=self.PASSWORD)
+        assert client.login(username=user.email, password=self.PASSWORD)
         return client
 
 
