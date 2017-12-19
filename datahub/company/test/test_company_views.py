@@ -22,7 +22,7 @@ class TestCompany(APITestMixin):
 
     def test_companies_list_no_permissions(self):
         """Should return 403"""
-        user = create_test_user(team=TeamFactory())
+        user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v3:company:collection')
         response = api_client.get(url)

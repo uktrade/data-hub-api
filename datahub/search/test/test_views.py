@@ -394,7 +394,7 @@ class TestSearch(APITestMixin):
     ))
     def test_basic_search_permissions(self, setup_es, permission, permission_entity, entity):
         """Tests model permissions enforcement in basic search."""
-        user = create_test_user(team=TeamFactory(), permission_codenames=[permission])
+        user = create_test_user(permission_codenames=[permission], dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
 
         InvestmentProjectFactory(created_by=user)
