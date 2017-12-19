@@ -46,7 +46,7 @@ class TestListView(APITestMixin):
 
     def test_investments_no_permissions(self):
         """Should return 403"""
-        user = create_test_user(team=TeamFactory())
+        user = create_test_user(dit_team=TeamFactory())
         url = reverse('api-v3:investment:investment-collection')
         api_client = self.create_api_client(user=user)
         response = api_client.get(url)
@@ -2027,6 +2027,6 @@ def test_view_set_name(view_set):
 
 
 def _create_user_and_api_client(test_instance, team, permissions):
-    user = create_test_user(team=team, permission_codenames=permissions)
+    user = create_test_user(dit_team=team, permission_codenames=permissions)
     api_client = test_instance.create_api_client(user=user)
     return user, api_client
