@@ -378,8 +378,7 @@ class InvestmentProjectTeamMember(models.Model):
 
     class Meta:
         unique_together = (('investment_project', 'adviser'),)
-        permissions = (('read_investmentprojectteammember',
-                        'Can read investment project team member'),)
+        default_permissions = ()
 
 
 class InvestmentProjectCode(models.Model):

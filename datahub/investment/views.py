@@ -20,8 +20,9 @@ from datahub.investment.models import (
     InvestmentProject, InvestmentProjectTeamMember, IProjectDocument
 )
 from datahub.investment.permissions import (
-    InvestmentProjectModelPermissions, IsAssociatedToInvestmentProjectFilter,
-    IsAssociatedToInvestmentProjectPermission
+    InvestmentProjectModelPermissions, InvestmentProjectTeamMemberModelPermissions,
+    IsAssociatedToInvestmentProjectFilter, IsAssociatedToInvestmentProjectPermission,
+    IsAssociatedToInvestmentProjectTeamMemberPermission,
 )
 from datahub.investment.serializers import (
     IProjectDocumentSerializer, IProjectSerializer, IProjectTeamMemberSerializer,
@@ -143,6 +144,12 @@ class IProjectModifiedSinceViewSet(IProjectViewSet):
 class IProjectTeamMembersViewSet(CoreViewSetV3):
     """Investment project team member views."""
 
+    non_existent_project_error_message = 'Specified investment project does not exist'
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        InvestmentProjectTeamMemberModelPermissions,
+        IsAssociatedToInvestmentProjectTeamMemberPermission,
+    )
     required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectTeamMemberSerializer
     lookup_field = 'adviser_id'
@@ -184,9 +191,16 @@ class IProjectTeamMembersViewSet(CoreViewSetV3):
         """Returns the view set name for the DRF UI."""
         return 'Investment project team members'
 
+    def get_project(self):
+        """Gets the investment project object referred to in the URL path."""
+        try:
+            return InvestmentProject.objects.get(pk=self.kwargs['project_pk'])
+        except InvestmentProject.DoesNotExist:
+            raise Http404(self.non_existent_project_error_message)
+
     def _check_project_exists(self):
         if not InvestmentProject.objects.filter(pk=self.kwargs['project_pk']).exists():
-            raise Http404('Specified investment project does not exist')
+            raise Http404(self.non_existent_project_error_message)
 
 
 class IProjectDocumentViewSet(CoreViewSetV3):
