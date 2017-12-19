@@ -29,6 +29,8 @@ class InvestmentProjectModelPermissions(BasePermission):
       all of them
     """
 
+    many_to_many = False
+
     permission_mapping = {
         'add': (
             PermissionTemplates.standard,
@@ -51,8 +53,7 @@ class InvestmentProjectModelPermissions(BasePermission):
         if not request.user or not request.user.is_authenticated:
             return False
 
-        model = view.get_queryset().model
-        perms = self._get_required_permissions(request, view, model)
+        perms = self._get_required_permissions(request, view, InvestmentProject)
 
         return any(request.user.has_perm(perm) for perm in perms)
 
@@ -60,7 +61,9 @@ class InvestmentProjectModelPermissions(BasePermission):
         """
         Returns the permissions that a user should have one of for a particular method.
         """
-        action = get_model_action_for_view_action(request.method, view.action)
+        action = get_model_action_for_view_action(
+            request.method, view.action, many_to_many=self.many_to_many
+        )
 
         format_kwargs = {
             'app_label': model_cls._meta.app_label,
@@ -77,6 +80,7 @@ class InvestmentProjectAssociationChecker(ObjectAssociationCheckerBase):
     InvestmentProject through the user's team.
     """
 
+    many_to_many = False
     restricted_actions = {'read', 'change'}
 
     def is_associated(self, request, obj):
@@ -89,7 +93,9 @@ class InvestmentProjectAssociationChecker(ObjectAssociationCheckerBase):
 
     def should_apply_restrictions(self, request, view_action, model):
         """Check if restrictions should be applied."""
-        action = get_model_action_for_view_action(request.method, view_action)
+        action = get_model_action_for_view_action(
+            request.method, view_action, many_to_many=self.many_to_many
+        )
         if action not in self.restricted_actions:
             return False
 
@@ -151,6 +157,40 @@ class IsAssociatedToInvestmentProjectFilter(BaseFilterBackend):
             full_field_name = f'{field.field_name}__{field.subfield_name}__dit_team_id'
             query |= Q(**{full_field_name: value})
         return queryset.filter(query)
+
+
+class InvestmentProjectTeamMemberModelPermissions(InvestmentProjectModelPermissions):
+    """
+    Custom permissions class for team member views.
+
+    Uses InvestmentProject model permissions.
+    """
+
+    many_to_many = True
+
+
+class InvestmentProjectTeamMemberAssociationChecker(InvestmentProjectAssociationChecker):
+    """
+    Association checker for checking association of a user with an investment project,
+    via a team member object.
+    """
+
+    many_to_many = True
+    restricted_actions = {'read', 'change'}
+
+
+class IsAssociatedToInvestmentProjectTeamMemberPermission(IsAssociatedToObjectPermission):
+    """Permission based on InvestmentProjectTeamMemberAssociationChecker."""
+
+    checker_class = InvestmentProjectTeamMemberAssociationChecker
+
+    def has_permission(self, request, view):
+        """Checks if the user has permission using the investment project object."""
+        return self._check_actual_object_permission(request, view, view.get_project())
+
+    def get_actual_object(self, obj):
+        """Returns the investment project from an InvestmentProjectTeamMember object."""
+        return obj.investment_project
 
 
 def get_association_filters(dit_team_id):

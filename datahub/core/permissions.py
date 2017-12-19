@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
 
+# View to model action mapping for standard model-based views
 _VIEW_TO_ACTION_MAPPING = {
     'create': 'add',
     'list': 'read',
@@ -13,6 +14,20 @@ _VIEW_TO_ACTION_MAPPING = {
     'partial_update': 'change',
     'archive': 'change',
     'unarchive': 'change',
+    'metadata': 'read',
+}
+
+
+# View to model action mapping for many-to-many views where permissions are based on the
+# primary model e.g. for InvestmentProjectTeamMember where permissions are based on
+# InvestmentProject
+_MANY_TO_MANY_VIEW_TO_ACTION_MAPPING = {
+    'create': 'change',
+    'list': 'read',
+    'retrieve': 'read',
+    'destroy': 'change',
+    'destroy_all': 'change',
+    'partial_update': 'change',
     'metadata': 'read',
 }
 
@@ -61,18 +76,34 @@ class IsAssociatedToObjectPermission(BasePermission):
         """Initialises the instance."""
         self.checker = self.checker_class()
 
+    def get_actual_object(self, obj):
+        """
+        Gets the actual object for permissions to be checked on.
+
+        Subclasses can override this for cases where permissions need to be checked on an
+        attribute on the model associated with the view's queryset.
+        """
+        return obj
+
     def has_object_permission(self, request, view, obj):
         """
         Determines whether the user has permission for the specified object, using checker_class.
         """
-        if self.checker.should_apply_restrictions(request, view.action, view.get_queryset().model):
+        actual_obj = self.get_actual_object(obj)
+
+        return self._check_actual_object_permission(request, view, actual_obj)
+
+    def _check_actual_object_permission(self, request, view, obj):
+        if self.checker.should_apply_restrictions(request, view.action, obj._meta.model):
             return self.checker.is_associated(request, obj)
         return True
 
 
-def get_model_action_for_view_action(http_method, view_action):
+def get_model_action_for_view_action(http_method, view_action, many_to_many=False):
     """Gets the model action corresponding to a view action."""
     if http_method == 'OPTIONS':
         return 'read'
 
-    return _VIEW_TO_ACTION_MAPPING[view_action]
+    mapping = _MANY_TO_MANY_VIEW_TO_ACTION_MAPPING if many_to_many else _VIEW_TO_ACTION_MAPPING
+
+    return mapping[view_action]

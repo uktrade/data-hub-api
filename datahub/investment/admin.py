@@ -2,7 +2,10 @@
 
 from django.contrib import admin
 
-from datahub.core.admin import BaseModelVersionAdmin, custom_change_permission, DisabledOnFilter
+from datahub.core.admin import (
+    BaseModelVersionAdmin, custom_add_permission, custom_change_permission,
+    custom_delete_permission, DisabledOnFilter,
+)
 from datahub.investment.models import (
     InvestmentProject,
     InvestmentProjectTeamMember,
@@ -40,6 +43,9 @@ class InvestmentProjectAdmin(BaseModelVersionAdmin):
 
 
 @admin.register(InvestmentProjectTeamMember)
+@custom_add_permission(Permissions.change_all)
+@custom_change_permission(Permissions.change_all)
+@custom_delete_permission(Permissions.change_all)
 class InvestmentProjectTeamMemberAdmin(BaseModelVersionAdmin):
     """Investment project team member admin."""
 
