@@ -1738,7 +1738,8 @@ class TestUpdateTeamMemberView(APITestMixin):
     def test_restricted_user_can_patch_team_member_of_associated_project(self):
         """Test that a restricted user can update a team member of an associated project."""
         creator = AdviserFactory()
-        team_member = InvestmentProjectTeamMemberFactory()
+        project = InvestmentProjectFactory(created_by=creator)
+        team_member = InvestmentProjectTeamMemberFactory(investment_project=project)
         url = reverse('api-v3:investment:team-member-item', kwargs={
             'project_pk': team_member.investment_project.pk,
             'adviser_pk': team_member.adviser.pk
@@ -1807,7 +1808,7 @@ class TestDeleteTeamMemberView(APITestMixin):
         associated project.
         """
         creator = AdviserFactory()
-        project = InvestmentProjectFactory()
+        project = InvestmentProjectFactory(created_by=creator)
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
             2, investment_project=project
         )
