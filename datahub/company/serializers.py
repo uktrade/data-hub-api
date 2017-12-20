@@ -5,7 +5,8 @@ from django.db import models
 from rest_framework import serializers
 
 from datahub.company.models import (
-    Advisor, CompaniesHouseCompany, Company, Contact, ExportExperienceCategory
+    Advisor, CompaniesHouseCompany, Company, CompanyPermission,
+    Contact, ContactPermission, ExportExperienceCategory,
 )
 from datahub.core.serializers import NestedRelatedField, RelaxedURLField
 from datahub.core.validators import RequiredUnlessAlreadyBlankValidator
@@ -112,6 +113,16 @@ class ContactSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'archived_documents_url_path',
         )
+
+    def __init__(self, *args, **kwargs):
+        """Initialise Contact serialiser and check permissions."""
+        super().__init__(*args, **kwargs)
+        context = kwargs.get('context')
+        if context and 'request' in context:
+            request = context['request']
+            permission = f'company.{ContactPermission.read_contact_document}'
+            if not request.user.has_perm(permission):
+                self.fields.pop('archived_documents_url_path')
 
 
 class CompanySerializer(serializers.ModelSerializer):
@@ -236,3 +247,13 @@ class CompanySerializer(serializers.ModelSerializer):
             'reference_code',
         )
         validators = [RequiredUnlessAlreadyBlankValidator('sector', 'business_type')]
+
+    def __init__(self, *args, **kwargs):
+        """Initialise Company serialiser and check permissions."""
+        super().__init__(*args, **kwargs)
+        context = kwargs.get('context')
+        if context and 'request' in context:
+            request = context['request']
+            permission = f'company.{CompanyPermission.read_company_document}'
+            if not request.user.has_perm(permission):
+                self.fields.pop('archived_documents_url_path')
