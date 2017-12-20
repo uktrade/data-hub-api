@@ -73,7 +73,7 @@ class TestSearch(APITestMixin):
 
     def test_investment_project_no_permissions(self):
         """Should return 403"""
-        user = create_test_user(team=TeamFactory())
+        user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v3:search:investment_project')
         response = api_client.get(url)
@@ -247,8 +247,8 @@ class TestSearch(APITestMixin):
         adviser_2 = AdviserFactory(dit_team_id=team_others.id)
 
         request_user = create_test_user(
-            team=team,
             permission_codenames=permissions,
+            dit_team=team
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -279,8 +279,8 @@ class TestSearch(APITestMixin):
         adviser_other = AdviserFactory(dit_team_id=team_other.id)
         adviser_same_team = AdviserFactory(dit_team_id=team.id)
         request_user = create_test_user(
-            team=team,
-            permission_codenames=['read_associated_investmentproject']
+            permission_codenames=['read_associated_investmentproject'],
+            dit_team=team
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -418,8 +418,8 @@ class TestBasicSearch(APITestMixin):
         adviser_2 = AdviserFactory(dit_team_id=team_others.id)
 
         request_user = create_test_user(
-            team=team,
             permission_codenames=permissions,
+            dit_team=team
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -453,8 +453,8 @@ class TestBasicSearch(APITestMixin):
         adviser_other = AdviserFactory(dit_team_id=team_other.id)
         adviser_same_team = AdviserFactory(dit_team_id=team.id)
         request_user = create_test_user(
-            team=team,
-            permission_codenames=['read_associated_investmentproject']
+            permission_codenames=['read_associated_investmentproject'],
+            dit_team=team
         )
         api_client = self.create_api_client(user=request_user)
 

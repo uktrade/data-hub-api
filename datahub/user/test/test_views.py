@@ -34,7 +34,7 @@ class TestUserView(APITestMixin):
         team = TeamFactory(name='Test Team', role=role)
         team.role.groups.add(group)
 
-        user_test = create_test_user(team=team)
+        user_test = create_test_user(dit_team=team)
         user_test.user_permissions.set(permissions[1:])
         api_client = self.create_api_client(user=user_test)
 

@@ -22,7 +22,7 @@ class TestPermissions(APITestMixin):
         permission_group.permissions.add(permission)
         team = TeamFactory()
         team.role.groups.add(permission_group)
-        user = create_test_user(team=team)
+        user = create_test_user(dit_team=team)
         token = self.get_token(user=user)
 
         request = factory.get('/', data={}, content_type='application/json',
@@ -38,7 +38,7 @@ class TestPermissions(APITestMixin):
         """
         Tests view returns 403
         """
-        user = create_test_user(team=TeamFactory())
+        user = create_test_user(dit_team=TeamFactory())
         token = self.get_token(user=user)
 
         request = factory.get('/', data={}, content_type='application/json',
