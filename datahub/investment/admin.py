@@ -8,17 +8,17 @@ from datahub.core.admin import (
 )
 from datahub.investment.models import (
     InvestmentProject,
+    InvestmentProjectPermission,
     InvestmentProjectTeamMember,
     InvestorType,
     Involvement,
     IProjectDocument,
-    Permissions,
     SpecificProgramme,
 )
 
 
 @admin.register(InvestmentProject)
-@custom_change_permission(Permissions.change_all)
+@custom_change_permission(InvestmentProjectPermission.change_all)
 class InvestmentProjectAdmin(BaseModelVersionAdmin):
     """Investment project admin."""
 
@@ -43,9 +43,9 @@ class InvestmentProjectAdmin(BaseModelVersionAdmin):
 
 
 @admin.register(InvestmentProjectTeamMember)
-@custom_add_permission(Permissions.change_all)
-@custom_change_permission(Permissions.change_all)
-@custom_delete_permission(Permissions.change_all)
+@custom_add_permission(InvestmentProjectPermission.change_all)
+@custom_change_permission(InvestmentProjectPermission.change_all)
+@custom_delete_permission(InvestmentProjectPermission.change_all)
 class InvestmentProjectTeamMemberAdmin(BaseModelVersionAdmin):
     """Investment project team member admin."""
 
