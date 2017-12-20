@@ -25,8 +25,7 @@ from datahub.core.utils import executor
 from datahub.documents.av_scan import virus_scan_document
 from datahub.investment import views
 from datahub.investment.models import (
-    InvestmentProject, InvestmentProjectTeamMember, IProjectDocument,
-    Permissions
+    InvestmentProject, InvestmentProjectPermission, InvestmentProjectTeamMember, IProjectDocument
 )
 from datahub.investment.test.factories import (
     ActiveInvestmentProjectFactory, AssignPMInvestmentProjectFactory,
@@ -194,8 +193,8 @@ class TestListView(APITestMixin):
         assert response_data['results'][0]['id'] == str(project.id)
 
     @pytest.mark.parametrize('permissions', (
-        (Permissions.read_all,),
-        (Permissions.read_associated, Permissions.read_all),
+        (InvestmentProjectPermission.read_all,),
+        (InvestmentProjectPermission.read_associated, InvestmentProjectPermission.read_all),
     ))
     def test_non_restricted_user_can_see_all_projects(self, permissions):
         """Test that normal users can see all projects."""
@@ -229,7 +228,9 @@ class TestListView(APITestMixin):
         adviser_other = AdviserFactory(dit_team_id=team_others.id)
         adviser_same_team = AdviserFactory(dit_team_id=team.id)
 
-        _, api_client = _create_user_and_api_client(self, team, [Permissions.read_associated])
+        _, api_client = _create_user_and_api_client(
+            self, team, [InvestmentProjectPermission.read_associated]
+        )
 
         project_other = InvestmentProjectFactory()
         project_1 = InvestmentProjectFactory()
@@ -739,7 +740,7 @@ class TestRetrieveView(APITestMixin):
         adviser_1 = AdviserFactory(dit_team_id=team_associated.id)
 
         _, api_client = _create_user_and_api_client(
-            self, team_requester, [Permissions.read_associated]
+            self, team_requester, [InvestmentProjectPermission.read_associated]
         )
 
         iproject_1 = InvestmentProjectFactory()
@@ -751,8 +752,8 @@ class TestRetrieveView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize('permissions', (
-        (Permissions.read_all,),
-        (Permissions.read_associated, Permissions.read_all),
+        (InvestmentProjectPermission.read_all,),
+        (InvestmentProjectPermission.read_associated, InvestmentProjectPermission.read_all),
     ))
     def test_non_restricted_user_can_see_project_if_not_associated(self, permissions):
         """Tests that non-restricted users can access projects they aren't associated with."""
@@ -774,7 +775,9 @@ class TestRetrieveView(APITestMixin):
         """Tests that restricted users can see a project associated to them via a team member."""
         team = TeamFactory()
         adviser_1 = AdviserFactory(dit_team_id=team.id)
-        _, api_client = _create_user_and_api_client(self, team, [Permissions.read_associated])
+        _, api_client = _create_user_and_api_client(
+            self, team, [InvestmentProjectPermission.read_associated]
+        )
 
         iproject_1 = InvestmentProjectFactory()
         InvestmentProjectTeamMemberFactory(adviser=adviser_1, investment_project=iproject_1)
@@ -794,7 +797,9 @@ class TestRetrieveView(APITestMixin):
         team = TeamFactory()
         adviser_1 = AdviserFactory(dit_team_id=team.id)
 
-        _, api_client = _create_user_and_api_client(self, team, [Permissions.read_associated])
+        _, api_client = _create_user_and_api_client(
+            self, team, [InvestmentProjectPermission.read_associated]
+        )
 
         iproject_1 = InvestmentProjectFactory(**{field: adviser_1})
 
@@ -1219,7 +1224,7 @@ class TestPartialUpdateView(APITestMixin):
         adviser = AdviserFactory(dit_team_id=team_associated.id)
 
         _, api_client = _create_user_and_api_client(
-            self, team_requester, [Permissions.change_associated]
+            self, team_requester, [InvestmentProjectPermission.change_associated]
         )
 
         project = InvestmentProjectFactory(name='old name')
@@ -1233,8 +1238,8 @@ class TestPartialUpdateView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize('permissions', (
-        (Permissions.change_all,),
-        (Permissions.change_all, Permissions.change_associated),
+        (InvestmentProjectPermission.change_all,),
+        (InvestmentProjectPermission.change_all, InvestmentProjectPermission.change_associated),
     ))
     def test_non_restricted_user_can_update_project_if_not_associated(self, permissions):
         """Tests that non-restricted users can update projects they aren't associated with."""
@@ -1263,7 +1268,7 @@ class TestPartialUpdateView(APITestMixin):
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
         _, api_client = _create_user_and_api_client(
-            self, team, [Permissions.change_associated]
+            self, team, [InvestmentProjectPermission.change_associated]
         )
 
         project = InvestmentProjectFactory(name='old name')
@@ -1289,7 +1294,7 @@ class TestPartialUpdateView(APITestMixin):
         adviser = AdviserFactory(dit_team_id=team.id)
 
         _, api_client = _create_user_and_api_client(
-            self, team, [Permissions.change_associated]
+            self, team, [InvestmentProjectPermission.change_associated]
         )
 
         project = InvestmentProjectFactory(name='old name', **{field: adviser})
@@ -1395,8 +1400,8 @@ class TestModifiedSinceView(APITestMixin):
         assert response_data['count'] == 9
 
 
-class TestTeamMemberViews(APITestMixin):
-    """Tests for the team member views."""
+class TestAddTeamMemberView(APITestMixin):
+    """Tests for the add team member view."""
 
     def test_add_team_member_nonexistent_project(self):
         """Tests adding a team member to a non-existent project."""
@@ -1454,10 +1459,18 @@ class TestTeamMemberViews(APITestMixin):
             'role': ['This field may not be blank.']
         }
 
-    def test_add_team_member_success(self):
-        """Tests adding a team member to a project."""
+    @pytest.mark.parametrize('permissions', (
+        (InvestmentProjectPermission.change_all,),
+        (InvestmentProjectPermission.change_associated, InvestmentProjectPermission.change_all),
+    ))
+    def test_non_restricted_user_can_add_team_member(self, permissions):
+        """Test that a non-restricted user can add a team member to a project."""
         project = InvestmentProjectFactory()
         adviser = AdviserFactory()
+        team = TeamFactory()
+
+        _, api_client = _create_user_and_api_client(self, team, permissions)
+
         url = reverse('api-v3:investment:team-member-collection',
                       kwargs={'project_pk': project.pk})
         request_data = {
@@ -1466,7 +1479,53 @@ class TestTeamMemberViews(APITestMixin):
             },
             'role': 'Sector adviser'
         }
-        response = self.api_client.post(url, format='json', data=request_data)
+        response = api_client.post(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data['adviser']['id'] == str(adviser.pk)
+        assert response_data['role'] == 'Sector adviser'
+
+    def test_restricted_user_cannot_add_team_member_to_non_associated_project(self):
+        """Test that a restricted user cannot add a team member to a non-associated project."""
+        project = InvestmentProjectFactory()
+        adviser = AdviserFactory()
+        team = TeamFactory()
+
+        _, api_client = _create_user_and_api_client(
+            self, team, [InvestmentProjectPermission.change_associated]
+        )
+
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        request_data = {
+            'adviser': {
+                'id': str(adviser.pk)
+            },
+            'role': 'Sector adviser'
+        }
+        response = api_client.post(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_restricted_user_can_add_team_member_to_associated_project(self):
+        """Test that a restricted user can add a team member to an associated project."""
+        adviser = AdviserFactory()
+        creator = AdviserFactory()
+        project = InvestmentProjectFactory(created_by=creator)
+
+        _, api_client = _create_user_and_api_client(
+            self, creator.dit_team, [InvestmentProjectPermission.change_associated]
+        )
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        request_data = {
+            'adviser': {
+                'id': str(adviser.pk)
+            },
+            'role': 'Sector adviser'
+        }
+        response = api_client.post(url, format='json', data=request_data)
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
@@ -1493,30 +1552,131 @@ class TestTeamMemberViews(APITestMixin):
             'non_field_errors': ['The fields investment_project, adviser must make a unique set.']
         }
 
-    def test_delete_all_team_members_success(self):
-        """Tests removing all team members from a project."""
+
+class TestDeleteAllTeamMembersView(APITestMixin):
+    """Tests for the delete all team members view."""
+
+    @pytest.mark.parametrize('permissions', (
+        (InvestmentProjectPermission.change_all,),
+        (InvestmentProjectPermission.change_associated, InvestmentProjectPermission.change_all),
+    ))
+    def test_non_restricted_user_can_delete_all_team_members(self, permissions):
+        """Test that a non-restricted user can remove all team members from a project."""
         project = InvestmentProjectFactory()
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
             2, investment_project=project
         )
         InvestmentProjectTeamMemberFactory()
+
+        team = TeamFactory()
+        _, api_client = _create_user_and_api_client(self, team, permissions)
+
         url = reverse('api-v3:investment:team-member-collection', kwargs={
             'project_pk': team_members[0].investment_project.pk
         })
-        response = self.api_client.delete(url)
+        response = api_client.delete(url)
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not InvestmentProjectTeamMember.objects.filter(investment_project=project).exists()
         assert InvestmentProjectTeamMember.objects.all().exists()
 
-    def test_get_team_member_success(self):
-        """Tests getting a project team member."""
+    def test_restricted_user_cannot_delete_all_team_members_of_non_associated_project(self):
+        """
+        Test that a restricted user cannot remove all team members from a non-associated project.
+        """
+        project = InvestmentProjectFactory()
+        team_members = InvestmentProjectTeamMemberFactory.create_batch(
+            2, investment_project=project
+        )
+        InvestmentProjectTeamMemberFactory()
+
+        team = TeamFactory()
+        _, api_client = _create_user_and_api_client(
+            self, team, [InvestmentProjectPermission.change_associated]
+        )
+
+        url = reverse('api-v3:investment:team-member-collection', kwargs={
+            'project_pk': team_members[0].investment_project.pk
+        })
+        response = api_client.delete(url)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_restricted_user_can_delete_all_team_members_of_associated_project(self):
+        """
+        Test that a restricted user can remove all team members from an associated project.
+        """
+        creator = AdviserFactory()
+        project = InvestmentProjectFactory(created_by=creator)
+        team_members = InvestmentProjectTeamMemberFactory.create_batch(
+            2, investment_project=project
+        )
+        InvestmentProjectTeamMemberFactory()
+
+        _, api_client = _create_user_and_api_client(
+            self, creator.dit_team, [InvestmentProjectPermission.change_associated]
+        )
+
+        url = reverse('api-v3:investment:team-member-collection', kwargs={
+            'project_pk': team_members[0].investment_project.pk
+        })
+        response = api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert not InvestmentProjectTeamMember.objects.filter(investment_project=project).exists()
+        assert InvestmentProjectTeamMember.objects.all().exists()
+
+
+class TestGetTeamMemberView(APITestMixin):
+    """Tests for the get team member view."""
+
+    @pytest.mark.parametrize('permissions', (
+        (InvestmentProjectPermission.read_all,),
+        (InvestmentProjectPermission.read_associated, InvestmentProjectPermission.read_all),
+    ))
+    def test_non_restricted_user_can_get_team_member(self, permissions):
+        """Test that a non-restricted user can get a team member."""
         team_member = InvestmentProjectTeamMemberFactory()
         url = reverse('api-v3:investment:team-member-item', kwargs={
             'project_pk': team_member.investment_project.pk,
             'adviser_pk': team_member.adviser.pk
         })
-        response = self.api_client.get(url, format='json')
+        team = TeamFactory()
+        _, api_client = _create_user_and_api_client(self, team, permissions)
+        response = api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['role'] == team_member.role
+
+    def test_restricted_user_cannot_get_team_member_of_non_associated_project(self):
+        """Test that a restricted user cannot get a team member of a non-associated project."""
+        team_member = InvestmentProjectTeamMemberFactory()
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': team_member.investment_project.pk,
+            'adviser_pk': team_member.adviser.pk
+        })
+        team = TeamFactory()
+        _, api_client = _create_user_and_api_client(
+            self, team, [InvestmentProjectPermission.read_associated]
+        )
+        response = api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_restricted_user_can_get_team_member_of_associated_project(self):
+        """Test that a restricted user can get a team member of an associated project."""
+        creator = AdviserFactory()
+        project = InvestmentProjectFactory(created_by=creator)
+        team_member = InvestmentProjectTeamMemberFactory(investment_project=project)
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': team_member.investment_project.pk,
+            'adviser_pk': team_member.adviser.pk
+        })
+        _, api_client = _create_user_and_api_client(
+            self, creator.dit_team, [InvestmentProjectPermission.read_associated]
+        )
+        response = api_client.get(url, format='json')
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -1544,8 +1704,16 @@ class TestTeamMemberViews(APITestMixin):
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_patch_team_member_success(self):
-        """Tests updating a project team member's role."""
+
+class TestUpdateTeamMemberView(APITestMixin):
+    """Tests for the update team member view."""
+
+    @pytest.mark.parametrize('permissions', (
+        (InvestmentProjectPermission.change_all,),
+        (InvestmentProjectPermission.change_associated, InvestmentProjectPermission.change_all),
+    ))
+    def test_non_restricted_user_can_patch_team_member(self, permissions):
+        """Test that a non-restricted user can update a team member."""
         team_member = InvestmentProjectTeamMemberFactory()
         url = reverse('api-v3:investment:team-member-item', kwargs={
             'project_pk': team_member.investment_project.pk,
@@ -1554,14 +1722,63 @@ class TestTeamMemberViews(APITestMixin):
         request_data = {
             'role': 'updated role'
         }
-        response = self.api_client.patch(url, format='json', data=request_data)
+        team = TeamFactory()
+        _, api_client = _create_user_and_api_client(self, team, permissions)
+        response = api_client.patch(url, format='json', data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['role'] == request_data['role']
 
-    def test_delete_team_member_success(self):
-        """Tests removing a team member from a project."""
+    def test_restricted_user_cannot_patch_team_member_of_non_associated_project(self):
+        """Test that a restricted user cannot update a team member of a non-associated project."""
+        team_member = InvestmentProjectTeamMemberFactory()
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': team_member.investment_project.pk,
+            'adviser_pk': team_member.adviser.pk
+        })
+        request_data = {
+            'role': 'updated role'
+        }
+        team = TeamFactory()
+        _, api_client = _create_user_and_api_client(
+            self, team, [InvestmentProjectPermission.change_associated]
+        )
+        response = api_client.patch(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_restricted_user_can_patch_team_member_of_associated_project(self):
+        """Test that a restricted user can update a team member of an associated project."""
+        creator = AdviserFactory()
+        project = InvestmentProjectFactory(created_by=creator)
+        team_member = InvestmentProjectTeamMemberFactory(investment_project=project)
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': team_member.investment_project.pk,
+            'adviser_pk': team_member.adviser.pk
+        })
+        request_data = {
+            'role': 'updated role'
+        }
+        _, api_client = _create_user_and_api_client(
+            self, creator.dit_team, [InvestmentProjectPermission.change_associated]
+        )
+        response = api_client.patch(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['role'] == request_data['role']
+
+
+class TestDeleteTeamMemberView(APITestMixin):
+    """Tests for the delete team member views."""
+
+    @pytest.mark.parametrize('permissions', (
+        (InvestmentProjectPermission.change_all,),
+        (InvestmentProjectPermission.change_associated, InvestmentProjectPermission.change_all),
+    ))
+    def test_non_restricted_user_can_delete_team_member(self, permissions):
+        """Test that a non-restricted user can remove a team member from a project."""
         project = InvestmentProjectFactory()
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
             2, investment_project=project
@@ -1570,7 +1787,54 @@ class TestTeamMemberViews(APITestMixin):
             'project_pk': team_members[0].investment_project.pk,
             'adviser_pk': team_members[0].adviser.pk
         })
-        response = self.api_client.delete(url)
+        team = TeamFactory()
+        _, api_client = _create_user_and_api_client(self, team, permissions)
+        response = api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        new_team_members = InvestmentProjectTeamMember.objects.filter(investment_project=project)
+        assert new_team_members.count() == 1
+        assert new_team_members[0].adviser.pk == team_members[1].adviser.pk
+
+    def test_restricted_user_cannot_delete_team_member_of_non_associated_project(self):
+        """
+        Test that a restricted user cannot remove a team member from a project from a
+        non-associated project.
+        """
+        project = InvestmentProjectFactory()
+        team_members = InvestmentProjectTeamMemberFactory.create_batch(
+            2, investment_project=project
+        )
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': team_members[0].investment_project.pk,
+            'adviser_pk': team_members[0].adviser.pk
+        })
+        team = TeamFactory()
+        _, api_client = _create_user_and_api_client(
+            self, team, [InvestmentProjectPermission.change_associated]
+        )
+        response = api_client.delete(url)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_restricted_user_can_delete_team_member_of_associated_project(self):
+        """
+        Test that a restricted user can remove a team member from a project from an
+        associated project.
+        """
+        creator = AdviserFactory()
+        project = InvestmentProjectFactory(created_by=creator)
+        team_members = InvestmentProjectTeamMemberFactory.create_batch(
+            2, investment_project=project
+        )
+        url = reverse('api-v3:investment:team-member-item', kwargs={
+            'project_pk': team_members[0].investment_project.pk,
+            'adviser_pk': team_members[0].adviser.pk
+        })
+        _, api_client = _create_user_and_api_client(
+            self, creator.dit_team, [InvestmentProjectPermission.change_associated]
+        )
+        response = api_client.delete(url)
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
         new_team_members = InvestmentProjectTeamMember.objects.filter(investment_project=project)
@@ -1582,8 +1846,8 @@ class TestAuditLogView(APITestMixin):
     """Tests for the audit log view."""
 
     @pytest.mark.parametrize('permissions', (
-        (Permissions.read_all,),
-        (Permissions.read_associated, Permissions.read_all),
+        (InvestmentProjectPermission.read_all,),
+        (InvestmentProjectPermission.read_associated, InvestmentProjectPermission.read_all),
     ))
     def test_audit_log_non_restricted_user(self, permissions):
         """Test retrieval of audit log for a non-restricted user."""
@@ -1635,7 +1899,9 @@ class TestAuditLogView(APITestMixin):
         """Test retrieval of audit log for a restricted user and an associated project."""
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
-        user, api_client = _create_user_and_api_client(self, team, [Permissions.read_associated])
+        user, api_client = _create_user_and_api_client(
+            self, team, [InvestmentProjectPermission.read_associated]
+        )
 
         initial_datetime = now()
         with reversion.create_revision():
@@ -1682,7 +1948,9 @@ class TestAuditLogView(APITestMixin):
     def test_audit_log_restricted_user_non_associated_project(self):
         """Test retrieval of audit log for a restricted user and a non-associated project."""
         team = TeamFactory()
-        _, api_client = _create_user_and_api_client(self, team, [Permissions.read_associated])
+        _, api_client = _create_user_and_api_client(
+            self, team, [InvestmentProjectPermission.read_associated]
+        )
 
         iproject = InvestmentProjectFactory(
             description='Initial desc',
@@ -1697,8 +1965,8 @@ class TestArchiveViews(APITestMixin):
     """Tests for the archive and unarchive views."""
 
     @pytest.mark.parametrize('permissions', (
-        (Permissions.change_all,),
-        (Permissions.change_associated, Permissions.change_all),
+        (InvestmentProjectPermission.change_all,),
+        (InvestmentProjectPermission.change_associated, InvestmentProjectPermission.change_all),
     ))
     def test_archive_project_non_restricted_user(self, permissions):
         """Tests archiving a project for a non-restricted user."""
@@ -1723,7 +1991,7 @@ class TestArchiveViews(APITestMixin):
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
         user, api_client = _create_user_and_api_client(
-            self, team, [Permissions.change_associated]
+            self, team, [InvestmentProjectPermission.change_associated]
         )
 
         project = InvestmentProjectFactory(created_by=adviser)
@@ -1743,7 +2011,7 @@ class TestArchiveViews(APITestMixin):
         """Test that a restricted user cannot archive a non-associated project."""
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(
-            self, team, [Permissions.change_associated]
+            self, team, [InvestmentProjectPermission.change_associated]
         )
 
         project = InvestmentProjectFactory()
@@ -1796,8 +2064,8 @@ class TestArchiveViews(APITestMixin):
         }
 
     @pytest.mark.parametrize('permissions', (
-        (Permissions.change_all,),
-        (Permissions.change_associated, Permissions.change_all),
+        (InvestmentProjectPermission.change_all,),
+        (InvestmentProjectPermission.change_associated, InvestmentProjectPermission.change_all),
     ))
     def test_unarchive_project_non_restricted_user(self, permissions):
         """Tests unarchiving a project for a non-restricted user."""
@@ -1822,7 +2090,7 @@ class TestArchiveViews(APITestMixin):
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
         _, api_client = _create_user_and_api_client(
-            self, team, [Permissions.change_associated]
+            self, team, [InvestmentProjectPermission.change_associated]
         )
 
         project = InvestmentProjectFactory(
@@ -1845,7 +2113,7 @@ class TestArchiveViews(APITestMixin):
         team = TeamFactory()
         AdviserFactory(dit_team_id=team.id)
         _, api_client = _create_user_and_api_client(
-            self, team, [Permissions.change_associated]
+            self, team, [InvestmentProjectPermission.change_associated]
         )
 
         project = InvestmentProjectFactory(
