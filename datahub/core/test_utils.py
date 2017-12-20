@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from secrets import token_hex
+import factory
 
 import pytest
 from django.contrib.auth import get_user_model
@@ -10,7 +11,6 @@ from oauth2_provider.models import AccessToken, Application
 from rest_framework.fields import DateField, DateTimeField
 from rest_framework.test import APIClient
 
-from datahub.company.test.factories import AdviserFactory
 from datahub.metadata.models import Team
 from datahub.oauth.scopes import Scope
 
@@ -24,22 +24,33 @@ def get_default_test_user():
         team = Team.objects.filter(
             role__groups__name='DIT_staff'
         ).first()
-        test_user = user_model(
+        test_user = create_test_user(
             first_name='Testo',
             last_name='Useri',
             email='Testo@Useri.com',
-            date_joined=now(),
-            dit_team=team,
+            dit_team=team
         )
-        test_user.save()
     return test_user
 
 
-def create_test_user(team=None, permission_codenames=()):
-    """Return the test user."""
-    # Because AdviserFactory sets dit_team_id, passing dit_team to it doesn't work
-    dit_team_id = team.id if team else None
-    user = AdviserFactory(dit_team_id=dit_team_id)
+def create_test_user(permission_codenames=(), **user_attrs):
+    """
+    :returns: user
+    :param permission_codenames: list of codename permissions to be
+        applied to the user
+    :param user_attrs: any user attribute
+    """
+    user_defaults = {
+        'first_name': factory.Faker('first_name').generate({}),
+        'last_name': factory.Faker('last_name').generate({}),
+        'email': factory.Faker('email').generate({}),
+        'date_joined': now()
+    }
+    user_defaults.update(user_attrs)
+
+    user_model = get_user_model()
+    user = user_model(**user_defaults)
+    user.save()
 
     permissions = Permission.objects.filter(codename__in=permission_codenames)
     user.user_permissions.set(permissions)
@@ -82,7 +93,7 @@ class AdminTestMixin:
         if not user:
             user = self.user
         client = Client()
-        client.login(username=user.email, password=self.PASSWORD)
+        assert client.login(username=user.email, password=self.PASSWORD)
         return client
 
 

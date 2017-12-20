@@ -498,21 +498,16 @@ class Order(BaseModel):
         order_completed.send(sender=self.__class__, order=self)
 
     @transaction.atomic
-    def cancel(self, by, reason):
+    def cancel(self, by, reason, force=False):
         """
         Cancel an order.
 
         :param by: the adviser who cancelled the order
         :param reason: CancellationReason
+        :param force: if True, cancelling an order in quote accepted or paid
+            is allowed.
         """
-        for order_validator in [
-            validators.OrderInStatusValidator(
-                allowed_statuses=(
-                    OrderStatus.draft,
-                    OrderStatus.quote_awaiting_acceptance,
-                )
-            )
-        ]:
+        for order_validator in [validators.CancellableOrderValidator(force=force)]:
             order_validator.set_instance(self)
             order_validator()
 
