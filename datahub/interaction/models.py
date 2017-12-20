@@ -5,8 +5,25 @@ from django.db import models
 from model_utils import Choices
 
 from datahub.core.models import BaseConstantModel, BaseModel
+from datahub.core.utils import StrEnum
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
+
+class InteractionPermission(StrEnum):
+    """
+    Permission codename constants.
+
+    (Defined here rather than in permissions to avoid an import of that module.)
+    """
+
+    read = 'read_interaction'
+    read_associated_investmentproject = 'read_associated_investmentproject_interaction'
+    change = 'change_interaction'
+    change_associated_investmentproject = 'change_associated_investmentproject_interaction'
+    add = 'add_investmentproject'
+    add_associated_investmentproject = 'add_associated_investmentproject_interaction'
+    delete = 'delete_investmentproject'
 
 
 class CommunicationChannel(BaseConstantModel):
@@ -91,4 +108,21 @@ class Interaction(BaseModel):
         indexes = [
             models.Index(fields=['-date', '-created_on']),
         ]
-        permissions = (('read_interaction', 'Can read interaction'),)
+        permissions = (
+            (
+                InteractionPermission.read,
+                'Can read all interaction'
+            ),
+            (
+                InteractionPermission.read_associated_investmentproject,
+                'Can read interaction for associated investment projects'
+            ),
+            (
+                InteractionPermission.add_associated_investmentproject,
+                'Can add interaction for associated investment projects'
+            ),
+            (
+                InteractionPermission.change_associated_investmentproject,
+                'Can change interaction for associated investment projects'
+            ),
+        )

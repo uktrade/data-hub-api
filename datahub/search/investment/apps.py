@@ -66,7 +66,7 @@ class InvestmentSearchApp(SearchApp):
         """
         checker = InvestmentProjectAssociationChecker()
 
-        if not checker.should_apply_restrictions(request, 'list', DBInvestmentProject):
+        if not checker.should_apply_restrictions(request, 'list'):
             return None
 
         if checker.should_exclude_all(request):
