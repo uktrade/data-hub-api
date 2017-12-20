@@ -86,6 +86,10 @@ class ReadOnlyAdmin(admin.ModelAdmin):
 
         Always returns all fields.
         """
+        # if reaonly_fields defined explicitly, use that
+        if self.readonly_fields:
+            return self.readonly_fields
+
         # OrderedDict used instead of set to preserve order
         readonly_fields = list(OrderedDict.fromkeys(
             [field.name for field in self.opts.local_fields] +

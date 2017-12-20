@@ -9,9 +9,9 @@ from datahub.investment.models import (
     InvestorType,
     Involvement,
     IProjectDocument,
+    Permissions,
     SpecificProgramme,
 )
-from datahub.investment.permissions import Permissions
 
 
 @admin.register(InvestmentProject)

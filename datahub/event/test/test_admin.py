@@ -1,7 +1,7 @@
 from django.contrib.admin import helpers
+from django.urls import reverse
 from django.utils.timezone import now
 from rest_framework import status
-from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import AdminTestMixin
 from datahub.event.test.factories import EventFactory

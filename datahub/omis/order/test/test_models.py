@@ -575,10 +575,20 @@ class TestCancelOrder:
     """Tests for when an order is cancelled."""
 
     @pytest.mark.parametrize(
-        'allowed_status',
-        (OrderStatus.draft, OrderStatus.quote_awaiting_acceptance)
+        'allowed_status,force',
+        (
+            # force=False
+            (OrderStatus.draft, False),
+            (OrderStatus.quote_awaiting_acceptance, False),
+
+            # force=True
+            (OrderStatus.draft, True),
+            (OrderStatus.quote_awaiting_acceptance, True),
+            (OrderStatus.quote_accepted, True),
+            (OrderStatus.paid, True),
+        )
     )
-    def test_ok_if_order_in_allowed_status(self, allowed_status):
+    def test_ok_if_order_in_allowed_status(self, allowed_status, force):
         """
         Test that the order can be cancelled if it's in one of the allowed statuses.
         """
@@ -587,7 +597,7 @@ class TestCancelOrder:
         adviser = AdviserFactory()
 
         with freeze_time('2018-07-12 13:00'):
-            order.cancel(by=adviser, reason=reason)
+            order.cancel(by=adviser, reason=reason, force=force)
 
         order.refresh_from_db()
         assert order.status == OrderStatus.cancelled
@@ -596,15 +606,20 @@ class TestCancelOrder:
         assert order.cancelled_by == adviser
 
     @pytest.mark.parametrize(
-        'disallowed_status',
+        'disallowed_status,force',
         (
-            OrderStatus.quote_accepted,
-            OrderStatus.paid,
-            OrderStatus.complete,
-            OrderStatus.cancelled,
+            # force=False
+            (OrderStatus.quote_accepted, False),
+            (OrderStatus.paid, False),
+            (OrderStatus.complete, False),
+            (OrderStatus.cancelled, False),
+
+            # force=True
+            (OrderStatus.complete, True),
+            (OrderStatus.cancelled, True),
         )
     )
-    def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
+    def test_fails_if_order_not_in_allowed_status(self, disallowed_status, force):
         """
         Test that if the order is in a disallowed status, the order cannot be cancelled.
         """
@@ -612,7 +627,7 @@ class TestCancelOrder:
         order = OrderFactory(status=disallowed_status)
 
         with pytest.raises(Conflict):
-            order.cancel(by=None, reason=reason)
+            order.cancel(by=None, reason=reason, force=force)
 
         assert order.status == disallowed_status
 

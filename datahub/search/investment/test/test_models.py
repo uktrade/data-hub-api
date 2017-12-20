@@ -28,6 +28,7 @@ def test_investment_project_to_dict(setup_es):
         'sector',
         'project_code',
         'created_on',
+        'created_by',
         'modified_on',
         'archived',
         'archived_on',
