@@ -3,8 +3,8 @@ from django.db.models import Prefetch
 
 from datahub.investment.models import (
     InvestmentProject as DBInvestmentProject,
+    InvestmentProjectPermission,
     InvestmentProjectTeamMember as DBInvestmentProjectTeamMember,
-    Permissions
 )
 from datahub.investment.permissions import (
     get_association_filters, InvestmentProjectAssociationChecker
@@ -24,8 +24,8 @@ class InvestmentSearchApp(SearchApp):
     view = SearchInvestmentProjectAPIView
     export_view = SearchInvestmentProjectExportAPIView
     permission_required = (
-        f'investment.{Permissions.read_all}',
-        f'investment.{Permissions.read_associated}'
+        f'investment.{InvestmentProjectPermission.read_all}',
+        f'investment.{InvestmentProjectPermission.read_associated}'
     )
     queryset = DBInvestmentProject.objects.prefetch_related(
         'archived_by',
