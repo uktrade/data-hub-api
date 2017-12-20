@@ -11,7 +11,7 @@ from datahub.core.utils import StrEnum
 from datahub.investment.models import InvestmentProject
 
 
-class PermissionTemplates(StrEnum):
+class _PermissionTemplate(StrEnum):
     """Permission codename templates."""
 
     all = '{app_label}.{action}_all_{model_name}'
@@ -33,18 +33,18 @@ class InvestmentProjectModelPermissions(BasePermission):
 
     permission_mapping = {
         'add': (
-            PermissionTemplates.standard,
+            _PermissionTemplate.standard,
         ),
         'read': (
-            PermissionTemplates.all,
-            PermissionTemplates.associated,
+            _PermissionTemplate.all,
+            _PermissionTemplate.associated,
         ),
         'change': (
-            PermissionTemplates.all,
-            PermissionTemplates.associated,
+            _PermissionTemplate.all,
+            _PermissionTemplate.associated,
         ),
         'delete': (
-            PermissionTemplates.standard,
+            _PermissionTemplate.standard,
         ),
     }
 
@@ -105,10 +105,10 @@ class InvestmentProjectAssociationChecker(ObjectAssociationCheckerBase):
             'action': action
         }
 
-        if request.user.has_perm(PermissionTemplates.all.format(**format_kwargs)):
+        if request.user.has_perm(_PermissionTemplate.all.format(**format_kwargs)):
             return False
 
-        if request.user.has_perm(PermissionTemplates.associated.format(**format_kwargs)):
+        if request.user.has_perm(_PermissionTemplate.associated.format(**format_kwargs)):
             return True
 
         raise RuntimeError('User does not have any relevant investment project permissions.')

@@ -21,7 +21,7 @@ from datahub.documents.models import Document
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-class Permissions(StrEnum):
+class InvestmentProjectPermission(StrEnum):
     """
     Permission codename constants.
 
@@ -318,9 +318,18 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
 
     class Meta:
         permissions = (
-            (Permissions.read_all, 'Can read all investment project'),
-            (Permissions.read_associated, 'Can read associated investment project'),
-            (Permissions.change_associated, 'Can change associated investment project'),
+            (
+                InvestmentProjectPermission.read_all,
+                'Can read all investment project'
+            ),
+            (
+                InvestmentProjectPermission.read_associated,
+                'Can read associated investment project'
+            ),
+            (
+                InvestmentProjectPermission.change_associated,
+                'Can change associated investment project'
+            ),
         )
         default_permissions = (
             'add',
