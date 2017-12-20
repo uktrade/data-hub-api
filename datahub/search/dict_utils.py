@@ -51,6 +51,11 @@ def contact_or_adviser_dict(obj, include_dit_team=False):
     return data
 
 
+def adviser_dict_with_team(obj):
+    """Creates a dictionary with adviser names fields and the adviser's team."""
+    return contact_or_adviser_dict(obj, include_dit_team=True)
+
+
 def computed_nested_id_name_dict(nested_field):
     """Creates dictionary with selected fields from nested_field."""
     def get_dict(obj):

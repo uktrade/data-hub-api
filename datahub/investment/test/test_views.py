@@ -25,9 +25,9 @@ from datahub.core.utils import executor
 from datahub.documents.av_scan import virus_scan_document
 from datahub.investment import views
 from datahub.investment.models import (
-    InvestmentProject, InvestmentProjectTeamMember, IProjectDocument
+    InvestmentProject, InvestmentProjectTeamMember, IProjectDocument,
+    Permissions
 )
-from datahub.investment.permissions import Permissions
 from datahub.investment.test.factories import (
     ActiveInvestmentProjectFactory, AssignPMInvestmentProjectFactory,
     InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
@@ -46,7 +46,7 @@ class TestListView(APITestMixin):
 
     def test_investments_no_permissions(self):
         """Should return 403"""
-        user = create_test_user(team=TeamFactory())
+        user = create_test_user(dit_team=TeamFactory())
         url = reverse('api-v3:investment:investment-collection')
         api_client = self.create_api_client(user=user)
         response = api_client.get(url)
@@ -253,6 +253,27 @@ class TestListView(APITestMixin):
                         str(project_4.id), str(project_5.id)}
 
         assert {result['id'] for result in results} == expected_ids
+
+    def test_restricted_user_with_no_team_cannot_see_projects(self):
+        """
+        Checks that a restricted user that doesn't have a team cannot view any projects (in
+        particular projects associated with other advisers that don't have teams).
+        """
+        adviser_other = AdviserFactory(dit_team_id=None)
+        request_user = create_test_user(
+            permission_codenames=['read_associated_investmentproject']
+        )
+        api_client = self.create_api_client(user=request_user)
+
+        InvestmentProjectFactory()
+        InvestmentProjectFactory(created_by=adviser_other)
+
+        url = reverse('api-v3:investment:investment-collection')
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 0
 
 
 class TestCreateView(APITestMixin):
@@ -749,7 +770,7 @@ class TestRetrieveView(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
 
-    def test_restricted_user_can_see_project_if_associated(self):
+    def test_restricted_user_can_see_project_if_associated_via_team_member(self):
         """Tests that restricted users can see a project associated to them via a team member."""
         team = TeamFactory()
         adviser_1 = AdviserFactory(dit_team_id=team.id)
@@ -763,19 +784,42 @@ class TestRetrieveView(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
 
-    def test_restricted_user_can_see_project_if_in_created_by_team(self):
+    @pytest.mark.parametrize('field', (
+        'created_by',
+        'client_relationship_manager',
+        'project_assurance_adviser',
+        'project_manager'))
+    def test_restricted_user_can_see_project_if_associated_via_field(self, field):
         """Tests that restricted users can see a project when in the team of the creator."""
         team = TeamFactory()
         adviser_1 = AdviserFactory(dit_team_id=team.id)
 
         _, api_client = _create_user_and_api_client(self, team, [Permissions.read_associated])
 
-        iproject_1 = InvestmentProjectFactory(created_by=adviser_1)
+        iproject_1 = InvestmentProjectFactory(**{field: adviser_1})
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': iproject_1.pk})
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
+
+    def test_restricted_user_with_no_team_cannot_view_project(self):
+        """
+        Checks that a restricted user that doesn't have a team cannot view a project created by
+        another user without a team.
+        """
+        adviser_other = AdviserFactory(dit_team_id=None)
+        request_user = create_test_user(
+            permission_codenames=['read_associated_investmentproject']
+        )
+        api_client = self.create_api_client(user=request_user)
+
+        project = InvestmentProjectFactory(created_by=adviser_other)
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 class TestPartialUpdateView(APITestMixin):
@@ -1212,7 +1256,7 @@ class TestPartialUpdateView(APITestMixin):
         response_data = response.json()
         assert response_data['name'] == 'new name'
 
-    def test_restricted_user_can_update_project_if_associated(self):
+    def test_restricted_user_can_update_project_if_associated_via_team_member(self):
         """
         Tests that restricted users can update a project associated to them via a team member.
         """
@@ -1234,7 +1278,12 @@ class TestPartialUpdateView(APITestMixin):
         response_data = response.json()
         assert response_data['name'] == 'new name'
 
-    def test_restricted_user_can_update_project_if_in_created_by_team(self):
+    @pytest.mark.parametrize('field', (
+        'created_by',
+        'client_relationship_manager',
+        'project_assurance_adviser',
+        'project_manager'))
+    def test_restricted_user_can_update_project_if_associated_via_field(self, field):
         """Tests that restricted users can update a project when in the team of the creator."""
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
@@ -1243,7 +1292,7 @@ class TestPartialUpdateView(APITestMixin):
             self, team, [Permissions.change_associated]
         )
 
-        project = InvestmentProjectFactory(name='old name', created_by=adviser)
+        project = InvestmentProjectFactory(name='old name', **{field: adviser})
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         response = api_client.patch(url, {
@@ -1978,6 +2027,6 @@ def test_view_set_name(view_set):
 
 
 def _create_user_and_api_client(test_instance, team, permissions):
-    user = create_test_user(team=team, permission_codenames=permissions)
+    user = create_test_user(dit_team=team, permission_codenames=permissions)
     api_client = test_instance.create_api_client(user=user)
     return user, api_client

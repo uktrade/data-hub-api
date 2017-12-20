@@ -5,11 +5,18 @@ from django.conf import settings
 from elasticsearch.helpers import bulk as es_bulk
 from elasticsearch_dsl import analysis, Index, Search
 from elasticsearch_dsl.connections import connections
-from elasticsearch_dsl.query import MatchPhrase, MultiMatch, Q
+from elasticsearch_dsl.query import Bool, MatchPhrase, MultiMatch, Q, Query, Term
 
-from .apps import get_search_apps
+from .apps import EXCLUDE_ALL, get_search_apps
 
 MAX_RESULTS = 10000
+
+
+class MatchNone(Query):
+    """match_none query. This isn't defined in the Elasticsearch DSL library."""
+
+    name = 'match_none'
+
 
 lowercase_keyword_analyzer = analysis.CustomAnalyzer(
     'lowercase_keyword_analyzer',
@@ -156,9 +163,31 @@ def _get_sort_query(qs, field_order=None):
     return qs
 
 
+def _get_global_permission_query(permission_filters_by_entity=None):
+    if permission_filters_by_entity is None:
+        return None
+
+    subqueries = _get_global_permission_subqueries(permission_filters_by_entity)
+    return Bool(
+        should=list(subqueries),
+    )
+
+
+def _get_global_permission_subqueries(permission_filters_by_entity):
+    for entity, filter_args in permission_filters_by_entity.items():
+        query = Term(_type=entity)
+        entity_condition = _get_entity_permission_query(filter_args)
+
+        if entity_condition is not None:
+            query &= entity_condition
+
+        yield query
+
+
 def get_basic_search_query(
         term,
         entities=None,
+        permission_filters_by_entity=None,
         field_order=None,
         ignored_entities=(),
         offset=0,
@@ -167,6 +196,11 @@ def get_basic_search_query(
     """Performs basic search looking for name and then SEARCH_FIELDS in entity.
 
     Also returns number of results in other entities.
+
+    :param permission_filters_by_entity: List of pairs of entities and corresponding permission
+                                         filters. Only entities in this list are included in the
+                                         results, and those are entities are also filtered using
+                                         the corresponding permission filters.
     """
     limit = _clip_limit(offset, limit)
 
@@ -179,6 +213,11 @@ def get_basic_search_query(
 
     query = _get_search_term_query(term, fields=fields)
     s = Search(index=settings.ES_INDEX).query(query)
+
+    permission_query = _get_global_permission_query(permission_filters_by_entity)
+    if permission_query:
+        s = s.filter(permission_query)
+
     s = s.post_filter(
         Q('bool', should=[
             Q('term', _type=entity._doc_type.name) for entity in entities
@@ -331,13 +370,33 @@ def _get_must_filter_query(filters, composite_filters, ranges):
     return must_filter
 
 
+def _get_entity_permission_query(permission_filters=None):
+    if not permission_filters:
+        return None
+
+    if permission_filters is EXCLUDE_ALL:
+        return MatchNone()
+
+    subqueries = [Term(**{field: value}) for field, value in permission_filters.items()]
+
+    return Bool(
+        should=subqueries
+    )
+
+
 def get_search_by_entity_query(term=None,
                                filter_data=None,
                                composite_filters=None,
+                               permission_filters=None,
                                entity=None,
                                field_order=None,
                                aggregations=None):
-    """Perform filtered search for given terms in given entity."""
+    """
+    Perform filtered search for given terms in given entity.
+
+    :param permission_filters: dict of field names and values. These represent rules that records
+                               must match one of to be included in the results.
+    """
     query = [Q('term', _type=entity._doc_type.name)]
     if term != '':
         query.append(_get_search_term_query(term, fields=entity.SEARCH_FIELDS))
@@ -348,6 +407,11 @@ def get_search_by_entity_query(term=None,
     must_filter = _get_must_filter_query(filters, composite_filters, ranges)
 
     s = Search(index=settings.ES_INDEX).query('bool', must=query)
+
+    permission_query = _get_entity_permission_query(permission_filters)
+    if permission_query:
+        s = s.filter(permission_query)
+
     s = _get_sort_query(s, field_order=field_order)
 
     s = s.post_filter('bool', must=must_filter)

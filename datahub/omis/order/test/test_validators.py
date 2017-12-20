@@ -17,6 +17,7 @@ from ..models import Order
 from ..validators import (
     AddressValidator,
     AssigneesFilledInValidator,
+    CancellableOrderValidator,
     CompletableOrderValidator,
     ContactWorksAtCompanyValidator,
     NoOtherActiveQuoteExistsValidator,
@@ -645,6 +646,43 @@ class TestCompletableOrderValidator:
                 'to complete this order.'
             )
         }
+
+
+class TestCancellableOrderValidator:
+    """Tests for the CancellableOrderValidator."""
+
+    @pytest.mark.parametrize(
+        'order_status,force,should_pass',
+        (
+            # with force=False
+            (OrderStatus.draft, False, True),
+            (OrderStatus.quote_awaiting_acceptance, False, True),
+            (OrderStatus.quote_accepted, False, False),
+            (OrderStatus.paid, False, False),
+            (OrderStatus.complete, False, False),
+            (OrderStatus.cancelled, False, False),
+
+            # with force=True
+            (OrderStatus.draft, True, True),
+            (OrderStatus.quote_awaiting_acceptance, True, True),
+            (OrderStatus.quote_accepted, True, True),
+            (OrderStatus.paid, True, True),
+            (OrderStatus.complete, True, False),
+            (OrderStatus.cancelled, True, False),
+        )
+    )
+    def test_validation(self, order_status, force, should_pass):
+        """Test the validator with different order status and force values."""
+        order = Order(status=order_status)
+
+        validator = CancellableOrderValidator(force=force)
+        validator.set_instance(order)
+
+        if should_pass:
+            validator()
+        else:
+            with pytest.raises(Conflict):
+                validator()
 
 
 class TestAddressValidator:

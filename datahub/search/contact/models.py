@@ -59,7 +59,7 @@ class Contact(DocType, MapDBModelToDict):
     company = dsl_utils.id_name_partial_mapping('company')
     company_sector = dsl_utils.id_name_mapping()
     company_uk_region = dsl_utils.id_name_mapping()
-    created_by = dsl_utils.contact_or_adviser_mapping('created_by')
+    created_by = dsl_utils.contact_or_adviser_mapping('created_by', include_dit_team=True)
 
     MAPPINGS = {
         'id': str,
@@ -67,7 +67,7 @@ class Contact(DocType, MapDBModelToDict):
         'adviser': dict_utils.contact_or_adviser_dict,
         'company': dict_utils.id_name_dict,
         'archived_by': dict_utils.contact_or_adviser_dict,
-        'created_by': dict_utils.contact_or_adviser_dict,
+        'created_by': dict_utils.adviser_dict_with_team,
     }
 
     COMPUTED_MAPPINGS = {

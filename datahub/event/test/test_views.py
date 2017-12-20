@@ -17,7 +17,7 @@ class TestGetEventView(APITestMixin):
     def test_event_details_no_permissions(self):
         """Should return 403"""
         event = EventFactory()
-        user = create_test_user(team=TeamFactory())
+        user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
         response = api_client.get(url)
@@ -95,7 +95,7 @@ class TestListEventView(APITestMixin):
 
     def test_event_list_no_permissions(self):
         """Should return 403"""
-        user = create_test_user(team=TeamFactory())
+        user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v3:event:collection')
         response = api_client.get(url)

@@ -1,6 +1,9 @@
 import pytest
 
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.company.test.factories import AdviserFactory
+from datahub.investment.test.factories import (
+    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
+)
 from datahub.search import elasticsearch
 
 from ..models import InvestmentProject
@@ -40,3 +43,63 @@ def test_investment_project_auto_updates_to_es(setup_es):
     ).execute()
 
     assert result.hits.total == 1
+
+
+@pytest.fixture
+def team_member():
+    """Team member fixture"""
+    yield InvestmentProjectTeamMemberFactory(role='Co-ordinator')
+
+
+def test_investment_project_team_member_added_sync_to_es(setup_es, team_member):
+    """Tests if investment project gets synced to Elasticsearch when a team member is added."""
+    setup_es.indices.refresh()
+
+    results = elasticsearch.get_search_by_entity_query(
+        term='',
+        filter_data={},
+        entity=InvestmentProject,
+    ).execute()
+
+    assert len(results) == 1
+    result = results[0]
+
+    assert len(result['team_members']) == 1
+    assert result['team_members'][0]['id'] == str(team_member.adviser.id)
+
+
+def test_investment_project_team_member_updated_sync_to_es(setup_es, team_member):
+    """Tests if investment project gets synced to Elasticsearch when a team member is updated."""
+    new_adviser = AdviserFactory()
+    team_member.adviser = new_adviser
+    team_member.save()
+    setup_es.indices.refresh()
+
+    results = elasticsearch.get_search_by_entity_query(
+        term='',
+        filter_data={},
+        entity=InvestmentProject,
+    ).execute()
+
+    assert len(results) == 1
+    result = results[0]
+
+    assert len(result['team_members']) == 1
+    assert result['team_members'][0]['id'] == str(new_adviser.id)
+
+
+def test_investment_project_team_member_deleted_sync_to_es(setup_es, team_member):
+    """Tests if investment project gets synced to Elasticsearch when a team member is deleted."""
+    team_member.delete()
+    setup_es.indices.refresh()
+
+    results = elasticsearch.get_search_by_entity_query(
+        term='',
+        filter_data={},
+        entity=InvestmentProject,
+    ).execute()
+
+    assert len(results) == 1
+    result = results[0]
+
+    assert len(result['team_members']) == 0

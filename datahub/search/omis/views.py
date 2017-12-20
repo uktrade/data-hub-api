@@ -52,5 +52,3 @@ class SearchOrderParams:
 
 class SearchOrderAPIView(SearchOrderParams, SearchAPIView):
     """Filtered order search view."""
-
-    permission_required = 'order.read_order'

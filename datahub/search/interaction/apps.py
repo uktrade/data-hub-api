@@ -12,6 +12,7 @@ class InteractionSearchApp(SearchApp):
     ESModel = Interaction
     view = SearchInteractionAPIView
     export_view = SearchInteractionExportAPIView
+    permission_required = ('interaction.read_interaction',)
     queryset = DBInteraction.objects.prefetch_related(
         'company',
         'contact',
