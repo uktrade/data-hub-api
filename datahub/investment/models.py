@@ -364,6 +364,12 @@ class InvestmentProjectTeamMember(models.Model):
     ManyToManyField with through is not used in the InvestmentProject model, because
     it makes working with DRF serialisers difficult (as it would return advisers rather than
     instances of this model).
+
+    No default permissions are defined on this model as permissions from the InvestmentProject
+    model are used and enforced instead. This is to avoid unnecessary complexity in the
+    permissions model, where permissions on both models would need to be checked. (A custom read
+    permission is also not defined for the same reason, but also because team members are
+    returned in investment project responses in the investment and search APIs.)
     """
 
     investment_project = models.ForeignKey(
