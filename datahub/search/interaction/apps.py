@@ -1,4 +1,4 @@
-from datahub.interaction.models import Interaction as DBInteraction
+from datahub.interaction.models import Interaction as DBInteraction, InteractionPermission
 from datahub.search.apps import SearchApp
 from datahub.search.interaction.models import Interaction
 from datahub.search.interaction.views import (SearchInteractionAPIView,
@@ -12,7 +12,7 @@ class InteractionSearchApp(SearchApp):
     ESModel = Interaction
     view = SearchInteractionAPIView
     export_view = SearchInteractionExportAPIView
-    permission_required = ('interaction.read_interaction',)
+    permission_required = (f'interaction.{InteractionPermission.read_all}',)
     queryset = DBInteraction.objects.prefetch_related(
         'company',
         'contact',

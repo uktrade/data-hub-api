@@ -379,7 +379,7 @@ class TestSearch(APITestMixin):
         ('read_company', 'company'),
         ('read_contact', 'contact'),
         ('read_event', 'event'),
-        ('read_interaction', 'interaction'),
+        ('read_all_interaction', 'interaction'),
         ('read_all_investmentproject', 'investment_project'),
         ('read_associated_investmentproject', 'investment_project'),
         ('read_order', 'order'),

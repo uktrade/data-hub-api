@@ -14,6 +14,7 @@ from datahub.event.models import Event
 from datahub.investment.models import InvestmentProject
 from datahub.metadata.models import Service, Team
 from .models import CommunicationChannel, Interaction
+from .permissions import HasAssociatedInvestmentProjectValidator
 
 
 class InteractionSerializer(serializers.ModelSerializer):
@@ -93,6 +94,7 @@ class InteractionSerializer(serializers.ModelSerializer):
         )
         validators = [
             AnyOfValidator('company', 'investment_project'),
+            HasAssociatedInvestmentProjectValidator(),
             RulesBasedValidator(
                 ValidationRule(
                     'required',
@@ -129,5 +131,5 @@ class InteractionSerializer(serializers.ModelSerializer):
                     OperatorRule('event', not_),
                     when=OperatorRule('is_event', not_),
                 ),
-            )
+            ),
         ]

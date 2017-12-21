@@ -35,6 +35,15 @@
     - - read_associated_investmentproject
       - investment
       - investmentproject
+    - - add_associated_investmentproject_interaction
+      - interaction
+      - interaction
+    - - change_associated_investmentproject_interaction
+      - interaction
+      - interaction
+    - - read_associated_investmentproject_interaction
+      - interaction
+      - interaction
   model: auth.group
 - fields:
     name: DA
@@ -117,6 +126,15 @@
     - - read_associated_investmentproject
       - investment
       - investmentproject
+    - - add_associated_investmentproject_interaction
+      - interaction
+      - interaction
+    - - change_associated_investmentproject_interaction
+      - interaction
+      - interaction
+    - - read_associated_investmentproject_interaction
+      - interaction
+      - interaction
   model: auth.group
 - fields:
     name: DIT_staff
@@ -163,13 +181,13 @@
     - - read_event
       - event
       - event
-    - - add_interaction
+    - - add_all_interaction
       - interaction
       - interaction
-    - - change_interaction
+    - - change_all_interaction
       - interaction
       - interaction
-    - - read_interaction
+    - - read_all_interaction
       - interaction
       - interaction
     - - add_investmentproject
