@@ -11,6 +11,7 @@ from datahub.investment.permissions import (
 class _PermissionTemplate(StrEnum):
     """Permission codename templates."""
 
+    all = '{app_label}.{action}_all_{model_name}'
     associated_investmentproject = '{app_label}.{action}_associated_investmentproject_{model_name}'
     standard = '{app_label}.{action}_{model_name}'
 
@@ -20,15 +21,15 @@ class InteractionModelPermissions(ViewBasedModelPermissions):
 
     permission_mapping = {
         'read': (
-            _PermissionTemplate.standard,
+            _PermissionTemplate.all,
             _PermissionTemplate.associated_investmentproject,
         ),
         'add': (
-            _PermissionTemplate.standard,
+            _PermissionTemplate.all,
             _PermissionTemplate.associated_investmentproject,
         ),
         'change': (
-            _PermissionTemplate.standard,
+            _PermissionTemplate.all,
             _PermissionTemplate.associated_investmentproject,
         ),
         'delete': (
@@ -45,7 +46,7 @@ class InvestmentProjectInteractionAssociationChecker(InvestmentProjectAssociatio
 
     restricted_actions = {'add', 'read', 'change'}
     model = Interaction
-    all_permission_template = _PermissionTemplate.standard
+    all_permission_template = _PermissionTemplate.all
     associated_permission_template = _PermissionTemplate.associated_investmentproject
 
 
