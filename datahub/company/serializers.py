@@ -15,7 +15,7 @@ from datahub.metadata import models as meta_models
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-class PermittedFieldsSerializer(serializers.ModelSerializer):
+class PermittedFieldsModelSerializer(serializers.ModelSerializer):
     """Lets you get permitted fields only.
 
     Needs 'permissions' key in extra_kwargs Meta class in following format:
@@ -35,7 +35,7 @@ class PermittedFieldsSerializer(serializers.ModelSerializer):
             permissions = self.get_extra_kwargs().get('permissions', {})
             for permission, field in permissions.items():
                 if not request.user.has_perm(permission):
-                    fields.pop(field)
+                    del fields[field]
         return fields
 
 
@@ -76,7 +76,7 @@ NestedAdviserField = partial(
 )
 
 
-class ContactSerializer(PermittedFieldsSerializer):
+class ContactSerializer(PermittedFieldsModelSerializer):
     """Contact serializer for writing operations V3."""
 
     title = NestedRelatedField(
@@ -144,7 +144,7 @@ class ContactSerializer(PermittedFieldsSerializer):
         }
 
 
-class CompanySerializer(PermittedFieldsSerializer):
+class CompanySerializer(PermittedFieldsModelSerializer):
     """Company read/write serializer V3."""
 
     registered_address_country = NestedRelatedField(meta_models.Country)
