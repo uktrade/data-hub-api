@@ -17,13 +17,13 @@ class InteractionPermission(StrEnum):
     (Defined here rather than in permissions to avoid an import of that module.)
     """
 
-    read = 'read_interaction'
+    read_all = 'read_all_interaction'
     read_associated_investmentproject = 'read_associated_investmentproject_interaction'
-    change = 'change_interaction'
+    change_all = 'change_all_interaction'
     change_associated_investmentproject = 'change_associated_investmentproject_interaction'
-    add = 'add_investmentproject'
+    add_all = 'add_all_interaction'
     add_associated_investmentproject = 'add_associated_investmentproject_interaction'
-    delete = 'delete_investmentproject'
+    delete = 'delete_interaction'
 
 
 class CommunicationChannel(BaseConstantModel):
@@ -110,7 +110,7 @@ class Interaction(BaseModel):
         ]
         permissions = (
             (
-                InteractionPermission.read,
+                InteractionPermission.read_all,
                 'Can read all interaction'
             ),
             (
@@ -125,4 +125,9 @@ class Interaction(BaseModel):
                 InteractionPermission.change_associated_investmentproject,
                 'Can change interaction for associated investment projects'
             ),
+        )
+        default_permissions = (
+            'add_all',
+            'change_all',
+            'delete',
         )

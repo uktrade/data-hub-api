@@ -21,10 +21,10 @@ from datahub.metadata.test.factories import TeamFactory
 
 NON_RESTRICTED_READ_PERMISSIONS = (
     (
-        InteractionPermission.read,
+        InteractionPermission.read_all,
     ),
     (
-        InteractionPermission.read,
+        InteractionPermission.read_all,
         InteractionPermission.read_associated_investmentproject,
     )
 )
@@ -32,10 +32,10 @@ NON_RESTRICTED_READ_PERMISSIONS = (
 
 NON_RESTRICTED_CHANGE_PERMISSIONS = (
     (
-        InteractionPermission.change,
+        InteractionPermission.change_all,
     ),
     (
-        InteractionPermission.change,
+        InteractionPermission.change_all,
         InteractionPermission.change_associated_investmentproject,
     )
 )
