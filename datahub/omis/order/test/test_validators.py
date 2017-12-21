@@ -704,7 +704,7 @@ class TestAddressValidator:
         address_fields = {
             'address1': None,
             'address2': None,
-            'postcode': None,
+            'town': None,
         }
 
         instance = mock.Mock(**address_fields) if with_instance else None
@@ -715,7 +715,7 @@ class TestAddressValidator:
             fields_mapping={
                 'address1': {'required': True},
                 'address2': {'required': False},
-                'postcode': {'required': True},
+                'town': {'required': True},
             }
         )
 
@@ -725,7 +725,7 @@ class TestAddressValidator:
             validator(data)
         assert exc.value.detail == {
             'address1': ['This field is required.'],
-            'postcode': ['This field is required.']
+            'town': ['This field is required.']
         }
 
     @pytest.mark.parametrize('values_as_data', (True, False))
@@ -744,7 +744,7 @@ class TestAddressValidator:
         address_fields = {
             'address1': None,
             'address2': None,
-            'postcode': None,
+            'town': None,
         }
 
         instance = mock.Mock(**address_fields) if with_instance else None
@@ -755,7 +755,7 @@ class TestAddressValidator:
             fields_mapping={
                 'address1': {'required': True},
                 'address2': {'required': False},
-                'postcode': {'required': True},
+                'town': {'required': True},
             }
         )
 
@@ -782,7 +782,7 @@ class TestAddressValidator:
         address_fields = {
             'address1': None,
             'address2': 'lorem ipsum',
-            'postcode': None,
+            'town': None,
         }
 
         instance = mock.Mock(**address_fields)
@@ -793,7 +793,7 @@ class TestAddressValidator:
             fields_mapping={
                 'address1': {'required': True},
                 'address2': {'required': False},
-                'postcode': {'required': True},
+                'town': {'required': True},
             }
         )
 
@@ -803,7 +803,7 @@ class TestAddressValidator:
             validator(data)
         assert exc.value.detail == {
             'address1': ['This field is required.'],
-            'postcode': ['This field is required.']
+            'town': ['This field is required.']
         }
 
     def test_defaults(self):

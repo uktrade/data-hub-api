@@ -143,7 +143,7 @@ class OrderSerializer(serializers.ModelSerializer):
                     'billing_address_2': {'required': False},
                     'billing_address_town': {'required': True},
                     'billing_address_county': {'required': False},
-                    'billing_address_postcode': {'required': True},
+                    'billing_address_postcode': {'required': False},
                     'billing_address_country': {'required': True},
                 }
             )
