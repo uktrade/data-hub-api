@@ -58,9 +58,9 @@ class TestPopulateBillingData:
 
         populate_billing_data(order)
 
-        assert order.billing_contact_name == contact.name
-        assert order.billing_email == contact.email
-        assert order.billing_phone == contact.telephone_number
+        assert not order.billing_contact_name
+        assert not order.billing_email
+        assert not order.billing_phone
 
         assert order.billing_company_name == company.name
         assert order.billing_address_1 == company.registered_address_1
@@ -98,41 +98,22 @@ class TestPopulateBillingData:
         assert order.billing_address_postcode == ''
         assert order.billing_address_country is None
 
-    @pytest.mark.parametrize(
-        'order_field,order_value',
-        (
-            ('billing_company_name', 'My Corp'),
-            ('billing_contact_name', 'Another John'),
-            ('billing_email', 'another-email@example.com'),
-            ('billing_phone', '99 001122'),
-        )
-    )
-    def test_with_already_populated_billing_detail(self, order_field, order_value):
+    def test_with_already_populated_billing_detail(self):
         """
         Test that if the order has an order details field already populated,
         it does not get overridden.
         """
-        billing_details = {
-            'billing_company_name': '',
-            'billing_contact_name': '',
-            'billing_email': '',
-            'billing_phone': '',
-        }
+        billing_company_name = 'My Corp'
 
         contact = ContactFactory()
         order = OrderFactory(
             contact=contact,
-            **{
-                **billing_details,
-                order_field: order_value
-            },
+            billing_company_name=billing_company_name,
         )
 
         populate_billing_data(order)
 
-        assert getattr(order, order_field) == order_value
-        for populated_field in set(billing_details.keys()) - set(order_field):
-            assert getattr(order, populated_field)
+        assert order.billing_company_name == billing_company_name
 
     @pytest.mark.parametrize(
         'billing_address',

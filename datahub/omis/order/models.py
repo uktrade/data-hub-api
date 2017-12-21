@@ -209,9 +209,6 @@ class Order(BaseModel):
     )
 
     billing_company_name = models.CharField(max_length=MAX_LENGTH, blank=True)
-    billing_contact_name = models.CharField(max_length=MAX_LENGTH, blank=True)
-    billing_email = models.EmailField(max_length=MAX_LENGTH, blank=True)
-    billing_phone = models.CharField(max_length=150, blank=True)
     billing_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
     billing_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
     billing_address_town = models.CharField(max_length=MAX_LENGTH, blank=True)
@@ -259,8 +256,20 @@ class Order(BaseModel):
         help_text='Legacy field. Can DIT speak to the contacts?'
     )
     archived_documents_url_path = models.CharField(
-        max_length=MAX_LENGTH, blank=True,
+        max_length=MAX_LENGTH, blank=True, editable=False,
         help_text='Legacy field. Link to the archived documents for this order.'
+    )
+    billing_contact_name = models.CharField(
+        max_length=MAX_LENGTH, blank=True, editable=False,
+        help_text='Legacy field. Billing contact name.'
+    )
+    billing_email = models.EmailField(
+        max_length=MAX_LENGTH, blank=True, editable=False,
+        help_text='Legacy field. Billing email address.'
+    )
+    billing_phone = models.CharField(
+        max_length=150, blank=True, editable=False,
+        help_text='Legacy field. Billing phone number.'
     )
 
     objects = OrderQuerySet.as_manager()
