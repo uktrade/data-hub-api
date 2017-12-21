@@ -128,6 +128,9 @@ class OrderSerializer(serializers.ModelSerializer):
             'cancelled_on',
             'cancellation_reason',
             'billing_company_name',
+            'billing_contact_name',
+            'billing_email',
+            'billing_phone',
         )
         validators = (
             ContactWorksAtCompanyValidator(),

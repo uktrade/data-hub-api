@@ -328,17 +328,17 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='order',
             name='billing_contact_name',
-            field=models.CharField(blank=True, max_length=255),
+            field=models.CharField(blank=True, max_length=255, editable=False, help_text='Legacy field. Billing contact name.'),
         ),
         migrations.AddField(
             model_name='order',
             name='billing_email',
-            field=models.EmailField(blank=True, max_length=255),
+            field=models.EmailField(blank=True, max_length=255, editable=False, help_text='Legacy field. Billing email address.'),
         ),
         migrations.AddField(
             model_name='order',
             name='billing_phone',
-            field=models.CharField(blank=True, max_length=150),
+            field=models.CharField(blank=True, max_length=150, editable=False, help_text='Legacy field. Billing phone number.'),
         ),
         migrations.AddField(
             model_name='order',
@@ -353,7 +353,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='order',
             name='archived_documents_url_path',
-            field=models.CharField(blank=True, help_text='Legacy field. Link to the archived documents for this order.', max_length=255),
+            field=models.CharField(blank=True, editable=False, help_text='Legacy field. Link to the archived documents for this order.', max_length=255),
         ),
         migrations.AddField(
             model_name='order',
