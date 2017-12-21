@@ -357,7 +357,7 @@ class AddressValidator:
         'address_2': {'required': False},
         'address_town': {'required': True},
         'address_county': {'required': False},
-        'address_postcode': {'required': True},
+        'address_postcode': {'required': False},
         'address_country': {'required': True},
     }
 

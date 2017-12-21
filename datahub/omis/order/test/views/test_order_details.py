@@ -394,7 +394,6 @@ class TestAddOrderDetails(APITestMixin):
         assert response.json() == {
             'billing_address_1': ['This field is required.'],
             'billing_address_town': ['This field is required.'],
-            'billing_address_postcode': ['This field is required.'],
             'billing_address_country': ['This field is required.'],
         }
 
@@ -885,7 +884,6 @@ class TestChangeOrderDetails(APITestMixin):
         assert response.json() == {
             'billing_address_1': ['This field is required.'],
             'billing_address_town': ['This field is required.'],
-            'billing_address_postcode': ['This field is required.'],
             'billing_address_country': ['This field is required.'],
         }
 
