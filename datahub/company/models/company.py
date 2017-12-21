@@ -8,9 +8,17 @@ from django.utils.functional import cached_property
 
 from datahub.core import constants
 from datahub.core.models import ArchivableModel, BaseConstantModel, BaseModel
+from datahub.core.utils import StrEnum
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
+
+class CompanyPermission(StrEnum):
+    """Permission codename constants."""
+
+    read_company = 'read_company'
+    read_company_document = 'read_company_document'
 
 
 class ExportExperienceCategory(BaseConstantModel):
@@ -139,7 +147,10 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
 
     class Meta:
         verbose_name_plural = 'companies'
-        permissions = (('read_company', 'Can read company'),)
+        permissions = (
+            (CompanyPermission.read_company, 'Can read company'),
+            (CompanyPermission.read_company_document, 'Can read company document')
+        )
 
     @property
     def uk_based(self):
