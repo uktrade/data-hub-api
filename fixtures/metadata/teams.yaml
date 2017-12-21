@@ -199,6 +199,12 @@
     - - read_all_investmentproject
       - investment
       - investmentproject
+    - - read_company_document
+      - company
+      - company
+    - - read_contact_document
+      - company
+      - contact
     - - add_investmentprojectcode
       - investment
       - investmentprojectcode
