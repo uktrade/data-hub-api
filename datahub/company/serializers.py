@@ -20,7 +20,9 @@ class PermittedFieldsSerializer(serializers.ModelSerializer):
 
     Needs 'permissions' key in extra_kwargs Meta class in following format:
     extra_kwargs = {
-        'app_name.permission': 'field'
+        'permissions': {
+            'app_name.permission': 'field'
+        }
     }
     If user doesn't have required permission, corresponding field will be filtered out.
     """
