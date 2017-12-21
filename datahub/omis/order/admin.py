@@ -131,8 +131,7 @@ class OrderAdmin(ReadOnlyAdmin):
         :returns: read-only and clickable URL to the public facing OMIS page
         """
         url = order.get_public_facing_url()
-        return f'<a href="{url}">{url}<a>'
-    public_facing_url.allow_tags = True
+        return format_html('<a href="{href}">{text}<a>', href=url, text=url)
 
     def discount(self, order):
         """
@@ -150,7 +149,6 @@ class OrderAdmin(ReadOnlyAdmin):
             '', '<p>{0}</p>',
             ((sub.adviser.name,) for sub in order.subscribers.all())
         )
-    uk_advisers.allow_tags = True
 
     def post_advisers(self, order):
         """
@@ -165,7 +163,6 @@ class OrderAdmin(ReadOnlyAdmin):
                 assignee.actual_time or mark_safe('<i>unknown</i>')
             ) for assignee in order.assignees.all())
         )
-    post_advisers.allow_tags = True
 
     def get_urls(self):
         """Extend the standard get_urls by adding extra urls."""
