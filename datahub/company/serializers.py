@@ -15,6 +15,28 @@ from datahub.metadata import models as meta_models
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
+class PermittedFieldsSerializer(serializers.ModelSerializer):
+    """Lets you get permitted fields only.
+
+    Needs 'permissions' key in extra_kwargs Meta class in following format:
+    extra_kwargs = {
+        'app_name.permission': 'field'
+    }
+    If user doesn't have required permission, corresponding field will be filtered out.
+    """
+
+    def get_fields(self):
+        """Gets filtered dictionary of fields based on permissions."""
+        fields = super().get_fields()
+        request = self.context.get('request', None)
+        if request:
+            permissions = self.get_extra_kwargs().get('permissions', {})
+            for permission, field in permissions.items():
+                if not request.user.has_perm(permission):
+                    fields.pop(field)
+        return fields
+
+
 class AdviserSerializer(serializers.ModelSerializer):
     """Adviser serializer."""
 
@@ -52,7 +74,7 @@ NestedAdviserField = partial(
 )
 
 
-class ContactSerializer(serializers.ModelSerializer):
+class ContactSerializer(PermittedFieldsSerializer):
     """Contact serializer for writing operations V3."""
 
     title = NestedRelatedField(
@@ -113,19 +135,14 @@ class ContactSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'archived_documents_url_path',
         )
-
-    def __init__(self, *args, **kwargs):
-        """Initialise Contact serialiser and check permissions."""
-        super().__init__(*args, **kwargs)
-        context = kwargs.get('context')
-        if context and 'request' in context:
-            request = context['request']
-            permission = f'company.{ContactPermission.read_contact_document}'
-            if not request.user.has_perm(permission):
-                self.fields.pop('archived_documents_url_path')
+        extra_kwargs = {
+            'permissions': {
+                f'company.{ContactPermission.read_contact_document}': 'archived_documents_url_path'
+            }
+        }
 
 
-class CompanySerializer(serializers.ModelSerializer):
+class CompanySerializer(PermittedFieldsSerializer):
     """Company read/write serializer V3."""
 
     registered_address_country = NestedRelatedField(meta_models.Country)
@@ -247,13 +264,8 @@ class CompanySerializer(serializers.ModelSerializer):
             'reference_code',
         )
         validators = [RequiredUnlessAlreadyBlankValidator('sector', 'business_type')]
-
-    def __init__(self, *args, **kwargs):
-        """Initialise Company serialiser and check permissions."""
-        super().__init__(*args, **kwargs)
-        context = kwargs.get('context')
-        if context and 'request' in context:
-            request = context['request']
-            permission = f'company.{CompanyPermission.read_company_document}'
-            if not request.user.has_perm(permission):
-                self.fields.pop('archived_documents_url_path')
+        extra_kwargs = {
+            'permissions': {
+                f'company.{CompanyPermission.read_company_document}': 'archived_documents_url_path'
+            }
+        }
