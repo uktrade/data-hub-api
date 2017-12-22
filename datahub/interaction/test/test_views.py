@@ -12,7 +12,7 @@ from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.models import InteractionPermission
 from datahub.interaction.test.factories import (
-    EventServiceDeliveryFactory, InteractionFactory, InvestmentProjectInteractionFactory,
+    CompanyInteractionFactory, EventServiceDeliveryFactory, InvestmentProjectInteractionFactory,
     ServiceDeliveryFactory,
 )
 from datahub.investment.test.factories import InvestmentProjectFactory
@@ -46,7 +46,7 @@ class TestInteractionV3(APITestMixin):
 
     def test_interaction_no_permissions(self):
         """Should return 403"""
-        interaction = InteractionFactory()
+        interaction = CompanyInteractionFactory()
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
@@ -58,7 +58,7 @@ class TestInteractionV3(APITestMixin):
     def test_non_restricted_user_can_get_company_interaction(self, permissions):
         """Test that a non-restricted user can get a company interaction."""
         requester = create_test_user(permission_codenames=permissions)
-        interaction = InteractionFactory()
+        interaction = CompanyInteractionFactory()
         api_client = self.create_api_client(user=requester)
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
         response = api_client.get(url)
@@ -269,7 +269,7 @@ class TestInteractionV3(APITestMixin):
 
     def test_restricted_user_cannot_get_company_interaction(self):
         """Test that a restricted user cannot get a company interaction."""
-        interaction = InteractionFactory()
+        interaction = CompanyInteractionFactory()
         requester = create_test_user(
             permission_codenames=[InteractionPermission.read_associated_investmentproject],
             dit_team=TeamFactory()
@@ -805,7 +805,7 @@ class TestInteractionV3(APITestMixin):
     def test_non_restricted_user_can_update_interaction(self, permissions):
         """Test that a non-restricted user can update an interaction."""
         requester = create_test_user(permission_codenames=permissions)
-        interaction = InteractionFactory(subject='I am a subject')
+        interaction = CompanyInteractionFactory(subject='I am a subject')
 
         api_client = self.create_api_client(user=requester)
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
@@ -821,7 +821,7 @@ class TestInteractionV3(APITestMixin):
         requester = create_test_user(
             permission_codenames=[InteractionPermission.change_associated_investmentproject]
         )
-        interaction = InteractionFactory(subject='I am a subject')
+        interaction = CompanyInteractionFactory(subject='I am a subject')
 
         api_client = self.create_api_client(user=requester)
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
@@ -856,7 +856,7 @@ class TestInteractionV3(APITestMixin):
         """
         project_creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=project_creator)
-        interaction = InteractionFactory(
+        interaction = CompanyInteractionFactory(
             subject='I am a subject',
             investment_project=project
         )
@@ -878,7 +878,7 @@ class TestInteractionV3(APITestMixin):
 
     def test_update_read_only_fields(self):
         """Test updating read-only fields."""
-        interaction = InteractionFactory(
+        interaction = CompanyInteractionFactory(
             archived_documents_url_path='old_path',
         )
 
@@ -926,7 +926,7 @@ class TestInteractionV3(APITestMixin):
 
     def test_date_validation(self):
         """Test validation when an invalid date is provided."""
-        interaction = InteractionFactory()
+        interaction = CompanyInteractionFactory()
 
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
         response = self.api_client.patch(url, {
@@ -944,8 +944,8 @@ class TestInteractionV3(APITestMixin):
         company1 = CompanyFactory()
         company2 = CompanyFactory()
 
-        InteractionFactory.create_batch(3, company=company1)
-        interactions = InteractionFactory.create_batch(2, company=company2)
+        CompanyInteractionFactory.create_batch(3, company=company1)
+        interactions = CompanyInteractionFactory.create_batch(2, company=company2)
 
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.get(url, {'company_id': company2.id})
@@ -959,8 +959,8 @@ class TestInteractionV3(APITestMixin):
         contact1 = ContactFactory()
         contact2 = ContactFactory()
 
-        InteractionFactory.create_batch(3, contact=contact1)
-        interactions = InteractionFactory.create_batch(2, contact=contact2)
+        CompanyInteractionFactory.create_batch(3, contact=contact1)
+        interactions = CompanyInteractionFactory.create_batch(2, contact=contact2)
 
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.get(url, {'contact_id': contact2.id})
@@ -975,9 +975,9 @@ class TestInteractionV3(APITestMixin):
         project = InvestmentProjectFactory()
         company = CompanyFactory()
 
-        InteractionFactory.create_batch(3, contact=contact)
-        InteractionFactory.create_batch(3, company=company)
-        project_interactions = InteractionFactory.create_batch(
+        CompanyInteractionFactory.create_batch(3, contact=contact)
+        CompanyInteractionFactory.create_batch(3, company=company)
+        project_interactions = CompanyInteractionFactory.create_batch(
             2, investment_project=project
         )
 
@@ -1001,8 +1001,8 @@ class TestInteractionV3(APITestMixin):
 
         project = InvestmentProjectFactory()
         company = CompanyFactory()
-        company_interactions = InteractionFactory.create_batch(3, company=company)
-        project_interactions = InteractionFactory.create_batch(
+        company_interactions = CompanyInteractionFactory.create_batch(3, company=company)
+        project_interactions = CompanyInteractionFactory.create_batch(
             3, investment_project=project
         )
 
@@ -1032,11 +1032,11 @@ class TestInteractionV3(APITestMixin):
         non_associated_project = InvestmentProjectFactory()
         associated_project = InvestmentProjectFactory(created_by=creator)
 
-        InteractionFactory.create_batch(3, company=company)
-        InteractionFactory.create_batch(
+        CompanyInteractionFactory.create_batch(3, company=company)
+        CompanyInteractionFactory.create_batch(
             3, investment_project=non_associated_project
         )
-        associated_project_interactions = InteractionFactory.create_batch(
+        associated_project_interactions = CompanyInteractionFactory.create_batch(
             2, investment_project=associated_project
         )
 
