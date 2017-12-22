@@ -41,8 +41,8 @@ NON_RESTRICTED_CHANGE_PERMISSIONS = (
 )
 
 
-class TestInteractionV3(APITestMixin):
-    """Tests for v3 interaction views."""
+class TestGetInteractionView(APITestMixin):
+    """Tests for the get interaction view."""
 
     def test_interaction_no_permissions(self):
         """Should return 403"""
@@ -279,6 +279,10 @@ class TestInteractionV3(APITestMixin):
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+class TestAddInteractionView(APITestMixin):
+    """Tests for the add interaction view."""
 
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_add_interaction(self):
@@ -801,6 +805,10 @@ class TestInteractionV3(APITestMixin):
             'investment_project': ['This field is required.']
         }
 
+
+class TestUpdateInteractionView(APITestMixin):
+    """Tests for the update interaction view."""
+
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
     def test_non_restricted_user_can_update_interaction(self, permissions):
         """Test that a non-restricted user can update an interaction."""
@@ -938,6 +946,10 @@ class TestInteractionV3(APITestMixin):
         assert response_data['date'] == [
             'Datetime has wrong format. Use one of these formats instead: YYYY-MM-DD.'
         ]
+
+
+class TestListInteractionsView(APITestMixin):
+    """Tests for the list interactions view."""
 
     def test_list_filtered_company(self):
         """List of interactions filtered by company"""
