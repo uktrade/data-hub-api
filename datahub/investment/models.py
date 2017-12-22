@@ -26,6 +26,31 @@ class InvestmentProjectPermission(StrEnum):
     Permission codename constants.
 
     (Defined here rather than in permissions to avoid an import of that module.)
+
+
+    The following codenames mean that the user can read or change all investment projects:
+
+    read_all_investmentproject
+    change_all_investmentproject
+
+
+    The following codenames mean that the user can only read or change investment projects that
+    they are associated with:
+
+    read_associated_investmentproject
+    change_associated_investmentproject
+
+    An associated project means one that was created by an adviser in the same team,
+    or an adviser in the same team has been linked to the project via one of the attributes in
+    InvestmentProject._ASSOCIATED_ADVISER_TO_ONE_FIELDS or
+    InvestmentProject._ASSOCIATED_ADVISER_TO_MANY_FIELDS.
+
+
+    Note that if both *_all_* and *_associated_* permissions are assigned to the  same user,
+    the *_all_* permission will be the effective one.
+
+    add_investmentproject and delete_investmentproject take on their normal meanings i.e. a
+    project can be added, and any project can be deleted.
     """
 
     read_all = 'read_all_investmentproject'
