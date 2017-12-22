@@ -2,8 +2,9 @@ import pytest
 
 from django.conf import settings
 
-from datahub.interaction.test.factories import CompanyInteractionFactory
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.interaction.test.factories import (
+    CompanyInteractionFactory, InvestmentProjectInteractionFactory
+)
 from datahub.search.interaction.apps import InteractionSearchApp
 
 pytestmark = pytest.mark.django_db
@@ -81,13 +82,10 @@ def test_updating_project_name_updates_interaction(setup_es):
     Test that when an investment project's name is updated, the project's interactions are
     synced to ES.
     """
-    project = InvestmentProjectFactory()
-    interaction = CompanyInteractionFactory(
-        investment_project=project
-    )
+    interaction = InvestmentProjectInteractionFactory()
     new_project_name = 'helios'
-    project.name = new_project_name
-    project.save()
+    interaction.investment_project.name = new_project_name
+    interaction.investment_project.save()
     setup_es.indices.refresh()
 
     result = setup_es.get(
