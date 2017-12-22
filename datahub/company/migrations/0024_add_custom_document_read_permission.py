@@ -18,7 +18,8 @@ class Migration(migrations.Migration):
                 'permissions': (
                     ('read_company', 'Can read company'),
                     ('read_company_document', 'Can read company document'),
-                )
+                ),
+                'verbose_name_plural': 'companies',
             },
         ),
         migrations.AlterModelOptions(
@@ -27,7 +28,7 @@ class Migration(migrations.Migration):
                 'permissions': (
                     ('read_contact', 'Can read contact'),
                     ('read_contact_document', 'Can read contact document'),
-                )
+                ),
             },
         ),
     ]
