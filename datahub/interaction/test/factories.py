@@ -8,8 +8,8 @@ from datahub.interaction.models import Interaction
 from datahub.investment.test.factories import InvestmentProjectFactory
 
 
-class InteractionFactory(factory.django.DjangoModelFactory):
-    """Company interaction factory."""
+class CompanyInteractionFactory(factory.django.DjangoModelFactory):
+    """Factory for creating an interaction relating to a company."""
 
     kind = Interaction.KINDS.interaction
     created_by = factory.SubFactory(AdviserFactory)
@@ -30,7 +30,7 @@ class InteractionFactory(factory.django.DjangoModelFactory):
 
 
 class InvestmentProjectInteractionFactory(factory.django.DjangoModelFactory):
-    """Investment project interaction factory."""
+    """Factory for creating an interaction relating to an investment project."""
 
     kind = Interaction.KINDS.interaction
     created_by = factory.SubFactory(AdviserFactory)

@@ -1,6 +1,6 @@
 import pytest
 
-from datahub.interaction.test.factories import InteractionFactory
+from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.search.interaction.models import Interaction
 
@@ -9,7 +9,7 @@ pytestmark = pytest.mark.django_db
 
 def test_interaction_to_dict(setup_es):
     """Test converting an interaction to a dict."""
-    interaction = InteractionFactory(
+    interaction = CompanyInteractionFactory(
         investment_project=InvestmentProjectFactory()
     )
 
@@ -62,7 +62,7 @@ def test_interaction_to_dict(setup_es):
 
 def test_interactions_to_es_documents(setup_es):
     """Test converting 2 orders to Elasticsearch documents."""
-    interactions = InteractionFactory.create_batch(2)
+    interactions = CompanyInteractionFactory.create_batch(2)
 
     result = Interaction.dbmodels_to_es_documents(interactions)
 
