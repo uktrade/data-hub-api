@@ -15,6 +15,34 @@ class InteractionPermission(StrEnum):
     Permission codename constants.
 
     (Defined here rather than in permissions to avoid an import of that module.)
+
+
+    The following codenames mean that the user can read, change, add or delete any type of
+    interaction:
+
+    read_all_interaction
+    change_all_interaction
+    add_all_interaction
+    delete_interaction
+
+
+    The following codenames mean that the user can only read, change and add interactions for
+    investment projects that they are associated with:
+
+    read_associated_investmentproject_interaction
+    change_associated_investmentproject_interaction
+    add_associated_investmentproject_interaction
+
+    They cannot read, change or add interactions that do not relate to an investment project.
+
+    An associated project has the same meaning that it does in investment projects (that is a
+    project that was created by an adviser in the same team, or an adviser in the same team has
+    been linked to the project).
+
+
+    Note that permissions on other models are independent of permissions on interactions. Also
+    note that if both *_all_* and *_associated_investmentproject_* permissions are assigned to the
+    same user,  the *_all_* permission will be the effective one.
     """
 
     read_all = 'read_all_interaction'
