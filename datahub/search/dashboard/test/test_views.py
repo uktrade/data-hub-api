@@ -6,7 +6,7 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import ContactFactory
 from datahub.core.test_utils import APITestMixin
-from datahub.interaction.test.factories import InteractionFactory
+from datahub.interaction.test.factories import CompanyInteractionFactory
 
 
 class TestDashboard(APITestMixin):
@@ -20,7 +20,7 @@ class TestDashboard(APITestMixin):
 
         for creation_datetime in datetimes:
             with freeze_time(creation_datetime):
-                interactions.append(InteractionFactory(dit_adviser=self.user))
+                interactions.append(CompanyInteractionFactory(dit_adviser=self.user))
                 contacts.append(ContactFactory(created_by=self.user))
 
         setup_es.indices.refresh()
@@ -49,7 +49,7 @@ class TestDashboard(APITestMixin):
 
     def test_intelligent_homepage_limit(self, setup_es):
         """Test the limit param."""
-        InteractionFactory.create_batch(15, dit_adviser=self.user)
+        CompanyInteractionFactory.create_batch(15, dit_adviser=self.user)
         ContactFactory.create_batch(15, created_by=self.user)
 
         setup_es.indices.refresh()
