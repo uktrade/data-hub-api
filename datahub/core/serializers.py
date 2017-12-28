@@ -13,9 +13,6 @@ class ConstantModelSerializer(serializers.Serializer):
     name = serializers.ReadOnlyField()
     disabled_on = serializers.ReadOnlyField()
 
-    class Meta:
-        fields = '__all__'
-
 
 class NestedRelatedField(serializers.RelatedField):
     """DRF serialiser field for foreign keys and many-to-many fields.
