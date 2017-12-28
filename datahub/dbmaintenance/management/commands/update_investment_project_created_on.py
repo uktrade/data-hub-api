@@ -1,5 +1,7 @@
+import reversion
 from dateutil.parser import parse as dateutil_parse
 from django.utils.timezone import utc
+
 from datahub.investment.models import InvestmentProject
 from ..base import CSVBaseCommand
 
@@ -29,4 +31,6 @@ class Command(CSVBaseCommand):
             investment_project.created_on = created_on
 
             if not simulate:
-                investment_project.save(update_fields=('created_on',))
+                with reversion.create_revision():
+                    investment_project.save(update_fields=('created_on',))
+                    reversion.set_comment('Created On migration.')

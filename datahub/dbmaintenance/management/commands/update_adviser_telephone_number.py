@@ -1,5 +1,6 @@
-from datahub.company.models import Advisor
+import reversion
 
+from datahub.company.models import Advisor
 from ..base import CSVBaseCommand
 
 
@@ -26,4 +27,6 @@ class Command(CSVBaseCommand):
             adviser.telephone_number = telephone_number
 
             if not simulate:
-                adviser.save(update_fields=('telephone_number',))
+                with reversion.create_revision():
+                    adviser.save(update_fields=('telephone_number',))
+                    reversion.set_comment('Telephone number migration.')
