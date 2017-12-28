@@ -4,6 +4,7 @@ from datahub.company.test.factories import AdviserFactory
 from datahub.investment.test.factories import (
     InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
 )
+from datahub.metadata.test.factories import TeamFactory
 from datahub.search import elasticsearch
 
 from ..models import InvestmentProject
@@ -103,3 +104,56 @@ def test_investment_project_team_member_deleted_sync_to_es(setup_es, team_member
     result = results[0]
 
     assert len(result['team_members']) == 0
+
+
+@pytest.mark.parametrize('field', (
+    'created_by',
+    'client_relationship_manager',
+    'project_manager',
+    'project_assurance_adviser',
+))
+def test_investment_project_syncs_when_adviser_changes(setup_es, field):
+    """
+    Tests that when an adviser is updated, investment projects related to that adviser are
+    resynced.
+    """
+    adviser = AdviserFactory()
+    project = InvestmentProjectFactory(**{field: adviser})
+
+    adviser.dit_team = TeamFactory()
+    adviser.save()
+
+    setup_es.indices.refresh()
+
+    result = elasticsearch.get_search_by_entity_query(
+        term='',
+        filter_data={'id': project.pk},
+        entity=InvestmentProject
+    ).execute()
+
+    assert result.hits.total == 1
+    assert result.hits[0][field]['dit_team']['id'] == str(adviser.dit_team.id)
+    assert result.hits[0][field]['dit_team']['name'] == adviser.dit_team.name
+
+
+def test_investment_project_syncs_when_team_member_adviser_changes(setup_es, team_member):
+    """
+    Tests that when an adviser that is a team member of an investment project is updated,
+    the related investment project is resynced.
+    """
+    adviser = team_member.adviser
+
+    adviser.dit_team = TeamFactory()
+    adviser.save()
+
+    setup_es.indices.refresh()
+
+    result = elasticsearch.get_search_by_entity_query(
+        term='',
+        filter_data={'id': team_member.investment_project.pk},
+        entity=InvestmentProject
+    ).execute()
+
+    assert result.hits.total == 1
+    assert result.hits[0]['team_members'][0]['dit_team']['id'] == str(adviser.dit_team.id)
+    assert result.hits[0]['team_members'][0]['dit_team']['name'] == adviser.dit_team.name
