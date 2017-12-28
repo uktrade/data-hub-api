@@ -202,21 +202,11 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
                         if not getattr(self, field)]
         return {field: ['This field may not be null.'] for field in empty_fields}
 
-    def _validate_uk_region(self):
-        """UK region is mandatory if it's a UK company."""
-        if self.uk_based and not self.uk_region:
-            return False
-        return True
-
     def clean(self):
         """Custom validation."""
         if not self._validate_trading_address():
             raise ValidationError(
                 self._generate_trading_address_errors(),
-            )
-        if not self._validate_uk_region():
-            raise ValidationError(
-                {'uk_region': ['UK region is required for UK companies.']}
             )
         super().clean()
 

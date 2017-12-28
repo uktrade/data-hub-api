@@ -8,8 +8,12 @@ from datahub.company.models import (
     Advisor, CompaniesHouseCompany, Company, CompanyPermission,
     Contact, ContactPermission, ExportExperienceCategory,
 )
+from datahub.core.constants import Country
 from datahub.core.serializers import NestedRelatedField, RelaxedURLField
-from datahub.core.validators import RequiredUnlessAlreadyBlankValidator
+from datahub.core.validators import (
+    EqualsRule, OperatorRule, RequiredUnlessAlreadyBlankValidator, RulesBasedValidator,
+    ValidationRule
+)
 from datahub.metadata import models as meta_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -265,7 +269,17 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'archived_reason',
             'reference_code',
         )
-        validators = [RequiredUnlessAlreadyBlankValidator('sector', 'business_type')]
+        validators = [
+            RequiredUnlessAlreadyBlankValidator('sector', 'business_type'),
+            RulesBasedValidator(
+                ValidationRule(
+                    'required',
+                    OperatorRule('uk_region', bool),
+                    when=EqualsRule('registered_address_country',
+                                    Country.united_kingdom.value.id),
+                ),
+            ),
+        ]
         extra_kwargs = {
             'permissions': {
                 f'company.{CompanyPermission.read_company_document}': 'archived_documents_url_path'
