@@ -2,6 +2,7 @@ from io import BytesIO
 
 import pytest
 from django.core.management import call_command
+from reversion.models import Version
 
 from datahub.company.test.factories import AdviserFactory
 
@@ -81,3 +82,34 @@ def test_simulate(s3_stubber):
 
     assert advisers[0].telephone_number == '000000000'
     assert advisers[1].telephone_number == '111111111'
+
+
+def test_audit_log(s3_stubber):
+    """Test that the audit log is being created."""
+    adviser = AdviserFactory()
+
+    bucket = 'test_bucket'
+    object_key = 'test_key'
+    csv_content = f"""id,telephone_number
+{adviser.id},111222333
+"""
+    s3_stubber.add_response(
+        'get_object',
+        {
+            'Body': BytesIO(bytes(csv_content, encoding='utf-8'))
+        },
+        expected_params={
+            'Bucket': bucket,
+            'Key': object_key
+        }
+    )
+
+    call_command('update_adviser_telephone_number', bucket, object_key)
+
+    adviser.refresh_from_db()
+
+    assert adviser.telephone_number == '111222333'
+
+    versions = Version.objects.get_for_object(adviser)
+    assert len(versions) == 1
+    assert versions[0].revision.comment == 'Telephone number migration.'
