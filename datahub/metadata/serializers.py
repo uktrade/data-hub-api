@@ -13,6 +13,7 @@ class TeamSerializer(serializers.Serializer):
     role = NestedRelatedField(TeamRole, read_only=True)
     uk_region = NestedRelatedField(UKRegion, read_only=True)
     country = NestedRelatedField(Country, read_only=True)
+    disabled_on = serializers.DateTimeField(allow_null=True, read_only=True)
 
     class Meta:
         fields = '__all__'
