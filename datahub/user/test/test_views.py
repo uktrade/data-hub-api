@@ -76,7 +76,8 @@ class TestUserView(APITestMixin):
                 'country': {
                     'id': str(team.country_id),
                     'name': 'France',
-                }
+                },
+                'disabled_on': None,
             },
             'permissions': serialized_permissions
         }

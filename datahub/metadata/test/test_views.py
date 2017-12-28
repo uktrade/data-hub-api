@@ -99,7 +99,8 @@ def test_team_view(api_client):
     response = api_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json()[0] == {
+    teams = response.json()
+    assert teams[0] == {
         'id': 'cff02898-9698-e211-a939-e4115bead28a',
         'name': 'Aberdeen City Council',
         'role': {
@@ -110,5 +111,25 @@ def test_team_view(api_client):
         'country': {
             'name': 'United Kingdom',
             'id': '80756b9a-5d95-e211-a939-e4115bead28a'
-        }
+        },
+        'disabled_on': None,
+    }
+
+    disabled_team = next(
+        team for team in teams
+        if team['name'] == 'Business Information Centre Bhopal India'
+    )
+    assert disabled_team == {
+        'id': 'ff8333c8-9698-e211-a939-e4115bead28a',
+        'name': 'Business Information Centre Bhopal India',
+        'role': {
+            'name': 'Post',
+            'id': '62329c18-6095-e211-a939-e4115bead28a'
+        },
+        'uk_region': None,
+        'country': {
+            'name': 'India',
+            'id': '6f6a9ab2-5d95-e211-a939-e4115bead28a'
+        },
+        'disabled_on': '2013-03-31T16:21:07Z',
     }
