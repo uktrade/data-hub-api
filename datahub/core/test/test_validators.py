@@ -42,7 +42,7 @@ def test_any_of_all():
 ))
 def test_operator_rule(data, field, op, res):
     """Tests ValidationCondition for various cases."""
-    combiner = Mock(spec_set=DataCombiner, get_value=lambda field_: data[field_])
+    combiner = Mock(spec_set=DataCombiner, __getitem__=lambda self, field_: data[field_])
     condition = OperatorRule(field, op)
     assert condition(combiner) == res
 
@@ -53,7 +53,7 @@ def test_operator_rule(data, field, op, res):
 ))
 def test_equals_rule(data, field, test_value, res):
     """Tests ValidationCondition for various cases."""
-    combiner = Mock(spec_set=DataCombiner, get_value=lambda field_: data[field_])
+    combiner = Mock(spec_set=DataCombiner, __getitem__=lambda self, field_: data[field_])
     condition = EqualsRule(field, test_value)
     assert condition(combiner) == res
 
