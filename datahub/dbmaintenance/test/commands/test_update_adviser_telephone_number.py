@@ -63,7 +63,7 @@ def test_simulate(s3_stubber):
     csv_content = f"""id,telephone_number
 {advisers[0].id},+441234567890
 {advisers[1].id},+440987654321
-    """
+"""
     s3_stubber.add_response(
         'get_object',
         {
