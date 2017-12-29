@@ -14,6 +14,7 @@ from datahub.core.constants import Country
 from datahub.core.serializers import NestedRelatedField, RelaxedURLField
 from datahub.core.validators import (
     AddressValidator,
+    AnyIsNotBlankRule,
     EqualsRule,
     OperatorRule,
     RequiredUnlessAlreadyBlankValidator,
@@ -93,7 +94,10 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         'contact_preferences_required': ugettext_lazy(
             'A contact should have at least one way of being contacted. Please select either '
             'email or phone, or both.'
-        )
+        ),
+        'address_same_as_company_and_has_address': ugettext_lazy(
+            'Please select either address_same_as_company or enter an address manually, not both!'
+        ),
     }
 
     title = NestedRelatedField(
@@ -165,6 +169,18 @@ class ContactSerializer(PermittedFieldsModelSerializer):
                     'contact_preferences_required',
                     OperatorRule('contactable_by_phone', bool),
                     when=OperatorRule('contactable_by_email', not_),
+                ),
+                ValidationRule(
+                    'address_same_as_company_and_has_address',
+                    OperatorRule('address_same_as_company', not_),
+                    when=AnyIsNotBlankRule(
+                        'address_1',
+                        'address_2',
+                        'address_town',
+                        'address_county',
+                        'address_country',
+                        'address_postcode'
+                    ),
                 ),
             ),
         ]

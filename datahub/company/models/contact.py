@@ -111,10 +111,6 @@ class Contact(ArchivableModel, BaseModel):
         all_required_fields_existence = all(
             getattr(self, field) for field in self.REQUIRED_ADDRESS_FIELDS
         )
-        if self.address_same_as_company and some_address_fields_existence:
-            error_message = ('Please select either address_same_as_company or enter an address '
-                             'manually, not both!')
-            raise ValidationError({'address_same_as_company': error_message})
         if not self.address_same_as_company:
             if some_address_fields_existence and not all_required_fields_existence:
                 raise ValidationError(self._generate_address_errors())
