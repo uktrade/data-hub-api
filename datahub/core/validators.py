@@ -6,7 +6,7 @@ from typing import Any, Callable
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from datahub.core.validate_utils import DataCombiner, is_blank
+from datahub.core.validate_utils import DataCombiner, is_blank, is_not_blank
 
 
 class AnyOfValidator:
@@ -203,7 +203,7 @@ class AbstractRule(ABC):
 class BaseRule(AbstractRule):
     """Base class for rules."""
 
-    def __init__(self, field: str):
+    def __init__(self, field: str=None):
         """Sets the field name."""
         self._field = field
 
@@ -254,7 +254,7 @@ class ConditionalRule:
 
     def __init__(self, rule: AbstractRule, when: AbstractRule=None):
         """
-        Initialises then rule.
+        Initialises the rule.
 
         :param rule: Rule that must pass.
         :param when: Optional conditional rule to check before applying this rule.
@@ -280,6 +280,23 @@ class ConditionalRule:
         return (
             f'{self.__class__.__name__}({self._rule!r}, when={self._condition!r})'
         )
+
+
+class AnyIsNotBlankRule(BaseRule):
+    """A rule that checks if any of a list of specified fields is not blank."""
+
+    def __init__(self, *fields: str):
+        """
+        Initialises the rule.
+
+        :param fields: Fields to check for non-blankness.
+        """
+        super().__init__()
+        self._fields = fields
+
+    def __call__(self, combiner) -> bool:
+        """Test whether any of the fields are not blank."""
+        return any(is_not_blank(combiner[field]) for field in self._fields)
 
 
 class ValidationRule(ConditionalRule):
