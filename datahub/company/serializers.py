@@ -177,28 +177,17 @@ class ContactSerializer(PermittedFieldsModelSerializer):
                 ValidationRule(
                     'address_same_as_company_and_has_address',
                     OperatorRule('address_same_as_company', not_),
-                    when=AnyIsNotBlankRule(
-                        'address_1',
-                        'address_2',
-                        'address_town',
-                        'address_county',
-                        'address_country',
-                        'address_postcode'
-                    ),
+                    when=AnyIsNotBlankRule(*Contact.ADDRESS_VALIDATION_MAPPING.keys()),
                 ),
                 ValidationRule(
                     'no_address',
                     OperatorRule('address_same_as_company', bool),
-                    when=AllIsBlankRule(
-                        'address_1',
-                        'address_2',
-                        'address_town',
-                        'address_county',
-                        'address_country',
-                        'address_postcode'
-                    ),
+                    when=AllIsBlankRule(*Contact.ADDRESS_VALIDATION_MAPPING.keys()),
                 ),
             ),
+            # Note: This is deliberately after RulesBasedValidator, so that
+            # address_same_as_company rules run first.
+            AddressValidator(lazy=True, fields_mapping=Contact.ADDRESS_VALIDATION_MAPPING)
         ]
         extra_kwargs = {
             'contactable_by_email': {'default': True},

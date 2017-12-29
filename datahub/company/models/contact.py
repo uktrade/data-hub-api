@@ -1,7 +1,6 @@
 import uuid
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.db import models
 
 from datahub.core.models import ArchivableModel, BaseModel
@@ -21,11 +20,14 @@ class ContactPermission(StrEnum):
 class Contact(ArchivableModel, BaseModel):
     """Contact from CDMS."""
 
-    REQUIRED_ADDRESS_FIELDS = (
-        'address_1',
-        'address_country',
-        'address_town'
-    )
+    ADDRESS_VALIDATION_MAPPING = {
+        'address_1': {'required': True},
+        'address_2': {'required': False},
+        'address_town': {'required': True},
+        'address_county': {'required': False},
+        'address_postcode': {'required': False},
+        'address_country': {'required': True},
+    }
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     title = models.ForeignKey(
@@ -88,39 +90,3 @@ class Contact(ArchivableModel, BaseModel):
     def __str__(self):
         """Admin displayed human readable name."""
         return self.name
-
-    def _generate_address_errors(self):
-        """Generate per field error."""
-        empty_fields = [field for field in self.REQUIRED_ADDRESS_FIELDS
-                        if not getattr(self, field)]
-        return {field: ['This field may not be null.'] for field in empty_fields}
-
-    def validate_address(self):
-        """Custom validation for address.
-
-        Either 'same_as_company' or address_1, address_town and address_country must be defined.
-        """
-        some_address_fields_existence = any((
-            self.address_1,
-            self.address_2,
-            self.address_town,
-            self.address_county,
-            self.address_postcode,
-            self.address_country
-        ))
-        all_required_fields_existence = all(
-            getattr(self, field) for field in self.REQUIRED_ADDRESS_FIELDS
-        )
-        if not self.address_same_as_company:
-            if some_address_fields_existence and not all_required_fields_existence:
-                raise ValidationError(self._generate_address_errors())
-
-    def clean(self):
-        """Custom validation."""
-        self.validate_address()
-        super().clean()
-
-    def save(self, *args, **kwargs):
-        """Override the Django save implementation to hook the custom validation."""
-        self.clean()
-        super().save(*args, **kwargs)
