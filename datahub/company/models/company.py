@@ -50,11 +50,6 @@ class CompanyAbstract(models.Model):
         """Admin displayed human readable name."""
         return self.name
 
-    def save(self, *args, **kwargs):
-        """Override the Django save implementation to hook the custom validation."""
-        self.clean()
-        super().save(*args, **kwargs)
-
 
 class Company(ArchivableModel, BaseModel, CompanyAbstract):
     """Representation of the company as per CDMS."""
