@@ -5,6 +5,7 @@ from django.utils.timezone import now
 
 from datahub.company.models import ExportExperienceCategory
 from datahub.core import constants
+from datahub.metadata.test.factories import TeamFactory
 
 
 class AdviserFactory(factory.django.DjangoModelFactory):
@@ -13,7 +14,7 @@ class AdviserFactory(factory.django.DjangoModelFactory):
     id = factory.LazyFunction(uuid.uuid4)
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
-    dit_team_id = constants.Team.healthcare_uk.value.id
+    dit_team = factory.SubFactory(TeamFactory)
     email = factory.Sequence(lambda n: f'foo-{n}@bar.com')
     contact_email = factory.Faker('email')
     telephone_number = factory.Faker('phone_number')

@@ -262,11 +262,12 @@ class TestGenerateQuote:
         # status changed
         assert order.status == OrderStatus.quote_awaiting_acceptance
 
+        assert not order.billing_contact_name
+        assert not order.billing_email
+        assert not order.billing_phone
+
         # billing fields populated
         assert order.billing_company_name == company.name
-        assert order.billing_contact_name == order.contact.name
-        assert order.billing_email == order.contact.email
-        assert order.billing_phone == order.contact.telephone_number
         assert order.billing_address_1 == company.registered_address_1
         assert order.billing_address_2 == company.registered_address_2
         assert order.billing_address_county == company.registered_address_county

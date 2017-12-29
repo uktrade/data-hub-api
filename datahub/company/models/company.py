@@ -8,9 +8,17 @@ from django.utils.functional import cached_property
 
 from datahub.core import constants
 from datahub.core.models import ArchivableModel, BaseConstantModel, BaseModel
+from datahub.core.utils import StrEnum
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
+
+class CompanyPermission(StrEnum):
+    """Permission codename constants."""
+
+    read_company = 'read_company'
+    read_company_document = 'read_company_document'
 
 
 class ExportExperienceCategory(BaseConstantModel):
@@ -139,7 +147,10 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
 
     class Meta:
         verbose_name_plural = 'companies'
-        permissions = (('read_company', 'Can read company'),)
+        permissions = (
+            (CompanyPermission.read_company, 'Can read company'),
+            (CompanyPermission.read_company_document, 'Can read company document')
+        )
 
     @property
     def uk_based(self):
@@ -191,21 +202,11 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
                         if not getattr(self, field)]
         return {field: ['This field may not be null.'] for field in empty_fields}
 
-    def _validate_uk_region(self):
-        """UK region is mandatory if it's a UK company."""
-        if self.uk_based and not self.uk_region:
-            return False
-        return True
-
     def clean(self):
         """Custom validation."""
         if not self._validate_trading_address():
             raise ValidationError(
                 self._generate_trading_address_errors(),
-            )
-        if not self._validate_uk_region():
-            raise ValidationError(
-                {'uk_region': ['UK region is required for UK companies.']}
             )
         super().clean()
 

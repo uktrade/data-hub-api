@@ -30,13 +30,71 @@ class TestCompany(APITestMixin):
 
     def test_list_companies(self):
         """List the companies."""
-        CompanyFactory()
-        CompanyFactory()
+        CompanyFactory.create_batch(2)
         url = reverse('api-v3:company:collection')
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
+
+    def test_list_companies_without_read_document_permission(self):
+        """List the companies by user without read document permission."""
+        CompanyFactory.create_batch(5, archived_documents_url_path='hello world')
+
+        user = create_test_user(
+            permission_codenames=(
+                'read_company',
+            )
+        )
+        api_client = self.create_api_client(user=user)
+        url = reverse('api-v3:company:collection')
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 5
+        assert all(
+            'archived_documents_url_path' not in company
+            for company in response.data['results']
+        )
+
+    def test_list_companies_with_read_document_permission(self):
+        """List the companies by user with read document permission."""
+        CompanyFactory.create_batch(5, archived_documents_url_path='hello world')
+
+        user = create_test_user(
+            permission_codenames=(
+                'read_company',
+                'read_company_document',
+            )
+        )
+        api_client = self.create_api_client(user=user)
+        url = reverse('api-v3:company:collection')
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 5
+        assert all(
+            company['archived_documents_url_path'] == 'hello world'
+            for company in response.data['results']
+        )
+
+    def test_get_company_without_read_document_permission(self):
+        """Tests the company item view without read document permission."""
+        company = CompanyFactory(
+            archived_documents_url_path='http://some-documents',
+        )
+        user = create_test_user(
+            permission_codenames=(
+                'read_company',
+            )
+        )
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('api-v3:company:item', kwargs={'pk': company.id})
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert 'archived_documents_url_path' not in response.json()
 
     def test_get_company_with_company_number(self):
         """Tests the company item view for a company with a company number."""
@@ -56,9 +114,16 @@ class TestCompany(APITestMixin):
             registered_address_town='Barland',
             registered_address_country_id=Country.united_kingdom.value.id
         )
+        user = create_test_user(
+            permission_codenames=(
+                'read_company',
+                'read_company_document',
+            )
+        )
+        api_client = self.create_api_client(user=user)
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.id})
-        response = self.api_client.get(url)
+        response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
@@ -411,7 +476,7 @@ class TestCompany(APITestMixin):
         })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data == {'uk_region': ['UK region is required for UK companies.']}
+        assert response.data == {'uk_region': ['This field is required.']}
 
     def test_add_not_uk_company(self):
         """Test add new not UK company."""

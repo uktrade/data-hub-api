@@ -5,15 +5,11 @@ def populate_billing_data(order):
     :param order: Order to change if needed
     :returns: order with billing_* fields filled in
     """
-    contact = order.contact
     company = order.company
 
     # get default and current order values of billing details
     default_billing_details = {
         'billing_company_name': company.name,
-        'billing_contact_name': contact.name,
-        'billing_email': contact.email,
-        'billing_phone': contact.telephone_number,
     }
     order_billing_details = {
         field_name: getattr(order, field_name)

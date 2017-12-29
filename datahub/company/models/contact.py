@@ -5,9 +5,17 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from datahub.core.models import ArchivableModel, BaseModel
+from datahub.core.utils import StrEnum
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
+
+class ContactPermission(StrEnum):
+    """Permission codename constants."""
+
+    read_contact = 'read_contact'
+    read_contact_document = 'read_contact_document'
 
 
 class Contact(ArchivableModel, BaseModel):
@@ -67,7 +75,10 @@ class Contact(ArchivableModel, BaseModel):
     contactable_by_phone = models.BooleanField(default=True)
 
     class Meta:
-        permissions = (('read_contact', 'Can read contact'),)
+        permissions = (
+            (ContactPermission.read_contact, 'Can read contact'),
+            (ContactPermission.read_contact_document, 'Can read contact document'),
+        )
 
     @property
     def name(self):

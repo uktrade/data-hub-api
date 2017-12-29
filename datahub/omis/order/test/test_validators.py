@@ -236,13 +236,22 @@ class TestOrderDetailsFilledInValidator:
         """
         order_fields = {
             'primary_market': None,
-            'service_types': [],
             'description': '',
             'delivery_date': None,
             'vat_status': '',
         }
-        order = Order(**(order_fields if not values_as_data else {}))
-        data = order_fields if values_as_data else {}
+        order_m2m_fields = {
+            'service_types': []
+        }
+
+        if values_as_data:
+            order = Order()
+            data = {**order_fields, **order_m2m_fields}
+        else:
+            order = Order(**order_fields)
+            for k, v in order_m2m_fields.items():
+                getattr(order, k).set(v)
+            data = {}
 
         validator = OrderDetailsFilledInValidator()
         validator.set_instance(order)
@@ -250,8 +259,9 @@ class TestOrderDetailsFilledInValidator:
         with pytest.raises(ValidationError) as exc:
             validator(data)
 
+        all_fields = list(order_fields) + list(order_m2m_fields)
         assert exc.value.detail == {
-            **{field: ['This field is required.'] for field in order_fields},
+            **{field: ['This field is required.'] for field in all_fields},
             'assignees': ['You need to add at least one assignee.']
         }
 
@@ -704,7 +714,7 @@ class TestAddressValidator:
         address_fields = {
             'address1': None,
             'address2': None,
-            'postcode': None,
+            'town': None,
         }
 
         instance = mock.Mock(**address_fields) if with_instance else None
@@ -715,7 +725,7 @@ class TestAddressValidator:
             fields_mapping={
                 'address1': {'required': True},
                 'address2': {'required': False},
-                'postcode': {'required': True},
+                'town': {'required': True},
             }
         )
 
@@ -725,7 +735,7 @@ class TestAddressValidator:
             validator(data)
         assert exc.value.detail == {
             'address1': ['This field is required.'],
-            'postcode': ['This field is required.']
+            'town': ['This field is required.']
         }
 
     @pytest.mark.parametrize('values_as_data', (True, False))
@@ -744,7 +754,7 @@ class TestAddressValidator:
         address_fields = {
             'address1': None,
             'address2': None,
-            'postcode': None,
+            'town': None,
         }
 
         instance = mock.Mock(**address_fields) if with_instance else None
@@ -755,7 +765,7 @@ class TestAddressValidator:
             fields_mapping={
                 'address1': {'required': True},
                 'address2': {'required': False},
-                'postcode': {'required': True},
+                'town': {'required': True},
             }
         )
 
@@ -782,7 +792,7 @@ class TestAddressValidator:
         address_fields = {
             'address1': None,
             'address2': 'lorem ipsum',
-            'postcode': None,
+            'town': None,
         }
 
         instance = mock.Mock(**address_fields)
@@ -793,7 +803,7 @@ class TestAddressValidator:
             fields_mapping={
                 'address1': {'required': True},
                 'address2': {'required': False},
-                'postcode': {'required': True},
+                'town': {'required': True},
             }
         )
 
@@ -803,7 +813,7 @@ class TestAddressValidator:
             validator(data)
         assert exc.value.detail == {
             'address1': ['This field is required.'],
-            'postcode': ['This field is required.']
+            'town': ['This field is required.']
         }
 
     def test_defaults(self):

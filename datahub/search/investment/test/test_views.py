@@ -6,7 +6,7 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin, create_test_user
-from datahub.investment.models import InvestmentProject, Permissions
+from datahub.investment.models import InvestmentProject, InvestmentProjectPermission
 from datahub.investment.test.factories import (
     InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
 )
@@ -236,8 +236,8 @@ class TestSearch(APITestMixin):
         }
 
     @pytest.mark.parametrize('permissions', (
-        (Permissions.read_all,),
-        (Permissions.read_associated, Permissions.read_all),
+        (InvestmentProjectPermission.read_all,),
+        (InvestmentProjectPermission.read_associated, InvestmentProjectPermission.read_all),
     ))
     def test_non_restricted_user_can_see_all_projects(self, setup_es, permissions):
         """Test that normal users can see all projects."""
@@ -407,8 +407,8 @@ class TestBasicSearch(APITestMixin):
         assert response.data['results'][0]['project_code'] == investment_project.project_code
 
     @pytest.mark.parametrize('permissions', (
-        (Permissions.read_all,),
-        (Permissions.read_associated, Permissions.read_all),
+        (InvestmentProjectPermission.read_all,),
+        (InvestmentProjectPermission.read_associated, InvestmentProjectPermission.read_all),
     ))
     def test_global_non_restricted_user_can_see_all_projects(self, setup_es, permissions):
         """Test that normal users can see all projects."""

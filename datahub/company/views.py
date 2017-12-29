@@ -10,10 +10,18 @@ from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.investment.queryset import get_slim_investment_project_queryset
 from datahub.oauth.scopes import Scope
-from .models import Advisor, CompaniesHouseCompany, Company, Contact
+from .models import (
+    Advisor,
+    CompaniesHouseCompany,
+    Company,
+    Contact,
+)
 from .queryset import get_contact_queryset
 from .serializers import (
-    AdviserSerializer, CompaniesHouseCompanySerializer, CompanySerializer, ContactSerializer
+    AdviserSerializer,
+    CompaniesHouseCompanySerializer,
+    CompanySerializer,
+    ContactSerializer,
 )
 
 

@@ -35,6 +35,15 @@
     - - read_associated_investmentproject
       - investment
       - investmentproject
+    - - add_associated_investmentproject_interaction
+      - interaction
+      - interaction
+    - - change_associated_investmentproject_interaction
+      - interaction
+      - interaction
+    - - read_associated_investmentproject_interaction
+      - interaction
+      - interaction
   model: auth.group
 - fields:
     name: DA
@@ -117,6 +126,15 @@
     - - read_associated_investmentproject
       - investment
       - investmentproject
+    - - add_associated_investmentproject_interaction
+      - interaction
+      - interaction
+    - - change_associated_investmentproject_interaction
+      - interaction
+      - interaction
+    - - read_associated_investmentproject_interaction
+      - interaction
+      - interaction
   model: auth.group
 - fields:
     name: DIT_staff
@@ -163,13 +181,13 @@
     - - read_event
       - event
       - event
-    - - add_interaction
+    - - add_all_interaction
       - interaction
       - interaction
-    - - change_interaction
+    - - change_all_interaction
       - interaction
       - interaction
-    - - read_interaction
+    - - read_all_interaction
       - interaction
       - interaction
     - - add_investmentproject
@@ -181,24 +199,18 @@
     - - read_all_investmentproject
       - investment
       - investmentproject
+    - - read_company_document
+      - company
+      - company
+    - - read_contact_document
+      - company
+      - contact
     - - add_investmentprojectcode
       - investment
       - investmentprojectcode
     - - change_investmentprojectcode
       - investment
       - investmentprojectcode
-    - - add_investmentprojectteammember
-      - investment
-      - investmentprojectteammember
-    - - change_investmentprojectteammember
-      - investment
-      - investmentprojectteammember
-    - - delete_investmentprojectteammember
-      - investment
-      - investmentprojectteammember
-    - - read_investmentprojectteammember
-      - investment
-      - investmentprojectteammember
     - - add_iprojectdocument
       - investment
       - iprojectdocument

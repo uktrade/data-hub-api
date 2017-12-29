@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, Mock
 
 import pytest
 
+from datahub.core import validate_utils
 from datahub.core.validate_utils import DataCombiner, is_blank, is_not_blank
 
 
@@ -81,3 +82,46 @@ class TestDataCombiner:
         instance = Mock(field1=subinstance)
         data_combiner = DataCombiner(instance, {'field1': new_subinstance})
         assert data_combiner.get_value_id('field1') == str(new_subinstance.id)
+
+    def test_get_value_auto_instance(self, monkeypatch):
+        """Tests that get_value_auto() returns the ID for a foreign key."""
+        subinstance = Mock()
+        subinstance.id = 1234
+        instance = Mock(field1=subinstance)
+        model = Mock()
+        mock_field_info = Mock(
+            relations={'field1': Mock(to_many=False)}
+        )
+        monkeypatch.setattr(
+            validate_utils, '_get_model_field_info', Mock(return_value=mock_field_info)
+        )
+        data_combiner = DataCombiner(instance, None, model=model)
+        assert data_combiner.get_value_auto('field1') == str(subinstance.id)
+        assert data_combiner['field1'] == str(subinstance.id)
+
+    def test_get_value_auto_to_many(self, monkeypatch):
+        """Tests that get_value_auto() returns a list-like object for a to-many field."""
+        instance = Mock(field1=MagicMock())
+        instance.field1.all.return_value = [123]
+        model = Mock()
+        mock_field_info = Mock(
+            relations={'field1': Mock(to_many=True)}
+        )
+        monkeypatch.setattr(
+            validate_utils, '_get_model_field_info', Mock(return_value=mock_field_info)
+        )
+        data_combiner = DataCombiner(instance, None, model=model)
+        assert data_combiner.get_value_auto('field1') == [123]
+        assert data_combiner['field1'] == [123]
+
+    def test_get_value_normal_field(self, monkeypatch):
+        """Tests that get_value_auto() returns value for a normal field."""
+        instance = Mock(field1=123)
+        model = Mock()
+        mock_field_info = Mock(relations={})
+        monkeypatch.setattr(
+            validate_utils, '_get_model_field_info', Mock(return_value=mock_field_info)
+        )
+        data_combiner = DataCombiner(instance, None, model=model)
+        assert data_combiner.get_value_auto('field1') == 123
+        assert data_combiner['field1'] == 123
