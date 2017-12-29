@@ -263,11 +263,11 @@ class TestAddContact(APITestMixin):
         assert response.data == {
             'contactable_by_email': [
                 'A contact should have at least one way of being contacted. '
-                'Please select either email or phone, or both'
+                'Please select either email or phone, or both.'
             ],
             'contactable_by_phone': [
                 'A contact should have at least one way of being contacted. '
-                'Please select either email or phone, or both'
+                'Please select either email or phone, or both.'
             ]
         }
 
