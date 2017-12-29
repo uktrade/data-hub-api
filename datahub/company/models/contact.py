@@ -114,10 +114,6 @@ class Contact(ArchivableModel, BaseModel):
         if not self.address_same_as_company:
             if some_address_fields_existence and not all_required_fields_existence:
                 raise ValidationError(self._generate_address_errors())
-            elif not some_address_fields_existence:
-                error_message = ('Please select either address_same_as_company or enter an '
-                                 'address manually.')
-                raise ValidationError({'address_same_as_company': error_message})
 
     def clean(self):
         """Custom validation."""
