@@ -282,6 +282,23 @@ class ConditionalRule:
         )
 
 
+class AllIsBlankRule(BaseRule):
+    """A rule that checks if all fields in a list are blank."""
+
+    def __init__(self, *fields):
+        """
+        Initialises the rule.
+
+        :param fields: Fields to check for blankness.
+        """
+        super().__init__()
+        self._fields = fields
+
+    def __call__(self, combiner) -> bool:
+        """Test whether all of the fields are blank."""
+        return all(is_blank(combiner[field]) for field in self._fields)
+
+
 class AnyIsNotBlankRule(BaseRule):
     """A rule that checks if any of a list of specified fields is not blank."""
 
