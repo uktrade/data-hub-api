@@ -1,4 +1,7 @@
+from functools import lru_cache
 from typing import Sequence
+
+from rest_framework.utils import model_meta
 
 
 class DataCombiner:
@@ -10,7 +13,7 @@ class DataCombiner:
     will only contain data for fields being updated).
     """
 
-    def __init__(self, instance, update_data, serializer=None):
+    def __init__(self, instance, update_data, serializer=None, model=None):
         """Initialises the combiner."""
         if instance is None and update_data is None:
             raise TypeError('One of instance and update_data must be provided '
@@ -22,6 +25,32 @@ class DataCombiner:
         self.instance = instance
         self.data = update_data
         self.serializer = serializer
+        self.model = model
+
+    def __getitem__(self, item):
+        """Returns the value of a field, using get_value_auto()."""
+        return self.get_value_auto(item)
+
+    def get_value_auto(self, field_name):
+        """
+        Returns the value of a field (returning the ID for foreign keys).
+
+        Automatically calls get_value(), get_value_to_many() or get_value_id() depending on the
+        field type.
+
+        Requires the model class to be available.
+        """
+        field_info = _get_model_field_info(self.model)
+
+        if field_name in field_info.relations:
+            if field_info.relations[field_name].to_many:
+                value = self.get_value_to_many(field_name)
+            else:
+                value = self.get_value_id(field_name)
+        else:
+            value = self.get_value(field_name)
+
+        return value
 
     def get_value(self, field_name):
         """Returns the value of a standard field."""
@@ -53,3 +82,8 @@ def is_blank(value):
 def is_not_blank(value):
     """Returns True if a value is not considered empty or blank."""
     return not is_blank(value)
+
+
+@lru_cache()
+def _get_model_field_info(model):
+    return model_meta.get_field_info(model)
