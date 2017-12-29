@@ -8,14 +8,18 @@ from datahub.company.models import Advisor, Company, Contact
 from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import DataCombiner, is_blank
-from datahub.core.validators import OperatorRule, RulesBasedValidator, ValidationRule
+from datahub.core.validators import (
+    AddressValidator,
+    OperatorRule,
+    RulesBasedValidator,
+    ValidationRule,
+)
 from datahub.metadata.models import Country, Sector, Team, UKRegion
 
 from datahub.omis.market.models import Market
 from .constants import OrderStatus, VATStatus
 from .models import CancellationReason, Order, OrderAssignee, OrderSubscriber, ServiceType
 from .validators import (
-    AddressValidator,
     ContactWorksAtCompanyValidator,
     OrderInStatusRule,
     OrderInStatusValidator,
