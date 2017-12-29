@@ -101,6 +101,24 @@ class ReadOnlyAdmin(admin.ModelAdmin):
         return readonly_fields
 
 
+def custom_add_permission(permission_codename):
+    """
+    Decorator that allows a custom add permission to be used with ModelAdmin subclasses.
+
+    Usage example::
+
+        @admin.register(InvestmentProject)
+        @custom_change_permission('add_custom_investmentproject')
+        class InvestmentProjectAdmin(admin.ModelAdmin):
+            pass
+    """
+    def decorator(admin_cls):
+        admin_cls.has_add_permission = _make_admin_permission_getter(permission_codename)
+        return admin_cls
+
+    return decorator
+
+
 def custom_change_permission(permission_codename):
     """
     Decorator that allows a custom change permission to be used with ModelAdmin subclasses.
@@ -114,6 +132,24 @@ def custom_change_permission(permission_codename):
     """
     def decorator(admin_cls):
         admin_cls.has_change_permission = _make_admin_permission_getter(permission_codename)
+        return admin_cls
+
+    return decorator
+
+
+def custom_delete_permission(permission_codename):
+    """
+    Decorator that allows a custom delete permission to be used with ModelAdmin subclasses.
+
+    Usage example::
+
+        @admin.register(InvestmentProject)
+        @custom_delete_permission('delete_all_investmentproject')
+        class InvestmentProjectAdmin(admin.ModelAdmin):
+            pass
+    """
+    def decorator(admin_cls):
+        admin_cls.has_delete_permission = _make_admin_permission_getter(permission_codename)
         return admin_cls
 
     return decorator

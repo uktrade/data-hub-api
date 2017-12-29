@@ -1,5 +1,7 @@
 from datetime import date
+from itertools import chain
 
+import pytest
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -8,33 +10,279 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.core.constants import InteractionType, Service, Team
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.event.test.factories import EventFactory
+from datahub.interaction.models import InteractionPermission
 from datahub.interaction.test.factories import (
-    EventServiceDeliveryFactory, InteractionFactory, ServiceDeliveryFactory
+    CompanyInteractionFactory, EventServiceDeliveryFactory, InvestmentProjectInteractionFactory,
+    ServiceDeliveryFactory,
 )
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 
 
-class TestInteractionV3(APITestMixin):
-    """Tests for v3 interaction views."""
+NON_RESTRICTED_READ_PERMISSIONS = (
+    (
+        InteractionPermission.read_all,
+    ),
+    (
+        InteractionPermission.read_all,
+        InteractionPermission.read_associated_investmentproject,
+    )
+)
+
+
+NON_RESTRICTED_CHANGE_PERMISSIONS = (
+    (
+        InteractionPermission.change_all,
+    ),
+    (
+        InteractionPermission.change_all,
+        InteractionPermission.change_associated_investmentproject,
+    )
+)
+
+
+class TestGetInteractionView(APITestMixin):
+    """Tests for the get interaction view."""
 
     def test_interaction_no_permissions(self):
         """Should return 403"""
-        interaction = InteractionFactory()
+        interaction = CompanyInteractionFactory()
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
         response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_interaction_detail_view(self):
-        """Interaction detail view."""
-        interaction = InteractionFactory()
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_non_restricted_user_can_get_company_interaction(self, permissions):
+        """Test that a non-restricted user can get a company interaction."""
+        requester = create_test_user(permission_codenames=permissions)
+        interaction = CompanyInteractionFactory()
+        api_client = self.create_api_client(user=requester)
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        response = self.api_client.get(url)
+        response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['id'] == str(interaction.pk)
+        response_data = response.json()
+        assert response_data == {
+            'id': response_data['id'],
+            'kind': 'interaction',
+            'is_event': None,
+            'communication_channel': {
+                'id': InteractionType.face_to_face.value.id,
+                'name': InteractionType.face_to_face.value.name
+            },
+            'subject': interaction.subject,
+            'date': interaction.date.date().isoformat(),
+            'dit_adviser': {
+                'id': str(interaction.dit_adviser.pk),
+                'first_name': interaction.dit_adviser.first_name,
+                'last_name': interaction.dit_adviser.last_name,
+                'name': interaction.dit_adviser.name
+            },
+            'notes': interaction.notes,
+            'company': {
+                'id': str(interaction.company.pk),
+                'name': interaction.company.name
+            },
+            'contact': {
+                'id': str(interaction.contact.pk),
+                'name': interaction.contact.name
+            },
+            'event': None,
+            'service': {
+                'id': str(Service.trade_enquiry.value.id),
+                'name': Service.trade_enquiry.value.name,
+            },
+            'dit_team': {
+                'id': str(Team.healthcare_uk.value.id),
+                'name': Team.healthcare_uk.value.name,
+            },
+            'investment_project': None,
+            'archived_documents_url_path': interaction.archived_documents_url_path,
+            'created_by': {
+                'id': str(interaction.created_by.pk),
+                'first_name': interaction.created_by.first_name,
+                'last_name': interaction.created_by.last_name,
+                'name': interaction.created_by.name
+            },
+            'modified_by': {
+                'id': str(interaction.modified_by.pk),
+                'first_name': interaction.modified_by.first_name,
+                'last_name': interaction.modified_by.last_name,
+                'name': interaction.modified_by.name
+            },
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z'
+        }
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_non_restricted_user_can_get_investment_project_interaction(self, permissions):
+        """Test that a non-restricted user can get an investment project interaction."""
+        requester = create_test_user(permission_codenames=permissions)
+        interaction = InvestmentProjectInteractionFactory()
+        api_client = self.create_api_client(user=requester)
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data == {
+            'id': response_data['id'],
+            'kind': 'interaction',
+            'is_event': None,
+            'communication_channel': {
+                'id': InteractionType.face_to_face.value.id,
+                'name': InteractionType.face_to_face.value.name
+            },
+            'subject': interaction.subject,
+            'date': interaction.date.date().isoformat(),
+            'dit_adviser': {
+                'id': str(interaction.dit_adviser.pk),
+                'first_name': interaction.dit_adviser.first_name,
+                'last_name': interaction.dit_adviser.last_name,
+                'name': interaction.dit_adviser.name
+            },
+            'notes': interaction.notes,
+            'company': None,
+            'contact': {
+                'id': str(interaction.contact.pk),
+                'name': interaction.contact.name
+            },
+            'event': None,
+            'service': {
+                'id': str(Service.trade_enquiry.value.id),
+                'name': Service.trade_enquiry.value.name,
+            },
+            'dit_team': {
+                'id': str(Team.healthcare_uk.value.id),
+                'name': Team.healthcare_uk.value.name,
+            },
+            'investment_project': {
+                'id': str(interaction.investment_project.pk),
+                'name': interaction.investment_project.name,
+                'project_code': interaction.investment_project.project_code,
+            },
+            'archived_documents_url_path': interaction.archived_documents_url_path,
+            'created_by': {
+                'id': str(interaction.created_by.pk),
+                'first_name': interaction.created_by.first_name,
+                'last_name': interaction.created_by.last_name,
+                'name': interaction.created_by.name
+            },
+            'modified_by': {
+                'id': str(interaction.modified_by.pk),
+                'first_name': interaction.modified_by.first_name,
+                'last_name': interaction.modified_by.last_name,
+                'name': interaction.modified_by.name
+            },
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z'
+        }
+
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_restricted_user_can_get_associated_investment_project_interaction(self):
+        """Test that a restricted user can get an associated investment project interaction."""
+        project_creator = AdviserFactory()
+        project = InvestmentProjectFactory(created_by=project_creator)
+        interaction = InvestmentProjectInteractionFactory(investment_project=project)
+        requester = create_test_user(
+            permission_codenames=[InteractionPermission.read_associated_investmentproject],
+            dit_team=project_creator.dit_team,
+        )
+        api_client = self.create_api_client(user=requester)
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data == {
+            'id': response_data['id'],
+            'kind': 'interaction',
+            'is_event': None,
+            'communication_channel': {
+                'id': InteractionType.face_to_face.value.id,
+                'name': InteractionType.face_to_face.value.name
+            },
+            'subject': interaction.subject,
+            'date': interaction.date.date().isoformat(),
+            'dit_adviser': {
+                'id': str(interaction.dit_adviser.pk),
+                'first_name': interaction.dit_adviser.first_name,
+                'last_name': interaction.dit_adviser.last_name,
+                'name': interaction.dit_adviser.name
+            },
+            'notes': interaction.notes,
+            'company': None,
+            'contact': {
+                'id': str(interaction.contact.pk),
+                'name': interaction.contact.name
+            },
+            'event': None,
+            'service': {
+                'id': str(Service.trade_enquiry.value.id),
+                'name': Service.trade_enquiry.value.name,
+            },
+            'dit_team': {
+                'id': str(Team.healthcare_uk.value.id),
+                'name': Team.healthcare_uk.value.name,
+            },
+            'investment_project': {
+                'id': str(interaction.investment_project.pk),
+                'name': interaction.investment_project.name,
+                'project_code': interaction.investment_project.project_code,
+            },
+            'archived_documents_url_path': interaction.archived_documents_url_path,
+            'created_by': {
+                'id': str(interaction.created_by.pk),
+                'first_name': interaction.created_by.first_name,
+                'last_name': interaction.created_by.last_name,
+                'name': interaction.created_by.name
+            },
+            'modified_by': {
+                'id': str(interaction.modified_by.pk),
+                'first_name': interaction.modified_by.first_name,
+                'last_name': interaction.modified_by.last_name,
+                'name': interaction.modified_by.name
+            },
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z'
+        }
+
+    def test_restricted_user_cannot_get_non_associated_investment_project_interaction(self):
+        """
+        Test that a restricted user cannot get a non-associated investment project
+        interaction.
+        """
+        interaction = InvestmentProjectInteractionFactory()
+        requester = create_test_user(
+            permission_codenames=[InteractionPermission.read_associated_investmentproject],
+            dit_team=TeamFactory()
+        )
+        api_client = self.create_api_client(user=requester)
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_restricted_user_cannot_get_company_interaction(self):
+        """Test that a restricted user cannot get a company interaction."""
+        interaction = CompanyInteractionFactory()
+        requester = create_test_user(
+            permission_codenames=[InteractionPermission.read_associated_investmentproject],
+            dit_team=TeamFactory()
+        )
+        api_client = self.create_api_client(user=requester)
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+class TestAddInteractionView(APITestMixin):
+    """Tests for the add interaction view."""
 
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_add_interaction(self):
@@ -465,12 +713,171 @@ class TestInteractionV3(APITestMixin):
             ]
         }
 
-    def test_modify_interaction(self):
-        """Modify an existing interaction."""
-        interaction = InteractionFactory(subject='I am a subject')
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_restricted_user_can_add_associated_investment_project_interaction(self):
+        """
+        Test that a restricted user can add an interaction for an associated investment project.
+        """
+        project_creator = AdviserFactory()
+        project = InvestmentProjectFactory(created_by=project_creator)
+        requester = create_test_user(
+            permission_codenames=[InteractionPermission.add_associated_investmentproject]
+        )
+        contact = ContactFactory()
+        url = reverse('api-v3:interaction:collection')
+        response = self.api_client.post(url, {
+            'kind': 'interaction',
+            'contact': contact.pk,
+            'communication_channel': InteractionType.face_to_face.value.id,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': requester.pk,
+            'notes': 'hello',
+            'investment_project': project.pk,
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id
+        }, format='json')
 
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data['dit_adviser']['id'] == str(requester.pk)
+        assert response_data['investment_project']['id'] == str(project.pk)
+        assert response_data['modified_on'] == '2017-04-18T13:25:30.986208Z'
+        assert response_data['created_on'] == '2017-04-18T13:25:30.986208Z'
+
+    def test_restricted_user_cannot_add_non_associated_investment_project_interaction(self):
+        """
+        Test that a restricted user cannot add an interaction for a non-associated investment
+        project.
+        """
+        project = InvestmentProjectFactory()
+        requester = create_test_user(
+            permission_codenames=[InteractionPermission.add_associated_investmentproject]
+        )
+        contact = ContactFactory()
+        url = reverse('api-v3:interaction:collection')
+        api_client = self.create_api_client(user=requester)
+        response = api_client.post(url, {
+            'kind': 'interaction',
+            'contact': contact.pk,
+            'communication_channel': InteractionType.face_to_face.value.id,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': requester.pk,
+            'notes': 'hello',
+            'investment_project': project.pk,
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'investment_project': ["You don't have permission to add an interaction for this "
+                                   'investment project.']
+        }
+
+    def test_restricted_user_cannot_add_company_interaction(self):
+        """Test that a restricted user cannot add a company interaction."""
+        requester = create_test_user(
+            permission_codenames=[InteractionPermission.add_associated_investmentproject]
+        )
+        company = CompanyFactory()
+        contact = ContactFactory()
+        url = reverse('api-v3:interaction:collection')
+        api_client = self.create_api_client(user=requester)
+        response = api_client.post(url, {
+            'kind': 'interaction',
+            'company': company.pk,
+            'contact': contact.pk,
+            'communication_channel': InteractionType.face_to_face.value.id,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': requester.pk,
+            'notes': 'hello',
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'investment_project': ['This field is required.']
+        }
+
+
+class TestUpdateInteractionView(APITestMixin):
+    """Tests for the update interaction view."""
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
+    def test_non_restricted_user_can_update_interaction(self, permissions):
+        """Test that a non-restricted user can update an interaction."""
+        requester = create_test_user(permission_codenames=permissions)
+        interaction = CompanyInteractionFactory(subject='I am a subject')
+
+        api_client = self.create_api_client(user=requester)
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        response = self.api_client.patch(url, {
+        response = api_client.patch(url, {
+            'subject': 'I am another subject',
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['subject'] == 'I am another subject'
+
+    def test_restricted_user_cannot_update_company_interaction(self):
+        """Test that a restricted user cannot update a company interaction."""
+        requester = create_test_user(
+            permission_codenames=[InteractionPermission.change_associated_investmentproject]
+        )
+        interaction = CompanyInteractionFactory(subject='I am a subject')
+
+        api_client = self.create_api_client(user=requester)
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        response = api_client.patch(url, {
+            'subject': 'I am another subject',
+        }, format='json')
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_restricted_user_cannot_update_non_associated_investment_project_interaction(self):
+        """
+        Test that a restricted user cannot update a non-associated investment project interaction.
+        """
+        interaction = InvestmentProjectInteractionFactory(
+            subject='I am a subject',
+        )
+        requester = create_test_user(
+            permission_codenames=[InteractionPermission.change_associated_investmentproject]
+        )
+
+        api_client = self.create_api_client(user=requester)
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        response = api_client.patch(url, {
+            'subject': 'I am another subject',
+        }, format='json')
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_restricted_user_can_update_associated_investment_project_interaction(self):
+        """
+        Test that a restricted user can update an interaction for an associated investment project.
+        """
+        project_creator = AdviserFactory()
+        project = InvestmentProjectFactory(created_by=project_creator)
+        interaction = CompanyInteractionFactory(
+            subject='I am a subject',
+            investment_project=project
+        )
+        requester = create_test_user(
+            permission_codenames=[
+                InteractionPermission.change_associated_investmentproject
+            ],
+            dit_team=project_creator.dit_team
+        )
+
+        api_client = self.create_api_client(user=requester)
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        response = api_client.patch(url, {
             'subject': 'I am another subject',
         }, format='json')
 
@@ -479,7 +886,7 @@ class TestInteractionV3(APITestMixin):
 
     def test_update_read_only_fields(self):
         """Test updating read-only fields."""
-        interaction = InteractionFactory(
+        interaction = CompanyInteractionFactory(
             archived_documents_url_path='old_path',
         )
 
@@ -527,7 +934,7 @@ class TestInteractionV3(APITestMixin):
 
     def test_date_validation(self):
         """Test validation when an invalid date is provided."""
-        interaction = InteractionFactory()
+        interaction = CompanyInteractionFactory()
 
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
         response = self.api_client.patch(url, {
@@ -540,13 +947,17 @@ class TestInteractionV3(APITestMixin):
             'Datetime has wrong format. Use one of these formats instead: YYYY-MM-DD.'
         ]
 
+
+class TestListInteractionsView(APITestMixin):
+    """Tests for the list interactions view."""
+
     def test_list_filtered_company(self):
         """List of interactions filtered by company"""
         company1 = CompanyFactory()
         company2 = CompanyFactory()
 
-        InteractionFactory.create_batch(3, company=company1)
-        interactions = InteractionFactory.create_batch(2, company=company2)
+        CompanyInteractionFactory.create_batch(3, company=company1)
+        interactions = CompanyInteractionFactory.create_batch(2, company=company2)
 
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.get(url, {'company_id': company2.id})
@@ -560,8 +971,8 @@ class TestInteractionV3(APITestMixin):
         contact1 = ContactFactory()
         contact2 = ContactFactory()
 
-        InteractionFactory.create_batch(3, contact=contact1)
-        interactions = InteractionFactory.create_batch(2, contact=contact2)
+        CompanyInteractionFactory.create_batch(3, contact=contact1)
+        interactions = CompanyInteractionFactory.create_batch(2, contact=contact2)
 
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.get(url, {'contact_id': contact2.id})
@@ -576,9 +987,9 @@ class TestInteractionV3(APITestMixin):
         project = InvestmentProjectFactory()
         company = CompanyFactory()
 
-        InteractionFactory.create_batch(3, contact=contact)
-        InteractionFactory.create_batch(3, company=company)
-        project_interactions = InteractionFactory.create_batch(
+        CompanyInteractionFactory.create_batch(3, contact=contact)
+        CompanyInteractionFactory.create_batch(3, company=company)
+        project_interactions = CompanyInteractionFactory.create_batch(
             2, investment_project=project
         )
 
@@ -592,4 +1003,61 @@ class TestInteractionV3(APITestMixin):
         assert response_data['count'] == 2
         actual_ids = {i['id'] for i in response_data['results']}
         expected_ids = {str(i.id) for i in project_interactions}
+        assert actual_ids == expected_ids
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    def test_non_restricted_user_can_only_list_relevant_interactions(self, permissions):
+        """Test that a non-restricted user can list all interactions"""
+        requester = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=requester)
+
+        project = InvestmentProjectFactory()
+        company = CompanyFactory()
+        company_interactions = CompanyInteractionFactory.create_batch(3, company=company)
+        project_interactions = CompanyInteractionFactory.create_batch(
+            3, investment_project=project
+        )
+
+        url = reverse('api-v3:interaction:collection')
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 6
+        actual_ids = {i['id'] for i in response_data['results']}
+        expected_ids = {str(i.id) for i in chain(project_interactions, company_interactions)}
+        assert actual_ids == expected_ids
+
+    def test_restricted_user_can_only_associated_interactions(self):
+        """
+        Test that a restricted user can only list interactions for associated investment
+        projects.
+        """
+        creator = AdviserFactory()
+        requester = create_test_user(
+            permission_codenames=[InteractionPermission.read_associated_investmentproject],
+            dit_team=creator.dit_team
+        )
+        api_client = self.create_api_client(user=requester)
+
+        company = CompanyFactory()
+        non_associated_project = InvestmentProjectFactory()
+        associated_project = InvestmentProjectFactory(created_by=creator)
+
+        CompanyInteractionFactory.create_batch(3, company=company)
+        CompanyInteractionFactory.create_batch(
+            3, investment_project=non_associated_project
+        )
+        associated_project_interactions = CompanyInteractionFactory.create_batch(
+            2, investment_project=associated_project
+        )
+
+        url = reverse('api-v3:interaction:collection')
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 2
+        actual_ids = {i['id'] for i in response_data['results']}
+        expected_ids = {str(i.id) for i in associated_project_interactions}
         assert actual_ids == expected_ids

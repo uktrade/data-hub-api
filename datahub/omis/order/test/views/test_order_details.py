@@ -59,9 +59,6 @@ class TestAddOrderDetails(APITestMixin):
                 'vat_status': VATStatus.eu,
                 'vat_number': '01234566789',
                 'vat_verified': True,
-                'billing_contact_name': 'Billing contact name',
-                'billing_email': 'billing@example.com',
-                'billing_phone': '00112233',
                 'billing_address_1': 'Apt 1',
                 'billing_address_2': 'London Street',
                 'billing_address_town': 'London',
@@ -132,9 +129,9 @@ class TestAddOrderDetails(APITestMixin):
             'vat_cost': 0,
             'total_cost': 0,
             'billing_company_name': '',
-            'billing_contact_name': 'Billing contact name',
-            'billing_email': 'billing@example.com',
-            'billing_phone': '00112233',
+            'billing_contact_name': '',
+            'billing_email': '',
+            'billing_phone': '',
             'billing_address_1': 'Apt 1',
             'billing_address_2': 'London Street',
             'billing_address_town': 'London',
@@ -328,6 +325,9 @@ class TestAddOrderDetails(APITestMixin):
                 'product_info': 'lorem ipsum',
                 'permission_to_approach_contacts': 'lorem ipsum',
                 'archived_documents_url_path': '/documents/123',
+                'billing_contact_name': 'John Doe',
+                'billing_email': 'JohnDoe@example.com',
+                'billing_phone': '0123456789',
             },
             format='json'
         )
@@ -336,6 +336,9 @@ class TestAddOrderDetails(APITestMixin):
         assert response.json()['product_info'] == ''
         assert response.json()['permission_to_approach_contacts'] == ''
         assert response.json()['archived_documents_url_path'] == ''
+        assert response.json()['billing_contact_name'] == ''
+        assert response.json()['billing_email'] == ''
+        assert response.json()['billing_phone'] == ''
 
     @pytest.mark.parametrize(
         'vat_status',
@@ -394,41 +397,8 @@ class TestAddOrderDetails(APITestMixin):
         assert response.json() == {
             'billing_address_1': ['This field is required.'],
             'billing_address_town': ['This field is required.'],
-            'billing_address_postcode': ['This field is required.'],
             'billing_address_country': ['This field is required.'],
         }
-
-    @pytest.mark.parametrize(
-        'field,value',
-        (
-            ('billing_contact_name', 'lorem'),
-            ('billing_email', 'billing@example.com'),
-            ('billing_phone', '0011'),
-        )
-    )
-    def test_ok_with_non_address_billing_fields_set(self, field, value):
-        """
-        Test that if a non-address billing field is set, the validation of the
-        billing address is not triggered.
-        E.g. I can set billing email without billing address.
-        """
-        company = CompanyFactory()
-        contact = ContactFactory(company=company)
-        country = Country.france.value
-
-        url = reverse('api-v3:omis:order:list')
-        response = self.api_client.post(
-            url,
-            {
-                'company': {'id': company.pk},
-                'contact': {'id': contact.pk},
-                'primary_market': {'id': country.id},
-                field: value,
-            },
-            format='json'
-        )
-
-        assert response.status_code == status.HTTP_201_CREATED
 
 
 class TestChangeOrderDetails(APITestMixin):
@@ -465,9 +435,6 @@ class TestChangeOrderDetails(APITestMixin):
                 'vat_status': VATStatus.eu,
                 'vat_number': 'new vat number',
                 'vat_verified': False,
-                'billing_contact_name': 'Billing contact name',
-                'billing_email': 'billing@example.com',
-                'billing_phone': '00112233',
                 'billing_address_1': 'Apt 1',
                 'billing_address_2': 'London Street',
                 'billing_address_town': 'London',
@@ -539,9 +506,9 @@ class TestChangeOrderDetails(APITestMixin):
             'vat_cost': order.vat_cost,
             'total_cost': order.total_cost,
             'billing_company_name': order.billing_company_name,
-            'billing_contact_name': 'Billing contact name',
-            'billing_email': 'billing@example.com',
-            'billing_phone': '00112233',
+            'billing_contact_name': order.billing_contact_name,
+            'billing_email': order.billing_email,
+            'billing_phone': order.billing_phone,
             'billing_address_1': 'Apt 1',
             'billing_address_2': 'London Street',
             'billing_address_town': 'London',
@@ -780,6 +747,9 @@ class TestChangeOrderDetails(APITestMixin):
                     'id': uuid.uuid4()
                 },
                 'billing_company_name': 'New Corp',
+                'billing_contact_name': 'John Doe',
+                'billing_email': 'JohnDoe@example.com',
+                'billing_phone': '0123456789',
             },
             format='json'
         )
@@ -804,6 +774,9 @@ class TestChangeOrderDetails(APITestMixin):
         assert not response.json()['cancelled_on']
         assert not response.json()['cancellation_reason']
         assert response.json()['billing_company_name'] != 'New Corp'
+        assert response.json()['billing_contact_name'] != 'John Doe'
+        assert response.json()['billing_email'] != 'JohnDoe@example.com'
+        assert response.json()['billing_phone'] != '0123456789'
 
     @pytest.mark.parametrize(
         'disallowed_status', (
@@ -885,7 +858,6 @@ class TestChangeOrderDetails(APITestMixin):
         assert response.json() == {
             'billing_address_1': ['This field is required.'],
             'billing_address_town': ['This field is required.'],
-            'billing_address_postcode': ['This field is required.'],
             'billing_address_country': ['This field is required.'],
         }
 

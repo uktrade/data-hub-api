@@ -13,7 +13,7 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.interaction.models import Interaction
-from datahub.interaction.test.factories import InteractionFactory, ServiceDeliveryFactory
+from datahub.interaction.test.factories import CompanyInteractionFactory, ServiceDeliveryFactory
 from datahub.metadata.test.factories import TeamFactory
 
 pytestmark = pytest.mark.django_db
@@ -25,23 +25,23 @@ def interactions(setup_es):
     data = []
     with freeze_time('2017-01-01 13:00:00'):
         data.extend([
-            InteractionFactory(
+            CompanyInteractionFactory(
                 subject='Exports meeting',
                 date=dateutil_parse('2017-10-30T00:00:00Z')
             ),
-            InteractionFactory(
+            CompanyInteractionFactory(
                 subject='a coffee',
                 date=dateutil_parse('2017-04-05T00:00:00Z')
             ),
-            InteractionFactory(
+            CompanyInteractionFactory(
                 subject='Email about exhibition',
                 date=dateutil_parse('2016-09-02T00:00:00Z')
             ),
-            InteractionFactory(
+            CompanyInteractionFactory(
                 subject='talking about cats',
                 date=dateutil_parse('2018-02-01T00:00:00Z')
             ),
-            InteractionFactory(
+            CompanyInteractionFactory(
                 subject='Event at HQ',
                 date=dateutil_parse('2018-01-01T00:00:00Z')
             ),
@@ -114,7 +114,7 @@ class TestViews(APITestMixin):
             datetime(2017, 7, 5, 11, 44, 33, tzinfo=utc),
             datetime(2017, 2, 1, 18, 15, 1, tzinfo=utc),
         )
-        InteractionFactory.create_batch(
+        CompanyInteractionFactory.create_batch(
             len(dates),
             date=factory.Iterator(dates)
         )
@@ -238,7 +238,7 @@ class TestViews(APITestMixin):
 
     def test_filter_by_kind(self, setup_es):
         """Tests filtering interaction by kind."""
-        InteractionFactory.create_batch(10),
+        CompanyInteractionFactory.create_batch(10),
         service_deliveries = ServiceDeliveryFactory.create_batch(10)
 
         setup_es.indices.refresh()
@@ -262,7 +262,7 @@ class TestViews(APITestMixin):
     def test_filter_by_company_id(self, setup_es):
         """Tests filtering interaction by company id."""
         companies = CompanyFactory.create_batch(10)
-        InteractionFactory.create_batch(
+        CompanyInteractionFactory.create_batch(
             len(companies),
             company=factory.Iterator(companies)
         )
@@ -286,7 +286,7 @@ class TestViews(APITestMixin):
     def test_filter_by_company_name(self, setup_es):
         """Tests filtering interaction by company name."""
         companies = CompanyFactory.create_batch(10)
-        InteractionFactory.create_batch(
+        CompanyInteractionFactory.create_batch(
             len(companies),
             company=factory.Iterator(companies)
         )
@@ -313,7 +313,7 @@ class TestViews(APITestMixin):
     def test_filter_by_contact_id(self, setup_es):
         """Tests filtering interaction by contact id."""
         contacts = ContactFactory.create_batch(10)
-        InteractionFactory.create_batch(
+        CompanyInteractionFactory.create_batch(
             len(contacts),
             contact=factory.Iterator(contacts)
         )
@@ -338,7 +338,7 @@ class TestViews(APITestMixin):
     def test_filter_by_contact_name(self, setup_es):
         """Tests filtering interaction by contact name."""
         contacts = ContactFactory.create_batch(10)
-        InteractionFactory.create_batch(
+        CompanyInteractionFactory.create_batch(
             len(contacts),
             contact=factory.Iterator(contacts)
         )
@@ -367,8 +367,8 @@ class TestViews(APITestMixin):
     )
     def test_filter_by_created_on_exists(self, setup_es, created_on_exists):
         """Tests filtering interaction by created_on exists."""
-        InteractionFactory.create_batch(3)
-        no_created_on = InteractionFactory.create_batch(3)
+        CompanyInteractionFactory.create_batch(3)
+        no_created_on = CompanyInteractionFactory.create_batch(3)
         for interaction in no_created_on:
             interaction.created_on = None
             interaction.save()
@@ -392,7 +392,7 @@ class TestViews(APITestMixin):
     def test_filter_by_dit_adviser_id(self, setup_es):
         """Tests filtering interaction by dit adviser id."""
         advisers = AdviserFactory.create_batch(10)
-        InteractionFactory.create_batch(
+        CompanyInteractionFactory.create_batch(
             len(advisers),
             dit_adviser=factory.Iterator(advisers)
         )
@@ -419,7 +419,7 @@ class TestViews(APITestMixin):
     def test_filter_by_dit_adviser_name(self, setup_es):
         """Tests filtering interaction by dit adviser name."""
         advisers = AdviserFactory.create_batch(10)
-        InteractionFactory.create_batch(
+        CompanyInteractionFactory.create_batch(
             len(advisers),
             dit_adviser=factory.Iterator(advisers)
         )
@@ -445,9 +445,9 @@ class TestViews(APITestMixin):
 
     def test_filter_by_dit_team(self, setup_es):
         """Tests filtering interaction by dit team."""
-        InteractionFactory.create_batch(5, dit_team_id=constants.Team.crm.value.id)
+        CompanyInteractionFactory.create_batch(5, dit_team_id=constants.Team.crm.value.id)
         dit_team_id = constants.Team.td_events_healthcare.value.id
-        InteractionFactory.create_batch(5, dit_team_id=dit_team_id)
+        CompanyInteractionFactory.create_batch(5, dit_team_id=dit_team_id)
 
         setup_es.indices.refresh()
 
@@ -468,12 +468,12 @@ class TestViews(APITestMixin):
 
     def test_filter_by_communication_channel(self, setup_es):
         """Tests filtering interaction by interaction type."""
-        InteractionFactory.create_batch(
+        CompanyInteractionFactory.create_batch(
             5,
             communication_channel_id=constants.InteractionType.email_website.value.id
         )
         communication_channel_id = constants.InteractionType.social_media.value.id
-        InteractionFactory.create_batch(
+        CompanyInteractionFactory.create_batch(
             5,
             communication_channel_id=communication_channel_id
         )
@@ -498,12 +498,12 @@ class TestViews(APITestMixin):
 
     def test_filter_by_service(self, setup_es):
         """Tests filtering interaction by service."""
-        InteractionFactory.create_batch(
+        CompanyInteractionFactory.create_batch(
             5,
             service_id=constants.Service.trade_enquiry.value.id
         )
         service_id = constants.Service.account_management.value.id
-        InteractionFactory.create_batch(
+        CompanyInteractionFactory.create_batch(
             5,
             service_id=service_id
         )

@@ -155,7 +155,7 @@ class OperatorRule(BaseRule):
 
     def __call__(self, combiner) -> bool:
         """Test whether the rule passes or fails."""
-        value = combiner.get_value(self.field)
+        value = combiner[self.field]
         return self._operator(value)
 
 
@@ -255,7 +255,8 @@ class RulesBasedValidator:
         combiner = DataCombiner(
             instance=self._serializer.instance,
             update_data=data,
-            serializer=self._serializer
+            serializer=self._serializer,
+            model=self._serializer.Meta.model,
         )
         for rule in self._rules:
             if not rule(combiner):

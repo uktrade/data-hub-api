@@ -21,11 +21,36 @@ from datahub.documents.models import Document
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-class Permissions(StrEnum):
+class InvestmentProjectPermission(StrEnum):
     """
     Permission codename constants.
 
     (Defined here rather than in permissions to avoid an import of that module.)
+
+
+    The following codenames mean that the user can read or change all investment projects:
+
+    read_all_investmentproject
+    change_all_investmentproject
+
+
+    The following codenames mean that the user can only read or change investment projects that
+    they are associated with:
+
+    read_associated_investmentproject
+    change_associated_investmentproject
+
+    An associated project means one that was created by an adviser in the same team,
+    or an adviser in the same team has been linked to the project via one of the attributes in
+    InvestmentProject._ASSOCIATED_ADVISER_TO_ONE_FIELDS or
+    InvestmentProject._ASSOCIATED_ADVISER_TO_MANY_FIELDS.
+
+
+    Note that if both *_all_* and *_associated_* permissions are assigned to the  same user,
+    the *_all_* permission will be the effective one.
+
+    add_investmentproject and delete_investmentproject take on their normal meanings i.e. a
+    project can be added, and any project can be deleted.
     """
 
     read_all = 'read_all_investmentproject'
@@ -318,9 +343,18 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
 
     class Meta:
         permissions = (
-            (Permissions.read_all, 'Can read all investment project'),
-            (Permissions.read_associated, 'Can read associated investment project'),
-            (Permissions.change_associated, 'Can change associated investment project'),
+            (
+                InvestmentProjectPermission.read_all,
+                'Can read all investment project'
+            ),
+            (
+                InvestmentProjectPermission.read_associated,
+                'Can read associated investment project'
+            ),
+            (
+                InvestmentProjectPermission.change_associated,
+                'Can change associated investment project'
+            ),
         )
         default_permissions = (
             'add',
@@ -364,6 +398,12 @@ class InvestmentProjectTeamMember(models.Model):
     ManyToManyField with through is not used in the InvestmentProject model, because
     it makes working with DRF serialisers difficult (as it would return advisers rather than
     instances of this model).
+
+    No default permissions are defined on this model as permissions from the InvestmentProject
+    model are used and enforced instead. This is to avoid unnecessary complexity in the
+    permissions model, where permissions on both models would need to be checked. (A custom read
+    permission is also not defined for the same reason, but also because team members are
+    returned in investment project responses in the investment and search APIs.)
     """
 
     investment_project = models.ForeignKey(
@@ -378,8 +418,7 @@ class InvestmentProjectTeamMember(models.Model):
 
     class Meta:
         unique_together = (('investment_project', 'adviser'),)
-        permissions = (('read_investmentprojectteammember',
-                        'Can read investment project team member'),)
+        default_permissions = ()
 
 
 class InvestmentProjectCode(models.Model):

@@ -5,8 +5,9 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import ContactFactory
-from datahub.core.test_utils import APITestMixin
-from datahub.interaction.test.factories import InteractionFactory
+from datahub.core.test_utils import APITestMixin, create_test_user
+from datahub.interaction.models import InteractionPermission
+from datahub.interaction.test.factories import CompanyInteractionFactory
 
 
 class TestDashboard(APITestMixin):
@@ -20,7 +21,7 @@ class TestDashboard(APITestMixin):
 
         for creation_datetime in datetimes:
             with freeze_time(creation_datetime):
-                interactions.append(InteractionFactory(dit_adviser=self.user))
+                interactions.append(CompanyInteractionFactory(dit_adviser=self.user))
                 contacts.append(ContactFactory(created_by=self.user))
 
         setup_es.indices.refresh()
@@ -49,7 +50,7 @@ class TestDashboard(APITestMixin):
 
     def test_intelligent_homepage_limit(self, setup_es):
         """Test the limit param."""
-        InteractionFactory.create_batch(15, dit_adviser=self.user)
+        CompanyInteractionFactory.create_batch(15, dit_adviser=self.user)
         ContactFactory.create_batch(15, created_by=self.user)
 
         setup_es.indices.refresh()
@@ -63,3 +64,47 @@ class TestDashboard(APITestMixin):
         response_data = response.json()
         assert len(response_data['contacts']) == 10
         assert len(response_data['interactions']) == 10
+
+    def test_contact_permission(self, setup_es):
+        """Test that the contact read permission is enforced."""
+        requester = create_test_user(
+            permission_codenames=(InteractionPermission.read_all,)
+        )
+        CompanyInteractionFactory.create_batch(5, dit_adviser=requester)
+        ContactFactory.create_batch(5, created_by=requester)
+
+        setup_es.indices.refresh()
+
+        api_client = self.create_api_client(user=requester)
+
+        url = reverse('dashboard:intelligent-homepage')
+        response = api_client.get(url, data={
+            'limit': 10
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['contacts'] == []
+        assert len(response_data['interactions']) == 5
+
+    def test_interaction_permission(self, setup_es):
+        """Test that the interaction read permission is enforced."""
+        requester = create_test_user(
+            permission_codenames=('read_contact',)
+        )
+        CompanyInteractionFactory.create_batch(5, dit_adviser=requester)
+        ContactFactory.create_batch(5, created_by=requester)
+
+        setup_es.indices.refresh()
+
+        api_client = self.create_api_client(user=requester)
+
+        url = reverse('dashboard:intelligent-homepage')
+        response = api_client.get(url, data={
+            'limit': 10
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert len(response_data['contacts']) == 5
+        assert response_data['interactions'] == []
