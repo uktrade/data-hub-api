@@ -1,7 +1,9 @@
 from functools import partial
+from operator import not_
 
 from django.conf import settings
 from django.db import models
+from django.utils.translation import ugettext_lazy
 from rest_framework import serializers
 
 from datahub.company.models import (
@@ -87,6 +89,13 @@ NestedAdviserField = partial(
 class ContactSerializer(PermittedFieldsModelSerializer):
     """Contact serializer for writing operations V3."""
 
+    default_error_messages = {
+        'contact_preferences_required': ugettext_lazy(
+            'A contact should have at least one way of being contacted. Please select either '
+            'email or phone, or both.'
+        )
+    }
+
     title = NestedRelatedField(
         meta_models.Title, required=False, allow_null=True
     )
@@ -145,7 +154,23 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         read_only_fields = (
             'archived_documents_url_path',
         )
+        validators = [
+            RulesBasedValidator(
+                ValidationRule(
+                    'contact_preferences_required',
+                    OperatorRule('contactable_by_email', bool),
+                    when=OperatorRule('contactable_by_phone', not_),
+                ),
+                ValidationRule(
+                    'contact_preferences_required',
+                    OperatorRule('contactable_by_phone', bool),
+                    when=OperatorRule('contactable_by_email', not_),
+                ),
+            ),
+        ]
         extra_kwargs = {
+            'contactable_by_email': {'default': True},
+            'contactable_by_phone': {'default': True},
             'permissions': {
                 f'company.{ContactPermission.read_contact_document}': 'archived_documents_url_path'
             }

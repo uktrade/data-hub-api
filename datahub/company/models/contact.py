@@ -95,14 +95,6 @@ class Contact(ArchivableModel, BaseModel):
                         if not getattr(self, field)]
         return {field: ['This field may not be null.'] for field in empty_fields}
 
-    def validate_contact_preferences(self):
-        """At least one of the contract preferences must be set to True."""
-        if not self.contactable_by_email and not self.contactable_by_phone:
-            error_message = 'A contact should have at least one way of being contacted. ' \
-                            'Please select either email or phone, or both'
-            raise ValidationError({'contactable_by_email': [error_message],
-                                   'contactable_by_phone': [error_message]})
-
     def validate_address(self):
         """Custom validation for address.
 
@@ -134,7 +126,6 @@ class Contact(ArchivableModel, BaseModel):
     def clean(self):
         """Custom validation."""
         self.validate_address()
-        self.validate_contact_preferences()
         super().clean()
 
     def save(self, *args, **kwargs):
