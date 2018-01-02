@@ -1,7 +1,9 @@
 from functools import partial
+from operator import not_
 
 from django.conf import settings
 from django.db import models
+from django.utils.translation import ugettext_lazy
 from rest_framework import serializers
 
 from datahub.company.models import (
@@ -12,6 +14,8 @@ from datahub.core.constants import Country
 from datahub.core.serializers import NestedRelatedField, RelaxedURLField
 from datahub.core.validators import (
     AddressValidator,
+    AllIsBlankRule,
+    AnyIsNotBlankRule,
     EqualsRule,
     OperatorRule,
     RequiredUnlessAlreadyBlankValidator,
@@ -87,6 +91,19 @@ NestedAdviserField = partial(
 class ContactSerializer(PermittedFieldsModelSerializer):
     """Contact serializer for writing operations V3."""
 
+    default_error_messages = {
+        'contact_preferences_required': ugettext_lazy(
+            'A contact should have at least one way of being contacted. Please select either '
+            'email or phone, or both.'
+        ),
+        'address_same_as_company_and_has_address': ugettext_lazy(
+            'Please select either address_same_as_company or enter an address manually, not both!'
+        ),
+        'no_address': ugettext_lazy(
+            'Please select either address_same_as_company or enter an address manually.'
+        ),
+    }
+
     title = NestedRelatedField(
         meta_models.Title, required=False, allow_null=True
     )
@@ -145,7 +162,36 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         read_only_fields = (
             'archived_documents_url_path',
         )
+        validators = [
+            RulesBasedValidator(
+                ValidationRule(
+                    'contact_preferences_required',
+                    OperatorRule('contactable_by_email', bool),
+                    when=OperatorRule('contactable_by_phone', not_),
+                ),
+                ValidationRule(
+                    'contact_preferences_required',
+                    OperatorRule('contactable_by_phone', bool),
+                    when=OperatorRule('contactable_by_email', not_),
+                ),
+                ValidationRule(
+                    'address_same_as_company_and_has_address',
+                    OperatorRule('address_same_as_company', not_),
+                    when=AnyIsNotBlankRule(*Contact.ADDRESS_VALIDATION_MAPPING.keys()),
+                ),
+                ValidationRule(
+                    'no_address',
+                    OperatorRule('address_same_as_company', bool),
+                    when=AllIsBlankRule(*Contact.ADDRESS_VALIDATION_MAPPING.keys()),
+                ),
+            ),
+            # Note: This is deliberately after RulesBasedValidator, so that
+            # address_same_as_company rules run first.
+            AddressValidator(lazy=True, fields_mapping=Contact.ADDRESS_VALIDATION_MAPPING)
+        ]
         extra_kwargs = {
+            'contactable_by_email': {'default': True},
+            'contactable_by_phone': {'default': True},
             'permissions': {
                 f'company.{ContactPermission.read_contact_document}': 'archived_documents_url_path'
             }
