@@ -11,8 +11,12 @@ from datahub.company.models import (
 from datahub.core.constants import Country
 from datahub.core.serializers import NestedRelatedField, RelaxedURLField
 from datahub.core.validators import (
-    EqualsRule, OperatorRule, RequiredUnlessAlreadyBlankValidator, RulesBasedValidator,
-    ValidationRule
+    AddressValidator,
+    EqualsRule,
+    OperatorRule,
+    RequiredUnlessAlreadyBlankValidator,
+    RulesBasedValidator,
+    ValidationRule,
 )
 from datahub.metadata import models as meta_models
 
@@ -279,6 +283,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                                     Country.united_kingdom.value.id),
                 ),
             ),
+            AddressValidator(lazy=True, fields_mapping=Company.TRADING_ADDRESS_VALIDATION_MAPPING),
         ]
         extra_kwargs = {
             'permissions': {
