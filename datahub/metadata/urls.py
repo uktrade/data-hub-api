@@ -1,6 +1,6 @@
-from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
 
-urlpatterns = [url(*args, **kwargs) for args, kwargs in views.urls_args]
+urlpatterns = [path(*args, **kwargs) for args, kwargs in views.urls_args]

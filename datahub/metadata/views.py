@@ -21,5 +21,5 @@ urls_args = []
 # programmatically generate metadata views
 for name, mapping in registry.mappings.items():
     fn = partial(metadata_view, mapping=mapping)
-    path = fr'^{name}/$'
+    path = f'{name}/'
     urls_args.append(((path, fn), {'name': name}))

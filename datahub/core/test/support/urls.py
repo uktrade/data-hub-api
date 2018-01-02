@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 
 from .views import MyDisableableModelViewset
 
@@ -7,5 +7,5 @@ collection = MyDisableableModelViewset.as_view({
 })
 
 urlpatterns = [
-    url(r'^test-disableable/$', collection, name='test-disableable-collection'),
+    path('test-disableable/', collection, name='test-disableable-collection'),
 ]
