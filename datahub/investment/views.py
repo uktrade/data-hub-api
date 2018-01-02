@@ -104,8 +104,8 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
 class _ModifiedOnFilter(FilterSet):
     """Filter set for the modified-since view."""
 
-    modified_on__gte = IsoDateTimeFilter(name='modified_on', lookup_expr='gte')
-    modified_on__lte = IsoDateTimeFilter(name='modified_on', lookup_expr='lte')
+    modified_on__gte = IsoDateTimeFilter(field_name='modified_on', lookup_expr='gte')
+    modified_on__lte = IsoDateTimeFilter(field_name='modified_on', lookup_expr='lte')
 
     class Meta:
         model = InvestmentProject
