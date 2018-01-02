@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 
 from datahub.interaction.views import InteractionViewSet
 
@@ -13,6 +13,6 @@ item = InteractionViewSet.as_view({
 })
 
 urlpatterns = [
-    url(r'^interaction$', collection, name='collection'),
-    url(r'^interaction/(?P<pk>[0-9a-z-]{36})$', item, name='item'),
+    path('interaction', collection, name='collection'),
+    path('interaction/<uuid:pk>', item, name='item'),
 ]

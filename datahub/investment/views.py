@@ -170,7 +170,7 @@ class IProjectTeamMembersViewSet(CoreViewSetV3):
         """
         data = kwargs.get('data')
         if data is not None:
-            data['investment_project'] = self.kwargs['project_pk']
+            data['investment_project'] = str(self.kwargs['project_pk'])
         return super().get_serializer(*args, **kwargs)
 
     def create(self, request, *args, **kwargs):
