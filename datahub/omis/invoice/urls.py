@@ -1,12 +1,12 @@
-from django.conf.urls import url
+from django.urls import path, re_path
 
 from .views import InvoiceViewSet, PublicInvoiceViewSet
 
 
 # internal frontend API
 internal_frontend_urls = [
-    url(
-        r'^order/(?P<order_pk>[0-9a-z-]{36})/invoice$',
+    path(
+        'order/<uuid:order_pk>/invoice',
         InvoiceViewSet.as_view({'get': 'retrieve'}),
         name='detail'
     ),
@@ -14,7 +14,7 @@ internal_frontend_urls = [
 
 # public facing API
 public_urls = [
-    url(
+    re_path(
         r'^order/(?P<public_token>[0-9A-Za-z_\-]{50})/invoice$',
         PublicInvoiceViewSet.as_view({'get': 'retrieve'}),
         name='detail'

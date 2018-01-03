@@ -1,6 +1,6 @@
 """API URL config."""
 
-from django.conf.urls import include, url
+from django.urls import path, include
 from rest_framework import routers
 
 from datahub.company import urls as company_urls
@@ -24,17 +24,17 @@ v1_urls = router_v1.urls
 # API V3
 
 v3_urls = [
-    url(r'^', include((company_urls.contact_urls, 'contact'), namespace='contact')),
-    url(r'^', include((company_urls.company_urls, 'company'), namespace='company')),
-    url(r'^', include((company_urls.ch_company_urls, 'ch-company'), namespace='ch-company')),
-    url(r'^', include((event_urls, 'event'), namespace='event')),
-    url(r'^', include((interaction_urls, 'interaction'), namespace='interaction')),
-    url(r'^', include((investment_urls, 'investment'), namespace='investment')),
-    url(r'^', include((leads_urls, 'business-leads'), namespace='business-leads')),
-    url(r'^', include((search_urls, 'search'), namespace='search')),
-    url(r'^omis/', include((omis_urls.internal_frontend_urls, 'omis'), namespace='omis')),
-    url(
-        r'^omis/public/',
+    path('', include((company_urls.contact_urls, 'contact'), namespace='contact')),
+    path('', include((company_urls.company_urls, 'company'), namespace='company')),
+    path('', include((company_urls.ch_company_urls, 'ch-company'), namespace='ch-company')),
+    path('', include((event_urls, 'event'), namespace='event')),
+    path('', include((interaction_urls, 'interaction'), namespace='interaction')),
+    path('', include((investment_urls, 'investment'), namespace='investment')),
+    path('', include((leads_urls, 'business-leads'), namespace='business-leads')),
+    path('', include((search_urls, 'search'), namespace='search')),
+    path('omis/', include((omis_urls.internal_frontend_urls, 'omis'), namespace='omis')),
+    path(
+        'omis/public/',
         include((omis_urls.public_urls, 'omis-public'), namespace='omis-public')
     ),
 ]
