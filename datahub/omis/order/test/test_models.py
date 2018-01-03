@@ -375,6 +375,7 @@ class TestAcceptQuote:
         assert order.invoice.billing_address_postcode == order.billing_address_postcode
         assert order.invoice.billing_address_country == order.billing_address_country
         assert order.invoice.po_number == order.po_number
+        assert order.invoice.contact_email == order.get_current_contact_email()
 
     @pytest.mark.parametrize(
         'disallowed_status',

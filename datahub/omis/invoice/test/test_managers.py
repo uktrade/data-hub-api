@@ -50,3 +50,4 @@ class TestInvoiceManager:
         assert invoice.invoice_address_postcode == constants.DIT_ADDRESS_POSTCODE
         assert str(invoice.invoice_address_country.pk) == constants.DIT_ADDRESS_COUNTRY_ID
         assert invoice.invoice_vat_number == constants.DIT_VAT_NUMBER
+        assert invoice.contact_email == order.get_current_contact_email()
