@@ -728,6 +728,155 @@ class TestAddCompany(APITestMixin):
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json()['website'] == expected_website
 
+    def test_add_uk_establishment(self):
+        """Test adding a UK establishment."""
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, format='json', data={
+            'name': 'Acme',
+            'trading_name': 'Trading name',
+            'business_type': {'id': BusinessType.uk_establishment.value.id},
+            'company_number': 'BR000006',
+            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
+            'registered_address_country': {
+                'id': Country.united_kingdom.value.id
+            },
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'uk_region': {'id': UKRegion.england.value.id},
+            'headquarter_type': {'id': HeadquarterType.ghq.value.id},
+            'classification': {'id': CompanyClassification.tier_a.value.id},
+        })
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.json()['company_number'] == 'BR000006'
+
+    def test_cannot_add_uk_establishment_without_number(self):
+        """Test that a UK establishment cannot be added without a company number."""
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, format='json', data={
+            'name': 'Acme',
+            'trading_name': 'Trading name',
+            'business_type': {'id': BusinessType.uk_establishment.value.id},
+            'company_number': '',
+            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
+            'registered_address_country': {
+                'id': Country.united_kingdom.value.id
+            },
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'uk_region': {'id': UKRegion.england.value.id},
+            'headquarter_type': {'id': HeadquarterType.ghq.value.id},
+            'classification': {'id': CompanyClassification.tier_a.value.id},
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'company_number': ['This field is required.']
+        }
+
+    def test_cannot_add_uk_establishment_as_foreign_company(self):
+        """Test that adding a UK establishment fails if its country is not UK."""
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, format='json', data={
+            'name': 'Acme',
+            'trading_name': 'Trading name',
+            'business_type': {'id': BusinessType.uk_establishment.value.id},
+            'company_number': 'BR000006',
+            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
+            'registered_address_country': {
+                'id': Country.united_states.value.id
+            },
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'uk_region': {'id': UKRegion.england.value.id},
+            'headquarter_type': {'id': HeadquarterType.ghq.value.id},
+            'classification': {'id': CompanyClassification.tier_a.value.id},
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'registered_address_country':
+                ['A UK establishment (branch of non-UK company) must be in the UK.']
+        }
+
+    def test_cannot_add_uk_establishment_invalid_prefix(self):
+        """
+        Test that adding a UK establishment fails if its company number does not start with BR.
+        """
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, format='json', data={
+            'name': 'Acme',
+            'trading_name': 'Trading name',
+            'business_type': {'id': BusinessType.uk_establishment.value.id},
+            'company_number': 'SC000006',
+            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
+            'registered_address_country': {
+                'id': Country.united_kingdom.value.id
+            },
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'uk_region': {'id': UKRegion.england.value.id},
+            'headquarter_type': {'id': HeadquarterType.ghq.value.id},
+            'classification': {'id': CompanyClassification.tier_a.value.id},
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'company_number':
+                ['This must be a valid UK establishment number, beginning with BR.']
+        }
+
+    def test_cannot_add_uk_establishment_invalid_characters(self):
+        """
+        Test that adding a UK establishment fails if its company number contains invalid
+        characters.
+        """
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, format='json', data={
+            'name': 'Acme',
+            'trading_name': 'Trading name',
+            'business_type': {'id': BusinessType.uk_establishment.value.id},
+            'company_number': 'BR000444é',
+            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
+            'registered_address_country': {
+                'id': Country.united_kingdom.value.id
+            },
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'uk_region': {'id': UKRegion.england.value.id},
+            'headquarter_type': {'id': HeadquarterType.ghq.value.id},
+            'classification': {'id': CompanyClassification.tier_a.value.id},
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'company_number':
+                ['This field can only contain the letters A to Z and numbers (no symbols, '
+                 'punctuation or spaces).']
+        }
+
+    def test_no_company_number_validation_for_normal_uk_companies(self):
+        """Test that no validation is done on company number for normal companies."""
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, format='json', data={
+            'name': 'Acme',
+            'trading_name': 'Trading name',
+            'business_type': {'id': BusinessType.private_limited_company.value.id},
+            'company_number': 'sc000444é',
+            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
+            'registered_address_country': {
+                'id': Country.united_kingdom.value.id
+            },
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'uk_region': {'id': UKRegion.england.value.id},
+            'headquarter_type': {'id': HeadquarterType.ghq.value.id},
+            'classification': {'id': CompanyClassification.tier_a.value.id},
+        })
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.json()['company_number'] == 'sc000444é'
+
 
 class TestArchiveCompany(APITestMixin):
     """Archive company tests."""

@@ -20,6 +20,11 @@ class BusinessType(Enum):
     public_limited_company = Constant(
         'Public limited company', 'dac8c591-03e7-e611-bca1-e4115bead28a'
     )
+    # These are called UK establishments by Companies House and in law, but we are calling them
+    # branches in the front end.
+    uk_establishment = Constant(
+        'UK branch of foreign company (BR)', 'b0730fc6-fcce-4071-bdab-ba8de4f4fc98'
+    )
 
 
 class Country(Enum):
