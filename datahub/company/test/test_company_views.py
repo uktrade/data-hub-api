@@ -17,8 +17,8 @@ from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 
 
-class TestCompany(APITestMixin):
-    """Company test case."""
+class TestListCompanies(APITestMixin):
+    """Tests for listing companies."""
 
     def test_companies_list_no_permissions(self):
         """Should return 403"""
@@ -77,6 +77,10 @@ class TestCompany(APITestMixin):
             company['archived_documents_url_path'] == 'hello world'
             for company in response.data['results']
         )
+
+
+class TestGetCompany(APITestMixin):
+    """Tests for getting a company."""
 
     def test_get_company_without_read_document_permission(self):
         """Tests the company item view without read document permission."""
@@ -319,6 +323,30 @@ class TestCompany(APITestMixin):
 
         assert actual_projects == expected_projects
 
+    @pytest.mark.parametrize(
+        'input_website,expected_website', (
+            ('www.google.com', 'http://www.google.com'),
+            ('http://www.google.com', 'http://www.google.com'),
+            ('https://www.google.com', 'https://www.google.com'),
+            ('', ''),
+            (None, None),
+        )
+    )
+    def test_get_company_with_website(self, input_website, expected_website):
+        """Test add new company with trading_address."""
+        company = CompanyFactory(
+            website=input_website
+        )
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['website'] == expected_website
+
+
+class TestUpdateCompany(APITestMixin):
+    """Tests for updating a single company."""
+
     def test_update_company(self):
         """Test company update."""
         company = CompanyFactory(
@@ -416,6 +444,60 @@ class TestCompany(APITestMixin):
         assert response.json() == {
             'trading_name': ['Ensure this field has no more than 255 characters.']
         }
+
+    @pytest.mark.parametrize('field,value', (
+        ('sector', Sector.aerospace_assembly_aircraft.value.id),
+    ))
+    def test_update_non_null_field_to_null(self, field, value):
+        """
+        Tests setting fields to null that are currently non-null, and are allowed to be null
+        when already null.
+        """
+        creation_data = {
+            'name': 'Foo ltd.',
+            'registered_address_1': 'Hello st.',
+            'registered_address_town': 'Fooland',
+            'registered_address_country_id': Country.united_states.value.id,
+            f'{field}_id': value
+        }
+        company = CompanyFactory(**creation_data)
+
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, {
+            field: None,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            field: ['This field is required.'],
+        }
+
+    @pytest.mark.parametrize('field', ('sector',))
+    def test_update_null_field_to_null(self, field):
+        """
+        Tests setting fields to null that are currently null, and are allowed to be null
+        when already null.
+        """
+        creation_data = {
+            'name': 'Foo ltd.',
+            'registered_address_1': 'Hello st.',
+            'registered_address_town': 'Fooland',
+            'registered_address_country_id': Country.united_states.value.id,
+            f'{field}_id': None
+        }
+        company = CompanyFactory(**creation_data)
+
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, {
+            field: None,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()[field] is None
+
+
+class TestAddCompany(APITestMixin):
+    """Tests for adding a company."""
 
     def test_add_uk_company(self):
         """Test add new UK company."""
@@ -615,76 +697,6 @@ class TestCompany(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json()[field] == ['This field is required.']
 
-    @pytest.mark.parametrize('field,value', (
-        ('sector', Sector.aerospace_assembly_aircraft.value.id),
-    ))
-    def test_update_non_null_field_to_null(self, field, value):
-        """
-        Tests setting fields to null that are currently non-null, and are allowed to be null
-        when already null.
-        """
-        creation_data = {
-            'name': 'Foo ltd.',
-            'registered_address_1': 'Hello st.',
-            'registered_address_town': 'Fooland',
-            'registered_address_country_id': Country.united_states.value.id,
-            f'{field}_id': value
-        }
-        company = CompanyFactory(**creation_data)
-
-        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.patch(url, {
-            field: None,
-        }, format='json')
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {
-            field: ['This field is required.'],
-        }
-
-    @pytest.mark.parametrize('field', ('sector',))
-    def test_update_null_field_to_null(self, field):
-        """
-        Tests setting fields to null that are currently null, and are allowed to be null
-        when already null.
-        """
-        creation_data = {
-            'name': 'Foo ltd.',
-            'registered_address_1': 'Hello st.',
-            'registered_address_town': 'Fooland',
-            'registered_address_country_id': Country.united_states.value.id,
-            f'{field}_id': None
-        }
-        company = CompanyFactory(**creation_data)
-
-        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.patch(url, {
-            field: None,
-        }, format='json')
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json()[field] is None
-
-    @pytest.mark.parametrize(
-        'input_website,expected_website', (
-            ('www.google.com', 'http://www.google.com'),
-            ('http://www.google.com', 'http://www.google.com'),
-            ('https://www.google.com', 'https://www.google.com'),
-            ('', ''),
-            (None, None),
-        )
-    )
-    def test_get_company_with_website(self, input_website, expected_website):
-        """Test add new company with trading_address."""
-        company = CompanyFactory(
-            website=input_website
-        )
-        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json()['website'] == expected_website
-
     @pytest.mark.parametrize(
         'input_website,expected_website', (
             ('www.google.com', 'http://www.google.com'),
@@ -715,6 +727,10 @@ class TestCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json()['website'] == expected_website
+
+
+class TestArchiveCompany(APITestMixin):
+    """Archive company tests."""
 
     def test_archive_company_no_reason(self):
         """Test company archive."""
@@ -754,6 +770,10 @@ class TestCompany(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived']
         assert response.data['archived_reason'] == 'foo'
+
+
+class TestUnarchiveCompany(APITestMixin):
+    """Unarchive company tests."""
 
     def test_unarchive_company_invalid_address(self):
         """
