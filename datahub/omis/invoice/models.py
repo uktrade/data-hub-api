@@ -49,6 +49,11 @@ class Invoice(BaseModel):
     invoice_vat_number = models.CharField(max_length=100, blank=True)
     payment_due_date = models.DateField()
 
+    contact_email = models.EmailField(
+        max_length=MAX_LENGTH, blank=True,
+        help_text='Email address of the contact at the time of invoice creation.'
+    )
+
     # legacy fields, only meant to be used in readonly mode as reference
     billing_contact_name = models.CharField(
         max_length=MAX_LENGTH, blank=True, editable=False,

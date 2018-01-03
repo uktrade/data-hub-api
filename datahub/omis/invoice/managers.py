@@ -33,5 +33,6 @@ class InvoiceManager(models.Manager):
             invoice_address_county=constants.DIT_ADDRESS_COUNTY,
             invoice_address_postcode=constants.DIT_ADDRESS_POSTCODE,
             invoice_address_country_id=constants.DIT_ADDRESS_COUNTRY_ID,
-            invoice_vat_number=constants.DIT_VAT_NUMBER
+            invoice_vat_number=constants.DIT_VAT_NUMBER,
+            contact_email=order.get_current_contact_email()
         )
