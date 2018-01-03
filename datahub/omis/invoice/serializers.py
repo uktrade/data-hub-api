@@ -10,16 +10,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
     """Invoice DRF serializer."""
 
     invoice_address_country = NestedRelatedField(Country)
-
-    billing_contact_name = serializers.ReadOnlyField(source='order.billing_contact_name')
-    billing_company_name = serializers.ReadOnlyField(source='order.billing_company_name')
-    billing_address_1 = serializers.ReadOnlyField(source='order.billing_address_1')
-    billing_address_2 = serializers.ReadOnlyField(source='order.billing_address_2')
-    billing_address_county = serializers.ReadOnlyField(source='order.billing_address_county')
-    billing_address_postcode = serializers.ReadOnlyField(source='order.billing_address_postcode')
-    billing_address_town = serializers.ReadOnlyField(source='order.billing_address_town')
-    billing_address_country = NestedRelatedField(Country, source='order.billing_address_country')
-    po_number = serializers.ReadOnlyField(source='order.po_number')
+    billing_address_country = NestedRelatedField(Country)
 
     class Meta:
         model = Invoice
