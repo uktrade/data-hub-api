@@ -17,6 +17,22 @@ class Invoice(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     invoice_number = models.CharField(max_length=100, unique=True)
 
+    po_number = models.CharField(max_length=100, blank=True)
+
+    billing_company_name = models.CharField(max_length=MAX_LENGTH, blank=True)
+    billing_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
+    billing_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
+    billing_address_town = models.CharField(max_length=MAX_LENGTH, blank=True)
+    billing_address_county = models.CharField(max_length=MAX_LENGTH, blank=True)
+    billing_address_postcode = models.CharField(max_length=100, blank=True)
+    billing_address_country = models.ForeignKey(
+        Country,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
+
     invoice_company_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     invoice_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
     invoice_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
@@ -32,6 +48,12 @@ class Invoice(BaseModel):
     )
     invoice_vat_number = models.CharField(max_length=100, blank=True)
     payment_due_date = models.DateField()
+
+    # legacy fields, only meant to be used in readonly mode as reference
+    billing_contact_name = models.CharField(
+        max_length=MAX_LENGTH, blank=True, editable=False,
+        help_text='Legacy field. Billing contact name.'
+    )
 
     objects = InvoiceManager()
 
