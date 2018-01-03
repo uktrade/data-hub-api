@@ -1,7 +1,7 @@
-from django.conf.urls import url
+from django.urls import path
 
 from .views import IntelligentHomepageView
 
 urlpatterns = [
-    url(r'^homepage/$', IntelligentHomepageView.as_view(), name='intelligent-homepage')
+    path('homepage/', IntelligentHomepageView.as_view(), name='intelligent-homepage')
 ]

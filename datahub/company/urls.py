@@ -1,6 +1,6 @@
 """Company views URL config."""
 
-from django.conf.urls import url
+from django.urls import path
 
 from datahub.company.views import (
     CompaniesHouseCompanyViewSet, CompanyAuditViewSet, CompanyViewSet,
@@ -32,14 +32,11 @@ contact_audit = ContactAuditViewSet.as_view({
 })
 
 contact_urls = [
-    url(r'^contact$', contact_collection, name='list'),
-    url(r'^contact/(?P<pk>[0-9a-z-]{36})$', contact_item, name='detail'),
-    url(r'^contact/(?P<pk>[0-9a-z-]{36})/archive$', contact_archive,
-        name='archive'),
-    url(r'^contact/(?P<pk>[0-9a-z-]{36})/unarchive$', contact_unarchive,
-        name='unarchive'),
-    url(r'^contact/(?P<pk>[0-9a-z-]{36})/audit$', contact_audit,
-        name='audit-item'),
+    path('contact', contact_collection, name='list'),
+    path('contact/<uuid:pk>', contact_item, name='detail'),
+    path('contact/<uuid:pk>/archive', contact_archive, name='archive'),
+    path('contact/<uuid:pk>/unarchive', contact_unarchive, name='unarchive'),
+    path('contact/<uuid:pk>/audit', contact_audit, name='audit-item'),
 ]
 
 # COMPANY
@@ -75,19 +72,14 @@ ch_company_item = CompaniesHouseCompanyViewSet.as_view({
 })
 
 company_urls = [
-    url(r'^company$', company_collection, name='collection'),
-    url(r'^company/(?P<pk>[0-9a-z-]{36})$', company_item, name='item'),
-    url(r'^company/(?P<pk>[0-9a-z-]{36})/archive$', company_archive,
-        name='archive'),
-    url(r'^company/(?P<pk>[0-9a-z-]{36})/unarchive$', company_unarchive,
-        name='unarchive'),
-    url(r'^company/(?P<pk>[0-9a-z-]{36})/audit$', company_audit,
-        name='audit-item'),
+    path('company', company_collection, name='collection'),
+    path('company/<uuid:pk>', company_item, name='item'),
+    path('company/<uuid:pk>/archive', company_archive, name='archive'),
+    path('company/<uuid:pk>/unarchive', company_unarchive, name='unarchive'),
+    path('company/<uuid:pk>/audit', company_audit, name='audit-item'),
 ]
 
 ch_company_urls = [
-    url(r'^ch-company$', ch_company_list,
-        name='collection'),
-    url(r'^ch-company/(?P<company_number>[\w]+)$', ch_company_item,
-        name='item'),
+    path('ch-company', ch_company_list, name='collection'),
+    path('ch-company/<company_number>', ch_company_item, name='item'),
 ]
