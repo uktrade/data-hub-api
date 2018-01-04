@@ -81,7 +81,7 @@ def generate_quote_content(order, expires_on):
             'quote_expires_on': expires_on,
             'company_address': escape_markdown(company_address),
             'contact_name': escape_markdown(order.contact.name),
-            'contact_email': order.contact_email or order.contact.email,
+            'contact_email': order.get_current_contact_email(),
             'generic_contact_email': settings.OMIS_GENERIC_CONTACT_EMAIL,
             'lead_assignee_name': escape_markdown(lead_assignee.adviser.name)
         }
