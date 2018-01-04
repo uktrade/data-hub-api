@@ -1,6 +1,7 @@
 #!/bin/bash -xe
-# This file is used as a cmd script with an automatically built backend docker to run User Acceptance Tests against on circleCI.
-# For more information about how this is used please see https://github.com/uktrade/data-hub-frontend
+# This file is used as a cmd script with an automatically built backend docker to run User Acceptance Tests against
+# on circleCI. For more information about how this is used please see
+# https://github.com/uktrade/data-hub-frontend#continuous-integration
 
 dockerize -wait ${POSTGRES_URL} -wait ${ES5_URL} -timeout 60s
 python /app/manage.py migrate
