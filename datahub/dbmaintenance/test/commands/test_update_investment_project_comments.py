@@ -26,7 +26,8 @@ def test_run(s3_stubber):
     object_key = 'test_key'
     csv_content = f"""Id,comments
 00000000-0000-0000-0000-000000000000,Comment 1
-{investment_projects[0].id},Comment 2
+{investment_projects[0].id},"Comment 2
+New Line :)"
 """
 
     s3_stubber.add_response(
@@ -45,7 +46,7 @@ def test_run(s3_stubber):
     for investment_project in investment_projects:
         investment_project.refresh_from_db()
 
-    assert investment_projects[0].comments == 'Comment 2'
+    assert investment_projects[0].comments == 'Comment 2\nNew Line :)'
     assert investment_projects[1].comments == old_comments
 
 
