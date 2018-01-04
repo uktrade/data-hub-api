@@ -1,6 +1,8 @@
 import datetime
 
 import pytest
+from dateutil.parser import parse as dateutil_parse
+from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -105,47 +107,113 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['name'] == 'abc defg'
 
-    @pytest.mark.parametrize('filter,results', (
-        ({'estimated_land_date_before': datetime.datetime(2017, 6, 13, 9, 44, 31, 62870)}, 1, ),
-        ({'estimated_land_date_after': datetime.datetime(2017, 6, 13, 9, 44, 31, 62870)}, 2,),
+    @pytest.mark.parametrize(
+        'query,num_results',
         (
-            {
-                'estimated_land_date_after': datetime.datetime(2017, 6, 13, 9, 44, 31, 62870),
-                'estimated_land_date_before': datetime.datetime(2030, 6, 13, 9, 44, 31, 62870),
-            },
-            1,
-        ),
-    ))
-    def test_search_investment_project_estimated_land_date_json(self, setup_data, filter, results):
+            (
+                {
+                    'estimated_land_date_before': '2017-06-13T09:44:31.062870Z'
+                },
+                1,
+            ),
+            (
+                {
+                    'estimated_land_date_after': '2017-06-13T09:44:31.062870Z'
+                },
+                2,
+            ),
+            (
+                {
+                    'estimated_land_date_after': '2017-06-13T09:44:31.062870Z',
+                    'estimated_land_date_before': '2030-06-13T09:44:31.062870Z',
+                },
+                1,
+            ),
+            (
+                {
+                    'estimated_land_date_before': '2017-06-13T09:44:31.062870Z',
+                    'estimated_land_date_after': '2030-06-13T09:44:31.062870Z',
+                },
+                0,
+            ),
+        )
+    )
+    def test_search_investment_project_estimated_land_date_json(
+        self,
+        setup_data,
+        query,
+        num_results
+    ):
         """Tests detailed investment project search."""
         url = reverse('api-v3:search:investment_project')
 
-        response = self.api_client.post(url, filter, format='json')
+        response = self.api_client.post(url, query, format='json')
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == results
-        assert len(response.data['results']) == results
+        assert response.data['count'] == num_results
+        results = response.data['results']
+        assert len(results) == num_results
 
-    @pytest.mark.parametrize('filter,results', (
-        ({'created_on_before': datetime.datetime(2017, 6, 13, 9, 44, 31, 62870)}, 2, ),
-        ({'created_on_after': datetime.datetime(2017, 6, 13, 9, 44, 31, 62870)}, 3,),
-        (
-            {
-                'created_on_after': datetime.datetime(2017, 6, 13, 9, 44, 31, 62870),
-                'created_on_before': datetime.datetime(2048, 2, 1, 5, 44, 31, 62870),
-            },
-            2,
-        ),
-    ))
-    def test_search_investment_project_created_on_json(self, created_on_data, filter, results):
+        for result in results:
+            estimated_land_date = dateutil_parse(
+                result['estimated_land_date']
+            ).replace(tzinfo=utc)
+            for filter_key, date in query.items():
+                date = dateutil_parse(date).replace(tzinfo=utc)
+                if filter_key == 'estimated_land_date_before':
+                    assert estimated_land_date <= date
+                if filter_key == 'estimated_land_date_after':
+                    assert estimated_land_date >= date
+
+    @pytest.mark.parametrize(
+        'query,num_results', (
+            (
+                {
+                    'created_on_before': '2017-06-13T09:44:31.062870Z'
+                },
+                2,
+            ),
+            (
+                {
+                    'created_on_after': '2017-06-13T09:44:31.062870Z'
+                },
+                3,
+            ),
+            (
+                {
+                    'created_on_after': '2017-06-13T09:44:31.062870Z',
+                    'created_on_before': '2048-02-01T05:44:31.062870Z',
+                },
+                2,
+            ),
+            (
+                {
+                    'created_on_before': '2017-06-13T09:44:31.062870Z',
+                    'created_on_after': '2048-02-01T05:44:31.062870Z',
+                },
+                0,
+            ),
+        )
+    )
+    def test_search_investment_project_created_on_json(self, created_on_data, query, num_results):
         """Tests detailed investment project search."""
         url = reverse('api-v3:search:investment_project')
 
-        response = self.api_client.post(url, filter, format='json')
+        response = self.api_client.post(url, query, format='json')
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == results
-        assert len(response.data['results']) == results
+        assert response.data['count'] == num_results
+        results = response.data['results']
+        assert len(results) == num_results
+
+        for result in results:
+            created_on = dateutil_parse(result['created_on']).replace(tzinfo=utc)
+            for filter_key, date in query.items():
+                date = dateutil_parse(date)
+                if filter_key == 'created_on_before':
+                    assert created_on <= date
+                if filter_key == 'created_on_after':
+                    assert created_on >= date
 
     def test_search_investment_project_invalid_date_json(self, setup_data):
         """Tests detailed investment project search."""
