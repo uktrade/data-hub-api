@@ -68,6 +68,7 @@ class TestListView(APITestMixin):
             'project_code',
             'investment_type',
             'description',
+            'comments',
             'anonymous_description',
             'estimated_land_date',
             'actual_land_date',
@@ -510,6 +511,7 @@ class TestRetrieveView(APITestMixin):
         assert response_data['id'] == str(project.id)
         assert response_data['name'] == project.name
         assert response_data['description'] == project.description
+        assert response_data['comments'] == project.comments
         assert response_data['likelihood_of_landing'] == project.likelihood_of_landing
         assert response_data['project_code'] == project.project_code
         assert response_data['estimated_land_date'] == str(project.estimated_land_date)

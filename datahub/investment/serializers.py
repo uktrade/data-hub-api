@@ -23,6 +23,7 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
     """Serialiser for investment project endpoints."""
 
     incomplete_fields = serializers.SerializerMethodField()
+    comments = serializers.CharField(read_only=True)
     project_code = serializers.CharField(read_only=True)
     investment_type = NestedRelatedField(meta_models.InvestmentType)
     stage = NestedRelatedField(meta_models.InvestmentProjectStage, required=False)
@@ -113,6 +114,7 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
             'name',
             'project_code',
             'description',
+            'comments',
             'anonymous_description',
             'estimated_land_date',
             'actual_land_date',
