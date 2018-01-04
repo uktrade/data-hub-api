@@ -62,7 +62,7 @@ def test_simulate(s3_stubber):
 
     bucket = 'test_bucket'
     object_key = 'test_key'
-    csv_content = f"""id,created_on
+    csv_content = f"""id,createdon
 {investment_projects[0].id},2015-09-29 11:03:20.000
 {investment_projects[1].id},2015-09-29 11:03:20.000
 """
