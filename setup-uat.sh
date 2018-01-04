@@ -8,6 +8,7 @@ python /app/manage.py migrate
 python /app/manage.py loadmetadata
 python /app/manage.py load_omis_metadata
 
+# TODO abstract this into a method in ./manage.py
 echo "import datetime
 from django.utils.timezone import now
 from oauth2_provider.models import AccessToken
