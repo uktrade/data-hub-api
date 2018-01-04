@@ -15,6 +15,8 @@ class SearchInvestmentProjectParams:
 
     FILTER_FIELDS = (
         'client_relationship_manager',
+        'created_on_after',
+        'created_on_before',
         'estimated_land_date_after',
         'estimated_land_date_before',
         'investment_type',
