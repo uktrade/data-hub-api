@@ -271,7 +271,7 @@ class IProjectTeamMemberListSerializer(serializers.ListSerializer):
 
         Unfortunately, overriding validate() results in a error dict being returned and the errors
         being placed in non_field_errors. Hence, run_validation() is overridden instead (to get
-        the expected behaviour of an error list being returned, which each entry corresponding
+        the expected behaviour of an error list being returned, with each entry corresponding
         to each item in the request body).
         """
         value = super().run_validation(data)
