@@ -6,7 +6,7 @@
 #
 asttokens==1.1.7          # via flake8-import-order
 boto3==1.4.8
-botocore==1.8.21          # via boto3, s3transfer
+botocore==1.8.22          # via boto3, s3transfer
 certifi==2017.11.5        # via requests
 chardet==3.0.4            # via chardet, requests
 click==6.7                # via click, pip-tools
@@ -76,7 +76,7 @@ pytest==3.2.3
 python-dateutil==2.6.1
 pytz==2017.3              # via django
 pyyaml==3.12
-raven==6.3.0
+raven==6.4.0
 requests-mock==1.4.0
 requests==2.18.4
 requests_toolbelt==0.8.0
