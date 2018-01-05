@@ -1605,6 +1605,39 @@ class TestReplaceAllTeamMembersView(APITestMixin):
             adviser.id for adviser in advisers
         }
 
+    def test_update_existing_team_members(self):
+        """Test that existing team members can be updated."""
+        project = InvestmentProjectFactory()
+        team_members = InvestmentProjectTeamMemberFactory.create_batch(
+            2, investment_project=project, role='Old role'
+        )
+
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        request_data = [{
+            'adviser': {
+                'id': str(team_member.adviser.pk)
+            },
+            'role': 'New role'
+        } for team_member in team_members]
+        response = self.api_client.put(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data == [{
+            'adviser': {
+                'id': str(team_member.adviser.pk),
+                'first_name': team_member.adviser.first_name,
+                'last_name': team_member.adviser.last_name,
+                'name': team_member.adviser.name,
+            },
+            'investment_project': {
+                'id': str(project.pk),
+                'name': project.name,
+            },
+            'role': 'New role',
+        } for team_member in team_members]
+
     @pytest.mark.parametrize('permissions', (
         (InvestmentProjectPermission.change_all,),
         (InvestmentProjectPermission.change_associated, InvestmentProjectPermission.change_all),
