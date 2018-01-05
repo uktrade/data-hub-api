@@ -321,10 +321,20 @@ class IProjectTeamMemberSerializer(serializers.ModelSerializer):
     investment_project = NestedRelatedField(InvestmentProject)
     adviser = NestedAdviserField()
 
+    @classmethod
+    def many_init(cls, *args, **kwargs):
+        """
+        Initialises a many-item instance of the serialiser using custom logic.
+
+        This disables the unique together validator in the child serialiser, as it's incompatible
+        with many-item update operations (as it mistakenly fails existing rows).
+        """
+        child = cls(context=kwargs.get('context'), validators=())
+        return IProjectTeamMemberListSerializer(child=child, *args, **kwargs)
+
     class Meta:
         model = InvestmentProjectTeamMember
         fields = ('investment_project', 'adviser', 'role')
-        list_serializer_class = IProjectTeamMemberListSerializer
 
 
 class NestedIProjectTeamMemberSerializer(serializers.ModelSerializer):
