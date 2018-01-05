@@ -367,6 +367,15 @@ class TestAcceptQuote:
         assert order.quote.accepted_on
         assert order.quote.accepted_by == contact
         assert order.invoice
+        assert order.invoice.billing_company_name == order.billing_company_name
+        assert order.invoice.billing_address_1 == order.billing_address_1
+        assert order.invoice.billing_address_2 == order.billing_address_2
+        assert order.invoice.billing_address_town == order.billing_address_town
+        assert order.invoice.billing_address_county == order.billing_address_county
+        assert order.invoice.billing_address_postcode == order.billing_address_postcode
+        assert order.invoice.billing_address_country == order.billing_address_country
+        assert order.invoice.po_number == order.po_number
+        assert order.invoice.contact_email == order.get_current_contact_email()
 
     @pytest.mark.parametrize(
         'disallowed_status',

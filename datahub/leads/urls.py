@@ -1,6 +1,6 @@
 """Investment views URL config."""
 
-from django.conf.urls import url
+from django.urls import path
 
 from datahub.leads.views import BusinessLeadViewSet
 
@@ -23,11 +23,8 @@ unarchive_lead_item = BusinessLeadViewSet.as_view({
 })
 
 urlpatterns = [
-    url(r'^business-leads$', lead_collection, name='lead-collection'),
-    url(r'^business-leads/(?P<pk>[0-9a-z-]{36})$', lead_item,
-        name='lead-item'),
-    url(r'^business-leads/(?P<pk>[0-9a-z-]{36})/archive$', archive_lead_item,
-        name='archive-lead-item'),
-    url(r'^business-leads/(?P<pk>[0-9a-z-]{36})/unarchive$',
-        unarchive_lead_item, name='unarchive-lead-item')
+    path('business-leads', lead_collection, name='lead-collection'),
+    path('business-leads/<uuid:pk>', lead_item, name='lead-item'),
+    path('business-leads/<uuid:pk>/archive', archive_lead_item, name='archive-lead-item'),
+    path('business-leads/<uuid:pk>/unarchive', unarchive_lead_item, name='unarchive-lead-item')
 ]

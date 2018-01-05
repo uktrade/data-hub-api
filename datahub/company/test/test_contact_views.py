@@ -237,8 +237,8 @@ class TestAddContact(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
-            'address_country': ['This field may not be null.'],
-            'address_town': ['This field may not be null.']
+            'address_country': ['This field is required.'],
+            'address_town': ['This field is required.']
         }
 
     def test_fails_with_contact_preferences_not_set(self):
@@ -263,11 +263,11 @@ class TestAddContact(APITestMixin):
         assert response.data == {
             'contactable_by_email': [
                 'A contact should have at least one way of being contacted. '
-                'Please select either email or phone, or both'
+                'Please select either email or phone, or both.'
             ],
             'contactable_by_phone': [
                 'A contact should have at least one way of being contacted. '
-                'Please select either email or phone, or both'
+                'Please select either email or phone, or both.'
             ]
         }
 
@@ -433,6 +433,18 @@ class TestArchiveContact(APITestMixin):
         }
         assert response.data['archived_reason'] == 'foo'
         assert response.data['id'] == str(contact.pk)
+
+    def test_archive_with_invalid_address(self):
+        """Test archiving a contact with an invalid address."""
+        contact = ContactFactory(
+            address_same_as_company=False,
+            address_1='',
+        )
+        url = reverse('api-v3:contact:archive', kwargs={'pk': contact.pk})
+        response = self.api_client.post(url, {'reason': 'foo'})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['archived']
 
     def test_unarchive(self):
         """Test unarchiving a contact."""

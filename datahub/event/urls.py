@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 
 from datahub.event.views import EventViewSet
 
@@ -13,6 +13,6 @@ item = EventViewSet.as_view({
 })
 
 urlpatterns = [
-    url(r'^event$', collection, name='collection'),
-    url(r'^event/(?P<pk>[0-9a-z-]{36})$', item, name='item'),
+    path('event', collection, name='collection'),
+    path('event/<uuid:pk>', item, name='item'),
 ]

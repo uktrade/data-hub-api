@@ -2,7 +2,6 @@
 import uuid
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.functional import cached_property
 
@@ -51,20 +50,18 @@ class CompanyAbstract(models.Model):
         """Admin displayed human readable name."""
         return self.name
 
-    def save(self, *args, **kwargs):
-        """Override the Django save implementation to hook the custom validation."""
-        self.clean()
-        super().save(*args, **kwargs)
-
 
 class Company(ArchivableModel, BaseModel, CompanyAbstract):
     """Representation of the company as per CDMS."""
 
-    REQUIRED_TRADING_ADDRESS_FIELDS = (
-        'trading_address_1',
-        'trading_address_country',
-        'trading_address_town'
-    )
+    TRADING_ADDRESS_VALIDATION_MAPPING = {
+        'trading_address_1': {'required': True},
+        'trading_address_2': {'required': False},
+        'trading_address_town': {'required': True},
+        'trading_address_county': {'required': False},
+        'trading_address_postcode': {'required': False},
+        'trading_address_country': {'required': True},
+    }
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     reference_code = models.CharField(max_length=MAX_LENGTH, blank=True)
@@ -174,41 +171,11 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
 
     def has_valid_trading_address(self):
         """Tells if Company has all required trading address fields defined."""
+        field_mapping = self.TRADING_ADDRESS_VALIDATION_MAPPING
+
         return all(
-            getattr(self, field) for field in self.REQUIRED_TRADING_ADDRESS_FIELDS
+            getattr(self, field) for field, rules in field_mapping.items() if rules['required']
         )
-
-    def _validate_trading_address(self):
-        """Trading address fields are not mandatory in the model definition.
-
-        If any trading address field is supplied then address_1, town and
-        country must also be provided.
-        """
-        any_trading_address_fields = any((
-            self.trading_address_1,
-            self.trading_address_2,
-            self.trading_address_town,
-            self.trading_address_county,
-            self.trading_address_postcode,
-            self.trading_address_country
-        ))
-        if any_trading_address_fields and not self.has_valid_trading_address():
-            return False
-        return True
-
-    def _generate_trading_address_errors(self):
-        """Generate per field error."""
-        empty_fields = [field for field in self.REQUIRED_TRADING_ADDRESS_FIELDS
-                        if not getattr(self, field)]
-        return {field: ['This field may not be null.'] for field in empty_fields}
-
-    def clean(self):
-        """Custom validation."""
-        if not self._validate_trading_address():
-            raise ValidationError(
-                self._generate_trading_address_errors(),
-            )
-        super().clean()
 
 
 class CompaniesHouseCompany(CompanyAbstract):

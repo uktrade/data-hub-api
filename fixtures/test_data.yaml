@@ -18,6 +18,8 @@
     registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
     uk_region: 824cd12a-6095-e211-a939-e4115bead28a
     description: This is a dummy company for testing
+    created_on: '2016-06-05T12:00:00Z'
+    modified_on: '2016-07-05T12:00:00Z'
 
 - model: company.company
   pk: 0f5216e0-849f-11e6-ae22-56b6b6499611
@@ -33,6 +35,8 @@
     description: This is a dummy company for testing
     reference_code: ORG-10096257
     archived_documents_url_path: '/documents/123'
+    created_on: '2016-06-15T10:00:00Z'
+    modified_on: '2016-07-15T10:00:00Z'
 
 - model: company.company
   pk: 731bdcc1-f685-4c8e-bd66-b356b2c16995
@@ -53,6 +57,8 @@
     registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
     uk_region: 824cd12a-6095-e211-a939-e4115bead28a
     description: This is a dummy company for testing
+    created_on: '2016-09-16T11:00:00Z'
+    modified_on: '2017-10-16T11:00:00Z'
 
 - model: company.company
   pk: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
@@ -72,6 +78,8 @@
     registered_address_postcode: 765413
     registered_address_country: 81756b9a-5d95-e211-a939-e4115bead28a  # US
     description: This is a dummy company for testing
+    created_on: '2017-10-16T11:00:00Z'
+    modified_on: '2017-11-16T11:00:00Z'
 
 - model: company.company
   pk: 0fb3379c-341c-4da4-b825-bf8d47b26baa
@@ -91,6 +99,8 @@
     registered_address_postcode: 75001
     registered_address_country: 82756b9a-5d95-e211-a939-e4115bead28a  # France
     description: This is a dummy company for testing
+    created_on: '2015-10-26T11:00:00Z'
+    modified_on: '2017-11-26T11:00:00Z'
 
 - model: company.advisor
   pk: e83a608e-84a4-11e6-ae22-56b6b6499611
@@ -98,7 +108,7 @@
     email: Puck.Head@example.com
     first_name: Puck
     last_name: Head
-    dit_team: 602b971d-5df6-e511-888e-e4115bead28a
+    dit_team: 602b971d-5df6-e511-888e-e4115bead28a  # CBBC North EAST
 
 - model: company.advisor
   pk: 7bad8082-4978-4fe8-a018-740257f01637
@@ -106,7 +116,7 @@
     email: John.Rogers@example.com
     first_name: John
     last_name: Rogers
-    dit_team: 8248318c-9698-e211-a939-e4115bead28a
+    dit_team: 8248318c-9698-e211-a939-e4115bead28a  # Marketing - Marketing Team
 
 - model: company.advisor
   pk: d7493b4e-5d7b-4834-98d9-28b78a74052a
@@ -114,7 +124,7 @@
     email: michael.wining@example.com
     first_name: Michael
     last_name: Wining
-    dit_team: 8248318c-9698-e211-a939-e4115bead28a
+    dit_team: 8248318c-9698-e211-a939-e4115bead28a  # Marketing - Marketing Team
 
 - model: company.advisor
   pk: 5a644146-5298-4741-91f3-d5d7558adf47
@@ -122,7 +132,7 @@
     email: paula.churing@example.com
     first_name: Paula
     last_name: Churing
-    dit_team: 8248318c-9698-e211-a939-e4115bead28a
+    dit_team: 8248318c-9698-e211-a939-e4115bead28a  # Marketing - Marketing Team
 
 - model: company.advisor
   pk: a80ff5fd-8904-4940-bf96-fe8047e34be5
@@ -130,7 +140,7 @@
     email: barry.oling@example.com
     first_name: Barry
     last_name: Oling
-    dit_team: a4f924aa-9698-e211-a939-e4115bead28a
+    dit_team: a4f924aa-9698-e211-a939-e4115bead28a  # Isle of Wight Chamber of Commerce
 
 - model: company.advisor
   pk: f1eb4363-0a37-4344-bd96-e90abeaf483e
@@ -138,7 +148,55 @@
     email: jenny.carey@example.com
     first_name: Jenny
     last_name: Carey
-    dit_team: c833d869-2f50-e311-a56a-e4115bead28a
+    dit_team: c833d869-2f50-e311-a56a-e4115bead28a  # IG - Specialists - Knowledge Intensive Industry
+
+- model: company.advisor
+  pk: 379f390a-e083-4a2c-9cea-e3b9a08606a7
+  fields:
+    email: holly.collins@example.com
+    first_name: Holly
+    last_name: Collins
+    dit_team: 08d987f8-6525-e511-b6bc-e4115bead28a  # Heart of the South West LEP
+
+- model: company.advisor
+  pk: a6f39399-5bf4-46cb-a686-826f73e9f0ca
+  fields:
+    email: dennis.kennedy@example.com
+    first_name: Dennis
+    last_name: Kennedy
+    dit_team: 08d987f8-6525-e511-b6bc-e4115bead28a  # Heart of the South West LEP
+
+- model: company.advisor
+  pk: b4848b30-f532-4cfc-a063-b064d8435b65
+  fields:
+    email: jacob.webster@example.com
+    first_name: Jacob
+    last_name: Webster
+    dit_team: 1e68d89b-8225-e511-b6bc-e4115bead28a  # South East Midlands LEP
+
+- model: company.advisor
+  pk: 4b4e1553-4ed3-46b4-b52a-a1f07fea5352
+  fields:
+    email: jodie.matthews@example.com
+    first_name: Jodie
+    last_name: Matthews
+    dit_team: bc85aa17-fabd-e511-88b6-e4115bead28a  # Welsh Government (Investment)
+
+- model: company.advisor
+  pk: 8dcd2bb8-dc73-4a42-8655-4ae42d4d3c5a
+  fields:
+    email: bernard.harris-patel@example.com
+    first_name: Bernard
+    last_name: Harris-Patel
+    dit_team: bc85aa17-fabd-e511-88b6-e4115bead28a  # Welsh Government (Investment)
+
+- model: company.advisor
+  pk: b4ce0b40-25f0-4532-b78f-1e0345934a6d
+  fields:
+    email: kathryn.nicholls@example.com
+    first_name: Kathryn
+    last_name: Nicholls
+    dit_team: e53ade1c-9798-e211-a939-e4115bead28a  # Invest Northern Ireland
 
 - model: company.contact
   pk: 9b1138ab-ec7b-497f-b8c3-27fed21694ef
@@ -161,6 +219,7 @@
     contactable_by_email: false
     contactable_by_phone: true
     notes: This is a dummy contact for testing
+    created_on: '2017-02-28T15:00:00Z'
     modified_on: '2017-06-05T00:00:00Z'
     archived_documents_url_path: '/documents/123'
 
@@ -182,7 +241,8 @@
     contactable_by_email: true
     contactable_by_phone: false
     notes: This is a dummy contact for testing
-    modified_on: '2016-06-05T00:00:00Z'
+    created_on: '2017-02-28T15:00:00Z'
+    modified_on: '2017-06-05T00:00:00Z'
 
 - model: company.contact
   pk: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
@@ -202,6 +262,7 @@
     contactable_by_email: true
     contactable_by_phone: false
     notes: This is a dummy contact for testing
+    created_on: '2017-02-28T15:00:00Z'
     modified_on: '2017-06-08T00:00:00Z'
 
 - model: company.contact
@@ -225,6 +286,7 @@
     contactable_by_email: false
     contactable_by_phone: true
     notes: This is a dummy contact for testing
+    created_on: '2017-02-28T15:00:00Z'
     modified_on: '2017-04-05T00:00:00Z'
 
 - model: company.contact
@@ -248,6 +310,7 @@
     contactable_by_email: false
     contactable_by_phone: true
     notes: This is a dummy contact for testing
+    created_on: '2017-04-28T15:00:00Z'
     modified_on: '2016-04-05T00:00:00Z'
 
 - model: company.contact
@@ -271,7 +334,8 @@
     contactable_by_email: false
     contactable_by_phone: true
     notes: This is a dummy contact for testing
-    modified_on: '2017-03-05T00:00:00Z'
+    created_on: '2017-04-28T15:00:00Z'
+    modified_on: '2017-06-05T00:00:00Z'
 
 - model: interaction.interaction
   pk: 236b656c-ae26-43ca-bb51-c72d553383f3
@@ -286,6 +350,8 @@
     dit_team: 8248318c-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
     communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
+    created_on: '2017-06-01T00:00:00Z'
+    modified_on: '2017-06-01T00:00:00Z'
 
 - model: interaction.interaction
   pk: 6015dbf3-d777-4947-a254-afd5f0d0499c
@@ -300,6 +366,8 @@
     dit_team: 8248318c-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
     communication_channel: a5d71fdd-5d95-e211-a939-e4115bead28a
+    created_on: '2017-06-03T00:00:00Z'
+    modified_on: '2017-06-03T00:00:00Z'
 
 - model: interaction.interaction
   pk: 2a162e87-06d5-423d-963e-1ecbe46c62af
@@ -317,7 +385,9 @@
     communication_channel: ~
     investment_project: ~
     created_by: 7bad8082-4978-4fe8-a018-740257f01637
+    created_on: '2017-06-05T00:00:00Z'
     modified_by: 7bad8082-4978-4fe8-a018-740257f01637
+    modified_on: '2017-06-05T00:00:00Z'
 
 - model: interaction.interaction
   pk: ec4a46ef-6e50-4a5c-bba0-e311f0471312
@@ -335,7 +405,9 @@
     communication_channel: ~
     investment_project: ~
     created_by: e83a608e-84a4-11e6-ae22-56b6b6499611
+    created_on: '2017-06-05T00:00:00Z'
     modified_by: e83a608e-84a4-11e6-ae22-56b6b6499611
+    modified_on: '2017-06-05T00:00:00Z'
     archived_documents_url_path: '/documents/123'
 
 - model: investment.investmentproject
@@ -370,6 +442,8 @@
     client_requirements: Anywhere
     strategic_drivers:
       - 382aa6d1-a362-4166-a09d-f579d9f3be75
+    created_on: '2017-03-17T15:12:00Z'
+    modified_on: '2017-06-05T10:00:00Z'
 
 - model: investment.investmentproject
   pk: c4c0f5c2-42f1-4c2d-9dfa-bdbb99a0aea1
@@ -389,6 +463,8 @@
     sector: 034be3be-5329-e511-b6bc-e4115bead28a
     business_activities:
       - a2dbd807-ae52-421c-8d1d-88adfc7a506b
+    created_on: '2017-07-05T10:00:00Z'
+    modified_on: '2017-07-05T10:00:00Z'
 
 - model: investment.investmentproject
   pk: fb5b5006-56af-40e0-8615-7aba53e0e4bf
@@ -410,6 +486,8 @@
     business_activities:
       - a2dbd807-ae52-421c-8d1d-88adfc7a506b
     archived_documents_url_path: '/documents/123'
+    created_on: '2017-06-07T10:00:00Z'
+    modified_on: '2017-06-07T10:00:00Z'
 
 - model: investment.investmentproject
   pk: 18750b26-a8c3-41b2-8d3a-fb0b930c2270
@@ -446,6 +524,8 @@
       - 382aa6d1-a362-4166-a09d-f579d9f3be75
     project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
     project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
+    created_on: '2017-06-15T10:00:00Z'
+    modified_on: '2017-06-15T10:00:00Z'
 
 - model: investment.investmentprojectteammember
   pk: 1
@@ -497,6 +577,8 @@
       - 382aa6d1-a362-4166-a09d-f579d9f3be75
     project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
     project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
+    created_on: '2017-08-05T10:00:00Z'
+    modified_on: '2017-08-05T10:00:00Z'
 
 - model: investment.investmentproject
   pk: addca042-5a00-412c-9d7c-acc04552756c
@@ -535,6 +617,8 @@
       - 382aa6d1-a362-4166-a09d-f579d9f3be75
     project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
     project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
+    created_on: '2017-10-08T10:00:00Z'
+    modified_on: '2017-11-08T10:00:00Z'
 
 - model: investment.investmentproject
   pk: 3520b973-0e77-46cf-be75-3585f2f6691e
@@ -574,6 +658,8 @@
       - 382aa6d1-a362-4166-a09d-f579d9f3be75
     project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
     project_assurance_adviser: 5a644146-5298-4741-91f3-d5d7558adf47
+    created_on: '2017-03-05T12:00:00Z'
+    modified_on: '2017-05-05T10:00:00Z'
 
 - model: investment.investmentproject
   pk: ea3a03ba-b239-4956-b2fb-f35c91109674
@@ -619,6 +705,8 @@
     address_1: 10 Eastings Road
     address_town: London
     address_postcode: W1 2AA
+    created_on: '2017-03-05T12:00:00Z'
+    modified_on: '2017-03-05T15:00:00Z'
 
 
 - model: investment.investmentproject
@@ -665,6 +753,116 @@
     address_1: 10 Eastings Road
     address_town: London
     address_postcode: W1 2AA
+    created_on: '2018-01-02T10:00:00Z'
+    modified_on: '2018-01-02T10:00:00Z'
+
+- model: investment.investmentproject
+  pk: ba1f0b14-5fe4-4c36-bf6a-ddf115272977
+  fields:
+    name: New zoo (LEP)
+    description: This is a dummy investment project for testing
+    stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8  # Active
+    status: ongoing
+    estimated_land_date: 2020-02-01
+    investment_type: 3e143372-496c-4d1e-8278-6fdd3da9b48b  # FDI
+    investor_company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
+    client_contacts:
+      - 6791d583-7a52-418f-a0d3-d8d527f20d43
+    client_relationship_manager: 5a644146-5298-4741-91f3-d5d7558adf47
+    referral_source_adviser: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_activity: 0c4f8e74-d34f-4aca-b764-a44cdc2d0087
+    fdi_type: f8447013-cfdc-4f35-a146-6619665388b3
+    sector: 034be3be-5329-e511-b6bc-e4115bead28a
+    business_activities:
+      - a2dbd807-ae52-421c-8d1d-88adfc7a506b
+    client_cannot_provide_total_investment: false
+    total_investment: 1100000.0
+    client_cannot_provide_foreign_investment: false
+    foreign_equity_investment: 250000.0
+    government_assistance: false
+    number_new_jobs: 50
+    average_salary: 2943bf3d-32dd-43be-8ad4-969b006dee7b
+    site_decided: false
+    client_considering_other_countries: false
+    uk_region_locations:
+      - 814cd12a-6095-e211-a939-e4115bead28a
+    client_requirements: Anywhere
+    strategic_drivers:
+      - 7cc42486-30bb-46d5-813d-6ad1c918ef08
+    project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
+    project_assurance_adviser: 7bad8082-4978-4fe8-a018-740257f01637
+    created_on: '2017-08-16T10:00:00Z'
+    created_by: 5a644146-5298-4741-91f3-d5d7558adf47
+    modified_on: '2017-09-18T13:00:00Z'
+    modified_by: 5a644146-5298-4741-91f3-d5d7558adf47
+
+- model: investment.investmentprojectteammember
+  pk: 3
+  fields:
+    investment_project: ba1f0b14-5fe4-4c36-bf6a-ddf115272977
+    adviser: f1eb4363-0a37-4344-bd96-e90abeaf483e
+    role: Sector adviser
+
+- model: investment.investmentprojectteammember
+  pk: 4
+  fields:
+    investment_project: ba1f0b14-5fe4-4c36-bf6a-ddf115272977
+    adviser: a6f39399-5bf4-46cb-a686-826f73e9f0ca
+    role: Region adviser
+
+- model: investment.investmentproject
+  pk: e32b3c33-80ac-4589-a8c4-dda305d726ba
+  fields:
+    name: New golf course (DA)
+    description: This is a dummy investment project for testing
+    stage: 7606cc19-20da-4b74-aba1-2cec0d753ad8  # Active
+    status: ongoing
+    estimated_land_date: 2020-03-01
+    investment_type: 9c364e64-2b28-401b-b2df-50e08b0bca44  # Non-FDI
+    investor_company: b2c34b41-1d5a-4b4b-9249-7c53ff2868dd
+    client_contacts:
+      - 7d43f9a2-868f-4d85-8e5f-631e5a8c9a3b
+    client_relationship_manager: 5a644146-5298-4741-91f3-d5d7558adf47
+    referral_source_adviser: e83a608e-84a4-11e6-ae22-56b6b6499611
+    referral_source_activity: 0c4f8e74-d34f-4aca-b764-a44cdc2d0087
+    fdi_type: f8447013-cfdc-4f35-a146-6619665388b3
+    sector: 559c37e5-5f95-e211-a939-e4115bead28a
+    business_activities:
+      - a2dbd807-ae52-421c-8d1d-88adfc7a506b
+    client_cannot_provide_total_investment: false
+    total_investment: 1100000.0
+    client_cannot_provide_foreign_investment: false
+    foreign_equity_investment: 250000.0
+    government_assistance: false
+    number_new_jobs: 50
+    average_salary: 2943bf3d-32dd-43be-8ad4-969b006dee7b
+    site_decided: false
+    client_considering_other_countries: false
+    uk_region_locations:
+      - 814cd12a-6095-e211-a939-e4115bead28a
+    client_requirements: Anywhere
+    strategic_drivers:
+      - 7cc42486-30bb-46d5-813d-6ad1c918ef08
+    project_manager: d7493b4e-5d7b-4834-98d9-28b78a74052a
+    project_assurance_adviser: 7bad8082-4978-4fe8-a018-740257f01637
+    created_on: '2017-08-16T10:00:00Z'
+    created_by: 5a644146-5298-4741-91f3-d5d7558adf47
+    modified_on: '2017-09-18T13:00:00Z'
+    modified_by: 5a644146-5298-4741-91f3-d5d7558adf47
+
+- model: investment.investmentprojectteammember
+  pk: 5
+  fields:
+    investment_project: e32b3c33-80ac-4589-a8c4-dda305d726ba
+    adviser: f1eb4363-0a37-4344-bd96-e90abeaf483e
+    role: Sector adviser
+
+- model: investment.investmentprojectteammember
+  pk: 6
+  fields:
+    investment_project: e32b3c33-80ac-4589-a8c4-dda305d726ba
+    adviser: 4b4e1553-4ed3-46b4-b52a-a1f07fea5352
+    role: Region adviser
 
 - model: interaction.interaction
   pk: 94d03877-fceb-44a0-8813-17b727d2e7f6
@@ -679,6 +877,8 @@
     dit_team: 197c51d4-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
     communication_channel: 72c226d7-5d95-e211-a939-e4115bead28a
+    created_on: '2017-06-03T00:00:00Z'
+    modified_on: '2017-06-03T00:00:00Z'
 
 - model: interaction.interaction
   pk: 0dcb3748-c097-4f20-b84f-0114bbb1a8e0
@@ -693,6 +893,8 @@
     dit_team: 197c51d4-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
     communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
+    created_on: '2017-06-05T00:00:00Z'
+    modified_on: '2017-06-05T00:00:00Z'
 
 - model: event.event
   pk: bda12a57-433c-4a0c-a7ce-5ebd080e09e8
@@ -718,6 +920,8 @@
       - 1abe5563-6482-41d8-b566-6a9ee9e37c5f
     uk_region: 864cd12a-6095-e211-a939-e4115bead28a
     service: 9584b82b-3499-e211-a939-e4115bead28a
+    created_on: '2017-01-05T00:00:00Z'
+    modified_on: '2017-01-05T00:00:00Z'
 
 - model: event.event
   pk: b93d4273-36fe-4008-ac40-fbc197910791
@@ -743,3 +947,5 @@
       - d352a68f-aaf4-4c43-b39d-9bca67a8322e
     service: ccf9b82b-3499-e211-a939-e4115bead28a
     archived_documents_url_path: '/documents/123'
+    created_on: '2017-01-25T00:00:00Z'
+    modified_on: '2017-01-25T00:00:00Z'

@@ -418,3 +418,29 @@ class TestSearch(APITestMixin):
 
         assert len(response_data['aggregations']) == 1
         assert response_data['aggregations'][0]['entity'] == permission_entity
+
+    def test_basic_search_no_permissions(self, setup_es):
+        """Tests model permissions enforcement in basic search for a user with no permissions."""
+        user = create_test_user(permission_codenames=[], dit_team=TeamFactory())
+        api_client = self.create_api_client(user=user)
+
+        InvestmentProjectFactory(created_by=user)
+        CompanyFactory()
+        ContactFactory()
+        EventFactory()
+        CompanyInteractionFactory()
+        OrderFactory()
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:basic')
+        response = api_client.get(url, {
+            'term': '',
+            'entity': 'company',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 0
+
+        assert len(response_data['aggregations']) == 0

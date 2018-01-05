@@ -294,7 +294,7 @@ class TestNotifyOrderPaid:
 
         assert notify.client.send_email_notification.called
         call_args = notify.client.send_email_notification.call_args_list[0][1]
-        assert call_args['email_address'] == order.contact_email
+        assert call_args['email_address'] == order.get_current_contact_email()
         assert call_args['template_id'] == Template.order_paid_for_customer.value
         assert call_args['personalisation']['recipient name'] == order.contact.name
         assert call_args['personalisation']['embedded link'] == order.get_public_facing_url()
@@ -382,7 +382,7 @@ class TestNotifyOrderCancelled:
 
         assert notify.client.send_email_notification.called
         call_args = notify.client.send_email_notification.call_args_list[0][1]
-        assert call_args['email_address'] == order.contact_email
+        assert call_args['email_address'] == order.get_current_contact_email()
         assert call_args['template_id'] == Template.order_cancelled_for_customer.value
         assert call_args['personalisation']['recipient name'] == order.contact.name
         assert call_args['personalisation']['embedded link'] == order.get_public_facing_url()
@@ -435,7 +435,7 @@ class TestNotifyQuoteGenerated:
 
         assert notify.client.send_email_notification.called
         call_args = notify.client.send_email_notification.call_args_list[0][1]
-        assert call_args['email_address'] == order.contact_email
+        assert call_args['email_address'] == order.get_current_contact_email()
         assert call_args['template_id'] == Template.quote_sent_for_customer.value
         assert call_args['personalisation']['recipient name'] == order.contact.name
         assert call_args['personalisation']['embedded link'] == order.get_public_facing_url()
@@ -488,7 +488,7 @@ class TestNotifyQuoteAccepted:
 
         assert notify.client.send_email_notification.called
         call_args = notify.client.send_email_notification.call_args_list[0][1]
-        assert call_args['email_address'] == order.contact_email
+        assert call_args['email_address'] == order.get_current_contact_email()
         assert call_args['template_id'] == Template.quote_accepted_for_customer.value
         assert call_args['personalisation']['recipient name'] == order.contact.name
         assert call_args['personalisation']['embedded link'] == order.get_public_facing_url()
@@ -541,7 +541,7 @@ class TestNotifyQuoteCancelled:
 
         assert notify.client.send_email_notification.called
         call_args = notify.client.send_email_notification.call_args_list[0][1]
-        assert call_args['email_address'] == order.contact_email
+        assert call_args['email_address'] == order.get_current_contact_email()
         assert call_args['template_id'] == Template.quote_cancelled_for_customer.value
         assert call_args['personalisation']['recipient name'] == order.contact.name
         assert call_args['personalisation']['embedded link'] == order.get_public_facing_url()

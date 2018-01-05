@@ -328,6 +328,8 @@ class TestAddOrderDetails(APITestMixin):
                 'billing_contact_name': 'John Doe',
                 'billing_email': 'JohnDoe@example.com',
                 'billing_phone': '0123456789',
+                'contact_email': 'JohnDoe@example.com',
+                'contact_phone': '0123456789',
             },
             format='json'
         )
@@ -339,6 +341,8 @@ class TestAddOrderDetails(APITestMixin):
         assert response.json()['billing_contact_name'] == ''
         assert response.json()['billing_email'] == ''
         assert response.json()['billing_phone'] == ''
+        assert response.json()['contact_email'] == ''
+        assert response.json()['contact_phone'] == ''
 
     @pytest.mark.parametrize(
         'vat_status',
