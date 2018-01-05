@@ -168,9 +168,7 @@ class IProjectTeamMembersViewSet(CoreViewSetV3):
 
         Adds the investment_project_id from the URL path to the user-provided data.
         """
-        data = kwargs.get('data')
-        if data is not None:
-            data['investment_project'] = str(self.kwargs['project_pk'])
+        self._update_serializer_data_with_project(*args, **kwargs)
         return super().get_serializer(*args, **kwargs)
 
     def create(self, request, *args, **kwargs):
@@ -187,6 +185,18 @@ class IProjectTeamMembersViewSet(CoreViewSetV3):
         queryset.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    def replace_all(self, request, *args, **kwargs):
+        """Replaces all team members in the specified project."""
+        self._check_project_exists()
+        queryset = self.get_queryset()
+        queryset.delete()
+
+        serializer = self.get_serializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK, headers=headers)
+
     def get_view_name(self):
         """Returns the view set name for the DRF UI."""
         return 'Investment project team members'
@@ -197,6 +207,13 @@ class IProjectTeamMembersViewSet(CoreViewSetV3):
             return InvestmentProject.objects.get(pk=self.kwargs['project_pk'])
         except InvestmentProject.DoesNotExist:
             raise Http404(self.non_existent_project_error_message)
+
+    def _update_serializer_data_with_project(self, *args, data=None, many=False, **kwargs):
+        if data is not None:
+            project_pk = str(self.kwargs['project_pk'])
+            items = data if many else [data]
+            for item in items:
+                item['investment_project'] = project_pk
 
     def _check_project_exists(self):
         if not InvestmentProject.objects.filter(pk=self.kwargs['project_pk']).exists():

@@ -19,7 +19,8 @@ project_item = IProjectViewSet.as_view({
 
 project_team_member_collection = IProjectTeamMembersViewSet.as_view({
     'post': 'create',
-    'delete': 'destroy_all'
+    'delete': 'destroy_all',
+    'put': 'replace_all',
 })
 
 project_team_member_item = IProjectTeamMembersViewSet.as_view({
