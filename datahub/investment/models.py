@@ -84,6 +84,7 @@ class IProjectAbstract(models.Model):
 
     name = models.CharField(max_length=MAX_LENGTH)
     description = models.TextField()
+    comments = models.TextField(blank=True)
     anonymous_description = models.TextField(blank=True)
     estimated_land_date = models.DateField()
     investment_type = models.ForeignKey(
