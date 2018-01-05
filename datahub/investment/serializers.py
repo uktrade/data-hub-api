@@ -1,5 +1,8 @@
 """Investment serialisers for views."""
 
+from collections import Counter
+
+from django.utils.translation import ugettext_lazy
 from rest_framework import serializers
 
 import datahub.metadata.models as meta_models
@@ -253,6 +256,39 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
         )
 
 
+class IProjectTeamMemberListSerializer(serializers.ListSerializer):
+    """Team member list serialiser that adds validation for duplicates."""
+
+    default_error_messages = {
+        'duplicate_adviser': ugettext_lazy(
+            'You cannot add the same adviser as a team member more than once.'
+        )
+    }
+
+    def run_validation(self, data=serializers.empty):
+        """
+        Validates that there are no duplicate advisers (to avoid a 500 error).
+
+        Unfortunately, overriding validate() results in a error dict being returned and the errors
+        being placed in non_field_errors. Hence, run_validation() is overridden instead (to get
+        the expected behaviour of an error list being returned, which each entry corresponding
+        to each item in the request body).
+        """
+        value = super().run_validation(data)
+
+        counts = Counter(team_member['adviser'].id for team_member in value)
+        if len(counts) < len(value):
+            errors = []
+            for item in value:
+                item_errors = {}
+                if counts[item['adviser'].id] > 1:
+                    item_errors['adviser'] = [self.error_messages['duplicate_adviser']]
+                errors.append(item_errors)
+            raise serializers.ValidationError(errors)
+
+        return value
+
+
 class IProjectTeamMemberSerializer(serializers.ModelSerializer):
     """Serialiser for investment project team members."""
 
@@ -262,6 +298,7 @@ class IProjectTeamMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvestmentProjectTeamMember
         fields = ('investment_project', 'adviser', 'role')
+        list_serializer_class = IProjectTeamMemberListSerializer
 
 
 class NestedIProjectTeamMemberSerializer(serializers.ModelSerializer):
