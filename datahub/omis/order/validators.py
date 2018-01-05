@@ -292,12 +292,7 @@ class OrderInStatusValidator:
         if not self.instance and not self.order_required:
             return  # all fine
 
-        allowed = any(
-            self.instance.status == status
-            for status in self.allowed_statuses
-        )
-
-        if not allowed:
+        if self.instance.status not in self.allowed_statuses:
             raise Conflict(
                 self.message.format(self.instance.get_status_display())
             )
@@ -361,7 +356,13 @@ class OrderInStatusRule(AbstractRule):
 
     def __call__(self, combiner):
         """Check that order is in the expected state."""
-        order = combiner.serializer.context['order']
+        if 'order' in combiner.serializer.context:
+            order = combiner.serializer.context['order']
+        else:
+            order = combiner.serializer.instance
+
+        if not order:
+            return False
         return order.status in self.order_statuses
 
 
@@ -376,3 +377,28 @@ class ForceDeleteRule(BaseRule):
     def __call__(self, combiner):
         """Check that the force_delete flag has the expected value."""
         return combiner.serializer.context.get('force_delete', False) == self.value
+
+
+class EditableFieldsRule(AbstractRule):
+    """Rule that checks that only certain fields have been modified."""
+
+    def __init__(self, editable_fields):
+        """Initialise the rule."""
+        self.editable_fields = editable_fields
+        self._field_in_error = None
+
+    @property
+    def field(self):
+        """Field in error, dynamically calculated."""
+        return self._field_in_error
+
+    def __call__(self, combiner):
+        """
+        :returns: True if all fields in data can be editable.
+        """
+        self._field_in_error = None
+        for field in combiner.data:
+            if field not in self.editable_fields:
+                self._field_in_error = field
+                return False
+        return True
