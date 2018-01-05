@@ -114,3 +114,17 @@ def test_configure_connection(connections, settings):
         'hosts': [settings.ES_URL],
         'verify_certs': settings.ES_VERIFY_CERTS
     })
+
+
+def test_get_entity_permission_query_no_conditions():
+    """
+    Test that _get_entity_permission_query() correctly handles an empty dict
+    of conditions.
+
+    (An empty dict of conditions should mean that there are no conditions that would permit
+    access.)
+    """
+    query = elasticsearch._get_entity_permission_query(permission_filters={})
+    assert query.to_dict() == {
+        'match_none': {}
+    }
