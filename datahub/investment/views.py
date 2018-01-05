@@ -104,8 +104,8 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
 class _ModifiedOnFilter(FilterSet):
     """Filter set for the modified-since view."""
 
-    modified_on__gte = IsoDateTimeFilter(name='modified_on', lookup_expr='gte')
-    modified_on__lte = IsoDateTimeFilter(name='modified_on', lookup_expr='lte')
+    modified_on__gte = IsoDateTimeFilter(field_name='modified_on', lookup_expr='gte')
+    modified_on__lte = IsoDateTimeFilter(field_name='modified_on', lookup_expr='lte')
 
     class Meta:
         model = InvestmentProject
@@ -170,7 +170,7 @@ class IProjectTeamMembersViewSet(CoreViewSetV3):
         """
         data = kwargs.get('data')
         if data is not None:
-            data['investment_project'] = self.kwargs['project_pk']
+            data['investment_project'] = str(self.kwargs['project_pk'])
         return super().get_serializer(*args, **kwargs)
 
     def create(self, request, *args, **kwargs):

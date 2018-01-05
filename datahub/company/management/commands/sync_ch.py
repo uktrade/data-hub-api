@@ -24,13 +24,13 @@ logger = getLogger(__name__)
 COMPANY_CATEGORY_RELEVANCY_MAPPING = {
     'community interest company': True,
     'european public limited-liability company (se)': True,
-    # Address not available
+    # Address not available/main registration with FCA
     'industrial and provident society': False,
-    # Address not available
+    # Address not available/main registration with FCA
     'investment company with variable capital': False,
-    # Address not available
+    # Address not available/main registration with FCA
     'investment company with variable capital (securities)': False,
-    # Address not available
+    # Address not available/main registration with FCA
     'investment company with variable capital(umbrella)': False,
     'limited liability partnership': True,
     'limited partnership': True,
@@ -44,8 +44,10 @@ COMPANY_CATEGORY_RELEVANCY_MAPPING = {
     'private limited company': True,
     'private unlimited': True,
     'private unlimited company': True,
+    # Address not available/main registration with FCA
+    'protected cell company': False,
     'public limited company': True,
-    # Address not available
+    # Address not available/main registration with FCA
     'registered society': False,
     # Address not available
     'royal charter company': False,

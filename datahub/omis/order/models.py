@@ -165,9 +165,6 @@ class Order(BaseModel):
 
     delivery_date = models.DateField(blank=True, null=True)
 
-    contact_email = models.EmailField(blank=True)
-    contact_phone = models.CharField(max_length=254, blank=True)
-
     quote = models.OneToOneField(
         Quote,
         null=True, blank=True,
@@ -270,6 +267,14 @@ class Order(BaseModel):
     billing_phone = models.CharField(
         max_length=150, blank=True, editable=False,
         help_text='Legacy field. Billing phone number.'
+    )
+    contact_email = models.EmailField(
+        blank=True, editable=False,
+        help_text='Legacy field. Contact email specified for this order.'
+    )
+    contact_phone = models.CharField(
+        max_length=254, blank=True, editable=False,
+        help_text='Legacy field. Contact phone number specified for this order.'
     )
 
     objects = OrderQuerySet.as_manager()

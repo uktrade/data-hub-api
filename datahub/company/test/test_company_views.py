@@ -514,8 +514,8 @@ class TestCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
-            'trading_address_town': ['This field may not be null.'],
-            'trading_address_country': ['This field may not be null.']
+            'trading_address_town': ['This field is required.'],
+            'trading_address_country': ['This field is required.']
         }
 
     def test_add_company_with_trading_address(self):
@@ -737,6 +737,41 @@ class TestCompany(APITestMixin):
         assert response.data['archived']
         assert response.data['archived_reason'] == 'foo'
         assert response.data['id'] == str(company.id)
+
+    def test_archive_company_invalid_address(self):
+        """
+        Test archiving a company when the company has an invalid trading address and missing
+        UK region.
+        """
+        company = CompanyFactory(
+            registered_address_country_id=Country.united_kingdom.value.id,
+            trading_address_town='',
+            uk_region_id=None,
+        )
+        url = reverse('api-v3:company:archive', kwargs={'pk': company.id})
+        response = self.api_client.post(url, {'reason': 'foo'}, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['archived']
+        assert response.data['archived_reason'] == 'foo'
+
+    def test_unarchive_company_invalid_address(self):
+        """
+        Test unarchiving a company when the company has an invalid trading address and missing
+        UK region.
+        """
+        company = CompanyFactory(
+            registered_address_country_id=Country.united_kingdom.value.id,
+            trading_address_town='',
+            uk_region_id=None,
+            archived=True,
+            archived_reason='Dissolved',
+        )
+        url = reverse('api-v3:company:unarchive', kwargs={'pk': company.id})
+        response = self.api_client.post(url, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert not response.data['archived']
 
     def test_unarchive_company(self):
         """Unarchive a company."""

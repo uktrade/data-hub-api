@@ -18,6 +18,14 @@ class InvoiceManager(models.Manager):
         return self.create(
             invoice_number=generate_datetime_based_reference(self.model, field='invoice_number'),
             payment_due_date=calculate_payment_due_date(order),
+            billing_company_name=order.billing_company_name,
+            billing_address_1=order.billing_address_1,
+            billing_address_2=order.billing_address_2,
+            billing_address_town=order.billing_address_town,
+            billing_address_county=order.billing_address_county,
+            billing_address_postcode=order.billing_address_postcode,
+            billing_address_country=order.billing_address_country,
+            po_number=order.po_number,
             invoice_company_name=constants.DIT_COMPANY_NAME,
             invoice_address_1=constants.DIT_ADDRESS_1,
             invoice_address_2=constants.DIT_ADDRESS_2,
@@ -25,5 +33,6 @@ class InvoiceManager(models.Manager):
             invoice_address_county=constants.DIT_ADDRESS_COUNTY,
             invoice_address_postcode=constants.DIT_ADDRESS_POSTCODE,
             invoice_address_country_id=constants.DIT_ADDRESS_COUNTRY_ID,
-            invoice_vat_number=constants.DIT_VAT_NUMBER
+            invoice_vat_number=constants.DIT_VAT_NUMBER,
+            contact_email=order.get_current_contact_email()
         )

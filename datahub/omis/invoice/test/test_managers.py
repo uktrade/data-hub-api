@@ -2,6 +2,8 @@ from unittest import mock
 import pytest
 from dateutil.parser import parse as dateutil_parse
 
+from datahub.omis.order.test.factories import OrderFactory
+
 from .. import constants
 from ..models import Invoice
 
@@ -26,11 +28,20 @@ class TestInvoiceManager:
         mocked_generate_datetime_based_reference.return_value = '201702010004'
         mocked_calculate_payment_due_date.return_value = payment_due_date
 
-        invoice = Invoice.objects.create_from_order(mock.MagicMock())
+        order = OrderFactory()
+        invoice = Invoice.objects.create_from_order(order)
 
         invoice.refresh_from_db()
         assert invoice.invoice_number == '201702010004'
         assert invoice.payment_due_date == payment_due_date
+        assert invoice.billing_company_name == order.billing_company_name
+        assert invoice.billing_address_1 == order.billing_address_1
+        assert invoice.billing_address_2 == order.billing_address_2
+        assert invoice.billing_address_town == order.billing_address_town
+        assert invoice.billing_address_county == order.billing_address_county
+        assert invoice.billing_address_postcode == order.billing_address_postcode
+        assert invoice.billing_address_country == order.billing_address_country
+        assert invoice.po_number == order.po_number
         assert invoice.invoice_company_name == constants.DIT_COMPANY_NAME
         assert invoice.invoice_address_1 == constants.DIT_ADDRESS_1
         assert invoice.invoice_address_2 == constants.DIT_ADDRESS_2
@@ -39,3 +50,4 @@ class TestInvoiceManager:
         assert invoice.invoice_address_postcode == constants.DIT_ADDRESS_POSTCODE
         assert str(invoice.invoice_address_country.pk) == constants.DIT_ADDRESS_COUNTRY_ID
         assert invoice.invoice_vat_number == constants.DIT_VAT_NUMBER
+        assert invoice.contact_email == order.get_current_contact_email()

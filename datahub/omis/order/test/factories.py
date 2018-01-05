@@ -54,8 +54,8 @@ class OrderFactory(factory.django.DjangoModelFactory):
     billing_address_2 = factory.Sequence(lambda n: f'{n} Foo st.')
     billing_address_country_id = Country.united_kingdom.value.id
     billing_address_county = factory.Faker('text')
-    billing_address_postcode = 'SW1A1AA'
-    billing_address_town = 'London'
+    billing_address_postcode = factory.Faker('postcode')
+    billing_address_town = factory.Faker('city')
 
     @to_many_field
     def service_types(self):

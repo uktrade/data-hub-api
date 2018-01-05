@@ -28,6 +28,7 @@ def confirm_action(title, action_message):
                 action_checkbox_name=helpers.ACTION_CHECKBOX_NAME,
                 opts=self.model._meta,
                 queryset=queryset,
+                media=self.media,
             )
             return TemplateResponse(request, 'admin/action_confirmation.html', context)
 

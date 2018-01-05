@@ -1,6 +1,5 @@
-from django.core.exceptions import FieldDoesNotExist, ValidationError
+from django.core.exceptions import FieldDoesNotExist
 from rest_framework import mixins
-from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.viewsets import GenericViewSet
 
 
@@ -32,26 +31,6 @@ class CoreViewSetV1(mixins.CreateModelMixin,
             return self.read_serializer_class
         elif self.action in ('create', 'update', 'partial_update'):
             return self.write_serializer_class
-
-    def create(self, request, *args, **kwargs):
-        """Override create to catch the validation errors coming from the models.
-
-        These are not real Exceptions, rather user errors.
-        """
-        try:
-            return super().create(request, *args, **kwargs)
-        except ValidationError as e:
-            raise DRFValidationError({'errors': e.message_dict})
-
-    def update(self, request, *args, **kwargs):
-        """Override update to catch the validation errors coming from the models.
-
-        These are not real Exceptions, rather user errors.
-        """
-        try:
-            return super().update(request, *args, **kwargs)
-        except ValidationError as e:
-            raise DRFValidationError({'errors': e.message_dict})
 
     def perform_create(self, serializer):
         """Custom logic for creating the model instance."""
@@ -98,10 +77,7 @@ class CoreViewSetV3(mixins.CreateModelMixin,
         response is generated.
         """
         extra_data = self.get_additional_data(True)
-        try:
-            serializer.save(**extra_data)
-        except ValidationError as e:
-            raise DRFValidationError(e.message_dict)
+        serializer.save(**extra_data)
 
     def perform_update(self, serializer):
         """Custom logic for updating the model instance.
@@ -111,10 +87,7 @@ class CoreViewSetV3(mixins.CreateModelMixin,
         response is generated.
         """
         extra_data = self.get_additional_data(False)
-        try:
-            serializer.save(**extra_data)
-        except ValidationError as e:
-            raise DRFValidationError(e.message_dict)
+        serializer.save(**extra_data)
 
     def get_additional_data(self, create):
         """Returns additional data to be saved in the model instance.

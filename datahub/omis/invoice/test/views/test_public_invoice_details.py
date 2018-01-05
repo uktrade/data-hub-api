@@ -59,18 +59,18 @@ class TestPublicGetInvoice(APITestMixin):
             'invoice_vat_number': invoice.invoice_vat_number,
             'payment_due_date': invoice.payment_due_date.isoformat(),
 
-            'billing_contact_name': order.billing_contact_name,
-            'billing_company_name': order.billing_company_name,
-            'billing_address_1': order.billing_address_1,
-            'billing_address_2': order.billing_address_2,
-            'billing_address_county': order.billing_address_county,
-            'billing_address_postcode': order.billing_address_postcode,
-            'billing_address_town': order.billing_address_town,
+            'billing_contact_name': invoice.billing_contact_name,
+            'billing_company_name': invoice.billing_company_name,
+            'billing_address_1': invoice.billing_address_1,
+            'billing_address_2': invoice.billing_address_2,
+            'billing_address_county': invoice.billing_address_county,
+            'billing_address_postcode': invoice.billing_address_postcode,
+            'billing_address_town': invoice.billing_address_town,
             'billing_address_country': {
-                'id': str(order.billing_address_country.pk),
-                'name': order.billing_address_country.name
+                'id': str(invoice.billing_address_country.pk),
+                'name': invoice.billing_address_country.name
             },
-            'po_number': order.po_number,
+            'po_number': invoice.po_number,
         }
 
     def test_404_if_order_doesnt_exist(self):

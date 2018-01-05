@@ -1,6 +1,5 @@
 from functools import update_wrapper
 from django import forms
-from django.conf.urls import url
 from django.contrib import admin
 from django.contrib import messages
 from django.contrib.admin.exceptions import SuspiciousOperation
@@ -12,7 +11,7 @@ from django.db import router, transaction
 from django.http import HttpResponseRedirect
 from django.template.defaultfilters import date as date_filter, time as time_filter
 from django.template.response import TemplateResponse
-from django.urls import reverse
+from django.urls import path, reverse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text
 from django.utils.html import format_html, format_html_join
@@ -176,7 +175,8 @@ class OrderAdmin(ReadOnlyAdmin):
 
         info = self.model._meta.app_label, self.model._meta.model_name
         return [
-            url(r'^(.+)/cancel/$', wrap(self.cancel_order_view), name='%s_%s_cancel' % info),
+            path('<path:object_id>/cancel/', wrap(self.cancel_order_view),
+                 name='%s_%s_cancel' % info),
         ] + urls
 
     @csrf_protect_m
