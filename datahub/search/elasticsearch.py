@@ -163,14 +163,28 @@ def _get_sort_query(qs, field_order=None):
     return qs
 
 
-def _get_global_permission_query(permission_filters_by_entity=None):
+def _get_global_permission_query(permission_filters_by_entity):
+    """
+    Returns the filter query to use to enforce permissions in global search.
+
+    See also:
+        get_basic_search_query()
+
+    """
+    # None means that permissions aren't in effect for the current query. None is returned to
+    # indicate that a filter query should not be applied.
     if permission_filters_by_entity is None:
         return None
 
-    subqueries = _get_global_permission_subqueries(permission_filters_by_entity)
-    return Bool(
-        should=list(subqueries),
-    )
+    subqueries = list(_get_global_permission_subqueries(permission_filters_by_entity))
+    # Check if there are any should subqueries (of which at least one should be matched).
+    # If there are no conditions, return MatchNone() to ensure that all results are filtered out
+    #  (as you can't meet at least one condition when there are no conditions).
+    if len(subqueries) > 0:
+        return Bool(
+            should=subqueries,
+        )
+    return MatchNone()
 
 
 def _get_global_permission_subqueries(permission_filters_by_entity):
@@ -370,8 +384,11 @@ def _get_must_filter_query(filters, composite_filters, ranges):
     return must_filter
 
 
-def _get_entity_permission_query(permission_filters=None):
-    if not permission_filters:
+def _get_entity_permission_query(permission_filters):
+    """Gets the filter query to apply to enforce permissions for a model."""
+    # None is used when there is no filtering to apply for the entity,
+    # Returns None to indicate that no filter query should be used.
+    if permission_filters is None:
         return None
 
     if permission_filters is EXCLUDE_ALL:
@@ -379,9 +396,14 @@ def _get_entity_permission_query(permission_filters=None):
 
     subqueries = [Term(**{field: value}) for field, value in permission_filters.items()]
 
-    return Bool(
-        should=subqueries
-    )
+    # Check if there are any should subqueries (of which at least one should be matched).
+    # If there are no conditions, return MatchNone() to ensure that all results are filtered out
+    #  (as you can't meet at least one condition when there are no conditions).
+    if len(subqueries) > 0:
+        return Bool(
+            should=subqueries
+        )
+    return MatchNone()
 
 
 def get_search_by_entity_query(term=None,
