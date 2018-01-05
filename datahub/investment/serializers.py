@@ -265,6 +265,32 @@ class IProjectTeamMemberListSerializer(serializers.ListSerializer):
         )
     }
 
+    def update(self, instances, validated_data):
+        """
+        Performs an update i.e. replaces all team members.
+
+        Based on example code in DRF documentation for ListSerializer.
+        """
+        old_advisers_mapping = {team_member.adviser.id: team_member for team_member in
+                                instances}
+        new_advisers_mapping = {team_member['adviser'].id: team_member for team_member in
+                                validated_data}
+
+        # Create new team members and update existing ones
+        ret = []
+        for adviser_id, new_team_member_data in new_advisers_mapping.items():
+            team_member = old_advisers_mapping.get(adviser_id, None)
+            if team_member is None:
+                ret.append(self.child.create(new_team_member_data))
+            else:
+                ret.append(self.child.update(team_member, new_team_member_data))
+
+        # Delete removed team members
+        for adviser_id in old_advisers_mapping.keys() - new_advisers_mapping.keys():
+            old_advisers_mapping[adviser_id].delete()
+
+        return ret
+
     def run_validation(self, data=serializers.empty):
         """
         Validates that there are no duplicate advisers (to avoid a 500 error).

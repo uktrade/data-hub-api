@@ -194,8 +194,7 @@ class IProjectTeamMembersViewSet(CoreViewSetV3):
         serializer.is_valid(raise_exception=True)
 
         with transaction.atomic():
-            queryset.delete()
-            self.perform_create(serializer)
+            serializer.update(queryset, serializer.validated_data)
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK, headers=headers)
