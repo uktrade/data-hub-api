@@ -39,6 +39,7 @@ class InvestmentProjectAdmin(BaseModelVersionAdmin):
     )
     readonly_fields = (
         'archived_documents_url_path',
+        'comments',
     )
 
 

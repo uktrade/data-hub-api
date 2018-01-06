@@ -1,9 +1,7 @@
-from datetime import datetime
 from io import BytesIO
 
 import pytest
 from django.core.management import call_command
-from django.utils.timezone import utc
 from reversion.models import Version
 
 from datahub.investment.test.factories import InvestmentProjectFactory
@@ -16,22 +14,20 @@ def test_run(s3_stubber):
     investment_projects = [
         # investment project in CSV doesn't exist so row should fail
 
-        # created_on should get updated
+        # comment should get updated
         InvestmentProjectFactory(),
         # should be ignored
         InvestmentProjectFactory(),
-        # date in the file is invalid so it should fail
-        InvestmentProjectFactory(),
     ]
 
-    created_on_dates = [ip.created_on for ip in investment_projects]
+    old_comments = investment_projects[1].comments
 
     bucket = 'test_bucket'
     object_key = 'test_key'
-    csv_content = f"""id,createdon
-00000000-0000-0000-0000-000000000000,2016-09-29 14:03:20.000
-{investment_projects[0].id},2015-09-29 11:03:20.000
-{investment_projects[2].id},invalid_date
+    csv_content = f"""Id,comments
+00000000-0000-0000-0000-000000000000,Comment 1
+{investment_projects[0].id},"Comment 2
+New Line :)"
 """
 
     s3_stubber.add_response(
@@ -45,26 +41,25 @@ def test_run(s3_stubber):
         }
     )
 
-    call_command('update_investment_project_created_on', bucket, object_key)
+    call_command('update_investment_project_comments', bucket, object_key)
 
     for investment_project in investment_projects:
         investment_project.refresh_from_db()
 
-    assert investment_projects[0].created_on == datetime(2015, 9, 29, 11, 3, 20, tzinfo=utc)
-    assert investment_projects[1].created_on == created_on_dates[1]
-    assert investment_projects[2].created_on == created_on_dates[2]
+    assert investment_projects[0].comments == 'Comment 2\nNew Line :)'
+    assert investment_projects[1].comments == old_comments
 
 
 def test_simulate(s3_stubber):
     """Test that the command only simulates the actions if --simulate is passed in."""
     investment_projects = InvestmentProjectFactory.create_batch(2)
-    created_on_dates = [ip.created_on for ip in investment_projects]
+    old_comments = [ip.comments for ip in investment_projects]
 
     bucket = 'test_bucket'
     object_key = 'test_key'
-    csv_content = f"""id,createdon
-{investment_projects[0].id},2015-09-29 11:03:20.000
-{investment_projects[1].id},2015-09-29 11:03:20.000
+    csv_content = f"""Id,comments
+{investment_projects[0].id},Comment 1
+{investment_projects[1].id},Comment 2
 """
     s3_stubber.add_response(
         'get_object',
@@ -77,28 +72,28 @@ def test_simulate(s3_stubber):
         }
     )
 
-    call_command('update_investment_project_created_on', bucket, object_key, simulate=True)
+    call_command('update_investment_project_comments', bucket, object_key, simulate=True)
 
     for investment_project in investment_projects:
         investment_project.refresh_from_db()
 
-    assert investment_projects[0].created_on == created_on_dates[0]
-    assert investment_projects[1].created_on == created_on_dates[1]
+    assert investment_projects[0].comments == old_comments[0]
+    assert investment_projects[1].comments == old_comments[1]
 
 
 def test_audit_log(s3_stubber):
-    """Test that the audit log is being created."""
-    investment_project = InvestmentProjectFactory()
+    """Test that reversion revisions are created."""
+    investment_projects = InvestmentProjectFactory.create_batch(2)
 
     bucket = 'test_bucket'
     object_key = 'test_key'
-    csv_content = f"""id,createdon
-{investment_project.id},2015-09-29 11:03:20.000
+    csv_content = f"""Id,comments
+{investment_projects[0].id},Comment 1
 """
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(bytes(csv_content, encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
         },
         expected_params={
             'Bucket': bucket,
@@ -106,12 +101,11 @@ def test_audit_log(s3_stubber):
         }
     )
 
-    call_command('update_investment_project_created_on', bucket, object_key)
+    call_command('update_investment_project_comments', bucket, object_key)
 
-    investment_project.refresh_from_db()
-
-    assert investment_project.created_on == datetime(2015, 9, 29, 11, 3, 20, tzinfo=utc)
-
-    versions = Version.objects.get_for_object(investment_project)
+    versions = Version.objects.get_for_object(investment_projects[0])
     assert len(versions) == 1
-    assert versions[0].revision.comment == 'Created On migration.'
+    assert versions[0].revision.comment == 'Comments migration.'
+
+    versions = Version.objects.get_for_object(investment_projects[1])
+    assert len(versions) == 0

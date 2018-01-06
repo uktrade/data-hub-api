@@ -36,6 +36,7 @@ def test_investment_project_to_dict(setup_es):
         'archived_by',
         'name',
         'description',
+        'comments',
         'anonymous_description',
         'estimated_land_date',
         'actual_land_date',

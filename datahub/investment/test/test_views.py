@@ -68,6 +68,7 @@ class TestListView(APITestMixin):
             'project_code',
             'investment_type',
             'description',
+            'comments',
             'anonymous_description',
             'estimated_land_date',
             'actual_land_date',
@@ -510,6 +511,7 @@ class TestRetrieveView(APITestMixin):
         assert response_data['id'] == str(project.id)
         assert response_data['name'] == project.name
         assert response_data['description'] == project.description
+        assert response_data['comments'] == project.comments
         assert response_data['likelihood_of_landing'] == project.likelihood_of_landing
         assert response_data['project_code'] == project.project_code
         assert response_data['estimated_land_date'] == str(project.estimated_land_date)
@@ -1207,15 +1209,18 @@ class TestPartialUpdateView(APITestMixin):
         """Test updating read-only fields."""
         project = InvestmentProjectFactory(
             archived_documents_url_path='old_path',
+            comments='old_comment',
         )
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         response = self.api_client.patch(url, format='json', data={
-            'archived_documents_url_path': 'new_path'
+            'archived_documents_url_path': 'new_path',
+            'comments': 'new_comments',
         })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived_documents_url_path'] == 'old_path'
+        assert response.data['comments'] == 'old_comment'
 
     def test_restricted_user_cannot_update_project_if_not_associated(self):
         """Tests that a restricted user cannot update another team's project."""

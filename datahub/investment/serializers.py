@@ -158,7 +158,8 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
             'archived_reason',
             'archived_by',
             'created_on',
-            'modified_on'
+            'modified_on',
+            'comments',
         )
         # DRF defaults to required=False even though this field is
         # non-nullable
@@ -170,6 +171,7 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
             'archived_on',
             'archived_reason',
             'archived_documents_url_path',
+            'comments',
         )
 
 
