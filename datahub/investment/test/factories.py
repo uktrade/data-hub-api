@@ -26,6 +26,7 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     modified_by = factory.SubFactory(AdviserFactory)
     name = factory.Sequence(lambda n: f'name {n}')
     description = factory.Sequence(lambda n: f'desc {n}')
+    comments = factory.Faker('text')
     estimated_land_date = date(2020, 1, 1)
     investment_type_id = InvestmentType.commitment_to_invest.value.id
     referral_source_activity_id = ReferralSourceActivity.cold_call.value.id
