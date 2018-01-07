@@ -53,7 +53,7 @@ jmespath==0.9.3           # via boto3, botocore, jmespath
 lxml==4.1.1
 mccabe==0.6.1             # via flake8, mccabe
 monotonic==1.4            # via notifications-python-client
-notifications-python-client==4.6.0
+notifications-python-client==4.7.1
 oauthlib==2.0.6           # via django-oauth-toolkit
 parso==0.1.1              # via jedi
 pep8-naming==0.4.1
