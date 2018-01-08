@@ -19,6 +19,13 @@ class Invoice(BaseModel):
 
     po_number = models.CharField(max_length=100, blank=True)
 
+    # As invoice details can be requested to be changed but the instances are considered
+    # immutable, we need to create new records every time.
+    # We only care about the most up-to-date instance though so we have a foreign key to the
+    # invoice from the order. Invoices do not link to orders to avoid any confusion.
+    # Order references as string on invoices can however be useful for debug purposes.
+    order_reference = models.CharField(max_length=100, blank=True)
+
     billing_company_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     billing_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
     billing_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)

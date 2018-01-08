@@ -16,6 +16,7 @@ class InvoiceManager(models.Manager):
         :returns: Invoice object generated from the order
         """
         return self.create(
+            order_reference=order.reference,
             invoice_number=generate_datetime_based_reference(self.model, field='invoice_number'),
             payment_due_date=calculate_payment_due_date(order),
             billing_company_name=order.billing_company_name,

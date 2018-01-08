@@ -1,5 +1,5 @@
+from django.db import transaction
 from django.utils.timezone import now
-
 from django.utils.translation import ugettext_lazy
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -26,6 +26,20 @@ from .validators import (
     OrderInStatusValidator,
     ReadonlyAfterCreationValidator,
 )
+
+
+ORDER_FIELDS_INVOICE_RELATED = {
+    'billing_address_1',
+    'billing_address_2',
+    'billing_address_town',
+    'billing_address_county',
+    'billing_address_postcode',
+    'billing_address_country',
+    'vat_status',
+    'vat_number',
+    'vat_verified',
+    'po_number',
+}
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -142,39 +156,37 @@ class OrderSerializer(serializers.ModelSerializer):
             'billing_phone',
         )
         validators = (
-            ContactWorksAtCompanyValidator(),
-            ReadonlyAfterCreationValidator(fields=('company', 'primary_market')),
+            # the endpoint can only be called to create or to update orders in
+            # status 'Draft', 'Quote Awaiting Acceptance' or 'Quote accepted'
             OrderInStatusValidator(
                 allowed_statuses=(
                     OrderStatus.draft,
                     OrderStatus.quote_awaiting_acceptance,
+                    OrderStatus.quote_accepted,
                 ),
                 order_required=False
             ),
+            # after creation these fields cannot be changed
+            ReadonlyAfterCreationValidator(fields=('company', 'primary_market')),
+            # when the order is in 'Quote Awaiting Acceptance' or
+            # 'Quote Accepted' only some of the fields can be changed
             RulesBasedValidator(
-                # when the order is in 'Quote Awaiting Acceptance'
-                # only some of the fields can be changed
                 ValidationRule(
                     'readonly',
                     EditableFieldsRule(
-                        editable_fields=(
-                            'billing_address_1',
-                            'billing_address_2',
-                            'billing_address_town',
-                            'billing_address_county',
-                            'billing_address_postcode',
-                            'billing_address_country',
-                            'vat_status',
-                            'vat_number',
-                            'vat_verified',
-                            'po_number',
-                        )
+                        editable_fields=ORDER_FIELDS_INVOICE_RELATED
                     ),
                     when=OrderInStatusRule(
-                        (OrderStatus.quote_awaiting_acceptance,)
+                        (
+                            OrderStatus.quote_awaiting_acceptance,
+                            OrderStatus.quote_accepted,
+                        )
                     )
                 ),
             ),
+            # contact has to work at company
+            ContactWorksAtCompanyValidator(),
+            # validate billing address if edited
             AddressValidator(
                 lazy=True,
                 fields_mapping={
@@ -250,6 +262,22 @@ class OrderSerializer(serializers.ModelSerializer):
         if 'uk_region' not in validated_data:
             validated_data['uk_region'] = validated_data['company'].uk_region
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        """
+        Update invoice details if any of the invoice related fields has changed.
+        """
+        with transaction.atomic():
+            instance = super().update(instance, validated_data)
+
+            # update invoice details if necessary
+            if (
+                instance.status == OrderStatus.quote_accepted
+                and (ORDER_FIELDS_INVOICE_RELATED & validated_data.keys())
+            ):
+                instance.update_invoice_details()
+
+            return instance
 
 
 class CompleteOrderSerializer(OrderSerializer):

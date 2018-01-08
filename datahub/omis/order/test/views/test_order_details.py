@@ -14,7 +14,8 @@ from datahub.omis.market.models import Market
 
 from ..factories import (
     OrderAssigneeCompleteFactory, OrderAssigneeFactory,
-    OrderFactory, OrderPaidFactory, OrderWithOpenQuoteFactory
+    OrderFactory, OrderPaidFactory, OrderWithAcceptedQuoteFactory,
+    OrderWithOpenQuoteFactory,
 )
 
 from ...constants import OrderStatus, VATStatus
@@ -666,7 +667,6 @@ class TestGeneralChangeOrder(APITestMixin):
 
     @pytest.mark.parametrize(
         'disallowed_status', (
-            OrderStatus.quote_accepted,
             OrderStatus.paid,
             OrderStatus.complete,
             OrderStatus.cancelled,
@@ -874,12 +874,22 @@ class TestChangeOrderInDraft(APITestMixin):
         }
 
 
-class TestChangeOrderInQuoteAwaitingAcceptance(APITestMixin):
-    """Tests for changing an order when it's in quote_awaiting_acceptance."""
+class TestChangeOrderInQuoteStatuses(APITestMixin):
+    """
+    Tests for changing an order when it's in quote_awaiting_acceptance
+    or quote_accepted.
+    """
 
-    def test_can_change_allowed_fields(self):
+    @pytest.mark.parametrize(
+        'order_factory',
+        (
+            OrderWithOpenQuoteFactory,
+            OrderWithAcceptedQuoteFactory,
+        )
+    )
+    def test_can_change_allowed_fields(self, order_factory):
         """Test that allowed fields can be changed."""
-        order = OrderWithOpenQuoteFactory(
+        order = order_factory(
             vat_status=VATStatus.eu,
             vat_number='01234566789',
             vat_verified=True,
@@ -914,6 +924,102 @@ class TestChangeOrderInQuoteAwaitingAcceptance(APITestMixin):
     @pytest.mark.parametrize(
         'field,value',
         (
+            ('billing_address_1', 'New billing address 1'),
+            ('billing_address_2', 'New billing address 2'),
+            ('billing_address_town', 'New billing town'),
+            ('billing_address_county', 'New billing county'),
+            ('billing_address_postcode', 'New billing postcode'),
+            ('billing_address_country', Country.france.value.id),
+            ('vat_status', VATStatus.eu),
+            ('vat_number', '987654321'),
+            ('vat_verified', False),
+            ('po_number', 'New po number'),
+        )
+    )
+    def test_new_invoice_generated_if_quote_accepted(self, field, value):
+        """
+        Test that if the order is in status 'Quote accepted' and one of the
+        billing fields has changed, a new invoice is generated.
+        """
+        order = OrderWithAcceptedQuoteFactory(
+            vat_status=VATStatus.eu,
+            vat_number='01234566789',
+            vat_verified=True,
+        )
+        old_invoice = order.invoice
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(url, {field: value}, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
+        order.refresh_from_db()
+        assert order.invoice != old_invoice
+
+        new_value = getattr(order.invoice, field)
+        if hasattr(new_value, 'pk'):
+            new_value = str(new_value.pk)
+        assert new_value == value
+
+    def test_pricing_on_invoice_changed_if_quote_accepted(self):
+        """
+        Test that if the order is in status 'Quote accepted'
+        and one of the vat fields change, the pricing on the new invoice
+        get updated.
+        """
+        order = OrderWithAcceptedQuoteFactory(
+            vat_status=VATStatus.eu,
+            vat_number='01234566789',
+            vat_verified=True,
+        )
+        old_invoice = order.invoice
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(url, {'vat_verified': False}, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
+        order.refresh_from_db()
+        new_invoice = order.invoice
+
+        assert new_invoice != old_invoice
+        assert new_invoice.vat_status == old_invoice.vat_status
+        assert new_invoice.vat_number == old_invoice.vat_number
+        assert new_invoice.vat_verified != old_invoice.vat_verified
+        assert new_invoice.net_cost == old_invoice.net_cost
+        assert new_invoice.subtotal_cost == old_invoice.subtotal_cost
+        assert new_invoice.vat_cost != old_invoice.vat_cost
+        assert new_invoice.vat_cost > 0
+        assert new_invoice.total_cost > old_invoice.total_cost
+
+    def test_invoice_not_generated_if_quote_awaiting_acceptance(self):
+        """
+        Test that if the order is in status 'Quote Awaiting Acceptance'
+        and one of the billing field has changed, no invoice gets created.
+        """
+        order = OrderWithOpenQuoteFactory(
+            vat_status=VATStatus.eu,
+            vat_number='01234566789',
+            vat_verified=True,
+        )
+        assert not order.invoice
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(url, {'vat_verified': False}, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
+        order.refresh_from_db()
+        assert not order.vat_verified
+        assert not order.invoice
+
+    @pytest.mark.parametrize(
+        'order_factory',
+        (
+            OrderWithOpenQuoteFactory,
+            OrderWithAcceptedQuoteFactory,
+        )
+    )
+    @pytest.mark.parametrize(
+        'field,value',
+        (
             (
                 'service_types',
                 lambda o: [ServiceType.objects.filter(disabled_on__isnull=True).first().id]
@@ -928,9 +1034,9 @@ class TestChangeOrderInQuoteAwaitingAcceptance(APITestMixin):
             ('contact', lambda o: ContactFactory(company=o.company).id),
         )
     )
-    def test_cannot_change_disallowed_fields(self, field, value):
+    def test_cannot_change_disallowed_fields(self, order_factory, field, value):
         """Test that disallowed fields cannot be changed."""
-        order = OrderWithOpenQuoteFactory()
+        order = order_factory()
         value = value(order) if callable(value) else value
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
