@@ -21,6 +21,7 @@ from .constants import OrderStatus, VATStatus
 from .models import CancellationReason, Order, OrderAssignee, OrderSubscriber, ServiceType
 from .validators import (
     ContactWorksAtCompanyValidator,
+    EditableFieldsRule,
     OrderInStatusRule,
     OrderInStatusValidator,
     ReadonlyAfterCreationValidator,
@@ -54,6 +55,10 @@ class OrderSerializer(serializers.ModelSerializer):
 
     cancellation_reason = NestedRelatedField(CancellationReason, read_only=True)
     cancelled_by = NestedRelatedField(Advisor, read_only=True)
+
+    default_error_messages = {
+        'readonly': ugettext_lazy('This field cannot be changed at this stage.'),
+    }
 
     class Meta:
         model = Order
@@ -140,8 +145,35 @@ class OrderSerializer(serializers.ModelSerializer):
             ContactWorksAtCompanyValidator(),
             ReadonlyAfterCreationValidator(fields=('company', 'primary_market')),
             OrderInStatusValidator(
-                allowed_statuses=(OrderStatus.draft,),
+                allowed_statuses=(
+                    OrderStatus.draft,
+                    OrderStatus.quote_awaiting_acceptance,
+                ),
                 order_required=False
+            ),
+            RulesBasedValidator(
+                # when the order is in 'Quote Awaiting Acceptance'
+                # only some of the fields can be changed
+                ValidationRule(
+                    'readonly',
+                    EditableFieldsRule(
+                        editable_fields=(
+                            'billing_address_1',
+                            'billing_address_2',
+                            'billing_address_town',
+                            'billing_address_county',
+                            'billing_address_postcode',
+                            'billing_address_country',
+                            'vat_status',
+                            'vat_number',
+                            'vat_verified',
+                            'po_number',
+                        )
+                    ),
+                    when=OrderInStatusRule(
+                        (OrderStatus.quote_awaiting_acceptance,)
+                    )
+                ),
             ),
             AddressValidator(
                 lazy=True,
