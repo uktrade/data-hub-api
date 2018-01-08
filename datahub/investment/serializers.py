@@ -1,5 +1,8 @@
 """Investment serialisers for views."""
 
+from collections import Counter
+
+from django.utils.translation import ugettext_lazy
 from rest_framework import serializers
 
 import datahub.metadata.models as meta_models
@@ -253,11 +256,81 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
         )
 
 
+class IProjectTeamMemberListSerializer(serializers.ListSerializer):
+    """Team member list serialiser that adds validation for duplicates."""
+
+    default_error_messages = {
+        'duplicate_adviser': ugettext_lazy(
+            'You cannot add the same adviser as a team member more than once.'
+        )
+    }
+
+    def update(self, instances, validated_data):
+        """
+        Performs an update i.e. replaces all team members.
+
+        Based on example code in DRF documentation for ListSerializer.
+        """
+        old_advisers_mapping = {team_member.adviser.id: team_member for team_member in
+                                instances}
+        new_advisers_mapping = {team_member['adviser'].id: team_member for team_member in
+                                validated_data}
+
+        # Create new team members and update existing ones
+        ret = []
+        for adviser_id, new_team_member_data in new_advisers_mapping.items():
+            team_member = old_advisers_mapping.get(adviser_id, None)
+            if team_member is None:
+                ret.append(self.child.create(new_team_member_data))
+            else:
+                ret.append(self.child.update(team_member, new_team_member_data))
+
+        # Delete removed team members
+        for adviser_id in old_advisers_mapping.keys() - new_advisers_mapping.keys():
+            old_advisers_mapping[adviser_id].delete()
+
+        return ret
+
+    def run_validation(self, data=serializers.empty):
+        """
+        Validates that there are no duplicate advisers (to avoid a 500 error).
+
+        Unfortunately, overriding validate() results in a error dict being returned and the errors
+        being placed in non_field_errors. Hence, run_validation() is overridden instead (to get
+        the expected behaviour of an error list being returned, with each entry corresponding
+        to each item in the request body).
+        """
+        value = super().run_validation(data)
+
+        counts = Counter(team_member['adviser'].id for team_member in value)
+        if len(counts) < len(value):
+            errors = []
+            for item in value:
+                item_errors = {}
+                if counts[item['adviser'].id] > 1:
+                    item_errors['adviser'] = [self.error_messages['duplicate_adviser']]
+                errors.append(item_errors)
+            raise serializers.ValidationError(errors)
+
+        return value
+
+
 class IProjectTeamMemberSerializer(serializers.ModelSerializer):
     """Serialiser for investment project team members."""
 
     investment_project = NestedRelatedField(InvestmentProject)
     adviser = NestedAdviserField()
+
+    @classmethod
+    def many_init(cls, *args, **kwargs):
+        """
+        Initialises a many-item instance of the serialiser using custom logic.
+
+        This disables the unique together validator in the child serialiser, as it's incompatible
+        with many-item update operations (as it mistakenly fails existing rows).
+        """
+        child = cls(context=kwargs.get('context'), validators=())
+        return IProjectTeamMemberListSerializer(child=child, *args, **kwargs)
 
     class Meta:
         model = InvestmentProjectTeamMember

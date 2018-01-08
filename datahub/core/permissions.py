@@ -28,6 +28,7 @@ _MANY_TO_MANY_VIEW_TO_ACTION_MAPPING = {
     'destroy': 'change',
     'destroy_all': 'change',
     'partial_update': 'change',
+    'replace_all': 'change',
     'metadata': 'read',
 }
 
