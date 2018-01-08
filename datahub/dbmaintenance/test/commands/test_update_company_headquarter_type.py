@@ -11,8 +11,10 @@ from datahub.core.constants import HeadquarterType
 pytestmark = pytest.mark.django_db
 
 
-def test_run(s3_stubber, capsys):
+def test_run(s3_stubber, caplog):
     """Test that the command updates the specified records (ignoring ones with errors)."""
+    caplog.set_level('ERROR')
+
     company_no_hq_type = CompanyFactory(
         headquarter_type_id=None
     )
@@ -57,9 +59,8 @@ def test_run(s3_stubber, capsys):
     for company in companies:
         company.refresh_from_db()
 
-    _, err = capsys.readouterr()
-    assert 'Company matching query does not exist' in err
-    assert err.count('Failed') == 1
+    assert 'Company matching query does not exist' in caplog.text
+    assert len(caplog.records) == 1
 
     assert company_no_hq_type.headquarter_type_id == UUID(HeadquarterType.ehq.value.id)
     assert company_ghq.headquarter_type_id == UUID(HeadquarterType.ehq.value.id)
@@ -67,8 +68,10 @@ def test_run(s3_stubber, capsys):
     assert company_ukhq.headquarter_type_id == UUID(HeadquarterType.ukhq.value.id)
 
 
-def test_simulate(s3_stubber, capsys):
+def test_simulate(s3_stubber, caplog):
     """Test that the command simulates updates if --simulate is passed in."""
+    caplog.set_level('ERROR')
+
     company_no_hq_type = CompanyFactory(
         headquarter_type_id=None
     )
@@ -113,9 +116,8 @@ def test_simulate(s3_stubber, capsys):
     for company in companies:
         company.refresh_from_db()
 
-    _, err = capsys.readouterr()
-    assert 'Company matching query does not exist' in err
-    assert err.count('Failed') == 1
+    assert 'Company matching query does not exist' in caplog.text
+    assert len(caplog.records) == 1
 
     assert company_no_hq_type.headquarter_type_id is None
     assert company_ghq.headquarter_type_id == UUID(HeadquarterType.ghq.value.id)
