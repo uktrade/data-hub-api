@@ -14,7 +14,7 @@ from datahub.omis.market.models import Market
 
 from ..factories import (
     OrderAssigneeCompleteFactory, OrderAssigneeFactory,
-    OrderFactory, OrderPaidFactory
+    OrderFactory, OrderPaidFactory, OrderWithOpenQuoteFactory
 )
 
 from ...constants import OrderStatus, VATStatus
@@ -25,7 +25,7 @@ from ...models import CancellationReason, ServiceType
 pytestmark = pytest.mark.django_db
 
 
-class TestAddOrderDetails(APITestMixin):
+class TestAddOrder(APITestMixin):
     """Add Order details test case."""
 
     @freeze_time('2017-04-18 13:00:00.000000')
@@ -405,131 +405,8 @@ class TestAddOrderDetails(APITestMixin):
         }
 
 
-class TestChangeOrderDetails(APITestMixin):
-    """Change Order details test case."""
-
-    @freeze_time('2017-04-18 13:00:00.000000')
-    def test_success(self):
-        """Test changing an existing order."""
-        order = OrderFactory(
-            vat_status=VATStatus.outside_eu,
-            uk_region_id=UKRegion.alderney.value.id
-        )
-        new_contact = ContactFactory(company=order.company)
-        new_sector = Sector.renewable_energy_wind.value
-        new_uk_region = UKRegion.channel_islands.value
-        new_service_type = ServiceType.objects.filter(disabled_on__isnull=True).first()
-
-        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(
-            url,
-            {
-                'contact': {'id': new_contact.pk},
-                'sector': {'id': new_sector.id},
-                'uk_region': {'id': new_uk_region.id},
-                'service_types': [
-                    {'id': str(new_service_type.pk)},
-                ],
-                'description': 'Updated description',
-                'contacts_not_to_approach': 'Updated contacts not to approach',
-                'further_info': 'Updated additional notes',
-                'existing_agents': 'Updated contacts in the market',
-                'delivery_date': '2017-04-21',
-                'po_number': 'NEW PO 321',
-                'vat_status': VATStatus.eu,
-                'vat_number': 'new vat number',
-                'vat_verified': False,
-                'billing_address_1': 'Apt 1',
-                'billing_address_2': 'London Street',
-                'billing_address_town': 'London',
-                'billing_address_county': 'London',
-                'billing_address_postcode': 'SW1A1AA',
-                'billing_address_country': Country.united_kingdom.value.id,
-            },
-            format='json'
-        )
-
-        order.refresh_from_db()
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            'id': str(order.pk),
-            'reference': order.reference,
-            'status': OrderStatus.draft,
-            'created_on': '2017-04-18T13:00:00Z',
-            'created_by': {
-                'id': str(order.created_by.pk),
-                'name': order.created_by.name
-            },
-            'modified_on': '2017-04-18T13:00:00Z',
-            'modified_by': {
-                'id': str(self.user.pk),
-                'name': self.user.name
-            },
-            'company': {
-                'id': str(order.company.pk),
-                'name': order.company.name
-            },
-            'contact': {
-                'id': str(new_contact.pk),
-                'name': new_contact.name
-            },
-            'primary_market': {
-                'id': str(order.primary_market.pk),
-                'name': order.primary_market.name
-            },
-            'sector': {
-                'id': new_sector.id,
-                'name': new_sector.name
-            },
-            'uk_region': {
-                'id': new_uk_region.id,
-                'name': new_uk_region.name
-            },
-            'service_types': [
-                {
-                    'id': str(new_service_type.pk),
-                    'name': new_service_type.name
-                }
-            ],
-            'description': 'Updated description',
-            'contacts_not_to_approach': 'Updated contacts not to approach',
-            'product_info': order.product_info,
-            'further_info': 'Updated additional notes',
-            'existing_agents': 'Updated contacts in the market',
-            'permission_to_approach_contacts': order.permission_to_approach_contacts,
-            'delivery_date': '2017-04-21',
-            'contact_email': order.contact_email,
-            'contact_phone': order.contact_phone,
-            'po_number': 'NEW PO 321',
-            'discount_value': order.discount_value,
-            'vat_status': VATStatus.eu,
-            'vat_number': 'new vat number',
-            'vat_verified': False,
-            'net_cost': order.net_cost,
-            'subtotal_cost': order.subtotal_cost,
-            'vat_cost': order.vat_cost,
-            'total_cost': order.total_cost,
-            'billing_company_name': order.billing_company_name,
-            'billing_contact_name': order.billing_contact_name,
-            'billing_email': order.billing_email,
-            'billing_phone': order.billing_phone,
-            'billing_address_1': 'Apt 1',
-            'billing_address_2': 'London Street',
-            'billing_address_town': 'London',
-            'billing_address_county': 'London',
-            'billing_address_postcode': 'SW1A1AA',
-            'billing_address_country': {
-                'id': str(Country.united_kingdom.value.id),
-                'name': Country.united_kingdom.value.name
-            },
-            'archived_documents_url_path': '',
-            'paid_on': None,
-            'completed_by': None,
-            'completed_on': None,
-            'cancelled_by': None,
-            'cancelled_on': None,
-            'cancellation_reason': None,
-        }
+class TestGeneralChangeOrder(APITestMixin):
+    """Tests for changing an order not related to any particular status."""
 
     @freeze_time('2017-04-18 13:00:00.000000')
     def test_uk_region_not_populated_on_change(self):
@@ -553,11 +430,16 @@ class TestChangeOrderDetails(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert not response.json()['uk_region']
 
-    def test_fails_if_contact_not_from_company(self):
+    @pytest.mark.parametrize(
+        'allowed_status', (
+            OrderStatus.draft,
+        )
+    )
+    def test_fails_if_contact_not_from_company(self, allowed_status):
         """
         Test that if the contact does not work at the company specified, the validation fails.
         """
-        order = OrderFactory()
+        order = OrderFactory(status=allowed_status)
         other_contact = ContactFactory()  # doesn't work at `order.company`
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
@@ -784,14 +666,13 @@ class TestChangeOrderDetails(APITestMixin):
 
     @pytest.mark.parametrize(
         'disallowed_status', (
-            OrderStatus.quote_awaiting_acceptance,
             OrderStatus.quote_accepted,
             OrderStatus.paid,
             OrderStatus.complete,
             OrderStatus.cancelled,
         )
     )
-    def test_409_if_order_not_in_draft(self, disallowed_status):
+    def test_409_if_order_not_in_allowed_status(self, disallowed_status):
         """
         Test that if the order is not in one of the allowed statuses, the endpoint
         returns 409.
@@ -864,6 +745,198 @@ class TestChangeOrderDetails(APITestMixin):
             'billing_address_town': ['This field is required.'],
             'billing_address_country': ['This field is required.'],
         }
+
+
+class TestChangeOrderInDraft(APITestMixin):
+    """Tests for changing an order when it's in draft."""
+
+    @freeze_time('2017-04-18 13:00:00.000000')
+    def test_success(self):
+        """Test changing an existing order."""
+        order = OrderFactory(
+            vat_status=VATStatus.outside_eu,
+            uk_region_id=UKRegion.alderney.value.id
+        )
+        new_contact = ContactFactory(company=order.company)
+        new_sector = Sector.renewable_energy_wind.value
+        new_uk_region = UKRegion.channel_islands.value
+        new_service_type = ServiceType.objects.filter(disabled_on__isnull=True).first()
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(
+            url,
+            {
+                'contact': {'id': new_contact.pk},
+                'sector': {'id': new_sector.id},
+                'uk_region': {'id': new_uk_region.id},
+                'service_types': [
+                    {'id': str(new_service_type.pk)},
+                ],
+                'description': 'Updated description',
+                'contacts_not_to_approach': 'Updated contacts not to approach',
+                'further_info': 'Updated additional notes',
+                'existing_agents': 'Updated contacts in the market',
+                'delivery_date': '2017-04-21',
+                'po_number': 'NEW PO 321',
+                'vat_status': VATStatus.eu,
+                'vat_number': 'new vat number',
+                'vat_verified': False,
+                'billing_address_1': 'Apt 1',
+                'billing_address_2': 'London Street',
+                'billing_address_town': 'London',
+                'billing_address_county': 'London',
+                'billing_address_postcode': 'SW1A1AA',
+                'billing_address_country': Country.united_kingdom.value.id,
+            },
+            format='json'
+        )
+
+        order.refresh_from_db()
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            'id': str(order.pk),
+            'reference': order.reference,
+            'status': OrderStatus.draft,
+            'created_on': '2017-04-18T13:00:00Z',
+            'created_by': {
+                'id': str(order.created_by.pk),
+                'name': order.created_by.name
+            },
+            'modified_on': '2017-04-18T13:00:00Z',
+            'modified_by': {
+                'id': str(self.user.pk),
+                'name': self.user.name
+            },
+            'company': {
+                'id': str(order.company.pk),
+                'name': order.company.name
+            },
+            'contact': {
+                'id': str(new_contact.pk),
+                'name': new_contact.name
+            },
+            'primary_market': {
+                'id': str(order.primary_market.pk),
+                'name': order.primary_market.name
+            },
+            'sector': {
+                'id': new_sector.id,
+                'name': new_sector.name
+            },
+            'uk_region': {
+                'id': new_uk_region.id,
+                'name': new_uk_region.name
+            },
+            'service_types': [
+                {
+                    'id': str(new_service_type.pk),
+                    'name': new_service_type.name
+                }
+            ],
+            'description': 'Updated description',
+            'contacts_not_to_approach': 'Updated contacts not to approach',
+            'product_info': order.product_info,
+            'further_info': 'Updated additional notes',
+            'existing_agents': 'Updated contacts in the market',
+            'permission_to_approach_contacts': order.permission_to_approach_contacts,
+            'delivery_date': '2017-04-21',
+            'contact_email': order.contact_email,
+            'contact_phone': order.contact_phone,
+            'po_number': 'NEW PO 321',
+            'discount_value': order.discount_value,
+            'vat_status': VATStatus.eu,
+            'vat_number': 'new vat number',
+            'vat_verified': False,
+            'net_cost': order.net_cost,
+            'subtotal_cost': order.subtotal_cost,
+            'vat_cost': order.vat_cost,
+            'total_cost': order.total_cost,
+            'billing_company_name': order.billing_company_name,
+            'billing_contact_name': order.billing_contact_name,
+            'billing_email': order.billing_email,
+            'billing_phone': order.billing_phone,
+            'billing_address_1': 'Apt 1',
+            'billing_address_2': 'London Street',
+            'billing_address_town': 'London',
+            'billing_address_county': 'London',
+            'billing_address_postcode': 'SW1A1AA',
+            'billing_address_country': {
+                'id': str(Country.united_kingdom.value.id),
+                'name': Country.united_kingdom.value.name
+            },
+            'archived_documents_url_path': '',
+            'paid_on': None,
+            'completed_by': None,
+            'completed_on': None,
+            'cancelled_by': None,
+            'cancelled_on': None,
+            'cancellation_reason': None,
+        }
+
+
+class TestChangeOrderInQuoteAwaitingAcceptance(APITestMixin):
+    """Tests for changing an order when it's in quote_awaiting_acceptance."""
+
+    def test_can_change_allowed_fields(self):
+        """Test that allowed fields can be changed."""
+        order = OrderWithOpenQuoteFactory(
+            vat_status=VATStatus.eu,
+            vat_number='01234566789',
+            vat_verified=True,
+        )
+
+        data = {
+            'billing_address_1': 'New billing address 1',
+            'billing_address_2': 'New billing address 2',
+            'billing_address_town': 'New billing town',
+            'billing_address_county': 'New billing county',
+            'billing_address_postcode': 'New billing postcode',
+            'billing_address_country': Country.france.value.id,
+            'vat_status': VATStatus.eu,
+            'vat_number': '987654321',
+            'vat_verified': False,
+            'po_number': 'New po number',
+        }
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(url, data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+        assert {
+            k: v for k, v in response.json().items() if k in data
+        } == {
+            **data,
+            'billing_address_country': {
+                'id': Country.france.value.id,
+                'name': Country.france.value.name,
+            },
+        }
+
+    @pytest.mark.parametrize(
+        'field,value',
+        (
+            (
+                'service_types',
+                lambda o: [ServiceType.objects.filter(disabled_on__isnull=True).first().id]
+            ),
+            ('uk_region', UKRegion.jersey.value.id),
+            ('sector', Sector.aerospace_assembly_aircraft.value.id),
+            ('existing_agents', 'loremm ipsum'),
+            ('further_info', 'lorem ipsum'),
+            ('contacts_not_to_approach', 'lorem ipsum'),
+            ('description', 'lorem ipsum'),
+            ('delivery_date', '2017-04-20'),
+            ('contact', lambda o: ContactFactory(company=o.company).id),
+        )
+    )
+    def test_cannot_change_disallowed_fields(self, field, value):
+        """Test that disallowed fields cannot be changed."""
+        order = OrderWithOpenQuoteFactory()
+        value = value(order) if callable(value) else value
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(url, {field: value}, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {field: ['This field cannot be changed at this stage.']}
 
 
 class TestMarkOrderAsComplete(APITestMixin):

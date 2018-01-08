@@ -19,6 +19,7 @@ from ..validators import (
     CancellableOrderValidator,
     CompletableOrderValidator,
     ContactWorksAtCompanyValidator,
+    EditableFieldsRule,
     NoOtherActiveQuoteExistsValidator,
     OrderDetailsFilledInValidator,
     OrderInStatusRule,
@@ -708,4 +709,23 @@ def test_order_in_status_rule(order_status, expected_status, res):
     combiner.serializer.context = {'order': order}
 
     rule = OrderInStatusRule(expected_status)
+    assert rule(combiner) == res
+
+
+@pytest.mark.parametrize(
+    'fields,res',
+    (
+        (('field1',), True),
+        (('field1', 'field2'), True),
+        (('field3'), False),
+        (('field1', 'field3'), False),
+    )
+)
+def test_editable_fields_rule(fields, res):
+    """Tests for EditableFieldsRule."""
+    combiner = mock.Mock(data=fields)
+    rule = EditableFieldsRule(
+        editable_fields=('field1', 'field2')
+    )
+
     assert rule(combiner) == res
