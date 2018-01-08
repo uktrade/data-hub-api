@@ -5,6 +5,7 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 asttokens==1.1.7          # via flake8-import-order
+attrs==17.4.0             # via pytest
 boto3==1.5.9
 botocore==1.8.23          # via boto3, s3transfer
 certifi==2017.11.5        # via requests
@@ -60,6 +61,7 @@ pep8-naming==0.5.0
 pexpect==4.3.1            # via ipython
 pickleshare==0.7.4        # via ipython, pickleshare
 pip-tools==1.11.0
+pluggy==0.6.0             # via pytest
 prompt-toolkit==1.0.15    # via ipython, prompt-toolkit
 psycopg2==2.7.3.2
 ptyprocess==0.5.2         # via pexpect, ptyprocess
@@ -72,7 +74,7 @@ pyjwt==1.5.3              # via notifications-python-client, pyjwt
 pytest-cov==2.5.1
 pytest-django==3.1.2
 pytest-sugar==0.9.0
-pytest==3.2.3
+pytest==3.3.2
 python-dateutil==2.6.1
 pytz==2017.3              # via django
 pyyaml==3.12
@@ -82,7 +84,7 @@ requests==2.18.4
 requests_toolbelt==0.8.0
 s3transfer==0.1.12        # via boto3
 simplegeneric==0.8.1      # via ipython, simplegeneric
-six==1.11.0               # via asttokens, django-environ, django-extensions, elasticsearch-dsl, faker, flake8-print, freezegun, pip-tools, prompt-toolkit, pydocstyle, python-dateutil, requests-mock, six, traitlets
+six==1.11.0               # via asttokens, django-environ, django-extensions, elasticsearch-dsl, faker, flake8-print, freezegun, pip-tools, prompt-toolkit, pydocstyle, pytest, python-dateutil, requests-mock, six, traitlets
 snowballstemmer==1.2.1    # via pydocstyle, snowballstemmer
 sqlparse==0.2.4           # via django-debug-toolbar, sqlparse
 termcolor==1.1.0          # via pytest-sugar, termcolor
