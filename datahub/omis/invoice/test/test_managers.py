@@ -51,3 +51,10 @@ class TestInvoiceManager:
         assert str(invoice.invoice_address_country.pk) == constants.DIT_ADDRESS_COUNTRY_ID
         assert invoice.invoice_vat_number == constants.DIT_VAT_NUMBER
         assert invoice.contact_email == order.get_current_contact_email()
+        assert invoice.vat_status == order.vat_status
+        assert invoice.vat_number == order.vat_number
+        assert invoice.vat_verified == order.vat_verified
+        assert invoice.net_cost == order.net_cost
+        assert invoice.subtotal_cost == order.subtotal_cost
+        assert invoice.vat_cost == order.vat_cost
+        assert invoice.total_cost == order.total_cost
