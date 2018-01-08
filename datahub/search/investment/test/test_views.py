@@ -112,27 +112,27 @@ class TestSearch(APITestMixin):
         (
             (
                 {
-                    'estimated_land_date_before': '2017-06-13T00:00:00.000000Z'
+                    'estimated_land_date_before': '2017-06-13'
                 },
                 1,
             ),
             (
                 {
-                    'estimated_land_date_after': '2017-06-13T09:44:31.062870Z'
+                    'estimated_land_date_after': '2017-06-13'
                 },
                 2,
             ),
             (
                 {
-                    'estimated_land_date_after': '2017-06-13T09:44:31.062870Z',
-                    'estimated_land_date_before': '2030-06-13T09:44:31.062870Z',
+                    'estimated_land_date_after': '2017-06-13',
+                    'estimated_land_date_before': '2030-06-13',
                 },
                 1,
             ),
             (
                 {
-                    'estimated_land_date_before': '2017-06-13T09:44:31.062870Z',
-                    'estimated_land_date_after': '2030-06-13T09:44:31.062870Z',
+                    'estimated_land_date_before': '2017-06-13',
+                    'estimated_land_date_after': '2030-06-13',
                 },
                 0,
             ),
@@ -155,11 +155,9 @@ class TestSearch(APITestMixin):
         assert len(results) == num_results
 
         for result in results:
-            estimated_land_date = dateutil_parse(
-                result['estimated_land_date']
-            ).replace(tzinfo=utc)
+            estimated_land_date = dateutil_parse(result['estimated_land_date'])
             for filter_key, date in query.items():
-                date = dateutil_parse(date).replace(tzinfo=utc)
+                date = dateutil_parse(date)
                 if filter_key == 'estimated_land_date_before':
                     assert estimated_land_date <= date
                 if filter_key == 'estimated_land_date_after':
