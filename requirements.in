@@ -22,7 +22,7 @@ psycopg2==2.7.3.2
 
 boto3==1.4.8
 
-notifications-python-client==4.6.0
+notifications-python-client==4.7.1
 
 # ES
 elasticsearch==5.4.0
