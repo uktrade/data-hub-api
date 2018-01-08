@@ -5,7 +5,8 @@ from freezegun import freeze_time
 
 from datahub.omis.core.utils import generate_datetime_based_reference
 
-from .factories import InvoiceFactory
+from datahub.omis.order.test.factories import OrderWithAcceptedQuoteFactory
+
 from ..models import Invoice
 from ..utils import calculate_payment_due_date
 
@@ -30,7 +31,8 @@ class TestGenerateInvoiceNumber:
         )
         for dt in dts:
             with freeze_time(dt):
-                InvoiceFactory()
+                OrderWithAcceptedQuoteFactory()
+        assert Invoice.objects.count() == 4
 
         with freeze_time('2017-02-01 13:00:00'):
             invoice_number = generate_datetime_based_reference(Invoice, field='invoice_number')
@@ -52,7 +54,8 @@ class TestGenerateInvoiceNumber:
         )
         for dt in dts:
             with freeze_time(dt):
-                InvoiceFactory()
+                OrderWithAcceptedQuoteFactory()
+        assert Invoice.objects.count() == 7
 
         with freeze_time('2017-02-01 13:00:00'):
             invoice_number = generate_datetime_based_reference(Invoice, field='invoice_number')
