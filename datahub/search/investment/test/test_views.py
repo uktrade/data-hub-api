@@ -112,7 +112,7 @@ class TestSearch(APITestMixin):
         (
             (
                 {
-                    'estimated_land_date_before': '2017-06-13T09:44:31.062870Z'
+                    'estimated_land_date_before': '2017-06-13T00:00:00.000000Z'
                 },
                 1,
             ),
@@ -169,7 +169,13 @@ class TestSearch(APITestMixin):
         'query,num_results', (
             (
                 {
-                    'created_on_before': '2017-06-13T09:44:31.062870Z'
+                    'created_on_before': '2016-09-13T09:44:31.062870Z'
+                },
+                2,
+            ),
+            (
+                {
+                    'created_on_before': '2016-09-12T00:00:00.000000Z'
                 },
                 2,
             ),
@@ -178,6 +184,12 @@ class TestSearch(APITestMixin):
                     'created_on_after': '2017-06-13T09:44:31.062870Z'
                 },
                 3,
+            ),
+            (
+                {
+                    'created_on_after': '2016-09-12T00:00:00.000000Z'
+                },
+                4,
             ),
             (
                 {
