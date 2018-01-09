@@ -32,6 +32,7 @@ class TestInvoiceManager:
         invoice = Invoice.objects.create_from_order(order)
 
         invoice.refresh_from_db()
+        assert invoice.order_reference == order.reference
         assert invoice.invoice_number == '201702010004'
         assert invoice.payment_due_date == payment_due_date
         assert invoice.billing_company_name == order.billing_company_name

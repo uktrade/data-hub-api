@@ -410,6 +410,17 @@ class Order(BaseModel):
         # send signal
         quote_cancelled.send(sender=self.__class__, order=self, by=by)
 
+    def update_invoice_details(self):
+        """Generate a new invoice and link it to this order."""
+        for validator in [
+            validators.OrderInStatusValidator(allowed_statuses=(OrderStatus.quote_accepted,))
+        ]:
+            validator.set_instance(self)
+            validator()
+
+        self.invoice = Invoice.objects.create_from_order(self)
+        self.save(update_fields=('invoice',))
+
     @transaction.atomic
     def accept_quote(self, by):
         """
@@ -429,9 +440,11 @@ class Order(BaseModel):
 
         self.quote.accept(by)
 
-        self.invoice = Invoice.objects.create_from_order(self)
         self.status = OrderStatus.quote_accepted
         self.save()
+
+        # this has to come after saving so that we use the most up-to-date pricing values
+        self.update_invoice_details()
 
         # send signal
         quote_accepted.send(sender=self.__class__, order=self)
