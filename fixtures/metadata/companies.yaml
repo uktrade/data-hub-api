@@ -32,37 +32,6 @@
   pk: 43281c5e-92a4-4794-867b-b4d5f801e6f3
   fields: {name: ghq}
 
-# Initial business types
-# Note: These are the business types that were present when Data Hub went live.
-# Business types are now added and updated using migrations
-- model: metadata.businesstype
-  pk: 98d14e94-5d95-e211-a939-e4115bead28a
-  fields: {name: Company}
-- model: metadata.businesstype
-  pk: 99d14e94-5d95-e211-a939-e4115bead28a
-  fields: {name: Sole Trader}
-- model: metadata.businesstype
-  pk: 9ad14e94-5d95-e211-a939-e4115bead28a
-  fields: {name: Partnership}
-- model: metadata.businesstype
-  pk: 9bd14e94-5d95-e211-a939-e4115bead28a
-  fields: {name: Intermediary}
-- model: metadata.businesstype
-  pk: 9cd14e94-5d95-e211-a939-e4115bead28a
-  fields: {name: Government Dept}
-- model: metadata.businesstype
-  pk: 9dd14e94-5d95-e211-a939-e4115bead28a
-  fields: {name: Charity}
-- model: metadata.businesstype
-  pk: 6f75408b-03e7-e611-bca1-e4115bead28a
-  fields: {name: Private limited company }
-- model: metadata.businesstype
-  pk: dac8c591-03e7-e611-bca1-e4115bead28a
-  fields: {name: Public limited company }
-- model: metadata.businesstype
-  pk: 8b6eaf7e-03e7-e611-bca1-e4115bead28a
-  fields: {name: Limited partnership}
-
 # Employee range
 - model: metadata.employeerange
   pk: 3dafd8d0-5d95-e211-a939-e4115bead28a

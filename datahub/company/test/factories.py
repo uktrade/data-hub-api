@@ -3,6 +3,7 @@ import uuid
 import factory
 from django.utils.timezone import now
 
+from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import ExportExperienceCategory
 from datahub.core import constants
 from datahub.metadata.test.factories import TeamFactory
@@ -38,7 +39,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     trading_address_1 = factory.Sequence(lambda x: f'{x} Fake Lane')
     trading_address_town = 'Woodside'
     trading_address_country_id = constants.Country.united_kingdom.value.id
-    business_type_id = constants.BusinessType.private_limited_company.value.id
+    business_type_id = BusinessTypeConstant.private_limited_company.value.id
     sector_id = constants.Sector.aerospace_assembly_aircraft.value.id
     archived = False
     uk_region_id = constants.UKRegion.england.value.id

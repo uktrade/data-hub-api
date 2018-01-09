@@ -6,6 +6,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy
 from rest_framework import serializers
 
+from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import (
     Advisor, CompaniesHouseCompany, Company, CompanyPermission,
     Contact, ContactPermission, ExportExperienceCategory,
@@ -14,7 +15,7 @@ from datahub.company.validators import (
     has_no_invalid_company_number_characters,
     has_uk_establishment_number_prefix,
 )
-from datahub.core.constants import BusinessType, Country
+from datahub.core.constants import Country
 from datahub.core.serializers import (
     NestedRelatedField, PermittedFieldsModelSerializer, RelaxedURLField
 )
@@ -332,22 +333,26 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 ValidationRule(
                     'uk_establishment_not_in_uk',
                     EqualsRule('registered_address_country', Country.united_kingdom.value.id),
-                    when=EqualsRule('business_type', BusinessType.uk_establishment.value.id),
+                    when=EqualsRule('business_type',
+                                    BusinessTypeConstant.uk_establishment.value.id),
                 ),
                 ValidationRule(
                     'required',
                     OperatorRule('company_number', bool),
-                    when=EqualsRule('business_type', BusinessType.uk_establishment.value.id),
+                    when=EqualsRule('business_type',
+                                    BusinessTypeConstant.uk_establishment.value.id),
                 ),
                 ValidationRule(
                     'invalid_uk_establishment_number_characters',
                     OperatorRule('company_number', has_no_invalid_company_number_characters),
-                    when=EqualsRule('business_type', BusinessType.uk_establishment.value.id),
+                    when=EqualsRule('business_type',
+                                    BusinessTypeConstant.uk_establishment.value.id),
                 ),
                 ValidationRule(
                     'invalid_uk_establishment_number_prefix',
                     OperatorRule('company_number', has_uk_establishment_number_prefix),
-                    when=EqualsRule('business_type', BusinessType.uk_establishment.value.id),
+                    when=EqualsRule('business_type',
+                                    BusinessTypeConstant.uk_establishment.value.id),
                 ),
             ),
             AddressValidator(lazy=True, fields_mapping=Company.TRADING_ADDRESS_VALIDATION_MAPPING),
