@@ -7,10 +7,11 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from reversion.models import Version
 
+from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import CompaniesHouseCompany
 from datahub.company.test.factories import CompaniesHouseCompanyFactory, CompanyFactory
 from datahub.core.constants import (
-    BusinessType, CompanyClassification, Country, HeadquarterType, Sector, UKRegion
+    CompanyClassification, Country, HeadquarterType, Sector, UKRegion
 )
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 from datahub.investment.test.factories import InvestmentProjectFactory
@@ -505,7 +506,7 @@ class TestAddCompany(APITestMixin):
         response = self.api_client.post(url, format='json', data={
             'name': 'Acme',
             'trading_name': 'Trading name',
-            'business_type': {'id': BusinessType.company.value.id},
+            'business_type': {'id': BusinessTypeConstant.company.value.id},
             'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
             'registered_address_country': {
                 'id': Country.united_kingdom.value.id
@@ -529,7 +530,7 @@ class TestAddCompany(APITestMixin):
         response = self.api_client.post(url, {
             'name': 'Acme',
             'company_number': 1234567890,
-            'business_type': BusinessType.company.value.id,
+            'business_type': BusinessTypeConstant.company.value.id,
             'sector': Sector.aerospace_assembly_aircraft.value.id,
             'registered_address_country': Country.united_kingdom.value.id,
             'registered_address_1': '75 Stramford Road',
@@ -548,7 +549,7 @@ class TestAddCompany(APITestMixin):
         response = self.api_client.post(url, format='json', data={
             'name': 'Acme',
             'trading_name': None,
-            'business_type': {'id': BusinessType.company.value.id},
+            'business_type': {'id': BusinessTypeConstant.company.value.id},
             'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
             'registered_address_country': {
                 'id': Country.united_kingdom.value.id
@@ -566,7 +567,7 @@ class TestAddCompany(APITestMixin):
         response = self.api_client.post(url, format='json', data={
             'name': 'Acme',
             'trading_name': None,
-            'business_type': {'id': BusinessType.company.value.id},
+            'business_type': {'id': BusinessTypeConstant.company.value.id},
             'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
             'registered_address_country': {
                 'id': Country.united_states.value.id
@@ -583,7 +584,7 @@ class TestAddCompany(APITestMixin):
         url = reverse('api-v3:company:collection')
         response = self.api_client.post(url, format='json', data={
             'name': 'Acme',
-            'business_type': {'id': BusinessType.company.value.id},
+            'business_type': {'id': BusinessTypeConstant.company.value.id},
             'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
             'registered_address_country': {
                 'id': Country.united_kingdom.value.id
@@ -605,7 +606,7 @@ class TestAddCompany(APITestMixin):
         url = reverse('api-v3:company:collection')
         response = self.api_client.post(url, format='json', data={
             'name': 'Acme',
-            'business_type': {'id': BusinessType.company.value.id},
+            'business_type': {'id': BusinessTypeConstant.company.value.id},
             'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
             'registered_address_country': {
                 'id': Country.united_kingdom.value.id
@@ -626,7 +627,7 @@ class TestAddCompany(APITestMixin):
         response = self.api_client.post(url, {
             'name': 'Acme',
             'trading_name': None,
-            'business_type': BusinessType.company.value.id,
+            'business_type': BusinessTypeConstant.company.value.id,
             'sector': Sector.aerospace_assembly_aircraft.value.id,
         })
 
@@ -643,7 +644,7 @@ class TestAddCompany(APITestMixin):
         response = self.api_client.post(url, {
             'name': 'Acme',
             'trading_name': None,
-            'business_type': BusinessType.company.value.id,
+            'business_type': BusinessTypeConstant.company.value.id,
             'sector': Sector.aerospace_assembly_aircraft.value.id,
             'registered_address_1': None,
             'registered_address_town': None,
@@ -663,7 +664,7 @@ class TestAddCompany(APITestMixin):
         response = self.api_client.post(url, {
             'name': 'Acme',
             'trading_name': None,
-            'business_type': BusinessType.company.value.id,
+            'business_type': BusinessTypeConstant.company.value.id,
             'sector': Sector.aerospace_assembly_aircraft.value.id,
             'registered_address_1': '',
             'registered_address_town': '',
@@ -687,7 +688,7 @@ class TestAddCompany(APITestMixin):
         response = self.api_client.post(url, {
             'name': 'Acme',
             'alias': None,
-            'business_type': BusinessType.company.value.id,
+            'business_type': BusinessTypeConstant.company.value.id,
             'registered_address_1': '75 Stramford Road',
             'registered_address_town': 'London',
             'registered_address_country': Country.united_kingdom.value.id,
@@ -711,7 +712,7 @@ class TestAddCompany(APITestMixin):
         url = reverse('api-v3:company:collection')
         response = self.api_client.post(url, format='json', data={
             'name': 'Acme',
-            'business_type': {'id': BusinessType.company.value.id},
+            'business_type': {'id': BusinessTypeConstant.company.value.id},
             'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
             'registered_address_country': {
                 'id': Country.united_kingdom.value.id
@@ -734,7 +735,7 @@ class TestAddCompany(APITestMixin):
         response = self.api_client.post(url, format='json', data={
             'name': 'Acme',
             'trading_name': 'Trading name',
-            'business_type': {'id': BusinessType.uk_establishment.value.id},
+            'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
             'company_number': 'BR000006',
             'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
             'registered_address_country': {
@@ -756,7 +757,7 @@ class TestAddCompany(APITestMixin):
         response = self.api_client.post(url, format='json', data={
             'name': 'Acme',
             'trading_name': 'Trading name',
-            'business_type': {'id': BusinessType.uk_establishment.value.id},
+            'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
             'company_number': '',
             'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
             'registered_address_country': {
@@ -780,7 +781,7 @@ class TestAddCompany(APITestMixin):
         response = self.api_client.post(url, format='json', data={
             'name': 'Acme',
             'trading_name': 'Trading name',
-            'business_type': {'id': BusinessType.uk_establishment.value.id},
+            'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
             'company_number': 'BR000006',
             'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
             'registered_address_country': {
@@ -807,7 +808,7 @@ class TestAddCompany(APITestMixin):
         response = self.api_client.post(url, format='json', data={
             'name': 'Acme',
             'trading_name': 'Trading name',
-            'business_type': {'id': BusinessType.uk_establishment.value.id},
+            'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
             'company_number': 'SC000006',
             'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
             'registered_address_country': {
@@ -835,7 +836,7 @@ class TestAddCompany(APITestMixin):
         response = self.api_client.post(url, format='json', data={
             'name': 'Acme',
             'trading_name': 'Trading name',
-            'business_type': {'id': BusinessType.uk_establishment.value.id},
+            'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
             'company_number': 'BR000444é',
             'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
             'registered_address_country': {
@@ -861,7 +862,7 @@ class TestAddCompany(APITestMixin):
         response = self.api_client.post(url, format='json', data={
             'name': 'Acme',
             'trading_name': 'Trading name',
-            'business_type': {'id': BusinessType.private_limited_company.value.id},
+            'business_type': {'id': BusinessTypeConstant.private_limited_company.value.id},
             'company_number': 'sc000444é',
             'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
             'registered_address_country': {

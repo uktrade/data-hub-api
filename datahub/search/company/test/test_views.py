@@ -10,6 +10,7 @@ from django.utils.text import slugify
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import Company
 from datahub.company.test.factories import (AdviserFactory, CompaniesHouseCompanyFactory,
                                             CompanyFactory, ContactFactory)
@@ -398,7 +399,7 @@ class TestSearchExport(APITestMixin):
             'alias': factory.Faker('text'),
             'archived': archived,
             'business_type_id':
-                TestSearchExport._get_random_constant_id(constants.BusinessType),
+                TestSearchExport._get_random_constant_id(BusinessTypeConstant),
             'classification_id':
                 TestSearchExport._get_random_constant_id(constants.CompanyClassification),
             'company_number': ch.company_number,

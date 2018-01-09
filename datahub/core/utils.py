@@ -87,3 +87,20 @@ def delete_s3_obj(bucket, key, client=None):
     )
 
     assert response['ResponseMetadata']['HTTPStatusCode'] == 204
+
+
+def load_constants_to_database(constants, model):
+    """Loads an iterable of constants (typically an Enum) for a model to the database."""
+    for constant in constants:
+        model_obj, created = model.objects.get_or_create(pk=constant.value.id)
+        if created or model_obj.name != constant.value.name:
+            if created:
+                logger.info('Creating %s "%s"', model._meta.verbose_name, constant.value.name)
+            else:
+                logger.info('Updating name of %s "%s" to "%s"',
+                            model._meta.verbose_name,
+                            model_obj.name,
+                            constant.value.name)
+
+            model_obj.name = constant.value.name
+            model_obj.save()
