@@ -98,12 +98,12 @@ class OrderWithAcceptedQuoteFactory(OrderFactory):
     quote = factory.SubFactory(AcceptedQuoteFactory)
     status = OrderStatus.quote_accepted
 
-    @classmethod
-    def _create(cls, model_class, *args, **kwargs):
-        obj = super()._create(model_class, *args, **kwargs)
-        obj.invoice = Invoice.objects.create_from_order(obj)
-        obj.save(update_fields=['invoice'])
-        return obj
+    @factory.post_generation
+    def set_invoice(self, create, extracted, **kwargs):
+        """Set invoice after creating the instance."""
+        if not create:
+            return
+        self.invoice = Invoice.objects.create_from_order(self)
 
 
 class OrderCompleteFactory(OrderWithAcceptedQuoteFactory):
