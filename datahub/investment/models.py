@@ -59,6 +59,7 @@ class InvestmentProjectPermission(StrEnum):
     change_associated = 'change_associated_investmentproject'
     add = 'add_investmentproject'
     delete = 'delete_investmentproject'
+    read_investmentproject_document = 'read_investmentproject_document'
 
 
 class IProjectAbstract(models.Model):
@@ -345,16 +346,20 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
     class Meta:
         permissions = (
             (
-                InvestmentProjectPermission.read_all,
+                InvestmentProjectPermission.read_all.value,
                 'Can read all investment project'
             ),
             (
-                InvestmentProjectPermission.read_associated,
+                InvestmentProjectPermission.read_associated.value,
                 'Can read associated investment project'
             ),
             (
-                InvestmentProjectPermission.change_associated,
+                InvestmentProjectPermission.change_associated.value,
                 'Can change associated investment project'
+            ),
+            (
+                InvestmentProjectPermission.read_investmentproject_document.value,
+                'Can read investment project document'
             ),
         )
         default_permissions = (
