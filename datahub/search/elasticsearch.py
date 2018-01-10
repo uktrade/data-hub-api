@@ -1,14 +1,14 @@
 from collections import defaultdict
 from itertools import chain
 
-from django.conf import settings
 from urllib.parse import urlparse
+from django.conf import settings
 from aws_requests_auth.aws_auth import AWSRequestsAuth
+from elasticsearch import RequestsHttpConnection
 from elasticsearch.helpers import bulk as es_bulk
 from elasticsearch_dsl import analysis, Index, Search
 from elasticsearch_dsl.connections import connections
 from elasticsearch_dsl.query import Bool, MatchPhrase, MultiMatch, Q, Query, Term
-from elasticsearch import Elasticsearch, RequestsHttpConnection
 
 from .apps import EXCLUDE_ALL, get_search_apps
 
@@ -91,11 +91,11 @@ def configure_connection():
         es_host = urlparse(settings.ES_URL)
         es_port = es_host.port if es_host.port else es_protocol.get(es_host.scheme)
         auth = AWSRequestsAuth(
-            aws_access_key = settings.AWS_ELASTICSEARCH_KEY,
-            aws_secret_access_key = settings.AWS_ELASTICSEARCH_SECRET,
-            aws_host = es_host.netloc,
-            aws_region = settings.AWS_ELASTICSEARCH_REGION,
-            aws_service = 'es'
+            aws_access_key=settings.AWS_ELASTICSEARCH_KEY,
+            aws_secret_access_key=settings.AWS_ELASTICSEARCH_SECRET,
+            aws_host=es_host.netloc,
+            aws_region=settings.AWS_ELASTICSEARCH_REGION,
+            aws_service='es'
         )
         connections_default = {
             'hosts': [es_host.netloc],
@@ -112,7 +112,7 @@ def configure_connection():
         }
 
     connections.configure(
-        default = connections_default
+        default=connections_default
     )
 
 
