@@ -9,10 +9,11 @@ import datahub.metadata.models as meta_models
 from datahub.company.models import Company, Contact
 from datahub.company.serializers import NestedAdviserField
 from datahub.core.constants import InvestmentProjectStage
-from datahub.core.serializers import NestedRelatedField
+from datahub.core.serializers import NestedRelatedField, PermittedFieldsModelSerializer
 from datahub.core.validate_utils import DataCombiner
 from datahub.investment.models import (
     InvestmentProject,
+    InvestmentProjectPermission,
     InvestmentProjectTeamMember,
     InvestorType,
     Involvement,
@@ -22,7 +23,7 @@ from datahub.investment.models import (
 from datahub.investment.validate import validate
 
 
-class IProjectSummarySerializer(serializers.ModelSerializer):
+class IProjectSummarySerializer(PermittedFieldsModelSerializer):
     """Serialiser for investment project endpoints."""
 
     incomplete_fields = serializers.SerializerMethodField()
@@ -168,6 +169,10 @@ class IProjectSummarySerializer(serializers.ModelSerializer):
         # non-nullable
         extra_kwargs = {
             'likelihood_of_landing': {'min_value': 0, 'max_value': 100},
+        }
+        permissions = {
+            f'investment.{InvestmentProjectPermission.read_investmentproject_document}':
+                'archived_documents_url_path'
         }
         read_only_fields = (
             'archived',
@@ -393,6 +398,7 @@ class IProjectSerializer(IProjectSummarySerializer, IProjectValueSerializer,
         )
         extra_kwargs = IProjectSummarySerializer.Meta.extra_kwargs
         read_only_fields = IProjectSummarySerializer.Meta.read_only_fields
+        permissions = IProjectSummarySerializer.Meta.permissions
 
 
 class IProjectDocumentSerializer(serializers.ModelSerializer):

@@ -78,8 +78,8 @@ class Contact(ArchivableModel, BaseModel):
 
     class Meta:
         permissions = (
-            (ContactPermission.read_contact, 'Can read contact'),
-            (ContactPermission.read_contact_document, 'Can read contact document'),
+            (ContactPermission.read_contact.value, 'Can read contact'),
+            (ContactPermission.read_contact_document.value, 'Can read contact document'),
         )
 
     @property
