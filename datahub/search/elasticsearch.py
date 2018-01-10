@@ -83,22 +83,21 @@ lowercase_analyzer = analysis.CustomAnalyzer(
 
 def configure_connection():
     """Configure Elasticsearch default connection."""
-    es_protocol = {
-        'http': 80,
-        'https': 443
-    }
-    es_host = urlparse(settings.ES_URL)
-    es_port = es_host.port if es_host.port else es_protocol.get(es_host.scheme)
-
-    auth = AWSRequestsAuth(
-        aws_access_key = settings.AWS_ELASTICSEARCH_KEY,
-        aws_secret_access_key = settings.AWS_ELASTICSEARCH_SECRET,
-        aws_host = es_host.netloc,
-        aws_region = settings.AWS_ELASTICSEARCH_REGION,
-        aws_service = 'es'
-    )
-    connections.configure(
-        default={
+    if settings.ES_USE_AWS_AUTH:
+        es_protocol = {
+            'http': 80,
+            'https': 443
+        }
+        es_host = urlparse(settings.ES_URL)
+        es_port = es_host.port if es_host.port else es_protocol.get(es_host.scheme)
+        auth = AWSRequestsAuth(
+            aws_access_key = settings.AWS_ELASTICSEARCH_KEY,
+            aws_secret_access_key = settings.AWS_ELASTICSEARCH_SECRET,
+            aws_host = es_host.netloc,
+            aws_region = settings.AWS_ELASTICSEARCH_REGION,
+            aws_service = 'es'
+        )
+        connections_default = {
             'hosts': [es_host.netloc],
             'port': es_port,
             'use_ssl': settings.ES_USE_SSL,
@@ -106,6 +105,14 @@ def configure_connection():
             'http_auth': auth,
             'connection_class': RequestsHttpConnection
         }
+    else:
+        connections_default = {
+            'hosts': [settings.ES_URL],
+            'verify_certs': settings.ES_VERIFY_CERTS
+        }
+
+    connections.configure(
+        default = connections_default
     )
 
 
