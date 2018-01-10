@@ -2,12 +2,12 @@ from collections import defaultdict
 from itertools import chain
 
 from django.conf import settings
+from urllib.parse import urlparse
+from aws_requests_auth.aws_auth import AWSRequestsAuth
 from elasticsearch.helpers import bulk as es_bulk
 from elasticsearch_dsl import analysis, Index, Search
 from elasticsearch_dsl.connections import connections
 from elasticsearch_dsl.query import Bool, MatchPhrase, MultiMatch, Q, Query, Term
-from urllib.parse import urlparse
-from aws_requests_auth.aws_auth import AWSRequestsAuth
 from elasticsearch import Elasticsearch, RequestsHttpConnection
 
 from .apps import EXCLUDE_ALL, get_search_apps
@@ -83,12 +83,12 @@ lowercase_analyzer = analysis.CustomAnalyzer(
 
 def configure_connection():
     """Configure Elasticsearch default connection."""
-    ES_PROTOCOL = {
+    es_protocol = {
         'http': 80,
         'https': 443
     }
     es_host = urlparse(settings.ES_URL)
-    es_port = es_host.port if es_host.port else ES_PROTOCOL.get(es_host.scheme)
+    es_port = es_host.port if es_host.port else es_protocol.get(es_host.scheme)
 
     auth = AWSRequestsAuth(
         aws_access_key = settings.AWS_ELASTICSEARCH_KEY,
