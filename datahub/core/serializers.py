@@ -17,21 +17,27 @@ class ConstantModelSerializer(serializers.Serializer):
 class PermittedFieldsModelSerializer(serializers.ModelSerializer):
     """Lets you get permitted fields only.
 
-    Needs 'permissions' key in extra_kwargs Meta class in following format:
-    extra_kwargs = {
-        'permissions': {
+    Needs 'permissions' attribute on Meta class in following format:
+        permissions = {
             'app_name.permission': 'field'
         }
-    }
+
     If user doesn't have required permission, corresponding field will be filtered out.
     """
 
     def get_fields(self):
         """Gets filtered dictionary of fields based on permissions."""
+        assert hasattr(self.Meta, 'permissions'), (
+            'Class {serializer_class} missing "Meta.permissions" attribute'.format(
+                serializer_class=self.__class__.__name__
+            )
+        )
+
         fields = super().get_fields()
         request = self.context.get('request', None)
+
         if request:
-            permissions = self.get_extra_kwargs().get('permissions', {})
+            permissions = self.Meta.permissions
             for permission, field in permissions.items():
                 if not request.user.has_perm(permission):
                     del fields[field]

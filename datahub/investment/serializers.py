@@ -169,10 +169,10 @@ class IProjectSummarySerializer(PermittedFieldsModelSerializer):
         # non-nullable
         extra_kwargs = {
             'likelihood_of_landing': {'min_value': 0, 'max_value': 100},
-            'permissions': {
-                f'investment.{InvestmentProjectPermission.read_investmentproject_document}':
-                    'archived_documents_url_path'
-            },
+        }
+        permissions = {
+            f'investment.{InvestmentProjectPermission.read_investmentproject_document}':
+                'archived_documents_url_path'
         }
         read_only_fields = (
             'archived',
@@ -398,6 +398,7 @@ class IProjectSerializer(IProjectSummarySerializer, IProjectValueSerializer,
         )
         extra_kwargs = IProjectSummarySerializer.Meta.extra_kwargs
         read_only_fields = IProjectSummarySerializer.Meta.read_only_fields
+        permissions = IProjectSummarySerializer.Meta.permissions
 
 
 class IProjectDocumentSerializer(serializers.ModelSerializer):
