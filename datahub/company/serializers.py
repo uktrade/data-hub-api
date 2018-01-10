@@ -170,9 +170,9 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         extra_kwargs = {
             'contactable_by_email': {'default': True},
             'contactable_by_phone': {'default': True},
-            'permissions': {
-                f'company.{ContactPermission.read_contact_document}': 'archived_documents_url_path'
-            }
+        }
+        permissions = {
+            f'company.{ContactPermission.read_contact_document}': 'archived_documents_url_path',
         }
 
 
@@ -309,8 +309,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             ),
             AddressValidator(lazy=True, fields_mapping=Company.TRADING_ADDRESS_VALIDATION_MAPPING),
         ]
-        extra_kwargs = {
-            'permissions': {
-                f'company.{CompanyPermission.read_company_document}': 'archived_documents_url_path'
-            }
+        permissions = {
+            f'company.{CompanyPermission.read_company_document}': 'archived_documents_url_path',
         }
