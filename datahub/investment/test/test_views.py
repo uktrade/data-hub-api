@@ -1109,13 +1109,17 @@ class TestPartialUpdateView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
     def test_change_stage_to_won(self):
-        """Tests moving a complete project to the 'Won' stage."""
+        """
+        Tests moving a complete project to the 'Won' stage, when all required fields are
+        complete.
+        """
         project = VerifyWinInvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'stage': {
                 'id': constants.InvestmentProjectStage.won.value.id
-            }
+            },
+            'actual_land_date': '2016-01-31',
         }
         response = self.api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
@@ -1125,6 +1129,25 @@ class TestPartialUpdateView(APITestMixin):
             'name': constants.InvestmentProjectStage.won.value.name,
         }
         assert response_data['status'] == 'won'
+
+    def test_change_stage_to_won_failure(self):
+        """
+        Tests moving a project to the 'Won' stage, when required field for that transition
+        are missing.
+        """
+        project = VerifyWinInvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.won.value.id
+            },
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'actual_land_date': ['This field is required.'],
+        }
 
     def test_revert_stage_to_verify_win(self):
         """Tests moving a complete project from the 'Won' stage to 'Verify win'."""
