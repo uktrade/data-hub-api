@@ -14,6 +14,30 @@ class ConstantModelSerializer(serializers.Serializer):
     disabled_on = serializers.ReadOnlyField()
 
 
+class PermittedFieldsModelSerializer(serializers.ModelSerializer):
+    """Lets you get permitted fields only.
+
+    Needs 'permissions' key in extra_kwargs Meta class in following format:
+    extra_kwargs = {
+        'permissions': {
+            'app_name.permission': 'field'
+        }
+    }
+    If user doesn't have required permission, corresponding field will be filtered out.
+    """
+
+    def get_fields(self):
+        """Gets filtered dictionary of fields based on permissions."""
+        fields = super().get_fields()
+        request = self.context.get('request', None)
+        if request:
+            permissions = self.get_extra_kwargs().get('permissions', {})
+            for permission, field in permissions.items():
+                if not request.user.has_perm(permission):
+                    del fields[field]
+        return fields
+
+
 class NestedRelatedField(serializers.RelatedField):
     """DRF serialiser field for foreign keys and many-to-many fields.
 
