@@ -17,6 +17,7 @@ services:
       DJANGO_SECRET_KEY: changeme
       DJANGO_SETTINGS_MODULE: config.settings.local
       COV_TOKEN: ${COV_TOKEN}
+      ES_USE_AWS_AUTH: 'False'
       ES_INDEX: test_index
       ES5_URL: http://es:9200
       AWS_DEFAULT_REGION: eu-west-2
