@@ -76,6 +76,43 @@ class ReadonlyAfterCreationValidator:
                     })
 
 
+class OrderEditableFieldsValidator:
+    """
+    Validator that makes sure that only certain fields have been modified
+    depending on the order status.
+    """
+
+    message = 'This field cannot be changed at this stage.'
+
+    def __init__(self, mapping=None):
+        """
+        Set the mapping.
+
+        :param mapping: dict of <order status, editable fields>
+        """
+        self.mapping = mapping or {}
+        self.instance = None
+
+    def set_context(self, serializer):
+        """
+        This hook is called by the serializer instance,
+        prior to the validation call being made.
+        """
+        self.instance = getattr(serializer, 'instance', None)
+
+    def __call__(self, data):
+        """Validate editable fields depending on the order status."""
+        if not self.instance or self.instance.status not in self.mapping:
+            return
+
+        combiner = DataCombiner(self.instance, data)
+
+        editable_fields = self.mapping[self.instance.status]
+        for field in combiner.data:
+            if field not in editable_fields:
+                raise ValidationError({field: self.message})
+
+
 class VATValidator:
     """Validator for checking VAT fields on the order."""
 
@@ -377,28 +414,3 @@ class ForceDeleteRule(BaseRule):
     def __call__(self, combiner):
         """Check that the force_delete flag has the expected value."""
         return combiner.serializer.context.get('force_delete', False) == self.value
-
-
-class EditableFieldsRule(AbstractRule):
-    """Rule that checks that only certain fields have been modified."""
-
-    def __init__(self, editable_fields):
-        """Initialise the rule."""
-        self.editable_fields = editable_fields
-        self._field_in_error = None
-
-    @property
-    def field(self):
-        """Field in error, dynamically calculated."""
-        return self._field_in_error
-
-    def __call__(self, combiner):
-        """
-        :returns: True if all fields in data can be editable.
-        """
-        self._field_in_error = None
-        for field in combiner.data:
-            if field not in self.editable_fields:
-                self._field_in_error = field
-                return False
-        return True

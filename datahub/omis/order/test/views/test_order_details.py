@@ -434,6 +434,9 @@ class TestGeneralChangeOrder(APITestMixin):
     @pytest.mark.parametrize(
         'allowed_status', (
             OrderStatus.draft,
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.quote_accepted,
+            OrderStatus.paid,
         )
     )
     def test_fails_if_contact_not_from_company(self, allowed_status):
@@ -667,7 +670,6 @@ class TestGeneralChangeOrder(APITestMixin):
 
     @pytest.mark.parametrize(
         'disallowed_status', (
-            OrderStatus.paid,
             OrderStatus.complete,
             OrderStatus.cancelled,
         )
@@ -894,6 +896,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
             vat_number='01234566789',
             vat_verified=True,
         )
+        new_contact = ContactFactory(company=order.company)
 
         data = {
             'billing_address_1': 'New billing address 1',
@@ -906,6 +909,8 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
             'vat_number': '987654321',
             'vat_verified': False,
             'po_number': 'New po number',
+
+            'contact': new_contact.pk,
         }
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
@@ -919,6 +924,10 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
                 'id': Country.france.value.id,
                 'name': Country.france.value.name,
             },
+            'contact': {
+                'id': str(new_contact.pk),
+                'name': new_contact.name
+            }
         }
 
     @pytest.mark.parametrize(
@@ -990,25 +999,43 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
         assert new_invoice.vat_cost > 0
         assert new_invoice.total_cost > old_invoice.total_cost
 
-    def test_invoice_not_generated_if_quote_awaiting_acceptance(self):
-        """
-        Test that if the order is in status 'Quote Awaiting Acceptance'
-        and one of the billing field has changed, no invoice gets created.
-        """
-        order = OrderWithOpenQuoteFactory(
+    @pytest.mark.parametrize(
+        'order_factory,data',
+        (
+            (OrderWithOpenQuoteFactory, {'vat_verified': False}),
+            (
+                OrderWithOpenQuoteFactory,
+                {'contact': lambda o: ContactFactory(company=o.company).pk}
+            ),
+            (
+                OrderWithAcceptedQuoteFactory,
+                {'contact': lambda o: ContactFactory(company=o.company).pk}
+            ),
+            (
+                OrderPaidFactory,
+                {'contact': lambda o: ContactFactory(company=o.company).pk}
+            ),
+        )
+    )
+    def test_invoice_not_generated(self, order_factory, data):
+        """Test that changing `data` does not generate a new invoice."""
+        order = order_factory(
             vat_status=VATStatus.eu,
             vat_number='01234566789',
             vat_verified=True,
         )
-        assert not order.invoice
+        old_invoice = order.invoice
 
+        data = {
+            field: value(order) if callable(value) else value
+            for field, value in data.items()
+        }
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(url, {'vat_verified': False}, format='json')
+        response = self.api_client.patch(url, data, format='json')
         assert response.status_code == status.HTTP_200_OK
 
         order.refresh_from_db()
-        assert not order.vat_verified
-        assert not order.invoice
+        assert old_invoice == order.invoice
 
     @pytest.mark.parametrize(
         'order_factory',
@@ -1031,12 +1058,69 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
             ('contacts_not_to_approach', 'lorem ipsum'),
             ('description', 'lorem ipsum'),
             ('delivery_date', '2017-04-20'),
-            ('contact', lambda o: ContactFactory(company=o.company).id),
         )
     )
     def test_cannot_change_disallowed_fields(self, order_factory, field, value):
         """Test that disallowed fields cannot be changed."""
         order = order_factory()
+        value = value(order) if callable(value) else value
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(url, {field: value}, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {field: ['This field cannot be changed at this stage.']}
+
+
+class TestChangeOrderInPaid(APITestMixin):
+    """Tests for changing an order when it's in paid."""
+
+    def test_can_change_allowed_fields(self):
+        """Test that allowed fields can be changed."""
+        order = OrderPaidFactory()
+        new_contact = ContactFactory(company=order.company)
+
+        data = {
+            'contact': new_contact.pk,
+        }
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(url, data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['contact'] == {
+            'id': str(new_contact.pk),
+            'name': new_contact.name
+        }
+
+    @pytest.mark.parametrize(
+        'field,value',
+        (
+            (
+                'service_types',
+                lambda o: [ServiceType.objects.filter(disabled_on__isnull=True).first().id]
+            ),
+            ('uk_region', UKRegion.jersey.value.id),
+            ('sector', Sector.aerospace_assembly_aircraft.value.id),
+            ('existing_agents', 'loremm ipsum'),
+            ('further_info', 'lorem ipsum'),
+            ('contacts_not_to_approach', 'lorem ipsum'),
+            ('description', 'lorem ipsum'),
+            ('delivery_date', '2017-04-20'),
+
+            ('billing_address_1', 'New billing address 1'),
+            ('billing_address_2', 'New billing address 2'),
+            ('billing_address_town', 'New billing town'),
+            ('billing_address_county', 'New billing county'),
+            ('billing_address_postcode', 'New billing postcode'),
+            ('billing_address_country', Country.france.value.id),
+            ('vat_status', VATStatus.eu),
+            ('vat_number', '987654321'),
+            ('vat_verified', False),
+            ('po_number', 'New po number'),
+        )
+    )
+    def test_cannot_change_disallowed_fields(self, field, value):
+        """Test that disallowed fields cannot be changed."""
+        order = OrderPaidFactory()
         value = value(order) if callable(value) else value
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
