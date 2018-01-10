@@ -23,6 +23,8 @@ class PermittedFieldsModelSerializer(serializers.ModelSerializer):
         }
 
     If user doesn't have required permission, corresponding field will be filtered out.
+
+    Note: The current implementation does not allow access to the field if request.user is None.
     """
 
     def get_fields(self):
@@ -39,7 +41,7 @@ class PermittedFieldsModelSerializer(serializers.ModelSerializer):
         if request:
             permissions = self.Meta.permissions
             for permission, field in permissions.items():
-                if not request.user.has_perm(permission):
+                if not request.user or not request.user.has_perm(permission):
                     del fields[field]
         return fields
 
