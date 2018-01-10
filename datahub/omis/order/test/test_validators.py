@@ -19,9 +19,9 @@ from ..validators import (
     CancellableOrderValidator,
     CompletableOrderValidator,
     ContactWorksAtCompanyValidator,
-    EditableFieldsRule,
     NoOtherActiveQuoteExistsValidator,
     OrderDetailsFilledInValidator,
+    OrderEditableFieldsValidator,
     OrderInStatusRule,
     OrderInStatusValidator,
     ReadonlyAfterCreationValidator,
@@ -712,20 +712,50 @@ def test_order_in_status_rule(order_status, expected_status, res):
     assert rule(combiner) == res
 
 
-@pytest.mark.parametrize(
-    'fields,res',
-    (
-        (('field1',), True),
-        (('field1', 'field2'), True),
-        (('field3'), False),
-        (('field1', 'field3'), False),
-    )
-)
-def test_editable_fields_rule(fields, res):
-    """Tests for EditableFieldsRule."""
-    combiner = mock.Mock(data=fields)
-    rule = EditableFieldsRule(
-        editable_fields=('field1', 'field2')
-    )
+class TestOrderEditableFieldsValidator:
+    """Tests for the OrderEditableFieldsValidator."""
 
-    assert rule(combiner) == res
+    @pytest.mark.parametrize(
+        'order_status,mapping,data,should_pass',
+        (
+            (
+                OrderStatus.draft,
+                {OrderStatus.draft: {'description'}},
+                {'description': 'lorem ipsum'},
+                True
+            ),
+            (
+                OrderStatus.draft,
+                {OrderStatus.draft: {'contact'}},
+                {'description': 'lorem ipsum'},
+                False
+            ),
+            (
+                OrderStatus.draft,
+                {OrderStatus.paid: {'contact'}},
+                {'description': 'lorem ipsum'},
+                True
+            ),
+        )
+    )
+    def test_validation_with_order(self, order_status, mapping, data, should_pass):
+        """Test the validator with different order status, mapping and data."""
+        order = Order(status=order_status)
+        serializer = mock.Mock(instance=order)
+
+        validator = OrderEditableFieldsValidator(mapping)
+        validator.set_context(serializer)
+
+        if should_pass:
+            validator(data)
+        else:
+            with pytest.raises(ValidationError):
+                validator(data)
+
+    def test_validation_passes_on_creation(self):
+        """Test that the validation passes if we are creating the order instead of editing it."""
+        serializer = mock.Mock(instance=None)
+
+        validator = OrderEditableFieldsValidator({OrderStatus.paid: {'contact'}})
+        validator.set_context(serializer)
+        validator({'description': 'lorem ipsum'})

@@ -21,7 +21,7 @@ from .constants import OrderStatus, VATStatus
 from .models import CancellationReason, Order, OrderAssignee, OrderSubscriber, ServiceType
 from .validators import (
     ContactWorksAtCompanyValidator,
-    EditableFieldsRule,
+    OrderEditableFieldsValidator,
     OrderInStatusRule,
     OrderInStatusValidator,
     ReadonlyAfterCreationValidator,
@@ -163,26 +163,25 @@ class OrderSerializer(serializers.ModelSerializer):
                     OrderStatus.draft,
                     OrderStatus.quote_awaiting_acceptance,
                     OrderStatus.quote_accepted,
+                    OrderStatus.paid,
                 ),
                 order_required=False
             ),
             # after creation these fields cannot be changed
             ReadonlyAfterCreationValidator(fields=('company', 'primary_market')),
-            # when the order is in 'Quote Awaiting Acceptance' or
-            # 'Quote Accepted' only some of the fields can be changed
-            RulesBasedValidator(
-                ValidationRule(
-                    'readonly',
-                    EditableFieldsRule(
-                        editable_fields=ORDER_FIELDS_INVOICE_RELATED
-                    ),
-                    when=OrderInStatusRule(
-                        (
-                            OrderStatus.quote_awaiting_acceptance,
-                            OrderStatus.quote_accepted,
-                        )
-                    )
-                ),
+            # only some of the fields can be changed depending of the status
+            OrderEditableFieldsValidator(
+                {
+                    OrderStatus.quote_awaiting_acceptance: {
+                        *ORDER_FIELDS_INVOICE_RELATED,
+                        'contact',
+                    },
+                    OrderStatus.quote_accepted: {
+                        *ORDER_FIELDS_INVOICE_RELATED,
+                        'contact',
+                    },
+                    OrderStatus.paid: {'contact'},
+                }
             ),
             # contact has to work at company
             ContactWorksAtCompanyValidator(),
