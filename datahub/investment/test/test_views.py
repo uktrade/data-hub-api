@@ -829,6 +829,51 @@ class TestRetrieveView(APITestMixin):
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    def test_get_project_without_read_document_permission(self):
+        """
+        Tests that the archived documents path is not returned for users without the read document
+        permission.
+        """
+        project = InvestmentProjectFactory(
+            archived_documents_url_path='path/to/document',
+        )
+        user = create_test_user(
+            permission_codenames=(
+                InvestmentProjectPermission.read_all,
+            )
+        )
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert 'archived_documents_url_path' not in response.json()
+
+    def test_get_project_with_read_document_permission(self):
+        """
+        Tests that the archived documents path is returned for users without the read document
+        permission.
+        """
+        project = InvestmentProjectFactory(
+            archived_documents_url_path='path/to/document',
+        )
+        user = create_test_user(
+            permission_codenames=(
+                InvestmentProjectPermission.read_all,
+                InvestmentProjectPermission.read_investmentproject_document,
+            )
+        )
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert 'archived_documents_url_path' in response.json()
+        assert response_data['archived_documents_url_path'] == 'path/to/document'
+
 
 class TestPartialUpdateView(APITestMixin):
     """
