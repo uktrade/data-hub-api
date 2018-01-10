@@ -2,8 +2,9 @@ from collections import defaultdict
 from itertools import chain
 
 from urllib.parse import urlparse
-from django.conf import settings
 from aws_requests_auth.aws_auth import AWSRequestsAuth
+
+from django.conf import settings
 from elasticsearch import RequestsHttpConnection
 from elasticsearch.helpers import bulk as es_bulk
 from elasticsearch_dsl import analysis, Index, Search
