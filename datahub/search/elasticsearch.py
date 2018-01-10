@@ -6,6 +6,9 @@ from elasticsearch.helpers import bulk as es_bulk
 from elasticsearch_dsl import analysis, Index, Search
 from elasticsearch_dsl.connections import connections
 from elasticsearch_dsl.query import Bool, MatchPhrase, MultiMatch, Q, Query, Term
+from urllib.parse import urlparse
+from aws_requests_auth.aws_auth import AWSRequestsAuth
+from elasticsearch import Elasticsearch, RequestsHttpConnection
 
 from .apps import EXCLUDE_ALL, get_search_apps
 
@@ -80,10 +83,28 @@ lowercase_analyzer = analysis.CustomAnalyzer(
 
 def configure_connection():
     """Configure Elasticsearch default connection."""
+    ES_PROTOCOL = {
+        'http': 80,
+        'https': 443
+    }
+    es_host = urlparse(settings.ES_URL)
+    es_port = es_host.port if es_host.port else ES_PROTOCOL.get(es_host.scheme)
+
+    auth = AWSRequestsAuth(
+        aws_access_key = settings.AWS_ELASTICSEARCH_KEY,
+        aws_secret_access_key = settings.AWS_ELASTICSEARCH_SECRET,
+        aws_host = es_host.netloc,
+        aws_region = settings.AWS_ELASTICSEARCH_REGION,
+        aws_service = 'es'
+    )
     connections.configure(
         default={
-            'hosts': [settings.ES_URL],
-            'verify_certs': settings.ES_VERIFY_CERTS
+            'hosts': [es_host.netloc],
+            'port': es_port,
+            'use_ssl': settings.ES_USE_SSL,
+            'verify_certs': settings.ES_VERIFY_CERTS,
+            'http_auth': auth,
+            'connection_class': RequestsHttpConnection
         }
     )
 
