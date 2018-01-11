@@ -14,7 +14,8 @@ from datahub.omis.market.models import Market
 
 from ..factories import (
     OrderAssigneeCompleteFactory, OrderAssigneeFactory,
-    OrderFactory, OrderPaidFactory, OrderWithAcceptedQuoteFactory,
+    OrderCancelledFactory, OrderCompleteFactory, OrderFactory,
+    OrderPaidFactory, OrderWithAcceptedQuoteFactory,
     OrderWithOpenQuoteFactory,
 )
 
@@ -36,7 +37,7 @@ class TestAddOrder(APITestMixin):
         contact = ContactFactory(company=company)
         country = Country.france.value
         uk_region = UKRegion.jersey.value
-        sector = Sector.aerospace_assembly_aircraft.value
+        sector = Sector.renewable_energy_wind.value
         service_type = ServiceType.objects.filter(disabled_on__isnull=True).first()
 
         url = reverse('api-v3:omis:order:list')
@@ -431,19 +432,11 @@ class TestGeneralChangeOrder(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert not response.json()['uk_region']
 
-    @pytest.mark.parametrize(
-        'allowed_status', (
-            OrderStatus.draft,
-            OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted,
-            OrderStatus.paid,
-        )
-    )
-    def test_fails_if_contact_not_from_company(self, allowed_status):
+    def test_fails_if_contact_not_from_company(self):
         """
         Test that if the contact does not work at the company specified, the validation fails.
         """
-        order = OrderFactory(status=allowed_status)
+        order = OrderFactory()
         other_contact = ContactFactory()  # doesn't work at `order.company`
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
@@ -458,45 +451,6 @@ class TestGeneralChangeOrder(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
             'contact': ['The contact does not work at the given company.'],
-        }
-
-    def test_cannot_change_company(self):
-        """Test that company cannot be changed."""
-        order = OrderFactory()
-        company = CompanyFactory()
-        contact = ContactFactory(company=company)
-
-        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(
-            url,
-            {
-                'company': {'id': company.pk},
-                'contact': {'id': contact.pk},
-            },
-            format='json'
-        )
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {
-            'company': ['The company cannot be changed after creation.'],
-        }
-
-    def test_cannot_change_primary_market(self):
-        """Test that primary market cannot be changed."""
-        order = OrderFactory()
-
-        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(
-            url,
-            {
-                'primary_market': {'id': Country.greece.value.id},
-            },
-            format='json'
-        )
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {
-            'primary_market': ['The primary market cannot be changed after creation.'],
         }
 
     def test_general_validation(self):
@@ -582,33 +536,6 @@ class TestGeneralChangeOrder(APITestMixin):
             }
         ]
 
-    def test_can_save_with_primary_market_disabled(self):
-        """
-        Test that if the primary market was not disabled at the creation time
-        but it became later on, the record can still be saved without any
-        validation error.
-        """
-        market = Market.objects.filter(disabled_on__isnull=True).first()
-        country = market.country
-
-        with freeze_time('2017-01-01'):
-            order = OrderFactory(primary_market_id=country.pk)
-
-        market.disabled_on = dateutil_parse('2017-02-01T00:00:00Z')
-        market.save()
-
-        with freeze_time('2017-03-01'):
-            url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-            response = self.api_client.patch(
-                url,
-                {
-                    'primary_market': country.pk
-                },
-                format='json'
-            )
-
-            assert response.status_code == status.HTTP_200_OK
-
     def test_cannot_change_readonly_fields(self):
         """Test that if readonly fields are passed in when updating an order, they get ignored."""
         order = OrderFactory()
@@ -667,29 +594,6 @@ class TestGeneralChangeOrder(APITestMixin):
         assert response.json()['billing_contact_name'] != 'John Doe'
         assert response.json()['billing_email'] != 'JohnDoe@example.com'
         assert response.json()['billing_phone'] != '0123456789'
-
-    @pytest.mark.parametrize(
-        'disallowed_status', (
-            OrderStatus.complete,
-            OrderStatus.cancelled,
-        )
-    )
-    def test_409_if_order_not_in_allowed_status(self, disallowed_status):
-        """
-        Test that if the order is not in one of the allowed statuses, the endpoint
-        returns 409.
-        """
-        order = OrderFactory(status=disallowed_status)
-
-        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(url, {}, format='json')
-        assert response.status_code == status.HTTP_409_CONFLICT
-        assert response.json() == {
-            'detail': (
-                'The action cannot be performed '
-                f'in the current status {OrderStatus[disallowed_status]}.'
-            )
-        }
 
     @pytest.mark.parametrize(
         'vat_status',
@@ -753,7 +657,7 @@ class TestChangeOrderInDraft(APITestMixin):
     """Tests for changing an order when it's in draft."""
 
     @freeze_time('2017-04-18 13:00:00.000000')
-    def test_success(self):
+    def test_can_change_allowed_fields(self):
         """Test changing an existing order."""
         order = OrderFactory(
             vat_status=VATStatus.outside_eu,
@@ -875,6 +779,38 @@ class TestChangeOrderInDraft(APITestMixin):
             'cancellation_reason': None,
         }
 
+    @pytest.mark.parametrize(
+        'field,value',
+        (
+            ('company', lambda o: CompanyFactory().pk),
+            ('primary_market', Country.greece.value.id),
+        )
+    )
+    def test_cannot_change_disallowed_fields(self, field, value):
+        """Test that disallowed fields cannot be changed."""
+        order = OrderFactory()
+        value = value(order) if callable(value) else value
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(url, {field: value}, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {field: ['This field cannot be changed at this stage.']}
+
+    def test_ok_with_unchanged_disallowed_fields(self):
+        """Test that disallowed fields can be passed in if their values don't change."""
+        order = OrderFactory()
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(
+            url,
+            {
+                'company': order.company.pk,
+                'primary_market': order.primary_market.pk
+            },
+            format='json'
+        )
+        assert response.status_code == status.HTTP_200_OK
+
 
 class TestChangeOrderInQuoteStatuses(APITestMixin):
     """
@@ -929,6 +865,73 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
                 'name': new_contact.name
             }
         }
+
+    @pytest.mark.parametrize(
+        'order_factory',
+        (
+            OrderWithOpenQuoteFactory,
+            OrderWithAcceptedQuoteFactory,
+        )
+    )
+    @pytest.mark.parametrize(
+        'field,value',
+        (
+            ('company', lambda o: CompanyFactory().pk),
+            ('primary_market', Country.greece.value.id),
+
+            (
+                'service_types',
+                lambda o: [ServiceType.objects.filter(disabled_on__isnull=True).first().id]
+            ),
+            ('uk_region', UKRegion.jersey.value.id),
+            ('sector', Sector.renewable_energy_wind.value.id),
+            ('existing_agents', 'loremm ipsum'),
+            ('further_info', 'lorem ipsum'),
+            ('contacts_not_to_approach', 'lorem ipsum'),
+            ('description', 'lorem ipsum'),
+            ('delivery_date', '2017-04-20'),
+        )
+    )
+    def test_cannot_change_disallowed_fields(self, order_factory, field, value):
+        """Test that disallowed fields cannot be changed."""
+        order = order_factory()
+        value = value(order) if callable(value) else value
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(url, {field: value}, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {field: ['This field cannot be changed at this stage.']}
+
+    @pytest.mark.parametrize(
+        'order_factory',
+        (
+            OrderWithOpenQuoteFactory,
+            OrderWithAcceptedQuoteFactory,
+        )
+    )
+    def test_ok_with_unchanged_disallowed_fields(self, order_factory):
+        """Test that disallowed fields can be passed in if their values don't change."""
+        order = order_factory()
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(
+            url,
+            {
+                'company': order.company.pk,
+                'primary_market': order.primary_market.pk,
+
+                'service_types': order.service_types.values_list('id', flat=True),
+                'uk_region': order.uk_region.pk,
+                'sector': order.sector.pk,
+                'existing_agents': order.existing_agents,
+                'further_info': order.further_info,
+                'contacts_not_to_approach': order.contacts_not_to_approach,
+                'description': order.description,
+                'delivery_date': order.delivery_date.isoformat(),
+            },
+            format='json'
+        )
+        assert response.status_code == status.HTTP_200_OK
 
     @pytest.mark.parametrize(
         'field,value',
@@ -1037,39 +1040,6 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
         order.refresh_from_db()
         assert old_invoice == order.invoice
 
-    @pytest.mark.parametrize(
-        'order_factory',
-        (
-            OrderWithOpenQuoteFactory,
-            OrderWithAcceptedQuoteFactory,
-        )
-    )
-    @pytest.mark.parametrize(
-        'field,value',
-        (
-            (
-                'service_types',
-                lambda o: [ServiceType.objects.filter(disabled_on__isnull=True).first().id]
-            ),
-            ('uk_region', UKRegion.jersey.value.id),
-            ('sector', Sector.aerospace_assembly_aircraft.value.id),
-            ('existing_agents', 'loremm ipsum'),
-            ('further_info', 'lorem ipsum'),
-            ('contacts_not_to_approach', 'lorem ipsum'),
-            ('description', 'lorem ipsum'),
-            ('delivery_date', '2017-04-20'),
-        )
-    )
-    def test_cannot_change_disallowed_fields(self, order_factory, field, value):
-        """Test that disallowed fields cannot be changed."""
-        order = order_factory()
-        value = value(order) if callable(value) else value
-
-        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(url, {field: value}, format='json')
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {field: ['This field cannot be changed at this stage.']}
-
 
 class TestChangeOrderInPaid(APITestMixin):
     """Tests for changing an order when it's in paid."""
@@ -1094,12 +1064,15 @@ class TestChangeOrderInPaid(APITestMixin):
     @pytest.mark.parametrize(
         'field,value',
         (
+            ('company', lambda o: CompanyFactory().pk),
+            ('primary_market', Country.greece.value.id),
+
             (
                 'service_types',
                 lambda o: [ServiceType.objects.filter(disabled_on__isnull=True).first().id]
             ),
             ('uk_region', UKRegion.jersey.value.id),
-            ('sector', Sector.aerospace_assembly_aircraft.value.id),
+            ('sector', Sector.renewable_energy_wind.value.id),
             ('existing_agents', 'loremm ipsum'),
             ('further_info', 'lorem ipsum'),
             ('contacts_not_to_approach', 'lorem ipsum'),
@@ -1112,7 +1085,7 @@ class TestChangeOrderInPaid(APITestMixin):
             ('billing_address_county', 'New billing county'),
             ('billing_address_postcode', 'New billing postcode'),
             ('billing_address_country', Country.france.value.id),
-            ('vat_status', VATStatus.eu),
+            ('vat_status', VATStatus.uk),
             ('vat_number', '987654321'),
             ('vat_verified', False),
             ('po_number', 'New po number'),
@@ -1127,6 +1100,140 @@ class TestChangeOrderInPaid(APITestMixin):
         response = self.api_client.patch(url, {field: value}, format='json')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {field: ['This field cannot be changed at this stage.']}
+
+    def test_ok_with_unchanged_disallowed_fields(self):
+        """Test that disallowed fields can be passed in if their values don't change."""
+        order = OrderPaidFactory()
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+
+        response = self.api_client.patch(
+            url,
+            {
+                'company': order.company.pk,
+                'primary_market': order.primary_market.pk,
+
+                'service_types': order.service_types.values_list('id', flat=True),
+                'uk_region': order.uk_region.pk,
+                'sector': order.sector.pk,
+                'existing_agents': order.existing_agents,
+                'further_info': order.further_info,
+                'contacts_not_to_approach': order.contacts_not_to_approach,
+                'description': order.description,
+                'delivery_date': order.delivery_date.isoformat(),
+
+                'billing_address_1': order.billing_address_1,
+                'billing_address_2': order.billing_address_2,
+                'billing_address_town': order.billing_address_town,
+                'billing_address_county': order.billing_address_county,
+                'billing_address_postcode': order.billing_address_postcode,
+                'billing_address_country': order.billing_address_country.pk,
+                'vat_status': order.vat_status,
+                'vat_number': order.vat_number,
+                'vat_verified': order.vat_verified,
+                'po_number': order.po_number,
+            },
+            format='json'
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+
+class TestChangeOrderInEndStatuses(APITestMixin):
+    """Tests for changing an order when it's in complete or cancelled."""
+
+    @pytest.mark.parametrize(
+        'order_factory',
+        (
+            OrderCompleteFactory,
+            OrderCancelledFactory,
+        )
+    )
+    @pytest.mark.parametrize(
+        'field,value',
+        (
+            ('company', lambda o: CompanyFactory().pk),
+            ('primary_market', Country.greece.value.id),
+
+            (
+                'service_types',
+                lambda o: [ServiceType.objects.filter(disabled_on__isnull=True).first().id]
+            ),
+            ('uk_region', UKRegion.jersey.value.id),
+            ('sector', Sector.renewable_energy_wind.value.id),
+            ('existing_agents', 'loremm ipsum'),
+            ('further_info', 'lorem ipsum'),
+            ('contacts_not_to_approach', 'lorem ipsum'),
+            ('description', 'lorem ipsum'),
+            ('delivery_date', '2017-04-20'),
+
+            ('billing_address_1', 'New billing address 1'),
+            ('billing_address_2', 'New billing address 2'),
+            ('billing_address_town', 'New billing town'),
+            ('billing_address_county', 'New billing county'),
+            ('billing_address_postcode', 'New billing postcode'),
+            ('billing_address_country', Country.france.value.id),
+            ('vat_status', VATStatus.uk),
+            ('vat_number', '987654321'),
+            ('vat_verified', False),
+            ('po_number', 'New po number'),
+
+            ('contact', lambda o: ContactFactory(company=o.company).pk),
+        )
+    )
+    def test_cannot_change_disallowed_fields(self, order_factory, field, value):
+        """Test that disallowed fields cannot be changed."""
+        order = order_factory()
+        value = value(order) if callable(value) else value
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+        response = self.api_client.patch(url, {field: value}, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {field: ['This field cannot be changed at this stage.']}
+
+    @pytest.mark.parametrize(
+        'order_factory',
+        (
+            OrderCompleteFactory,
+            OrderCancelledFactory,
+        )
+    )
+    def test_ok_with_unchanged_disallowed_fields(self, order_factory):
+        """Test that disallowed fields can be passed in if their values don't change."""
+        order = order_factory()
+
+        url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
+
+        response = self.api_client.patch(
+            url,
+            {
+                'company': order.company.pk,
+                'primary_market': order.primary_market.pk,
+
+                'service_types': order.service_types.values_list('id', flat=True),
+                'uk_region': order.uk_region.pk,
+                'sector': order.sector.pk,
+                'existing_agents': order.existing_agents,
+                'further_info': order.further_info,
+                'contacts_not_to_approach': order.contacts_not_to_approach,
+                'description': order.description,
+                'delivery_date': order.delivery_date.isoformat(),
+
+                'billing_address_1': order.billing_address_1,
+                'billing_address_2': order.billing_address_2,
+                'billing_address_town': order.billing_address_town,
+                'billing_address_county': order.billing_address_county,
+                'billing_address_postcode': order.billing_address_postcode,
+                'billing_address_country': order.billing_address_country.pk,
+                'vat_status': order.vat_status,
+                'vat_number': order.vat_number,
+                'vat_verified': order.vat_verified,
+                'po_number': order.po_number,
+
+                'contact': order.contact.pk,
+            },
+            format='json'
+        )
+        assert response.status_code == status.HTTP_200_OK
 
 
 class TestMarkOrderAsComplete(APITestMixin):
