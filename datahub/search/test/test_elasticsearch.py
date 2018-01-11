@@ -105,6 +105,7 @@ def test_bulk(connections, es_bulk):
 def test_configure_connection(connections, settings):
     """Tests if Heroku connection is configured."""
     settings.HEROKU = True
+    settings.ES_USE_AWS_AUTH = False
     settings.ES_URL = 'https://login:password@test:1234'
     connections.configure.return_value = {}
 

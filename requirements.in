@@ -27,6 +27,7 @@ notifications-python-client==4.6.0
 # ES
 elasticsearch==5.4.0
 elasticsearch-dsl==5.3.0
+aws-requests-auth==0.4.1
 
 # Testing and dev
 pytest==3.2.3
