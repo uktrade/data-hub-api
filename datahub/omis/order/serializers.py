@@ -24,7 +24,6 @@ from .validators import (
     OrderEditableFieldsValidator,
     OrderInStatusRule,
     OrderInStatusValidator,
-    ReadonlyAfterCreationValidator,
 )
 
 
@@ -156,22 +155,15 @@ class OrderSerializer(serializers.ModelSerializer):
             'billing_phone',
         )
         validators = (
-            # the endpoint can only be called to create or to update orders in
-            # status 'Draft', 'Quote Awaiting Acceptance' or 'Quote accepted'
-            OrderInStatusValidator(
-                allowed_statuses=(
-                    OrderStatus.draft,
-                    OrderStatus.quote_awaiting_acceptance,
-                    OrderStatus.quote_accepted,
-                    OrderStatus.paid,
-                ),
-                order_required=False
-            ),
-            # after creation these fields cannot be changed
-            ReadonlyAfterCreationValidator(fields=('company', 'primary_market')),
             # only some of the fields can be changed depending of the status
             OrderEditableFieldsValidator(
                 {
+                    OrderStatus.draft: {
+                        *ORDER_FIELDS_INVOICE_RELATED,
+                        'description', 'service_types', 'sector', 'uk_region',
+                        'contacts_not_to_approach', 'contact', 'existing_agents',
+                        'further_info', 'delivery_date'
+                    },
                     OrderStatus.quote_awaiting_acceptance: {
                         *ORDER_FIELDS_INVOICE_RELATED,
                         'contact',
@@ -181,6 +173,8 @@ class OrderSerializer(serializers.ModelSerializer):
                         'contact',
                     },
                     OrderStatus.paid: {'contact'},
+                    OrderStatus.complete: {},  # nothing can be changed
+                    OrderStatus.cancelled: {},  # nothing can be changed
                 }
             ),
             # contact has to work at company

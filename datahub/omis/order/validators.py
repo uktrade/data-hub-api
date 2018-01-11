@@ -41,41 +41,6 @@ class ContactWorksAtCompanyValidator:
             })
 
 
-class ReadonlyAfterCreationValidator:
-    """
-    Validator which checks that the specified fields become readonly
-    after creation.
-    """
-
-    message = 'The {0} cannot be changed after creation.'
-
-    def __init__(self, fields):
-        """Set the fields."""
-        self.fields = fields
-        self.instance = None
-
-    def set_context(self, serializer):
-        """
-        This hook is called by the serializer instance,
-        prior to the validation call being made.
-        """
-        self.instance = getattr(serializer, 'instance', None)
-
-    def __call__(self, data):
-        """Validate readonly fields after creation."""
-        data_combiner = DataCombiner(self.instance, data)
-
-        if self.instance:
-            for field in self.fields:
-                value = data_combiner.get_value(field)
-
-                if value != getattr(self.instance, field):
-                    field_name = self.instance._meta.get_field(field).verbose_name
-                    raise ValidationError({
-                        field: self.message.format(field_name)
-                    })
-
-
 class OrderEditableFieldsValidator:
     """
     Validator that makes sure that only certain fields have been modified
@@ -100,16 +65,33 @@ class OrderEditableFieldsValidator:
         """
         self.instance = getattr(serializer, 'instance', None)
 
+    def _has_changed(self, field, combiner):
+        """
+        :returns: True if the data value for `field` has changed compared to
+            its instance value.
+        """
+        field_value = combiner.get_value_auto(field)
+        instance_value = DataCombiner(
+            self.instance, {},
+            model=self.instance.__class__
+        ).get_value_auto(field)
+
+        # if it's a queryset, evaluate it
+        if hasattr(instance_value, 'all'):
+            instance_value = list(instance_value)
+
+        return field_value != instance_value
+
     def __call__(self, data):
         """Validate editable fields depending on the order status."""
         if not self.instance or self.instance.status not in self.mapping:
             return
 
-        combiner = DataCombiner(self.instance, data)
+        combiner = DataCombiner(self.instance, data, model=self.instance.__class__)
 
         editable_fields = self.mapping[self.instance.status]
         for field in combiner.data:
-            if field not in editable_fields:
+            if field not in editable_fields and self._has_changed(field, combiner):
                 raise ValidationError({field: self.message})
 
 
