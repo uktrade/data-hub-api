@@ -273,7 +273,14 @@ class IProjectRequirementsAbstract(models.Model):
         null=True, blank=True, on_delete=models.SET_NULL
     )
     competitor_countries = models.ManyToManyField('metadata.Country', related_name='+', blank=True)
-    uk_region_locations = models.ManyToManyField('metadata.UKRegion', related_name='+', blank=True)
+    uk_region_locations = models.ManyToManyField(
+        'metadata.UKRegion', related_name='+', blank=True,
+        verbose_name='possible UK regions',
+    )
+    actual_uk_region = models.ForeignKey(
+        'metadata.UKRegion', related_name='+', null=True, blank=True, on_delete=models.PROTECT,
+        verbose_name='actual UK region',
+    )
     strategic_drivers = models.ManyToManyField(
         'metadata.InvestmentStrategicDriver',
         related_name='investment_projects', blank=True

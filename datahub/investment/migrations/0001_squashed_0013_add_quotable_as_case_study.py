@@ -72,7 +72,7 @@ class Migration(migrations.Migration):
                 ('sector', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='metadata.Sector')),
                 ('strategic_drivers', models.ManyToManyField(blank=True, related_name='investment_projects', to='metadata.InvestmentStrategicDriver')),
                 ('uk_company', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='investee_projects', to='company.Company')),
-                ('uk_region_locations', models.ManyToManyField(blank=True, related_name='_investmentproject_uk_region_locations_+', to='metadata.UKRegion')),
+                ('uk_region_locations', models.ManyToManyField(blank=True, related_name='_investmentproject_uk_region_locations_+', to='metadata.UKRegion', verbose_name='possible UK regions')),
             ],
             options={
                 'abstract': False,
