@@ -176,3 +176,13 @@ def format_date_or_datetime(value):
     if isinstance(value, datetime):
         return DateTimeField().to_representation(value)
     return DateField().to_representation(value)
+
+
+def random_obj_for_model(model):
+    """Returns a random object for a model."""
+    return random_obj_for_queryset(model.objects.all())
+
+
+def random_obj_for_queryset(queryset):
+    """Returns a random object for a queryset."""
+    return queryset.order_by('?').first()
