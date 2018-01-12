@@ -8,7 +8,7 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.core.constants import Country, Sector, UKRegion
 from datahub.core.test.factories import to_many_field
 
-from datahub.omis.invoice.test.factories import InvoiceFactory
+from datahub.omis.invoice.models import Invoice
 from datahub.omis.quote.test.factories import (
     AcceptedQuoteFactory, CancelledQuoteFactory, QuoteFactory
 )
@@ -96,8 +96,14 @@ class OrderWithAcceptedQuoteFactory(OrderFactory):
     """Order factory with an accepted quote."""
 
     quote = factory.SubFactory(AcceptedQuoteFactory)
-    invoice = factory.SubFactory(InvoiceFactory)
     status = OrderStatus.quote_accepted
+
+    @factory.post_generation
+    def set_invoice(self, create, extracted, **kwargs):
+        """Set invoice after creating the instance."""
+        if not create:
+            return
+        self.invoice = Invoice.objects.create_from_order(self)
 
 
 class OrderCompleteFactory(OrderWithAcceptedQuoteFactory):

@@ -47,6 +47,13 @@ class TestGetInvoice(APITestMixin):
                 'name': invoice.billing_address_country.name
             },
             'po_number': invoice.po_number,
+            'vat_status': invoice.vat_status,
+            'vat_number': invoice.vat_number,
+            'vat_verified': invoice.vat_verified,
+            'net_cost': invoice.net_cost,
+            'subtotal_cost': invoice.subtotal_cost,
+            'vat_cost': invoice.vat_cost,
+            'total_cost': invoice.total_cost,
         }
 
     def test_404_if_order_doesnt_exist(self):
