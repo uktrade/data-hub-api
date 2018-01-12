@@ -345,6 +345,42 @@ class TestReopen:
         assert order.status == disallowed_status
 
 
+class TestUpdateInvoiceDetails:
+    """Tests for the update_invoice_details method."""
+
+    def test_ok_if_order_in_quote_accepted(self):
+        """
+        Test that update_invoice_details creates a new invoice and links it to the order.
+        """
+        order = OrderWithAcceptedQuoteFactory()
+        old_invoice = order.invoice
+
+        order.update_invoice_details()
+
+        order.refresh_from_db()
+        assert order.invoice != old_invoice
+
+    @pytest.mark.parametrize(
+        'disallowed_status',
+        (
+            OrderStatus.draft,
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.paid,
+            OrderStatus.complete,
+            OrderStatus.cancelled,
+        )
+    )
+    def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
+        """
+        Test that if the order is in a disallowed status, the invoice details cannot be updated.
+        """
+        order = OrderFactory(status=disallowed_status)
+        with pytest.raises(Conflict):
+            order.update_invoice_details()
+
+        assert order.status == disallowed_status
+
+
 class TestAcceptQuote:
     """Tests for when a quote is accepted."""
 

@@ -205,6 +205,9 @@
     - - read_contact_document
       - company
       - contact
+    - - read_investmentproject_document
+      - investment
+      - investmentproject
     - - add_investmentprojectcode
       - investment
       - investmentprojectcode
