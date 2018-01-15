@@ -19,6 +19,13 @@ class Invoice(BaseModel):
 
     po_number = models.CharField(max_length=100, blank=True)
 
+    # As invoice details can be requested to be changed but the instances are considered
+    # immutable, we need to create new records every time.
+    # We only care about the most up-to-date instance though so we have a foreign key to the
+    # invoice from the order. Invoices do not link to orders to avoid any confusion.
+    # Order references as string on invoices can however be useful for debug purposes.
+    order_reference = models.CharField(max_length=100, blank=True)
+
     billing_company_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     billing_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True)
     billing_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True)
@@ -52,6 +59,26 @@ class Invoice(BaseModel):
     contact_email = models.EmailField(
         max_length=MAX_LENGTH, blank=True,
         help_text='Email address of the contact at the time of invoice creation.'
+    )
+
+    # Pricing fields.
+    # If this is the most up-to-date invoice for an order, these values will be
+    # the same as the ones on the order.
+    vat_status = models.CharField(max_length=100, blank=True)
+    vat_number = models.CharField(max_length=100, blank=True)
+    vat_verified = models.NullBooleanField()
+
+    net_cost = models.PositiveIntegerField(
+        default=0, help_text='Net value in pence.'
+    )
+    subtotal_cost = models.PositiveIntegerField(
+        default=0, help_text='Net cost - any discount in pence.'
+    )
+    vat_cost = models.PositiveIntegerField(
+        default=0, help_text='VAT amount of subtotal in pence.'
+    )
+    total_cost = models.PositiveIntegerField(
+        default=0, help_text='Subtotal + VAT cost in pence.'
     )
 
     # legacy fields, only meant to be used in readonly mode as reference

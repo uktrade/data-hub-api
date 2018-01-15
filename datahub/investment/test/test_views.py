@@ -4,6 +4,7 @@ import re
 import uuid
 from collections import Counter
 from datetime import date, datetime
+from operator import attrgetter
 from unittest.mock import patch
 
 import pytest
@@ -828,6 +829,51 @@ class TestRetrieveView(APITestMixin):
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    def test_get_project_without_read_document_permission(self):
+        """
+        Tests that the archived documents path is not returned for users without the read document
+        permission.
+        """
+        project = InvestmentProjectFactory(
+            archived_documents_url_path='path/to/document',
+        )
+        user = create_test_user(
+            permission_codenames=(
+                InvestmentProjectPermission.read_all,
+            )
+        )
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert 'archived_documents_url_path' not in response.json()
+
+    def test_get_project_with_read_document_permission(self):
+        """
+        Tests that the archived documents path is returned for users without the read document
+        permission.
+        """
+        project = InvestmentProjectFactory(
+            archived_documents_url_path='path/to/document',
+        )
+        user = create_test_user(
+            permission_codenames=(
+                InvestmentProjectPermission.read_all,
+                InvestmentProjectPermission.read_investmentproject_document,
+            )
+        )
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert 'archived_documents_url_path' in response.json()
+        assert response_data['archived_documents_url_path'] == 'path/to/document'
+
 
 class TestPartialUpdateView(APITestMixin):
     """
@@ -1063,13 +1109,17 @@ class TestPartialUpdateView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
     def test_change_stage_to_won(self):
-        """Tests moving a complete project to the 'Won' stage."""
+        """
+        Tests moving a complete project to the 'Won' stage, when all required fields are
+        complete.
+        """
         project = VerifyWinInvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'stage': {
                 'id': constants.InvestmentProjectStage.won.value.id
-            }
+            },
+            'actual_land_date': '2016-01-31',
         }
         response = self.api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
@@ -1079,6 +1129,25 @@ class TestPartialUpdateView(APITestMixin):
             'name': constants.InvestmentProjectStage.won.value.name,
         }
         assert response_data['status'] == 'won'
+
+    def test_change_stage_to_won_failure(self):
+        """
+        Tests moving a project to the 'Won' stage, when required field for that transition
+        are missing.
+        """
+        project = VerifyWinInvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.won.value.id
+            },
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'actual_land_date': ['This field is required.'],
+        }
 
     def test_revert_stage_to_verify_win(self):
         """Tests moving a complete project from the 'Won' stage to 'Verify win'."""
@@ -1556,6 +1625,270 @@ class TestAddTeamMemberView(APITestMixin):
         assert response_data == {
             'non_field_errors': ['The fields investment_project, adviser must make a unique set.']
         }
+
+
+class TestReplaceAllTeamMembersView(APITestMixin):
+    """Tests for the replace all team members view."""
+
+    def test_replace_all_team_members(self):
+        """
+        Test that replacing all team members removes existing team members and adds the new ones.
+        """
+        project = InvestmentProjectFactory()
+        advisers = AdviserFactory.create_batch(2)
+        advisers.sort(key=attrgetter('id'))
+        InvestmentProjectTeamMemberFactory.create_batch(
+            2, investment_project=project
+        )
+
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        request_data = [{
+            'adviser': {
+                'id': str(adviser.pk)
+            },
+            'role': 'Sector adviser'
+        } for adviser in advisers]
+        response = self.api_client.put(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        response_data.sort(key=_get_adviser_id)
+        assert response_data == [{
+            'adviser': {
+                'id': str(adviser.pk),
+                'first_name': adviser.first_name,
+                'last_name': adviser.last_name,
+                'name': adviser.name,
+            },
+            'investment_project': {
+                'id': str(project.pk),
+                'name': project.name,
+            },
+            'role': 'Sector adviser',
+        } for adviser in advisers]
+
+        # Make sure old advisers have been removed
+        assert {team_member.adviser.id for team_member in project.team_members.all()} == {
+            adviser.id for adviser in advisers
+        }
+
+    def test_update_existing_team_members(self):
+        """Test that existing team members can be updated."""
+        project = InvestmentProjectFactory()
+        team_members = InvestmentProjectTeamMemberFactory.create_batch(
+            2, investment_project=project, role='Old role'
+        )
+
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        request_data = [{
+            'adviser': {
+                'id': str(team_member.adviser.pk)
+            },
+            'role': 'New role'
+        } for team_member in team_members]
+        response = self.api_client.put(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data == [{
+            'adviser': {
+                'id': str(team_member.adviser.pk),
+                'first_name': team_member.adviser.first_name,
+                'last_name': team_member.adviser.last_name,
+                'name': team_member.adviser.name,
+            },
+            'investment_project': {
+                'id': str(project.pk),
+                'name': project.name,
+            },
+            'role': 'New role',
+        } for team_member in team_members]
+
+    @pytest.mark.parametrize('permissions', (
+        (InvestmentProjectPermission.change_all,),
+        (InvestmentProjectPermission.change_associated, InvestmentProjectPermission.change_all),
+    ))
+    def test_non_restricted_user_can_replace_team_members(self, permissions):
+        """Test that a non-restricted user can replace team members of a project."""
+        project = InvestmentProjectFactory()
+        adviser = AdviserFactory()
+        team = TeamFactory()
+
+        _, api_client = _create_user_and_api_client(self, team, permissions)
+
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        request_data = [{
+            'adviser': {
+                'id': str(adviser.pk)
+            },
+            'role': 'Sector adviser'
+        }]
+        response = api_client.put(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data == [{
+            'adviser': {
+                'id': str(adviser.pk),
+                'first_name': adviser.first_name,
+                'last_name': adviser.last_name,
+                'name': adviser.name,
+            },
+            'investment_project': {
+                'id': str(project.pk),
+                'name': project.name,
+            },
+            'role': 'Sector adviser',
+        }]
+
+    def test_restricted_user_cannot_replace_team_members_for_non_associated_project(self):
+        """Test that a restricted user cannot replace team members for a non-associated project."""
+        project = InvestmentProjectFactory()
+        adviser = AdviserFactory()
+        team = TeamFactory()
+
+        _, api_client = _create_user_and_api_client(
+            self, team, [InvestmentProjectPermission.change_associated]
+        )
+
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        request_data = [{
+            'adviser': {
+                'id': str(adviser.pk)
+            },
+            'role': 'Sector adviser',
+        }]
+        response = api_client.put(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_restricted_user_can_replace_team_members_for_associated_project(self):
+        """Test that a restricted user can replace team members for an associated project."""
+        adviser = AdviserFactory()
+        creator = AdviserFactory()
+        project = InvestmentProjectFactory(created_by=creator)
+
+        _, api_client = _create_user_and_api_client(
+            self, creator.dit_team, [InvestmentProjectPermission.change_associated]
+        )
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        request_data = [{
+            'adviser': {
+                'id': str(adviser.pk)
+            },
+            'role': 'Sector adviser'
+        }]
+        response = api_client.put(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data == [{
+            'adviser': {
+                'id': str(adviser.pk),
+                'first_name': adviser.first_name,
+                'last_name': adviser.last_name,
+                'name': adviser.name,
+            },
+            'investment_project': {
+                'id': str(project.pk),
+                'name': project.name,
+            },
+            'role': 'Sector adviser',
+        }]
+
+    def test_replace_all_team_members_doesnt_affect_other_projects(self):
+        """Test that replacing team members only affects the specified project."""
+        project = InvestmentProjectFactory()
+        other_project = InvestmentProjectFactory()
+        InvestmentProjectTeamMemberFactory(investment_project=other_project)
+
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        request_data = []
+        response = self.api_client.put(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data == []
+        assert other_project.team_members.count() == 1
+
+    def test_replace_all_team_members_validation(self):
+        """Test that an array of errors is returned for validation errors."""
+        project = InvestmentProjectFactory()
+        advisers = AdviserFactory.create_batch(2)
+
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        request_data = [{
+            'adviser': None,
+            'role': 'Sector adviser'
+        }, {
+            'adviser': {
+                'id': str(advisers[0].pk)
+            },
+            'role': 'Sector adviser'
+        }, {
+            'adviser': {
+                'id': str(advisers[1].pk)
+            },
+            'role': ''
+        }]
+        response = self.api_client.put(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == [
+            {'adviser': ['This field may not be null.']},
+            {},
+            {'role': ['This field may not be blank.']}
+        ]
+
+    def test_replace_all_team_members_duplicate(self):
+        """Test that duplicate advisers returns errors."""
+        project = InvestmentProjectFactory()
+        advisers = AdviserFactory.create_batch(2)
+
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': project.pk})
+        request_data = [{
+            'adviser': {
+                'id': str(advisers[0].pk)
+            },
+            'role': 'Sector adviser'
+        }, {
+            'adviser': {
+                'id': str(advisers[1].pk)
+            },
+            'role': 'Area adviser'
+        }, {
+            'adviser': {
+                'id': str(advisers[0].pk)
+            },
+            'role': 'Development adviser'
+        }]
+        response = self.api_client.put(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == [
+            {'adviser': ['You cannot add the same adviser as a team member more than once.']},
+            {},
+            {'adviser': ['You cannot add the same adviser as a team member more than once.']},
+        ]
+
+    def test_replace_all_team_members_non_existent_project(self):
+        """Test that a 404 is returned for a non-existent project."""
+        url = reverse('api-v3:investment:team-member-collection',
+                      kwargs={'project_pk': uuid.uuid4()})
+        request_data = []
+        response = self.api_client.put(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 class TestDeleteAllTeamMembersView(APITestMixin):
@@ -2303,3 +2636,7 @@ def _create_user_and_api_client(test_instance, team, permissions):
     user = create_test_user(dit_team=team, permission_codenames=permissions)
     api_client = test_instance.create_api_client(user=user)
     return user, api_client
+
+
+def _get_adviser_id(item):
+    return item['adviser']['id']

@@ -11,7 +11,9 @@ from datahub.company.models import (
     Contact, ContactPermission, ExportExperienceCategory,
 )
 from datahub.core.constants import Country
-from datahub.core.serializers import NestedRelatedField, RelaxedURLField
+from datahub.core.serializers import (
+    NestedRelatedField, PermittedFieldsModelSerializer, RelaxedURLField
+)
 from datahub.core.validators import (
     AddressValidator,
     AllIsBlankRule,
@@ -25,30 +27,6 @@ from datahub.core.validators import (
 from datahub.metadata import models as meta_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
-
-
-class PermittedFieldsModelSerializer(serializers.ModelSerializer):
-    """Lets you get permitted fields only.
-
-    Needs 'permissions' key in extra_kwargs Meta class in following format:
-    extra_kwargs = {
-        'permissions': {
-            'app_name.permission': 'field'
-        }
-    }
-    If user doesn't have required permission, corresponding field will be filtered out.
-    """
-
-    def get_fields(self):
-        """Gets filtered dictionary of fields based on permissions."""
-        fields = super().get_fields()
-        request = self.context.get('request', None)
-        if request:
-            permissions = self.get_extra_kwargs().get('permissions', {})
-            for permission, field in permissions.items():
-                if not request.user.has_perm(permission):
-                    del fields[field]
-        return fields
 
 
 class AdviserSerializer(serializers.ModelSerializer):
@@ -192,9 +170,9 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         extra_kwargs = {
             'contactable_by_email': {'default': True},
             'contactable_by_phone': {'default': True},
-            'permissions': {
-                f'company.{ContactPermission.read_contact_document}': 'archived_documents_url_path'
-            }
+        }
+        permissions = {
+            f'company.{ContactPermission.read_contact_document}': 'archived_documents_url_path',
         }
 
 
@@ -331,8 +309,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             ),
             AddressValidator(lazy=True, fields_mapping=Company.TRADING_ADDRESS_VALIDATION_MAPPING),
         ]
-        extra_kwargs = {
-            'permissions': {
-                f'company.{CompanyPermission.read_company_document}': 'archived_documents_url_path'
-            }
+        permissions = {
+            f'company.{CompanyPermission.read_company_document}': 'archived_documents_url_path',
         }

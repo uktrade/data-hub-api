@@ -138,19 +138,19 @@ class Interaction(BaseModel):
         ]
         permissions = (
             (
-                InteractionPermission.read_all,
+                InteractionPermission.read_all.value,
                 'Can read all interaction'
             ),
             (
-                InteractionPermission.read_associated_investmentproject,
+                InteractionPermission.read_associated_investmentproject.value,
                 'Can read interaction for associated investment projects'
             ),
             (
-                InteractionPermission.add_associated_investmentproject,
+                InteractionPermission.add_associated_investmentproject.value,
                 'Can add interaction for associated investment projects'
             ),
             (
-                InteractionPermission.change_associated_investmentproject,
+                InteractionPermission.change_associated_investmentproject.value,
                 'Can change interaction for associated investment projects'
             ),
         )

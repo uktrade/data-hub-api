@@ -50,7 +50,7 @@ def test_virus_scan_document_infected(s3_stubber, requests_stubber):
     assert document.av_clean is False
 
 
-def test_virus_scan_document_bad_response_body(s3_stubber, requests_stubber, capsys):
+def test_virus_scan_document_bad_response_body(s3_stubber, requests_stubber, caplog):
     """Tests handling of unexpected response bodies from the AV service."""
     document = DocumentFactory()
     s3_stubber.add_response('get_object', MOCK_S3_RESPONSE, expected_params={
@@ -60,12 +60,11 @@ def test_virus_scan_document_bad_response_body(s3_stubber, requests_stubber, cap
 
     av_scan.virus_scan_document(str(document.id))
     document.refresh_from_db()
-    _, err = capsys.readouterr()
     assert document.av_clean is None
-    assert 'Unexpected response from AV service' in err
+    assert 'Unexpected response from AV service' in caplog.text
 
 
-def test_virus_scan_document_s3_key_not_found(s3_stubber, requests_stubber, capsys):
+def test_virus_scan_document_s3_key_not_found(s3_stubber, requests_stubber, caplog):
     """Tests handling of a not found error from S3."""
     document = DocumentFactory()
     s3_stubber.add_client_error(
@@ -75,12 +74,11 @@ def test_virus_scan_document_s3_key_not_found(s3_stubber, requests_stubber, caps
 
     av_scan.virus_scan_document(str(document.id))
     document.refresh_from_db()
-    _, err = capsys.readouterr()
     assert document.av_clean is None
-    assert 'NoSuchKey' in err
+    assert 'NoSuchKey' in caplog.text
 
 
-def test_virus_scan_document_bad_response_status(s3_stubber, requests_stubber, capsys):
+def test_virus_scan_document_bad_response_status(s3_stubber, requests_stubber, caplog):
     """Tests handling of error response statuses from the AV service."""
     document = DocumentFactory()
     s3_stubber.add_response('get_object', MOCK_S3_RESPONSE, expected_params={
@@ -91,6 +89,5 @@ def test_virus_scan_document_bad_response_status(s3_stubber, requests_stubber, c
 
     av_scan.virus_scan_document(str(document.id))
     document.refresh_from_db()
-    _, err = capsys.readouterr()
     assert document.av_clean is None
-    assert '400 Client Error' in err
+    assert '400 Client Error' in caplog.text

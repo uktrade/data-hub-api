@@ -16,6 +16,7 @@ class InvoiceManager(models.Manager):
         :returns: Invoice object generated from the order
         """
         return self.create(
+            order_reference=order.reference,
             invoice_number=generate_datetime_based_reference(self.model, field='invoice_number'),
             payment_due_date=calculate_payment_due_date(order),
             billing_company_name=order.billing_company_name,
@@ -34,5 +35,12 @@ class InvoiceManager(models.Manager):
             invoice_address_postcode=constants.DIT_ADDRESS_POSTCODE,
             invoice_address_country_id=constants.DIT_ADDRESS_COUNTRY_ID,
             invoice_vat_number=constants.DIT_VAT_NUMBER,
-            contact_email=order.get_current_contact_email()
+            contact_email=order.get_current_contact_email(),
+            vat_status=order.vat_status,
+            vat_number=order.vat_number,
+            vat_verified=order.vat_verified,
+            net_cost=order.net_cost,
+            subtotal_cost=order.subtotal_cost,
+            vat_cost=order.vat_cost,
+            total_cost=order.total_cost,
         )

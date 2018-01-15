@@ -24,7 +24,7 @@ def update_billing_fields(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         ('omis-invoice', '0004_billing_fields'),
-        ('order', '0001_squashed_0030_cancellation'),
+        ('order', '0005_order_billing_company_name'),
     ]
 
     operations = [
