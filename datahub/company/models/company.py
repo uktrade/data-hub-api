@@ -145,8 +145,8 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     class Meta:
         verbose_name_plural = 'companies'
         permissions = (
-            (CompanyPermission.read_company, 'Can read company'),
-            (CompanyPermission.read_company_document, 'Can read company document')
+            (CompanyPermission.read_company.value, 'Can read company'),
+            (CompanyPermission.read_company_document.value, 'Can read company document')
         )
 
     @property

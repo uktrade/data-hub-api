@@ -30,13 +30,13 @@ AccessToken.objects.create(
     scope='data-hub:internal-front-end',
 )
 
-da_scottish_council_id = 'b23ade1c-9798-e211-a939-e4115bead28a'
+welsh_government_id = 'bc85aa17-fabd-e511-88b6-e4115bead28a'
 
 da_staff_user = Advisor.objects.create_user(
     email='da_staff@datahub.com',
     first_name='DA',
     last_name='Staff',
-    dit_team_id=da_scottish_council_id,
+    dit_team_id=welsh_government_id,
 )
 
 AccessToken.objects.create(

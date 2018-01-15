@@ -7,28 +7,26 @@ from rest_framework.reverse import reverse
 from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.oauth.scopes import Scope
 from datahub.omis.order.constants import OrderStatus
-from datahub.omis.order.test.factories import OrderFactory, OrderWithAcceptedQuoteFactory
-
-from ..factories import InvoiceFactory
+from datahub.omis.order.test.factories import (
+    OrderCompleteFactory, OrderFactory,
+    OrderPaidFactory, OrderWithAcceptedQuoteFactory
+)
 
 
 class TestPublicGetInvoice(APITestMixin):
     """Get public invoice test case."""
 
     @pytest.mark.parametrize(
-        'order_status',
+        'order_factory',
         (
-            OrderStatus.quote_accepted,
-            OrderStatus.paid,
-            OrderStatus.complete
+            OrderWithAcceptedQuoteFactory,
+            OrderPaidFactory,
+            OrderCompleteFactory
         )
     )
-    def test_get(self, order_status):
+    def test_get(self, order_factory):
         """Test a successful call to get a invoice."""
-        order = OrderFactory(
-            invoice=InvoiceFactory(),
-            status=order_status
-        )
+        order = order_factory()
 
         url = reverse(
             'api-v3:omis-public:invoice:detail',
@@ -71,6 +69,14 @@ class TestPublicGetInvoice(APITestMixin):
                 'name': invoice.billing_address_country.name
             },
             'po_number': invoice.po_number,
+
+            'vat_status': invoice.vat_status,
+            'vat_number': invoice.vat_number,
+            'vat_verified': invoice.vat_verified,
+            'net_cost': invoice.net_cost,
+            'subtotal_cost': invoice.subtotal_cost,
+            'vat_cost': invoice.vat_cost,
+            'total_cost': invoice.total_cost,
         }
 
     def test_404_if_order_doesnt_exist(self):
@@ -110,10 +116,7 @@ class TestPublicGetInvoice(APITestMixin):
     )
     def test_404_if_in_disallowed_status(self, order_status):
         """Test that if the order is not in an allowed state, the endpoint returns 404."""
-        order = OrderFactory(
-            status=order_status,
-            invoice=InvoiceFactory()
-        )
+        order = OrderWithAcceptedQuoteFactory(status=order_status)
 
         url = reverse(
             'api-v3:omis-public:invoice:detail',

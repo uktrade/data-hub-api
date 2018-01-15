@@ -121,6 +121,7 @@ class WonInvestmentProjectFactory(VerifyWinInvestmentProjectFactory):
 
     stage_id = InvestmentProjectStage.won.value.id
     status = InvestmentProject.STATUSES.won
+    actual_land_date = factory.Faker('past_date')
 
 
 class InvestmentProjectTeamMemberFactory(factory.django.DjangoModelFactory):

@@ -35,5 +35,12 @@ class InvoiceSerializer(serializers.ModelSerializer):
             'billing_address_town',
             'billing_address_country',
             'po_number',
+            'vat_status',
+            'vat_number',
+            'vat_verified',
+            'net_cost',
+            'subtotal_cost',
+            'vat_cost',
+            'total_cost',
         )
         read_only_fields = fields

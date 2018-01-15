@@ -12,6 +12,8 @@ class SearchInvestmentProjectSerializer(SearchSerializer):
     """Serialiser used to validate investment project search POST bodies."""
 
     client_relationship_manager = SingleOrListField(child=StringUUIDField(), required=False)
+    created_on_after = RelaxedDateTimeField(required=False)
+    created_on_before = RelaxedDateTimeField(required=False)
     estimated_land_date_after = RelaxedDateTimeField(required=False)
     estimated_land_date_before = RelaxedDateTimeField(required=False)
     investment_type = SingleOrListField(child=StringUUIDField(), required=False)
