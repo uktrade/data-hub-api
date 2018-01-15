@@ -28,6 +28,7 @@ class InvestmentSearchApp(SearchApp):
         f'investment.{InvestmentProjectPermission.read_associated}'
     )
     queryset = DBInvestmentProject.objects.prefetch_related(
+        'actual_uk_regions',
         'archived_by',
         'average_salary',
         'business_activities',
