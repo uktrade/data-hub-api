@@ -2,13 +2,14 @@ import pytest
 
 from datahub.company.test.factories import AdviserFactory, ContactFactory
 from datahub.core import constants
+from datahub.core.test_utils import random_obj_for_model
 from datahub.investment.serializers import (
     IProjectRequirementsSerializer, IProjectSummarySerializer, IProjectTeamSerializer,
     IProjectValueSerializer
 )
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.investment.validate import validate
-from datahub.metadata.models import ReferralSourceActivity
+from datahub.metadata.models import ReferralSourceActivity, UKRegion
 
 pytestmark = pytest.mark.django_db
 
@@ -180,7 +181,7 @@ def test_validate_reqs_instance_success():
     strategic_drivers = [
         constants.InvestmentStrategicDriver.access_to_market.value.id
     ]
-    uk_region_locations = [constants.UKRegion.england.value.id]
+    uk_region_locations = [random_obj_for_model(UKRegion)]
     project = InvestmentProjectFactory(
         stage_id=constants.InvestmentProjectStage.assign_pm.value.id,
         client_considering_other_countries=False,
@@ -270,7 +271,7 @@ def test_validate_verify_win_instance_failure():
         client_requirements='client reqs',
         site_decided=False,
         strategic_drivers=strategic_drivers,
-        uk_region_locations=[constants.UKRegion.england.value.id],
+        uk_region_locations=[random_obj_for_model(UKRegion)],
         project_assurance_adviser=adviser,
         project_manager=adviser
     )
@@ -285,6 +286,7 @@ def test_validate_verify_win_instance_failure():
         'address_1': 'This field is required.',
         'address_town': 'This field is required.',
         'address_postcode': 'This field is required.',
+        'actual_uk_regions': 'This field is required.',
         'average_salary': 'This field is required.',
         'client_cannot_provide_foreign_investment': 'This field is required.',
         'foreign_equity_investment': 'This field is required.',
@@ -336,7 +338,7 @@ def test_validate_verify_win_instance_with_cond_fields():
         client_requirements='client reqs',
         site_decided=False,
         strategic_drivers=strategic_drivers,
-        uk_region_locations=[constants.UKRegion.england.value.id],
+        uk_region_locations=[random_obj_for_model(UKRegion)],
         project_assurance_adviser=adviser,
         project_manager=adviser,
         government_assistance=False,
@@ -349,6 +351,7 @@ def test_validate_verify_win_instance_with_cond_fields():
         address_1='12 London Road',
         address_town='London',
         address_postcode='SW1A 2AA',
+        actual_uk_regions=[random_obj_for_model(UKRegion)],
         average_salary_id=constants.SalaryRange.below_25000.value.id
     )
     errors = validate(instance=project)
