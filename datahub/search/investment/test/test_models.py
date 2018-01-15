@@ -70,7 +70,7 @@ def test_investment_project_to_dict(setup_es):
         'export_revenue',
         'client_requirements',
         'uk_region_locations',
-        'actual_uk_region',
+        'actual_uk_regions',
         'site_decided',
         'address_1',
         'address_2',

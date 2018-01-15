@@ -231,7 +231,7 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
     competitor_countries = NestedRelatedField(meta_models.Country, many=True, required=False)
     # Note: uk_region_locations is the possible UK regions (not the actual/final UK region)
     uk_region_locations = NestedRelatedField(meta_models.UKRegion, many=True, required=False)
-    actual_uk_region = NestedRelatedField(meta_models.UKRegion, required=False)
+    actual_uk_regions = NestedRelatedField(meta_models.UKRegion, many=True, required=False)
     strategic_drivers = NestedRelatedField(
         meta_models.InvestmentStrategicDriver, many=True, required=False
     )
@@ -255,7 +255,7 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
             'address_postcode',
             'competitor_countries',
             'uk_region_locations',
-            'actual_uk_region',
+            'actual_uk_regions',
             'strategic_drivers',
             'client_considering_other_countries',
             'uk_company_decided',

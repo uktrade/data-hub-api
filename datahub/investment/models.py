@@ -276,9 +276,9 @@ class IProjectRequirementsAbstract(models.Model):
         'metadata.UKRegion', related_name='+', blank=True,
         verbose_name='possible UK regions',
     )
-    actual_uk_region = models.ForeignKey(
-        'metadata.UKRegion', related_name='+', null=True, blank=True, on_delete=models.PROTECT,
-        verbose_name='actual UK region',
+    actual_uk_regions = models.ManyToManyField(
+        'metadata.UKRegion', related_name='+', blank=True,
+        verbose_name='actual UK regions',
     )
     strategic_drivers = models.ManyToManyField(
         'metadata.InvestmentStrategicDriver',
