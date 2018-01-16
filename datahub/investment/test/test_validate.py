@@ -214,6 +214,21 @@ def test_validate_reqs_competitor_countries_present():
     assert 'competitor_countries' not in errors
 
 
+@pytest.mark.parametrize('allow_blank_possible_uk_regions,is_error', (
+    (True, False),
+    (False, True),
+))
+def test_validate_possible_uk_regions(allow_blank_possible_uk_regions, is_error):
+    """Tests uk_region_locations (possible UK regions) conditional validation."""
+    project = InvestmentProjectFactory(
+        stage_id=constants.InvestmentProjectStage.assign_pm.value.id,
+        allow_blank_possible_uk_regions=allow_blank_possible_uk_regions,
+        uk_region_locations=[],
+    )
+    errors = validate(instance=project, fields=IProjectRequirementsSerializer.Meta.fields)
+    assert ('uk_region_locations' in errors) == is_error
+
+
 def test_validate_team_fail():
     """Tests validating an incomplete team section."""
     project = InvestmentProjectFactory(

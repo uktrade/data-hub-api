@@ -15,6 +15,7 @@ def test_investment_project_to_dict(setup_es):
     keys = {
         'id',
         'allow_blank_estimated_land_date',
+        'allow_blank_possible_uk_regions',
         'business_activities',
         'client_contacts',
         'client_relationship_manager',
