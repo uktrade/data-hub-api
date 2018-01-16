@@ -20,13 +20,13 @@ python-dateutil==2.6.1
 # Persistency layer
 psycopg2==2.7.3.2
 
-boto3==1.5.14
+boto3==1.5.15
 
 notifications-python-client==4.7.1
 
 # ES
-elasticsearch==5.4.0
-elasticsearch-dsl==5.3.0
+elasticsearch==5.5.2
+elasticsearch-dsl==5.4.0
 aws-requests-auth==0.4.1
 
 # Testing and dev
