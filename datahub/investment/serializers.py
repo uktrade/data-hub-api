@@ -258,6 +258,7 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
             'address_town',
             'address_postcode',
             'competitor_countries',
+            'allow_blank_possible_uk_regions',
             'uk_region_locations',
             'actual_uk_regions',
             'strategic_drivers',
@@ -265,6 +266,13 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
             'uk_company_decided',
             'uk_company',
             'requirements_complete'
+        )
+        extra_kwargs = {
+            # Required for validation as ModelSerializer does not automatically set defaults
+            'allow_blank_possible_uk_regions': {'default': False},
+        }
+        read_only_fields = (
+            'allow_blank_possible_uk_regions',
         )
 
 
@@ -393,7 +401,11 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
 
 class IProjectSerializer(IProjectSummarySerializer, IProjectValueSerializer,
                          IProjectRequirementsSerializer, IProjectTeamSerializer):
-    """Serialiser for investment projects, used with the new unified investment endpoint."""
+    """
+    Serialiser for investment projects, used with the new unified investment endpoint.
+
+    TODO: Combine the four base serialisers into one.
+    """
 
     class Meta:
         model = InvestmentProject
@@ -403,8 +415,14 @@ class IProjectSerializer(IProjectSummarySerializer, IProjectValueSerializer,
             + IProjectRequirementsSerializer.Meta.fields
             + IProjectTeamSerializer.Meta.fields
         )
-        extra_kwargs = IProjectSummarySerializer.Meta.extra_kwargs
-        read_only_fields = IProjectSummarySerializer.Meta.read_only_fields
+        extra_kwargs = {
+            **IProjectSummarySerializer.Meta.extra_kwargs,
+            **IProjectRequirementsSerializer.Meta.extra_kwargs,
+        }
+        read_only_fields = (
+            IProjectSummarySerializer.Meta.read_only_fields
+            + IProjectRequirementsSerializer.Meta.read_only_fields
+        )
         permissions = IProjectSummarySerializer.Meta.permissions
 
 

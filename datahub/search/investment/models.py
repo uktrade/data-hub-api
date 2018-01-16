@@ -11,6 +11,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
 
     id = Keyword()
     allow_blank_estimated_land_date = Boolean(index=False)
+    allow_blank_possible_uk_regions = Boolean(index=False)
     approved_commitment_to_invest = Boolean()
     approved_fdi = Boolean()
     approved_good_value = Boolean()
