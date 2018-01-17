@@ -10,6 +10,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
     """Elasticsearch representation of InvestmentProject."""
 
     id = Keyword()
+    allow_blank_estimated_land_date = Boolean(index=False)
     approved_commitment_to_invest = Boolean()
     approved_fdi = Boolean()
     approved_good_value = Boolean()

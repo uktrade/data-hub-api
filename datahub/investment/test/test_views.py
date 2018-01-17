@@ -72,6 +72,7 @@ class TestListView(APITestMixin):
             'description',
             'comments',
             'anonymous_description',
+            'allow_blank_estimated_land_date',
             'estimated_land_date',
             'actual_land_date',
             'quotable_as_public_case_study',
@@ -385,7 +386,6 @@ class TestCreateView(APITestMixin):
             'client_contacts': ['This field is required.'],
             'client_relationship_manager': ['This field is required.'],
             'description': ['This field is required.'],
-            'estimated_land_date': ['This field is required.'],
             'investor_company': ['This field is required.'],
             'investment_type': ['This field is required.'],
             'name': ['This field is required.'],
@@ -402,7 +402,6 @@ class TestCreateView(APITestMixin):
             'client_contacts': None,
             'client_relationship_manager': None,
             'description': None,
-            'estimated_land_date': None,
             'investor_company': None,
             'investment_type': None,
             'name': None,
@@ -418,7 +417,6 @@ class TestCreateView(APITestMixin):
             'client_contacts': ['This field may not be null.'],
             'client_relationship_manager': ['This field may not be null.'],
             'description': ['This field may not be null.'],
-            'estimated_land_date': ['This field may not be null.'],
             'investor_company': ['This field may not be null.'],
             'investment_type': ['This field may not be null.'],
             'name': ['This field may not be null.'],
@@ -455,7 +453,6 @@ class TestCreateView(APITestMixin):
         request_data = {
             'name': 'project name',
             'description': 'project description',
-            'estimated_land_date': '2020-12-12',
             'investment_type': {
                 'id': constants.InvestmentType.fdi.value.id
             },
@@ -493,6 +490,7 @@ class TestCreateView(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
+            'estimated_land_date': ['This field is required.'],
             'fdi_type': ['This field is required.']
         }
 
@@ -969,6 +967,23 @@ class TestPartialUpdateView(APITestMixin):
         assert len(response_data['client_contacts']) == 1
         assert response_data['client_contacts'][0]['id'] == str(new_contact.id)
 
+    def test_patch_estimated_land_date_legacy_project(self):
+        """
+        Test the validation of estimated_land_date for projects with
+        allow_blank_estimated_land_date=True.
+        """
+        project = VerifyWinInvestmentProjectFactory(
+            allow_blank_estimated_land_date=True,
+            estimated_land_date=None,
+        )
+        url = reverse('api-v3:investment:investment-item',
+                      kwargs={'pk': project.pk})
+        request_data = {
+            'estimated_land_date': None,
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
     def test_change_stage_assign_pm_failure(self):
         """Tests moving an incomplete project to the Assign PM stage."""
         project = InvestmentProjectFactory()
@@ -1287,17 +1302,20 @@ class TestPartialUpdateView(APITestMixin):
         project = InvestmentProjectFactory(
             archived_documents_url_path='old_path',
             comments='old_comment',
+            allow_blank_estimated_land_date=False,
         )
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         response = self.api_client.patch(url, format='json', data={
             'archived_documents_url_path': 'new_path',
             'comments': 'new_comments',
+            'allow_blank_estimated_land_date': True,
         })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived_documents_url_path'] == 'old_path'
         assert response.data['comments'] == 'old_comment'
+        assert response.data['allow_blank_estimated_land_date'] is False
 
     def test_restricted_user_cannot_update_project_if_not_associated(self):
         """Tests that a restricted user cannot update another team's project."""

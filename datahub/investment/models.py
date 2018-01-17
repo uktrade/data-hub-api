@@ -87,7 +87,13 @@ class IProjectAbstract(models.Model):
     description = models.TextField()
     comments = models.TextField(blank=True)
     anonymous_description = models.TextField(blank=True)
-    estimated_land_date = models.DateField()
+    allow_blank_estimated_land_date = models.BooleanField(
+        default=False,
+        help_text='Controls whether estimated land date is a required field. Intended for '
+                  'projects migrated from CDMS in the verify win and won stages where legacy '
+                  'data for estimated land date does not exist.'
+    )
+    estimated_land_date = models.DateField(null=True)
     investment_type = models.ForeignKey(
         'metadata.InvestmentType', on_delete=models.PROTECT,
         related_name='investment_projects'
