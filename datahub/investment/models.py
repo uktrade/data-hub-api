@@ -278,6 +278,12 @@ class IProjectRequirementsAbstract(models.Model):
         null=True, blank=True, on_delete=models.SET_NULL
     )
     competitor_countries = models.ManyToManyField('metadata.Country', related_name='+', blank=True)
+    allow_blank_possible_uk_regions = models.BooleanField(
+        default=False,
+        help_text='Controls whether possible UK regions is a required field (after the prospect '
+                  'stage). Intended for projects migrated from CDMS in the verify win and won '
+                  'stages where legacy data for possible UK regions does not exist.'
+    )
     uk_region_locations = models.ManyToManyField(
         'metadata.UKRegion', related_name='+', blank=True,
         verbose_name='possible UK regions',

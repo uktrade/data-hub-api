@@ -141,6 +141,7 @@ class TestListView(APITestMixin):
             'address_town',
             'address_postcode',
             'competitor_countries',
+            'allow_blank_possible_uk_regions',
             'uk_region_locations',
             'actual_uk_regions',
             'strategic_drivers',
@@ -1253,6 +1254,23 @@ class TestPartialUpdateView(APITestMixin):
         assert response_data['address_1'] == 'address 1 new'
         assert response_data['address_2'] == 'address 2 new'
 
+    def test_patch_possible_regions_legacy_project(self):
+        """
+        Test the validation of uk_regions_locations for projects with
+        allow_blank_possible_uk_regions=True.
+        """
+        project = VerifyWinInvestmentProjectFactory(
+            allow_blank_possible_uk_regions=True,
+            uk_region_locations=[],
+        )
+        url = reverse('api-v3:investment:investment-item',
+                      kwargs={'pk': project.pk})
+        request_data = {
+            'uk_region_locations': [],
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
     def test_patch_team_success(self):
         """Test successfully partially updating a requirements object."""
         crm_team = constants.Team.crm.value
@@ -1303,6 +1321,7 @@ class TestPartialUpdateView(APITestMixin):
             archived_documents_url_path='old_path',
             comments='old_comment',
             allow_blank_estimated_land_date=False,
+            allow_blank_possible_uk_regions=False,
         )
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
@@ -1310,12 +1329,14 @@ class TestPartialUpdateView(APITestMixin):
             'archived_documents_url_path': 'new_path',
             'comments': 'new_comments',
             'allow_blank_estimated_land_date': True,
+            'allow_blank_possible_uk_regions': True,
         })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived_documents_url_path'] == 'old_path'
         assert response.data['comments'] == 'old_comment'
         assert response.data['allow_blank_estimated_land_date'] is False
+        assert response.data['allow_blank_possible_uk_regions'] is False
 
     def test_restricted_user_cannot_update_project_if_not_associated(self):
         """Tests that a restricted user cannot update another team's project."""
