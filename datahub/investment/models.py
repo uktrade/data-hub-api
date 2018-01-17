@@ -259,7 +259,6 @@ class IProjectRequirementsAbstract(models.Model):
         abstract = True
 
     client_requirements = models.TextField(blank=True, null=True)
-    # site_decided is deprecated; will be removed
     site_decided = models.NullBooleanField()
     address_1 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
     address_2 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
@@ -273,7 +272,14 @@ class IProjectRequirementsAbstract(models.Model):
         null=True, blank=True, on_delete=models.SET_NULL
     )
     competitor_countries = models.ManyToManyField('metadata.Country', related_name='+', blank=True)
-    uk_region_locations = models.ManyToManyField('metadata.UKRegion', related_name='+', blank=True)
+    uk_region_locations = models.ManyToManyField(
+        'metadata.UKRegion', related_name='+', blank=True,
+        verbose_name='possible UK regions',
+    )
+    actual_uk_regions = models.ManyToManyField(
+        'metadata.UKRegion', related_name='+', blank=True,
+        verbose_name='actual UK regions',
+    )
     strategic_drivers = models.ManyToManyField(
         'metadata.InvestmentStrategicDriver',
         related_name='investment_projects', blank=True
