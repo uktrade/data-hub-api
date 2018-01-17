@@ -26,7 +26,8 @@ from datahub.core.utils import executor
 from datahub.documents.av_scan import virus_scan_document
 from datahub.investment import views
 from datahub.investment.models import (
-    InvestmentProject, InvestmentProjectPermission, InvestmentProjectTeamMember, IProjectDocument
+    InvestmentDeliveryPartner, InvestmentProject, InvestmentProjectPermission,
+    InvestmentProjectTeamMember, IProjectDocument
 )
 from datahub.investment.test.factories import (
     ActiveInvestmentProjectFactory, AssignPMInvestmentProjectFactory,
@@ -144,6 +145,7 @@ class TestListView(APITestMixin):
             'allow_blank_possible_uk_regions',
             'uk_region_locations',
             'actual_uk_regions',
+            'delivery_partners',
             'strategic_drivers',
             'client_considering_other_countries',
             'uk_company_decided',
@@ -639,6 +641,7 @@ class TestRetrieveView(APITestMixin):
         ]
         uk_region_locations = [random_obj_for_model(UKRegion)]
         actual_uk_regions = [random_obj_for_model(UKRegion)]
+        delivery_partners = [random_obj_for_model(InvestmentDeliveryPartner)]
         project = InvestmentProjectFactory(
             client_requirements='client reqs',
             site_decided=True,
@@ -649,6 +652,7 @@ class TestRetrieveView(APITestMixin):
             uk_company_decided=False,
             uk_region_locations=uk_region_locations,
             actual_uk_regions=actual_uk_regions,
+            delivery_partners=delivery_partners,
         )
         url = reverse('api-v3:investment:investment-item',
                       kwargs={'pk': project.pk})
@@ -664,6 +668,10 @@ class TestRetrieveView(APITestMixin):
         assert response_data['actual_uk_regions'] == [{
             'id': str(actual_uk_regions[0].pk),
             'name': actual_uk_regions[0].name,
+        }]
+        assert response_data['delivery_partners'] == [{
+            'id': str(delivery_partners[0].pk),
+            'name': delivery_partners[0].name,
         }]
         assert sorted(country['id'] for country in response_data[
             'competitor_countries']) == sorted(countries)
