@@ -38,6 +38,7 @@ class InvestmentProjectAdmin(BaseModelVersionAdmin):
         'modified_by',
     )
     readonly_fields = (
+        'allow_blank_estimated_land_date',
         'archived_documents_url_path',
         'comments',
     )

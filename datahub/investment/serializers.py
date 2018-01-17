@@ -118,6 +118,7 @@ class IProjectSummarySerializer(PermittedFieldsModelSerializer):
             'project_code',
             'description',
             'anonymous_description',
+            'allow_blank_estimated_land_date',
             'estimated_land_date',
             'actual_land_date',
             'quotable_as_public_case_study',
@@ -169,12 +170,15 @@ class IProjectSummarySerializer(PermittedFieldsModelSerializer):
         # non-nullable
         extra_kwargs = {
             'likelihood_of_landing': {'min_value': 0, 'max_value': 100},
+            # Required for validation as ModelSerializer does not automatically set defaults
+            'allow_blank_estimated_land_date': {'default': False},
         }
         permissions = {
             f'investment.{InvestmentProjectPermission.read_investmentproject_document}':
                 'archived_documents_url_path'
         }
         read_only_fields = (
+            'allow_blank_estimated_land_date',
             'archived',
             'archived_on',
             'archived_reason',
