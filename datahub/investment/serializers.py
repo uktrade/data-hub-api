@@ -229,7 +229,9 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
     """Serialiser for investment project requirements objects."""
 
     competitor_countries = NestedRelatedField(meta_models.Country, many=True, required=False)
+    # Note: uk_region_locations is the possible UK regions (not the actual/final UK region)
     uk_region_locations = NestedRelatedField(meta_models.UKRegion, many=True, required=False)
+    actual_uk_regions = NestedRelatedField(meta_models.UKRegion, many=True, required=False)
     strategic_drivers = NestedRelatedField(
         meta_models.InvestmentStrategicDriver, many=True, required=False
     )
@@ -246,13 +248,14 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
         model = InvestmentProject
         fields = (
             'client_requirements',
-            'site_decided',  # deprecated; will be removed
+            'site_decided',
             'address_1',
             'address_2',
             'address_town',
             'address_postcode',
             'competitor_countries',
             'uk_region_locations',
+            'actual_uk_regions',
             'strategic_drivers',
             'client_considering_other_countries',
             'uk_company_decided',

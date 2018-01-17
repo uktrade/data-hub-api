@@ -19,8 +19,8 @@ from reversion.models import Version
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import (
-    APITestMixin, create_test_user, format_date_or_datetime, synchronous_executor_submit,
-    synchronous_transaction_on_commit
+    APITestMixin, create_test_user, format_date_or_datetime, random_obj_for_model,
+    synchronous_executor_submit, synchronous_transaction_on_commit
 )
 from datahub.core.utils import executor
 from datahub.documents.av_scan import virus_scan_document
@@ -33,6 +33,7 @@ from datahub.investment.test.factories import (
     InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
     VerifyWinInvestmentProjectFactory, WonInvestmentProjectFactory
 )
+from datahub.metadata.models import UKRegion
 from datahub.metadata.test.factories import TeamFactory
 from datahub.oauth.scopes import Scope
 
@@ -140,6 +141,7 @@ class TestListView(APITestMixin):
             'address_postcode',
             'competitor_countries',
             'uk_region_locations',
+            'actual_uk_regions',
             'strategic_drivers',
             'client_considering_other_countries',
             'uk_company_decided',
@@ -636,7 +638,8 @@ class TestRetrieveView(APITestMixin):
         strategic_drivers = [
             constants.InvestmentStrategicDriver.access_to_market.value.id
         ]
-        uk_region_locations = [constants.UKRegion.england.value.id]
+        uk_region_locations = [random_obj_for_model(UKRegion)]
+        actual_uk_regions = [random_obj_for_model(UKRegion)]
         project = InvestmentProjectFactory(
             client_requirements='client reqs',
             site_decided=True,
@@ -645,7 +648,8 @@ class TestRetrieveView(APITestMixin):
             competitor_countries=countries,
             strategic_drivers=strategic_drivers,
             uk_company_decided=False,
-            uk_region_locations=uk_region_locations
+            uk_region_locations=uk_region_locations,
+            actual_uk_regions=actual_uk_regions,
         )
         url = reverse('api-v3:investment:investment-item',
                       kwargs={'pk': project.pk})
@@ -658,6 +662,10 @@ class TestRetrieveView(APITestMixin):
         assert response_data['requirements_complete'] is True
         assert response_data['uk_company_decided'] is False
         assert response_data['address_1'] == 'address 1'
+        assert response_data['actual_uk_regions'] == [{
+            'id': str(actual_uk_regions[0].pk),
+            'name': actual_uk_regions[0].name,
+        }]
         assert sorted(country['id'] for country in response_data[
             'competitor_countries']) == sorted(countries)
         assert sorted(driver['id'] for driver in response_data[
@@ -997,7 +1005,7 @@ class TestPartialUpdateView(APITestMixin):
             client_requirements='client reqs',
             site_decided=False,
             strategic_drivers=strategic_drivers,
-            uk_region_locations=[constants.UKRegion.england.value.id]
+            uk_region_locations=[random_obj_for_model(UKRegion)]
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
