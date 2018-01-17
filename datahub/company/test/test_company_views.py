@@ -7,18 +7,19 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from reversion.models import Version
 
+from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import CompaniesHouseCompany
 from datahub.company.test.factories import CompaniesHouseCompanyFactory, CompanyFactory
 from datahub.core.constants import (
-    BusinessType, CompanyClassification, Country, HeadquarterType, Sector, UKRegion
+    CompanyClassification, Country, HeadquarterType, Sector, UKRegion
 )
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 
 
-class TestCompany(APITestMixin):
-    """Company test case."""
+class TestListCompanies(APITestMixin):
+    """Tests for listing companies."""
 
     def test_companies_list_no_permissions(self):
         """Should return 403"""
@@ -77,6 +78,10 @@ class TestCompany(APITestMixin):
             company['archived_documents_url_path'] == 'hello world'
             for company in response.data['results']
         )
+
+
+class TestGetCompany(APITestMixin):
+    """Tests for getting a company."""
 
     def test_get_company_without_read_document_permission(self):
         """Tests the company item view without read document permission."""
@@ -319,6 +324,30 @@ class TestCompany(APITestMixin):
 
         assert actual_projects == expected_projects
 
+    @pytest.mark.parametrize(
+        'input_website,expected_website', (
+            ('www.google.com', 'http://www.google.com'),
+            ('http://www.google.com', 'http://www.google.com'),
+            ('https://www.google.com', 'https://www.google.com'),
+            ('', ''),
+            (None, None),
+        )
+    )
+    def test_get_company_with_website(self, input_website, expected_website):
+        """Test add new company with trading_address."""
+        company = CompanyFactory(
+            website=input_website
+        )
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['website'] == expected_website
+
+
+class TestUpdateCompany(APITestMixin):
+    """Tests for updating a single company."""
+
     def test_update_company(self):
         """Test company update."""
         company = CompanyFactory(
@@ -417,204 +446,6 @@ class TestCompany(APITestMixin):
             'trading_name': ['Ensure this field has no more than 255 characters.']
         }
 
-    def test_add_uk_company(self):
-        """Test add new UK company."""
-        url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, format='json', data={
-            'name': 'Acme',
-            'trading_name': 'Trading name',
-            'business_type': {'id': BusinessType.company.value.id},
-            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
-            'registered_address_country': {
-                'id': Country.united_kingdom.value.id
-            },
-            'registered_address_1': '75 Stramford Road',
-            'registered_address_town': 'London',
-            'uk_region': {'id': UKRegion.england.value.id},
-            'headquarter_type': {'id': HeadquarterType.ghq.value.id},
-            'classification': {'id': CompanyClassification.tier_a.value.id},
-        })
-
-        assert response.status_code == status.HTTP_201_CREATED
-        assert response.data['name'] == 'Acme'
-        assert response.data['trading_name'] == 'Trading name'
-
-    def test_promote_a_ch_company(self):
-        """Promote a CH company to full company."""
-        CompaniesHouseCompanyFactory(company_number=1234567890)
-
-        url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, {
-            'name': 'Acme',
-            'company_number': 1234567890,
-            'business_type': BusinessType.company.value.id,
-            'sector': Sector.aerospace_assembly_aircraft.value.id,
-            'registered_address_country': Country.united_kingdom.value.id,
-            'registered_address_1': '75 Stramford Road',
-            'registered_address_town': 'London',
-            'trading_address_country': Country.ireland.value.id,
-            'trading_address_1': '1 Hello st.',
-            'trading_address_town': 'Dublin',
-            'uk_region': UKRegion.england.value.id
-        }, format='json')
-
-        assert response.status_code == status.HTTP_201_CREATED
-
-    def test_add_uk_company_without_uk_region(self):
-        """Test add new UK without UK region company."""
-        url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, format='json', data={
-            'name': 'Acme',
-            'trading_name': None,
-            'business_type': {'id': BusinessType.company.value.id},
-            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
-            'registered_address_country': {
-                'id': Country.united_kingdom.value.id
-            },
-            'registered_address_1': '75 Stramford Road',
-            'registered_address_town': 'London',
-        })
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data == {'uk_region': ['This field is required.']}
-
-    def test_add_not_uk_company(self):
-        """Test add new not UK company."""
-        url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, format='json', data={
-            'name': 'Acme',
-            'trading_name': None,
-            'business_type': {'id': BusinessType.company.value.id},
-            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
-            'registered_address_country': {
-                'id': Country.united_states.value.id
-            },
-            'registered_address_1': '75 Stramford Road',
-            'registered_address_town': 'London',
-        })
-
-        assert response.status_code == status.HTTP_201_CREATED
-        assert response.data['name'] == 'Acme'
-
-    def test_add_company_partial_trading_address(self):
-        """Test add new company with partial trading address."""
-        url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, format='json', data={
-            'name': 'Acme',
-            'business_type': {'id': BusinessType.company.value.id},
-            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
-            'registered_address_country': {
-                'id': Country.united_kingdom.value.id
-            },
-            'registered_address_1': '75 Stramford Road',
-            'registered_address_town': 'London',
-            'trading_address_1': 'test',
-            'uk_region': {'id': UKRegion.england.value.id}
-        })
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data == {
-            'trading_address_town': ['This field is required.'],
-            'trading_address_country': ['This field is required.']
-        }
-
-    def test_add_company_with_trading_address(self):
-        """Test add new company with trading_address."""
-        url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, format='json', data={
-            'name': 'Acme',
-            'business_type': {'id': BusinessType.company.value.id},
-            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
-            'registered_address_country': {
-                'id': Country.united_kingdom.value.id
-            },
-            'registered_address_1': '75 Stramford Road',
-            'registered_address_town': 'London',
-            'trading_address_country': {'id': Country.ireland.value.id},
-            'trading_address_1': '1 Hello st.',
-            'trading_address_town': 'Dublin',
-            'uk_region': {'id': UKRegion.england.value.id}
-        })
-
-        assert response.status_code == status.HTTP_201_CREATED
-
-    def test_add_company_without_address(self):
-        """Tests adding a company without a country."""
-        url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, {
-            'name': 'Acme',
-            'trading_name': None,
-            'business_type': BusinessType.company.value.id,
-            'sector': Sector.aerospace_assembly_aircraft.value.id,
-        })
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data == {
-            'registered_address_1': ['This field is required.'],
-            'registered_address_town': ['This field is required.'],
-            'registered_address_country': ['This field is required.'],
-        }
-
-    def test_add_company_with_null_address(self):
-        """Tests adding a company without a country."""
-        url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, {
-            'name': 'Acme',
-            'trading_name': None,
-            'business_type': BusinessType.company.value.id,
-            'sector': Sector.aerospace_assembly_aircraft.value.id,
-            'registered_address_1': None,
-            'registered_address_town': None,
-            'registered_address_country': None
-        }, format='json')
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data == {
-            'registered_address_1': ['This field may not be null.'],
-            'registered_address_town': ['This field may not be null.'],
-            'registered_address_country': ['This field may not be null.'],
-        }
-
-    def test_add_company_with_blank_address(self):
-        """Tests adding a company without a country."""
-        url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, {
-            'name': 'Acme',
-            'trading_name': None,
-            'business_type': BusinessType.company.value.id,
-            'sector': Sector.aerospace_assembly_aircraft.value.id,
-            'registered_address_1': '',
-            'registered_address_town': '',
-            'registered_address_country': None,
-        }, format='json')
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data == {
-            'registered_address_1': ['This field may not be blank.'],
-            'registered_address_town': ['This field may not be blank.'],
-            'registered_address_country': ['This field may not be null.']
-        }
-
-    @pytest.mark.parametrize('field', ('sector',))
-    def test_add_company_without_required_field(self, field):
-        """
-        Tests adding a company without required fields that are allowed to be null (during
-        updates) when already null.
-        """
-        url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, {
-            'name': 'Acme',
-            'alias': None,
-            'business_type': BusinessType.company.value.id,
-            'registered_address_1': '75 Stramford Road',
-            'registered_address_town': 'London',
-            'registered_address_country': Country.united_kingdom.value.id,
-            'uk_region': UKRegion.england.value.id,
-        }, format='json')
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json()[field] == ['This field is required.']
-
     @pytest.mark.parametrize('field,value', (
         ('sector', Sector.aerospace_assembly_aircraft.value.id),
     ))
@@ -665,25 +496,207 @@ class TestCompany(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json()[field] is None
 
-    @pytest.mark.parametrize(
-        'input_website,expected_website', (
-            ('www.google.com', 'http://www.google.com'),
-            ('http://www.google.com', 'http://www.google.com'),
-            ('https://www.google.com', 'https://www.google.com'),
-            ('', ''),
-            (None, None),
-        )
-    )
-    def test_get_company_with_website(self, input_website, expected_website):
-        """Test add new company with trading_address."""
-        company = CompanyFactory(
-            website=input_website
-        )
-        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.get(url)
 
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json()['website'] == expected_website
+class TestAddCompany(APITestMixin):
+    """Tests for adding a company."""
+
+    def test_add_uk_company(self):
+        """Test add new UK company."""
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, format='json', data={
+            'name': 'Acme',
+            'trading_name': 'Trading name',
+            'business_type': {'id': BusinessTypeConstant.company.value.id},
+            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
+            'registered_address_country': {
+                'id': Country.united_kingdom.value.id
+            },
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'uk_region': {'id': UKRegion.england.value.id},
+            'headquarter_type': {'id': HeadquarterType.ghq.value.id},
+            'classification': {'id': CompanyClassification.tier_a.value.id},
+        })
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data['name'] == 'Acme'
+        assert response.data['trading_name'] == 'Trading name'
+
+    def test_promote_a_ch_company(self):
+        """Promote a CH company to full company."""
+        CompaniesHouseCompanyFactory(company_number=1234567890)
+
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, {
+            'name': 'Acme',
+            'company_number': 1234567890,
+            'business_type': BusinessTypeConstant.company.value.id,
+            'sector': Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_country': Country.united_kingdom.value.id,
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'trading_address_country': Country.ireland.value.id,
+            'trading_address_1': '1 Hello st.',
+            'trading_address_town': 'Dublin',
+            'uk_region': UKRegion.england.value.id
+        }, format='json')
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+    def test_add_uk_company_without_uk_region(self):
+        """Test add new UK without UK region company."""
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, format='json', data={
+            'name': 'Acme',
+            'trading_name': None,
+            'business_type': {'id': BusinessTypeConstant.company.value.id},
+            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
+            'registered_address_country': {
+                'id': Country.united_kingdom.value.id
+            },
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {'uk_region': ['This field is required.']}
+
+    def test_add_not_uk_company(self):
+        """Test add new not UK company."""
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, format='json', data={
+            'name': 'Acme',
+            'trading_name': None,
+            'business_type': {'id': BusinessTypeConstant.company.value.id},
+            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
+            'registered_address_country': {
+                'id': Country.united_states.value.id
+            },
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+        })
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data['name'] == 'Acme'
+
+    def test_add_company_partial_trading_address(self):
+        """Test add new company with partial trading address."""
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, format='json', data={
+            'name': 'Acme',
+            'business_type': {'id': BusinessTypeConstant.company.value.id},
+            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
+            'registered_address_country': {
+                'id': Country.united_kingdom.value.id
+            },
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'trading_address_1': 'test',
+            'uk_region': {'id': UKRegion.england.value.id}
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'trading_address_town': ['This field is required.'],
+            'trading_address_country': ['This field is required.']
+        }
+
+    def test_add_company_with_trading_address(self):
+        """Test add new company with trading_address."""
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, format='json', data={
+            'name': 'Acme',
+            'business_type': {'id': BusinessTypeConstant.company.value.id},
+            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
+            'registered_address_country': {
+                'id': Country.united_kingdom.value.id
+            },
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'trading_address_country': {'id': Country.ireland.value.id},
+            'trading_address_1': '1 Hello st.',
+            'trading_address_town': 'Dublin',
+            'uk_region': {'id': UKRegion.england.value.id}
+        })
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+    def test_add_company_without_address(self):
+        """Tests adding a company without a country."""
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, {
+            'name': 'Acme',
+            'trading_name': None,
+            'business_type': BusinessTypeConstant.company.value.id,
+            'sector': Sector.aerospace_assembly_aircraft.value.id,
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'registered_address_1': ['This field is required.'],
+            'registered_address_town': ['This field is required.'],
+            'registered_address_country': ['This field is required.'],
+        }
+
+    def test_add_company_with_null_address(self):
+        """Tests adding a company without a country."""
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, {
+            'name': 'Acme',
+            'trading_name': None,
+            'business_type': BusinessTypeConstant.company.value.id,
+            'sector': Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_1': None,
+            'registered_address_town': None,
+            'registered_address_country': None
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'registered_address_1': ['This field may not be null.'],
+            'registered_address_town': ['This field may not be null.'],
+            'registered_address_country': ['This field may not be null.'],
+        }
+
+    def test_add_company_with_blank_address(self):
+        """Tests adding a company without a country."""
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, {
+            'name': 'Acme',
+            'trading_name': None,
+            'business_type': BusinessTypeConstant.company.value.id,
+            'sector': Sector.aerospace_assembly_aircraft.value.id,
+            'registered_address_1': '',
+            'registered_address_town': '',
+            'registered_address_country': None,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            'registered_address_1': ['This field may not be blank.'],
+            'registered_address_town': ['This field may not be blank.'],
+            'registered_address_country': ['This field may not be null.']
+        }
+
+    @pytest.mark.parametrize('field', ('sector',))
+    def test_add_company_without_required_field(self, field):
+        """
+        Tests adding a company without required fields that are allowed to be null (during
+        updates) when already null.
+        """
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, {
+            'name': 'Acme',
+            'alias': None,
+            'business_type': BusinessTypeConstant.company.value.id,
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'registered_address_country': Country.united_kingdom.value.id,
+            'uk_region': UKRegion.england.value.id,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json()[field] == ['This field is required.']
 
     @pytest.mark.parametrize(
         'input_website,expected_website', (
@@ -699,7 +712,7 @@ class TestCompany(APITestMixin):
         url = reverse('api-v3:company:collection')
         response = self.api_client.post(url, format='json', data={
             'name': 'Acme',
-            'business_type': {'id': BusinessType.company.value.id},
+            'business_type': {'id': BusinessTypeConstant.company.value.id},
             'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
             'registered_address_country': {
                 'id': Country.united_kingdom.value.id
@@ -715,6 +728,159 @@ class TestCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json()['website'] == expected_website
+
+    def test_add_uk_establishment(self):
+        """Test adding a UK establishment."""
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, format='json', data={
+            'name': 'Acme',
+            'trading_name': 'Trading name',
+            'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
+            'company_number': 'BR000006',
+            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
+            'registered_address_country': {
+                'id': Country.united_kingdom.value.id
+            },
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'uk_region': {'id': UKRegion.england.value.id},
+            'headquarter_type': {'id': HeadquarterType.ghq.value.id},
+            'classification': {'id': CompanyClassification.tier_a.value.id},
+        })
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.json()['company_number'] == 'BR000006'
+
+    def test_cannot_add_uk_establishment_without_number(self):
+        """Test that a UK establishment cannot be added without a company number."""
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, format='json', data={
+            'name': 'Acme',
+            'trading_name': 'Trading name',
+            'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
+            'company_number': '',
+            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
+            'registered_address_country': {
+                'id': Country.united_kingdom.value.id
+            },
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'uk_region': {'id': UKRegion.england.value.id},
+            'headquarter_type': {'id': HeadquarterType.ghq.value.id},
+            'classification': {'id': CompanyClassification.tier_a.value.id},
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'company_number': ['This field is required.']
+        }
+
+    def test_cannot_add_uk_establishment_as_foreign_company(self):
+        """Test that adding a UK establishment fails if its country is not UK."""
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, format='json', data={
+            'name': 'Acme',
+            'trading_name': 'Trading name',
+            'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
+            'company_number': 'BR000006',
+            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
+            'registered_address_country': {
+                'id': Country.united_states.value.id
+            },
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'uk_region': {'id': UKRegion.england.value.id},
+            'headquarter_type': {'id': HeadquarterType.ghq.value.id},
+            'classification': {'id': CompanyClassification.tier_a.value.id},
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'registered_address_country':
+                ['A UK establishment (branch of non-UK company) must be in the UK.']
+        }
+
+    def test_cannot_add_uk_establishment_invalid_prefix(self):
+        """
+        Test that adding a UK establishment fails if its company number does not start with BR.
+        """
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, format='json', data={
+            'name': 'Acme',
+            'trading_name': 'Trading name',
+            'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
+            'company_number': 'SC000006',
+            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
+            'registered_address_country': {
+                'id': Country.united_kingdom.value.id
+            },
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'uk_region': {'id': UKRegion.england.value.id},
+            'headquarter_type': {'id': HeadquarterType.ghq.value.id},
+            'classification': {'id': CompanyClassification.tier_a.value.id},
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'company_number':
+                ['This must be a valid UK establishment number, beginning with BR.']
+        }
+
+    def test_cannot_add_uk_establishment_invalid_characters(self):
+        """
+        Test that adding a UK establishment fails if its company number contains invalid
+        characters.
+        """
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, format='json', data={
+            'name': 'Acme',
+            'trading_name': 'Trading name',
+            'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
+            'company_number': 'BR000444é',
+            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
+            'registered_address_country': {
+                'id': Country.united_kingdom.value.id
+            },
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'uk_region': {'id': UKRegion.england.value.id},
+            'headquarter_type': {'id': HeadquarterType.ghq.value.id},
+            'classification': {'id': CompanyClassification.tier_a.value.id},
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'company_number':
+                ['This field can only contain the letters A to Z and numbers (no symbols, '
+                 'punctuation or spaces).']
+        }
+
+    def test_no_company_number_validation_for_normal_uk_companies(self):
+        """Test that no validation is done on company number for normal companies."""
+        url = reverse('api-v3:company:collection')
+        response = self.api_client.post(url, format='json', data={
+            'name': 'Acme',
+            'trading_name': 'Trading name',
+            'business_type': {'id': BusinessTypeConstant.private_limited_company.value.id},
+            'company_number': 'sc000444é',
+            'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
+            'registered_address_country': {
+                'id': Country.united_kingdom.value.id
+            },
+            'registered_address_1': '75 Stramford Road',
+            'registered_address_town': 'London',
+            'uk_region': {'id': UKRegion.england.value.id},
+            'headquarter_type': {'id': HeadquarterType.ghq.value.id},
+            'classification': {'id': CompanyClassification.tier_a.value.id},
+        })
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.json()['company_number'] == 'sc000444é'
+
+
+class TestArchiveCompany(APITestMixin):
+    """Archive company tests."""
 
     def test_archive_company_no_reason(self):
         """Test company archive."""
@@ -754,6 +920,10 @@ class TestCompany(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived']
         assert response.data['archived_reason'] == 'foo'
+
+
+class TestUnarchiveCompany(APITestMixin):
+    """Unarchive company tests."""
 
     def test_unarchive_company_invalid_address(self):
         """
