@@ -12,6 +12,7 @@ from datahub.core.constants import InvestmentProjectStage
 from datahub.core.serializers import NestedRelatedField, PermittedFieldsModelSerializer
 from datahub.core.validate_utils import DataCombiner
 from datahub.investment.models import (
+    InvestmentDeliveryPartner,
     InvestmentProject,
     InvestmentProjectPermission,
     InvestmentProjectTeamMember,
@@ -233,9 +234,11 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
     """Serialiser for investment project requirements objects."""
 
     competitor_countries = NestedRelatedField(meta_models.Country, many=True, required=False)
-    # Note: uk_region_locations is the possible UK regions (not the actual/final UK region)
+    # Note: uk_region_locations is the possible UK regions at the start of the project (not the
+    # actual/final UK regions at the end of the project)
     uk_region_locations = NestedRelatedField(meta_models.UKRegion, many=True, required=False)
     actual_uk_regions = NestedRelatedField(meta_models.UKRegion, many=True, required=False)
+    delivery_partners = NestedRelatedField(InvestmentDeliveryPartner, many=True, required=False)
     strategic_drivers = NestedRelatedField(
         meta_models.InvestmentStrategicDriver, many=True, required=False
     )
@@ -261,6 +264,7 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
             'allow_blank_possible_uk_regions',
             'uk_region_locations',
             'actual_uk_regions',
+            'delivery_partners',
             'strategic_drivers',
             'client_considering_other_countries',
             'uk_company_decided',
