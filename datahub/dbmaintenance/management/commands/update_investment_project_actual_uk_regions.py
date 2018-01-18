@@ -1,8 +1,8 @@
 from logging import getLogger
 
 import reversion
-from rest_framework.fields import UUIDField
 
+from datahub.dbmaintenance.utils import parse_uuid, parse_uuid_list
 from datahub.investment.models import InvestmentProject
 from ..base import CSVBaseCommand
 
@@ -26,9 +26,9 @@ class Command(CSVBaseCommand):
 
     def _process_row(self, row, simulate=False, **options):
         """Process one single row."""
-        pk = _parse_uuid(row['id'])
+        pk = parse_uuid(row['id'])
         investment_project = InvestmentProject.objects.get(pk=pk)
-        new_actual_uk_regions = _parse_uuid_list(row['actual_uk_regions'])
+        new_actual_uk_regions = parse_uuid_list(row['actual_uk_regions'])
 
         if investment_project.actual_uk_regions.all():
             logger.warning('Not updating project with existing actual UK regions: %s, %s',
@@ -39,20 +39,3 @@ class Command(CSVBaseCommand):
             with reversion.create_revision():
                 investment_project.actual_uk_regions.set(new_actual_uk_regions)
                 reversion.set_comment('Actual UK regions migration.')
-
-
-def _parse_uuid_list(value):
-    if not value or value.lower().strip() == 'null':
-        return []
-
-    field = UUIDField()
-
-    return [field.to_internal_value(item) for item in value.split(',')]
-
-
-def _parse_uuid(value):
-    if not value or value.lower().strip() == 'null':
-        return None
-
-    field = UUIDField()
-    return field.to_internal_value(value)
