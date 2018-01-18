@@ -35,6 +35,7 @@ class InvestmentSearchApp(SearchApp):
         'client_contacts',
         'client_relationship_manager',
         'competitor_countries',
+        'delivery_partners',
         'fdi_type',
         'intermediate_company',
         'investment_type',

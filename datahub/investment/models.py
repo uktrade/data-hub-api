@@ -292,6 +292,11 @@ class IProjectRequirementsAbstract(models.Model):
         'metadata.UKRegion', related_name='+', blank=True,
         verbose_name='actual UK regions',
     )
+    delivery_partners = models.ManyToManyField(
+        'InvestmentDeliveryPartner', related_name='+', blank=True,
+        verbose_name='investment delivery partners',
+        help_text='These are the delivery partner(s) in the region(s) where the project landed.',
+    )
     strategic_drivers = models.ManyToManyField(
         'metadata.InvestmentStrategicDriver',
         related_name='investment_projects', blank=True
@@ -540,3 +545,7 @@ class InvestorType(BaseConstantModel):
 
 class Involvement(BaseConstantModel):
     """Level of Involvements."""
+
+
+class InvestmentDeliveryPartner(BaseConstantModel):
+    """Investment delivery partners."""

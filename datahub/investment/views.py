@@ -87,6 +87,7 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'client_contacts',
         'business_activities',
         'competitor_countries',
+        'delivery_partners',
         'uk_region_locations',
         'strategic_drivers',
         Prefetch('team_members', queryset=_team_member_queryset),
