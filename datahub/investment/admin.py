@@ -7,6 +7,7 @@ from datahub.core.admin import (
     custom_delete_permission, DisabledOnFilter,
 )
 from datahub.investment.models import (
+    InvestmentDeliveryPartner,
     InvestmentProject,
     InvestmentProjectPermission,
     InvestmentProjectTeamMember,
@@ -79,6 +80,7 @@ class IProjectDocumentAdmin(admin.ModelAdmin):
 
 
 @admin.register(
+    InvestmentDeliveryPartner,
     InvestorType,
     Involvement,
     SpecificProgramme,

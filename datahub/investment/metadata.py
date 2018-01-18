@@ -27,3 +27,8 @@ registry.register(
     metadata_id='investment-involvement',
     model=models.Involvement,
 )
+
+registry.register(
+    metadata_id='investment-delivery-partner',
+    model=models.InvestmentDeliveryPartner,
+)
