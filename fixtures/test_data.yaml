@@ -896,6 +896,70 @@
     created_on: '2017-06-05T00:00:00Z'
     modified_on: '2017-06-05T00:00:00Z'
 
+- model: interaction.interaction
+  pk: 6861510c-e287-4f81-a76b-e0a0427daaef
+  fields:
+    kind: interaction
+    date: '2018-01-02T00:00:00Z'
+    investment_project: ba1f0b14-5fe4-4c36-bf6a-ddf115272977
+    contact: 7d43f9a2-868f-4d85-8e5f-631e5a8c9a3b
+    service: 9484b82b-3499-e211-a939-e4115bead28a
+    subject: Chat about tigers
+    dit_adviser: 379f390a-e083-4a2c-9cea-e3b9a08606a7
+    dit_team: 08d987f8-6525-e511-b6bc-e4115bead28a
+    notes: This is a dummy interaction for testing
+    communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
+    created_on: '2018-01-16T00:00:00Z'
+    modified_on: '2018-01-16T00:00:00Z'
+
+- model: interaction.interaction
+  pk: b862665f-a1a9-4daf-9410-8b12ed9adf86
+  fields:
+    kind: interaction
+    date: '2018-01-10T00:00:00Z'
+    investment_project: ba1f0b14-5fe4-4c36-bf6a-ddf115272977
+    contact: 7d43f9a2-868f-4d85-8e5f-631e5a8c9a3b
+    service: 9484b82b-3499-e211-a939-e4115bead28a
+    subject: Chat about monkeys
+    dit_adviser: 379f390a-e083-4a2c-9cea-e3b9a08606a7
+    dit_team: 08d987f8-6525-e511-b6bc-e4115bead28a
+    notes: This is a dummy interaction for testing
+    communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
+    created_on: '2018-01-16T00:00:00Z'
+    modified_on: '2018-01-16T00:00:00Z'
+
+- model: interaction.interaction
+  pk: 7283bd7c-7031-4257-9417-a500fec3b017
+  fields:
+    kind: interaction
+    date: '2018-01-05T00:00:00Z'
+    investment_project: e32b3c33-80ac-4589-a8c4-dda305d726ba
+    contact: 6791d583-7a52-418f-a0d3-d8d527f20d43
+    service: 0796b92b-3499-e211-a939-e4115bead28a
+    subject: Email about golf balls
+    dit_adviser: 4b4e1553-4ed3-46b4-b52a-a1f07fea5352
+    dit_team: bc85aa17-fabd-e511-88b6-e4115bead28a
+    notes: This is a dummy interaction for testing
+    communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
+    created_on: '2018-01-16T00:00:00Z'
+    modified_on: '2018-01-16T00:00:00Z'
+
+- model: interaction.interaction
+  pk: 4e5c8f03-32b3-45cf-85b7-533033cd3d4c
+  fields:
+    kind: interaction
+    date: '2018-01-02T00:00:00Z'
+    investment_project: e32b3c33-80ac-4589-a8c4-dda305d726ba
+    contact: 6791d583-7a52-418f-a0d3-d8d527f20d43
+    service: 0796b92b-3499-e211-a939-e4115bead28a
+    subject: Website feedback about lawn mowers
+    dit_adviser: 4b4e1553-4ed3-46b4-b52a-a1f07fea5352
+    dit_team: bc85aa17-fabd-e511-88b6-e4115bead28a
+    notes: This is a dummy interaction for testing
+    communication_channel: 70c226d7-5d95-e211-a939-e4115bead28a
+    created_on: '2018-01-16T00:00:00Z'
+    modified_on: '2018-01-16T00:00:00Z'
+
 - model: event.event
   pk: bda12a57-433c-4a0c-a7ce-5ebd080e09e8
   fields:

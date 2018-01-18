@@ -6,9 +6,14 @@ from django.db import models
 from django.utils.translation import ugettext_lazy
 from rest_framework import serializers
 
+from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import (
     Advisor, CompaniesHouseCompany, Company, CompanyPermission,
     Contact, ContactPermission, ExportExperienceCategory,
+)
+from datahub.company.validators import (
+    has_no_invalid_company_number_characters,
+    has_uk_establishment_number_prefix,
 )
 from datahub.core.constants import Country
 from datahub.core.serializers import (
@@ -177,7 +182,26 @@ class ContactSerializer(PermittedFieldsModelSerializer):
 
 
 class CompanySerializer(PermittedFieldsModelSerializer):
-    """Company read/write serializer V3."""
+    """
+    Company read/write serializer V3.
+
+    Note that there is special validation for company number for UK establishments. This is
+    because we don't get UK establishments in our Companies House data file at present, so users
+    have to enter company numbers for UK establishments manually.
+    """
+
+    default_error_messages = {
+        'invalid_uk_establishment_number_prefix': ugettext_lazy(
+            'This must be a valid UK establishment number, beginning with BR.'
+        ),
+        'invalid_uk_establishment_number_characters': ugettext_lazy(
+            'This field can only contain the letters A to Z and numbers (no symbols, punctuation '
+            'or spaces).'
+        ),
+        'uk_establishment_not_in_uk': ugettext_lazy(
+            'A UK establishment (branch of non-UK company) must be in the UK.'
+        )
+    }
 
     registered_address_country = NestedRelatedField(meta_models.Country)
     trading_name = serializers.CharField(
@@ -305,6 +329,30 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                     OperatorRule('uk_region', bool),
                     when=EqualsRule('registered_address_country',
                                     Country.united_kingdom.value.id),
+                ),
+                ValidationRule(
+                    'uk_establishment_not_in_uk',
+                    EqualsRule('registered_address_country', Country.united_kingdom.value.id),
+                    when=EqualsRule('business_type',
+                                    BusinessTypeConstant.uk_establishment.value.id),
+                ),
+                ValidationRule(
+                    'required',
+                    OperatorRule('company_number', bool),
+                    when=EqualsRule('business_type',
+                                    BusinessTypeConstant.uk_establishment.value.id),
+                ),
+                ValidationRule(
+                    'invalid_uk_establishment_number_characters',
+                    OperatorRule('company_number', has_no_invalid_company_number_characters),
+                    when=EqualsRule('business_type',
+                                    BusinessTypeConstant.uk_establishment.value.id),
+                ),
+                ValidationRule(
+                    'invalid_uk_establishment_number_prefix',
+                    OperatorRule('company_number', has_uk_establishment_number_prefix),
+                    when=EqualsRule('business_type',
+                                    BusinessTypeConstant.uk_establishment.value.id),
                 ),
             ),
             AddressValidator(lazy=True, fields_mapping=Company.TRADING_ADDRESS_VALIDATION_MAPPING),

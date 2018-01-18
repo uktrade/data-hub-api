@@ -83,9 +83,11 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'project_assurance_adviser',
         'project_assurance_adviser__dit_team'
     ).prefetch_related(
+        'actual_uk_regions',
         'client_contacts',
         'business_activities',
         'competitor_countries',
+        'delivery_partners',
         'uk_region_locations',
         'strategic_drivers',
         Prefetch('team_members', queryset=_team_member_queryset),

@@ -1,6 +1,10 @@
 from django.db import models
 
-from ...models import BaseModel, DisableableModel
+from ...models import BaseConstantModel, BaseModel, DisableableModel
+
+
+class MetadataModel(BaseConstantModel):
+    """Test metadata model."""
 
 
 class InheritedModel(BaseModel):

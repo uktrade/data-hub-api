@@ -87,7 +87,13 @@ class IProjectAbstract(models.Model):
     description = models.TextField()
     comments = models.TextField(blank=True)
     anonymous_description = models.TextField(blank=True)
-    estimated_land_date = models.DateField()
+    allow_blank_estimated_land_date = models.BooleanField(
+        default=False,
+        help_text='Controls whether estimated land date is a required field. Intended for '
+                  'projects migrated from CDMS in the verify win and won stages where legacy '
+                  'data for estimated land date does not exist.'
+    )
+    estimated_land_date = models.DateField(null=True)
     investment_type = models.ForeignKey(
         'metadata.InvestmentType', on_delete=models.PROTECT,
         related_name='investment_projects'
@@ -259,7 +265,6 @@ class IProjectRequirementsAbstract(models.Model):
         abstract = True
 
     client_requirements = models.TextField(blank=True, null=True)
-    # site_decided is deprecated; will be removed
     site_decided = models.NullBooleanField()
     address_1 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
     address_2 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
@@ -273,7 +278,25 @@ class IProjectRequirementsAbstract(models.Model):
         null=True, blank=True, on_delete=models.SET_NULL
     )
     competitor_countries = models.ManyToManyField('metadata.Country', related_name='+', blank=True)
-    uk_region_locations = models.ManyToManyField('metadata.UKRegion', related_name='+', blank=True)
+    allow_blank_possible_uk_regions = models.BooleanField(
+        default=False,
+        help_text='Controls whether possible UK regions is a required field (after the prospect '
+                  'stage). Intended for projects migrated from CDMS in the verify win and won '
+                  'stages where legacy data for possible UK regions does not exist.'
+    )
+    uk_region_locations = models.ManyToManyField(
+        'metadata.UKRegion', related_name='+', blank=True,
+        verbose_name='possible UK regions',
+    )
+    actual_uk_regions = models.ManyToManyField(
+        'metadata.UKRegion', related_name='+', blank=True,
+        verbose_name='actual UK regions',
+    )
+    delivery_partners = models.ManyToManyField(
+        'InvestmentDeliveryPartner', related_name='+', blank=True,
+        verbose_name='investment delivery partners',
+        help_text='These are the delivery partner(s) in the region(s) where the project landed.',
+    )
     strategic_drivers = models.ManyToManyField(
         'metadata.InvestmentStrategicDriver',
         related_name='investment_projects', blank=True
@@ -522,3 +545,7 @@ class InvestorType(BaseConstantModel):
 
 class Involvement(BaseConstantModel):
     """Level of Involvements."""
+
+
+class InvestmentDeliveryPartner(BaseConstantModel):
+    """Investment delivery partners."""

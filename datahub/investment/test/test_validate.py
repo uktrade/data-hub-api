@@ -44,6 +44,22 @@ def test_validate_fdi_type():
     assert 'fdi_type' in errors
 
 
+@pytest.mark.parametrize('allow_blank_estimated_land_date,is_error', (
+    (True, False),
+    (False, True),
+))
+def test_validate_estimated_land_date(allow_blank_estimated_land_date, is_error):
+    """Tests estimated_land_date conditional validation."""
+    investment_type_id = constants.InvestmentType.fdi.value.id
+    project = InvestmentProjectFactory(
+        investment_type_id=investment_type_id,
+        allow_blank_estimated_land_date=allow_blank_estimated_land_date,
+        estimated_land_date=None,
+    )
+    errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
+    assert ('estimated_land_date' in errors) == is_error
+
+
 def test_validate_business_activity_other_instance():
     """Tests other_business_activity conditional validation for a model instance."""
     project = InvestmentProjectFactory(
@@ -196,6 +212,21 @@ def test_validate_reqs_competitor_countries_present():
     )
     errors = validate(instance=project, fields=IProjectRequirementsSerializer.Meta.fields)
     assert 'competitor_countries' not in errors
+
+
+@pytest.mark.parametrize('allow_blank_possible_uk_regions,is_error', (
+    (True, False),
+    (False, True),
+))
+def test_validate_possible_uk_regions(allow_blank_possible_uk_regions, is_error):
+    """Tests uk_region_locations (possible UK regions) conditional validation."""
+    project = InvestmentProjectFactory(
+        stage_id=constants.InvestmentProjectStage.assign_pm.value.id,
+        allow_blank_possible_uk_regions=allow_blank_possible_uk_regions,
+        uk_region_locations=[],
+    )
+    errors = validate(instance=project, fields=IProjectRequirementsSerializer.Meta.fields)
+    assert ('uk_region_locations' in errors) == is_error
 
 
 def test_validate_team_fail():

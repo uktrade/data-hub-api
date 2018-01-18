@@ -12,6 +12,7 @@ from datahub.core.constants import InvestmentProjectStage
 from datahub.core.serializers import NestedRelatedField, PermittedFieldsModelSerializer
 from datahub.core.validate_utils import DataCombiner
 from datahub.investment.models import (
+    InvestmentDeliveryPartner,
     InvestmentProject,
     InvestmentProjectPermission,
     InvestmentProjectTeamMember,
@@ -118,6 +119,7 @@ class IProjectSummarySerializer(PermittedFieldsModelSerializer):
             'project_code',
             'description',
             'anonymous_description',
+            'allow_blank_estimated_land_date',
             'estimated_land_date',
             'actual_land_date',
             'quotable_as_public_case_study',
@@ -169,12 +171,15 @@ class IProjectSummarySerializer(PermittedFieldsModelSerializer):
         # non-nullable
         extra_kwargs = {
             'likelihood_of_landing': {'min_value': 0, 'max_value': 100},
+            # Required for validation as ModelSerializer does not automatically set defaults
+            'allow_blank_estimated_land_date': {'default': False},
         }
         permissions = {
             f'investment.{InvestmentProjectPermission.read_investmentproject_document}':
                 'archived_documents_url_path'
         }
         read_only_fields = (
+            'allow_blank_estimated_land_date',
             'archived',
             'archived_on',
             'archived_reason',
@@ -229,7 +234,11 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
     """Serialiser for investment project requirements objects."""
 
     competitor_countries = NestedRelatedField(meta_models.Country, many=True, required=False)
+    # Note: uk_region_locations is the possible UK regions at the start of the project (not the
+    # actual/final UK regions at the end of the project)
     uk_region_locations = NestedRelatedField(meta_models.UKRegion, many=True, required=False)
+    actual_uk_regions = NestedRelatedField(meta_models.UKRegion, many=True, required=False)
+    delivery_partners = NestedRelatedField(InvestmentDeliveryPartner, many=True, required=False)
     strategic_drivers = NestedRelatedField(
         meta_models.InvestmentStrategicDriver, many=True, required=False
     )
@@ -246,18 +255,28 @@ class IProjectRequirementsSerializer(serializers.ModelSerializer):
         model = InvestmentProject
         fields = (
             'client_requirements',
-            'site_decided',  # deprecated; will be removed
+            'site_decided',
             'address_1',
             'address_2',
             'address_town',
             'address_postcode',
             'competitor_countries',
+            'allow_blank_possible_uk_regions',
             'uk_region_locations',
+            'actual_uk_regions',
+            'delivery_partners',
             'strategic_drivers',
             'client_considering_other_countries',
             'uk_company_decided',
             'uk_company',
             'requirements_complete'
+        )
+        extra_kwargs = {
+            # Required for validation as ModelSerializer does not automatically set defaults
+            'allow_blank_possible_uk_regions': {'default': False},
+        }
+        read_only_fields = (
+            'allow_blank_possible_uk_regions',
         )
 
 
@@ -386,7 +405,11 @@ class IProjectTeamSerializer(serializers.ModelSerializer):
 
 class IProjectSerializer(IProjectSummarySerializer, IProjectValueSerializer,
                          IProjectRequirementsSerializer, IProjectTeamSerializer):
-    """Serialiser for investment projects, used with the new unified investment endpoint."""
+    """
+    Serialiser for investment projects, used with the new unified investment endpoint.
+
+    TODO: Combine the four base serialisers into one.
+    """
 
     class Meta:
         model = InvestmentProject
@@ -396,8 +419,14 @@ class IProjectSerializer(IProjectSummarySerializer, IProjectValueSerializer,
             + IProjectRequirementsSerializer.Meta.fields
             + IProjectTeamSerializer.Meta.fields
         )
-        extra_kwargs = IProjectSummarySerializer.Meta.extra_kwargs
-        read_only_fields = IProjectSummarySerializer.Meta.read_only_fields
+        extra_kwargs = {
+            **IProjectSummarySerializer.Meta.extra_kwargs,
+            **IProjectRequirementsSerializer.Meta.extra_kwargs,
+        }
+        read_only_fields = (
+            IProjectSummarySerializer.Meta.read_only_fields
+            + IProjectRequirementsSerializer.Meta.read_only_fields
+        )
         permissions = IProjectSummarySerializer.Meta.permissions
 
 

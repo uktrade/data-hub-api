@@ -19,20 +19,22 @@ from reversion.models import Version
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import (
-    APITestMixin, create_test_user, format_date_or_datetime, synchronous_executor_submit,
-    synchronous_transaction_on_commit
+    APITestMixin, create_test_user, format_date_or_datetime, random_obj_for_model,
+    synchronous_executor_submit, synchronous_transaction_on_commit
 )
 from datahub.core.utils import executor
 from datahub.documents.av_scan import virus_scan_document
 from datahub.investment import views
 from datahub.investment.models import (
-    InvestmentProject, InvestmentProjectPermission, InvestmentProjectTeamMember, IProjectDocument
+    InvestmentDeliveryPartner, InvestmentProject, InvestmentProjectPermission,
+    InvestmentProjectTeamMember, IProjectDocument
 )
 from datahub.investment.test.factories import (
     ActiveInvestmentProjectFactory, AssignPMInvestmentProjectFactory,
     InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
     VerifyWinInvestmentProjectFactory, WonInvestmentProjectFactory
 )
+from datahub.metadata.models import UKRegion
 from datahub.metadata.test.factories import TeamFactory
 from datahub.oauth.scopes import Scope
 
@@ -71,6 +73,7 @@ class TestListView(APITestMixin):
             'description',
             'comments',
             'anonymous_description',
+            'allow_blank_estimated_land_date',
             'estimated_land_date',
             'actual_land_date',
             'quotable_as_public_case_study',
@@ -139,7 +142,10 @@ class TestListView(APITestMixin):
             'address_town',
             'address_postcode',
             'competitor_countries',
+            'allow_blank_possible_uk_regions',
             'uk_region_locations',
+            'actual_uk_regions',
+            'delivery_partners',
             'strategic_drivers',
             'client_considering_other_countries',
             'uk_company_decided',
@@ -383,7 +389,6 @@ class TestCreateView(APITestMixin):
             'client_contacts': ['This field is required.'],
             'client_relationship_manager': ['This field is required.'],
             'description': ['This field is required.'],
-            'estimated_land_date': ['This field is required.'],
             'investor_company': ['This field is required.'],
             'investment_type': ['This field is required.'],
             'name': ['This field is required.'],
@@ -400,7 +405,6 @@ class TestCreateView(APITestMixin):
             'client_contacts': None,
             'client_relationship_manager': None,
             'description': None,
-            'estimated_land_date': None,
             'investor_company': None,
             'investment_type': None,
             'name': None,
@@ -416,7 +420,6 @@ class TestCreateView(APITestMixin):
             'client_contacts': ['This field may not be null.'],
             'client_relationship_manager': ['This field may not be null.'],
             'description': ['This field may not be null.'],
-            'estimated_land_date': ['This field may not be null.'],
             'investor_company': ['This field may not be null.'],
             'investment_type': ['This field may not be null.'],
             'name': ['This field may not be null.'],
@@ -453,7 +456,6 @@ class TestCreateView(APITestMixin):
         request_data = {
             'name': 'project name',
             'description': 'project description',
-            'estimated_land_date': '2020-12-12',
             'investment_type': {
                 'id': constants.InvestmentType.fdi.value.id
             },
@@ -491,6 +493,7 @@ class TestCreateView(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
+            'estimated_land_date': ['This field is required.'],
             'fdi_type': ['This field is required.']
         }
 
@@ -636,7 +639,9 @@ class TestRetrieveView(APITestMixin):
         strategic_drivers = [
             constants.InvestmentStrategicDriver.access_to_market.value.id
         ]
-        uk_region_locations = [constants.UKRegion.england.value.id]
+        uk_region_locations = [random_obj_for_model(UKRegion)]
+        actual_uk_regions = [random_obj_for_model(UKRegion)]
+        delivery_partners = [random_obj_for_model(InvestmentDeliveryPartner)]
         project = InvestmentProjectFactory(
             client_requirements='client reqs',
             site_decided=True,
@@ -645,7 +650,9 @@ class TestRetrieveView(APITestMixin):
             competitor_countries=countries,
             strategic_drivers=strategic_drivers,
             uk_company_decided=False,
-            uk_region_locations=uk_region_locations
+            uk_region_locations=uk_region_locations,
+            actual_uk_regions=actual_uk_regions,
+            delivery_partners=delivery_partners,
         )
         url = reverse('api-v3:investment:investment-item',
                       kwargs={'pk': project.pk})
@@ -658,6 +665,14 @@ class TestRetrieveView(APITestMixin):
         assert response_data['requirements_complete'] is True
         assert response_data['uk_company_decided'] is False
         assert response_data['address_1'] == 'address 1'
+        assert response_data['actual_uk_regions'] == [{
+            'id': str(actual_uk_regions[0].pk),
+            'name': actual_uk_regions[0].name,
+        }]
+        assert response_data['delivery_partners'] == [{
+            'id': str(delivery_partners[0].pk),
+            'name': delivery_partners[0].name,
+        }]
         assert sorted(country['id'] for country in response_data[
             'competitor_countries']) == sorted(countries)
         assert sorted(driver['id'] for driver in response_data[
@@ -961,6 +976,23 @@ class TestPartialUpdateView(APITestMixin):
         assert len(response_data['client_contacts']) == 1
         assert response_data['client_contacts'][0]['id'] == str(new_contact.id)
 
+    def test_patch_estimated_land_date_legacy_project(self):
+        """
+        Test the validation of estimated_land_date for projects with
+        allow_blank_estimated_land_date=True.
+        """
+        project = VerifyWinInvestmentProjectFactory(
+            allow_blank_estimated_land_date=True,
+            estimated_land_date=None,
+        )
+        url = reverse('api-v3:investment:investment-item',
+                      kwargs={'pk': project.pk})
+        request_data = {
+            'estimated_land_date': None,
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
     def test_change_stage_assign_pm_failure(self):
         """Tests moving an incomplete project to the Assign PM stage."""
         project = InvestmentProjectFactory()
@@ -997,7 +1029,7 @@ class TestPartialUpdateView(APITestMixin):
             client_requirements='client reqs',
             site_decided=False,
             strategic_drivers=strategic_drivers,
-            uk_region_locations=[constants.UKRegion.england.value.id]
+            uk_region_locations=[random_obj_for_model(UKRegion)]
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
@@ -1230,6 +1262,23 @@ class TestPartialUpdateView(APITestMixin):
         assert response_data['address_1'] == 'address 1 new'
         assert response_data['address_2'] == 'address 2 new'
 
+    def test_patch_possible_regions_legacy_project(self):
+        """
+        Test the validation of uk_regions_locations for projects with
+        allow_blank_possible_uk_regions=True.
+        """
+        project = VerifyWinInvestmentProjectFactory(
+            allow_blank_possible_uk_regions=True,
+            uk_region_locations=[],
+        )
+        url = reverse('api-v3:investment:investment-item',
+                      kwargs={'pk': project.pk})
+        request_data = {
+            'uk_region_locations': [],
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
     def test_patch_team_success(self):
         """Test successfully partially updating a requirements object."""
         crm_team = constants.Team.crm.value
@@ -1279,17 +1328,23 @@ class TestPartialUpdateView(APITestMixin):
         project = InvestmentProjectFactory(
             archived_documents_url_path='old_path',
             comments='old_comment',
+            allow_blank_estimated_land_date=False,
+            allow_blank_possible_uk_regions=False,
         )
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         response = self.api_client.patch(url, format='json', data={
             'archived_documents_url_path': 'new_path',
             'comments': 'new_comments',
+            'allow_blank_estimated_land_date': True,
+            'allow_blank_possible_uk_regions': True,
         })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived_documents_url_path'] == 'old_path'
         assert response.data['comments'] == 'old_comment'
+        assert response.data['allow_blank_estimated_land_date'] is False
+        assert response.data['allow_blank_possible_uk_regions'] is False
 
     def test_restricted_user_cannot_update_project_if_not_associated(self):
         """Tests that a restricted user cannot update another team's project."""

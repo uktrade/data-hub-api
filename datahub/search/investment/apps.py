@@ -28,12 +28,14 @@ class InvestmentSearchApp(SearchApp):
         f'investment.{InvestmentProjectPermission.read_associated}'
     )
     queryset = DBInvestmentProject.objects.prefetch_related(
+        'actual_uk_regions',
         'archived_by',
         'average_salary',
         'business_activities',
         'client_contacts',
         'client_relationship_manager',
         'competitor_countries',
+        'delivery_partners',
         'fdi_type',
         'intermediate_company',
         'investment_type',
