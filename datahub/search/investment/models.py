@@ -10,6 +10,8 @@ class InvestmentProject(DocType, MapDBModelToDict):
     """Elasticsearch representation of InvestmentProject."""
 
     id = Keyword()
+    allow_blank_estimated_land_date = Boolean(index=False)
+    allow_blank_possible_uk_regions = Boolean(index=False)
     approved_commitment_to_invest = Boolean()
     approved_fdi = Boolean()
     approved_good_value = Boolean()
@@ -62,6 +64,8 @@ class InvestmentProject(DocType, MapDBModelToDict):
     new_tech_to_uk = Boolean()
     export_revenue = Boolean()
     uk_region_locations = dsl_utils.id_name_mapping()
+    actual_uk_regions = dsl_utils.id_name_mapping()
+    delivery_partners = dsl_utils.id_name_mapping()
     site_decided = Boolean()
     government_assistance = Boolean()
     client_cannot_provide_total_investment = Boolean()
@@ -89,6 +93,9 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'business_activities': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
         'client_contacts': lambda col: [dict_utils.contact_or_adviser_dict(c) for c in col.all()],
         'client_relationship_manager': dict_utils.adviser_dict_with_team,
+        'delivery_partners': lambda col: [
+            dict_utils.id_name_dict(c) for c in col.all()
+        ],
         'team_members': lambda col: [
             dict_utils.contact_or_adviser_dict(c.adviser, include_dit_team=True) for c in col.all()
         ],
@@ -101,6 +108,9 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'level_of_involvement': dict_utils.id_name_dict,
         'specific_programme': dict_utils.id_name_dict,
         'uk_region_locations': lambda col: [
+            dict_utils.id_name_dict(c) for c in col.all()
+        ],
+        'actual_uk_regions': lambda col: [
             dict_utils.id_name_dict(c) for c in col.all()
         ],
         'uk_company': dict_utils.id_name_dict,

@@ -7,6 +7,7 @@ from datahub.core.admin import (
     custom_delete_permission, DisabledOnFilter,
 )
 from datahub.investment.models import (
+    InvestmentDeliveryPartner,
     InvestmentProject,
     InvestmentProjectPermission,
     InvestmentProjectTeamMember,
@@ -38,6 +39,8 @@ class InvestmentProjectAdmin(BaseModelVersionAdmin):
         'modified_by',
     )
     readonly_fields = (
+        'allow_blank_estimated_land_date',
+        'allow_blank_possible_uk_regions',
         'archived_documents_url_path',
         'comments',
     )
@@ -77,6 +80,7 @@ class IProjectDocumentAdmin(admin.ModelAdmin):
 
 
 @admin.register(
+    InvestmentDeliveryPartner,
     InvestorType,
     Involvement,
     SpecificProgramme,

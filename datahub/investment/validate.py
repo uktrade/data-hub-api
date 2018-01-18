@@ -23,7 +23,6 @@ VALIDATION_MAPPING = {
     'client_cannot_provide_total_investment': Stage.assign_pm.value,
     'number_new_jobs': Stage.assign_pm.value,
     'strategic_drivers': Stage.assign_pm.value,
-    'uk_region_locations': Stage.assign_pm.value,
     'client_requirements': Stage.assign_pm.value,
     'client_considering_other_countries': Stage.assign_pm.value,
     'project_manager': Stage.active.value,
@@ -60,6 +59,8 @@ def _get_to_many_id(instance):
 
 # Conditional validation rules. Mapping from field names to validation rules.
 CONDITIONAL_VALIDATION_MAPPING = {
+    'estimated_land_date':
+        CondValRule('allow_blank_estimated_land_date', False, Stage.prospect.value),
     'referral_source_activity_event':
         CondValRule('referral_source_activity', Activity.event.value.id, Stage.prospect.value),
     'other_business_activity':
@@ -75,6 +76,8 @@ CONDITIONAL_VALIDATION_MAPPING = {
         CondValRule('client_cannot_provide_total_investment', not_, Stage.assign_pm.value),
     'competitor_countries':
         CondValRule('client_considering_other_countries', True, Stage.assign_pm.value),
+    'uk_region_locations':
+        CondValRule('allow_blank_possible_uk_regions', False, Stage.assign_pm.value),
     'foreign_equity_investment':
         CondValRule('client_cannot_provide_foreign_investment', not_, Stage.verify_win.value),
     'average_salary':

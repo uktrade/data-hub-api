@@ -64,6 +64,14 @@ class InvestmentProjectFactory(factory.django.DjangoModelFactory):
     def uk_region_locations(self):
         """Add support for setting uk_region_locations."""
 
+    @to_many_field
+    def actual_uk_regions(self):
+        """Add support for setting actual_uk_regions."""
+
+    @to_many_field
+    def delivery_partners(self):
+        """Add support for setting delivery_partners."""
+
     class Meta:
         model = 'investment.InvestmentProject'
 
