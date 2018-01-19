@@ -1,6 +1,6 @@
 import pytest
-
 from django.conf import settings
+from elasticsearch.exceptions import NotFoundError
 
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory, InvestmentProjectInteractionFactory
@@ -36,6 +36,32 @@ def test_updated_interaction_synced(setup_es):
         id=interaction.pk
     )
     assert result['_source']['subject'] == new_subject
+
+
+def test_deleted_interaction_deleted_from_es(setup_es):
+    """
+    Test that when an interaction is deleted from db it is also
+    deleted from ES.
+    """
+    interaction = InvestmentProjectInteractionFactory()
+    setup_es.indices.refresh()
+
+    assert setup_es.get(
+        index=settings.ES_INDEX,
+        doc_type=InteractionSearchApp.name,
+        id=interaction.pk
+    )
+
+    interaction_id = interaction.pk
+    interaction.delete()
+    setup_es.indices.refresh()
+
+    with pytest.raises(NotFoundError):
+        assert setup_es.get(
+            index=settings.ES_INDEX,
+            doc_type=InteractionSearchApp.name,
+            id=interaction_id
+        ) is None
 
 
 def test_updating_company_name_updates_interaction(setup_es):

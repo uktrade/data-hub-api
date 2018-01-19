@@ -18,6 +18,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='investmentproject',
             name='estimated_land_date',
-            field=models.DateField(null=True),
+            field=models.DateField(null=True, blank=True),
         ),
     ]
