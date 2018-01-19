@@ -19,15 +19,23 @@ class Command(CSVBaseCommand):
     def add_arguments(self, parser):
         """Define extra arguments."""
         super().add_arguments(parser)
+
         parser.add_argument(
             '--simulate',
             action='store_true',
-            dest='simulate',
             default=False,
             help='If True it only simulates the command without saving the changes.',
         )
 
-    def _process_row(self, row, simulate=False, **options):
+        parser.add_argument(
+            '--ignore-old-regions',
+            action='store_true',
+            default=False,
+            help='If True it does not check if the regions match the old_uk_region_locations '
+                 'column.',
+        )
+
+    def _process_row(self, row, simulate=False, ignore_old_regions=False, **options):
         """Process one single row."""
         pk = parse_uuid(row['id'])
         investment_project = InvestmentProject.objects.get(pk=pk)
@@ -39,6 +47,12 @@ class Command(CSVBaseCommand):
         if (investment_project.allow_blank_possible_uk_regions == allow_blank_possible_uk_regions
                 and current_region_ids == set(uk_region_locations)):
             return
+
+        if not ignore_old_regions:
+            old_uk_region_locations = parse_uuid_list(row['old_uk_region_locations'])
+
+            if current_region_ids != set(old_uk_region_locations):
+                return
 
         investment_project.allow_blank_possible_uk_regions = allow_blank_possible_uk_regions
 
