@@ -9,13 +9,15 @@ from django.utils.timezone import now
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import (
     InvestmentBusinessActivity, InvestmentProjectStage, InvestmentStrategicDriver,
-    InvestmentType, ReferralSourceActivity, SalaryRange, Sector, UKRegion
+    InvestmentType, ReferralSourceActivity, SalaryRange, Sector
 )
 from datahub.core.test.factories import to_many_field
+from datahub.core.test_utils import random_obj_for_model
 from datahub.investment.constants import (
     InvestorType, Involvement, SpecificProgramme
 )
 from datahub.investment.models import InvestmentProject
+from datahub.metadata.models import UKRegion
 
 
 class InvestmentProjectFactory(factory.django.DjangoModelFactory):
@@ -95,7 +97,7 @@ class AssignPMInvestmentProjectFactory(InvestmentProjectFactory):
     @to_many_field
     def uk_region_locations(self):
         """Add support for setting uk_region_locations."""
-        return [UKRegion.england.value.id]
+        return [random_obj_for_model(UKRegion)]
 
 
 class ActiveInvestmentProjectFactory(AssignPMInvestmentProjectFactory):
@@ -122,6 +124,11 @@ class VerifyWinInvestmentProjectFactory(ActiveInvestmentProjectFactory):
     address_town = factory.Faker('city')
     address_postcode = factory.Faker('postcode')
     average_salary_id = SalaryRange.below_25000.value.id
+
+    @to_many_field
+    def actual_uk_regions(self):
+        """Set a default value for actual_uk_regions."""
+        return [random_obj_for_model(UKRegion)]
 
 
 class WonInvestmentProjectFactory(VerifyWinInvestmentProjectFactory):

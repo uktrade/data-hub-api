@@ -1,10 +1,10 @@
-from datetime import datetime
 from logging import getLogger
 from uuid import UUID
 
 import reversion
 
 from datahub.core.constants import InvestmentProjectStage
+from datahub.dbmaintenance.utils import parse_date
 from datahub.investment.models import InvestmentProject
 from ..base import CSVBaseCommand
 
@@ -33,8 +33,8 @@ class Command(CSVBaseCommand):
     def _process_row(self, row, simulate=False, **options):
         """Process one single row."""
         investment_project = InvestmentProject.objects.get(pk=row['id'])
-        old_actual_land_date = _parse_date(row['old_actual_land_date'])
-        new_actual_land_date = _parse_date(row['new_actual_land_date'])
+        old_actual_land_date = parse_date(row['old_actual_land_date'])
+        new_actual_land_date = parse_date(row['new_actual_land_date'])
 
         if investment_project.actual_land_date != old_actual_land_date:
             return
@@ -53,9 +53,3 @@ class Command(CSVBaseCommand):
             with reversion.create_revision():
                 investment_project.save(update_fields=('actual_land_date',))
                 reversion.set_comment('Actual land date migration correction.')
-
-
-def _parse_date(date_str):
-    if not date_str or date_str.lower().strip() == 'null':
-        return None
-    return datetime.strptime(date_str, '%Y-%m-%d').date()
