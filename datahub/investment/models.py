@@ -93,7 +93,7 @@ class IProjectAbstract(models.Model):
                   'projects migrated from CDMS in the verify win and won stages where legacy '
                   'data for estimated land date does not exist.'
     )
-    estimated_land_date = models.DateField(null=True)
+    estimated_land_date = models.DateField(null=True, blank=True)
     investment_type = models.ForeignKey(
         'metadata.InvestmentType', on_delete=models.PROTECT,
         related_name='investment_projects'
