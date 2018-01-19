@@ -102,6 +102,15 @@ def transform_ch_row(row):
     for name in settings.CH_RELEVANT_FIELDS:
         ret[name] = row.get(name, '')
 
+    if ret['registered_address_1'] != '' and ret['registered_address_town'] == '':
+        # This is a workaround for missing town value.
+        # Our validation requires town to be present in the company registered address.
+        # This is not always the case with Companies House data.
+        # It is difficult to tell if registered_address_2 is really a town.
+        # Comma put in place of a missing town will satisfy our validation.
+        # We assume that registered_address_town with comma is empty.
+        ret['registered_address_town'] = ','
+
     # Nasty... copied from korben
     try:
         ret['incorporation_date'] = datetime.strptime(
@@ -152,7 +161,7 @@ def process_row(row):
             yield transform_ch_row(row)
 
 
-def sync_ch(tmp_file_creator, endpoint=None, truncate_first=False):
+def sync_ch(tmp_file_creator, endpoint=None, truncate_first=False, simulate=False):
     """Do the sync.
 
     We are batching the records instead of letting bulk_create doing it because Django casts
@@ -167,7 +176,7 @@ def sync_ch(tmp_file_creator, endpoint=None, truncate_first=False):
     endpoint = endpoint or settings.CH_DOWNLOAD_URL
     ch_csv_urls = get_ch_latest_dump_file_list(endpoint)
     logger.info('Found the following Companies House CSV URLs: %s', ch_csv_urls)
-    if truncate_first:
+    if truncate_first and not simulate:
         truncate_ch_companies_table()
     for csv_url in ch_csv_urls:
         ch_company_rows = iter_ch_csv_from_url(csv_url, tmp_file_creator)
@@ -176,10 +185,11 @@ def sync_ch(tmp_file_creator, endpoint=None, truncate_first=False):
             ch_company_rows, settings.BULK_CREATE_BATCH_SIZE, _create_ch_company
         )
         for batch in batch_iter:
-            CompaniesHouseCompany.objects.bulk_create(
-                objs=batch,
-                batch_size=settings.BULK_CREATE_BATCH_SIZE
-            )
+            if not simulate:
+                CompaniesHouseCompany.objects.bulk_create(
+                    objs=batch,
+                    batch_size=settings.BULK_CREATE_BATCH_SIZE
+                )
             count += len(batch)
             logger.info('%d Companies House records loaded...', count)
             # In debug mode, Django keeps track of SQL statements executed which
@@ -210,6 +220,20 @@ def _create_ch_company(row_dict):
 class Command(BaseCommand):
     """Companies House sync command."""
 
+    def add_arguments(self, parser):
+        """Define extra arguments."""
+        super().add_arguments(parser)
+        parser.add_argument(
+            '--simulate',
+            action='store_true',
+            default=False,
+            help='If True it only simulates the command without saving the changes.',
+        )
+
     def handle(self, *args, **options):
         """Handle."""
-        sync_ch(tmp_file_creator=tempfile.TemporaryFile, truncate_first=True)
+        sync_ch(
+            tmp_file_creator=tempfile.TemporaryFile,
+            truncate_first=True,
+            simulate=options['simulate'],
+        )
