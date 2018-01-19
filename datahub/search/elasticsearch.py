@@ -506,3 +506,9 @@ def _split_date_range_fields(fields):
 
 def _clip_limit(offset, limit):
     return max(min(limit, MAX_RESULTS - offset), 0)
+
+
+def delete_document(model, document_id):
+    """Deletes specified model's document."""
+    doc = model.get(id=document_id)
+    doc.delete()
