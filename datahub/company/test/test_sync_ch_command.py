@@ -52,6 +52,7 @@ def test_missing_registered_address_town():
 def test_empty_registered_address_town():
     """Test empty registered address town."""
     test_dict = {
+        'registered_address_1': '3 Lions Lane',
         'registered_address_town': '',
     }
 
@@ -71,6 +72,19 @@ def test_present_registered_address_town():
 
     assert set(result.keys()) > set(settings.CH_RELEVANT_FIELDS)
     assert result['registered_address_town'] == 'Meow town'
+
+
+def test_empty_address_town_when_no_address():
+    """Test registered address town is empty when no address."""
+    test_dict = {
+        'registered_address_1': '',
+        'registered_address_town': '',
+    }
+
+    result = sync_ch.transform_ch_row(test_dict)
+
+    assert set(result.keys()) > set(settings.CH_RELEVANT_FIELDS)
+    assert result['registered_address_town'] == ''
 
 
 def test_unzip_and_csv_read_on_the_fly():
