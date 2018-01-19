@@ -11,7 +11,7 @@ logger = getLogger(__name__)
 
 
 class Command(CSVBaseCommand):
-    """Command to update InvestmentProject.actual_uk_regions."""
+    """Command to update InvestmentProject.delivery_partners."""
 
     def add_arguments(self, parser):
         """Define extra arguments."""
@@ -28,14 +28,14 @@ class Command(CSVBaseCommand):
         """Process one single row."""
         pk = parse_uuid(row['id'])
         investment_project = InvestmentProject.objects.get(pk=pk)
-        new_actual_uk_regions = parse_uuid_list(row['actual_uk_regions'])
+        new_delivery_partners = parse_uuid_list(row['delivery_partners'])
 
-        if investment_project.actual_uk_regions.all():
-            logger.warning('Not updating project with existing actual UK regions: %s, %s',
+        if investment_project.delivery_partners.all():
+            logger.warning('Not updating project with existing delivery partners: %s, %s',
                            investment_project.project_code, investment_project)
             return
 
         if not simulate:
             with reversion.create_revision():
-                investment_project.actual_uk_regions.set(new_actual_uk_regions)
-                reversion.set_comment('Actual UK regions migration.')
+                investment_project.delivery_partners.set(new_delivery_partners)
+                reversion.set_comment('Investment delivery partners migration.')

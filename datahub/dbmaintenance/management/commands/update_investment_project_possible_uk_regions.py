@@ -1,8 +1,8 @@
 from logging import getLogger
 
 import reversion
-from rest_framework.fields import BooleanField, UUIDField
 
+from datahub.dbmaintenance.utils import parse_bool, parse_uuid, parse_uuid_list
 from datahub.investment.models import InvestmentProject
 from ..base import CSVBaseCommand
 
@@ -29,10 +29,10 @@ class Command(CSVBaseCommand):
 
     def _process_row(self, row, simulate=False, **options):
         """Process one single row."""
-        pk = _parse_uuid(row['id'])
+        pk = parse_uuid(row['id'])
         investment_project = InvestmentProject.objects.get(pk=pk)
-        allow_blank_possible_uk_regions = _parse_bool(row['allow_blank_possible_uk_regions'])
-        uk_region_locations = _parse_uuid_list(row['uk_region_locations'])
+        allow_blank_possible_uk_regions = parse_bool(row['allow_blank_possible_uk_regions'])
+        uk_region_locations = parse_uuid_list(row['uk_region_locations'])
 
         current_regions = investment_project.uk_region_locations.all()
         current_region_ids = set(region.pk for region in current_regions)
@@ -51,27 +51,3 @@ class Command(CSVBaseCommand):
             )
             investment_project.uk_region_locations.set(uk_region_locations)
             reversion.set_comment('Possible UK regions data migration correction.')
-
-
-def _parse_bool(value):
-    return _parse_value(value, BooleanField())
-
-
-def _parse_uuid(value):
-    return _parse_value(value, UUIDField())
-
-
-def _parse_uuid_list(value):
-    if not value or value.lower().strip() == 'null':
-        return []
-
-    field = UUIDField()
-
-    return [field.to_internal_value(item) for item in value.split(',')]
-
-
-def _parse_value(value, field):
-    if not value or value.lower().strip() == 'null':
-        return None
-
-    return field.to_internal_value(value)
