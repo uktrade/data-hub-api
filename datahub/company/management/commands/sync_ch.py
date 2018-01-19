@@ -102,7 +102,7 @@ def transform_ch_row(row):
     for name in settings.CH_RELEVANT_FIELDS:
         ret[name] = row.get(name, '')
 
-    if 'registered_address_town' in row and row['registered_address_town'] == '':
+    if ret['registered_address_1'] != '' and ret['registered_address_town'] == '':
         # This is a workaround for missing town value.
         # Our validation requires town to be present in the company registered address.
         # This is not always the case with Companies House data.
