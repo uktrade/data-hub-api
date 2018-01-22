@@ -19,7 +19,7 @@ def sync_interaction_to_es(sender, instance, **kwargs):
 def remove_interaction_from_es(sender, instance, **kwargs):
     """Remove interaction from es."""
     transaction.on_commit(
-        lambda: delete_document(ESInteraction, str(instance.pk))
+        lambda pk=instance.pk: delete_document(ESInteraction, str(pk))
     )
 
 
@@ -86,4 +86,10 @@ def disconnect_signals():
         sync_related_interactions_to_es,
         sender=DBInvestmentProject,
         dispatch_uid='iproject_sync_related_interactions_to_es'
+    )
+
+    post_delete.disconnect(
+        remove_interaction_from_es,
+        sender=DBInteraction,
+        dispatch_uid='remove_interaction_from_es',
     )
