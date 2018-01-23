@@ -38,6 +38,7 @@ VALIDATION_MAPPING = {
     'address_town': Stage.verify_win.value,
     'address_postcode': Stage.verify_win.value,
     'actual_uk_regions': Stage.verify_win.value,
+    'delivery_partners': Stage.verify_win.value,
     'actual_land_date': Stage.won.value,
 }
 

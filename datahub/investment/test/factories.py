@@ -16,7 +16,7 @@ from datahub.core.test_utils import random_obj_for_model
 from datahub.investment.constants import (
     InvestorType, Involvement, SpecificProgramme
 )
-from datahub.investment.models import InvestmentProject
+from datahub.investment.models import InvestmentDeliveryPartner, InvestmentProject
 from datahub.metadata.models import UKRegion
 
 
@@ -129,6 +129,11 @@ class VerifyWinInvestmentProjectFactory(ActiveInvestmentProjectFactory):
     def actual_uk_regions(self):
         """Set a default value for actual_uk_regions."""
         return [random_obj_for_model(UKRegion)]
+
+    @to_many_field
+    def delivery_partners(self):
+        """Sets default delivery partners."""
+        return [random_obj_for_model(InvestmentDeliveryPartner)]
 
 
 class WonInvestmentProjectFactory(VerifyWinInvestmentProjectFactory):
