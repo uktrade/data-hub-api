@@ -1104,6 +1104,7 @@ class TestPartialUpdateView(APITestMixin):
             'address_town': ['This field is required.'],
             'address_postcode': ['This field is required.'],
             'actual_uk_regions': ['This field is required.'],
+            'delivery_partners': ['This field is required.'],
             'average_salary': ['This field is required.'],
             'client_cannot_provide_foreign_investment': ['This field is required.'],
             'foreign_equity_investment': ['This field is required.'],
@@ -1131,7 +1132,8 @@ class TestPartialUpdateView(APITestMixin):
             address_1='12 London Road',
             address_town='London',
             address_postcode='SW1A 2AA',
-            average_salary_id=constants.SalaryRange.below_25000.value.id
+            delivery_partners=[random_obj_for_model(InvestmentDeliveryPartner)],
+            average_salary_id=constants.SalaryRange.below_25000.value.id,
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
