@@ -19,12 +19,11 @@ from ..validators import (
     CancellableOrderValidator,
     CompletableOrderValidator,
     ContactWorksAtCompanyValidator,
-    EditableFieldsRule,
     NoOtherActiveQuoteExistsValidator,
     OrderDetailsFilledInValidator,
+    OrderEditableFieldsValidator,
     OrderInStatusRule,
     OrderInStatusValidator,
-    ReadonlyAfterCreationValidator,
     VATValidator,
 )
 
@@ -88,66 +87,6 @@ class TestContactWorksAtCompanyValidator:
             validator({
                 'main_contact': new_main_contact,
                 'main_company': company
-            })
-        except Exception:
-            pytest.fail('Should not raise a validator error.')
-
-
-class TestReadonlyAfterCreationValidator:
-    """Tests for ReadonlyAfterCreationValidator."""
-
-    def test_can_change_when_creating(self):
-        """Test that if we are creating the instance, the validation passes."""
-        serializer = mock.Mock(instance=None)
-
-        validator = ReadonlyAfterCreationValidator(
-            fields=('field1', 'field2')
-        )
-        validator.set_context(serializer)
-
-        try:
-            validator({
-                'field1': 'some value',
-                'field2': 'some value',
-            })
-        except Exception:
-            pytest.fail('Should not raise a validator error.')
-
-    def test_cannot_change_after_creation(self):
-        """
-        Test that if we are updating the instance and we try to update the fields,
-        the validation fails.
-        """
-        serializer = mock.Mock()  # serializer.instance is != None
-
-        validator = ReadonlyAfterCreationValidator(
-            fields=('field1', 'field2')
-        )
-        validator.set_context(serializer)
-
-        with pytest.raises(ValidationError):
-            validator({
-                'field1': 'some value',
-                'field2': 'some value',
-            })
-
-    def test_ok_if_the_values_dont_change_after_creation(self):
-        """
-        Test that if we are updating the instance and we don't update the fields,
-        the validation passes.
-        """
-        serializer = mock.Mock()
-        instance = serializer.instance
-
-        validator = ReadonlyAfterCreationValidator(
-            fields=('field1', 'field2')
-        )
-        validator.set_context(serializer)
-
-        try:
-            validator({
-                'field1': instance.field1,
-                'field2': instance.field2,
             })
         except Exception:
             pytest.fail('Should not raise a validator error.')
@@ -712,20 +651,70 @@ def test_order_in_status_rule(order_status, expected_status, res):
     assert rule(combiner) == res
 
 
-@pytest.mark.parametrize(
-    'fields,res',
-    (
-        (('field1',), True),
-        (('field1', 'field2'), True),
-        (('field3'), False),
-        (('field1', 'field3'), False),
-    )
-)
-def test_editable_fields_rule(fields, res):
-    """Tests for EditableFieldsRule."""
-    combiner = mock.Mock(data=fields)
-    rule = EditableFieldsRule(
-        editable_fields=('field1', 'field2')
-    )
+class TestOrderEditableFieldsValidator:
+    """Tests for the OrderEditableFieldsValidator."""
 
-    assert rule(combiner) == res
+    @pytest.mark.parametrize(
+        'order_status,mapping,data,should_pass',
+        (
+            # allowed field => OK
+            (
+                OrderStatus.draft,
+                {OrderStatus.draft: {'description'}},
+                {'description': 'lorem ipsum'},
+                True
+            ),
+            # disallowed field => Fail
+            (
+                OrderStatus.draft,
+                {OrderStatus.draft: {'contact'}},
+                {'description': 'lorem ipsum'},
+                False
+            ),
+            # status not in mapping => OK
+            (
+                OrderStatus.draft,
+                {OrderStatus.paid: {'contact'}},
+                {'description': 'lorem ipsum'},
+                True
+            ),
+            # disallowed field didn't change => OK
+            (
+                OrderStatus.draft,
+                {OrderStatus.draft: {'contact'}},
+                {'description': 'original description'},
+                True
+            ),
+            # nothing allowed => Fail
+            (
+                OrderStatus.draft,
+                {OrderStatus.draft: {}},
+                {'description': 'lorem ipsum'},
+                False
+            ),
+        )
+    )
+    def test_validation_with_order(self, order_status, mapping, data, should_pass):
+        """Test the validator with different order status, mapping and data."""
+        order = Order(
+            status=order_status,
+            description='original description'
+        )
+        serializer = mock.Mock(instance=order)
+
+        validator = OrderEditableFieldsValidator(mapping)
+        validator.set_context(serializer)
+
+        if should_pass:
+            validator(data)
+        else:
+            with pytest.raises(ValidationError):
+                validator(data)
+
+    def test_validation_passes_on_creation(self):
+        """Test that the validation passes if we are creating the order instead of editing it."""
+        serializer = mock.Mock(instance=None)
+
+        validator = OrderEditableFieldsValidator({OrderStatus.paid: {'contact'}})
+        validator.set_context(serializer)
+        validator({'description': 'lorem ipsum'})

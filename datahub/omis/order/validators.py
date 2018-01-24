@@ -41,17 +41,21 @@ class ContactWorksAtCompanyValidator:
             })
 
 
-class ReadonlyAfterCreationValidator:
+class OrderEditableFieldsValidator:
     """
-    Validator which checks that the specified fields become readonly
-    after creation.
+    Validator that makes sure that only certain fields have been modified
+    depending on the order status.
     """
 
-    message = 'The {0} cannot be changed after creation.'
+    message = 'This field cannot be changed at this stage.'
 
-    def __init__(self, fields):
-        """Set the fields."""
-        self.fields = fields
+    def __init__(self, mapping=None):
+        """
+        Set the mapping.
+
+        :param mapping: dict of <order status, editable fields>
+        """
+        self.mapping = mapping or {}
         self.instance = None
 
     def set_context(self, serializer):
@@ -61,19 +65,34 @@ class ReadonlyAfterCreationValidator:
         """
         self.instance = getattr(serializer, 'instance', None)
 
+    def _has_changed(self, field, combiner):
+        """
+        :returns: True if the data value for `field` has changed compared to
+            its instance value.
+        """
+        field_value = combiner.get_value_auto(field)
+        instance_value = DataCombiner(
+            self.instance, {},
+            model=self.instance.__class__
+        ).get_value_auto(field)
+
+        # if it's a queryset, evaluate it
+        if hasattr(instance_value, 'all'):
+            instance_value = list(instance_value)
+
+        return field_value != instance_value
+
     def __call__(self, data):
-        """Validate readonly fields after creation."""
-        data_combiner = DataCombiner(self.instance, data)
+        """Validate editable fields depending on the order status."""
+        if not self.instance or self.instance.status not in self.mapping:
+            return
 
-        if self.instance:
-            for field in self.fields:
-                value = data_combiner.get_value(field)
+        combiner = DataCombiner(self.instance, data, model=self.instance.__class__)
 
-                if value != getattr(self.instance, field):
-                    field_name = self.instance._meta.get_field(field).verbose_name
-                    raise ValidationError({
-                        field: self.message.format(field_name)
-                    })
+        editable_fields = self.mapping[self.instance.status]
+        for field in combiner.data:
+            if field not in editable_fields and self._has_changed(field, combiner):
+                raise ValidationError({field: self.message})
 
 
 class VATValidator:
@@ -377,28 +396,3 @@ class ForceDeleteRule(BaseRule):
     def __call__(self, combiner):
         """Check that the force_delete flag has the expected value."""
         return combiner.serializer.context.get('force_delete', False) == self.value
-
-
-class EditableFieldsRule(AbstractRule):
-    """Rule that checks that only certain fields have been modified."""
-
-    def __init__(self, editable_fields):
-        """Initialise the rule."""
-        self.editable_fields = editable_fields
-        self._field_in_error = None
-
-    @property
-    def field(self):
-        """Field in error, dynamically calculated."""
-        return self._field_in_error
-
-    def __call__(self, combiner):
-        """
-        :returns: True if all fields in data can be editable.
-        """
-        self._field_in_error = None
-        for field in combiner.data:
-            if field not in self.editable_fields:
-                self._field_in_error = field
-                return False
-        return True
