@@ -1,4 +1,5 @@
 import datetime
+from collections import Counter
 
 import pytest
 from dateutil.parser import parse as dateutil_parse
@@ -27,6 +28,7 @@ def setup_data(setup_es):
             name='abc defg',
             description='investmentproject1',
             estimated_land_date=datetime.date(2011, 6, 13),
+            actual_land_date=datetime.date(2010, 8, 13),
             investor_company=CompanyFactory(
                 registered_address_country_id=constants.Country.united_states.value.id
             ),
@@ -40,6 +42,7 @@ def setup_data(setup_es):
             name='delayed project',
             description='investmentproject2',
             estimated_land_date=datetime.date(2057, 6, 13),
+            actual_land_date=datetime.date(2047, 8, 13),
             investor_company=CompanyFactory(
                 registered_address_country_id=constants.Country.japan.value.id
             ),
@@ -55,6 +58,7 @@ def setup_data(setup_es):
             name='won project',
             description='investmentproject3',
             estimated_land_date=datetime.date(2027, 9, 13),
+            actual_land_date=datetime.date(2022, 11, 13),
             investor_company=CompanyFactory(
                 registered_address_country_id=constants.Country.united_kingdom.value.id
             ),
@@ -162,6 +166,78 @@ class TestSearch(APITestMixin):
                     assert estimated_land_date <= date
                 if filter_key == 'estimated_land_date_after':
                     assert estimated_land_date >= date
+
+    @pytest.mark.parametrize(
+        'query,expected_results',
+        (
+            (
+                {
+                    'actual_land_date_before': '2010-12-13'
+                },
+                [
+                    'abc defg',
+                ],
+            ),
+            (
+                {
+                    'actual_land_date_before': '2022-11-13'
+                },
+                [
+                    'abc defg',
+                    'won project',
+                ],
+            ),
+            (
+                {
+                    'actual_land_date_after': '2010-12-13'
+                },
+                [
+                    'delayed project',
+                    'won project',
+                ],
+            ),
+            (
+                {
+                    'actual_land_date_after': '2022-11-13'
+                },
+                [
+                    'delayed project',
+                    'won project',
+                ],
+            ),
+            (
+                {
+                    'actual_land_date_after': '2010-12-13',
+                    'actual_land_date_before': '2025-06-13',
+                },
+                [
+                    'won project',
+                ],
+            ),
+            (
+                {
+                    'actual_land_date_before': '2010-12-13',
+                    'actual_land_date_after': '2025-06-13',
+                },
+                [],
+            ),
+        )
+    )
+    def test_search_investment_project_actual_land_date_json(
+        self,
+        setup_data,
+        query,
+        expected_results,
+    ):
+        """Tests the actual land date filter."""
+        url = reverse('api-v3:search:investment_project')
+
+        response = self.api_client.post(url, query, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == len(expected_results)
+        results = response.data['results']
+        assert Counter(result['name'] for result in results) == Counter(expected_results)
 
     @pytest.mark.parametrize(
         'query,num_results', (
