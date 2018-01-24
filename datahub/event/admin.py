@@ -70,7 +70,6 @@ class EventAdmin(BaseModelVersionAdmin):
         'service',
         'disabled_on',
     )
-    list_editable = ('disabled_on',)
     list_filter = (
         DisabledOnFilter,
         ('start_date', DateFieldListFilter),
@@ -97,7 +96,12 @@ class EventAdmin(BaseModelVersionAdmin):
     )
     def disable_selected(self, request, queryset):
         """Disables selected objects."""
-        return queryset.update(disabled_on=now())
+        current_date = now()
+        # we process records individually, so that the post_save signal
+        # is being triggered
+        for row in queryset:
+            row.disabled_on = current_date
+            row.save()
 
     disable_selected.short_description = 'Disable selected events'
 
@@ -107,7 +111,11 @@ class EventAdmin(BaseModelVersionAdmin):
     )
     def enable_selected(self, request, queryset):
         """Enables selected objects."""
-        return queryset.update(disabled_on=None)
+        # we process records individually, so that the post_save signal
+        # is being triggered
+        for row in queryset:
+            row.disabled_on = None
+            row.save()
 
     enable_selected.short_description = 'Enable selected events'
 
