@@ -19,6 +19,8 @@ class SearchInvestmentProjectParams:
         'created_on_before',
         'estimated_land_date_after',
         'estimated_land_date_before',
+        'actual_land_date_after',
+        'actual_land_date_before',
         'investment_type',
         'investor_company',
         'investor_company_country',
