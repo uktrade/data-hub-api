@@ -268,7 +268,9 @@ Update Companies House records:
 ./manage.py sync_ch
 ```
 
-This truncates the Companies House table, downloads the latest data from Companies House and repopulates the table.
+This downloads the latest data from Companies House, updates the Companies House table and triggers an Elasticsearch sync.
+
+(Note that this does not remove any records from the Companies House table.)
 
 ## Dependencies
 
