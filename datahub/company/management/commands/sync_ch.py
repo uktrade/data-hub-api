@@ -12,7 +12,7 @@ import requests
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
-from django.db import connection, reset_queries
+from django.db import connection, reset_queries, transaction
 from lxml import etree
 from raven.contrib.django.raven_compat.models import client
 
@@ -251,6 +251,7 @@ class CHSynchroniser:
         self.count = 0
         self.simulate = simulate
 
+    @transaction.atomic
     def run(self, tmp_file_creator, endpoint=None):
         """Runs the synchronisation operation."""
         logger.info('Starting CH load...')
