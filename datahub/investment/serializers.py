@@ -23,8 +23,128 @@ from datahub.investment.models import (
 )
 from datahub.investment.validate import validate
 
+CORE_FIELDS = (
+    'id',
+    'incomplete_fields',
+    'name',
+    'project_code',
+    'description',
+    'anonymous_description',
+    'allow_blank_estimated_land_date',
+    'estimated_land_date',
+    'actual_land_date',
+    'quotable_as_public_case_study',
+    'likelihood_of_landing',
+    'priority',
+    'approved_commitment_to_invest',
+    'approved_fdi',
+    'approved_good_value',
+    'approved_high_value',
+    'approved_landed',
+    'approved_non_fdi',
+    'investment_type',
+    'stage',
+    'status',
+    'reason_delayed',
+    'reason_abandoned',
+    'date_abandoned',
+    'reason_lost',
+    'date_lost',
+    'country_lost_to',
+    'investor_company',
+    'investor_type',
+    'investor_company_country',
+    'intermediate_company',
+    'level_of_involvement',
+    'specific_programme',
+    'client_contacts',
+    'client_relationship_manager',
+    'client_relationship_manager_team',
+    'referral_source_adviser',
+    'referral_source_activity',
+    'referral_source_activity_website',
+    'referral_source_activity_marketing',
+    'referral_source_activity_event',
+    'fdi_type',
+    'sector',
+    'business_activities',
+    'other_business_activity',
+    'archived',
+    'archived_documents_url_path',
+    'archived_on',
+    'archived_reason',
+    'archived_by',
+    'created_on',
+    'modified_on',
+    'comments',
+)
 
-class IProjectSummarySerializer(PermittedFieldsModelSerializer):
+VALUE_FIELDS = (
+    'fdi_value',
+    'total_investment',
+    'foreign_equity_investment',
+    'government_assistance',
+    'some_new_jobs',
+    'number_new_jobs',
+    'will_new_jobs_last_two_years',
+    'average_salary',
+    'number_safeguarded_jobs',
+    'r_and_d_budget',
+    'non_fdi_r_and_d_budget',
+    'associated_non_fdi_r_and_d_project',
+    'new_tech_to_uk',
+    'export_revenue',
+    'value_complete',
+    'client_cannot_provide_total_investment',
+    'client_cannot_provide_foreign_investment',
+)
+
+REQUIREMENTS_FIELDS = (
+    'client_requirements',
+    'site_decided',
+    'address_1',
+    'address_2',
+    'address_town',
+    'address_postcode',
+    'competitor_countries',
+    'allow_blank_possible_uk_regions',
+    'uk_region_locations',
+    'actual_uk_regions',
+    'delivery_partners',
+    'strategic_drivers',
+    'client_considering_other_countries',
+    'uk_company_decided',
+    'uk_company',
+    'requirements_complete',
+)
+
+TEAM_FIELDS = (
+    'project_manager',
+    'project_assurance_adviser',
+    'project_manager_team',
+    'project_assurance_team',
+    'team_complete',
+    'team_members',
+)
+
+ALL_FIELDS = CORE_FIELDS + VALUE_FIELDS + REQUIREMENTS_FIELDS + TEAM_FIELDS
+
+
+class NestedIProjectTeamMemberSerializer(serializers.ModelSerializer):
+    """Serialiser for investment project team members when nested in the main investment
+    project object.
+
+    Used to exclude the investment project from the serialised representation.
+    """
+
+    adviser = NestedAdviserField()
+
+    class Meta:
+        model = InvestmentProjectTeamMember
+        fields = ('adviser', 'role')
+
+
+class IProjectSerializer(PermittedFieldsModelSerializer):
     """Serialiser for investment project endpoints."""
 
     incomplete_fields = serializers.SerializerMethodField()
@@ -33,9 +153,7 @@ class IProjectSummarySerializer(PermittedFieldsModelSerializer):
     stage = NestedRelatedField(meta_models.InvestmentProjectStage, required=False)
     country_lost_to = NestedRelatedField(meta_models.Country, required=False, allow_null=True)
     investor_company = NestedRelatedField(Company, required=True, allow_null=False)
-    investor_company_country = NestedRelatedField(
-        meta_models.Country, read_only=True
-    )
+    investor_company_country = NestedRelatedField(meta_models.Country, read_only=True)
     investor_type = NestedRelatedField(InvestorType, required=False, allow_null=True)
     intermediate_company = NestedRelatedField(Company, required=False, allow_null=True)
     level_of_involvement = NestedRelatedField(Involvement, required=False, allow_null=True)
@@ -45,9 +163,7 @@ class IProjectSummarySerializer(PermittedFieldsModelSerializer):
     )
 
     client_relationship_manager = NestedAdviserField(required=True, allow_null=False)
-    client_relationship_manager_team = NestedRelatedField(
-        meta_models.Team, read_only=True
-    )
+    client_relationship_manager_team = NestedRelatedField(meta_models.Team, read_only=True)
     referral_source_adviser = NestedAdviserField(required=True, allow_null=False)
     referral_source_activity = NestedRelatedField(
         meta_models.ReferralSourceActivity, required=True, allow_null=False
@@ -66,11 +182,36 @@ class IProjectSummarySerializer(PermittedFieldsModelSerializer):
     )
     archived_by = NestedAdviserField(read_only=True)
 
-    def get_incomplete_fields(self, instance):
-        """Returns the names of the fields that still need to be completed in order to
-        move to the next stage.
-        """
-        return tuple(validate(instance=instance, next_stage=True))
+    # Value fields
+    fdi_value = NestedRelatedField(meta_models.FDIValue, required=False, allow_null=True)
+    average_salary = NestedRelatedField(
+        meta_models.SalaryRange, required=False, allow_null=True
+    )
+    value_complete = serializers.SerializerMethodField()
+    associated_non_fdi_r_and_d_project = NestedRelatedField(
+        InvestmentProject, required=False, allow_null=True, extra_fields=('name', 'project_code')
+    )
+
+    # Requirements fields
+    competitor_countries = NestedRelatedField(meta_models.Country, many=True, required=False)
+    # Note: uk_region_locations is the possible UK regions at the start of the project (not the
+    # actual/final UK regions at the end of the project)
+    uk_region_locations = NestedRelatedField(meta_models.UKRegion, many=True, required=False)
+    actual_uk_regions = NestedRelatedField(meta_models.UKRegion, many=True, required=False)
+    delivery_partners = NestedRelatedField(InvestmentDeliveryPartner, many=True, required=False)
+    strategic_drivers = NestedRelatedField(
+        meta_models.InvestmentStrategicDriver, many=True, required=False
+    )
+    uk_company = NestedRelatedField(Company, required=False, allow_null=True)
+    requirements_complete = serializers.SerializerMethodField()
+
+    # Team fields
+    project_manager = NestedAdviserField(required=False, allow_null=True)
+    project_assurance_adviser = NestedAdviserField(required=False, allow_null=True)
+    project_manager_team = NestedRelatedField(meta_models.Team, read_only=True)
+    project_assurance_team = NestedRelatedField(meta_models.Team, read_only=True)
+    team_members = NestedIProjectTeamMemberSerializer(many=True, read_only=True)
+    team_complete = serializers.SerializerMethodField()
 
     def validate(self, data):
         """Validates the object after individual fields have been validated.
@@ -93,6 +234,30 @@ class IProjectSummarySerializer(PermittedFieldsModelSerializer):
 
         return data
 
+    def get_incomplete_fields(self, instance):
+        """Returns the names of the fields that still need to be completed in order to
+        move to the next stage.
+        """
+        return tuple(validate(instance=instance, next_stage=True))
+
+    def get_value_complete(self, instance):
+        """Whether the value fields required to move to the next stage are complete."""
+        return not validate(
+            instance=instance, fields=VALUE_FIELDS, next_stage=True
+        )
+
+    def get_requirements_complete(self, instance):
+        """Whether the requirements fields required to move to the next stage are complete."""
+        return not validate(
+            instance=instance, fields=REQUIREMENTS_FIELDS, next_stage=True
+        )
+
+    def get_team_complete(self, instance):
+        """Whether the team fields required to move to the next stage are complete."""
+        return not validate(
+            instance=instance, fields=TEAM_FIELDS, next_stage=True
+        )
+
     def _update_status(self, data):
         """Updates the project status when the stage changes to or from Won."""
         old_stage = self.instance.stage if self.instance else None
@@ -112,67 +277,13 @@ class IProjectSummarySerializer(PermittedFieldsModelSerializer):
 
     class Meta:
         model = InvestmentProject
-        fields = (
-            'id',
-            'incomplete_fields',
-            'name',
-            'project_code',
-            'description',
-            'anonymous_description',
-            'allow_blank_estimated_land_date',
-            'estimated_land_date',
-            'actual_land_date',
-            'quotable_as_public_case_study',
-            'likelihood_of_landing',
-            'priority',
-            'approved_commitment_to_invest',
-            'approved_fdi',
-            'approved_good_value',
-            'approved_high_value',
-            'approved_landed',
-            'approved_non_fdi',
-            'investment_type',
-            'stage',
-            'status',
-            'reason_delayed',
-            'reason_abandoned',
-            'date_abandoned',
-            'reason_lost',
-            'date_lost',
-            'country_lost_to',
-            'investor_company',
-            'investor_type',
-            'investor_company_country',
-            'intermediate_company',
-            'level_of_involvement',
-            'specific_programme',
-            'client_contacts',
-            'client_relationship_manager',
-            'client_relationship_manager_team',
-            'referral_source_adviser',
-            'referral_source_activity',
-            'referral_source_activity_website',
-            'referral_source_activity_marketing',
-            'referral_source_activity_event',
-            'fdi_type',
-            'sector',
-            'business_activities',
-            'other_business_activity',
-            'archived',
-            'archived_documents_url_path',
-            'archived_on',
-            'archived_reason',
-            'archived_by',
-            'created_on',
-            'modified_on',
-            'comments',
-        )
-        # DRF defaults to required=False even though this field is
-        # non-nullable
+        fields = ALL_FIELDS
+        # DRF defaults to required=False even though this field is non-nullable
         extra_kwargs = {
             'likelihood_of_landing': {'min_value': 0, 'max_value': 100},
             # Required for validation as ModelSerializer does not automatically set defaults
             'allow_blank_estimated_land_date': {'default': False},
+            'allow_blank_possible_uk_regions': {'default': False},
         }
         permissions = {
             f'investment.{InvestmentProjectPermission.read_investmentproject_document}':
@@ -180,103 +291,12 @@ class IProjectSummarySerializer(PermittedFieldsModelSerializer):
         }
         read_only_fields = (
             'allow_blank_estimated_land_date',
+            'allow_blank_possible_uk_regions',
             'archived',
             'archived_on',
             'archived_reason',
             'archived_documents_url_path',
             'comments',
-        )
-
-
-class IProjectValueSerializer(serializers.ModelSerializer):
-    """Serialiser for investment project value objects."""
-
-    fdi_value = NestedRelatedField(meta_models.FDIValue, required=False, allow_null=True)
-    average_salary = NestedRelatedField(
-        meta_models.SalaryRange, required=False,
-        allow_null=True
-    )
-    value_complete = serializers.SerializerMethodField()
-    associated_non_fdi_r_and_d_project = NestedRelatedField(
-        InvestmentProject, required=False, allow_null=True, extra_fields=('name', 'project_code')
-    )
-
-    def get_value_complete(self, instance):
-        """Whether the value fields required to move to the next stage are complete."""
-        return not validate(
-            instance=instance, fields=IProjectValueSerializer.Meta.fields, next_stage=True
-        )
-
-    class Meta:
-        model = InvestmentProject
-        fields = (
-            'fdi_value',
-            'total_investment',
-            'foreign_equity_investment',
-            'government_assistance',
-            'some_new_jobs',
-            'number_new_jobs',
-            'will_new_jobs_last_two_years',
-            'average_salary',
-            'number_safeguarded_jobs',
-            'r_and_d_budget',
-            'non_fdi_r_and_d_budget',
-            'associated_non_fdi_r_and_d_project',
-            'new_tech_to_uk',
-            'export_revenue',
-            'value_complete',
-            'client_cannot_provide_total_investment',
-            'client_cannot_provide_foreign_investment'
-        )
-
-
-class IProjectRequirementsSerializer(serializers.ModelSerializer):
-    """Serialiser for investment project requirements objects."""
-
-    competitor_countries = NestedRelatedField(meta_models.Country, many=True, required=False)
-    # Note: uk_region_locations is the possible UK regions at the start of the project (not the
-    # actual/final UK regions at the end of the project)
-    uk_region_locations = NestedRelatedField(meta_models.UKRegion, many=True, required=False)
-    actual_uk_regions = NestedRelatedField(meta_models.UKRegion, many=True, required=False)
-    delivery_partners = NestedRelatedField(InvestmentDeliveryPartner, many=True, required=False)
-    strategic_drivers = NestedRelatedField(
-        meta_models.InvestmentStrategicDriver, many=True, required=False
-    )
-    uk_company = NestedRelatedField(Company, required=False, allow_null=True)
-    requirements_complete = serializers.SerializerMethodField()
-
-    def get_requirements_complete(self, instance):
-        """Whether the requirements fields required to move to the next stage are complete."""
-        return not validate(
-            instance=instance, fields=IProjectRequirementsSerializer.Meta.fields, next_stage=True
-        )
-
-    class Meta:
-        model = InvestmentProject
-        fields = (
-            'client_requirements',
-            'site_decided',
-            'address_1',
-            'address_2',
-            'address_town',
-            'address_postcode',
-            'competitor_countries',
-            'allow_blank_possible_uk_regions',
-            'uk_region_locations',
-            'actual_uk_regions',
-            'delivery_partners',
-            'strategic_drivers',
-            'client_considering_other_countries',
-            'uk_company_decided',
-            'uk_company',
-            'requirements_complete'
-        )
-        extra_kwargs = {
-            # Required for validation as ModelSerializer does not automatically set defaults
-            'allow_blank_possible_uk_regions': {'default': False},
-        }
-        read_only_fields = (
-            'allow_blank_possible_uk_regions',
         )
 
 
@@ -359,75 +379,6 @@ class IProjectTeamMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvestmentProjectTeamMember
         fields = ('investment_project', 'adviser', 'role')
-
-
-class NestedIProjectTeamMemberSerializer(serializers.ModelSerializer):
-    """Serialiser for investment project team members when nested in the main investment
-    project object.
-
-    Used to exclude the investment project from the serialised representation.
-    """
-
-    adviser = NestedAdviserField()
-
-    class Meta:
-        model = InvestmentProjectTeamMember
-        fields = ('adviser', 'role')
-
-
-class IProjectTeamSerializer(serializers.ModelSerializer):
-    """Serialiser for investment project team objects."""
-
-    project_manager = NestedAdviserField(required=False, allow_null=True)
-    project_assurance_adviser = NestedAdviserField(required=False, allow_null=True)
-    project_manager_team = NestedRelatedField(meta_models.Team, read_only=True)
-    project_assurance_team = NestedRelatedField(meta_models.Team, read_only=True)
-    team_members = NestedIProjectTeamMemberSerializer(many=True, read_only=True)
-    team_complete = serializers.SerializerMethodField()
-
-    def get_team_complete(self, instance):
-        """Whether the team fields required to move to the next stage are complete."""
-        return not validate(
-            instance=instance, fields=IProjectTeamSerializer.Meta.fields, next_stage=True
-        )
-
-    class Meta:
-        model = InvestmentProject
-        fields = (
-            'project_manager',
-            'project_assurance_adviser',
-            'project_manager_team',
-            'project_assurance_team',
-            'team_complete',
-            'team_members'
-        )
-
-
-class IProjectSerializer(IProjectSummarySerializer, IProjectValueSerializer,
-                         IProjectRequirementsSerializer, IProjectTeamSerializer):
-    """
-    Serialiser for investment projects, used with the new unified investment endpoint.
-
-    TODO: Combine the four base serialisers into one.
-    """
-
-    class Meta:
-        model = InvestmentProject
-        fields = (
-            IProjectSummarySerializer.Meta.fields
-            + IProjectValueSerializer.Meta.fields
-            + IProjectRequirementsSerializer.Meta.fields
-            + IProjectTeamSerializer.Meta.fields
-        )
-        extra_kwargs = {
-            **IProjectSummarySerializer.Meta.extra_kwargs,
-            **IProjectRequirementsSerializer.Meta.extra_kwargs,
-        }
-        read_only_fields = (
-            IProjectSummarySerializer.Meta.read_only_fields
-            + IProjectRequirementsSerializer.Meta.read_only_fields
-        )
-        permissions = IProjectSummarySerializer.Meta.permissions
 
 
 class IProjectDocumentSerializer(serializers.ModelSerializer):
