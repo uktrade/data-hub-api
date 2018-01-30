@@ -5,8 +5,7 @@ from datahub.core import constants
 from datahub.core.test_utils import random_obj_for_model
 from datahub.investment.models import InvestmentDeliveryPartner
 from datahub.investment.serializers import (
-    IProjectRequirementsSerializer, IProjectSummarySerializer, IProjectTeamSerializer,
-    IProjectValueSerializer
+    CORE_FIELDS, REQUIREMENTS_FIELDS, TEAM_FIELDS, VALUE_FIELDS
 )
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.investment.validate import validate
@@ -21,7 +20,7 @@ def test_validate_project_fail():
         investment_type_id=constants.InvestmentType.fdi.value.id,
         fdi_type_id=None
     )
-    errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
+    errors = validate(instance=project, fields=CORE_FIELDS)
     assert errors == {
         'fdi_type': 'This field is required.'
     }
@@ -32,7 +31,7 @@ def test_validate_project_instance_success():
     project = InvestmentProjectFactory(
         client_contacts=[ContactFactory().id, ContactFactory().id]
     )
-    errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
+    errors = validate(instance=project, fields=CORE_FIELDS)
     assert not errors
 
 
@@ -42,7 +41,7 @@ def test_validate_fdi_type():
     project = InvestmentProjectFactory(
         investment_type_id=investment_type_id
     )
-    errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
+    errors = validate(instance=project, fields=CORE_FIELDS)
     assert 'fdi_type' in errors
 
 
@@ -58,7 +57,7 @@ def test_validate_estimated_land_date(allow_blank_estimated_land_date, is_error)
         allow_blank_estimated_land_date=allow_blank_estimated_land_date,
         estimated_land_date=None,
     )
-    errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
+    errors = validate(instance=project, fields=CORE_FIELDS)
     assert ('estimated_land_date' in errors) == is_error
 
 
@@ -67,7 +66,7 @@ def test_validate_business_activity_other_instance():
     project = InvestmentProjectFactory(
         business_activities=[constants.InvestmentBusinessActivity.other.value.id]
     )
-    errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
+    errors = validate(instance=project, fields=CORE_FIELDS)
     assert errors == {
         'other_business_activity': 'This field is required.'
     }
@@ -80,7 +79,7 @@ def test_validate_business_activity_other_update_data():
         'business_activities': [constants.InvestmentBusinessActivity.other.value.id]
     }
     errors = validate(instance=project, update_data=data,
-                      fields=IProjectSummarySerializer.Meta.fields)
+                      fields=CORE_FIELDS)
     assert errors == {
         'other_business_activity': 'This field is required.'
     }
@@ -92,7 +91,7 @@ def test_validate_project_referral_website():
     project = InvestmentProjectFactory(
         referral_source_activity_id=referral_source_id
     )
-    errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
+    errors = validate(instance=project, fields=CORE_FIELDS)
     assert 'referral_source_activity_website' in errors
     assert 'referral_source_activity_event' not in errors
     assert 'referral_source_activity_marketing' not in errors
@@ -104,7 +103,7 @@ def test_validate_project_referral_event():
     project = InvestmentProjectFactory(
         referral_source_activity_id=referral_source_id
     )
-    errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
+    errors = validate(instance=project, fields=CORE_FIELDS)
     assert 'referral_source_activity_event' in errors
     assert 'referral_source_activity_website' not in errors
     assert 'referral_source_activity_marketing' not in errors
@@ -116,7 +115,7 @@ def test_validate_project_referral_marketing():
     project = InvestmentProjectFactory(
         referral_source_activity_id=referral_source_id
     )
-    errors = validate(instance=project, fields=IProjectSummarySerializer.Meta.fields)
+    errors = validate(instance=project, fields=CORE_FIELDS)
     assert 'referral_source_activity_marketing' in errors
     assert 'referral_source_activity_website' not in errors
     assert 'referral_source_activity_event' not in errors
@@ -131,7 +130,7 @@ def test_validate_project_update_data():
         'referral_source_activity': referral_source
     }
     errors = validate(instance=project, update_data=update_data,
-                      fields=IProjectSummarySerializer.Meta.fields)
+                      fields=CORE_FIELDS)
     assert 'referral_source_activity_marketing' in errors
     assert 'referral_source_activity_website' not in errors
     assert 'referral_source_activity_event' not in errors
@@ -142,7 +141,7 @@ def test_validate_value_fail():
     project = InvestmentProjectFactory(
         sector_id=None, stage_id=constants.InvestmentProjectStage.assign_pm.value.id
     )
-    errors = validate(instance=project, fields=IProjectValueSerializer.Meta.fields)
+    errors = validate(instance=project, fields=VALUE_FIELDS)
     assert errors == {
         'client_cannot_provide_total_investment': 'This field is required.',
         'total_investment': 'This field is required.',
@@ -158,7 +157,7 @@ def test_validate_value_instance_success():
         total_investment=100,
         number_new_jobs=0
     )
-    errors = validate(instance=project, fields=IProjectValueSerializer.Meta.fields)
+    errors = validate(instance=project, fields=VALUE_FIELDS)
     assert not errors
 
 
@@ -168,7 +167,7 @@ def test_validate_reqs_fail():
         stage_id=constants.InvestmentProjectStage.assign_pm.value.id,
         sector_id=None
     )
-    errors = validate(instance=project, fields=IProjectRequirementsSerializer.Meta.fields)
+    errors = validate(instance=project, fields=REQUIREMENTS_FIELDS)
     assert errors == {
         'client_considering_other_countries': 'This field is required.',
         'client_requirements': 'This field is required.',
@@ -191,7 +190,7 @@ def test_validate_reqs_instance_success():
         strategic_drivers=strategic_drivers,
         uk_region_locations=uk_region_locations
     )
-    errors = validate(instance=project, fields=IProjectRequirementsSerializer.Meta.fields)
+    errors = validate(instance=project, fields=REQUIREMENTS_FIELDS)
     assert not errors
 
 
@@ -201,7 +200,7 @@ def test_validate_reqs_competitor_countries_missing():
         stage_id=constants.InvestmentProjectStage.assign_pm.value.id,
         client_considering_other_countries=True
     )
-    errors = validate(instance=project, fields=IProjectRequirementsSerializer.Meta.fields)
+    errors = validate(instance=project, fields=REQUIREMENTS_FIELDS)
     assert 'competitor_countries' in errors
 
 
@@ -212,7 +211,7 @@ def test_validate_reqs_competitor_countries_present():
         client_considering_other_countries=True,
         competitor_countries=[constants.Country.united_states.value.id]
     )
-    errors = validate(instance=project, fields=IProjectRequirementsSerializer.Meta.fields)
+    errors = validate(instance=project, fields=REQUIREMENTS_FIELDS)
     assert 'competitor_countries' not in errors
 
 
@@ -227,7 +226,7 @@ def test_validate_possible_uk_regions(allow_blank_possible_uk_regions, is_error)
         allow_blank_possible_uk_regions=allow_blank_possible_uk_regions,
         uk_region_locations=[],
     )
-    errors = validate(instance=project, fields=IProjectRequirementsSerializer.Meta.fields)
+    errors = validate(instance=project, fields=REQUIREMENTS_FIELDS)
     assert ('uk_region_locations' in errors) == is_error
 
 
@@ -237,7 +236,7 @@ def test_validate_team_fail():
         stage_id=constants.InvestmentProjectStage.active.value.id,
         sector_id=None
     )
-    errors = validate(instance=project, fields=IProjectTeamSerializer.Meta.fields)
+    errors = validate(instance=project, fields=TEAM_FIELDS)
     assert errors == {
         'project_assurance_adviser': 'This field is required.',
         'project_manager': 'This field is required.'
@@ -252,7 +251,7 @@ def test_validate_team_instance_success():
         project_manager=adviser,
         project_assurance_adviser=adviser
     )
-    errors = validate(instance=project, fields=IProjectTeamSerializer.Meta.fields)
+    errors = validate(instance=project, fields=TEAM_FIELDS)
     assert not errors
 
 
