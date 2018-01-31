@@ -23,7 +23,10 @@ from datahub.investment.models import (
 class InvestmentProjectAdmin(BaseModelVersionAdmin):
     """Investment project admin."""
 
-    search_fields = ['name']
+    search_fields = (
+        '=pk',
+        'name',
+    )
     raw_id_fields = (
         'archived_by',
         'associated_non_fdi_r_and_d_project',
