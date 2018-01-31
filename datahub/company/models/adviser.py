@@ -91,7 +91,8 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     @cached_property
     def name(self):
         """Full name shorthand."""
-        return f'{self.first_name} {self.last_name}'
+        parts = (self.first_name, self.last_name)
+        return ' '.join(parts)
 
     def __str__(self):
         """Admin displayed human readable name."""
