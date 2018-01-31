@@ -25,12 +25,12 @@ class InteractionAdmin(BaseModelVersionAdmin):
     """Interaction admin."""
 
     search_fields = (
-        'id',
+        '=pk',
         'subject',
         'company__name',
     )
     list_display = (
-        '__str__',
+        'subject',
         'date',
         'company',
         'contact',
