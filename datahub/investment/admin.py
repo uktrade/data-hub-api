@@ -47,6 +47,11 @@ class InvestmentProjectAdmin(BaseModelVersionAdmin):
         'archived_documents_url_path',
         'comments',
     )
+    list_display = (
+        'name',
+        'investor_company',
+        'stage',
+    )
 
 
 @admin.register(InvestmentProjectTeamMember)
