@@ -85,7 +85,10 @@ class BaseConstantModel(DisableableModel):
 
     def __str__(self):
         """Human readable admin name."""
-        return self.name
+        parts = [self.name]
+        if self.disabled_on:
+            parts.append('(disabled)')
+        return ' '.join(parts)
 
 
 class BaseOrderedConstantModel(BaseConstantModel):
