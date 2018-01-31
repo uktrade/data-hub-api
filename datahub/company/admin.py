@@ -37,6 +37,10 @@ class CompanyAdmin(BaseModelVersionAdmin):
         'archived_documents_url_path',
         'reference_code',
     )
+    list_display = (
+        'name',
+        'registered_address_country',
+    )
 
 
 @admin.register(Contact)
@@ -44,9 +48,11 @@ class ContactAdmin(BaseModelVersionAdmin):
     """Contact admin."""
 
     search_fields = (
+        'pk',
         'first_name',
         'last_name',
-        'company__name'
+        'company__pk',
+        'company__name',
     )
     raw_id_fields = (
         'company',
@@ -57,6 +63,10 @@ class ContactAdmin(BaseModelVersionAdmin):
     )
     readonly_fields = (
         'archived_documents_url_path',
+    )
+    list_display = (
+        '__str__',
+        'company',
     )
 
 
