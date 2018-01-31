@@ -92,11 +92,11 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     def name(self):
         """Full name shorthand."""
         parts = (self.first_name, self.last_name)
-        return ' '.join(parts)
+        return ' '.join(filter(None, parts))
 
     def __str__(self):
         """Admin displayed human readable name."""
-        return self.name
+        return self.name or '(no name)'
 
     # Django User methods, required for Admin interface
 
