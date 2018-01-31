@@ -110,7 +110,13 @@ class AdviserAdmin(BaseModelVersionAdmin, UserAdmin):
             'fields': ('email', 'password1', 'password2'),
         }),
     )
-    list_display = ('email', 'first_name', 'last_name', 'is_staff',)
-    search_fields = ('first_name', 'last_name', 'email')
+    list_display = ('email', 'first_name', 'last_name', 'dit_team', 'is_active', 'is_staff',)
+    search_fields = (
+        '=pk',
+        'first_name',
+        'last_name',
+        'email',
+        '=dit_team__pk',
+        'dit_team__name',
+    )
     ordering = ('email',)
-    actions = ['enable_users', 'disable_users']
