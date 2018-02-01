@@ -3,7 +3,6 @@
 [![image](https://circleci.com/gh/uktrade/data-hub-leeloo/tree/master.svg?style=svg)](https://circleci.com/gh/uktrade/data-hub-leeloo/tree/master)
 [![image](https://codecov.io/gh/uktrade/data-hub-leeloo/branch/master/graph/badge.svg)](https://codecov.io/gh/uktrade/data-hub-leeloo)
 [![image](https://codeclimate.com/github/uktrade/data-hub-leeloo/badges/gpa.svg)](https://codeclimate.com/github/uktrade/data-hub-leeloo)
-[![Code Health](https://landscape.io/github/uktrade/data-hub-leeloo/master/landscape.svg?style=flat)](https://landscape.io/github/uktrade/data-hub-leeloo/master)
 [![Updates](https://pyup.io/repos/github/uktrade/data-hub-leeloo/shield.svg)](https://pyup.io/repos/github/uktrade/data-hub-leeloo/)
 
 Leeloo provides an API into Data Hub for Data Hub clients. Using Leeloo you can search for entities and manage companies, contacts and interactions.
@@ -188,7 +187,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `AWS_ACCESS_KEY_ID` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
 | `AWS_DEFAULT_REGION` | No | [Default region used by boto3.](http://boto3.readthedocs.io/en/latest/guide/configuration.html#environment-variable-configuration) |
 | `AWS_SECRET_ACCESS_KEY` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
-| `BULK_CREATE_BATCH_SIZE`  | No | Used when loading Companies House records (default=5000). |
+| `BULK_INSERT_BATCH_SIZE`  | No | Used when loading Companies House records (default=5000). |
 | `DATABASE_URL`  | Yes | PostgreSQL server URL (with embedded credentials). |
 | `DATAHUB_FRONTEND_BASE_URL`  | Yes | |
 | `DATAHUB_SECRET`  | Yes | |
@@ -268,7 +267,9 @@ Update Companies House records:
 ./manage.py sync_ch
 ```
 
-This truncates the Companies House table, downloads the latest data from Companies House and repopulates the table.
+This downloads the latest data from Companies House, updates the Companies House table and triggers an Elasticsearch sync.
+
+(Note that this does not remove any records from the Companies House table.)
 
 ## Dependencies
 

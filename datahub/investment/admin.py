@@ -23,7 +23,10 @@ from datahub.investment.models import (
 class InvestmentProjectAdmin(BaseModelVersionAdmin):
     """Investment project admin."""
 
-    search_fields = ['name']
+    search_fields = (
+        '=pk',
+        'name',
+    )
     raw_id_fields = (
         'archived_by',
         'associated_non_fdi_r_and_d_project',
@@ -43,6 +46,11 @@ class InvestmentProjectAdmin(BaseModelVersionAdmin):
         'allow_blank_possible_uk_regions',
         'archived_documents_url_path',
         'comments',
+    )
+    list_display = (
+        'name',
+        'investor_company',
+        'stage',
     )
 
 
