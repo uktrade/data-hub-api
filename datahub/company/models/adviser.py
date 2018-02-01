@@ -9,6 +9,7 @@ from django.db import models
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 
+from datahub.core.utils import join_truthy_strings
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -91,11 +92,11 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     @cached_property
     def name(self):
         """Full name shorthand."""
-        return f'{self.first_name} {self.last_name}'
+        return join_truthy_strings(self.first_name, self.last_name)
 
     def __str__(self):
         """Admin displayed human readable name."""
-        return self.name
+        return self.name or '(no name)'
 
     # Django User methods, required for Admin interface
 
