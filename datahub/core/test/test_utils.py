@@ -5,9 +5,27 @@ import pytest
 
 from datahub.core.constants import Constant
 from datahub.core.test.support.models import MetadataModel
-from datahub.core.utils import load_constants_to_database, slice_iterable_into_chunks
+from datahub.core.utils import (
+    join_truthy_strings, load_constants_to_database, slice_iterable_into_chunks
+)
 
 pytestmark = pytest.mark.django_db
+
+
+@pytest.mark.parametrize(
+    'args,sep,res',
+    (
+        (('abc', 'def', 'ghi'), ',', 'abc,def,ghi'),
+        (('abc', 'def'), ' ', 'abc def'),
+        (('abc', ''), ' ', 'abc'),
+        (('abc', None), ' ', 'abc'),
+        ((None, ''), ' ', ''),
+        ((), ' ', ''),
+    )
+)
+def test_join_truthy_strings(args, sep, res):
+    """Tests joining turthy strings."""
+    assert join_truthy_strings(*args, sep=sep) == res
 
 
 def test_slice_iterable_into_chunks():

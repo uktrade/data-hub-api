@@ -10,12 +10,12 @@ from urllib.parse import urlparse
 
 import requests
 from django.conf import settings
+from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import connection, reset_queries, transaction
 from lxml import etree
 from raven.contrib.django.raven_compat.models import client
 
-from datahub.company.models import CompaniesHouseCompany
 from datahub.core.utils import slice_iterable_into_chunks, stream_to_file_pointer
 
 logger = getLogger(__name__)
@@ -54,6 +54,79 @@ COMPANY_CATEGORY_RELEVANCY_MAPPING = {
     # Scottish qualifying partnership, generally have a foreign address
     'scottish partnership': False,
 }
+
+
+UPSERT_SQL_STATEMENT = """
+INSERT INTO company_companieshousecompany (
+    company_number,
+    company_category,
+    company_status,
+    incorporation_date,
+    "name",
+    registered_address_1,
+    registered_address_2,
+    registered_address_country_id,
+    registered_address_county,
+    registered_address_postcode,
+    registered_address_town,
+    sic_code_1,
+    sic_code_2,
+    sic_code_3,
+    sic_code_4,
+    uri
+) VALUES (
+    %(company_number)s,
+    %(company_category)s,
+    %(company_status)s,
+    %(incorporation_date)s,
+    %(name)s,
+    %(registered_address_1)s,
+    %(registered_address_2)s,
+    %(registered_address_country_id)s,
+    %(registered_address_county)s,
+    %(registered_address_postcode)s,
+    %(registered_address_town)s,
+    %(sic_code_1)s,
+    %(sic_code_2)s,
+    %(sic_code_3)s,
+    %(sic_code_4)s,
+    %(uri)s
+  )
+ON CONFLICT (company_number)
+DO UPDATE SET (
+    company_category,
+    company_status,
+    incorporation_date,
+    "name",
+    registered_address_1,
+    registered_address_2,
+    registered_address_country_id,
+    registered_address_county,
+    registered_address_postcode,
+    registered_address_town,
+    sic_code_1,
+    sic_code_2,
+    sic_code_3,
+    sic_code_4,
+    uri
+) = (
+    %(company_category)s,
+    %(company_status)s,
+    %(incorporation_date)s,
+    %(name)s,
+    %(registered_address_1)s,
+    %(registered_address_2)s,
+    %(registered_address_country_id)s,
+    %(registered_address_county)s,
+    %(registered_address_postcode)s,
+    %(registered_address_town)s,
+    %(sic_code_1)s,
+    %(sic_code_2)s,
+    %(sic_code_3)s,
+    %(sic_code_4)s,
+    %(uri)s
+)
+"""
 
 
 def is_relevant_company_type(row):
@@ -161,60 +234,58 @@ def process_row(row):
             yield transform_ch_row(row)
 
 
-def sync_ch(tmp_file_creator, endpoint=None, truncate_first=False, simulate=False):
-    """Do the sync.
-
-    We are batching the records instead of letting bulk_create doing it because Django casts
-    the objects into a list:
-    https://github.com/django/django/blob/master/django/db/models/query.py#L420
-
-    This would create a list with millions of objects, that will try to be saved in batches
-    in a single transaction.
+class CHSynchroniser:
     """
-    logger.info('Starting CH load...')
-    count = 0
-    endpoint = endpoint or settings.CH_DOWNLOAD_URL
-    ch_csv_urls = get_ch_latest_dump_file_list(endpoint)
-    logger.info('Found the following Companies House CSV URLs: %s', ch_csv_urls)
-    if truncate_first and not simulate:
-        truncate_ch_companies_table()
-    for csv_url in ch_csv_urls:
-        ch_company_rows = iter_ch_csv_from_url(csv_url, tmp_file_creator)
+    Updates the records in our Companies House table with the latest data from Companies House.
 
-        batch_iter = slice_iterable_into_chunks(
-            ch_company_rows, settings.BULK_CREATE_BATCH_SIZE, _create_ch_company
-        )
-        for batch in batch_iter:
-            if not simulate:
-                CompaniesHouseCompany.objects.bulk_create(
-                    objs=batch,
-                    batch_size=settings.BULK_CREATE_BATCH_SIZE
-                )
-            count += len(batch)
-            logger.info('%d Companies House records loaded...', count)
-            # In debug mode, Django keeps track of SQL statements executed which
-            # eventually leads to memory exhaustion.
-            # This clears that history.
-            reset_queries()
+    As this is a large data set (over 4 million records), this is a time-consuming job.
 
-    logger.info('Companies House load complete, %s records loaded', count)
+    For speed and as this is a bulk operation, the ORM is not used and native PostgreSQL
+    INSERT ... ON CONFLICT (upsert) statements are used instead.
 
-
-@transaction.atomic
-def truncate_ch_companies_table():
-    """Delete all the companies house companies.
-
-    delete() is too slow, we use truncate.
+    This is also so the sync can be done without any downtime.
     """
-    cursor = connection.cursor()
-    table_name = CompaniesHouseCompany._meta.db_table
-    logger.info('Truncating the %s table', table_name)
-    query = f'truncate {table_name};'
-    cursor.execute(query)
+
+    def __init__(self, simulate=False):
+        """Initialises the operation, setting whether database operations should be skipped."""
+        self.count = 0
+        self.simulate = simulate
+
+    @transaction.atomic
+    def run(self, tmp_file_creator, endpoint=None):
+        """Runs the synchronisation operation."""
+        logger.info('Starting CH load...')
+        endpoint = endpoint or settings.CH_DOWNLOAD_URL
+        ch_csv_urls = get_ch_latest_dump_file_list(endpoint)
+        logger.info('Found the following Companies House CSV URLs: %s', ch_csv_urls)
+
+        for csv_url in ch_csv_urls:
+            ch_company_rows = iter_ch_csv_from_url(csv_url, tmp_file_creator)
+
+            batch_iter = slice_iterable_into_chunks(
+                ch_company_rows, settings.BULK_INSERT_BATCH_SIZE, lambda x: x
+            )
+            with connection.cursor() as cursor:
+                for batch in batch_iter:
+                    self._process_batch(cursor, batch)
+
+        logger.info('Companies House load complete, %s records loaded', self.count)
+
+    def _process_batch(self, cursor, rows):
+        if not self.simulate:
+            _upsert_ch_records(cursor, rows)
+
+        self.count += len(rows)
+        # In debug mode, Django keeps track of SQL statements executed which
+        # eventually leads to memory exhaustion.
+        # This clears that history.
+        reset_queries()
+
+        logger.info('%d Companies House records loaded...', self.count)
 
 
-def _create_ch_company(row_dict):
-    return CompaniesHouseCompany(**row_dict)
+def _upsert_ch_records(cursor, rows):
+    cursor.executemany(UPSERT_SQL_STATEMENT, rows)
 
 
 class Command(BaseCommand):
@@ -229,11 +300,17 @@ class Command(BaseCommand):
             default=False,
             help='If True it only simulates the command without saving the changes.',
         )
+        parser.add_argument(
+            '--skip-sync-es',
+            action='store_true',
+            default=False,
+            help='Skips running sync_es after the Companies House load finishes.',
+        )
 
     def handle(self, *args, **options):
         """Handle."""
-        sync_ch(
-            tmp_file_creator=tempfile.TemporaryFile,
-            truncate_first=True,
-            simulate=options['simulate'],
-        )
+        syncer = CHSynchroniser(simulate=options['simulate'])
+        syncer.run(tmp_file_creator=tempfile.TemporaryFile)
+
+        if not options['skip_sync_es']:
+            call_command('sync_es', model=['companieshousecompany'])

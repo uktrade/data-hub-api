@@ -8,7 +8,6 @@ MODELS_TO_REGISTER_DISABLEABLE = (
     models.CompanyClassification,
     models.Country,
     models.FDIType,
-    models.FDIValue,
     models.HeadquarterType,
     models.InvestmentBusinessActivity,
     models.InvestmentStrategicDriver,
@@ -24,6 +23,7 @@ MODELS_TO_REGISTER_DISABLEABLE = (
 
 MODELS_TO_REGISTER_WITH_ORDER = (
     models.EmployeeRange,
+    models.FDIValue,
     models.TurnoverRange,
     models.SalaryRange,
 )
