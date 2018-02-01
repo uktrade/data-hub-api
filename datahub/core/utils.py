@@ -18,6 +18,11 @@ class StrEnum(str, Enum):
     """
 
 
+def join_truthy_strings(*args, sep=' '):
+    """Joins a list of strings using a separtor, omitting falsey values."""
+    return sep.join(filter(None, args))
+
+
 def generate_enum_code_from_queryset(model_queryset):
     """Generate the Enum code for a given constant model queryset.
 

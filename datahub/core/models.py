@@ -4,6 +4,8 @@ from django.conf import settings
 from django.db import models
 from django.utils.timezone import now
 
+from datahub.core.utils import join_truthy_strings
+
 
 class BaseModel(models.Model):
     """Common fields for most of the models we use."""
@@ -85,10 +87,10 @@ class BaseConstantModel(DisableableModel):
 
     def __str__(self):
         """Human readable admin name."""
-        parts = [self.name]
-        if self.disabled_on:
-            parts.append('(disabled)')
-        return ' '.join(parts)
+        return join_truthy_strings(
+            self.name,
+            '(disabled)' if self.disabled_on else None
+        )
 
 
 class BaseOrderedConstantModel(BaseConstantModel):
