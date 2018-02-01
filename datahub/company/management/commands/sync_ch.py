@@ -22,6 +22,8 @@ logger = getLogger(__name__)
 
 # Mapping used by is_relevant_company_type() to determine which companies should be loaded
 COMPANY_CATEGORY_RELEVANCY_MAPPING = {
+    # Address not available/main registration not with Companies House
+    'charitable incorporated organisation': False,
     'community interest company': True,
     'european public limited-liability company (se)': True,
     # Address not available/main registration with FCA
@@ -51,6 +53,8 @@ COMPANY_CATEGORY_RELEVANCY_MAPPING = {
     'registered society': False,
     # Address not available
     'royal charter company': False,
+    # Address not available/main registration not with Companies House
+    'scottish charitable incorporated organisation': False,
     # Scottish qualifying partnership, generally have a foreign address
     'scottish partnership': False,
 }
