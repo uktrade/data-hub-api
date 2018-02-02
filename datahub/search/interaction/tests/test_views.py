@@ -471,9 +471,9 @@ class TestViews(APITestMixin):
         """Tests filtering interaction by interaction type."""
         CompanyInteractionFactory.create_batch(
             5,
-            communication_channel_id=constants.InteractionType.email_website.value.id
+            communication_channel_id=constants.CommunicationChannel.email_website.value.id
         )
-        communication_channel_id = constants.InteractionType.social_media.value.id
+        communication_channel_id = constants.CommunicationChannel.social_media.value.id
         CompanyInteractionFactory.create_batch(
             5,
             communication_channel_id=communication_channel_id
