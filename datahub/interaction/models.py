@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db import models
 from model_utils import Choices
 
-from datahub.core.models import BaseConstantModel, BaseModel
+from datahub.core.models import BaseConstantModel, BaseModel, BaseOrderedConstantModel
 from datahub.core.utils import StrEnum
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -56,6 +56,14 @@ class InteractionPermission(StrEnum):
 
 class CommunicationChannel(BaseConstantModel):
     """Communication channel/mode of communication."""
+
+
+class ServiceDeliveryStatus(BaseOrderedConstantModel):
+    """
+    Status of a service delivery.
+
+    Primarily used for Tradeshow Access Programme (TAP) grants.
+    """
 
 
 class Interaction(BaseModel):
