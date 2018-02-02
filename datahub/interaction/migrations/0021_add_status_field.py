@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='interaction',
             name='service_delivery_status',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='interaction.ServiceDeliveryStatus'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='interaction.ServiceDeliveryStatus', help_text='For service deliveries only.', verbose_name='status'),
         ),
     ]
