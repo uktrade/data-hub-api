@@ -21,5 +21,6 @@ class InteractionSearchApp(SearchApp):
         'communication_channel',
         'investment_project',
         'service',
+        'service_delivery_status',
         'event',
     )

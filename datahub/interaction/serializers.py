@@ -13,7 +13,7 @@ from datahub.core.validators import (
 from datahub.event.models import Event
 from datahub.investment.models import InvestmentProject
 from datahub.metadata.models import Service, Team
-from .models import CommunicationChannel, Interaction
+from .models import CommunicationChannel, Interaction, ServiceDeliveryStatus
 from .permissions import HasAssociatedInvestmentProjectValidator
 
 
@@ -47,6 +47,9 @@ class InteractionSerializer(serializers.ModelSerializer):
     )
     modified_by = NestedAdviserField(read_only=True)
     service = NestedRelatedField(Service)
+    service_delivery_status = NestedRelatedField(
+        ServiceDeliveryStatus, required=False, allow_null=True
+    )
 
     def validate(self, data):
         """
@@ -85,6 +88,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             'communication_channel',
             'investment_project',
             'service',
+            'service_delivery_status',
             'subject',
             'notes',
             'archived_documents_url_path',
@@ -114,6 +118,11 @@ class InteractionSerializer(serializers.ModelSerializer):
                 ValidationRule(
                     'invalid_for_interaction',
                     OperatorRule('is_event', is_blank),
+                    when=EqualsRule('kind', Interaction.KINDS.interaction),
+                ),
+                ValidationRule(
+                    'invalid_for_interaction',
+                    OperatorRule('service_delivery_status', is_blank),
                     when=EqualsRule('kind', Interaction.KINDS.interaction),
                 ),
                 ValidationRule(
