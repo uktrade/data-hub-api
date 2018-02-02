@@ -32,7 +32,7 @@ class CompanyInteractionFactory(InteractionFactoryBase):
 
     kind = Interaction.KINDS.interaction
     company = factory.SubFactory(CompanyFactory)
-    communication_channel_id = constants.InteractionType.face_to_face.value.id
+    communication_channel_id = constants.CommunicationChannel.face_to_face.value.id
 
 
 class InvestmentProjectInteractionFactory(InteractionFactoryBase):
@@ -40,7 +40,7 @@ class InvestmentProjectInteractionFactory(InteractionFactoryBase):
 
     kind = Interaction.KINDS.interaction
     investment_project = factory.SubFactory(InvestmentProjectFactory)
-    communication_channel_id = constants.InteractionType.face_to_face.value.id
+    communication_channel_id = constants.CommunicationChannel.face_to_face.value.id
 
 
 class ServiceDeliveryFactory(InteractionFactoryBase):
