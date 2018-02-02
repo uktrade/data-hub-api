@@ -8,9 +8,9 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import InteractionType, Service, Team
-from datahub.core.test_utils import APITestMixin, create_test_user
+from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.event.test.factories import EventFactory
-from datahub.interaction.models import InteractionPermission
+from datahub.interaction.models import InteractionPermission, ServiceDeliveryStatus
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory, EventServiceDeliveryFactory, InvestmentProjectInteractionFactory,
     ServiceDeliveryFactory,
@@ -69,6 +69,7 @@ class TestGetInteractionView(APITestMixin):
             'id': response_data['id'],
             'kind': 'interaction',
             'is_event': None,
+            'service_delivery_status': None,
             'communication_channel': {
                 'id': InteractionType.face_to_face.value.id,
                 'name': InteractionType.face_to_face.value.name
@@ -133,6 +134,7 @@ class TestGetInteractionView(APITestMixin):
             'id': response_data['id'],
             'kind': 'interaction',
             'is_event': None,
+            'service_delivery_status': None,
             'communication_channel': {
                 'id': InteractionType.face_to_face.value.id,
                 'name': InteractionType.face_to_face.value.name
@@ -202,6 +204,7 @@ class TestGetInteractionView(APITestMixin):
             'id': response_data['id'],
             'kind': 'interaction',
             'is_event': None,
+            'service_delivery_status': None,
             'communication_channel': {
                 'id': InteractionType.face_to_face.value.id,
                 'name': InteractionType.face_to_face.value.name
@@ -311,6 +314,7 @@ class TestAddInteractionView(APITestMixin):
             'id': response_data['id'],
             'kind': 'interaction',
             'is_event': None,
+            'service_delivery_status': None,
             'communication_channel': {
                 'id': InteractionType.face_to_face.value.id,
                 'name': InteractionType.face_to_face.value.name
@@ -388,6 +392,7 @@ class TestAddInteractionView(APITestMixin):
             'id': response_data['id'],
             'kind': 'service_delivery',
             'is_event': True,
+            'service_delivery_status': None,
             'communication_channel': None,
             'subject': 'whatever',
             'date': '2017-04-18',
@@ -469,9 +474,11 @@ class TestAddInteractionView(APITestMixin):
         adviser = AdviserFactory()
         company = CompanyFactory()
         contact = ContactFactory()
+        service_delivery_status = random_obj_for_model(ServiceDeliveryStatus)
         url = reverse('api-v3:interaction:collection')
         request_data = {
             'kind': 'service_delivery',
+            'service_delivery_status': service_delivery_status.pk,
             'is_event': False,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -490,6 +497,10 @@ class TestAddInteractionView(APITestMixin):
             'id': response_data['id'],
             'is_event': False,
             'kind': 'service_delivery',
+            'service_delivery_status': {
+                'id': str(service_delivery_status.pk),
+                'name': service_delivery_status.name,
+            },
             'communication_channel': None,
             'subject': 'whatever',
             'date': '2017-04-18',
@@ -623,7 +634,8 @@ class TestAddInteractionView(APITestMixin):
             'contact': contact.pk,
             'service': Service.trade_enquiry.value.id,
             'dit_team': Team.healthcare_uk.value.id,
-            'event': EventFactory().pk
+            'event': EventFactory().pk,
+            'service_delivery_status': random_obj_for_model(ServiceDeliveryStatus).pk,
         }
         response = self.api_client.post(url, request_data, format='json')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -631,6 +643,7 @@ class TestAddInteractionView(APITestMixin):
         assert response_data == {
             'is_event': ['This field is only valid for service deliveries.'],
             'event': ['This field is only valid for event service deliveries.'],
+            'service_delivery_status': ['This field is only valid for service deliveries.'],
         }
 
     def test_add_service_delivery_with_interaction_fields(self):

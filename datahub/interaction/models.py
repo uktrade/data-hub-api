@@ -128,6 +128,9 @@ class Interaction(BaseModel):
         max_length=MAX_LENGTH, blank=True,
         help_text='Legacy field. File browser path to the archived documents for this interaction.'
     )
+    service_delivery_status = models.ForeignKey(
+        'ServiceDeliveryStatus', blank=True, null=True, on_delete=models.PROTECT
+    )
 
     @property
     def is_event(self):
