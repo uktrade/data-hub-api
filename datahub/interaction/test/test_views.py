@@ -7,10 +7,12 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
-from datahub.core.constants import CommunicationChannel, Service, Team
+from datahub.core.constants import Service, Team
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.event.test.factories import EventFactory
+from datahub.interaction.constants import CommunicationChannel
 from datahub.interaction.models import InteractionPermission, ServiceDeliveryStatus
+
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory, EventServiceDeliveryFactory, InvestmentProjectInteractionFactory,
     ServiceDeliveryFactory,
@@ -71,8 +73,8 @@ class TestGetInteractionView(APITestMixin):
             'is_event': None,
             'service_delivery_status': None,
             'communication_channel': {
-                'id': CommunicationChannel.face_to_face.value.id,
-                'name': CommunicationChannel.face_to_face.value.name
+                'id': str(interaction.communication_channel.pk),
+                'name': interaction.communication_channel.name
             },
             'subject': interaction.subject,
             'date': interaction.date.date().isoformat(),
@@ -136,8 +138,8 @@ class TestGetInteractionView(APITestMixin):
             'is_event': None,
             'service_delivery_status': None,
             'communication_channel': {
-                'id': CommunicationChannel.face_to_face.value.id,
-                'name': CommunicationChannel.face_to_face.value.name
+                'id': str(interaction.communication_channel.pk),
+                'name': interaction.communication_channel.name
             },
             'subject': interaction.subject,
             'date': interaction.date.date().isoformat(),
@@ -206,8 +208,8 @@ class TestGetInteractionView(APITestMixin):
             'is_event': None,
             'service_delivery_status': None,
             'communication_channel': {
-                'id': CommunicationChannel.face_to_face.value.id,
-                'name': CommunicationChannel.face_to_face.value.name
+                'id': str(interaction.communication_channel.pk),
+                'name': interaction.communication_channel.name
             },
             'subject': interaction.subject,
             'date': interaction.date.date().isoformat(),
