@@ -11,5 +11,6 @@ def get_interaction_queryset():
         'communication_channel',
         'investment_project',
         'service',
+        'service_delivery_status',
         'event',
     )
