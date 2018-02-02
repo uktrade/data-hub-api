@@ -232,6 +232,7 @@ class TestViews(APITestMixin):
                 'name': interaction.communication_channel.name,
             },
             'investment_project': None,
+            'service_delivery_status': None,
             'created_on': interaction.created_on.isoformat(),
             'modified_on': interaction.modified_on.isoformat(),
         }]
