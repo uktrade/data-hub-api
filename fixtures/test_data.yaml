@@ -347,6 +347,7 @@
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
     service_delivery_status: ~
+    grant_amount_offered: ~
     dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
     dit_team: 8248318c-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
@@ -364,6 +365,7 @@
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     service: 46cd2e66-dc21-e311-a78e-e4115bead28a
     service_delivery_status: ~
+    grant_amount_offered: ~
     dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
     dit_team: 8248318c-9698-e211-a939-e4115bead28a
     notes: This is a dummy interaction for testing
@@ -382,6 +384,7 @@
     event: ~
     service: f56eb92b-3499-e211-a939-e4115bead28a
     service_delivery_status: ~
+    grant_amount_offered: ~
     dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
     notes: This is a dummy service delivery for testing
     dit_team: 8248318c-9698-e211-a939-e4115bead28a
@@ -403,6 +406,7 @@
     event: bda12a57-433c-4a0c-a7ce-5ebd080e09e8
     service: 9584b82b-3499-e211-a939-e4115bead28a
     service_delivery_status: ~
+    grant_amount_offered: ~
     dit_adviser: e83a608e-84a4-11e6-ae22-56b6b6499611
     notes: This is a dummy service delivery for testing
     dit_team: 602b971d-5df6-e511-888e-e4115bead28a
@@ -425,6 +429,7 @@
     event: ~
     service: 380bba2b-3499-e211-a939-e4115bead28a
     service_delivery_status: 45329c18-6095-e211-a939-e4115bead28a
+    grant_amount_offered: '2500.00'
     dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
     notes: This is a dummy service delivery for testing
     dit_team: 8248318c-9698-e211-a939-e4115bead28a
