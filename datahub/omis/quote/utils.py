@@ -18,10 +18,14 @@ from .constants import QUOTE_EXPIRY_DAYS_BEFORE_DELIVERY, QUOTE_EXPIRY_DAYS_FROM
 QUOTE_TEMPLATE = PurePath(__file__).parent / 'templates/content.md'
 
 
-def escape_markdown(content):
+def escape_markdown(content, escape_html=True):
     """
     Escape markdown characters so that when it's interpreted
     the converted text is not a valid markdown text.
+
+    :param escape_html: html chars are escaped if True.
+        Django already escapes HTML chars automatically when rendering
+        templates so in those cases escape_html cam be safely set to False
     """
     # escape all markdown chars (e.g. replace * with \*)
     content = re.sub(r'([~_\*#\(\)\[\]`\-\+\\])', r'\\\1', content)
@@ -30,7 +34,8 @@ def escape_markdown(content):
     content = re.sub(r'\s+', r' ', content)
 
     # escape html
-    content = html.escape(content)
+    if escape_html:
+        content = html.escape(content)
 
     return content
 
@@ -73,17 +78,17 @@ def generate_quote_content(order, expires_on):
     return render_to_string(
         QUOTE_TEMPLATE,
         {
-            'order_reference': escape_markdown(order.reference),
-            'company_name': escape_markdown(order.company.name),
-            'order_description': escape_markdown(order.description),
+            'order_reference': escape_markdown(order.reference, escape_html=False),
+            'company_name': escape_markdown(order.company.name, escape_html=False),
+            'order_description': escape_markdown(order.description, escape_html=False),
             'order_delivery_date': order.delivery_date,
             'subtotal_cost': pricing.subtotal_cost,
             'quote_expires_on': expires_on,
-            'company_address': escape_markdown(company_address),
-            'contact_name': escape_markdown(order.contact.name),
+            'company_address': escape_markdown(company_address, escape_html=False),
+            'contact_name': escape_markdown(order.contact.name, escape_html=False),
             'contact_email': order.get_current_contact_email(),
             'generic_contact_email': settings.OMIS_GENERIC_CONTACT_EMAIL,
-            'lead_assignee_name': escape_markdown(lead_assignee.adviser.name)
+            'lead_assignee_name': escape_markdown(lead_assignee.adviser.name, escape_html=False)
         }
     )
 
