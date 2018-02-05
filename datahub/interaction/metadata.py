@@ -20,9 +20,3 @@ registry.register(
     metadata_id='service-delivery-status',
     model=models.ServiceDeliveryStatus,
 )
-
-# For backwards compatibility. Will be removed once front end updated.
-registry.register(
-    metadata_id='interaction-type',
-    model=models.CommunicationChannel,
-)
