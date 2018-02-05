@@ -56,6 +56,7 @@ def test_interaction_to_dict(setup_es):
             'name': interaction.investment_project.name,
         },
         'service_delivery_status': None,
+        'grant_amount_offered': None,
         'created_on': interaction.created_on,
         'modified_on': interaction.modified_on,
     }
@@ -105,6 +106,7 @@ def test_service_delivery_to_dict(setup_es):
             'id': str(interaction.service_delivery_status.pk),
             'name': interaction.service_delivery_status.name,
         },
+        'grant_amount_offered': interaction.grant_amount_offered,
         'created_on': interaction.created_on,
         'modified_on': interaction.modified_on,
     }

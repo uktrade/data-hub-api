@@ -1,7 +1,7 @@
 from operator import attrgetter
 
 from django.conf import settings
-from elasticsearch_dsl import Boolean, Date, DocType, Keyword
+from elasticsearch_dsl import Boolean, Date, DocType, Double, Keyword
 
 from datahub.search import dict_utils, dsl_utils
 from datahub.search.models import MapDBModelToDict
@@ -28,6 +28,7 @@ class Interaction(DocType, MapDBModelToDict):
     communication_channel = dsl_utils.id_name_mapping()
     investment_project = dsl_utils.id_name_mapping()
     service_delivery_status = dsl_utils.id_name_mapping()
+    grant_amount_offered = Double()
     created_on = Date()
     modified_on = Date()
 
