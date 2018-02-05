@@ -7,10 +7,12 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
-from datahub.core.constants import InteractionType, Service, Team
+from datahub.core.constants import Service, Team
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.event.test.factories import EventFactory
+from datahub.interaction.constants import CommunicationChannel
 from datahub.interaction.models import InteractionPermission, ServiceDeliveryStatus
+
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory, EventServiceDeliveryFactory, InvestmentProjectInteractionFactory,
     ServiceDeliveryFactory,
@@ -71,8 +73,8 @@ class TestGetInteractionView(APITestMixin):
             'is_event': None,
             'service_delivery_status': None,
             'communication_channel': {
-                'id': InteractionType.face_to_face.value.id,
-                'name': InteractionType.face_to_face.value.name
+                'id': str(interaction.communication_channel.pk),
+                'name': interaction.communication_channel.name
             },
             'subject': interaction.subject,
             'date': interaction.date.date().isoformat(),
@@ -136,8 +138,8 @@ class TestGetInteractionView(APITestMixin):
             'is_event': None,
             'service_delivery_status': None,
             'communication_channel': {
-                'id': InteractionType.face_to_face.value.id,
-                'name': InteractionType.face_to_face.value.name
+                'id': str(interaction.communication_channel.pk),
+                'name': interaction.communication_channel.name
             },
             'subject': interaction.subject,
             'date': interaction.date.date().isoformat(),
@@ -206,8 +208,8 @@ class TestGetInteractionView(APITestMixin):
             'is_event': None,
             'service_delivery_status': None,
             'communication_channel': {
-                'id': InteractionType.face_to_face.value.id,
-                'name': InteractionType.face_to_face.value.name
+                'id': str(interaction.communication_channel.pk),
+                'name': interaction.communication_channel.name
             },
             'subject': interaction.subject,
             'date': interaction.date.date().isoformat(),
@@ -296,7 +298,7 @@ class TestAddInteractionView(APITestMixin):
         url = reverse('api-v3:interaction:collection')
         request_data = {
             'kind': 'interaction',
-            'communication_channel': InteractionType.face_to_face.value.id,
+            'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -316,8 +318,8 @@ class TestAddInteractionView(APITestMixin):
             'is_event': None,
             'service_delivery_status': None,
             'communication_channel': {
-                'id': InteractionType.face_to_face.value.id,
-                'name': InteractionType.face_to_face.value.name
+                'id': CommunicationChannel.face_to_face.value.id,
+                'name': CommunicationChannel.face_to_face.value.name
             },
             'subject': 'whatever',
             'date': '2017-04-18',
@@ -625,7 +627,7 @@ class TestAddInteractionView(APITestMixin):
         request_data = {
             'kind': 'interaction',
             'is_event': False,
-            'communication_channel': InteractionType.face_to_face.value.id,
+            'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -655,7 +657,7 @@ class TestAddInteractionView(APITestMixin):
         request_data = {
             'kind': 'service_delivery',
             'is_event': True,
-            'communication_channel': InteractionType.face_to_face.value.id,
+            'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -683,7 +685,7 @@ class TestAddInteractionView(APITestMixin):
         response = self.api_client.post(url, {
             'kind': 'interaction',
             'contact': contact.pk,
-            'communication_channel': InteractionType.face_to_face.value.id,
+            'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -709,7 +711,7 @@ class TestAddInteractionView(APITestMixin):
         response = self.api_client.post(url, {
             'kind': 'interaction',
             'contact': contact.pk,
-            'communication_channel': InteractionType.face_to_face.value.id,
+            'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': AdviserFactory().pk,
@@ -741,7 +743,7 @@ class TestAddInteractionView(APITestMixin):
         response = self.api_client.post(url, {
             'kind': 'interaction',
             'contact': contact.pk,
-            'communication_channel': InteractionType.face_to_face.value.id,
+            'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': requester.pk,
@@ -773,7 +775,7 @@ class TestAddInteractionView(APITestMixin):
         response = api_client.post(url, {
             'kind': 'interaction',
             'contact': contact.pk,
-            'communication_channel': InteractionType.face_to_face.value.id,
+            'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': requester.pk,
@@ -803,7 +805,7 @@ class TestAddInteractionView(APITestMixin):
             'kind': 'interaction',
             'company': company.pk,
             'contact': contact.pk,
-            'communication_channel': InteractionType.face_to_face.value.id,
+            'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': requester.pk,
