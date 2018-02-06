@@ -136,6 +136,9 @@ class Interaction(BaseModel):
         verbose_name='status',
         help_text='For service deliveries only.'
     )
+    grant_amount_offered = models.DecimalField(
+        null=True, blank=True, max_digits=19, decimal_places=2
+    )
 
     @property
     def is_event(self):

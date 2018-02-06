@@ -55,6 +55,9 @@ class ServiceDeliveryFactory(InteractionFactoryBase):
     service_delivery_status = factory.LazyFunction(
         lambda: random_obj_for_model(ServiceDeliveryStatus)
     )
+    grant_amount_offered = factory.Faker(
+        'pydecimal', left_digits=4, right_digits=2, positive=True
+    )
 
     class Meta:
         model = 'interaction.Interaction'
