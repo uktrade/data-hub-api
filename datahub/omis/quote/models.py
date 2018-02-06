@@ -19,16 +19,24 @@ class TermsAndConditions(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     created_on = models.DateTimeField(
-        db_index=True, auto_now_add=True
+        db_index=True, auto_now_add=True,
+        help_text='Set automatically.'
     )
     name = models.CharField(
         max_length=100,
         help_text='Only used internally.'
     )
-    content = models.TextField()
+    content = models.TextField(
+        help_text=(
+            'In <a href="https://daringfireball.net/projects/markdown/syntax">Markdown</a>. '
+            'You can preview the formatted content using an online editor '
+            'such as <a href="https://dillinger.io/">dillinger.io</a>'
+        )
+    )
 
     class Meta:
         ordering = ('-created_on', )
+        verbose_name_plural = 'terms and conditions'
 
     def __str__(self):
         """Human-readable representation"""

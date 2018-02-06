@@ -1,0 +1,21 @@
+{% extends "admin/change_form.html" %}{% load i18n %}
+
+{% block content %}
+
+<p class="help">
+    {% blocktrans %}Please note that records cannot be changed or deleted after creation.
+    If you want to update the current Terms and Conditions, you need to create a new record.{% endblocktrans %}
+</p>
+<p class="help">
+    {% blocktrans %}The system uses the latest version (based on the created on field) when generating a quote which is then
+    stored against the order and kept permanently.{% endblocktrans %}
+</p>
+{{block.super}}
+{% endblock content %}
+
+
+{% block submit_buttons_bottom %}
+    {% with show_save_and_continue=False %}
+        {% if not change %}{{block.super}}{% endif %}
+    {% endwith %}
+{% endblock %}
