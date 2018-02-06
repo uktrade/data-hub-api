@@ -18,12 +18,12 @@ class Migration(migrations.Migration):
             name='TermsAndConditions',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('created_on', models.DateTimeField(auto_now_add=True, db_index=True)),
+                ('created_on', models.DateTimeField(auto_now_add=True, db_index=True, help_text='Set automatically.')),
                 ('name', models.CharField(help_text='Only used internally.', max_length=100)),
-                ('content', models.TextField()),
+                ('content', models.TextField(help_text='In <a href="https://daringfireball.net/projects/markdown/syntax">Markdown</a>. You can preview the formatted content using an online editor such as <a href="https://dillinger.io/">dillinger.io</a>')),
             ],
             options={
-                'ordering': ('-created_on',),
+                'ordering': ('-created_on',), 'verbose_name_plural': 'terms and conditions'
             },
         ),
         migrations.AddField(
