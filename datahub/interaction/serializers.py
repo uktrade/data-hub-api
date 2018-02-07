@@ -116,11 +116,6 @@ class InteractionSerializer(serializers.ModelSerializer):
                 ),
                 ValidationRule(
                     'invalid_for_interaction',
-                    OperatorRule('event', not_),
-                    when=EqualsRule('kind', Interaction.KINDS.interaction),
-                ),
-                ValidationRule(
-                    'invalid_for_interaction',
                     OperatorRule('is_event', is_blank),
                     when=EqualsRule('kind', Interaction.KINDS.interaction),
                 ),
