@@ -371,7 +371,8 @@ class RulesBasedValidator:
         )
         for rule in self._rules:
             if not rule(combiner):
-                errors[rule.field] = self._serializer.error_messages[rule.error_key]
+                fields_errors = errors.setdefault(rule.field, [])
+                fields_errors.append(self._serializer.error_messages[rule.error_key])
 
         if errors:
             raise serializers.ValidationError(errors)
