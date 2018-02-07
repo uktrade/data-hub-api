@@ -9,6 +9,7 @@ from raven.contrib.django.raven_compat.models import client as raven_client
 
 from datahub.core.utils import executor
 from datahub.omis.market.models import Market
+from datahub.omis.region.models import UKRegionalSettings
 
 from .constants import Template
 
@@ -110,11 +111,11 @@ class Notify:
             )
         )
 
-    def order_created(self, order):
+    def _order_created_for_post_managers(self, order):
         """
-        Send a notification of an order just created.
-        This usually alerts the related overseas manager if it exists or it falls back
-        to notifying the OMIS admin that something is not right.
+        Notify the related overseas manager that a new order has been created
+        if that manager exists or fall back to notifying the OMIS admin
+        that something is not right.
         """
         try:
             market = order.primary_market.market
@@ -153,6 +154,44 @@ class Notify:
                 )
 
             self.order_info(**data)
+
+    def _order_created_for_regional_managers(self, order):
+        """
+        Notify the related regional managers that a new order has been created.
+        """
+        # no UK region specified for this order => skip
+        if not order.uk_region:
+            return
+
+        # no settings for this UK region => skip
+        try:
+            regional_settings = order.uk_region.omis_settings
+        except UKRegionalSettings.DoesNotExist:
+            return
+
+        # no email addresses for this UK region => skip
+        if not regional_settings.manager_emails:
+            return
+
+        for manager_email in regional_settings.manager_emails:
+            self._send_email(
+                email_address=manager_email,
+                template_id=Template.order_created_for_regional_manager.value,
+                personalisation=self._prepare_personalisation(
+                    order,
+                    {
+                        'recipient name': manager_email,
+                        'creator': order.created_by.name if order.created_by else None,
+                    }
+                )
+            )
+
+    def order_created(self, order):
+        """
+        Notify post managers and regional managers that a new order has been created.
+        """
+        self._order_created_for_post_managers(order)
+        self._order_created_for_regional_managers(order)
 
     def adviser_added(self, order, adviser, by, creation_date):
         """Send a notification when an adviser is added to an order."""
