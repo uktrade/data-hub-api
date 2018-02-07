@@ -1,0 +1,22 @@
+- model: company.company
+  pk: a73efeba-8499-11e6-ae22-56b6b6499611
+  fields:
+    company_number: 99919
+    name: Mercury Ltd
+    business_type: 6f75408b-03e7-e611-bca1-e4115bead28a  # Private Limited Company
+    employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
+    turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
+    export_to_countries:
+    - 35afd8d0-5d95-e211-a939-e4115bead28a
+    - 36afd8d0-5d95-e211-a939-e4115bead28a
+    future_interest_countries:
+    - 37afd8d0-5d95-e211-a939-e4115bead28a
+    sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    registered_address_1: 82 Ramsgate Rd
+    registered_address_town: Willington
+    registered_address_postcode: NE28 5JB
+    registered_address_country: 80756b9a-5d95-e211-a939-e4115bead28a  # UK
+    uk_region: 824cd12a-6095-e211-a939-e4115bead28a
+    description: This is a dummy company for testing
+    created_on: '2016-06-05T12:00:00Z'
+    modified_on: '2016-07-05T12:00:00Z'
