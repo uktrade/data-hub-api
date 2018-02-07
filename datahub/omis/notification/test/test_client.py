@@ -9,12 +9,14 @@ from django.conf import settings
 from notifications_python_client.errors import APIError
 
 from datahub.company.test.factories import AdviserFactory
+from datahub.core.constants import UKRegion
 from datahub.core.test_utils import synchronous_executor_submit
 from datahub.omis.market.models import Market
 from datahub.omis.order.test.factories import (
     OrderAssigneeCompleteFactory, OrderAssigneeFactory, OrderCompleteFactory,
     OrderFactory, OrderPaidFactory, OrderSubscriberFactory, OrderWithOpenQuoteFactory
 )
+from datahub.omis.region.models import UKRegionalSettings
 
 from ..client import notify, send_email
 from ..constants import Template
@@ -159,25 +161,45 @@ class TestNotifyOrderInfo:
 class TestNotifyOrderCreated:
     """Tests for notifications sent when an order is created."""
 
-    def test_email_sent_to_manager(self):
+    def test_email_sent_to_managers(self):
         """
-        Test that `.order_created` sends an email to the overseas manager
-        of the market related to the order just created if that is defined.
+        Test that `.order_created` sends an email to
+        - the overseas manager of the market related to the order
+        - the regional managers of the UK region related to the order
         """
         market = Market.objects.first()
         market.manager_email = 'test@test.com'
         market.save()
 
-        order = OrderFactory(primary_market_id=market.country.pk)
+        regional_manager_emails = ['reg1@email.com', 'reg2@email.com']
+        UKRegionalSettings.objects.create(
+            uk_region_id=UKRegion.london.value.id,
+            manager_emails=regional_manager_emails
+        )
+
+        order = OrderFactory(
+            primary_market_id=market.country.pk,
+            uk_region_id=UKRegion.london.value.id
+        )
 
         notify.client.reset_mock()
 
         notify.order_created(order)
 
-        assert notify.client.send_email_notification.called
-        call_args = notify.client.send_email_notification.call_args_list[0][1]
+        assert notify.client.send_email_notification.call_count == 3
+
+        send_email_call_args_list = notify.client.send_email_notification.call_args_list
+
+        # post manager notified
+        call_args = send_email_call_args_list[0][1]
         assert call_args['email_address'] == 'test@test.com'
         assert call_args['template_id'] == Template.order_created_for_post_manager.value
+
+        # regional managers notified
+        for index, call_args in enumerate(send_email_call_args_list[1:]):
+            call_args = call_args[1]
+            assert call_args['email_address'] == regional_manager_emails[index]
+            assert call_args['template_id'] == Template.order_created_for_regional_manager.value
 
     def test_email_sent_to_omis_admin_if_no_manager(self):
         """
@@ -219,6 +241,54 @@ class TestNotifyOrderCreated:
         call_args = notify.client.send_email_notification.call_args_list[0][1]
         assert call_args['email_address'] == settings.OMIS_NOTIFICATION_ADMIN_EMAIL
         assert call_args['template_id'] == Template.generic_order_info.value
+
+    def test_no_email_sent_to_regions_if_region_is_null(self):
+        """
+        Test that if order.uk_region is null, the regional notification does not get
+        triggered.
+        """
+        order = OrderFactory(uk_region_id=None)
+
+        notify.client.reset_mock()
+        notify.order_created(order)
+
+        assert notify.client.send_email_notification.call_count == 1
+        call_args = notify.client.send_email_notification.call_args_list[0][1]
+        assert call_args['template_id'] != Template.order_created_for_regional_manager.value
+
+    def test_no_email_sent_to_regions_without_settings(self):
+        """
+        Test that if there's no UKRegionalSettings record defined for order.uk_region,
+        the regional notification does not get triggered.
+        """
+        assert not UKRegionalSettings.objects.count()
+        order = OrderFactory(uk_region_id=UKRegion.london.value.id)
+
+        notify.client.reset_mock()
+        notify.order_created(order)
+
+        assert notify.client.send_email_notification.call_count == 1
+        call_args = notify.client.send_email_notification.call_args_list[0][1]
+        assert call_args['template_id'] != Template.order_created_for_regional_manager.value
+
+    def test_no_email_sent_to_regions_if_no_manager_email_defined(self):
+        """
+        Test that if the UKRegionalSettings for the order.uk_region does not define any
+        manager emails, the regional notification does not get triggered.
+        """
+        UKRegionalSettings.objects.create(
+            uk_region_id=UKRegion.london.value.id,
+            manager_emails=[]
+        )
+
+        order = OrderFactory(uk_region_id=UKRegion.london.value.id)
+
+        notify.client.reset_mock()
+        notify.order_created(order)
+
+        assert notify.client.send_email_notification.call_count == 1
+        call_args = notify.client.send_email_notification.call_args_list[0][1]
+        assert call_args['template_id'] != Template.order_created_for_regional_manager.value
 
 
 @mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)

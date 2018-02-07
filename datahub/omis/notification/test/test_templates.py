@@ -5,12 +5,14 @@ from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
 
 from datahub.company.test.factories import AdviserFactory
+from datahub.core.constants import UKRegion
 from datahub.core.test_utils import synchronous_executor_submit
 from datahub.omis.market.models import Market
 from datahub.omis.order.test.factories import (
     OrderCompleteFactory, OrderFactory,
     OrderPaidFactory, OrderWithOpenQuoteFactory
 )
+from datahub.omis.region.models import UKRegionalSettings
 
 from ..client import Notify
 
@@ -57,7 +59,15 @@ class TestTemplates:
         market.manager_email = 'test@test.com'
         market.save()
 
-        order = OrderFactory(primary_market_id=market.country.pk)
+        UKRegionalSettings.objects.create(
+            uk_region_id=UKRegion.london.value.id,
+            manager_emails=['reg_test@test.com']
+        )
+
+        order = OrderFactory(
+            primary_market_id=market.country.pk,
+            uk_region_id=UKRegion.london.value.id
+        )
 
         notify.order_created(order)
 
