@@ -19,4 +19,4 @@ shellplus:
 	docker-compose run leeloo python manage.py shell_plus --ipython
 
 load-metadata:
-	docker-compose run leeloo python manage.py loadmetadata
+	docker-compose run leeloo python manage.py loadinitialmetadata
