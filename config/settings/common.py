@@ -66,6 +66,7 @@ LOCAL_APPS = [
     'datahub.omis.core',
     'datahub.omis.order',
     'datahub.omis.market',
+    'datahub.omis.region',
     'datahub.omis.notification',
     'datahub.omis.quote',
     'datahub.omis.invoice',

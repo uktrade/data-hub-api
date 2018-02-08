@@ -12,6 +12,7 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin, create_test_user
+from datahub.interaction.constants import CommunicationChannel
 from datahub.interaction.models import Interaction
 from datahub.interaction.test.factories import CompanyInteractionFactory, ServiceDeliveryFactory
 from datahub.metadata.test.factories import TeamFactory
@@ -232,6 +233,8 @@ class TestViews(APITestMixin):
                 'name': interaction.communication_channel.name,
             },
             'investment_project': None,
+            'service_delivery_status': None,
+            'grant_amount_offered': None,
             'created_on': interaction.created_on.isoformat(),
             'modified_on': interaction.modified_on.isoformat(),
         }]
@@ -470,9 +473,9 @@ class TestViews(APITestMixin):
         """Tests filtering interaction by interaction type."""
         CompanyInteractionFactory.create_batch(
             5,
-            communication_channel_id=constants.InteractionType.email_website.value.id
+            communication_channel_id=CommunicationChannel.email_website.value.id
         )
-        communication_channel_id = constants.InteractionType.social_media.value.id
+        communication_channel_id = CommunicationChannel.social_media.value.id
         CompanyInteractionFactory.create_batch(
             5,
             communication_channel_id=communication_channel_id

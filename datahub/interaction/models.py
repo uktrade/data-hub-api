@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db import models
 from model_utils import Choices
 
-from datahub.core.models import BaseConstantModel, BaseModel
+from datahub.core.models import BaseConstantModel, BaseModel, BaseOrderedConstantModel
 from datahub.core.utils import StrEnum
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -58,6 +58,14 @@ class CommunicationChannel(BaseConstantModel):
     """Communication channel/mode of communication."""
 
 
+class ServiceDeliveryStatus(BaseOrderedConstantModel):
+    """
+    Status of a service delivery.
+
+    Primarily used for Tradeshow Access Programme (TAP) grants.
+    """
+
+
 class Interaction(BaseModel):
     """Interaction."""
 
@@ -88,7 +96,8 @@ class Interaction(BaseModel):
         related_name="%(class)ss",  # noqa: Q000
         blank=True,
         null=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
+        help_text='For service deliveries only.'
     )
     service = models.ForeignKey(
         'metadata.Service', blank=True, null=True, on_delete=models.SET_NULL
@@ -107,18 +116,28 @@ class Interaction(BaseModel):
     )
     communication_channel = models.ForeignKey(
         'CommunicationChannel', blank=True, null=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
+        help_text='For interactions only.',
     )
     investment_project = models.ForeignKey(
         'investment.InvestmentProject',
         related_name="%(class)ss",  # noqa: Q000
         null=True,
         blank=True,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        help_text='For interactions only.',
     )
     archived_documents_url_path = models.CharField(
         max_length=MAX_LENGTH, blank=True,
         help_text='Legacy field. File browser path to the archived documents for this interaction.'
+    )
+    service_delivery_status = models.ForeignKey(
+        'ServiceDeliveryStatus', blank=True, null=True, on_delete=models.PROTECT,
+        verbose_name='status',
+        help_text='For service deliveries only.'
+    )
+    grant_amount_offered = models.DecimalField(
+        null=True, blank=True, max_digits=19, decimal_places=2
     )
 
     @property

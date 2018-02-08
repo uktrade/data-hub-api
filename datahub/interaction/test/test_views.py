@@ -7,10 +7,12 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
-from datahub.core.constants import InteractionType, Service, Team
-from datahub.core.test_utils import APITestMixin, create_test_user
+from datahub.core.constants import Service, Team
+from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.event.test.factories import EventFactory
-from datahub.interaction.models import InteractionPermission
+from datahub.interaction.constants import CommunicationChannel
+from datahub.interaction.models import InteractionPermission, ServiceDeliveryStatus
+
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory, EventServiceDeliveryFactory, InvestmentProjectInteractionFactory,
     ServiceDeliveryFactory,
@@ -69,9 +71,11 @@ class TestGetInteractionView(APITestMixin):
             'id': response_data['id'],
             'kind': 'interaction',
             'is_event': None,
+            'service_delivery_status': None,
+            'grant_amount_offered': None,
             'communication_channel': {
-                'id': InteractionType.face_to_face.value.id,
-                'name': InteractionType.face_to_face.value.name
+                'id': str(interaction.communication_channel.pk),
+                'name': interaction.communication_channel.name
             },
             'subject': interaction.subject,
             'date': interaction.date.date().isoformat(),
@@ -133,9 +137,11 @@ class TestGetInteractionView(APITestMixin):
             'id': response_data['id'],
             'kind': 'interaction',
             'is_event': None,
+            'service_delivery_status': None,
+            'grant_amount_offered': None,
             'communication_channel': {
-                'id': InteractionType.face_to_face.value.id,
-                'name': InteractionType.face_to_face.value.name
+                'id': str(interaction.communication_channel.pk),
+                'name': interaction.communication_channel.name
             },
             'subject': interaction.subject,
             'date': interaction.date.date().isoformat(),
@@ -202,9 +208,11 @@ class TestGetInteractionView(APITestMixin):
             'id': response_data['id'],
             'kind': 'interaction',
             'is_event': None,
+            'service_delivery_status': None,
+            'grant_amount_offered': None,
             'communication_channel': {
-                'id': InteractionType.face_to_face.value.id,
-                'name': InteractionType.face_to_face.value.name
+                'id': str(interaction.communication_channel.pk),
+                'name': interaction.communication_channel.name
             },
             'subject': interaction.subject,
             'date': interaction.date.date().isoformat(),
@@ -293,7 +301,7 @@ class TestAddInteractionView(APITestMixin):
         url = reverse('api-v3:interaction:collection')
         request_data = {
             'kind': 'interaction',
-            'communication_channel': InteractionType.face_to_face.value.id,
+            'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -311,9 +319,11 @@ class TestAddInteractionView(APITestMixin):
             'id': response_data['id'],
             'kind': 'interaction',
             'is_event': None,
+            'service_delivery_status': None,
+            'grant_amount_offered': None,
             'communication_channel': {
-                'id': InteractionType.face_to_face.value.id,
-                'name': InteractionType.face_to_face.value.name
+                'id': CommunicationChannel.face_to_face.value.id,
+                'name': CommunicationChannel.face_to_face.value.name
             },
             'subject': 'whatever',
             'date': '2017-04-18',
@@ -388,6 +398,8 @@ class TestAddInteractionView(APITestMixin):
             'id': response_data['id'],
             'kind': 'service_delivery',
             'is_event': True,
+            'service_delivery_status': None,
+            'grant_amount_offered': None,
             'communication_channel': None,
             'subject': 'whatever',
             'date': '2017-04-18',
@@ -465,13 +477,18 @@ class TestAddInteractionView(APITestMixin):
 
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_add_non_event_service_delivery(self):
-        """Test adding a new non-event service delivery."""
+        """
+        Test adding a new non-event service delivery with blank status and grant amount
+        offered.
+        """
         adviser = AdviserFactory()
         company = CompanyFactory()
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         request_data = {
             'kind': 'service_delivery',
+            'service_delivery_status': None,
+            'grant_amount_offered': None,
             'is_event': False,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -490,6 +507,88 @@ class TestAddInteractionView(APITestMixin):
             'id': response_data['id'],
             'is_event': False,
             'kind': 'service_delivery',
+            'service_delivery_status': None,
+            'grant_amount_offered': None,
+            'communication_channel': None,
+            'subject': 'whatever',
+            'date': '2017-04-18',
+            'dit_adviser': {
+                'id': str(adviser.pk),
+                'first_name': adviser.first_name,
+                'last_name': adviser.last_name,
+                'name': adviser.name
+            },
+            'notes': 'hello',
+            'company': {
+                'id': str(company.pk),
+                'name': company.name
+            },
+            'contact': {
+                'id': str(contact.pk),
+                'name': contact.name
+            },
+            'event': None,
+            'service': {
+                'id': str(Service.trade_enquiry.value.id),
+                'name': Service.trade_enquiry.value.name,
+            },
+            'dit_team': {
+                'id': str(Team.healthcare_uk.value.id),
+                'name': Team.healthcare_uk.value.name,
+            },
+            'investment_project': None,
+            'archived_documents_url_path': '',
+            'created_by': {
+                'id': str(self.user.pk),
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'name': self.user.name
+            },
+            'modified_by': {
+                'id': str(self.user.pk),
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'name': self.user.name
+            },
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z'
+        }
+
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_add_non_event_service_delivery_extended(self):
+        """Test adding a new non-event service delivery with status and grant amount offered."""
+        adviser = AdviserFactory()
+        company = CompanyFactory()
+        contact = ContactFactory()
+        service_delivery_status = random_obj_for_model(ServiceDeliveryStatus)
+        url = reverse('api-v3:interaction:collection')
+        request_data = {
+            'kind': 'service_delivery',
+            'service_delivery_status': service_delivery_status.pk,
+            'grant_amount_offered': '9999.99',
+            'is_event': False,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': adviser.pk,
+            'notes': 'hello',
+            'company': company.pk,
+            'contact': contact.pk,
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id
+        }
+        response = self.api_client.post(url, request_data, format='json')
+
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data == {
+            'id': response_data['id'],
+            'is_event': False,
+            'kind': 'service_delivery',
+            'service_delivery_status': {
+                'id': str(service_delivery_status.pk),
+                'name': service_delivery_status.name,
+            },
+            'grant_amount_offered': '9999.99',
             'communication_channel': None,
             'subject': 'whatever',
             'date': '2017-04-18',
@@ -614,7 +713,7 @@ class TestAddInteractionView(APITestMixin):
         request_data = {
             'kind': 'interaction',
             'is_event': False,
-            'communication_channel': InteractionType.face_to_face.value.id,
+            'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -623,7 +722,9 @@ class TestAddInteractionView(APITestMixin):
             'contact': contact.pk,
             'service': Service.trade_enquiry.value.id,
             'dit_team': Team.healthcare_uk.value.id,
-            'event': EventFactory().pk
+            'event': EventFactory().pk,
+            'service_delivery_status': random_obj_for_model(ServiceDeliveryStatus).pk,
+            'grant_amount_offered': '1111.11',
         }
         response = self.api_client.post(url, request_data, format='json')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -631,6 +732,8 @@ class TestAddInteractionView(APITestMixin):
         assert response_data == {
             'is_event': ['This field is only valid for service deliveries.'],
             'event': ['This field is only valid for event service deliveries.'],
+            'service_delivery_status': ['This field is only valid for service deliveries.'],
+            'grant_amount_offered': ['This field is only valid for service deliveries.'],
         }
 
     def test_add_service_delivery_with_interaction_fields(self):
@@ -642,7 +745,7 @@ class TestAddInteractionView(APITestMixin):
         request_data = {
             'kind': 'service_delivery',
             'is_event': True,
-            'communication_channel': InteractionType.face_to_face.value.id,
+            'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -670,7 +773,7 @@ class TestAddInteractionView(APITestMixin):
         response = self.api_client.post(url, {
             'kind': 'interaction',
             'contact': contact.pk,
-            'communication_channel': InteractionType.face_to_face.value.id,
+            'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -696,7 +799,7 @@ class TestAddInteractionView(APITestMixin):
         response = self.api_client.post(url, {
             'kind': 'interaction',
             'contact': contact.pk,
-            'communication_channel': InteractionType.face_to_face.value.id,
+            'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': AdviserFactory().pk,
@@ -728,7 +831,7 @@ class TestAddInteractionView(APITestMixin):
         response = self.api_client.post(url, {
             'kind': 'interaction',
             'contact': contact.pk,
-            'communication_channel': InteractionType.face_to_face.value.id,
+            'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': requester.pk,
@@ -760,7 +863,7 @@ class TestAddInteractionView(APITestMixin):
         response = api_client.post(url, {
             'kind': 'interaction',
             'contact': contact.pk,
-            'communication_channel': InteractionType.face_to_face.value.id,
+            'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': requester.pk,
@@ -790,7 +893,7 @@ class TestAddInteractionView(APITestMixin):
             'kind': 'interaction',
             'company': company.pk,
             'contact': contact.pk,
-            'communication_channel': InteractionType.face_to_face.value.id,
+            'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': requester.pk,
@@ -945,6 +1048,21 @@ class TestUpdateInteractionView(APITestMixin):
         response_data = response.json()
         assert response_data['date'] == [
             'Datetime has wrong format. Use one of these formats instead: YYYY-MM-DD.'
+        ]
+
+    def test_negative_grant_amount_is_rejected(self):
+        """Test validation when an a negative grant amount offered is entered."""
+        interaction = ServiceDeliveryFactory()
+
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        response = self.api_client.patch(url, {
+            'grant_amount_offered': '-100.00',
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data['grant_amount_offered'] == [
+            'Ensure this value is greater than or equal to 0.'
         ]
 
 

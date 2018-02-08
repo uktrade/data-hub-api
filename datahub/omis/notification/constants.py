@@ -7,6 +7,7 @@ class Template(Enum):
     generic_order_info = '53055338-6acd-4dd6-b315-d1bd74015eb2'
 
     order_created_for_post_manager = '335f5402-f610-43ef-bfcf-e196215b3cf1'
+    order_created_for_regional_manager = '15a7824a-b179-4ffb-a8a1-74ba89285e20'
     you_have_been_added_for_adviser = '1c631f72-4d33-41f5-ba9b-12862b5b273a'
     you_have_been_removed_for_adviser = '07668530-2dc1-4dde-9a12-9144fc303eb7'
 
