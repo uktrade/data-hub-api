@@ -3,8 +3,9 @@ from django.utils.timezone import utc
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
+from datahub.core.test_utils import random_obj_for_model
 from datahub.event.test.factories import EventFactory
-from datahub.interaction.models import Interaction
+from datahub.interaction.models import CommunicationChannel, Interaction, ServiceDeliveryStatus
 from datahub.investment.test.factories import InvestmentProjectFactory
 
 
@@ -31,7 +32,9 @@ class CompanyInteractionFactory(InteractionFactoryBase):
 
     kind = Interaction.KINDS.interaction
     company = factory.SubFactory(CompanyFactory)
-    communication_channel_id = constants.InteractionType.face_to_face.value.id
+    communication_channel = factory.LazyFunction(
+        lambda: random_obj_for_model(CommunicationChannel)
+    )
 
 
 class InvestmentProjectInteractionFactory(InteractionFactoryBase):
@@ -39,7 +42,9 @@ class InvestmentProjectInteractionFactory(InteractionFactoryBase):
 
     kind = Interaction.KINDS.interaction
     investment_project = factory.SubFactory(InvestmentProjectFactory)
-    communication_channel_id = constants.InteractionType.face_to_face.value.id
+    communication_channel = factory.LazyFunction(
+        lambda: random_obj_for_model(CommunicationChannel)
+    )
 
 
 class ServiceDeliveryFactory(InteractionFactoryBase):
@@ -47,6 +52,12 @@ class ServiceDeliveryFactory(InteractionFactoryBase):
 
     kind = Interaction.KINDS.service_delivery
     company = factory.SubFactory(CompanyFactory)
+    service_delivery_status = factory.LazyFunction(
+        lambda: random_obj_for_model(ServiceDeliveryStatus)
+    )
+    grant_amount_offered = factory.Faker(
+        'pydecimal', left_digits=4, right_digits=2, positive=True
+    )
 
     class Meta:
         model = 'interaction.Interaction'
