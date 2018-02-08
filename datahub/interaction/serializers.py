@@ -117,20 +117,8 @@ class InteractionSerializer(serializers.ModelSerializer):
                 ValidationRule(
                     'invalid_for_interaction',
                     OperatorRule('is_event', is_blank),
-                    when=EqualsRule('kind', Interaction.KINDS.interaction),
-                ),
-                ValidationRule(
-                    'invalid_for_interaction',
                     OperatorRule('service_delivery_status', is_blank),
-                    when=EqualsRule('kind', Interaction.KINDS.interaction),
-                ),
-                ValidationRule(
-                    'invalid_for_interaction',
                     OperatorRule('grant_amount_offered', is_blank),
-                    when=EqualsRule('kind', Interaction.KINDS.interaction),
-                ),
-                ValidationRule(
-                    'invalid_for_interaction',
                     OperatorRule('net_company_receipt', is_blank),
                     when=EqualsRule('kind', Interaction.KINDS.interaction),
                 ),
