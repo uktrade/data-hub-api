@@ -29,6 +29,7 @@ class Interaction(DocType, MapDBModelToDict):
     investment_project = dsl_utils.id_name_mapping()
     service_delivery_status = dsl_utils.id_name_mapping()
     grant_amount_offered = Double()
+    net_company_receipt = Double()
     created_on = Date()
     modified_on = Date()
 
