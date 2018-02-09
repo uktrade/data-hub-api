@@ -137,7 +137,12 @@ class Interaction(BaseModel):
         help_text='For service deliveries only.'
     )
     grant_amount_offered = models.DecimalField(
-        null=True, blank=True, max_digits=19, decimal_places=2
+        null=True, blank=True, max_digits=19, decimal_places=2,
+        help_text='For service deliveries only.',
+    )
+    net_company_receipt = models.DecimalField(
+        null=True, blank=True, max_digits=19, decimal_places=2,
+        help_text='For service deliveries only.',
     )
 
     @property

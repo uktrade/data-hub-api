@@ -209,8 +209,8 @@ def test_conditional_rule(rule_res, when_res, res):
     assert rule(combiner) == res
 
 
-def _make_stub_rule(field, return_value):
-    return Mock(return_value=return_value, field=field, error_key='error')
+def _make_stub_rule(field, return_value, error_key='error'):
+    return Mock(return_value=return_value, field=field, error_key=error_key)
 
 
 class TestRulesBasedValidator:
@@ -231,21 +231,31 @@ class TestRulesBasedValidator:
     @pytest.mark.parametrize('rules,errors', (
         (
             (_make_stub_rule('field1', False),),
-            {'field1': 'test error'}
+            {'field1': ['test error']}
         ),
         (
             (_make_stub_rule('field1', False), _make_stub_rule('field2', False),),
-            {'field1': 'test error', 'field2': 'test error'}
+            {'field1': ['test error'], 'field2': ['test error']}
         ),
         (
             (_make_stub_rule('field1', False), _make_stub_rule('field2', True),),
-            {'field1': 'test error'}
+            {'field1': ['test error']}
+        ),
+        (
+            (
+                _make_stub_rule('field1', False),
+                _make_stub_rule('field1', False, error_key='error2'),
+            ),
+            {'field1': ['test error', 'test error 2']}
         ),
     ))
     def test_validation_fails(self, rules, errors):
         """Test that validation fails when any rule fails."""
         instance = Mock()
-        serializer = Mock(instance=instance, error_messages={'error': 'test error'})
+        serializer = Mock(instance=instance, error_messages={
+            'error': 'test error',
+            'error2': 'test error 2',
+        })
         validator = RulesBasedValidator(*rules)
         validator.set_context(serializer)
         with pytest.raises(ValidationError) as excinfo:
