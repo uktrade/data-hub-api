@@ -6,7 +6,7 @@ from . import models
 
 
 class ServiceTypeFixtures(Fixture):
-    """Metadata fixtures (for the loadmetadata command)."""
+    """Metadata fixtures (for the loadinitialmetadata command)."""
 
     files = [
         'fixtures/service_types.yaml'
@@ -14,7 +14,7 @@ class ServiceTypeFixtures(Fixture):
 
 
 class CancellationReasonFixtures(Fixture):
-    """Metadata fixtures (for the loadmetadata command)."""
+    """Metadata fixtures (for the loadinitialmetadata command)."""
 
     files = [
         'fixtures/cancellation_reasons.yaml'
