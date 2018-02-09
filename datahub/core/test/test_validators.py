@@ -11,9 +11,11 @@ from datahub.core.validators import (
     AnyOfValidator,
     ConditionalRule,
     EqualsRule,
+    FieldAndError,
     OperatorRule,
     RequiredUnlessAlreadyBlankValidator,
     RulesBasedValidator,
+    ValidationRule,
 )
 
 
@@ -199,7 +201,7 @@ def test_equals_rule(data, field, test_value, res):
     (False, False, True),
 ))
 def test_conditional_rule(rule_res, when_res, res):
-    """Tests ValidationRule for various cases."""
+    """Tests ConditionalRule for various cases."""
     combiner = Mock(spec_set=DataCombiner)
     rule = Mock(spec_set=OperatorRule)
     rule.return_value = rule_res
@@ -209,16 +211,54 @@ def test_conditional_rule(rule_res, when_res, res):
     assert rule(combiner) == res
 
 
-def _make_stub_rule(field, return_value, error_key='error'):
-    return Mock(return_value=return_value, field=field, error_key=error_key)
+def _make_stub_rule(field, is_valid):
+    return Mock(return_value=is_valid, field=field)
+
+
+@pytest.mark.parametrize('rules,when,res', (
+    (
+        (_make_stub_rule('field1', False),),
+        _make_stub_rule('field_when', True),
+        [FieldAndError('field1', 'error')],
+    ),
+    (
+        (_make_stub_rule('field1', False), _make_stub_rule('field2', False),),
+        _make_stub_rule('field_when', True),
+        [FieldAndError('field1', 'error'), FieldAndError('field2', 'error')],
+    ),
+    (
+        (_make_stub_rule('field1', True), _make_stub_rule('field2', False),),
+        _make_stub_rule('field_when', True),
+        [FieldAndError('field2', 'error')],
+    ),
+    (
+        (_make_stub_rule('field1', True),),
+        _make_stub_rule('field_when', False),
+        [],
+    ),
+    (
+        (_make_stub_rule('field1', False),),
+        _make_stub_rule('field_when', False),
+        [],
+    ),
+))
+def test_validation_rule(rules, when, res):
+    """Tests ValidationRule for various cases."""
+    combiner = Mock(spec_set=DataCombiner)
+    rule = ValidationRule('error', *rules, when=when)
+    assert rule(combiner) == res
+
+
+def _make_stub_validation_rule(errors=None):
+    return Mock(return_value=errors)
 
 
 class TestRulesBasedValidator:
     """RulesBasedValidator tests."""
 
     @pytest.mark.parametrize('rules', (
-        (_make_stub_rule('field1', True),),
-        (_make_stub_rule('field1', True), _make_stub_rule(True, 'field2')),
+        (_make_stub_validation_rule([]),),
+        (_make_stub_validation_rule([]), _make_stub_validation_rule([])),
     ))
     def test_validation_passes(self, rules):
         """Test that validation passes when the rules pass."""
@@ -230,21 +270,29 @@ class TestRulesBasedValidator:
 
     @pytest.mark.parametrize('rules,errors', (
         (
-            (_make_stub_rule('field1', False),),
-            {'field1': ['test error']}
-        ),
-        (
-            (_make_stub_rule('field1', False), _make_stub_rule('field2', False),),
-            {'field1': ['test error'], 'field2': ['test error']}
-        ),
-        (
-            (_make_stub_rule('field1', False), _make_stub_rule('field2', True),),
+            (
+                _make_stub_validation_rule([FieldAndError('field1', 'error')]),
+            ),
             {'field1': ['test error']}
         ),
         (
             (
-                _make_stub_rule('field1', False),
-                _make_stub_rule('field1', False, error_key='error2'),
+                _make_stub_validation_rule([FieldAndError('field1', 'error')]),
+                _make_stub_validation_rule([FieldAndError('field2', 'error')]),
+            ),
+            {'field1': ['test error'], 'field2': ['test error']}
+        ),
+        (
+            (
+                _make_stub_validation_rule([FieldAndError('field1', 'error')]),
+                _make_stub_validation_rule([]),
+            ),
+            {'field1': ['test error']}
+        ),
+        (
+            (
+                _make_stub_validation_rule([FieldAndError('field1', 'error')]),
+                _make_stub_validation_rule([FieldAndError('field1', 'error2')]),
             ),
             {'field1': ['test error', 'test error 2']}
         ),
