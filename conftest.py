@@ -14,7 +14,6 @@ def django_db_setup(django_db_setup, django_db_blocker):
         # force=True is not necessary, but saves a few seconds as it doesn't check if there is
         # any existing data
         call_command('loadinitialmetadata', force=True)
-        call_command('load_omis_metadata')
 
 
 @pytest.fixture(scope='session', autouse=True)
