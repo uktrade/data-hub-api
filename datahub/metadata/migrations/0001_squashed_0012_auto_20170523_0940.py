@@ -49,17 +49,6 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='InteractionType',
-            fields=[
-                ('id', models.UUIDField(primary_key=True, serialize=False)),
-                ('name', models.TextField(blank=True)),
-            ],
-            options={
-                'ordering': ('name',),
-                'abstract': False,
-            },
-        ),
-        migrations.CreateModel(
             name='Role',
             fields=[
                 ('id', models.UUIDField(primary_key=True, serialize=False)),
@@ -135,18 +124,6 @@ class Migration(migrations.Migration):
             options={
                 'ordering': ('name',),
                 'abstract': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='ServiceDeliveryStatus',
-            fields=[
-                ('id', models.UUIDField(primary_key=True, serialize=False)),
-                ('name', models.TextField(blank=True)),
-            ],
-            options={
-                'abstract': False,
-                'verbose_name_plural': 'service delivery statuses',
-                'ordering': ('name',),
             },
         ),
         migrations.CreateModel(

@@ -9,11 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('metadata', '0006_remove_interaction_type'),
-        ('interaction', '0014_remove_service_delivery'),
     ]
 
     operations = [
-        migrations.DeleteModel(
-            name='ServiceDeliveryStatus',
-        ),
     ]
