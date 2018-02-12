@@ -8,7 +8,6 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('investment', '0025_remove_non_fdi_type'),
         ('metadata', '0009_adding_read_permissions'),
     ]
 
