@@ -27,6 +27,7 @@ class CompanySearchApp(SearchApp):
         'headquarter_type',
         'one_list_account_owner',
         'parent',
+        'global_headquarter',
         'registered_address_country',
         'sector',
         'trading_address_country',

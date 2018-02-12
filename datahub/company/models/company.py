@@ -130,6 +130,10 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         'self', blank=True, null=True, on_delete=models.SET_NULL,
         related_name='children'
     )
+    global_headquarter = models.ForeignKey(
+        'self', blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='subsidiaries',
+    )
     one_list_account_owner = models.ForeignKey(
         'Advisor', blank=True, null=True, on_delete=models.SET_NULL,
         related_name='one_list_owned_companies'

@@ -40,6 +40,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'headquarter_type',
         'one_list_account_owner',
         'parent',
+        'global_headquarter',
         'registered_address_country',
         'sector',
         'trading_address_country',
@@ -49,6 +50,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         Prefetch('contacts', queryset=get_contact_queryset()),
         Prefetch('investor_investment_projects', queryset=get_slim_investment_project_queryset()),
         'children',
+        'subsidiaries',
         'export_to_countries',
         'future_interest_countries',
     )
