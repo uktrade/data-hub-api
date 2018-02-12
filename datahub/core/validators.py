@@ -3,7 +3,6 @@ from collections import namedtuple
 from functools import partial
 from operator import eq
 from typing import Any, Callable, Sequence
-
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -234,6 +233,15 @@ class OperatorRule(BaseRule):
     def __call__(self, combiner) -> bool:
         """Test whether the rule passes or fails."""
         value = combiner[self.field]
+        return self._operator(value)
+
+
+class ForeignKeyOperatorRule(OperatorRule):
+    """Simple operator-based rule when object pointed by foreign key is required."""
+
+    def __call__(self, combiner) -> bool:
+        """Test whether the rule passes or fails."""
+        value = combiner.get_value(self.field)
         return self._operator(value)
 
 

@@ -35,6 +35,7 @@ def test_company_dbmodel_to_dict(setup_es):
         'name',
         'one_list_account_owner',
         'parent',
+        'global_headquarter',
         'reference_code',
         'registered_address_1',
         'registered_address_2',

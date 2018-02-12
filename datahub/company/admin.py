@@ -27,6 +27,7 @@ class CompanyAdmin(BaseModelVersionAdmin):
     )
     raw_id_fields = (
         'parent',
+        'global_headquarter',
         'one_list_account_owner',
         'account_manager',
         'archived_by',

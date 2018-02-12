@@ -14,6 +14,7 @@ from datahub.company.models import (
 from datahub.company.validators import (
     has_no_invalid_company_number_characters,
     has_uk_establishment_number_prefix,
+    is_company_a_global_headquarter,
 )
 from datahub.core.constants import Country
 from datahub.core.serializers import (
@@ -24,6 +25,7 @@ from datahub.core.validators import (
     AllIsBlankRule,
     AnyIsNotBlankRule,
     EqualsRule,
+    ForeignKeyOperatorRule,
     OperatorRule,
     RequiredUnlessAlreadyBlankValidator,
     RulesBasedValidator,
@@ -200,7 +202,10 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         ),
         'uk_establishment_not_in_uk': ugettext_lazy(
             'A UK establishment (branch of non-UK company) must be in the UK.'
-        )
+        ),
+        'global_headquarter_company_is_not_a_global_headquarter': ugettext_lazy(
+            'Company to be set as Global Headquarter must be a Global Headquarter.'
+        ),
     }
 
     registered_address_country = NestedRelatedField(meta_models.Country)
@@ -216,6 +221,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         meta_models.BusinessType, required=False, allow_null=True
     )
     children = NestedRelatedField('company.Company', many=True, required=False)
+    subsidiaries = NestedRelatedField('company.Company', many=True, required=False)
     classification = NestedRelatedField(
         meta_models.CompanyClassification, required=False, allow_null=True
     )
@@ -237,6 +243,9 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         required=False, allow_null=True
     )
     parent = NestedRelatedField(
+        'company.Company', required=False, allow_null=True
+    )
+    global_headquarter = NestedRelatedField(
         'company.Company', required=False, allow_null=True
     )
     sector = NestedRelatedField(meta_models.Sector, required=False, allow_null=True)
@@ -298,6 +307,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'account_manager',
             'business_type',
             'children',
+            'subsidiaries',
             'classification',
             'companies_house_data',
             'contacts',
@@ -307,6 +317,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'headquarter_type',
             'one_list_account_owner',
             'parent',
+            'global_headquarter',
             'sector',
             'turnover_range',
             'uk_region',
@@ -354,6 +365,11 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                     when=EqualsRule('business_type',
                                     BusinessTypeConstant.uk_establishment.value.id),
                 ),
+                ValidationRule(
+                    'global_headquarter_company_is_not_a_global_headquarter',
+                    ForeignKeyOperatorRule('global_headquarter', is_company_a_global_headquarter),
+                    when=OperatorRule('global_headquarter', bool)
+                )
             ),
             AddressValidator(lazy=True, fields_mapping=Company.TRADING_ADDRESS_VALIDATION_MAPPING),
         ]
