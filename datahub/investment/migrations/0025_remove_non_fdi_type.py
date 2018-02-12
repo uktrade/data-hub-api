@@ -12,8 +12,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='investmentproject',
-            name='non_fdi_type',
-        ),
     ]

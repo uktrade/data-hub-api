@@ -61,7 +61,6 @@ class Migration(migrations.Migration):
                 ('intermediate_company', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='intermediate_investment_projects', to='company.Company')),
                 ('investment_type', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='investment_projects', to='metadata.InvestmentType')),
                 ('investor_company', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='investor_investment_projects', to='company.Company')),
-                ('non_fdi_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='investment_projects', to='metadata.NonFDIType')),
                 ('stage', models.ForeignKey(default='8a320cc9-ae2e-443e-9d26-2f36452c2ced', on_delete=django.db.models.deletion.PROTECT, related_name='investment_projects', to='metadata.InvestmentProjectStage')),
                 ('project_assurance_adviser', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
                 ('project_manager', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
