@@ -20,6 +20,18 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
+            name='CommunicationChannel',
+            fields=[
+                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
+                ('name', models.TextField(blank=True)),
+                ('disabled_on', models.DateTimeField(blank=True, null=True)),
+            ],
+            options={
+                'ordering': ('name',),
+                'abstract': False,
+            },
+        ),
+        migrations.CreateModel(
             name='Interaction',
             fields=[
                 ('created_on', models.DateTimeField(auto_now_add=True, null=True)),
@@ -32,7 +44,7 @@ class Migration(migrations.Migration):
                 ('contact', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='interactions', to='company.Contact')),
                 ('dit_advisor', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='interactions', to=settings.AUTH_USER_MODEL)),
                 ('dit_team', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.Team')),
-                ('interaction_type', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.InteractionType')),
+                ('interaction_type', models.ForeignKey(blank=True, null=True, on_delete=models.deletion.SET_NULL, to='interaction.CommunicationChannel', help_text='For interactions only.')),
                 ('service', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.Service')),
             ],
             options={

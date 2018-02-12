@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='interaction',
             name='interaction_type',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.InteractionType'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=models.deletion.SET_NULL, to='interaction.CommunicationChannel', help_text='For interactions only.'),
         ),
         migrations.AlterField(
             model_name='interaction',
