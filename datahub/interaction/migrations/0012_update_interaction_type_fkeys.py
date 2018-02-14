@@ -12,11 +12,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='interaction',
-            name='communication_channel',
-            field=models.ForeignKey(blank=True, null=True, on_delete=models.deletion.SET_NULL,
-                                    to='interaction.CommunicationChannel',
-                                    help_text='For interactions only.')
-        )
     ]
