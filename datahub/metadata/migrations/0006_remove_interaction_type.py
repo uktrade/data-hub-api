@@ -9,15 +9,10 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('metadata', '0005_auto_20171002_0950'),
-        ('interaction', '0013_rename_interaction_type_table'),
     ]
 
     state_operations = [
-        migrations.DeleteModel(
-            name='InteractionType',
-        ),
     ]
 
     operations = [
-        migrations.SeparateDatabaseAndState(state_operations=state_operations)
     ]
