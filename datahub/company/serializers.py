@@ -367,7 +367,10 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 ),
                 ValidationRule(
                     'global_headquarters_company_is_not_a_global_headquarters',
-                    ForeignKeyOperatorRule('global_headquarters', is_company_a_global_headquarters),
+                    ForeignKeyOperatorRule(
+                        'global_headquarters',
+                        is_company_a_global_headquarters
+                    ),
                     when=OperatorRule('global_headquarters', bool)
                 )
             ),
