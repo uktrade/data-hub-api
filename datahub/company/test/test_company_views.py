@@ -198,7 +198,7 @@ class TestGetCompany(APITestMixin):
             'modified_on': format_date_or_datetime(company.modified_on),
             'one_list_account_owner': None,
             'parent': None,
-            'global_headquarter': None,
+            'global_headquarters': None,
             'sector': {
                 'id': str(company.sector.id),
                 'name': company.sector.name,
@@ -504,7 +504,7 @@ class TestUpdateCompany(APITestMixin):
         (HeadquarterType.ghq.value.id, True),
         (None, False),
     ))
-    def test_update_company_global_headquarters_with_not_a_global_headquarter(self, hq, is_valid):
+    def test_update_company_global_headquarters_with_not_a_global_headquarters(self, hq, is_valid):
         """Tests if adding company that is not a Global HQ as a Global HQ
         will fail or if added company is a Global HQ then it will pass.
         """
@@ -514,36 +514,36 @@ class TestUpdateCompany(APITestMixin):
         # now update it
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
         response = self.api_client.patch(url, format='json', data={
-            'global_headquarter': headquarter.id,
+            'global_headquarters': headquarter.id,
         })
         if is_valid:
             assert response.status_code == status.HTTP_200_OK
             if hq is not None:
-                assert response.data['global_headquarter']['id'] == str(headquarter.id)
+                assert response.data['global_headquarters']['id'] == str(headquarter.id)
         else:
             assert response.status_code == status.HTTP_400_BAD_REQUEST
-            error = ['Company to be set as Global Headquarter must be a Global Headquarter.']
-            assert response.data['global_headquarter'] == error
+            error = ['Company to be linked as global headquarters must be a global headquarters.']
+            assert response.data['global_headquarters'] == error
 
-    def test_remove_global_headquarter_link(self):
+    def test_remove_global_headquarters_link(self):
         """Tests if we can remove global headquarter link."""
-        global_headquarter = CompanyFactory(
+        global_headquarters = CompanyFactory(
             headquarter_type_id=HeadquarterType.ghq.value.id
         )
-        company = CompanyFactory(global_headquarter=global_headquarter)
+        company = CompanyFactory(global_headquarters=global_headquarters)
 
-        assert global_headquarter.subsidiaries.count() == 1
+        assert global_headquarters.subsidiaries.count() == 1
 
         # now update it
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
         response = self.api_client.patch(url, format='json', data={
-            'global_headquarter': None,
+            'global_headquarters': None,
         })
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['global_headquarter'] is None
+        assert response.data['global_headquarters'] is None
 
-        assert global_headquarter.subsidiaries.count() == 0
+        assert global_headquarters.subsidiaries.count() == 0
 
 
 class TestAddCompany(APITestMixin):
