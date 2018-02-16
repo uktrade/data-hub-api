@@ -14,7 +14,7 @@ from datahub.company.models import (
 from datahub.company.validators import (
     has_no_invalid_company_number_characters,
     has_uk_establishment_number_prefix,
-    is_company_a_global_headquarter,
+    is_company_a_global_headquarters,
 )
 from datahub.core.constants import Country
 from datahub.core.serializers import (
@@ -203,8 +203,8 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         'uk_establishment_not_in_uk': ugettext_lazy(
             'A UK establishment (branch of non-UK company) must be in the UK.'
         ),
-        'global_headquarter_company_is_not_a_global_headquarter': ugettext_lazy(
-            'Company to be set as Global Headquarter must be a Global Headquarter.'
+        'global_headquarters_company_is_not_a_global_headquarters': ugettext_lazy(
+            'Company to be linked as global headquarters must be a global headquarters.'
         ),
     }
 
@@ -245,7 +245,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     parent = NestedRelatedField(
         'company.Company', required=False, allow_null=True
     )
-    global_headquarter = NestedRelatedField(
+    global_headquarters = NestedRelatedField(
         'company.Company', required=False, allow_null=True
     )
     sector = NestedRelatedField(meta_models.Sector, required=False, allow_null=True)
@@ -317,7 +317,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'headquarter_type',
             'one_list_account_owner',
             'parent',
-            'global_headquarter',
+            'global_headquarters',
             'sector',
             'turnover_range',
             'uk_region',
@@ -366,9 +366,9 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                                     BusinessTypeConstant.uk_establishment.value.id),
                 ),
                 ValidationRule(
-                    'global_headquarter_company_is_not_a_global_headquarter',
-                    ForeignKeyOperatorRule('global_headquarter', is_company_a_global_headquarter),
-                    when=OperatorRule('global_headquarter', bool)
+                    'global_headquarters_company_is_not_a_global_headquarters',
+                    ForeignKeyOperatorRule('global_headquarters', is_company_a_global_headquarters),
+                    when=OperatorRule('global_headquarters', bool)
                 )
             ),
             AddressValidator(lazy=True, fields_mapping=Company.TRADING_ADDRESS_VALIDATION_MAPPING),

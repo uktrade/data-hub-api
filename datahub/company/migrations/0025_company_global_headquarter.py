@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='company',
-            name='global_headquarter',
+            name='global_headquarters',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='subsidiaries', to='company.Company'),
         ),
     ]

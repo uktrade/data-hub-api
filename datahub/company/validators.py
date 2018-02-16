@@ -14,8 +14,8 @@ def has_no_invalid_company_number_characters(value):
     return not value or not _INVALID_COMPANY_NUMBER_RE.search(value)
 
 
-def is_company_a_global_headquarter(value):
-    """Checks if company is a global headquarter."""
+def is_company_a_global_headquarters(value):
+    """Checks if company is a global headquarters."""
     if value is None or value.headquarter_type is None:
         return False
 

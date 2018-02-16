@@ -130,7 +130,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         'self', blank=True, null=True, on_delete=models.SET_NULL,
         related_name='children'
     )
-    global_headquarter = models.ForeignKey(
+    global_headquarters = models.ForeignKey(
         'self', blank=True, null=True, on_delete=models.SET_NULL,
         related_name='subsidiaries',
     )

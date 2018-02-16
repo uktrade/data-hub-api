@@ -501,7 +501,7 @@ class TestSearchExport(APITestMixin):
                 'export_experience_category',
                 'export_to_countries',
                 'future_interest_countries',
-                'global_headquarter',
+                'global_headquarters',
                 'headquarter_type',
                 'id',
                 'modified_on',

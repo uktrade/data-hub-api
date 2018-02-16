@@ -5,7 +5,7 @@ import pytest
 from datahub.company.validators import (
     has_no_invalid_company_number_characters,
     has_uk_establishment_number_prefix,
-    is_company_a_global_headquarter,
+    is_company_a_global_headquarters,
 )
 from datahub.core.constants import HeadquarterType
 
@@ -39,6 +39,6 @@ def test_has_uk_establishment_number_prefix(company_number, is_valid):
     (Mock(headquarter_type=None), False),
     (Mock(headquarter_type=Mock(id=HeadquarterType.ghq.value.id)), True),
 ))
-def test_is_company_a_global_headquarter(company, is_valid):
-    """Tests validation of Global Headquarter."""
-    assert is_company_a_global_headquarter(company) == is_valid
+def test_is_company_a_global_headquarters(company, is_valid):
+    """Tests validation of Global Headquarters."""
+    assert is_company_a_global_headquarters(company) == is_valid

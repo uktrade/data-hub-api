@@ -40,7 +40,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'headquarter_type',
         'one_list_account_owner',
         'parent',
-        'global_headquarter',
+        'global_headquarters',
         'registered_address_country',
         'sector',
         'trading_address_country',
