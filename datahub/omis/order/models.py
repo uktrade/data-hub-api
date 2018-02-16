@@ -341,7 +341,7 @@ class Order(BaseModel):
 
     def get_public_facing_url(self):
         """Return the url to the OMIS public facing order page."""
-        return f'{settings.OMIS_PUBLIC_BASE_URL}/{self.public_token}'
+        return settings.OMIS_PUBLIC_ORDER_URL.format(public_token=self.public_token)
 
     @transaction.atomic
     def generate_quote(self, by, commit=True):
