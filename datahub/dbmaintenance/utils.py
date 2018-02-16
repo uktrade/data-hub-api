@@ -1,4 +1,4 @@
-from rest_framework.fields import BooleanField, DateField, EmailField, UUIDField
+from rest_framework.fields import BooleanField, DateField, DecimalField, EmailField, UUIDField
 
 
 def parse_bool(value):
@@ -9,6 +9,11 @@ def parse_bool(value):
 def parse_date(value):
     """Parses a date from a string."""
     return _parse_value(value, DateField())
+
+
+def parse_decimal(value, max_digits=19, decimal_places=2):
+    """Parses a decimal from a string."""
+    return _parse_value(value, DecimalField(max_digits, decimal_places))
 
 
 def parse_email(value):
