@@ -26,6 +26,7 @@ from datahub.core.validators import (
     AnyIsNotBlankRule,
     EqualsRule,
     ForeignKeyOperatorRule,
+    IsModelIdNotEqualToForeignKeyId,
     OperatorRule,
     RequiredUnlessAlreadyBlankValidator,
     RulesBasedValidator,
@@ -206,6 +207,9 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         'global_headquarters_company_is_not_a_global_headquarters': ugettext_lazy(
             'Company to be linked as global headquarters must be a global headquarters.'
         ),
+        'invalid_global_headquarters': ugettext_lazy(
+            'Global headquarters cannot point to itself.'
+        )
     }
 
     registered_address_country = NestedRelatedField(meta_models.Country)
@@ -366,12 +370,17 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                                     BusinessTypeConstant.uk_establishment.value.id),
                 ),
                 ValidationRule(
+                    'invalid_global_headquarters',
+                    IsModelIdNotEqualToForeignKeyId('global_headquarters'),
+                    when=OperatorRule('global_headquarters', bool),
+                ),
+                ValidationRule(
                     'global_headquarters_company_is_not_a_global_headquarters',
                     ForeignKeyOperatorRule(
                         'global_headquarters',
                         is_company_a_global_headquarters
                     ),
-                    when=OperatorRule('global_headquarters', bool)
+                    when=OperatorRule('global_headquarters', bool),
                 )
             ),
             AddressValidator(lazy=True, fields_mapping=Company.TRADING_ADDRESS_VALIDATION_MAPPING),

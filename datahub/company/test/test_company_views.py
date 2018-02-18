@@ -545,6 +545,22 @@ class TestUpdateCompany(APITestMixin):
 
         assert global_headquarters.subsidiaries.count() == 0
 
+    def test_company_pointing_itself_as_global_headquarters(self):
+        """Test if you can point company as its own global headquarters."""
+        company = CompanyFactory(
+            headquarter_type_id=HeadquarterType.ghq.value.id
+        )
+
+        # now update it
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, format='json', data={
+            'global_headquarters': company.id,
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        error = ['Global headquarters cannot point to itself.']
+        assert response.data['global_headquarters'] == error
+
 
 class TestAddCompany(APITestMixin):
     """Tests for adding a company."""
