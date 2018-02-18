@@ -224,7 +224,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     business_type = NestedRelatedField(
         meta_models.BusinessType, required=False, allow_null=True
     )
-    children = NestedRelatedField('company.Company', many=True, required=False)
     subsidiaries = NestedRelatedField('company.Company', many=True, required=False)
     classification = NestedRelatedField(
         meta_models.CompanyClassification, required=False, allow_null=True
@@ -245,9 +244,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     )
     one_list_account_owner = NestedAdviserField(
         required=False, allow_null=True
-    )
-    parent = NestedRelatedField(
-        'company.Company', required=False, allow_null=True
     )
     global_headquarters = NestedRelatedField(
         'company.Company', required=False, allow_null=True
@@ -310,7 +306,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'trading_address_country',
             'account_manager',
             'business_type',
-            'children',
             'subsidiaries',
             'classification',
             'companies_house_data',
@@ -320,7 +315,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'future_interest_countries',
             'headquarter_type',
             'one_list_account_owner',
-            'parent',
             'global_headquarters',
             'sector',
             'turnover_range',
