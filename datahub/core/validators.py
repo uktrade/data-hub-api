@@ -245,6 +245,16 @@ class ForeignKeyOperatorRule(OperatorRule):
         return self._operator(value)
 
 
+class IsModelIdNotEqualToForeignKeyId(BaseRule):
+    """Simple rule that checks if a foreign key's id is different from id
+    of the model it belongs to.
+    """
+
+    def __call__(self, combiner) -> bool:
+        """Test whether model id is different from foreign key id."""
+        return str(combiner.get_value('id')) != combiner.get_value_id(self.field)
+
+
 class EqualsRule(OperatorRule):
     """Equals operator-based rule for a field."""
 
