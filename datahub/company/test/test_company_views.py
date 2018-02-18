@@ -178,7 +178,6 @@ class TestGetCompany(APITestMixin):
                 'id': str(company.business_type.id),
                 'name': company.business_type.name,
             },
-            'children': [],
             'subsidiaries': [],
             'classification': None,
             'company_number': '123',
@@ -197,7 +196,6 @@ class TestGetCompany(APITestMixin):
             'investment_projects_invested_in_count': 0,
             'modified_on': format_date_or_datetime(company.modified_on),
             'one_list_account_owner': None,
-            'parent': None,
             'global_headquarters': None,
             'sector': {
                 'id': str(company.sector.id),
