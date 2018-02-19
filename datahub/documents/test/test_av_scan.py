@@ -1,20 +1,12 @@
 from io import BytesIO
 
 import pytest
-import requests_mock
 from rest_framework import status
 
 from datahub.documents import av_scan
 from datahub.documents.test.factories import DocumentFactory
 
 pytestmark = pytest.mark.django_db
-
-
-@pytest.fixture()
-def requests_stubber():
-    """Requests stubber based on requests-mock"""
-    with requests_mock.mock() as requests_stubber:
-        yield requests_stubber
 
 
 MOCK_S3_RESPONSE = {

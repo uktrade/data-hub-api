@@ -1,5 +1,6 @@
 import factory
 import pytest
+import requests_mock
 from botocore.stub import Stubber
 from django.core.management import call_command
 from pytest_django.lazy_django import skip_if_no_django
@@ -48,3 +49,10 @@ def s3_stubber():
     s3_client = get_s3_client()
     with Stubber(s3_client) as s3_stubber:
         yield s3_stubber
+
+
+@pytest.fixture()
+def requests_stubber():
+    """Requests stubber based on requests-mock"""
+    with requests_mock.mock() as requests_stubber:
+        yield requests_stubber
