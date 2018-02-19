@@ -73,6 +73,7 @@ class TestGetInteractionView(APITestMixin):
             'is_event': None,
             'service_delivery_status': None,
             'grant_amount_offered': None,
+            'net_company_receipt': None,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
                 'name': interaction.communication_channel.name
@@ -139,6 +140,7 @@ class TestGetInteractionView(APITestMixin):
             'is_event': None,
             'service_delivery_status': None,
             'grant_amount_offered': None,
+            'net_company_receipt': None,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
                 'name': interaction.communication_channel.name
@@ -210,6 +212,7 @@ class TestGetInteractionView(APITestMixin):
             'is_event': None,
             'service_delivery_status': None,
             'grant_amount_offered': None,
+            'net_company_receipt': None,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
                 'name': interaction.communication_channel.name
@@ -321,6 +324,7 @@ class TestAddInteractionView(APITestMixin):
             'is_event': None,
             'service_delivery_status': None,
             'grant_amount_offered': None,
+            'net_company_receipt': None,
             'communication_channel': {
                 'id': CommunicationChannel.face_to_face.value.id,
                 'name': CommunicationChannel.face_to_face.value.name
@@ -400,6 +404,7 @@ class TestAddInteractionView(APITestMixin):
             'is_event': True,
             'service_delivery_status': None,
             'grant_amount_offered': None,
+            'net_company_receipt': None,
             'communication_channel': None,
             'subject': 'whatever',
             'date': '2017-04-18',
@@ -489,6 +494,7 @@ class TestAddInteractionView(APITestMixin):
             'kind': 'service_delivery',
             'service_delivery_status': None,
             'grant_amount_offered': None,
+            'net_company_receipt': None,
             'is_event': False,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -509,6 +515,7 @@ class TestAddInteractionView(APITestMixin):
             'kind': 'service_delivery',
             'service_delivery_status': None,
             'grant_amount_offered': None,
+            'net_company_receipt': None,
             'communication_channel': None,
             'subject': 'whatever',
             'date': '2017-04-18',
@@ -566,6 +573,7 @@ class TestAddInteractionView(APITestMixin):
             'kind': 'service_delivery',
             'service_delivery_status': service_delivery_status.pk,
             'grant_amount_offered': '9999.99',
+            'net_company_receipt': '8888.99',
             'is_event': False,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -589,6 +597,7 @@ class TestAddInteractionView(APITestMixin):
                 'name': service_delivery_status.name,
             },
             'grant_amount_offered': '9999.99',
+            'net_company_receipt': '8888.99',
             'communication_channel': None,
             'subject': 'whatever',
             'date': '2017-04-18',
@@ -725,6 +734,7 @@ class TestAddInteractionView(APITestMixin):
             'event': EventFactory().pk,
             'service_delivery_status': random_obj_for_model(ServiceDeliveryStatus).pk,
             'grant_amount_offered': '1111.11',
+            'net_company_receipt': '8888.11',
         }
         response = self.api_client.post(url, request_data, format='json')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -734,6 +744,7 @@ class TestAddInteractionView(APITestMixin):
             'event': ['This field is only valid for event service deliveries.'],
             'service_delivery_status': ['This field is only valid for service deliveries.'],
             'grant_amount_offered': ['This field is only valid for service deliveries.'],
+            'net_company_receipt': ['This field is only valid for service deliveries.'],
         }
 
     def test_add_service_delivery_with_interaction_fields(self):
@@ -1062,6 +1073,21 @@ class TestUpdateInteractionView(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data['grant_amount_offered'] == [
+            'Ensure this value is greater than or equal to 0.'
+        ]
+
+    def test_negative_net_company_receipt_is_rejected(self):
+        """Test validation when an a negative net company receipt is entered."""
+        interaction = ServiceDeliveryFactory()
+
+        url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
+        response = self.api_client.patch(url, {
+            'net_company_receipt': '-100.00',
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data['net_company_receipt'] == [
             'Ensure this value is greater than or equal to 0.'
         ]
 

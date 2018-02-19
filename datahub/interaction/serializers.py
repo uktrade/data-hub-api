@@ -71,6 +71,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             # v1 API.
             'date': {'format': '%Y-%m-%d', 'input_formats': ['%Y-%m-%d']},
             'grant_amount_offered': {'min_value': 0},
+            'net_company_receipt': {'min_value': 0},
         }
         fields = (
             'id',
@@ -89,6 +90,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             'communication_channel',
             'grant_amount_offered',
             'investment_project',
+            'net_company_receipt',
             'service',
             'service_delivery_status',
             'subject',
@@ -114,22 +116,10 @@ class InteractionSerializer(serializers.ModelSerializer):
                 ),
                 ValidationRule(
                     'invalid_for_interaction',
-                    OperatorRule('event', not_),
-                    when=EqualsRule('kind', Interaction.KINDS.interaction),
-                ),
-                ValidationRule(
-                    'invalid_for_interaction',
                     OperatorRule('is_event', is_blank),
-                    when=EqualsRule('kind', Interaction.KINDS.interaction),
-                ),
-                ValidationRule(
-                    'invalid_for_interaction',
                     OperatorRule('service_delivery_status', is_blank),
-                    when=EqualsRule('kind', Interaction.KINDS.interaction),
-                ),
-                ValidationRule(
-                    'invalid_for_interaction',
                     OperatorRule('grant_amount_offered', is_blank),
+                    OperatorRule('net_company_receipt', is_blank),
                     when=EqualsRule('kind', Interaction.KINDS.interaction),
                 ),
                 ValidationRule(

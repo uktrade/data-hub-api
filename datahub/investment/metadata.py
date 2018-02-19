@@ -4,7 +4,7 @@ from datahub.metadata.registry import registry
 
 
 class InvestmentFixtures(Fixture):
-    """Metadata fixtures (for the loadmetadata command)."""
+    """Metadata fixtures (for the loadinitialmetadata command)."""
 
     files = [
         'fixtures/investor_types.yaml',

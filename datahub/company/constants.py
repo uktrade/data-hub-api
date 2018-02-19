@@ -34,3 +34,6 @@ class BusinessTypeConstant(Enum):
     uk_establishment = Constant(
         'UK branch of foreign company (BR)', 'b0730fc6-fcce-4071-bdab-ba8de4f4fc98'
     )
+    community_interest_company = Constant(
+        'Community interest company', '34e4cb83-e5e1-421e-ac90-8a52edcc209c'
+    )

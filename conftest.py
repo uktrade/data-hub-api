@@ -11,8 +11,9 @@ from datahub.core.utils import get_s3_client
 def django_db_setup(django_db_setup, django_db_blocker):
     """Fixture for DB setup."""
     with django_db_blocker.unblock():
-        call_command('loadmetadata')
-        call_command('load_omis_metadata')
+        # force=True is not necessary, but saves a few seconds as it doesn't check if there is
+        # any existing data
+        call_command('loadinitialmetadata', force=True)
 
 
 @pytest.fixture(scope='session', autouse=True)

@@ -58,6 +58,9 @@ class ServiceDeliveryFactory(InteractionFactoryBase):
     grant_amount_offered = factory.Faker(
         'pydecimal', left_digits=4, right_digits=2, positive=True
     )
+    net_company_receipt = factory.Faker(
+        'pydecimal', left_digits=4, right_digits=2, positive=True
+    )
 
     class Meta:
         model = 'interaction.Interaction'

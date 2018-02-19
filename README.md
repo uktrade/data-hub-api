@@ -28,8 +28,7 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
 
     ```shell
     docker-compose run leeloo ./manage.py migrate
-    docker-compose run leeloo ./manage.py loadmetadata
-    docker-compose run leeloo ./manage.py load_omis_metadata
+    docker-compose run leeloo ./manage.py loadinitialmetadata
     docker-compose run leeloo ./manage.py createinitialrevisions
     ```
 4. Optionally, you can load some test data and update elasticsearch:
@@ -112,8 +111,7 @@ Dependencies:
     ./manage.py migrate
     ./manage.py createsuperuser
 
-    ./manage.py loadmetadata
-    ./manage.py load_omis_metadata
+    ./manage.py loadinitialmetadata
     ./manage.py createinitialrevisions
     ```
 
@@ -220,11 +218,14 @@ If using Docker, remember to run these commands inside your container by prefixi
 
 ### Database
 
-Apply migrations:
+
+#### Apply migrations
 
 ```shell
-docker-compose run leeloo ./manage.py migrate
+./manage.py migrate
 ```
+
+#### Create django-reversion initial revisions
 
 If the database is freshly built or a new versioned model is added run:
 
@@ -232,12 +233,14 @@ If the database is freshly built or a new versioned model is added run:
 ./manage.py createinitialrevisions
 ```
 
-Load metadata:
+#### Load initial metadata
+
+These commands are generally only intended to be used on a blank database.
 
 ```shell
-./manage.py loadmetadata
-./manage.py load_omis_metadata
+./manage.py loadinitialmetadata
 ```
+
 
 ### Elasticsearch
 

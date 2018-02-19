@@ -5,8 +5,7 @@
 
 dockerize -wait ${POSTGRES_URL} -wait ${ES5_URL} -timeout 60s
 python /app/manage.py migrate
-python /app/manage.py loadmetadata
-python /app/manage.py load_omis_metadata
+python /app/manage.py loadinitialmetadata
 
 # TODO abstract this into a method in ./manage.py
 echo "import datetime

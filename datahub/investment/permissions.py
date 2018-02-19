@@ -150,7 +150,7 @@ class IsAssociatedToInvestmentProjectFilter(BaseFilterBackend):
             full_field_name = (f'{field_prefix}{field.field_name}__'
                                f'{field.subfield_name}__dit_team_id')
             query |= Q(**{full_field_name: value})
-        return queryset.filter(query)
+        return queryset.filter(query).distinct()
 
     def _get_filter_field_prefix(self):
         return f'{self.model_attribute}__' if self.model_attribute else ''
