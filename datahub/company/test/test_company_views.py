@@ -178,7 +178,6 @@ class TestGetCompany(APITestMixin):
                 'id': str(company.business_type.id),
                 'name': company.business_type.name,
             },
-            'subsidiaries': [],
             'classification': None,
             'company_number': '123',
             'contacts': [],

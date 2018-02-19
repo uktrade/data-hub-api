@@ -224,7 +224,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     business_type = NestedRelatedField(
         meta_models.BusinessType, required=False, allow_null=True
     )
-    subsidiaries = NestedRelatedField('company.Company', many=True, required=False)
     classification = NestedRelatedField(
         meta_models.CompanyClassification, required=False, allow_null=True
     )
@@ -306,7 +305,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'trading_address_country',
             'account_manager',
             'business_type',
-            'subsidiaries',
             'classification',
             'companies_house_data',
             'contacts',
