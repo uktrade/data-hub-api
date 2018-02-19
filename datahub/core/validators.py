@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
+from collections import namedtuple
 from functools import partial
 from operator import eq
-from typing import Any, Callable
+from typing import Any, Callable, Sequence
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -316,13 +317,28 @@ class AnyIsNotBlankRule(BaseRule):
         return any(is_not_blank(combiner[field]) for field in self._fields)
 
 
-class ValidationRule(ConditionalRule):
-    """A rule that is only checked when a condition is met."""
+FieldAndError = namedtuple('FieldAndError', ('field', 'error_key'))
+
+
+class AbstractValidationRule(ABC):
+    """Abstract base class for RulesBasedValidator validation rules."""
+
+    @abstractmethod
+    def __call__(self, combiner) -> Sequence[FieldAndError]:
+        """Performs validation, returning a list of errors."""
+
+
+class ValidationRule(AbstractValidationRule):
+    """
+    A simple validation rule, taking a list of rules that must be met if a condition is also met.
+
+    Used with RulesBasedValidator.
+    """
 
     def __init__(self,
                  error_key: str,
-                 rule: OperatorRule,
-                 when: OperatorRule=None):
+                 *rules: AbstractRule,
+                 when: AbstractRule=None):
         """
         Initialises a validation rule.
 
@@ -331,25 +347,30 @@ class ValidationRule(ConditionalRule):
         :param when:      Optional conditional rule to check before applying this rule.
                           If the condition evaluates to False, validation passes.
         """
-        super().__init__(rule, when=when)
-        self.error_key = error_key
+        self._rules = [ConditionalRule(rule, when=when) for rule in rules]
+        self._error_key = error_key
+
+    def __call__(self, combiner) -> Sequence[FieldAndError]:
+        """Performs validation, returning a list of errors."""
+        errors = []
+        for rule in self._rules:
+            if not rule(combiner):
+                errors.append(FieldAndError(rule.field, self._error_key))
+        return errors
 
     def __repr__(self):
         """Returns the Python representation of this object."""
-        return (
-            f'{self.__class__.__name__}({self.error_key!r}, {self._rule!r}, '
-            f'when={self._condition!r})'
-        )
+        return f'{self.__class__.__name__}({self._error_key!r}, {self._rules!r})'
 
 
 class RulesBasedValidator:
     """
     Class-level DRF validator for cross-field validation.
 
-    Validation is performed using rules (instances of ValidationRule).
+    Validation is performed using rules (instances of AbstractValidationRule).
     """
 
-    def __init__(self, *rules: ValidationRule):
+    def __init__(self, *rules: AbstractValidationRule):
         """
         Initialises the validator with rules.
         """
@@ -370,8 +391,10 @@ class RulesBasedValidator:
             model=self._serializer.Meta.model,
         )
         for rule in self._rules:
-            if not rule(combiner):
-                errors[rule.field] = self._serializer.error_messages[rule.error_key]
+            rule_errors = rule(combiner)
+            for error in rule_errors:
+                fields_errors = errors.setdefault(error.field, [])
+                fields_errors.append(self._serializer.error_messages[error.error_key])
 
         if errors:
             raise serializers.ValidationError(errors)

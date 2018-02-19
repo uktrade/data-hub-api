@@ -111,6 +111,50 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['name'] == 'abc defg'
 
+    def test_search_adviser_filter(self, setup_es):
+        """Tests the adviser filter."""
+        adviser = AdviserFactory()
+
+        # Non-matching projects
+        project_other_1 = InvestmentProjectFactory()
+        InvestmentProjectTeamMemberFactory(investment_project=project_other_1)
+        InvestmentProjectTeamMemberFactory(investment_project=project_other_1)
+        InvestmentProjectFactory()
+
+        # Matching projects
+        project_1 = InvestmentProjectFactory()
+        InvestmentProjectTeamMemberFactory(adviser=adviser, investment_project=project_1)
+        InvestmentProjectTeamMemberFactory(investment_project=project_1)
+
+        project_2 = InvestmentProjectFactory(created_by=adviser)
+        project_3 = InvestmentProjectFactory(client_relationship_manager=adviser)
+        project_4 = InvestmentProjectFactory(project_manager=adviser)
+        project_5 = InvestmentProjectFactory(project_assurance_adviser=adviser)
+        # Should only be returned once
+        project_6 = InvestmentProjectFactory(
+            created_by=adviser,
+            client_relationship_manager=adviser,
+            project_assurance_adviser=adviser,
+            project_manager=adviser,
+        )
+        InvestmentProjectTeamMemberFactory(adviser=adviser, investment_project=project_6)
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:investment_project')
+
+        response = self.api_client.post(url, {
+            'adviser': adviser.pk,
+        }, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 6
+        results = response_data['results']
+        expected_ids = {str(project_1.pk), str(project_2.pk), str(project_3.pk),
+                        str(project_4.pk), str(project_5.pk), str(project_6.pk)}
+        assert {result['id'] for result in results} == expected_ids
+
     @pytest.mark.parametrize(
         'query,num_results',
         (
