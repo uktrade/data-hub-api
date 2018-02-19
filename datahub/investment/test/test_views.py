@@ -200,6 +200,41 @@ class TestListView(APITestMixin):
         assert response_data['count'] == 1
         assert response_data['results'][0]['id'] == str(project.id)
 
+    def test_listed_projects_are_not_repeated(self):
+        """Test that investment projects are not repeated in the results."""
+        team = TeamFactory()
+
+        _, api_client = _create_user_and_api_client(
+            self, team,
+            (
+                InvestmentProjectPermission.read_associated,
+            )
+        )
+        advisers = AdviserFactory.create_batch(3, dit_team_id=team.id)
+
+        InvestmentProjectFactory.create_batch(5)
+
+        investor_company = CompanyFactory()
+        investment_project = InvestmentProjectFactory(
+            investor_company=investor_company
+        )
+
+        for adviser in advisers:
+            InvestmentProjectTeamMemberFactory(
+                adviser=adviser,
+                investment_project=investment_project
+            )
+
+        url = reverse('api-v3:investment:investment-collection')
+        response = api_client.get(url, {
+            'investor_company_id': str(investor_company.id)
+        })
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 1
+        assert len(response_data['results']) == 1
+        assert response_data['results'][0]['id'] == str(investment_project.id)
+
     @pytest.mark.parametrize('permissions', (
         (InvestmentProjectPermission.read_all,),
         (InvestmentProjectPermission.read_associated, InvestmentProjectPermission.read_all),
