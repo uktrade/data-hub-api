@@ -14,6 +14,7 @@ class SearchInvestmentProjectParams:
     include_aggregations = True
 
     FILTER_FIELDS = (
+        'adviser',
         'client_relationship_manager',
         'created_on_after',
         'created_on_before',
@@ -38,6 +39,16 @@ class SearchInvestmentProjectParams:
         'sector': 'sector.id',
         'stage': 'stage.id',
         'uk_region_location': 'uk_region_locations.id',
+    }
+
+    COMPOSITE_FILTERS = {
+        'adviser': [
+            'created_by.id',
+            'client_relationship_manager.id',
+            'project_assurance_adviser.id',
+            'project_manager.id',
+            'team_members.id',
+        ],
     }
 
 
