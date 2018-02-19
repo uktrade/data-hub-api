@@ -11,6 +11,7 @@ from ..serializers import (
 class SearchInvestmentProjectSerializer(SearchSerializer):
     """Serialiser used to validate investment project search POST bodies."""
 
+    adviser = SingleOrListField(child=StringUUIDField(), required=False)
     client_relationship_manager = SingleOrListField(child=StringUUIDField(), required=False)
     created_on_after = RelaxedDateTimeField(required=False)
     created_on_before = RelaxedDateTimeField(required=False)
