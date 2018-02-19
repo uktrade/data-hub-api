@@ -14,9 +14,9 @@ from datahub.company.models import (
 from datahub.company.validators import (
     has_no_invalid_company_number_characters,
     has_uk_establishment_number_prefix,
-    is_company_a_global_headquarters,
 )
 from datahub.core.constants import Country
+from datahub.core.constants import HeadquarterType
 from datahub.core.serializers import (
     NestedRelatedField, PermittedFieldsModelSerializer, RelaxedURLField
 )
@@ -25,8 +25,6 @@ from datahub.core.validators import (
     AllIsBlankRule,
     AnyIsNotBlankRule,
     EqualsRule,
-    ForeignKeyOperatorRule,
-    IsModelIdNotEqualToForeignKeyId,
     OperatorRule,
     RequiredUnlessAlreadyBlankValidator,
     RulesBasedValidator,
@@ -272,6 +270,28 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         models.URLField: RelaxedURLField,
     }
 
+    def validate_global_headquarters(self, global_headquarters):
+        """Ensure that global headquarters is global headquarters and it is not pointing
+        at the model itself.
+        """
+        if global_headquarters:
+            # checks if global_headquarters is global_headquarters
+            if (
+                global_headquarters.headquarter_type
+                and str(global_headquarters.headquarter_type.id) != HeadquarterType.ghq.value.id
+            ) or not global_headquarters.headquarter_type:
+                raise serializers.ValidationError(
+                    self.error_messages['global_headquarters_company_is_not_a_global_headquarters']
+                )
+
+            # check if global_headquarters is not pointing to an instance of the model
+            if self.instance and self.instance.id == global_headquarters.id:
+                raise serializers.ValidationError(
+                    self.error_messages['invalid_global_headquarters']
+                )
+
+        return global_headquarters
+
     class Meta:
         model = Company
         fields = (
@@ -361,19 +381,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                     when=EqualsRule('business_type',
                                     BusinessTypeConstant.uk_establishment.value.id),
                 ),
-                ValidationRule(
-                    'invalid_global_headquarters',
-                    IsModelIdNotEqualToForeignKeyId('global_headquarters'),
-                    when=OperatorRule('global_headquarters', bool),
-                ),
-                ValidationRule(
-                    'global_headquarters_company_is_not_a_global_headquarters',
-                    ForeignKeyOperatorRule(
-                        'global_headquarters',
-                        is_company_a_global_headquarters
-                    ),
-                    when=OperatorRule('global_headquarters', bool),
-                )
             ),
             AddressValidator(lazy=True, fields_mapping=Company.TRADING_ADDRESS_VALIDATION_MAPPING),
         ]
