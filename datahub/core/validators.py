@@ -3,6 +3,7 @@ from collections import namedtuple
 from functools import partial
 from operator import eq
 from typing import Any, Callable, Sequence
+
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 

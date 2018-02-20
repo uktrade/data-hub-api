@@ -48,7 +48,6 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     ).prefetch_related(
         Prefetch('contacts', queryset=get_contact_queryset()),
         Prefetch('investor_investment_projects', queryset=get_slim_investment_project_queryset()),
-        'subsidiaries',
         'export_to_countries',
         'future_interest_countries',
     )
