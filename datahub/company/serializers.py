@@ -295,10 +295,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         """
         if global_headquarters:
             # checks if global_headquarters is global_headquarters
-            if (
-                global_headquarters.headquarter_type
-                and global_headquarters.headquarter_type_id != UUID(HeadquarterType.ghq.value.id)
-            ) or not global_headquarters.headquarter_type:
+            if global_headquarters.headquarter_type_id != UUID(HeadquarterType.ghq.value.id):
                 raise serializers.ValidationError(
                     self.error_messages['global_headquarters_company_is_not_a_global_headquarters']
                 )
