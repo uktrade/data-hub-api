@@ -1,5 +1,6 @@
 from functools import partial
 from operator import not_
+from uuid import UUID
 
 from django.conf import settings
 from django.db import models
@@ -207,6 +208,9 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         ),
         'invalid_global_headquarters': ugettext_lazy(
             'Global headquarters cannot point to itself.'
+        ),
+        'global_headquarters_has_subsidiaries': ugettext_lazy(
+            'Subsidiaries have to be unlinked before changing headquarter type.',
         )
     }
 
@@ -270,6 +274,21 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         models.URLField: RelaxedURLField,
     }
 
+    def validate_headquarter_type(self, headquarter_type):
+        """Ensure that global headquarters doesn't have any subsidiaries before changing
+        headquarter type.
+        """
+        if self.instance and self.instance.headquarter_type != headquarter_type:
+            if (
+                self.instance.headquarter_type_id == UUID(HeadquarterType.ghq.value.id)
+                and self.instance.subsidiaries.count() > 0
+            ):
+                raise serializers.ValidationError(
+                    self.error_messages['global_headquarters_has_subsidiaries']
+                )
+
+        return headquarter_type
+
     def validate_global_headquarters(self, global_headquarters):
         """Ensure that global headquarters is global headquarters and it is not pointing
         at the model itself.
@@ -278,14 +297,14 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             # checks if global_headquarters is global_headquarters
             if (
                 global_headquarters.headquarter_type
-                and str(global_headquarters.headquarter_type.id) != HeadquarterType.ghq.value.id
+                and global_headquarters.headquarter_type_id != UUID(HeadquarterType.ghq.value.id)
             ) or not global_headquarters.headquarter_type:
                 raise serializers.ValidationError(
                     self.error_messages['global_headquarters_company_is_not_a_global_headquarters']
                 )
 
             # check if global_headquarters is not pointing to an instance of the model
-            if self.instance and self.instance.id == global_headquarters.id:
+            if self.instance == global_headquarters:
                 raise serializers.ValidationError(
                     self.error_messages['invalid_global_headquarters']
                 )
