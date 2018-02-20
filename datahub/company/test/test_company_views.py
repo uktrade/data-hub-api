@@ -558,6 +558,43 @@ class TestUpdateCompany(APITestMixin):
         error = ['Global headquarters cannot point to itself.']
         assert response.data['global_headquarters'] == error
 
+    @pytest.mark.parametrize('headquarter_type_id,changed_to,has_subsidiaries,is_valid', (
+        (HeadquarterType.ghq.value.id, None, True, False),
+        (HeadquarterType.ghq.value.id, HeadquarterType.ehq.value.id, True, False),
+        (HeadquarterType.ghq.value.id, HeadquarterType.ehq.value.id, False, True),
+        (HeadquarterType.ghq.value.id, None, False, True),
+    ))
+    def test_change_ghq_to_non_ghq(
+        self,
+        headquarter_type_id,
+        changed_to,
+        has_subsidiaries,
+        is_valid
+    ):
+        """Test updating headquarter type."""
+        company = CompanyFactory(
+            headquarter_type_id=headquarter_type_id
+        )
+        if has_subsidiaries:
+            CompanyFactory(global_headquarters=company)
+            assert company.subsidiaries.count() == 1
+
+        # now update it
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, format='json', data={
+            'headquarter_type': changed_to,
+        })
+
+        if is_valid:
+            assert response.status_code == status.HTTP_200_OK
+            assert response.data['id'] == str(company.id)
+            company.refresh_from_db()
+            assert str(company.headquarter_type_id) == str(changed_to)
+        else:
+            assert response.status_code == status.HTTP_400_BAD_REQUEST
+            error = ['Subsidiaries have to be unlinked before changing headquarter type.']
+            assert response.data['headquarter_type'] == error
+
 
 class TestAddCompany(APITestMixin):
     """Tests for adding a company."""
