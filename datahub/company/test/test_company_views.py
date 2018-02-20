@@ -564,7 +564,7 @@ class TestUpdateCompany(APITestMixin):
         (HeadquarterType.ghq.value.id, HeadquarterType.ehq.value.id, False, True),
         (HeadquarterType.ghq.value.id, None, False, True),
     ))
-    def test_change_ghq_to_non_ghq(
+    def test_update_headquarter_type(
         self,
         headquarter_type_id,
         changed_to,
