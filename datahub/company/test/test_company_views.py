@@ -178,7 +178,6 @@ class TestGetCompany(APITestMixin):
                 'id': str(company.business_type.id),
                 'name': company.business_type.name,
             },
-            'children': [],
             'classification': None,
             'company_number': '123',
             'contacts': [],
@@ -196,7 +195,7 @@ class TestGetCompany(APITestMixin):
             'investment_projects_invested_in_count': 0,
             'modified_on': format_date_or_datetime(company.modified_on),
             'one_list_account_owner': None,
-            'parent': None,
+            'global_headquarters': None,
             'sector': {
                 'id': str(company.sector.id),
                 'name': company.sector.name,
@@ -495,6 +494,106 @@ class TestUpdateCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()[field] is None
+
+    @pytest.mark.parametrize('hq,is_valid', (
+        (HeadquarterType.ehq.value.id, False),
+        (HeadquarterType.ukhq.value.id, False),
+        (HeadquarterType.ghq.value.id, True),
+        (None, False),
+    ))
+    def test_update_company_global_headquarters_with_not_a_global_headquarters(self, hq, is_valid):
+        """Tests if adding company that is not a Global HQ as a Global HQ
+        will fail or if added company is a Global HQ then it will pass.
+        """
+        company = CompanyFactory()
+        headquarter = CompanyFactory(headquarter_type_id=hq)
+
+        # now update it
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, format='json', data={
+            'global_headquarters': headquarter.id,
+        })
+        if is_valid:
+            assert response.status_code == status.HTTP_200_OK
+            if hq is not None:
+                assert response.data['global_headquarters']['id'] == str(headquarter.id)
+        else:
+            assert response.status_code == status.HTTP_400_BAD_REQUEST
+            error = ['Company to be linked as global headquarters must be a global headquarters.']
+            assert response.data['global_headquarters'] == error
+
+    def test_remove_global_headquarters_link(self):
+        """Tests if we can remove global headquarter link."""
+        global_headquarters = CompanyFactory(
+            headquarter_type_id=HeadquarterType.ghq.value.id
+        )
+        company = CompanyFactory(global_headquarters=global_headquarters)
+
+        assert global_headquarters.subsidiaries.count() == 1
+
+        # now update it
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, format='json', data={
+            'global_headquarters': None,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['global_headquarters'] is None
+
+        assert global_headquarters.subsidiaries.count() == 0
+
+    def test_company_pointing_itself_as_global_headquarters(self):
+        """Test if you can point company as its own global headquarters."""
+        company = CompanyFactory(
+            headquarter_type_id=HeadquarterType.ghq.value.id
+        )
+
+        # now update it
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, format='json', data={
+            'global_headquarters': company.id,
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        error = ['Global headquarters cannot point to itself.']
+        assert response.data['global_headquarters'] == error
+
+    @pytest.mark.parametrize('headquarter_type_id,changed_to,has_subsidiaries,is_valid', (
+        (HeadquarterType.ghq.value.id, None, True, False),
+        (HeadquarterType.ghq.value.id, HeadquarterType.ehq.value.id, True, False),
+        (HeadquarterType.ghq.value.id, HeadquarterType.ehq.value.id, False, True),
+        (HeadquarterType.ghq.value.id, None, False, True),
+    ))
+    def test_update_headquarter_type(
+        self,
+        headquarter_type_id,
+        changed_to,
+        has_subsidiaries,
+        is_valid
+    ):
+        """Test updating headquarter type."""
+        company = CompanyFactory(
+            headquarter_type_id=headquarter_type_id
+        )
+        if has_subsidiaries:
+            CompanyFactory(global_headquarters=company)
+            assert company.subsidiaries.count() == 1
+
+        # now update it
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, format='json', data={
+            'headquarter_type': changed_to,
+        })
+
+        if is_valid:
+            assert response.status_code == status.HTTP_200_OK
+            assert response.data['id'] == str(company.id)
+            company.refresh_from_db()
+            assert str(company.headquarter_type_id) == str(changed_to)
+        else:
+            assert response.status_code == status.HTTP_400_BAD_REQUEST
+            error = ['Subsidiaries have to be unlinked before changing headquarter type.']
+            assert response.data['headquarter_type'] == error
 
 
 class TestAddCompany(APITestMixin):
