@@ -1,15 +1,108 @@
 import uuid
 
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 
 from datahub.core.models import BaseModel
-
-from .constants import PaymentMethod, RefundStatus
-from .managers import PaymentManager
+from .constants import PaymentGatewaySessionStatus, PaymentMethod, RefundStatus
+from .govukpay import PayClient
+from .managers import PaymentGatewaySessionManager, PaymentManager
+from .utils import trasform_govuk_payment_to_omis_payment_data
 
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
+
+class PaymentGatewaySession(BaseModel):
+    """Details of a payment-by-card session."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    order = models.ForeignKey(
+        'order.Order',
+        on_delete=models.CASCADE,
+        related_name='payment_gateway_sessions',
+    )
+    status = models.CharField(
+        max_length=100,
+        choices=PaymentGatewaySessionStatus,
+        default=PaymentGatewaySessionStatus.created
+    )
+    govuk_payment_id = models.CharField(
+        max_length=100,
+        verbose_name='GOV.UK payment ID'
+    )
+
+    objects = PaymentGatewaySessionManager()
+
+    class Meta:
+        ordering = ('-created_on', )
+        permissions = (('read_paymentgatewaysession', 'Can read payment gateway session'),)
+
+    def __str__(self):
+        """Human-readable representation"""
+        return f'Payment gateway session {self.id} for order {self.order}'
+
+    def _get_payment_from_govuk_pay(self):
+        """
+        :returns: the GOV.UK payment data for this payment gateway session
+
+        :raises GOVUKPayAPIException: if there is a problem with GOV.UK Pay
+        """
+        return PayClient().get_payment_by_id(self.govuk_payment_id)
+
+    def is_finished(self):
+        """
+        :returns: True if this payment gateway session is in a finished status
+        """
+        return self.status in (
+            PaymentGatewaySessionStatus.success,
+            PaymentGatewaySessionStatus.failed,
+            PaymentGatewaySessionStatus.cancelled,
+            PaymentGatewaySessionStatus.error,
+        )
+
+    @transaction.atomic
+    def refresh_from_govuk_payment(self):
+        """
+        Refreshes this record with the data from the related GOV.UK payment.
+        If, during the update, the GOV.UK response says that the payment happened
+        successfully, the related order gets marked as `paid` and an
+        `payment.Payment` record is created from the GOV.UK payment data.
+
+        :returns: True if the record needed and got refreshed, False otherwise
+
+        :raises GOVUKPayAPIException: if there is a problem with GOV.UK Pay
+
+        Note: this should be the only method changing the status of this session object.
+        """
+        if self.is_finished():  # no need to refresh
+            return False
+
+        govuk_payment = self._get_payment_from_govuk_pay()
+        new_status = govuk_payment['state']['status']
+        if new_status == self.status:  # no changes made
+            return False
+
+        self.status = new_status
+        self.save()
+
+        if self.status == PaymentGatewaySessionStatus.success:
+            self.order.mark_as_paid(
+                by=None,
+                payments_data=[
+                    trasform_govuk_payment_to_omis_payment_data(govuk_payment)
+                ]
+            )
+        return True
+
+    def cancel(self):
+        """
+        Cancels this payment gateway session and the related GOV.UK payment.
+
+        :raises GOVUKPayAPIException: if there is a problem with GOV.UK Pay
+        """
+        PayClient().cancel_payment(self.govuk_payment_id)
+        self.refresh_from_govuk_payment()
 
 
 class Payment(BaseModel):

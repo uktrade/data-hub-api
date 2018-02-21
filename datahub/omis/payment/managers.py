@@ -1,6 +1,96 @@
+import uuid
+
+from django.conf import settings
 from django.db import models
 
 from datahub.omis.core.utils import generate_datetime_based_reference
+from datahub.omis.order.constants import OrderStatus
+from datahub.omis.order.validators import OrderInStatusValidator
+from .constants import PaymentGatewaySessionStatus
+from .govukpay import PayClient
+
+
+class BasePaymentGatewaySessionManager(models.Manager):
+    """Custom Payment Gateway Session Manager."""
+
+    def create_from_order(self, order, attrs=None):
+        """
+        :param order: Order instance for this payment gateway session
+        :param attrs: dict with any extra property to be set on the object
+
+        :returns: Payment Gateway Session instance created
+        :raises GOVUKPayAPIException: if there is a problem with GOV.UK Pay
+        :raises Conflict: if the order is not in the allowed status
+        """
+        self.filter(order=order).ongoing().refresh_from_govuk_pay()
+
+        # validate that the order is in `quote_accepted`
+        order.refresh_from_db()
+        validator = OrderInStatusValidator(
+            allowed_statuses=(OrderStatus.quote_accepted,)
+        )
+        validator.set_instance(order)
+        validator()
+
+        # lock order to avoid race conditions
+        order.__class__.objects.select_for_update().get(pk=order.pk)
+
+        # cancel other ongoing sessions
+        for session in self.filter(order=order).ongoing():
+            session.cancel()
+
+        # create a new payment gateway session
+        session_id = uuid.uuid4()
+
+        pay = PayClient()
+        govuk_payment = pay.create_payment(
+            amount=order.total_cost,
+            reference=str(session_id),
+            description=settings.GOVUK_PAY_PAYMENT_DESCRIPTION,
+            return_url=settings.GOVUK_PAY_RETURN_URL.format(
+                public_token=order.public_token,
+                session_id=session_id
+            )
+        )
+
+        session = self.create(
+            id=session_id,
+            order=order,
+            govuk_payment_id=govuk_payment['payment_id'],
+            **(attrs or {})
+        )
+
+        return session
+
+
+class PaymentGatewaySessionQuerySet(models.QuerySet):
+    """Custom Payment Gateway Session QuerySet."""
+
+    def ongoing(self):
+        """
+        :returns: only non-finished sessions
+        """
+        return self.filter(
+            status__in=[
+                PaymentGatewaySessionStatus.created,
+                PaymentGatewaySessionStatus.started,
+                PaymentGatewaySessionStatus.submitted,
+            ]
+        )
+
+    def refresh_from_govuk_pay(self):
+        """
+        Refresh the objects in the queryset by re-synching the status with the
+        GOV.UK payment.
+        """
+        for session in self:
+            session.refresh_from_govuk_payment()
+
+
+# We use this style because some of the methods make sense only on the manager
+PaymentGatewaySessionManager = BasePaymentGatewaySessionManager.from_queryset(
+    PaymentGatewaySessionQuerySet
+)
 
 
 class PaymentManager(models.Manager):
