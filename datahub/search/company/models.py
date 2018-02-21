@@ -41,6 +41,7 @@ class Company(DocType, MapDBModelToDict):
     name_trigram = dsl_utils.TrigramText()
     one_list_account_owner = dsl_utils.contact_or_adviser_mapping('one_list_account_owner')
     parent = dsl_utils.id_name_mapping()
+    global_headquarters = dsl_utils.id_name_mapping()
     reference_code = dsl_utils.SortableCaseInsensitiveKeywordText()
     registered_address_1 = Text()
     registered_address_2 = Text()
@@ -89,6 +90,7 @@ class Company(DocType, MapDBModelToDict):
         'employee_range': dict_utils.id_name_dict,
         'headquarter_type': dict_utils.id_name_dict,
         'parent': dict_utils.id_name_dict,
+        'global_headquarters': dict_utils.id_name_dict,
         'registered_address_country': dict_utils.id_name_dict,
         'sector': dict_utils.id_name_dict,
         'trading_address_country': dict_utils.id_name_dict,
@@ -107,6 +109,7 @@ class Company(DocType, MapDBModelToDict):
         'alias',
         'business_leads',
         'children',
+        'subsidiaries',
         'created_by',
         'interactions',
         'intermediate_investment_projects',
