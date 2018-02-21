@@ -229,3 +229,5 @@ OMIS_PUBLIC_ORDER_URL = f'{OMIS_PUBLIC_BASE_URL}/{{public_token}}'
 GOVUK_PAY_URL = env('GOVUK_PAY_URL', default='')
 GOVUK_PAY_AUTH_TOKEN = env('GOVUK_PAY_AUTH_TOKEN', default='')
 GOVUK_PAY_TIMEOUT = 15  # in seconds
+GOVUK_PAY_PAYMENT_DESCRIPTION = 'Overseas Market Introduction Service'
+GOVUK_PAY_RETURN_URL = f'{OMIS_PUBLIC_ORDER_URL}/card-payment/{{session_id}}'

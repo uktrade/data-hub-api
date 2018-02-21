@@ -1,5 +1,6 @@
 import uuid
 from operator import itemgetter
+
 import pytest
 from dateutil.parser import parse as dateutil_parse
 from freezegun import freeze_time
@@ -11,7 +12,6 @@ from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import (
     OrderFactory, OrderPaidFactory, OrderWithAcceptedQuoteFactory
 )
-
 from ..factories import PaymentFactory
 from ...constants import PaymentMethod
 

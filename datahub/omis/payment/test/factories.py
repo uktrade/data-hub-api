@@ -1,8 +1,8 @@
 import uuid
+
 import factory
 
-from datahub.omis.order.test.factories import OrderPaidFactory
-
+from datahub.omis.order.test.factories import OrderPaidFactory, OrderWithAcceptedQuoteFactory
 from .. import constants
 
 
@@ -20,3 +20,15 @@ class PaymentFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'omis-payment.Payment'
+
+
+class PaymentGatewaySessionFactory(factory.django.DjangoModelFactory):
+    """PaymentGatewaySession factory."""
+
+    id = factory.LazyFunction(uuid.uuid4)
+    order = factory.SubFactory(OrderWithAcceptedQuoteFactory)
+    status = constants.PaymentGatewaySessionStatus.created
+    govuk_payment_id = factory.Faker('pystr', min_chars=27, max_chars=27)
+
+    class Meta:
+        model = 'omis-payment.PaymentGatewaySession'
