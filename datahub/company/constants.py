@@ -21,6 +21,9 @@ class BusinessTypeConstant(Enum):
     limited_partnership = Constant(
         'Limited partnership', '8b6eaf7e-03e7-e611-bca1-e4115bead28a'
     )
+    limited_liability_partnership = Constant(
+        'Limited liability partnership', 'b70764b9-e523-46cf-8297-4c694ecbc5ce',
+    )
     partnership = Constant('Partnership', '9ad14e94-5d95-e211-a939-e4115bead28a')
     sole_trader = Constant('Sole Trader', '99d14e94-5d95-e211-a939-e4115bead28a')
     private_limited_company = Constant(
