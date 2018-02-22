@@ -3,6 +3,7 @@ import uuid
 from django.conf import settings
 from django.db import models
 
+from datahub.core import reversion
 from datahub.core.models import ArchivableModel, BaseModel
 from datahub.core.utils import StrEnum
 from datahub.metadata import models as metadata_models
@@ -17,6 +18,7 @@ class ContactPermission(StrEnum):
     read_contact_document = 'read_contact_document'
 
 
+@reversion.register_base_model()
 class Contact(ArchivableModel, BaseModel):
     """Contact from CDMS."""
 

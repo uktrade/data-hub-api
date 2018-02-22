@@ -4,8 +4,9 @@ from django.contrib import admin
 from django.contrib.admin import DateFieldListFilter, helpers
 from django.template.response import TemplateResponse
 from django.utils.timezone import now
+from reversion.admin import VersionAdmin
 
-from datahub.core.admin import BaseModelVersionAdmin, DisabledOnFilter
+from datahub.core.admin import DisabledOnFilter
 from datahub.event.models import Event, EventType, LocationType, Programme
 
 
@@ -38,7 +39,7 @@ def confirm_action(title, action_message):
 
 
 @admin.register(Event)
-class EventAdmin(BaseModelVersionAdmin):
+class EventAdmin(VersionAdmin):
     """Admin for Events."""
 
     fields = (

@@ -1,8 +1,7 @@
 from django.contrib import admin
+from reversion.admin import VersionAdmin
 
-from datahub.core.admin import (
-    BaseModelVersionAdmin, custom_add_permission, custom_change_permission, DisabledOnFilter
-)
+from datahub.core.admin import custom_add_permission, custom_change_permission, DisabledOnFilter
 from datahub.interaction.models import InteractionPermission
 from .models import CommunicationChannel, Interaction
 
@@ -21,7 +20,7 @@ class MetadataAdmin(admin.ModelAdmin):
 @admin.register(Interaction)
 @custom_add_permission(InteractionPermission.add_all)
 @custom_change_permission(InteractionPermission.change_all)
-class InteractionAdmin(BaseModelVersionAdmin):
+class InteractionAdmin(VersionAdmin):
     """Interaction admin."""
 
     search_fields = (
