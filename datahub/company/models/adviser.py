@@ -9,6 +9,7 @@ from django.db import models
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 
+from datahub.core import reversion
 from datahub.core.utils import join_truthy_strings
 from datahub.metadata import models as metadata_models
 
@@ -47,6 +48,7 @@ class AdviserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
+@reversion.register_base_model(extra_exclude=('last_login',))
 class Advisor(AbstractBaseUser, PermissionsMixin):
     """Adviser model.
 
