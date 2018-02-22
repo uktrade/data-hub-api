@@ -3,11 +3,13 @@ import uuid
 from django.conf import settings
 from django.db import models
 
+from datahub.core import reversion
 from datahub.core.models import BaseConstantModel, BaseModel, DisableableModel
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
+@reversion.register_base_model()
 class Event(BaseModel, DisableableModel):
     """An event (exhibition etc.)"""
 
