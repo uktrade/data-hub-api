@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from reversion.admin import VersionAdmin
 
-from datahub.core.admin import BaseModelVersionAdmin, DisabledOnFilter, ReadOnlyAdmin
+from datahub.core.admin import DisabledOnFilter, ReadOnlyAdmin
 from .models import Advisor, CompaniesHouseCompany, Company, Contact, ExportExperienceCategory
 
 
@@ -17,7 +18,7 @@ class MetadataAdmin(admin.ModelAdmin):
 
 
 @admin.register(Company)
-class CompanyAdmin(BaseModelVersionAdmin):
+class CompanyAdmin(VersionAdmin):
     """Company admin."""
 
     search_fields = (
@@ -45,7 +46,7 @@ class CompanyAdmin(BaseModelVersionAdmin):
 
 
 @admin.register(Contact)
-class ContactAdmin(BaseModelVersionAdmin):
+class ContactAdmin(VersionAdmin):
     """Contact admin."""
 
     search_fields = (
@@ -79,10 +80,9 @@ class CHCompany(ReadOnlyAdmin):
 
 
 @admin.register(Advisor)
-class AdviserAdmin(BaseModelVersionAdmin, UserAdmin):
+class AdviserAdmin(VersionAdmin, UserAdmin):
     """Adviser admin."""
 
-    reversion_excluded_fields = BaseModelVersionAdmin.reversion_excluded_fields + ('last_login',)
     fieldsets = (
         (None, {
             'fields': (

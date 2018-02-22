@@ -9,6 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, transaction
 from model_utils import Choices
 
+from datahub.core import reversion
 from datahub.core.constants import InvestmentProjectStage
 from datahub.core.models import (
     ArchivableModel,
@@ -341,6 +342,7 @@ _AssociatedToManyField = namedtuple(
 )
 
 
+@reversion.register_base_model()
 class InvestmentProject(ArchivableModel, IProjectAbstract,
                         IProjectValueAbstract, IProjectRequirementsAbstract,
                         IProjectTeamAbstract, BaseModel):
@@ -421,6 +423,7 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
                     yield adviser
 
 
+@reversion.register_base_model()
 class InvestmentProjectTeamMember(models.Model):
     """Intermediary M2M model for investment project team members.
 
