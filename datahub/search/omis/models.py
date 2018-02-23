@@ -98,6 +98,7 @@ class Order(DocType, MapDBModelToDict):
         'payments',
         'refunds',
         'archived_documents_url_path',
+        'payment_gateway_sessions'
     )
 
     SEARCH_FIELDS = (
