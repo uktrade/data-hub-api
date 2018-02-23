@@ -1,8 +1,6 @@
 from datahub.omis.order.models import Order as DBOrder
-
 from .models import Order
 from .views import SearchOrderAPIView
-
 from ..apps import SearchApp
 
 

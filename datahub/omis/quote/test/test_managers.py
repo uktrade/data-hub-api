@@ -1,9 +1,9 @@
 from unittest import mock
+
 import pytest
 from dateutil.parser import parse as dateutil_parse
 
 from datahub.company.test.factories import AdviserFactory
-
 from ..models import Quote, TermsAndConditions
 
 

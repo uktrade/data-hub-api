@@ -4,7 +4,6 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import APITestMixin
-
 from ..factories import OrderAssigneeFactory, OrderFactory, OrderPaidFactory
 from ...constants import OrderStatus
 from ...models import OrderAssignee

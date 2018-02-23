@@ -1,10 +1,8 @@
 from django.contrib.auth import get_user_model
-
 from rest_framework import serializers, status
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from .support.models import EmptyModel, InheritedModel
-
 from ..test_utils import APITestMixin
 from ..viewsets import CoreViewSetV1, CoreViewSetV3
 

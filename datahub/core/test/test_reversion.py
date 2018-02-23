@@ -1,4 +1,5 @@
 from unittest import mock
+
 import pytest
 
 from ..reversion import EXCLUDED_BASE_MODEL_FIELDS, register_base_model
