@@ -1,10 +1,9 @@
 import urllib.parse
 from logging import getLogger
-import requests
 
+import requests
 from django.conf import settings
 from django.utils.functional import cached_property
-
 from rest_framework.exceptions import APIException
 
 
