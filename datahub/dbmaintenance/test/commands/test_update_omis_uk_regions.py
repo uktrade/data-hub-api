@@ -1,6 +1,6 @@
 from io import BytesIO
-import pytest
 
+import pytest
 from django.core.management import call_command
 
 from datahub.core import constants

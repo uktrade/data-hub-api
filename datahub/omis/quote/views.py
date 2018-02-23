@@ -1,13 +1,11 @@
 from django.http import Http404
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
-
 from rest_framework import status
 from rest_framework.response import Response
 
 from datahub.oauth.scopes import Scope
 from datahub.omis.order.models import Order
 from datahub.omis.order.views import BaseNestedOrderViewSet
-
 from .models import Quote
 from .serializers import PublicQuoteSerializer, QuoteSerializer
 

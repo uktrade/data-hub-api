@@ -4,7 +4,6 @@ from freezegun import freeze_time
 
 from datahub.company.test.factories import AdviserFactory, ContactFactory
 from datahub.omis.quote.test.factories import AcceptedQuoteFactory, CancelledQuoteFactory
-
 from .factories import QuoteFactory
 from ..models import Quote
 

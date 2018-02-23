@@ -1,6 +1,7 @@
 import secrets
 from functools import partial
 from unittest import mock
+
 import factory
 import pytest
 from dateutil.parser import parse as dateutil_parse
@@ -16,7 +17,6 @@ from datahub.omis.core.exceptions import Conflict
 from datahub.omis.invoice.models import Invoice
 from datahub.omis.payment.models import Payment
 from datahub.omis.quote.models import Quote
-
 from .factories import (
     OrderAssigneeCompleteFactory,
     OrderAssigneeFactory,
@@ -25,7 +25,6 @@ from .factories import (
     OrderWithAcceptedQuoteFactory,
     OrderWithOpenQuoteFactory,
 )
-
 from ..constants import OrderStatus
 from ..models import CancellationReason
 

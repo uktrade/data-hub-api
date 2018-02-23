@@ -1,6 +1,6 @@
 from unittest import mock
-import pytest
 
+import pytest
 from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
 
@@ -13,7 +13,6 @@ from datahub.omis.order.test.factories import (
     OrderPaidFactory, OrderWithOpenQuoteFactory
 )
 from datahub.omis.region.models import UKRegionalSettings
-
 from ..client import Notify
 
 

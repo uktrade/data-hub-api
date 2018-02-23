@@ -2,6 +2,7 @@ import codecs
 import csv
 from contextlib import closing
 from logging import getLogger
+
 from django.core.management.base import BaseCommand
 
 from datahub.core.utils import get_s3_client

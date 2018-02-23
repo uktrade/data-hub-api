@@ -1,10 +1,8 @@
 import pytest
 from django.core.exceptions import ImproperlyConfigured
-
 from rest_framework import serializers
 
 from datahub.core.serializers import ConstantModelSerializer
-
 from ..models import Sector, UKRegion
 from ..registry import MetadataRegistry
 

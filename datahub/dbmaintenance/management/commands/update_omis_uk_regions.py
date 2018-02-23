@@ -2,7 +2,6 @@ from functools import lru_cache
 
 from datahub.metadata.models import UKRegion
 from datahub.omis.order.models import Order
-
 from ..base import CSVBaseCommand
 
 

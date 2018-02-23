@@ -1,5 +1,4 @@
 from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
-
 from .models import Country, TeamRole, UKRegion
 
 
