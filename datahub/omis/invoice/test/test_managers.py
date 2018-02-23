@@ -1,9 +1,9 @@
 from unittest import mock
+
 import pytest
 from dateutil.parser import parse as dateutil_parse
 
 from datahub.omis.order.test.factories import OrderFactory
-
 from .. import constants
 from ..models import Invoice
 

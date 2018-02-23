@@ -15,7 +15,6 @@ from datahub.core.validators import (
     ValidationRule,
 )
 from datahub.metadata.models import Country, Sector, Team, UKRegion
-
 from datahub.omis.market.models import Market
 from .constants import OrderStatus, VATStatus
 from .models import CancellationReason, Order, OrderAssignee, OrderSubscriber, ServiceType

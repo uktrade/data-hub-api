@@ -1,8 +1,8 @@
 import uuid
+
 import pytest
 from dateutil.parser import parse as dateutil_parse
 from django.utils.timezone import now
-
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -11,14 +11,12 @@ from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.constants import Country, Sector, UKRegion
 from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.omis.market.models import Market
-
 from ..factories import (
     OrderAssigneeCompleteFactory, OrderAssigneeFactory,
     OrderCancelledFactory, OrderCompleteFactory, OrderFactory,
     OrderPaidFactory, OrderWithAcceptedQuoteFactory,
     OrderWithOpenQuoteFactory,
 )
-
 from ...constants import OrderStatus, VATStatus
 from ...models import CancellationReason, ServiceType
 

@@ -5,7 +5,6 @@ from datahub.company.test.factories import (
     CompaniesHouseCompanyFactory, CompanyFactory, ContactFactory
 )
 from datahub.core import constants
-
 from .factories import OrderFactory
 from ..utils import populate_billing_data
 

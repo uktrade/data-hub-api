@@ -7,7 +7,6 @@ from django.test.client import Client
 from django.urls import reverse
 
 from datahub.core.test_utils import AdminTestMixin, create_test_user
-
 from .factories import (
     OrderCancelledFactory, OrderCompleteFactory,
     OrderFactory, OrderPaidFactory,

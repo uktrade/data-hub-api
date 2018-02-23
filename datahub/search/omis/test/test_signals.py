@@ -1,12 +1,10 @@
 import pytest
-
 from django.conf import settings
 
 from datahub.omis.order.test.factories import (
     OrderAssigneeFactory, OrderFactory,
     OrderSubscriberFactory, OrderWithOpenQuoteFactory
 )
-
 from .. import OrderSearchApp
 
 pytestmark = pytest.mark.django_db

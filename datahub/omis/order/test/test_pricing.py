@@ -1,11 +1,10 @@
 from decimal import Decimal
 from unittest import mock
-import pytest
 
+import pytest
 from rest_framework.exceptions import ValidationError
 
 from .factories import HourlyRateFactory, OrderAssigneeFactory, OrderFactory
-
 from ..constants import VATStatus
 from ..models import Order
 from ..pricing import (
