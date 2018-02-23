@@ -1,12 +1,11 @@
 from unittest import mock
+
 import pytest
 from dateutil.parser import parse as dateutil_parse
 from freezegun import freeze_time
 
 from datahub.omis.core.utils import generate_datetime_based_reference
-
 from datahub.omis.order.test.factories import OrderWithAcceptedQuoteFactory
-
 from ..models import Invoice
 from ..utils import calculate_payment_due_date
 

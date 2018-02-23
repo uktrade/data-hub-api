@@ -1,5 +1,4 @@
 import pytest
-
 from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse

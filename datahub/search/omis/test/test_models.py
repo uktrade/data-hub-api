@@ -5,7 +5,6 @@ from datahub.omis.order.test.factories import (
     OrderFactory, OrderPaidFactory, OrderSubscriberFactory,
     OrderWithAcceptedQuoteFactory
 )
-
 from ..models import Order as ESOrder
 
 pytestmark = pytest.mark.django_db

@@ -1,13 +1,12 @@
 from collections import defaultdict
-from django.db import models
 
+from django.db import models
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
 
 from datahub.core.validate_utils import DataCombiner
 from datahub.core.validators import AbstractRule, BaseRule
 from datahub.omis.core.exceptions import Conflict
-
 from .constants import OrderStatus, VATStatus
 
 

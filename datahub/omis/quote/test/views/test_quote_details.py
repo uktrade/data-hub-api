@@ -1,7 +1,7 @@
 import uuid
 from unittest import mock
-import pytest
 
+import pytest
 from dateutil.parser import parse as dateutil_parse
 from freezegun import freeze_time
 from rest_framework import status
@@ -13,7 +13,6 @@ from datahub.omis.order.models import Order
 from datahub.omis.order.test.factories import (
     OrderFactory, OrderWithCancelledQuoteFactory, OrderWithOpenQuoteFactory
 )
-
 from ..factories import QuoteFactory
 from ...models import Quote, TermsAndConditions
 
