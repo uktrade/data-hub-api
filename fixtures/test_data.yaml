@@ -399,6 +399,29 @@
     modified_on: '2017-06-05T00:00:00Z'
 
 - model: interaction.interaction
+  pk: aa162e87-06d5-423d-963e-1ecbe46c62aa
+  fields:
+    kind: policy
+    subject: Unhappy with tariff
+    date: '2017-07-05T00:00:00Z'
+    company: 0f5216e0-849f-11e6-ae22-56b6b6499611
+    contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
+    event: ~
+    service: f56eb92b-3499-e211-a939-e4115bead28a
+    service_delivery_status: ~
+    grant_amount_offered: ~
+    net_company_receipt: ~
+    dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
+    notes: This is a dummy interaction for testing
+    dit_team: 8248318c-9698-e211-a939-e4115bead28a
+    communication_channel: ~
+    investment_project: ~
+    created_by: 7bad8082-4978-4fe8-a018-740257f01637
+    created_on: '2017-07-05T00:00:00Z'
+    modified_by: 7bad8082-4978-4fe8-a018-740257f01637
+    modified_on: '2017-07-05T00:00:00Z'
+
+- model: interaction.interaction
   pk: ec4a46ef-6e50-4a5c-bba0-e311f0471312
   fields:
     kind: service_delivery
