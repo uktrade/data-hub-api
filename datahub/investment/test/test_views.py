@@ -18,6 +18,7 @@ from reversion.models import Version
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
+from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
     APITestMixin, create_test_user, format_date_or_datetime, random_obj_for_model,
     synchronous_executor_submit, synchronous_transaction_on_commit
@@ -1477,6 +1478,167 @@ class TestPartialUpdateView(APITestMixin):
         assert response_data['name'] == 'new name'
 
 
+class TestInvestmentProjectVersioning(APITestMixin):
+    """
+    Tests for versions created when interacting with the investment project endpoints.
+    """
+
+    def test_add_creates_a_new_version(self):
+        """Test that creating an investment project creates a new version."""
+        assert Version.objects.count() == 0
+
+        adviser = AdviserFactory()
+
+        response = self.api_client.post(
+            reverse('api-v3:investment:investment-collection'),
+            data={
+                'name': 'project name',
+                'description': 'project description',
+                'estimated_land_date': '2020-12-12',
+                'investment_type': {
+                    'id': constants.InvestmentType.fdi.value.id
+                },
+                'business_activities': [{
+                    'id': constants.InvestmentBusinessActivity.retail.value.id
+                }],
+                'other_business_activity': 'New innovation centre',
+                'client_contacts': [{'id': str(ContactFactory().id)}],
+                'client_relationship_manager': {'id': str(adviser.id)},
+                'fdi_type': {
+                    'id': constants.FDIType.creation_of_new_site_or_activity.value.id
+                },
+                'investor_company': {'id': str(CompanyFactory().id)},
+                'referral_source_activity': {
+                    'id': constants.ReferralSourceActivity.cold_call.value.id
+                },
+                'referral_source_adviser': {'id': str(adviser.id)},
+                'sector': {
+                    'id': str(constants.Sector.aerospace_assembly_aircraft.value.id)
+                }
+            },
+            format='json'
+        )
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data['name'] == 'project name'
+
+        investment_project = InvestmentProject.objects.get(pk=response.data['id'])
+
+        # check version created
+        assert Version.objects.get_for_object(investment_project).count() == 1
+        version = Version.objects.get_for_object(investment_project).first()
+        assert version.revision.user == self.user
+        assert version.field_dict['name'] == 'project name'
+        assert not any(set(version.field_dict) & set(EXCLUDED_BASE_MODEL_FIELDS))
+
+    def test_add_400_doesnt_create_a_new_version(self):
+        """Test that if the endpoint returns 400, no version is created."""
+        assert Version.objects.count() == 0
+
+        response = self.api_client.post(
+            reverse('api-v3:investment:investment-collection'),
+            data={
+                'name': 'project name'
+            },
+            format='json'
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert Version.objects.count() == 0
+
+    def test_update_creates_a_new_version(self):
+        """Test that updating an investment project creates a new version."""
+        project = InvestmentProjectFactory()
+
+        assert Version.objects.get_for_object(project).count() == 0
+
+        response = self.api_client.patch(
+            reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk}),
+            data={
+                'name': 'new name',
+                'description': 'new description',
+            },
+            format='json'
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['name'] == 'new name'
+        assert response.data['description'] == 'new description'
+
+        # check version created
+        assert Version.objects.get_for_object(project).count() == 1
+        version = Version.objects.get_for_object(project).first()
+        assert version.revision.user == self.user
+        assert version.field_dict['name'] == 'new name'
+        assert version.field_dict['description'] == 'new description'
+
+    def test_update_400_doesnt_create_a_new_version(self):
+        """Test that if the endpoint returns 400, no version is created."""
+        project = InvestmentProjectFactory()
+
+        assert Version.objects.get_for_object(project).count() == 0
+
+        response = self.api_client.patch(
+            reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk}),
+            data={'likelihood_of_landing': -10},
+            format='json'
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert Version.objects.get_for_object(project).count() == 0
+
+    def test_archive_creates_a_new_version(self):
+        """Test that archiving an investment project creates a new version."""
+        project = InvestmentProjectFactory()
+
+        assert Version.objects.get_for_object(project).count() == 0
+
+        response = self.api_client.post(
+            reverse('api-v3:investment:archive-item', kwargs={'pk': project.pk}),
+            data={'reason': 'foo'},
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['archived'] is True
+        assert response.data['archived_reason'] == 'foo'
+
+        # check version created
+        assert Version.objects.get_for_object(project).count() == 1
+        version = Version.objects.get_for_object(project).first()
+        assert version.revision.user == self.user
+        assert version.field_dict['archived'] is True
+        assert version.field_dict['archived_reason'] == 'foo'
+
+    def test_archive_400_doesnt_create_a_new_version(self):
+        """Test that if the endpoint returns 400, no version is created."""
+        project = InvestmentProjectFactory()
+
+        assert Version.objects.get_for_object(project).count() == 0
+
+        url = reverse('api-v3:investment:archive-item', kwargs={'pk': project.pk})
+        response = self.api_client.post(url, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert Version.objects.get_for_object(project).count() == 0
+
+    def test_unarchive_creates_a_new_version(self):
+        """Test that unarchiving an investment project creates a new version."""
+        project = InvestmentProjectFactory(
+            archived=True, archived_on=now(), archived_reason='foo'
+        )
+        assert Version.objects.get_for_object(project).count() == 0
+
+        url = reverse('api-v3:investment:unarchive-item', kwargs={'pk': project.pk})
+        response = self.api_client.post(url, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert not response.data['archived']
+        assert response.data['archived_reason'] == ''
+
+        # check version created
+        assert Version.objects.get_for_object(project).count() == 1
+        version = Version.objects.get_for_object(project).first()
+        assert version.revision.user == self.user
+        assert not version.field_dict['archived']
+
+
 class TestModifiedSinceView(APITestMixin):
     """Tests for the modified-since view."""
 
@@ -2274,6 +2436,240 @@ class TestDeleteTeamMemberView(APITestMixin):
         assert new_team_members[0].adviser.pk == team_members[1].adviser.pk
 
 
+class TestTeamMemberVersioning(APITestMixin):
+    """
+    Tests for versions created when interacting with the investment team member endpoints.
+    """
+
+    def test_add_creates_a_new_version(self):
+        """Test that adding a team member creates a new version."""
+        project = InvestmentProjectFactory()
+        adviser = AdviserFactory()
+
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': project.pk}
+        )
+        response = self.api_client.post(
+            url,
+            data={
+                'adviser': {
+                    'id': str(adviser.pk)
+                },
+                'role': 'Sector adviser'
+            },
+            format='json',
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data['adviser']['id'] == str(adviser.pk)
+        assert response.data['role'] == 'Sector adviser'
+
+        assert project.team_members.count() == 1
+        team_member = project.team_members.first()
+
+        # check version created
+        assert Version.objects.get_for_object(team_member).count() == 1
+        version = Version.objects.get_for_object(team_member).first()
+        assert version.revision.user == self.user
+        assert version.field_dict['adviser_id'] == adviser.pk
+        assert version.field_dict['role'] == 'Sector adviser'
+        assert not any(set(version.field_dict) & set(EXCLUDED_BASE_MODEL_FIELDS))
+
+    def test_add_400_doesnt_create_a_new_version(self):
+        """Test that if the endpoint returns 400, no version is created."""
+        assert Version.objects.count() == 0
+
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': InvestmentProjectFactory().pk}
+        )
+        response = self.api_client.post(
+            url,
+            data={
+                'adviser': {'id': 'invalid'},
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert Version.objects.count() == 0
+
+    def test_replace_creates_new_versions(self):
+        """Test that replacing all team members creates new versions."""
+        assert Version.objects.count() == 0
+
+        project = InvestmentProjectFactory()
+        advisers = AdviserFactory.create_batch(2)
+        advisers.sort(key=attrgetter('id'))
+        InvestmentProjectTeamMemberFactory.create_batch(
+            2, investment_project=project
+        )
+
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': project.pk}
+        )
+        request_data = [{
+            'adviser': {
+                'id': str(adviser.pk)
+            },
+            'role': 'Sector adviser'
+        } for adviser in advisers]
+        response = self.api_client.put(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        response.data.sort(key=_get_adviser_id)
+        assert response.data == [{
+            'adviser': {
+                'id': str(adviser.pk),
+                'first_name': adviser.first_name,
+                'last_name': adviser.last_name,
+                'name': adviser.name,
+            },
+            'investment_project': {
+                'id': str(project.pk),
+                'name': project.name,
+            },
+            'role': 'Sector adviser',
+        } for adviser in advisers]
+
+        assert project.team_members.count() == 2
+
+        # check version created
+        assert Version.objects.count() == 2
+        for adviser in advisers:
+            team_member = project.team_members.filter(adviser=adviser).first()
+            version = Version.objects.get_for_object(team_member).first()
+            assert version.revision.user == self.user
+            assert version.field_dict['adviser_id'] == adviser.pk
+            assert not any(set(version.field_dict) & set(EXCLUDED_BASE_MODEL_FIELDS))
+
+    def test_update_existing_team_members_creates_new_versions(self):
+        """Test that updating existing team members creates new versions."""
+        assert Version.objects.count() == 0
+
+        project = InvestmentProjectFactory()
+        team_members = InvestmentProjectTeamMemberFactory.create_batch(
+            2, investment_project=project, role='Old role'
+        )
+
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': project.pk}
+        )
+        request_data = [{
+            'adviser': {
+                'id': str(team_member.adviser.pk)
+            },
+            'role': 'New role'
+        } for team_member in team_members]
+        response = self.api_client.put(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == [{
+            'adviser': {
+                'id': str(team_member.adviser.pk),
+                'first_name': team_member.adviser.first_name,
+                'last_name': team_member.adviser.last_name,
+                'name': team_member.adviser.name,
+            },
+            'investment_project': {
+                'id': str(project.pk),
+                'name': project.name,
+            },
+            'role': 'New role',
+        } for team_member in team_members]
+
+        # check version created
+        assert Version.objects.count() == 2
+        for team_member in team_members:
+            version = Version.objects.get_for_object(team_member).first()
+            assert version.revision.user == self.user
+            assert version.field_dict['adviser_id'] == team_member.adviser.pk
+            assert not any(set(version.field_dict) & set(EXCLUDED_BASE_MODEL_FIELDS))
+
+    def test_replace_400_doesnt_create_a_new_version(self):
+        """Test that if the endpoint returns 400, no version is created."""
+        assert Version.objects.count() == 0
+
+        project = InvestmentProjectFactory()
+        advisers = AdviserFactory.create_batch(2)
+
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': project.pk}
+        )
+        request_data = [{
+            'adviser': None,
+            'role': 'Sector adviser'
+        }, {
+            'adviser': {
+                'id': str(advisers[0].pk)
+            },
+            'role': 'Sector adviser'
+        }, {
+            'adviser': {
+                'id': str(advisers[1].pk)
+            },
+            'role': ''
+        }]
+        response = self.api_client.put(url, format='json', data=request_data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert Version.objects.count() == 0
+
+    def test_delete_doesnt_create_a_new_version(self):
+        """Test that deleting a team member doesn't create a new version."""
+        assert Version.objects.count() == 0
+
+        project = InvestmentProjectFactory()
+        team_members = InvestmentProjectTeamMemberFactory.create_batch(
+            2, investment_project=project
+        )
+        InvestmentProjectTeamMemberFactory()
+
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={
+                'project_pk': team_members[0].investment_project.pk
+            }
+        )
+        response = self.api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert Version.objects.count() == 0
+
+    def test_update_team_member_creates_a_new_version(self):
+        """Test that updating a team member creates a new version."""
+        assert Version.objects.count() == 0
+
+        team_member = InvestmentProjectTeamMemberFactory()
+        url = reverse(
+            'api-v3:investment:team-member-item',
+            kwargs={
+                'project_pk': team_member.investment_project.pk,
+                'adviser_pk': team_member.adviser.pk
+            }
+        )
+        response = self.api_client.patch(
+            url,
+            data={
+                'role': 'updated role'
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        # check version created
+        assert Version.objects.count() == 1
+        version = Version.objects.get_for_object(team_member).first()
+        assert version.revision.user == self.user
+        assert version.field_dict['adviser_id'] == team_member.adviser.pk
+        assert not any(set(version.field_dict) & set(EXCLUDED_BASE_MODEL_FIELDS))
+
+
 class TestAuditLogView(APITestMixin):
     """Tests for the audit log view."""
 
@@ -2324,8 +2720,7 @@ class TestAuditLogView(APITestMixin):
             'TS can be set manually'
         assert entry['changes']['description'] == ['Initial desc', 'New desc'], \
             'Changes are reflected'
-        assert not {'created_on', 'created_by', 'modified_on', 'modified_by'} & entry[
-            'changes'].keys()
+        assert not set(EXCLUDED_BASE_MODEL_FIELDS) & entry['changes'].keys()
 
     def test_audit_log_restricted_user_associated_project(self):
         """Test retrieval of audit log for a restricted user and an associated project."""
@@ -2374,8 +2769,7 @@ class TestAuditLogView(APITestMixin):
             'TS can be set manually'
         assert entry['changes']['description'] == ['Initial desc', 'New desc'], \
             'Changes are reflected'
-        assert not {'created_on', 'created_by', 'modified_on', 'modified_by'} & entry[
-            'changes'].keys()
+        assert not set(EXCLUDED_BASE_MODEL_FIELDS) & entry['changes'].keys()
 
     def test_audit_log_restricted_user_non_associated_project(self):
         """Test retrieval of audit log for a restricted user and a non-associated project."""

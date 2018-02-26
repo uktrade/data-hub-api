@@ -8,11 +8,12 @@ from rest_framework.reverse import reverse
 from reversion.models import Version
 
 from datahub.company.constants import BusinessTypeConstant
-from datahub.company.models import CompaniesHouseCompany
+from datahub.company.models import CompaniesHouseCompany, Company
 from datahub.company.test.factories import CompaniesHouseCompanyFactory, CompanyFactory
 from datahub.core.constants import (
     CompanyClassification, Country, HeadquarterType, Sector, UKRegion
 )
+from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
@@ -1056,6 +1057,173 @@ class TestUnarchiveCompany(APITestMixin):
         assert response.data['id'] == str(company.id)
 
 
+class TestCompanyVersioning(APITestMixin):
+    """
+    Tests for versions created when interacting with the company endpoints.
+    """
+
+    def test_add_creates_a_new_version(self):
+        """Test that creating a company creates a new version."""
+        assert Version.objects.count() == 0
+
+        response = self.api_client.post(
+            reverse('api-v3:company:collection'),
+            data={
+                'name': 'Acme',
+                'trading_name': 'Trading name',
+                'business_type': {'id': BusinessTypeConstant.company.value.id},
+                'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
+                'registered_address_country': {
+                    'id': Country.united_kingdom.value.id
+                },
+                'registered_address_1': '75 Stramford Road',
+                'registered_address_town': 'London',
+                'uk_region': {'id': UKRegion.england.value.id},
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data['name'] == 'Acme'
+        assert response.data['trading_name'] == 'Trading name'
+
+        company = Company.objects.get(pk=response.data['id'])
+
+        # check version created
+        assert Version.objects.get_for_object(company).count() == 1
+        version = Version.objects.get_for_object(company).first()
+        assert version.revision.user == self.user
+        assert version.field_dict['name'] == 'Acme'
+        assert version.field_dict['alias'] == 'Trading name'
+        assert not any(set(version.field_dict) & set(EXCLUDED_BASE_MODEL_FIELDS))
+
+    def test_promoting_a_ch_company_creates_a_new_version(self):
+        """Test that promoting a CH company to full company creates a new version."""
+        assert Version.objects.count() == 0
+        CompaniesHouseCompanyFactory(company_number=1234567890)
+
+        response = self.api_client.post(
+            reverse('api-v3:company:collection'),
+            data={
+                'name': 'Acme',
+                'company_number': 1234567890,
+                'business_type': BusinessTypeConstant.company.value.id,
+                'sector': Sector.aerospace_assembly_aircraft.value.id,
+                'registered_address_country': Country.united_kingdom.value.id,
+                'registered_address_1': '75 Stramford Road',
+                'registered_address_town': 'London',
+                'uk_region': UKRegion.england.value.id
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+        company = Company.objects.get(pk=response.data['id'])
+
+        # check version created
+        assert Version.objects.get_for_object(company).count() == 1
+        version = Version.objects.get_for_object(company).first()
+        assert version.field_dict['company_number'] == '1234567890'
+
+    def test_add_400_doesnt_create_a_new_version(self):
+        """Test that if the endpoint returns 400, no version is created."""
+        assert Version.objects.count() == 0
+
+        response = self.api_client.post(
+            reverse('api-v3:company:collection'),
+            data={'name': 'Acme'},
+            format='json',
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert Version.objects.count() == 0
+
+    def test_update_creates_a_new_version(self):
+        """Test that updating a company creates a new version."""
+        company = CompanyFactory(name='Foo ltd.')
+
+        assert Version.objects.get_for_object(company).count() == 0
+
+        response = self.api_client.patch(
+            reverse('api-v3:company:item', kwargs={'pk': company.pk}),
+            data={'name': 'Acme'},
+            format='json',
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['name'] == 'Acme'
+
+        # check version created
+        assert Version.objects.get_for_object(company).count() == 1
+        version = Version.objects.get_for_object(company).first()
+        assert version.revision.user == self.user
+        assert version.field_dict['name'] == 'Acme'
+
+    def test_update_400_doesnt_create_a_new_version(self):
+        """Test that if the endpoint returns 400, no version is created."""
+        company = CompanyFactory()
+
+        response = self.api_client.patch(
+            reverse('api-v3:company:item', kwargs={'pk': company.pk}),
+            data={'trading_name': 'a' * 600},
+            format='json',
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert Version.objects.get_for_object(company).count() == 0
+
+    def test_archive_creates_a_new_version(self):
+        """Test that archiving a company creates a new version."""
+        company = CompanyFactory()
+        assert Version.objects.get_for_object(company).count() == 0
+
+        url = reverse('api-v3:company:archive', kwargs={'pk': company.id})
+        response = self.api_client.post(url, {'reason': 'foo'}, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['archived']
+        assert response.data['archived_reason'] == 'foo'
+
+        # check version created
+        assert Version.objects.get_for_object(company).count() == 1
+        version = Version.objects.get_for_object(company).first()
+        assert version.revision.user == self.user
+        assert version.field_dict['archived']
+        assert version.field_dict['archived_reason'] == 'foo'
+
+    def test_archive_400_doesnt_create_a_new_version(self):
+        """Test that if the endpoint returns 400, no version is created."""
+        company = CompanyFactory()
+        assert Version.objects.get_for_object(company).count() == 0
+
+        url = reverse('api-v3:company:archive', kwargs={'pk': company.id})
+        response = self.api_client.post(url, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert Version.objects.get_for_object(company).count() == 0
+
+    def test_unarchive_creates_a_new_version(self):
+        """Test that unarchiving a company creates a new version."""
+        company = CompanyFactory(
+            archived=True, archived_on=now(), archived_reason='foo'
+        )
+        assert Version.objects.get_for_object(company).count() == 0
+
+        url = reverse('api-v3:company:unarchive', kwargs={'pk': company.id})
+        response = self.api_client.post(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert not response.data['archived']
+        assert response.data['archived_reason'] == ''
+
+        # check version created
+        assert Version.objects.get_for_object(company).count() == 1
+        version = Version.objects.get_for_object(company).first()
+        assert version.revision.user == self.user
+        assert not version.field_dict['archived']
+
+
 class TestAuditLogView(APITestMixin):
     """Tests for the audit log view."""
 
@@ -1096,8 +1264,7 @@ class TestAuditLogView(APITestMixin):
         assert entry['comment'] == 'Changed'
         assert entry['timestamp'] == format_date_or_datetime(changed_datetime)
         assert entry['changes']['description'] == ['Initial desc', 'New desc']
-        assert not {'created_on', 'created_by', 'modified_on', 'modified_by'} & entry[
-            'changes'].keys()
+        assert not set(EXCLUDED_BASE_MODEL_FIELDS) & entry['changes'].keys()
 
 
 class TestCHCompany(APITestMixin):
