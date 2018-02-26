@@ -1,4 +1,5 @@
 import uuid
+
 import reversion
 
 from datahub.investment.models import InvestmentProject

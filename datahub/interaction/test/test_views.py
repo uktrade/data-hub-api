@@ -12,7 +12,6 @@ from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_f
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.constants import CommunicationChannel
 from datahub.interaction.models import InteractionPermission, ServiceDeliveryStatus
-
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory, EventServiceDeliveryFactory, InvestmentProjectInteractionFactory,
     ServiceDeliveryFactory,

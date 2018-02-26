@@ -1,5 +1,4 @@
 from ..models import Company as ESCompany
-
 from ... import elasticsearch
 
 

@@ -3,11 +3,9 @@ from unittest import mock
 import pytest
 from django.core import management
 
-
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.search.management.commands import sync_es
-
 from ...apps import get_search_apps
 from ...company.models import Company as ESCompany
 from ...contact.models import Contact as ESContact

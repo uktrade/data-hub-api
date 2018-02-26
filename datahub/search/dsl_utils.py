@@ -1,4 +1,5 @@
 from functools import partial
+
 from elasticsearch_dsl import Keyword, Nested, Text
 
 SortableCaseInsensitiveKeywordText = partial(

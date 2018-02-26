@@ -1,6 +1,5 @@
 from django.db.models import Prefetch
 
-
 from datahub.investment.models import (
     InvestmentProject as DBInvestmentProject,
     InvestmentProjectPermission,
@@ -9,10 +8,8 @@ from datahub.investment.models import (
 from datahub.investment.permissions import (
     get_association_filters, InvestmentProjectAssociationChecker
 )
-
 from .models import InvestmentProject
 from .views import SearchInvestmentProjectAPIView, SearchInvestmentProjectExportAPIView
-
 from ..apps import EXCLUDE_ALL, SearchApp
 
 

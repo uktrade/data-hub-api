@@ -1,7 +1,6 @@
 import reversion
 
 from datahub.investment.models import InvestmentProject
-
 from ..base import CSVBaseCommand
 
 
