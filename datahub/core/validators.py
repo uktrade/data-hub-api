@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from collections import namedtuple
 from functools import partial
-from operator import eq
-from typing import Any, Callable, Sequence
+from operator import contains, eq
+from typing import Any, Callable, Iterable, Sequence
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -248,6 +248,19 @@ class EqualsRule(OperatorRule):
         :param value: Value to test equality with.
         """
         super().__init__(field, partial(eq, value))
+
+
+class InRule(OperatorRule):
+    """Contains operator-based rule for a field. Checks that field value is in values"""
+
+    def __init__(self, field: str, value: Iterable[Any]):
+        """
+        Initialises the rule.
+
+        :param field: The name of the field the rule applies to.
+        :param value: a list of Values to test equality with.
+        """
+        super().__init__(field, partial(contains, value))
 
 
 class ConditionalRule:
