@@ -1,4 +1,5 @@
 import reversion
+from reversion.middleware import RevisionMiddleware
 
 EXCLUDED_BASE_MODEL_FIELDS = ('created_on', 'created_by', 'modified_on', 'modified_by')
 
@@ -32,3 +33,15 @@ def register_base_model(extra_exclude=None, **kwargs):
         )
 
     return reversion.register(**kwargs)
+
+
+class NonAtomicRevisionMiddleware(RevisionMiddleware):
+    """
+    Same as reversion.middleware.RevisionMiddleware but with atomic == False.
+    Therefore the resulting atomic value depends on:
+    - the `ATOMIC_REQUESTS` settings
+    - whether `transaction.atomic()` is used
+    - whether `transaction.non_atomic_requests()` is used
+    """
+
+    atomic = False
