@@ -6,7 +6,6 @@ from pytest import fixture
 
 from datahub.core.test_utils import synchronous_executor_submit, synchronous_transaction_on_commit
 from datahub.search import elasticsearch
-
 from .apps import get_search_apps
 
 

@@ -1,7 +1,6 @@
 import pytest
 
 from datahub.company.test.factories import CompanyFactory
-
 from ..models import Company as ESCompany
 
 pytestmark = pytest.mark.django_db

@@ -1,5 +1,6 @@
 from django.conf import settings
 from elasticsearch_dsl import Boolean, Date, DocType, Keyword, Text
+
 from . import dict_utils as contact_dict_utils
 from .. import dict_utils
 from .. import dsl_utils
