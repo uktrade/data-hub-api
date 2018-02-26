@@ -5,13 +5,15 @@ import pytest
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
+from reversion.models import Version
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import Service, Team
+from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.constants import CommunicationChannel
-from datahub.interaction.models import InteractionPermission, ServiceDeliveryStatus
+from datahub.interaction.models import Interaction, InteractionPermission, ServiceDeliveryStatus
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory, EventServiceDeliveryFactory, InvestmentProjectInteractionFactory,
     ServiceDeliveryFactory,
@@ -1204,3 +1206,93 @@ class TestListInteractionsView(APITestMixin):
         actual_ids = {i['id'] for i in response_data['results']}
         expected_ids = {str(i.id) for i in associated_project_interactions}
         assert actual_ids == expected_ids
+
+
+class TestInteractionVersioning(APITestMixin):
+    """
+    Tests for versions created when interacting with the interaction endpoints.
+    """
+
+    def test_add_creates_a_new_version(self):
+        """Test that creating an interaction creates a new version."""
+        assert Version.objects.count() == 0
+
+        response = self.api_client.post(
+            reverse('api-v3:interaction:collection'),
+            data={
+                'kind': 'interaction',
+                'communication_channel': CommunicationChannel.face_to_face.value.id,
+                'subject': 'whatever',
+                'date': date.today().isoformat(),
+                'dit_adviser': AdviserFactory().pk,
+                'notes': 'hello',
+                'company': CompanyFactory().pk,
+                'contact': ContactFactory().pk,
+                'service': Service.trade_enquiry.value.id,
+                'dit_team': Team.healthcare_uk.value.id
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data['subject'] == 'whatever'
+
+        interaction = Interaction.objects.get(pk=response.data['id'])
+
+        # check version created
+        assert Version.objects.get_for_object(interaction).count() == 1
+        version = Version.objects.get_for_object(interaction).first()
+        assert version.revision.user == self.user
+        assert version.field_dict['subject'] == 'whatever'
+        assert not any(set(version.field_dict) & set(EXCLUDED_BASE_MODEL_FIELDS))
+
+    def test_add_400_doesnt_create_a_new_version(self):
+        """Test that if the endpoint returns 400, no version is created."""
+        assert Version.objects.count() == 0
+
+        response = self.api_client.post(
+            reverse('api-v3:interaction:collection'),
+            data={
+                'kind': 'interaction'
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert Version.objects.count() == 0
+
+    def test_update_creates_a_new_version(self):
+        """Test that updating an interaction creates a new version."""
+        service_delivery = EventServiceDeliveryFactory()
+
+        assert Version.objects.get_for_object(service_delivery).count() == 0
+
+        response = self.api_client.patch(
+            reverse('api-v3:interaction:item', kwargs={'pk': service_delivery.pk}),
+            data={'subject': 'new subject'},
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['subject'] == 'new subject'
+
+        # check version created
+        assert Version.objects.get_for_object(service_delivery).count() == 1
+        version = Version.objects.get_for_object(service_delivery).first()
+        assert version.revision.user == self.user
+        assert version.field_dict['subject'] == 'new subject'
+
+    def test_update_400_doesnt_create_a_new_version(self):
+        """Test that if the endpoint returns 400, no version is created."""
+        service_delivery = EventServiceDeliveryFactory()
+
+        assert Version.objects.get_for_object(service_delivery).count() == 0
+
+        response = self.api_client.patch(
+            reverse('api-v3:interaction:item', kwargs={'pk': service_delivery.pk}),
+            data={'kind': 'invalid'},
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert Version.objects.get_for_object(service_delivery).count() == 0
