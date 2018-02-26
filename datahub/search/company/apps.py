@@ -1,8 +1,6 @@
 from datahub.company.models import Company as DBCompany
-
 from .models import Company
 from .views import SearchCompanyAPIView, SearchCompanyExportAPIView
-
 from ..apps import SearchApp
 
 

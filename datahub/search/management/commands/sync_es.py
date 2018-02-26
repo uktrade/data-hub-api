@@ -5,7 +5,6 @@ from django.core.paginator import Paginator
 from django.db import models
 
 from datahub.search.elasticsearch import bulk
-
 from ...apps import get_search_apps
 
 

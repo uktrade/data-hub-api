@@ -1,8 +1,8 @@
 from logging import getLogger
 
 from raven.contrib.django.raven_compat.models import client
-from datahub.core.utils import executor
 
+from datahub.core.utils import executor
 from datahub.search import elasticsearch
 
 logger = getLogger(__name__)
