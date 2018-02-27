@@ -41,7 +41,7 @@ jobs:
 
       - run:
           name: Install dependencies
-          command: pip install --cache-dir ~/cache/pip -r requirements.txt
+          command: python -m pip install --cache-dir ~/cache/pip -r requirements.txt
 
       - save_cache:
           name: Save pip cache
@@ -50,17 +50,14 @@ jobs:
             - ~/cache/pip
       - run:
           name: Run Flake8
-          command: flake8
+          command: python -m flake8
 
       - run:
           name: Run tests
-          command: |
-            set -xu
-            ./tests.sh
+          command: python -m pytest -n 4 --cov -s
 
       - run:
           name: Publish coverage
           command: |
-            set -xu
             wget -O codecov.sh https://codecov.io/bash
             bash ./codecov.sh -t ${COV_TOKEN}
