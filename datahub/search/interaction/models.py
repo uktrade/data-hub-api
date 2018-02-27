@@ -1,6 +1,5 @@
 from operator import attrgetter
 
-from django.conf import settings
 from elasticsearch_dsl import Boolean, Date, DocType, Double, Keyword
 
 from datahub.search import dict_utils, dsl_utils
@@ -73,5 +72,4 @@ class Interaction(DocType, MapDBModelToDict):
     class Meta:
         """Default document meta data."""
 
-        index = settings.ES_INDEX
         doc_type = 'interaction'
