@@ -136,8 +136,16 @@ If using Docker, prefix these commands with `docker-compose run leeloo`.
 To run the tests:
 
 ```shell
-bash tests.sh
+./tests.sh
 ```
+
+To run the tests in parallel, pass `-n <number of processes>` to `./tests.sh`. For example, for four processes:
+
+
+```shell
+./tests.sh -n 4
+```
+
 
 To run the linter:
 
