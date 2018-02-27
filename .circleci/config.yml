@@ -54,7 +54,10 @@ jobs:
 
       - run:
           name: Run tests
-          command: python -m pytest -n 4 --cov -s
+          command: python -m pytest -n 4 --cov -s --junitxml=test-reports/junit.xml
+
+      - store_test_results:
+          path: test-reports
 
       - run:
           name: Publish coverage
