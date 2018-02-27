@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from dateutil.parser import parse as dateutil_parse
 from rest_framework import serializers
 from rest_framework.settings import api_settings
@@ -70,7 +68,7 @@ class NullStringUUIDField(StringUUIDField):
         if value in self.NULL_VALUES:
             return None
 
-        return UUID(value)
+        return super().to_representation(value)
 
     def to_internal_value(self, data):
         """
