@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from ..serializers import (
+    NullStringUUIDField,
     SearchSerializer,
     SingleOrListField,
     StringUUIDField,
@@ -15,6 +16,8 @@ class SearchCompanySerializer(SearchSerializer):
     description = serializers.CharField(required=False)
     export_to_country = SingleOrListField(child=StringUUIDField(), required=False)
     future_interest_country = SingleOrListField(child=StringUUIDField(), required=False)
+    global_headquarters = SingleOrListField(child=StringUUIDField(), required=False)
+    headquarter_type = SingleOrListField(child=NullStringUUIDField(), required=False)
     name = serializers.CharField(required=False)
     sector = SingleOrListField(child=StringUUIDField(), required=False)
     trading_address_country = SingleOrListField(child=StringUUIDField(), required=False)

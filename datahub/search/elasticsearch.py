@@ -292,6 +292,12 @@ def _get_basic_field_query(field, value):
 
 def _get_field_query(field, value):
     """Gets field query."""
+    if value is None:
+        return _get_exists_query(
+            f"{field.rsplit('.', maxsplit=1)[0]}_exists",
+            False
+        )
+
     query = _get_basic_field_query(field, value)
     if '.' not in field:
         return query
