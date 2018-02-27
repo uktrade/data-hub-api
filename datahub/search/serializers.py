@@ -64,7 +64,7 @@ class NullStringUUIDField(StringUUIDField):
     NULL_VALUES = {'n', 'N', 'null', 'Null', 'NULL', '', None, 'None'}
 
     def to_representation(self, value):
-        """Converts string to UUID or returns None if null-ish."""
+        """Converts UUID to string or returns None if null-ish."""
         if value in self.NULL_VALUES:
             return None
 
