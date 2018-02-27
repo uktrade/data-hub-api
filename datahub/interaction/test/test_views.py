@@ -296,15 +296,16 @@ class TestGetInteractionView(APITestMixin):
 class TestAddInteractionView(APITestMixin):
     """Tests for the add interaction view."""
 
+    @pytest.mark.parametrize('kind', (Interaction.KINDS.interaction, Interaction.KINDS.policy,))
     @freeze_time('2017-04-18 13:25:30.986208')
-    def test_add_interaction(self):
+    def test_add_interaction(self, kind):
         """Test add new interaction."""
         adviser = AdviserFactory()
         company = CompanyFactory()
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         request_data = {
-            'kind': 'interaction',
+            'kind': kind,
             'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -321,7 +322,7 @@ class TestAddInteractionView(APITestMixin):
         response_data = response.json()
         assert response_data == {
             'id': response_data['id'],
-            'kind': 'interaction',
+            'kind': kind,
             'is_event': None,
             'service_delivery_status': None,
             'grant_amount_offered': None,
@@ -690,14 +691,15 @@ class TestAddInteractionView(APITestMixin):
             'subject': ['This field is required.'],
         }
 
-    def test_add_interaction_missing_interaction_only_fields(self):
+    @pytest.mark.parametrize('kind', (Interaction.KINDS.interaction, Interaction.KINDS.policy,))
+    def test_add_interaction_missing_interaction_only_fields(self, kind):
         """Test add new interaction without required interaction-only fields."""
         adviser = AdviserFactory()
         company = CompanyFactory()
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         request_data = {
-            'kind': 'interaction',
+            'kind': kind,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -714,14 +716,15 @@ class TestAddInteractionView(APITestMixin):
             'communication_channel': ['This field is required.'],
         }
 
-    def test_add_interaction_with_service_delivery_fields(self):
+    @pytest.mark.parametrize('kind', (Interaction.KINDS.interaction, Interaction.KINDS.policy,))
+    def test_add_interaction_with_service_delivery_fields(self, kind):
         """Tests that adding an interaction with an event fails."""
         adviser = AdviserFactory()
         company = CompanyFactory()
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         request_data = {
-            'kind': 'interaction',
+            'kind': kind,
             'is_event': False,
             'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
@@ -776,14 +779,15 @@ class TestAddInteractionView(APITestMixin):
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
-    def test_add_interaction_project(self):
+    @pytest.mark.parametrize('kind', (Interaction.KINDS.interaction, Interaction.KINDS.policy,))
+    def test_add_interaction_project(self, kind):
         """Test add new interaction for an investment project."""
         project = InvestmentProjectFactory()
         adviser = AdviserFactory()
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.post(url, {
-            'kind': 'interaction',
+            'kind': kind,
             'contact': contact.pk,
             'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
@@ -802,14 +806,15 @@ class TestAddInteractionView(APITestMixin):
         assert response_data['modified_on'] == '2017-04-18T13:25:30.986208Z'
         assert response_data['created_on'] == '2017-04-18T13:25:30.986208Z'
 
-    def test_add_interaction_no_entity(self):
+    @pytest.mark.parametrize('kind', (Interaction.KINDS.interaction, Interaction.KINDS.policy,))
+    def test_add_interaction_no_entity(self, kind):
         """Test add new interaction without a contact, company or
         investment project.
         """
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.post(url, {
-            'kind': 'interaction',
+            'kind': kind,
             'contact': contact.pk,
             'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
