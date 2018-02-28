@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from .constants import PaymentMethod
-from .models import Payment
+from .models import Payment, PaymentGatewaySession
 
 
 class PaymentListSerializer(serializers.ListSerializer):
@@ -44,4 +44,27 @@ class PaymentSerializer(serializers.ModelSerializer):
             'created_on',
             'reference',
             'additional_reference',
+        )
+
+
+class PaymentGatewaySessionSerializer(serializers.ModelSerializer):
+    """Payment Gateway Session DRF serializer."""
+
+    payment_url = serializers.CharField(source='get_payment_url', required=False)
+
+    class Meta:
+        model = PaymentGatewaySession
+        fields = (
+            'id',
+            'created_on',
+            'status',
+            'payment_url',
+        )
+        read_only_fields = fields
+
+    def create(self, validated_data):
+        """Create a payment gateway session."""
+        return PaymentGatewaySession.objects.create_from_order(
+            self.context['order'],
+            validated_data
         )
