@@ -148,7 +148,7 @@ class TestPaymentGatewaySessionManager:
             requests_stubber.get(
                 govuk_url(f'payments/{session.govuk_payment_id}'),
                 [
-                    # this is for tthe initial refresh
+                    # this is for the initial refresh
                     {
                         'status_code': 200,
                         'json': {'state': {'status': session.status}},
