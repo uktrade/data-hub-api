@@ -1,4 +1,3 @@
-from django.conf import settings
 from elasticsearch_dsl import Boolean, Date, DocType, Keyword, Text
 
 from . import dict_utils as contact_dict_utils
@@ -102,5 +101,4 @@ class Contact(DocType, MapDBModelToDict):
     class Meta:
         """Default document meta data."""
 
-        index = settings.ES_INDEX
         doc_type = 'contact'

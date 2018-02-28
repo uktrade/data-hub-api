@@ -10,12 +10,18 @@ from .apps import get_search_apps
 
 
 @fixture(scope='session')
-def client(request):
-    """Makes the ES test helper client available."""
-    from elasticsearch_dsl.connections import connections
-    client = get_test_client(nowait=False)
-    connections.add_connection('default', client)
-    return client
+def client(worker_id):
+    """
+    Makes the ES test helper client available.
+
+    Also patches settings.ES_INDEX using the xdist worker ID so that each process gets a unique
+    index when running tests using multiple processes using pytest -n.
+    """
+    with mock.patch.object(settings, 'ES_INDEX', new=f'test_{worker_id}'):
+        from elasticsearch_dsl.connections import connections
+        client = get_test_client(nowait=False)
+        connections.add_connection('default', client)
+        yield client
 
 
 @fixture(scope='session')

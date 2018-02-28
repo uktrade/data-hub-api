@@ -1,4 +1,3 @@
-from django.conf import settings
 from elasticsearch_dsl import Date, DocType, Keyword, Text
 
 from datahub.search import dict_utils, dsl_utils
@@ -49,5 +48,4 @@ class CompaniesHouseCompany(DocType, MapDBModelToDict):
     class Meta:
         """Default document meta data."""
 
-        index = settings.ES_INDEX
         doc_type = 'companieshousecompany'
