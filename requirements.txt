@@ -4,6 +4,7 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
+apipkg==1.4               # via execnet
 attrs==17.4.0             # via pytest
 aws-requests-auth==0.4.1
 boto3==1.5.36
@@ -29,6 +30,7 @@ docutils==0.14            # via botocore, docutils
 elasticsearch-dsl==5.4.0
 elasticsearch==5.5.2
 enum34==1.1.6             # via flake8-import-order
+execnet==1.5.0            # via pytest-xdist
 factory-boy==2.10.0
 faker==0.8.11             # via factory-boy
 first==2.0.1              # via first, pip-tools
@@ -74,7 +76,9 @@ pygments==2.2.0           # via ipython, pygments
 pyjwt==1.5.3              # via notifications-python-client, pyjwt
 pytest-cov==2.5.1
 pytest-django==3.1.2
+pytest-forked==0.2        # via pytest-xdist
 pytest-sugar==0.9.1
+pytest-xdist==1.22.2
 pytest==3.4.1
 python-dateutil==2.6.1
 pytz==2018.3              # via django

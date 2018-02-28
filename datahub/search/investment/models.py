@@ -1,4 +1,3 @@
-from django.conf import settings
 from elasticsearch_dsl import Boolean, Date, DocType, Double, Integer, Keyword, Text
 
 from .. import dict_utils
@@ -166,5 +165,4 @@ class InvestmentProject(DocType, MapDBModelToDict):
     class Meta:
         """Default document meta data."""
 
-        index = settings.ES_INDEX
         doc_type = 'investment_project'

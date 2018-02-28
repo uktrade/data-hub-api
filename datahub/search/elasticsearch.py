@@ -516,5 +516,5 @@ def _clip_limit(offset, limit):
 
 def delete_document(model, document_id):
     """Deletes specified model's document."""
-    doc = model.get(id=document_id)
+    doc = model.get(id=document_id, index=settings.ES_INDEX)
     doc.delete()

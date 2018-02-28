@@ -12,7 +12,8 @@ INSTALLED_APPS += [
     'datahub.core.test.support'
 ]
 
-ES_INDEX = 'test'
+# The index is set dynamically in datahub/search/conftest.py, so that tests can be parallelised.
+ES_INDEX = None
 ES_INDEX_SETTINGS = {
     'index.mapping.nested_fields.limit': 100,
     'number_of_shards': 1,

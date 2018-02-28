@@ -1,4 +1,3 @@
-from django.conf import settings
 from elasticsearch_dsl import Boolean, Date, DocType, Integer, Keyword, Text
 
 from .. import dict_utils
@@ -114,5 +113,4 @@ class Order(DocType, MapDBModelToDict):
     class Meta:
         """Default document meta data."""
 
-        index = settings.ES_INDEX
         doc_type = 'order'
