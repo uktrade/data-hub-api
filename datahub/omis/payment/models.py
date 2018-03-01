@@ -50,6 +50,15 @@ class PaymentGatewaySession(BaseModel):
         """
         return PayClient().get_payment_by_id(self.govuk_payment_id)
 
+    def get_payment_url(self):
+        """
+        :returns: the GOV.UK Pay payment url to redirect the users to complete the payment
+
+        :raises GOVUKPayAPIException: if there is a problem with GOV.UK Pay
+        """
+        next_url = self._get_payment_from_govuk_pay()['_links']['next_url'] or {}
+        return next_url.get('href', '')
+
     def is_finished(self):
         """
         :returns: True if this payment gateway session is in a finished status

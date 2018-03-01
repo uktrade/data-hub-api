@@ -34,6 +34,55 @@ class TestPaymentGatewaySessionIsFinished:
         assert session.is_finished() == finished
 
 
+class TestPaymentGatewaySessionGetPaymentURL:
+    """Tests for the `get_payment_url` method."""
+
+    def test_with_value(self, requests_stubber):
+        """
+        Test the value returned when the GOV.UK Pay response data includes next_url.
+        """
+        govuk_payment_id = '123abc123abc123abc123abc12'
+        next_url = 'https://payment.example.com/123abc'
+        requests_stubber.get(
+            govuk_url(f'payments/{govuk_payment_id}'),
+            status_code=200,
+            json={
+                'state': {'status': 'started', 'finished': False},
+                'payment_id': govuk_payment_id,
+                '_links': {
+                    'next_url': {
+                        'href': next_url,
+                        'method': 'GET'
+                    },
+                }
+            }
+        )
+
+        session = PaymentGatewaySession(govuk_payment_id=govuk_payment_id)
+        assert session.get_payment_url() == next_url
+
+    def test_without_value(self, requests_stubber):
+        """
+        Test that an empty string is returned when the GOV.UK Pay response data
+        doesn't include next_url.
+        """
+        govuk_payment_id = '123abc123abc123abc123abc12'
+        requests_stubber.get(
+            govuk_url(f'payments/{govuk_payment_id}'),
+            status_code=200,
+            json={
+                'state': {'status': 'cancelled', 'finished': True},
+                'payment_id': govuk_payment_id,
+                '_links': {
+                    'next_url': None,
+                }
+            }
+        )
+
+        session = PaymentGatewaySession(govuk_payment_id=govuk_payment_id)
+        assert session.get_payment_url() == ''
+
+
 @pytest.mark.django_db
 class TestPaymentGatewaySessionRefresh:
     """Tests for the `refresh_from_govuk_payment` method."""
