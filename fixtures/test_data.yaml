@@ -401,7 +401,7 @@
 - model: interaction.interaction
   pk: aa162e87-06d5-423d-963e-1ecbe46c62aa
   fields:
-    kind: policy
+    kind: policy_feedback
     subject: Unhappy with tariff
     date: '2017-07-05T00:00:00Z'
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
