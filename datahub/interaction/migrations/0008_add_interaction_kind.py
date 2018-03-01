@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             field=models.CharField(choices=[
                 ('interaction', 'Interaction'),
                 ('service_delivery', 'Service delivery'),
-                ('policy', 'Policy interaction'),
+                ('policy_feedback', 'Policy feedback'),
             ], default='interaction', max_length=255),
             preserve_default=False,
         ),

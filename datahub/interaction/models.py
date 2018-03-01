@@ -74,7 +74,7 @@ class Interaction(BaseModel):
     KINDS = Choices(
         ('interaction', 'Interaction'),
         ('service_delivery', 'Service delivery'),
-        ('policy', 'Policy interaction'),
+        ('policy_feedback', 'Policy feedback'),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)

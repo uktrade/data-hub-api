@@ -109,7 +109,7 @@ class InteractionSerializer(serializers.ModelSerializer):
                     OperatorRule('communication_channel', bool),
                     when=InRule('kind', [
                         Interaction.KINDS.interaction,
-                        Interaction.KINDS.policy
+                        Interaction.KINDS.policy_feedback
                     ]),
                 ),
                 ValidationRule(
@@ -125,7 +125,7 @@ class InteractionSerializer(serializers.ModelSerializer):
                     OperatorRule('net_company_receipt', is_blank),
                     when=InRule('kind', [
                         Interaction.KINDS.interaction,
-                        Interaction.KINDS.policy
+                        Interaction.KINDS.policy_feedback
                     ]),
                 ),
                 ValidationRule(
