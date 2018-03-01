@@ -23,6 +23,8 @@ pytestmark = pytest.mark.django_db
 def test_order_to_dict(Factory, setup_es):
     """Test converting an order to dict."""
     order = Factory()
+    setup_es.indices.refresh()
+
     invoice = order.invoice
     OrderSubscriberFactory.create_batch(2, order=order)
     OrderAssigneeFactory.create_batch(2, order=order)
