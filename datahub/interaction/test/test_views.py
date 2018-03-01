@@ -296,7 +296,9 @@ class TestGetInteractionView(APITestMixin):
 class TestAddInteractionView(APITestMixin):
     """Tests for the add interaction view."""
 
-    @pytest.mark.parametrize('kind', (Interaction.KINDS.interaction, Interaction.KINDS.policy,))
+    @pytest.mark.parametrize(
+        'kind', (Interaction.KINDS.interaction, Interaction.KINDS.policy_feedback,)
+    )
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_add_interaction(self, kind):
         """Test add new interaction."""
@@ -691,7 +693,10 @@ class TestAddInteractionView(APITestMixin):
             'subject': ['This field is required.'],
         }
 
-    @pytest.mark.parametrize('kind', (Interaction.KINDS.interaction, Interaction.KINDS.policy,))
+    @pytest.mark.parametrize(
+        'kind',
+        (Interaction.KINDS.interaction, Interaction.KINDS.policy_feedback,)
+    )
     def test_add_interaction_missing_interaction_only_fields(self, kind):
         """Test add new interaction without required interaction-only fields."""
         adviser = AdviserFactory()
@@ -716,7 +721,10 @@ class TestAddInteractionView(APITestMixin):
             'communication_channel': ['This field is required.'],
         }
 
-    @pytest.mark.parametrize('kind', (Interaction.KINDS.interaction, Interaction.KINDS.policy,))
+    @pytest.mark.parametrize(
+        'kind',
+        (Interaction.KINDS.interaction, Interaction.KINDS.policy_feedback,)
+    )
     def test_add_interaction_with_service_delivery_fields(self, kind):
         """Tests that adding an interaction with an event fails."""
         adviser = AdviserFactory()
@@ -779,7 +787,10 @@ class TestAddInteractionView(APITestMixin):
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
-    @pytest.mark.parametrize('kind', (Interaction.KINDS.interaction, Interaction.KINDS.policy,))
+    @pytest.mark.parametrize(
+        'kind',
+        (Interaction.KINDS.interaction, Interaction.KINDS.policy_feedback,)
+    )
     def test_add_interaction_project(self, kind):
         """Test add new interaction for an investment project."""
         project = InvestmentProjectFactory()
@@ -806,7 +817,10 @@ class TestAddInteractionView(APITestMixin):
         assert response_data['modified_on'] == '2017-04-18T13:25:30.986208Z'
         assert response_data['created_on'] == '2017-04-18T13:25:30.986208Z'
 
-    @pytest.mark.parametrize('kind', (Interaction.KINDS.interaction, Interaction.KINDS.policy,))
+    @pytest.mark.parametrize(
+        'kind',
+        (Interaction.KINDS.interaction, Interaction.KINDS.policy_feedback,)
+    )
     def test_add_interaction_no_entity(self, kind):
         """Test add new interaction without a contact, company or
         investment project.
