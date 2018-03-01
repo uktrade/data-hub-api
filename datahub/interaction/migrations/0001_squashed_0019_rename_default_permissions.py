@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
                 ('investment_project', models.ForeignKey(blank=True, help_text='For interactions only.', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='interactions', to='investment.InvestmentProject')),
                 ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
                 ('modified_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('kind', models.CharField(choices=[('interaction', 'Interaction'), ('service_delivery', 'Service delivery'), ('policy', 'Policy interaction')], max_length=255)),
+                ('kind', models.CharField(choices=[('interaction', 'Interaction'), ('service_delivery', 'Service delivery'), ('policy_feedback', 'Policy feedback')], max_length=255)),
                 ('event', models.ForeignKey(blank=True, help_text='For service deliveries only.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='interactions', to='event.Event')),
                 ('archived_documents_url_path', models.CharField(blank=True, help_text='Legacy field. File browser path to the archived documents for this interaction.', max_length=255)),
 
