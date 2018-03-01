@@ -50,6 +50,7 @@ def setup_es(setup_es_indexes):
     """Sets up ES and deletes all the records after each run."""
     yield setup_es_indexes
 
+    setup_es_indexes.indices.refresh()
     setup_es_indexes.delete_by_query(
         settings.ES_INDEX,
         body={'query': {'match_all': {}}},
