@@ -54,8 +54,7 @@ def setup_es(_setup_es_indexes, monkeypatch):
     _setup_es_indexes.indices.refresh()
     _setup_es_indexes.delete_by_query(
         settings.ES_INDEX,
-        body={'query': {'match_all': {}}},
-        ignore=(409,)
+        body={'query': {'match_all': {}}}
     )
     _setup_es_indexes.indices.refresh()
 
