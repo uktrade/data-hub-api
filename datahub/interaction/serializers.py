@@ -8,7 +8,7 @@ from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import is_blank, is_not_blank
 from datahub.core.validators import (
-    AnyOfValidator, EqualsRule, OperatorRule, RulesBasedValidator, ValidationRule
+    AnyOfValidator, EqualsRule, InRule, OperatorRule, RulesBasedValidator, ValidationRule
 )
 from datahub.event.models import Event
 from datahub.investment.models import InvestmentProject
@@ -107,7 +107,10 @@ class InteractionSerializer(serializers.ModelSerializer):
                 ValidationRule(
                     'required',
                     OperatorRule('communication_channel', bool),
-                    when=EqualsRule('kind', Interaction.KINDS.interaction),
+                    when=InRule('kind', [
+                        Interaction.KINDS.interaction,
+                        Interaction.KINDS.policy_feedback
+                    ]),
                 ),
                 ValidationRule(
                     'invalid_for_service_delivery',
@@ -120,7 +123,10 @@ class InteractionSerializer(serializers.ModelSerializer):
                     OperatorRule('service_delivery_status', is_blank),
                     OperatorRule('grant_amount_offered', is_blank),
                     OperatorRule('net_company_receipt', is_blank),
-                    when=EqualsRule('kind', Interaction.KINDS.interaction),
+                    when=InRule('kind', [
+                        Interaction.KINDS.interaction,
+                        Interaction.KINDS.policy_feedback
+                    ]),
                 ),
                 ValidationRule(
                     'required',

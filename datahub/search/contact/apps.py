@@ -1,8 +1,6 @@
 from datahub.company.models import Contact as DBContact
-
 from .models import Contact
 from .views import SearchContactAPIView, SearchContactExportAPIView
-
 from ..apps import SearchApp
 
 

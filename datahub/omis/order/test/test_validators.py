@@ -1,17 +1,15 @@
 from unittest import mock
+
 import pytest
 from django.db.models import Sum
-
 from rest_framework.exceptions import ValidationError
 
 from datahub.omis.core.exceptions import Conflict
-
 from .factories import (
     OrderFactory,
     OrderWithCancelledQuoteFactory,
     OrderWithOpenQuoteFactory,
 )
-
 from ..constants import OrderStatus, VATStatus
 from ..models import Order
 from ..validators import (

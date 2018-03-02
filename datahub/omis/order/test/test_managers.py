@@ -1,7 +1,6 @@
 import pytest
 
 from datahub.omis.quote.test.factories import CancelledQuoteFactory
-
 from .factories import OrderFactory
 from ..constants import OrderStatus
 from ..models import Order

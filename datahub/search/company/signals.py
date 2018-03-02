@@ -2,7 +2,6 @@ from django.db import transaction
 from django.db.models.signals import post_save
 
 from datahub.company.models import Company as DBCompany
-
 from .models import Company as ESCompany
 from ..signals import sync_es
 

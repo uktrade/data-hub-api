@@ -1,8 +1,6 @@
 from datahub.company.models import Company as DBCompany
-
 from .models import Company
 from .views import SearchCompanyAPIView, SearchCompanyExportAPIView
-
 from ..apps import SearchApp
 
 
@@ -27,6 +25,7 @@ class CompanySearchApp(SearchApp):
         'headquarter_type',
         'one_list_account_owner',
         'parent',
+        'global_headquarters',
         'registered_address_country',
         'sector',
         'trading_address_country',

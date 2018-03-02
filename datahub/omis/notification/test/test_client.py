@@ -2,10 +2,8 @@ import itertools
 from unittest import mock
 
 import pytest
-
 from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
-
 from notifications_python_client.errors import APIError
 
 from datahub.company.test.factories import AdviserFactory
@@ -17,7 +15,6 @@ from datahub.omis.order.test.factories import (
     OrderFactory, OrderPaidFactory, OrderSubscriberFactory, OrderWithOpenQuoteFactory
 )
 from datahub.omis.region.models import UKRegionalSettings
-
 from ..client import notify, send_email
 from ..constants import Template
 

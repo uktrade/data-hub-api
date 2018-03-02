@@ -1,5 +1,6 @@
 from functools import partial
 from operator import not_
+from uuid import UUID
 
 from django.conf import settings
 from django.db import models
@@ -16,6 +17,7 @@ from datahub.company.validators import (
     has_uk_establishment_number_prefix,
 )
 from datahub.core.constants import Country
+from datahub.core.constants import HeadquarterType
 from datahub.core.serializers import (
     NestedRelatedField, PermittedFieldsModelSerializer, RelaxedURLField
 )
@@ -200,6 +202,15 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         ),
         'uk_establishment_not_in_uk': ugettext_lazy(
             'A UK establishment (branch of non-UK company) must be in the UK.'
+        ),
+        'global_headquarters_company_is_not_a_global_headquarters': ugettext_lazy(
+            'Company to be linked as global headquarters must be a global headquarters.'
+        ),
+        'invalid_global_headquarters': ugettext_lazy(
+            'Global headquarters cannot point to itself.'
+        ),
+        'global_headquarters_has_subsidiaries': ugettext_lazy(
+            'Subsidiaries have to be unlinked before changing headquarter type.',
         )
     }
 
@@ -215,7 +226,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     business_type = NestedRelatedField(
         meta_models.BusinessType, required=False, allow_null=True
     )
-    children = NestedRelatedField('company.Company', many=True, required=False)
     classification = NestedRelatedField(
         meta_models.CompanyClassification, required=False, allow_null=True
     )
@@ -236,7 +246,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     one_list_account_owner = NestedAdviserField(
         required=False, allow_null=True
     )
-    parent = NestedRelatedField(
+    global_headquarters = NestedRelatedField(
         'company.Company', required=False, allow_null=True
     )
     sector = NestedRelatedField(meta_models.Sector, required=False, allow_null=True)
@@ -263,6 +273,40 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         **serializers.ModelSerializer.serializer_field_mapping,
         models.URLField: RelaxedURLField,
     }
+
+    def validate_headquarter_type(self, headquarter_type):
+        """Ensure that global headquarters doesn't have any subsidiaries before changing
+        headquarter type.
+        """
+        if self.instance and self.instance.headquarter_type != headquarter_type:
+            if (
+                self.instance.headquarter_type_id == UUID(HeadquarterType.ghq.value.id)
+                and self.instance.subsidiaries.count() > 0
+            ):
+                raise serializers.ValidationError(
+                    self.error_messages['global_headquarters_has_subsidiaries']
+                )
+
+        return headquarter_type
+
+    def validate_global_headquarters(self, global_headquarters):
+        """Ensure that global headquarters is global headquarters and it is not pointing
+        at the model itself.
+        """
+        if global_headquarters:
+            # checks if global_headquarters is global_headquarters
+            if global_headquarters.headquarter_type_id != UUID(HeadquarterType.ghq.value.id):
+                raise serializers.ValidationError(
+                    self.error_messages['global_headquarters_company_is_not_a_global_headquarters']
+                )
+
+            # check if global_headquarters is not pointing to an instance of the model
+            if self.instance == global_headquarters:
+                raise serializers.ValidationError(
+                    self.error_messages['invalid_global_headquarters']
+                )
+
+        return global_headquarters
 
     class Meta:
         model = Company
@@ -297,7 +341,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'trading_address_country',
             'account_manager',
             'business_type',
-            'children',
             'classification',
             'companies_house_data',
             'contacts',
@@ -306,7 +349,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'future_interest_countries',
             'headquarter_type',
             'one_list_account_owner',
-            'parent',
+            'global_headquarters',
             'sector',
             'turnover_range',
             'uk_region',

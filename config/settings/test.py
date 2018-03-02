@@ -12,7 +12,8 @@ INSTALLED_APPS += [
     'datahub.core.test.support'
 ]
 
-ES_INDEX = 'test'
+# The index is set dynamically in datahub/search/conftest.py, so that tests can be parallelised.
+ES_INDEX = None
 ES_INDEX_SETTINGS = {
     'index.mapping.nested_fields.limit': 100,
     'number_of_shards': 1,
@@ -25,3 +26,5 @@ OMIS_GENERIC_CONTACT_EMAIL = 'omis@example.com'
 OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL = ''
 OMIS_NOTIFICATION_ADMIN_EMAIL = 'fake-omis-admin@digital.trade.gov.uk'
 OMIS_NOTIFICATION_API_KEY = ''
+
+GOVUK_PAY_URL='https://payments.example.com/'

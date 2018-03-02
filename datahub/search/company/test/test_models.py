@@ -1,7 +1,6 @@
 import pytest
 
 from datahub.company.test.factories import CompanyFactory
-
 from ..models import Company as ESCompany
 
 pytestmark = pytest.mark.django_db
@@ -35,6 +34,7 @@ def test_company_dbmodel_to_dict(setup_es):
         'name',
         'one_list_account_owner',
         'parent',
+        'global_headquarters',
         'reference_code',
         'registered_address_1',
         'registered_address_2',
