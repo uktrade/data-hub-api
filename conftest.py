@@ -2,6 +2,8 @@ import factory
 import pytest
 import requests_mock
 from botocore.stub import Stubber
+from django.conf import settings
+from django.core.cache import CacheHandler
 from django.core.management import call_command
 from pytest_django.lazy_django import skip_if_no_django
 
@@ -56,3 +58,14 @@ def requests_stubber():
     """Requests stubber based on requests-mock"""
     with requests_mock.mock() as requests_stubber:
         yield requests_stubber
+
+
+@pytest.fixture()
+def local_memory_cache(monkeypatch):
+    """Configure settings.CACHES to use LocMemCache."""
+    monkeypatch.setitem(
+        settings.CACHES,
+        'default',
+        {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}
+    )
+    monkeypatch.setattr('django.core.cache.caches', CacheHandler())

@@ -1,5 +1,7 @@
 import factory
 import pytest
+from django.conf import settings
+from freezegun import freeze_time
 from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -16,6 +18,15 @@ from ...models import Payment, PaymentGatewaySession
 
 class TestPublicCreatePaymentGatewaySession(APITestMixin):
     """Public create payment gateway session test case."""
+
+    @pytest.fixture(autouse=True)
+    def disable_payment_throttle_rate(self, monkeypatch):
+        """Disable the throttling for all the tests in this class."""
+        monkeypatch.setitem(
+            settings.REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'],
+            'payment_gateway_session.create',
+            None
+        )
 
     def test_create_first_session(self, requests_stubber):
         """
@@ -447,6 +458,63 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         )
         response = client.post(url, format='json')
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @freeze_time('2018-03-01 00:00:00')
+    def test_429_if_too_many_requests_made(
+        self, local_memory_cache, requests_stubber, monkeypatch
+    ):
+        """Test that the throttling for the create endpoint works if its rate is set."""
+        monkeypatch.setitem(
+            settings.REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'],
+            'payment_gateway_session.create',
+            '3/sec'
+        )
+
+        # mock GOV.UK response
+        govuk_payment_id = '123abc123abc123abc123abc12'
+        json_response = {
+            'state': {'status': 'created', 'finished': False},
+            'payment_id': govuk_payment_id,
+            '_links': {
+                'next_url': {
+                    'href': 'https://payment.example.com/123abc',
+                    'method': 'GET'
+                },
+            }
+        }
+        requests_stubber.post(
+            govuk_url('payments'),  # create payment
+            status_code=201,
+            json=json_response
+        )
+        requests_stubber.get(
+            govuk_url(f'payments/{govuk_payment_id}'),  # get payment
+            status_code=200,
+            json=json_response
+        )
+        requests_stubber.post(
+            govuk_url(f'payments/{govuk_payment_id}/cancel'),  # cancel payment
+            status_code=204
+        )
+
+        order = OrderWithAcceptedQuoteFactory()
+
+        url = reverse(
+            'api-v3:omis-public:payment-gateway-session:collection',
+            kwargs={'public_token': order.public_token}
+        )
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
+
+        # the 4th time it should error
+        for dummy in range(3):
+            response = client.post(url, format='json')
+            assert response.status_code == status.HTTP_201_CREATED
+
+        response = client.post(url, format='json')
+        assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
 
 
 class TestPublicGetPaymentGatewaySession(APITestMixin):
