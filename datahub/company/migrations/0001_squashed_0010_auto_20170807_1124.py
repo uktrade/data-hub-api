@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('metadata', '0001_squashed_0012_auto_20170523_0940'),
+        ('metadata', '0001_squashed_0011_add_default_id_for_metadata'),
         ('auth', '0008_alter_user_username_max_length'),
     ]
 
