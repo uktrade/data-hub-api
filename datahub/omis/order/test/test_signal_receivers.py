@@ -1,7 +1,6 @@
 import pytest
 
 from .factories import OrderAssigneeFactory, OrderFactory
-
 from ..constants import VATStatus
 from ..pricing import get_pricing_from_order
 

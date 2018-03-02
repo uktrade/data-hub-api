@@ -1,6 +1,5 @@
 from datahub.metadata.fixtures import Fixture
 from datahub.metadata.registry import registry
-
 from . import models
 from .serializers import MarketSerializer
 

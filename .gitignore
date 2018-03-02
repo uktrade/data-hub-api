@@ -47,6 +47,8 @@ coverage.xml
 *,cover
 .hypothesis/
 /codecov.sh
+/test-reports/
+/.pytest_cache/
 
 # Translations
 *.mo

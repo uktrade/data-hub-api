@@ -1,4 +1,5 @@
 from unittest import mock
+
 from pytest import raises
 
 from .. import dict_utils

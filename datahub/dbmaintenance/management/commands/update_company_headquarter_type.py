@@ -1,4 +1,5 @@
 import uuid
+
 import reversion
 
 from datahub.company.models import Company

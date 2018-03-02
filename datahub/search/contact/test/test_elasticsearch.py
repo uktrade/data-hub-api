@@ -1,5 +1,4 @@
 from ..models import Contact as ESContact
-
 from ... import elasticsearch
 
 

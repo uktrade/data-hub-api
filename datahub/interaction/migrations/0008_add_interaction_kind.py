@@ -15,7 +15,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='interaction',
             name='kind',
-            field=models.CharField(choices=[('interaction', 'Interaction'), ('service_delivery', 'Service delivery')], default='interaction', max_length=255),
+            field=models.CharField(choices=[
+                ('interaction', 'Interaction'),
+                ('service_delivery', 'Service delivery'),
+                ('policy_feedback', 'Policy feedback'),
+            ], default='interaction', max_length=255),
             preserve_default=False,
         ),
     ]

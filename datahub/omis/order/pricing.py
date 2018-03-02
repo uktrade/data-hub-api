@@ -1,6 +1,6 @@
 from collections import namedtuple
-from django.db.models import Sum
 
+from django.db.models import Sum
 from rest_framework.exceptions import ValidationError
 
 from .constants import VATStatus

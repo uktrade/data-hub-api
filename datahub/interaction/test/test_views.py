@@ -5,14 +5,15 @@ import pytest
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
+from reversion.models import Version
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import Service, Team
+from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.constants import CommunicationChannel
-from datahub.interaction.models import InteractionPermission, ServiceDeliveryStatus
-
+from datahub.interaction.models import Interaction, InteractionPermission, ServiceDeliveryStatus
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory, EventServiceDeliveryFactory, InvestmentProjectInteractionFactory,
     ServiceDeliveryFactory,
@@ -295,15 +296,18 @@ class TestGetInteractionView(APITestMixin):
 class TestAddInteractionView(APITestMixin):
     """Tests for the add interaction view."""
 
+    @pytest.mark.parametrize(
+        'kind', (Interaction.KINDS.interaction, Interaction.KINDS.policy_feedback,)
+    )
     @freeze_time('2017-04-18 13:25:30.986208')
-    def test_add_interaction(self):
+    def test_add_interaction(self, kind):
         """Test add new interaction."""
         adviser = AdviserFactory()
         company = CompanyFactory()
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         request_data = {
-            'kind': 'interaction',
+            'kind': kind,
             'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -320,7 +324,7 @@ class TestAddInteractionView(APITestMixin):
         response_data = response.json()
         assert response_data == {
             'id': response_data['id'],
-            'kind': 'interaction',
+            'kind': kind,
             'is_event': None,
             'service_delivery_status': None,
             'grant_amount_offered': None,
@@ -689,14 +693,18 @@ class TestAddInteractionView(APITestMixin):
             'subject': ['This field is required.'],
         }
 
-    def test_add_interaction_missing_interaction_only_fields(self):
+    @pytest.mark.parametrize(
+        'kind',
+        (Interaction.KINDS.interaction, Interaction.KINDS.policy_feedback,)
+    )
+    def test_add_interaction_missing_interaction_only_fields(self, kind):
         """Test add new interaction without required interaction-only fields."""
         adviser = AdviserFactory()
         company = CompanyFactory()
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         request_data = {
-            'kind': 'interaction',
+            'kind': kind,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -713,14 +721,18 @@ class TestAddInteractionView(APITestMixin):
             'communication_channel': ['This field is required.'],
         }
 
-    def test_add_interaction_with_service_delivery_fields(self):
+    @pytest.mark.parametrize(
+        'kind',
+        (Interaction.KINDS.interaction, Interaction.KINDS.policy_feedback,)
+    )
+    def test_add_interaction_with_service_delivery_fields(self, kind):
         """Tests that adding an interaction with an event fails."""
         adviser = AdviserFactory()
         company = CompanyFactory()
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         request_data = {
-            'kind': 'interaction',
+            'kind': kind,
             'is_event': False,
             'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
@@ -775,14 +787,18 @@ class TestAddInteractionView(APITestMixin):
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
-    def test_add_interaction_project(self):
+    @pytest.mark.parametrize(
+        'kind',
+        (Interaction.KINDS.interaction, Interaction.KINDS.policy_feedback,)
+    )
+    def test_add_interaction_project(self, kind):
         """Test add new interaction for an investment project."""
         project = InvestmentProjectFactory()
         adviser = AdviserFactory()
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.post(url, {
-            'kind': 'interaction',
+            'kind': kind,
             'contact': contact.pk,
             'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
@@ -801,14 +817,18 @@ class TestAddInteractionView(APITestMixin):
         assert response_data['modified_on'] == '2017-04-18T13:25:30.986208Z'
         assert response_data['created_on'] == '2017-04-18T13:25:30.986208Z'
 
-    def test_add_interaction_no_entity(self):
+    @pytest.mark.parametrize(
+        'kind',
+        (Interaction.KINDS.interaction, Interaction.KINDS.policy_feedback,)
+    )
+    def test_add_interaction_no_entity(self, kind):
         """Test add new interaction without a contact, company or
         investment project.
         """
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.post(url, {
-            'kind': 'interaction',
+            'kind': kind,
             'contact': contact.pk,
             'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
@@ -1205,3 +1225,93 @@ class TestListInteractionsView(APITestMixin):
         actual_ids = {i['id'] for i in response_data['results']}
         expected_ids = {str(i.id) for i in associated_project_interactions}
         assert actual_ids == expected_ids
+
+
+class TestInteractionVersioning(APITestMixin):
+    """
+    Tests for versions created when interacting with the interaction endpoints.
+    """
+
+    def test_add_creates_a_new_version(self):
+        """Test that creating an interaction creates a new version."""
+        assert Version.objects.count() == 0
+
+        response = self.api_client.post(
+            reverse('api-v3:interaction:collection'),
+            data={
+                'kind': 'interaction',
+                'communication_channel': CommunicationChannel.face_to_face.value.id,
+                'subject': 'whatever',
+                'date': date.today().isoformat(),
+                'dit_adviser': AdviserFactory().pk,
+                'notes': 'hello',
+                'company': CompanyFactory().pk,
+                'contact': ContactFactory().pk,
+                'service': Service.trade_enquiry.value.id,
+                'dit_team': Team.healthcare_uk.value.id
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data['subject'] == 'whatever'
+
+        interaction = Interaction.objects.get(pk=response.data['id'])
+
+        # check version created
+        assert Version.objects.get_for_object(interaction).count() == 1
+        version = Version.objects.get_for_object(interaction).first()
+        assert version.revision.user == self.user
+        assert version.field_dict['subject'] == 'whatever'
+        assert not any(set(version.field_dict) & set(EXCLUDED_BASE_MODEL_FIELDS))
+
+    def test_add_400_doesnt_create_a_new_version(self):
+        """Test that if the endpoint returns 400, no version is created."""
+        assert Version.objects.count() == 0
+
+        response = self.api_client.post(
+            reverse('api-v3:interaction:collection'),
+            data={
+                'kind': 'interaction'
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert Version.objects.count() == 0
+
+    def test_update_creates_a_new_version(self):
+        """Test that updating an interaction creates a new version."""
+        service_delivery = EventServiceDeliveryFactory()
+
+        assert Version.objects.get_for_object(service_delivery).count() == 0
+
+        response = self.api_client.patch(
+            reverse('api-v3:interaction:item', kwargs={'pk': service_delivery.pk}),
+            data={'subject': 'new subject'},
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['subject'] == 'new subject'
+
+        # check version created
+        assert Version.objects.get_for_object(service_delivery).count() == 1
+        version = Version.objects.get_for_object(service_delivery).first()
+        assert version.revision.user == self.user
+        assert version.field_dict['subject'] == 'new subject'
+
+    def test_update_400_doesnt_create_a_new_version(self):
+        """Test that if the endpoint returns 400, no version is created."""
+        service_delivery = EventServiceDeliveryFactory()
+
+        assert Version.objects.get_for_object(service_delivery).count() == 0
+
+        response = self.api_client.patch(
+            reverse('api-v3:interaction:item', kwargs={'pk': service_delivery.pk}),
+            data={'kind': 'invalid'},
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert Version.objects.get_for_object(service_delivery).count() == 0

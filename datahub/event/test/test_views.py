@@ -2,11 +2,14 @@ from operator import itemgetter
 
 from rest_framework import status
 from rest_framework.reverse import reverse
+from reversion.models import Version
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import Country, Service, Team, UKRegion
+from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.event.constants import EventType, LocationType, Programme
+from datahub.event.models import Event
 from datahub.event.test.factories import EventFactory
 from datahub.metadata.test.factories import TeamFactory
 
@@ -550,6 +553,90 @@ class TestUpdateEventView(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived_documents_url_path'] == 'old_path'
+
+
+class TestEventVersioning(APITestMixin):
+    """
+    Tests for versions created when interacting with the event endpoints.
+    """
+
+    def test_add_creates_a_new_version(self):
+        """Test that creating an event creates a new version."""
+        assert Version.objects.count() == 0
+
+        response = self.api_client.post(
+            reverse('api-v3:event:collection'),
+            data={
+                'name': 'Grand exhibition',
+                'event_type': EventType.seminar.value.id,
+                'address_1': 'Grand Court Exhibition Centre',
+                'address_town': 'New York',
+                'address_country': Country.united_states.value.id,
+                'service': Service.trade_enquiry.value.id,
+                'start_date': '2010-09-12',
+                'end_date': '2010-09-12',
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data['name'] == 'Grand exhibition'
+
+        event = Event.objects.get(pk=response.data['id'])
+
+        # check version created
+        assert Version.objects.get_for_object(event).count() == 1
+        version = Version.objects.get_for_object(event).first()
+        assert version.revision.user == self.user
+        assert version.field_dict['name'] == 'Grand exhibition'
+        assert not any(set(version.field_dict) & set(EXCLUDED_BASE_MODEL_FIELDS))
+
+    def test_add_400_doesnt_create_a_new_version(self):
+        """Test that if the endpoint returns 400, no version is created."""
+        assert Version.objects.count() == 0
+
+        response = self.api_client.post(
+            reverse('api-v3:event:collection'),
+            data={'name': 'Grand exhibition'},
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert Version.objects.count() == 0
+
+    def test_update_creates_a_new_version(self):
+        """Test that updating an event creates a new version."""
+        event = EventFactory()
+
+        assert Version.objects.get_for_object(event).count() == 0
+
+        response = self.api_client.patch(
+            reverse('api-v3:event:item', kwargs={'pk': event.pk}),
+            data={'name': 'Annual exhibition'},
+            format='json'
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['name'] == 'Annual exhibition'
+
+        # check version created
+        assert Version.objects.get_for_object(event).count() == 1
+        version = Version.objects.get_for_object(event).first()
+        assert version.revision.user == self.user
+        assert version.field_dict['name'] == 'Annual exhibition'
+
+    def test_update_400_doesnt_create_a_new_version(self):
+        """Test that if the endpoint returns 400, no version is created."""
+        event = EventFactory()
+
+        assert Version.objects.get_for_object(event).count() == 0
+
+        response = self.api_client.patch(
+            reverse('api-v3:event:item', kwargs={'pk': event.pk}),
+            data={'event_type': 'invalid'},
+            format='json'
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert Version.objects.get_for_object(event).count() == 0
 
 
 def _get_canonical_response_data(response):

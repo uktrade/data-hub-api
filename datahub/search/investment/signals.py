@@ -7,7 +7,6 @@ from datahub.investment.models import (
     InvestmentProject as DBInvestmentProject,
     InvestmentProjectTeamMember
 )
-
 from .models import InvestmentProject as ESInvestmentProject
 from ..signals import sync_es
 

@@ -6,7 +6,6 @@ from datahub.investment.test.factories import (
 )
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search import elasticsearch
-
 from ..models import InvestmentProject
 
 pytestmark = pytest.mark.django_db

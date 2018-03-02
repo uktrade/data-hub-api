@@ -1,2 +1,2 @@
 #!/bin/bash -xe
-pytest --cov -s
+pytest --cov -s $@

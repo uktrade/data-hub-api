@@ -7,7 +7,6 @@ from datahub.omis.order.test.factories import (
     OrderFactory, OrderPaidFactory,
     OrderWithAcceptedQuoteFactory
 )
-
 from .. import OrderSearchApp
 from ..models import Order as ESOrder
 from ... import elasticsearch

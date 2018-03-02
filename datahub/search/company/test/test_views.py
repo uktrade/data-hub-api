@@ -44,6 +44,28 @@ def setup_data(setup_es):
     setup_es.indices.refresh()
 
 
+@pytest.fixture
+def setup_headquarters_data(setup_es):
+    """Sets up data for headquarter type tests."""
+    CompanyFactory(
+        name='ghq',
+        headquarter_type_id=constants.HeadquarterType.ghq.value.id,
+    )
+    CompanyFactory(
+        name='ehq',
+        headquarter_type_id=constants.HeadquarterType.ehq.value.id,
+    )
+    CompanyFactory(
+        name='ukhq',
+        headquarter_type_id=constants.HeadquarterType.ukhq.value.id,
+    )
+    CompanyFactory(
+        name='none',
+        headquarter_type_id=None,
+    )
+    setup_es.indices.refresh()
+
+
 class TestSearch(APITestMixin):
     """Tests search views."""
 
@@ -82,6 +104,83 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['uk_region']['id'] == uk_region
+
+    @pytest.mark.parametrize(
+        'query,results', (
+            (
+                {
+                    'headquarter_type': None,
+                },
+                {'none'},
+            ),
+            (
+                {
+                    'headquarter_type': constants.HeadquarterType.ghq.value.id
+                },
+                {'ghq'},
+            ),
+            (
+                {
+                    'headquarter_type': [
+                        constants.HeadquarterType.ghq.value.id,
+                        constants.HeadquarterType.ehq.value.id,
+                    ],
+                },
+                {'ehq', 'ghq'},
+            ),
+            (
+                {
+                    'headquarter_type': [
+                        constants.HeadquarterType.ghq.value.id,
+                        constants.HeadquarterType.ehq.value.id,
+                        None,
+                    ],
+                },
+                {'ehq', 'ghq', 'none'},
+            ),
+        )
+    )
+    def test_headquarter_type_filter(self, setup_headquarters_data, query, results):
+        """Test headquarter type filter."""
+        url = reverse('api-v3:search:company')
+        response = self.api_client.post(
+            url,
+            query
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        num_results = len(results)
+        assert response.data['count'] == num_results
+        assert len(response.data['results']) == num_results
+
+        search_results = {company['name'] for company in response.data['results']}
+        assert search_results == results
+
+    def test_global_headquarters(self, setup_es):
+        """Test global headquarters filter."""
+        ghq1 = CompanyFactory(headquarter_type_id=constants.HeadquarterType.ghq.value.id)
+        ghq2 = CompanyFactory(headquarter_type_id=constants.HeadquarterType.ghq.value.id)
+        companies = CompanyFactory.create_batch(5, global_headquarters=ghq1)
+        CompanyFactory.create_batch(5, global_headquarters=ghq2)
+        CompanyFactory.create_batch(10)
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:company')
+        response = self.api_client.post(
+            url,
+            {
+                'global_headquarters': ghq1.id
+            }
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        assert response.data['count'] == 5
+        assert len(response.data['results']) == 5
+
+        search_results = {uuid.UUID(company['id']) for company in response.data['results']}
+        assert search_results == {company.id for company in companies}
 
     @pytest.mark.parametrize(
         'country,match',
@@ -501,6 +600,7 @@ class TestSearchExport(APITestMixin):
                 'export_experience_category',
                 'export_to_countries',
                 'future_interest_countries',
+                'global_headquarters',
                 'headquarter_type',
                 'id',
                 'modified_on',

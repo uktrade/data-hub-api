@@ -1,5 +1,4 @@
 import pytest
-
 from oauth2_provider.models import Application
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -8,7 +7,6 @@ from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.oauth.scopes import Scope
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import OrderFactory, OrderPaidFactory
-
 from ..factories import PaymentFactory
 
 

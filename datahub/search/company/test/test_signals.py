@@ -2,7 +2,6 @@ import pytest
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.search import elasticsearch
-
 from ..models import Company
 
 pytestmark = pytest.mark.django_db

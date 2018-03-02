@@ -6,7 +6,6 @@ from datahub.omis.order.models import (
     OrderAssignee as DBOrderAssignee,
     OrderSubscriber as DBOrderSubscriber
 )
-
 from .models import Order as ESOrder
 from ..signals import sync_es
 
