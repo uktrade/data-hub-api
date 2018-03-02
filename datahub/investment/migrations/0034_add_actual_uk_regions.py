@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('metadata', '0011_add_default_id_for_metadata'),
+        ('metadata', '0001_squashed_0011_add_default_id_for_metadata'),
         ('investment', '0033_add_investment_document_permission'),
     ]
 
