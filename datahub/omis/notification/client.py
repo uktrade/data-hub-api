@@ -10,7 +10,6 @@ from raven.contrib.django.raven_compat.models import client as raven_client
 from datahub.core.utils import executor
 from datahub.omis.market.models import Market
 from datahub.omis.region.models import UKRegionalSettings
-
 from .constants import Template
 
 

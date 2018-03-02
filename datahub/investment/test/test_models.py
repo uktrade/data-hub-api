@@ -1,7 +1,6 @@
 """Tests for investment models."""
 
 import pytest
-
 from django.core.exceptions import ObjectDoesNotExist
 
 from datahub.company.test.factories import AdviserFactory

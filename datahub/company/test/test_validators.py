@@ -1,7 +1,8 @@
 import pytest
 
 from datahub.company.validators import (
-    has_no_invalid_company_number_characters, has_uk_establishment_number_prefix
+    has_no_invalid_company_number_characters,
+    has_uk_establishment_number_prefix,
 )
 
 

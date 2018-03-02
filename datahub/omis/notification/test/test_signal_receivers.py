@@ -1,4 +1,5 @@
 from unittest import mock
+
 import pytest
 from dateutil.parser import parse as dateutil_parse
 
@@ -12,7 +13,6 @@ from datahub.omis.order.test.factories import (
     OrderPaidFactory, OrderSubscriberFactory,
     OrderWithAcceptedQuoteFactory, OrderWithOpenQuoteFactory
 )
-
 from ..client import notify
 from ..constants import Template
 

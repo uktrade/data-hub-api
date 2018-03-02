@@ -1,10 +1,9 @@
 import uuid
-import factory
 
+import factory
 from django.utils.timezone import now
 
 from datahub.company.test.factories import AdviserFactory, ContactFactory
-
 from ..models import TermsAndConditions
 
 

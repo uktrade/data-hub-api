@@ -12,6 +12,7 @@ from datahub.core.validators import (
     ConditionalRule,
     EqualsRule,
     FieldAndError,
+    InRule,
     OperatorRule,
     RequiredUnlessAlreadyBlankValidator,
     RulesBasedValidator,
@@ -191,6 +192,17 @@ def test_equals_rule(data, field, test_value, res):
     """Tests ValidationCondition for various cases."""
     combiner = Mock(spec_set=DataCombiner, __getitem__=lambda self, field_: data[field_])
     condition = EqualsRule(field, test_value)
+    assert condition(combiner) == res
+
+
+@pytest.mark.parametrize('data,field,test_value,res', (
+    ({'colour': 'red'}, 'colour', ['red', 'green'], True),
+    ({'colour': 'red'}, 'colour', ['blue', 'green'], False),
+))
+def test_in_rule(data, field, test_value, res):
+    """Tests InRule for various cases."""
+    combiner = Mock(spec_set=DataCombiner, __getitem__=lambda self, field_: data[field_])
+    condition = InRule(field, test_value)
     assert condition(combiner) == res
 
 

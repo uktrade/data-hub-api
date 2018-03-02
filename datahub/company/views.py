@@ -39,7 +39,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'export_experience_category',
         'headquarter_type',
         'one_list_account_owner',
-        'parent',
+        'global_headquarters',
         'registered_address_country',
         'sector',
         'trading_address_country',
@@ -48,7 +48,6 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSetV3):
     ).prefetch_related(
         Prefetch('contacts', queryset=get_contact_queryset()),
         Prefetch('investor_investment_projects', queryset=get_slim_investment_project_queryset()),
-        'children',
         'export_to_countries',
         'future_interest_countries',
     )

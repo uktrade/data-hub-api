@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 from model_utils import Choices
 
+from datahub.core import reversion
 from datahub.core.models import BaseConstantModel, BaseModel, BaseOrderedConstantModel
 from datahub.core.utils import StrEnum
 
@@ -66,12 +67,14 @@ class ServiceDeliveryStatus(BaseOrderedConstantModel):
     """
 
 
+@reversion.register_base_model()
 class Interaction(BaseModel):
     """Interaction."""
 
     KINDS = Choices(
         ('interaction', 'Interaction'),
         ('service_delivery', 'Service delivery'),
+        ('policy_feedback', 'Policy feedback'),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)

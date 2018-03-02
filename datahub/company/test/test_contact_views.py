@@ -8,7 +8,9 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from reversion.models import Version
 
+from datahub.company.models import Contact
 from datahub.core import constants
+from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 from datahub.metadata.test.factories import TeamFactory
 from .factories import CompanyFactory, ContactFactory
@@ -681,6 +683,149 @@ class TestContactList(APITestMixin):
         assert {contact['id'] for contact in response.data['results']} == expected_contacts
 
 
+class TestContactVersioning(APITestMixin):
+    """
+    Tests for versions created when interacting with the contact endpoints.
+    """
+
+    def test_add_creates_a_new_version(self):
+        """Test that creating a contact creates a new version."""
+        assert Version.objects.count() == 0
+
+        response = self.api_client.post(
+            reverse('api-v3:contact:list'),
+            data={
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+                'company': {'id': CompanyFactory().pk},
+                'email': 'foo@bar.com',
+                'telephone_countrycode': '+44',
+                'telephone_number': '123456789',
+                'address_same_as_company': True,
+                'primary': True
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data['first_name'] == 'Oratio'
+        assert response.data['last_name'] == 'Nelson'
+
+        contact = Contact.objects.get(pk=response.data['id'])
+
+        # check version created
+        assert Version.objects.get_for_object(contact).count() == 1
+        version = Version.objects.get_for_object(contact).first()
+        assert version.revision.user == self.user
+        assert version.field_dict['first_name'] == 'Oratio'
+        assert version.field_dict['last_name'] == 'Nelson'
+        assert not any(set(version.field_dict) & set(EXCLUDED_BASE_MODEL_FIELDS))
+
+    def test_add_400_doesnt_create_a_new_version(self):
+        """Test that if the endpoint returns 400, no version is created."""
+        assert Version.objects.count() == 0
+
+        response = self.api_client.post(
+            reverse('api-v3:contact:list'),
+            data={
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+            },
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert Version.objects.count() == 0
+
+    def test_update_creates_a_new_version(self):
+        """Test that updating a contact creates a new version."""
+        contact = ContactFactory(
+            first_name='Oratio',
+            last_name='Nelson'
+        )
+
+        response = self.api_client.patch(
+            reverse('api-v3:contact:detail', kwargs={'pk': contact.pk}),
+            data={'first_name': 'New Oratio'},
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['first_name'] == 'New Oratio'
+
+        # check version created
+        assert Version.objects.get_for_object(contact).count() == 1
+        version = Version.objects.get_for_object(contact).first()
+        assert version.revision.user == self.user
+        assert version.field_dict['first_name'] == 'New Oratio'
+
+    def test_update_400_doesnt_create_a_new_version(self):
+        """Test that if the endpoint returns 400, no version is created."""
+        contact = ContactFactory(
+            first_name='Oratio',
+            last_name='Nelson'
+        )
+
+        response = self.api_client.patch(
+            reverse('api-v3:contact:detail', kwargs={'pk': contact.pk}),
+            data={'email': 'invalid'},
+            format='json'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert Version.objects.get_for_object(contact).count() == 0
+
+    def test_archive_creates_a_new_version(self):
+        """Test that archiving a contact creates a new version."""
+        contact = ContactFactory()
+        assert Version.objects.get_for_object(contact).count() == 0
+
+        url = reverse('api-v3:contact:archive', kwargs={'pk': contact.id})
+        response = self.api_client.post(url, {'reason': 'foo'}, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['archived']
+        assert response.data['archived_reason'] == 'foo'
+
+        # check version created
+        assert Version.objects.get_for_object(contact).count() == 1
+        version = Version.objects.get_for_object(contact).first()
+        assert version.revision.user == self.user
+        assert version.field_dict['archived']
+        assert version.field_dict['archived_reason'] == 'foo'
+
+    def test_archive_400_doesnt_create_a_new_version(self):
+        """Test that if the endpoint returns 400, no version is created."""
+        contact = ContactFactory()
+        assert Version.objects.get_for_object(contact).count() == 0
+
+        url = reverse('api-v3:contact:archive', kwargs={'pk': contact.id})
+        response = self.api_client.post(url, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert Version.objects.get_for_object(contact).count() == 0
+
+    def test_unarchive_creates_a_new_version(self):
+        """Test that unarchiving a contact creates a new version."""
+        contact = ContactFactory(
+            archived=True, archived_on=now(), archived_reason='foo'
+        )
+        assert Version.objects.get_for_object(contact).count() == 0
+
+        url = reverse('api-v3:contact:unarchive', kwargs={'pk': contact.id})
+        response = self.api_client.post(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert not response.data['archived']
+        assert response.data['archived_reason'] == ''
+
+        # check version created
+        assert Version.objects.get_for_object(contact).count() == 1
+        version = Version.objects.get_for_object(contact).first()
+        assert version.revision.user == self.user
+        assert not version.field_dict['archived']
+
+
 class TestAuditLogView(APITestMixin):
     """Tests for the audit log view."""
 
@@ -721,5 +866,4 @@ class TestAuditLogView(APITestMixin):
         assert entry['comment'] == 'Changed'
         assert entry['timestamp'] == format_date_or_datetime(changed_datetime)
         assert entry['changes']['notes'] == ['Initial notes', 'New notes']
-        assert not {'created_on', 'created_by', 'modified_on', 'modified_by'} & entry[
-            'changes'].keys()
+        assert not set(EXCLUDED_BASE_MODEL_FIELDS) & entry['changes'].keys()

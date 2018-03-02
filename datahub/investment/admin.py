@@ -1,9 +1,10 @@
 """Admin registration for investment models."""
 
 from django.contrib import admin
+from reversion.admin import VersionAdmin
 
 from datahub.core.admin import (
-    BaseModelVersionAdmin, custom_add_permission, custom_change_permission,
+    custom_add_permission, custom_change_permission,
     custom_delete_permission, DisabledOnFilter,
 )
 from datahub.investment.models import (
@@ -20,7 +21,7 @@ from datahub.investment.models import (
 
 @admin.register(InvestmentProject)
 @custom_change_permission(InvestmentProjectPermission.change_all)
-class InvestmentProjectAdmin(BaseModelVersionAdmin):
+class InvestmentProjectAdmin(VersionAdmin):
     """Investment project admin."""
 
     search_fields = (
@@ -58,7 +59,7 @@ class InvestmentProjectAdmin(BaseModelVersionAdmin):
 @custom_add_permission(InvestmentProjectPermission.change_all)
 @custom_change_permission(InvestmentProjectPermission.change_all)
 @custom_delete_permission(InvestmentProjectPermission.change_all)
-class InvestmentProjectTeamMemberAdmin(BaseModelVersionAdmin):
+class InvestmentProjectTeamMemberAdmin(VersionAdmin):
     """Investment project team member admin."""
 
     raw_id_fields = (

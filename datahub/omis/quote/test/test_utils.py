@@ -1,6 +1,7 @@
 from decimal import Decimal
 from pathlib import PurePath
 from unittest import mock
+
 import pytest
 from dateutil.parser import parse as dateutil_parse
 from freezegun import freeze_time
@@ -15,7 +16,6 @@ from datahub.omis.order.constants import VATStatus
 from datahub.omis.order.test.factories import (
     HourlyRateFactory, OrderAssigneeFactory, OrderFactory
 )
-
 from ..utils import (
     calculate_quote_expiry_date,
     escape_markdown,

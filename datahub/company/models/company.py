@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.functional import cached_property
 
-from datahub.core import constants
+from datahub.core import constants, reversion
 from datahub.core.models import ArchivableModel, BaseConstantModel, BaseModel
 from datahub.core.utils import StrEnum
 from datahub.metadata import models as metadata_models
@@ -51,6 +51,7 @@ class CompanyAbstract(models.Model):
         return self.name
 
 
+@reversion.register_base_model()
 class Company(ArchivableModel, BaseModel, CompanyAbstract):
     """Representation of the company as per CDMS."""
 
@@ -129,6 +130,10 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     parent = models.ForeignKey(
         'self', blank=True, null=True, on_delete=models.SET_NULL,
         related_name='children'
+    )
+    global_headquarters = models.ForeignKey(
+        'self', blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='subsidiaries',
     )
     one_list_account_owner = models.ForeignKey(
         'Advisor', blank=True, null=True, on_delete=models.SET_NULL,

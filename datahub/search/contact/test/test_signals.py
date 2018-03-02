@@ -2,7 +2,6 @@ import pytest
 
 from datahub.company.test.factories import ContactFactory
 from datahub.search import elasticsearch
-
 from ..models import Contact
 
 pytestmark = pytest.mark.django_db

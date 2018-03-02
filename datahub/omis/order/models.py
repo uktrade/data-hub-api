@@ -13,14 +13,12 @@ from datahub.company.models import Advisor, Company, Contact
 from datahub.core.models import (
     BaseConstantModel, BaseModel, BaseOrderedConstantModel
 )
-
 from datahub.metadata.models import Country, Sector, Team, UKRegion
 from datahub.omis.core.utils import generate_reference
 from datahub.omis.invoice.models import Invoice
 from datahub.omis.payment.models import Payment
 from datahub.omis.payment.validators import ReconcilablePaymentsValidator
 from datahub.omis.quote.models import Quote
-
 from . import validators
 from .constants import DEFAULT_HOURLY_RATE, OrderStatus, VATStatus
 from .managers import OrderQuerySet

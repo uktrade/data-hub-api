@@ -1,5 +1,4 @@
 from ..models import InvestmentProject as ESInvestmentProject
-
 from ... import elasticsearch
 
 

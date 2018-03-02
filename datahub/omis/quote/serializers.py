@@ -3,7 +3,6 @@ from rest_framework import serializers
 from datahub.company.models import Contact
 from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
-
 from .models import Quote
 
 
