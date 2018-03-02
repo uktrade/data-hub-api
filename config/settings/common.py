@@ -175,6 +175,9 @@ REST_FRAMEWORK = {
         'oauth2_provider.contrib.rest_framework.IsAuthenticatedOrTokenHasScope',
         'datahub.core.permissions.DjangoCrudPermission',
     ],
+    'DEFAULT_THROTTLE_RATES': {
+        'payment_gateway_session.create': None,  # disabled for now
+    },
     'ORDERING_PARAM': 'sortby'
 }
 

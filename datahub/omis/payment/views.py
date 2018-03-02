@@ -2,6 +2,7 @@ from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOr
 from rest_framework import status
 from rest_framework.response import Response
 
+from datahub.core.throttling import PathRateThrottle
 from datahub.oauth.scopes import Scope
 from datahub.omis.core.exceptions import Conflict
 from datahub.omis.order.constants import OrderStatus
@@ -54,6 +55,15 @@ class PublicPaymentViewSet(BasePaymentViewSet):
     order_queryset = Order.objects.publicly_accessible()
 
 
+class CreatePaymentGatewaySessionThrottle(PathRateThrottle):
+    """
+    Implementation of PathRateThrottle with a specific scope.
+    This is to make it clear that it's for the create payment session only.
+    """
+
+    scope = 'payment_gateway_session.create'
+
+
 class PublicPaymentGatewaySessionViewSet(BaseNestedOrderViewSet):
     """Payment Gateway Session ViewSet for public facing API."""
 
@@ -88,6 +98,12 @@ class PublicPaymentGatewaySessionViewSet(BaseNestedOrderViewSet):
         obj = super().get_object()
         obj.refresh_from_govuk_payment()
         return obj
+
+    def get_throttles(self):
+        """If action is `create`, CreatePaymentGatewaySessionThrottle is used."""
+        if self.action == 'create':
+            return (CreatePaymentGatewaySessionThrottle(),)
+        return ()
 
     def create(self, request, *args, **kwargs):
         """
