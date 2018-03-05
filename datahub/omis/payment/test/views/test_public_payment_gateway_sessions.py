@@ -447,3 +447,385 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         )
         response = client.post(url, format='json')
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+class TestPublicGetPaymentGatewaySession(APITestMixin):
+    """Public get payment gateway session test case."""
+
+    @pytest.mark.parametrize(
+        'order_status', (
+            OrderStatus.quote_accepted,
+            OrderStatus.paid,
+            OrderStatus.complete,
+        )
+    )
+    @pytest.mark.parametrize(
+        'session_status',
+        (
+            PaymentGatewaySessionStatus.created,
+            PaymentGatewaySessionStatus.started,
+            PaymentGatewaySessionStatus.submitted,
+        )
+    )
+    def test_get(self, order_status, session_status, requests_stubber):
+        """Test a successful call to get a payment gateway session."""
+        order = OrderFactory(status=order_status)
+        session = PaymentGatewaySessionFactory(
+            order=order,
+            status=session_status
+        )
+
+        # mock GOV.UK Pay request used to get the existing session
+        next_url = 'https://payment.example.com/123abc'
+        requests_stubber.get(
+            govuk_url(f'payments/{session.govuk_payment_id}'),
+            status_code=200,
+            json={
+                'state': {'status': session.status},
+                'payment_id': session.govuk_payment_id,
+                '_links': {
+                    'next_url': {
+                        'href': next_url,
+                        'method': 'GET'
+                    },
+                }
+            }
+        )
+
+        # make API call
+        url = reverse(
+            'api-v3:omis-public:payment-gateway-session:detail',
+            kwargs={'public_token': order.public_token, 'pk': session.id}
+        )
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
+        response = client.get(url, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
+        # check API response
+        assert response.json() == {
+            'id': str(session.id),
+            'created_on': format_date_or_datetime(session.created_on),
+            'status': session.status,
+            'payment_url': next_url,
+        }
+
+    @pytest.mark.parametrize(
+        'session_status',
+        (
+            PaymentGatewaySessionStatus.success,
+            PaymentGatewaySessionStatus.failed,
+            PaymentGatewaySessionStatus.cancelled,
+            PaymentGatewaySessionStatus.error,
+        )
+    )
+    def test_doesnt_call_govuk_pay_if_session_finished(self, session_status, requests_stubber):
+        """
+        Test a successful call to get a payment gateway session when the session is finished.
+        The system does not call GOV.UK Pay as the record is up-to-date.
+        """
+        session = PaymentGatewaySessionFactory(status=session_status)
+
+        # make API call
+        url = reverse(
+            'api-v3:omis-public:payment-gateway-session:detail',
+            kwargs={'public_token': session.order.public_token, 'pk': session.id}
+        )
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
+        response = client.get(url, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
+        # check API response
+        assert response.json() == {
+            'id': str(session.id),
+            'created_on': format_date_or_datetime(session.created_on),
+            'status': session.status,
+            'payment_url': '',
+        }
+        assert not requests_stubber.called
+
+    @pytest.mark.parametrize(
+        'govuk_status,payment_url',
+        (
+            (PaymentGatewaySessionStatus.created, 'https://payment.example.com/123abc'),
+            (PaymentGatewaySessionStatus.started, 'https://payment.example.com/123abc'),
+            (PaymentGatewaySessionStatus.submitted, 'https://payment.example.com/123abc'),
+            (PaymentGatewaySessionStatus.failed, ''),
+            (PaymentGatewaySessionStatus.cancelled, ''),
+            (PaymentGatewaySessionStatus.error, ''),
+        )
+    )
+    def test_with_different_govuk_payment_status_updates_session(
+        self, govuk_status, payment_url, requests_stubber
+    ):
+        """
+        Test that if the GOV.UK payment status is not the same as the payment gateway session one,
+        the record is updated.
+        """
+        # choose an initial status != from the govuk one to test the update
+        initial_status = PaymentGatewaySessionStatus.created
+        if initial_status == govuk_status:
+            initial_status = PaymentGatewaySessionStatus.started
+
+        session = PaymentGatewaySessionFactory(status=initial_status)
+
+        # mock GOV.UK call used to get the existing session
+        requests_stubber.get(
+            govuk_url(f'payments/{session.govuk_payment_id}'),
+            status_code=200,
+            json={
+                'state': {'status': govuk_status},
+                'payment_id': session.govuk_payment_id,
+                '_links': {
+                    'next_url': None if not payment_url else {'href': payment_url},
+                }
+            }
+        )
+
+        # make API call
+        url = reverse(
+            'api-v3:omis-public:payment-gateway-session:detail',
+            kwargs={'public_token': session.order.public_token, 'pk': session.id}
+        )
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
+        response = client.get(url, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
+        # refresh record
+        session.refresh_from_db()
+        assert session.status == govuk_status
+
+        # check API response
+        assert response.json() == {
+            'id': str(session.id),
+            'created_on': format_date_or_datetime(session.created_on),
+            'status': govuk_status,
+            'payment_url': payment_url,
+        }
+
+    def test_with_govuk_payment_success_updates_order(self, requests_stubber):
+        """
+        Test that if the GOV.UK payment status is `success` and the payment gateway session is
+        out of date, the record is updated, the related order marked as `paid` and an OMIS
+        `payment.Payment` record created from the GOV.UK response data one.
+        """
+        order = OrderWithAcceptedQuoteFactory()
+        session = PaymentGatewaySessionFactory(
+            order=order,
+            status=PaymentGatewaySessionStatus.created
+        )
+
+        # mock GOV.UK calls used to refresh the payment session
+        # Pay says that the payment completed successfully
+        requests_stubber.get(
+            govuk_url(f'payments/{session.govuk_payment_id}'),
+            status_code=200,
+            json={
+                'amount': order.total_cost,
+                'state': {'status': 'success'},
+                'email': 'email@example.com',
+                'created_date': '2018-02-13T14:56:56.734Z',
+                '_links': {
+                    'next_url': None,
+                },
+                'card_details': {
+                    'last_digits_card_number': '1111',
+                    'cardholder_name': 'John Doe',
+                    'expiry_date': '01/20',
+                    'billing_address': {
+                        'line1': 'line 1 address',
+                        'line2': 'line 2 address',
+                        'postcode': 'SW1A 1AA',
+                        'city': 'London',
+                        'country': 'GB'
+                    },
+                    'card_brand': 'Visa',
+                },
+            }
+        )
+
+        # make API call
+        url = reverse(
+            'api-v3:omis-public:payment-gateway-session:detail',
+            kwargs={'public_token': order.public_token, 'pk': session.id}
+        )
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
+        response = client.get(url, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
+        # check API response
+        assert response.json() == {
+            'id': str(session.id),
+            'created_on': format_date_or_datetime(session.created_on),
+            'status': PaymentGatewaySessionStatus.success,
+            'payment_url': '',
+        }
+
+        # check session record
+        session.refresh_from_db()
+        assert session.status == PaymentGatewaySessionStatus.success
+
+        # check order and payment
+        order.refresh_from_db()
+        assert order.status == OrderStatus.paid
+        assert Payment.objects.filter(order=order).count() == 1
+
+    @pytest.mark.parametrize('govuk_status_code', (401, 404, 500))
+    def test_500_if_govuk_pay_errors(self, govuk_status_code, requests_stubber):
+        """
+        Test that if GOV.UK Pay errors whilst getting a payment, the endpoint returns 500.
+
+        Possible GOV.UK errors:
+        - 401 - UNAUTHORIZED
+        - 404 - NOT FOUND
+        - 500 - INTERNAL SERVER ERROR
+        """
+        order = OrderWithAcceptedQuoteFactory()
+        session = PaymentGatewaySessionFactory(
+            order=order,
+            status=PaymentGatewaySessionStatus.created
+        )
+
+        requests_stubber.get(
+            govuk_url(f'payments/{session.govuk_payment_id}'),
+            status_code=govuk_status_code
+        )
+
+        # make API call
+        url = reverse(
+            'api-v3:omis-public:payment-gateway-session:detail',
+            kwargs={'public_token': order.public_token, 'pk': session.id}
+        )
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
+        response = client.get(url, format='json')
+        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    @pytest.mark.parametrize(
+        'order_status',
+        (
+            OrderStatus.draft,
+            OrderStatus.quote_awaiting_acceptance,
+            OrderStatus.cancelled
+        )
+    )
+    def test_404_if_in_disallowed_status(self, order_status):
+        """Test that if the order is not in an allowed state, the endpoint returns 404."""
+        order = OrderFactory(status=order_status)
+        session = PaymentGatewaySessionFactory(order=order)
+
+        # make API call
+        url = reverse(
+            'api-v3:omis-public:payment-gateway-session:detail',
+            kwargs={'public_token': order.public_token, 'pk': session.id}
+        )
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
+        response = client.get(url, format='json')
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_404_if_order_doesnt_exist(self):
+        """Test that if the order doesn't exist, the endpoint returns 404."""
+        url = reverse(
+            'api-v3:omis-public:payment-gateway-session:detail',
+            kwargs={
+                'public_token': ('1234-abcd-' * 5),
+                'pk': '00000000-0000-0000-0000-000000000000'
+            }
+        )
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
+        response = client.get(url, format='json')
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_404_if_session_doesnt_exist(self):
+        """Test that if the payment gateway session doesn't exist, the endpoint returns 404."""
+        order = OrderWithAcceptedQuoteFactory()
+        url = reverse(
+            'api-v3:omis-public:payment-gateway-session:detail',
+            kwargs={
+                'public_token': order.public_token,
+                'pk': '00000000-0000-0000-0000-000000000000'
+            }
+        )
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
+        response = client.get(url, format='json')
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_404_if_session_belongs_to_another_order(self):
+        """
+        Test that if the payment gateway session belongs to another order,
+        the endpoint returns 404.
+        """
+        orders = OrderWithAcceptedQuoteFactory.create_batch(2)
+        sessions = PaymentGatewaySessionFactory.create_batch(2, order=factory.Iterator(orders))
+        url = reverse(
+            'api-v3:omis-public:payment-gateway-session:detail',
+            kwargs={
+                'public_token': orders[0].public_token,
+                'pk': sessions[1].id
+            }
+        )
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
+        response = client.get(url, format='json')
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    @pytest.mark.parametrize('verb', ('post', 'patch', 'delete'))
+    def test_verbs_not_allowed(self, verb):
+        """Test that makes sure the other verbs are not allowed."""
+        order = OrderWithAcceptedQuoteFactory()
+        session = PaymentGatewaySessionFactory(order=order)
+
+        url = reverse(
+            'api-v3:omis-public:payment-gateway-session:detail',
+            kwargs={'public_token': order.public_token, 'pk': session.id}
+        )
+        client = self.create_api_client(
+            scope=Scope.public_omis_front_end,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
+        response = getattr(client, verb)(url)
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+    @pytest.mark.parametrize(
+        'scope',
+        (s.value for s in Scope if s != Scope.public_omis_front_end.value)
+    )
+    def test_403_if_scope_not_allowed(self, scope):
+        """Test that other oauth2 scopes are not allowed."""
+        order = OrderWithAcceptedQuoteFactory()
+        session = PaymentGatewaySessionFactory(order=order)
+
+        url = reverse(
+            'api-v3:omis-public:payment-gateway-session:detail',
+            kwargs={'public_token': order.public_token, 'pk': session.id}
+        )
+        client = self.create_api_client(
+            scope=scope,
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
+        response = client.get(url, format='json')
+        assert response.status_code == status.HTTP_403_FORBIDDEN
