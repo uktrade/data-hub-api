@@ -524,7 +524,7 @@ class TestUpdateCompany(APITestMixin):
             assert response.data['global_headquarters'] == error
 
     def test_remove_global_headquarters_link(self):
-        """Tests if we can remove global headquarter link."""
+        """Tests that we can remove global headquarter link."""
         global_headquarters = CompanyFactory(
             headquarter_type_id=HeadquarterType.ghq.value.id
         )
@@ -544,7 +544,7 @@ class TestUpdateCompany(APITestMixin):
         assert global_headquarters.subsidiaries.count() == 0
 
     def test_cannot_point_company_to_itself_as_global_headquarters(self):
-        """Test if you cannot point company as its own global headquarters."""
+        """Test that you cannot point company as its own global headquarters."""
         company = CompanyFactory(
             headquarter_type_id=HeadquarterType.ghq.value.id
         )
@@ -560,7 +560,7 @@ class TestUpdateCompany(APITestMixin):
         assert response.data['global_headquarters'] == error
 
     def test_subsidiary_cannot_become_a_global_headquarters(self):
-        """Tests if subsidiary cannot become a global headquarter."""
+        """Tests that subsidiary cannot become a global headquarter."""
         global_headquarters = CompanyFactory(
             headquarter_type_id=HeadquarterType.ghq.value.id
         )
