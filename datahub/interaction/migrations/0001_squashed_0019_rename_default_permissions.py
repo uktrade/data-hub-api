@@ -8,16 +8,14 @@ import uuid
 
 class Migration(migrations.Migration):
 
-    replaces = [('interaction', '0001_squash_0008_initial'), ('interaction', '0002_add_investment_project_to_interactions'), ('interaction', '0003_fix_blank_fields'), ('interaction', '0004_rename_advsor_fkeys_to_adviser'), ('interaction', '0005_created_modified_by'), ('interaction', '0006_auto_20170807_1124'), ('interaction', '0007_add_date_index'), ('interaction', '0008_add_interaction_kind'), ('interaction', '0009_add_interaction_event'), ('interaction', '0010_ren_interaction_type_comm_channel'), ('interaction', '0011_move_interaction_type'), ('interaction', '0012_update_interaction_type_fkeys'), ('interaction', '0013_rename_interaction_type_table'), ('interaction', '0014_remove_service_delivery'), ('interaction', '0015_adding_read_permissions'), ('interaction', '0016_add_archived_documents_url_path'), ('interaction', '0017_add_default_id_for_metadata'), ('interaction', '0018_add_assoc_permissions'), ('interaction', '0019_rename_default_permissions')]
-
     initial = True
 
     dependencies = [
-        ('metadata', '0011_add_default_id_for_metadata'),
+        ('metadata', '0001_squashed_0011_add_default_id_for_metadata'),
         ('event', '0008_add_service'),
         ('company', '0001_squashed_0010_auto_20170807_1124'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('investment', '0001_squashed_0013_add_quotable_as_case_study'),
+        ('investment', '0001_squashed_0025_remove_non_fdi_type'),
     ]
 
     operations = [

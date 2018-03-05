@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('metadata', '0001_squashed_0012_auto_20170523_0940'),
+        ('metadata', '0001_squashed_0011_add_default_id_for_metadata'),
         ('company', '0001_squashed_0010_auto_20170807_1124'),
     ]
 

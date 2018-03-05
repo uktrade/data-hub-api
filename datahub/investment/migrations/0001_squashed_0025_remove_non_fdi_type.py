@@ -8,14 +8,11 @@ import uuid
 
 class Migration(migrations.Migration):
 
-    replaces = [('investment', '0001_squashed_0013_add_quotable_as_case_study'), ('investment', '0014_add_other_business_activity'), ('investment', '0015_created_modified_by'), ('investment', '0016_auto_20170807_1124'), ('investment', '0016_add_project_status'), ('investment', '0017_merge_20170808_1301'), ('investment', '0018_add_anon_desc'), ('investment', '0019_add_assoc_r_and_d'), ('investment', '0020_auto_20171018_1506'), ('investment', '0021_remove_nda_shareable_fields'), ('investment', '0022_investortype_involvement_specificprogramme'), ('investment', '0023_auto_20171101_1044'), ('investment', '0024_adding_read_permissions'), ('investment', '0025_remove_non_fdi_type')]
-
     initial = True
 
     dependencies = [
         ('documents', '0001_initial'),
-        ('metadata', '0004_team_roles_regions_countries'),
-        ('metadata', '0003_add_fdi_value'),
+        ('metadata', '0001_squashed_0011_add_default_id_for_metadata'),
         ('company', '0001_squashed_0010_auto_20170807_1124'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]

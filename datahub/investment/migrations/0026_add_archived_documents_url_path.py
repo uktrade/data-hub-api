@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('investment', '0025_remove_non_fdi_type'),
+        ('investment', '0001_squashed_0025_remove_non_fdi_type'),
     ]
 
     operations = [
