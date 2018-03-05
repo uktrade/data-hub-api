@@ -211,6 +211,9 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         ),
         'global_headquarters_has_subsidiaries': ugettext_lazy(
             'Subsidiaries have to be unlinked before changing headquarter type.',
+        ),
+        'subsidiary_cannot_be_a_global_headquarters': ugettext_lazy(
+            'A company cannot both be and have a global headquarters.',
         )
     }
 
@@ -278,16 +281,39 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         """Ensure that global headquarters doesn't have any subsidiaries before changing
         headquarter type.
         """
-        if self.instance and self.instance.headquarter_type != headquarter_type:
-            if (
-                self.instance.headquarter_type_id == UUID(HeadquarterType.ghq.value.id)
-                and self.instance.subsidiaries.count() > 0
-            ):
-                raise serializers.ValidationError(
-                    self.error_messages['global_headquarters_has_subsidiaries']
-                )
+        headquarter_type_id = getattr(headquarter_type, 'id', None)
+
+        if (
+            self.instance
+            and self.instance.headquarter_type_id != headquarter_type_id
+        ):
+            self._validate_cannot_remove_ghq_if_it_has_subsidiaries()
+            self._validate_cannot_become_ghq_if_linked_to_another_ghq(headquarter_type_id)
 
         return headquarter_type
+
+    def _validate_cannot_remove_ghq_if_it_has_subsidiaries(self):
+        """Raises an exception if company is a global hq and has subsidiaries."""
+        if (
+            self.instance.headquarter_type_id == UUID(HeadquarterType.ghq.value.id)
+            and self.instance.subsidiaries.count() > 0
+        ):
+            raise serializers.ValidationError(
+                self.error_messages['global_headquarters_has_subsidiaries']
+            )
+
+    def _validate_cannot_become_ghq_if_linked_to_another_ghq(
+        self,
+        headquarter_type_id
+    ):
+        """Raises an exception if new headquarter type is ghq and company is linked to ghq."""
+        if (
+            headquarter_type_id == UUID(HeadquarterType.ghq.value.id)
+            and self.instance.global_headquarters is not None
+        ):
+            raise serializers.ValidationError(
+                self.error_messages['subsidiary_cannot_be_a_global_headquarters']
+            )
 
     def validate_global_headquarters(self, global_headquarters):
         """Ensure that global headquarters is global headquarters and it is not pointing
@@ -300,7 +326,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                     self.error_messages['global_headquarters_company_is_not_a_global_headquarters']
                 )
 
-            # check if global_headquarters is not pointing to an instance of the model
+            # checks if global_headquarters is not pointing to an instance of the model
             if self.instance == global_headquarters:
                 raise serializers.ValidationError(
                     self.error_messages['invalid_global_headquarters']

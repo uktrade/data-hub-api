@@ -524,7 +524,7 @@ class TestUpdateCompany(APITestMixin):
             assert response.data['global_headquarters'] == error
 
     def test_remove_global_headquarters_link(self):
-        """Tests if we can remove global headquarter link."""
+        """Tests that we can remove global headquarter link."""
         global_headquarters = CompanyFactory(
             headquarter_type_id=HeadquarterType.ghq.value.id
         )
@@ -543,8 +543,8 @@ class TestUpdateCompany(APITestMixin):
 
         assert global_headquarters.subsidiaries.count() == 0
 
-    def test_company_pointing_itself_as_global_headquarters(self):
-        """Test if you can point company as its own global headquarters."""
+    def test_cannot_point_company_to_itself_as_global_headquarters(self):
+        """Test that you cannot point company as its own global headquarters."""
         company = CompanyFactory(
             headquarter_type_id=HeadquarterType.ghq.value.id
         )
@@ -558,6 +558,27 @@ class TestUpdateCompany(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         error = ['Global headquarters cannot point to itself.']
         assert response.data['global_headquarters'] == error
+
+    def test_subsidiary_cannot_become_a_global_headquarters(self):
+        """Tests that subsidiary cannot become a global headquarter."""
+        global_headquarters = CompanyFactory(
+            headquarter_type_id=HeadquarterType.ghq.value.id
+        )
+        company = CompanyFactory(
+            headquarter_type_id=None,
+            global_headquarters=global_headquarters,
+        )
+
+        assert global_headquarters.subsidiaries.count() == 1
+
+        # now update it
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, format='json', data={
+            'headquarter_type': HeadquarterType.ghq.value.id,
+        })
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        error = ['A company cannot both be and have a global headquarters.']
+        assert response.data['headquarter_type'] == error
 
     @pytest.mark.parametrize('headquarter_type_id,changed_to,has_subsidiaries,is_valid', (
         (HeadquarterType.ghq.value.id, None, True, False),
