@@ -17,7 +17,7 @@ def load_initial_statuses(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('interaction', '0019_rename_default_permissions'),
+        ('interaction', '0001_squashed_0019_rename_default_permissions'),
     ]
 
     operations = [

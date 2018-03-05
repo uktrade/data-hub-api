@@ -11,7 +11,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('metadata', '0004_team_roles_regions_countries'),
+        ('metadata', '0001_squashed_0011_add_default_id_for_metadata'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('event', '0001_add_programme'),
     ]

@@ -7,8 +7,6 @@ import uuid
 
 class Migration(migrations.Migration):
 
-    replaces = [('metadata', '0001_squashed_0012_auto_20170523_0940'), ('metadata', '0002_rename_phase_to_stage'), ('metadata', '0003_add_fdi_value'), ('metadata', '0004_team_roles_regions_countries'), ('metadata', '0005_auto_20171002_0950'), ('metadata', '0006_remove_interaction_type'), ('metadata', '0007_remove_service_delivery'), ('metadata', '0008_remove_legacy_event'), ('metadata', '0009_adding_read_permissions'), ('metadata', '0010_remove_non_fdi_type'), ('metadata', '0011_add_default_id_for_metadata')]
-
     initial = True
 
     dependencies = [
