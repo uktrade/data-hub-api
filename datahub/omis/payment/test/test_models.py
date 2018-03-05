@@ -82,6 +82,27 @@ class TestPaymentGatewaySessionGetPaymentURL:
         session = PaymentGatewaySession(govuk_payment_id=govuk_payment_id)
         assert session.get_payment_url() == ''
 
+    @pytest.mark.parametrize(
+        'session_status',
+        (
+            PaymentGatewaySessionStatus.success,
+            PaymentGatewaySessionStatus.failed,
+            PaymentGatewaySessionStatus.cancelled,
+            PaymentGatewaySessionStatus.error,
+        )
+    )
+    def test_doesnt_call_govuk_pay_if_finished(self, session_status, requests_stubber):
+        """
+        Test that if the payment gateway session is finished, no call to GOV.UK Pay is made
+        and the method returns an empty string.
+        """
+        session = PaymentGatewaySession(
+            status=session_status,
+            govuk_payment_id='123abc123abc123abc123abc12'
+        )
+        assert session.get_payment_url() == ''
+        assert not requests_stubber.called
+
 
 @pytest.mark.django_db
 class TestPaymentGatewaySessionRefresh:
@@ -205,7 +226,7 @@ class TestPaymentGatewaySessionRefresh:
         session.refresh_from_db()
         assert session.status == PaymentGatewaySessionStatus.success
 
-        # checko order
+        # check order
         order.refresh_from_db()
         assert order.status == OrderStatus.paid
 
