@@ -8,7 +8,6 @@ MODELS_TO_REGISTER_DISABLEABLE = (
     models.CompanyClassification,
     models.Country,
     models.FDIType,
-    models.HeadquarterType,
     models.InvestmentBusinessActivity,
     models.InvestmentStrategicDriver,
     models.ReferralSourceActivity,
@@ -30,6 +29,7 @@ MODELS_TO_REGISTER_WITH_ORDER = (
 
 MODELS_TO_REGISTER_READ_ONLY = (
     models.BusinessType,
+    models.HeadquarterType,
     models.InvestmentType,
     models.InvestmentProjectStage,
 )
