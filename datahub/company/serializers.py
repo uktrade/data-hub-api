@@ -213,7 +213,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'Subsidiaries have to be unlinked before changing headquarter type.',
         ),
         'subsidiary_cannot_be_a_global_headquarters': ugettext_lazy(
-            'Global headquarters cannot have assigned global headquarters.',
+            'A company cannot both be and have a global headquarters.',
         )
     }
 
@@ -281,7 +281,10 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         """Ensure that global headquarters doesn't have any subsidiaries before changing
         headquarter type.
         """
-        if self.instance and self.instance.headquarter_type != headquarter_type:
+        if (
+            self.instance
+            and self.instance.headquarter_type_id != getattr(headquarter_type, 'id', None)
+        ):
             if (
                 self.instance.headquarter_type_id == UUID(HeadquarterType.ghq.value.id)
                 and self.instance.subsidiaries.count() > 0
@@ -290,7 +293,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                     self.error_messages['global_headquarters_has_subsidiaries']
                 )
             if (
-                str(headquarter_type) == HeadquarterType.ghq.value.name
+                getattr(headquarter_type, 'id', None) == UUID(HeadquarterType.ghq.value.id)
                 and self.instance.global_headquarters is not None
             ):
                 raise serializers.ValidationError(

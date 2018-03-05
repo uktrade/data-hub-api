@@ -543,8 +543,8 @@ class TestUpdateCompany(APITestMixin):
 
         assert global_headquarters.subsidiaries.count() == 0
 
-    def test_company_pointing_itself_as_global_headquarters(self):
-        """Test if you can point company as its own global headquarters."""
+    def test_cannot_point_company_to_itself_as_global_headquarters(self):
+        """Test if you cannot point company as its own global headquarters."""
         company = CompanyFactory(
             headquarter_type_id=HeadquarterType.ghq.value.id
         )
@@ -559,13 +559,13 @@ class TestUpdateCompany(APITestMixin):
         error = ['Global headquarters cannot point to itself.']
         assert response.data['global_headquarters'] == error
 
-    def test_subsidiary_becomes_a_global_headquarters(self):
-        """Tests if subsidiary can become a global headquarter."""
+    def test_subsidiary_cannot_become_a_global_headquarters(self):
+        """Tests if subsidiary cannot become a global headquarter."""
         global_headquarters = CompanyFactory(
             headquarter_type_id=HeadquarterType.ghq.value.id
         )
         company = CompanyFactory(
-            headquarter_type=None,
+            headquarter_type_id=None,
             global_headquarters=global_headquarters,
         )
 
@@ -576,9 +576,8 @@ class TestUpdateCompany(APITestMixin):
         response = self.api_client.patch(url, format='json', data={
             'headquarter_type': HeadquarterType.ghq.value.id,
         })
-
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        error = ['Global headquarters cannot have assigned global headquarters.']
+        error = ['A company cannot both be and have a global headquarters.']
         assert response.data['headquarter_type'] == error
 
     @pytest.mark.parametrize('headquarter_type_id,changed_to,has_subsidiaries,is_valid', (
