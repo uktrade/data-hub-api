@@ -79,6 +79,16 @@ class PublicPaymentGatewaySessionViewSet(BaseNestedOrderViewSet):
         """
         return super().get_queryset().filter(order=self.get_order())
 
+    def get_object(self):
+        """
+        :returns: the PaymentGatewaySession instance or 404 if it doesn't exist.
+            It refreshes the data from the related GOV.UK payment record if
+            necessary
+        """
+        obj = super().get_object()
+        obj.refresh_from_govuk_payment()
+        return obj
+
     def create(self, request, *args, **kwargs):
         """
         Same as the DRF create but it catches the Conflict exception and
