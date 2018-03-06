@@ -22,9 +22,17 @@ ES_INDEX_SETTINGS = {
 DOCUMENT_BUCKET='test-bucket'
 AV_SERVICE_URL='http://av-service/'
 
+REDIS_URL=None
+
 OMIS_GENERIC_CONTACT_EMAIL = 'omis@example.com'
 OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL = ''
 OMIS_NOTIFICATION_ADMIN_EMAIL = 'fake-omis-admin@digital.trade.gov.uk'
 OMIS_NOTIFICATION_API_KEY = ''
 
 GOVUK_PAY_URL='https://payments.example.com/'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache'
+    }
+}

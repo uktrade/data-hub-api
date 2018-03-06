@@ -19,6 +19,7 @@ services:
       COV_TOKEN: ${COV_TOKEN}
       ES_INDEX: test_index
       ES5_URL: http://es:9200
+      REDIS_URL: redis://redis:6379/0
       AWS_DEFAULT_REGION: eu-west-2
       AWS_ACCESS_KEY_ID: foo
       AWS_SECRET_ACCESS_KEY: bar
@@ -45,3 +46,7 @@ services:
     restart: always
     ports:
       - "9200:9200"
+
+  redis:
+    image: redis:3.2
+    restart: always
