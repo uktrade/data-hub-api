@@ -57,6 +57,7 @@ Dependencies:
 
 -   Python 3.6.x
 -   PostgreSQL (tested on 9.5 and 9.6)
+-   redis 3.2
 
 1.  Clone the repository:
 
@@ -105,7 +106,9 @@ Dependencies:
     docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" elasticsearch:5.5
     ```
 
-9.  Configure and populate the db:
+9. Make sure you have redis running locally and that the REDIS_URL in your `.env` is up-to-date.
+
+10.  Configure and populate the db:
 
     ```shell
     ./manage.py migrate
@@ -115,7 +118,7 @@ Dependencies:
     ./manage.py createinitialrevisions
     ```
 
-10. Optionally, you can load some test data and update Elasticsearch:
+11. Optionally, you can load some test data and update Elasticsearch:
 
     ```shell
     ./manage.py loaddata fixtures/test_data.yaml
@@ -123,7 +126,7 @@ Dependencies:
     ./manage.py sync_es
     ```
 
-11. Start the server:
+12. Start the server:
 
     ```shell
     ./manage.py runserver

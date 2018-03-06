@@ -23,6 +23,7 @@ django-filter==1.1.0
 django-model-utils==3.1.1
 django-oauth-toolkit==1.0.0
 django-pglocks==1.0.2
+django-redis==4.9.0
 django-reversion==2.0.13
 django==2.0.3
 djangorestframework==3.7.7
@@ -84,6 +85,7 @@ python-dateutil==2.6.1
 pytz==2018.3              # via django
 pyyaml==3.12
 raven==6.6.0
+redis==2.10.6             # via django-redis
 requests-mock==1.4.0
 requests==2.18.4
 requests_toolbelt==0.8.0
