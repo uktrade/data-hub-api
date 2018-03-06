@@ -206,6 +206,19 @@ BULK_INSERT_BATCH_SIZE = env.int('BULK_INSERT_BATCH_SIZE', default=25000)
 DOCUMENTS_BUCKET = env('DOCUMENTS_BUCKET')
 AV_SERVICE_URL = env('AV_SERVICE_URL', default=None)
 
+# CACHE / REDIS
+REDIS_URL = env('REDIS_URL', default=None)
+if REDIS_URL:
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": REDIS_URL,
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            }
+        }
+    }
+
 # FRONTEND
 DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://localhost:3000')
 
