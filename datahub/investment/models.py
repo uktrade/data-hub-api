@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, transaction
 from model_utils import Choices
+from mptt.fields import TreeForeignKey
 
 from datahub.core import reversion
 from datahub.core.constants import InvestmentProjectStage
@@ -178,7 +179,7 @@ class IProjectAbstract(models.Model):
         'metadata.FDIType', related_name='investment_projects', null=True,
         blank=True, on_delete=models.SET_NULL
     )
-    sector = models.ForeignKey(
+    sector = TreeForeignKey(
         'metadata.Sector', related_name='+', null=True, blank=True,
         on_delete=models.SET_NULL
     )

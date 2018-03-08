@@ -72,7 +72,7 @@ class SectorFactory(factory.django.DjangoModelFactory):
     """Sector factory."""
 
     id = factory.LazyFunction(uuid.uuid4)
-    name = factory.Sequence(lambda n: f'name {n}')
+    segment = factory.Sequence(lambda n: f'name {n}')
 
     class Meta:
         model = 'metadata.Sector'

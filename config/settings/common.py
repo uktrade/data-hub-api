@@ -48,6 +48,7 @@ THIRD_PARTY_APPS = [
     'reversion',
     'oauth2_provider',
     'django_filters',
+    'mptt',
 ]
 
 LOCAL_APPS = [
@@ -186,6 +187,10 @@ REST_FRAMEWORK = {
 
 
 APPEND_SLASH = False
+
+# MPTT
+
+MPTT_ADMIN_LEVEL_INDENT = 30
 
 # Leeloo stuff
 ES_USE_AWS_AUTH = env.bool('ES_USE_AWS_AUTH', False)

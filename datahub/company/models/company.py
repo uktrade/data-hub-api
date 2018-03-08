@@ -4,6 +4,7 @@ import uuid
 from django.conf import settings
 from django.db import models
 from django.utils.functional import cached_property
+from mptt.fields import TreeForeignKey
 
 from datahub.core import constants, reversion
 from datahub.core.models import ArchivableModel, BaseConstantModel, BaseModel
@@ -75,7 +76,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         metadata_models.BusinessType, blank=True, null=True,
         on_delete=models.SET_NULL
     )
-    sector = models.ForeignKey(
+    sector = TreeForeignKey(
         metadata_models.Sector, blank=True, null=True,
         on_delete=models.SET_NULL
     )
