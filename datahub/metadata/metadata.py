@@ -1,12 +1,20 @@
 from . import models
 from .registry import registry
-from .serializers import TeamSerializer
+from .serializers import SectorSerializer, TeamSerializer
 
 registry.register(metadata_id='business-type', model=models.BusinessType)
 registry.register(metadata_id='country', model=models.Country)
 registry.register(metadata_id='employee-range', model=models.EmployeeRange)
 registry.register(metadata_id='role', model=models.Role)
-registry.register(metadata_id='sector', model=models.Sector)
+registry.register(
+    metadata_id='sector',
+    model=models.Sector,
+    queryset=models.Sector.objects.select_related(
+        'parent',
+        'parent__parent',
+    ),
+    serializer=SectorSerializer,
+)
 registry.register(metadata_id='service', model=models.Service)
 registry.register(metadata_id='team-role', model=models.TeamRole)
 registry.register(

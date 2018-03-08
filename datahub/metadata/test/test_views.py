@@ -1,11 +1,14 @@
 from contextlib import suppress
+from operator import itemgetter
 
 import pytest
 from django.core.exceptions import FieldDoesNotExist
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from datahub.core.test_utils import format_date_or_datetime
 from .. import urls
+from ..models import Sector
 from ..registry import registry
 
 # mark the whole module for db use
@@ -133,3 +136,30 @@ def test_team_view(api_client):
         },
         'disabled_on': '2013-03-31T16:21:07Z',
     }
+
+
+def test_sector_view(api_client):
+    """
+    Test listing sectors.
+
+    Sectors should be sorted by full name (path).
+    """
+    url = reverse(viewname='sector')
+    response = api_client.get(url)
+    sector = Sector.objects.order_by('lft')[0]
+
+    assert response.status_code == status.HTTP_200_OK
+    sectors = response.json()
+    assert sectors[0] == {
+        'id': str(sector.pk),
+        'name': sector.name,
+        'segment': sector.segment,
+        'level': sector.level,
+        'parent': {
+            'id': str(sector.parent.pk),
+            'name': sector.parent.name,
+        } if sector.parent else None,
+        'disabled_on': format_date_or_datetime(sector.disabled_on) if sector.disabled_on else None,
+    }
+
+    assert sectors == list(sorted(sectors, key=itemgetter('name')))
