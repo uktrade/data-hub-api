@@ -45,8 +45,10 @@ class BasePaymentGatewaySessionManager(models.Manager):
         pay = PayClient()
         govuk_payment = pay.create_payment(
             amount=order.total_cost,
-            reference=str(session_id),
-            description=settings.GOVUK_PAY_PAYMENT_DESCRIPTION,
+            reference=f'{order.reference}-{str(session_id)[:8].upper()}',
+            description=settings.GOVUK_PAY_PAYMENT_DESCRIPTION.format(
+                reference=order.reference
+            ),
             return_url=settings.GOVUK_PAY_RETURN_URL.format(
                 public_token=order.public_token,
                 session_id=session_id

@@ -204,6 +204,7 @@ class TestPaymentGatewaySessionRefresh:
             'state': {'status': 'success'},
             'email': 'email@example.com',
             'created_date': '2018-02-13T14:56:56.734Z',
+            'reference': '12345',
             'card_details': {
                 'last_digits_card_number': '1111',
                 'cardholder_name': 'John Doe',
@@ -237,6 +238,7 @@ class TestPaymentGatewaySessionRefresh:
         assert payment.amount == response_json['amount']
         assert payment.method == PaymentMethod.card
         assert payment.received_on == dateutil_parse('2018-02-13').date()
+        assert payment.transaction_reference == '12345'
 
         assert payment.cardholder_name == 'John Doe'
         assert payment.card_brand == 'Visa'
