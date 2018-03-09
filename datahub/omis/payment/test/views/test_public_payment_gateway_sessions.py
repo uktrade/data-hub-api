@@ -347,6 +347,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
                 'amount': order.total_cost,
                 'state': {'status': 'success'},
                 'email': 'email@example.com',
+                'reference': '12345',
                 'created_date': '2018-02-13T14:56:56.734Z',
                 'card_details': {
                     'last_digits_card_number': '1111',
@@ -700,6 +701,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
                 'amount': order.total_cost,
                 'state': {'status': 'success'},
                 'email': 'email@example.com',
+                'reference': '12345',
                 'created_date': '2018-02-13T14:56:56.734Z',
                 '_links': {
                     'next_url': None,
