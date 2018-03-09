@@ -176,7 +176,7 @@ REST_FRAMEWORK = {
         'datahub.core.permissions.DjangoCrudPermission',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'payment_gateway_session.create': None,  # disabled for now
+        'payment_gateway_session.create': '5/min',
     },
     'ORDERING_PARAM': 'sortby'
 }
