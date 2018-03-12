@@ -20,6 +20,7 @@ class SearchCompanySerializer(SearchSerializer):
     headquarter_type = SingleOrListField(child=NullStringUUIDField(), required=False)
     name = serializers.CharField(required=False)
     sector = SingleOrListField(child=StringUUIDField(), required=False)
+    sector_descends = SingleOrListField(child=StringUUIDField(), required=False)
     trading_address_country = SingleOrListField(child=StringUUIDField(), required=False)
     country = SingleOrListField(child=StringUUIDField(), required=False)
     uk_based = serializers.BooleanField(required=False)

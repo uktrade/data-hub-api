@@ -15,7 +15,8 @@ from datahub.company.models import Company
 from datahub.company.test.factories import (AdviserFactory, CompaniesHouseCompanyFactory,
                                             CompanyFactory, ContactFactory)
 from datahub.core import constants
-from datahub.core.test_utils import APITestMixin, create_test_user
+from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_queryset
+from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
 
 pytestmark = pytest.mark.django_db
@@ -181,6 +182,42 @@ class TestSearch(APITestMixin):
 
         search_results = {uuid.UUID(company['id']) for company in response.data['results']}
         assert search_results == {company.id for company in companies}
+
+    @pytest.mark.parametrize(
+        'sector_level',
+        (0, 1, 2),
+    )
+    def test_sector_descends_filter(self, hierarchical_sectors, setup_es, sector_level):
+        """Test the sector_descends filter."""
+        num_sectors = len(hierarchical_sectors)
+        sectors_ids = [sector.pk for sector in hierarchical_sectors]
+
+        companies = CompanyFactory.create_batch(
+            num_sectors,
+            sector_id=factory.Iterator(sectors_ids)
+        )
+        CompanyFactory.create_batch(
+            3,
+            sector=factory.LazyFunction(lambda: random_obj_for_queryset(
+                Sector.objects.exclude(pk__in=sectors_ids)
+            ))
+        )
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:company')
+        body = {
+            'sector_descends': hierarchical_sectors[sector_level].pk
+        }
+        response = self.api_client.post(url, body)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['count'] == num_sectors - sector_level
+
+        actual_ids = {uuid.UUID(company['id']) for company in response_data['results']}
+        expected_ids = {company.pk for company in companies[sector_level:]}
+        assert actual_ids == expected_ids
 
     @pytest.mark.parametrize(
         'country,match',

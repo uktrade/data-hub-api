@@ -26,6 +26,7 @@ class SearchInvestmentProjectParams:
         'investor_company',
         'investor_company_country',
         'sector',
+        'sector_descends',
         'stage',
         'status',
         'uk_region_location',
@@ -48,6 +49,10 @@ class SearchInvestmentProjectParams:
             'project_assurance_adviser.id',
             'project_manager.id',
             'team_members.id',
+        ],
+        'sector_descends': [
+            'sector.id',
+            'sector.ancestors.id'
         ],
     }
 
