@@ -16,6 +16,7 @@ class SearchContactParams:
         'company',
         'company_name',
         'company_sector',
+        'company_sector_descends',
         'company_uk_region',
         'created_by',
         'created_on_exists',
@@ -41,6 +42,10 @@ class SearchContactParams:
             'company.name_trigram',
             'company.trading_name',
             'company.trading_name_trigram',
+        ],
+        'company_sector_descends': [
+            'company_sector.id',
+            'company_sector.ancestors.id',
         ],
     }
 

@@ -28,6 +28,8 @@ class CompanySearchApp(SearchApp):
         'global_headquarters',
         'registered_address_country',
         'sector',
+        'sector__parent',
+        'sector__parent__parent',
         'trading_address_country',
         'turnover_range',
         'uk_region',

@@ -117,11 +117,7 @@ def sector_dict(obj):
     return {
         'id': str(obj.id),
         'name': obj.name,
-        'ancestors': [_format_ancestor_sector(ancestor) for ancestor in obj.get_ancestors()],
-    }
-
-
-def _format_ancestor_sector(obj):
-    return {
-        'id': str(obj.id),
+        'ancestors': [{
+            'id': str(ancestor.id),
+        } for ancestor in obj.get_ancestors()],
     }
