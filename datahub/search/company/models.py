@@ -132,7 +132,6 @@ class Company(DocType, MapDBModelToDict):
         'reference_code',
         'registered_address_country.name_trigram',
         'registered_address_postcode_trigram',
-        'sector.name_trigram',
         'trading_address_country.name_trigram',
         'trading_address_postcode_trigram',
         'uk_region.name_trigram'

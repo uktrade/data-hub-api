@@ -54,7 +54,6 @@ def test_get_basic_search_query():
                                 'registered_address_postcode_trigram',
                                 'related_programmes.name',
                                 'related_programmes.name_trigram',
-                                'sector.name_trigram',
                                 'subject_english',
                                 'subtotal_cost_string',
                                 'teams.name',
@@ -151,7 +150,6 @@ def test_limited_get_search_by_entity_query():
                                             'investor_company.name',
                                             'investor_company.name_trigram',
                                             'project_code_trigram',
-                                            'sector.name_trigram'
                                         ),
                                         'type': 'cross_fields',
                                         'operator': 'and'
