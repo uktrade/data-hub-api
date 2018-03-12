@@ -56,8 +56,8 @@ def adviser_dict_with_team(obj):
     return contact_or_adviser_dict(obj, include_dit_team=True)
 
 
-def computed_nested_id_name_dict(nested_field):
-    """Creates dictionary with selected fields from nested_field."""
+def _computed_nested_dict(nested_field, dict_func):
+    """Creates a dictionary from a nested field using dict_func."""
     def get_dict(obj):
         fields = nested_field.split('.', maxsplit=1)
         if len(fields) != 2:
@@ -71,9 +71,19 @@ def computed_nested_id_name_dict(nested_field):
         if field is None:
             return None
 
-        return id_name_dict(field)
+        return dict_func(field)
 
     return get_dict
+
+
+def computed_nested_id_name_dict(nested_field):
+    """Creates a dictionary with id and name from a nested field."""
+    return _computed_nested_dict(nested_field, id_name_dict)
+
+
+def computed_nested_sector_dict(nested_field):
+    """Creates a dictionary for a sector from from a nested field."""
+    return _computed_nested_dict(nested_field, sector_dict)
 
 
 def company_dict(obj):
@@ -96,4 +106,22 @@ def investment_project_dict(obj):
         'id': str(obj.id),
         'name': obj.name,
         'project_code': obj.project_code,
+    }
+
+
+def sector_dict(obj):
+    """Creates a dictionary for a sector."""
+    if obj is None:
+        return None
+
+    return {
+        'id': str(obj.id),
+        'name': obj.name,
+        'ancestors': [_format_ancestor_sector(ancestor) for ancestor in obj.get_ancestors()],
+    }
+
+
+def _format_ancestor_sector(obj):
+    return {
+        'id': str(obj.id),
     }

@@ -368,6 +368,15 @@ def test_mapping(setup_es):
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
                             'type': 'text'
+                        },
+                        'ancestors': {
+                            'include_in_parent': True,
+                            'properties': {
+                                'id': {
+                                    'type': 'keyword'
+                                }
+                            },
+                            'type': 'nested'
                         }
                     },
                     'type': 'nested'
@@ -543,7 +552,10 @@ def test_indexed_doc(Factory, setup_es):
             },
             'sector': {
                 'id': str(order.sector.pk),
-                'name': order.sector.name
+                'name': order.sector.name,
+                'ancestors': [{
+                    'id': str(ancestor.pk),
+                } for ancestor in order.sector.get_ancestors()]
             },
             'uk_region': {
                 'id': str(order.uk_region.pk),
