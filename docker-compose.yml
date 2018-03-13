@@ -10,30 +10,29 @@ services:
       - .:/app
     entrypoint: |
         dockerize -wait tcp://postgres:5432 -wait tcp://es:9200 -timeout 60s
-    environment:
-      DATABASE_URL: postgresql://postgres@postgres/datahub
-      DATAHUB_SECRET: secret
-      DEBUG: 'True'
-      DJANGO_SECRET_KEY: changeme
-      DJANGO_SETTINGS_MODULE: config.settings.local
-      COV_TOKEN: ${COV_TOKEN}
-      ES_INDEX: test_index
-      ES5_URL: http://es:9200
-      REDIS_URL: redis://redis:6379/0
-      AWS_DEFAULT_REGION: eu-west-2
-      AWS_ACCESS_KEY_ID: foo
-      AWS_SECRET_ACCESS_KEY: bar
-      DOCUMENTS_BUCKET: baz
-      SSO_ENABLED: 'True'
-      RESOURCE_SERVER_INTROSPECTION_URL: http://sso/o/introspect/
-      RESOURCE_SERVER_AUTH_TOKEN: sso-token
+    env_file: docker-compose.env
     depends_on:
       - postgres
       - es
+      - redis
     links:
       - postgres
       - es
+      - redis
     command: /app/start.sh
+
+  celery:
+    build:
+      context: .
+    volumes:
+      - .:/app
+    entrypoint: dockerize -wait tcp://leeloo:8000 -timeout 60s
+    env_file: docker-compose.env
+    depends_on:
+      - leeloo
+    links:
+      - leeloo
+    command: celery worker -A config -l info -B
 
   postgres:
     image: postgres:9.6
@@ -46,7 +45,11 @@ services:
     restart: always
     ports:
       - "9200:9200"
+    environment:
+      - ES_JAVA_OPTS=-Xms750m -Xmx750m
 
   redis:
     image: redis:3.2
     restart: always
+    ports:
+      - "6379:6379"

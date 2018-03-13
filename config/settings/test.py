@@ -22,8 +22,6 @@ ES_INDEX_SETTINGS = {
 DOCUMENT_BUCKET='test-bucket'
 AV_SERVICE_URL='http://av-service/'
 
-REDIS_URL=None
-
 OMIS_GENERIC_CONTACT_EMAIL = 'omis@example.com'
 OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL = ''
 OMIS_NOTIFICATION_ADMIN_EMAIL = 'fake-omis-admin@digital.trade.gov.uk'
@@ -36,3 +34,5 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache'
     }
 }
+
+CELERY_TASK_ALWAYS_EAGER = True
