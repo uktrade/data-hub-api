@@ -67,7 +67,7 @@ class TestSendEmail:
         )
 
 
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
 class TestNotifyOrderInfo:
     """Tests for generic notifications related to an order."""
 
@@ -154,7 +154,7 @@ class TestNotifyOrderInfo:
         assert call_args['personalisation']['recipient name'] == 'example name'
 
 
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
 class TestNotifyOrderCreated:
     """Tests for notifications sent when an order is created."""
 
@@ -288,7 +288,7 @@ class TestNotifyOrderCreated:
         assert call_args['template_id'] != Template.order_created_for_regional_manager.value
 
 
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
 class TestNotifyAdviserAdded:
     """Tests for the adviser_added logic."""
 
@@ -320,7 +320,7 @@ class TestNotifyAdviserAdded:
         assert call_args['personalisation']['creation date'] == '18/05/2017'
 
 
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
 class TestNotifyAdviserRemoved:
     """Tests for the adviser_removed logic."""
 
@@ -344,7 +344,7 @@ class TestNotifyAdviserRemoved:
         assert call_args['personalisation']['recipient name'] == adviser.name
 
 
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
 class TestNotifyOrderPaid:
     """Tests for the order_paid logic."""
 
@@ -397,7 +397,7 @@ class TestNotifyOrderPaid:
             assert call['personalisation']['embedded link'] == order.get_datahub_frontend_url()
 
 
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
 class TestNotifyOrderCompleted:
     """Tests for the order_completed logic."""
 
@@ -432,7 +432,7 @@ class TestNotifyOrderCompleted:
             assert call['personalisation']['embedded link'] == order.get_datahub_frontend_url()
 
 
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
 class TestNotifyOrderCancelled:
     """Tests for the order_cancelled logic."""
 
@@ -485,7 +485,7 @@ class TestNotifyOrderCancelled:
             assert call['personalisation']['embedded link'] == order.get_datahub_frontend_url()
 
 
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
 class TestNotifyQuoteGenerated:
     """Tests for the quote_generated logic."""
 
@@ -538,7 +538,7 @@ class TestNotifyQuoteGenerated:
             assert call['personalisation']['embedded link'] == order.get_datahub_frontend_url()
 
 
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
 class TestNotifyQuoteAccepted:
     """Tests for the quote_accepted logic."""
 
@@ -591,7 +591,7 @@ class TestNotifyQuoteAccepted:
             assert call['personalisation']['embedded link'] == order.get_datahub_frontend_url()
 
 
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
 class TestNotifyQuoteCancelled:
     """Tests for the quote_cancelled logic."""
 

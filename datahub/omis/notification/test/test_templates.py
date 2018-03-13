@@ -23,7 +23,7 @@ pytestmark = pytest.mark.django_db
     not settings.OMIS_NOTIFICATION_TEST_API_KEY,
     reason='`settings.OMIS_NOTIFICATION_TEST_API_KEY` not set (optional).'
 )
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
 class TestTemplates:
     """
     These tests are going to be run only if `OMIS_NOTIFICATION_TEST_API_KEY` is set

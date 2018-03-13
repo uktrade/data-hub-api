@@ -48,7 +48,7 @@ def _setup_es_indexes(_es_client):
 def setup_es(_setup_es_indexes, monkeypatch):
     """Sets up ES and deletes all the records after each run."""
     monkeypatch.setattr('django.db.transaction.on_commit', synchronous_transaction_on_commit)
-    monkeypatch.setattr('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    monkeypatch.setattr('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
 
     yield _setup_es_indexes
 

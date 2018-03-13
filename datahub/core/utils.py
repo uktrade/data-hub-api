@@ -6,8 +6,8 @@ from logging import getLogger
 import boto3
 import requests
 
-executor = ThreadPoolExecutor()
 logger = getLogger(__name__)
+_executor = ThreadPoolExecutor()
 
 
 class StrEnum(str, Enum):
@@ -51,10 +51,24 @@ def slice_iterable_into_chunks(iterable, batch_size, obj_creator):
         yield objects
 
 
+def submit_to_thread_pool(fn, *args, **kwargs):
+    """Submits a function to be run in the thread pool."""
+    return _submit_to_thread_pool(fn, *args, **kwargs)
+
+
+def _submit_to_thread_pool(fn, *args, **kwargs):
+    """
+    Implementation of submit_to_thread_pool().
+
+    Gives tests a centralised place to patch task submission for synchronous execution.
+    """
+    return _executor.submit(fn, *args, **kwargs)
+
+
 def shut_down_thread_pool():
     """Shuts down the thread pool."""
     logger.info('Shutting down thread pool...')
-    executor.shutdown()
+    _executor.shutdown()
 
 
 def get_s3_client():
