@@ -3059,10 +3059,9 @@ class TestDocumentViews(APITestMixin):
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert mock_submit.called is False
 
-    @patch('datahub.core.utils.get_s3_client')
     @patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
     @patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
-    def test_document_delete(self, mock_s3):
+    def test_document_delete(self, s3_stubber):
         """Tests document deletion."""
         project = InvestmentProjectFactory()
         doc = IProjectDocument.create_from_declaration_request(
@@ -3071,15 +3070,19 @@ class TestDocumentViews(APITestMixin):
         doc.document.uploaded_on = now()
         doc.document.save()
 
+        s3_stubber.add_response('delete_object', {
+            'ResponseMetadata': {
+                'HTTPStatusCode': 204,
+            }
+        }, expected_params={
+            'Bucket': doc.document.s3_bucket, 'Key': doc.document.s3_key
+        })
+
         url = reverse('api-v3:investment:document-item',
                       kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
 
         response = self.api_client.delete(url)
         assert response.status_code == status.HTTP_204_NO_CONTENT
-        mock_s3().delete_object.assert_called_with(
-            Bucket=doc.document.s3_bucket,
-            Key=doc.document.s3_key,
-        )
 
     def test_document_upload_status_wrong_status(self):
         """Tests request validation in the document status endpoint."""

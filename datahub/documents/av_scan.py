@@ -48,12 +48,8 @@ def virus_scan_document(document_pk: str):
 
     Any errors are logged and sent to Sentry.
     """
-    try:
-        with advisory_lock(f'av-scan-{document_pk}'):
-            _process_document(document_pk)
-    except Exception:
-        logger.exception('Error scanning document for viruses')
-        client.captureException()
+    with advisory_lock(f'av-scan-{document_pk}'):
+        _process_document(document_pk)
 
 
 def _process_document(document_pk: str):

@@ -6,7 +6,6 @@ from django.conf import settings
 from django.db import models, transaction
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
-from raven.contrib.django.raven_compat.models import client
 
 from datahub.core.models import ArchivableModel, BaseModel
 from datahub.core.utils import delete_s3_obj, sign_s3_url, submit_to_thread_pool
@@ -81,12 +80,7 @@ def document_post_delete(sender, **kwargs):
     key = instance.s3_key
 
     def delete_document():
-        try:
-            delete_s3_obj(bucket, key)
-        except Exception:
-            msg = 'Exception during s3 object removal.'
-            logger.exception(msg)
-            client.captureException(msg)
+        delete_s3_obj(bucket, key)
 
     transaction.on_commit(
         lambda: submit_to_thread_pool(delete_document)
