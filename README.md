@@ -106,7 +106,7 @@ Dependencies:
     docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" elasticsearch:5.5
     ```
 
-9. Make sure you have redis running locally and that the REDIS_URL in your `.env` is up-to-date.
+9. Make sure you have redis running locally and that the REDIS_BASE_URL in your `.env` is up-to-date.
 
 10.  Configure and populate the db:
 
@@ -130,6 +130,12 @@ Dependencies:
 
     ```shell
     ./manage.py runserver
+    ```
+
+13. Start celery:
+
+    ```shell
+    celery worker -A config -l info -B
     ```
 
 ## Local development
@@ -216,6 +222,9 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `OMIS_NOTIFICATION_API_KEY`  | Yes | |
 | `OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL`  | No | |
 | `OMIS_PUBLIC_BASE_URL`  | Yes | |
+| `REDIS_BASE_URL`  | No | redis base URL without the db |
+| `REDIS_CACHE_DB`  | No | redis db for django cache (default 0) |
+| `REDIS_CELERY_DB`  | No | redis db for celery (default 1) |
 | `RESOURCE_SERVER_INTROSPECTION_URL` | If SSO enabled | RFC 7662 token introspection URL used for signle sign-on |
 | `RESOURCE_SERVER_AUTH_TOKEN` | If SSO enabled | Access token for RFC 7662 token introspection server |
 | `SENTRY_ENVIRONMENT`  | Yes | Value for the environment tag in Sentry. |
