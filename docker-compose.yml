@@ -36,7 +36,7 @@ services:
     command: /app/start.sh
 
   postgres:
-    image: postgres:9.5
+    image: postgres:9.6
     restart: always
     environment:
       - POSTGRES_DB=datahub
