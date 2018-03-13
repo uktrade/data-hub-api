@@ -85,6 +85,8 @@ class InvestmentProject(DocType, MapDBModelToDict):
     average_salary = dsl_utils.id_name_mapping()
     date_lost = Date()
     date_abandoned = Date()
+    project_arrived_in_triage = Date()
+    proposal_deadline = Date()
 
     MAPPINGS = {
         'id': str,
@@ -149,6 +151,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'modified_by',
         'strategic_drivers',
         'archived_documents_url_path',
+        'stage_log',
     )
 
     SEARCH_FIELDS = (

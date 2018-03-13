@@ -338,6 +338,16 @@ class IProjectTeamAbstract(models.Model):
         return None
 
 
+class IProjectSPIAbstract(models.Model):
+    """The SPI part of an investment project."""
+
+    class Meta:
+        abstract = True
+
+    project_arrived_in_triage = models.DateField(blank=True, null=True)
+    proposal_deadline = models.DateField(blank=True, null=True)
+
+
 _AssociatedToManyField = namedtuple(
     '_AssociatedToManyField', ('field_name', 'subfield_name', 'es_field_name')
 )
@@ -346,7 +356,7 @@ _AssociatedToManyField = namedtuple(
 @reversion.register_base_model()
 class InvestmentProject(ArchivableModel, IProjectAbstract,
                         IProjectValueAbstract, IProjectRequirementsAbstract,
-                        IProjectTeamAbstract, BaseModel):
+                        IProjectTeamAbstract, IProjectSPIAbstract, BaseModel):
     """An investment project."""
 
     _ASSOCIATED_ADVISER_TO_ONE_FIELDS = (
@@ -452,6 +462,23 @@ class InvestmentProjectTeamMember(models.Model):
     class Meta:
         unique_together = (('investment_project', 'adviser'),)
         default_permissions = ()
+
+
+class InvestmentProjectStageLog(models.Model):
+    """Investment Project stages log."""
+
+    investment_project = models.ForeignKey(
+        InvestmentProject, on_delete=models.CASCADE, related_name='stage_log'
+    )
+    stage = models.ForeignKey(
+        'metadata.InvestmentProjectStage', on_delete=models.PROTECT,
+        related_name='+',
+    )
+    created_on = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        """Human-readable representation."""
+        return f'{self.investment_project} – {self.created_on} – {self.stage}'
 
 
 class InvestmentProjectCode(models.Model):
