@@ -5,7 +5,6 @@ from unittest import mock
 
 from django.conf import settings
 from notifications_python_client.notifications import NotificationsAPIClient
-from raven.contrib.django.raven_compat.models import client as raven_client
 
 from datahub.core.utils import submit_to_thread_pool
 from datahub.omis.market.models import Market
@@ -24,12 +23,7 @@ def send_email(client, **kwargs):
     if settings.OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL:
         data['email_address'] = settings.OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL
 
-    try:
-        client.send_email_notification(**data)
-    except:  # noqa: B901
-        logger.exception('Error while sending a notification email.')
-        raven_client.captureException()
-        raise
+    client.send_email_notification(**data)
 
 
 class Notify:

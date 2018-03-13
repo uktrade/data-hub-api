@@ -4,7 +4,6 @@ from unittest import mock
 import pytest
 from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
-from notifications_python_client.errors import APIError
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import UKRegion
@@ -23,20 +22,6 @@ pytestmark = pytest.mark.django_db
 
 class TestSendEmail:
     """Tests for errors with the internal send_email function."""
-
-    @mock.patch('datahub.omis.notification.client.raven_client')
-    def test_error_raises_exception(self, mock_raven_client):
-        """
-        Test that if an error occurs whilst sending an email,
-        the exception is raised and sent to sentry.
-        """
-        notify_client = mock.Mock()
-        notify_client.send_email_notification.side_effect = APIError()
-
-        with pytest.raises(APIError):
-            send_email(notify_client)
-
-        assert mock_raven_client.captureException.called
 
     def test_override_recipient_email(self, settings):
         """

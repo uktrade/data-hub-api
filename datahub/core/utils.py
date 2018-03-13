@@ -5,6 +5,7 @@ from logging import getLogger
 
 import boto3
 import requests
+from raven.contrib.django.raven_compat.models import client
 
 logger = getLogger(__name__)
 _executor = ThreadPoolExecutor()
@@ -62,7 +63,19 @@ def _submit_to_thread_pool(fn, *args, **kwargs):
 
     Gives tests a centralised place to patch task submission for synchronous execution.
     """
-    return _executor.submit(fn, *args, **kwargs)
+    return _executor.submit(_make_thread_pool_task(fn, *args, **kwargs))
+
+
+def _make_thread_pool_task(fn, *args, **kwargs):
+    def _task():
+        try:
+            fn(*args, **kwargs)
+        except Exception:
+            msg = f'Error running thread pool task {fn.__name__}'
+            logger.exception(msg)
+            client.captureException(msg)
+            raise
+    return _task
 
 
 def shut_down_thread_pool():
