@@ -23,7 +23,6 @@ from datahub.core.test_utils import (
     APITestMixin, create_test_user, format_date_or_datetime, random_obj_for_model,
     synchronous_executor_submit, synchronous_transaction_on_commit
 )
-from datahub.core.utils import executor
 from datahub.documents.av_scan import virus_scan_document
 from datahub.investment import views
 from datahub.investment.models import (
@@ -3023,7 +3022,7 @@ class TestDocumentViews(APITestMixin):
         assert response.data['filename'] == 'test.txt'
         assert 'signed_url' in response.data
 
-    @patch.object(executor, 'submit')
+    @patch('datahub.core.utils._submit_to_thread_pool')
     def test_document_upload_status(self, mock_submit):
         """Tests setting of document upload status to complete.
 
@@ -3044,8 +3043,7 @@ class TestDocumentViews(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         mock_submit.assert_called_once_with(virus_scan_document, str(doc.pk))
 
-    @patch.object(executor, 'submit')
-    @patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @patch('datahub.core.utils._submit_to_thread_pool')
     @patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_document_delete_of_not_uploaded_doc_does_not_trigger_s3_delete(self, mock_submit):
         """Tests document deletion."""
@@ -3062,7 +3060,7 @@ class TestDocumentViews(APITestMixin):
         assert mock_submit.called is False
 
     @patch('datahub.core.utils.get_s3_client')
-    @patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+    @patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
     @patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
     def test_document_delete(self, mock_s3):
         """Tests document deletion."""

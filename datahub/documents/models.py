@@ -9,7 +9,7 @@ from django.dispatch import receiver
 from raven.contrib.django.raven_compat.models import client
 
 from datahub.core.models import ArchivableModel, BaseModel
-from datahub.core.utils import delete_s3_obj, executor, sign_s3_url
+from datahub.core.utils import delete_s3_obj, sign_s3_url, submit_to_thread_pool
 
 logger = getLogger(__name__)
 
@@ -89,5 +89,5 @@ def document_post_delete(sender, **kwargs):
             client.captureException(msg)
 
     transaction.on_commit(
-        lambda: executor.submit(delete_document)
+        lambda: submit_to_thread_pool(delete_document)
     )
