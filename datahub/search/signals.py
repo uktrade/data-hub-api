@@ -1,6 +1,6 @@
 from logging import getLogger
 
-from datahub.core.utils import submit_to_thread_pool
+from datahub.core.thread_pool import submit_to_thread_pool
 from datahub.search import elasticsearch
 
 logger = getLogger(__name__)
