@@ -156,7 +156,7 @@ class TestListView(APITestMixin):
             'project_assurance_team',
             'team_complete',
             'team_members',
-            'project_arrived_in_triage',
+            'project_arrived_in_triage_on',
             'proposal_deadline',
             'stage_log',
         }
@@ -1018,15 +1018,15 @@ class TestPartialUpdateView(APITestMixin):
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
-            'project_arrived_in_triage': '2017-04-18T13:25:30.986208Z',
-            'proposal_deadline': '2017-04-19T13:25:30.986208Z',
+            'project_arrived_in_triage_on': '2017-04-18',
+            'proposal_deadline': '2017-04-19',
         }
         response = self.api_client.patch(url, data=request_data, format='json')
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        project_arrived_in_triage = response_data['project_arrived_in_triage']
-        assert project_arrived_in_triage == request_data['project_arrived_in_triage']
+        project_arrived_in_triage_on = response_data['project_arrived_in_triage_on']
+        assert project_arrived_in_triage_on == request_data['project_arrived_in_triage_on']
         assert response_data['proposal_deadline'] == request_data['proposal_deadline']
 
     def test_patch_estimated_land_date_legacy_project(self):
@@ -1069,13 +1069,6 @@ class TestPartialUpdateView(APITestMixin):
             'uk_region_locations': ['This field is required.'],
         }
 
-        project.refresh_from_db()
-        assert [
-            entry.stage.id for entry in project.stage_log.order_by('created_on')
-        ] == [
-            uuid.UUID(constants.InvestmentProjectStage.prospect.value.id),
-        ]
-
     def test_change_stage_assign_pm_success(self):
         """Tests moving a complete project to the Assign PM stage."""
         strategic_drivers = [
@@ -1099,14 +1092,6 @@ class TestPartialUpdateView(APITestMixin):
         }
         response = self.api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
-
-        project.refresh_from_db()
-        assert [
-            entry.stage.id for entry in project.stage_log.order_by('created_on')
-        ] == [
-            uuid.UUID(constants.InvestmentProjectStage.prospect.value.id),
-            uuid.UUID(constants.InvestmentProjectStage.assign_pm.value.id),
-        ]
 
     def test_change_stage_active_failure(self):
         """Tests moving an incomplete project to the Active stage."""
@@ -1132,12 +1117,6 @@ class TestPartialUpdateView(APITestMixin):
             'project_assurance_adviser': ['This field is required.'],
             'project_manager': ['This field is required.'],
         }
-        project.refresh_from_db()
-        assert [
-            entry.stage.id for entry in project.stage_log.order_by('created_on')
-        ] == [
-            uuid.UUID(constants.InvestmentProjectStage.prospect.value.id),
-        ]
 
     def test_change_stage_active_success(self):
         """Tests moving a complete project to the Active stage."""
@@ -1154,14 +1133,6 @@ class TestPartialUpdateView(APITestMixin):
         }
         response = self.api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
-
-        project.refresh_from_db()
-        assert [
-            entry.stage.id for entry in project.stage_log.order_by('created_on')
-        ] == [
-            uuid.UUID(constants.InvestmentProjectStage.assign_pm.value.id),
-            uuid.UUID(constants.InvestmentProjectStage.active.value.id),
-        ]
 
     def test_change_stage_verify_win_failure(self):
         """Tests moving a partially complete project to the 'Verify win' stage."""
@@ -1191,13 +1162,6 @@ class TestPartialUpdateView(APITestMixin):
             'client_cannot_provide_foreign_investment': ['This field is required.'],
             'foreign_equity_investment': ['This field is required.'],
         }
-
-        project.refresh_from_db()
-        assert [
-            entry.stage.id for entry in project.stage_log.order_by('created_on')
-        ] == [
-            uuid.UUID(constants.InvestmentProjectStage.active.value.id),
-        ]
 
     def test_change_stage_verify_win_success(self):
         """Tests moving a complete project to the 'Verify win' stage."""
@@ -1233,20 +1197,6 @@ class TestPartialUpdateView(APITestMixin):
         response = self.api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
 
-        response_data = response.json()
-        assert len(response_data['stage_log']) == 2
-        assert set(
-            entry['stage']['name'] for entry in response_data['stage_log']
-        ) == {'Active', 'Verify win'}
-
-        project.refresh_from_db()
-        assert [
-            entry.stage.id for entry in project.stage_log.order_by('created_on')
-        ] == [
-            uuid.UUID(constants.InvestmentProjectStage.active.value.id),
-            uuid.UUID(constants.InvestmentProjectStage.verify_win.value.id),
-        ]
-
     def test_change_stage_to_won(self):
         """
         Tests moving a complete project to the 'Won' stage, when all required fields are
@@ -1269,14 +1219,6 @@ class TestPartialUpdateView(APITestMixin):
         }
         assert response_data['status'] == 'won'
 
-        project.refresh_from_db()
-        assert [
-            entry.stage.id for entry in project.stage_log.order_by('created_on')
-        ] == [
-            uuid.UUID(constants.InvestmentProjectStage.verify_win.value.id),
-            uuid.UUID(constants.InvestmentProjectStage.won.value.id),
-        ]
-
     def test_change_stage_to_won_failure(self):
         """
         Tests moving a project to the 'Won' stage, when required field for that transition
@@ -1296,13 +1238,6 @@ class TestPartialUpdateView(APITestMixin):
             'actual_land_date': ['This field is required.'],
         }
 
-        project.refresh_from_db()
-        assert [
-            entry.stage.id for entry in project.stage_log.order_by('created_on')
-        ] == [
-            uuid.UUID(constants.InvestmentProjectStage.verify_win.value.id),
-        ]
-
     def test_revert_stage_to_verify_win(self):
         """Tests moving a complete project from the 'Won' stage to 'Verify win'."""
         project = WonInvestmentProjectFactory()
@@ -1321,13 +1256,39 @@ class TestPartialUpdateView(APITestMixin):
         }
         assert response_data['status'] == 'ongoing'
 
-        project.refresh_from_db()
-        assert project.stage_log.count() == 2
+    def test_change_stage_log(self):
+        """Tests change of the project stage is being logged."""
+        project1 = InvestmentProjectFactory()
+        project1.stage_id = constants.InvestmentProjectStage.assign_pm.value.id
+        project1.save()
+        assert project1.stage_log.count() == 2
+
+        adviser = AdviserFactory()
+        project2 = AssignPMInvestmentProjectFactory(
+            project_assurance_adviser=adviser,
+            project_manager=adviser,
+        )
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project2.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.active.value.id
+            }
+        }
+
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['stage_log']) == 2
         assert [
-            entry.stage.id for entry in project.stage_log.order_by('created_on')
+            entry['stage']['name'] for entry in response_data['stage_log']
+        ] == ['Assign PM', 'Active']
+
+        assert [
+            entry.stage.id for entry in project2.stage_log.order_by('created_on')
         ] == [
-            uuid.UUID(constants.InvestmentProjectStage.won.value.id),
-            uuid.UUID(constants.InvestmentProjectStage.verify_win.value.id),
+            uuid.UUID(constants.InvestmentProjectStage.assign_pm.value.id),
+            uuid.UUID(constants.InvestmentProjectStage.active.value.id),
         ]
 
     def test_invalid_state_validation(self):

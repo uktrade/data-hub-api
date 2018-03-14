@@ -24,7 +24,14 @@ def project_code_project_post_save(sender, **kwargs):
 
 @receiver(post_save, sender=InvestmentProject, dispatch_uid='stage_log_project_post_save')
 def stage_log_project_post_save(sender, **kwargs):
-    """Creates a log of changes to stage field."""
+    """Creates a log of changes to stage field.
+
+    This allows us to construct the timeline of changes to the stage field as
+    required for Service Performance Indicators (SPI).
+    """
+    if kwargs['raw']:
+        return
+
     instance = kwargs['instance']
     created = kwargs['created']
 
@@ -33,13 +40,16 @@ def stage_log_project_post_save(sender, **kwargs):
     if created:
         created_on = instance.created_on
     else:
-        last_stage = InvestmentProjectStageLog.objects.order_by('-created_on').first()
-        if last_stage.stage != instance.stage:
+        last_stage = InvestmentProjectStageLog.objects.filter(
+            investment_project_id=instance.pk
+        ).order_by('-created_on').first()
+
+        if str(last_stage.stage_id) != instance.stage_id:
             created_on = instance.modified_on
 
     if created_on:
         InvestmentProjectStageLog.objects.create(
-            investment_project=instance,
-            stage=instance.stage,
+            investment_project_id=instance.pk,
+            stage_id=instance.stage_id,
             created_on=created_on,
         )
