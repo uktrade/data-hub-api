@@ -86,7 +86,7 @@ def test_investment_project_to_dict(setup_es):
         'team_members',
         'likelihood_of_landing',
         'priority',
-        'project_arrived_in_triage',
+        'project_arrived_in_triage_on',
         'quotable_as_public_case_study',
         'other_business_activity',
         'status',

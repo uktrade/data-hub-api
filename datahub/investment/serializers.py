@@ -129,7 +129,7 @@ TEAM_FIELDS = (
 )
 
 SPI_FIELDS = (
-    'project_arrived_in_triage',
+    'project_arrived_in_triage_on',
     'proposal_deadline',
     'stage_log',
 )
@@ -232,9 +232,9 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
     team_complete = serializers.SerializerMethodField()
 
     # SPI fields
-    project_arrived_in_triage = serializers.DateTimeField(required=False, allow_null=True)
-    proposal_deadline = serializers.DateTimeField(required=False, allow_null=True)
-    stage_log = NestedInvestmentProjectStageLogSerializer(many=True, read_only=True)
+    project_arrived_in_triage_on = serializers.DateField(required=False, allow_null=True)
+    proposal_deadline = serializers.DateField(required=False, allow_null=True)
+    stage_log = serializers.SerializerMethodField()
 
     def validate(self, data):
         """Validates the object after individual fields have been validated.
@@ -280,6 +280,15 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
         return not validate(
             instance=instance, fields=TEAM_FIELDS, next_stage=True
         )
+
+    def get_stage_log(self, instance):
+        """Returns stage log sorted by created_on."""
+        stage_log = instance.stage_log.order_by('created_on')
+        return NestedInvestmentProjectStageLogSerializer(
+            stage_log,
+            many=True,
+            read_only=True
+        ).data
 
     def _update_status(self, data):
         """Updates the project status when the stage changes to or from Won."""

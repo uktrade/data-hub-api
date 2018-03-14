@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='investmentproject',
-            name='project_arrived_in_triage',
+            name='project_arrived_in_triage_on',
             field=models.DateField(blank=True, null=True),
         ),
         migrations.AddField(

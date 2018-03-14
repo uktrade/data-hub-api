@@ -344,7 +344,7 @@ class IProjectSPIAbstract(models.Model):
     class Meta:
         abstract = True
 
-    project_arrived_in_triage = models.DateField(blank=True, null=True)
+    project_arrived_in_triage_on = models.DateField(blank=True, null=True)
     proposal_deadline = models.DateField(blank=True, null=True)
 
 

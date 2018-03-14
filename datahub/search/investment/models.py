@@ -85,7 +85,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
     average_salary = dsl_utils.id_name_mapping()
     date_lost = Date()
     date_abandoned = Date()
-    project_arrived_in_triage = Date()
+    project_arrived_in_triage_on = Date()
     proposal_deadline = Date()
 
     MAPPINGS = {
