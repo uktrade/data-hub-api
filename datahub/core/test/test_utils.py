@@ -6,7 +6,6 @@ import pytest
 
 from datahub.core.constants import Constant
 from datahub.core.test.support.models import MetadataModel
-from datahub.core.test_utils import synchronous_executor_submit
 from datahub.core.utils import (
     join_truthy_strings, load_constants_to_database, slice_iterable_into_chunks,
     submit_to_thread_pool
@@ -86,7 +85,11 @@ def test_load_constants_to_database():
     assert actual_items == expected_items
 
 
-@mock.patch('datahub.core.utils._executor.submit', synchronous_executor_submit)
+def _synchronous_executor_submit(fn, *args, **kwargs):
+    fn(*args, **kwargs)
+
+
+@mock.patch('datahub.core.utils._executor.submit', _synchronous_executor_submit)
 @mock.patch('datahub.core.utils.client')
 def test_error_raises_exception(mock_raven_client):
     """

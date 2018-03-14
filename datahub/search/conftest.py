@@ -2,7 +2,6 @@ from django.conf import settings
 from elasticsearch.helpers.test import get_test_client
 from pytest import fixture
 
-from datahub.core.test_utils import synchronous_executor_submit, synchronous_transaction_on_commit
 from datahub.metadata.test.factories import SectorFactory
 from datahub.search import elasticsearch
 from .apps import get_search_apps
@@ -45,11 +44,8 @@ def _setup_es_indexes(_es_client):
 
 
 @fixture
-def setup_es(_setup_es_indexes, monkeypatch):
+def setup_es(_setup_es_indexes, synchronous_on_commit, synchronous_thread_pool):
     """Sets up ES and deletes all the records after each run."""
-    monkeypatch.setattr('django.db.transaction.on_commit', synchronous_transaction_on_commit)
-    monkeypatch.setattr('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
-
     yield _setup_es_indexes
 
     _setup_es_indexes.indices.refresh()
