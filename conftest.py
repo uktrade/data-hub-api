@@ -75,7 +75,7 @@ def local_memory_cache(monkeypatch):
 def synchronous_thread_pool(monkeypatch):
     """Run everything submitted to thread pools executor in sync."""
     monkeypatch.setattr(
-        'datahub.core.utils._submit_to_thread_pool',
+        'datahub.core.thread_pool._submit_to_thread_pool',
         _synchronous_submit_to_thread_pool
     )
 

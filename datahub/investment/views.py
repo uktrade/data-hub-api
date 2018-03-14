@@ -13,7 +13,7 @@ from rest_framework.response import Response
 
 from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
-from datahub.core.utils import submit_to_thread_pool
+from datahub.core.thread_pool import submit_to_thread_pool
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.documents.av_scan import virus_scan_document
 from datahub.investment.models import (

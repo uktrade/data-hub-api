@@ -8,7 +8,8 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
 from datahub.core.models import ArchivableModel, BaseModel
-from datahub.core.utils import delete_s3_obj, sign_s3_url, submit_to_thread_pool
+from datahub.core.thread_pool import submit_to_thread_pool
+from datahub.core.utils import delete_s3_obj, sign_s3_url
 
 logger = getLogger(__name__)
 

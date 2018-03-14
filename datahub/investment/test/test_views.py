@@ -3021,7 +3021,7 @@ class TestDocumentViews(APITestMixin):
         assert response.data['filename'] == 'test.txt'
         assert 'signed_url' in response.data
 
-    @patch('datahub.core.utils._submit_to_thread_pool')
+    @patch('datahub.core.thread_pool._submit_to_thread_pool')
     def test_document_upload_status(self, mock_submit):
         """Tests setting of document upload status to complete.
 
@@ -3042,7 +3042,7 @@ class TestDocumentViews(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         mock_submit.assert_called_once_with(virus_scan_document, str(doc.pk))
 
-    @patch('datahub.core.utils._submit_to_thread_pool')
+    @patch('datahub.core.thread_pool._submit_to_thread_pool')
     @pytest.mark.usefixtures('synchronous_on_commit')
     def test_document_delete_of_not_uploaded_doc_does_not_trigger_s3_delete(self, mock_submit):
         """Tests document deletion."""

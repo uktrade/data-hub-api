@@ -6,7 +6,7 @@ from unittest import mock
 from django.conf import settings
 from notifications_python_client.notifications import NotificationsAPIClient
 
-from datahub.core.utils import submit_to_thread_pool
+from datahub.core.thread_pool import submit_to_thread_pool
 from datahub.omis.market.models import Market
 from datahub.omis.region.models import UKRegionalSettings
 from .constants import Template

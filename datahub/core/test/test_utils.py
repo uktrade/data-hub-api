@@ -1,5 +1,4 @@
 from enum import Enum
-from unittest import mock
 from uuid import UUID
 
 import pytest
@@ -7,8 +6,7 @@ import pytest
 from datahub.core.constants import Constant
 from datahub.core.test.support.models import MetadataModel
 from datahub.core.utils import (
-    join_truthy_strings, load_constants_to_database, slice_iterable_into_chunks,
-    submit_to_thread_pool
+    join_truthy_strings, load_constants_to_database, slice_iterable_into_chunks
 )
 
 pytestmark = pytest.mark.django_db
@@ -83,22 +81,3 @@ def test_load_constants_to_database():
     }
     actual_items = {(obj.id, obj.name) for obj in MetadataModel.objects.all()}
     assert actual_items == expected_items
-
-
-def _synchronous_executor_submit(fn, *args, **kwargs):
-    fn(*args, **kwargs)
-
-
-@mock.patch('datahub.core.utils._executor.submit', _synchronous_executor_submit)
-@mock.patch('datahub.core.utils.client')
-def test_error_raises_exception(mock_raven_client):
-    """
-    Test that if an error occurs whilst executing a thread pool task,
-    the exception is raised and sent to sentry.
-    """
-    mock_task = mock.Mock(__name__='mock_task', side_effect=ValueError())
-
-    with pytest.raises(ValueError):
-        submit_to_thread_pool(mock_task)
-
-    assert mock_raven_client.captureException.called
