@@ -21,7 +21,6 @@ from datahub.core import constants
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
     APITestMixin, create_test_user, format_date_or_datetime, random_obj_for_model,
-    synchronous_executor_submit, synchronous_transaction_on_commit
 )
 from datahub.documents.av_scan import virus_scan_document
 from datahub.investment import views
@@ -3044,7 +3043,7 @@ class TestDocumentViews(APITestMixin):
         mock_submit.assert_called_once_with(virus_scan_document, str(doc.pk))
 
     @patch('datahub.core.utils._submit_to_thread_pool')
-    @patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    @pytest.mark.usefixtures('synchronous_on_commit')
     def test_document_delete_of_not_uploaded_doc_does_not_trigger_s3_delete(self, mock_submit):
         """Tests document deletion."""
         project = InvestmentProjectFactory()
@@ -3059,8 +3058,7 @@ class TestDocumentViews(APITestMixin):
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert mock_submit.called is False
 
-    @patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
-    @patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    @pytest.mark.usefixtures('synchronous_thread_pool', 'synchronous_on_commit')
     def test_document_delete(self, s3_stubber):
         """Tests document deletion."""
         project = InvestmentProjectFactory()

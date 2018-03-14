@@ -7,7 +7,6 @@ from django.conf import settings
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import UKRegion
-from datahub.core.test_utils import synchronous_executor_submit
 from datahub.omis.market.models import Market
 from datahub.omis.order.test.factories import (
     OrderAssigneeCompleteFactory, OrderAssigneeFactory, OrderCompleteFactory,
@@ -52,7 +51,7 @@ class TestSendEmail:
         )
 
 
-@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
+@pytest.mark.usefixtures('synchronous_thread_pool')
 class TestNotifyOrderInfo:
     """Tests for generic notifications related to an order."""
 
@@ -139,7 +138,7 @@ class TestNotifyOrderInfo:
         assert call_args['personalisation']['recipient name'] == 'example name'
 
 
-@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
+@pytest.mark.usefixtures('synchronous_thread_pool')
 class TestNotifyOrderCreated:
     """Tests for notifications sent when an order is created."""
 
@@ -273,7 +272,7 @@ class TestNotifyOrderCreated:
         assert call_args['template_id'] != Template.order_created_for_regional_manager.value
 
 
-@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
+@pytest.mark.usefixtures('synchronous_thread_pool')
 class TestNotifyAdviserAdded:
     """Tests for the adviser_added logic."""
 
@@ -305,7 +304,7 @@ class TestNotifyAdviserAdded:
         assert call_args['personalisation']['creation date'] == '18/05/2017'
 
 
-@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
+@pytest.mark.usefixtures('synchronous_thread_pool')
 class TestNotifyAdviserRemoved:
     """Tests for the adviser_removed logic."""
 
@@ -329,7 +328,7 @@ class TestNotifyAdviserRemoved:
         assert call_args['personalisation']['recipient name'] == adviser.name
 
 
-@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
+@pytest.mark.usefixtures('synchronous_thread_pool')
 class TestNotifyOrderPaid:
     """Tests for the order_paid logic."""
 
@@ -382,7 +381,7 @@ class TestNotifyOrderPaid:
             assert call['personalisation']['embedded link'] == order.get_datahub_frontend_url()
 
 
-@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
+@pytest.mark.usefixtures('synchronous_thread_pool')
 class TestNotifyOrderCompleted:
     """Tests for the order_completed logic."""
 
@@ -417,7 +416,7 @@ class TestNotifyOrderCompleted:
             assert call['personalisation']['embedded link'] == order.get_datahub_frontend_url()
 
 
-@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
+@pytest.mark.usefixtures('synchronous_thread_pool')
 class TestNotifyOrderCancelled:
     """Tests for the order_cancelled logic."""
 
@@ -470,7 +469,7 @@ class TestNotifyOrderCancelled:
             assert call['personalisation']['embedded link'] == order.get_datahub_frontend_url()
 
 
-@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
+@pytest.mark.usefixtures('synchronous_thread_pool')
 class TestNotifyQuoteGenerated:
     """Tests for the quote_generated logic."""
 
@@ -523,7 +522,7 @@ class TestNotifyQuoteGenerated:
             assert call['personalisation']['embedded link'] == order.get_datahub_frontend_url()
 
 
-@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
+@pytest.mark.usefixtures('synchronous_thread_pool')
 class TestNotifyQuoteAccepted:
     """Tests for the quote_accepted logic."""
 
@@ -576,7 +575,7 @@ class TestNotifyQuoteAccepted:
             assert call['personalisation']['embedded link'] == order.get_datahub_frontend_url()
 
 
-@mock.patch('datahub.core.utils._submit_to_thread_pool', synchronous_executor_submit)
+@pytest.mark.usefixtures('synchronous_thread_pool')
 class TestNotifyQuoteCancelled:
     """Tests for the quote_cancelled logic."""
 

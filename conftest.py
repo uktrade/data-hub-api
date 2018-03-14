@@ -69,3 +69,26 @@ def local_memory_cache(monkeypatch):
         {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}
     )
     monkeypatch.setattr('django.core.cache.caches', CacheHandler())
+
+
+@pytest.fixture
+def synchronous_thread_pool(monkeypatch):
+    """Run everything submitted to thread pools executor in sync."""
+    monkeypatch.setattr(
+        'datahub.core.utils._submit_to_thread_pool',
+        _synchronous_submit_to_thread_pool
+    )
+
+
+@pytest.fixture
+def synchronous_on_commit(monkeypatch):
+    """During a test run a transaction is never committed, so we have to improvise."""
+    monkeypatch.setattr('django.db.transaction.on_commit', _synchronous_on_commit)
+
+
+def _synchronous_submit_to_thread_pool(fn, *args, **kwargs):
+    fn(*args, **kwargs)
+
+
+def _synchronous_on_commit(fn):
+    fn()
