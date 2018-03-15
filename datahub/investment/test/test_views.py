@@ -1293,23 +1293,36 @@ class TestPartialUpdateView(APITestMixin):
 
     def test_change_stage_log_when_log_is_empty(self):
         """Tests that stage is being logged for Investment Projects with empty log."""
-        project = InvestmentProjectFactory()
-        project.stage_log.all().delete()
-        project.stage_id = constants.InvestmentProjectStage.assign_pm.value.id
-        project.save()
-        assert [
-            entry.stage.id for entry in project.stage_log.all()
-        ] == [
-            uuid.UUID(constants.InvestmentProjectStage.assign_pm.value.id),
-        ]
+        project1 = InvestmentProjectFactory()
+        project1.stage_id = constants.InvestmentProjectStage.assign_pm.value.id
+        project1.save()
+        assert project1.stage_log.count() == 2
 
-    def test_stage_log_added_when_investment_project_is_created(self):
-        """Tests that stage is being logged when Investment Projects is created."""
-        project = InvestmentProjectFactory()
+        adviser = AdviserFactory()
+        project2 = AssignPMInvestmentProjectFactory(
+            project_assurance_adviser=adviser,
+            project_manager=adviser,
+        )
+        project2.stage_log.all().delete()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project2.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.active.value.id
+            }
+        }
+
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
         assert [
-            entry.stage.id for entry in project.stage_log.all()
+            entry['stage']['name'] for entry in response_data['stage_log']
+        ] == ['Active']
+
+        assert [
+            entry.stage.id for entry in project2.stage_log.order_by('created_on')
         ] == [
-            uuid.UUID(constants.InvestmentProjectStage.prospect.value.id),
+            uuid.UUID(constants.InvestmentProjectStage.active.value.id),
         ]
 
     def test_invalid_state_validation(self):
