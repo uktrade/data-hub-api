@@ -44,7 +44,7 @@ def stage_log_project_post_save(sender, **kwargs):
             investment_project_id=instance.pk
         ).order_by('-created_on').first()
 
-        if str(last_stage.stage_id) != instance.stage_id:
+        if last_stage is None or str(last_stage.stage_id) != instance.stage_id:
             created_on = instance.modified_on
 
     if created_on:
