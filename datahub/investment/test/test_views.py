@@ -1291,6 +1291,27 @@ class TestPartialUpdateView(APITestMixin):
             uuid.UUID(constants.InvestmentProjectStage.active.value.id),
         ]
 
+    def test_change_stage_log_when_log_is_empty(self):
+        """Tests that stage is being logged for Investment Projects with empty log."""
+        project = InvestmentProjectFactory()
+        project.stage_log.all().delete()
+        project.stage_id = constants.InvestmentProjectStage.assign_pm.value.id
+        project.save()
+        assert [
+            entry.stage.id for entry in project.stage_log.all()
+        ] == [
+            uuid.UUID(constants.InvestmentProjectStage.assign_pm.value.id),
+        ]
+
+    def test_stage_log_added_when_investment_project_is_created(self):
+        """Tests that stage is being logged when Investment Projects is created."""
+        project = InvestmentProjectFactory()
+        assert [
+            entry.stage.id for entry in project.stage_log.all()
+        ] == [
+            uuid.UUID(constants.InvestmentProjectStage.prospect.value.id),
+        ]
+
     def test_invalid_state_validation(self):
         """Tests validation when a project that is in an invalid state.
 
