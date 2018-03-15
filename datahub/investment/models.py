@@ -339,7 +339,11 @@ class IProjectTeamAbstract(models.Model):
 
 
 class IProjectSPIAbstract(models.Model):
-    """The SPI part of an investment project."""
+    """The Service Performance Indicator (SPI) part of an investment project.
+
+    It enables monitoring and measurement of the Investment Services Team’s (IST)
+    key service performance indicators (SPIs).
+    """
 
     class Meta:
         abstract = True
@@ -465,7 +469,10 @@ class InvestmentProjectTeamMember(models.Model):
 
 
 class InvestmentProjectStageLog(models.Model):
-    """Investment Project stages log."""
+    """Investment Project stage log.
+
+    It is being used to support reporting of Service Performance Indicators (SPIs).
+    """
 
     investment_project = models.ForeignKey(
         InvestmentProject, on_delete=models.CASCADE, related_name='stage_log'
