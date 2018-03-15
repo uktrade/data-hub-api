@@ -1,5 +1,7 @@
 """Tests for investment models."""
 
+from uuid import UUID
+
 import pytest
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -129,3 +131,39 @@ def test_associated_advisers_no_none():
     """Tests that get_associated_advisers() does not include None."""
     project = InvestmentProjectFactory(client_relationship_manager_id=None)
     assert None not in tuple(project.get_associated_advisers())
+
+
+def test_change_stage_log():
+    """Tests that stage is being logged for Investment Projects with empty log."""
+    project = InvestmentProjectFactory()
+    project.stage_id = constants.InvestmentProjectStage.assign_pm.value.id
+    project.save()
+    assert [
+        entry.stage.id for entry in project.stage_log.order_by('created_on')
+    ] == [
+        UUID(constants.InvestmentProjectStage.prospect.value.id),
+        UUID(constants.InvestmentProjectStage.assign_pm.value.id),
+    ]
+
+
+def test_change_stage_log_when_log_is_empty():
+    """Tests that stage is being logged for Investment Projects with empty log."""
+    project = InvestmentProjectFactory()
+    project.stage_log.all().delete()
+    project.stage_id = constants.InvestmentProjectStage.assign_pm.value.id
+    project.save()
+    assert [
+        entry.stage.id for entry in project.stage_log.all()
+    ] == [
+        UUID(constants.InvestmentProjectStage.assign_pm.value.id),
+    ]
+
+
+def test_stage_log_added_when_investment_project_is_created():
+    """Tests that stage is being logged when Investment Projects is created."""
+    project = InvestmentProjectFactory()
+    assert [
+        entry.stage.id for entry in project.stage_log.all()
+    ] == [
+        UUID(constants.InvestmentProjectStage.prospect.value.id),
+    ]

@@ -481,7 +481,7 @@ class InvestmentProjectStageLog(models.Model):
         'metadata.InvestmentProjectStage', on_delete=models.PROTECT,
         related_name='+',
     )
-    created_on = models.DateTimeField(null=True, blank=True)
+    created_on = models.DateTimeField()
 
     def __str__(self):
         """Human-readable representation."""
