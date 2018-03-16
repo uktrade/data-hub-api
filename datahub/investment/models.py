@@ -378,6 +378,46 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
+    def __init__(self, *args, **kwargs):
+        """Keep the original stage value so that we can see if it changes when saving."""
+        super().__init__(*args, **kwargs)
+        self.__stage_id = self.stage_id
+
+    def save(self, *args, **kwargs):
+        """Updates the stage log after saving."""
+        adding = self._state.adding
+        super().save(*args, **kwargs)
+        self._update_stage_log(adding)
+
+    def _update_stage_log(self, adding):
+        """Creates a log of changes to stage field.
+
+        This allows us to construct the timeline of changes to the stage field as
+        required for Service Performance Indicators (SPI).
+        """
+        created_on = None
+
+        if adding:
+            created_on = self.created_on
+        else:
+            last_stage = InvestmentProjectStageLog.objects.filter(
+                investment_project_id=self.pk
+            ).order_by('-created_on').first()
+
+            if last_stage is None:
+                # if there is no stage log, check if stage has been updated
+                if self.__stage_id != self.stage_id:
+                    created_on = self.modified_on
+            elif str(last_stage.stage_id) != self.stage_id:
+                created_on = self.modified_on
+
+        if created_on:
+            InvestmentProjectStageLog.objects.create(
+                investment_project_id=self.pk,
+                stage_id=self.stage_id,
+                created_on=created_on,
+            )
+
     def __str__(self):
         """Human-readable name for admin section etc."""
         company_name = self.investor_company or 'No company'

@@ -159,6 +159,15 @@ def test_change_stage_log_when_log_is_empty():
     ]
 
 
+def test_no_stage_log_when_log_is_empty_and_no_change_on_save():
+    """Tests that stage log is not created when there is no change to stage on save."""
+    project = InvestmentProjectFactory()
+    project.stage_log.all().delete()
+    # no change to the stage
+    project.save()
+    assert project.stage_log.count() == 0
+
+
 def test_stage_log_added_when_investment_project_is_created():
     """Tests that stage is being logged when Investment Projects is created."""
     project = InvestmentProjectFactory()
