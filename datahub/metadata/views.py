@@ -1,25 +1,36 @@
-from functools import partial
-
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.mixins import ListModelMixin
+from rest_framework.viewsets import GenericViewSet
 
 from .registry import registry
 
 
-@api_view()
-@authentication_classes([])
-@permission_classes([])
-def metadata_view(request, mapping):
-    """Metadata generic view."""
-    qs = mapping.queryset.all()
-    serializer = mapping.serializer(qs, many=True)
-    return Response(data=serializer.data)
+def _create_metadata_view(mapping):
+    attrs = {
+        'authentication_classes': (),
+        'filter_backends': (DjangoFilterBackend,) if mapping.filter_fields else (),
+        'filter_fields': mapping.filter_fields,
+        'pagination_class': None,
+        'permission_classes': (),
+        'queryset': mapping.queryset,
+        'serializer_class': mapping.serializer,
+    }
+
+    view_set = type(
+        f'{mapping.model.__name__}ViewSet',
+        (GenericViewSet, ListModelMixin),
+        attrs,
+    )
+
+    return view_set.as_view({
+        'get': 'list'
+    })
 
 
 urls_args = []
 
 # programmatically generate metadata views
 for name, mapping in registry.mappings.items():
-    fn = partial(metadata_view, mapping=mapping)
+    view = _create_metadata_view(mapping)
     path = f'{name}/'
-    urls_args.append(((path, fn), {'name': name}))
+    urls_args.append(((path, view), {'name': name}))
