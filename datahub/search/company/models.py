@@ -56,7 +56,7 @@ class Company(DocType, MapDBModelToDict):
     )
     registered_address_postcode_trigram = dsl_utils.TrigramText()
     registered_address_town = dsl_utils.SortableCaseInsensitiveKeywordText()
-    sector = dsl_utils.id_name_partial_mapping('sector')
+    sector = dsl_utils.sector_mapping()
     trading_address_1 = Text()
     trading_address_2 = Text()
     trading_address_country = dsl_utils.id_name_partial_mapping(
@@ -92,7 +92,7 @@ class Company(DocType, MapDBModelToDict):
         'parent': dict_utils.id_name_dict,
         'global_headquarters': dict_utils.id_name_dict,
         'registered_address_country': dict_utils.id_name_dict,
-        'sector': dict_utils.id_name_dict,
+        'sector': dict_utils.sector_dict,
         'trading_address_country': dict_utils.id_name_dict,
         'turnover_range': dict_utils.id_name_dict,
         'uk_region': dict_utils.id_name_dict,
@@ -132,7 +132,6 @@ class Company(DocType, MapDBModelToDict):
         'reference_code',
         'registered_address_country.name_trigram',
         'registered_address_postcode_trigram',
-        'sector.name_trigram',
         'trading_address_country.name_trigram',
         'trading_address_postcode_trigram',
         'uk_region.name_trigram'

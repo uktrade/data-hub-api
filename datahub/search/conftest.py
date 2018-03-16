@@ -3,6 +3,7 @@ from elasticsearch.helpers.test import get_test_client
 from pytest import fixture
 
 from datahub.core.test_utils import synchronous_executor_submit, synchronous_transaction_on_commit
+from datahub.metadata.test.factories import SectorFactory
 from datahub.search import elasticsearch
 from .apps import get_search_apps
 
@@ -65,3 +66,17 @@ def _create_test_index(client, index):
         client.indices.delete(index)
 
     elasticsearch.configure_index(index, settings.ES_INDEX_SETTINGS)
+
+
+@fixture
+def hierarchical_sectors():
+    """Creates three test sectors in a hierarchy."""
+    parent = None
+    sectors = []
+
+    for _ in range(3):
+        sector = SectorFactory(parent=parent)
+        sectors.append(sector)
+        parent = sector
+
+    yield sectors

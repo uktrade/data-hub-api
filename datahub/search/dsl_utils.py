@@ -92,3 +92,25 @@ def investment_project_mapping():
         'name': SortableCaseInsensitiveKeywordText(),
         'project_code': SortableCaseInsensitiveKeywordText(),
     })
+
+
+def sector_mapping():
+    """Mapping for sector fields."""
+    return Nested(
+        properties={
+            'id': Keyword(),
+            'name': SortableCaseInsensitiveKeywordText(),
+            'ancestors': _ancestor_sector_mapping(),
+        },
+        include_in_parent=True,
+    )
+
+
+def _ancestor_sector_mapping():
+    """Mapping for ancestral sector fields."""
+    return Nested(
+        properties={
+            'id': Keyword(),
+        },
+        include_in_parent=True,
+    )
