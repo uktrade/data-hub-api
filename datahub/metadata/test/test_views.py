@@ -79,7 +79,7 @@ def test_metadata_view_patch(metadata_view_name, api_client):
 def test_view_name_generation():
     """Test urls are generated correctly."""
     patterns = urls.urlpatterns
-    assert {pattern.name for pattern in patterns} == registry.mappings.keys()
+    assert {pattern.name for pattern in patterns} == frozenset(registry.mappings.keys())
 
 
 def test_ordered_metadata_order_view(ordered_mapping, api_client):
@@ -138,28 +138,52 @@ def test_team_view(api_client):
     }
 
 
-def test_sector_view(api_client):
-    """
-    Test listing sectors.
+class TestSectorView:
+    """Tests for the /metadata/sector/ view."""
 
-    Sectors should be sorted by full name (path).
-    """
-    url = reverse(viewname='sector')
-    response = api_client.get(url)
-    sector = Sector.objects.order_by('lft')[0]
+    def test_list(self, api_client):
+        """
+        Test listing sectors.
 
-    assert response.status_code == status.HTTP_200_OK
-    sectors = response.json()
-    assert sectors[0] == {
-        'id': str(sector.pk),
-        'name': sector.name,
-        'segment': sector.segment,
-        'level': sector.level,
-        'parent': {
-            'id': str(sector.parent.pk),
-            'name': sector.parent.name,
-        } if sector.parent else None,
-        'disabled_on': format_date_or_datetime(sector.disabled_on) if sector.disabled_on else None,
-    }
+        Sectors should be sorted by full name (path).
+        """
+        url = reverse(viewname='sector')
+        response = api_client.get(url)
+        sector = Sector.objects.order_by('lft')[0]
 
-    assert sectors == list(sorted(sectors, key=itemgetter('name')))
+        assert response.status_code == status.HTTP_200_OK
+        sectors = response.json()
+        disabled_on = format_date_or_datetime(sector.disabled_on) if sector.disabled_on else None
+        assert sectors[0] == {
+            'id': str(sector.pk),
+            'name': sector.name,
+            'segment': sector.segment,
+            'level': sector.level,
+            'parent': {
+                'id': str(sector.parent.pk),
+                'name': sector.parent.name,
+            } if sector.parent else None,
+            'disabled_on': disabled_on,
+        }
+
+        assert sectors == list(sorted(sectors, key=itemgetter('name')))
+
+    @pytest.mark.parametrize('level', (0, 1))
+    def test_list_filter_by_level(self, api_client, level):
+        """Test listing sectors, filter by level."""
+        url = reverse(viewname='sector')
+        response = api_client.get(url, data={'level__lte': level})
+        sector_count_for_level = Sector.objects.filter(level__lte=level).count()
+
+        assert response.status_code == status.HTTP_200_OK
+        sectors = response.json()
+        assert len(sectors) == sector_count_for_level
+        assert all(sector['level'] <= level for sector in sectors)
+
+    @pytest.mark.parametrize('method', ('POST', 'PATCH', 'PUT'))
+    def test_unsupported_methods(self, api_client, method):
+        """Test that POST, PATCH and PUT return a 405."""
+        url = reverse(viewname='sector')
+        response = api_client.generic(method, url)
+
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED

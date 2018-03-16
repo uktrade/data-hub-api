@@ -4,7 +4,10 @@ from django.core.exceptions import ImproperlyConfigured
 
 from datahub.core.serializers import ConstantModelSerializer
 
-MetadataMapping = namedtuple('MetadataMapping', ['model', 'queryset', 'serializer'])
+MetadataMapping = namedtuple(
+    'MetadataMapping',
+    ['model', 'queryset', 'serializer', 'filter_fields'],
+)
 
 
 class MetadataRegistry:
@@ -36,13 +39,14 @@ class MetadataRegistry:
         """Keeps a local copy of the metadata registered."""
         self.metadata = {}
 
-    def register(self, metadata_id, model, queryset=None, serializer=ConstantModelSerializer):
+    def register(self, metadata_id, model, queryset=None, serializer=ConstantModelSerializer,
+                 filter_fields=None):
         """Registers a new metadata."""
         if metadata_id in self.metadata:
             raise ImproperlyConfigured(f'Metadata {metadata_id} already registered.')
 
         queryset = queryset if queryset is not None else model.objects.all()
-        self.metadata[metadata_id] = MetadataMapping(model, queryset, serializer)
+        self.metadata[metadata_id] = MetadataMapping(model, queryset, serializer, filter_fields)
 
     @property
     def mappings(self):
