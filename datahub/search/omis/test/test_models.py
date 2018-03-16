@@ -48,7 +48,10 @@ def test_order_to_dict(Factory):
         },
         'sector': {
             'id': str(order.sector.pk),
-            'name': order.sector.name
+            'name': order.sector.name,
+            'ancestors': [{
+                'id': str(ancestor.pk),
+            } for ancestor in order.sector.get_ancestors()]
         },
         'uk_region': {
             'id': str(order.uk_region.pk),

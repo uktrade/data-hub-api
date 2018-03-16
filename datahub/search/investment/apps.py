@@ -47,6 +47,8 @@ class InvestmentSearchApp(SearchApp):
         'referral_source_activity_website',
         'referral_source_adviser',
         'sector',
+        'sector__parent',
+        'sector__parent__parent',
         'specific_programme',
         'strategic_drivers',
         'stage',

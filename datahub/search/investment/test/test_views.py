@@ -1,6 +1,8 @@
 import datetime
 from collections import Counter
+from uuid import UUID
 
+import factory
 import pytest
 from dateutil.parser import parse as dateutil_parse
 from django.utils.timezone import utc
@@ -10,11 +12,12 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core import constants
-from datahub.core.test_utils import APITestMixin, create_test_user
+from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_queryset
 from datahub.investment.models import InvestmentProject, InvestmentProjectPermission
 from datahub.investment.test.factories import (
     InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
 )
+from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
 
 pytestmark = pytest.mark.django_db
@@ -394,6 +397,42 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['name'] == 'abc defg'
+
+    @pytest.mark.parametrize(
+        'sector_level',
+        (0, 1, 2),
+    )
+    def test_sector_descends_filter(self, hierarchical_sectors, setup_es, sector_level):
+        """Test the sector_descends filter."""
+        num_sectors = len(hierarchical_sectors)
+        sectors_ids = [sector.pk for sector in hierarchical_sectors]
+
+        projects = InvestmentProjectFactory.create_batch(
+            num_sectors,
+            sector_id=factory.Iterator(sectors_ids)
+        )
+        InvestmentProjectFactory.create_batch(
+            3,
+            sector=factory.LazyFunction(lambda: random_obj_for_queryset(
+                Sector.objects.exclude(pk__in=sectors_ids)
+            ))
+        )
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:investment_project')
+        body = {
+            'sector_descends': hierarchical_sectors[sector_level].pk
+        }
+        response = self.api_client.post(url, body)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['count'] == num_sectors - sector_level
+
+        actual_ids = {UUID(project['id']) for project in response_data['results']}
+        expected_ids = {project.pk for project in projects[sector_level:]}
+        assert actual_ids == expected_ids
 
     def test_search_investment_project_no_filters(self, setup_data):
         """Tests case where there is no filters provided."""
