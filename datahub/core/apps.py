@@ -2,7 +2,7 @@ import atexit
 
 from django.apps import AppConfig
 
-from datahub.core.utils import shut_down_thread_pool
+from datahub.core.thread_pool import shut_down_thread_pool
 
 
 class CoreConfig(AppConfig):

@@ -1,12 +1,7 @@
-from unittest import mock
-
 import pytest
 from dateutil.parser import parse as dateutil_parse
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.core.test_utils import (
-    synchronous_executor_submit, synchronous_transaction_on_commit
-)
 from datahub.omis.order.models import CancellationReason
 from datahub.omis.order.test.factories import (
     OrderAssigneeCompleteFactory, OrderAssigneeFactory, OrderFactory,
@@ -19,8 +14,7 @@ from ..constants import Template
 pytestmark = pytest.mark.django_db
 
 
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
-@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+@pytest.mark.usefixtures('synchronous_thread_pool', 'synchronous_on_commit')
 class TestNotifyPostSaveOrder:
     """Tests for notifications sent when an order is saved/updated."""
 
@@ -44,8 +38,7 @@ class TestNotifyPostSaveOrder:
         assert not notify.client.send_email_notification.called
 
 
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
-@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+@pytest.mark.usefixtures('synchronous_thread_pool', 'synchronous_on_commit')
 class TestNofityPostSaveOrderAdviser:
     """Tests for notifications sent when an adviser is added to an order."""
 
@@ -78,8 +71,7 @@ class TestNofityPostSaveOrderAdviser:
         assert call_args['template_id'] == Template.you_have_been_added_for_adviser.value
 
 
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
-@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+@pytest.mark.usefixtures('synchronous_thread_pool', 'synchronous_on_commit')
 class TestNofityPostDeleteOrderAdviser:
     """Tests for notifications sent when an adviser is removed from an order."""
 
@@ -116,8 +108,7 @@ class TestNofityPostDeleteOrderAdviser:
         assert call_args['template_id'] == Template.you_have_been_removed_for_adviser.value
 
 
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
-@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+@pytest.mark.usefixtures('synchronous_thread_pool', 'synchronous_on_commit')
 class TestNofityPostOrderPaid:
     """Tests for notifications sent when an order is marked as paid."""
 
@@ -154,8 +145,7 @@ class TestNofityPostOrderPaid:
         ]
 
 
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
-@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+@pytest.mark.usefixtures('synchronous_thread_pool', 'synchronous_on_commit')
 class TestNotifyPostOrderCompleted:
     """Tests for notifications sent when an order marked as completed."""
 
@@ -183,8 +173,7 @@ class TestNotifyPostOrderCompleted:
         ]
 
 
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
-@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+@pytest.mark.usefixtures('synchronous_thread_pool', 'synchronous_on_commit')
 class TestNofityPostOrderCancelled:
     """Tests for notifications sent when an order is cancelled."""
 
@@ -213,8 +202,7 @@ class TestNofityPostOrderCancelled:
         ]
 
 
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
-@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+@pytest.mark.usefixtures('synchronous_thread_pool', 'synchronous_on_commit')
 class TestNotifyPostQuoteGenerated:
     """Tests for notifications sent when a quote is generated."""
 
@@ -243,8 +231,7 @@ class TestNotifyPostQuoteGenerated:
         ]
 
 
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
-@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+@pytest.mark.usefixtures('synchronous_thread_pool', 'synchronous_on_commit')
 class TestNotifyPostQuoteAccepted:
     """Tests for notifications sent when a quote is accepted."""
 
@@ -273,8 +260,7 @@ class TestNotifyPostQuoteAccepted:
         ]
 
 
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
-@mock.patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+@pytest.mark.usefixtures('synchronous_thread_pool', 'synchronous_on_commit')
 class TestNotifyPostQuoteCancelled:
     """Tests for notifications sent when a quote is cancelled."""
 

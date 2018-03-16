@@ -203,6 +203,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `AWS_DEFAULT_REGION` | No | [Default region used by boto3.](http://boto3.readthedocs.io/en/latest/guide/configuration.html#environment-variable-configuration) |
 | `AWS_SECRET_ACCESS_KEY` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
 | `BULK_INSERT_BATCH_SIZE`  | No | Used when loading Companies House records (default=5000). |
+| `DATABASE_CONN_MAX_AGE`  | No | [Maximum database connection age (in seconds).](https://docs.djangoproject.com/en/2.0/ref/databases/) |
 | `DATABASE_URL`  | Yes | PostgreSQL server URL (with embedded credentials). |
 | `DATAHUB_FRONTEND_BASE_URL`  | Yes | |
 | `DATAHUB_SECRET`  | Yes | |

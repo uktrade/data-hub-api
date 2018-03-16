@@ -111,9 +111,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 DATABASES = {
-    'default': env.db('DATABASE_URL')
+    'default': {
+        **env.db('DATABASE_URL'),
+        'ATOMIC_REQUESTS': True,
+        'CONN_MAX_AGE': env.int('DATABASE_CONN_MAX_AGE', 0),
+    }
 }
-DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 FIXTURE_DIRS = [
     str(ROOT_DIR('fixtures'))
