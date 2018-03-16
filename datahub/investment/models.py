@@ -400,15 +400,8 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
         if adding:
             created_on = self.created_on
         else:
-            last_stage = InvestmentProjectStageLog.objects.filter(
-                investment_project_id=self.pk
-            ).order_by('-created_on').first()
-
-            if last_stage is None:
-                # if there is no stage log, check if stage has been updated
-                if self.__stage_id != self.stage_id:
-                    created_on = self.modified_on
-            elif str(last_stage.stage_id) != self.stage_id:
+            # if there is no stage log, check if stage has been updated
+            if self.__stage_id != self.stage_id:
                 created_on = self.modified_on
 
         if created_on:
