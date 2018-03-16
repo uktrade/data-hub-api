@@ -13,7 +13,7 @@ from rest_framework.response import Response
 
 from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
-from datahub.core.utils import executor
+from datahub.core.thread_pool import submit_to_thread_pool
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.documents.av_scan import virus_scan_document
 from datahub.investment.models import (
@@ -268,7 +268,7 @@ class IProjectDocumentViewSet(CoreViewSetV3):
         serializer = UploadStatusSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        executor.submit(virus_scan_document, str(doc.pk))
+        submit_to_thread_pool(virus_scan_document, str(doc.pk))
 
         return Response(
             status=status.HTTP_200_OK,

@@ -5,9 +5,8 @@ from unittest import mock
 
 from django.conf import settings
 from notifications_python_client.notifications import NotificationsAPIClient
-from raven.contrib.django.raven_compat.models import client as raven_client
 
-from datahub.core.utils import executor
+from datahub.core.thread_pool import submit_to_thread_pool
 from datahub.omis.market.models import Market
 from datahub.omis.region.models import UKRegionalSettings
 from .constants import Template
@@ -24,12 +23,7 @@ def send_email(client, **kwargs):
     if settings.OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL:
         data['email_address'] = settings.OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL
 
-    try:
-        client.send_email_notification(**data)
-    except:  # noqa: B901
-        logger.exception('Error while sending a notification email.')
-        raven_client.captureException()
-        raise
+    client.send_email_notification(**data)
 
 
 class Notify:
@@ -63,7 +57,7 @@ class Notify:
 
     def _send_email(self, **kwargs):
         """Send email in a separate thread."""
-        executor.submit(send_email, self.client, **kwargs)
+        submit_to_thread_pool(send_email, self.client, **kwargs)
 
     def _prepare_personalisation(self, order, data=None):
         """Prepare the personalisation data with common values."""
