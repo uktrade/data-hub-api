@@ -204,6 +204,13 @@ class TestViews(APITestMixin):
                 'id': str(interaction.company.pk),
                 'name': interaction.company.name,
             },
+            'company_sector': {
+                'id': str(interaction.company.sector.pk),
+                'name': interaction.company.sector.name,
+                'ancestors': [{
+                    'id': str(ancestor.pk),
+                } for ancestor in interaction.company.sector.get_ancestors()],
+            },
             'contact': {
                 'id': str(interaction.contact.pk),
                 'first_name': interaction.contact.first_name,
@@ -233,6 +240,7 @@ class TestViews(APITestMixin):
                 'name': interaction.communication_channel.name,
             },
             'investment_project': None,
+            'investment_project_sector': None,
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
