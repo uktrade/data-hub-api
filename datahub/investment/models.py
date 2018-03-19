@@ -516,6 +516,9 @@ class InvestmentProjectStageLog(models.Model):
     )
     created_on = models.DateTimeField()
 
+    class Meta:
+        ordering = ('created_on',)
+
     def __str__(self):
         """Human-readable representation."""
         return f'{self.investment_project} – {self.created_on} – {self.stage}'
