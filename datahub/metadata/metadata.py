@@ -7,6 +7,9 @@ registry.register(metadata_id='country', model=models.Country)
 registry.register(metadata_id='employee-range', model=models.EmployeeRange)
 registry.register(metadata_id='role', model=models.Role)
 registry.register(
+    filter_fields={
+        'level': ['lte'],
+    },
     metadata_id='sector',
     model=models.Sector,
     queryset=models.Sector.objects.select_related(
