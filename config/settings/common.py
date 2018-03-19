@@ -225,11 +225,11 @@ REDIS_BASE_URL = env('REDIS_BASE_URL', default=None)
 if REDIS_BASE_URL:
     REDIS_CACHE_DB = env('REDIS_CACHE_DB', default=0)
     CACHES = {
-        "default": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": f'{REDIS_BASE_URL}/{REDIS_CACHE_DB}',
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': f'{REDIS_BASE_URL}/{REDIS_CACHE_DB}',
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             }
         }
     }
