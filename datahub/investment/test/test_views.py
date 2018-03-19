@@ -1290,11 +1290,21 @@ class TestPartialUpdateView(APITestMixin):
 
         response_data = response.json()
         assert len(response_data['stage_log']) == 2
-        assert [
-            (entry['stage']['name'], entry['created_on'],) for entry in response_data['stage_log']
-        ] == [
-            ('Assign PM', '2017-04-28T17:35:00Z',),
-            ('Active', '2017-04-28T17:37:00Z',),
+        assert response_data['stage_log'] == [
+            {
+                'stage': {
+                    'id': constants.InvestmentProjectStage.assign_pm.value.id,
+                    'name': 'Assign PM',
+                },
+                'created_on': '2017-04-28T17:35:00Z',
+            },
+            {
+                'stage': {
+                    'id': constants.InvestmentProjectStage.active.value.id,
+                    'name': 'Active',
+                },
+                'created_on': '2017-04-28T17:37:00Z',
+            },
         ]
 
         date_iter = iter(dates)
@@ -1331,11 +1341,14 @@ class TestPartialUpdateView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
         response_data = response.json()
-        assert [
-            (entry['stage']['name'], entry['created_on'],)
-            for entry in response_data['stage_log']
-        ] == [
-            ('Active', '2017-04-28T17:35:00Z',)
+        assert response_data['stage_log'] == [
+            {
+                'stage': {
+                    'id': constants.InvestmentProjectStage.active.value.id,
+                    'name': 'Active',
+                },
+                'created_on': '2017-04-28T17:35:00Z',
+            },
         ]
 
         assert [
