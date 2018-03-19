@@ -136,8 +136,8 @@ def test_associated_advisers_no_none():
     assert None not in tuple(project.get_associated_advisers())
 
 
-def test_change_stage_log():
-    """Tests that stage is being logged for Investment Projects with empty log."""
+def test_creates_stage_log_if_stage_was_modified():
+    """Tests that change to investment project stage creates a stage log record."""
     dates = (
         datetime(2017, 4, 28, 17, 35, tzinfo=utc),
         datetime(2017, 4, 28, 17, 37, tzinfo=utc),
@@ -159,36 +159,12 @@ def test_change_stage_log():
     ]
 
 
-def test_change_stage_log_when_log_is_empty():
-    """Tests that stage is being logged for Investment Projects with empty log."""
-    dates = (
-        datetime(2017, 4, 28, 17, 35, tzinfo=utc),
-        datetime(2017, 4, 28, 17, 37, tzinfo=utc),
-    )
-    date_iter = iter(dates)
-
-    with freeze_time(next(date_iter)):
-        project = InvestmentProjectFactory()
-        project.stage_log.all().delete()
-    with freeze_time(next(date_iter)):
-        project.stage_id = constants.InvestmentProjectStage.assign_pm.value.id
-        project.save()
-    date_iter = iter(dates)
-    next(date_iter)
-    assert [
-        (entry.stage.id, entry.created_on,) for entry in project.stage_log.all()
-    ] == [
-        (UUID(constants.InvestmentProjectStage.assign_pm.value.id), next(date_iter),)
-    ]
-
-
-def test_no_stage_log_when_log_is_empty_and_no_change_on_save():
-    """Tests that stage log is not created when there is no change to stage on save."""
+def test_doesnt_create_stage_log_if_stage_was_not_modified():
+    """Tests that stage log is not created when there is no change to stage."""
     project = InvestmentProjectFactory()
-    project.stage_log.all().delete()
     # no change to the stage
     project.save()
-    assert project.stage_log.count() == 0
+    assert project.stage_log.count() == 1
 
 
 @freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
