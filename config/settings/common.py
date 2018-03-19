@@ -7,8 +7,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/dev/ref/settings/
 """
 
-import environ
 import ssl
+
+import environ
+from celery.schedules import crontab
 
 from .companieshouse import *
 
@@ -244,7 +246,15 @@ if REDIS_BASE_URL:
             'ssl_cert_reqs': ssl.CERT_NONE
         }
         CELERY_BROKER_USE_SSL = CELERY_REDIS_BACKEND_USE_SSL
-    CELERY_BEAT_SCHEDULE = {}
+    CELERY_BEAT_SCHEDULE = {
+        'refresh_pending_payment_gateway_sessions': {
+            'task': 'datahub.omis.payment.tasks.refresh_pending_payment_gateway_sessions',
+            'schedule': crontab(minute=0, hour='*'),
+            'kwargs': {
+                'age_check': 60  # in minutes
+            }
+        },
+    }
 
 # FRONTEND
 DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://localhost:3000')
