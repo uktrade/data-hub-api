@@ -1,9 +1,12 @@
 """Tests for investment models."""
 
+from datetime import datetime
 from uuid import UUID
 
 import pytest
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.timezone import utc
+from freezegun import freeze_time
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core import constants
@@ -135,27 +138,47 @@ def test_associated_advisers_no_none():
 
 def test_change_stage_log():
     """Tests that stage is being logged for Investment Projects with empty log."""
-    project = InvestmentProjectFactory()
-    project.stage_id = constants.InvestmentProjectStage.assign_pm.value.id
-    project.save()
+    dates = (
+        datetime(2017, 4, 28, 17, 35, tzinfo=utc),
+        datetime(2017, 4, 28, 17, 37, tzinfo=utc),
+    )
+    date_iter = iter(dates)
+
+    with freeze_time(next(date_iter)):
+        project = InvestmentProjectFactory()
+    with freeze_time(next(date_iter)):
+        project.stage_id = constants.InvestmentProjectStage.assign_pm.value.id
+        project.save()
+
+    date_iter = iter(dates)
     assert [
-        entry.stage.id for entry in project.stage_log.order_by('created_on')
+        (entry.stage.id, entry.created_on,) for entry in project.stage_log.order_by('created_on')
     ] == [
-        UUID(constants.InvestmentProjectStage.prospect.value.id),
-        UUID(constants.InvestmentProjectStage.assign_pm.value.id),
+        (UUID(constants.InvestmentProjectStage.prospect.value.id), next(date_iter),),
+        (UUID(constants.InvestmentProjectStage.assign_pm.value.id), next(date_iter),)
     ]
 
 
 def test_change_stage_log_when_log_is_empty():
     """Tests that stage is being logged for Investment Projects with empty log."""
-    project = InvestmentProjectFactory()
-    project.stage_log.all().delete()
-    project.stage_id = constants.InvestmentProjectStage.assign_pm.value.id
-    project.save()
+    dates = (
+        datetime(2017, 4, 28, 17, 35, tzinfo=utc),
+        datetime(2017, 4, 28, 17, 37, tzinfo=utc),
+    )
+    date_iter = iter(dates)
+
+    with freeze_time(next(date_iter)):
+        project = InvestmentProjectFactory()
+        project.stage_log.all().delete()
+    with freeze_time(next(date_iter)):
+        project.stage_id = constants.InvestmentProjectStage.assign_pm.value.id
+        project.save()
+    date_iter = iter(dates)
+    next(date_iter)
     assert [
-        entry.stage.id for entry in project.stage_log.all()
+        (entry.stage.id, entry.created_on,) for entry in project.stage_log.all()
     ] == [
-        UUID(constants.InvestmentProjectStage.assign_pm.value.id),
+        (UUID(constants.InvestmentProjectStage.assign_pm.value.id), next(date_iter),)
     ]
 
 
@@ -168,11 +191,15 @@ def test_no_stage_log_when_log_is_empty_and_no_change_on_save():
     assert project.stage_log.count() == 0
 
 
+@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
 def test_stage_log_added_when_investment_project_is_created():
     """Tests that stage is being logged when Investment Projects is created."""
     project = InvestmentProjectFactory()
     assert [
-        entry.stage.id for entry in project.stage_log.all()
+        (entry.stage.id, entry.created_on,) for entry in project.stage_log.all()
     ] == [
-        UUID(constants.InvestmentProjectStage.prospect.value.id),
+        (
+            UUID(constants.InvestmentProjectStage.prospect.value.id),
+            datetime(2017, 4, 28, 17, 35, tzinfo=utc),
+        )
     ]
