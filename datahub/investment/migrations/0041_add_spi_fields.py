@@ -7,8 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('metadata', '0001_squashed_0011_add_default_id_for_metadata'),
-        ('investment', '0039_add_additional_delivery_partners'),
+        ('investment', '0040_add_sector_hierarchy'),
     ]
 
     operations = [
