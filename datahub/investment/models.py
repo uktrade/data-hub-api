@@ -395,20 +395,19 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
         This allows us to construct the timeline of changes to the stage field as
         required for Service Performance Indicators (SPI).
         """
-        created_on = None
+        stage_changed_on = None
 
         if adding:
-            created_on = self.created_on
+            stage_changed_on = self.created_on
         else:
-            # if there is no stage log, check if stage has been updated
             if self.__stage_id != self.stage_id:
-                created_on = self.modified_on
+                stage_changed_on = self.modified_on
 
-        if created_on:
+        if stage_changed_on:
             InvestmentProjectStageLog.objects.create(
                 investment_project_id=self.pk,
                 stage_id=self.stage_id,
-                created_on=created_on,
+                created_on=stage_changed_on,
             )
 
     def __str__(self):
