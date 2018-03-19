@@ -1258,16 +1258,24 @@ class TestPartialUpdateView(APITestMixin):
 
     def test_change_stage_log(self):
         """Tests change of the project stage is being logged."""
+        dates = (
+            datetime(2017, 4, 28, 17, 35, tzinfo=utc),
+            datetime(2017, 4, 28, 17, 37, tzinfo=utc),
+        )
+        date_iter = iter(dates)
+
         project1 = InvestmentProjectFactory()
         project1.stage_id = constants.InvestmentProjectStage.assign_pm.value.id
         project1.save()
         assert project1.stage_log.count() == 2
 
         adviser = AdviserFactory()
-        project2 = AssignPMInvestmentProjectFactory(
-            project_assurance_adviser=adviser,
-            project_manager=adviser,
-        )
+        with freeze_time(next(date_iter)):
+            project2 = AssignPMInvestmentProjectFactory(
+                project_assurance_adviser=adviser,
+                project_manager=adviser,
+            )
+
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project2.pk})
         request_data = {
             'stage': {
@@ -1275,20 +1283,27 @@ class TestPartialUpdateView(APITestMixin):
             }
         }
 
-        response = self.api_client.patch(url, data=request_data, format='json')
+        with freeze_time(next(date_iter)):
+            response = self.api_client.patch(url, data=request_data, format='json')
+
         assert response.status_code == status.HTTP_200_OK
 
         response_data = response.json()
         assert len(response_data['stage_log']) == 2
         assert [
-            entry['stage']['name'] for entry in response_data['stage_log']
-        ] == ['Assign PM', 'Active']
-
-        assert [
-            entry.stage.id for entry in project2.stage_log.order_by('created_on')
+            (entry['stage']['name'], entry['created_on'],) for entry in response_data['stage_log']
         ] == [
-            uuid.UUID(constants.InvestmentProjectStage.assign_pm.value.id),
-            uuid.UUID(constants.InvestmentProjectStage.active.value.id),
+            ('Assign PM', '2017-04-28T17:35:00Z',),
+            ('Active', '2017-04-28T17:37:00Z',),
+        ]
+
+        date_iter = iter(dates)
+        assert [
+            (entry.stage.id, entry.created_on,)
+            for entry in project2.stage_log.order_by('created_on')
+        ] == [
+            (uuid.UUID(constants.InvestmentProjectStage.assign_pm.value.id), next(date_iter)),
+            (uuid.UUID(constants.InvestmentProjectStage.active.value.id), next(date_iter),),
         ]
 
     def test_change_stage_log_when_log_is_empty(self):
@@ -1311,18 +1326,26 @@ class TestPartialUpdateView(APITestMixin):
             }
         }
 
-        response = self.api_client.patch(url, data=request_data, format='json')
+        with freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc)):
+            response = self.api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
 
         response_data = response.json()
         assert [
-            entry['stage']['name'] for entry in response_data['stage_log']
-        ] == ['Active']
+            (entry['stage']['name'], entry['created_on'],)
+            for entry in response_data['stage_log']
+        ] == [
+            ('Active', '2017-04-28T17:35:00Z',)
+        ]
 
         assert [
-            entry.stage.id for entry in project2.stage_log.order_by('created_on')
+            (entry.stage.id, entry.created_on,)
+            for entry in project2.stage_log.order_by('created_on')
         ] == [
-            uuid.UUID(constants.InvestmentProjectStage.active.value.id),
+            (
+                uuid.UUID(constants.InvestmentProjectStage.active.value.id),
+                datetime(2017, 4, 28, 17, 35, tzinfo=utc),
+            ),
         ]
 
     def test_invalid_state_validation(self):
