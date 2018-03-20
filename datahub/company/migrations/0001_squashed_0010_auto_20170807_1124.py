@@ -9,6 +9,7 @@ import django.contrib.postgres.operations
 from django.db import migrations, models
 import django.db.models.deletion
 import django.utils.timezone
+import mptt.fields
 import uuid
 
 
@@ -109,7 +110,7 @@ class Migration(migrations.Migration):
                 ('one_list_account_owner', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='one_list_owned_companies', to=settings.AUTH_USER_MODEL)),
                 ('parent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='children', to='company.Company')),
                 ('registered_address_country', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='companys', to='metadata.Country')),
-                ('sector', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.Sector')),
+                ('sector', mptt.fields.TreeForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.Sector')),
                 ('trading_address_country', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='company_trading_address_country', to='metadata.Country')),
                 ('turnover_range', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.TurnoverRange')),
                 ('uk_region', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='metadata.UKRegion')),
