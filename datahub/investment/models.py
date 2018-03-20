@@ -338,6 +338,20 @@ class IProjectTeamAbstract(models.Model):
         return None
 
 
+class IProjectSPIAbstract(models.Model):
+    """The Service Performance Indicator (SPI) part of an investment project.
+
+    It enables monitoring and measurement of the Investment Services Team’s (IST)
+    key service performance indicators (SPIs).
+    """
+
+    class Meta:
+        abstract = True
+
+    project_arrived_in_triage_on = models.DateField(blank=True, null=True)
+    proposal_deadline = models.DateField(blank=True, null=True)
+
+
 _AssociatedToManyField = namedtuple(
     '_AssociatedToManyField', ('field_name', 'subfield_name', 'es_field_name')
 )
@@ -346,7 +360,7 @@ _AssociatedToManyField = namedtuple(
 @reversion.register_base_model()
 class InvestmentProject(ArchivableModel, IProjectAbstract,
                         IProjectValueAbstract, IProjectRequirementsAbstract,
-                        IProjectTeamAbstract, BaseModel):
+                        IProjectTeamAbstract, IProjectSPIAbstract, BaseModel):
     """An investment project."""
 
     _ASSOCIATED_ADVISER_TO_ONE_FIELDS = (
@@ -363,6 +377,38 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+
+    def __init__(self, *args, **kwargs):
+        """Keep the original stage value so that we can see if it changes when saving."""
+        super().__init__(*args, **kwargs)
+        self.__stage_id = self.stage_id
+
+    def save(self, *args, **kwargs):
+        """Updates the stage log after saving."""
+        adding = self._state.adding
+        super().save(*args, **kwargs)
+        self._update_stage_log(adding)
+
+    def _update_stage_log(self, adding):
+        """Creates a log of changes to stage field.
+
+        This allows us to construct the timeline of changes to the stage field as
+        required for Service Performance Indicators (SPI).
+        """
+        stage_changed_on = None
+
+        if adding:
+            stage_changed_on = self.created_on
+        else:
+            if self.__stage_id != self.stage_id:
+                stage_changed_on = self.modified_on
+
+        if stage_changed_on:
+            InvestmentProjectStageLog.objects.create(
+                investment_project_id=self.pk,
+                stage_id=self.stage_id,
+                created_on=stage_changed_on,
+            )
 
     def __str__(self):
         """Human-readable name for admin section etc."""
@@ -452,6 +498,29 @@ class InvestmentProjectTeamMember(models.Model):
     class Meta:
         unique_together = (('investment_project', 'adviser'),)
         default_permissions = ()
+
+
+class InvestmentProjectStageLog(models.Model):
+    """Investment Project stage log.
+
+    It is being used to support reporting of Service Performance Indicators (SPIs).
+    """
+
+    investment_project = models.ForeignKey(
+        InvestmentProject, on_delete=models.CASCADE, related_name='stage_log'
+    )
+    stage = models.ForeignKey(
+        'metadata.InvestmentProjectStage', on_delete=models.PROTECT,
+        related_name='+',
+    )
+    created_on = models.DateTimeField()
+
+    class Meta:
+        ordering = ('created_on',)
+
+    def __str__(self):
+        """Human-readable representation."""
+        return f'{self.investment_project} – {self.created_on} – {self.stage}'
 
 
 class InvestmentProjectCode(models.Model):
