@@ -28,3 +28,11 @@ OMIS_NOTIFICATION_ADMIN_EMAIL = 'fake-omis-admin@digital.trade.gov.uk'
 OMIS_NOTIFICATION_API_KEY = ''
 
 GOVUK_PAY_URL='https://payments.example.com/'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache'
+    }
+}
+
+CELERY_TASK_ALWAYS_EAGER = True

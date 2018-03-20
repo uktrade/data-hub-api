@@ -1,12 +1,9 @@
-from unittest import mock
-
 import pytest
 from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import UKRegion
-from datahub.core.test_utils import synchronous_executor_submit
 from datahub.omis.market.models import Market
 from datahub.omis.order.test.factories import (
     OrderCompleteFactory, OrderFactory,
@@ -23,7 +20,7 @@ pytestmark = pytest.mark.django_db
     not settings.OMIS_NOTIFICATION_TEST_API_KEY,
     reason='`settings.OMIS_NOTIFICATION_TEST_API_KEY` not set (optional).'
 )
-@mock.patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
+@pytest.mark.usefixtures('synchronous_thread_pool')
 class TestTemplates:
     """
     These tests are going to be run only if `OMIS_NOTIFICATION_TEST_API_KEY` is set

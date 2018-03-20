@@ -1,9 +1,12 @@
 from io import BytesIO
 
 import pytest
+from botocore.exceptions import ClientError
+from requests.exceptions import HTTPError
 from rest_framework import status
 
 from datahub.documents import av_scan
+from datahub.documents.av_scan import VirusScanException
 from datahub.documents.test.factories import DocumentFactory
 
 pytestmark = pytest.mark.django_db
@@ -50,10 +53,11 @@ def test_virus_scan_document_bad_response_body(s3_stubber, requests_stubber, cap
     })
     requests_stubber.post('http://av-service/', text='BADRESPONSE')
 
-    av_scan.virus_scan_document(str(document.id))
+    with pytest.raises(VirusScanException):
+        av_scan.virus_scan_document(str(document.id))
+
     document.refresh_from_db()
     assert document.av_clean is None
-    assert 'Unexpected response from AV service' in caplog.text
 
 
 def test_virus_scan_document_s3_key_not_found(s3_stubber, requests_stubber, caplog):
@@ -64,10 +68,11 @@ def test_virus_scan_document_s3_key_not_found(s3_stubber, requests_stubber, capl
         expected_params={'Bucket': document.s3_bucket, 'Key': document.s3_key}
     )
 
-    av_scan.virus_scan_document(str(document.id))
+    with pytest.raises(ClientError) as exc:
+        av_scan.virus_scan_document(str(document.id))
     document.refresh_from_db()
     assert document.av_clean is None
-    assert 'NoSuchKey' in caplog.text
+    assert exc.value.response['Error']['Code'] == 'NoSuchKey'
 
 
 def test_virus_scan_document_bad_response_status(s3_stubber, requests_stubber, caplog):
@@ -79,7 +84,8 @@ def test_virus_scan_document_bad_response_status(s3_stubber, requests_stubber, c
     requests_stubber.post('http://av-service/', text='OK',
                           status_code=status.HTTP_400_BAD_REQUEST)
 
-    av_scan.virus_scan_document(str(document.id))
+    with pytest.raises(HTTPError) as exc:
+        av_scan.virus_scan_document(str(document.id))
     document.refresh_from_db()
     assert document.av_clean is None
-    assert '400 Client Error' in caplog.text
+    assert exc.value.response.status_code == status.HTTP_400_BAD_REQUEST

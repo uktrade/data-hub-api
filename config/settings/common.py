@@ -8,6 +8,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 
 import environ
+import ssl
 
 from .companieshouse import *
 
@@ -48,6 +49,7 @@ THIRD_PARTY_APPS = [
     'reversion',
     'oauth2_provider',
     'django_filters',
+    'mptt',
 ]
 
 LOCAL_APPS = [
@@ -109,9 +111,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 DATABASES = {
-    'default': env.db('DATABASE_URL')
+    'default': {
+        **env.db('DATABASE_URL'),
+        'ATOMIC_REQUESTS': True,
+        'CONN_MAX_AGE': env.int('DATABASE_CONN_MAX_AGE', 0),
+    }
 }
-DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 FIXTURE_DIRS = [
     str(ROOT_DIR('fixtures'))
@@ -175,6 +180,9 @@ REST_FRAMEWORK = {
         'oauth2_provider.contrib.rest_framework.IsAuthenticatedOrTokenHasScope',
         'datahub.core.permissions.DjangoCrudPermission',
     ],
+    'DEFAULT_THROTTLE_RATES': {
+        'payment_gateway_session.create': '5/min',
+    },
     'ORDERING_PARAM': 'sortby'
 }
 
@@ -183,6 +191,10 @@ REST_FRAMEWORK = {
 
 
 APPEND_SLASH = False
+
+# MPTT
+
+MPTT_ADMIN_LEVEL_INDENT = 30
 
 # Leeloo stuff
 ES_USE_AWS_AUTH = env.bool('ES_USE_AWS_AUTH', False)
@@ -205,6 +217,34 @@ HEROKU = False
 BULK_INSERT_BATCH_SIZE = env.int('BULK_INSERT_BATCH_SIZE', default=25000)
 DOCUMENTS_BUCKET = env('DOCUMENTS_BUCKET')
 AV_SERVICE_URL = env('AV_SERVICE_URL', default=None)
+
+# CACHE / REDIS
+REDIS_BASE_URL = env('REDIS_BASE_URL', default=None)
+if REDIS_BASE_URL:
+    REDIS_CACHE_DB = env('REDIS_CACHE_DB', default=0)
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": f'{REDIS_BASE_URL}/{REDIS_CACHE_DB}',
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            }
+        }
+    }
+
+# CELERY (it does not understand rediss:// yet so extra work needed)
+if REDIS_BASE_URL:
+    # REDIS_BASIC_URL == REDIS_BASE_URL without the SSL
+    REDIS_BASIC_URL = REDIS_BASE_URL.replace('rediss://', 'redis://')
+    REDIS_CELERY_DB = env('REDIS_CELERY_DB', default=1)
+    CELERY_BROKER_URL = f'{REDIS_BASIC_URL}/{REDIS_CELERY_DB}'
+    CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+    if 'rediss://' in REDIS_BASE_URL:
+        CELERY_REDIS_BACKEND_USE_SSL = {
+            'ssl_cert_reqs': ssl.CERT_NONE
+        }
+        CELERY_BROKER_USE_SSL = CELERY_REDIS_BACKEND_USE_SSL
+    CELERY_BEAT_SCHEDULE = {}
 
 # FRONTEND
 DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://localhost:3000')
@@ -229,5 +269,5 @@ OMIS_PUBLIC_ORDER_URL = f'{OMIS_PUBLIC_BASE_URL}/{{public_token}}'
 GOVUK_PAY_URL = env('GOVUK_PAY_URL', default='')
 GOVUK_PAY_AUTH_TOKEN = env('GOVUK_PAY_AUTH_TOKEN', default='')
 GOVUK_PAY_TIMEOUT = 15  # in seconds
-GOVUK_PAY_PAYMENT_DESCRIPTION = 'Overseas Market Introduction Service'
-GOVUK_PAY_RETURN_URL = f'{OMIS_PUBLIC_ORDER_URL}/card-payment/{{session_id}}'
+GOVUK_PAY_PAYMENT_DESCRIPTION = 'Overseas Market Introduction Service order {reference}'
+GOVUK_PAY_RETURN_URL = f'{OMIS_PUBLIC_ORDER_URL}/payment/card/{{session_id}}'

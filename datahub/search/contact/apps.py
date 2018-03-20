@@ -19,6 +19,8 @@ class ContactSearchApp(SearchApp):
         'address_country',
         'archived_by',
         'company__sector',
+        'company__sector__parent',
+        'company__sector__parent__parent',
         'company__uk_region',
         'company__registered_address_country',
         'company__trading_address_country',

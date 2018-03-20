@@ -4,8 +4,8 @@ from django.dispatch import receiver
 from datahub.investment.models import InvestmentProject, InvestmentProjectCode
 
 
-@receiver(post_save, sender=InvestmentProject, dispatch_uid='project_post_save')
-def project_post_save(sender, **kwargs):
+@receiver(post_save, sender=InvestmentProject, dispatch_uid='project_code_project_post_save')
+def project_code_project_post_save(sender, **kwargs):
     """Creates a project code for investment projects on creation.
 
     Projects with a CDMS project code do not get a new project code.

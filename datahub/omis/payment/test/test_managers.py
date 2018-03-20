@@ -56,10 +56,15 @@ class TestPaymentManager:
 class TestPaymentGatewaySessionManager:
     """Tests for the Payment Gateway Session Manager."""
 
-    def test_create_first_session_from_order(self, requests_stubber):
+    def test_create_first_session_from_order(self, requests_stubber, monkeypatch):
         """
         Test the successful creation of the first payment gateway session for an order.
         """
+        monkeypatch.setattr(
+            'uuid.uuid4',
+            mock.Mock(return_value='0123abcd-0000-0000-0000-000000000000')
+        )
+
         # mock request
         govuk_payment_id = '123abc123abc123abc123abc12'
         govuk_payments_url = govuk_url('payments')
@@ -101,8 +106,10 @@ class TestPaymentGatewaySessionManager:
         assert requests_stubber.request_history[-1].url == govuk_payments_url
         assert requests_stubber.request_history[-1].json() == {
             'amount': order.total_cost,
-            'reference': str(session.id),
-            'description': settings.GOVUK_PAY_PAYMENT_DESCRIPTION,
+            'reference': f'{order.reference}-0123ABCD',
+            'description': settings.GOVUK_PAY_PAYMENT_DESCRIPTION.format(
+                reference=order.reference
+            ),
             'return_url': settings.GOVUK_PAY_RETURN_URL.format(
                 public_token=order.public_token,
                 session_id=session.pk
@@ -202,8 +209,10 @@ class TestPaymentGatewaySessionManager:
         assert requests_stubber.call_count == (2 + 2 + 2 + 1)
         assert requests_stubber.request_history[-1].json() == {
             'amount': order.total_cost,
-            'reference': str(session.id),
-            'description': settings.GOVUK_PAY_PAYMENT_DESCRIPTION,
+            'reference': f'{order.reference}-{str(session.id)[:8].upper()}',
+            'description': settings.GOVUK_PAY_PAYMENT_DESCRIPTION.format(
+                reference=order.reference
+            ),
             'return_url': settings.GOVUK_PAY_RETURN_URL.format(
                 public_token=order.public_token,
                 session_id=session.id
@@ -259,6 +268,7 @@ class TestPaymentGatewaySessionManager:
                 'state': {'status': 'success'},
                 'email': 'email@example.com',
                 'created_date': '2018-02-13T14:56:56.734Z',
+                'reference': '12345',
                 'card_details': {
                     'last_digits_card_number': '1111',
                     'cardholder_name': 'John Doe',
@@ -292,6 +302,7 @@ class TestPaymentGatewaySessionManager:
         assert payment.amount == order.total_cost
         assert payment.method == PaymentMethod.card
         assert payment.received_on == dateutil_parse('2018-02-13').date()
+        assert payment.transaction_reference == '12345'
         assert payment.cardholder_name == 'John Doe'
         assert payment.billing_address_1 == 'line 1 address'
         assert payment.billing_address_2 == 'line 2 address'

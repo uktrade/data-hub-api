@@ -82,6 +82,27 @@ class TestPaymentGatewaySessionGetPaymentURL:
         session = PaymentGatewaySession(govuk_payment_id=govuk_payment_id)
         assert session.get_payment_url() == ''
 
+    @pytest.mark.parametrize(
+        'session_status',
+        (
+            PaymentGatewaySessionStatus.success,
+            PaymentGatewaySessionStatus.failed,
+            PaymentGatewaySessionStatus.cancelled,
+            PaymentGatewaySessionStatus.error,
+        )
+    )
+    def test_doesnt_call_govuk_pay_if_finished(self, session_status, requests_stubber):
+        """
+        Test that if the payment gateway session is finished, no call to GOV.UK Pay is made
+        and the method returns an empty string.
+        """
+        session = PaymentGatewaySession(
+            status=session_status,
+            govuk_payment_id='123abc123abc123abc123abc12'
+        )
+        assert session.get_payment_url() == ''
+        assert not requests_stubber.called
+
 
 @pytest.mark.django_db
 class TestPaymentGatewaySessionRefresh:
@@ -183,6 +204,7 @@ class TestPaymentGatewaySessionRefresh:
             'state': {'status': 'success'},
             'email': 'email@example.com',
             'created_date': '2018-02-13T14:56:56.734Z',
+            'reference': '12345',
             'card_details': {
                 'last_digits_card_number': '1111',
                 'cardholder_name': 'John Doe',
@@ -205,7 +227,7 @@ class TestPaymentGatewaySessionRefresh:
         session.refresh_from_db()
         assert session.status == PaymentGatewaySessionStatus.success
 
-        # checko order
+        # check order
         order.refresh_from_db()
         assert order.status == OrderStatus.paid
 
@@ -216,6 +238,7 @@ class TestPaymentGatewaySessionRefresh:
         assert payment.amount == response_json['amount']
         assert payment.method == PaymentMethod.card
         assert payment.received_on == dateutil_parse('2018-02-13').date()
+        assert payment.transaction_reference == '12345'
 
         assert payment.cardholder_name == 'John Doe'
         assert payment.card_brand == 'Visa'

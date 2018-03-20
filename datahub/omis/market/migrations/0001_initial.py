@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('metadata', '0004_team_roles_regions_countries'),
+        ('metadata', '0001_squashed_0011_add_default_id_for_metadata'),
     ]
 
     operations = [

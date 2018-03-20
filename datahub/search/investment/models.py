@@ -80,11 +80,13 @@ class InvestmentProject(DocType, MapDBModelToDict):
     referral_source_activity_website = dsl_utils.id_name_mapping()
     referral_source_activity_event = dsl_utils.SortableCaseInsensitiveKeywordText()
     referral_source_advisor = dsl_utils.contact_or_adviser_mapping('referral_source_advisor')
-    sector = dsl_utils.id_name_partial_mapping('sector')
+    sector = dsl_utils.sector_mapping()
     status = dsl_utils.SortableCaseInsensitiveKeywordText()
     average_salary = dsl_utils.id_name_mapping()
     date_lost = Date()
     date_abandoned = Date()
+    project_arrived_in_triage_on = Date()
+    proposal_deadline = Date()
 
     MAPPINGS = {
         'id': str,
@@ -123,7 +125,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'referral_source_activity_marketing': dict_utils.id_name_dict,
         'referral_source_activity_website': dict_utils.id_name_dict,
         'referral_source_adviser': dict_utils.contact_or_adviser_dict,
-        'sector': dict_utils.id_name_dict,
+        'sector': dict_utils.sector_dict,
         'project_code': str,
         'average_salary': dict_utils.id_name_dict,
         'archived_by': dict_utils.contact_or_adviser_dict,
@@ -149,6 +151,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'modified_by',
         'strategic_drivers',
         'archived_documents_url_path',
+        'stage_log',
     )
 
     SEARCH_FIELDS = (
@@ -159,7 +162,6 @@ class InvestmentProject(DocType, MapDBModelToDict):
         'investor_company.name',
         'investor_company.name_trigram',
         'project_code_trigram',
-        'sector.name_trigram',
     )
 
     class Meta:

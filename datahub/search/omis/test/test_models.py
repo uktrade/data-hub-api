@@ -20,10 +20,9 @@ pytestmark = pytest.mark.django_db
         OrderWithAcceptedQuoteFactory
     )
 )
-def test_order_to_dict(Factory, setup_es):
+def test_order_to_dict(Factory):
     """Test converting an order to dict."""
     order = Factory()
-    setup_es.indices.refresh()
 
     invoice = order.invoice
     OrderSubscriberFactory.create_batch(2, order=order)
@@ -49,7 +48,10 @@ def test_order_to_dict(Factory, setup_es):
         },
         'sector': {
             'id': str(order.sector.pk),
-            'name': order.sector.name
+            'name': order.sector.name,
+            'ancestors': [{
+                'id': str(ancestor.pk),
+            } for ancestor in order.sector.get_ancestors()]
         },
         'uk_region': {
             'id': str(order.uk_region.pk),
@@ -154,7 +156,7 @@ def test_order_to_dict(Factory, setup_es):
     }
 
 
-def test_orders_to_es_documents(setup_es):
+def test_orders_to_es_documents():
     """Test converting 2 orders to Elasticsearch documents."""
     orders = OrderFactory.create_batch(2)
 

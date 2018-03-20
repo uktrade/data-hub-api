@@ -8,6 +8,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
 from django.utils.crypto import get_random_string
 from django.utils.timezone import now, utc
+from mptt.fields import TreeForeignKey
 
 from datahub.company.models import Advisor, Company, Contact
 from datahub.core.models import (
@@ -126,7 +127,7 @@ class Order(BaseModel):
         null=True,
         on_delete=models.SET_NULL
     )
-    sector = models.ForeignKey(
+    sector = TreeForeignKey(
         Sector,
         related_name='+',
         null=True, blank=True,

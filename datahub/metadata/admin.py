@@ -1,4 +1,5 @@
 from django.contrib import admin
+from mptt.admin import MPTTModelAdmin
 
 from datahub.core.admin import DisabledOnFilter, ReadOnlyAdmin
 from . import models
@@ -8,14 +9,12 @@ MODELS_TO_REGISTER_DISABLEABLE = (
     models.CompanyClassification,
     models.Country,
     models.FDIType,
-    models.HeadquarterType,
     models.InvestmentBusinessActivity,
     models.InvestmentStrategicDriver,
     models.ReferralSourceActivity,
     models.ReferralSourceMarketing,
     models.ReferralSourceWebsite,
     models.Role,
-    models.Sector,
     models.Service,
     models.Title,
     models.UKRegion,
@@ -30,6 +29,7 @@ MODELS_TO_REGISTER_WITH_ORDER = (
 
 MODELS_TO_REGISTER_READ_ONLY = (
     models.BusinessType,
+    models.HeadquarterType,
     models.InvestmentType,
     models.InvestmentProjectStage,
 )
@@ -87,4 +87,15 @@ class TeamRoleAdmin(admin.ModelAdmin):
     readonly_fields = ('id',)
     search_fields = ('name', 'pk')
     filter_horizontal = ('groups',)
+    list_filter = (DisabledOnFilter,)
+
+
+@admin.register(models.Sector)
+class SectorAdmin(MPTTModelAdmin):
+    """Sector admin."""
+
+    fields = ('id', 'segment', 'parent', 'disabled_on',)
+    list_display = ('segment', 'disabled_on',)
+    readonly_fields = ('id',)
+    search_fields = ('segment', 'pk')
     list_filter = (DisabledOnFilter,)

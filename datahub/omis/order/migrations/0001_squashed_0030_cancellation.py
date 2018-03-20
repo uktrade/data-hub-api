@@ -26,12 +26,11 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('metadata', '0002_rename_phase_to_stage'),
+        ('metadata', '0001_squashed_0011_add_default_id_for_metadata'),
         ('omis-invoice', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('omis-quote', '0001_initial'),
         ('company', '0001_squashed_0010_auto_20170807_1124'),
-        ('metadata', '0004_team_roles_regions_countries'),
     ]
 
     operations = [
