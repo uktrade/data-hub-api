@@ -1,0 +1,6 @@
+- model: metadata.service
+  pk: 24ff1c98-f67e-4064-b9fc-759de04dce92
+  fields: {disabled_on: null, name: Investment - IST Project Manager notification (IST use only)}
+- model: metadata.service
+  pk: 718ff945-ab49-4043-a90f-1b85869039af
+  fields: {disabled_on: null, name: Investment - Aftercare offered}
