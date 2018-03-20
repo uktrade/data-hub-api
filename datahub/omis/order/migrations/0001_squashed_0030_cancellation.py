@@ -6,6 +6,7 @@ from django.conf import settings
 import django.core.validators
 from django.db import migrations, models
 import django.db.models.deletion
+import mptt.fields
 import uuid
 
 
@@ -91,7 +92,7 @@ class Migration(migrations.Migration):
                 ('company', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='orders', to='company.Company')),
                 ('contact', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='orders', to='company.Contact')),
                 ('primary_market', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='orders', to='metadata.Country')),
-                ('sector', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='metadata.Sector')),
+                ('sector', mptt.fields.TreeForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='metadata.Sector')),
                 ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
                 ('modified_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
                 ('contacts_not_to_approach', models.TextField(blank=True, help_text='Specific people or organisations the company does not want DIT to talk to.')),

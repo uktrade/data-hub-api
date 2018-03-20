@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
+import mptt.fields
 import uuid
 
 
@@ -99,7 +100,7 @@ class Migration(migrations.Migration):
                 ('referral_source_activity_marketing', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='investment_projects', to='metadata.ReferralSourceMarketing')),
                 ('referral_source_activity_website', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='investment_projects', to='metadata.ReferralSourceWebsite')),
                 ('referral_source_adviser', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='referred_investment_projects', to=settings.AUTH_USER_MODEL)),
-                ('sector', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='metadata.Sector')),
+                ('sector', mptt.fields.TreeForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='metadata.Sector')),
                 ('strategic_drivers', models.ManyToManyField(blank=True, related_name='investment_projects', to='metadata.InvestmentStrategicDriver')),
                 ('uk_company', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='investee_projects', to='company.Company')),
                 ('uk_region_locations', models.ManyToManyField(blank=True, related_name='_investmentproject_uk_region_locations_+', to='metadata.UKRegion', verbose_name='possible UK regions')),
