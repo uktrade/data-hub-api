@@ -155,7 +155,10 @@ class TestListView(APITestMixin):
             'project_manager_team',
             'project_assurance_team',
             'team_complete',
-            'team_members'
+            'team_members',
+            'project_arrived_in_triage_on',
+            'proposal_deadline',
+            'stage_log',
         }
 
     def test_list_is_sorted_by_created_on_desc(self):
@@ -1010,6 +1013,22 @@ class TestPartialUpdateView(APITestMixin):
         assert len(response_data['client_contacts']) == 1
         assert response_data['client_contacts'][0]['id'] == str(new_contact.id)
 
+    def test_patch_spi_fields(self):
+        """Test updating a project with SPI fields."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'project_arrived_in_triage_on': '2017-04-18',
+            'proposal_deadline': '2017-04-19',
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        project_arrived_in_triage_on = response_data['project_arrived_in_triage_on']
+        assert project_arrived_in_triage_on == request_data['project_arrived_in_triage_on']
+        assert response_data['proposal_deadline'] == request_data['proposal_deadline']
+
     def test_patch_estimated_land_date_legacy_project(self):
         """
         Test the validation of estimated_land_date for projects with
@@ -1236,6 +1255,111 @@ class TestPartialUpdateView(APITestMixin):
             'name': constants.InvestmentProjectStage.verify_win.value.name,
         }
         assert response_data['status'] == 'ongoing'
+
+    def test_change_stage_log(self):
+        """Tests change of the project stage is being logged."""
+        dates = (
+            datetime(2017, 4, 28, 17, 35, tzinfo=utc),
+            datetime(2017, 4, 28, 17, 37, tzinfo=utc),
+        )
+        date_iter = iter(dates)
+
+        project1 = InvestmentProjectFactory()
+        project1.stage_id = constants.InvestmentProjectStage.assign_pm.value.id
+        project1.save()
+        assert project1.stage_log.count() == 2
+
+        adviser = AdviserFactory()
+        with freeze_time(next(date_iter)):
+            project2 = AssignPMInvestmentProjectFactory(
+                project_assurance_adviser=adviser,
+                project_manager=adviser,
+            )
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project2.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.active.value.id
+            }
+        }
+
+        with freeze_time(next(date_iter)):
+            response = self.api_client.patch(url, data=request_data, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['stage_log']) == 2
+        assert response_data['stage_log'] == [
+            {
+                'stage': {
+                    'id': constants.InvestmentProjectStage.assign_pm.value.id,
+                    'name': 'Assign PM',
+                },
+                'created_on': '2017-04-28T17:35:00Z',
+            },
+            {
+                'stage': {
+                    'id': constants.InvestmentProjectStage.active.value.id,
+                    'name': 'Active',
+                },
+                'created_on': '2017-04-28T17:37:00Z',
+            },
+        ]
+
+        date_iter = iter(dates)
+        assert [
+            (entry.stage.id, entry.created_on,)
+            for entry in project2.stage_log.order_by('created_on')
+        ] == [
+            (uuid.UUID(constants.InvestmentProjectStage.assign_pm.value.id), next(date_iter)),
+            (uuid.UUID(constants.InvestmentProjectStage.active.value.id), next(date_iter),),
+        ]
+
+    def test_change_stage_log_when_log_is_empty(self):
+        """Tests that stage is being logged for Investment Projects with empty log."""
+        project1 = InvestmentProjectFactory()
+        project1.stage_id = constants.InvestmentProjectStage.assign_pm.value.id
+        project1.save()
+        assert project1.stage_log.count() == 2
+
+        adviser = AdviserFactory()
+        project2 = AssignPMInvestmentProjectFactory(
+            project_assurance_adviser=adviser,
+            project_manager=adviser,
+        )
+        project2.stage_log.all().delete()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project2.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.active.value.id
+            }
+        }
+
+        with freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc)):
+            response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['stage_log'] == [
+            {
+                'stage': {
+                    'id': constants.InvestmentProjectStage.active.value.id,
+                    'name': 'Active',
+                },
+                'created_on': '2017-04-28T17:35:00Z',
+            },
+        ]
+
+        assert [
+            (entry.stage.id, entry.created_on,)
+            for entry in project2.stage_log.order_by('created_on')
+        ] == [
+            (
+                uuid.UUID(constants.InvestmentProjectStage.active.value.id),
+                datetime(2017, 4, 28, 17, 35, tzinfo=utc),
+            ),
+        ]
 
     def test_invalid_state_validation(self):
         """Tests validation when a project that is in an invalid state.
