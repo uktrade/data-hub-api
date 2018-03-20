@@ -1,7 +1,12 @@
 """Tests for investment models."""
 
+from datetime import datetime
+from uuid import UUID
+
 import pytest
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.timezone import utc
+from freezegun import freeze_time
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core import constants
@@ -129,3 +134,48 @@ def test_associated_advisers_no_none():
     """Tests that get_associated_advisers() does not include None."""
     project = InvestmentProjectFactory(client_relationship_manager_id=None)
     assert None not in tuple(project.get_associated_advisers())
+
+
+def test_creates_stage_log_if_stage_was_modified():
+    """Tests that change to investment project stage creates a stage log record."""
+    dates = (
+        datetime(2017, 4, 28, 17, 35, tzinfo=utc),
+        datetime(2017, 4, 28, 17, 37, tzinfo=utc),
+    )
+    date_iter = iter(dates)
+
+    with freeze_time(next(date_iter)):
+        project = InvestmentProjectFactory()
+    with freeze_time(next(date_iter)):
+        project.stage_id = constants.InvestmentProjectStage.assign_pm.value.id
+        project.save()
+
+    date_iter = iter(dates)
+    assert [
+        (entry.stage.id, entry.created_on,) for entry in project.stage_log.order_by('created_on')
+    ] == [
+        (UUID(constants.InvestmentProjectStage.prospect.value.id), next(date_iter),),
+        (UUID(constants.InvestmentProjectStage.assign_pm.value.id), next(date_iter),)
+    ]
+
+
+def test_doesnt_create_stage_log_if_stage_was_not_modified():
+    """Tests that stage log is not created when there is no change to stage."""
+    project = InvestmentProjectFactory()
+    # no change to the stage
+    project.save()
+    assert project.stage_log.count() == 1
+
+
+@freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
+def test_stage_log_added_when_investment_project_is_created():
+    """Tests that stage is being logged when Investment Projects is created."""
+    project = InvestmentProjectFactory()
+    assert [
+        (entry.stage.id, entry.created_on,) for entry in project.stage_log.all()
+    ] == [
+        (
+            UUID(constants.InvestmentProjectStage.prospect.value.id),
+            datetime(2017, 4, 28, 17, 35, tzinfo=utc),
+        )
+    ]

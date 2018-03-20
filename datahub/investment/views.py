@@ -13,7 +13,7 @@ from rest_framework.response import Response
 
 from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
-from datahub.core.utils import executor
+from datahub.core.thread_pool import submit_to_thread_pool
 from datahub.core.viewsets import CoreViewSetV3
 from datahub.documents.av_scan import virus_scan_document
 from datahub.investment.models import (
@@ -69,19 +69,21 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'level_of_involvement',
         'specific_programme',
         'uk_company',
+        'uk_company__registered_address_country',
         'investmentprojectcode',
         'client_relationship_manager',
+        'client_relationship_manager__dit_team',
         'referral_source_adviser',
         'referral_source_activity',
         'referral_source_activity_website',
         'referral_source_activity_marketing',
         'fdi_type',
-        'sector',
         'average_salary',
         'project_manager',
         'project_manager__dit_team',
         'project_assurance_adviser',
-        'project_assurance_adviser__dit_team'
+        'project_assurance_adviser__dit_team',
+        'country_lost_to',
     ).prefetch_related(
         'actual_uk_regions',
         'client_contacts',
@@ -89,6 +91,9 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'competitor_countries',
         'delivery_partners',
         'uk_region_locations',
+        'sector',
+        'sector__parent',
+        'sector__parent__parent',
         'strategic_drivers',
         Prefetch('team_members', queryset=_team_member_queryset),
     )
@@ -263,7 +268,7 @@ class IProjectDocumentViewSet(CoreViewSetV3):
         serializer = UploadStatusSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        executor.submit(virus_scan_document, str(doc.pk))
+        submit_to_thread_pool(virus_scan_document, str(doc.pk))
 
         return Response(
             status=status.HTTP_200_OK,

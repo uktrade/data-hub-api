@@ -41,7 +41,6 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         'one_list_account_owner',
         'global_headquarters',
         'registered_address_country',
-        'sector',
         'trading_address_country',
         'turnover_range',
         'uk_region',
@@ -50,6 +49,9 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSetV3):
         Prefetch('investor_investment_projects', queryset=get_slim_investment_project_queryset()),
         'export_to_countries',
         'future_interest_countries',
+        'sector',
+        'sector__parent',
+        'sector__parent__parent',
     )
 
 

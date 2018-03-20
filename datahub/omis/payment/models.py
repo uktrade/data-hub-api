@@ -56,6 +56,9 @@ class PaymentGatewaySession(BaseModel):
 
         :raises GOVUKPayAPIException: if there is a problem with GOV.UK Pay
         """
+        if self.is_finished():
+            return ''
+
         next_url = self._get_payment_from_govuk_pay()['_links']['next_url'] or {}
         return next_url.get('href', '')
 

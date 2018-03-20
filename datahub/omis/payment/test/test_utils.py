@@ -28,6 +28,7 @@ class TestGetOmisPaymentDataFromGovukPayment:
             'state': {'status': 'success'},
             'email': 'email@example.com',
             'created_date': '2018-02-13T14:56:56.734Z',
+            'reference': '12345',
             'card_details': {
                 'last_digits_card_number': '1111',
                 'cardholder_name': 'John Doe',
@@ -49,6 +50,7 @@ class TestGetOmisPaymentDataFromGovukPayment:
             'amount': 1234,
             'method': PaymentMethod.card,
             'received_on': dateutil_parse('2018-02-13').date(),
+            'transaction_reference': '12345',
             'cardholder_name': 'John Doe',
             'card_brand': 'Visa',
             'billing_email': 'email@example.com',

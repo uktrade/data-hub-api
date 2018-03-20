@@ -18,7 +18,7 @@ class Order(DocType, MapDBModelToDict):
     created_on = Date()
     modified_on = Date()
     primary_market = dsl_utils.id_name_mapping()
-    sector = dsl_utils.id_name_mapping()
+    sector = dsl_utils.sector_mapping()
     uk_region = dsl_utils.id_name_mapping()
     description = dsl_utils.EnglishText()
     contacts_not_to_approach = Text()
@@ -66,7 +66,7 @@ class Order(DocType, MapDBModelToDict):
         'contact': dict_utils.contact_or_adviser_dict,
         'created_by': dict_utils.adviser_dict_with_team,
         'primary_market': dict_utils.id_name_dict,
-        'sector': dict_utils.id_name_dict,
+        'sector': dict_utils.sector_dict,
         'uk_region': dict_utils.id_name_dict,
         'service_types': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
         'subscribers': lambda col: [

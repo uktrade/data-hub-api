@@ -76,3 +76,6 @@ import.sh
 # docker things
 docker-volumes/
 .env
+
+# celery
+celerybeat-schedule

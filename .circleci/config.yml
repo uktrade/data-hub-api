@@ -6,7 +6,7 @@ jobs:
 
       - image: elasticsearch:5.5
 
-      - image: postgres:9.5
+      - image: postgres:9.6
         environment:
           POSTGRES_DB=datahub
 

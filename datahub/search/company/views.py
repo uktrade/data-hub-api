@@ -20,6 +20,7 @@ class SearchCompanyParams:
         'headquarter_type',
         'name',
         'sector',
+        'sector_descends',
         'country',
         'trading_address_country',
         'trading_address_postcode',
@@ -43,6 +44,7 @@ class SearchCompanyParams:
     COMPOSITE_FILTERS = {
         'name': ['name', 'name_trigram', 'trading_name_trigram'],
         'country': ['trading_address_country.id', 'registered_address_country.id'],
+        'sector_descends': ['sector.id', 'sector.ancestors.id'],
     }
 
 

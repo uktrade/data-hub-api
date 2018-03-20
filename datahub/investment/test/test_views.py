@@ -21,9 +21,7 @@ from datahub.core import constants
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
     APITestMixin, create_test_user, format_date_or_datetime, random_obj_for_model,
-    synchronous_executor_submit, synchronous_transaction_on_commit
 )
-from datahub.core.utils import executor
 from datahub.documents.av_scan import virus_scan_document
 from datahub.investment import views
 from datahub.investment.models import (
@@ -157,7 +155,10 @@ class TestListView(APITestMixin):
             'project_manager_team',
             'project_assurance_team',
             'team_complete',
-            'team_members'
+            'team_members',
+            'project_arrived_in_triage_on',
+            'proposal_deadline',
+            'stage_log',
         }
 
     def test_list_is_sorted_by_created_on_desc(self):
@@ -1012,6 +1013,22 @@ class TestPartialUpdateView(APITestMixin):
         assert len(response_data['client_contacts']) == 1
         assert response_data['client_contacts'][0]['id'] == str(new_contact.id)
 
+    def test_patch_spi_fields(self):
+        """Test updating a project with SPI fields."""
+        project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'project_arrived_in_triage_on': '2017-04-18',
+            'proposal_deadline': '2017-04-19',
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        project_arrived_in_triage_on = response_data['project_arrived_in_triage_on']
+        assert project_arrived_in_triage_on == request_data['project_arrived_in_triage_on']
+        assert response_data['proposal_deadline'] == request_data['proposal_deadline']
+
     def test_patch_estimated_land_date_legacy_project(self):
         """
         Test the validation of estimated_land_date for projects with
@@ -1238,6 +1255,111 @@ class TestPartialUpdateView(APITestMixin):
             'name': constants.InvestmentProjectStage.verify_win.value.name,
         }
         assert response_data['status'] == 'ongoing'
+
+    def test_change_stage_log(self):
+        """Tests change of the project stage is being logged."""
+        dates = (
+            datetime(2017, 4, 28, 17, 35, tzinfo=utc),
+            datetime(2017, 4, 28, 17, 37, tzinfo=utc),
+        )
+        date_iter = iter(dates)
+
+        project1 = InvestmentProjectFactory()
+        project1.stage_id = constants.InvestmentProjectStage.assign_pm.value.id
+        project1.save()
+        assert project1.stage_log.count() == 2
+
+        adviser = AdviserFactory()
+        with freeze_time(next(date_iter)):
+            project2 = AssignPMInvestmentProjectFactory(
+                project_assurance_adviser=adviser,
+                project_manager=adviser,
+            )
+
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project2.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.active.value.id
+            }
+        }
+
+        with freeze_time(next(date_iter)):
+            response = self.api_client.patch(url, data=request_data, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert len(response_data['stage_log']) == 2
+        assert response_data['stage_log'] == [
+            {
+                'stage': {
+                    'id': constants.InvestmentProjectStage.assign_pm.value.id,
+                    'name': 'Assign PM',
+                },
+                'created_on': '2017-04-28T17:35:00Z',
+            },
+            {
+                'stage': {
+                    'id': constants.InvestmentProjectStage.active.value.id,
+                    'name': 'Active',
+                },
+                'created_on': '2017-04-28T17:37:00Z',
+            },
+        ]
+
+        date_iter = iter(dates)
+        assert [
+            (entry.stage.id, entry.created_on,)
+            for entry in project2.stage_log.order_by('created_on')
+        ] == [
+            (uuid.UUID(constants.InvestmentProjectStage.assign_pm.value.id), next(date_iter)),
+            (uuid.UUID(constants.InvestmentProjectStage.active.value.id), next(date_iter),),
+        ]
+
+    def test_change_stage_log_when_log_is_empty(self):
+        """Tests that stage is being logged for Investment Projects with empty log."""
+        project1 = InvestmentProjectFactory()
+        project1.stage_id = constants.InvestmentProjectStage.assign_pm.value.id
+        project1.save()
+        assert project1.stage_log.count() == 2
+
+        adviser = AdviserFactory()
+        project2 = AssignPMInvestmentProjectFactory(
+            project_assurance_adviser=adviser,
+            project_manager=adviser,
+        )
+        project2.stage_log.all().delete()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project2.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.active.value.id
+            }
+        }
+
+        with freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc)):
+            response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['stage_log'] == [
+            {
+                'stage': {
+                    'id': constants.InvestmentProjectStage.active.value.id,
+                    'name': 'Active',
+                },
+                'created_on': '2017-04-28T17:35:00Z',
+            },
+        ]
+
+        assert [
+            (entry.stage.id, entry.created_on,)
+            for entry in project2.stage_log.order_by('created_on')
+        ] == [
+            (
+                uuid.UUID(constants.InvestmentProjectStage.active.value.id),
+                datetime(2017, 4, 28, 17, 35, tzinfo=utc),
+            ),
+        ]
 
     def test_invalid_state_validation(self):
         """Tests validation when a project that is in an invalid state.
@@ -3023,7 +3145,7 @@ class TestDocumentViews(APITestMixin):
         assert response.data['filename'] == 'test.txt'
         assert 'signed_url' in response.data
 
-    @patch.object(executor, 'submit')
+    @patch('datahub.core.thread_pool._submit_to_thread_pool')
     def test_document_upload_status(self, mock_submit):
         """Tests setting of document upload status to complete.
 
@@ -3044,9 +3166,8 @@ class TestDocumentViews(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         mock_submit.assert_called_once_with(virus_scan_document, str(doc.pk))
 
-    @patch.object(executor, 'submit')
-    @patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
-    @patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
+    @patch('datahub.core.thread_pool._submit_to_thread_pool')
+    @pytest.mark.usefixtures('synchronous_on_commit')
     def test_document_delete_of_not_uploaded_doc_does_not_trigger_s3_delete(self, mock_submit):
         """Tests document deletion."""
         project = InvestmentProjectFactory()
@@ -3061,10 +3182,8 @@ class TestDocumentViews(APITestMixin):
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert mock_submit.called is False
 
-    @patch('datahub.core.utils.get_s3_client')
-    @patch('datahub.core.utils.executor.submit', synchronous_executor_submit)
-    @patch('django.db.transaction.on_commit', synchronous_transaction_on_commit)
-    def test_document_delete(self, mock_s3):
+    @pytest.mark.usefixtures('synchronous_thread_pool', 'synchronous_on_commit')
+    def test_document_delete(self, s3_stubber):
         """Tests document deletion."""
         project = InvestmentProjectFactory()
         doc = IProjectDocument.create_from_declaration_request(
@@ -3073,15 +3192,19 @@ class TestDocumentViews(APITestMixin):
         doc.document.uploaded_on = now()
         doc.document.save()
 
+        s3_stubber.add_response('delete_object', {
+            'ResponseMetadata': {
+                'HTTPStatusCode': 204,
+            }
+        }, expected_params={
+            'Bucket': doc.document.s3_bucket, 'Key': doc.document.s3_key
+        })
+
         url = reverse('api-v3:investment:document-item',
                       kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
 
         response = self.api_client.delete(url)
         assert response.status_code == status.HTTP_204_NO_CONTENT
-        mock_s3().delete_object.assert_called_with(
-            Bucket=doc.document.s3_bucket,
-            Key=doc.document.s3_key,
-        )
 
     def test_document_upload_status_wrong_status(self):
         """Tests request validation in the document status endpoint."""

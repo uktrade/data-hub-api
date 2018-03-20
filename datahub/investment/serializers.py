@@ -15,6 +15,7 @@ from datahub.investment.models import (
     InvestmentDeliveryPartner,
     InvestmentProject,
     InvestmentProjectPermission,
+    InvestmentProjectStageLog,
     InvestmentProjectTeamMember,
     InvestorType,
     Involvement,
@@ -127,7 +128,13 @@ TEAM_FIELDS = (
     'team_members',
 )
 
-ALL_FIELDS = CORE_FIELDS + VALUE_FIELDS + REQUIREMENTS_FIELDS + TEAM_FIELDS
+SPI_FIELDS = (
+    'project_arrived_in_triage_on',
+    'proposal_deadline',
+    'stage_log',
+)
+
+ALL_FIELDS = CORE_FIELDS + VALUE_FIELDS + REQUIREMENTS_FIELDS + TEAM_FIELDS + SPI_FIELDS
 
 
 class NestedIProjectTeamMemberSerializer(serializers.ModelSerializer):
@@ -142,6 +149,17 @@ class NestedIProjectTeamMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvestmentProjectTeamMember
         fields = ('adviser', 'role')
+
+
+class NestedInvestmentProjectStageLogSerializer(serializers.ModelSerializer):
+    """Serialiser for investment project stage log."""
+
+    stage = NestedRelatedField(meta_models.InvestmentProjectStage, read_only=True)
+    created_on = serializers.DateTimeField(read_only=True)
+
+    class Meta:
+        model = InvestmentProjectStageLog
+        fields = ('stage', 'created_on')
 
 
 class IProjectSerializer(PermittedFieldsModelSerializer):
@@ -212,6 +230,11 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
     project_assurance_team = NestedRelatedField(meta_models.Team, read_only=True)
     team_members = NestedIProjectTeamMemberSerializer(many=True, read_only=True)
     team_complete = serializers.SerializerMethodField()
+
+    # SPI fields
+    project_arrived_in_triage_on = serializers.DateField(required=False, allow_null=True)
+    proposal_deadline = serializers.DateField(required=False, allow_null=True)
+    stage_log = NestedInvestmentProjectStageLogSerializer(many=True, read_only=True)
 
     def validate(self, data):
         """Validates the object after individual fields have been validated.

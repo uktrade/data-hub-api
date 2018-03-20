@@ -52,7 +52,6 @@ def test_get_basic_search_query():
                                 'registered_address_postcode_trigram',
                                 'related_programmes.name',
                                 'related_programmes.name_trigram',
-                                'sector.name_trigram',
                                 'subject_english',
                                 'subtotal_cost_string',
                                 'teams.name',

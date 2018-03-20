@@ -1,12 +1,14 @@
 import uuid
 
+import factory
 import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import Country, Sector, UKRegion
-from datahub.core.test_utils import APITestMixin, create_test_user
+from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_queryset
+from datahub.metadata.models import Sector as SectorModel
 from datahub.metadata.test.factories import TeamFactory
 
 pytestmark = pytest.mark.django_db
@@ -118,6 +120,51 @@ class TestSearch(APITestMixin):
         assert contact['company']['name'] == company.name
         assert contact['company_uk_region'] is None
         assert contact['company_sector']['id'] == company.sector_id
+
+    @pytest.mark.parametrize(
+        'sector_level',
+        (0, 1, 2),
+    )
+    def test_company_sector_descends_filter(self, hierarchical_sectors, setup_es, sector_level):
+        """Test the company_sector_descends filter."""
+        num_sectors = len(hierarchical_sectors)
+        sectors_ids = [sector.pk for sector in hierarchical_sectors]
+
+        companies = CompanyFactory.create_batch(
+            num_sectors,
+            sector_id=factory.Iterator(sectors_ids)
+        )
+        contacts = ContactFactory.create_batch(
+            3,
+            company=factory.Iterator(companies)
+        )
+
+        other_companies = CompanyFactory.create_batch(
+            3,
+            sector=factory.LazyFunction(lambda: random_obj_for_queryset(
+                SectorModel.objects.exclude(pk__in=sectors_ids)
+            ))
+        )
+        ContactFactory.create_batch(
+            3,
+            company=factory.Iterator(other_companies)
+        )
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:contact')
+        body = {
+            'company_sector_descends': hierarchical_sectors[sector_level].pk
+        }
+        response = self.api_client.post(url, body)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['count'] == num_sectors - sector_level
+
+        actual_ids = {uuid.UUID(contact['id']) for contact in response_data['results']}
+        expected_ids = {contact.pk for contact in contacts[sector_level:]}
+        assert actual_ids == expected_ids
 
     def test_search_contact_by_partial_company_name(self, setup_es, setup_data):
         """Tests filtering by partially matching company name."""

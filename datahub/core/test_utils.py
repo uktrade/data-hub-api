@@ -157,16 +157,6 @@ class APITestMixin:
         return self._applications[grant_type]
 
 
-def synchronous_executor_submit(fn, *args, **kwargs):
-    """Run everything submitted to thread pools executor in sync."""
-    fn(*args, **kwargs)
-
-
-def synchronous_transaction_on_commit(fn):
-    """During a test run a transaction is never committed, so we have to improvise."""
-    fn()
-
-
 def format_date_or_datetime(value):
     """
     Formats a date or datetime using DRF fields.
