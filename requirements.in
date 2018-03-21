@@ -1,12 +1,12 @@
 # For CH Sync
-lxml==4.1.1
+lxml==4.2.0
 cssselect==1.0.3
 
 # Django and django related
 Django==2.0.3
 djangorestframework==3.7.7
 django-environ==0.4.4
-django-extensions==2.0.0
+django-extensions==2.0.6
 django-filter==1.1.0
 django-reversion==2.0.13
 django-pglocks==1.0.2
@@ -21,9 +21,9 @@ python-dateutil==2.6.1
 # Persistency layer
 psycopg2==2.7.4
 
-boto3==1.6.3
+boto3==1.6.12
 
-notifications-python-client==4.7.2
+notifications-python-client==4.8.1
 
 # REDIS
 django-redis==4.9.0
