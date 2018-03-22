@@ -1,8 +1,10 @@
 import uuid
+from random import choice
 
 import factory
 from django.utils.timezone import now
 
+from datahub.company.ch_constants import COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING
 from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import ExportExperienceCategory
 from datahub.core import constants
@@ -53,11 +55,17 @@ class CompanyFactory(factory.django.DjangoModelFactory):
         model = 'company.Company'
 
 
+def _get_random_company_category():
+    categories = ([key for key, val in COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING.items() if val])
+    return choice(categories).capitalize()
+
+
 class CompaniesHouseCompanyFactory(factory.django.DjangoModelFactory):
     """Companies house company factory."""
 
     name = factory.Sequence(lambda n: f'name{n}')
     company_number = factory.Sequence(str)
+    company_category = factory.LazyFunction(_get_random_company_category)
     registered_address_1 = factory.Sequence(lambda n: f'{n} Bar st.')
     registered_address_town = 'Rome'
     registered_address_country_id = constants.Country.italy.value.id
