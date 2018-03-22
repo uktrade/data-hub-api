@@ -59,6 +59,8 @@ class Interaction(DocType, MapDBModelToDict):
         'created_by',
         'modified_by',
         'archived_documents_url_path',
+        'policy_area',
+        'policy_issue_type',
     )
 
     SEARCH_FIELDS = (
