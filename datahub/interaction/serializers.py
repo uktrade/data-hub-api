@@ -13,7 +13,8 @@ from datahub.core.validators import (
 from datahub.event.models import Event
 from datahub.investment.models import InvestmentProject
 from datahub.metadata.models import Service, Team
-from .models import CommunicationChannel, Interaction, ServiceDeliveryStatus
+from .models import (CommunicationChannel, Interaction, PolicyArea, PolicyIssueType,
+                     ServiceDeliveryStatus)
 from .permissions import HasAssociatedInvestmentProjectValidator
 
 
@@ -29,6 +30,12 @@ class InteractionSerializer(serializers.ModelSerializer):
         ),
         'invalid_for_non_event': ugettext_lazy(
             'This field is only valid for event service deliveries.'
+        ),
+        'invalid_for_policy_feedback': ugettext_lazy(
+            'This field is only valid for interactions.'
+        ),
+        'invalid_for_non_policy_feedback': ugettext_lazy(
+            'This field is only valid for policy feedback.'
         ),
     }
 
@@ -49,6 +56,12 @@ class InteractionSerializer(serializers.ModelSerializer):
     service = NestedRelatedField(Service)
     service_delivery_status = NestedRelatedField(
         ServiceDeliveryStatus, required=False, allow_null=True
+    )
+    policy_area = NestedRelatedField(
+        PolicyArea, required=False, allow_null=True
+    )
+    policy_issue_type = NestedRelatedField(
+        PolicyIssueType, required=False, allow_null=True
     )
 
     def validate(self, data):
@@ -96,6 +109,8 @@ class InteractionSerializer(serializers.ModelSerializer):
             'subject',
             'notes',
             'archived_documents_url_path',
+            'policy_area',
+            'policy_issue_type',
         )
         read_only_fields = (
             'archived_documents_url_path',
@@ -111,6 +126,11 @@ class InteractionSerializer(serializers.ModelSerializer):
                         Interaction.KINDS.interaction,
                         Interaction.KINDS.policy_feedback
                     ]),
+                ),
+                ValidationRule(
+                    'invalid_for_policy_feedback',
+                    OperatorRule('investment_project', not_),
+                    when=EqualsRule('kind', Interaction.KINDS.policy_feedback),
                 ),
                 ValidationRule(
                     'invalid_for_service_delivery',
@@ -129,9 +149,24 @@ class InteractionSerializer(serializers.ModelSerializer):
                     ]),
                 ),
                 ValidationRule(
+                    'invalid_for_non_policy_feedback',
+                    OperatorRule('policy_area', is_blank),
+                    OperatorRule('policy_issue_type', is_blank),
+                    when=InRule('kind', [
+                        Interaction.KINDS.interaction,
+                        Interaction.KINDS.service_delivery,
+                    ])
+                ),
+                ValidationRule(
                     'required',
                     OperatorRule('is_event', is_not_blank),
                     when=EqualsRule('kind', Interaction.KINDS.service_delivery),
+                ),
+                ValidationRule(
+                    'required',
+                    OperatorRule('policy_area', is_not_blank),
+                    OperatorRule('policy_issue_type', is_not_blank),
+                    when=EqualsRule('kind', Interaction.KINDS.policy_feedback),
                 ),
                 ValidationRule(
                     'required',

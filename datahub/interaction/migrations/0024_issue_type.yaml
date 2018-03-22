@@ -1,0 +1,15 @@
+- model: interaction.policyissuetype
+  pk: 688ac22e-89d4-4d1f-bf0b-013588bf63a7
+  fields: {disabled_on: null, name: Domestic, order: 100.0}
+- model: interaction.policyissuetype
+  pk: a4d65900-3c83-4d2f-884b-be8977a554c4
+  fields: {disabled_on: null, name: Non-EU trade priority, order: 300.0}
+- model: interaction.policyissuetype
+  pk: c1543164-7612-42df-b556-f59ae5173042
+  fields: {disabled_on: null, name: Economic risk, order: 500.0}
+- model: interaction.policyissuetype
+  pk: c1f1e29b-17ba-402f-ac98-aa23f9dc9bcb
+  fields: {disabled_on: null, name: EU exit, order: 200.0}
+- model: interaction.policyissuetype
+  pk: fa35595d-780d-4faa-b575-35f1c319bfee
+  fields: {disabled_on: null, name: Economic opportunity, order: 400.0}
