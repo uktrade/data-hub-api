@@ -25,6 +25,7 @@ class SearchInteractionParams:
         'date_before',
         'communication_channel',
         'investment_project',
+        'sector_descends',
         'service',
     )
 
@@ -52,6 +53,12 @@ class SearchInteractionParams:
         'dit_adviser_name': [
             'dit_adviser.name',
             'dit_adviser.name_trigram'
+        ],
+        'sector_descends': [
+            'company_sector.id',
+            'company_sector.ancestors.id',
+            'investment_project_sector.id',
+            'investment_project_sector.ancestors.id',
         ],
     }
 
