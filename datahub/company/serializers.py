@@ -58,13 +58,46 @@ class AdviserSerializer(serializers.ModelSerializer):
         depth = 1
 
 
-class CompaniesHouseCompanySerializer(serializers.ModelSerializer):
-    """Companies House company serializer."""
+class NestedCompaniesHouseCompanySerializer(serializers.ModelSerializer):
+    """Nested Companies House company serializer."""
+
+    registered_address_country = NestedRelatedField('metadata.Country')
 
     class Meta:
         model = CompaniesHouseCompany
-        depth = 1
-        fields = '__all__'
+        fields = (
+            'id',
+            'company_category',
+            'company_number',
+            'company_status',
+            'incorporation_date',
+            'name',
+            'registered_address_1',
+            'registered_address_2',
+            'registered_address_county',
+            'registered_address_country',
+            'registered_address_town',
+            'registered_address_postcode',
+            'sic_code_1',
+            'sic_code_2',
+            'sic_code_3',
+            'sic_code_4',
+            'uri',
+        )
+        read_only_fields = fields
+
+
+class CompaniesHouseCompanySerializer(NestedCompaniesHouseCompanySerializer):
+    """Full Companies House company serializer."""
+
+    business_type = NestedRelatedField('metadata.BusinessType')
+
+    class Meta(NestedCompaniesHouseCompanySerializer.Meta):
+        fields = (
+            *NestedCompaniesHouseCompanySerializer.Meta.fields,
+            'business_type',
+        )
+        read_only_fields = fields
 
 
 NestedAdviserField = partial(
@@ -232,7 +265,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     classification = NestedRelatedField(
         meta_models.CompanyClassification, required=False, allow_null=True
     )
-    companies_house_data = CompaniesHouseCompanySerializer(read_only=True)
+    companies_house_data = NestedCompaniesHouseCompanySerializer(read_only=True)
     contacts = ContactSerializer(many=True, read_only=True)
     employee_range = NestedRelatedField(
         meta_models.EmployeeRange, required=False, allow_null=True

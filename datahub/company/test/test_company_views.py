@@ -137,7 +137,7 @@ class TestGetCompany(APITestMixin):
             'companies_house_data': {
                 'id': ch_company.id,
                 'company_number': '123',
-                'company_category': '',
+                'company_category': ch_company.company_category,
                 'company_status': '',
                 'incorporation_date': format_date_or_datetime(ch_company.incorporation_date),
                 'name': 'Foo Ltd',
@@ -148,7 +148,6 @@ class TestGetCompany(APITestMixin):
                 'registered_address_postcode': None,
                 'registered_address_country': {
                     'id': str(ch_company.registered_address_country.id),
-                    'disabled_on': None,
                     'name': ch_company.registered_address_country.name,
                 },
                 'sic_code_1': '',
@@ -1312,7 +1311,32 @@ class TestCHCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert response_data['company_number'] == ch_company.company_number
+        assert response_data == {
+            'id': ch_company.id,
+            'business_type': {
+                'id': str(ch_company.business_type.id),
+                'name': ch_company.business_type.name,
+            },
+            'company_number': ch_company.company_number,
+            'company_category': ch_company.company_category,
+            'company_status': ch_company.company_status,
+            'incorporation_date': format_date_or_datetime(ch_company.incorporation_date),
+            'name': ch_company.name,
+            'registered_address_1': ch_company.registered_address_1,
+            'registered_address_2': ch_company.registered_address_2,
+            'registered_address_town': ch_company.registered_address_town,
+            'registered_address_county': ch_company.registered_address_county,
+            'registered_address_postcode': ch_company.registered_address_postcode,
+            'registered_address_country': {
+                'id': str(ch_company.registered_address_country.id),
+                'name': ch_company.registered_address_country.name,
+            },
+            'sic_code_1': ch_company.sic_code_1,
+            'sic_code_2': ch_company.sic_code_2,
+            'sic_code_3': ch_company.sic_code_3,
+            'sic_code_4': ch_company.sic_code_4,
+            'uri': ch_company.uri,
+        }
 
     def test_get_ch_company_alphanumeric(self):
         """Test retrieving a single CH company where the company number contains letters."""
