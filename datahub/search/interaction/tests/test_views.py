@@ -1,5 +1,6 @@
 from collections import Counter
 from datetime import datetime
+from uuid import UUID
 
 import factory
 import pytest
@@ -11,10 +12,14 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
-from datahub.core.test_utils import APITestMixin, create_test_user
+from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_queryset
 from datahub.interaction.constants import CommunicationChannel
 from datahub.interaction.models import Interaction
-from datahub.interaction.test.factories import CompanyInteractionFactory, ServiceDeliveryFactory
+from datahub.interaction.test.factories import (
+    CompanyInteractionFactory, InvestmentProjectInteractionFactory, ServiceDeliveryFactory,
+)
+from datahub.investment.test.factories import ActiveInvestmentProjectFactory
+from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
 
 pytestmark = pytest.mark.django_db
@@ -204,6 +209,13 @@ class TestViews(APITestMixin):
                 'id': str(interaction.company.pk),
                 'name': interaction.company.name,
             },
+            'company_sector': {
+                'id': str(interaction.company.sector.pk),
+                'name': interaction.company.sector.name,
+                'ancestors': [{
+                    'id': str(ancestor.pk),
+                } for ancestor in interaction.company.sector.get_ancestors()],
+            },
             'contact': {
                 'id': str(interaction.contact.pk),
                 'first_name': interaction.contact.first_name,
@@ -233,6 +245,7 @@ class TestViews(APITestMixin):
                 'name': interaction.communication_channel.name,
             },
             'investment_project': None,
+            'investment_project_sector': None,
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
@@ -570,3 +583,105 @@ class TestViews(APITestMixin):
         response_data = response.json()
         names = {result['subject'] for result in response_data['results']}
         assert names == results
+
+    @pytest.mark.parametrize(
+        'sector_level',
+        (0, 1, 2),
+    )
+    def test_sector_descends_filter_for_company_interaction(
+            self,
+            hierarchical_sectors,
+            setup_es,
+            sector_level,
+    ):
+        """Test the sector_descends filter with company interactions."""
+        num_sectors = len(hierarchical_sectors)
+        sectors_ids = [sector.pk for sector in hierarchical_sectors]
+
+        companies = CompanyFactory.create_batch(
+            num_sectors,
+            sector_id=factory.Iterator(sectors_ids)
+        )
+        company_interactions = CompanyInteractionFactory.create_batch(
+            3,
+            company=factory.Iterator(companies)
+        )
+
+        other_companies = CompanyFactory.create_batch(
+            3,
+            sector=factory.LazyFunction(lambda: random_obj_for_queryset(
+                Sector.objects.exclude(pk__in=sectors_ids)
+            ))
+        )
+        CompanyInteractionFactory.create_batch(
+            3,
+            company=factory.Iterator(other_companies)
+        )
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:interaction')
+        body = {
+            'sector_descends': hierarchical_sectors[sector_level].pk
+        }
+        response = self.api_client.post(url, body)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['count'] == num_sectors - sector_level
+
+        actual_ids = {UUID(interaction['id']) for interaction in response_data['results']}
+        expected_ids = {interaction.pk for interaction in company_interactions[sector_level:]}
+        assert actual_ids == expected_ids
+
+    @pytest.mark.parametrize(
+        'sector_level',
+        (0, 1, 2),
+    )
+    def test_sector_descends_filter_for_investment_project_interaction(
+            self,
+            hierarchical_sectors,
+            setup_es,
+            sector_level,
+    ):
+        """Test the sector_descends filter with investment project interactions."""
+        num_sectors = len(hierarchical_sectors)
+        sectors_ids = [sector.pk for sector in hierarchical_sectors]
+
+        projects = ActiveInvestmentProjectFactory.create_batch(
+            num_sectors,
+            sector_id=factory.Iterator(sectors_ids)
+        )
+        investment_project_interactions = InvestmentProjectInteractionFactory.create_batch(
+            3,
+            investment_project=factory.Iterator(projects)
+        )
+
+        other_projects = ActiveInvestmentProjectFactory.create_batch(
+            3,
+            sector=factory.LazyFunction(lambda: random_obj_for_queryset(
+                Sector.objects.exclude(pk__in=sectors_ids)
+            ))
+        )
+        InvestmentProjectInteractionFactory.create_batch(
+            3,
+            investment_project=factory.Iterator(other_projects)
+        )
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:interaction')
+        body = {
+            'sector_descends': hierarchical_sectors[sector_level].pk
+        }
+        response = self.api_client.post(url, body)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['count'] == num_sectors - sector_level
+
+        actual_ids = {UUID(interaction['id']) for interaction in response_data['results']}
+        expected_ids = {
+            interaction.pk for interaction in investment_project_interactions[sector_level:]
+        }
+        assert actual_ids == expected_ids

@@ -25,6 +25,7 @@ class SearchInteractionSerializer(SearchSerializer):
     communication_channel = SingleOrListField(child=StringUUIDField(), required=False)
     investment_project = SingleOrListField(child=StringUUIDField(), required=False)
     service = SingleOrListField(child=StringUUIDField(), required=False)
+    sector_descends = SingleOrListField(child=StringUUIDField(), required=False)
 
     DEFAULT_ORDERING = 'date:desc'
 
