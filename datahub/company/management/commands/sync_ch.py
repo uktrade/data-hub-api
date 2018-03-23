@@ -16,48 +16,10 @@ from django.db import connection, reset_queries, transaction
 from lxml import etree
 from raven.contrib.django.raven_compat.models import client
 
+from datahub.company.ch_constants import COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING
 from datahub.core.utils import slice_iterable_into_chunks, stream_to_file_pointer
 
 logger = getLogger(__name__)
-
-# Mapping used by is_relevant_company_type() to determine which companies should be loaded
-COMPANY_CATEGORY_RELEVANCY_MAPPING = {
-    # Address not available/main registration not with Companies House
-    'charitable incorporated organisation': False,
-    'community interest company': True,
-    'european public limited-liability company (se)': True,
-    # Address not available/main registration with FCA
-    'industrial and provident society': False,
-    # Address not available/main registration with FCA
-    'investment company with variable capital': False,
-    # Address not available/main registration with FCA
-    'investment company with variable capital (securities)': False,
-    # Address not available/main registration with FCA
-    'investment company with variable capital(umbrella)': False,
-    'limited liability partnership': True,
-    'limited partnership': True,
-    'old public company': True,
-    # Foreign and other irrelevant companies
-    'other company type': False,
-    "pri/lbg/nsc (private, limited by guarantee, no share capital, use of 'limited' exemption)":
-        True,
-    'pri/ltd by guar/nsc (private, limited by guarantee, no share capital)': True,
-    'priv ltd sect. 30 (private limited company, section 30 of the companies act)': True,
-    'private limited company': True,
-    'private unlimited': True,
-    'private unlimited company': True,
-    # Address not available/main registration with FCA
-    'protected cell company': False,
-    'public limited company': True,
-    # Address not available/main registration with FCA
-    'registered society': False,
-    # Address not available
-    'royal charter company': False,
-    # Address not available/main registration not with Companies House
-    'scottish charitable incorporated organisation': False,
-    # Scottish qualifying partnership, generally have a foreign address
-    'scottish partnership': False,
-}
 
 
 UPSERT_SQL_STATEMENT = """
@@ -146,14 +108,14 @@ def is_relevant_company_type(row):
     the type of company, but this is not used here. RegAddress.Country and CountryOfOrigin are
     not entirely reliable for detecting foreign companies.)
     """
-    is_relevant = COMPANY_CATEGORY_RELEVANCY_MAPPING.get(row['company_category'].lower())
-    if is_relevant is None:
+    lower_company_category = row['company_category'].lower()
+    if lower_company_category not in COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING:
         message = (f'Unknown Companies House company category {row["company_category"]} '
-                   f'encountered. Update the company category relevancy mapping to indicate if '
-                   f'it should be loaded.')
+                   f'encountered. Update the company category to business type mapping to '
+                   f'indicate if it should be loaded.')
         logger.warning(message)
         client.captureMessage(message)
-    return is_relevant
+    return bool(COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING.get(lower_company_category))
 
 
 def get_ch_latest_dump_file_list(url, selector='.omega a'):

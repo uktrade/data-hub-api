@@ -6,10 +6,12 @@ from django.db import models
 from django.utils.functional import cached_property
 from mptt.fields import TreeForeignKey
 
+from datahub.company.ch_constants import COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING
 from datahub.core import constants, reversion
 from datahub.core.models import ArchivableModel, BaseConstantModel, BaseModel
 from datahub.core.utils import StrEnum
 from datahub.metadata import models as metadata_models
+from datahub.metadata.models import BusinessType
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -200,6 +202,16 @@ class CompaniesHouseCompany(CompanyAbstract):
     def __str__(self):
         """Admin displayed human readable name."""
         return self.name
+
+    @cached_property
+    def business_type(self):
+        """The business type associated with the company category provided by Companies House."""
+        business_type = COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING.get(
+            self.company_category.lower()
+        )
+        if business_type:
+            return BusinessType.objects.get(pk=business_type.value.id)
+        return None
 
     class Meta:
         verbose_name_plural = 'Companies House companies'
