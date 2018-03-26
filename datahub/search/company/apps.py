@@ -8,7 +8,7 @@ class CompanySearchApp(SearchApp):
     """SearchApp for company."""
 
     name = 'company'
-    ESModel = Company
+    es_model = Company
     view = SearchCompanyAPIView
     export_view = SearchCompanyExportAPIView
     permission_required = ('company.read_company',)

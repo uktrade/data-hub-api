@@ -25,7 +25,7 @@ class SearchApp:
     """Used to configure ES search modules to be used within Data Hub."""
 
     name = None
-    ESModel = None
+    es_model = None
     view = None
     export_view = None
     queryset = None
@@ -46,7 +46,7 @@ class SearchApp:
         Makes sure mappings exist in Elasticsearch.
         This call is idempotent.
         """
-        self.ESModel.init(index=settings.ES_INDEX)
+        self.es_model.init(index=settings.ES_INDEX)
 
     def connect_signals(self):
         """
@@ -68,7 +68,7 @@ class SearchApp:
         """Returns dataset that will be synchronised with Elasticsearch."""
         queryset = self.get_queryset()
 
-        return DataSet(queryset, self.ESModel)
+        return DataSet(queryset, self.es_model)
 
     def get_permission_filters(self, request):
         """
