@@ -7,7 +7,7 @@ from datahub.omis.order.models import (
     OrderSubscriber as DBOrderSubscriber
 )
 from .models import Order as ESOrder
-from ..signals import sync_es
+from ..signals import SignalReceiver, sync_es
 
 
 def order_sync_es(sender, instance, **kwargs):
@@ -22,58 +22,10 @@ def related_order_sync_es(sender, instance, **kwargs):
     order_sync_es(sender, instance.order, **kwargs)
 
 
-def connect_signals():
-    """Connect signals for ES sync."""
-    post_save.connect(
-        order_sync_es,
-        sender=DBOrder,
-        dispatch_uid='order_sync_es'
-    )
-
-    post_save.connect(
-        related_order_sync_es,
-        sender=DBOrderSubscriber,
-        dispatch_uid='subscriber_added_order_sync_es'
-    )
-    post_delete.connect(
-        related_order_sync_es,
-        sender=DBOrderSubscriber,
-        dispatch_uid='subscriber_deleted_order_sync_es'
-    )
-
-    post_save.connect(
-        related_order_sync_es,
-        sender=DBOrderAssignee,
-        dispatch_uid='assignee_added_order_sync_es'
-    )
-    post_delete.connect(
-        related_order_sync_es,
-        sender=DBOrderAssignee,
-        dispatch_uid='assignee_deleted_order_sync_es'
-    )
-
-
-def disconnect_signals():
-    """Disconnect signals from ES sync."""
-    post_save.disconnect(
-        sender=DBOrder,
-        dispatch_uid='order_sync_es'
-    )
-
-    post_save.disconnect(
-        sender=DBOrderSubscriber,
-        dispatch_uid='subscriber_added_order_sync_es'
-    )
-    post_delete.disconnect(
-        sender=DBOrderSubscriber,
-        dispatch_uid='subscriber_deleted_order_sync_es'
-    )
-
-    post_save.disconnect(
-        sender=DBOrderAssignee,
-        dispatch_uid='assignee_added_order_sync_es'
-    )
-    post_delete.disconnect(
-        sender=DBOrderAssignee,
-        dispatch_uid='assignee_deleted_order_sync_es'
-    )
+receivers = (
+    SignalReceiver(post_save, DBOrder, order_sync_es),
+    SignalReceiver(post_save, DBOrderSubscriber, related_order_sync_es),
+    SignalReceiver(post_delete, DBOrderSubscriber, related_order_sync_es),
+    SignalReceiver(post_save, DBOrderAssignee, related_order_sync_es),
+    SignalReceiver(post_delete, DBOrderAssignee, related_order_sync_es),
+)
