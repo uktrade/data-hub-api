@@ -1,0 +1,153 @@
+- model: interaction.policyarea
+  pk: 01861666-4150-4aaf-b659-31f84e459612
+  fields: {disabled_on: null, name: Local Growth, order: 3200.0}
+- model: interaction.policyarea
+  pk: 0da4abf1-6344-48bc-85cf-1834b5fb26e1
+  fields: {disabled_on: null, name: Imports, order: 2700.0}
+- model: interaction.policyarea
+  pk: 121b75fa-02a1-481e-8bb6-968d81f104b9
+  fields: {disabled_on: null, name: Northern Powerhouse, order: 3900.0}
+- model: interaction.policyarea
+  pk: 1428a832-b726-4008-a1d3-f48ea2a7b580
+  fields: {disabled_on: null, name: European Lobbying Feedback, order: 2100.0}
+- model: interaction.policyarea
+  pk: 1f1c9c0e-f93c-46b1-94f8-28dc48bd6d61
+  fields: {disabled_on: null, name: Gender Pay, order: 2400.0}
+- model: interaction.policyarea
+  pk: 2242e7bd-e54e-4195-a639-3a9e52992c2f
+  fields: {disabled_on: null, name: Company Law and Company Reporting, order: 800.0}
+- model: interaction.policyarea
+  pk: 273bc920-9961-459a-9eb0-b9686d37421d
+  fields: {disabled_on: null, name: Industrial Strategy, order: 2900.0}
+- model: interaction.policyarea
+  pk: 276b98bc-d12e-42e2-b506-27c3f36083a4
+  fields: {disabled_on: null, name: Returnships, order: 4300.0}
+- model: interaction.policyarea
+  pk: 2ca6322b-27e4-4ed9-95d4-342989d98022
+  fields: {disabled_on: null, name: Movement of Services, order: 3600.0}
+- model: interaction.policyarea
+  pk: 3f995c74-f601-4281-9ee4-4b3a73a33dfe
+  fields: {disabled_on: null, name: Education and Skills (including students), order: 1600.0}
+- model: interaction.policyarea
+  pk: 42e8b64d-304e-4de3-9928-b3d278db5a68
+  fields: {disabled_on: null, name: Announcement Feedback, order: 400.0}
+- model: interaction.policyarea
+  pk: 46468f7a-575d-4e95-8350-0879cab5993a
+  fields: {disabled_on: null, name: Regional Devolution, order: 4100.0}
+- model: interaction.policyarea
+  pk: 4b9142df-0520-46bd-9da9-94147cdbae13
+  fields: {disabled_on: null, name: Access to Finance, order: 100.0}
+- model: interaction.policyarea
+  pk: 4e6d6400-61f1-4c9e-ab97-4215e4d7fd49
+  fields: {disabled_on: null, name: Devolved Administration - Scotland, order: 1400.0}
+- model: interaction.policyarea
+  pk: 4fb8c6c6-d3aa-4b36-a954-7578e0337f4d
+  fields: {disabled_on: null, name: Government Communications, order: 2500.0}
+- model: interaction.policyarea
+  pk: 53ca7c82-5851-4bed-908e-92016f77c5b9
+  fields: {disabled_on: null, name: Business Regulation, order: 700.0}
+- model: interaction.policyarea
+  pk: 583c0bb6-d3c5-4e4b-8f25-e861c1e8d9c9
+  fields: {disabled_on: null, name: State Aid, order: 4600.0}
+- model: interaction.policyarea
+  pk: 5bb2abdd-b56f-4d64-8f11-f31c217932fb
+  fields: {disabled_on: null, name: National Security, order: 3700.0}
+- model: interaction.policyarea
+  pk: 6596d1bd-7e23-4f4c-9821-e19cc72aa44d
+  fields: {disabled_on: null, name: Other, order: 4000.0}
+- model: interaction.policyarea
+  pk: 67649465-c70a-443b-af49-00560d8ab6b5
+  fields: {disabled_on: null, name: Employment Law and Labour Market Policy, order: 1700.0}
+- model: interaction.policyarea
+  pk: 6c0b0d7f-1007-437d-bc0b-6f7b8c148bc5
+  fields: {disabled_on: null, name: Energy Market Regulation, order: 1900.0}
+- model: interaction.policyarea
+  pk: 6e414839-8427-402b-a904-2fb95b37f005
+  fields: {disabled_on: null, name: Exporting and Export Support, order: 2200.0}
+- model: interaction.policyarea
+  pk: 6f5db2e8-a128-4d66-ae0a-5e314758933b
+  fields: {disabled_on: null, name: Tariffs and Trade Policy, order: 4800.0}
+- model: interaction.policyarea
+  pk: 6fa2ec0e-073b-4b0d-8e74-3eb9aef34dca
+  fields: {disabled_on: null, name: 'Energy (exploration, production, distribution
+      and use)', order: 1800.0}
+- model: interaction.policyarea
+  pk: 708a84d8-d25f-4b1e-ab56-15105f7537b6
+  fields: {disabled_on: null, name: Inclusive Economy, order: 2800.0}
+- model: interaction.policyarea
+  pk: 75834c92-573f-4cae-b670-3f61dd2448d3
+  fields: {disabled_on: null, name: Transportation (Freight and People), order: 5000.0}
+- model: interaction.policyarea
+  pk: 77e60c71-944b-48e9-b998-c4a21d0f0045
+  fields: {disabled_on: null, name: Law and Justice, order: 3000.0}
+- model: interaction.policyarea
+  pk: 7a1d48ed-84a6-4d17-b065-df6cfb81eb4e
+  fields: {disabled_on: null, name: Health and Social Care (NHS), order: 2600.0}
+- model: interaction.policyarea
+  pk: 7a8ce103-a08f-4068-a236-749f1f0d9e7c
+  fields: {disabled_on: null, name: New Investment/Jobs, order: 3800.0}
+- model: interaction.policyarea
+  pk: 7d5aecf6-d747-4cdc-b06a-5c51c8a0b21c
+  fields: {disabled_on: null, name: Competition Law and Policy, order: 900.0}
+- model: interaction.policyarea
+  pk: 7e22430d-1a6e-42ca-8f4e-60238dc26129
+  fields: {disabled_on: null, name: Devolved Administration - Northern Ireland, order: 1300.0}
+- model: interaction.policyarea
+  pk: 808e2fbb-dd23-4d87-82a3-6eacbf95cfeb
+  fields: {disabled_on: null, name: Facility Locations (Legal HQ/Factory/etc), order: 2300.0}
+- model: interaction.policyarea
+  pk: 8b31e513-c5c8-4c93-a494-9273381b6d14
+  fields: {disabled_on: null, name: Supply Chains and Raw Materials, order: 4700.0}
+- model: interaction.policyarea
+  pk: 8feee1c8-97d5-4169-acb4-e10d2926c856
+  fields: {disabled_on: null, name: Standards, order: 4500.0}
+- model: interaction.policyarea
+  pk: 96b0e3b3-686e-4e5f-bfa5-061b3df6223d
+  fields: {disabled_on: null, name: Market Access, order: 3400.0}
+- model: interaction.policyarea
+  pk: 9a9ae32a-0a12-4e0f-82f9-17050dd95449
+  fields: {disabled_on: null, name: Environmental Law and Policy, order: 2000.0}
+- model: interaction.policyarea
+  pk: 9c5c4f45-09de-4383-83b5-7190c3f58b7b
+  fields: {disabled_on: null, name: 'Science, R&D and Innovation', order: 4400.0}
+- model: interaction.policyarea
+  pk: 9feefd50-7f4c-4b73-a33e-779121d40419
+  fields: {disabled_on: null, name: Access to Public Funding (inc. EU funding), order: 200.0}
+- model: interaction.policyarea
+  pk: a5441150-ce05-4bd9-a49d-5ce6504f9625
+  fields: {disabled_on: null, name: Devolved Administration - Wales, order: 1500.0}
+- model: interaction.policyarea
+  pk: a87aa322-0153-4b1e-a2fd-23a03060204e
+  fields: {disabled_on: null, name: 'Borders, Migration, Immigration and Foreign Travel',
+    order: 600.0}
+- model: interaction.policyarea
+  pk: a89151e6-2bf9-43ec-8ac3-c5cbc3e3554f
+  fields: {disabled_on: null, name: Movement of Goods, order: 3500.0}
+- model: interaction.policyarea
+  pk: c5916321-1c8e-452a-bd5d-05569afd7a5f
+  fields: {disabled_on: null, name: Data Policy, order: 1200.0}
+- model: interaction.policyarea
+  pk: d1614021-6728-4194-84b7-15186295bf45
+  fields: {disabled_on: null, name: Customs Union, order: 1100.0}
+- model: interaction.policyarea
+  pk: d4e57549-1eae-43f0-b7cb-04fc57b9a276
+  fields: {disabled_on: null, name: 'Consumer Rights, Trading Standards, Product Regulation',
+    order: 1000.0}
+- model: interaction.policyarea
+  pk: d54d96c4-20f8-4acd-9d70-fb27f3596d54
+  fields: {disabled_on: null, name: Local Government, order: 3100.0}
+- model: interaction.policyarea
+  pk: d6ef8497-a12c-41a8-a6fe-3652028e7fad
+  fields: {disabled_on: null, name: 'Art, Culture, Sport and Leisure', order: 500.0}
+- model: interaction.policyarea
+  pk: e23a60ba-aaa5-42da-866a-7f1a563dbc3e
+  fields: {disabled_on: null, name: Loss of Investment/Jobs, order: 3300.0}
+- model: interaction.policyarea
+  pk: e28d0a0a-287c-40f4-a7d6-fd03c70ec641
+  fields: {disabled_on: null, name: Agriculture (Regulation/Support), order: 300.0}
+- model: interaction.policyarea
+  pk: ef9ec638-eddf-4936-b039-77a37e45cfb5
+  fields: {disabled_on: null, name: Tax and Revenue, order: 4900.0}
+- model: interaction.policyarea
+  pk: fb4b00c8-93fb-46f5-bd3d-bf1bd7466a86
+  fields: {disabled_on: null, name: Repeal Bill, order: 4200.0}

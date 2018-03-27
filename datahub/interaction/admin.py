@@ -2,7 +2,7 @@ from django.contrib import admin
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import custom_add_permission, custom_change_permission, DisabledOnFilter
-from datahub.interaction.models import InteractionPermission
+from datahub.interaction.models import InteractionPermission, PolicyArea, PolicyIssueType
 from .models import CommunicationChannel, Interaction
 
 
@@ -15,6 +15,17 @@ class MetadataAdmin(admin.ModelAdmin):
     readonly_fields = ('id',)
     search_fields = ('name', 'pk')
     list_filter = (DisabledOnFilter,)
+
+
+@admin.register(
+    PolicyArea,
+    PolicyIssueType
+)
+class OrderedMetadataAdmin(MetadataAdmin):
+    """Ordered Metadata model admin."""
+
+    fields = ('id', 'name', 'disabled_on', 'order')
+    list_display = ('name', 'disabled_on', 'order')
 
 
 @admin.register(Interaction)
