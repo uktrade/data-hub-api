@@ -4,10 +4,8 @@ from rest_framework.views import APIView
 
 from datahub.oauth.scopes import Scope
 from datahub.search.contact.apps import ContactSearchApp
-from datahub.search.contact.models import Contact
 from datahub.search.elasticsearch import get_search_by_entity_query, limit_search_query
 from datahub.search.interaction.apps import InteractionSearchApp
-from datahub.search.interaction.models import Interaction
 from datahub.search.permissions import has_permissions_for_app
 from .serializers import HomepageSerializer
 
@@ -26,8 +24,8 @@ class IntelligentHomepageView(APIView):
         serializer.is_valid(raise_exception=True)
         limit = serializer.validated_data['limit']
 
-        interactions = self._get_interactions(request, limit)
-        contacts = self._get_contacts(request, limit)
+        interactions = _get_objects(request, limit, InteractionSearchApp, 'dit_adviser.id')
+        contacts = _get_objects(request, limit, ContactSearchApp, 'created_by.id')
 
         response = {
             'interactions': interactions,
@@ -36,44 +34,24 @@ class IntelligentHomepageView(APIView):
 
         return Response(data=response)
 
-    def _get_interactions(self, request, limit):
-        if not has_permissions_for_app(request, InteractionSearchApp):
-            return []
 
-        interactions_query = get_search_by_entity_query(
-            term='',
-            entity=Interaction,
-            filter_data={
-                'dit_adviser.id': request.user.id,
-                'created_on_exists': True,
-            },
-            field_order='created_on:desc',
-        )
-        interactions = limit_search_query(
-            interactions_query,
-            offset=0,
-            limit=limit,
-        ).execute()
+def _get_objects(request, limit, search_app, adviser_field):
+    if not has_permissions_for_app(request, search_app):
+        return []
 
-        return [interaction.to_dict() for interaction in interactions.hits]
+    query = get_search_by_entity_query(
+        term='',
+        entity=search_app.es_model,
+        filter_data={
+            adviser_field: request.user.id,
+            'created_on_exists': True,
+        },
+        field_order='created_on:desc',
+    )
+    results = limit_search_query(
+        query,
+        offset=0,
+        limit=limit,
+    ).execute()
 
-    def _get_contacts(self, request, limit):
-        if not has_permissions_for_app(request, ContactSearchApp):
-            return []
-
-        contacts_query = get_search_by_entity_query(
-            term='',
-            entity=Contact,
-            filter_data={
-                'created_by.id': request.user.id,
-                'created_on_exists': True,
-            },
-            field_order='created_on:desc',
-        )
-        contacts = limit_search_query(
-            contacts_query,
-            offset=0,
-            limit=limit,
-        ).execute()
-
-        return [contact.to_dict() for contact in contacts.hits]
+    return [result.to_dict() for result in results.hits]

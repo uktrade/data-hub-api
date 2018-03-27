@@ -17,7 +17,7 @@ class InvestmentSearchApp(SearchApp):
     """SearchApp for investment"""
 
     name = 'investment_project'
-    ESModel = InvestmentProject
+    es_model = InvestmentProject
     view = SearchInvestmentProjectAPIView
     export_view = SearchInvestmentProjectExportAPIView
     permission_required = (

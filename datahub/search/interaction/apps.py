@@ -9,7 +9,7 @@ class InteractionSearchApp(SearchApp):
     """SearchApp for interactions."""
 
     name = 'interaction'
-    ESModel = Interaction
+    es_model = Interaction
     view = SearchInteractionAPIView
     export_view = SearchInteractionExportAPIView
     permission_required = (f'interaction.{InteractionPermission.read_all}',)

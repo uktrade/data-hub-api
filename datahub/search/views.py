@@ -46,7 +46,7 @@ class SearchBasicAPIView(APIView):
 
         self.entity_by_name = {
             search_app.name: EntitySearch(
-                search_app.ESModel,
+                search_app.es_model,
                 search_app.name,
             )
             for search_app in get_search_apps()
@@ -105,7 +105,7 @@ def _get_permission_filters(request):
             continue
 
         filter_args = app.get_permission_filters(request)
-        yield (app.ESModel._doc_type.name, filter_args)
+        yield (app.es_model._doc_type.name, filter_args)
 
 
 class SearchAPIView(APIView):
