@@ -20,3 +20,13 @@ registry.register(
     metadata_id='service-delivery-status',
     model=models.ServiceDeliveryStatus,
 )
+
+registry.register(
+    metadata_id='policy-area',
+    model=models.PolicyArea,
+)
+
+registry.register(
+    metadata_id='policy-issue-type',
+    model=models.PolicyIssueType,
+)

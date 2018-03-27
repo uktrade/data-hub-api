@@ -1,18 +1,20 @@
 import pytest
 
-from datahub.interaction.test.factories import CompanyInteractionFactory, ServiceDeliveryFactory
-from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.interaction.test.factories import (
+    CompanyInteractionFactory, InvestmentProjectInteractionFactory, ServiceDeliveryFactory,
+)
 from datahub.search.interaction.models import Interaction
 
 pytestmark = pytest.mark.django_db
 
 
-def test_interaction_to_dict(setup_es):
+@pytest.mark.parametrize(
+    'factory_cls',
+    (CompanyInteractionFactory, InvestmentProjectInteractionFactory),
+)
+def test_interaction_to_dict(setup_es, factory_cls):
     """Test converting an interaction to a dict."""
-    interaction = CompanyInteractionFactory(
-        investment_project=InvestmentProjectFactory()
-    )
-
+    interaction = factory_cls()
     result = Interaction.dbmodel_to_dict(interaction)
 
     assert result == {
@@ -22,7 +24,14 @@ def test_interaction_to_dict(setup_es):
         'company': {
             'id': str(interaction.company.pk),
             'name': interaction.company.name,
-        },
+        } if interaction.company else None,
+        'company_sector': {
+            'id': str(interaction.company.sector.pk),
+            'name': interaction.company.sector.name,
+            'ancestors': [{
+                'id': str(ancestor.pk),
+            } for ancestor in interaction.company.sector.get_ancestors()],
+        } if interaction.company else None,
         'contact': {
             'id': str(interaction.contact.pk),
             'first_name': interaction.contact.first_name,
@@ -54,7 +63,14 @@ def test_interaction_to_dict(setup_es):
         'investment_project': {
             'id': str(interaction.investment_project.pk),
             'name': interaction.investment_project.name,
-        },
+        } if interaction.investment_project else None,
+        'investment_project_sector': {
+            'id': str(interaction.investment_project.sector.pk),
+            'name': interaction.investment_project.sector.name,
+            'ancestors': [{
+                'id': str(ancestor.pk),
+            } for ancestor in interaction.investment_project.sector.get_ancestors()],
+        } if interaction.investment_project else None,
         'service_delivery_status': None,
         'grant_amount_offered': None,
         'net_company_receipt': None,
@@ -76,6 +92,13 @@ def test_service_delivery_to_dict(setup_es):
         'company': {
             'id': str(interaction.company.pk),
             'name': interaction.company.name,
+        },
+        'company_sector': {
+            'id': str(interaction.company.sector.pk),
+            'name': interaction.company.sector.name,
+            'ancestors': [{
+                'id': str(ancestor.pk),
+            } for ancestor in interaction.company.sector.get_ancestors()],
         },
         'contact': {
             'id': str(interaction.contact.pk),
@@ -103,6 +126,7 @@ def test_service_delivery_to_dict(setup_es):
         },
         'communication_channel': None,
         'investment_project': None,
+        'investment_project_sector': None,
         'service_delivery_status': {
             'id': str(interaction.service_delivery_status.pk),
             'name': interaction.service_delivery_status.name,

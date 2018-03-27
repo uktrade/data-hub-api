@@ -1,4 +1,7 @@
-from rest_framework.fields import BooleanField, DateField, DecimalField, EmailField, UUIDField
+from django.conf import settings
+from rest_framework.fields import (
+    BooleanField, CharField, DateField, DecimalField, EmailField, UUIDField,
+)
 
 
 def parse_bool(value):
@@ -34,6 +37,11 @@ def parse_uuid_list(value):
     field = UUIDField()
 
     return [field.to_internal_value(item) for item in value.split(',')]
+
+
+def parse_limited_string(value, max_length=settings.CHAR_FIELD_MAX_LENGTH):
+    """Parses/validates a string."""
+    return _parse_value(value, CharField(max_length=max_length), blank_value='')
 
 
 def _parse_value(value, field, blank_value=None):

@@ -15,11 +15,17 @@ class InteractionSearchApp(SearchApp):
     permission_required = (f'interaction.{InteractionPermission.read_all}',)
     queryset = DBInteraction.objects.prefetch_related(
         'company',
+        'company__sector',
+        'company__sector__parent',
+        'company__sector__parent__parent',
         'contact',
         'dit_adviser',
         'dit_team',
         'communication_channel',
         'investment_project',
+        'investment_project__sector',
+        'investment_project__sector__parent',
+        'investment_project__sector__parent__parent',
         'service',
         'service_delivery_status',
         'event',

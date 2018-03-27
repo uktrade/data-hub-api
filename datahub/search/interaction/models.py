@@ -13,6 +13,7 @@ class Interaction(DocType, MapDBModelToDict):
     kind = Keyword()
     date = Date()
     company = dsl_utils.id_name_partial_mapping('company')
+    company_sector = dsl_utils.sector_mapping()
     contact = dsl_utils.contact_or_adviser_partial_mapping('contact')
     is_event = Boolean()
     event = dsl_utils.id_name_partial_mapping('event')
@@ -26,6 +27,7 @@ class Interaction(DocType, MapDBModelToDict):
     dit_team = dsl_utils.id_name_partial_mapping('dit_team')
     communication_channel = dsl_utils.id_name_mapping()
     investment_project = dsl_utils.id_name_mapping()
+    investment_project_sector = dsl_utils.sector_mapping()
     service_delivery_status = dsl_utils.id_name_mapping()
     grant_amount_offered = Double()
     net_company_receipt = Double()
@@ -46,13 +48,19 @@ class Interaction(DocType, MapDBModelToDict):
     }
 
     COMPUTED_MAPPINGS = {
-        'is_event': attrgetter('is_event')
+        'is_event': attrgetter('is_event'),
+        'company_sector': dict_utils.computed_nested_sector_dict('company.sector'),
+        'investment_project_sector': dict_utils.computed_nested_sector_dict(
+            'investment_project.sector'
+        ),
     }
 
     IGNORED_FIELDS = (
         'created_by',
         'modified_by',
         'archived_documents_url_path',
+        'policy_area',
+        'policy_issue_type',
     )
 
     SEARCH_FIELDS = (

@@ -67,6 +67,18 @@ class ServiceDeliveryStatus(BaseOrderedConstantModel):
     """
 
 
+class PolicyArea(BaseOrderedConstantModel):
+    """
+    Policy area for a policy feedback interaction.
+    """
+
+
+class PolicyIssueType(BaseOrderedConstantModel):
+    """
+    Policy issue type for a policy feedback interaction.
+    """
+
+
 @reversion.register_base_model()
 class Interaction(BaseModel):
     """Interaction."""
@@ -146,6 +158,14 @@ class Interaction(BaseModel):
     net_company_receipt = models.DecimalField(
         null=True, blank=True, max_digits=19, decimal_places=2,
         help_text='For service deliveries only.',
+    )
+    policy_area = models.ForeignKey(
+        'PolicyArea', blank=True, null=True, on_delete=models.PROTECT,
+        help_text='For policy feedback only.'
+    )
+    policy_issue_type = models.ForeignKey(
+        'PolicyIssueType', blank=True, null=True, on_delete=models.PROTECT,
+        help_text='For policy feedback only.'
     )
 
     @property
