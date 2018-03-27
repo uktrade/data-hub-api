@@ -13,14 +13,14 @@ from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.constants import CommunicationChannel
-from datahub.interaction.models import Interaction, InteractionPermission, ServiceDeliveryStatus
-from datahub.interaction.test.factories import (
-    CompanyInteractionFactory, EventServiceDeliveryFactory, InvestmentProjectInteractionFactory,
-    ServiceDeliveryFactory,
-)
+from datahub.interaction.models import (Interaction, InteractionPermission, PolicyArea,
+                                        PolicyIssueType, ServiceDeliveryStatus)
+from datahub.interaction.test.factories import (CompanyInteractionFactory,
+                                                EventServiceDeliveryFactory,
+                                                InvestmentProjectInteractionFactory,
+                                                ServiceDeliveryFactory)
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
-
 
 NON_RESTRICTED_READ_PERMISSIONS = (
     (
@@ -75,6 +75,8 @@ class TestGetInteractionView(APITestMixin):
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
+            'policy_area': None,
+            'policy_issue_type': None,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
                 'name': interaction.communication_channel.name
@@ -142,6 +144,8 @@ class TestGetInteractionView(APITestMixin):
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
+            'policy_area': None,
+            'policy_issue_type': None,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
                 'name': interaction.communication_channel.name
@@ -214,6 +218,8 @@ class TestGetInteractionView(APITestMixin):
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
+            'policy_area': None,
+            'policy_issue_type': None,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
                 'name': interaction.communication_channel.name
@@ -296,18 +302,15 @@ class TestGetInteractionView(APITestMixin):
 class TestAddInteractionView(APITestMixin):
     """Tests for the add interaction view."""
 
-    @pytest.mark.parametrize(
-        'kind', (Interaction.KINDS.interaction, Interaction.KINDS.policy_feedback,)
-    )
     @freeze_time('2017-04-18 13:25:30.986208')
-    def test_add_interaction(self, kind):
+    def test_add_interaction(self):
         """Test add new interaction."""
         adviser = AdviserFactory()
         company = CompanyFactory()
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         request_data = {
-            'kind': kind,
+            'kind': Interaction.KINDS.interaction,
             'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -316,7 +319,7 @@ class TestAddInteractionView(APITestMixin):
             'company': company.pk,
             'contact': contact.pk,
             'service': Service.trade_enquiry.value.id,
-            'dit_team': Team.healthcare_uk.value.id
+            'dit_team': Team.healthcare_uk.value.id,
         }
         response = self.api_client.post(url, request_data, format='json')
 
@@ -324,11 +327,13 @@ class TestAddInteractionView(APITestMixin):
         response_data = response.json()
         assert response_data == {
             'id': response_data['id'],
-            'kind': kind,
+            'kind': Interaction.KINDS.interaction,
             'is_event': None,
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
+            'policy_area': None,
+            'policy_issue_type': None,
             'communication_channel': {
                 'id': CommunicationChannel.face_to_face.value.id,
                 'name': CommunicationChannel.face_to_face.value.name
@@ -374,7 +379,95 @@ class TestAddInteractionView(APITestMixin):
                 'name': self.user.name
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
-            'modified_on': '2017-04-18T13:25:30.986208Z'
+            'modified_on': '2017-04-18T13:25:30.986208Z',
+        }
+
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_add_policy_feedback(self):
+        """Test add new policy feedback interaction."""
+        adviser = AdviserFactory()
+        company = CompanyFactory()
+        contact = ContactFactory()
+        policy_area = random_obj_for_model(PolicyArea)
+        policy_issue_type = random_obj_for_model(PolicyIssueType)
+        url = reverse('api-v3:interaction:collection')
+        request_data = {
+            'kind': Interaction.KINDS.policy_feedback,
+            'communication_channel': CommunicationChannel.face_to_face.value.id,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': adviser.pk,
+            'notes': 'hello',
+            'company': company.pk,
+            'contact': contact.pk,
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id,
+            'policy_area': policy_area.pk,
+            'policy_issue_type': policy_issue_type.pk
+        }
+        response = self.api_client.post(url, request_data, format='json')
+
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.json()
+        assert response_data == {
+            'id': response_data['id'],
+            'kind': Interaction.KINDS.policy_feedback,
+            'is_event': None,
+            'service_delivery_status': None,
+            'grant_amount_offered': None,
+            'net_company_receipt': None,
+            'policy_area': {
+                'id': str(policy_area.pk), 'name': policy_area.name
+            },
+            'policy_issue_type': {
+                'id': str(policy_issue_type.pk), 'name': policy_issue_type.name
+            },
+            'communication_channel': {
+                'id': CommunicationChannel.face_to_face.value.id,
+                'name': CommunicationChannel.face_to_face.value.name
+            },
+            'subject': 'whatever',
+            'date': '2017-04-18',
+            'dit_adviser': {
+                'id': str(adviser.pk),
+                'first_name': adviser.first_name,
+                'last_name': adviser.last_name,
+                'name': adviser.name
+            },
+            'notes': 'hello',
+            'company': {
+                'id': str(company.pk),
+                'name': company.name
+            },
+            'contact': {
+                'id': str(contact.pk),
+                'name': contact.name
+            },
+            'event': None,
+            'service': {
+                'id': str(Service.trade_enquiry.value.id),
+                'name': Service.trade_enquiry.value.name,
+            },
+            'dit_team': {
+                'id': str(Team.healthcare_uk.value.id),
+                'name': Team.healthcare_uk.value.name,
+            },
+            'investment_project': None,
+            'archived_documents_url_path': '',
+            'created_by': {
+                'id': str(self.user.pk),
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'name': self.user.name
+            },
+            'modified_by': {
+                'id': str(self.user.pk),
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'name': self.user.name
+            },
+            'created_on': '2017-04-18T13:25:30.986208Z',
+            'modified_on': '2017-04-18T13:25:30.986208Z',
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -410,6 +503,8 @@ class TestAddInteractionView(APITestMixin):
             'grant_amount_offered': None,
             'net_company_receipt': None,
             'communication_channel': None,
+            'policy_area': None,
+            'policy_issue_type': None,
             'subject': 'whatever',
             'date': '2017-04-18',
             'dit_adviser': {
@@ -521,6 +616,8 @@ class TestAddInteractionView(APITestMixin):
             'grant_amount_offered': None,
             'net_company_receipt': None,
             'communication_channel': None,
+            'policy_area': None,
+            'policy_issue_type': None,
             'subject': 'whatever',
             'date': '2017-04-18',
             'dit_adviser': {
@@ -603,6 +700,8 @@ class TestAddInteractionView(APITestMixin):
             'grant_amount_offered': '9999.99',
             'net_company_receipt': '8888.99',
             'communication_channel': None,
+            'policy_area': None,
+            'policy_issue_type': None,
             'subject': 'whatever',
             'date': '2017-04-18',
             'dit_adviser': {
@@ -693,18 +792,14 @@ class TestAddInteractionView(APITestMixin):
             'subject': ['This field is required.'],
         }
 
-    @pytest.mark.parametrize(
-        'kind',
-        (Interaction.KINDS.interaction, Interaction.KINDS.policy_feedback,)
-    )
-    def test_add_interaction_missing_interaction_only_fields(self, kind):
+    def test_add_interaction_missing_interaction_only_fields(self):
         """Test add new interaction without required interaction-only fields."""
         adviser = AdviserFactory()
         company = CompanyFactory()
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         request_data = {
-            'kind': kind,
+            'kind': Interaction.KINDS.interaction,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -712,7 +807,7 @@ class TestAddInteractionView(APITestMixin):
             'company': company.pk,
             'contact': contact.pk,
             'service': Service.trade_enquiry.value.id,
-            'dit_team': Team.healthcare_uk.value.id
+            'dit_team': Team.healthcare_uk.value.id,
         }
         response = self.api_client.post(url, request_data, format='json')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -721,18 +816,43 @@ class TestAddInteractionView(APITestMixin):
             'communication_channel': ['This field is required.'],
         }
 
-    @pytest.mark.parametrize(
-        'kind',
-        (Interaction.KINDS.interaction, Interaction.KINDS.policy_feedback,)
-    )
-    def test_add_interaction_with_service_delivery_fields(self, kind):
+    def test_add_policy_feedback_missing_policy_feedback_only_fields(self):
+        """
+        Test add new policy feedback interaction without
+        required policy_feedback-only fields.
+        """
+        adviser = AdviserFactory()
+        company = CompanyFactory()
+        contact = ContactFactory()
+        url = reverse('api-v3:interaction:collection')
+        request_data = {
+            'kind': 'policy_feedback',
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': adviser.pk,
+            'notes': 'hello',
+            'company': company.pk,
+            'contact': contact.pk,
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id,
+        }
+        response = self.api_client.post(url, request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'policy_area': ['This field is required.'],
+            'policy_issue_type': ['This field is required.'],
+            'communication_channel': ['This field is required.'],
+        }
+
+    def test_add_interaction_with_service_delivery_fields(self):
         """Tests that adding an interaction with an event fails."""
         adviser = AdviserFactory()
         company = CompanyFactory()
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         request_data = {
-            'kind': kind,
+            'kind': Interaction.KINDS.interaction,
             'is_event': False,
             'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
@@ -786,19 +906,78 @@ class TestAddInteractionView(APITestMixin):
             'communication_channel': ['This field is only valid for interactions.'],
         }
 
+    def test_add_service_delivery_with_policy_feedback_fields(self):
+        """Tests that adding a service delivery with a policy area & issue_type fails."""
+        adviser = AdviserFactory()
+        company = CompanyFactory()
+        contact = ContactFactory()
+        url = reverse('api-v3:interaction:collection')
+        policy_area = random_obj_for_model(PolicyArea)
+        policy_issue_type = random_obj_for_model(PolicyIssueType)
+
+        request_data = {
+            'kind': 'service_delivery',
+            'is_event': True,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': adviser.pk,
+            'notes': 'hello',
+            'company': company.pk,
+            'contact': contact.pk,
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id,
+            'event': EventFactory().pk,
+            'policy_area': policy_area.pk,
+            'policy_issue_type': policy_issue_type.pk
+        }
+        response = self.api_client.post(url, request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'policy_area': ['This field is only valid for policy feedback.'],
+            'policy_issue_type': ['This field is only valid for policy feedback.']
+        }
+
+    def test_add_interaction_with_policy_feedback_fields(self):
+        """Tests that adding a service delivery with a policy area & issue_type fails."""
+        adviser = AdviserFactory()
+        company = CompanyFactory()
+        contact = ContactFactory()
+        url = reverse('api-v3:interaction:collection')
+        policy_area = random_obj_for_model(PolicyArea)
+        policy_issue_type = random_obj_for_model(PolicyIssueType)
+
+        request_data = {
+            'kind': 'interaction',
+            'communication_channel': CommunicationChannel.face_to_face.value.id,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': adviser.pk,
+            'notes': 'hello',
+            'company': company.pk,
+            'contact': contact.pk,
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id,
+            'policy_area': policy_area.pk,
+            'policy_issue_type': policy_issue_type.pk
+        }
+        response = self.api_client.post(url, request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'policy_area': ['This field is only valid for policy feedback.'],
+            'policy_issue_type': ['This field is only valid for policy feedback.']
+        }
+
     @freeze_time('2017-04-18 13:25:30.986208')
-    @pytest.mark.parametrize(
-        'kind',
-        (Interaction.KINDS.interaction, Interaction.KINDS.policy_feedback,)
-    )
-    def test_add_interaction_project(self, kind):
+    def test_add_interaction_project(self):
         """Test add new interaction for an investment project."""
         project = InvestmentProjectFactory()
         adviser = AdviserFactory()
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.post(url, {
-            'kind': kind,
+            'kind': Interaction.KINDS.interaction,
             'contact': contact.pk,
             'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
@@ -807,7 +986,8 @@ class TestAddInteractionView(APITestMixin):
             'notes': 'hello',
             'investment_project': project.pk,
             'service': Service.trade_enquiry.value.id,
-            'dit_team': Team.healthcare_uk.value.id
+            'dit_team': Team.healthcare_uk.value.id,
+
         }, format='json')
 
         assert response.status_code == status.HTTP_201_CREATED
@@ -817,18 +997,47 @@ class TestAddInteractionView(APITestMixin):
         assert response_data['modified_on'] == '2017-04-18T13:25:30.986208Z'
         assert response_data['created_on'] == '2017-04-18T13:25:30.986208Z'
 
-    @pytest.mark.parametrize(
-        'kind',
-        (Interaction.KINDS.interaction, Interaction.KINDS.policy_feedback,)
-    )
-    def test_add_interaction_no_entity(self, kind):
+    @freeze_time('2017-04-18 13:25:30.986208')
+    def test_add_policy_feedback_project(self):
+        """
+        Test add new policy feedback interaction for an investment project.
+        This should not be allowed.
+        """
+        project = InvestmentProjectFactory()
+        adviser = AdviserFactory()
+        contact = ContactFactory()
+        policy_area = random_obj_for_model(PolicyArea)
+        policy_issue_type = random_obj_for_model(PolicyIssueType)
+        url = reverse('api-v3:interaction:collection')
+        response = self.api_client.post(url, {
+            'kind': Interaction.KINDS.policy_feedback,
+            'contact': contact.pk,
+            'communication_channel': CommunicationChannel.face_to_face.value.id,
+            'subject': 'whatever',
+            'date': date.today().isoformat(),
+            'dit_adviser': adviser.pk,
+            'notes': 'hello',
+            'investment_project': project.pk,
+            'service': Service.trade_enquiry.value.id,
+            'dit_team': Team.healthcare_uk.value.id,
+            'policy_area': policy_area.pk,
+            'policy_issue_type': policy_issue_type.pk
+        }, format='json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'investment_project': ['This field is only valid for interactions.']
+        }
+
+    def test_add_interaction_no_entity(self):
         """Test add new interaction without a contact, company or
         investment project.
         """
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.post(url, {
-            'kind': kind,
+            'kind': Interaction.KINDS.interaction,
             'contact': contact.pk,
             'communication_channel': CommunicationChannel.face_to_face.value.id,
             'subject': 'whatever',
@@ -836,7 +1045,7 @@ class TestAddInteractionView(APITestMixin):
             'dit_adviser': AdviserFactory().pk,
             'notes': 'hello',
             'service': Service.trade_enquiry.value.id,
-            'dit_team': Team.healthcare_uk.value.id
+            'dit_team': Team.healthcare_uk.value.id,
         }, format='json')
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST

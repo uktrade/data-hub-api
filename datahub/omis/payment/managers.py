@@ -22,7 +22,9 @@ class BasePaymentGatewaySessionManager(models.Manager):
         :raises GOVUKPayAPIException: if there is a problem with GOV.UK Pay
         :raises Conflict: if the order is not in the allowed status
         """
-        self.filter(order=order).ongoing().refresh_from_govuk_pay()
+        # refresh ongoing sessions for this order first of all
+        for session in self.filter(order=order).ongoing().select_for_update():
+            session.refresh_from_govuk_payment()
 
         # validate that the order is in `quote_accepted`
         order.refresh_from_db()
@@ -79,14 +81,6 @@ class PaymentGatewaySessionQuerySet(models.QuerySet):
                 PaymentGatewaySessionStatus.submitted,
             ]
         )
-
-    def refresh_from_govuk_pay(self):
-        """
-        Refresh the objects in the queryset by re-synching the status with the
-        GOV.UK payment.
-        """
-        for session in self:
-            session.refresh_from_govuk_payment()
 
 
 # We use this style because some of the methods make sense only on the manager
