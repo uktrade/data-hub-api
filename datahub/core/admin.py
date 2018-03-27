@@ -1,6 +1,20 @@
 from collections import OrderedDict
 
 from django.contrib import admin
+from django.contrib.admin.templatetags.admin_modify import register
+from django.contrib.admin.templatetags.admin_modify import submit_row as _submit_row
+
+
+@register.inclusion_tag('admin/submit_line.html', takes_context=True)
+def submit_row(context):
+    """Enables to override show_save_and_add_another context parameter in the admin submit line."""
+    new_context = _submit_row(context)
+    new_context.update({
+        'show_save_and_add_another': context.get(
+            'show_save_and_add_another', new_context['show_save_and_add_another']
+        ),
+    })
+    return new_context
 
 
 class DisabledOnFilter(admin.SimpleListFilter):

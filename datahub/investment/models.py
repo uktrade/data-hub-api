@@ -622,3 +622,37 @@ class Involvement(BaseConstantModel):
 
 class InvestmentDeliveryPartner(BaseConstantModel):
     """Investment delivery partners."""
+
+
+class InvestmentProjectSPIReportConfiguration(BaseModel):
+    """Investment Project SPI Report Configuration."""
+
+    active_stage = models.ForeignKey(
+        'metadata.InvestmentProjectStage',
+        on_delete=models.PROTECT,
+        related_name='+',
+    )
+
+    verify_win_stage = models.ForeignKey(
+        'metadata.InvestmentProjectStage',
+        on_delete=models.PROTECT,
+        related_name='+',
+    )
+
+    project_manager_assigned = models.ForeignKey(
+        'metadata.Service',
+        on_delete=models.PROTECT,
+        related_name='+',
+    )
+
+    client_proposal = models.ForeignKey(
+        'metadata.Service',
+        on_delete=models.PROTECT,
+        related_name='+',
+    )
+
+    after_care_offered = models.ForeignKey(
+        'metadata.Service',
+        on_delete=models.PROTECT,
+        related_name='+',
+    )

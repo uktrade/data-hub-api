@@ -1,6 +1,9 @@
 """Admin registration for investment models."""
+import csv
 
 from django.contrib import admin
+from django.http import HttpResponse
+from django.template.response import TemplateResponse
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import (
@@ -12,11 +15,15 @@ from datahub.investment.models import (
     InvestmentDeliveryPartner,
     InvestmentProject,
     InvestmentProjectPermission,
+    InvestmentProjectSPIReportConfiguration,
     InvestmentProjectTeamMember,
     InvestorType,
     Involvement,
     IProjectDocument,
     SpecificProgramme,
+)
+from datahub.investment.report import (
+    generate_spi_report, get_spi_report_fieldnames
 )
 from datahub.metadata.admin import DisableableMetadataAdmin
 
@@ -96,3 +103,76 @@ admin.site.register((
     Involvement,
     SpecificProgramme,
 ), DisableableMetadataAdmin)
+
+
+@admin.register(
+    InvestmentProjectSPIReportConfiguration
+)
+class InvestmentProjectSPIReportConfigurationAdmin(admin.ModelAdmin):
+    """Investment Project SPI Report Configuration Admin."""
+
+    fields = (
+        'active_stage',
+        'verify_win_stage',
+        'after_care_offered',
+        'project_manager_assigned',
+        'client_proposal',
+    )
+
+    actions = ('create_spi_report',)
+
+    def has_add_permission(self, request):
+        """Disallow adding new configuration records if one already exists."""
+        has_permission = super().has_add_permission(request)
+        if has_permission:
+            if not InvestmentProjectSPIReportConfiguration.objects.exists():
+                return True
+        return False
+
+    def add_view(self, request, form_url='', extra_context=None):
+        """Remove unnecessary buttons."""
+        extra_context = extra_context or {}
+        extra_context['show_save_and_continue'] = False
+        # key below requires modification to "submit_row" templatetag, which is included in
+        # core/admin.py
+        extra_context['show_save_and_add_another'] = False
+        return super().add_view(request, form_url=form_url, extra_context=extra_context)
+
+    def create_spi_report(self, request, queryset):
+        """Create SPI report action."""
+        if request.POST.get('create') == 'yes':
+            self.message_user(request, 'Created')
+
+            month = int(request.POST.get('month'))
+            year = int(request.POST.get('year'))
+            report = generate_spi_report(month, year)
+
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = f'attachment; filename="report.csv"'
+            fieldnames = get_spi_report_fieldnames()
+            dw = csv.DictWriter(
+                response,
+                delimiter=',',
+                fieldnames=fieldnames.keys()
+            )
+            dw.writer.writerow(fieldnames.values())
+
+            for row in report:
+                dw.writerow(row)
+
+            return response
+
+        context = dict(
+            self.admin_site.each_context(request),
+            title='Create SPI Report',
+            action=self.create_spi_report.__name__,
+            action_message='Create SPI Report',
+            action_checkbox_name=admin.helpers.ACTION_CHECKBOX_NAME,
+            opts=self.model._meta,
+            queryset=queryset,
+            media=self.media,
+        )
+
+        return TemplateResponse(request, 'admin/action_create_spi_report.html', context)
+
+    create_spi_report.short_description = 'Create SPI Report'
