@@ -2,19 +2,12 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from reversion.admin import VersionAdmin
 
-from datahub.core.admin import DisabledOnFilter, ReadOnlyAdmin
+from datahub.core.admin import ReadOnlyAdmin
+from datahub.metadata.admin import DisableableMetadataAdmin
 from .models import Advisor, CompaniesHouseCompany, Company, Contact, ExportExperienceCategory
 
 
-@admin.register(ExportExperienceCategory)
-class MetadataAdmin(admin.ModelAdmin):
-    """Export experience category admin."""
-
-    fields = ('id', 'name', 'disabled_on', )
-    list_display = ('name', 'disabled_on', )
-    readonly_fields = ('id',)
-    search_fields = ('name', 'pk')
-    list_filter = (DisabledOnFilter,)
+admin.site.register(ExportExperienceCategory, DisableableMetadataAdmin)
 
 
 @admin.register(Company)
