@@ -13,4 +13,6 @@ def get_interaction_queryset():
         'service',
         'service_delivery_status',
         'event',
+        'policy_area',
+        'policy_issue_type',
     )
