@@ -4,8 +4,6 @@ from functools import partial
 from operator import not_
 from uuid import UUID
 
-from rest_framework.utils import model_meta
-
 from datahub.core.constants import (
     InvestmentBusinessActivity as BusinessActivity,
     InvestmentProjectStage as Stage,
@@ -98,9 +96,8 @@ def validate(instance=None, update_data=None, fields=None, next_stage=False):
     :param next_stage:  Perform validation for the next stage (rather than the current stage)
     :return:            dict containing errors for incomplete fields
     """
-    data = DataCombiner(instance, update_data)
-    info = model_meta.get_field_info(InvestmentProject)
-    desired_stage = data.get_value('stage') or Stage.prospect.value
+    combiner = DataCombiner(instance, update_data, model=InvestmentProject)
+    desired_stage = combiner.get_value('stage') or Stage.prospect.value
     desired_stage_order = desired_stage.order
     if next_stage:
         desired_stage_order += 100.0
@@ -111,14 +108,14 @@ def validate(instance=None, update_data=None, fields=None, next_stage=False):
         if _should_skip_rule(field, fields, desired_stage_order, req_stage.order):
             continue
 
-        if _field_incomplete(info, data, field):
+        if _field_incomplete(combiner, field):
             errors[field] = REQUIRED_MESSAGE
 
     for field, rule in CONDITIONAL_VALIDATION_MAPPING.items():
         if _should_skip_rule(field, fields, desired_stage_order, rule.stage.order):
             continue
 
-        if _check_rule(info, data, rule) and _field_incomplete(info, data, field):
+        if _check_rule(combiner, rule) and _field_incomplete(combiner, field):
             errors[field] = REQUIRED_MESSAGE
 
     return errors
@@ -131,22 +128,16 @@ def _should_skip_rule(field, validate_fields, desired_stage_order, req_stage_ord
     return skip_field or desired_stage_order < req_stage_order
 
 
-def _field_incomplete(field_info, data_view, field):
-    """Checks whether a field has been completed."""
-    if field in field_info.relations and field_info.relations[field].to_many:
-        return not data_view.get_value_to_many(field)
-    return data_view.get_value(field) in (None, '')
+def _field_incomplete(combiner, field):
+    """Checks whether a field has been filled in."""
+    if combiner.is_field_to_many(field):
+        return not combiner.get_value_to_many(field)
+    return combiner.get_value(field) in (None, '')
 
 
-def _check_rule(field_info, data_view, rule):
+def _check_rule(combiner, rule):
     """Checks a conditional validation rule."""
-    if rule.field in field_info.relations:
-        if field_info.relations[rule.field].to_many:
-            actual_value = data_view.get_value_to_many(rule.field)
-        else:
-            actual_value = data_view.get_value_id(rule.field)
-    else:
-        actual_value = data_view.get_value(rule.field)
+    value = combiner.get_value_auto(rule.field)
     if callable(rule.condition):
-        return rule.condition(actual_value)
-    return actual_value == rule.condition
+        return rule.condition(value)
+    return value == rule.condition
