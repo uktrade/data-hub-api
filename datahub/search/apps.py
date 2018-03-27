@@ -53,12 +53,14 @@ class SearchApp:
         Connects all signal handlers so DB models can be synced with Elasticsearch on save.
         """
         signals_mod = import_module(self.mod_signals)
-        getattr(signals_mod, 'connect_signals')()
+        for receiver in signals_mod.receivers:
+            receiver.connect()
 
     def disconnect_signals(self):
         """Disconnects all signal handlers."""
         signals_mod = import_module(self.mod_signals)
-        getattr(signals_mod, 'disconnect_signals')()
+        for receiver in signals_mod.receivers:
+            receiver.disconnect()
 
     def get_queryset(self):
         """Gets the queryset that will be synced with Elasticsearch."""
