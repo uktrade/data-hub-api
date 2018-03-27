@@ -8,7 +8,7 @@ class EventSearchApp(SearchApp):
     """SearchApp for events."""
 
     name = 'event'
-    ESModel = Event
+    es_model = Event
     view = SearchEventAPIView
     export_view = SearchEventExportAPIView
     permission_required = ('event.read_event',)

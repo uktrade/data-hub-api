@@ -246,7 +246,7 @@ def get_basic_search_query(
     """
     limit = _clip_limit(offset, limit)
 
-    all_models = (search_app.ESModel for search_app in get_search_apps())
+    all_models = (search_app.es_model for search_app in get_search_apps())
     fields = set(chain.from_iterable(entity.SEARCH_FIELDS for entity in all_models))
 
     # Sort the fields so that this function is deterministic

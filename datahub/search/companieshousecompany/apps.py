@@ -8,7 +8,7 @@ class CompaniesHouseCompanySearchApp(SearchApp):
     """SearchApp for companies house companies."""
 
     name = 'companieshousecompany'
-    ESModel = CompaniesHouseCompany
+    es_model = CompaniesHouseCompany
     view = SearchCompaniesHouseCompanyAPIView
     permission_required = ('company.read_companieshousecompany',)
     queryset = DBCompaniesHouseCompany.objects.prefetch_related(
