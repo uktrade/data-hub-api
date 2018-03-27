@@ -5,11 +5,4 @@ should be issued to sync db with Elasticsearch.
 """
 
 
-def connect_signals():
-    """Connect signals for ES sync."""
-    pass
-
-
-def disconnect_signals():
-    """Disconnect signals from ES sync."""
-    pass
+receivers = ()

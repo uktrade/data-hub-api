@@ -8,7 +8,7 @@ from datahub.investment.models import (
     InvestmentProjectTeamMember
 )
 from .models import InvestmentProject as ESInvestmentProject
-from ..signals import sync_es
+from ..signals import SignalReceiver, sync_es
 
 
 def investment_project_sync_es(sender, instance, **kwargs):
@@ -54,49 +54,9 @@ def investment_project_sync_es_adviser_change(sender, instance, **kwargs):
     transaction.on_commit(sync_es_wrapper)
 
 
-def connect_signals():
-    """Connect signals for ES sync."""
-    post_save.connect(
-        investment_project_sync_es,
-        sender=DBInvestmentProject,
-        dispatch_uid='investment_project_sync_es'
-    )
-    post_save.connect(
-        investment_project_sync_es,
-        sender=InvestmentProjectTeamMember,
-        dispatch_uid='investment_project_team_member_save_sync_es'
-    )
-    post_delete.connect(
-        investment_project_sync_es,
-        sender=InvestmentProjectTeamMember,
-        dispatch_uid='investment_project_team_member_delete_sync_es'
-    )
-    post_save.connect(
-        investment_project_sync_es_adviser_change,
-        sender=Advisor,
-        dispatch_uid='investment_project_sync_es_adviser_change'
-    )
-
-
-def disconnect_signals():
-    """Disconnect signals from ES sync."""
-    post_save.disconnect(
-        investment_project_sync_es,
-        sender=DBInvestmentProject,
-        dispatch_uid='investment_project_sync_es'
-    )
-    post_save.disconnect(
-        investment_project_sync_es,
-        sender=InvestmentProjectTeamMember,
-        dispatch_uid='investment_project_team_member_save_sync_es'
-    )
-    post_delete.disconnect(
-        investment_project_sync_es,
-        sender=InvestmentProjectTeamMember,
-        dispatch_uid='investment_project_team_member_delete_sync_es'
-    )
-    post_save.disconnect(
-        investment_project_sync_es_adviser_change,
-        sender=Advisor,
-        dispatch_uid='investment_project_sync_es_adviser_change'
-    )
+receivers = (
+    SignalReceiver(post_save, DBInvestmentProject, investment_project_sync_es),
+    SignalReceiver(post_save, InvestmentProjectTeamMember, investment_project_sync_es),
+    SignalReceiver(post_delete, InvestmentProjectTeamMember, investment_project_sync_es),
+    SignalReceiver(post_save, Advisor, investment_project_sync_es_adviser_change),
+)
