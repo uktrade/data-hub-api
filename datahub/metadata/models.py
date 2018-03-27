@@ -57,9 +57,6 @@ class Sector(MPTTModel, DisableableModel):
             ancestors.append(obj)
         return reversed(ancestors)
 
-    class Meta(MPTTModel.Meta, BaseConstantModel.Meta):
-        ordering = ('lft', )
-
     class MPTTMeta:
         order_insertion_by = ('segment',)
 
