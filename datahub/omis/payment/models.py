@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models, transaction
 
 from datahub.core.models import BaseModel
+from datahub.omis.core.utils import generate_datetime_based_reference
 from .constants import PaymentGatewaySessionStatus, PaymentMethod, RefundStatus
 from .govukpay import PayClient
 from .managers import PaymentGatewaySessionManager, PaymentManager
@@ -203,7 +204,9 @@ class Refund(BaseModel):
         related_name='+'
     )
     refund_reason = models.TextField(blank=True)
-    requested_amount = models.PositiveIntegerField()
+    requested_amount = models.PositiveIntegerField(
+        help_text='In pence. E.g. £10 should be 1000.'
+    )
 
     level1_approved_on = models.DateTimeField(blank=True, null=True)
     level1_approved_by = models.ForeignKey(
@@ -228,9 +231,18 @@ class Refund(BaseModel):
         null=True, blank=True,
         choices=PaymentMethod
     )
-    net_amount = models.PositiveIntegerField(null=True, blank=True)
-    vat_amount = models.PositiveIntegerField(null=True, blank=True)
-    total_amount = models.PositiveIntegerField(null=True, blank=True)
+    net_amount = models.PositiveIntegerField(
+        null=True, blank=True,
+        help_text='In pence. E.g. £10 should be 1000.'
+    )
+    vat_amount = models.PositiveIntegerField(
+        null=True, blank=True,
+        help_text='In pence. E.g. £10 should be 1000.'
+    )
+    total_amount = models.PositiveIntegerField(
+        null=True, blank=True,
+        help_text='In pence. E.g. £10 should be 1000.'
+    )
 
     rejection_reason = models.TextField(blank=True)
 
@@ -248,4 +260,10 @@ class Refund(BaseModel):
 
     def __str__(self):
         """Human-readable representation"""
-        return self.reference
+        return f'{self.reference} for order {self.order}'
+
+    def save(self, *args, **kwargs):
+        """Generate a reference if necessary."""
+        if not self.reference:
+            self.reference = generate_datetime_based_reference(self.__class__, field='reference')
+        super().save(*args, **kwargs)
