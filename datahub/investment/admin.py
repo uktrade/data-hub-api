@@ -174,4 +174,4 @@ class InvestmentProjectSPIReportConfigurationAdmin(admin.ModelAdmin):
 
         return TemplateResponse(request, 'admin/action_create_spi_report.html', context)
 
-    create_spi_report.short_description = 'Create SPI Report'
+    create_spi_report.short_description = 'Create spi report'
