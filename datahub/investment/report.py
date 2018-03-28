@@ -152,10 +152,10 @@ def generate_spi_report(month, year):
 
 
 def get_spi_report_fieldnames():
-    """Gets SPI Report field names."""
+    """Gets SPI report field names."""
     return {
-        'id': 'Project ID',
-        'project_code': 'Project Code',
+        'project_code': 'Project ID',
+        'id': 'Data Hub ID',
         'name': 'Project Name',
         'email_received_date': 'Email received date',
         'moved_to_active_on': 'Date moved to active',
@@ -165,6 +165,6 @@ def get_spi_report_fieldnames():
         'proposal_notification_on': 'Date of proposal sent',
         'moved_to_verify_win': 'Verify win date',
         'sharepoint evidence': 'Sharepoint evidence',
-        'actual_land_date': 'Actual Land date',
-        'first_after_care_offered_on': 'Aftercare Offered Date',
+        'actual_land_date': 'Actual land date',
+        'first_after_care_offered_on': 'Aftercare offered date',
     }
