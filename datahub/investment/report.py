@@ -16,7 +16,7 @@ def get_investment_projects_in_active_stage(configuration, month, year):
     stage_log = InvestmentProjectStageLog.objects.prefetch_related(
         'investment_project'
     ).filter(
-        stage_id=configuration.active_stage_id,
+        stage_id=InvestmentProjectStage.active.value.id,
         created_on__month=month,
         created_on__year=year,
     )
@@ -36,7 +36,7 @@ def get_investment_projects_in_verify_win_stage(configuration, month, year):
     stage_log = InvestmentProjectStageLog.objects.prefetch_related(
         'investment_project'
     ).filter(
-        stage_id=configuration.verify_win_stage_id,
+        stage_id=InvestmentProjectStage.verify_win.value.id,
         created_on__month=month,
         created_on__year=year,
     )

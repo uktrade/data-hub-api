@@ -20,13 +20,11 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_on', models.DateTimeField(auto_now_add=True, db_index=True, null=True)),
                 ('modified_on', models.DateTimeField(auto_now=True, null=True)),
-                ('active_stage', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='metadata.InvestmentProjectStage')),
                 ('after_care_offered', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='metadata.Service')),
                 ('client_proposal', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='metadata.Service')),
                 ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
                 ('modified_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
                 ('project_manager_assigned', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='metadata.Service')),
-                ('verify_win_stage', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='metadata.InvestmentProjectStage')),
             ],
             options={
                 'abstract': False,

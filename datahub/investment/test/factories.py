@@ -158,8 +158,6 @@ class InvestmentProjectTeamMemberFactory(factory.django.DjangoModelFactory):
 class InvestmentProjectSPIReportConfigurationFactory(factory.django.DjangoModelFactory):
     """Investment Project SPI report configuration factory."""
 
-    active_stage_id = InvestmentProjectStage.active.value.id
-    verify_win_stage_id = InvestmentProjectStage.verify_win.value.id
     after_care_offered_id = None
     project_manager_assigned_id = None
     client_proposal_id = None
