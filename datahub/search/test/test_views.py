@@ -1,5 +1,7 @@
 import datetime
+from uuid import UUID
 
+import factory
 import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -88,6 +90,57 @@ class TestSearch(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
         assert len(response.data['results']) == 1
+
+    def test_basic_search_consistent_paging(self, setup_es):
+        """Tests if content placement is consistent between pages."""
+        ids = [
+            UUID('05ab924a-903e-4dd0-9a36-958091bcf41b'),
+            UUID('141dca14-e35a-49d6-9b75-6a1447aa0a3c'),
+            UUID('24c5f478-5e81-478c-81ae-e7a266bd3e80'),
+            UUID('3a4af76f-fbba-46e1-a7f9-35a5b3353e61'),
+            UUID('4596442e-8a03-47c7-bce1-69ab2c59ff34'),
+            UUID('5fd2f3d8-c074-42a8-a34d-17e0313361f2'),
+            UUID('6ce0e41f-6d38-425b-bc0a-71347e999e6a'),
+        ]
+
+        CompanyFactory.create_batch(
+            len(ids),
+            id=factory.Iterator(ids),
+            name='test record'
+        )
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:basic')
+        response = self.api_client.get(url, {
+            'term': 'test record',
+            'entity': 'company',
+            'offset': 0,
+            'limit': 2,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert ids[:2] == [UUID(company['id']) for company in response.data['results']]
+
+        response = self.api_client.get(url, {
+            'term': 'test record',
+            'entity': 'company',
+            'offset': 2,
+            'limit': 2,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert ids[2:4] == [UUID(company['id']) for company in response.data['results']]
+
+        response = self.api_client.get(url, {
+            'term': 'test record',
+            'entity': 'company',
+            'offset': 4,
+            'limit': 2,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert ids[4:6] == [UUID(company['id']) for company in response.data['results']]
 
     def test_invalid_entity(self, setup_es, setup_data):
         """Tests case where provided entity is invalid."""

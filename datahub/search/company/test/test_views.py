@@ -1,8 +1,8 @@
 import csv
 import random
-import uuid
 from datetime import datetime
 from unittest import mock
+from uuid import UUID
 
 import factory
 import pytest
@@ -12,8 +12,12 @@ from rest_framework.reverse import reverse
 
 from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import Company
-from datahub.company.test.factories import (AdviserFactory, CompaniesHouseCompanyFactory,
-                                            CompanyFactory, ContactFactory)
+from datahub.company.test.factories import (
+    AdviserFactory,
+    CompaniesHouseCompanyFactory,
+    CompanyFactory,
+    ContactFactory
+)
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_queryset
 from datahub.metadata.models import Sector
@@ -180,7 +184,7 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 5
         assert len(response.data['results']) == 5
 
-        search_results = {uuid.UUID(company['id']) for company in response.data['results']}
+        search_results = {UUID(company['id']) for company in response.data['results']}
         assert search_results == {company.id for company in companies}
 
     @pytest.mark.parametrize(
@@ -215,7 +219,7 @@ class TestSearch(APITestMixin):
         response_data = response.json()
         assert response_data['count'] == num_sectors - sector_level
 
-        actual_ids = {uuid.UUID(company['id']) for company in response_data['results']}
+        actual_ids = {UUID(company['id']) for company in response_data['results']}
         expected_ids = {company.pk for company in companies[sector_level:]}
         assert actual_ids == expected_ids
 
@@ -365,17 +369,56 @@ class TestSearch(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {'uk_region': ['This field may not be null.']}
 
-    def test_company_search_paging(self, setup_data):
-        """Tests pagination of results."""
+    def test_company_search_paging(self, setup_es):
+        """Tests if content placement is consistent between pages."""
+        ids = [
+            UUID('05ab924a-903e-4dd0-9a36-958091bcf41b'),
+            UUID('141dca14-e35a-49d6-9b75-6a1447aa0a3c'),
+            UUID('24c5f478-5e81-478c-81ae-e7a266bd3e80'),
+            UUID('3a4af76f-fbba-46e1-a7f9-35a5b3353e61'),
+            UUID('4596442e-8a03-47c7-bce1-69ab2c59ff34'),
+            UUID('5fd2f3d8-c074-42a8-a34d-17e0313361f2'),
+            UUID('6ce0e41f-6d38-425b-bc0a-71347e999e6a'),
+        ]
+
+        CompanyFactory.create_batch(
+            len(ids),
+            id=factory.Iterator(ids),
+            name='test record'
+        )
+
+        setup_es.indices.refresh()
+
         url = reverse('api-v3:search:company')
         response = self.api_client.post(url, {
-            'offset': 1,
-            'limit': 1,
+            'original_query': 'test record',
+            'entity': 'company',
+            'offset': 0,
+            'limit': 2,
         })
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] > 1
-        assert len(response.data['results']) == 1
+        assert ids[:2] == [UUID(company['id']) for company in response.data['results']]
+
+        response = self.api_client.post(url, {
+            'original_query': 'test record',
+            'entity': 'company',
+            'offset': 2,
+            'limit': 2,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert ids[2:4] == [UUID(company['id']) for company in response.data['results']]
+
+        response = self.api_client.post(url, {
+            'original_query': 'test record',
+            'entity': 'company',
+            'offset': 4,
+            'limit': 2,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert ids[4:6] == [UUID(company['id']) for company in response.data['results']]
 
     def test_company_search_paging_query_params(self, setup_data):
         """Tests pagination of results."""
@@ -666,7 +709,7 @@ class TestSearchExport(APITestMixin):
                 'website'] == csv_file.fieldnames
 
         for row in rows:
-            company = Company.objects.get(pk=uuid.UUID(row['id']))
+            company = Company.objects.get(pk=UUID(row['id']))
             # checks if first and last column match
             assert company.account_manager.name == row['account_manager']
             assert company.website == row['website']
