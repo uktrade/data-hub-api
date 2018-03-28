@@ -22,9 +22,7 @@ from datahub.investment.models import (
     IProjectDocument,
     SpecificProgramme,
 )
-from datahub.investment.report import (
-    generate_spi_report, get_spi_report_fieldnames
-)
+from datahub.investment.report import generate_spi_report, get_spi_report_fieldnames
 from datahub.metadata.admin import DisableableMetadataAdmin
 
 
