@@ -148,7 +148,8 @@ class InvestmentProjectSPIReportConfigurationAdmin(admin.ModelAdmin):
             report = generate_spi_report(month, year)
 
             response = HttpResponse(content_type='text/csv')
-            response['Content-Disposition'] = f'attachment; filename="report.csv"'
+            filename = f'attachment; filename="Investment Projects SPI {month} {year}.csv"'
+            response['Content-Disposition'] = filename
             fieldnames = get_spi_report_fieldnames()
             dw = csv.DictWriter(
                 response,
