@@ -19,7 +19,7 @@ def get_investment_projects_in_active_stage(configuration, month, year):
         stage_id=InvestmentProjectStage.active.value.id,
         created_on__month=month,
         created_on__year=year,
-    )
+    ).order_by('investment_project_id', '-created_on').distinct('investment_project_id')
 
     for stage in stage_log:
         yield {
@@ -39,7 +39,7 @@ def get_investment_projects_in_verify_win_stage(configuration, month, year):
         stage_id=InvestmentProjectStage.verify_win.value.id,
         created_on__month=month,
         created_on__year=year,
-    )
+    ).order_by('investment_project_id', '-created_on').distinct('investment_project_id')
 
     for stage in stage_log:
         yield {
@@ -62,12 +62,13 @@ def get_investment_projects_with_pm_assigned(configuration, month, year):
         service_id=configuration.project_manager_assigned_id,
         date__month=month,
         date__year=year
-    )
+    ).order_by('investment_project_id', 'date').distinct('investment_project_id')
+
     for interaction in interactions:
         # find when project was moved to "Assign PM" stage.
         stage = interaction.investment_project.stage_log.filter(
             stage_id=InvestmentProjectStage.assign_pm.value.id
-        ).first()
+        ).order_by('created_on').first()
 
         yield {
             'id': interaction.investment_project_id,
@@ -86,7 +87,8 @@ def get_investment_projects_with_proposal_deadline(configuration, month, year):
         service_id=configuration.client_proposal_id,
         date__month=month,
         date__year=year
-    )
+    ).order_by('investment_project_id', 'date').distinct('investment_project_id')
+
     for interaction in interactions:
         yield {
             'id': interaction.investment_project.id,
@@ -104,7 +106,7 @@ def get_investment_projects_by_actual_land_date(configuration, month, year):
     """
     interactions = Interaction.objects.filter(
         service_id=configuration.after_care_offered_id
-    ).order_by('created_on')
+    ).order_by('-created_on')
     prefetch = Prefetch(
         'interactions',
         queryset=interactions,

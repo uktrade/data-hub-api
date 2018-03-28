@@ -52,6 +52,13 @@ def test_get_investment_projects_in_active_stage(
         ip2 = InvestmentProjectFactory()
         ip2.stage_id = InvestmentProjectStage.active.value.id
         ip2.save()
+        ip2.stage_id = InvestmentProjectStage.prospect.value.id
+        ip2.save()
+
+    # to make sure we get the latest date when project moved to active stage
+    with freeze_time('2017-02-11'):
+        ip2.stage_id = InvestmentProjectStage.active.value.id
+        ip2.save()
 
     items = get_investment_projects_in_active_stage(
         investment_project_spi_report_configuration,
@@ -59,7 +66,9 @@ def test_get_investment_projects_in_active_stage(
         2017
     )
 
-    stage_log = ip2.stage_log.filter(stage_id=ip2.stage_id).first()
+    stage_log = ip2.stage_log.filter(
+        stage_id=ip2.stage_id
+    ).order_by('-created_on').first()
     assert [
         {
             'id': ip2.id,
@@ -84,6 +93,13 @@ def test_get_investment_projects_in_verify_win_stage(
         ip2 = InvestmentProjectFactory()
         ip2.stage_id = InvestmentProjectStage.verify_win.value.id
         ip2.save()
+        ip2.stage_id = InvestmentProjectStage.active.value.id
+        ip2.save()
+
+    # to make sure we get the latest date when project moved to verify win stage
+    with freeze_time('2017-02-11'):
+        ip2.stage_id = InvestmentProjectStage.verify_win.value.id
+        ip2.save()
 
     items = get_investment_projects_in_verify_win_stage(
         investment_project_spi_report_configuration,
@@ -91,7 +107,9 @@ def test_get_investment_projects_in_verify_win_stage(
         2017
     )
 
-    stage_log = ip2.stage_log.filter(stage_id=ip2.stage_id).first()
+    stage_log = ip2.stage_log.filter(
+        stage_id=ip2.stage_id
+    ).order_by('-created_on').first()
     assert [
         {
             'id': ip2.id,
@@ -124,7 +142,20 @@ def test_get_investment_projects_with_pm_assigned(
         ip2 = InvestmentProjectFactory()
         ip2.stage_id = InvestmentProjectStage.assign_pm.value.id
         ip2.save()
+        ip2.stage_id = InvestmentProjectStage.prospect.value.id
+        ip2.save()
         interaction2 = InvestmentProjectInteractionFactory(
+            investment_project=ip2,
+            service_id=investment_project_spi_report_configuration.project_manager_assigned_id,
+            date=mocked_now().replace(tzinfo=utc),
+        )
+
+    # to make sure we get the earliest date when project moved to assign pm stage
+    # and earliest interaction
+    with freeze_time('2017-02-11') as mocked_now:
+        ip2.stage_id = InvestmentProjectStage.assign_pm.value.id
+        ip2.save()
+        InvestmentProjectInteractionFactory(
             investment_project=ip2,
             service_id=investment_project_spi_report_configuration.project_manager_assigned_id,
             date=mocked_now().replace(tzinfo=utc),
@@ -136,7 +167,9 @@ def test_get_investment_projects_with_pm_assigned(
         2017
     )
 
-    stage_log = ip2.stage_log.filter(stage_id=ip2.stage_id).first()
+    stage_log = ip2.stage_log.filter(
+        stage_id=ip2.stage_id
+    ).order_by('created_on').first()
     assert [
         {
             'id': ip2.id,
@@ -170,6 +203,14 @@ def test_get_investment_projects_with_proposal_deadline(
             proposal_deadline=mocked_now().date()
         )
         interaction2 = InvestmentProjectInteractionFactory(
+            investment_project=ip2,
+            service_id=investment_project_spi_report_configuration.client_proposal_id,
+            date=mocked_now().replace(tzinfo=utc),
+        )
+
+    # to make sure we get the earliest interaction
+    with freeze_time('2017-02-11') as mocked_now:
+        InvestmentProjectInteractionFactory(
             investment_project=ip2,
             service_id=investment_project_spi_report_configuration.client_proposal_id,
             date=mocked_now().replace(tzinfo=utc),
@@ -213,6 +254,13 @@ def test_get_investment_projects_by_actual_land_date(
         ip2 = InvestmentProjectFactory(
             actual_land_date=mocked_now().date()
         )
+        InvestmentProjectInteractionFactory(
+            investment_project=ip2,
+            service_id=investment_project_spi_report_configuration.after_care_offered_id,
+            date=mocked_now().replace(tzinfo=utc),
+        )
+
+    with freeze_time('2017-02-11') as mocked_now:
         interaction2 = InvestmentProjectInteractionFactory(
             investment_project=ip2,
             service_id=investment_project_spi_report_configuration.after_care_offered_id,
