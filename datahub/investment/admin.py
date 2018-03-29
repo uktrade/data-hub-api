@@ -1,4 +1,5 @@
 """Admin registration for investment models."""
+import calendar
 import csv
 
 from django.contrib import admin
@@ -110,8 +111,6 @@ class InvestmentProjectSPIReportConfigurationAdmin(admin.ModelAdmin):
     """Investment Project SPI Report Configuration Admin."""
 
     fields = (
-        'active_stage',
-        'verify_win_stage',
         'after_care_offered',
         'project_manager_assigned',
         'client_proposal',
@@ -170,6 +169,8 @@ class InvestmentProjectSPIReportConfigurationAdmin(admin.ModelAdmin):
             opts=self.model._meta,
             queryset=queryset,
             media=self.media,
+            months=[(i, calendar.month_name[i]) for i in range(1, 13)],
+            years=[year for year in range(2018, 2020)],
         )
 
         return TemplateResponse(request, 'admin/action_create_spi_report.html', context)
