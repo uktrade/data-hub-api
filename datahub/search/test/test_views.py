@@ -91,7 +91,12 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 2
         assert len(response.data['results']) == 1
 
-    def test_basic_search_consistent_paging(self, setup_es):
+    @pytest.mark.parametrize('sortby', (
+        {},
+        {'sortby': 'name:asc'},
+        {'sortby': 'created_on:asc'},
+    ))
+    def test_basic_search_consistent_paging(self, setup_es, sortby):
         """Tests if content placement is consistent between pages."""
         ids = [
             UUID('05ab924a-903e-4dd0-9a36-958091bcf41b'),
@@ -117,6 +122,7 @@ class TestSearch(APITestMixin):
             'entity': 'company',
             'offset': 0,
             'limit': 2,
+            **sortby
         })
 
         assert response.status_code == status.HTTP_200_OK
