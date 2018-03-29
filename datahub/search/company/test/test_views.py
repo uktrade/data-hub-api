@@ -374,7 +374,7 @@ class TestSearch(APITestMixin):
         {'sortby': 'name:asc'},
         {'sortby': 'created_on:asc'},
     ))
-    def test_company_search_paging(self, sortby, setup_es):
+    def test_company_search_paging(self, setup_es, sortby):
         """Tests if content placement is consistent between pages."""
         ids = [
             UUID('05ab924a-903e-4dd0-9a36-958091bcf41b'),
