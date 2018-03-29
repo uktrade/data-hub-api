@@ -369,7 +369,12 @@ class TestSearch(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {'uk_region': ['This field may not be null.']}
 
-    def test_company_search_paging(self, setup_es):
+    @pytest.mark.parametrize('sortby', (
+        {},
+        {'sortby': 'name:asc'},
+        {'sortby': 'created_on:asc'},
+    ))
+    def test_company_search_paging(self, sortby, setup_es):
         """Tests if content placement is consistent between pages."""
         ids = [
             UUID('05ab924a-903e-4dd0-9a36-958091bcf41b'),
@@ -395,6 +400,7 @@ class TestSearch(APITestMixin):
             'entity': 'company',
             'offset': 0,
             'limit': 2,
+            **sortby,
         })
 
         assert response.status_code == status.HTTP_200_OK
