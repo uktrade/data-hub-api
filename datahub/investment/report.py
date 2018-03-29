@@ -1,9 +1,7 @@
 from django.db.models import Prefetch
 
 from datahub.core.constants import InvestmentProjectStage
-from datahub.interaction.models import (
-    Interaction
-)
+from datahub.interaction.models import Interaction
 from datahub.investment.models import (
     InvestmentProject,
     InvestmentProjectSPIReportConfiguration,
