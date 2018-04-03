@@ -91,7 +91,11 @@ def test_get_basic_search_query():
             }
         },
         'from': 5,
-        'size': 5
+        'size': 5,
+        'sort': [
+            '_score',
+            'id'
+        ]
     }
 
 
@@ -207,5 +211,9 @@ def test_limited_get_search_by_entity_query():
             }
         },
         'from': 5,
-        'size': 5
+        'size': 5,
+        'sort': [
+            '_score',
+            'id'
+        ]
     }

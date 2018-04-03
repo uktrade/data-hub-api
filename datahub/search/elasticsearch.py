@@ -170,7 +170,7 @@ def _remap_sort_field(field):
 def _get_sort_query(qs, field_order=None):
     """Attaches sort query."""
     if field_order is None:
-        return qs
+        return qs.sort('_score', 'id')
 
     tokens = field_order.rsplit(':', maxsplit=1)
     order = tokens[1] if len(tokens) > 1 else 'asc'
@@ -187,7 +187,7 @@ def _get_sort_query(qs, field_order=None):
 
     qs = qs.sort({
         _remap_sort_field(tokens[0]): sort_params
-    })
+    }, 'id')
     return qs
 
 
