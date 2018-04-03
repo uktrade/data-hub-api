@@ -1,339 +1,566 @@
+---
 - model: metadata.service
   pk: d03cce05-f9f7-e511-888e-e4115bead28a
-  fields: {disabled_on: null, name: Investment - IST Client Proposal (IST use only)}
+  fields:
+    disabled_on:
+    name: Investment - IST Client Proposal (IST use only)
 - model: metadata.service
   pk: 88efd448-f9f7-e511-888e-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:40:13.000002Z', name: Investment - IST Commercial Partner Introduction (IST use only)}
+  fields:
+    disabled_on: '2017-06-27T13:40:13.000002Z'
+    name: Investment - IST Commercial Partner Introduction (IST use only)
 - model: metadata.service
   pk: ade9836c-f9f7-e511-888e-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:40:13.000002Z', name: Investment - IST Specialist Introduction (IST use only)}
+  fields:
+    disabled_on: '2017-06-27T13:40:13.000002Z'
+    name: Investment - IST Specialist Introduction (IST use only)
 - model: metadata.service
   pk: 42c71892-f9f7-e511-888e-e4115bead28a
-  fields: {disabled_on: null, name: Investment - IST Visit (IST use only)}
+  fields:
+    disabled_on:
+    name: Investment - IST Visit (IST use only)
 - model: metadata.service
   pk: 21f2c8c2-f9f7-e511-888e-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:40:13.000002Z', name: Investment - IST Research Request (IST use only)}
+  fields:
+    disabled_on: '2017-06-27T13:40:13.000002Z'
+    name: Investment - IST Research Request (IST use only)
 - model: metadata.service
   pk: bd3d1be3-f9f7-e511-888e-e4115bead28a
-  fields: {disabled_on: null, name: Investment - IST Aftercare (IST use only)}
+  fields:
+    disabled_on:
+    name: Investment - IST Aftercare (IST use only)
 - model: metadata.service
   pk: ad7a7746-2ad5-e311-8a2b-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:43:30.000003Z', name: Trade - ECR Web Action Plan}
+  fields:
+    disabled_on: '2017-06-27T13:43:30.000003Z'
+    name: Trade - ECR Web Action Plan
 - model: metadata.service
   pk: 0b94cd30-e5eb-e311-8a2b-e4115bead28a
-  fields: {disabled_on: null, name: OBN Chargeable Services}
+  fields:
+    disabled_on:
+    name: OBN Chargeable Services
 - model: metadata.service
   pk: 44345a68-49fd-e311-8a2b-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:43:30.000003Z', name: Postgraduates for Interrnational Business - Referral}
+  fields:
+    disabled_on: '2017-06-27T13:43:30.000003Z'
+    name: Postgraduates for Interrnational Business - Referral
 - model: metadata.service
   pk: 3b848e75-49fd-e311-8a2b-e4115bead28a
-  fields: {disabled_on: '2017-01-19T15:07:37.000004Z', name: Postgraduates for Interrnational Business - Placement}
+  fields:
+    disabled_on: '2017-01-19T15:07:37.000004Z'
+    name: Postgraduates for Interrnational Business - Placement
 - model: metadata.service
   pk: 4d74b1e4-8d16-e611-9bdc-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:40:12Z', name: "Investment – IST Business Development Multiplier (IST use only)"}
+  fields:
+    disabled_on: '2017-06-27T13:40:12Z'
+    name: Investment – IST Business Development Multiplier (IST use only)
 - model: metadata.service
   pk: 8c8fbb61-9a25-e611-9bdc-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:40:13.000002Z', name: Investment - IST Business Development Target (IST use only)}
+  fields:
+    disabled_on: '2017-06-27T13:40:13.000002Z'
+    name: Investment - IST Business Development Target (IST use only)
 - model: metadata.service
   pk: 5befb468-3173-e511-9d3c-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:43:19.000004Z', name: First Time Exporters - Export Insight Visits}
+  fields:
+    disabled_on: '2017-06-27T13:43:19.000004Z'
+    name: First Time Exporters - Export Insight Visits
 - model: metadata.service
   pk: 510a4016-4bb9-e211-a646-e4115bead28a
-  fields: {disabled_on: null, name: Events - Webinars}
+  fields:
+    disabled_on:
+    name: Events - Webinars
 - model: metadata.service
   pk: 496f0ce8-dcc9-e211-a646-e4115bead28a
-  fields: {disabled_on: null, name: TPU - Opportunity}
+  fields:
+    disabled_on:
+    name: TPU - Opportunity
 - model: metadata.service
   pk: 4840b339-ddc9-e211-a646-e4115bead28a
-  fields: {disabled_on: '2017-01-19T15:07:40.000003Z', name: TPU - Opportunity Interest}
+  fields:
+    disabled_on: '2017-01-19T15:07:40.000003Z'
+    name: TPU - Opportunity Interest
 - model: metadata.service
   pk: 1f7de16b-b7ce-e211-a646-e4115bead28a
-  fields: {disabled_on: '2017-01-19T15:08:10Z', name: TPU - Opportunity Status}
+  fields:
+    disabled_on: '2017-01-19T15:08:10Z'
+    name: TPU - Opportunity Status
 - model: metadata.service
   pk: be8b6c03-83cf-e211-a646-e4115bead28a
-  fields: {disabled_on: '2017-01-19T15:07:21.999996Z', name: Events - Open to Export Webinars}
+  fields:
+    disabled_on: '2017-01-19T15:07:21.999996Z'
+    name: Events - Open to Export Webinars
 - model: metadata.service
   pk: 561c6040-db21-e311-a78e-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:43:30.999996Z', name: UKEF - Bond Support Scheme}
+  fields:
+    disabled_on: '2017-06-27T13:43:30.999996Z'
+    name: UKEF - Bond Support Scheme
 - model: metadata.service
   pk: c7dc4f0b-dc21-e311-a78e-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:43:31.999998Z', name: UKEF - Export Working Capital Scheme}
+  fields:
+    disabled_on: '2017-06-27T13:43:31.999998Z'
+    name: UKEF - Export Working Capital Scheme
 - model: metadata.service
   pk: 1632b942-dc21-e311-a78e-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:43:31.999998Z', name: UKEF - Export Insurance Policy}
+  fields:
+    disabled_on: '2017-06-27T13:43:31.999998Z'
+    name: UKEF - Export Insurance Policy
 - model: metadata.service
   pk: 46cd2e66-dc21-e311-a78e-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:43:31.999998Z', name: UKEF - EFA Advice}
+  fields:
+    disabled_on: '2017-06-27T13:43:31.999998Z'
+    name: UKEF - EFA Advice
 - model: metadata.service
   pk: f1ed6742-5c9a-e411-a839-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:50:42.000003Z', name: Trade - G3 (01) - Offer Letter}
+  fields:
+    disabled_on: '2017-06-27T13:50:42.000003Z'
+    name: Trade - G3 (01) - Offer Letter
 - model: metadata.service
   pk: 60986f5c-5c9a-e411-a839-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:50:42.000003Z', name: Trade - G3 (05) - Combined 2 & 3}
+  fields:
+    disabled_on: '2017-06-27T13:50:42.000003Z'
+    name: Trade - G3 (05) - Combined 2 & 3
 - model: metadata.service
   pk: be3d8979-5c9a-e411-a839-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:50:42.000003Z', name: 'Trade - G3 (06) - 2, 3 & 4'}
+  fields:
+    disabled_on: '2017-06-27T13:50:42.000003Z'
+    name: Trade - G3 (06) - 2, 3 & 4
 - model: metadata.service
   pk: 1ec5548f-5c9a-e411-a839-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:50:42.000003Z', name: Trade - G3 (07) - Revised Action Plans}
+  fields:
+    disabled_on: '2017-06-27T13:50:42.000003Z'
+    name: Trade - G3 (07) - Revised Action Plans
 - model: metadata.service
   pk: 6e3db1a1-5c9a-e411-a839-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:50:42.000003Z', name: Trade - G3 (08) - Evaluation Form}
+  fields:
+    disabled_on: '2017-06-27T13:50:42.000003Z'
+    name: Trade - G3 (08) - Evaluation Form
 - model: metadata.service
   pk: 1ec4e4b9-5c9a-e411-a839-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:50:42.999997Z', name: Trade - G3 (09) - Exit Letter}
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999997Z'
+    name: Trade - G3 (09) - Exit Letter
 - model: metadata.service
   pk: d6d19f54-5d9a-e411-a839-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:50:42.999997Z', name: Trade - P2E (01) - Offer Letter}
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999997Z'
+    name: Trade - P2E (01) - Offer Letter
 - model: metadata.service
   pk: 5e7ca186-5d9a-e411-a839-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:50:42.999997Z', name: Trade - P2E (05) - Combined 2 & 3}
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999997Z'
+    name: Trade - P2E (05) - Combined 2 & 3
 - model: metadata.service
   pk: c24f53ed-5d9a-e411-a839-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:50:42.999997Z', name: 'Trade - P2E (06) - Combined 2, 3 & 4'}
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999997Z'
+    name: Trade - P2E (06) - Combined 2, 3 & 4
 - model: metadata.service
   pk: ce7de007-5e9a-e411-a839-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:50:42.999997Z', name: Trade - P2E (07) - Revised Action Plans}
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999997Z'
+    name: Trade - P2E (07) - Revised Action Plans
 - model: metadata.service
   pk: 9e8a641f-5e9a-e411-a839-e4115bead28a
-  fields: {disabled_on: '2017-11-06T13:34:50.000002Z', name: Trade - P2E (08) - Evaluation Form}
+  fields:
+    disabled_on: '2017-11-06T13:34:50.000002Z'
+    name: Trade - P2E (08) - Evaluation Form
 - model: metadata.service
   pk: 1e36073d-5e9a-e411-a839-e4115bead28a
-  fields: {disabled_on: '2017-11-06T13:34:50.000002Z', name: Trade - P2E (09) - Exit Letter}
+  fields:
+    disabled_on: '2017-11-06T13:34:50.000002Z'
+    name: Trade - P2E (09) - Exit Letter
 - model: metadata.service
   pk: a222c657-5e9a-e411-a839-e4115bead28a
-  fields: {disabled_on: '2017-11-06T13:34:50.000002Z', name: Trade - P2E (10) - Other}
+  fields:
+    disabled_on: '2017-11-06T13:34:50.000002Z'
+    name: Trade - P2E (10) - Other
 - model: metadata.service
   pk: 952a72f3-5f9a-e411-a839-e4115bead28a
-  fields: {disabled_on: '2017-01-19T15:08:12.999998Z', name: Trade - ECR Web Offer Letter}
+  fields:
+    disabled_on: '2017-01-19T15:08:12.999998Z'
+    name: Trade - ECR Web Offer Letter
 - model: metadata.service
   pk: 3ef6d80b-609a-e411-a839-e4115bead28a
-  fields: {disabled_on: '2017-01-19T15:08:12.999998Z', name: Trade - ECR Web Exit Letter}
+  fields:
+    disabled_on: '2017-01-19T15:08:12.999998Z'
+    name: Trade - ECR Web Exit Letter
 - model: metadata.service
   pk: 9384b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Investment - Business Proposition}
+  fields:
+    disabled_on:
+    name: Investment - Business Proposition
 - model: metadata.service
   pk: 9484b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Account Management}
+  fields:
+    disabled_on:
+    name: Account Management
 - model: metadata.service
   pk: 9584b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Events - UK Based}
+  fields:
+    disabled_on:
+    name: Events - UK Based
 - model: metadata.service
   pk: 9684b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Market Selection Service (MSS)}
+  fields:
+    disabled_on:
+    name: Market Selection Service (MSS)
 - model: metadata.service
   pk: 9784b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-11-06T13:34:40.999998Z', name: Trade - G3 (10) - Other}
+  fields:
+    disabled_on: '2017-11-06T13:34:40.999998Z'
+    name: Trade - G3 (10) - Other
 - model: metadata.service
   pk: 9884b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:43:19.000004Z', name: 'Account Management : High Growth'}
+  fields:
+    disabled_on: '2017-06-27T13:43:19.000004Z'
+    name: 'Account Management : High Growth'
 - model: metadata.service
   pk: 9984b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Inbound Referral}
+  fields:
+    disabled_on:
+    name: Inbound Referral
 - model: metadata.service
   pk: 9a84b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: UK Region Local}
+  fields:
+    disabled_on:
+    name: UK Region Local
 - model: metadata.service
   pk: 9b84b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-01-19T15:08:14Z', name: UK Trade and Investment Website}
+  fields:
+    disabled_on: '2017-01-19T15:08:14Z'
+    name: UK Trade and Investment Website
 - model: metadata.service
   pk: 9c84b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:43:29.000001Z', name: Post Local}
+  fields:
+    disabled_on: '2017-06-27T13:43:29.000001Z'
+    name: Post Local
 - model: metadata.service
   pk: 9d84b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:50:42.000003Z', name: Trade - G3 (04) - Action Plan}
+  fields:
+    disabled_on: '2017-06-27T13:50:42.000003Z'
+    name: Trade - G3 (04) - Action Plan
 - model: metadata.service
   pk: c3f9b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-01-19T15:07:39Z', name: Researching Export Markets Training (REMs)}
+  fields:
+    disabled_on: '2017-01-19T15:07:39Z'
+    name: Researching Export Markets Training (REMs)
 - model: metadata.service
   pk: c4f9b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Onward Referral}
+  fields:
+    disabled_on:
+    name: Onward Referral
 - model: metadata.service
   pk: c5f9b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2014-09-17T10:15:01.999996Z', name: Events - E-Delivery}
+  fields:
+    disabled_on: '2014-09-17T10:15:01.999996Z'
+    name: Events - E-Delivery
 - model: metadata.service
   pk: c6f9b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2014-09-17T10:15:02.999998Z', name: Business Visitor}
+  fields:
+    disabled_on: '2014-09-17T10:15:02.999998Z'
+    name: Business Visitor
 - model: metadata.service
   pk: c7f9b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:43:30.999996Z', name: Trade - Passport to Export - Other}
+  fields:
+    disabled_on: '2017-06-27T13:43:30.999996Z'
+    name: Trade - Passport to Export - Other
 - model: metadata.service
   pk: c8f9b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2014-09-17T10:15:02.999998Z', name: BERR - Enquiry}
+  fields:
+    disabled_on: '2014-09-17T10:15:02.999998Z'
+    name: BERR - Enquiry
 - model: metadata.service
   pk: c9f9b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-11-06T13:29:04.999998Z', name: Passport to Export}
+  fields:
+    disabled_on: '2017-11-06T13:29:04.999998Z'
+    name: Passport to Export
 - model: metadata.service
   pk: caf9b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-01-19T15:07:29.999997Z', name: Export Market Research Scheme (EMRS)}
+  fields:
+    disabled_on: '2017-01-19T15:07:29.999997Z'
+    name: Export Market Research Scheme (EMRS)
 - model: metadata.service
   pk: cbf9b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2015-11-03T10:35:41.000004Z', name: Export Insight Visit}
+  fields:
+    disabled_on: '2015-11-03T10:35:41.000004Z'
+    name: Export Insight Visit
 - model: metadata.service
   pk: ccf9b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Events - Overseas}
+  fields:
+    disabled_on:
+    name: Events - Overseas
 - model: metadata.service
   pk: cdf9b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:50:42.999997Z', name: Trade - P2E (02) - Stage 1}
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999997Z'
+    name: Trade - P2E (02) - Stage 1
 - model: metadata.service
   pk: cef9b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:50:42.999997Z', name: Trade - P2E (03) - ITR}
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999997Z'
+    name: Trade - P2E (03) - ITR
 - model: metadata.service
   pk: cff9b82b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:50:42.999997Z', name: Trade - P2E - Actions Record}
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999997Z'
+    name: Trade - P2E - Actions Record
 - model: metadata.service
   pk: d320b92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Investment - Company Visit}
+  fields:
+    disabled_on:
+    name: Investment - Company Visit
 - model: metadata.service
   pk: d420b92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Investment - Regional Tour}
+  fields:
+    disabled_on:
+    name: Investment - Regional Tour
 - model: metadata.service
   pk: d520b92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Export Opportunities}
+  fields:
+    disabled_on:
+    name: Export Opportunities
 - model: metadata.service
   pk: d620b92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2014-09-17T10:15:02.999998Z', name: Trade - Open to Export}
+  fields:
+    disabled_on: '2014-09-17T10:15:02.999998Z'
+    name: Trade - Open to Export
 - model: metadata.service
   pk: d720b92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2014-09-17T10:15:02.999998Z', name: FDI Target}
+  fields:
+    disabled_on: '2014-09-17T10:15:02.999998Z'
+    name: FDI Target
 - model: metadata.service
   pk: d820b92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Significant Assistance Development Aid (PIMS)}
+  fields:
+    disabled_on:
+    name: Significant Assistance Development Aid (PIMS)
 - model: metadata.service
   pk: d920b92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:43:29.000001Z', name: Passport to Export R & D}
+  fields:
+    disabled_on: '2017-06-27T13:43:29.000001Z'
+    name: Passport to Export R & D
 - model: metadata.service
   pk: da20b92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-01-19T15:07:29.000004Z', name: Export Communication Review Scheme (ECR)}
+  fields:
+    disabled_on: '2017-01-19T15:07:29.000004Z'
+    name: Export Communication Review Scheme (ECR)
 - model: metadata.service
   pk: db20b92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-01-19T15:07:37.000004Z', name: Global Partnerships}
+  fields:
+    disabled_on: '2017-01-19T15:07:37.000004Z'
+    name: Global Partnerships
 - model: metadata.service
   pk: dc20b92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-01-19T15:07:40.000003Z', name: Support for New Inward Investors}
+  fields:
+    disabled_on: '2017-01-19T15:07:40.000003Z'
+    name: Support for New Inward Investors
 - model: metadata.service
   pk: dd20b92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:50:42.000003Z', name: Trade - G3 (02) - Stage 1 Information}
+  fields:
+    disabled_on: '2017-06-27T13:50:42.000003Z'
+    name: Trade - G3 (02) - Stage 1 Information
 - model: metadata.service
   pk: f36eb92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Trade - Services (Other)}
+  fields:
+    disabled_on:
+    name: Trade - Services (Other)
 - model: metadata.service
   pk: f46eb92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Tradeshow Access Programme (TAP) Non Funded}
+  fields:
+    disabled_on:
+    name: Tradeshow Access Programme (TAP) Non Funded
 - model: metadata.service
   pk: f56eb92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Significant Assistance (PIMS)}
+  fields:
+    disabled_on:
+    name: Significant Assistance (PIMS)
 - model: metadata.service
   pk: f66eb92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-01-19T15:07:30.999999Z', name: FTSE 100 Programme}
+  fields:
+    disabled_on: '2017-01-19T15:07:30.999999Z'
+    name: FTSE 100 Programme
 - model: metadata.service
   pk: f76eb92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Trade - Tradeshow Access Programme (TAP)}
+  fields:
+    disabled_on:
+    name: Trade - Tradeshow Access Programme (TAP)
 - model: metadata.service
   pk: f86eb92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-01-19T15:07:21.000003Z', name: Entrepreneurial Inward Investment}
+  fields:
+    disabled_on: '2017-01-19T15:07:21.000003Z'
+    name: Entrepreneurial Inward Investment
 - model: metadata.service
   pk: f96eb92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2014-09-17T10:15:04Z', name: BR Proactive Management}
+  fields:
+    disabled_on: '2014-09-17T10:15:04Z'
+    name: BR Proactive Management
 - model: metadata.service
   pk: fa6eb92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Tradeshow Access Programme (TAP) - Solo}
+  fields:
+    disabled_on:
+    name: Tradeshow Access Programme (TAP) - Solo
 - model: metadata.service
   pk: fb6eb92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-01-19T15:07:39Z', name: Support for Current Inward Investors}
+  fields:
+    disabled_on: '2017-01-19T15:07:39Z'
+    name: Support for Current Inward Investors
 - model: metadata.service
   pk: 0396b92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-11-06T13:25:20.000004Z', name: Gateway to Global Growth}
+  fields:
+    disabled_on: '2017-11-06T13:25:20.000004Z'
+    name: Gateway to Global Growth
 - model: metadata.service
   pk: 0496b92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-01-19T15:07:39Z', name: SG Special Reports}
+  fields:
+    disabled_on: '2017-01-19T15:07:39Z'
+    name: SG Special Reports
 - model: metadata.service
   pk: 0596b92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Investment - Services}
+  fields:
+    disabled_on:
+    name: Investment - Services
 - model: metadata.service
   pk: 0696b92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Events - Outward Missions}
+  fields:
+    disabled_on:
+    name: Events - Outward Missions
 - model: metadata.service
   pk: 0796b92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: DSO Interaction}
+  fields:
+    disabled_on:
+    name: DSO Interaction
 - model: metadata.service
   pk: 0896b92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2014-09-17T10:15:04Z', name: New Products from Britain (NPFB)}
+  fields:
+    disabled_on: '2014-09-17T10:15:04Z'
+    name: New Products from Britain (NPFB)
 - model: metadata.service
   pk: 0996b92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:50:42.999997Z', name: Trade - P2E (04) - Action Plan}
+  fields:
+    disabled_on: '2017-06-27T13:50:42.999997Z'
+    name: Trade - P2E (04) - Action Plan
 - model: metadata.service
   pk: 0a96b92b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:50:42.000003Z', name: Trade - G3 (03) - ITR}
+  fields:
+    disabled_on: '2017-06-27T13:50:42.000003Z'
+    name: Trade - G3 (03) - ITR
 - model: metadata.service
   pk: 330bba2b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Trade - Enquiry}
+  fields:
+    disabled_on:
+    name: Trade - Enquiry
 - model: metadata.service
   pk: 340bba2b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Events - Market Visit Support (MVS)}
+  fields:
+    disabled_on:
+    name: Events - Market Visit Support (MVS)
 - model: metadata.service
   pk: 350bba2b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Export Win}
+  fields:
+    disabled_on:
+    name: Export Win
 - model: metadata.service
   pk: 360bba2b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Overseas Market Introduction Service (OMIS)}
+  fields:
+    disabled_on:
+    name: Overseas Market Introduction Service (OMIS)
 - model: metadata.service
   pk: 370bba2b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Events - Inward Missions}
+  fields:
+    disabled_on:
+    name: Events - Inward Missions
 - model: metadata.service
   pk: 380bba2b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Tradeshow Access Programme (TAP)}
+  fields:
+    disabled_on:
+    name: Tradeshow Access Programme (TAP)
 - model: metadata.service
   pk: 390bba2b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-11-06T13:31:48Z', name: Trade - G3 - Actions Record}
+  fields:
+    disabled_on: '2017-11-06T13:31:48Z'
+    name: Trade - G3 - Actions Record
 - model: metadata.service
   pk: 3a0bba2b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Investment - Enquiry}
+  fields:
+    disabled_on:
+    name: Investment - Enquiry
 - model: metadata.service
   pk: 5359ba2b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-01-19T15:07:21.999996Z', name: Exhibitions (Not TAP)}
+  fields:
+    disabled_on: '2017-01-19T15:07:21.999996Z'
+    name: Exhibitions (Not TAP)
 - model: metadata.service
   pk: 5459ba2b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-01-19T15:07:37.000004Z', name: Passport Aftercare}
+  fields:
+    disabled_on: '2017-01-19T15:07:37.000004Z'
+    name: Passport Aftercare
 - model: metadata.service
   pk: 5559ba2b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:43:21Z', name: Open to Export Assist (OtE)}
+  fields:
+    disabled_on: '2017-06-27T13:43:21Z'
+    name: Open to Export Assist (OtE)
 - model: metadata.service
   pk: 5659ba2b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:43:19.000004Z', name: BIS Interaction}
+  fields:
+    disabled_on: '2017-06-27T13:43:19.000004Z'
+    name: BIS Interaction
 - model: metadata.service
   pk: 5759ba2b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2016-05-04T10:56:10.000003Z', name: XXX}
+  fields:
+    disabled_on: '2016-05-04T10:56:10.000003Z'
+    name: XXX
 - model: metadata.service
   pk: 5859ba2b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:43:30.999996Z', name: Trade - OMIS/MSS}
+  fields:
+    disabled_on: '2017-06-27T13:43:30.999996Z'
+    name: Trade - OMIS/MSS
 - model: metadata.service
   pk: 5959ba2b-3499-e211-a939-e4115bead28a
-  fields: {disabled_on: null, name: Investment - Aftercare Company Visit}
+  fields:
+    disabled_on:
+    name: Investment - Aftercare Company Visit
 - model: metadata.service
   pk: fe09d0f5-61ee-e411-bbc1-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:43:19.999998Z', name: "First Time Exporters – Export Savvy"}
+  fields:
+    disabled_on: '2017-06-27T13:43:19.999998Z'
+    name: First Time Exporters – Export Savvy
 - model: metadata.service
   pk: 3a812c0a-62ee-e411-bbc1-e4115bead28a
-  fields: {disabled_on: '2015-10-15T11:38:32.000004Z', name: "First Time Exporters – Other"}
+  fields:
+    disabled_on: '2015-10-15T11:38:32.000004Z'
+    name: First Time Exporters – Other
 - model: metadata.service
   pk: e96a775a-1ff3-e411-bcbe-e4115bead28a
-  fields: {disabled_on: null, name: Language and Culture Advisers One-to-One}
+  fields:
+    disabled_on:
+    name: Language and Culture Advisers One-to-One
 - model: metadata.service
   pk: 56c42f6d-1ff3-e411-bcbe-e4115bead28a
-  fields: {disabled_on: null, name: Digital Trade Advisers One-to-One}
+  fields:
+    disabled_on:
+    name: Digital Trade Advisers One-to-One
 - model: metadata.service
   pk: 12907483-1ff3-e411-bcbe-e4115bead28a
-  fields: {disabled_on: '2017-06-27T13:43:26.999996Z', name: Overseas Business Network Advisers One-to-One}
+  fields:
+    disabled_on: '2017-06-27T13:43:26.999996Z'
+    name: Overseas Business Network Advisers One-to-One
 - model: metadata.service
   pk: 632b8708-28b6-e611-984a-e4115bead28a
-  fields: {disabled_on: null, name: Bank Referral}
+  fields:
+    disabled_on:
+    name: Bank Referral
 - model: metadata.service
   pk: a4a733b6-eb95-e611-be23-e4115bead28a
-  fields: {disabled_on: null, name: 'Account Managment: Northern Powerhouse'}
+  fields:
+    disabled_on:
+    name: 'Account Managment: Northern Powerhouse'
 - model: metadata.service
   pk: e7238b26-653c-e711-8a1f-e4115bead28a
-  fields: {disabled_on: null, name: EiG Referral}
+  fields:
+    disabled_on:
+    name: EiG Referral
 - model: metadata.service
   pk: 3b679865-ea99-e711-ba5d-e4115bead28a
-  fields: {disabled_on: null, name: Global Growth Pilot (2017)}
+  fields:
+    disabled_on:
+    name: Global Growth Pilot (2017)
