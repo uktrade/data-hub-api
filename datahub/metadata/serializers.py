@@ -1,7 +1,13 @@
 from rest_framework import serializers
 
 from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
-from .models import Country, TeamRole, UKRegion
+from .models import Country, Service, TeamRole, UKRegion
+
+
+class ServiceSerializer(ConstantModelSerializer):
+    """Service serializer."""
+
+    contexts = serializers.MultipleChoiceField(choices=Service.CONTEXTS, read_only=True)
 
 
 class TeamSerializer(ConstantModelSerializer):

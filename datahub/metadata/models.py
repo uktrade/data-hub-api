@@ -2,12 +2,15 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.models import Group
+from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
+from model_utils import Choices
 from mptt.models import MPTTModel, TreeForeignKey
 
 from datahub.core.exceptions import DataHubException
+from datahub.core.fields import MultipleChoiceField
 from datahub.core.models import BaseConstantModel, BaseOrderedConstantModel, DisableableModel
 from datahub.core.utils import join_truthy_strings
 
@@ -124,6 +127,25 @@ class Team(BaseConstantModel):
 
 class Service(BaseConstantModel):
     """Service."""
+
+    CONTEXTS = Choices(
+        ('event', 'Event'),
+        ('interaction', 'Interaction'),
+        ('investment_project_interaction', 'Investment project interaction'),
+        ('policy_feedback', 'Policy feedback'),
+        ('service_delivery', 'Service delivery'),
+    )
+
+    contexts = MultipleChoiceField(
+        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+        choices=CONTEXTS,
+        blank=True,
+    )
+
+    class Meta(BaseConstantModel.Meta):
+        indexes = [
+            GinIndex(fields=['contexts']),
+        ]
 
 
 class HeadquarterType(BaseOrderedConstantModel):
