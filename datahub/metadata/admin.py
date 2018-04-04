@@ -15,7 +15,6 @@ MODELS_TO_REGISTER_DISABLEABLE = (
     models.ReferralSourceMarketing,
     models.ReferralSourceWebsite,
     models.Role,
-    models.Service,
     models.Title,
     models.UKRegion,
 )
@@ -95,6 +94,21 @@ admin.site.register(
     MODELS_TO_REGISTER_EDITABLE_ORDER_ONLY,
     EditableOrderOnlyOrderedMetadataAdmin
 )
+
+
+@admin.register(models.Service)
+class ServiceAdmin(DisableableMetadataAdmin):
+    """Admin for services."""
+
+    fields = ('id', 'name', 'contexts', 'disabled_on')
+    list_display = ('name', 'contexts_friendly', 'disabled_on')
+
+    def contexts_friendly(self, obj):
+        """Displays the contexts using their names (instead of their internal values)."""
+        return ', '.join(obj.CONTEXTS[context] for context in obj.contexts)
+
+    contexts_friendly.short_description = 'Contexts'
+    contexts_friendly.admin_order_field = 'contexts'
 
 
 @admin.register(models.Team)

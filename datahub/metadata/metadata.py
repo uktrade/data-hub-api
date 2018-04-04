@@ -1,6 +1,7 @@
 from . import models
+from .filters import ServiceFilterSet
 from .registry import registry
-from .serializers import SectorSerializer, TeamSerializer
+from .serializers import SectorSerializer, ServiceSerializer, TeamSerializer
 
 registry.register(metadata_id='business-type', model=models.BusinessType)
 registry.register(metadata_id='country', model=models.Country)
@@ -18,7 +19,12 @@ registry.register(
     ),
     serializer=SectorSerializer,
 )
-registry.register(metadata_id='service', model=models.Service)
+registry.register(
+    filter_class=ServiceFilterSet,
+    metadata_id='service',
+    model=models.Service,
+    serializer=ServiceSerializer
+)
 registry.register(metadata_id='team-role', model=models.TeamRole)
 registry.register(
     metadata_id='team',
