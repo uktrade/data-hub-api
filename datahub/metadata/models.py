@@ -15,8 +15,6 @@ from datahub.core.utils import join_truthy_strings
 class BusinessType(BaseConstantModel):
     """Company business type."""
 
-    pass
-
 
 class Sector(MPTTModel, DisableableModel):
     """Company sector."""
@@ -64,19 +62,13 @@ class Sector(MPTTModel, DisableableModel):
 class EmployeeRange(BaseOrderedConstantModel):
     """Company employee range."""
 
-    pass
-
 
 class TurnoverRange(BaseOrderedConstantModel):
     """Company turnover range."""
 
-    pass
-
 
 class UKRegion(BaseConstantModel):
     """UK region."""
-
-    pass
 
 
 class Country(BaseConstantModel):
@@ -89,13 +81,9 @@ class Country(BaseConstantModel):
 class Title(BaseConstantModel):
     """Contact title."""
 
-    pass
-
 
 class Role(BaseConstantModel):
     """Contact role."""
-
-    pass
 
 
 class TeamRole(BaseConstantModel):
@@ -137,19 +125,13 @@ class Team(BaseConstantModel):
 class Service(BaseConstantModel):
     """Service."""
 
-    pass
-
 
 class HeadquarterType(BaseConstantModel):
     """Head Quarter."""
 
-    pass
-
 
 class CompanyClassification(BaseConstantModel):
     """Company classification."""
-
-    pass
 
 
 class InvestmentProjectStage(BaseOrderedConstantModel):
