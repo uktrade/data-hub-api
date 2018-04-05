@@ -127,7 +127,7 @@ class Service(BaseConstantModel):
 
 
 class HeadquarterType(BaseOrderedConstantModel):
-    """Head Quarter."""
+    """Headquarter type."""
 
 
 class CompanyClassification(BaseConstantModel):
