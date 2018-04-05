@@ -29,9 +29,12 @@ MODELS_TO_REGISTER_WITH_ORDER = (
 
 MODELS_TO_REGISTER_READ_ONLY = (
     models.BusinessType,
-    models.HeadquarterType,
     models.InvestmentType,
     models.InvestmentProjectStage,
+)
+
+MODELS_TO_REGISTER_EDITABLE_ORDER_ONLY = (
+    models.HeadquarterType,
 )
 
 
@@ -75,9 +78,23 @@ class OrderedMetadataAdmin(admin.ModelAdmin):
     list_filter = (DisabledOnFilter,)
 
 
+class EditableOrderOnlyOrderedMetadataAdmin(OrderedMetadataAdmin, ReadOnlyAdmin):
+    """
+    Generic admin for ordered metadata models with editable order.
+
+    Intended to be used across apps.
+    """
+
+    readonly_fields = ('id', 'name', 'disabled_on')
+
+
 admin.site.register(MODELS_TO_REGISTER_DISABLEABLE, DisableableMetadataAdmin)
 admin.site.register(MODELS_TO_REGISTER_READ_ONLY, ReadOnlyMetadataAdmin)
 admin.site.register(MODELS_TO_REGISTER_WITH_ORDER, OrderedMetadataAdmin)
+admin.site.register(
+    MODELS_TO_REGISTER_EDITABLE_ORDER_ONLY,
+    EditableOrderOnlyOrderedMetadataAdmin
+)
 
 
 @admin.register(models.Team)
