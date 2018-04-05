@@ -153,3 +153,14 @@ class InvestmentProjectTeamMemberFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'investment.InvestmentProjectTeamMember'
+
+
+class InvestmentProjectSPIReportConfigurationFactory(factory.django.DjangoModelFactory):
+    """Investment Project SPI report configuration factory."""
+
+    after_care_offered_id = None
+    project_manager_assigned_id = None
+    client_proposal_id = None
+
+    class Meta:
+        model = 'investment.InvestmentProjectSPIReportConfiguration'
