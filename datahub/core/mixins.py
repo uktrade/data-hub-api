@@ -1,7 +1,7 @@
 """General mixins."""
 from django.conf import settings
 from rest_framework import serializers
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 
@@ -17,7 +17,7 @@ class ArchiveSerializer(serializers.Serializer):
 class ArchivableViewSetMixin:
     """To be used with archivable models."""
 
-    @detail_route(methods=['post'])
+    @action(methods=['post'], detail=True)
     def archive(self, request, pk):
         """Archive the object."""
         serializer = ArchiveSerializer(data=request.data)
@@ -29,7 +29,7 @@ class ArchivableViewSetMixin:
         serializer = self.get_serializer_class()(obj)
         return Response(data=serializer.data)
 
-    @detail_route(methods=['post'])
+    @action(methods=['post'], detail=True)
     def unarchive(self, request, pk):
         """Unarchive the object."""
         obj = self.get_object()
