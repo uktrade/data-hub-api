@@ -31,9 +31,17 @@ class SingleOrListField(serializers.ListField):
     """Field can be single instance or list."""
 
     def to_internal_value(self, data):
-        """If data is str, creates a list."""
+        """
+        If data is str, call the child serialiser's run_validation() directly.
+
+        This is to maintain an error format matching the input (if a list is provided, return an
+        error list for each item, otherwise return a single error list).
+
+        (We call self.child.run_validation() rather than self.child.to_internal_value(), because
+        ListField performs child field validation in its to_internal_value().)
+        """
         if isinstance(data, str):
-            data = [data]
+            return [self.child.run_validation(data)]
         return super().to_internal_value(data)
 
 
