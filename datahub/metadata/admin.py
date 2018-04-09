@@ -101,14 +101,7 @@ class ServiceAdmin(DisableableMetadataAdmin):
     """Admin for services."""
 
     fields = ('id', 'name', 'contexts', 'disabled_on')
-    list_display = ('name', 'contexts_friendly', 'disabled_on')
-
-    def contexts_friendly(self, obj):
-        """Displays the contexts using their names (instead of their internal values)."""
-        return ', '.join(obj.CONTEXTS[context] for context in obj.contexts)
-
-    contexts_friendly.short_description = 'Contexts'
-    contexts_friendly.admin_order_field = 'contexts'
+    list_display = ('name', 'get_contexts_display', 'disabled_on')
 
 
 @admin.register(models.Team)
