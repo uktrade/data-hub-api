@@ -1,10 +1,14 @@
+from datahub.search.query_builder import (
+    get_basic_search_query,
+    get_search_by_entity_query,
+    limit_search_query,
+)
 from ..models import Contact as ESContact
-from ... import elasticsearch
 
 
 def test_get_basic_search_query():
     """Tests basic search query."""
-    query = elasticsearch.get_basic_search_query('test', entities=(ESContact,), offset=5, limit=5)
+    query = get_basic_search_query('test', entities=(ESContact,), offset=5, limit=5)
 
     assert query.to_dict() == {
         'query': {
@@ -108,12 +112,12 @@ def test_get_limited_search_by_entity_query():
         'estimated_land_date_after': date,
         'estimated_land_date_before': date,
     }
-    query = elasticsearch.get_search_by_entity_query(
+    query = get_search_by_entity_query(
         term='test',
         filter_data=filter_data,
         entity=ESContact,
     )
-    query = elasticsearch.limit_search_query(
+    query = limit_search_query(
         query,
         offset=5,
         limit=5,
