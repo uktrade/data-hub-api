@@ -12,9 +12,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from datahub.oauth.scopes import Scope
-from . import elasticsearch
 from .apps import get_search_apps
 from .permissions import has_permissions_for_app, SearchAppPermissions
+from .query_builder import (
+    get_basic_search_query,
+    get_search_by_entity_query,
+    limit_search_query,
+)
 from .serializers import SearchSerializer
 from .utils import Echo
 
@@ -73,7 +77,7 @@ class SearchBasicAPIView(APIView):
         offset = int(request.query_params.get('offset', 0))
         limit = int(request.query_params.get('limit', 100))
 
-        results = elasticsearch.get_basic_search_query(
+        results = get_basic_search_query(
             term=term,
             entities=(self.entity_by_name[entity].model,),
             permission_filters_by_entity=dict(_get_permission_filters(request)),
@@ -174,7 +178,7 @@ class SearchAPIView(APIView):
         aggregations = (self.REMAP_FIELDS.get(field, field) for field in self.FILTER_FIELDS) \
             if self.include_aggregations else None
 
-        query = elasticsearch.get_search_by_entity_query(
+        query = get_search_by_entity_query(
             entity=self.entity,
             term=validated_data['original_query'],
             filter_data=filter_data,
@@ -184,7 +188,7 @@ class SearchAPIView(APIView):
             aggregations=aggregations,
         )
 
-        results = elasticsearch.limit_search_query(
+        results = limit_search_query(
             query,
             offset=validated_data['offset'],
             limit=validated_data['limit'],
@@ -268,7 +272,7 @@ class SearchExportAPIView(SearchAPIView):
         validated_data = self.validate_data(request.data)
         filter_data = self._get_filter_data(validated_data)
 
-        results = elasticsearch.get_search_by_entity_query(
+        results = get_search_by_entity_query(
             entity=self.entity,
             term=validated_data['original_query'],
             filter_data=filter_data,

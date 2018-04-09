@@ -1,7 +1,7 @@
 import pytest
 
 from datahub.company.test.factories import ContactFactory
-from datahub.search import elasticsearch
+from datahub.search.query_builder import get_basic_search_query
 from ..models import Contact
 
 pytestmark = pytest.mark.django_db
@@ -15,7 +15,7 @@ def test_contact_auto_sync_to_es(setup_es):
     )
     setup_es.indices.refresh()
 
-    result = elasticsearch.get_basic_search_query(test_name, entities=(Contact,)).execute()
+    result = get_basic_search_query(test_name, entities=(Contact,)).execute()
 
     assert result.hits.total == 1
 
@@ -33,7 +33,7 @@ def test_contact_auto_updates_to_es(setup_es):
     contact.save()
     setup_es.indices.refresh()
 
-    result = elasticsearch.get_basic_search_query(new_test_name, entities=(Contact,)).execute()
+    result = get_basic_search_query(new_test_name, entities=(Contact,)).execute()
 
     assert result.hits.total == 1
     assert result.hits[0].id == str(contact.id)
