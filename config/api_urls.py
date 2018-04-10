@@ -6,6 +6,7 @@ from rest_framework import routers
 from datahub.company import urls as company_urls
 from datahub.company import views as company_views
 from datahub.event import urls as event_urls
+from datahub.featureflag import urls as featureflag_urls
 from datahub.interaction import urls as interaction_urls
 from datahub.investment import urls as investment_urls
 from datahub.leads import urls as leads_urls
@@ -28,6 +29,7 @@ v3_urls = [
     path('', include((company_urls.company_urls, 'company'), namespace='company')),
     path('', include((company_urls.ch_company_urls, 'ch-company'), namespace='ch-company')),
     path('', include((event_urls, 'event'), namespace='event')),
+    path('', include((featureflag_urls, 'featureflag'), namespace='featureflag')),
     path('', include((interaction_urls, 'interaction'), namespace='interaction')),
     path('', include((investment_urls, 'investment'), namespace='investment')),
     path('', include((leads_urls, 'business-leads'), namespace='business-leads')),
