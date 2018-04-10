@@ -5,7 +5,9 @@ from datahub.investment.test.factories import (
     InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
 )
 from datahub.metadata.test.factories import TeamFactory
-from datahub.search import elasticsearch
+from datahub.search.query_builder import (
+    get_search_by_entity_query,
+)
 from ..models import InvestmentProject
 
 pytestmark = pytest.mark.django_db
@@ -19,7 +21,7 @@ def test_investment_project_auto_sync_to_es(setup_es):
     )
     setup_es.indices.refresh()
 
-    result = elasticsearch.get_search_by_entity_query(
+    result = get_search_by_entity_query(
         term='',
         filter_data={'name': test_name},
         entity=InvestmentProject
@@ -36,7 +38,7 @@ def test_investment_project_auto_updates_to_es(setup_es):
     project.save()
     setup_es.indices.refresh()
 
-    result = elasticsearch.get_search_by_entity_query(
+    result = get_search_by_entity_query(
         term='',
         filter_data={'name': new_test_name},
         entity=InvestmentProject
@@ -55,7 +57,7 @@ def test_investment_project_team_member_added_sync_to_es(setup_es, team_member):
     """Tests if investment project gets synced to Elasticsearch when a team member is added."""
     setup_es.indices.refresh()
 
-    results = elasticsearch.get_search_by_entity_query(
+    results = get_search_by_entity_query(
         term='',
         filter_data={},
         entity=InvestmentProject,
@@ -75,7 +77,7 @@ def test_investment_project_team_member_updated_sync_to_es(setup_es, team_member
     team_member.save()
     setup_es.indices.refresh()
 
-    results = elasticsearch.get_search_by_entity_query(
+    results = get_search_by_entity_query(
         term='',
         filter_data={},
         entity=InvestmentProject,
@@ -93,7 +95,7 @@ def test_investment_project_team_member_deleted_sync_to_es(setup_es, team_member
     team_member.delete()
     setup_es.indices.refresh()
 
-    results = elasticsearch.get_search_by_entity_query(
+    results = get_search_by_entity_query(
         term='',
         filter_data={},
         entity=InvestmentProject,
@@ -124,7 +126,7 @@ def test_investment_project_syncs_when_adviser_changes(setup_es, field):
 
     setup_es.indices.refresh()
 
-    result = elasticsearch.get_search_by_entity_query(
+    result = get_search_by_entity_query(
         term='',
         filter_data={'id': project.pk},
         entity=InvestmentProject
@@ -147,7 +149,7 @@ def test_investment_project_syncs_when_team_member_adviser_changes(setup_es, tea
 
     setup_es.indices.refresh()
 
-    result = elasticsearch.get_search_by_entity_query(
+    result = get_search_by_entity_query(
         term='',
         filter_data={'id': team_member.investment_project.pk},
         entity=InvestmentProject

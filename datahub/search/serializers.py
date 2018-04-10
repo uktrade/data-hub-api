@@ -2,7 +2,7 @@ from dateutil.parser import parse as dateutil_parse
 from rest_framework import serializers
 from rest_framework.settings import api_settings
 
-from datahub.search.elasticsearch import MAX_RESULTS
+from datahub.search.query_builder import MAX_RESULTS
 
 
 class RelaxedDateTimeField(serializers.Field):
