@@ -46,7 +46,7 @@ def _get_objects(request, limit, search_app, adviser_field):
             adviser_field: request.user.id,
             'created_on_exists': True,
         },
-        field_order='created_on:desc',
+        ordering='created_on:desc',
     )
     results = limit_search_query(
         query,
