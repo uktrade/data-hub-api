@@ -8,6 +8,9 @@ from elasticsearch_dsl.query import Bool, MatchPhrase, MultiMatch, Query, Term
 from datahub.search.apps import EXCLUDE_ALL, get_search_apps
 
 MAX_RESULTS = 10000
+FIELD_REMAPPING = {
+    'name': 'name_keyword',
+}
 
 
 class MatchNone(Query):
@@ -26,7 +29,7 @@ def get_basic_search_query(
         term,
         entities=None,
         permission_filters_by_entity=None,
-        field_order=None,
+        ordering=None,
         ignored_entities=(),
         offset=0,
         limit=100
@@ -49,64 +52,61 @@ def get_basic_search_query(
     # and the same query is always generated with the same inputs
     fields = sorted(fields)
 
-    query = _get_search_term_query(term, fields=fields)
-    s = Search(index=settings.ES_INDEX).query(query)
+    query = _build_term_query(term, fields=fields)
+    search = Search(index=settings.ES_INDEX).query(query)
 
-    permission_query = _get_global_permission_query(permission_filters_by_entity)
+    permission_query = _build_global_permission_query(permission_filters_by_entity)
     if permission_query:
-        s = s.filter(permission_query)
+        search = search.filter(permission_query)
 
-    s = s.post_filter(
+    search = search.post_filter(
         Q('bool', should=[
             Q('term', _type=entity._doc_type.name) for entity in entities
             if entity._doc_type.name not in ignored_entities
         ])
     )
-
-    s = _get_sort_query(s, field_order=field_order)
-    s.aggs.bucket(
+    search = _apply_sorting_to_query(search, ordering)
+    search.aggs.bucket(
         'count_by_type', 'terms', field='_type'
     )
 
-    return s[offset:offset + limit]
+    return search[offset:offset + limit]
 
 
 def get_search_by_entity_query(
         term=None,
         filter_data=None,
-        composite_filters=None,
+        composite_field_mapping=None,
         permission_filters=None,
         entity=None,
-        field_order=None,
-        aggregations=None
+        ordering=None,
+        aggregation_fields=None
 ):
     """
-    Perform filtered search for given terms in given entity.
+    Performs filtered search for given terms in given entity.
 
     :param permission_filters: dict of field names and values. These represent rules that records
                                must match one of to be included in the results.
     """
     query = [Q('term', _type=entity._doc_type.name)]
     if term != '':
-        query.append(_get_search_term_query(term, fields=entity.SEARCH_FIELDS))
+        query.append(_build_term_query(term, fields=entity.SEARCH_FIELDS))
 
     filters, ranges = _split_date_range_fields(filter_data)
 
     # document must match all filters in the list (and)
-    must_filter = _get_must_filter_query(filters, composite_filters, ranges)
+    must_filter = _build_must_queries(filters, ranges, composite_field_mapping)
 
     s = Search(index=settings.ES_INDEX).query('bool', must=query)
 
-    permission_query = _get_entity_permission_query(permission_filters)
+    permission_query = _build_entity_permission_query(permission_filters)
     if permission_query:
         s = s.filter(permission_query)
 
-    s = _get_sort_query(s, field_order=field_order)
-
     s = s.post_filter('bool', must=must_filter)
-
-    if aggregations:
-        _apply_aggs_query(s, aggregations)
+    s = _apply_sorting_to_query(s, ordering)
+    if aggregation_fields:
+        s = _add_aggs_to_query(s, aggregation_fields)
 
     return s
 
@@ -118,7 +118,7 @@ def limit_search_query(query, offset=0, limit=100):
 
 
 def _split_date_range_fields(fields):
-    """Finds and format range fields."""
+    """Finds and formats range fields."""
     filters = {}
     ranges = defaultdict(dict)
 
@@ -142,7 +142,7 @@ def _clip_limit(offset, limit):
     return max(min(limit, MAX_RESULTS - offset), 0)
 
 
-def _get_global_permission_query(permission_filters_by_entity):
+def _build_global_permission_query(permission_filters_by_entity):
     """
     Returns the filter query to use to enforce permissions in global search.
 
@@ -155,7 +155,7 @@ def _get_global_permission_query(permission_filters_by_entity):
     if permission_filters_by_entity is None:
         return None
 
-    subqueries = list(_get_global_permission_subqueries(permission_filters_by_entity))
+    subqueries = list(_build_global_permission_subqueries(permission_filters_by_entity))
     # Check if there are any should subqueries (of which at least one should be matched).
     # If there are no conditions, return MatchNone() to ensure that all results are filtered out
     #  (as you can't meet at least one condition when there are no conditions).
@@ -166,10 +166,10 @@ def _get_global_permission_query(permission_filters_by_entity):
     return MatchNone()
 
 
-def _get_global_permission_subqueries(permission_filters_by_entity):
+def _build_global_permission_subqueries(permission_filters_by_entity):
     for entity, filter_args in permission_filters_by_entity.items():
         query = Term(_type=entity)
-        entity_condition = _get_entity_permission_query(filter_args)
+        entity_condition = _build_entity_permission_query(filter_args)
 
         if entity_condition is not None:
             query &= entity_condition
@@ -177,8 +177,8 @@ def _get_global_permission_subqueries(permission_filters_by_entity):
         yield query
 
 
-def _get_entity_permission_query(permission_filters):
-    """Gets the filter query to apply to enforce permissions for a model."""
+def _build_entity_permission_query(permission_filters):
+    """Builds the filter query to apply to enforce permissions for a model."""
     # None is used when there is no filtering to apply for the entity,
     # Returns None to indicate that no filter query should be used.
     if permission_filters is None:
@@ -199,8 +199,8 @@ def _get_entity_permission_query(permission_filters):
     return MatchNone()
 
 
-def _get_search_term_query(term, fields=None):
-    """Returns search term query."""
+def _build_term_query(term, fields=None):
+    """Builds a term query."""
     if term == '':
         return Q('match_all')
 
@@ -221,70 +221,8 @@ def _get_search_term_query(term, fields=None):
     return Q('bool', should=should_query)
 
 
-def _remap_sort_field(field):
-    """Replaces fields to aliases suitable for sorting."""
-    name_map = {
-        'name': 'name_keyword',
-    }
-    return name_map.get(field, field)
-
-
-def _get_sort_query(qs, field_order=None):
-    """Attaches sort query."""
-    if field_order is None:
-        return qs.sort('_score', 'id')
-
-    tokens = field_order.rsplit(':', maxsplit=1)
-    order = tokens[1] if len(tokens) > 1 else 'asc'
-
-    sort_params = {
-        'order': order,
-        'missing': '_first' if order == 'asc' else '_last'
-    }
-
-    # check if we sort by field in nested document (example: 'stage.name')
-    if '.' in tokens[0]:
-        # extract and add path to nested document (example: 'stage')
-        sort_params['nested_path'] = tokens[0].split('.', 1)[0]
-
-    qs = qs.sort({
-        _remap_sort_field(tokens[0]): sort_params
-    }, 'id')
-    return qs
-
-
-def _get_basic_field_query(field, value):
-    """Gets field query depending on field suffix."""
-    if any(field.endswith(suffix) for suffix in ('.id', '_keyword')):
-        return Q('match_phrase', **{field: value})
-
-    if field.endswith('_exists'):
-        return _get_exists_query(field, value)
-
-    field_query = {
-        'query': value,
-        'operator': 'and',
-    }
-    return Q('match', **{field: field_query})
-
-
-def _get_field_query(field, value):
-    """Gets field query."""
-    if value is None:
-        return _get_exists_query(
-            f"{field.rsplit('.', maxsplit=1)[0]}_exists",
-            False
-        )
-
-    query = _get_basic_field_query(field, value)
-    if '.' not in field:
-        return query
-
-    return Q('nested', path=field.rsplit('.', maxsplit=1)[0], query=query)
-
-
-def _get_exists_query(field, value):
-    """Gets exists query."""
+def _build_exists_query(field, value):
+    """Builds an exists query."""
     real_field = field[:field.rindex('_')]
 
     kind = 'must' if value else 'must_not'
@@ -294,103 +232,156 @@ def _get_exists_query(field, value):
     return Q('bool', **query)
 
 
-def _apply_aggs_query(search, aggregates):
-    """Applies aggregates query to the search."""
-    for aggregate in aggregates:
-        # skip range and "search" filters as we can't aggregate them
-        if any(aggregate.endswith(x) for x in ('_before', '_after', '_trigram', '_exists')):
-            continue
+def _build_single_field_query(field, value):
+    """
+    Used by _build_field_query and always expecting value as a single value.
+    You should never need to use this, it's more likely you want _build_field_query instead.
+    """
+    # define field and value
+    real_field, real_value = field, value
+    if real_value is None:
+        real_value = False
+        if not real_field.endswith('_exists'):
+            real_field = f"{real_field.rsplit('.', maxsplit=1)[0]}_exists"
 
-        search_aggs = search.aggs
-        if '.' in aggregate:
-            search_aggs = search_aggs.bucket(
-                aggregate,
-                'nested',
-                path=aggregate.split('.', 1)[0]
-            )
+    # build initial query
+    if any(real_field.endswith(suffix) for suffix in ('.id', '_keyword')):
+        query = Q('match_phrase', **{real_field: real_value})
+    elif real_field.endswith('_exists'):
+        query = _build_exists_query(real_field, real_value)
+    else:
+        field_query = {
+            'query': real_value,
+            'operator': 'and',
+        }
+        query = Q('match', **{real_field: field_query})
 
-        search_aggs.bucket(aggregate, 'terms', field=aggregate)
+    # return nested or plain query
+    if '.' in real_field:
+        return Q('nested', path=real_field.rsplit('.', maxsplit=1)[0], query=query)
+    return query
 
 
-def _get_filter_query(key, value):
-    """Gets filter query."""
+def _build_field_query(field, value):
+    """Builds a field query."""
     if isinstance(value, list):
         # perform "or" query
         should_filter = [
-            _get_field_query(key, v) for v in value
+            _build_single_field_query(field, single_value) for single_value in value
         ]
         return Q('bool', should=should_filter, minimum_should_match=1)
 
-    return _get_field_query(key, value)
+    return _build_single_field_query(field, value)
 
 
-def _get_filter_queries(filters):
-    """Gets filter queries."""
+def _build_field_queries(filters):
+    """
+    Builds field queries.
+    Same as _build_field_query but expects a dict of field/values and returns a list of queries.
+    """
     return [
-        _get_filter_query(k, v)
-        for k, v in filters.items()
+        _build_field_query(field, value)
+        for field, value in filters.items()
     ]
 
 
-def _get_range_queries(ranges):
-    """Gets range queries."""
+def _build_range_queries(filters):
+    """Builds range queries."""
     return [
-        Q('range', **{k: v})
-        for k, v in ranges.items()
+        Q('range', **{field: value})
+        for field, value in filters.items()
     ]
 
 
-def _get_composite_filters(composite_filters, value):
-    """Gets queries for composite filters."""
-    return [
-        _get_filter_query(composite_filter, value)
-        for composite_filter in composite_filters
-    ]
-
-
-def _get_nested_filters(field_name, nested_filters):
-    """Gets queries for nested filters."""
+def _build_nested_queries(field, nested_filters):
+    """Builds nested queries."""
     normalised_nested_filters = {
-        f'{field_name}_{k}': v
-        for k, v in nested_filters.items()
+        f'{field}_{nested_field}': nested_value
+        for nested_field, nested_value in nested_filters.items()
     }
 
     filters, ranges = _split_date_range_fields(normalised_nested_filters)
-    should_filters = _get_filter_queries(filters)
+    return [
+        *_build_field_queries(filters),
+        *_build_range_queries(ranges),
+    ]
 
-    if ranges:
-        should_filters.extend(_get_range_queries(ranges))
-    return should_filters
 
-
-def _get_must_filter_query(filters, composite_filters, ranges):
-    """Gets "and" filter query."""
-    if filters is None:
-        filters = {}
-
+def _build_must_queries(filters, ranges, composite_field_mapping):
+    """Builds a "must" filter query."""
     must_filter = []
 
-    for k, v in filters.items():
+    for field, value in filters.items():
         should_filters = None
 
         # get nested "or" filters
-        if composite_filters and k in composite_filters:
+        if composite_field_mapping and field in composite_field_mapping:
             # process composite filters
-            should_filters = _get_composite_filters(composite_filters[k], v)
-        elif isinstance(v, dict):
-            should_filters = _get_nested_filters(k, v)
+            composite_fields = composite_field_mapping[field]
+            should_filters = _build_field_queries(
+                {composite_field: value for composite_field in composite_fields}
+            )
+        elif isinstance(value, dict):
+            should_filters = _build_nested_queries(field, value)
 
         if should_filters:
-            # builds "or" query for given list of fields
+            # builds an "or" query for given list of fields
             must_filter.append(
                 Q('bool', should=should_filters, minimum_should_match=1)
             )
         else:
             must_filter.append(
-                _get_filter_query(k, v)
+                _build_field_query(field, value)
             )
 
     if ranges:
-        must_filter.extend(_get_range_queries(ranges))
+        must_filter.extend(_build_range_queries(ranges))
 
     return must_filter
+
+
+def _apply_sorting_to_query(query, ordering):
+    """Applies sorting to the query."""
+    if ordering is None:
+        return query.sort('_score', 'id')
+
+    tokens = ordering.rsplit(':', maxsplit=1)
+    order = tokens[1] if len(tokens) > 1 else 'asc'
+    field_name = tokens[0]
+
+    sort_params = {
+        'order': order,
+        'missing': '_first' if order == 'asc' else '_last'
+    }
+
+    # check if we sort by field in nested document (example: 'stage.name')
+    if '.' in field_name:
+        # extract and add path to nested document (example: 'stage')
+        sort_params['nested_path'] = field_name.split('.', 1)[0]
+
+    # remap field name if necessary
+    field_name = FIELD_REMAPPING.get(field_name, field_name)
+
+    return query.sort(
+        {field_name: sort_params},
+        'id'
+    )
+
+
+def _add_aggs_to_query(query, aggregation_fields):
+    """Applies aggregates to the query."""
+    for field in aggregation_fields:
+        # skip range and "query" filters as we can't aggregate them
+        if any(field.endswith(x) for x in ('_before', '_after', '_trigram', '_exists')):
+            continue
+
+        query_aggs = query.aggs
+        if '.' in field:
+            query_aggs = query_aggs.bucket(
+                field,
+                'nested',
+                path=field.split('.', 1)[0]
+            )
+
+        query_aggs.bucket(field, 'terms', field=field)
+    return query
