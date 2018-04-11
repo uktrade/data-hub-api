@@ -1,14 +1,16 @@
 from contextlib import suppress
 from operator import itemgetter
 
+import factory
 import pytest
 from django.core.exceptions import FieldDoesNotExist
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import format_date_or_datetime
+from .factories import ServiceFactory
 from .. import urls
-from ..models import Sector
+from ..models import Sector, Service
 from ..registry import registry
 
 # mark the whole module for db use
@@ -136,6 +138,64 @@ def test_team_view(api_client):
         },
         'disabled_on': '2013-03-31T16:21:07Z',
     }
+
+
+class TestServiceView:
+    """Tests for the /metadata/service/ view."""
+
+    def test_list(self, api_client):
+        """
+        Test listing services.
+
+        Services should include a list of contexts.
+        """
+        url = reverse(viewname='service')
+        response = api_client.get(url)
+        service = Service.objects.order_by('name')[0]
+
+        assert response.status_code == status.HTTP_200_OK
+        services = response.json()
+        disabled_on = format_date_or_datetime(service.disabled_on) if service.disabled_on else None
+        services[0]['contexts'] = sorted(services[0]['contexts'])
+
+        assert services[0] == {
+            'id': str(service.pk),
+            'name': service.name,
+            'contexts': sorted(service.contexts),
+            'disabled_on': disabled_on,
+        }
+        assert len(services) == Service.objects.count()
+
+    @pytest.mark.parametrize(
+        'contexts',
+        (
+            [Service.CONTEXTS.interaction],
+            ['non-existent-context'],
+            [Service.CONTEXTS.interaction, Service.CONTEXTS.service_delivery],
+        ),
+    )
+    def test_list_filter_by_has_any(self, api_client, contexts):
+        """Test listing services, filtered by context."""
+        test_data_contexts = (
+            [Service.CONTEXTS.interaction],
+            [Service.CONTEXTS.service_delivery],
+            [Service.CONTEXTS.interaction, Service.CONTEXTS.service_delivery],
+        )
+
+        ServiceFactory.create_batch(
+            len(test_data_contexts),
+            contexts=factory.Iterator(test_data_contexts)
+        )
+
+        url = reverse(viewname='service')
+        contexts_query_arg = ','.join(contexts)
+        response = api_client.get(url, data={'contexts__has_any': contexts_query_arg})
+        service_count_for_context = Service.objects.filter(contexts__overlap=contexts).count()
+
+        assert response.status_code == status.HTTP_200_OK
+        services = response.json()
+        assert len(services) == service_count_for_context
+        assert all(set(service['contexts']) & set(contexts) for service in services)
 
 
 class TestSectorView:

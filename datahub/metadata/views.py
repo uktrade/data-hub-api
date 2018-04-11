@@ -6,9 +6,12 @@ from .registry import registry
 
 
 def _create_metadata_view(mapping):
+    has_filters = mapping.filter_fields or mapping.filter_class
+
     attrs = {
         'authentication_classes': (),
-        'filter_backends': (DjangoFilterBackend,) if mapping.filter_fields else (),
+        'filter_backends': (DjangoFilterBackend,) if has_filters else (),
+        'filter_class': mapping.filter_class,
         'filter_fields': mapping.filter_fields,
         'pagination_class': None,
         'permission_classes': (),
