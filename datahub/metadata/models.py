@@ -2,20 +2,21 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.models import Group
+from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
+from model_utils import Choices
 from mptt.models import MPTTModel, TreeForeignKey
 
 from datahub.core.exceptions import DataHubException
+from datahub.core.fields import MultipleChoiceField
 from datahub.core.models import BaseConstantModel, BaseOrderedConstantModel, DisableableModel
 from datahub.core.utils import join_truthy_strings
 
 
 class BusinessType(BaseConstantModel):
     """Company business type."""
-
-    pass
 
 
 class Sector(MPTTModel, DisableableModel):
@@ -64,19 +65,13 @@ class Sector(MPTTModel, DisableableModel):
 class EmployeeRange(BaseOrderedConstantModel):
     """Company employee range."""
 
-    pass
-
 
 class TurnoverRange(BaseOrderedConstantModel):
     """Company turnover range."""
 
-    pass
-
 
 class UKRegion(BaseConstantModel):
     """UK region."""
-
-    pass
 
 
 class Country(BaseConstantModel):
@@ -89,13 +84,9 @@ class Country(BaseConstantModel):
 class Title(BaseConstantModel):
     """Contact title."""
 
-    pass
-
 
 class Role(BaseConstantModel):
     """Contact role."""
-
-    pass
 
 
 class TeamRole(BaseConstantModel):
@@ -137,19 +128,32 @@ class Team(BaseConstantModel):
 class Service(BaseConstantModel):
     """Service."""
 
-    pass
+    CONTEXTS = Choices(
+        ('event', 'Event'),
+        ('interaction', 'Interaction'),
+        ('investment_project_interaction', 'Investment project interaction'),
+        ('policy_feedback', 'Policy feedback'),
+        ('service_delivery', 'Service delivery'),
+    )
+
+    contexts = MultipleChoiceField(
+        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+        choices=CONTEXTS,
+        blank=True,
+    )
+
+    class Meta(BaseConstantModel.Meta):
+        indexes = [
+            GinIndex(fields=['contexts']),
+        ]
 
 
-class HeadquarterType(BaseConstantModel):
-    """Head Quarter."""
-
-    pass
+class HeadquarterType(BaseOrderedConstantModel):
+    """Headquarter type."""
 
 
 class CompanyClassification(BaseConstantModel):
     """Company classification."""
-
-    pass
 
 
 class InvestmentProjectStage(BaseOrderedConstantModel):

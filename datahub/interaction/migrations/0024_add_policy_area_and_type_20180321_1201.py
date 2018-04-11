@@ -55,12 +55,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='interaction',
             name='policy_area',
-            field=models.ForeignKey(blank=True, help_text='For policy feedback only.', null=True, on_delete=django.db.models.deletion.PROTECT, to='interaction.PolicyArea', verbose_name='policy_area'),
+            field=models.ForeignKey(blank=True, help_text='For policy feedback only.', null=True, on_delete=django.db.models.deletion.PROTECT, to='interaction.PolicyArea'),
         ),
         migrations.AddField(
             model_name='interaction',
             name='policy_issue_type',
-            field=models.ForeignKey(blank=True, help_text='For policy feedback only.', null=True, on_delete=django.db.models.deletion.PROTECT, to='interaction.PolicyIssueType', verbose_name='policy_issue_type'),
+            field=models.ForeignKey(blank=True, help_text='For policy feedback only.', null=True, on_delete=django.db.models.deletion.PROTECT, to='interaction.PolicyIssueType'),
         ),
         migrations.RunPython(load_initial_policy_area, reverse_code=migrations.RunPython.noop),
         migrations.RunPython(load_initial_policy_issue_type, reverse_code=migrations.RunPython.noop)

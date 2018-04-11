@@ -8,7 +8,7 @@ class ContactSearchApp(SearchApp):
     """SearchApp for contacts"""
 
     name = 'contact'
-    ESModel = Contact
+    es_model = Contact
     view = SearchContactAPIView
     export_view = SearchContactExportAPIView
     permission_required = ('company.read_contact',)

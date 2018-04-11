@@ -8,7 +8,7 @@ class OrderSearchApp(SearchApp):
     """SearchApp for order"""
 
     name = 'order'
-    ESModel = Order
+    es_model = Order
     view = SearchOrderAPIView
     permission_required = ('order.read_order',)
     queryset = DBOrder.objects.prefetch_related(

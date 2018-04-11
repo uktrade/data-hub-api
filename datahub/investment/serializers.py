@@ -245,6 +245,11 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
         cases, only the fields being modified are validated.  If a project ends up in an
         invalid state, this avoids the user being unable to rectify the situation.
         """
+        if not self.instance:
+            # Required for validation as DRF does not allow defaults for read-only fields
+            data['allow_blank_estimated_land_date'] = False
+            data['allow_blank_possible_uk_regions'] = False
+
         fields = None
         if self.partial and 'stage' not in data:
             fields = data.keys()
@@ -304,9 +309,6 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
         # DRF defaults to required=False even though this field is non-nullable
         extra_kwargs = {
             'likelihood_of_landing': {'min_value': 0, 'max_value': 100},
-            # Required for validation as ModelSerializer does not automatically set defaults
-            'allow_blank_estimated_land_date': {'default': False},
-            'allow_blank_possible_uk_regions': {'default': False},
         }
         permissions = {
             f'investment.{InvestmentProjectPermission.read_investmentproject_document}':

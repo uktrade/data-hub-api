@@ -8,6 +8,7 @@ from reversion.admin import VersionAdmin
 
 from datahub.core.admin import DisabledOnFilter
 from datahub.event.models import Event, EventType, LocationType, Programme
+from datahub.metadata.admin import DisableableMetadataAdmin
 
 
 def confirm_action(title, action_message):
@@ -121,12 +122,4 @@ class EventAdmin(VersionAdmin):
     enable_selected.short_description = 'Enable selected events'
 
 
-@admin.register(EventType, LocationType, Programme)
-class DisableableMetadataAdmin(admin.ModelAdmin):
-    """Custom Disableable Metadata Admin."""
-
-    fields = ('id', 'name', 'disabled_on',)
-    list_display = ('name', 'disabled_on',)
-    readonly_fields = ('id',)
-    search_fields = ('name', 'pk')
-    list_filter = (DisabledOnFilter,)
+admin.site.register((EventType, LocationType, Programme), DisableableMetadataAdmin)
