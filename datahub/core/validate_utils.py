@@ -31,6 +31,11 @@ class DataCombiner:
         """Returns the value of a field, using get_value_auto()."""
         return self.get_value_auto(item)
 
+    def is_field_to_many(self, field_name):
+        """Returns whether a field is a to-many field."""
+        field_info = _get_model_field_info(self.model)
+        return field_name in field_info.relations and field_info.relations[field_name].to_many
+
     def get_value_auto(self, field_name):
         """
         Returns the value of a field (returning the ID for foreign keys).

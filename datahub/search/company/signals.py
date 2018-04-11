@@ -3,7 +3,7 @@ from django.db.models.signals import post_save
 
 from datahub.company.models import Company as DBCompany
 from .models import Company as ESCompany
-from ..signals import sync_es
+from ..signals import SignalReceiver, sync_es
 
 
 def company_sync_es(sender, instance, **kwargs):
@@ -13,11 +13,4 @@ def company_sync_es(sender, instance, **kwargs):
     )
 
 
-def connect_signals():
-    """Connect signals for ES sync."""
-    post_save.connect(company_sync_es, sender=DBCompany, dispatch_uid='company_sync_es')
-
-
-def disconnect_signals():
-    """Disconnect signals from ES sync."""
-    post_save.disconnect(company_sync_es, sender=DBCompany, dispatch_uid='company_sync_es')
+receivers = (SignalReceiver(post_save, DBCompany, company_sync_es),)

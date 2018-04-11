@@ -37,6 +37,47 @@ def test_is_not_blank(value, blank):
 class TestDataCombiner:
     """Data Combiner tests."""
 
+    def test_is_field_to_many_for_to_many_field(self, monkeypatch):
+        """Tests that test_is_field_to_many() returns True for a to-many field."""
+        instance = Mock()
+        model = Mock()
+        mock_field_info = Mock(
+            relations={
+                'field1': Mock(to_many=True),
+            }
+        )
+        monkeypatch.setattr(
+            validate_utils, '_get_model_field_info', Mock(return_value=mock_field_info)
+        )
+        data_combiner = DataCombiner(instance, None, model=model)
+        assert data_combiner.is_field_to_many('field1')
+
+    def test_is_field_to_many_for_non_to_many_relation(self, monkeypatch):
+        """Tests that test_is_field_to_many() returns False for a non-to-many relation."""
+        instance = Mock()
+        model = Mock()
+        mock_field_info = Mock(
+            relations={
+                'field1': Mock(to_many=False),
+            }
+        )
+        monkeypatch.setattr(
+            validate_utils, '_get_model_field_info', Mock(return_value=mock_field_info)
+        )
+        data_combiner = DataCombiner(instance, None, model=model)
+        assert not data_combiner.is_field_to_many('field1')
+
+    def test_is_field_to_many_for_normal_field(self, monkeypatch):
+        """Tests that test_is_field_to_many() returns False for a normal field."""
+        instance = Mock()
+        model = Mock()
+        mock_field_info = Mock(relations={})
+        monkeypatch.setattr(
+            validate_utils, '_get_model_field_info', Mock(return_value=mock_field_info)
+        )
+        data_combiner = DataCombiner(instance, None, model=model)
+        assert not data_combiner.is_field_to_many('field1')
+
     def test_get_value_instance(self):
         """Tests getting a simple value from an instance."""
         instance = Mock(field1=1, field2=2)
@@ -114,7 +155,7 @@ class TestDataCombiner:
         assert data_combiner.get_value_auto('field1') == [123]
         assert data_combiner['field1'] == [123]
 
-    def test_get_value_normal_field(self, monkeypatch):
+    def test_get_value_auto_normal_field(self, monkeypatch):
         """Tests that get_value_auto() returns value for a normal field."""
         instance = Mock(field1=123)
         model = Mock()

@@ -61,70 +61,70 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
         (
             (  # no filter => return all records
                 {},
-                ['111', '222', '333']
+                {'111', '222', '333'}
             ),
             (  # pagination
                 {
                     'limit': 1,
                     'offset': 1
                 },
-                ['222']
+                {'222'}
             ),
             (  # company number filter
                 {
                     'company_number': '222'
                 },
-                ['222'],
+                {'222'},
             ),
             (  # incorporation date filter
                 {
                     'incorporation_date_after': '2014'
                 },
-                ['222', '333'],
+                {'222', '333'},
             ),
             (  # incorporation date filter
                 {
                     'incorporation_date_before': '2014'
                 },
-                ['111'],
+                {'111'},
             ),
             (  # incorporation date filter
                 {
                     'incorporation_date_after': '2014',
                     'incorporation_date_before': '2017'
                 },
-                ['222', '333'],
+                {'222', '333'},
             ),
             (  # incorporation date filter
                 {
                     'incorporation_date_after': '2010',
                     'incorporation_date_before': '2015-10-01'
                 },
-                ['111', '222'],
+                {'111', '222'},
             ),
             (  # company status filter
                 {
                     'company_status': ['purring', 'sleeping'],
                 },
-                ['222', '333'],
+                {'222', '333'},
             ),
             (  # company name filter
                 {
                     'name': 'pallas',
                 },
-                ['111'],
+                {'111'},
             ),
             (  # original query match
                 {
                     'original_query': '111',
                 },
-                ['111'],
+                {'111'},
             ),
             (  # original query partial match
                 {
                     'original_query': 'jaguar',
                 },
-                ['222'],
+                {'222'},
             ),
         )
     )
@@ -135,9 +135,9 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
         response = self.api_client.post(url, data, format='json')
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()['results']) == len(results)
-        assert [
+        assert {
             item['company_number'] for item in response.json()['results']
-        ] == results
+        } == results
 
     def test_incorrect_date_raise_validation_error(self, setup_data):
         """Test that if the date is not in a valid format, the API return a validation error."""

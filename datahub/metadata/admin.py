@@ -15,7 +15,6 @@ MODELS_TO_REGISTER_DISABLEABLE = (
     models.ReferralSourceMarketing,
     models.ReferralSourceWebsite,
     models.Role,
-    models.Service,
     models.Title,
     models.UKRegion,
 )
@@ -29,15 +28,21 @@ MODELS_TO_REGISTER_WITH_ORDER = (
 
 MODELS_TO_REGISTER_READ_ONLY = (
     models.BusinessType,
-    models.HeadquarterType,
     models.InvestmentType,
     models.InvestmentProjectStage,
 )
 
+MODELS_TO_REGISTER_EDITABLE_ORDER_ONLY = (
+    models.HeadquarterType,
+)
 
-@admin.register(*MODELS_TO_REGISTER_DISABLEABLE)
+
 class DisableableMetadataAdmin(admin.ModelAdmin):
-    """Custom Disableable Metadata Admin."""
+    """
+    Generic admin for disableable metadata models.
+
+    Intended to be used across apps.
+    """
 
     fields = ('id', 'name', 'disabled_on',)
     list_display = ('name', 'disabled_on',)
@@ -46,24 +51,57 @@ class DisableableMetadataAdmin(admin.ModelAdmin):
     list_filter = (DisabledOnFilter,)
 
 
-@admin.register(*MODELS_TO_REGISTER_READ_ONLY)
 class ReadOnlyMetadataAdmin(ReadOnlyAdmin):
-    """Admin for metadata models that shouldn't be edited."""
+    """
+    Generic admin for metadata models that shouldn't be edited.
+
+    Intended to be used across apps.
+    """
 
     list_display = ('name', 'disabled_on',)
     search_fields = ('name', 'pk')
     list_filter = (DisabledOnFilter,)
 
 
-@admin.register(*MODELS_TO_REGISTER_WITH_ORDER)
 class OrderedMetadataAdmin(admin.ModelAdmin):
-    """Admin for ordered metadata models."""
+    """
+    Generic admin for ordered metadata models.
+
+    Intended to be used across apps.
+    """
 
     fields = ('id', 'name', 'order', 'disabled_on',)
     list_display = ('name', 'order', 'disabled_on',)
     readonly_fields = ('id',)
     search_fields = ('name', 'pk')
     list_filter = (DisabledOnFilter,)
+
+
+class EditableOrderOnlyOrderedMetadataAdmin(OrderedMetadataAdmin, ReadOnlyAdmin):
+    """
+    Generic admin for ordered metadata models with editable order.
+
+    Intended to be used across apps.
+    """
+
+    readonly_fields = ('id', 'name', 'disabled_on')
+
+
+admin.site.register(MODELS_TO_REGISTER_DISABLEABLE, DisableableMetadataAdmin)
+admin.site.register(MODELS_TO_REGISTER_READ_ONLY, ReadOnlyMetadataAdmin)
+admin.site.register(MODELS_TO_REGISTER_WITH_ORDER, OrderedMetadataAdmin)
+admin.site.register(
+    MODELS_TO_REGISTER_EDITABLE_ORDER_ONLY,
+    EditableOrderOnlyOrderedMetadataAdmin
+)
+
+
+@admin.register(models.Service)
+class ServiceAdmin(DisableableMetadataAdmin):
+    """Admin for services."""
+
+    fields = ('id', 'name', 'contexts', 'disabled_on')
+    list_display = ('name', 'get_contexts_display', 'disabled_on')
 
 
 @admin.register(models.Team)

@@ -4,8 +4,9 @@ from django.contrib import admin
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import (
-    custom_add_permission, custom_change_permission,
-    custom_delete_permission, DisabledOnFilter,
+    custom_add_permission,
+    custom_change_permission,
+    custom_delete_permission,
 )
 from datahub.investment.models import (
     InvestmentDeliveryPartner,
@@ -17,6 +18,7 @@ from datahub.investment.models import (
     IProjectDocument,
     SpecificProgramme,
 )
+from datahub.metadata.admin import DisableableMetadataAdmin
 
 
 @admin.register(InvestmentProject)
@@ -88,17 +90,9 @@ class IProjectDocumentAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_on'
 
 
-@admin.register(
+admin.site.register((
     InvestmentDeliveryPartner,
     InvestorType,
     Involvement,
     SpecificProgramme,
-)
-class DisableableMetadataAdmin(admin.ModelAdmin):
-    """Custom Disableable Metadata Admin."""
-
-    fields = ('id', 'name', 'disabled_on',)
-    list_display = ('name', 'disabled_on',)
-    readonly_fields = ('id',)
-    search_fields = ('name', 'pk')
-    list_filter = (DisabledOnFilter,)
+), DisableableMetadataAdmin)

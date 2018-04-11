@@ -4,8 +4,8 @@ from django.db.models.signals import post_delete, post_save
 from datahub.company.models import Company as DBCompany, Contact as DBContact
 from datahub.interaction.models import Interaction as DBInteraction
 from datahub.investment.models import InvestmentProject as DBInvestmentProject
-from datahub.search.elasticsearch import delete_document
-from datahub.search.signals import sync_es
+from datahub.search.query_builder import delete_document
+from datahub.search.signals import SignalReceiver, sync_es
 from .models import Interaction as ESInteraction
 
 
@@ -29,67 +29,10 @@ def sync_related_interactions_to_es(sender, instance, **kwargs):
         sync_interaction_to_es(sender, contact, **kwargs)
 
 
-def connect_signals():
-    """Connect signals for ES sync."""
-    post_save.connect(
-        sync_interaction_to_es,
-        sender=DBInteraction,
-        dispatch_uid='sync_interaction_to_es'
-    )
-
-    post_save.connect(
-        sync_related_interactions_to_es,
-        sender=DBCompany,
-        dispatch_uid='company_sync_related_interactions_to_es'
-    )
-
-    post_save.connect(
-        sync_related_interactions_to_es,
-        sender=DBContact,
-        dispatch_uid='contact_sync_related_interactions_to_es'
-    )
-
-    post_save.connect(
-        sync_related_interactions_to_es,
-        sender=DBInvestmentProject,
-        dispatch_uid='iproject_sync_related_interactions_to_es'
-    )
-
-    post_delete.connect(
-        remove_interaction_from_es,
-        sender=DBInteraction,
-        dispatch_uid='remove_interaction_from_es',
-    )
-
-
-def disconnect_signals():
-    """Disconnect signals from ES sync."""
-    post_save.disconnect(
-        sync_interaction_to_es,
-        sender=DBInteraction,
-        dispatch_uid='sync_interaction_to_es'
-    )
-
-    post_save.disconnect(
-        sync_related_interactions_to_es,
-        sender=DBCompany,
-        dispatch_uid='company_sync_related_interactions_to_es'
-    )
-
-    post_save.disconnect(
-        sync_related_interactions_to_es,
-        sender=DBContact,
-        dispatch_uid='contact_sync_related_interactions_to_es'
-    )
-
-    post_save.disconnect(
-        sync_related_interactions_to_es,
-        sender=DBInvestmentProject,
-        dispatch_uid='iproject_sync_related_interactions_to_es'
-    )
-
-    post_delete.disconnect(
-        remove_interaction_from_es,
-        sender=DBInteraction,
-        dispatch_uid='remove_interaction_from_es',
-    )
+receivers = (
+    SignalReceiver(post_save, DBInteraction, sync_interaction_to_es),
+    SignalReceiver(post_save, DBCompany, sync_related_interactions_to_es),
+    SignalReceiver(post_save, DBContact, sync_related_interactions_to_es),
+    SignalReceiver(post_save, DBInvestmentProject, sync_related_interactions_to_es),
+    SignalReceiver(post_delete, DBInteraction, remove_interaction_from_es),
+)
