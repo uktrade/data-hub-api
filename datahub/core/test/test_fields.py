@@ -41,3 +41,21 @@ class TestMultipleChoiceField:
         with pytest.raises(ValidationError) as excinfo:
             field.clean(['option3', 'option4'], instance)
         assert excinfo.value.code == 'item_invalid'
+
+    @pytest.mark.parametrize(
+        'value,display_value',
+        (
+            (['option2', 'option1'], 'Option 2, Option 1'),
+            ([], ''),
+            (['option2'], 'Option 2'),
+        )
+    )
+    def test_contribute_to_class(self, field, value, display_value):
+        """Test that a working get_{field_name}_display method is injected into the model."""
+        model = Mock()
+        instance = Mock(test_field=value)
+        field.contribute_to_class(model, 'test_field')
+
+        assert model.get_test_field_display(instance) == display_value
+        assert model.get_test_field_display.short_description == 'Test field'
+        assert model.get_test_field_display.admin_order_field == 'test_field'
