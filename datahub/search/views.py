@@ -81,7 +81,7 @@ class SearchBasicAPIView(APIView):
             term=term,
             entities=(self.entity_by_name[entity].model,),
             permission_filters_by_entity=dict(_get_permission_filters(request)),
-            field_order=sortby,
+            ordering=sortby,
             ignored_entities=self.IGNORED_ENTITIES,
             offset=offset,
             limit=limit
@@ -175,17 +175,19 @@ class SearchAPIView(APIView):
         filter_data = self._get_filter_data(validated_data)
         permission_filters = self.search_app.get_permission_filters(request)
 
-        aggregations = (self.REMAP_FIELDS.get(field, field) for field in self.FILTER_FIELDS) \
-            if self.include_aggregations else None
+        aggregation_fields = (
+            self.REMAP_FIELDS.get(field, field)
+            for field in self.FILTER_FIELDS
+        ) if self.include_aggregations else None
 
         query = get_search_by_entity_query(
             entity=self.entity,
             term=validated_data['original_query'],
             filter_data=filter_data,
-            composite_filters=self.COMPOSITE_FILTERS,
+            composite_field_mapping=self.COMPOSITE_FILTERS,
             permission_filters=permission_filters,
-            field_order=validated_data['sortby'],
-            aggregations=aggregations,
+            ordering=validated_data['sortby'],
+            aggregation_fields=aggregation_fields,
         )
 
         results = limit_search_query(
@@ -276,7 +278,7 @@ class SearchExportAPIView(SearchAPIView):
             entity=self.entity,
             term=validated_data['original_query'],
             filter_data=filter_data,
-            field_order=validated_data['sortby'],
+            ordering=validated_data['sortby'],
         )
 
         base_filename = self._get_base_filename(validated_data['original_query'])
