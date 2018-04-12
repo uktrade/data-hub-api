@@ -6,7 +6,6 @@ from .serializers import SectorSerializer, ServiceSerializer, TeamSerializer
 registry.register(metadata_id='business-type', model=models.BusinessType)
 registry.register(metadata_id='country', model=models.Country)
 registry.register(metadata_id='employee-range', model=models.EmployeeRange)
-registry.register(metadata_id='role', model=models.Role)
 registry.register(
     filter_fields={
         'level': ['lte'],
