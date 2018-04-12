@@ -87,6 +87,7 @@ class ContactFactory(factory.django.DjangoModelFactory):
     last_name = factory.Faker('last_name')
     company = factory.SubFactory(CompanyFactory)
     email = 'foo@bar.com'
+    job_title = factory.Faker('job')
     primary = True
     telephone_countrycode = '+44'
     telephone_number = '123456789'
