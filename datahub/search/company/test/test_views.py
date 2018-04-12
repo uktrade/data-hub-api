@@ -435,13 +435,13 @@ class TestSearch(APITestMixin):
         assert response.data['count'] > 1
         assert len(response.data['results']) == 1
 
-    @mock.patch('datahub.search.query_builder._apply_aggs_query')
-    def test_company_search_no_aggregations(self, _apply_aggs_query, setup_data):
+    @mock.patch('datahub.search.query_builder._add_aggs_to_query')
+    def test_company_search_no_aggregations(self, _add_aggs_to_query, setup_data):
         """Tests if no aggregation occurs."""
         url = reverse('api-v3:search:company')
         response = self.api_client.post(url)
 
-        assert _apply_aggs_query.call_count == 0
+        assert _add_aggs_to_query.call_count == 0
 
         assert response.status_code == status.HTTP_200_OK
         assert 'aggregations' not in response.data
