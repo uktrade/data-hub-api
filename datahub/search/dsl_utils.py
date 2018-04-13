@@ -1,6 +1,6 @@
 from functools import partial
 
-from elasticsearch_dsl import Keyword, Nested, Text
+from elasticsearch_dsl import Keyword, Nested, Object, Text
 
 SortableCaseInsensitiveKeywordText = partial(
     Text,
@@ -103,6 +103,17 @@ def sector_mapping():
             'ancestors': _ancestor_sector_mapping(),
         },
         include_in_parent=True,
+    )
+
+
+def object_mapping(*fields):
+    """This is a mapping that reflects how Elasticsearch auto-creates mappings for objects."""
+    return Object(
+        properties={
+            field: Text(fields={
+                'keyword': Keyword(ignore_above=256)
+            }) for field in fields
+        }
     )
 
 

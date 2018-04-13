@@ -96,7 +96,6 @@ class Company(DocType, MapDBModelToDict):
         'trading_address_country': dict_utils.id_name_dict,
         'turnover_range': dict_utils.id_name_dict,
         'uk_region': dict_utils.id_name_dict,
-        'address_country': dict_utils.id_name_dict,
         'contacts': lambda col: [dict_utils.contact_or_adviser_dict(c) for c in col.all()],
         'id': str,
         'uk_based': bool,
