@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Boolean, Date, DocType, Double, Integer, Keyword, Object, Text
+from elasticsearch_dsl import Boolean, Date, DocType, Double, Integer, Keyword, Text
 
 from .. import dict_utils
 from .. import dsl_utils
@@ -15,22 +15,17 @@ def _referral_source_adviser_mapping():
     The mapping here reflects how it has been auto-created. Further down the line, this mapping
     and contact_or_adviser_mapping will be harmonised.
     """
-    return Object(
-        properties={
-            'id': Text(fields={
-                'keyword': Keyword(ignore_above=256)
-            }),
-            'first_name': Text(fields={
-                'keyword': Keyword(ignore_above=256)
-            }),
-            'last_name': Text(fields={
-                'keyword': Keyword(ignore_above=256)
-            }),
-            'name': Text(fields={
-                'keyword': Keyword(ignore_above=256)
-            }),
-        }
-    )
+    return dsl_utils.object_mapping('id', 'first_name', 'last_name', 'name')
+
+
+def _country_lost_to_mapping():
+    """
+    Mapping for country_lost_to.
+
+    The mapping for country_lost_to was implicitly auto-created. This reflects how it was
+    auto-created so that we can explicitly define it in the model.
+    """
+    return dsl_utils.object_mapping('id', 'name')
 
 
 class InvestmentProject(DocType, MapDBModelToDict):
@@ -109,6 +104,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
     status = dsl_utils.SortableCaseInsensitiveKeywordText()
     average_salary = dsl_utils.id_name_mapping()
     date_lost = Date()
+    country_lost_to = _country_lost_to_mapping()
     date_abandoned = Date()
     project_arrived_in_triage_on = Date()
     proposal_deadline = Date()
