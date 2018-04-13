@@ -44,6 +44,16 @@ def test_validate_model_mapping_fields(search_app):
     assert not invalid_fields
 
 
+def test_validate_model_computed_mapping_fields(search_app):
+    """Test that all fields defined in COMPUTED_MAPPINGS exist on the ES model."""
+    es_model = search_app.es_model
+    valid_fields = _get_es_model_fields(es_model)
+    fields = es_model.COMPUTED_MAPPINGS.keys()
+    invalid_fields = fields - valid_fields
+
+    assert not invalid_fields
+
+
 def _get_es_model_es_properties(es_model):
     return es_model._doc_type.mapping.properties._params['properties']
 
