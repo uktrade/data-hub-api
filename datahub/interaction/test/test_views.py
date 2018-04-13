@@ -12,9 +12,10 @@ from datahub.core.constants import Service, Team
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.event.test.factories import EventFactory
-from datahub.interaction.constants import CommunicationChannel
-from datahub.interaction.models import (Interaction, InteractionPermission, PolicyArea,
-                                        PolicyIssueType, ServiceDeliveryStatus)
+from datahub.interaction.models import (
+    CommunicationChannel, Interaction, InteractionPermission, PolicyArea,
+    PolicyIssueType, ServiceDeliveryStatus
+)
 from datahub.interaction.test.factories import (CompanyInteractionFactory,
                                                 EventServiceDeliveryFactory,
                                                 InvestmentProjectInteractionFactory,
@@ -308,10 +309,12 @@ class TestAddInteractionView(APITestMixin):
         adviser = AdviserFactory()
         company = CompanyFactory()
         contact = ContactFactory()
+        communication_channel = random_obj_for_model(CommunicationChannel)
+
         url = reverse('api-v3:interaction:collection')
         request_data = {
             'kind': Interaction.KINDS.interaction,
-            'communication_channel': CommunicationChannel.face_to_face.value.id,
+            'communication_channel': communication_channel.pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -335,8 +338,8 @@ class TestAddInteractionView(APITestMixin):
             'policy_area': None,
             'policy_issue_type': None,
             'communication_channel': {
-                'id': CommunicationChannel.face_to_face.value.id,
-                'name': CommunicationChannel.face_to_face.value.name
+                'id': str(communication_channel.pk),
+                'name': communication_channel.name
             },
             'subject': 'whatever',
             'date': '2017-04-18',
@@ -390,10 +393,12 @@ class TestAddInteractionView(APITestMixin):
         contact = ContactFactory()
         policy_area = random_obj_for_model(PolicyArea)
         policy_issue_type = random_obj_for_model(PolicyIssueType)
+        communication_channel = random_obj_for_model(CommunicationChannel)
+
         url = reverse('api-v3:interaction:collection')
         request_data = {
             'kind': Interaction.KINDS.policy_feedback,
-            'communication_channel': CommunicationChannel.face_to_face.value.id,
+            'communication_channel': communication_channel.pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -423,8 +428,8 @@ class TestAddInteractionView(APITestMixin):
                 'id': str(policy_issue_type.pk), 'name': policy_issue_type.name
             },
             'communication_channel': {
-                'id': CommunicationChannel.face_to_face.value.id,
-                'name': CommunicationChannel.face_to_face.value.name
+                'id': str(communication_channel.pk),
+                'name': communication_channel.name
             },
             'subject': 'whatever',
             'date': '2017-04-18',
@@ -850,11 +855,12 @@ class TestAddInteractionView(APITestMixin):
         adviser = AdviserFactory()
         company = CompanyFactory()
         contact = ContactFactory()
+
         url = reverse('api-v3:interaction:collection')
         request_data = {
             'kind': Interaction.KINDS.interaction,
             'is_event': False,
-            'communication_channel': CommunicationChannel.face_to_face.value.id,
+            'communication_channel': random_obj_for_model(CommunicationChannel).pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -888,7 +894,7 @@ class TestAddInteractionView(APITestMixin):
         request_data = {
             'kind': 'service_delivery',
             'is_event': True,
-            'communication_channel': CommunicationChannel.face_to_face.value.id,
+            'communication_channel': random_obj_for_model(CommunicationChannel).pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -949,7 +955,7 @@ class TestAddInteractionView(APITestMixin):
 
         request_data = {
             'kind': 'interaction',
-            'communication_channel': CommunicationChannel.face_to_face.value.id,
+            'communication_channel': random_obj_for_model(CommunicationChannel).pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -979,7 +985,7 @@ class TestAddInteractionView(APITestMixin):
         response = self.api_client.post(url, {
             'kind': Interaction.KINDS.interaction,
             'contact': contact.pk,
-            'communication_channel': CommunicationChannel.face_to_face.value.id,
+            'communication_channel': random_obj_for_model(CommunicationChannel).pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -1012,7 +1018,7 @@ class TestAddInteractionView(APITestMixin):
         response = self.api_client.post(url, {
             'kind': Interaction.KINDS.policy_feedback,
             'contact': contact.pk,
-            'communication_channel': CommunicationChannel.face_to_face.value.id,
+            'communication_channel': random_obj_for_model(CommunicationChannel).pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -1039,7 +1045,7 @@ class TestAddInteractionView(APITestMixin):
         response = self.api_client.post(url, {
             'kind': Interaction.KINDS.interaction,
             'contact': contact.pk,
-            'communication_channel': CommunicationChannel.face_to_face.value.id,
+            'communication_channel': random_obj_for_model(CommunicationChannel).pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': AdviserFactory().pk,
@@ -1071,7 +1077,7 @@ class TestAddInteractionView(APITestMixin):
         response = self.api_client.post(url, {
             'kind': 'interaction',
             'contact': contact.pk,
-            'communication_channel': CommunicationChannel.face_to_face.value.id,
+            'communication_channel': random_obj_for_model(CommunicationChannel).pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': requester.pk,
@@ -1103,7 +1109,7 @@ class TestAddInteractionView(APITestMixin):
         response = api_client.post(url, {
             'kind': 'interaction',
             'contact': contact.pk,
-            'communication_channel': CommunicationChannel.face_to_face.value.id,
+            'communication_channel': random_obj_for_model(CommunicationChannel).pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': requester.pk,
@@ -1133,7 +1139,7 @@ class TestAddInteractionView(APITestMixin):
             'kind': 'interaction',
             'company': company.pk,
             'contact': contact.pk,
-            'communication_channel': CommunicationChannel.face_to_face.value.id,
+            'communication_channel': random_obj_for_model(CommunicationChannel).pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': requester.pk,
@@ -1449,7 +1455,7 @@ class TestInteractionVersioning(APITestMixin):
             reverse('api-v3:interaction:collection'),
             data={
                 'kind': 'interaction',
-                'communication_channel': CommunicationChannel.face_to_face.value.id,
+                'communication_channel': random_obj_for_model(CommunicationChannel).pk,
                 'subject': 'whatever',
                 'date': date.today().isoformat(),
                 'dit_adviser': AdviserFactory().pk,
