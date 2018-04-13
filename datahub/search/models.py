@@ -33,7 +33,7 @@ class MapDBModelToDict:
     def dbmodel_to_dict(cls, dbmodel):
         """Converts dbmodel instance to a dictionary suitable for ElasticSearch."""
         result = {col: fn(getattr(dbmodel, col)) for col, fn in cls.MAPPINGS.items()
-                  if getattr(dbmodel, col, None) is not None}
+                  if getattr(dbmodel, col) is not None}
 
         result.update({
             col: fn(dbmodel) for col, fn in cls.COMPUTED_MAPPINGS.items()
