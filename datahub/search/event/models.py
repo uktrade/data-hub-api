@@ -29,6 +29,8 @@ class Event(DocType, MapDBModelToDict):
     teams = dsl_utils.id_name_partial_mapping('teams')
     related_programmes = dsl_utils.id_name_partial_mapping('related_programmes')
     service = dsl_utils.id_name_mapping()
+    created_on = Date()
+    modified_on = Date()
     disabled_on = Date()
 
     MAPPINGS = {
