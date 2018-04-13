@@ -13,8 +13,7 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_queryset
-from datahub.interaction.constants import CommunicationChannel
-from datahub.interaction.models import Interaction
+from datahub.interaction.models import CommunicationChannel, Interaction
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory, InvestmentProjectInteractionFactory, ServiceDeliveryFactory,
 )
@@ -485,21 +484,21 @@ class TestViews(APITestMixin):
 
     def test_filter_by_communication_channel(self, setup_es):
         """Tests filtering interaction by interaction type."""
+        communication_channels = list(CommunicationChannel.objects.order_by('?')[:2])
         CompanyInteractionFactory.create_batch(
             5,
-            communication_channel_id=CommunicationChannel.email_website.value.id
+            communication_channel=communication_channels[0]
         )
-        communication_channel_id = CommunicationChannel.social_media.value.id
         CompanyInteractionFactory.create_batch(
             5,
-            communication_channel_id=communication_channel_id
+            communication_channel=communication_channels[1]
         )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:interaction')
         request_data = {
             'original_query': '',
-            'communication_channel': communication_channel_id
+            'communication_channel': communication_channels[1].pk
         }
         response = self.api_client.post(url, request_data, format='json')
 
@@ -511,7 +510,7 @@ class TestViews(APITestMixin):
 
         results = response_data['results']
         result_ids = {result['communication_channel']['id'] for result in results}
-        assert result_ids == {str(communication_channel_id)}
+        assert result_ids == {str(communication_channels[1].pk)}
 
     def test_filter_by_service(self, setup_es):
         """Tests filtering interaction by service."""
