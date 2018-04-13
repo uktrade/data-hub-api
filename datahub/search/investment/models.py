@@ -1,8 +1,36 @@
-from elasticsearch_dsl import Boolean, Date, DocType, Double, Integer, Keyword, Text
+from elasticsearch_dsl import Boolean, Date, DocType, Double, Integer, Keyword, Object, Text
 
 from .. import dict_utils
 from .. import dsl_utils
 from ..models import MapDBModelToDict
+
+
+def _referral_source_adviser_mapping():
+    """
+    Mapping for referral_source_adviser.
+
+    referral_source_adviser is not using contact_or_adviser_mapping because the mapping for it
+    was not explicitly defined, and so was implicitly auto-created.
+
+    The mapping here reflects how it has been auto-created. Further down the line, this mapping
+    and contact_or_adviser_mapping will be harmonised.
+    """
+    return Object(
+        properties={
+            'id': Text(fields={
+                'keyword': Keyword(ignore_above=256)
+            }),
+            'first_name': Text(fields={
+                'keyword': Keyword(ignore_above=256)
+            }),
+            'last_name': Text(fields={
+                'keyword': Keyword(ignore_above=256)
+            }),
+            'name': Text(fields={
+                'keyword': Keyword(ignore_above=256)
+            }),
+        }
+    )
 
 
 class InvestmentProject(DocType, MapDBModelToDict):
@@ -76,7 +104,7 @@ class InvestmentProject(DocType, MapDBModelToDict):
     referral_source_activity_marketing = dsl_utils.id_name_mapping()
     referral_source_activity_website = dsl_utils.id_name_mapping()
     referral_source_activity_event = dsl_utils.SortableCaseInsensitiveKeywordText()
-    referral_source_advisor = dsl_utils.contact_or_adviser_mapping('referral_source_advisor')
+    referral_source_adviser = _referral_source_adviser_mapping()
     sector = dsl_utils.sector_mapping()
     status = dsl_utils.SortableCaseInsensitiveKeywordText()
     average_salary = dsl_utils.id_name_mapping()
