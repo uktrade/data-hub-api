@@ -104,24 +104,6 @@ class Company(DocType, MapDBModelToDict):
         'export_experience_category': dict_utils.id_name_dict,
     }
 
-    IGNORED_FIELDS = (
-        'alias',
-        'business_leads',
-        'children',
-        'subsidiaries',
-        'created_by',
-        'interactions',
-        'intermediate_investment_projects',
-        'investee_projects',
-        'investor_investment_projects',
-        'lft',
-        'modified_by',
-        'orders',
-        'rght',
-        'tree_id',
-        'archived_documents_url_path',
-    )
-
     SEARCH_FIELDS = (
         'name',
         'name_trigram',

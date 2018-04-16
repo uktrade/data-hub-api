@@ -81,14 +81,6 @@ class Contact(DocType, MapDBModelToDict):
         'address_country': contact_dict_utils.computed_address_field('address_country'),
     }
 
-    IGNORED_FIELDS = (
-        'interactions',
-        'investment_projects',
-        'modified_by',
-        'orders',
-        'archived_documents_url_path',
-    )
-
     SEARCH_FIELDS = (
         'name',
         'name_trigram',

@@ -55,14 +55,6 @@ class Interaction(DocType, MapDBModelToDict):
         ),
     }
 
-    IGNORED_FIELDS = (
-        'created_by',
-        'modified_by',
-        'archived_documents_url_path',
-        'policy_area',
-        'policy_issue_type',
-    )
-
     SEARCH_FIELDS = (
         'company.name',
         'company.name_trigram',
