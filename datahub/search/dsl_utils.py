@@ -13,6 +13,21 @@ EnglishText = partial(Text, analyzer='english_analyzer')
 SortableText = partial(Text, fielddata=True)
 
 
+class TextWithKeyword(Text):
+    """
+    Text field with keyword sub-field.
+
+    This definition is in line with the data type Elasticsearch uses for dynamically mapped text
+    fields.
+    """
+
+    def __init__(self, *args, **kwargs):
+        """Initialises the field, creating a keyword sub-field."""
+        super().__init__(*args, **kwargs, fields={
+            'keyword': Keyword(ignore_above=256)
+        })
+
+
 def contact_or_adviser_mapping(field, include_dit_team=False):
     """Mapping for Adviser/Contact fields."""
     props = {
@@ -109,11 +124,7 @@ def sector_mapping():
 def object_mapping(*fields):
     """This is a mapping that reflects how Elasticsearch auto-creates mappings for objects."""
     return Object(
-        properties={
-            field: Text(fields={
-                'keyword': Keyword(ignore_above=256)
-            }) for field in fields
-        }
+        properties={field: TextWithKeyword() for field in fields}
     )
 
 
