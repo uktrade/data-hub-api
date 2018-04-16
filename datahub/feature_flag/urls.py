@@ -1,7 +1,11 @@
 from django.urls import path
 
-from datahub.feature_flag.views import get_feature_flags
+from datahub.feature_flag.views import FeatureFlagViewSet
+
+collection = FeatureFlagViewSet.as_view({
+    'get': 'list',
+})
 
 urlpatterns = [
-    path('feature-flag', get_feature_flags, name='collection'),
+    path('feature-flag', collection, name='collection'),
 ]

@@ -18,8 +18,8 @@ class TestListFeatureFlags(APITestMixin):
         response = api_client.get(url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_can_get_feature_flags(self):
-        """Get feature flags."""
+    def test_can_list_feature_flags(self):
+        """List feature flags."""
         feature_flags = FeatureFlagFactory.create_batch(10)
         url = reverse('api-v3:feature-flag:collection')
         response = self.api_client.get(url)
@@ -28,8 +28,13 @@ class TestListFeatureFlags(APITestMixin):
 
         response_data = response.json()
 
-        expected_feature_flags = {
-            feature_flag.code: feature_flag.is_active
-            for feature_flag in feature_flags
-        }
+        expected_feature_flags = sorted(
+            (
+                {
+                    'code': feature_flag.code,
+                    'is_active': feature_flag.is_active
+                } for feature_flag in feature_flags
+            ),
+            key=lambda item: item['code'],
+        )
         assert response_data == expected_feature_flags
