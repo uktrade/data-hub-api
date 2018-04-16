@@ -1,16 +1,14 @@
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 
+from datahub.core.viewsets import CoreViewSetV3
 from datahub.feature_flag.models import FeatureFlag
+from datahub.feature_flag.serializers import FeatureFlagSerializer
 
 
-@api_view()
-@permission_classes([IsAuthenticated])
-def get_feature_flags(request):
-    """Return a dictionary of feature flags."""
-    feature_flags = {
-        feature_flag.code: feature_flag.is_active
-        for feature_flag in FeatureFlag.objects.all()
-    }
-    return Response(data=feature_flags)
+class FeatureFlagViewSet(CoreViewSetV3):
+    """Feature flag ViewSet v3."""
+
+    pagination_class = None
+    permission_classes = (IsAuthenticated,)
+    queryset = FeatureFlag.objects.all()
+    serializer_class = FeatureFlagSerializer

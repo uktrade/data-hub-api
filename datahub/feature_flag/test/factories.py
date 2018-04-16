@@ -10,7 +10,7 @@ class FeatureFlagFactory(factory.django.DjangoModelFactory):
     """Factory for creating a feature flag."""
 
     id = factory.LazyFunction(uuid.uuid4)
-    code = factory.Faker('sentence', nb_words=4)
+    code = factory.Sequence(lambda n: f'CODE_{n}')
     description = factory.Faker('sentence', nb_words=8)
     is_active = True
 
