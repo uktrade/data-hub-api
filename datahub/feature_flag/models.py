@@ -21,3 +21,7 @@ class FeatureFlag(BaseModel):
 
     class Meta:
         ordering = ('code',)
+
+    def __str__(self):
+        """Human readable representation."""
+        return f'{self.code} - {self.is_active}'
