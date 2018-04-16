@@ -396,8 +396,8 @@ class TestRefundAdmin(AdminTestMixin):
             'level2_approved_on_1': time_str,
             'level2_approved_by': AdviserFactory().pk,
             'method': refund.method or '',
-            'net_amount': refund.net_amount or '',
-            'vat_amount': refund.vat_amount or '',
+            'net_amount': '' if refund.net_amount is None else refund.net_amount,
+            'vat_amount': '' if refund.vat_amount is None else refund.vat_amount,
         }
 
         for changed_status, _ in RefundStatus:
