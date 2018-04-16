@@ -1,15 +1,16 @@
-from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
-from datahub.core.viewsets import CoreViewSetV3
-from datahub.feature_flag.queryset import get_feature_flag_queryset
-from datahub.feature_flag.serializers import FeatureFlagSerializer
-from datahub.oauth.scopes import Scope
+from datahub.feature_flag.models import FeatureFlag
 
 
-class FeatureFlagViewSet(CoreViewSetV3):
-    """Feature flag ViewSet v3."""
-
-    required_scopes = (Scope.internal_front_end,)
-    permission_classes = (IsAuthenticatedOrTokenHasScope,)
-    serializer_class = FeatureFlagSerializer
-    queryset = get_feature_flag_queryset()
+@api_view()
+@permission_classes([IsAuthenticated])
+def get_feature_flags(request):
+    """Return a dictionary of feature flags."""
+    feature_flags = {
+        feature_flag.code: feature_flag.is_active
+        for feature_flag in FeatureFlag.objects.all()
+    }
+    return Response(data=feature_flags)
