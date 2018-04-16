@@ -48,13 +48,6 @@ class Event(DocType, MapDBModelToDict):
 
     COMPUTED_MAPPINGS = {}
 
-    IGNORED_FIELDS = (
-        'created_by',
-        'modified_by',
-        'interactions',
-        'archived_documents_url_path',
-    )
-
     SEARCH_FIELDS = (
         'name',
         'name_trigram',

@@ -85,21 +85,6 @@ class Order(DocType, MapDBModelToDict):
         'payment_due_date': lambda x: x.invoice.payment_due_date if x.invoice else None,
     }
 
-    IGNORED_FIELDS = (
-        'modified_by',
-        'product_info',
-        'permission_to_approach_contacts',
-        'quote',
-        'hourly_rate',
-        'discount_label',
-        'public_token',
-        'invoice',
-        'payments',
-        'refunds',
-        'archived_documents_url_path',
-        'payment_gateway_sessions'
-    )
-
     SEARCH_FIELDS = (
         'reference_trigram',
         'company.name',

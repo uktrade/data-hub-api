@@ -174,19 +174,6 @@ class InvestmentProject(DocType, MapDBModelToDict):
         ),
     }
 
-    IGNORED_FIELDS = (
-        'cdms_project_code',
-        'client_considering_other_countries',
-        'competitor_countries',
-        'documents',
-        'interactions',
-        'investmentprojectcode',
-        'modified_by',
-        'strategic_drivers',
-        'archived_documents_url_path',
-        'stage_log',
-    )
-
     SEARCH_FIELDS = (
         'name',
         'name_trigram',
