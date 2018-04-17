@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 
-from datahub.search.utils import get_model_copied_to_field_names
+from datahub.search.utils import get_model_copy_to_target_field_names
 
 
 def test_get_model_copy_to_field_names(monkeypatch):
@@ -12,7 +12,7 @@ def test_get_model_copy_to_field_names(monkeypatch):
             'field3': Mock(spec_set=('copy_to',), copy_to=['copy_to_list1', 'copy_to_list2']),
         }
     ))
-    assert get_model_copied_to_field_names(Mock()) == {
+    assert get_model_copy_to_target_field_names(Mock()) == {
         'copy_to_str',
         'copy_to_list1',
         'copy_to_list2',

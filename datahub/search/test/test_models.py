@@ -3,7 +3,7 @@ import inspect
 from django.utils.functional import cached_property
 
 from datahub.search.apps import get_search_apps
-from datahub.search.utils import get_model_copied_to_field_names, get_model_field_names
+from datahub.search.utils import get_model_copy_to_target_field_names, get_model_field_names
 
 
 def pytest_generate_tests(metafunc):
@@ -24,7 +24,7 @@ def test_validate_model_fields(search_app):
 
     fields = get_model_field_names(es_model)
 
-    copy_to_fields = get_model_copied_to_field_names(es_model)
+    copy_to_fields = get_model_copy_to_target_field_names(es_model)
     computed_fields = es_model.COMPUTED_MAPPINGS.keys()
     db_model_properties = _get_object_properties(db_model)
     db_model_fields = _get_db_model_fields(db_model)

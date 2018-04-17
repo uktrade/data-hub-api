@@ -16,8 +16,8 @@ def get_model_field_names(es_model):
     return get_model_fields(es_model).keys()
 
 
-def get_model_copied_to_field_names(es_model):
-    """Gets the names of fields that are copied to in an ES model."""
+def get_model_copy_to_target_field_names(es_model):
+    """Gets the names of fields (for an ES model) that are copy-to targets."""
     fields = get_model_fields(es_model)
 
     copy_to_field_lists = [
@@ -33,7 +33,7 @@ def get_model_non_mapped_field_names(es_model):
     """Gets the names of fields that are not copied to, mapped or computed."""
     return (
         get_model_field_names(es_model)
-        - get_model_copied_to_field_names(es_model)
+        - get_model_copy_to_target_field_names(es_model)
         - es_model.MAPPINGS.keys()
         - es_model.COMPUTED_MAPPINGS.keys()
     )
