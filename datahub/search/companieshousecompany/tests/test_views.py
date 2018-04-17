@@ -66,7 +66,8 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
             (  # pagination
                 {
                     'limit': 1,
-                    'offset': 1
+                    'offset': 1,
+                    'sortby': 'name:asc',
                 },
                 {'222'}
             ),
