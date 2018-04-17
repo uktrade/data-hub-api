@@ -25,6 +25,7 @@ class InteractionAdmin(VersionAdmin):
     list_display = (
         'subject',
         'date',
+        'created_on',
         'company',
         'contact',
         'investment_project',
@@ -43,6 +44,8 @@ class InteractionAdmin(VersionAdmin):
     )
     readonly_fields = (
         'archived_documents_url_path',
+        'created_on',
+        'modified_on',
     )
     list_select_related = (
         'company',
