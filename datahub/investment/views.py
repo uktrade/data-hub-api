@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.thread_pool import submit_to_thread_pool
-from datahub.core.viewsets import CoreViewSetV3
+from datahub.core.viewsets import CoreViewSet
 from datahub.documents.av_scan import virus_scan_document
 from datahub.investment.models import (
     InvestmentProject, InvestmentProjectTeamMember, IProjectDocument
@@ -49,7 +49,7 @@ class IProjectAuditViewSet(AuditViewSet):
         return 'Investment project audit log'
 
 
-class IProjectViewSet(ArchivableViewSetMixin, CoreViewSetV3):
+class IProjectViewSet(ArchivableViewSetMixin, CoreViewSet):
     """Unified investment project views.
 
     This replaces the previous project, value, team and requirements endpoints.
@@ -148,7 +148,7 @@ class IProjectModifiedSinceViewSet(IProjectViewSet):
     filter_class = _ModifiedOnFilter
 
 
-class IProjectTeamMembersViewSet(CoreViewSetV3):
+class IProjectTeamMembersViewSet(CoreViewSet):
     """Investment project team member views."""
 
     non_existent_project_error_message = 'Specified investment project does not exist'
@@ -229,7 +229,7 @@ class IProjectTeamMembersViewSet(CoreViewSetV3):
             raise Http404(self.non_existent_project_error_message)
 
 
-class IProjectDocumentViewSet(CoreViewSetV3):
+class IProjectDocumentViewSet(CoreViewSet):
     """Investment Project Documents ViewSet."""
 
     required_scopes = (Scope.internal_front_end,)
