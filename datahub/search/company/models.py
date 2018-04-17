@@ -1,14 +1,13 @@
 from operator import attrgetter
 
-from django.conf import settings
-from elasticsearch_dsl import Boolean, Date, DocType, Keyword, Text
+from elasticsearch_dsl import Boolean, Date, Keyword, Text
 
 from .. import dict_utils
 from .. import dsl_utils
-from ..models import MapDBModelToDict
+from ..models import BaseESModel
 
 
-class Company(DocType, MapDBModelToDict):
+class Company(BaseESModel):
     """Elasticsearch representation of Company model."""
 
     id = Keyword()
@@ -104,24 +103,6 @@ class Company(DocType, MapDBModelToDict):
         'export_experience_category': dict_utils.id_name_dict,
     }
 
-    IGNORED_FIELDS = (
-        'alias',
-        'business_leads',
-        'children',
-        'subsidiaries',
-        'created_by',
-        'interactions',
-        'intermediate_investment_projects',
-        'investee_projects',
-        'investor_investment_projects',
-        'lft',
-        'modified_by',
-        'orders',
-        'rght',
-        'tree_id',
-        'archived_documents_url_path',
-    )
-
     SEARCH_FIELDS = (
         'name',
         'name_trigram',
@@ -139,5 +120,4 @@ class Company(DocType, MapDBModelToDict):
     class Meta:
         """Default document meta data."""
 
-        index = settings.ES_INDEX
         doc_type = 'company'

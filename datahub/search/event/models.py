@@ -1,10 +1,10 @@
-from elasticsearch_dsl import Date, DocType, Keyword, Text
+from elasticsearch_dsl import Date, Keyword, Text
 
 from datahub.search import dict_utils, dsl_utils
-from datahub.search.models import MapDBModelToDict
+from datahub.search.models import BaseESModel
 
 
-class Event(DocType, MapDBModelToDict):
+class Event(BaseESModel):
     """Elasticsearch representation of Event model."""
 
     id = Keyword()
@@ -29,6 +29,8 @@ class Event(DocType, MapDBModelToDict):
     teams = dsl_utils.id_name_partial_mapping('teams')
     related_programmes = dsl_utils.id_name_partial_mapping('related_programmes')
     service = dsl_utils.id_name_mapping()
+    created_on = Date()
+    modified_on = Date()
     disabled_on = Date()
 
     MAPPINGS = {
@@ -45,13 +47,6 @@ class Event(DocType, MapDBModelToDict):
     }
 
     COMPUTED_MAPPINGS = {}
-
-    IGNORED_FIELDS = (
-        'created_by',
-        'modified_by',
-        'interactions',
-        'archived_documents_url_path',
-    )
 
     SEARCH_FIELDS = (
         'name',

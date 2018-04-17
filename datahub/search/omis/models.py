@@ -1,11 +1,11 @@
-from elasticsearch_dsl import Boolean, Date, DocType, Integer, Keyword, Text
+from elasticsearch_dsl import Boolean, Date, Integer, Keyword, Text
 
 from .. import dict_utils
 from .. import dsl_utils
-from ..models import MapDBModelToDict
+from ..models import BaseESModel
 
 
-class Order(DocType, MapDBModelToDict):
+class Order(BaseESModel):
     """Elasticsearch representation of Order model."""
 
     id = Keyword()
@@ -84,21 +84,6 @@ class Order(DocType, MapDBModelToDict):
     COMPUTED_MAPPINGS = {
         'payment_due_date': lambda x: x.invoice.payment_due_date if x.invoice else None,
     }
-
-    IGNORED_FIELDS = (
-        'modified_by',
-        'product_info',
-        'permission_to_approach_contacts',
-        'quote',
-        'hourly_rate',
-        'discount_label',
-        'public_token',
-        'invoice',
-        'payments',
-        'refunds',
-        'archived_documents_url_path',
-        'payment_gateway_sessions'
-    )
 
     SEARCH_FIELDS = (
         'reference_trigram',

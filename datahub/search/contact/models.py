@@ -1,12 +1,12 @@
-from elasticsearch_dsl import Boolean, Date, DocType, Keyword, Text
+from elasticsearch_dsl import Boolean, Date, Keyword, Text
 
 from . import dict_utils as contact_dict_utils
 from .. import dict_utils
 from .. import dsl_utils
-from ..models import MapDBModelToDict
+from ..models import BaseESModel
 
 
-class Contact(DocType, MapDBModelToDict):
+class Contact(BaseESModel):
     """Elasticsearch representation of Contact model."""
 
     id = Keyword()
@@ -80,14 +80,6 @@ class Contact(DocType, MapDBModelToDict):
         'address_postcode': contact_dict_utils.computed_address_field('address_postcode'),
         'address_country': contact_dict_utils.computed_address_field('address_country'),
     }
-
-    IGNORED_FIELDS = (
-        'interactions',
-        'investment_projects',
-        'modified_by',
-        'orders',
-        'archived_documents_url_path',
-    )
 
     SEARCH_FIELDS = (
         'name',

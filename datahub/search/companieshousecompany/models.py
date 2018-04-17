@@ -1,10 +1,10 @@
-from elasticsearch_dsl import Date, DocType, Keyword, Text
+from elasticsearch_dsl import Date, Keyword, Text
 
 from datahub.search import dict_utils, dsl_utils
-from datahub.search.models import MapDBModelToDict
+from datahub.search.models import BaseESModel
 
 
-class CompaniesHouseCompany(DocType, MapDBModelToDict):
+class CompaniesHouseCompany(BaseESModel):
     """Elasticsearch representation of CompaniesHouseCompany model."""
 
     id = Keyword()
