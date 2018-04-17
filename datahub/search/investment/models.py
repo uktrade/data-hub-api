@@ -1,8 +1,8 @@
-from elasticsearch_dsl import Boolean, Date, DocType, Double, Integer, Keyword, Long, Text
+from elasticsearch_dsl import Boolean, Date, Double, Integer, Keyword, Long, Text
 
 from .. import dict_utils
 from .. import dsl_utils
-from ..models import MapDBModelToDict
+from ..models import BaseESModel
 
 
 def _referral_source_adviser_mapping():
@@ -28,7 +28,7 @@ def _country_lost_to_mapping():
     return dsl_utils.object_mapping('id', 'name')
 
 
-class InvestmentProject(DocType, MapDBModelToDict):
+class InvestmentProject(BaseESModel):
     """Elasticsearch representation of InvestmentProject."""
 
     id = Keyword()
