@@ -55,6 +55,14 @@ def test_validate_model_computed_mapping_fields(search_app):
     assert not invalid_fields
 
 
+def test_validate_model_no_mapping_and_computed_intersection(search_app):
+    """Test that MAPPINGS and COMPUTED_MAPPINGS on ES models don't overlap."""
+    es_model = search_app.es_model
+    intersection = es_model.MAPPINGS.keys() & es_model.COMPUTED_MAPPINGS.keys()
+
+    assert not intersection
+
+
 def _get_db_model_fields(db_model):
     return {field.name for field in db_model._meta.get_fields()}
 
