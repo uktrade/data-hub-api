@@ -45,6 +45,7 @@ class InteractionAdmin(VersionAdmin):
     readonly_fields = (
         'archived_documents_url_path',
         'created_on',
+        'modified_on',
     )
     list_select_related = (
         'company',
