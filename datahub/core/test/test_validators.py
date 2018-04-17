@@ -1,4 +1,3 @@
-from types import SimpleNamespace
 from unittest import mock
 from unittest.mock import Mock
 
@@ -8,7 +7,6 @@ from rest_framework.exceptions import ValidationError
 from datahub.core.validate_utils import DataCombiner
 from datahub.core.validators import (
     AddressValidator,
-    AnyOfValidator,
     ConditionalRule,
     EqualsRule,
     FieldAndError,
@@ -18,31 +16,6 @@ from datahub.core.validators import (
     RulesBasedValidator,
     ValidationRule,
 )
-
-
-def test_any_of_none():
-    """Tests that validation fails if no any-of fields provided."""
-    instance = SimpleNamespace(field_a=None, field_b=None)
-    validator = AnyOfValidator('field_a', 'field_b')
-    validator.set_context(Mock(instance=instance))
-    with pytest.raises(ValidationError):
-        validator({})
-
-
-def test_any_of_some():
-    """Tests that validation passes if some any-of fields provided."""
-    instance = SimpleNamespace(field_a=None, field_b=None)
-    validator = AnyOfValidator('field_a', 'field_b')
-    validator.set_context(Mock(instance=instance))
-    validator({'field_a': Mock()})
-
-
-def test_any_of_all():
-    """Tests that validation passes if all any-of fields provided."""
-    instance = SimpleNamespace(field_a=None, field_b=None)
-    validator = AnyOfValidator('field_a', 'field_b')
-    validator.set_context(Mock(instance=instance))
-    validator({'field_a': Mock(), 'field_b': Mock()})
 
 
 class TestAddressValidator:
@@ -252,6 +225,11 @@ def _make_stub_rule(field, is_valid):
         (_make_stub_rule('field1', False),),
         _make_stub_rule('field_when', False),
         [],
+    ),
+    (
+        (_make_stub_rule(None, False),),
+        _make_stub_rule('field_when', True),
+        [FieldAndError('non_field_errors', 'error')],
     ),
 ))
 def test_validation_rule(rules, when, res):

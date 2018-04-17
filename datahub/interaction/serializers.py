@@ -8,7 +8,7 @@ from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import is_blank, is_not_blank
 from datahub.core.validators import (
-    AnyOfValidator, EqualsRule, InRule, OperatorRule, RulesBasedValidator, ValidationRule
+    AnyIsNotBlankRule, EqualsRule, InRule, OperatorRule, RulesBasedValidator, ValidationRule
 )
 from datahub.event.models import Event
 from datahub.investment.models import InvestmentProject
@@ -22,6 +22,9 @@ class InteractionSerializer(serializers.ModelSerializer):
     """V3 interaction serialiser."""
 
     default_error_messages = {
+        'missing_entity': ugettext_lazy(
+            'A company or investment_project must be provided.'
+        ),
         'invalid_for_non_service_delivery': ugettext_lazy(
             'This field is only valid for service deliveries.'
         ),
@@ -116,7 +119,6 @@ class InteractionSerializer(serializers.ModelSerializer):
             'archived_documents_url_path',
         )
         validators = [
-            AnyOfValidator('company', 'investment_project'),
             HasAssociatedInvestmentProjectValidator(),
             RulesBasedValidator(
                 ValidationRule(
@@ -142,6 +144,11 @@ class InteractionSerializer(serializers.ModelSerializer):
                         Interaction.KINDS.service_delivery,
                         Interaction.KINDS.policy_feedback
                     ]),
+                ),
+                ValidationRule(
+                    'missing_entity',
+                    AnyIsNotBlankRule('company', 'investment_project'),
+                    when=EqualsRule('kind', Interaction.KINDS.interaction),
                 ),
                 ValidationRule(
                     'invalid_for_service_delivery',
