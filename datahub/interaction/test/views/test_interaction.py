@@ -172,7 +172,7 @@ class TestAddInteraction(APITestMixin):
                 },
                 {
                     'non_field_errors': [
-                        'One or more of company, investment_project must be provided.'
+                        'A company or investment_project must be provided.'
                     ]
                 }
             ),
