@@ -1,8 +1,8 @@
-from elasticsearch_dsl import Boolean, Date, DocType, Double, Integer, Keyword, Text
+from elasticsearch_dsl import Boolean, Date, Double, Integer, Keyword, Long, Text
 
 from .. import dict_utils
 from .. import dsl_utils
-from ..models import MapDBModelToDict
+from ..models import BaseESModel
 
 
 def _referral_source_adviser_mapping():
@@ -28,7 +28,7 @@ def _country_lost_to_mapping():
     return dsl_utils.object_mapping('id', 'name')
 
 
-class InvestmentProject(DocType, MapDBModelToDict):
+class InvestmentProject(BaseESModel):
     """Elasticsearch representation of InvestmentProject."""
 
     id = Keyword()
@@ -108,6 +108,23 @@ class InvestmentProject(DocType, MapDBModelToDict):
     date_abandoned = Date()
     project_arrived_in_triage_on = Date()
     proposal_deadline = Date()
+    address_1 = Text()
+    address_2 = Text()
+    address_town = dsl_utils.SortableCaseInsensitiveKeywordText()
+    address_postcode = Text()
+    archived_on = Date()
+    client_cannot_provide_foreign_investment = Boolean()
+    client_requirements = dsl_utils.TextWithKeyword()
+    likelihood_of_landing = Long()
+    number_safeguarded_jobs = Long()
+    other_business_activity = dsl_utils.TextWithKeyword()
+    quotable_as_public_case_study = Boolean()
+    reason_abandoned = dsl_utils.TextWithKeyword()
+    reason_delayed = dsl_utils.TextWithKeyword()
+    reason_lost = dsl_utils.TextWithKeyword()
+    some_new_jobs = Boolean()
+    will_new_jobs_last_two_years = Boolean()
+    uk_company_decided = Boolean()
 
     MAPPINGS = {
         'id': str,
@@ -156,19 +173,6 @@ class InvestmentProject(DocType, MapDBModelToDict):
             'investor_company.registered_address_country'
         ),
     }
-
-    IGNORED_FIELDS = (
-        'cdms_project_code',
-        'client_considering_other_countries',
-        'competitor_countries',
-        'documents',
-        'interactions',
-        'investmentprojectcode',
-        'modified_by',
-        'strategic_drivers',
-        'archived_documents_url_path',
-        'stage_log',
-    )
 
     SEARCH_FIELDS = (
         'name',

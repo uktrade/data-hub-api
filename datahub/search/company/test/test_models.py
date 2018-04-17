@@ -20,6 +20,7 @@ def test_company_dbmodel_to_dict(setup_es):
         'archived_reason',
         'business_type',
         'classification',
+        'companies_house_data',
         'company_number',
         'contacts',
         'created_on',

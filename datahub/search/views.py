@@ -20,7 +20,7 @@ from .query_builder import (
     limit_search_query,
 )
 from .serializers import SearchSerializer
-from .utils import Echo
+from .utils import Echo, get_model_field_names
 
 EntitySearch = namedtuple('EntitySearch', ['model', 'name'])
 
@@ -265,9 +265,8 @@ class SearchExportAPIView(SearchAPIView):
 
     def _get_fieldnames(self):
         """Gets cleaned list of entity field names."""
-        return self._clean_fieldnames(
-            self.entity._doc_type.mapping.properties._params['properties'].keys()
-        )
+        field_names = get_model_field_names(self.entity)
+        return self._clean_fieldnames(field_names)
 
     def post(self, request, format=None):
         """Performs search and returns CSV file."""

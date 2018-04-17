@@ -3,6 +3,7 @@ import inspect
 from django.utils.functional import cached_property
 
 from datahub.search.apps import get_search_apps
+from datahub.search.utils import get_model_copy_to_target_field_names, get_model_field_names
 
 
 def pytest_generate_tests(metafunc):
@@ -21,9 +22,9 @@ def test_validate_model_fields(search_app):
     es_model = search_app.es_model
     db_model = search_app.queryset.model
 
-    fields = _get_es_model_fields(es_model)
+    fields = get_model_field_names(es_model)
 
-    copy_to_fields = _get_es_model_copy_to_fields(es_model)
+    copy_to_fields = get_model_copy_to_target_field_names(es_model)
     computed_fields = es_model.COMPUTED_MAPPINGS.keys()
     db_model_properties = _get_object_properties(db_model)
     db_model_fields = _get_db_model_fields(db_model)
@@ -37,7 +38,7 @@ def test_validate_model_fields(search_app):
 def test_validate_model_mapping_fields(search_app):
     """Test that all fields defined in MAPPINGS exist on the ES model."""
     es_model = search_app.es_model
-    valid_fields = _get_es_model_fields(es_model)
+    valid_fields = get_model_field_names(es_model)
     fields = es_model.MAPPINGS.keys()
     invalid_fields = fields - valid_fields
 
@@ -47,31 +48,19 @@ def test_validate_model_mapping_fields(search_app):
 def test_validate_model_computed_mapping_fields(search_app):
     """Test that all fields defined in COMPUTED_MAPPINGS exist on the ES model."""
     es_model = search_app.es_model
-    valid_fields = _get_es_model_fields(es_model)
+    valid_fields = get_model_field_names(es_model)
     fields = es_model.COMPUTED_MAPPINGS.keys()
     invalid_fields = fields - valid_fields
 
     assert not invalid_fields
 
 
-def _get_es_model_es_properties(es_model):
-    return es_model._doc_type.mapping.properties._params['properties']
+def test_validate_model_no_mapping_and_computed_intersection(search_app):
+    """Test that MAPPINGS and COMPUTED_MAPPINGS on ES models don't overlap."""
+    es_model = search_app.es_model
+    intersection = es_model.MAPPINGS.keys() & es_model.COMPUTED_MAPPINGS.keys()
 
-
-def _get_es_model_fields(es_model):
-    return _get_es_model_es_properties(es_model).keys()
-
-
-def _get_es_model_copy_to_fields(es_model):
-    props = _get_es_model_es_properties(es_model)
-
-    copy_to_field_lists = [
-        [prop.copy_to] if isinstance(prop.copy_to, str) else prop.copy_to
-        for prop in props.values()
-        if hasattr(prop, 'copy_to')
-    ]
-
-    return {field for fields in copy_to_field_lists for field in fields}
+    assert not intersection
 
 
 def _get_db_model_fields(db_model):
