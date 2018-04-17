@@ -1,12 +1,12 @@
-from elasticsearch_dsl import Boolean, Date, DocType, Keyword, Text
+from elasticsearch_dsl import Boolean, Date, Keyword, Text
 
 from . import dict_utils as contact_dict_utils
 from .. import dict_utils
 from .. import dsl_utils
-from ..models import MapDBModelToDict
+from ..models import BaseESModel
 
 
-class Contact(DocType, MapDBModelToDict):
+class Contact(BaseESModel):
     """Elasticsearch representation of Contact model."""
 
     id = Keyword()

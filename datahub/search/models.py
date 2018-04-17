@@ -1,13 +1,14 @@
 from collections import namedtuple
 
 from django.conf import settings
+from elasticsearch_dsl import DocType, MetaField
 
 from datahub.search.utils import get_model_non_mapped_field_names
 
 DataSet = namedtuple('DataSet', ('queryset', 'es_model',))
 
 
-class MapDBModelToDict:
+class BaseESModel(DocType):
     """Helps convert Django models to dictionaries."""
 
     MAPPINGS = {}
@@ -15,6 +16,9 @@ class MapDBModelToDict:
     COMPUTED_MAPPINGS = {}
 
     SEARCH_FIELDS = ()
+
+    class Meta:
+        dynamic = MetaField('strict')
 
     @classmethod
     def es_document(cls, dbmodel):

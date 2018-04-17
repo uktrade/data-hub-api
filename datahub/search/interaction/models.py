@@ -1,12 +1,12 @@
 from operator import attrgetter
 
-from elasticsearch_dsl import Boolean, Date, DocType, Double, Keyword
+from elasticsearch_dsl import Boolean, Date, Double, Keyword
 
 from datahub.search import dict_utils, dsl_utils
-from datahub.search.models import MapDBModelToDict
+from datahub.search.models import BaseESModel
 
 
-class Interaction(DocType, MapDBModelToDict):
+class Interaction(BaseESModel):
     """Elasticsearch representation of Interaction model."""
 
     id = Keyword()

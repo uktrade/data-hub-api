@@ -1,10 +1,10 @@
-from elasticsearch_dsl import Date, DocType, Keyword, Text
+from elasticsearch_dsl import Date, Keyword, Text
 
 from datahub.search import dict_utils, dsl_utils
-from datahub.search.models import MapDBModelToDict
+from datahub.search.models import BaseESModel
 
 
-class Event(DocType, MapDBModelToDict):
+class Event(BaseESModel):
     """Elasticsearch representation of Event model."""
 
     id = Keyword()
