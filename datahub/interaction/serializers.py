@@ -22,17 +22,17 @@ class InteractionSerializer(serializers.ModelSerializer):
     """V3 interaction serialiser."""
 
     default_error_messages = {
-        'invalid_for_interaction': ugettext_lazy(
+        'invalid_for_non_service_delivery': ugettext_lazy(
             'This field is only valid for service deliveries.'
         ),
         'invalid_for_service_delivery': ugettext_lazy(
+            'This field is not valid for service deliveries.'
+        ),
+        'invalid_for_non_interaction': ugettext_lazy(
             'This field is only valid for interactions.'
         ),
         'invalid_for_non_event': ugettext_lazy(
             'This field is only valid for event service deliveries.'
-        ),
-        'invalid_for_policy_feedback': ugettext_lazy(
-            'This field is only valid for interactions.'
         ),
         'invalid_for_non_policy_feedback': ugettext_lazy(
             'This field is only valid for policy feedback.'
@@ -128,9 +128,20 @@ class InteractionSerializer(serializers.ModelSerializer):
                     ]),
                 ),
                 ValidationRule(
-                    'invalid_for_policy_feedback',
+                    'required',
+                    OperatorRule('company', bool),
+                    when=InRule('kind', [
+                        Interaction.KINDS.service_delivery,
+                        Interaction.KINDS.policy_feedback
+                    ]),
+                ),
+                ValidationRule(
+                    'invalid_for_non_interaction',
                     OperatorRule('investment_project', not_),
-                    when=EqualsRule('kind', Interaction.KINDS.policy_feedback),
+                    when=InRule('kind', [
+                        Interaction.KINDS.service_delivery,
+                        Interaction.KINDS.policy_feedback
+                    ]),
                 ),
                 ValidationRule(
                     'invalid_for_service_delivery',
@@ -138,8 +149,9 @@ class InteractionSerializer(serializers.ModelSerializer):
                     when=EqualsRule('kind', Interaction.KINDS.service_delivery),
                 ),
                 ValidationRule(
-                    'invalid_for_interaction',
+                    'invalid_for_non_service_delivery',
                     OperatorRule('is_event', is_blank),
+                    OperatorRule('event', is_blank),
                     OperatorRule('service_delivery_status', is_blank),
                     OperatorRule('grant_amount_offered', is_blank),
                     OperatorRule('net_company_receipt', is_blank),

@@ -12,30 +12,9 @@ from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
+from .utils import NON_RESTRICTED_READ_PERMISSIONS
 from ..factories import CompanyInteractionFactory, EventServiceDeliveryFactory
 from ...models import CommunicationChannel, Interaction, InteractionPermission
-
-
-NON_RESTRICTED_READ_PERMISSIONS = (
-    (
-        InteractionPermission.read_all,
-    ),
-    (
-        InteractionPermission.read_all,
-        InteractionPermission.read_associated_investmentproject,
-    )
-)
-
-
-NON_RESTRICTED_CHANGE_PERMISSIONS = (
-    (
-        InteractionPermission.change_all,
-    ),
-    (
-        InteractionPermission.change_all,
-        InteractionPermission.change_associated_investmentproject,
-    )
-)
 
 
 class TestGetInteraction(APITestMixin):
