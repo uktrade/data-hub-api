@@ -166,28 +166,45 @@ class TestSearch(APITestMixin):
         expected_ids = {contact.pk for contact in contacts[sector_level:]}
         assert actual_ids == expected_ids
 
-    def test_search_contact_by_partial_company_name(self, setup_es, setup_data):
+    @pytest.mark.parametrize(
+        'term,match',
+        (
+            ('whiskers', True),
+            ('house lion', True),
+            ('tiger', False),
+            ('panda', False),
+        )
+    )
+    def test_search_contact_by_partial_company_name(self, setup_es, term, match):
         """Tests filtering by partially matching company name."""
-        contact = ContactFactory()
-        company = contact.company
-        company.name = 'Verylongcompanyname'
-        company.save()
+        matching_company = CompanyFactory(
+            name='whiskers and tabby',
+            alias='house lion and moggie',
+        )
+        non_matching_company = CompanyFactory(
+            name='Pluto and pippo',
+            alias='Epsilon and lippo',
+        )
+        matching_contact = ContactFactory(company=matching_company)
+        ContactFactory(company=non_matching_company)
 
         setup_es.indices.refresh()
-
-        term = ''
 
         url = reverse('api-v3:search:contact')
 
         response = self.api_client.post(url, {
-            'original_query': term,
-            'company_name': 'verylong',
+            'original_query': '',
+            'company_name': term,
         })
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 1
-        assert len(response.data['results']) == 1
-        assert response.data['results'][0]['company']['name'] == company.name
+        if match:
+            assert response.data['count'] == 1
+            assert len(response.data['results']) == 1
+            assert response.data['results'][0]['id'] == str(matching_contact.id)
+        else:
+            assert response.data['count'] == 0
+            assert len(response.data['results']) == 0
 
     def test_search_contact_by_partial_name(self, setup_es, setup_data):
         """Tests filtering by partially matching name."""
