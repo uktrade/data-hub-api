@@ -34,7 +34,6 @@ class SearchCompanyParams:
         'global_headquarters': 'global_headquarters.id',
         'headquarter_type': 'headquarter_type.id',
         'sector': 'sector.id',
-        'registered_address_country': 'registered_address_country.id',
         'trading_address_country': 'trading_address_country.id',
         'uk_region': 'uk_region.id',
     }

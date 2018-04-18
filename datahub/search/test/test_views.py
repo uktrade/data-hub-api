@@ -83,7 +83,7 @@ class TestValidateViewAttributes:
         invalid_fields = frozenset(view.FILTER_FIELDS) - valid_fields
         assert not invalid_fields
 
-    def test_validate_remap_fields(self, search_app):
+    def test_validate_remap_fields_exist(self, search_app):
         """Validate that the values of REMAP_FIELDS are valid field paths."""
         view = search_app.view
 
@@ -93,6 +93,12 @@ class TestValidateViewAttributes:
         }
 
         assert not invalid_fields
+
+    def test_validate_remap_fields_are_used_in_filters(self, search_app):
+        """Validate that the values of REMAP_FIELDS are used in a filter."""
+        view = search_app.view
+
+        assert not {field for field in view.REMAP_FIELDS if field not in view.FILTER_FIELDS}
 
     @staticmethod
     def _model_has_field_path(es_model, path):
