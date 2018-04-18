@@ -96,7 +96,23 @@ def id_uri_mapping():
     })
 
 
-def company_mapping():
+def company_mapping(field):
+    """Mapping for company fields."""
+    return Nested(
+        properties={
+            'id': Keyword(),
+            'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+            'name_trigram': TrigramText(),
+            'trading_name': SortableCaseInsensitiveKeywordText(
+                copy_to=f'{field}.trading_name_trigram'
+            ),
+            'trading_name_trigram': TrigramText(),
+        },
+        include_in_parent=True,
+    )
+
+
+def ch_company_mapping():
     """Mapping for id company_number fields."""
     return Nested(properties={
         'id': Keyword(),

@@ -10,7 +10,7 @@ class Interaction(BaseESModel):
     """Elasticsearch representation of Interaction model."""
 
     id = Keyword()
-    company = dsl_utils.id_name_partial_mapping('company')
+    company = dsl_utils.company_mapping('company')
     company_sector = dsl_utils.sector_mapping()
     communication_channel = dsl_utils.id_name_mapping()
     contact = dsl_utils.contact_or_adviser_partial_mapping('contact')
@@ -36,7 +36,7 @@ class Interaction(BaseESModel):
 
     MAPPINGS = {
         'id': str,
-        'company': dict_utils.id_name_dict,
+        'company': dict_utils.company_dict,
         'communication_channel': dict_utils.id_name_dict,
         'contact': dict_utils.contact_or_adviser_dict,
         'dit_adviser': dict_utils.contact_or_adviser_dict,
