@@ -70,6 +70,18 @@ def setup_data():
     )
 
 
+class TestValidateViewAttributes:
+    """Validates the field names specified in various class attributes on views."""
+
+    def test_validate_filter_fields_are_in_serializer(self, search_app):
+        """Validates that all filter fields exist in the serializer class."""
+        view = search_app.view
+        valid_fields = view.serializer_class._declared_fields.keys()
+
+        invalid_fields = frozenset(view.FILTER_FIELDS) - valid_fields
+        assert not invalid_fields
+
+
 class TestSearch(APITestMixin):
     """Tests search views."""
 
