@@ -32,140 +32,140 @@ class InvestmentProject(BaseESModel):
     """Elasticsearch representation of InvestmentProject."""
 
     id = Keyword()
-    allow_blank_estimated_land_date = Boolean(index=False)
-    allow_blank_possible_uk_regions = Boolean(index=False)
+    actual_land_date = Date()
+    actual_uk_regions = dsl_utils.id_name_mapping()
+    address_1 = Text()
+    address_2 = Text()
+    address_town = dsl_utils.SortableCaseInsensitiveKeywordText()
+    address_postcode = Text()
     approved_commitment_to_invest = Boolean()
     approved_fdi = Boolean()
     approved_good_value = Boolean()
     approved_high_value = Boolean()
     approved_landed = Boolean()
     approved_non_fdi = Boolean()
-    actual_land_date = Date()
+    allow_blank_estimated_land_date = Boolean(index=False)
+    allow_blank_possible_uk_regions = Boolean(index=False)
+    anonymous_description = dsl_utils.EnglishText()
+    archived = Boolean()
+    archived_by = dsl_utils.contact_or_adviser_mapping('archived_by')
+    archived_on = Date()
+    archived_reason = Text()
+    associated_non_fdi_r_and_d_project = dsl_utils.investment_project_mapping()
+    average_salary = dsl_utils.id_name_mapping()
     business_activities = dsl_utils.id_name_mapping()
+    client_cannot_provide_foreign_investment = Boolean()
+    client_cannot_provide_total_investment = Boolean()
     client_contacts = dsl_utils.contact_or_adviser_mapping('client_contacts')
     client_relationship_manager = dsl_utils.contact_or_adviser_mapping(
         'client_relationship_manager', include_dit_team=True
     )
-    project_manager = dsl_utils.contact_or_adviser_mapping(
-        'project_manager', include_dit_team=True
-    )
-    project_assurance_adviser = dsl_utils.contact_or_adviser_mapping(
-        'project_assurance_adviser', include_dit_team=True
-    )
-    team_members = dsl_utils.contact_or_adviser_mapping('team_members', include_dit_team=True)
-    archived = Boolean()
-    archived_reason = Text()
-    archived_by = dsl_utils.contact_or_adviser_mapping('archived_by')
+    client_requirements = dsl_utils.TextWithKeyword()
+    comments = dsl_utils.EnglishText()
+    country_lost_to = _country_lost_to_mapping()
     created_on = Date()
     created_by = dsl_utils.contact_or_adviser_mapping(
         'created_by', include_dit_team=True
     )
-    modified_on = Date()
+    date_abandoned = Date()
+    date_lost = Date()
+    delivery_partners = dsl_utils.id_name_mapping()
     description = dsl_utils.EnglishText()
-    comments = dsl_utils.EnglishText()
-    anonymous_description = dsl_utils.EnglishText()
     estimated_land_date = Date()
+    export_revenue = Boolean()
     fdi_type = dsl_utils.id_name_mapping()
     fdi_value = dsl_utils.id_name_mapping()
+    foreign_equity_investment = Double()
+    government_assistance = Boolean()
     intermediate_company = dsl_utils.id_name_mapping()
-    uk_company = dsl_utils.id_name_partial_mapping('uk_company')
     investor_company = dsl_utils.id_name_partial_mapping('investor_company')
     investor_company_country = dsl_utils.id_name_mapping()
     investment_type = dsl_utils.id_name_mapping()
     investor_type = dsl_utils.id_name_mapping()
     level_of_involvement = dsl_utils.id_name_mapping()
-    specific_programme = dsl_utils.id_name_mapping()
+    likelihood_of_landing = Long()
+    project_assurance_adviser = dsl_utils.contact_or_adviser_mapping(
+        'project_assurance_adviser', include_dit_team=True
+    )
+    project_manager = dsl_utils.contact_or_adviser_mapping(
+        'project_manager', include_dit_team=True
+    )
     name = dsl_utils.SortableText(copy_to=['name_keyword', 'name_trigram'])
     name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
     name_trigram = dsl_utils.TrigramText()
-    r_and_d_budget = Boolean()
-    non_fdi_r_and_d_budget = Boolean()
-    associated_non_fdi_r_and_d_project = dsl_utils.investment_project_mapping()
     new_tech_to_uk = Boolean()
-    export_revenue = Boolean()
-    uk_region_locations = dsl_utils.id_name_mapping()
-    actual_uk_regions = dsl_utils.id_name_mapping()
-    delivery_partners = dsl_utils.id_name_mapping()
-    site_decided = Boolean()
-    government_assistance = Boolean()
-    client_cannot_provide_total_investment = Boolean()
-    total_investment = Double()
-    foreign_equity_investment = Double()
+    non_fdi_r_and_d_budget = Boolean()
     number_new_jobs = Integer()
-    stage = dsl_utils.id_name_mapping()
+    number_safeguarded_jobs = Long()
+    modified_on = Date()
+    project_arrived_in_triage_on = Date()
     project_code = dsl_utils.SortableCaseInsensitiveKeywordText(copy_to='project_code_trigram')
     project_code_trigram = dsl_utils.TrigramText()
-    referral_source_activity = dsl_utils.id_name_mapping()
-    referral_source_activity_marketing = dsl_utils.id_name_mapping()
-    referral_source_activity_website = dsl_utils.id_name_mapping()
-    referral_source_activity_event = dsl_utils.SortableCaseInsensitiveKeywordText()
-    referral_source_adviser = _referral_source_adviser_mapping()
-    sector = dsl_utils.sector_mapping()
-    status = dsl_utils.SortableCaseInsensitiveKeywordText()
-    average_salary = dsl_utils.id_name_mapping()
-    date_lost = Date()
-    country_lost_to = _country_lost_to_mapping()
-    date_abandoned = Date()
-    project_arrived_in_triage_on = Date()
     proposal_deadline = Date()
-    address_1 = Text()
-    address_2 = Text()
-    address_town = dsl_utils.SortableCaseInsensitiveKeywordText()
-    address_postcode = Text()
-    archived_on = Date()
-    client_cannot_provide_foreign_investment = Boolean()
-    client_requirements = dsl_utils.TextWithKeyword()
-    likelihood_of_landing = Long()
-    number_safeguarded_jobs = Long()
     other_business_activity = dsl_utils.TextWithKeyword()
     quotable_as_public_case_study = Boolean()
+    r_and_d_budget = Boolean()
     reason_abandoned = dsl_utils.TextWithKeyword()
     reason_delayed = dsl_utils.TextWithKeyword()
     reason_lost = dsl_utils.TextWithKeyword()
+    referral_source_activity = dsl_utils.id_name_mapping()
+    referral_source_activity_event = dsl_utils.SortableCaseInsensitiveKeywordText()
+    referral_source_activity_marketing = dsl_utils.id_name_mapping()
+    referral_source_activity_website = dsl_utils.id_name_mapping()
+    referral_source_adviser = _referral_source_adviser_mapping()
+    sector = dsl_utils.sector_mapping()
+    site_decided = Boolean()
     some_new_jobs = Boolean()
-    will_new_jobs_last_two_years = Boolean()
+    specific_programme = dsl_utils.id_name_mapping()
+    stage = dsl_utils.id_name_mapping()
+    status = dsl_utils.SortableCaseInsensitiveKeywordText()
+    team_members = dsl_utils.contact_or_adviser_mapping('team_members', include_dit_team=True)
+    total_investment = Double()
+    uk_company = dsl_utils.id_name_partial_mapping('uk_company')
     uk_company_decided = Boolean()
+    uk_region_locations = dsl_utils.id_name_mapping()
+    will_new_jobs_last_two_years = Boolean()
 
     MAPPINGS = {
         'id': str,
+        'actual_uk_regions': lambda col: [
+            dict_utils.id_name_dict(c) for c in col.all()
+        ],
+        'archived_by': dict_utils.contact_or_adviser_dict,
+        'associated_non_fdi_r_and_d_project': dict_utils.investment_project_dict,
+        'average_salary': dict_utils.id_name_dict,
         'business_activities': lambda col: [dict_utils.id_name_dict(c) for c in col.all()],
         'client_contacts': lambda col: [dict_utils.contact_or_adviser_dict(c) for c in col.all()],
         'client_relationship_manager': dict_utils.adviser_dict_with_team,
+        'country_lost_to': dict_utils.id_name_dict,
+        'created_by': dict_utils.adviser_dict_with_team,
         'delivery_partners': lambda col: [
             dict_utils.id_name_dict(c) for c in col.all()
-        ],
-        'team_members': lambda col: [
-            dict_utils.contact_or_adviser_dict(c.adviser, include_dit_team=True) for c in col.all()
         ],
         'fdi_type': dict_utils.id_name_dict,
         'fdi_value': dict_utils.id_name_dict,
         'intermediate_company': dict_utils.id_name_dict,
+        'investment_type': dict_utils.id_name_dict,
         'investor_company': dict_utils.id_name_dict,
         'investor_type': dict_utils.id_name_dict,
         'level_of_involvement': dict_utils.id_name_dict,
-        'specific_programme': dict_utils.id_name_dict,
-        'uk_region_locations': lambda col: [
-            dict_utils.id_name_dict(c) for c in col.all()
-        ],
-        'actual_uk_regions': lambda col: [
-            dict_utils.id_name_dict(c) for c in col.all()
-        ],
-        'uk_company': dict_utils.id_name_dict,
-        'investment_type': dict_utils.id_name_dict,
-        'associated_non_fdi_r_and_d_project': dict_utils.investment_project_dict,
-        'stage': dict_utils.id_name_dict,
+        'project_assurance_adviser': dict_utils.adviser_dict_with_team,
+        'project_code': str,
+        'project_manager': dict_utils.adviser_dict_with_team,
         'referral_source_activity': dict_utils.id_name_dict,
         'referral_source_activity_marketing': dict_utils.id_name_dict,
         'referral_source_activity_website': dict_utils.id_name_dict,
         'referral_source_adviser': dict_utils.contact_or_adviser_dict,
         'sector': dict_utils.sector_dict,
-        'project_code': str,
-        'average_salary': dict_utils.id_name_dict,
-        'archived_by': dict_utils.contact_or_adviser_dict,
-        'project_manager': dict_utils.adviser_dict_with_team,
-        'project_assurance_adviser': dict_utils.adviser_dict_with_team,
-        'country_lost_to': dict_utils.id_name_dict,
-        'created_by': dict_utils.adviser_dict_with_team,
+        'specific_programme': dict_utils.id_name_dict,
+        'stage': dict_utils.id_name_dict,
+        'team_members': lambda col: [
+            dict_utils.contact_or_adviser_dict(c.adviser, include_dit_team=True) for c in col.all()
+        ],
+        'uk_company': dict_utils.id_name_dict,
+        'uk_region_locations': lambda col: [
+            dict_utils.id_name_dict(c) for c in col.all()
+        ],
     }
 
     COMPUTED_MAPPINGS = {
