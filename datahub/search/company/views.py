@@ -23,8 +23,6 @@ class SearchCompanyParams:
         'sector_descends',
         'country',
         'trading_address_country',
-        'trading_address_postcode',
-        'trading_address_town',
         'uk_based',
         'uk_region'
     )
