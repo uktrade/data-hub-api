@@ -1,28 +1,3 @@
-from ...models import InteractionPermission
-
-
-NON_RESTRICTED_READ_PERMISSIONS = (
-    (
-        InteractionPermission.read_all,
-    ),
-    (
-        InteractionPermission.read_all,
-        InteractionPermission.read_associated_investmentproject,
-    )
-)
-
-
-NON_RESTRICTED_CHANGE_PERMISSIONS = (
-    (
-        InteractionPermission.change_all,
-    ),
-    (
-        InteractionPermission.change_all,
-        InteractionPermission.change_associated_investmentproject,
-    )
-)
-
-
 def resolve_data(data):
     """
     Given a data dict with keys and values,
