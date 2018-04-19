@@ -100,6 +100,19 @@ class TestValidateViewAttributes:
 
         assert not {field for field in view.REMAP_FIELDS if field not in view.FILTER_FIELDS}
 
+    def test_validate_composite_filter_fields(self, search_app):
+        """Validate that the values of COMPOSITE_FILTERS are valid field paths."""
+        view = search_app.view
+
+        invalid_fields = {
+            field
+            for field_list in view.COMPOSITE_FILTERS.values()
+            for field in field_list
+            if not self._model_has_field_path(search_app.es_model, field)
+        }
+
+        assert not invalid_fields
+
     @staticmethod
     def _model_has_field_path(es_model, path):
         path_components = path.split('.')

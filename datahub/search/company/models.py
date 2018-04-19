@@ -18,7 +18,7 @@ class Company(BaseESModel):
     archived_reason = Text()
     business_type = dsl_utils.id_name_mapping()
     classification = dsl_utils.id_name_mapping()
-    companies_house_data = dsl_utils.company_mapping()
+    companies_house_data = dsl_utils.ch_company_mapping()
     company_number = dsl_utils.SortableCaseInsensitiveKeywordText()
     contacts = dsl_utils.contact_or_adviser_mapping('contacts')
     created_on = Date()
@@ -85,7 +85,7 @@ class Company(BaseESModel):
         'archived_by': dict_utils.contact_or_adviser_dict,
         'business_type': dict_utils.id_name_dict,
         'classification': dict_utils.id_name_dict,
-        'companies_house_data': dict_utils.company_dict,
+        'companies_house_data': dict_utils.ch_company_dict,
         'contacts': lambda col: [dict_utils.contact_or_adviser_dict(c) for c in col.all()],
         'employee_range': dict_utils.id_name_dict,
         'export_experience_category': dict_utils.id_name_dict,

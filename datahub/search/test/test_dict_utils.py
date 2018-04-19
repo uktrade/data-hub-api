@@ -47,6 +47,24 @@ def test_id_uri_dict():
     }
 
 
+def test_company_dict():
+    """Tests company_dict."""
+    obj = mock.Mock(
+        id=123,
+        name='Name',
+        alias='Trading',
+        spec_set=('id', 'name', 'alias')
+    )
+
+    res = dict_utils.company_dict(obj)
+
+    assert res == {
+        'id': str(obj.id),
+        'name': obj.name,
+        'trading_name': obj.alias,
+    }
+
+
 def test_contact_or_adviser_dict():
     """Tests contact_or_adviser_dict."""
     obj = mock.Mock()
@@ -109,13 +127,13 @@ def test_contact_or_adviser_dict_none_dit_team():
     }
 
 
-def test_company_dict():
-    """Tests company_dict."""
+def test_ch_company_dict():
+    """Tests ch_company_dict."""
     obj = mock.Mock()
     obj.id = 123
     obj.company_number = '01234567'
 
-    res = dict_utils.company_dict(obj)
+    res = dict_utils.ch_company_dict(obj)
 
     assert res == {
         'id': str(obj.id),

@@ -35,6 +35,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SubFactory(AdviserFactory)
     name = factory.Faker('company')
+    alias = factory.Faker('company')
     registered_address_1 = factory.Sequence(lambda n: f'{n} Foo st.')
     registered_address_town = 'London'
     registered_address_country_id = constants.Country.united_kingdom.value.id
