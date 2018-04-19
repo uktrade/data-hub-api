@@ -207,6 +207,7 @@ class TestViews(APITestMixin):
             'company': {
                 'id': str(interaction.company.pk),
                 'name': interaction.company.name,
+                'trading_name': interaction.company.alias,
             },
             'company_sector': {
                 'id': str(interaction.company.sector.pk),
@@ -299,7 +300,8 @@ class TestViews(APITestMixin):
         results = response_data['results']
         assert results[0]['company']['id'] == str(companies[5].id)
 
-    def test_filter_by_company_name(self, setup_es):
+    @pytest.mark.parametrize('attr', ('name', 'alias'))
+    def test_filter_by_company_name(self, setup_es, attr):
         """Tests filtering interaction by company name."""
         companies = CompanyFactory.create_batch(10)
         CompanyInteractionFactory.create_batch(
@@ -311,7 +313,7 @@ class TestViews(APITestMixin):
 
         url = reverse('api-v3:search:interaction')
         request_data = {
-            'company_name': companies[5].name
+            'company_name': getattr(companies[5], attr)
         }
         response = self.api_client.post(url, request_data, format='json')
 
@@ -324,7 +326,6 @@ class TestViews(APITestMixin):
         results = response_data['results']
         # multiple records can match our filter, let's make sure at least one is exact match
         assert any(result['company']['id'] == str(companies[5].id) for result in results)
-        assert any(result['company']['name'] == companies[5].name for result in results)
 
     def test_filter_by_contact_id(self, setup_es):
         """Tests filtering interaction by contact id."""

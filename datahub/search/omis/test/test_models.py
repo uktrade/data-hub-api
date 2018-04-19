@@ -34,7 +34,8 @@ def test_order_to_dict(Factory):
         'id': str(order.pk),
         'company': {
             'id': str(order.company.pk),
-            'name': order.company.name
+            'name': order.company.name,
+            'trading_name': order.company.alias,
         },
         'contact': {
             'id': str(order.contact.pk),

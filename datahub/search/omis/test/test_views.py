@@ -23,7 +23,7 @@ pytestmark = pytest.mark.django_db
 def setup_data(setup_es):
     """Sets up data for the tests."""
     with freeze_time('2017-01-01 13:00:00'):
-        company = CompanyFactory(name='Mercury trading')
+        company = CompanyFactory(name='Mercury trading', alias='Uranus supplies')
         contact = ContactFactory(company=company, first_name='John', last_name='Doe')
         order = OrderFactory(
             reference='abcd',
@@ -48,7 +48,7 @@ def setup_data(setup_es):
         )
 
     with freeze_time('2017-02-01 13:00:00'):
-        company = CompanyFactory(name='Venus Ltd')
+        company = CompanyFactory(name='Venus Ltd', alias='Earth outsourcing')
         contact = ContactFactory(company=company, first_name='Jenny', last_name='Cakeman')
         order = OrderWithAcceptedQuoteFactory(
             reference='efgh',
@@ -190,6 +190,14 @@ class TestSearchOrder(APITestMixin):
             ),
             (  # search by company name partial
                 {'company_name': 'Venus'},
+                ['efgh']
+            ),
+            (  # search by trading name exact
+                {'company_name': 'Earth outsourcing'},
+                ['efgh']
+            ),
+            (  # search by trading name partial
+                {'company_name': 'Earth'},
                 ['efgh']
             ),
             (  # sort by created_on ASC

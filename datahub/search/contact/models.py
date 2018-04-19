@@ -23,7 +23,7 @@ class Contact(BaseESModel):
     archived_by = dsl_utils.contact_or_adviser_mapping('archived_by')
     archived_on = Date()
     archived_reason = Text()
-    company = dsl_utils.id_name_partial_mapping('company')
+    company = dsl_utils.company_mapping('company')
     company_sector = dsl_utils.sector_mapping()
     company_uk_region = dsl_utils.id_name_mapping()
     contactable_by_dit = Boolean()
@@ -65,7 +65,7 @@ class Contact(BaseESModel):
         'id': str,
         'adviser': dict_utils.contact_or_adviser_dict,
         'archived_by': dict_utils.contact_or_adviser_dict,
-        'company': dict_utils.id_name_dict,
+        'company': dict_utils.company_dict,
         'created_by': dict_utils.adviser_dict_with_team,
         'title': dict_utils.id_name_dict,
     }
