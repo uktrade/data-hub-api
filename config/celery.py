@@ -2,6 +2,7 @@ import logging
 import os
 
 from celery import Celery
+from celery.signals import after_setup_logger
 from raven import Client
 from raven.contrib.celery import register_logger_signal, register_signal
 
@@ -31,3 +32,10 @@ register_logger_signal(client)
 
 # hook into the Celery error handler
 register_signal(client, ignore_expected=True)
+
+
+@after_setup_logger.connect
+def after_setup_logger_handler(**kwargs):
+    """As the Elasticsearch module is noisy, set its log level to WARNING for Celery workers."""
+    es_logger = logging.getLogger('elasticsearch')
+    es_logger.setLevel(logging.WARNING)
