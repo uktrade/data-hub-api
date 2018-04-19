@@ -32,19 +32,6 @@ class Command(CSVBaseCommand):
             return None
         return InvestmentProjectStage.objects.get(id=stage_id)
 
-    def _should_update(self,
-                       investment_project,
-                       old_stage,
-                       ):
-        """
-        Checks if Investment project should be updated.
-
-        :param investment_project: instance of InvestmentProject
-        :param old_stage: instance of InvestmentProjectStage or none
-        :return: True if investment project needs to be updated
-        """
-        return investment_project.stage == old_stage
-
     def _process_row(self, row, simulate=False, **options):
         """Process one single row."""
         investment_project = InvestmentProject.objects.get(pk=row['id'])
@@ -52,16 +39,13 @@ class Command(CSVBaseCommand):
         old_stage = self.get_stage(row['old_stage'])
         new_stage = self.get_stage(row['new_stage'])
 
-        if self._should_update(
-            investment_project,
-            old_stage,
-        ):
-            investment_project.stage = new_stage
-            if not simulate:
-                with reversion.create_revision():
-                    investment_project.save(
-                        update_fields=(
-                            'stage',
-                        )
+
+        investment_project.stage = new_stage
+        if not simulate:
+            with reversion.create_revision():
+                investment_project.save(
+                    update_fields=(
+                        'stage',
                     )
-                    reversion.set_comment('Stage migration.')
+                )
+                reversion.set_comment('Stage migration.')

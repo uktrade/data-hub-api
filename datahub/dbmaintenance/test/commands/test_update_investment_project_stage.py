@@ -50,7 +50,7 @@ def test_run(s3_stubber):
     for investment_project in investment_projects:
         investment_project.refresh_from_db()
 
-    # assert investment_projects[0].stage == new_stages[0]
+    assert investment_projects[0].stage_id == (UUID(new_stages[0].value.id))
     assert investment_projects[1].stage_id == (UUID(new_stages[1].value.id))
     assert investment_projects[2].stage_id == (UUID(new_stages[2].value.id))
 
@@ -112,8 +112,6 @@ def test_audit_log(s3_stubber):
 
     investment_project.refresh_from_db()
 
-    print(investment_project.stage_id, new_stage.value.id)
-    assert investment_project.stage == new_stage.value
     versions = Version.objects.get_for_object(investment_project)
     assert len(versions) == 1
     assert versions[0].revision.comment == 'Stage migration.'
