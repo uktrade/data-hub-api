@@ -7,6 +7,17 @@ from datahub.search import elasticsearch
 from .apps import get_search_apps
 
 
+def pytest_generate_tests(metafunc):
+    """Parametrises tests that use the `search_app` fixture."""
+    if 'search_app' in metafunc.fixturenames:
+        apps = get_search_apps()
+        metafunc.parametrize(
+            'search_app',
+            apps,
+            ids=[app.__class__.__name__ for app in apps]
+        )
+
+
 @fixture(scope='session')
 def _es_client(worker_id):
     """
