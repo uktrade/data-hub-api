@@ -2,19 +2,7 @@ import inspect
 
 from django.utils.functional import cached_property
 
-from datahub.search.apps import get_search_apps
 from datahub.search.utils import get_model_copy_to_target_field_names, get_model_field_names
-
-
-def pytest_generate_tests(metafunc):
-    """Parametrizes the tests that use the `search_app` fixture."""
-    if 'search_app' in metafunc.fixturenames:
-        apps = get_search_apps()
-        metafunc.parametrize(
-            'search_app',
-            apps,
-            ids=[app.__class__.__name__ for app in apps]
-        )
 
 
 def test_validate_model_fields(search_app):

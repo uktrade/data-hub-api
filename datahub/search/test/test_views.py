@@ -3,6 +3,7 @@ from uuid import UUID
 
 import factory
 import pytest
+from elasticsearch_dsl import AttrDict
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -14,6 +15,7 @@ from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.order.test.factories import OrderFactory
+from datahub.search.utils import get_model_fields
 
 pytestmark = pytest.mark.django_db
 
@@ -68,6 +70,51 @@ def setup_data():
         trading_address_country_id=country_us,
         registered_address_country_id=country_us
     )
+
+
+class TestValidateViewAttributes:
+    """Validates the field names specified in various class attributes on views."""
+
+    def test_validate_filter_fields_are_in_serializer(self, search_app):
+        """Validates that all filter fields exist in the serializer class."""
+        view = search_app.view
+        valid_fields = view.serializer_class._declared_fields.keys()
+
+        invalid_fields = frozenset(view.FILTER_FIELDS) - valid_fields
+        assert not invalid_fields
+
+    def test_validate_remap_fields_exist(self, search_app):
+        """Validate that the values of REMAP_FIELDS are valid field paths."""
+        view = search_app.view
+
+        invalid_fields = {
+            field for field in view.REMAP_FIELDS.values()
+            if not self._model_has_field_path(search_app.es_model, field)
+        }
+
+        assert not invalid_fields
+
+    def test_validate_remap_fields_are_used_in_filters(self, search_app):
+        """Validate that the values of REMAP_FIELDS are used in a filter."""
+        view = search_app.view
+
+        assert not {field for field in view.REMAP_FIELDS if field not in view.FILTER_FIELDS}
+
+    @staticmethod
+    def _model_has_field_path(es_model, path):
+        path_components = path.split('.')
+        fields = get_model_fields(es_model)
+
+        for sub_field_name in path_components:
+            if sub_field_name not in fields:
+                return False
+
+            sub_field = fields.get(sub_field_name)
+            fields = getattr(sub_field, 'properties', AttrDict({})).to_dict()
+            if not fields:
+                fields = getattr(sub_field, 'fields', {})
+
+        return True
 
 
 class TestSearch(APITestMixin):
