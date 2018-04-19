@@ -135,6 +135,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'date': ['This field is required.'],
                     'subject': ['This field is required.'],
                     'notes': ['This field is required.'],
+                    'company': ['This field is required.'],
                     'contact': ['This field is required.'],
                     'dit_adviser': ['This field is required.'],
                     'service': ['This field is required.'],
@@ -149,6 +150,7 @@ class TestAddServiceDelivery(APITestMixin):
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
                     'notes': 'hello',
+                    'company': CompanyFactory,
                     'contact': ContactFactory,
                     'dit_adviser': AdviserFactory,
                     'service': Service.trade_enquiry.value.id,
@@ -156,7 +158,6 @@ class TestAddServiceDelivery(APITestMixin):
                 },
                 {
                     'is_event': ['This field is required.'],
-                    'company': ['This field is required.'],
                 }
             ),
 

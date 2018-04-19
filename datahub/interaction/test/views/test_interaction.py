@@ -32,9 +32,7 @@ class TestAddInteraction(APITestMixin):
         'extra_data',
         (
             # company interaction
-            {
-                'company': CompanyFactory,
-            },
+            {},
             # investment project interaction
             {
                 'investment_project': InvestmentProjectFactory,
@@ -45,6 +43,7 @@ class TestAddInteraction(APITestMixin):
     def test_add(self, extra_data):
         """Test add a new interaction."""
         adviser = AdviserFactory()
+        company = CompanyFactory()
         contact = ContactFactory()
         communication_channel = random_obj_for_model(CommunicationChannel)
 
@@ -56,6 +55,7 @@ class TestAddInteraction(APITestMixin):
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
             'notes': 'hello',
+            'company': company.pk,
             'contact': contact.pk,
             'service': Service.trade_enquiry.value.id,
             'dit_team': Team.healthcare_uk.value.id,
@@ -88,7 +88,10 @@ class TestAddInteraction(APITestMixin):
                 'name': adviser.name
             },
             'notes': 'hello',
-            'company': request_data.get('company'),
+            'company': {
+                'id': str(company.pk),
+                'name': company.name
+            },
             'contact': {
                 'id': str(contact.pk),
                 'name': contact.name
@@ -132,6 +135,7 @@ class TestAddInteraction(APITestMixin):
                     'date': ['This field is required.'],
                     'subject': ['This field is required.'],
                     'notes': ['This field is required.'],
+                    'company': ['This field is required.'],
                     'contact': ['This field is required.'],
                     'dit_adviser': ['This field is required.'],
                     'service': ['This field is required.'],
@@ -154,26 +158,6 @@ class TestAddInteraction(APITestMixin):
                 },
                 {
                     'communication_channel': ['This field is required.'],
-                }
-            ),
-
-            # company or investment_project required
-            (
-                {
-                    'kind': Interaction.KINDS.interaction,
-                    'date': date.today().isoformat(),
-                    'subject': 'whatever',
-                    'notes': 'hello',
-                    'contact': ContactFactory,
-                    'dit_adviser': AdviserFactory,
-                    'service': Service.trade_enquiry.value.id,
-                    'dit_team': Team.healthcare_uk.value.id,
-                    'communication_channel': partial(random_obj_for_model, CommunicationChannel),
-                },
-                {
-                    'non_field_errors': [
-                        'A company or investment_project must be provided.'
-                    ]
                 }
             ),
 
@@ -235,10 +219,12 @@ class TestAddInteraction(APITestMixin):
         requester = create_test_user(
             permission_codenames=[InteractionPermission.add_associated_investmentproject]
         )
+        company = CompanyFactory()
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.post(url, {
             'kind': Interaction.KINDS.interaction,
+            'company': company.pk,
             'contact': contact.pk,
             'communication_channel': random_obj_for_model(CommunicationChannel).pk,
             'subject': 'whatever',
@@ -266,11 +252,13 @@ class TestAddInteraction(APITestMixin):
         requester = create_test_user(
             permission_codenames=[InteractionPermission.add_associated_investmentproject]
         )
+        company = CompanyFactory()
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         api_client = self.create_api_client(user=requester)
         response = api_client.post(url, {
             'kind': Interaction.KINDS.interaction,
+            'company': company.pk,
             'contact': contact.pk,
             'communication_channel': random_obj_for_model(CommunicationChannel).pk,
             'subject': 'whatever',
@@ -424,7 +412,10 @@ class TestGetInteraction(APITestMixin):
                 'name': interaction.dit_adviser.name
             },
             'notes': interaction.notes,
-            'company': None,
+            'company': {
+                'id': str(interaction.company.pk),
+                'name': interaction.company.name
+            },
             'contact': {
                 'id': str(interaction.contact.pk),
                 'name': interaction.contact.name
@@ -498,7 +489,10 @@ class TestGetInteraction(APITestMixin):
                 'name': interaction.dit_adviser.name
             },
             'notes': interaction.notes,
-            'company': None,
+            'company': {
+                'id': str(interaction.company.pk),
+                'name': interaction.company.name
+            },
             'contact': {
                 'id': str(interaction.contact.pk),
                 'name': interaction.contact.name
