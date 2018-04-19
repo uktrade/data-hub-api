@@ -1,5 +1,6 @@
 from datetime import date
 from functools import partial
+from itertools import chain
 
 import pytest
 from freezegun import freeze_time
@@ -12,9 +13,7 @@ from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_f
 from datahub.event.test.factories import EventFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
-from .utils import (
-    NON_RESTRICTED_CHANGE_PERMISSIONS, NON_RESTRICTED_READ_PERMISSIONS, resolve_data
-)
+from .utils import resolve_data
 from ..factories import (
     CompanyInteractionFactory, InvestmentProjectInteractionFactory
 )
@@ -24,10 +23,44 @@ from ...models import (
 )
 
 
+NON_RESTRICTED_READ_PERMISSIONS = (
+    (
+        InteractionPermission.read_all,
+    ),
+    (
+        InteractionPermission.read_all,
+        InteractionPermission.read_associated_investmentproject,
+    )
+)
+
+
+NON_RESTRICTED_ADD_PERMISSIONS = (
+    (
+        InteractionPermission.add_all,
+    ),
+    (
+        InteractionPermission.add_all,
+        InteractionPermission.add_associated_investmentproject,
+    )
+)
+
+
+NON_RESTRICTED_CHANGE_PERMISSIONS = (
+    (
+        InteractionPermission.change_all,
+    ),
+    (
+        InteractionPermission.change_all,
+        InteractionPermission.change_associated_investmentproject,
+    )
+)
+
+
 class TestAddInteraction(APITestMixin):
     """Tests for the add interaction view."""
 
     @freeze_time('2017-04-18 13:25:30.986208')
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
     @pytest.mark.parametrize(
         'extra_data',
         (
@@ -40,9 +73,9 @@ class TestAddInteraction(APITestMixin):
 
         )
     )
-    def test_add(self, extra_data):
+    def test_add(self, extra_data, permissions):
         """Test add a new interaction."""
-        adviser = AdviserFactory()
+        adviser = create_test_user(permission_codenames=permissions)
         company = CompanyFactory()
         contact = ContactFactory()
         communication_channel = random_obj_for_model(CommunicationChannel)
@@ -62,7 +95,9 @@ class TestAddInteraction(APITestMixin):
 
             **resolve_data(extra_data),
         }
-        response = self.api_client.post(url, request_data, format='json')
+
+        api_client = self.create_api_client(user=adviser)
+        response = api_client.post(url, request_data, format='json')
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
@@ -108,16 +143,16 @@ class TestAddInteraction(APITestMixin):
             'investment_project': request_data.get('investment_project'),
             'archived_documents_url_path': '',
             'created_by': {
-                'id': str(self.user.pk),
-                'first_name': self.user.first_name,
-                'last_name': self.user.last_name,
-                'name': self.user.name
+                'id': str(adviser.pk),
+                'first_name': adviser.first_name,
+                'last_name': adviser.last_name,
+                'name': adviser.name
             },
             'modified_by': {
-                'id': str(self.user.pk),
-                'first_name': self.user.first_name,
-                'last_name': self.user.last_name,
-                'name': self.user.name
+                'id': str(adviser.pk),
+                'first_name': adviser.first_name,
+                'last_name': adviser.last_name,
+                'name': adviser.name
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
@@ -217,12 +252,14 @@ class TestAddInteraction(APITestMixin):
         project_creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=project_creator)
         requester = create_test_user(
-            permission_codenames=[InteractionPermission.add_associated_investmentproject]
+            permission_codenames=[InteractionPermission.add_associated_investmentproject],
+            dit_team=project_creator.dit_team,  # same dit team as the project creator
         )
         company = CompanyFactory()
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
-        response = self.api_client.post(url, {
+        api_client = self.create_api_client(user=requester)
+        response = api_client.post(url, {
             'kind': Interaction.KINDS.interaction,
             'company': company.pk,
             'contact': contact.pk,
@@ -248,18 +285,18 @@ class TestAddInteraction(APITestMixin):
         Test that a restricted user cannot add an interaction for a non-associated investment
         project.
         """
-        project = InvestmentProjectFactory()
+        project_creator = AdviserFactory()
+        project = InvestmentProjectFactory(created_by=project_creator)
         requester = create_test_user(
-            permission_codenames=[InteractionPermission.add_associated_investmentproject]
+            permission_codenames=[InteractionPermission.add_associated_investmentproject],
+            dit_team=TeamFactory(),  # different dit team from the project creator
         )
-        company = CompanyFactory()
-        contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         api_client = self.create_api_client(user=requester)
         response = api_client.post(url, {
             'kind': Interaction.KINDS.interaction,
-            'company': company.pk,
-            'contact': contact.pk,
+            'company': CompanyFactory().pk,
+            'contact': ContactFactory().pk,
             'communication_channel': random_obj_for_model(CommunicationChannel).pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -271,8 +308,7 @@ class TestAddInteraction(APITestMixin):
         }, format='json')
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        response_data = response.json()
-        assert response_data == {
+        assert response.json() == {
             'investment_project': ["You don't have permission to add an interaction for this "
                                    'investment project.']
         }
@@ -282,14 +318,12 @@ class TestAddInteraction(APITestMixin):
         requester = create_test_user(
             permission_codenames=[InteractionPermission.add_associated_investmentproject]
         )
-        company = CompanyFactory()
-        contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         api_client = self.create_api_client(user=requester)
         response = api_client.post(url, {
             'kind': Interaction.KINDS.interaction,
-            'company': company.pk,
-            'contact': contact.pk,
+            'company': CompanyFactory().pk,
+            'contact': ContactFactory().pk,
             'communication_channel': random_obj_for_model(CommunicationChannel).pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
@@ -300,8 +334,7 @@ class TestAddInteraction(APITestMixin):
         }, format='json')
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        response_data = response.json()
-        assert response_data == {
+        assert response.json() == {
             'investment_project': ['This field is required.']
         }
 
@@ -635,3 +668,64 @@ class TestUpdateInteraction(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['subject'] == 'I am another subject'
+
+
+class TestListInteractions(APITestMixin):
+    """Tests for the list interactions view."""
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    def test_non_restricted_user_can_only_list_relevant_interactions(self, permissions):
+        """Test that a non-restricted user can list all interactions"""
+        requester = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=requester)
+
+        project = InvestmentProjectFactory()
+        company = CompanyFactory()
+        company_interactions = CompanyInteractionFactory.create_batch(3, company=company)
+        project_interactions = CompanyInteractionFactory.create_batch(
+            3, investment_project=project
+        )
+
+        url = reverse('api-v3:interaction:collection')
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 6
+        actual_ids = {i['id'] for i in response_data['results']}
+        expected_ids = {str(i.id) for i in chain(project_interactions, company_interactions)}
+        assert actual_ids == expected_ids
+
+    def test_restricted_user_can_only_list_associated_interactions(self):
+        """
+        Test that a restricted user can only list interactions for associated investment
+        projects.
+        """
+        creator = AdviserFactory()
+        requester = create_test_user(
+            permission_codenames=[InteractionPermission.read_associated_investmentproject],
+            dit_team=creator.dit_team
+        )
+        api_client = self.create_api_client(user=requester)
+
+        company = CompanyFactory()
+        non_associated_project = InvestmentProjectFactory()
+        associated_project = InvestmentProjectFactory(created_by=creator)
+
+        CompanyInteractionFactory.create_batch(3, company=company)
+        CompanyInteractionFactory.create_batch(
+            3, investment_project=non_associated_project
+        )
+        associated_project_interactions = CompanyInteractionFactory.create_batch(
+            2, investment_project=associated_project
+        )
+
+        url = reverse('api-v3:interaction:collection')
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 2
+        actual_ids = {i['id'] for i in response_data['results']}
+        expected_ids = {str(i.id) for i in associated_project_interactions}
+        assert actual_ids == expected_ids

@@ -1,7 +1,5 @@
 from datetime import date
-from itertools import chain
 
-import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 from reversion.models import Version
@@ -12,9 +10,8 @@ from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
-from .utils import NON_RESTRICTED_READ_PERMISSIONS
 from ..factories import CompanyInteractionFactory, EventServiceDeliveryFactory
-from ...models import CommunicationChannel, Interaction, InteractionPermission
+from ...models import CommunicationChannel, Interaction
 
 
 class TestGetInteraction(APITestMixin):
@@ -118,63 +115,6 @@ class TestListInteractions(APITestMixin):
         assert response_data['count'] == 2
         actual_ids = {i['id'] for i in response_data['results']}
         expected_ids = {str(i.id) for i in project_interactions}
-        assert actual_ids == expected_ids
-
-    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
-    def test_non_restricted_user_can_only_list_relevant_interactions(self, permissions):
-        """Test that a non-restricted user can list all interactions"""
-        requester = create_test_user(permission_codenames=permissions)
-        api_client = self.create_api_client(user=requester)
-
-        project = InvestmentProjectFactory()
-        company = CompanyFactory()
-        company_interactions = CompanyInteractionFactory.create_batch(3, company=company)
-        project_interactions = CompanyInteractionFactory.create_batch(
-            3, investment_project=project
-        )
-
-        url = reverse('api-v3:interaction:collection')
-        response = api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['count'] == 6
-        actual_ids = {i['id'] for i in response_data['results']}
-        expected_ids = {str(i.id) for i in chain(project_interactions, company_interactions)}
-        assert actual_ids == expected_ids
-
-    def test_restricted_user_can_only_list_associated_interactions(self):
-        """
-        Test that a restricted user can only list interactions for associated investment
-        projects.
-        """
-        creator = AdviserFactory()
-        requester = create_test_user(
-            permission_codenames=[InteractionPermission.read_associated_investmentproject],
-            dit_team=creator.dit_team
-        )
-        api_client = self.create_api_client(user=requester)
-
-        company = CompanyFactory()
-        non_associated_project = InvestmentProjectFactory()
-        associated_project = InvestmentProjectFactory(created_by=creator)
-
-        CompanyInteractionFactory.create_batch(3, company=company)
-        CompanyInteractionFactory.create_batch(
-            3, investment_project=non_associated_project
-        )
-        associated_project_interactions = CompanyInteractionFactory.create_batch(
-            2, investment_project=associated_project
-        )
-
-        url = reverse('api-v3:interaction:collection')
-        response = api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['count'] == 2
-        actual_ids = {i['id'] for i in response_data['results']}
-        expected_ids = {str(i.id) for i in associated_project_interactions}
         assert actual_ids == expected_ids
 
 
