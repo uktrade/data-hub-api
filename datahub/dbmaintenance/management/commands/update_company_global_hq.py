@@ -1,8 +1,7 @@
-import uuid
-
 import reversion
 
 from datahub.company.models import Company
+from datahub.dbmaintenance.utils import parse_uuid
 from ..base import CSVBaseCommand
 
 
@@ -19,19 +18,32 @@ class Command(CSVBaseCommand):
             default=False,
             help='If True it only simulates the command without saving the changes.',
         )
+        parser.add_argument(
+            '--override',
+            action='store_true',
+            dest='override',
+            default=False,
+            help='If true it will overwrite records having already set global hq.'
+        )
 
-    # Assume companies with a current Global HQ are correct, as this data did not come from CDMS
-    def _should_update(self, company):
-        return company.global_headquarters == None
+    def _should_update(self, company, override=False):
+        """Determine if we should update the company."""
+        if override:
+            return True
 
-    def _process_row(self, row, simulate=False, **options):
+        # Assume companies with a current Global HQ are correct,
+        # as this data did not come from CDMS
+        return company.global_headquarters is None
+
+    def _process_row(self, row, simulate=False, override=False, **options):
         """Process one single row."""
         company = Company.objects.get(pk=row['id'])
         global_hq = None
-        if _parse_uuid(row['global_hq_id']) != None:
-            global_hq = Company.objects.get(pk=_parse_uuid(row['global_hq_id']))
+        global_hq_id = parse_uuid(row['global_hq_id'])
+        if global_hq_id is not None:
+            global_hq = Company.objects.get(pk=global_hq_id)
 
-        if self._should_update(company):
+        if self._should_update(company, override=override):
             company.global_headquarters = global_hq
 
             if simulate:
@@ -44,9 +56,3 @@ class Command(CSVBaseCommand):
                     )
                 )
                 reversion.set_comment('Global HQ data migration.')
-
-
-def _parse_uuid(id_):
-    if not id_ or id_.lower().strip() == 'null':
-        return None
-    return uuid.UUID(id_)
