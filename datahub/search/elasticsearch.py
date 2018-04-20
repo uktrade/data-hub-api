@@ -1,11 +1,19 @@
+from logging import getLogger
 from urllib.parse import urlparse
 
 from aws_requests_auth.aws_auth import AWSRequestsAuth
 from django.conf import settings
+from django_pglocks import advisory_lock
 from elasticsearch import RequestsHttpConnection
 from elasticsearch.helpers import bulk as es_bulk
 from elasticsearch_dsl import analysis, Index
 from elasticsearch_dsl.connections import connections
+
+from datahub.search.apps import get_search_apps
+
+
+logger = getLogger(__name__)
+
 
 lowercase_keyword_analyzer = analysis.CustomAnalyzer(
     'lowercase_keyword_analyzer',
@@ -110,7 +118,7 @@ ANALYZERS = (
 )
 
 
-def configure_index(index_name, settings=None):
+def configure_index(index_name, index_settings=None):
     """Configures Elasticsearch index."""
     client = connections.get_connection()
     if not client.indices.exists(index=index_name):
@@ -118,9 +126,22 @@ def configure_index(index_name, settings=None):
         for analyzer in ANALYZERS:
             index.analyzer(analyzer)
 
-        if settings:
-            index.settings(**settings)
+        if index_settings:
+            index.settings(**index_settings)
         index.create()
+
+
+def init_es():
+    """Creates the Elasticsearch index if it doesn't exist, and updates the mapping."""
+    logger.info('Creating Elasticsearch index and initialising mapping...')
+
+    with advisory_lock('leeloo_init_es'):
+        configure_index(settings.ES_INDEX, index_settings=settings.ES_INDEX_SETTINGS)
+
+        for search_app in get_search_apps():
+            search_app.init_es()
+
+    logger.info('Elasticsearch index and mapping initialised')
 
 
 def bulk(actions=None, chunk_size=None, **kwargs):

@@ -1,5 +1,7 @@
 from unittest import mock
 
+import pytest
+
 from .. import elasticsearch
 
 
@@ -31,3 +33,106 @@ def test_configure_connection(connections, settings):
         'hosts': [settings.ES_URL],
         'verify_certs': settings.ES_VERIFY_CERTS
     })
+
+
+@mock.patch('elasticsearch_dsl.connections.connections.get_connection')
+def test_configure_index_creates_index_if_it_doesnt_exist(get_connection_mock):
+    """Test that configure_index() creates the index when it doesn't exist."""
+    index = 'test-index'
+    index_settings = {
+        'testsetting1': 'testval1'
+    }
+    connection = get_connection_mock.return_value
+    connection.indices.exists.return_value = False
+    elasticsearch.configure_index(index, index_settings=index_settings)
+    connection.indices.create.assert_called_once_with(
+        index='test-index',
+        body={
+            'settings': {
+                'testsetting1': 'testval1',
+                'analysis': {
+                    'analyzer': {
+                        'lowercase_keyword_analyzer': {
+                            'tokenizer': 'keyword',
+                            'filter': ['lowercase'],
+                            'type': 'custom'
+                        },
+                        'trigram_analyzer': {
+                            'tokenizer': 'trigram',
+                            'char_filter': ['special_chars'],
+                            'filter': ['lowercase'],
+                            'type': 'custom'
+                        },
+                        'english_analyzer': {
+                            'tokenizer': 'standard',
+                            'filter': [
+                                'english_possessive_stemmer',
+                                'lowercase',
+                                'english_stop',
+                                'english_stemmer'
+                            ],
+                            'type': 'custom'
+                        },
+                        'lowercase_analyzer': {
+                            'tokenizer': 'standard',
+                            'filter': ['lowercase'],
+                            'type': 'custom'
+                        }
+                    },
+                    'tokenizer': {
+                        'trigram': {
+                            'min_gram': 3,
+                            'max_gram': 3,
+                            'token_chars': ('letter', 'digit'),
+                            'type': 'nGram'
+                        }
+                    },
+                    'char_filter': {
+                        'special_chars': {
+                            'mappings': ('-=>',),
+                            'type': 'mapping'}
+                    },
+                    'filter': {
+                        'english_possessive_stemmer': {
+                            'language': 'possessive_english',
+                            'type': 'stemmer'
+                        },
+                        'english_stop': {
+                            'stopwords': '_english_', 'type': 'stop'
+                        },
+                        'english_stemmer': {
+                            'language': 'english', 'type': 'stemmer'
+                        }
+                    }
+                }
+            }
+        }
+    )
+
+
+@mock.patch('elasticsearch_dsl.connections.connections.get_connection')
+def test_configure_index_doesnt_create_index_if_it_exists(get_connection_mock):
+    """Test that configure_index() doesn't create the index when it already exists."""
+    index = 'test-index'
+    index_settings = {
+        'testsetting1': 'testval1'
+    }
+    connection = get_connection_mock.return_value
+    connection.indices.exists.return_value = True
+    elasticsearch.configure_index(index, index_settings=index_settings)
+    connection.indices.create.assert_not_called()
+
+
+@pytest.mark.django_db
+@mock.patch('datahub.search.elasticsearch.configure_index')
+@mock.patch('datahub.search.elasticsearch.get_search_apps')
+def test_init_es(get_search_apps_mock, configure_index_mock):
+    """Test that init_es() calls configure_index() and init_es() on each search app."""
+    apps = [mock.Mock(), mock.Mock()]
+    get_search_apps_mock.return_value = apps
+
+    elasticsearch.init_es()
+
+    configure_index_mock.assert_called_once()
+    apps[0].init_es.assert_called_once()
+    apps[1].init_es.assert_called_once()
