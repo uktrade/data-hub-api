@@ -1,4 +1,5 @@
 import datetime
+from math import ceil
 from uuid import UUID, uuid4
 
 import factory
@@ -173,7 +174,7 @@ class TestSearch(APITestMixin):
 
         page_size = 2
 
-        for page in range(int((len(ids) + 1) / page_size)):
+        for page in range(int(ceil(len(ids) / page_size))):
             url = reverse('api-v3:search:basic')
             response = self.api_client.get(url, {
                 'term': name,
