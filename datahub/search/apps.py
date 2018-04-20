@@ -36,11 +36,6 @@ class SearchApp:
         self.mod = mod
         self.mod_signals = f'{self.mod}.signals'
 
-    def init_all(self):
-        """Initialise all ES configs."""
-        self.init_es()
-        self.connect_signals()
-
     def init_es(self):
         """
         Makes sure mappings exist in Elasticsearch.
@@ -106,17 +101,10 @@ class SearchConfig(AppConfig):
     name = 'datahub.search'
     verbose_name = 'Search'
 
-    def __init__(self, *args, **kwargs):
-        """Initialises this AppConfig"""
-        super().__init__(*args, **kwargs)
-        self.search_apps = {}
-
     def ready(self):
         """Configures Elasticsearch default connection."""
-        from datahub.search import elasticsearch
+        from datahub.search.elasticsearch import configure_connection
 
-        elasticsearch.configure_connection()
-        elasticsearch.configure_index(settings.ES_INDEX, settings.ES_INDEX_SETTINGS)
-
-        for search_app in get_search_apps():
-            search_app.init_all()
+        configure_connection()
+        for app in get_search_apps():
+            app.connect_signals()
