@@ -1,6 +1,7 @@
 import csv
 import random
 from datetime import datetime
+from math import ceil
 from unittest import mock
 from uuid import UUID, uuid4
 
@@ -391,7 +392,7 @@ class TestSearch(APITestMixin):
 
         page_size = 2
 
-        for page in range(int((len(ids) + 1) / page_size)):
+        for page in range(int(ceil(len(ids) / page_size))):
             url = reverse('api-v3:search:company')
             response = self.api_client.post(url, {
                 'original_query': name,
