@@ -14,7 +14,6 @@ class Command(CSVBaseCommand):
         parser.add_argument(
             '--overwrite',
             action='store_true',
-            dest='overwrite',
             default=False,
             help='If true it will overwrite all provided records.'
         )
@@ -30,14 +29,11 @@ class Command(CSVBaseCommand):
 
     def _process_row(self, row, simulate=False, overwrite=False, **options):
         """Process one single row."""
-        company = Company.objects.get(pk=row['id'])
-        global_hq = None
+        company = Company.objects.get(pk=parse_uuid(row['id']))
         global_hq_id = parse_uuid(row['global_hq_id'])
-        if global_hq_id is not None:
-            global_hq = Company.objects.get(pk=global_hq_id)
 
         if self._should_update(company, overwrite=overwrite):
-            company.global_headquarters = global_hq
+            company.global_headquarters_id = global_hq_id
 
             if simulate:
                 return
@@ -48,4 +44,4 @@ class Command(CSVBaseCommand):
                         'global_headquarters',
                     )
                 )
-                reversion.set_comment('Global HQ data migration.')
+                reversion.set_comment('Global HQ data correction.')
