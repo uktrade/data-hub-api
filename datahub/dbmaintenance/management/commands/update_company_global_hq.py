@@ -6,7 +6,7 @@ from ..base import CSVBaseCommand
 
 
 class Command(CSVBaseCommand):
-    """Command to update Company.headquarter_type."""
+    """Command to update Company.global_headquarters."""
 
     def add_arguments(self, parser):
         """Define extra arguments."""
