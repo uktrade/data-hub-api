@@ -10,6 +10,8 @@ from ...apps import get_search_apps
 
 logger = getLogger(__name__)
 
+DEFAULT_BATCH_SIZE = 600
+
 
 def get_datasets(models=None):
     """
@@ -30,14 +32,14 @@ def get_datasets(models=None):
     ]
 
 
-def _batch_rows(qs, batch_size=100):
+def _batch_rows(qs, batch_size=DEFAULT_BATCH_SIZE):
     """Yields QuerySet in chunks."""
     paginator = Paginator(qs, batch_size)
     for page in range(1, paginator.num_pages + 1):
         yield paginator.page(page).object_list
 
 
-def sync_dataset(item, batch_size=1):
+def sync_dataset(item, batch_size=DEFAULT_BATCH_SIZE):
     """Sends dataset to ElasticSearch in batches of batch_size."""
     model_name = item.es_model.__name__
     logger.info(f'Processing {model_name} records...')
@@ -82,7 +84,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '--batch_size',
             dest='batch_size',
-            default=600,
+            default=DEFAULT_BATCH_SIZE,
             help='Batch size - number of rows processed at a time',
         )
         parser.add_argument(
