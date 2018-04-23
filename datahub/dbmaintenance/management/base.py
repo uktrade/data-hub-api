@@ -32,6 +32,12 @@ class CSVBaseCommand(BaseCommand):
         """Define extra arguments."""
         parser.add_argument('bucket', help='S3 bucket where the CSV is stored.')
         parser.add_argument('object_key', help='S3 key of the CSV file.')
+        parser.add_argument(
+            '--simulate',
+            action='store_true',
+            default=False,
+            help='If True it only simulates the command without saving the changes.',
+        )
 
     def handle(self, *args, **options):
         """Process the CSV file."""
