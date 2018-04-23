@@ -10,12 +10,6 @@ class Command(CSVBaseCommand):
         """Define extra arguments."""
         super().add_arguments(parser)
         parser.add_argument(
-            '--simulate',
-            action='store_true',
-            default=False,
-            help='If True it only simulates the command without saving the changes.',
-        )
-        parser.add_argument(
             '--overwrite',
             action='store_true',
             default=False,

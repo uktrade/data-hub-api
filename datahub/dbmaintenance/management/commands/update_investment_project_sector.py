@@ -10,17 +10,6 @@ from ..base import CSVBaseCommand
 class Command(CSVBaseCommand):
     """Command to update investment_project.sector."""
 
-    def add_arguments(self, parser):
-        """Define extra arguments."""
-        super().add_arguments(parser)
-        parser.add_argument(
-            '--simulate',
-            action='store_true',
-            dest='simulate',
-            default=False,
-            help='If True it only simulates the command without saving the changes.',
-        )
-
     @lru_cache(maxsize=None)
     def get_sector(self, sector_id):
         """
