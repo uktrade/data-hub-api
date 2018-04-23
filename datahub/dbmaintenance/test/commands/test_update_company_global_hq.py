@@ -16,25 +16,25 @@ def test_run(s3_stubber, caplog):
     Ignores ones with global hq already assigned or with errors.
     """
     caplog.set_level('ERROR')
-    company_global_hq = CompanyFactory(
+    global_hq = CompanyFactory(
         global_headquarters=None
     )
-    company_other_global_hq = CompanyFactory(
+    other_global_hq = CompanyFactory(
         global_headquarters=None
     )
     company_needs_global_hq = CompanyFactory(
         global_headquarters=None
     )
     company_should_keep_current_global_hq = CompanyFactory(
-        global_headquarters=company_other_global_hq
+        global_headquarters=other_global_hq
     )
     company_should_also_keep_global_hq = CompanyFactory(
-        global_headquarters=company_other_global_hq
+        global_headquarters=other_global_hq
     )
 
     companies = [
-        company_global_hq,
-        company_other_global_hq,
+        global_hq,
+        other_global_hq,
         company_needs_global_hq,
         company_should_keep_current_global_hq,
         company_should_also_keep_global_hq,
@@ -44,8 +44,8 @@ def test_run(s3_stubber, caplog):
     object_key = 'test_key'
     csv_content = f"""id,global_hq_id
 00000000-0000-0000-0000-000000000000,NULL
-{company_needs_global_hq.id},{company_global_hq.id}
-{company_should_keep_current_global_hq.id},{company_global_hq.id}
+{company_needs_global_hq.id},{global_hq.id}
+{company_should_keep_current_global_hq.id},{global_hq.id}
 {company_should_also_keep_global_hq.id},NULL
 """
 
@@ -69,21 +69,21 @@ def test_run(s3_stubber, caplog):
     assert 'Company matching query does not exist' in caplog.text
     assert len(caplog.records) == 1
 
-    assert company_needs_global_hq.global_headquarters == company_global_hq
+    assert company_needs_global_hq.global_headquarters == global_hq
     # Should not be updated
-    assert company_should_keep_current_global_hq.global_headquarters == company_other_global_hq
-    assert company_should_also_keep_global_hq.global_headquarters == company_other_global_hq
+    assert company_should_keep_current_global_hq.global_headquarters == other_global_hq
+    assert company_should_also_keep_global_hq.global_headquarters == other_global_hq
 
 
-def test_override(s3_stubber, caplog):
+def test_overwrite(s3_stubber, caplog):
     """
     Test that the command updates all specified records (ignoring ones with errors).
     """
     caplog.set_level('ERROR')
-    company_global_hq = CompanyFactory(
+    global_hq = CompanyFactory(
         global_headquarters=None
     )
-    company_other_global_hq = CompanyFactory(
+    other_global_hq = CompanyFactory(
         global_headquarters=None
     )
 
@@ -91,15 +91,15 @@ def test_override(s3_stubber, caplog):
         global_headquarters=None
     )
     company_should_get_new_global_hq = CompanyFactory(
-        global_headquarters=company_other_global_hq
+        global_headquarters=other_global_hq
     )
     company_should_have_global_hq_removed = CompanyFactory(
-        global_headquarters=company_other_global_hq
+        global_headquarters=other_global_hq
     )
 
     companies = [
-        company_global_hq,
-        company_other_global_hq,
+        global_hq,
+        other_global_hq,
         company_needs_global_hq,
         company_should_get_new_global_hq,
         company_should_have_global_hq_removed,
@@ -109,8 +109,8 @@ def test_override(s3_stubber, caplog):
     object_key = 'test_key'
     csv_content = f"""id,global_hq_id
 00000000-0000-0000-0000-000000000000,NULL
-{company_needs_global_hq.id},{company_global_hq.id}
-{company_should_get_new_global_hq.id},{company_global_hq.id}
+{company_needs_global_hq.id},{global_hq.id}
+{company_should_get_new_global_hq.id},{global_hq.id}
 {company_should_have_global_hq_removed.id},NULL
 """
 
@@ -125,7 +125,7 @@ def test_override(s3_stubber, caplog):
         }
     )
 
-    call_command('update_company_global_hq', bucket, object_key, override=True)
+    call_command('update_company_global_hq', bucket, object_key, overwrite=True)
 
     for company in companies:
         company.refresh_from_db()
@@ -134,17 +134,16 @@ def test_override(s3_stubber, caplog):
     assert 'Company matching query does not exist' in caplog.text
     assert len(caplog.records) == 1
 
-    assert company_needs_global_hq.global_headquarters == company_global_hq
-    # Should not be updated
-    assert company_should_get_new_global_hq.global_headquarters == company_global_hq
+    assert company_needs_global_hq.global_headquarters == global_hq
+    assert company_should_get_new_global_hq.global_headquarters == global_hq
     assert company_should_have_global_hq_removed.global_headquarters is None
 
 
 @pytest.mark.parametrize(
-    'override',
+    'overwrite',
     (True, False)
 )
-def test_simulate(s3_stubber, caplog, override):
+def test_simulate(s3_stubber, caplog, overwrite):
     """Test that the command simulates updates if --simulate is passed in."""
     caplog.set_level('ERROR')
 
@@ -154,18 +153,18 @@ def test_simulate(s3_stubber, caplog, override):
     company_to_be_global_hq = CompanyFactory(
         global_headquarters=None
     )
-    company_ghq_for_test = CompanyFactory(
+    global_hq = CompanyFactory(
         global_headquarters=None
     )
-    company_ghq_set_already = CompanyFactory(
-        global_headquarters=company_ghq_for_test
+    company_global_hq_set_already = CompanyFactory(
+        global_headquarters=global_hq
     )
 
     companies = [
         company_needs_global_hq,
         company_to_be_global_hq,
-        company_ghq_for_test,
-        company_ghq_set_already,
+        global_hq,
+        company_global_hq_set_already,
     ]
 
     bucket = 'test_bucket'
@@ -174,7 +173,7 @@ def test_simulate(s3_stubber, caplog, override):
 00000000-0000-0000-0000-000000000000,NULL
 {company_needs_global_hq.id},{company_to_be_global_hq.id}
 {company_to_be_global_hq.id},NULL
-{company_ghq_set_already.id},{company_to_be_global_hq.id}
+{company_global_hq_set_already.id},{company_to_be_global_hq.id}
 """
 
     s3_stubber.add_response(
@@ -193,7 +192,7 @@ def test_simulate(s3_stubber, caplog, override):
         bucket,
         object_key,
         simulate=True,
-        override=override
+        overwrite=overwrite
     )
 
     for company in companies:
@@ -205,8 +204,7 @@ def test_simulate(s3_stubber, caplog, override):
 
     assert company_needs_global_hq.global_headquarters is None
     assert company_to_be_global_hq.global_headquarters is None
-    # Should not be updated
-    assert company_ghq_set_already.global_headquarters == company_ghq_for_test
+    assert company_global_hq_set_already.global_headquarters == global_hq
 
 
 def test_audit_log(s3_stubber):
@@ -280,7 +278,7 @@ def test_override_audit_log(s3_stubber):
         }
     )
 
-    call_command('update_company_global_hq', bucket, object_key, override=True)
+    call_command('update_company_global_hq', bucket, object_key, overwrite=True)
 
     versions = Version.objects.get_for_object(company_needs_global_hq)
     assert len(versions) == 1

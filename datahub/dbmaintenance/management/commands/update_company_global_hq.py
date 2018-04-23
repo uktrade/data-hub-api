@@ -12,23 +12,23 @@ class Command(CSVBaseCommand):
         """Define extra arguments."""
         super().add_arguments(parser)
         parser.add_argument(
-            '--override',
+            '--overwrite',
             action='store_true',
-            dest='override',
+            dest='overwrite',
             default=False,
-            help='If true it will overwrite records having already set global hq.'
+            help='If true it will overwrite all provided records.'
         )
 
-    def _should_update(self, company, override=False):
+    def _should_update(self, company, overwrite=False):
         """Determine if we should update the company."""
-        if override:
+        if overwrite:
             return True
 
         # Assume companies with a current Global HQ are correct,
         # as this data did not come from CDMS
         return company.global_headquarters is None
 
-    def _process_row(self, row, simulate=False, override=False, **options):
+    def _process_row(self, row, simulate=False, overwrite=False, **options):
         """Process one single row."""
         company = Company.objects.get(pk=row['id'])
         global_hq = None
@@ -36,7 +36,7 @@ class Command(CSVBaseCommand):
         if global_hq_id is not None:
             global_hq = Company.objects.get(pk=global_hq_id)
 
-        if self._should_update(company, override=override):
+        if self._should_update(company, overwrite=overwrite):
             company.global_headquarters = global_hq
 
             if simulate:
