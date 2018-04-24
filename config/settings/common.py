@@ -256,6 +256,9 @@ if REDIS_BASE_URL:
             }
         },
     }
+    CELERY_WORKER_LOG_FORMAT = (
+        "[%(asctime)s: %(levelname)s/%(processName)s] [%(name)s] %(message)s"
+    )
 
 # FRONTEND
 DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://localhost:3000')

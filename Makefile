@@ -12,6 +12,9 @@ docker-cleanup:
 migrate:
 	docker-compose run leeloo python manage.py migrate
 
+init-es:
+	docker-compose run leeloo python manage.py init_es
+
 makemigrations:
 	docker-compose run leeloo python manage.py makemigrations
 

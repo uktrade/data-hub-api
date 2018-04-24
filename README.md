@@ -24,10 +24,11 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
     docker-compose build
     ```
 
-3.  Populate the db:
+3.  Populate the database and initialise Elasticsearch:
 
     ```shell
     docker-compose run leeloo ./manage.py migrate
+    docker-compose run leeloo ./manage.py init_es
     docker-compose run leeloo ./manage.py loadinitialmetadata
     docker-compose run leeloo ./manage.py createinitialrevisions
     ```
@@ -108,11 +109,11 @@ Dependencies:
 
 9. Make sure you have redis running locally and that the REDIS_BASE_URL in your `.env` is up-to-date.
 
-10.  Configure and populate the db:
+10.  Populate the database and initialise Elasticsearch:
 
     ```shell
     ./manage.py migrate
-    ./manage.py createsuperuser
+    ./manage.py init_es
 
     ./manage.py loadinitialmetadata
     ./manage.py createinitialrevisions
@@ -126,13 +127,19 @@ Dependencies:
     ./manage.py sync_es
     ```
 
-12. Start the server:
+12.  Create a superuser:
+
+    ```shell
+    ./manage.py createsuperuser
+    ```
+    
+13. Start the server:
 
     ```shell
     ./manage.py runserver
     ```
 
-13. Start celery:
+14. Start celery:
 
     ```shell
     celery worker -A config -l info -B
@@ -265,6 +272,12 @@ These commands are generally only intended to be used on a blank database.
 
 
 ### Elasticsearch
+
+Create the Elasticsearch index (if it doesn't exist) and update the mapping:
+
+```shell
+./manage.py init_es
+```
 
 Resync all Elasticsearch records:
 
