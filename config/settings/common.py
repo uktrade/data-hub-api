@@ -256,7 +256,7 @@ if REDIS_BASE_URL:
         'visibility_timeout': int(timedelta(hours=9).total_seconds())
     }
     CELERY_TASK_ROUTES = {
-        'datahub.search.tasks.*': {
+        'datahub.search.tasks.sync_model': {
             'queue': 'long-running'
         }
     }
