@@ -1,7 +1,7 @@
 from celery import shared_task
 
 from datahub.search.apps import get_search_app, SEARCH_APPS
-from datahub.search.management.commands.sync_es import sync_dataset
+from datahub.search.bulk_sync import sync_dataset
 
 
 @shared_task(acks_late=True, priority=9)
