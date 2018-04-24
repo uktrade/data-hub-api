@@ -72,7 +72,7 @@ def _create_test_index(client, index):
     if client.indices.exists(index=index):
         client.indices.delete(index)
 
-    elasticsearch.configure_index(index, settings.ES_INDEX_SETTINGS)
+    elasticsearch.configure_index(index, index_settings=settings.ES_INDEX_SETTINGS)
 
 
 @fixture
