@@ -17,6 +17,6 @@ class SearchCompaniesHouseCompanySerializer(SearchSerializer):
     incorporation_date_before = RelaxedDateTimeField(required=False)
 
     SORT_BY_FIELDS = (
-        'incorporated_date',
+        'incorporation_date',
         'name',
     )

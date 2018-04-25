@@ -3,7 +3,6 @@ from uuid import UUID, uuid4
 
 import factory
 import pytest
-from elasticsearch_dsl import AttrDict
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -15,7 +14,7 @@ from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.order.test.factories import OrderFactory
-from datahub.search.utils import get_model_fields
+from datahub.search.test.utils import model_has_field_path
 
 pytestmark = pytest.mark.django_db
 
@@ -89,7 +88,7 @@ class TestValidateViewAttributes:
 
         invalid_fields = {
             field for field in view.REMAP_FIELDS.values()
-            if not self._model_has_field_path(search_app.es_model, field)
+            if not model_has_field_path(search_app.es_model, field)
         }
 
         assert not invalid_fields
@@ -108,26 +107,10 @@ class TestValidateViewAttributes:
             field
             for field_list in view.COMPOSITE_FILTERS.values()
             for field in field_list
-            if not self._model_has_field_path(search_app.es_model, field)
+            if not model_has_field_path(search_app.es_model, field)
         }
 
         assert not invalid_fields
-
-    @staticmethod
-    def _model_has_field_path(es_model, path):
-        path_components = path.split('.')
-        fields = get_model_fields(es_model)
-
-        for sub_field_name in path_components:
-            if sub_field_name not in fields:
-                return False
-
-            sub_field = fields.get(sub_field_name)
-            fields = getattr(sub_field, 'properties', AttrDict({})).to_dict()
-            if not fields:
-                fields = getattr(sub_field, 'fields', {})
-
-        return True
 
 
 class TestSearch(APITestMixin):
