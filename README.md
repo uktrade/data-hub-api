@@ -142,8 +142,11 @@ Dependencies:
 14. Start celery:
 
     ```shell
-    celery worker -A config -l info -B
+    celery worker -A config -l info -Q celery,long-running -B
     ```
+    
+    Note that in production the `-O fair --prefetch-multiplier 1` arguments are also used for better fairness when
+    long-running tasks are running or pending execution.
 
 ## Local development
 
