@@ -36,9 +36,7 @@ class Command(CSVBaseCommand):
         """Process one single row."""
         investment_project = InvestmentProject.objects.get(pk=row['id'])
 
-        old_stage = self.get_stage(row['old_stage'])
         new_stage = self.get_stage(row['new_stage'])
-
 
         investment_project.stage = new_stage
         if not simulate:
