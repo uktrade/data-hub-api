@@ -8,6 +8,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 
 import ssl
+from datetime import timedelta
 
 import environ
 from celery.schedules import crontab
@@ -247,6 +248,18 @@ if REDIS_BASE_URL:
             'ssl_cert_reqs': ssl.CERT_NONE
         }
         CELERY_BROKER_USE_SSL = CELERY_REDIS_BACKEND_USE_SSL
+
+    # Increase timeout from one hour for long-running tasks
+    # (If the timeout is reached before a task, Celery will start it again. This
+    # would affect in particular any long-running tasks using acks_late=True.)
+    CELERY_BROKER_TRANSPORT_OPTIONS = {
+        'visibility_timeout': int(timedelta(hours=9).total_seconds())
+    }
+    CELERY_TASK_ROUTES = {
+        'datahub.search.tasks.sync_model': {
+            'queue': 'long-running'
+        }
+    }
     CELERY_BEAT_SCHEDULE = {
         'refresh_pending_payment_gateway_sessions': {
             'task': 'datahub.omis.payment.tasks.refresh_pending_payment_gateway_sessions',
@@ -254,6 +267,10 @@ if REDIS_BASE_URL:
             'kwargs': {
                 'age_check': 60  # in minutes
             }
+        },
+        'sync_es': {
+            'task': 'datahub.search.tasks.sync_all_models',
+            'schedule': crontab(minute=0, hour=1),
         },
     }
     CELERY_WORKER_LOG_FORMAT = (
