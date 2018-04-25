@@ -21,6 +21,7 @@ from datahub.core.constants import HeadquarterType
 from datahub.core.serializers import (
     NestedRelatedField, PermittedFieldsModelSerializer, RelaxedURLField
 )
+from datahub.core.validate_utils import DataCombiner
 from datahub.core.validators import (
     AddressValidator,
     AllIsBlankRule,
@@ -236,7 +237,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         'uk_establishment_not_in_uk': ugettext_lazy(
             'A UK establishment (branch of non-UK company) must be in the UK.'
         ),
-        'global_headquarters_company_is_not_a_global_headquarters': ugettext_lazy(
+        'headquarter_type_is_not_global_headquarters': ugettext_lazy(
             'Company to be linked as global headquarters must be a global headquarters.'
         ),
         'invalid_global_headquarters': ugettext_lazy(
@@ -310,68 +311,87 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         models.URLField: RelaxedURLField,
     }
 
-    def validate_headquarter_type(self, headquarter_type):
-        """Ensure that global headquarters doesn't have any subsidiaries before changing
-        headquarter type.
-        """
-        headquarter_type_id = getattr(headquarter_type, 'id', None)
+    def validate(self, data):
+        """Performs cross-field validation."""
+        errors = {}
+        combiner = DataCombiner(self.instance, data)
+
+        validators = (
+            self._validate_cannot_become_ghq_if_linked_to_another_ghq,
+            self._validate_cannot_remove_ghq_if_it_has_subsidiaries,
+            self._validate_ghq_is_not_self,
+            self._validate_ghq_has_ghq_headquarter_type,
+        )
+
+        for validator in validators:
+            errors.update(validator(combiner))
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return data
+
+    def _validate_cannot_remove_ghq_if_it_has_subsidiaries(self, combiner):
+        errors = {}
+
+        headquarter_type_id = combiner.get_value_id('headquarter_type')
+        subsidiaries = combiner.get_value_to_many('subsidiaries')
+
+        if headquarter_type_id == HeadquarterType.ghq.value.id:
+            return {}
+
+        total_subsidiaries = subsidiaries.count() \
+            if isinstance(subsidiaries, models.query.QuerySet) else len(subsidiaries)
+
+        if total_subsidiaries > 0:
+            message = self.error_messages['global_headquarters_has_subsidiaries']
+            errors['headquarter_type'] = message
+
+        return errors
+
+    def _validate_cannot_become_ghq_if_linked_to_another_ghq(self, combiner):
+        errors = {}
+
+        headquarter_type_id = combiner.get_value_id('headquarter_type')
+        global_headquarters_id = combiner.get_value_id('global_headquarters')
 
         if (
-            self.instance
-            and self.instance.headquarter_type_id != headquarter_type_id
+            headquarter_type_id is not None
+            and UUID(headquarter_type_id) == UUID(HeadquarterType.ghq.value.id)
+            and global_headquarters_id is not None
         ):
-            self._validate_cannot_remove_ghq_if_it_has_subsidiaries()
-            self._validate_cannot_become_ghq_if_linked_to_another_ghq(headquarter_type_id)
+            message = self.error_messages['subsidiary_cannot_be_a_global_headquarters']
+            errors['headquarter_type'] = message
 
-        return headquarter_type
+        return errors
 
-    def _validate_cannot_remove_ghq_if_it_has_subsidiaries(self):
-        """Raises an exception if company is a global hq and has subsidiaries."""
+    def _validate_ghq_is_not_self(self, combiner):
+        errors = {}
+
+        pk = combiner.get_value('pk')
+        global_headquarters_id = combiner.get_value_id('global_headquarters')
+
         if (
-            self.instance.headquarter_type_id == UUID(HeadquarterType.ghq.value.id)
-            and self.instance.subsidiaries.count() > 0
+            pk
+            and global_headquarters_id
+            and UUID(global_headquarters_id) == pk
         ):
-            raise serializers.ValidationError(
-                self.error_messages['global_headquarters_has_subsidiaries']
-            )
+            message = self.error_messages['invalid_global_headquarters']
+            errors['global_headquarters'] = message
 
-    def _validate_cannot_become_ghq_if_linked_to_another_ghq(
-        self,
-        headquarter_type_id
-    ):
-        """Raises an exception if new headquarter type is ghq and company is linked to ghq."""
+        return errors
+
+    def _validate_ghq_has_ghq_headquarter_type(self, combiner):
+        errors = {}
+
+        global_headquarter = combiner.get_value('global_headquarters')
         if (
-            headquarter_type_id == UUID(HeadquarterType.ghq.value.id)
-            and self.instance.global_headquarters is not None
+            global_headquarter and
+            global_headquarter.headquarter_type_id != UUID(HeadquarterType.ghq.value.id)
         ):
-            raise serializers.ValidationError(
-                self.error_messages['subsidiary_cannot_be_a_global_headquarters']
-            )
-
-    def validate_global_headquarters(self, global_headquarters):
-        """Ensure that global headquarters is global headquarters and it is not pointing
-        at the model itself.
-        """
-        if global_headquarters:
-            # checks if global_headquarters is not pointing to an instance of the model
-            if self.instance == global_headquarters:
-                raise serializers.ValidationError(
-                    self.error_messages['invalid_global_headquarters']
-                )
-
-            # checks if instance is global headquarters
-            if self.instance.headquarter_type_id == UUID(HeadquarterType.ghq.value.id):
-                raise serializers.ValidationError(
-                    self.error_messages['subsidiary_cannot_be_a_global_headquarters']
-                )
-
-            # checks if global_headquarters is global_headquarters
-            if global_headquarters.headquarter_type_id != UUID(HeadquarterType.ghq.value.id):
-                raise serializers.ValidationError(
-                    self.error_messages['global_headquarters_company_is_not_a_global_headquarters']
-                )
-
-        return global_headquarters
+            message = self.error_messages['headquarter_type_is_not_global_headquarters']
+            errors['global_headquarters'] = message
+        return errors
 
     class Meta:
         model = Company

@@ -52,5 +52,6 @@ class Command(CSVBaseCommand):
                 return
 
             with reversion.create_revision():
+                serializer.validated_data['modified_by'] = None
                 serializer.save()
                 reversion.set_comment('Global HQ data correction.')
