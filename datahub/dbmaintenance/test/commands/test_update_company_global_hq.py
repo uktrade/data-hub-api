@@ -74,6 +74,7 @@ def test_run(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert company_needs_global_hq.global_headquarters == global_hq
+
     # Should not be updated
     assert company_should_keep_current_global_hq.global_headquarters == other_global_hq
     assert company_should_also_keep_global_hq.global_headquarters == other_global_hq
