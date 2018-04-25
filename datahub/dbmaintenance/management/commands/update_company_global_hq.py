@@ -1,6 +1,7 @@
 import reversion
 
 from datahub.company.models import Company
+from datahub.company.serializers import CompanySerializer
 from datahub.dbmaintenance.utils import parse_uuid
 from ..base import CSVBaseCommand
 
@@ -30,18 +31,26 @@ class Command(CSVBaseCommand):
     def _process_row(self, row, simulate=False, overwrite=False, **options):
         """Process one single row."""
         company = Company.objects.get(pk=parse_uuid(row['id']))
-        global_hq_id = parse_uuid(row['global_hq_id'])
 
         if self._should_update(company, overwrite=overwrite):
-            company.global_headquarters_id = global_hq_id
+            global_hq_id = parse_uuid(row['global_hq_id'])
+            global_hq = {
+                'id': global_hq_id
+            } if global_hq_id is not None else None
 
+            data = {
+                'global_headquarters': global_hq,
+            }
+
+            serializer = CompanySerializer(
+                instance=company,
+                data=data,
+                partial=True
+            )
+            serializer.is_valid(raise_exception=True)
             if simulate:
                 return
 
             with reversion.create_revision():
-                company.save(
-                    update_fields=(
-                        'global_headquarters',
-                    )
-                )
+                serializer.save()
                 reversion.set_comment('Global HQ data correction.')

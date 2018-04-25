@@ -247,7 +247,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         ),
         'subsidiary_cannot_be_a_global_headquarters': ugettext_lazy(
             'A company cannot both be and have a global headquarters.',
-        )
+        ),
     }
 
     registered_address_country = NestedRelatedField(meta_models.Country)
@@ -353,16 +353,22 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         at the model itself.
         """
         if global_headquarters:
-            # checks if global_headquarters is global_headquarters
-            if global_headquarters.headquarter_type_id != UUID(HeadquarterType.ghq.value.id):
-                raise serializers.ValidationError(
-                    self.error_messages['global_headquarters_company_is_not_a_global_headquarters']
-                )
-
             # checks if global_headquarters is not pointing to an instance of the model
             if self.instance == global_headquarters:
                 raise serializers.ValidationError(
                     self.error_messages['invalid_global_headquarters']
+                )
+
+            # checks if instance is global headquarters
+            if self.instance.headquarter_type_id == UUID(HeadquarterType.ghq.value.id):
+                raise serializers.ValidationError(
+                    self.error_messages['subsidiary_cannot_be_a_global_headquarters']
+                )
+
+            # checks if global_headquarters is global_headquarters
+            if global_headquarters.headquarter_type_id != UUID(HeadquarterType.ghq.value.id):
+                raise serializers.ValidationError(
+                    self.error_messages['global_headquarters_company_is_not_a_global_headquarters']
                 )
 
         return global_headquarters
