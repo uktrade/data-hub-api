@@ -1,12 +1,12 @@
 from io import BytesIO
+from uuid import UUID
 
 import pytest
 from django.core.management import call_command
 from reversion.models import Version
 
-from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.core.constants import InvestmentProjectStage
-from uuid import UUID
+from datahub.investment.test.factories import InvestmentProjectFactory
 
 
 pytestmark = pytest.mark.django_db
@@ -14,7 +14,6 @@ pytestmark = pytest.mark.django_db
 
 def test_run(s3_stubber):
     """Test that the command updates the relevant records ignoring ones with errors."""
-
     investment_projects = [
         # stage should get updated
         InvestmentProjectFactory(stage_id=InvestmentProjectStage.prospect.value.id),
@@ -24,7 +23,11 @@ def test_run(s3_stubber):
         InvestmentProjectFactory(stage_id=InvestmentProjectStage.won.value.id),
     ]
 
-    new_stages = [InvestmentProjectStage.assign_pm, InvestmentProjectStage.active, InvestmentProjectStage.verify_win]
+    new_stages = [
+        InvestmentProjectStage.assign_pm,
+        InvestmentProjectStage.active,
+        InvestmentProjectStage.verify_win
+    ]
 
     bucket = 'test_bucket'
     object_key = 'test_key'
