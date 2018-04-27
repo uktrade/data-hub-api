@@ -1,5 +1,4 @@
 import pytest
-from django.conf import settings
 
 from datahub.event.test.factories import EventFactory
 from datahub.search.event.apps import EventSearchApp
@@ -13,7 +12,7 @@ def test_new_event_synced(setup_es):
     setup_es.indices.refresh()
 
     assert setup_es.get(
-        index=settings.ES_INDEX,
+        index=EventSearchApp.es_model.get_write_index(),
         doc_type=EventSearchApp.name,
         id=event.pk
     )
@@ -28,7 +27,7 @@ def test_updated_event_synced(setup_es):
     setup_es.indices.refresh()
 
     result = setup_es.get(
-        index=settings.ES_INDEX,
+        index=EventSearchApp.es_model.get_write_index(),
         doc_type=EventSearchApp.name,
         id=event.pk
     )
