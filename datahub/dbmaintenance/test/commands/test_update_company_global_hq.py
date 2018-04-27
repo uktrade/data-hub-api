@@ -74,6 +74,7 @@ def test_run(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert company_needs_global_hq.global_headquarters == global_hq
+    assert company_needs_global_hq.modified_by is None
 
     # Should not be updated
     assert company_should_keep_current_global_hq.global_headquarters == other_global_hq
@@ -142,8 +143,11 @@ def test_overwrite(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert company_needs_global_hq.global_headquarters == global_hq
+    assert company_needs_global_hq.modified_by is None
     assert company_should_get_new_global_hq.global_headquarters == global_hq
+    assert company_should_get_new_global_hq.modified_by is None
     assert company_should_have_global_hq_removed.global_headquarters is None
+    assert company_should_get_new_global_hq.modified_by is None
 
 
 @pytest.mark.parametrize(
@@ -216,8 +220,11 @@ def test_simulate(s3_stubber, caplog, overwrite):
     assert len(caplog.records) == 1
 
     assert company_needs_global_hq.global_headquarters is None
+    assert company_needs_global_hq.modified_by is not None
     assert company_should_get_new_global_hq.global_headquarters == other_global_hq
+    assert company_should_get_new_global_hq.modified_by is not None
     assert company_should_have_global_hq_removed.global_headquarters == other_global_hq
+    assert company_should_have_global_hq_removed.modified_by is not None
 
 
 def test_audit_log(s3_stubber):
