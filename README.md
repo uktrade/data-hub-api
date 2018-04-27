@@ -208,6 +208,8 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 
 | Variable name | Required | Description |
 | ------------- | ------------- | ------------- |
+| `ALLOWED_ADMIN_IPS` | No | IP addresses (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
+| `ALLOWED_ADMIN_IP_RANGES` | No | IP address ranges (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
 | `AV_SERVICE_URL` | Yes | URL for ClamAV service. If not configured, virus scanning will fail. |
 | `AWS_ACCESS_KEY_ID` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
 | `AWS_DEFAULT_REGION` | No | [Default region used by boto3.](http://boto3.readthedocs.io/en/latest/guide/configuration.html#environment-variable-configuration) |
@@ -239,6 +241,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `REDIS_CELERY_DB`  | No | redis db for celery (default 1) |
 | `RESOURCE_SERVER_INTROSPECTION_URL` | If SSO enabled | RFC 7662 token introspection URL used for signle sign-on |
 | `RESOURCE_SERVER_AUTH_TOKEN` | If SSO enabled | Access token for RFC 7662 token introspection server |
+| `RESTRICT_ADMIN` | No | Whether to restrict access to the admin site by IP address. |
 | `SENTRY_ENVIRONMENT`  | Yes | Value for the environment tag in Sentry. |
 | `SSO_ENABLED` | Yes | Whether single sign-on via RFC 7662 token introspection is enabled |
 | `WEB_CONCURRENCY` | No | Number of Gunicorn workers (set automatically by Heroku, otherwise defaults to 1). |
