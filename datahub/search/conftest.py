@@ -5,7 +5,6 @@ from elasticsearch.helpers.test import get_test_client
 from pytest import fixture
 
 from datahub.metadata.test.factories import SectorFactory
-from datahub.search import elasticsearch
 from .apps import get_search_apps
 
 
@@ -41,8 +40,6 @@ def _es_client(worker_id):
 @fixture(scope='session')
 def _setup_es_indexes(_es_client):
     """Sets up ES and makes the client available."""
-    _create_test_index(_es_client, settings.ES_INDEX)
-
     # Create models in the test index
     for search_app in get_search_apps():
         search_app.init_es()
@@ -50,9 +47,8 @@ def _setup_es_indexes(_es_client):
 
     yield _es_client
 
-    _es_client.indices.delete(settings.ES_INDEX)
-
     for search_app in get_search_apps():
+        _es_client.indices.delete(search_app.es_model.get_target_index_name())
         search_app.disconnect_signals()
 
 
@@ -62,19 +58,12 @@ def setup_es(_setup_es_indexes, synchronous_on_commit, synchronous_thread_pool):
     yield _setup_es_indexes
 
     _setup_es_indexes.indices.refresh()
+    indices = [search_app.es_model.get_target_index_name() for search_app in get_search_apps()]
     _setup_es_indexes.delete_by_query(
-        settings.ES_INDEX,
+        indices,
         body={'query': {'match_all': {}}}
     )
     _setup_es_indexes.indices.refresh()
-
-
-def _create_test_index(client, index):
-    """Creates/configures the test index."""
-    if client.indices.exists(index=index):
-        client.indices.delete(index)
-
-    elasticsearch.configure_index(index, index_settings=settings.ES_INDEX_SETTINGS)
 
 
 @fixture

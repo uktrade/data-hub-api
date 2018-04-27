@@ -1,7 +1,5 @@
 from unittest import mock
 
-import pytest
-
 from .. import elasticsearch
 
 
@@ -44,15 +42,14 @@ def test_configure_connection(connections, settings):
     })
 
 
-def test_configure_index_creates_index_if_it_doesnt_exist(mock_es_client):
-    """Test that configure_index() creates the index when it doesn't exist."""
+def test_creates_index(mock_es_client):
+    """Test creates_index()."""
     index = 'test-index'
     index_settings = {
         'testsetting1': 'testval1'
     }
     connection = mock_es_client.return_value
-    connection.indices.exists.return_value = False
-    elasticsearch.configure_index(index, index_settings=index_settings)
+    elasticsearch.create_index(index, index_settings=index_settings)
     connection.indices.create.assert_called_once_with(
         index='test-index',
         body={
@@ -118,28 +115,119 @@ def test_configure_index_creates_index_if_it_doesnt_exist(mock_es_client):
     )
 
 
-def test_configure_index_doesnt_create_index_if_it_exists(mock_es_client):
-    """Test that configure_index() doesn't create the index when it already exists."""
+def test_delete_index(mock_es_client):
+    """Test delete_index()."""
     index = 'test-index'
-    index_settings = {
-        'testsetting1': 'testval1'
+    client = mock_es_client.return_value
+    elasticsearch.delete_index(index)
+    client.indices.delete.assert_called_once_with(index)
+
+
+def test_get_indices_for_alias(mock_es_client):
+    """Test get_indices_for_alias()."""
+    alias = 'test-index'
+    client = mock_es_client.return_value
+    client.indices.get_alias.return_value = {
+        'index1': {'aliases': {'alias1': {}}},
+        'index2': {'aliases': {'alias2': {}}},
     }
-    connection = mock_es_client.return_value
-    connection.indices.exists.return_value = True
-    elasticsearch.configure_index(index, index_settings=index_settings)
-    connection.indices.create.assert_not_called()
+    assert elasticsearch.get_indices_for_alias(alias) == {'index1', 'index2'}
+    client.indices.get_alias.assert_called_with(name=alias)
 
 
-@pytest.mark.django_db
-@mock.patch('datahub.search.elasticsearch.configure_index')
-@mock.patch('datahub.search.elasticsearch.get_search_apps')
-def test_init_es(get_search_apps_mock, configure_index_mock):
-    """Test that init_es() calls configure_index() and init_es() on each search app."""
-    apps = [mock.Mock(), mock.Mock()]
-    get_search_apps_mock.return_value = apps
+def test_get_aliases_for_index(mock_es_client):
+    """Test get_aliases_for_index()."""
+    index = 'test-index'
+    client = mock_es_client.return_value
+    client.indices.get_alias.return_value = {
+        index: {
+            'aliases': {
+                'alias1': {},
+                'alias2': {},
+            }
+        }
+    }
+    assert elasticsearch.get_aliases_for_index(index) == {'alias1', 'alias2'}
+    client.indices.get_alias.assert_called_with(index=index)
 
-    elasticsearch.init_es()
 
-    configure_index_mock.assert_called_once()
-    apps[0].init_es.assert_called_once()
-    apps[1].init_es.assert_called_once()
+@pytest.mark.parametrize('expected', (True, False))
+def test_alias_exists(mock_es_client, expected):
+    """Test alias_exists()."""
+    index_name = 'test-index'
+
+    client = mock_es_client.return_value
+    client.indices.exists_alias.return_value = expected
+
+    assert elasticsearch.alias_exists(index_name) == expected
+    client.indices.exists_alias.assert_called_with(name=index_name)
+
+
+@pytest.mark.parametrize(
+    'add_actions,remove_actions,expected_body',
+    (
+        (
+            (
+                (),
+                (
+                    ('test-alias', ('index1', 'index2')),
+                ),
+                {
+                    'actions': [{
+                        'remove': {
+                            'alias': 'test-alias',
+                            'indices': ['index1', 'index2'],
+                        }
+                    }]
+                }
+            ),
+            (
+                (
+                    ('test-alias', ('index1', 'index2')),
+                ),
+                (),
+                {
+                    'actions': [{
+                        'add': {
+                            'alias': 'test-alias',
+                            'indices': ['index1', 'index2'],
+                        }
+                    }]
+                }
+            ),
+            (
+                (
+                    ('test-alias', ('index1', 'index2')),
+                ),
+                (
+                    ('test-alias-2', ('index3', 'index4')),
+                ),
+                {
+                    'actions': [
+                        {
+                            'add': {
+                                'alias': 'test-alias',
+                                'indices': ['index1', 'index2'],
+                            }
+                        },
+                        {
+                            'remove': {
+                                'alias': 'test-alias-2',
+                                'indices': ['index3', 'index4'],
+                            }
+                        },
+                    ]
+                }
+            ),
+        )
+    )
+)
+def test_update_alias(mock_es_client, add_actions, remove_actions, expected_body):
+    """Test get_aliases_for_index()."""
+    client = mock_es_client.return_value
+    with elasticsearch.start_alias_transaction() as alias_transaction:
+        for action in add_actions:
+            alias_transaction.add_indices_to_alias(action[0], action[1])
+        for action in remove_actions:
+            alias_transaction.remove_indices_from_alias(action[0], action[1])
+    client.indices.update_aliases.assert_called_with(body=expected_body)

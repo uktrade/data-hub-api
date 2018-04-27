@@ -40,10 +40,15 @@ class Command(BaseCommand):
         es_logger = getLogger('elasticsearch')
         es_logger.setLevel(WARNING)
 
-        if not index_exists():
-            raise CommandError(f'Index and mapping not initialised, please run `init_es` first.')
+        apps = get_apps_to_sync(options['model'])
+
+        for app in apps:
+            if not index_exists(app.es_model.get_write_alias()):
+                raise CommandError(
+                    f'Index and mapping not initialised, please run `init_es` first.'
+                )
 
         sync_es(
             batch_size=options['batch_size'],
-            search_apps=get_apps_to_sync(options['model'])
+            search_apps=apps
         )

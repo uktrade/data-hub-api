@@ -1,6 +1,7 @@
 from logging import getLogger
 
 from django.core.management.base import BaseCommand
+from django_pglocks import advisory_lock
 
 from datahub.search.elasticsearch import init_es
 
@@ -14,4 +15,5 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Executes the command."""
-        init_es()
+        with advisory_lock('leeloo_init_es'):
+            init_es()
