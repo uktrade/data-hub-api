@@ -34,7 +34,7 @@ class TestAddContact(APITestMixin):
             },
             'first_name': 'Oratio',
             'last_name': 'Nelson',
-            'job_title': constants.Role.owner.value.name,
+            'job_title': 'Head of Sales',
             'company': {
                 'id': str(company.pk)
             },
@@ -72,7 +72,7 @@ class TestAddContact(APITestMixin):
             'first_name': 'Oratio',
             'last_name': 'Nelson',
             'name': 'Oratio Nelson',
-            'job_title': constants.Role.owner.value.name,
+            'job_title': 'Head of Sales',
             'company': {
                 'id': str(company.pk),
                 'name': company.name
@@ -306,7 +306,7 @@ class TestEditContact(APITestMixin):
                 title_id=constants.Title.admiral_of_the_fleet.value.id,
                 first_name='Oratio',
                 last_name='Nelson',
-                job_title=constants.Role.owner.value.name,
+                job_title='Head of Sales',
                 company=company,
                 email='foo@bar.com',
                 email_alternative='foo2@bar.com',
@@ -347,7 +347,7 @@ class TestEditContact(APITestMixin):
             'first_name': 'New Oratio',
             'last_name': 'Nelson',
             'name': 'New Oratio Nelson',
-            'job_title': constants.Role.owner.value.name,
+            'job_title': 'Head of Sales',
             'company': {
                 'id': str(company.pk),
                 'name': company.name
@@ -481,7 +481,7 @@ class TestViewContact(APITestMixin):
             title_id=constants.Title.admiral_of_the_fleet.value.id,
             first_name='Oratio',
             last_name='Nelson',
-            job_title=constants.Role.owner.value.name,
+            job_title='Head of Sales',
             company=company,
             email='foo@bar.com',
             email_alternative='foo2@bar.com',
@@ -518,7 +518,7 @@ class TestViewContact(APITestMixin):
             'first_name': 'Oratio',
             'last_name': 'Nelson',
             'name': 'Oratio Nelson',
-            'job_title': constants.Role.owner.value.name,
+            'job_title': 'Head of Sales',
             'company': {
                 'id': str(company.pk),
                 'name': company.name

@@ -31,6 +31,18 @@ def id_uri_dict(obj):
     }
 
 
+def company_dict(obj):
+    """Creates dictionary for a company field."""
+    if obj is None:
+        return None
+
+    return {
+        'id': str(obj.id),
+        'name': obj.name,
+        'trading_name': obj.alias,
+    }
+
+
 def contact_or_adviser_dict(obj, include_dit_team=False):
     """Creates dictionary with selected field from supplied object."""
     if obj is None:
@@ -86,7 +98,7 @@ def computed_nested_sector_dict(nested_field):
     return _computed_nested_dict(nested_field, sector_dict)
 
 
-def company_dict(obj):
+def ch_company_dict(obj):
     """Creates dictionary from a company with id and company_number keys."""
     if obj is None:
         return None

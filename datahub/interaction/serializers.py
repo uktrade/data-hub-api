@@ -8,7 +8,7 @@ from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import is_blank, is_not_blank
 from datahub.core.validators import (
-    AnyOfValidator, EqualsRule, InRule, OperatorRule, RulesBasedValidator, ValidationRule
+    EqualsRule, InRule, OperatorRule, RulesBasedValidator, ValidationRule
 )
 from datahub.event.models import Event
 from datahub.investment.models import InvestmentProject
@@ -22,24 +22,24 @@ class InteractionSerializer(serializers.ModelSerializer):
     """V3 interaction serialiser."""
 
     default_error_messages = {
-        'invalid_for_interaction': ugettext_lazy(
+        'invalid_for_non_service_delivery': ugettext_lazy(
             'This field is only valid for service deliveries.'
         ),
         'invalid_for_service_delivery': ugettext_lazy(
+            'This field is not valid for service deliveries.'
+        ),
+        'invalid_for_non_interaction': ugettext_lazy(
             'This field is only valid for interactions.'
         ),
         'invalid_for_non_event': ugettext_lazy(
             'This field is only valid for event service deliveries.'
-        ),
-        'invalid_for_policy_feedback': ugettext_lazy(
-            'This field is only valid for interactions.'
         ),
         'invalid_for_non_policy_feedback': ugettext_lazy(
             'This field is only valid for policy feedback.'
         ),
     }
 
-    company = NestedRelatedField(Company, required=False, allow_null=True)
+    company = NestedRelatedField(Company)
     contact = NestedRelatedField(Contact)
     dit_adviser = NestedAdviserField()
     created_by = NestedAdviserField(read_only=True)
@@ -116,7 +116,6 @@ class InteractionSerializer(serializers.ModelSerializer):
             'archived_documents_url_path',
         )
         validators = [
-            AnyOfValidator('company', 'investment_project'),
             HasAssociatedInvestmentProjectValidator(),
             RulesBasedValidator(
                 ValidationRule(
@@ -128,9 +127,12 @@ class InteractionSerializer(serializers.ModelSerializer):
                     ]),
                 ),
                 ValidationRule(
-                    'invalid_for_policy_feedback',
+                    'invalid_for_non_interaction',
                     OperatorRule('investment_project', not_),
-                    when=EqualsRule('kind', Interaction.KINDS.policy_feedback),
+                    when=InRule('kind', [
+                        Interaction.KINDS.service_delivery,
+                        Interaction.KINDS.policy_feedback
+                    ]),
                 ),
                 ValidationRule(
                     'invalid_for_service_delivery',
@@ -138,8 +140,9 @@ class InteractionSerializer(serializers.ModelSerializer):
                     when=EqualsRule('kind', Interaction.KINDS.service_delivery),
                 ),
                 ValidationRule(
-                    'invalid_for_interaction',
+                    'invalid_for_non_service_delivery',
                     OperatorRule('is_event', is_blank),
+                    OperatorRule('event', is_blank),
                     OperatorRule('service_delivery_status', is_blank),
                     OperatorRule('grant_amount_offered', is_blank),
                     OperatorRule('net_company_receipt', is_blank),

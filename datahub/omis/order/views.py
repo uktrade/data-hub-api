@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from datahub.core.viewsets import CoreViewSetV3
+from datahub.core.viewsets import CoreViewSet
 from datahub.oauth.scopes import Scope
 from .models import Order
 from .serializers import (
@@ -17,7 +17,7 @@ from .serializers import (
 )
 
 
-class OrderViewSet(CoreViewSetV3):
+class OrderViewSet(CoreViewSet):
     """Order ViewSet"""
 
     required_scopes = (Scope.internal_front_end,)
@@ -66,7 +66,7 @@ class OrderViewSet(CoreViewSetV3):
         }
 
 
-class PublicOrderViewSet(CoreViewSetV3):
+class PublicOrderViewSet(CoreViewSet):
     """ViewSet for public facing order endpoint."""
 
     lookup_field = 'public_token'
@@ -192,7 +192,7 @@ class AssigneeView(APIView):
         return self.get_list_response(order)
 
 
-class BaseNestedOrderViewSet(CoreViewSetV3):
+class BaseNestedOrderViewSet(CoreViewSet):
     """
     Base class for nested viewsets with order as parent
     E.g. /order/<order-id>/<child>

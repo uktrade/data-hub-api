@@ -85,10 +85,6 @@ class Title(BaseConstantModel):
     """Contact title."""
 
 
-class Role(BaseConstantModel):
-    """Contact role."""
-
-
 class TeamRole(BaseConstantModel):
     """Team role."""
 

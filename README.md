@@ -24,10 +24,11 @@ Leeloo uses Docker compose to setup and run all the necessary components. The do
     docker-compose build
     ```
 
-3.  Populate the db:
+3.  Populate the database and initialise Elasticsearch:
 
     ```shell
     docker-compose run leeloo ./manage.py migrate
+    docker-compose run leeloo ./manage.py init_es
     docker-compose run leeloo ./manage.py loadinitialmetadata
     docker-compose run leeloo ./manage.py createinitialrevisions
     ```
@@ -108,11 +109,11 @@ Dependencies:
 
 9. Make sure you have redis running locally and that the REDIS_BASE_URL in your `.env` is up-to-date.
 
-10.  Configure and populate the db:
+10.  Populate the database and initialise Elasticsearch:
 
     ```shell
     ./manage.py migrate
-    ./manage.py createsuperuser
+    ./manage.py init_es
 
     ./manage.py loadinitialmetadata
     ./manage.py createinitialrevisions
@@ -126,17 +127,26 @@ Dependencies:
     ./manage.py sync_es
     ```
 
-12. Start the server:
+12.  Create a superuser:
+
+    ```shell
+    ./manage.py createsuperuser
+    ```
+    
+13. Start the server:
 
     ```shell
     ./manage.py runserver
     ```
 
-13. Start celery:
+14. Start celery:
 
     ```shell
-    celery worker -A config -l info -B
+    celery worker -A config -l info -Q celery,long-running -B
     ```
+    
+    Note that in production the `-O fair --prefetch-multiplier 1` arguments are also used for better fairness when
+    long-running tasks are running or pending execution.
 
 ## Local development
 
@@ -198,6 +208,8 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 
 | Variable name | Required | Description |
 | ------------- | ------------- | ------------- |
+| `ALLOWED_ADMIN_IPS` | No | IP addresses (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
+| `ALLOWED_ADMIN_IP_RANGES` | No | IP address ranges (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
 | `AV_SERVICE_URL` | Yes | URL for ClamAV service. If not configured, virus scanning will fail. |
 | `AWS_ACCESS_KEY_ID` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
 | `AWS_DEFAULT_REGION` | No | [Default region used by boto3.](http://boto3.readthedocs.io/en/latest/guide/configuration.html#environment-variable-configuration) |
@@ -229,6 +241,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `REDIS_CELERY_DB`  | No | redis db for celery (default 1) |
 | `RESOURCE_SERVER_INTROSPECTION_URL` | If SSO enabled | RFC 7662 token introspection URL used for signle sign-on |
 | `RESOURCE_SERVER_AUTH_TOKEN` | If SSO enabled | Access token for RFC 7662 token introspection server |
+| `RESTRICT_ADMIN` | No | Whether to restrict access to the admin site by IP address. |
 | `SENTRY_ENVIRONMENT`  | Yes | Value for the environment tag in Sentry. |
 | `SSO_ENABLED` | Yes | Whether single sign-on via RFC 7662 token introspection is enabled |
 | `WEB_CONCURRENCY` | No | Number of Gunicorn workers (set automatically by Heroku, otherwise defaults to 1). |
@@ -265,6 +278,12 @@ These commands are generally only intended to be used on a blank database.
 
 
 ### Elasticsearch
+
+Create the Elasticsearch index (if it doesn't exist) and update the mapping:
+
+```shell
+./manage.py init_es
+```
 
 Resync all Elasticsearch records:
 

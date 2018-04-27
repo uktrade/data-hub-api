@@ -1,20 +1,24 @@
 from collections import namedtuple
 
 from django.conf import settings
+from elasticsearch_dsl import DocType, MetaField
+
+from datahub.search.utils import get_model_non_mapped_field_names
 
 DataSet = namedtuple('DataSet', ('queryset', 'es_model',))
 
 
-class MapDBModelToDict:
+class BaseESModel(DocType):
     """Helps convert Django models to dictionaries."""
-
-    IGNORED_FIELDS = ()
 
     MAPPINGS = {}
 
     COMPUTED_MAPPINGS = {}
 
     SEARCH_FIELDS = ()
+
+    class Meta:
+        dynamic = MetaField('strict')
 
     @classmethod
     def es_document(cls, dbmodel):
@@ -32,18 +36,16 @@ class MapDBModelToDict:
     @classmethod
     def dbmodel_to_dict(cls, dbmodel):
         """Converts dbmodel instance to a dictionary suitable for ElasticSearch."""
-        result = {col: fn(getattr(dbmodel, col)) for col, fn in cls.MAPPINGS.items()
-                  if getattr(dbmodel, col, None) is not None}
+        mapped_values = (
+            (col, fn, getattr(dbmodel, col)) for col, fn in cls.MAPPINGS.items()
+        )
+        fields = get_model_non_mapped_field_names(cls)
 
-        result.update({
-            col: fn(dbmodel) for col, fn in cls.COMPUTED_MAPPINGS.items()
-        })
-
-        fields = [field for field in dbmodel._meta.get_fields()
-                  if field.name not in cls.IGNORED_FIELDS]
-
-        obj = {f.name: getattr(dbmodel, f.name) for f in fields if f.name not in result}
-        result.update(obj.items())
+        result = {
+            **{col: fn(val) if val is not None else None for col, fn, val in mapped_values},
+            **{col: fn(dbmodel) for col, fn in cls.COMPUTED_MAPPINGS.items()},
+            **{field: getattr(dbmodel, field) for field in fields},
+        }
 
         return result
 

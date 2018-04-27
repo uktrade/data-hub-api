@@ -36,11 +36,6 @@ class SearchApp:
         self.mod = mod
         self.mod_signals = f'{self.mod}.signals'
 
-    def init_all(self):
-        """Initialise all ES configs."""
-        self.init_es()
-        self.connect_signals()
-
     def init_es(self):
         """
         Makes sure mappings exist in Elasticsearch.
@@ -87,17 +82,16 @@ class SearchApp:
 @lru_cache(maxsize=None)
 def get_search_apps():
     """Registers all search apps specified in `SEARCH_APPS`."""
-    search_apps = []
+    return tuple(get_search_app(cls_path) for cls_path in SEARCH_APPS)
 
-    for search_mod in SEARCH_APPS:
-        mod_path, _, cls_name = search_mod.rpartition('.')
-        mod = import_module(mod_path)
-        SearchClass = getattr(mod, cls_name)  # noqa: N806
 
-        app = SearchClass(mod_path)
-        search_apps.append(app)
-
-    return search_apps
+@lru_cache(maxsize=None)
+def get_search_app(cls_path):
+    """Registers a single search app."""
+    mod_path, _, cls_name = cls_path.rpartition('.')
+    mod = import_module(mod_path)
+    cls = getattr(mod, cls_name)
+    return cls(mod_path)
 
 
 class SearchConfig(AppConfig):
@@ -106,17 +100,10 @@ class SearchConfig(AppConfig):
     name = 'datahub.search'
     verbose_name = 'Search'
 
-    def __init__(self, *args, **kwargs):
-        """Initialises this AppConfig"""
-        super().__init__(*args, **kwargs)
-        self.search_apps = {}
-
     def ready(self):
         """Configures Elasticsearch default connection."""
-        from datahub.search import elasticsearch
+        from datahub.search.elasticsearch import configure_connection
 
-        elasticsearch.configure_connection()
-        elasticsearch.configure_index(settings.ES_INDEX, settings.ES_INDEX_SETTINGS)
-
-        for search_app in get_search_apps():
-            search_app.init_all()
+        configure_connection()
+        for app in get_search_apps():
+            app.connect_signals()

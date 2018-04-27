@@ -15,18 +15,7 @@ from ...models import DataSet
 pytestmark = pytest.mark.django_db
 
 
-def test_batch_rows():
-    """Tests _batch_rows."""
-    rows = ({}, {}, {})
-
-    res = list(sync_es._batch_rows(rows, batch_size=2))
-
-    assert len(res) == 2
-    assert len(res[0]) == 2
-    assert len(res[1]) == 1
-
-
-@mock.patch('datahub.search.management.commands.sync_es.bulk')
+@mock.patch('datahub.search.bulk_sync.bulk')
 @mock.patch('datahub.search.management.commands.sync_es.get_datasets')
 def test_sync_dataset(get_datasets, bulk, setup_es):
     """Tests syncing dataset up to Elasticsearch."""
@@ -45,7 +34,7 @@ def test_sync_dataset(get_datasets, bulk, setup_es):
     'search_model',
     (app.name for app in get_search_apps())
 )
-@mock.patch('datahub.search.management.commands.sync_es.bulk')
+@mock.patch('datahub.search.bulk_sync.bulk')
 def test_sync_one_model(bulk, setup_es, search_model):
     """
     Test that --model can be used to specify what we weant to sync.
@@ -55,7 +44,7 @@ def test_sync_one_model(bulk, setup_es, search_model):
     assert bulk.call_count == 1
 
 
-@mock.patch('datahub.search.management.commands.sync_es.bulk')
+@mock.patch('datahub.search.bulk_sync.bulk')
 def test_sync_all_models(bulk, setup_es):
     """
     Test that if --model is not used, all the search apps are synced.
@@ -65,7 +54,7 @@ def test_sync_all_models(bulk, setup_es):
     assert bulk.call_count == len(get_search_apps())
 
 
-@mock.patch('datahub.search.management.commands.sync_es.bulk')
+@mock.patch('datahub.search.bulk_sync.bulk')
 def test_sync_invalid_model(bulk, setup_es):
     """
     Test that if an invalid value is used with --model, nothing gets synced.

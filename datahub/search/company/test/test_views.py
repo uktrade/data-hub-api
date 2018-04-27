@@ -2,7 +2,7 @@ import csv
 import random
 from datetime import datetime
 from unittest import mock
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import factory
 import pytest
@@ -376,55 +376,36 @@ class TestSearch(APITestMixin):
     ))
     def test_company_search_paging(self, setup_es, sortby):
         """Tests if content placement is consistent between pages."""
-        ids = [
-            UUID('05ab924a-903e-4dd0-9a36-958091bcf41b'),
-            UUID('141dca14-e35a-49d6-9b75-6a1447aa0a3c'),
-            UUID('24c5f478-5e81-478c-81ae-e7a266bd3e80'),
-            UUID('3a4af76f-fbba-46e1-a7f9-35a5b3353e61'),
-            UUID('4596442e-8a03-47c7-bce1-69ab2c59ff34'),
-            UUID('5fd2f3d8-c074-42a8-a34d-17e0313361f2'),
-            UUID('6ce0e41f-6d38-425b-bc0a-71347e999e6a'),
-        ]
+        ids = sorted((uuid4() for _ in range(9)))
+
+        name = 'test record'
 
         CompanyFactory.create_batch(
             len(ids),
             id=factory.Iterator(ids),
-            name='test record'
+            name=name,
+            alias='',
         )
 
         setup_es.indices.refresh()
 
-        url = reverse('api-v3:search:company')
-        response = self.api_client.post(url, {
-            'original_query': 'test record',
-            'entity': 'company',
-            'offset': 0,
-            'limit': 2,
-            **sortby,
-        })
+        page_size = 2
 
-        assert response.status_code == status.HTTP_200_OK
-        assert ids[:2] == [UUID(company['id']) for company in response.data['results']]
+        for page in range((len(ids) + page_size - 1) // page_size):
+            url = reverse('api-v3:search:company')
+            response = self.api_client.post(url, {
+                'original_query': name,
+                'entity': 'company',
+                'offset': page * page_size,
+                'limit': page_size,
+                **sortby
+            })
 
-        response = self.api_client.post(url, {
-            'original_query': 'test record',
-            'entity': 'company',
-            'offset': 2,
-            'limit': 2,
-        })
+            assert response.status_code == status.HTTP_200_OK
 
-        assert response.status_code == status.HTTP_200_OK
-        assert ids[2:4] == [UUID(company['id']) for company in response.data['results']]
-
-        response = self.api_client.post(url, {
-            'original_query': 'test record',
-            'entity': 'company',
-            'offset': 4,
-            'limit': 2,
-        })
-
-        assert response.status_code == status.HTTP_200_OK
-        assert ids[4:6] == [UUID(company['id']) for company in response.data['results']]
+            start = page * page_size
+            end = start + page_size
+            assert ids[start:end] == [UUID(company['id']) for company in response.data['results']]
 
     def test_company_search_paging_query_params(self, setup_data):
         """Tests pagination of results."""
@@ -435,13 +416,13 @@ class TestSearch(APITestMixin):
         assert response.data['count'] > 1
         assert len(response.data['results']) == 1
 
-    @mock.patch('datahub.search.query_builder._apply_aggs_query')
-    def test_company_search_no_aggregations(self, _apply_aggs_query, setup_data):
+    @mock.patch('datahub.search.query_builder._add_aggs_to_query')
+    def test_company_search_no_aggregations(self, _add_aggs_to_query, setup_data):
         """Tests if no aggregation occurs."""
         url = reverse('api-v3:search:company')
         response = self.api_client.post(url)
 
-        assert _apply_aggs_query.call_count == 0
+        assert _add_aggs_to_query.call_count == 0
 
         assert response.status_code == status.HTTP_200_OK
         assert 'aggregations' not in response.data

@@ -288,23 +288,6 @@ class Country(Enum):
     zimbabwe = Constant('Zimbabwe', '39afd8d0-5d95-e211-a939-e4115bead28a')
 
 
-class Role(Enum):
-    """Roles."""
-
-    agent = Constant('Agent', '71756b9a-5d95-e211-a939-e4115bead28a')
-    consultant = Constant('Consultant', '6f756b9a-5d95-e211-a939-e4115bead28a')
-    deceased = Constant('Deceased', '70756b9a-5d95-e211-a939-e4115bead28a')
-    director = Constant('Director', '6af7d52b-63a3-e211-a646-e4115bead28a')
-    employee = Constant('Employee', '6e756b9a-5d95-e211-a939-e4115bead28a')
-    individual = Constant('Individual', '72756b9a-5d95-e211-a939-e4115bead28a')
-    leftorganisation = Constant('LeftOrganisation', '6c756b9a-5d95-e211-a939-e4115bead28a')
-    managing_director = Constant('Managing Director', 'dc02a687-5da3-e211-a646-e4115bead28a')
-    owner = Constant('Owner', '73756b9a-5d95-e211-a939-e4115bead28a')
-    partner = Constant('Partner', '74756b9a-5d95-e211-a939-e4115bead28a')
-    student = Constant('Student', '75756b9a-5d95-e211-a939-e4115bead28a')
-    unknown = Constant('Unknown', '6d756b9a-5d95-e211-a939-e4115bead28a')
-
-
 class Sector(Enum):
     """Sectors (not all of them!)."""
 
