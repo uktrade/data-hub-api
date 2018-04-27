@@ -5,6 +5,7 @@
 
 dockerize -wait ${POSTGRES_URL} -wait ${ES5_URL} -timeout 60s
 python /app/manage.py migrate
+python /app/manage.py init_es
 python /app/manage.py loadinitialmetadata
 
 # TODO abstract this into a method in ./manage.py

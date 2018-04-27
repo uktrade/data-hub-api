@@ -7,7 +7,7 @@ from rest_framework.filters import OrderingFilter
 
 from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
-from datahub.core.viewsets import CoreViewSetV3
+from datahub.core.viewsets import CoreViewSet
 from datahub.investment.queryset import get_slim_investment_project_queryset
 from datahub.oauth.scopes import Scope
 from .models import (
@@ -25,7 +25,7 @@ from .serializers import (
 )
 
 
-class CompanyViewSet(ArchivableViewSetMixin, CoreViewSetV3):
+class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
     """Company view set V3."""
 
     required_scopes = (Scope.internal_front_end,)
@@ -72,7 +72,7 @@ class CompaniesHouseCompanyViewSet(
     lookup_field = 'company_number'
 
 
-class ContactViewSet(ArchivableViewSetMixin, CoreViewSetV3):
+class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):
     """Contact ViewSet v3."""
 
     required_scopes = (Scope.internal_front_end,)

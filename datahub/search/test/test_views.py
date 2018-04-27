@@ -1,5 +1,5 @@
 import datetime
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import factory
 import pytest
@@ -14,6 +14,7 @@ from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.order.test.factories import OrderFactory
+from datahub.search.test.utils import model_has_field_path
 
 pytestmark = pytest.mark.django_db
 
@@ -70,6 +71,48 @@ def setup_data():
     )
 
 
+class TestValidateViewAttributes:
+    """Validates the field names specified in various class attributes on views."""
+
+    def test_validate_filter_fields_are_in_serializer(self, search_app):
+        """Validates that all filter fields exist in the serializer class."""
+        view = search_app.view
+        valid_fields = view.serializer_class._declared_fields.keys()
+
+        invalid_fields = frozenset(view.FILTER_FIELDS) - valid_fields
+        assert not invalid_fields
+
+    def test_validate_remap_fields_exist(self, search_app):
+        """Validate that the values of REMAP_FIELDS are valid field paths."""
+        view = search_app.view
+
+        invalid_fields = {
+            field for field in view.REMAP_FIELDS.values()
+            if not model_has_field_path(search_app.es_model, field)
+        }
+
+        assert not invalid_fields
+
+    def test_validate_remap_fields_are_used_in_filters(self, search_app):
+        """Validate that the values of REMAP_FIELDS are used in a filter."""
+        view = search_app.view
+
+        assert not {field for field in view.REMAP_FIELDS if field not in view.FILTER_FIELDS}
+
+    def test_validate_composite_filter_fields(self, search_app):
+        """Validate that the values of COMPOSITE_FILTERS are valid field paths."""
+        view = search_app.view
+
+        invalid_fields = {
+            field
+            for field_list in view.COMPOSITE_FILTERS.values()
+            for field in field_list
+            if not model_has_field_path(search_app.es_model, field)
+        }
+
+        assert not invalid_fields
+
+
 class TestSearch(APITestMixin):
     """Tests search views."""
 
@@ -98,55 +141,36 @@ class TestSearch(APITestMixin):
     ))
     def test_basic_search_consistent_paging(self, setup_es, sortby):
         """Tests if content placement is consistent between pages."""
-        ids = [
-            UUID('05ab924a-903e-4dd0-9a36-958091bcf41b'),
-            UUID('141dca14-e35a-49d6-9b75-6a1447aa0a3c'),
-            UUID('24c5f478-5e81-478c-81ae-e7a266bd3e80'),
-            UUID('3a4af76f-fbba-46e1-a7f9-35a5b3353e61'),
-            UUID('4596442e-8a03-47c7-bce1-69ab2c59ff34'),
-            UUID('5fd2f3d8-c074-42a8-a34d-17e0313361f2'),
-            UUID('6ce0e41f-6d38-425b-bc0a-71347e999e6a'),
-        ]
+        ids = sorted((uuid4() for _ in range(9)))
+
+        name = 'test record'
 
         CompanyFactory.create_batch(
             len(ids),
             id=factory.Iterator(ids),
-            name='test record'
+            name=name,
+            alias='',
         )
 
         setup_es.indices.refresh()
 
-        url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': 'test record',
-            'entity': 'company',
-            'offset': 0,
-            'limit': 2,
-            **sortby
-        })
+        page_size = 2
 
-        assert response.status_code == status.HTTP_200_OK
-        assert ids[:2] == [UUID(company['id']) for company in response.data['results']]
+        for page in range((len(ids) + page_size - 1) // page_size):
+            url = reverse('api-v3:search:basic')
+            response = self.api_client.get(url, {
+                'term': name,
+                'entity': 'company',
+                'offset': page * page_size,
+                'limit': page_size,
+                **sortby
+            })
 
-        response = self.api_client.get(url, {
-            'term': 'test record',
-            'entity': 'company',
-            'offset': 2,
-            'limit': 2,
-        })
+            assert response.status_code == status.HTTP_200_OK
 
-        assert response.status_code == status.HTTP_200_OK
-        assert ids[2:4] == [UUID(company['id']) for company in response.data['results']]
-
-        response = self.api_client.get(url, {
-            'term': 'test record',
-            'entity': 'company',
-            'offset': 4,
-            'limit': 2,
-        })
-
-        assert response.status_code == status.HTTP_200_OK
-        assert ids[4:6] == [UUID(company['id']) for company in response.data['results']]
+            start = page * page_size
+            end = start + page_size
+            assert ids[start:end] == [UUID(company['id']) for company in response.data['results']]
 
     def test_invalid_entity(self, setup_es, setup_data):
         """Tests case where provided entity is invalid."""

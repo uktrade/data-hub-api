@@ -35,6 +35,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SubFactory(AdviserFactory)
     name = factory.Faker('company')
+    alias = factory.Faker('company')
     registered_address_1 = factory.Sequence(lambda n: f'{n} Foo st.')
     registered_address_town = 'London'
     registered_address_country_id = constants.Country.united_kingdom.value.id
@@ -87,6 +88,7 @@ class ContactFactory(factory.django.DjangoModelFactory):
     last_name = factory.Faker('last_name')
     company = factory.SubFactory(CompanyFactory)
     email = 'foo@bar.com'
+    job_title = factory.Faker('job')
     primary = True
     telephone_countrycode = '+44'
     telephone_number = '123456789'

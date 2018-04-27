@@ -20,6 +20,7 @@ def test_mapping(setup_es):
 
     assert mapping.to_dict() == {
         'order': {
+            'dynamic': 'strict',
             'properties': {
                 'assignees': {
                     'include_in_parent': True,
@@ -172,6 +173,16 @@ def test_mapping(setup_es):
                             'type': 'text'
                         },
                         'name_trigram': {
+                            'analyzer': 'trigram_analyzer',
+                            'type': 'text'
+                        },
+                        'trading_name': {
+                            'copy_to': ['company.trading_name_trigram'],
+                            'analyzer': 'lowercase_keyword_analyzer',
+                            'fielddata': True,
+                            'type': 'text'
+                        },
+                        'trading_name_trigram': {
                             'analyzer': 'trigram_analyzer',
                             'type': 'text'
                         }
@@ -538,7 +549,8 @@ def test_indexed_doc(Factory, setup_es):
             },
             'company': {
                 'id': str(order.company.pk),
-                'name': order.company.name
+                'name': order.company.name,
+                'trading_name': order.company.alias,
             },
             'contact': {
                 'id': str(order.contact.pk),

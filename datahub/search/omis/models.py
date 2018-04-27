@@ -1,18 +1,18 @@
-from elasticsearch_dsl import Boolean, Date, DocType, Integer, Keyword, Text
+from elasticsearch_dsl import Boolean, Date, Integer, Keyword, Text
 
 from .. import dict_utils
 from .. import dsl_utils
-from ..models import MapDBModelToDict
+from ..models import BaseESModel
 
 
-class Order(DocType, MapDBModelToDict):
+class Order(BaseESModel):
     """Elasticsearch representation of Order model."""
 
     id = Keyword()
     reference = dsl_utils.SortableCaseInsensitiveKeywordText(copy_to=['reference_trigram'])
     reference_trigram = dsl_utils.TrigramText()
     status = dsl_utils.SortableCaseInsensitiveKeywordText()
-    company = dsl_utils.id_name_partial_mapping('company')
+    company = dsl_utils.company_mapping('company')
     contact = dsl_utils.contact_or_adviser_partial_mapping('contact')
     created_by = dsl_utils.contact_or_adviser_mapping('created_by', include_dit_team=True)
     created_on = Date()
@@ -62,7 +62,7 @@ class Order(DocType, MapDBModelToDict):
 
     MAPPINGS = {
         'id': str,
-        'company': dict_utils.id_name_dict,
+        'company': dict_utils.company_dict,
         'contact': dict_utils.contact_or_adviser_dict,
         'created_by': dict_utils.adviser_dict_with_team,
         'primary_market': dict_utils.id_name_dict,
@@ -84,21 +84,6 @@ class Order(DocType, MapDBModelToDict):
     COMPUTED_MAPPINGS = {
         'payment_due_date': lambda x: x.invoice.payment_due_date if x.invoice else None,
     }
-
-    IGNORED_FIELDS = (
-        'modified_by',
-        'product_info',
-        'permission_to_approach_contacts',
-        'quote',
-        'hourly_rate',
-        'discount_label',
-        'public_token',
-        'invoice',
-        'payments',
-        'refunds',
-        'archived_documents_url_path',
-        'payment_gateway_sessions'
-    )
 
     SEARCH_FIELDS = (
         'reference_trigram',

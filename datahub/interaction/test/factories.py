@@ -14,6 +14,7 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
 
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SubFactory(AdviserFactory)
+    company = factory.SubFactory(CompanyFactory)
     contact = factory.SubFactory(ContactFactory)
     subject = factory.Faker('sentence', nb_words=8)
     date = factory.Faker('past_datetime', start_date='-5y', tzinfo=utc)
@@ -31,7 +32,6 @@ class CompanyInteractionFactory(InteractionFactoryBase):
     """Factory for creating an interaction relating to a company."""
 
     kind = Interaction.KINDS.interaction
-    company = factory.SubFactory(CompanyFactory)
     communication_channel = factory.LazyFunction(
         lambda: random_obj_for_model(CommunicationChannel)
     )
@@ -51,7 +51,6 @@ class ServiceDeliveryFactory(InteractionFactoryBase):
     """Service delivery factory."""
 
     kind = Interaction.KINDS.service_delivery
-    company = factory.SubFactory(CompanyFactory)
     service_delivery_status = factory.LazyFunction(
         lambda: random_obj_for_model(ServiceDeliveryStatus)
     )
@@ -70,5 +69,4 @@ class EventServiceDeliveryFactory(InteractionFactoryBase):
     """Event service delivery factory."""
 
     kind = Interaction.KINDS.service_delivery
-    company = factory.SubFactory(CompanyFactory)
     event = factory.SubFactory(EventFactory)

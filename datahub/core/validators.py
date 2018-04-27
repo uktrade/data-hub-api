@@ -6,59 +6,9 @@ from typing import Any, Callable, Iterable, Sequence
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from rest_framework.settings import api_settings
 
 from datahub.core.validate_utils import DataCombiner, is_blank, is_not_blank
-
-
-class AnyOfValidator:
-    """
-    Any-of validator for DRF serializer classes.
-
-    Checks that at least one of the specified fields has a value that is
-    not None.
-
-    To be used at class-level only. For updates, values from the model
-    instance are used where the fields are not part of the update request.
-    """
-
-    message = 'One or more of {field_names} must be provided.'
-
-    def __init__(self, *fields, message=None):
-        """
-        Initialises the validator.
-
-        :param fields:  Fields to perform any-of validation on
-        :param message: Optional custom error message
-        """
-        self.fields = fields
-        self.message = message or self.message
-        self.serializer = None
-
-    def set_context(self, serializer):
-        """
-        Saves a reference to the serializer object.
-
-        Called by DRF.
-        """
-        self.serializer = serializer
-
-    def __call__(self, attrs):
-        """
-        Performs validation. Called by DRF.
-
-        :param attrs:   Serializer data (post-field-validation/processing)
-        """
-        data_combiner = DataCombiner(self.serializer.instance, attrs)
-        values = (data_combiner.get_value(field) for field in self.fields)
-        value_present = any(value for value in values if value is not None)
-        if not value_present:
-            field_names = ', '.join(self.fields)
-            message = self.message.format(field_names=field_names)
-            raise ValidationError(message, code='any_of')
-
-    def __repr__(self):
-        """Returns the string representation of this object."""
-        return f'{self.__class__.__name__}(fields={self.fields!r})'
 
 
 class RequiredUnlessAlreadyBlankValidator:
@@ -368,7 +318,11 @@ class ValidationRule(AbstractValidationRule):
         errors = []
         for rule in self._rules:
             if not rule(combiner):
-                errors.append(FieldAndError(rule.field, self._error_key))
+                error = FieldAndError(
+                    rule.field or api_settings.NON_FIELD_ERRORS_KEY,
+                    self._error_key
+                )
+                errors.append(error)
         return errors
 
     def __repr__(self):
