@@ -12,17 +12,6 @@ class Command(CSVBaseCommand):
     investor_company, intermediate_company, uk_company, uk_company_decided.
     """
 
-    def add_arguments(self, parser):
-        """Define extra arguments."""
-        super().add_arguments(parser)
-        parser.add_argument(
-            '--simulate',
-            action='store_true',
-            dest='simulate',
-            default=False,
-            help='If True it only simulates the command without saving the changes.',
-        )
-
     def _parse_company_id(self, company_id):
         """
         :param company_id: string representing uuid of the company
