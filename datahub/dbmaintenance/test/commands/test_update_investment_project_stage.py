@@ -5,6 +5,7 @@ import pytest
 from django.core.management import call_command
 from reversion.models import Version
 
+from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import InvestmentProjectStage
 from datahub.investment.test.factories import InvestmentProjectFactory
 
@@ -12,7 +13,7 @@ from datahub.investment.test.factories import InvestmentProjectFactory
 pytestmark = pytest.mark.django_db
 
 
-def test_run(s3_stubber):
+def test_run_without_user(s3_stubber):
     """Test that the command updates the relevant records ignoring ones with errors."""
     investment_projects = [
         # stage should get updated
@@ -22,6 +23,8 @@ def test_run(s3_stubber):
         # should be moved back
         InvestmentProjectFactory(stage_id=InvestmentProjectStage.won.value.id),
     ]
+
+    original_adviser = investment_projects[0].modified_by
 
     new_stages = [
         InvestmentProjectStage.assign_pm,
@@ -53,6 +56,59 @@ def test_run(s3_stubber):
     for investment_project in investment_projects:
         investment_project.refresh_from_db()
 
+    # No user given so original adviser shouldn't change
+    assert investment_projects[0].modified_by == original_adviser
+    assert investment_projects[0].stage_id == (UUID(new_stages[0].value.id))
+    assert investment_projects[1].stage_id == (UUID(new_stages[1].value.id))
+    assert investment_projects[2].stage_id == (UUID(new_stages[2].value.id))
+
+
+def test_run_with_user(s3_stubber):
+    """Test that the command updates the relevant records ignoring ones with errors."""
+    orig_adviser = AdviserFactory()
+    new_adviser = AdviserFactory()
+    investment_projects = [
+        # stage should get updated
+        InvestmentProjectFactory(stage_id=InvestmentProjectStage.prospect.value.id,
+                                 modified_by=orig_adviser),
+        # stage has been updated so shouldn't change
+        InvestmentProjectFactory(stage_id=InvestmentProjectStage.active.value.id),
+        # should be moved back
+        InvestmentProjectFactory(stage_id=InvestmentProjectStage.won.value.id),
+    ]
+
+    new_stages = [
+        InvestmentProjectStage.assign_pm,
+        InvestmentProjectStage.active,
+        InvestmentProjectStage.verify_win
+    ]
+
+    bucket = 'test_bucket'
+    object_key = 'test_key'
+    csv_content = f"""id,old_stage,new_stage
+{investment_projects[0].id},{investment_projects[0].stage_id},{new_stages[0].value.id}
+{investment_projects[1].id},{investment_projects[1].stage_id},{new_stages[1].value.id}
+{investment_projects[2].id},{investment_projects[2].stage_id},{new_stages[2].value.id}
+"""
+
+    s3_stubber.add_response(
+        'get_object',
+        {
+            'Body': BytesIO(bytes(csv_content, encoding='utf-8'))
+        },
+        expected_params={
+            'Bucket': bucket,
+            'Key': object_key
+        }
+    )
+    # set an explicit adviser id to make the changes
+    call_command('update_investment_project_stage', bucket, object_key, user=str(new_adviser.id))
+
+    for investment_project in investment_projects:
+        investment_project.refresh_from_db()
+
+    # Adviser should change to reflect the command's user
+    assert investment_projects[0].modified_by == new_adviser
     assert investment_projects[0].stage_id == (UUID(new_stages[0].value.id))
     assert investment_projects[1].stage_id == (UUID(new_stages[1].value.id))
     assert investment_projects[2].stage_id == (UUID(new_stages[2].value.id))
@@ -117,4 +173,4 @@ def test_audit_log(s3_stubber):
 
     versions = Version.objects.get_for_object(investment_project)
     assert len(versions) == 1
-    assert versions[0].revision.comment == 'Stage migration.'
+    assert versions[0].revision.comment == 'Stage correction.'
