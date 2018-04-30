@@ -237,7 +237,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         'uk_establishment_not_in_uk': ugettext_lazy(
             'A UK establishment (branch of non-UK company) must be in the UK.'
         ),
-        'headquarter_type_is_not_global_headquarters': ugettext_lazy(
+        'global_headquarters_hq_type_is_not_global_headquarters': ugettext_lazy(
             'Company to be linked as global headquarters must be a global headquarters.'
         ),
         'invalid_global_headquarters': ugettext_lazy(
@@ -315,7 +315,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         """Performs cross-field validation."""
         combiner = DataCombiner(self.instance, data)
 
-        if any({'global_headquarters', 'headquarter_type'} & set(data)):
+        if {'global_headquarters', 'headquarter_type'} & data.keys():
             headquarter_type_id = combiner.get_value_id('headquarter_type')
             global_headquarters_id = combiner.get_value_id('global_headquarters')
             if (
@@ -363,7 +363,9 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             # checks if global_headquarters is global_headquarters
             if global_headquarters.headquarter_type_id != UUID(HeadquarterType.ghq.value.id):
                 raise serializers.ValidationError(
-                    self.error_messages['headquarter_type_is_not_global_headquarters']
+                    self.error_messages[
+                        'global_headquarters_hq_type_is_not_global_headquarters'
+                    ]
                 )
 
         return global_headquarters
