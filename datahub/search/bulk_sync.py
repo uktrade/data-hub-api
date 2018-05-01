@@ -7,6 +7,7 @@ from datahub.search.elasticsearch import bulk
 logger = getLogger(__name__)
 
 DEFAULT_BATCH_SIZE = 1000
+PROGRESS_INTERVAL = 20000
 
 
 def get_datasets(models=None):
@@ -35,7 +36,6 @@ def sync_dataset(item, batch_size=DEFAULT_BATCH_SIZE):
 
     rows_processed = 0
     total_rows = item.queryset.count()
-    batches_processed = 0
     it = item.queryset.iterator(chunk_size=batch_size)
     batches = slice_iterable_into_chunks(it, batch_size)
     for batch in batches:
@@ -49,9 +49,15 @@ def sync_dataset(item, batch_size=DEFAULT_BATCH_SIZE):
             raise_on_exception=True,
         )
 
+        emit_progress = (
+            (rows_processed + num_actions) // PROGRESS_INTERVAL
+            - rows_processed // PROGRESS_INTERVAL
+            > 0
+        )
+
         rows_processed += num_actions
-        batches_processed += 1
-        if batches_processed % 100 == 0:
+
+        if emit_progress:
             logger.info(f'{model_name} rows processed: {rows_processed}/{total_rows} '
                         f'{rows_processed*100//total_rows}%')
 
