@@ -1,14 +1,12 @@
 from logging import getLogger
 
-from django.core.paginator import Paginator
-from django.db import models
-
+from datahub.core.utils import slice_iterable_into_chunks
 from datahub.search.apps import get_search_apps
 from datahub.search.elasticsearch import bulk
 
 logger = getLogger(__name__)
 
-DEFAULT_BATCH_SIZE = 600
+DEFAULT_BATCH_SIZE = 1000
 
 
 def get_datasets(models=None):
@@ -30,25 +28,16 @@ def get_datasets(models=None):
     ]
 
 
-def _batch_rows(qs, batch_size=DEFAULT_BATCH_SIZE):
-    """Yields QuerySet in chunks."""
-    paginator = Paginator(qs, batch_size)
-    for page in range(1, paginator.num_pages + 1):
-        yield paginator.page(page).object_list
-
-
 def sync_dataset(item, batch_size=DEFAULT_BATCH_SIZE):
     """Sends dataset to ElasticSearch in batches of batch_size."""
     model_name = item.es_model.__name__
     logger.info(f'Processing {model_name} records...')
 
     rows_processed = 0
-    total_rows = (
-        item.queryset.count()
-        if isinstance(item.queryset, models.query.QuerySet) else len(item.queryset)
-    )
+    total_rows = item.queryset.count()
     batches_processed = 0
-    batches = _batch_rows(item.queryset, batch_size=batch_size)
+    it = item.queryset.iterator(chunk_size=batch_size)
+    batches = slice_iterable_into_chunks(it, batch_size)
     for batch in batches:
         actions = list(item.es_model.dbmodels_to_es_documents(batch))
         num_actions = len(actions)

@@ -1,9 +1,6 @@
-from django.db.models import Prefetch
-
 from datahub.investment.models import (
     InvestmentProject as DBInvestmentProject,
     InvestmentProjectPermission,
-    InvestmentProjectTeamMember as DBInvestmentProjectTeamMember,
 )
 from datahub.investment.permissions import (
     get_association_filters, InvestmentProjectAssociationChecker
@@ -24,15 +21,10 @@ class InvestmentSearchApp(SearchApp):
         f'investment.{InvestmentProjectPermission.read_all}',
         f'investment.{InvestmentProjectPermission.read_associated}'
     )
-    queryset = DBInvestmentProject.objects.prefetch_related(
-        'actual_uk_regions',
+    queryset = DBInvestmentProject.objects.select_related(
         'archived_by',
         'average_salary',
-        'business_activities',
-        'client_contacts',
         'client_relationship_manager',
-        'competitor_countries',
-        'delivery_partners',
         'fdi_type',
         'intermediate_company',
         'investment_type',
@@ -50,12 +42,8 @@ class InvestmentSearchApp(SearchApp):
         'sector__parent',
         'sector__parent__parent',
         'specific_programme',
-        'strategic_drivers',
         'stage',
         'uk_company',
-        'uk_region_locations',
-        Prefetch('team_members',
-                 queryset=DBInvestmentProjectTeamMember.objects.prefetch_related('adviser')),
     )
 
     def get_permission_filters(self, request):

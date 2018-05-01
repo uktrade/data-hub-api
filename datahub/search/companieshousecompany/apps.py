@@ -11,6 +11,6 @@ class CompaniesHouseCompanySearchApp(SearchApp):
     es_model = CompaniesHouseCompany
     view = SearchCompaniesHouseCompanyAPIView
     permission_required = ('company.read_companieshousecompany',)
-    queryset = DBCompaniesHouseCompany.objects.prefetch_related(
+    queryset = DBCompaniesHouseCompany.objects.select_related(
         'registered_address_country',
     )
