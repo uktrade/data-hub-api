@@ -276,11 +276,13 @@ if REDIS_BASE_URL:
                 'age_check': 60  # in minutes
             }
         },
-        'sync_es': {
+    }
+    if env.bool('ENABLE_DAILY_ES_SYNC', False):
+        CELERY_BEAT_SCHEDULE['sync_es'] = {
             'task': 'datahub.search.tasks.sync_all_models',
             'schedule': crontab(minute=0, hour=1),
-        },
-    }
+        }
+
     CELERY_WORKER_LOG_FORMAT = (
         "[%(asctime)s: %(levelname)s/%(processName)s] [%(name)s] %(message)s"
     )
