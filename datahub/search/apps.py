@@ -57,15 +57,9 @@ class SearchApp:
         for receiver in signals_mod.receivers:
             receiver.disconnect()
 
-    def get_queryset(self):
-        """Gets the queryset that will be synced with Elasticsearch."""
-        return self.queryset.order_by('pk')
-
     def get_dataset(self):
         """Returns dataset that will be synchronised with Elasticsearch."""
-        queryset = self.get_queryset()
-
-        return DataSet(queryset, self.es_model)
+        return DataSet(self.queryset, self.es_model)
 
     def get_permission_filters(self, request):
         """

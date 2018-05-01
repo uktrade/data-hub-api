@@ -23,13 +23,12 @@ class Command(BaseCommand):
         """Handle arguments."""
         parser.add_argument(
             '--batch_size',
-            dest='batch_size',
+            type=int,
             default=DEFAULT_BATCH_SIZE,
             help='Batch size - number of rows processed at a time',
         )
         parser.add_argument(
             '--model',
-            dest='model',
             action='append',
             choices=[search_app.name for search_app in get_search_apps()],
             help='Search model to import. If empty, it imports all',

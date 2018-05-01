@@ -12,7 +12,7 @@ class ContactSearchApp(SearchApp):
     view = SearchContactAPIView
     export_view = SearchContactExportAPIView
     permission_required = ('company.read_contact',)
-    queryset = DBContact.objects.prefetch_related(
+    queryset = DBContact.objects.select_related(
         'title',
         'company',
         'adviser',
