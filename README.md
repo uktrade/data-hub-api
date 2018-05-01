@@ -224,6 +224,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `DJANGO_SENTRY_DSN`  | Yes | |
 | `DJANGO_SETTINGS_MODULE`  | Yes | |
 | `DOCUMENTS_BUCKET`  | Yes | S3 bucket for document storage. |
+| `ENABLE_DAILY_ES_SYNC` | No | Whether to enable the daily ES sync (default=False). |
 | `ES_INDEX`  | Yes | |
 | `ES_URL`  | Yes | |
 | `ES_VERIFY_CERTS`  | No | |
