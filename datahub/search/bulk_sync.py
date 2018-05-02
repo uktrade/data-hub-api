@@ -6,33 +6,26 @@ from datahub.search.elasticsearch import bulk
 
 logger = getLogger(__name__)
 
-DEFAULT_BATCH_SIZE = 1000
 PROGRESS_INTERVAL = 20000
 
 
-def get_datasets(models=None):
+def get_apps_to_sync(models=None):
     """
-    Returns datasets that will be synchronised with Elasticsearch.
+    Returns apps that will be synchronised with Elasticsearch.
 
     :param models: list of search app names to index, None for all
     """
     search_apps = get_search_apps()
 
     # if models empty, assume all models
-    if not models:
-        models = [search_app.name for search_app in search_apps]
-
-    return [
-        search_app.get_dataset()
-        for search_app in search_apps
-        if search_app.name in models
-    ]
+    return [search_app for search_app in search_apps if not models or search_app.name in models]
 
 
-def sync_dataset(item, batch_size=DEFAULT_BATCH_SIZE):
-    """Sends dataset to ElasticSearch in batches of batch_size."""
+def sync_app(item, batch_size=None):
+    """Syncs objects for an app to ElasticSearch in batches of batch_size."""
     model_name = item.es_model.__name__
-    logger.info(f'Processing {model_name} records...')
+    batch_size = batch_size or item.bulk_batch_size
+    logger.info(f'Processing {model_name} records, using batch size {batch_size}')
 
     rows_processed = 0
     total_rows = item.queryset.count()

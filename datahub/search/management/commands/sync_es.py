@@ -2,16 +2,16 @@ from logging import getLogger, WARNING
 
 from django.core.management.base import BaseCommand
 
-from datahub.search.bulk_sync import DEFAULT_BATCH_SIZE, get_datasets, sync_dataset
+from datahub.search.bulk_sync import get_apps_to_sync, sync_app
 from ...apps import get_search_apps
 
 logger = getLogger(__name__)
 
 
-def sync_es(batch_size, datasets):
+def sync_es(batch_size, search_apps):
     """Sends data to Elasticsearch."""
-    for item in datasets:
-        sync_dataset(item, batch_size=batch_size)
+    for app in search_apps:
+        sync_app(app, batch_size=batch_size)
 
     logger.info('Elasticsearch sync complete!')
 
@@ -24,8 +24,8 @@ class Command(BaseCommand):
         parser.add_argument(
             '--batch_size',
             type=int,
-            default=DEFAULT_BATCH_SIZE,
-            help='Batch size - number of rows processed at a time',
+            help='Batch size - number of rows processed at a time (defaults to per-model '
+                 'defaults)',
         )
         parser.add_argument(
             '--model',
@@ -41,5 +41,5 @@ class Command(BaseCommand):
 
         sync_es(
             batch_size=options['batch_size'],
-            datasets=get_datasets(options['model'])
+            search_apps=get_apps_to_sync(options['model'])
         )

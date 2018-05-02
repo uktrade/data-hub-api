@@ -14,11 +14,11 @@ from ...investment.models import InvestmentProject as ESInvestmentProject
 
 
 @mock.patch('datahub.search.bulk_sync.bulk')
-@mock.patch('datahub.search.management.commands.sync_es.get_datasets')
+@mock.patch('datahub.search.management.commands.sync_es.get_apps_to_sync')
 @pytest.mark.django_db
-def test_sync_dataset(get_datasets, bulk):
-    """Tests syncing dataset up to Elasticsearch."""
-    get_datasets.return_value = (
+def test_sync_es(get_apps_to_sync, bulk):
+    """Tests syncing app to Elasticsearch."""
+    get_apps_to_sync.return_value = (
         mock.Mock(queryset=MockQuerySet([CompanyFactory(), CompanyFactory()]), es_model=ESCompany),
         mock.Mock(queryset=MockQuerySet([ContactFactory()]), es_model=ESContact),
         mock.Mock(
@@ -36,31 +36,31 @@ def test_sync_dataset(get_datasets, bulk):
     'search_model',
     (app.name for app in get_search_apps())
 )
-@mock.patch('datahub.search.management.commands.sync_es.sync_dataset')
-def test_sync_one_model(sync_dataset_mock, search_model):
+@mock.patch('datahub.search.management.commands.sync_es.sync_app')
+def test_sync_one_model(sync_app_mock, search_model):
     """
     Test that --model can be used to specify what we weant to sync.
     """
     management.call_command(sync_es.Command(), model=[search_model])
 
-    assert sync_dataset_mock.call_count == 1
+    assert sync_app_mock.call_count == 1
 
 
-@mock.patch('datahub.search.management.commands.sync_es.sync_dataset')
-def test_sync_all_models(sync_dataset_mock):
+@mock.patch('datahub.search.management.commands.sync_es.sync_app')
+def test_sync_all_models(sync_app_mock):
     """
     Test that if --model is not used, all the search apps are synced.
     """
     management.call_command(sync_es.Command())
 
-    assert sync_dataset_mock.call_count == len(get_search_apps())
+    assert sync_app_mock.call_count == len(get_search_apps())
 
 
-@mock.patch('datahub.search.management.commands.sync_es.sync_dataset')
-def test_sync_invalid_model(sync_dataset_mock):
+@mock.patch('datahub.search.management.commands.sync_es.sync_app')
+def test_sync_invalid_model(sync_app_mock):
     """
     Test that if an invalid value is used with --model, nothing gets synced.
     """
     management.call_command(sync_es.Command(), model='invalid')
 
-    assert sync_dataset_mock.call_count == 0
+    assert sync_app_mock.call_count == 0
