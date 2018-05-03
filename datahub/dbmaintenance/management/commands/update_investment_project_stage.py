@@ -37,6 +37,7 @@ class Command(CSVBaseCommand):
             return None
         return InvestmentProjectStage.objects.get(id=stage_id)
 
+    @lru_cache(maxsize=None)
     def get_adviser(self, adviser_id):
         """
         :param adviser: uuid of an adviser
@@ -47,7 +48,7 @@ class Command(CSVBaseCommand):
             return None
         return Advisor.objects.get(id=adviser_id)
 
-    def _process_row(self, row, simulate=False, adviser=False, **options):
+    def _process_row(self, row, simulate=False, adviser=None, **options):
         """Process one single row."""
         investment_project_id = parse_uuid(row['investment_project_id'])
         stage_id = parse_uuid(row['stage_id'])
@@ -56,7 +57,7 @@ class Command(CSVBaseCommand):
         investment_project = InvestmentProject.objects.get(pk=investment_project_id)
 
         new_stage = self.get_stage(stage_id)
-        current_adviser = self.get_adviser(adviser_id) or investment_project.modified_by
+        current_adviser = self.get_adviser(adviser_id)
         investment_project.stage = new_stage
 
         if current_adviser:
@@ -67,7 +68,8 @@ class Command(CSVBaseCommand):
                 investment_project.save(
                     update_fields=(
                         'stage',
-                        'modified_by'
+                        'modified_by',
+                        'modified_on'
                     )
                 )
                 reversion.set_comment('Stage correction.')
