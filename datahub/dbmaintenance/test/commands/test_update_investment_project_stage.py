@@ -2,7 +2,9 @@ from io import BytesIO
 from uuid import UUID
 
 import pytest
+from dateutil.parser import parse
 from django.core.management import call_command
+from freezegun import freeze_time
 from reversion.models import Version
 
 from datahub.company.test.factories import AdviserFactory
@@ -13,6 +15,7 @@ from datahub.investment.test.factories import InvestmentProjectFactory
 pytestmark = pytest.mark.django_db
 
 
+@freeze_time('2018-10-10 12:00:00')
 def test_run_without_user(s3_stubber):
     """Test that the command updates the relevant records ignoring ones with errors."""
     investment_projects = [
@@ -29,6 +32,8 @@ def test_run_without_user(s3_stubber):
         InvestmentProjectStage.active,
         InvestmentProjectStage.verify_win
     ]
+
+    modified_date = parse('2018-10-10 12:00:00 UTC')
 
     bucket = 'test_bucket'
     object_key = 'test_key'
@@ -55,13 +60,17 @@ def test_run_without_user(s3_stubber):
         investment_project.refresh_from_db()
 
     assert investment_projects[0].modified_by is None
-    assert investment_projects[0].stage_id == (UUID(new_stages[0].value.id))
     assert investment_projects[1].modified_by is None
-    assert investment_projects[1].stage_id == (UUID(new_stages[1].value.id))
     assert investment_projects[2].modified_by is None
+    assert investment_projects[0].stage_id == (UUID(new_stages[0].value.id))
+    assert investment_projects[1].stage_id == (UUID(new_stages[1].value.id))
     assert investment_projects[2].stage_id == (UUID(new_stages[2].value.id))
+    assert investment_projects[0].modified_on == modified_date
+    assert investment_projects[1].modified_on == modified_date
+    assert investment_projects[2].modified_on == modified_date
 
 
+@freeze_time('2018-11-11 12:00:00')
 def test_run_with_user(s3_stubber):
     """Test that the command updates the relevant records ignoring ones with errors."""
     new_adviser = AdviserFactory()
@@ -82,6 +91,8 @@ def test_run_with_user(s3_stubber):
         InvestmentProjectStage.active,
         InvestmentProjectStage.verify_win
     ]
+
+    modified_date = parse('2018-11-11 12:00:00 UTC')
 
     bucket = 'test_bucket'
     object_key = 'test_key'
@@ -109,13 +120,15 @@ def test_run_with_user(s3_stubber):
     for investment_project in investment_projects:
         investment_project.refresh_from_db()
 
-    # Adviser should change to reflect the command's user
     assert investment_projects[0].modified_by == new_adviser
-    assert investment_projects[0].stage_id == (UUID(new_stages[0].value.id))
     assert investment_projects[1].modified_by == new_adviser
-    assert investment_projects[1].stage_id == (UUID(new_stages[1].value.id))
     assert investment_projects[2].modified_by == new_adviser
+    assert investment_projects[0].stage_id == (UUID(new_stages[0].value.id))
+    assert investment_projects[1].stage_id == (UUID(new_stages[1].value.id))
     assert investment_projects[2].stage_id == (UUID(new_stages[2].value.id))
+    assert investment_projects[0].modified_on == modified_date
+    assert investment_projects[1].modified_on == modified_date
+    assert investment_projects[2].modified_on == modified_date
 
 
 def test_simulate(s3_stubber):

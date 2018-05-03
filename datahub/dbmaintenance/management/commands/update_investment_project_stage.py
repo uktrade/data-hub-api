@@ -53,9 +53,6 @@ class Command(CSVBaseCommand):
         investment_project.stage = self.get_stage(stage_id)
         investment_project.modified_by = self.get_adviser(adviser_id)
 
-        # if current_adviser:
-        #     investment_project.modified_by = current_adviser
-
         if not simulate:
             with reversion.create_revision():
                 investment_project.save(
