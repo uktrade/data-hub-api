@@ -24,8 +24,6 @@ def test_run_without_user(s3_stubber):
         InvestmentProjectFactory(stage_id=InvestmentProjectStage.won.value.id),
     ]
 
-    original_advisers = [project.modified_by for project in investment_projects]
-
     new_stages = [
         InvestmentProjectStage.assign_pm,
         InvestmentProjectStage.active,
@@ -56,11 +54,11 @@ def test_run_without_user(s3_stubber):
     for investment_project in investment_projects:
         investment_project.refresh_from_db()
 
-    assert investment_projects[0].modified_by == original_advisers[0]
+    assert investment_projects[0].modified_by is None
     assert investment_projects[0].stage_id == (UUID(new_stages[0].value.id))
-    assert investment_projects[1].modified_by == original_advisers[1]
+    assert investment_projects[1].modified_by is None
     assert investment_projects[1].stage_id == (UUID(new_stages[1].value.id))
-    assert investment_projects[2].modified_by == original_advisers[2]
+    assert investment_projects[2].modified_by is None
     assert investment_projects[2].stage_id == (UUID(new_stages[2].value.id))
 
 
@@ -106,7 +104,7 @@ def test_run_with_user(s3_stubber):
     # set an explicit adviser id to make the changes
     call_command('update_investment_project_stage',
                  bucket, object_key,
-                 adviser=str(new_adviser.id))
+                 modified_by=str(new_adviser.id))
 
     for investment_project in investment_projects:
         investment_project.refresh_from_db()

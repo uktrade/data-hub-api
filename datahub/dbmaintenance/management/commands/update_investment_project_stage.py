@@ -16,13 +16,7 @@ class Command(CSVBaseCommand):
         """Define extra arguments."""
         super().add_arguments(parser)
         parser.add_argument(
-            '--simulate',
-            action='store_true',
-            default=False,
-            help='If True it only simulates the command without saving the changes.',
-        )
-        parser.add_argument(
-            '--adviser',
+            '--modified_by',
             help='UUID of a valid adviser to use as the modified_by value',
         )
 
@@ -33,7 +27,7 @@ class Command(CSVBaseCommand):
         :return: instance of investment project stage with id == stage_id if it exists,
             None otherwise
         """
-        if not stage_id or stage_id == 'null':
+        if not stage_id:
             return None
         return InvestmentProjectStage.objects.get(id=stage_id)
 
@@ -44,24 +38,23 @@ class Command(CSVBaseCommand):
         :return: instance of an adviser if they exist,
             None otherwise
         """
-        if not adviser_id or adviser_id == 'null':
+        if not adviser_id:
             return None
         return Advisor.objects.get(id=adviser_id)
 
-    def _process_row(self, row, simulate=False, adviser=None, **options):
+    def _process_row(self, row, simulate=False, modified_by=None, **options):
         """Process one single row."""
         investment_project_id = parse_uuid(row['investment_project_id'])
         stage_id = parse_uuid(row['stage_id'])
-        adviser_id = parse_uuid(adviser)
+        adviser_id = parse_uuid(modified_by)
 
         investment_project = InvestmentProject.objects.get(pk=investment_project_id)
 
-        new_stage = self.get_stage(stage_id)
-        current_adviser = self.get_adviser(adviser_id)
-        investment_project.stage = new_stage
+        investment_project.stage = self.get_stage(stage_id)
+        investment_project.modified_by = self.get_adviser(adviser_id)
 
-        if current_adviser:
-            investment_project.modified_by = current_adviser
+        # if current_adviser:
+        #     investment_project.modified_by = current_adviser
 
         if not simulate:
             with reversion.create_revision():
