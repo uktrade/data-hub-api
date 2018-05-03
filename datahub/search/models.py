@@ -1,11 +1,7 @@
-from collections import namedtuple
-
 from django.conf import settings
 from elasticsearch_dsl import DocType, MetaField
 
 from datahub.search.utils import get_model_non_mapped_field_names
-
-DataSet = namedtuple('DataSet', ('queryset', 'es_model',))
 
 
 class BaseESModel(DocType):
