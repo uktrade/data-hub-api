@@ -28,18 +28,10 @@ def test_join_truthy_strings(args, sep, res):
 
 def test_slice_iterable_into_chunks():
     """Test slice iterable into chunks."""
-    size = 10
-    iterable = range(100)
-    chunks = list(slice_iterable_into_chunks(iterable, size, lambda x: x))
-    assert len(chunks) == 10
-
-
-def test_slice_iterable_into_chunks_default_obj_creator():
-    """Test slice iterable into chunks using the default object creator."""
     size = 2
     iterable = range(5)
     chunks = list(slice_iterable_into_chunks(iterable, size))
-    assert list(chunks) == [[0, 1], [2, 3], [4]]
+    assert chunks == [[0, 1], [2, 3], [4]]
 
 
 class _MetadataModelConstant(Enum):
