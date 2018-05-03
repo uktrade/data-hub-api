@@ -1,4 +1,3 @@
-from datetime import datetime
 from functools import lru_cache
 
 import reversion
@@ -23,17 +22,14 @@ class Command(CSVBaseCommand):
             help='If True it only simulates the command without saving the changes.',
         )
         parser.add_argument(
-            '--user',
-            default=False,
-            dest='user',
-            action='store',
+            '--adviser',
             help='UUID of a valid adviser to use as the modified_by value',
         )
 
     @lru_cache(maxsize=None)
     def get_stage(self, stage_id):
         """
-        :param company_id: uuid of the company
+        :param stage_id: uuid of the Investment project stage
         :return: instance of investment project stage with id == stage_id if it exists,
             None otherwise
         """
@@ -43,37 +39,34 @@ class Command(CSVBaseCommand):
 
     def get_adviser(self, adviser_id):
         """
-        :param adviser: uuid of the company
-        :return: instance of a data hub adviser,
+        :param adviser: uuid of an adviser
+        :return: instance of an adviser if they exist,
             None otherwise
         """
         if not adviser_id or adviser_id == 'null':
             return None
         return Advisor.objects.get(id=adviser_id)
 
-    def _process_row(self, row, simulate=False, user=False, **options):
+    def _process_row(self, row, simulate=False, adviser=False, **options):
         """Process one single row."""
-        id = parse_uuid(row['id'])
-        stage = parse_uuid(row['new_stage'])
-        adviser = parse_uuid(user)
+        investment_project_id = parse_uuid(row['investment_project_id'])
+        stage_id = parse_uuid(row['stage_id'])
+        adviser_id = parse_uuid(adviser)
 
-        investment_project = InvestmentProject.objects.get(pk=id)
+        investment_project = InvestmentProject.objects.get(pk=investment_project_id)
 
-        new_stage = self.get_stage(stage)
-        dh_user = self.get_adviser(adviser)
-        if not dh_user:
-            dh_user = investment_project.modified_by
-
+        new_stage = self.get_stage(stage_id)
+        current_adviser = self.get_adviser(adviser_id) or investment_project.modified_by
         investment_project.stage = new_stage
-        investment_project.modified_on = datetime.now()
-        investment_project.modified_by = dh_user
+
+        if current_adviser:
+            investment_project.modified_by = current_adviser
 
         if not simulate:
             with reversion.create_revision():
                 investment_project.save(
                     update_fields=(
                         'stage',
-                        'modified_on',
                         'modified_by'
                     )
                 )

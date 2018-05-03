@@ -16,15 +16,15 @@ pytestmark = pytest.mark.django_db
 def test_run_without_user(s3_stubber):
     """Test that the command updates the relevant records ignoring ones with errors."""
     investment_projects = [
-        # stage should get updated
+        # stage should get updated 'forwards' in the investment flow
         InvestmentProjectFactory(stage_id=InvestmentProjectStage.prospect.value.id),
-        # stage has been updated so shouldn't change
+        # Shouldn't be changed - stages match
         InvestmentProjectFactory(stage_id=InvestmentProjectStage.active.value.id),
         # should be moved back
         InvestmentProjectFactory(stage_id=InvestmentProjectStage.won.value.id),
     ]
 
-    original_adviser = investment_projects[0].modified_by
+    original_advisers = [project.modified_by for project in investment_projects]
 
     new_stages = [
         InvestmentProjectStage.assign_pm,
@@ -34,10 +34,10 @@ def test_run_without_user(s3_stubber):
 
     bucket = 'test_bucket'
     object_key = 'test_key'
-    csv_content = f"""id,old_stage,new_stage
-{investment_projects[0].id},{investment_projects[0].stage_id},{new_stages[0].value.id}
-{investment_projects[1].id},{investment_projects[1].stage_id},{new_stages[1].value.id}
-{investment_projects[2].id},{investment_projects[2].stage_id},{new_stages[2].value.id}
+    csv_content = f"""investment_project_id,stage_id
+{investment_projects[0].id},{new_stages[0].value.id}
+{investment_projects[1].id},{new_stages[1].value.id}
+{investment_projects[2].id},{new_stages[2].value.id}
 """
 
     s3_stubber.add_response(
@@ -56,25 +56,27 @@ def test_run_without_user(s3_stubber):
     for investment_project in investment_projects:
         investment_project.refresh_from_db()
 
-    # No user given so original adviser shouldn't change
-    assert investment_projects[0].modified_by == original_adviser
+    assert investment_projects[0].modified_by == original_advisers[0]
     assert investment_projects[0].stage_id == (UUID(new_stages[0].value.id))
+    assert investment_projects[1].modified_by == original_advisers[1]
     assert investment_projects[1].stage_id == (UUID(new_stages[1].value.id))
+    assert investment_projects[2].modified_by == original_advisers[2]
     assert investment_projects[2].stage_id == (UUID(new_stages[2].value.id))
 
 
 def test_run_with_user(s3_stubber):
     """Test that the command updates the relevant records ignoring ones with errors."""
-    orig_adviser = AdviserFactory()
     new_adviser = AdviserFactory()
     investment_projects = [
         # stage should get updated
         InvestmentProjectFactory(stage_id=InvestmentProjectStage.prospect.value.id,
-                                 modified_by=orig_adviser),
-        # stage has been updated so shouldn't change
-        InvestmentProjectFactory(stage_id=InvestmentProjectStage.active.value.id),
+                                 modified_by=AdviserFactory()),
+        # Shouldn't be changed - stages match
+        InvestmentProjectFactory(stage_id=InvestmentProjectStage.active.value.id,
+                                 modified_by=AdviserFactory()),
         # should be moved back
-        InvestmentProjectFactory(stage_id=InvestmentProjectStage.won.value.id),
+        InvestmentProjectFactory(stage_id=InvestmentProjectStage.won.value.id,
+                                 modified_by=AdviserFactory()),
     ]
 
     new_stages = [
@@ -85,10 +87,10 @@ def test_run_with_user(s3_stubber):
 
     bucket = 'test_bucket'
     object_key = 'test_key'
-    csv_content = f"""id,old_stage,new_stage
-{investment_projects[0].id},{investment_projects[0].stage_id},{new_stages[0].value.id}
-{investment_projects[1].id},{investment_projects[1].stage_id},{new_stages[1].value.id}
-{investment_projects[2].id},{investment_projects[2].stage_id},{new_stages[2].value.id}
+    csv_content = f"""investment_project_id,stage_id
+{investment_projects[0].id},{new_stages[0].value.id}
+{investment_projects[1].id},{new_stages[1].value.id}
+{investment_projects[2].id},{new_stages[2].value.id}
 """
 
     s3_stubber.add_response(
@@ -102,7 +104,9 @@ def test_run_with_user(s3_stubber):
         }
     )
     # set an explicit adviser id to make the changes
-    call_command('update_investment_project_stage', bucket, object_key, user=str(new_adviser.id))
+    call_command('update_investment_project_stage',
+                 bucket, object_key,
+                 adviser=str(new_adviser.id))
 
     for investment_project in investment_projects:
         investment_project.refresh_from_db()
@@ -110,7 +114,9 @@ def test_run_with_user(s3_stubber):
     # Adviser should change to reflect the command's user
     assert investment_projects[0].modified_by == new_adviser
     assert investment_projects[0].stage_id == (UUID(new_stages[0].value.id))
+    assert investment_projects[1].modified_by == new_adviser
     assert investment_projects[1].stage_id == (UUID(new_stages[1].value.id))
+    assert investment_projects[2].modified_by == new_adviser
     assert investment_projects[2].stage_id == (UUID(new_stages[2].value.id))
 
 
@@ -121,9 +127,9 @@ def test_simulate(s3_stubber):
 
     bucket = 'test_bucket'
     object_key = 'test_key'
-    csv_content = f"""id,old_stage,new_stage
-{investment_projects[0].id},{old_stages[0].id},{InvestmentProjectStage.prospect.value.id}
-{investment_projects[1].id},{old_stages[1].id},{InvestmentProjectStage.won.value.id}
+    csv_content = f"""investment_project_id,stage_id
+{investment_projects[0].id},{InvestmentProjectStage.prospect.value.id}
+{investment_projects[1].id},{InvestmentProjectStage.won.value.id}
 """
     s3_stubber.add_response(
         'get_object',
@@ -149,12 +155,10 @@ def test_audit_log(s3_stubber):
     """Test that audit log is being created."""
     new_stage = InvestmentProjectStage.won
     investment_project = InvestmentProjectFactory()
-    old_stage = investment_project.stage
-
     bucket = 'test_bucket'
     object_key = 'test_key'
-    csv_content = f"""id,old_stage,new_stage
-{investment_project.id},{old_stage.id},{new_stage.value.id}
+    csv_content = f"""investment_project_id,stage_id
+{investment_project.id},{new_stage.value.id}
 """
     s3_stubber.add_response(
         'get_object',
