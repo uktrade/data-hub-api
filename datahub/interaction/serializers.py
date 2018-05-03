@@ -25,9 +25,6 @@ class InteractionSerializer(serializers.ModelSerializer):
         'invalid_for_non_service_delivery': ugettext_lazy(
             'This field is only valid for service deliveries.'
         ),
-        'invalid_for_service_delivery': ugettext_lazy(
-            'This field is not valid for service deliveries.'
-        ),
         'invalid_for_non_interaction': ugettext_lazy(
             'This field is only valid for interactions.'
         ),
@@ -123,7 +120,6 @@ class InteractionSerializer(serializers.ModelSerializer):
                     OperatorRule('communication_channel', bool),
                     when=InRule('kind', [
                         Interaction.KINDS.interaction,
-                        Interaction.KINDS.policy_feedback
                     ]),
                 ),
                 ValidationRule(
@@ -135,9 +131,12 @@ class InteractionSerializer(serializers.ModelSerializer):
                     ]),
                 ),
                 ValidationRule(
-                    'invalid_for_service_delivery',
+                    'invalid_for_non_interaction',
                     OperatorRule('communication_channel', not_),
-                    when=EqualsRule('kind', Interaction.KINDS.service_delivery),
+                    when=InRule('kind', [
+                        Interaction.KINDS.service_delivery,
+                        Interaction.KINDS.policy_feedback,
+                    ]),
                 ),
                 ValidationRule(
                     'invalid_for_non_service_delivery',

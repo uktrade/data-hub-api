@@ -28,12 +28,10 @@ class TestAddPolicyFeedback(APITestMixin):
         contact = ContactFactory()
         policy_area = random_obj_for_model(PolicyArea)
         policy_issue_type = random_obj_for_model(PolicyIssueType)
-        communication_channel = random_obj_for_model(CommunicationChannel)
 
         url = reverse('api-v3:interaction:collection')
         request_data = {
             'kind': Interaction.KINDS.policy_feedback,
-            'communication_channel': communication_channel.pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
@@ -62,10 +60,7 @@ class TestAddPolicyFeedback(APITestMixin):
             'policy_issue_type': {
                 'id': str(policy_issue_type.pk), 'name': policy_issue_type.name
             },
-            'communication_channel': {
-                'id': str(communication_channel.pk),
-                'name': communication_channel.name
-            },
+            'communication_channel': None,
             'subject': 'whatever',
             'date': '2017-04-18',
             'dit_adviser': {
@@ -146,7 +141,6 @@ class TestAddPolicyFeedback(APITestMixin):
                 {
                     'policy_area': ['This field is required.'],
                     'policy_issue_type': ['This field is required.'],
-                    'communication_channel': ['This field is required.'],
                 }
             ),
 
@@ -185,6 +179,7 @@ class TestAddPolicyFeedback(APITestMixin):
                     ],
                     'grant_amount_offered': ['This field is only valid for service deliveries.'],
                     'net_company_receipt': ['This field is only valid for service deliveries.'],
+                    'communication_channel': ['This field is only valid for interactions.'],
                     'investment_project': ['This field is only valid for interactions.']
                 }
             ),
