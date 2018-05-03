@@ -5,6 +5,7 @@ import pytest
 from reversion.models import Version
 
 from datahub.core.audit import AuditViewSet
+from datahub.core.test_utils import MockQuerySet
 
 
 def test_audit_log_diff_algo():
@@ -63,24 +64,13 @@ def test_audit_log_pagination(num_versions, offset, limit, exp_results, exp_next
     assert [result['id'] for result in results] == list(exp_results)
 
 
-class _VersionQuerySetStub:
+class _VersionQuerySetStub(MockQuerySet):
     """VersionQuerySet stub."""
 
     def __init__(self, count):
         """Initialises the instance, creating some stub version instances to return as results."""
-        self.items = [MagicMock(id=n) for n in range(count)]
-
-    def __getitem__(self, item):
-        """Returns items from the fake data generated."""
-        return self.items[item]
-
-    def __len__(self):
-        """Returns the number of items generated."""
-        return len(self.items)
-
-    def count(self):
-        """Returns the number of items generated."""
-        return len(self.items)
+        items = [MagicMock(id=n) for n in range(count)]
+        super().__init__(items)
 
 
 def _create_get_for_object_stub(num_versions):

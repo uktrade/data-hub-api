@@ -176,3 +176,31 @@ def random_obj_for_model(model):
 def random_obj_for_queryset(queryset):
     """Returns a random object for a queryset."""
     return queryset.order_by('?').first()
+
+
+class MockQuerySet:
+    """Mock version of QuerySet that represents a fixed set of items."""
+
+    def __init__(self, items):
+        """Initialises the mock query set."""
+        self._items = items
+
+    def __getitem__(self, item):
+        """Returns an item."""
+        return self._items[item]
+
+    def __iter__(self):
+        """Returns an iterator over the query set items."""
+        return iter(self._items)
+
+    def __len__(self):
+        """Returns the number of items in the query set."""
+        return len(self._items)
+
+    def iterator(self, chunk_size=None):
+        """Returns an iterator over the query set items."""
+        return iter(self._items)
+
+    def count(self):
+        """Returns the number of items in the query set."""
+        return len(self._items)

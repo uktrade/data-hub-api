@@ -9,8 +9,6 @@ from datahub.core.utils import (
     join_truthy_strings, load_constants_to_database, slice_iterable_into_chunks
 )
 
-pytestmark = pytest.mark.django_db
-
 
 @pytest.mark.parametrize(
     'args,sep,res',
@@ -30,10 +28,10 @@ def test_join_truthy_strings(args, sep, res):
 
 def test_slice_iterable_into_chunks():
     """Test slice iterable into chunks."""
-    size = 10
-    iterable = range(100)
-    chunks = list(slice_iterable_into_chunks(iterable, size, lambda x: x))
-    assert len(chunks) == 10
+    size = 2
+    iterable = range(5)
+    chunks = list(slice_iterable_into_chunks(iterable, size))
+    assert chunks == [[0, 1], [2, 3], [4]]
 
 
 class _MetadataModelConstant(Enum):
@@ -43,6 +41,7 @@ class _MetadataModelConstant(Enum):
     object_5 = Constant('Object 5', '6ea0e2a2-0b2b-408c-a621-aff49f58496e')
 
 
+@pytest.mark.django_db
 def test_load_constants_to_database():
     """
     Test loading constants to the database.

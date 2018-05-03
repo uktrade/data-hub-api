@@ -9,16 +9,14 @@ def test_sync_model(monkeypatch):
     get_search_app_mock = Mock()
     monkeypatch.setattr('datahub.search.tasks.get_search_app', get_search_app_mock)
 
-    sync_dataset_mock = Mock()
-    monkeypatch.setattr('datahub.search.tasks.sync_dataset', sync_dataset_mock)
+    sync_app_mock = Mock()
+    monkeypatch.setattr('datahub.search.tasks.sync_app', sync_app_mock)
 
     search_app_path = SEARCH_APPS[0]
     sync_model.apply(args=(search_app_path,))
 
     get_search_app_mock.assert_called_once_with(search_app_path)
-    sync_dataset_mock.assert_called_once_with(
-        get_search_app_mock.return_value.get_dataset.return_value
-    )
+    sync_app_mock.assert_called_once_with(get_search_app_mock.return_value)
 
 
 def test_sync_all_models(monkeypatch):

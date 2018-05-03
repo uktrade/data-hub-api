@@ -13,7 +13,7 @@ class InteractionSearchApp(SearchApp):
     view = SearchInteractionAPIView
     export_view = SearchInteractionExportAPIView
     permission_required = (f'interaction.{InteractionPermission.read_all}',)
-    queryset = DBInteraction.objects.prefetch_related(
+    queryset = DBInteraction.objects.select_related(
         'company',
         'company__sector',
         'company__sector__parent',
