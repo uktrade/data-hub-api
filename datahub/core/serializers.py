@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from dateutil.parser import parse as dateutil_parse
 from django.apps import apps
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
@@ -126,6 +127,33 @@ class NestedRelatedField(serializers.RelatedField):
             )
             for item in queryset
         )
+
+
+class RelaxedDateTimeField(serializers.Field):
+    """
+    Relaxed DateTime field.
+
+    Front end uses free text field for data filters, that's why
+    we need to accept date/datetime in various different formats.
+    DRF DateTimeField doesn't offer that flexibility.
+    """
+
+    default_error_messages = {
+        'invalid': 'Date is in incorrect format.'
+    }
+
+    def to_internal_value(self, data):
+        """Parses data into datetime."""
+        try:
+            data = dateutil_parse(data)
+        except ValueError:
+            self.fail('invalid', value=data)
+        return data
+
+    def to_representation(self, value):
+        """Formats the datetime using a normal DateTimeField."""
+        repr_field = serializers.DateTimeField()
+        return repr_field.to_representation(value)
 
 
 class RelaxedURLField(serializers.URLField):
