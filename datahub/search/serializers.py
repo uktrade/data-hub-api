@@ -26,6 +26,11 @@ class RelaxedDateTimeField(serializers.Field):
             self.fail('invalid', value=data)
         return data
 
+    def to_representation(self, value):
+        """Formats the datetime using a normal DateTimeField."""
+        repr_field = serializers.DateTimeField()
+        return repr_field.to_representation(value)
+
 
 class SingleOrListField(serializers.ListField):
     """Field can be single instance or list."""
