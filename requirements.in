@@ -67,6 +67,7 @@ pydocstyle==2.1.1
 
 gunicorn==19.7.1
 gevent==1.2.2
+mohawk==0.3.4
 raven==6.6.0
 requests==2.18.4
 requests_toolbelt==0.8.0
