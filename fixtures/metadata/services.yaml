@@ -70,6 +70,13 @@
     contexts:
     - service_delivery
 - model: metadata.service
+  pk: ba6c666e-4ccd-4fdc-8209-2ab9aec6748c
+  fields:
+    disabled_on:
+    name: Policy feedback
+    contexts:
+    - policy_feedback
+- model: metadata.service
   pk: 44345a68-49fd-e311-8a2b-e4115bead28a
   fields:
     disabled_on: '2017-06-27T13:43:30.000003Z'
