@@ -9,13 +9,13 @@ from django.db.migrations import RunPython
 def load_service(apps, schema_editor):
     call_command(
         'loaddata',
-        PurePath(__file__).parent / '0004_add_policy_feedback_service.yaml'
+        PurePath(__file__).parent / '0008_add_policy_feedback_service.yaml'
     )
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('metadata', '0003_remove_sector_name_from_db'),
+        ('metadata', '0007_remove_role'),
     ]
 
     operations = [
