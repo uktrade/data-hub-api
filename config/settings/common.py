@@ -291,6 +291,14 @@ if REDIS_BASE_URL:
 # FRONTEND
 DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://localhost:3000')
 
+# DT07 reporting service (used for company timeline)
+REPORTING_SERVICE_API_URL = env('REPORTING_SERVICE_API_URL', default='')
+REPORTING_SERVICE_API_ID = env('REPORTING_SERVICE_API_ID', default='')
+REPORTING_SERVICE_API_KEY = env('REPORTING_SERVICE_API_KEY', default='')
+REPORTING_SERVICE_API_TIMEOUT = 15  # seconds
+# The company timeline API doesn't sign responses at present
+REPORTING_SERVICE_API_VERIFY_RESPONSES = False
+
 # OMIS
 
 # given to clients and generally available
