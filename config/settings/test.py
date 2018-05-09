@@ -22,6 +22,10 @@ ES_INDEX_SETTINGS = {
 DOCUMENT_BUCKET='test-bucket'
 AV_SERVICE_URL='http://av-service/'
 
+REPORTING_SERVICE_API_URL = 'http://company-timeline/'
+REPORTING_SERVICE_API_ID = 'company-timeline-api-id'
+REPORTING_SERVICE_API_KEY = 'company-timeline-api-key'
+
 OMIS_GENERIC_CONTACT_EMAIL = 'omis@example.com'
 OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL = ''
 OMIS_NOTIFICATION_ADMIN_EMAIL = 'fake-omis-admin@digital.trade.gov.uk'
