@@ -38,12 +38,12 @@ def stream_to_file_pointer(url, fp):
         fp.write(chunk)
 
 
-def slice_iterable_into_chunks(iterable, batch_size, obj_creator):
+def slice_iterable_into_chunks(iterable, batch_size):
     """Collect data into fixed-length chunks or blocks."""
     iterator = iter(iterable)
     while True:
         batch_iter = islice(iterator, batch_size)
-        objects = [obj_creator(row) for row in batch_iter]
+        objects = [row for row in batch_iter]
         if not objects:
             break
         yield objects

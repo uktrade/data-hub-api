@@ -12,16 +12,13 @@ class CompanySearchApp(SearchApp):
     view = SearchCompanyAPIView
     export_view = SearchCompanyExportAPIView
     permission_required = ('company.read_company',)
-    queryset = DBCompany.objects.prefetch_related(
+    queryset = DBCompany.objects.select_related(
         'account_manager',
         'archived_by',
         'business_type',
         'classification',
-        'contacts',
         'employee_range',
         'export_experience_category',
-        'export_to_countries',
-        'future_interest_countries',
         'headquarter_type',
         'one_list_account_owner',
         'parent',
