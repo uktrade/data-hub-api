@@ -4,8 +4,6 @@ from importlib import import_module
 from django.apps import AppConfig
 from django.conf import settings
 
-from .models import DataSet
-
 
 SEARCH_APPS = [
     'datahub.search.companieshousecompany.CompaniesHouseCompanySearchApp',
@@ -26,6 +24,7 @@ class SearchApp:
 
     name = None
     es_model = None
+    bulk_batch_size = 2000
     view = None
     export_view = None
     queryset = None
@@ -56,16 +55,6 @@ class SearchApp:
         signals_mod = import_module(self.mod_signals)
         for receiver in signals_mod.receivers:
             receiver.disconnect()
-
-    def get_queryset(self):
-        """Gets the queryset that will be synced with Elasticsearch."""
-        return self.queryset.order_by('pk')
-
-    def get_dataset(self):
-        """Returns dataset that will be synchronised with Elasticsearch."""
-        queryset = self.get_queryset()
-
-        return DataSet(queryset, self.es_model)
 
     def get_permission_filters(self, request):
         """

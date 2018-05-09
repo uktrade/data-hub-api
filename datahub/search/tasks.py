@@ -1,7 +1,7 @@
 from celery import shared_task
 
 from datahub.search.apps import get_search_app, SEARCH_APPS
-from datahub.search.bulk_sync import sync_dataset
+from datahub.search.bulk_sync import sync_app
 
 
 @shared_task(acks_late=True, priority=9)
@@ -29,4 +29,4 @@ def sync_model(search_app_cls_path):
     priority is set to the lowest priority (for Redis, 0 is the highest priority).
     """
     search_app = get_search_app(search_app_cls_path)
-    sync_dataset(search_app.get_dataset())
+    sync_app(search_app)

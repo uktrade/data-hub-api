@@ -11,13 +11,10 @@ class OrderSearchApp(SearchApp):
     es_model = Order
     view = SearchOrderAPIView
     permission_required = ('order.read_order',)
-    queryset = DBOrder.objects.prefetch_related(
+    queryset = DBOrder.objects.select_related(
         'company',
         'contact',
         'created_by',
         'primary_market',
         'sector',
-        'service_types',
-        'subscribers',
-        'assignees',
     )
