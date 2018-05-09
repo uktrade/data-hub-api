@@ -58,7 +58,6 @@ class AbandonPropositionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Proposition
         fields = (
-            'id',
             'reason_abandoned',
         )
 
