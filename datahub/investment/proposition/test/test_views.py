@@ -228,7 +228,12 @@ class TestGetProposition(APITestMixin):
                 'id': str(proposition.created_by.pk),
             },
             'abandoned_on': None,
-            'modified_by': None,
+            'modified_by': {
+                'first_name': proposition.modified_by.first_name,
+                'last_name': proposition.modified_by.last_name,
+                'name': proposition.modified_by.name,
+                'id': str(proposition.modified_by.pk),
+            },
             'completed_details': '',
             'completed_on': None,
         }
@@ -311,7 +316,6 @@ class TestCompleteProposition(APITestMixin):
 
         proposition.refresh_from_db()
         assert proposition.status == proposition_status
-        assert proposition.modified_by is None
         assert proposition.completed_on is None
 
 
@@ -392,5 +396,4 @@ class TestAbandonProposition(APITestMixin):
 
         proposition.refresh_from_db()
         assert proposition.status == proposition_status
-        assert proposition.modified_by is None
         assert proposition.abandoned_on is None

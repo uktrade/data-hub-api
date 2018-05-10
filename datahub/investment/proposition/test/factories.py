@@ -25,6 +25,7 @@ class PropositionFactory(factory.django.DjangoModelFactory):
 
     created_on = now()
     created_by = factory.SubFactory(AdviserFactory)
+    modified_by = factory.SubFactory(AdviserFactory)
 
     class Meta:
         model = Proposition

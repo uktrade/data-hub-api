@@ -1,5 +1,3 @@
-from operator import itemgetter
-
 import pytest
 import reversion
 from django.utils.timezone import now
@@ -15,7 +13,6 @@ from datahub.core.constants import (
 )
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
-from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 
 
@@ -191,8 +188,6 @@ class TestGetCompany(APITestMixin):
             'export_to_countries': [],
             'future_interest_countries': [],
             'headquarter_type': None,
-            'investment_projects_invested_in': [],
-            'investment_projects_invested_in_count': 0,
             'modified_on': format_date_or_datetime(company.modified_on),
             'one_list_account_owner': None,
             'global_headquarters': None,
@@ -279,49 +274,6 @@ class TestGetCompany(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['id'] == str(company.pk)
         assert response.data['uk_based'] is None
-
-    def test_get_company_investment_projects(self):
-        """Tests investment project properties in the company item view."""
-        company = CompanyFactory(
-            name='Foo ltd.',
-            registered_address_1='Hello st.',
-            registered_address_town='Fooland',
-            registered_address_country_id=Country.united_states.value.id,
-            headquarter_type_id=HeadquarterType.ukhq.value.id,
-            classification_id=CompanyClassification.tier_a.value.id,
-        )
-        projects = InvestmentProjectFactory.create_batch(
-            3, investor_company_id=company.id
-        )
-        InvestmentProjectFactory.create_batch(
-            2, intermediate_company_id=company.id
-        )
-
-        url = reverse('api-v3:company:item', kwargs={'pk': company.id})
-        response = self.api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['id'] == str(company.pk)
-        actual_projects = sorted(
-            response_data['investment_projects_invested_in'],
-            key=itemgetter('id')
-        )
-        expected_projects = sorted(({
-            'id': str(projects[0].id),
-            'name': projects[0].name,
-            'project_code': projects[0].project_code
-        }, {
-            'id': str(projects[1].id),
-            'name': projects[1].name,
-            'project_code': projects[1].project_code
-        }, {
-            'id': str(projects[2].id),
-            'name': projects[2].name,
-            'project_code': projects[2].project_code
-        }), key=itemgetter('id'))
-
-        assert actual_projects == expected_projects
 
     @pytest.mark.parametrize(
         'input_website,expected_website', (

@@ -1,17 +1,14 @@
 from rest_framework import serializers
 
 from datahub.company.serializers import NestedAdviserField
-from datahub.core.serializers import NestedRelatedField
 from datahub.investment.proposition.models import Proposition
+from datahub.investment.serializers import NestedInvestmentProjectField
 
 
 class CreatePropositionSerializer(serializers.ModelSerializer):
     """Proposition serialiser for create endpoint."""
 
-    investment_project = NestedRelatedField(
-        'investment.InvestmentProject',
-        extra_fields=('name', 'project_code')
-    )
+    investment_project = NestedInvestmentProjectField()
     adviser = NestedAdviserField()
 
     deadline = serializers.DateField()
@@ -73,10 +70,7 @@ class AbandonPropositionSerializer(serializers.ModelSerializer):
 class PropositionSerializer(serializers.ModelSerializer):
     """Proposition serialiser for view only endpoints."""
 
-    investment_project = NestedRelatedField(
-        'investment.InvestmentProject',
-        extra_fields=('name', 'project_code')
-    )
+    investment_project = NestedInvestmentProjectField()
     adviser = NestedAdviserField()
     deadline = serializers.DateField()
     name = serializers.CharField()

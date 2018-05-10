@@ -2,9 +2,9 @@ from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOr
 from rest_framework import status
 from rest_framework.response import Response
 
+from datahub.core.exceptions import APIConflictException
 from datahub.core.throttling import PathRateThrottle
 from datahub.oauth.scopes import Scope
-from datahub.omis.core.exceptions import Conflict
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.models import Order
 from datahub.omis.order.views import BaseNestedOrderViewSet
@@ -107,7 +107,7 @@ class PublicPaymentGatewaySessionViewSet(BaseNestedOrderViewSet):
 
     def create(self, request, *args, **kwargs):
         """
-        Same as the DRF create but it catches the Conflict exception and
+        Same as the DRF create but it catches the APIConflictException exception and
         builds a 409 response from it so that DRF does not roll back the transaction
         and therefore losing the potential database changes that we want to keep.
 
@@ -116,5 +116,5 @@ class PublicPaymentGatewaySessionViewSet(BaseNestedOrderViewSet):
         """
         try:
             return super().create(request, *args, **kwargs)
-        except Conflict as exc:
+        except APIConflictException as exc:
             return Response({'detail': exc.detail}, status=exc.status_code)

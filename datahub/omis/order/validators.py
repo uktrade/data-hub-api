@@ -4,9 +4,9 @@ from django.db import models
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
 
+from datahub.core.exceptions import APIConflictException
 from datahub.core.validate_utils import DataCombiner
 from datahub.core.validators import AbstractRule, BaseRule
-from datahub.omis.core.exceptions import Conflict
 from .constants import OrderStatus, VATStatus
 
 
@@ -268,7 +268,7 @@ class NoOtherActiveQuoteExistsValidator:
     def __call__(self, data=None):
         """Validate that no other active quote exists."""
         if self.instance.quote and not self.instance.quote.is_cancelled():
-            raise Conflict(self.message)
+            raise APIConflictException(self.message)
 
 
 class OrderInStatusValidator:
@@ -311,7 +311,7 @@ class OrderInStatusValidator:
             return  # all fine
 
         if self.instance.status not in self.allowed_statuses:
-            raise Conflict(
+            raise APIConflictException(
                 self.message.format(self.instance.get_status_display())
             )
 
