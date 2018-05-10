@@ -6,9 +6,9 @@ from django.conf import settings
 from django.db import models
 from django.utils.timezone import now
 
+from datahub.core.exceptions import APIConflictException
 from datahub.core.models import BaseModel
 from datahub.investment.proposition.constants import PropositionStatus
-from datahub.investment.proposition.exceptions import Conflict
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -49,7 +49,7 @@ class Proposition(BaseModel):
         :param details: details of completion
         """
         if self.status != PropositionStatus.ongoing:
-            raise Conflict(
+            raise APIConflictException(
                 f'The action cannot be performed in the current status {self.status}.'
             )
         self.status = PropositionStatus.completed
@@ -66,7 +66,7 @@ class Proposition(BaseModel):
         :param reason: reason of abandonment
         """
         if self.status != PropositionStatus.ongoing:
-            raise Conflict(
+            raise APIConflictException(
                 f'The action cannot be performed in the current status {self.status}.'
             )
         self.status = PropositionStatus.abandoned

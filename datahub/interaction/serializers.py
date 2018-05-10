@@ -11,7 +11,7 @@ from datahub.core.validators import (
     EqualsRule, InRule, OperatorRule, RulesBasedValidator, ValidationRule
 )
 from datahub.event.models import Event
-from datahub.investment.models import InvestmentProject
+from datahub.investment.serializers import NestedInvestmentProjectField
 from datahub.metadata.models import Service, Team
 from .models import (CommunicationChannel, Interaction, PolicyArea, PolicyIssueType,
                      ServiceDeliveryStatus)
@@ -49,9 +49,7 @@ class InteractionSerializer(serializers.ModelSerializer):
     )
     is_event = serializers.NullBooleanField(required=False)
     event = NestedRelatedField(Event, required=False, allow_null=True)
-    investment_project = NestedRelatedField(
-        InvestmentProject, required=False, allow_null=True, extra_fields=('name', 'project_code')
-    )
+    investment_project = NestedInvestmentProjectField(required=False, allow_null=True)
     modified_by = NestedAdviserField(read_only=True)
     service = NestedRelatedField(Service)
     service_delivery_status = NestedRelatedField(
