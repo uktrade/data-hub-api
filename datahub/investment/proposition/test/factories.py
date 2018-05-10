@@ -1,5 +1,4 @@
 import uuid
-from datetime import date
 
 import factory
 from django.utils.timezone import now
@@ -18,7 +17,7 @@ class PropositionFactory(factory.django.DjangoModelFactory):
     investment_project = factory.SubFactory(InvestmentProjectFactory)
     adviser = factory.SubFactory(AdviserFactory)
 
-    deadline = date(2018, 5, 20)
+    deadline = factory.Faker('future_date')
     status = PropositionStatus.ongoing
 
     name = factory.Sequence(lambda n: f'name {n}')

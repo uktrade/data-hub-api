@@ -81,8 +81,7 @@ class PropositionSerializer(serializers.ModelSerializer):
     deadline = serializers.DateField()
     name = serializers.CharField()
     created_by = NestedAdviserField()
-    abandoned_by = NestedAdviserField()
-    completed_by = NestedAdviserField()
+    modified_by = NestedAdviserField()
 
     class Meta:
         model = Proposition
@@ -97,10 +96,9 @@ class PropositionSerializer(serializers.ModelSerializer):
             'reason_abandoned',
             'created_on',
             'created_by',
+            'modified_by',
             'abandoned_on',
-            'abandoned_by',
             'completed_details',
             'completed_on',
-            'completed_by',
         )
         read_only_fields = fields

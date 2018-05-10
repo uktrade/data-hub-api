@@ -27,8 +27,8 @@ class PropositionViewSet(CoreViewSet):
     queryset = Proposition.objects.select_related(
         'investment_project',
         'adviser',
-        'abandoned_by',
-        'completed_by',
+        'created_by',
+        'modified_by',
     )
     filter_backends = (
         DjangoFilterBackend,

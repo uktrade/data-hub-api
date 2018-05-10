@@ -21,7 +21,7 @@ proposition_abandon = PropositionViewSet.as_view({
     'post': 'abandon',
 })
 
-public_urls = [
+urlpatterns = [
     path('proposition', proposition_collection, name='collection'),
     path('proposition/<uuid:pk>', proposition_item, name='item'),
     path('proposition/<uuid:pk>/complete', proposition_complete, name='complete'),
