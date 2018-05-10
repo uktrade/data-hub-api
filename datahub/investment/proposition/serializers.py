@@ -11,11 +11,6 @@ class CreatePropositionSerializer(serializers.ModelSerializer):
     investment_project = NestedInvestmentProjectField()
     adviser = NestedAdviserField()
 
-    deadline = serializers.DateField()
-
-    name = serializers.CharField()
-    scope = serializers.CharField()
-
     class Meta:
         model = Proposition
         fields = (
@@ -25,44 +20,38 @@ class CreatePropositionSerializer(serializers.ModelSerializer):
             'name',
             'scope',
         )
+        extra_kwargs = {
+            'deadline': {'required': True},
+            'name': {'required': True},
+            'scope': {'required': True}
+        }
 
 
-class CompletePropositionSerializer(serializers.ModelSerializer):
-    """Proposition serialiser for complete endpoint."""
-
-    completed_details = serializers.CharField()
+class CompleteOrAbandonPropositionSerializer(serializers.ModelSerializer):
+    """Proposition serialiser for complete and abandon endpoint."""
 
     class Meta:
         model = Proposition
         fields = (
-            'completed_details',
+            'details',
         )
+        extra_kwargs = {
+            'details': {'required': True},
+        }
 
     def complete(self):
         """Complete a proposition."""
         self.instance.complete(
             by=self.context['current_user'],
-            details=self.validated_data['completed_details']
+            details=self.validated_data['details']
         )
         return self.instance
-
-
-class AbandonPropositionSerializer(serializers.ModelSerializer):
-    """Proposition serialiser for abandon endpoint."""
-
-    reason_abandoned = serializers.CharField()
-
-    class Meta:
-        model = Proposition
-        fields = (
-            'reason_abandoned',
-        )
 
     def abandon(self):
         """Abandon a proposition."""
         self.instance.abandon(
             by=self.context['current_user'],
-            reason=self.validated_data['reason_abandoned']
+            details=self.validated_data['details']
         )
         return self.instance
 
@@ -72,8 +61,6 @@ class PropositionSerializer(serializers.ModelSerializer):
 
     investment_project = NestedInvestmentProjectField()
     adviser = NestedAdviserField()
-    deadline = serializers.DateField()
-    name = serializers.CharField()
     created_by = NestedAdviserField()
     modified_by = NestedAdviserField()
 
@@ -87,12 +74,10 @@ class PropositionSerializer(serializers.ModelSerializer):
             'status',
             'name',
             'scope',
-            'reason_abandoned',
+            'details',
             'created_on',
             'created_by',
+            'modified_on',
             'modified_by',
-            'abandoned_on',
-            'completed_details',
-            'completed_on',
         )
         read_only_fields = fields

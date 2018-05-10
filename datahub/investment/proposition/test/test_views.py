@@ -50,7 +50,7 @@ class TestCreateProposition(APITestMixin):
             'status': 'ongoing',
             'name': 'My proposition.',
             'scope': 'Very broad scope.',
-            'reason_abandoned': '',
+            'details': '',
             'created_on': instance.created_on.isoformat().replace('+00:00', 'Z'),
             'created_by': {
                 'first_name': instance.created_by.first_name,
@@ -59,14 +59,12 @@ class TestCreateProposition(APITestMixin):
                 'id': str(instance.created_by.pk),
             },
             'modified_by': {
-                'first_name': instance.created_by.first_name,
-                'last_name': instance.created_by.last_name,
-                'name': instance.created_by.name,
-                'id': str(instance.created_by.pk),
+                'first_name': instance.modified_by.first_name,
+                'last_name': instance.modified_by.last_name,
+                'name': instance.modified_by.name,
+                'id': str(instance.modified_by.pk),
             },
-            'abandoned_on': None,
-            'completed_details': '',
-            'completed_on': None,
+            'modified_on': instance.modified_on.isoformat().replace('+00:00', 'Z'),
         }
 
     def test_cannot_created_with_fields_missing(self):
@@ -219,7 +217,7 @@ class TestGetProposition(APITestMixin):
             'status': 'ongoing',
             'name': proposition.name,
             'scope': proposition.scope,
-            'reason_abandoned': '',
+            'details': '',
             'created_on': proposition.created_on.isoformat().replace('+00:00', 'Z'),
             'created_by': {
                 'first_name': proposition.created_by.first_name,
@@ -227,15 +225,13 @@ class TestGetProposition(APITestMixin):
                 'name': proposition.created_by.name,
                 'id': str(proposition.created_by.pk),
             },
-            'abandoned_on': None,
+            'modified_on': proposition.modified_on.isoformat().replace('+00:00', 'Z'),
             'modified_by': {
                 'first_name': proposition.modified_by.first_name,
                 'last_name': proposition.modified_by.last_name,
                 'name': proposition.modified_by.name,
                 'id': str(proposition.modified_by.pk),
             },
-            'completed_details': '',
-            'completed_on': None,
         }
 
 
@@ -250,7 +246,7 @@ class TestCompleteProposition(APITestMixin):
         response = self.api_client.post(
             url,
             {
-                'completed_details': 'All done 100% satisfaction.',
+                'details': 'All done 100% satisfaction.',
             },
             format='json',
         )
@@ -274,7 +270,6 @@ class TestCompleteProposition(APITestMixin):
             'status': 'completed',
             'name': proposition.name,
             'scope': proposition.scope,
-            'reason_abandoned': '',
             'created_on': proposition.created_on.isoformat().replace('+00:00', 'Z'),
             'created_by': {
                 'first_name': proposition.created_by.first_name,
@@ -282,9 +277,8 @@ class TestCompleteProposition(APITestMixin):
                 'name': proposition.created_by.name,
                 'id': str(proposition.created_by.pk),
             },
-            'abandoned_on': None,
-            'completed_details': 'All done 100% satisfaction.',
-            'completed_on': proposition.completed_on.isoformat().replace('+00:00', 'Z'),
+            'details': 'All done 100% satisfaction.',
+            'modified_on': proposition.modified_on.isoformat().replace('+00:00', 'Z'),
             'modified_by': {
                 'first_name': proposition.modified_by.first_name,
                 'last_name': proposition.modified_by.last_name,
@@ -305,7 +299,7 @@ class TestCompleteProposition(APITestMixin):
         response = self.api_client.post(
             url,
             {
-                'completed_details': 'All done 100% satisfaction.',
+                'details': 'All done 100% satisfaction.',
             },
             format='json',
         )
@@ -316,7 +310,7 @@ class TestCompleteProposition(APITestMixin):
 
         proposition.refresh_from_db()
         assert proposition.status == proposition_status
-        assert proposition.completed_on is None
+        assert proposition.details == ''
 
 
 class TestAbandonProposition(APITestMixin):
@@ -330,7 +324,7 @@ class TestAbandonProposition(APITestMixin):
         response = self.api_client.post(
             url,
             {
-                'reason_abandoned': 'Not enough information.',
+                'details': 'Not enough information.',
             },
             format='json',
         )
@@ -354,7 +348,6 @@ class TestAbandonProposition(APITestMixin):
             'status': 'abandoned',
             'name': proposition.name,
             'scope': proposition.scope,
-            'reason_abandoned': proposition.reason_abandoned,
             'created_on': proposition.created_on.isoformat().replace('+00:00', 'Z'),
             'created_by': {
                 'first_name': proposition.created_by.first_name,
@@ -362,15 +355,14 @@ class TestAbandonProposition(APITestMixin):
                 'name': proposition.created_by.name,
                 'id': str(proposition.created_by.pk),
             },
-            'abandoned_on': proposition.abandoned_on.isoformat().replace('+00:00', 'Z'),
+            'details': proposition.details,
+            'modified_on': proposition.modified_on.isoformat().replace('+00:00', 'Z'),
             'modified_by': {
                 'first_name': proposition.modified_by.first_name,
                 'last_name': proposition.modified_by.last_name,
                 'name': proposition.modified_by.name,
                 'id': str(proposition.modified_by.pk),
             },
-            'completed_details': '',
-            'completed_on': None,
         }
 
     @pytest.mark.parametrize(
@@ -385,7 +377,7 @@ class TestAbandonProposition(APITestMixin):
         response = self.api_client.post(
             url,
             {
-                'reason_abandoned': 'Too many cats.',
+                'details': 'Too many cats.',
             },
             format='json',
         )
@@ -396,4 +388,4 @@ class TestAbandonProposition(APITestMixin):
 
         proposition.refresh_from_db()
         assert proposition.status == proposition_status
-        assert proposition.abandoned_on is None
+        assert proposition.details == ''

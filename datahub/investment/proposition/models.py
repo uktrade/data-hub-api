@@ -23,23 +23,31 @@ class Proposition(BaseModel):
     adviser = models.ForeignKey(
         'company.Advisor', on_delete=models.CASCADE, related_name='+'
     )
-    deadline = models.DateField(blank=True, null=True)
+    deadline = models.DateField()
     status = models.CharField(
         max_length=MAX_LENGTH, choices=PropositionStatus, default=PropositionStatus.ongoing
     )
 
     name = models.CharField(max_length=MAX_LENGTH)
-    scope = models.TextField(blank=True)
+    scope = models.TextField()
 
-    reason_abandoned = models.TextField(blank=True)
-    abandoned_on = models.DateTimeField(blank=True, null=True)
-
-    completed_details = models.TextField(blank=True)
-    completed_on = models.DateTimeField(blank=True, null=True)
+    details = models.TextField()
 
     def __str__(self):
         """Human readable representation of the object."""
         return self.name
+
+    def _change_status(self, status, by, details):
+        """Change status of a proposition."""
+        if self.status != PropositionStatus.ongoing:
+            raise APIConflictException(
+                f'The action cannot be performed in the current status {self.status}.'
+            )
+        self.status = status
+        self.modified_by = by
+        self.modified_on = now()
+        self.details = details
+        self.save()
 
     def complete(self, by, details):
         """
@@ -48,29 +56,13 @@ class Proposition(BaseModel):
         :param by: the adviser who marked the proposition as complete
         :param details: details of completion
         """
-        if self.status != PropositionStatus.ongoing:
-            raise APIConflictException(
-                f'The action cannot be performed in the current status {self.status}.'
-            )
-        self.status = PropositionStatus.completed
-        self.modified_by = by
-        self.completed_on = now()
-        self.completed_details = details
-        self.save()
+        self._change_status(PropositionStatus.completed, by, details)
 
-    def abandon(self, by, reason):
+    def abandon(self, by, details):
         """
         Abandon a proposition
 
         :param by: the adviser who marked the proposition as abandoned
-        :param reason: reason of abandonment
+        :param details: reason of abandonment
         """
-        if self.status != PropositionStatus.ongoing:
-            raise APIConflictException(
-                f'The action cannot be performed in the current status {self.status}.'
-            )
-        self.status = PropositionStatus.abandoned
-        self.modified_by = by
-        self.abandoned_on = now()
-        self.reason_abandoned = reason
-        self.save()
+        self._change_status(PropositionStatus.abandoned, by, details)

@@ -6,10 +6,10 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 
 from datahub.core.viewsets import CoreViewSet
+from datahub.core.exceptions import APIBadRequestException
 from datahub.investment.proposition.models import Proposition
 from datahub.investment.proposition.serializers import (
-    AbandonPropositionSerializer,
-    CompletePropositionSerializer,
+    CompleteOrAbandonPropositionSerializer,
     CreatePropositionSerializer,
     PropositionSerializer
 )
@@ -49,37 +49,32 @@ class PropositionViewSet(CoreViewSet):
             status=status.HTTP_201_CREATED
         )
 
-    def complete(self, request, *args, **kwargs):
+    def _action(self, method, request, *args, **kwargs):
         """Completes proposition."""
+        if method not in ('abandon', 'complete'):
+            raise APIBadRequestException()
+
         instance = self.get_object()
 
-        serializer = CompletePropositionSerializer(
+        serializer = CompleteOrAbandonPropositionSerializer(
             instance,
             data=request.data,
             context=self.get_serializer_context(),
         )
         serializer.is_valid(raise_exception=True)
-        instance = serializer.complete()
+        instance = getattr(serializer, method)()
         return Response(
             self.get_serializer(instance=instance).data,
             status=status.HTTP_200_OK
         )
+
+    def complete(self, request, *args, **kwargs):
+        """Completes proposition."""
+        return self._action('complete', request, *args, **kwargs)
 
     def abandon(self, request, *args, **kwargs):
         """Abandons proposition."""
-        instance = self.get_object()
-
-        serializer = AbandonPropositionSerializer(
-            instance,
-            data=request.data,
-            context=self.get_serializer_context(),
-        )
-        serializer.is_valid(raise_exception=True)
-        instance = serializer.abandon()
-        return Response(
-            self.get_serializer(instance=instance).data,
-            status=status.HTTP_200_OK
-        )
+        return self._action('abandon', request, *args, **kwargs)
 
     def get_serializer_context(self):
         """Extra context provided to the serializer class."""
