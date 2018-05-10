@@ -1,5 +1,3 @@
-from uuid import UUID
-
 import factory
 import pytest
 from rest_framework import status
@@ -13,7 +11,7 @@ from .factories import PropositionFactory
 
 
 class TestCreateProposition(APITestMixin):
-    """Base tests for the create proposition view."""
+    """Tests for the create proposition view."""
 
     def test_can_create_proposition(self):
         """Test creating proposition."""
@@ -34,7 +32,7 @@ class TestCreateProposition(APITestMixin):
         )
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
-        instance = Proposition.objects.get(pk=UUID(response_data['id']))
+        instance = Proposition.objects.get(pk=response_data['id'])
         assert response_data == {
             'id': str(instance.pk),
             'investment_project': {
@@ -60,22 +58,21 @@ class TestCreateProposition(APITestMixin):
                 'name': instance.created_by.name,
                 'id': str(instance.created_by.pk),
             },
+            'modified_by': {
+                'first_name': instance.created_by.first_name,
+                'last_name': instance.created_by.last_name,
+                'name': instance.created_by.name,
+                'id': str(instance.created_by.pk),
+            },
             'abandoned_on': None,
-            'abandoned_by': None,
             'completed_details': '',
             'completed_on': None,
-            'completed_by': None
         }
 
     def test_cannot_created_with_fields_missing(self):
         """Test that proposition cannot be created without required fields."""
         url = reverse('api-v3:investment:proposition:collection')
-        response = self.api_client.post(
-            url,
-            {
-            },
-            format='json',
-        )
+        response = self.api_client.post(url, {}, format='json')
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -87,29 +84,9 @@ class TestCreateProposition(APITestMixin):
             'scope': ['This field is required.'],
         }
 
-    def test_deadline_validation(self):
-        """Test validation when an invalid date is provided."""
-        adviser = AdviserFactory()
-        investment_project = InvestmentProjectFactory()
-
-        url = reverse('api-v3:investment:proposition:collection')
-        response = self.api_client.post(url, {
-            'investment_project': investment_project.pk,
-            'name': 'My proposition.',
-            'scope': 'Very broad scope.',
-            'adviser': adviser.pk,
-            'deadline': 'abcd-de-fe',
-        }, format='json')
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        response_data = response.json()
-        assert response_data['deadline'] == [
-            'Date has wrong format. Use one of these formats instead: YYYY[-MM[-DD]].'
-        ]
-
 
 class TestUpdateProposition(APITestMixin):
-    """Base tests for the update proposition view."""
+    """Tests for the update proposition view."""
 
     @pytest.mark.parametrize(
         'method', ('put', 'patch',),
@@ -207,7 +184,7 @@ class TestListPropositions(APITestMixin):
 
 
 class TestGetProposition(APITestMixin):
-    """Base tests for get proposition view."""
+    """Tests for get proposition view."""
 
     def test_fails_without_permissions(self, api_client):
         """Should return 403"""
@@ -238,7 +215,7 @@ class TestGetProposition(APITestMixin):
                 'name': proposition.adviser.name,
                 'id': str(proposition.adviser.pk)
             },
-            'deadline': '2018-05-20',
+            'deadline': proposition.deadline.isoformat(),
             'status': 'ongoing',
             'name': proposition.name,
             'scope': proposition.scope,
@@ -251,15 +228,14 @@ class TestGetProposition(APITestMixin):
                 'id': str(proposition.created_by.pk),
             },
             'abandoned_on': None,
-            'abandoned_by': None,
+            'modified_by': None,
             'completed_details': '',
             'completed_on': None,
-            'completed_by': None,
         }
 
 
 class TestCompleteProposition(APITestMixin):
-    """Base tests for the complete proposition view."""
+    """Tests for the complete proposition view."""
 
     def test_can_complete_proposition(self):
         """Test completing proposition."""
@@ -289,7 +265,7 @@ class TestCompleteProposition(APITestMixin):
                 'name': proposition.adviser.name,
                 'id': str(proposition.adviser.pk)
             },
-            'deadline': '2018-05-20',
+            'deadline': proposition.deadline.isoformat(),
             'status': 'completed',
             'name': proposition.name,
             'scope': proposition.scope,
@@ -302,14 +278,13 @@ class TestCompleteProposition(APITestMixin):
                 'id': str(proposition.created_by.pk),
             },
             'abandoned_on': None,
-            'abandoned_by': None,
             'completed_details': 'All done 100% satisfaction.',
             'completed_on': proposition.completed_on.isoformat().replace('+00:00', 'Z'),
-            'completed_by': {
-                'first_name': proposition.completed_by.first_name,
-                'last_name': proposition.completed_by.last_name,
-                'name': proposition.completed_by.name,
-                'id': str(proposition.completed_by.pk),
+            'modified_by': {
+                'first_name': proposition.modified_by.first_name,
+                'last_name': proposition.modified_by.last_name,
+                'name': proposition.modified_by.name,
+                'id': str(proposition.modified_by.pk),
             }
         }
 
@@ -336,12 +311,12 @@ class TestCompleteProposition(APITestMixin):
 
         proposition.refresh_from_db()
         assert proposition.status == proposition_status
-        assert proposition.completed_by is None
+        assert proposition.modified_by is None
         assert proposition.completed_on is None
 
 
 class TestAbandonProposition(APITestMixin):
-    """Base tests for the abandon proposition view."""
+    """Tests for the abandon proposition view."""
 
     def test_can_abandon_proposition(self):
         """Test abandoning proposition."""
@@ -371,7 +346,7 @@ class TestAbandonProposition(APITestMixin):
                 'name': proposition.adviser.name,
                 'id': str(proposition.adviser.pk)
             },
-            'deadline': '2018-05-20',
+            'deadline': proposition.deadline.isoformat(),
             'status': 'abandoned',
             'name': proposition.name,
             'scope': proposition.scope,
@@ -384,15 +359,14 @@ class TestAbandonProposition(APITestMixin):
                 'id': str(proposition.created_by.pk),
             },
             'abandoned_on': proposition.abandoned_on.isoformat().replace('+00:00', 'Z'),
-            'abandoned_by': {
-                'first_name': proposition.abandoned_by.first_name,
-                'last_name': proposition.abandoned_by.last_name,
-                'name': proposition.abandoned_by.name,
-                'id': str(proposition.abandoned_by.pk),
+            'modified_by': {
+                'first_name': proposition.modified_by.first_name,
+                'last_name': proposition.modified_by.last_name,
+                'name': proposition.modified_by.name,
+                'id': str(proposition.modified_by.pk),
             },
             'completed_details': '',
             'completed_on': None,
-            'completed_by': None,
         }
 
     @pytest.mark.parametrize(
@@ -418,5 +392,5 @@ class TestAbandonProposition(APITestMixin):
 
         proposition.refresh_from_db()
         assert proposition.status == proposition_status
-        assert proposition.abandoned_by is None
+        assert proposition.modified_by is None
         assert proposition.abandoned_on is None

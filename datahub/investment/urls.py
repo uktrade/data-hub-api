@@ -2,7 +2,7 @@
 
 from django.urls import include, path
 
-from datahub.investment.proposition import urls as proposition_urls
+from datahub.investment.proposition.urls import urlpatterns as proposition_urlpatterns
 from datahub.investment.views import (
     IProjectAuditViewSet, IProjectDocumentViewSet, IProjectModifiedSinceViewSet,
     IProjectTeamMembersViewSet, IProjectViewSet
@@ -82,7 +82,7 @@ urlpatterns = [
     path(
         'investment/',
         include(
-            (proposition_urls.public_urls, 'proposition',),
+            (proposition_urlpatterns, 'proposition',),
             namespace='proposition'
         )
     ),
