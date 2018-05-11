@@ -66,7 +66,7 @@ class PropositionViewSet(CoreViewSet):
         )
 
     def _action(self, method, request, *args, **kwargs):
-        """Completes proposition."""
+        """Invokes action for a proposition."""
         if method not in ('abandon', 'complete'):
             raise APIBadRequestException()
 
