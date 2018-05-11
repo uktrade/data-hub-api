@@ -594,39 +594,44 @@
   fields:
     name: Superb prospect
     scope: Everything
+    deadline: 2020-10-01
     adviser: 5a644146-5298-4741-91f3-d5d7558adf47
     created_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
     created_on: '2017-06-15T12:00:00Z'
     investment_project: 18750b26-a8c3-41b2-8d3a-fb0b930c2270
     status: ongoing
+    modified_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
+    modified_on: '2017-06-15T12:00:00Z'
 
 - model: proposition.proposition
   pk: 45eef900-bd85-4679-824b-a74369cb6f18
   fields:
     name: List of cities
     scope: Parks
+    deadline: 2020-10-01
     adviser: 5a644146-5298-4741-91f3-d5d7558adf47
     created_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
     created_on: '2017-06-15T14:00:00Z'
     investment_project: 18750b26-a8c3-41b2-8d3a-fb0b930c2270
     status: abandoned
-    reason_abandoned: Initial scope was wrong.
-    abandoned_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
-    abandoned_on: '2017-06-15T14:30:00Z'
+    details: Initial scope was wrong.
+    modified_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
+    modified_on: '2017-06-15T14:30:00Z'
 
 - model: proposition.proposition
   pk: 3322750d-a645-4460-b584-8f9254459246
   fields:
     name: List of cities
     scope: Parks and unemployment
+    deadline: 2020-10-01
     adviser: 5a644146-5298-4741-91f3-d5d7558adf47
     created_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
     created_on: '2017-06-15T15:00:00Z'
     investment_project: 18750b26-a8c3-41b2-8d3a-fb0b930c2270
     status: completed
-    completed_details: Provided all materials.
-    completed_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
-    completed_on: '2017-06-15T16:00:00Z'
+    details: Provided all materials.
+    modified_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
+    modified_on: '2017-06-15T16:00:00Z'
 
 - model: investment.investmentprojectteammember
   pk: 1
