@@ -28,7 +28,7 @@ class TestCreateProposition(APITestMixin):
             {
                 'name': 'My proposition.',
                 'scope': 'Very broad scope.',
-                'adviser': adviser.pk,
+                'assigned_to': adviser.pk,
                 'deadline': '2018-02-10',
             },
             format='json',
@@ -45,7 +45,7 @@ class TestCreateProposition(APITestMixin):
                 'project_code': investment_project.project_code,
                 'id': str(investment_project.pk),
             },
-            'adviser': {
+            'assigned_to': {
                 'first_name': adviser.first_name,
                 'last_name': adviser.last_name,
                 'name': adviser.name,
@@ -84,7 +84,7 @@ class TestCreateProposition(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'adviser': ['This field is required.'],
+            'assigned_to': ['This field is required.'],
             'deadline': ['This field is required.'],
             'name': ['This field is required.'],
             'scope': ['This field is required.'],
@@ -148,7 +148,7 @@ class TestListPropositions(APITestMixin):
         assert actual_ids == expected_ids
 
     def test_filtered_by_adviser(self):
-        """List of propositions filtered by adviser."""
+        """List of propositions filtered by assigned adviser."""
         adviser = AdviserFactory()
         investment_project = InvestmentProjectFactory()
 
@@ -157,7 +157,7 @@ class TestListPropositions(APITestMixin):
         )
         propositions = PropositionFactory.create_batch(
             3,
-            adviser=adviser,
+            assigned_to=adviser,
             investment_project=investment_project,
         )
 
@@ -165,7 +165,7 @@ class TestListPropositions(APITestMixin):
             'project_pk': investment_project.pk,
         })
         response = self.api_client.get(url, {
-            'adviser_id': adviser.id
+            'assigned_to_id': adviser.id
         })
 
         assert response.status_code == status.HTTP_200_OK
@@ -242,11 +242,11 @@ class TestGetProposition(APITestMixin):
                 'project_code': proposition.investment_project.project_code,
                 'id': str(proposition.investment_project.pk),
             },
-            'adviser': {
-                'first_name': proposition.adviser.first_name,
-                'last_name': proposition.adviser.last_name,
-                'name': proposition.adviser.name,
-                'id': str(proposition.adviser.pk)
+            'assigned_to': {
+                'first_name': proposition.assigned_to.first_name,
+                'last_name': proposition.assigned_to.last_name,
+                'name': proposition.assigned_to.name,
+                'id': str(proposition.assigned_to.pk)
             },
             'deadline': proposition.deadline.isoformat(),
             'status': PropositionStatus.ongoing,
@@ -301,11 +301,11 @@ class TestCompleteProposition(APITestMixin):
                 'project_code': proposition.investment_project.project_code,
                 'id': str(proposition.investment_project.pk)
             },
-            'adviser': {
-                'first_name': proposition.adviser.first_name,
-                'last_name': proposition.adviser.last_name,
-                'name': proposition.adviser.name,
-                'id': str(proposition.adviser.pk)
+            'assigned_to': {
+                'first_name': proposition.assigned_to.first_name,
+                'last_name': proposition.assigned_to.last_name,
+                'name': proposition.assigned_to.name,
+                'id': str(proposition.assigned_to.pk)
             },
             'deadline': proposition.deadline.isoformat(),
             'status': PropositionStatus.completed,
@@ -410,11 +410,11 @@ class TestAbandonProposition(APITestMixin):
                 'project_code': proposition.investment_project.project_code,
                 'id': str(proposition.investment_project.pk),
             },
-            'adviser': {
-                'first_name': proposition.adviser.first_name,
-                'last_name': proposition.adviser.last_name,
-                'name': proposition.adviser.name,
-                'id': str(proposition.adviser.pk)
+            'assigned_to': {
+                'first_name': proposition.assigned_to.first_name,
+                'last_name': proposition.assigned_to.last_name,
+                'name': proposition.assigned_to.name,
+                'id': str(proposition.assigned_to.pk)
             },
             'deadline': proposition.deadline.isoformat(),
             'status': PropositionStatus.abandoned,
