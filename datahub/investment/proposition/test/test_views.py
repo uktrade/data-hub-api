@@ -6,7 +6,7 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 from datahub.investment.proposition.constants import PropositionStatus
-from datahub.investment.proposition.models import Proposition
+from datahub.investment.proposition.models import Proposition, PropositionPermission
 from datahub.investment.test.factories import InvestmentProjectFactory
 from .factories import PropositionFactory
 
@@ -277,7 +277,7 @@ class TestCompleteProposition(APITestMixin):
         """Test completing proposition."""
         proposition = PropositionFactory()
 
-        user = create_test_user()
+        user = create_test_user(permission_codenames=[PropositionPermission.change_all])
         api_client = self.create_api_client(user=user)
         url = reverse('api-v3:investment:proposition:complete', kwargs={
             'pk': proposition.pk,
@@ -386,7 +386,7 @@ class TestAbandonProposition(APITestMixin):
         """Test abandoning proposition."""
         proposition = PropositionFactory()
 
-        user = create_test_user()
+        user = create_test_user(permission_codenames=[PropositionPermission.change_all])
         api_client = self.create_api_client(user=user)
         url = reverse('api-v3:investment:proposition:abandon', kwargs={
             'pk': proposition.pk,

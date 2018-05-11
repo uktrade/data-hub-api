@@ -16,8 +16,16 @@ class APIConflictException(APIException):
 
 
 class APIBadRequestException(APIException):
-    """DRF Exception for the 409 status code."""
+    """DRF Exception for the 400 status code."""
 
     status_code = status.HTTP_400_BAD_REQUEST
     default_detail = _('Cannot process request due to a client error.')
     default_code = 'bad_request'
+
+
+class APIMethodNotAllowedException(APIException):
+    """DRF Exception for the 405 status code."""
+
+    status_code = status.HTTP_405_METHOD_NOT_ALLOWED
+    default_detail = _('Method is not allowed.')
+    default_code = 'method_not_allowed'

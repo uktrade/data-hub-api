@@ -8,6 +8,11 @@ from rest_framework.response import Response
 from datahub.core.exceptions import APIBadRequestException
 from datahub.core.viewsets import CoreViewSet
 from datahub.investment.proposition.models import Proposition
+from datahub.investment.proposition.permissions import (
+    IsAssociatedToInvestmentProjectPropositionFilter,
+    IsAssociatedToInvestmentProjectPropositionPermission,
+    PropositionModelPermissions,
+)
 from datahub.investment.proposition.serializers import (
     CompleteOrAbandonPropositionSerializer,
     CreatePropositionSerializer,
@@ -22,7 +27,11 @@ class PropositionViewSet(CoreViewSet):
     """ViewSet for public facing proposition endpoint."""
 
     required_scopes = (Scope.internal_front_end,)
-    permission_classes = (IsAuthenticatedOrTokenHasScope,)
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        PropositionModelPermissions,
+        IsAssociatedToInvestmentProjectPropositionPermission,
+    )
     serializer_class = PropositionSerializer
     queryset = Proposition.objects.select_related(
         'investment_project',
@@ -32,6 +41,7 @@ class PropositionViewSet(CoreViewSet):
     )
     filter_backends = (
         DjangoFilterBackend,
+        IsAssociatedToInvestmentProjectPropositionFilter,
         OrderingFilter,
     )
     filter_fields = ('adviser_id', 'status',)
