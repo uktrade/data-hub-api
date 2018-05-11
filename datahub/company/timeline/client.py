@@ -3,7 +3,7 @@ from django.core.exceptions import ImproperlyConfigured
 from raven.contrib.django.models import client
 from requests import HTTPError
 from rest_framework import status
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, ValidationError
 
 from datahub.company.timeline.exceptions import InvalidCompanyNumberError
 from datahub.company.timeline.serializers import TimelineEventSerializer
@@ -48,9 +48,7 @@ class ReportingServiceClient:
             'companies_house_id': transformed_company_number,
         })
 
-        serializer = TimelineEventSerializer(data=data.get('events', []), many=True)
-        serializer.is_valid(raise_exception=True)
-        return serializer.validated_data
+        return _transform_events_response(data)
 
     def _request(self, path, **kwargs):
         try:
@@ -63,6 +61,18 @@ class ReportingServiceClient:
             return {}
         else:
             return response.json()
+
+
+def _transform_events_response(data):
+    serializer = TimelineEventSerializer(data=data.get('events', []), many=True)
+    try:
+        serializer.is_valid(raise_exception=True)
+    except ValidationError as exc:
+        event_id = client.captureException()
+        raise APIException(f'Unexpected response data format received from the company '
+                           f'timeline API. Error reference: {event_id}.') from exc
+
+    return serializer.validated_data
 
 
 def _transform_company_number(company_number):
