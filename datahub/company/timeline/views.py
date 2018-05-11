@@ -1,7 +1,7 @@
 from oauth2_provider.contrib.rest_framework import IsAuthenticatedOrTokenHasScope
 
 from datahub.company.models import Company, CompanyPermission
-from datahub.company.timeline.client import ReportingServiceClient
+from datahub.company.timeline.client import DataScienceCompanyAPIClient
 from datahub.company.timeline.exceptions import InvalidCompanyNumberError
 from datahub.company.timeline.serializers import TimelineEventSerializer
 from datahub.core.permissions import HasPermissions
@@ -33,7 +33,7 @@ class CompanyTimelineViewSet(CoreViewSet):
 
 
 def _get_events_for_company(company):
-    client = ReportingServiceClient()
+    client = DataScienceCompanyAPIClient()
     try:
         return client.get_timeline_events_by_company_number(company.company_number)
     except InvalidCompanyNumberError:

@@ -17,7 +17,7 @@ class TestCompanyTimelineViews(APITestMixin):
     def test_list(self, requests_stubber):
         """Test the retrieval of the timeline for a company."""
         stubbed_url = urljoin(
-            settings.REPORTING_SERVICE_API_URL,
+            settings.DATA_SCIENCE_COMPANY_API_URL,
             '/api/v1/company/events/?companies_house_id=125694',
         )
         stubbed_response_data = {
@@ -59,10 +59,10 @@ class TestCompanyTimelineViews(APITestMixin):
     def test_list_with_no_matching_company_in_reporting_service(self, requests_stubber):
         """
         Test the retrieval of the timeline for a company with no matching record in the
-        reporting service.
+        upstream service.
         """
         stubbed_url = urljoin(
-            settings.REPORTING_SERVICE_API_URL,
+            settings.DATA_SCIENCE_COMPANY_API_URL,
             '/api/v1/company/events/?companies_house_id=125694',
         )
         requests_stubber.get(stubbed_url, status_code=status.HTTP_404_NOT_FOUND)
@@ -108,14 +108,14 @@ class TestCompanyTimelineViews(APITestMixin):
             requests_stubber,
             status_code,
     ):
-        """Test the behaviour when an error is returned from the reporting service."""
+        """Test the behaviour when an error is returned from the upstream service."""
         error_reference = 'error-ref-1'
         monkeypatch.setattr(
             'raven.contrib.django.models.client.captureException',
             Mock(return_value=error_reference),
         )
         stubbed_url = urljoin(
-            settings.REPORTING_SERVICE_API_URL,
+            settings.DATA_SCIENCE_COMPANY_API_URL,
             '/api/v1/company/events/?companies_house_id=125694',
         )
         requests_stubber.get(stubbed_url, status_code=status_code)
@@ -135,7 +135,7 @@ class TestCompanyTimelineViews(APITestMixin):
     def test_list_with_invalid_upstream_response(self, monkeypatch, requests_stubber):
         """
         Test the behaviour when an data is returned in an unexpected format from the
-        reporting service.
+        upstream service.
         """
         error_reference = 'error-ref-1'
         monkeypatch.setattr(
@@ -144,7 +144,7 @@ class TestCompanyTimelineViews(APITestMixin):
         )
 
         stubbed_url = urljoin(
-            settings.REPORTING_SERVICE_API_URL,
+            settings.DATA_SCIENCE_COMPANY_API_URL,
             '/api/v1/company/events/?companies_house_id=1000',
         )
         stubbed_response_data = {
