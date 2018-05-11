@@ -10,11 +10,11 @@ from datahub.company.timeline.serializers import TimelineEventSerializer
 from datahub.core.api_client import APIClient, HawkAuth
 
 
-class ReportingServiceClient:
+class DataScienceCompanyAPIClient:
     """
-    DT07 reporting service client.
+    Client for the data science DT07 reporting service.
 
-    (See https://github.com/uktrade/dt07-reporting for more information on the reporting service.)
+    (See https://github.com/uktrade/dt07-reporting for more information.)
 
     This is used for retrieving company timeline data.
     """
@@ -25,15 +25,17 @@ class ReportingServiceClient:
 
         The API URL and key are taken from settings.
         """
-        api_url = settings.REPORTING_SERVICE_API_URL
-        api_id = settings.REPORTING_SERVICE_API_ID
-        api_key = settings.REPORTING_SERVICE_API_KEY
+        api_url = settings.DATA_SCIENCE_COMPANY_API_URL
+        api_id = settings.DATA_SCIENCE_COMPANY_API_ID
+        api_key = settings.DATA_SCIENCE_COMPANY_API_KEY
 
         if not all((api_url, api_id, api_key)):
-            raise ImproperlyConfigured('Reporting service connection details not configured')
+            raise ImproperlyConfigured(
+                'Data science company API connection details not configured'
+            )
 
-        timeout = settings.REPORTING_SERVICE_API_TIMEOUT
-        verify_responses = settings.REPORTING_SERVICE_API_VERIFY_RESPONSES
+        timeout = settings.DATA_SCIENCE_COMPANY_API_TIMEOUT
+        verify_responses = settings.DATA_SCIENCE_COMPANY_API_VERIFY_RESPONSES
 
         auth = HawkAuth(api_id, api_key, verify_response=verify_responses)
         self._api_client = APIClient(api_url, auth, default_timeout=timeout)
@@ -79,7 +81,7 @@ def _transform_company_number(company_number):
     """
     This ensures that the company_number is a string and removes any leading zeroes.
 
-    The latter is required as the reporting service does not return results for
+    The latter is required as the upstream company timeline API does not return results for
     company numbers that start with a leading zero unless the leading zeroes are removed.
     """
     transformed_company_number = company_number or ''
