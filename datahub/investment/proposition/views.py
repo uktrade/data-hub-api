@@ -35,7 +35,7 @@ class PropositionViewSet(CoreViewSet):
     serializer_class = PropositionSerializer
     queryset = Proposition.objects.select_related(
         'investment_project',
-        'adviser',
+        'assigned_to',
         'created_by',
         'modified_by',
     )
@@ -44,7 +44,7 @@ class PropositionViewSet(CoreViewSet):
         IsAssociatedToInvestmentProjectPropositionFilter,
         OrderingFilter,
     )
-    filter_fields = ('adviser_id', 'status',)
+    filter_fields = ('assigned_to_id', 'status',)
     ordering_fields = ('deadline', 'created_on',)
     ordering = ('-deadline', '-created_on',)
 

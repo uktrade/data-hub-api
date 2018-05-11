@@ -15,7 +15,7 @@ class PropositionFactory(factory.django.DjangoModelFactory):
     id = factory.LazyFunction(uuid.uuid4)
 
     investment_project = factory.SubFactory(InvestmentProjectFactory)
-    adviser = factory.SubFactory(AdviserFactory)
+    assigned_to = factory.SubFactory(AdviserFactory)
 
     deadline = factory.Faker('future_date')
     status = PropositionStatus.ongoing

@@ -11,7 +11,7 @@ class CreatePropositionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Proposition
         fields = (
-            'adviser',
+            'assigned_to',
             'deadline',
             'name',
             'scope',
@@ -48,7 +48,7 @@ class PropositionSerializer(serializers.ModelSerializer):
     """Proposition serialiser for view only endpoints."""
 
     investment_project = NestedInvestmentProjectField()
-    adviser = NestedAdviserField()
+    assigned_to = NestedAdviserField()
     created_by = NestedAdviserField()
     modified_by = NestedAdviserField()
 
@@ -57,7 +57,7 @@ class PropositionSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'investment_project',
-            'adviser',
+            'assigned_to',
             'deadline',
             'status',
             'name',
