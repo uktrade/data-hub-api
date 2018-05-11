@@ -25,6 +25,13 @@ FAKE_RESPONSES = {
             }]
         }
     },
+    '/api/v1/company/events/?companies_house_id=989087': {
+        'json': {
+            'events': [{
+                'invalid_response': 'Accounts filed',
+            }]
+        }
+    },
     '/api/v1/company/events/?companies_house_id=356812': {
         'status_code': status.HTTP_404_NOT_FOUND
     },
@@ -80,6 +87,13 @@ class TestReportingServiceClient:
 
         with pytest.raises(APIException):
             client.get_timeline_events_by_company_number('886423')
+
+    def test_raises_api_exception_on_an_api_response(self):
+        """Test that an APIException is raised when data is received in an unexpected format."""
+        client = ReportingServiceClient()
+
+        with pytest.raises(APIException):
+            client.get_timeline_events_by_company_number('989087')
 
     @pytest.mark.parametrize('company_number', ('0125694', '125694'))
     def test_transforms_the_api_response(self, company_number):

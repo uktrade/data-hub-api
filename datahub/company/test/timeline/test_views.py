@@ -132,6 +132,47 @@ class TestCompanyTimelineViews(APITestMixin):
                       f'{error_reference}.'
         }
 
+    def test_list_with_invalid_upstream_response(self, monkeypatch, requests_stubber):
+        """
+        Test the behaviour when an data is returned in an unexpected format from the
+        reporting service.
+        """
+        error_reference = 'error-ref-1'
+        monkeypatch.setattr(
+            'raven.contrib.django.models.client.captureException',
+            Mock(return_value=error_reference),
+        )
+
+        stubbed_url = urljoin(
+            settings.REPORTING_SERVICE_API_URL,
+            '/api/v1/company/events/?companies_house_id=1000',
+        )
+        stubbed_response_data = {
+            'events': [{
+                'data_source_wrong': 'companies_house.companies',
+                'datetime_wrong': 'Mon, 31 Dec 2018 00:00:00 GMT',
+                'description_wrong': 'Accounts next due date',
+            }, {
+                'data_source_wrong': 'companies_house.companies',
+                'datetime_wrong': 'Mon, 31 Dec 2017 00:00:00 GMT',
+                'description_wrong': 'Accounts filed',
+            }]
+        }
+
+        requests_stubber.get(stubbed_url, json=stubbed_response_data)
+
+        company = CompanyFactory(company_number='1000')
+        url = reverse('api-v3:company:timeline-collection', kwargs={'pk': company.pk})
+
+        response = self.api_client.get(url)
+        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        response_data = response.json()
+
+        assert response_data == {
+            'detail': f'Unexpected response data format received from the company timeline API. '
+                      f'Error reference: {error_reference}.'
+        }
+
     @pytest.mark.parametrize(
         'permission_codenames',
         (
