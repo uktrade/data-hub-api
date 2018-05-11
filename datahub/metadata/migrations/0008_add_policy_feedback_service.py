@@ -6,7 +6,19 @@ from django.db import migrations
 from django.db.migrations import RunPython
 
 
-def load_service(apps, schema_editor):
+def load_initial_services(apps, schema_editor):
+    service_model = apps.get_model('metadata', 'Service')
+
+    # Only load the fixtures if there aren't any already in the database
+    # because we don't know if they have been changed via Django admin.
+    if not service_model.objects.exists():
+        call_command(
+            'loaddata',
+            PurePath(__file__).parent / '0008_initial_services.yaml'
+        )
+
+
+def load_policy_feedback_service(apps, schema_editor):
     call_command(
         'loaddata',
         PurePath(__file__).parent / '0008_add_policy_feedback_service.yaml'
@@ -19,5 +31,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        RunPython(load_service)
+        RunPython(load_initial_services, RunPython.noop),
+        RunPython(load_policy_feedback_service, RunPython.noop),
     ]
