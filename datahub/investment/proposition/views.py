@@ -5,8 +5,8 @@ from rest_framework import status
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 
-from datahub.core.viewsets import CoreViewSet
 from datahub.core.exceptions import APIBadRequestException
+from datahub.core.viewsets import CoreViewSet
 from datahub.investment.proposition.models import Proposition
 from datahub.investment.proposition.serializers import (
     CompleteOrAbandonPropositionSerializer,
@@ -34,9 +34,15 @@ class PropositionViewSet(CoreViewSet):
         DjangoFilterBackend,
         OrderingFilter,
     )
-    filter_fields = ('adviser_id', 'investment_project_id', 'status',)
+    filter_fields = ('adviser_id', 'status',)
     ordering_fields = ('deadline', 'created_on',)
     ordering = ('-deadline', '-created_on',)
+
+    def get_queryset(self):
+        """Filters the query set to the specified project."""
+        return self.queryset.filter(
+            investment_project_id=self.kwargs['project_pk']
+        )
 
     def create(self, request, *args, **kwargs):
         """Creates proposition."""
@@ -82,3 +88,10 @@ class PropositionViewSet(CoreViewSet):
             **super().get_serializer_context(),
             'current_user': self.request.user,
         }
+
+    def get_additional_data(self, create):
+        """Set investment project id from url parameter."""
+        data = super().get_additional_data(create)
+        if create:
+            data['investment_project_id'] = self.kwargs['project_pk']
+        return data
