@@ -8,23 +8,14 @@ from datahub.investment.serializers import NestedInvestmentProjectField
 class CreatePropositionSerializer(serializers.ModelSerializer):
     """Proposition serialiser for create endpoint."""
 
-    investment_project = NestedInvestmentProjectField()
-    adviser = NestedAdviserField()
-
     class Meta:
         model = Proposition
         fields = (
-            'investment_project',
             'adviser',
             'deadline',
             'name',
             'scope',
         )
-        extra_kwargs = {
-            'deadline': {'required': True},
-            'name': {'required': True},
-            'scope': {'required': True}
-        }
 
 
 class CompleteOrAbandonPropositionSerializer(serializers.ModelSerializer):
@@ -35,9 +26,6 @@ class CompleteOrAbandonPropositionSerializer(serializers.ModelSerializer):
         fields = (
             'details',
         )
-        extra_kwargs = {
-            'details': {'required': True},
-        }
 
     def complete(self):
         """Complete a proposition."""

@@ -4,7 +4,8 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.core.test_utils import APITestMixin
+from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
+from datahub.investment.proposition.constants import PropositionStatus
 from datahub.investment.proposition.models import Proposition
 from datahub.investment.test.factories import InvestmentProjectFactory
 from .factories import PropositionFactory
@@ -18,11 +19,13 @@ class TestCreateProposition(APITestMixin):
         adviser = AdviserFactory()
         investment_project = InvestmentProjectFactory()
 
-        url = reverse('api-v3:investment:proposition:collection')
+        url = reverse('api-v3:investment:proposition:collection', kwargs={
+            'project_pk': investment_project.pk,
+        })
+
         response = self.api_client.post(
             url,
             {
-                'investment_project': investment_project.pk,
                 'name': 'My proposition.',
                 'scope': 'Very broad scope.',
                 'adviser': adviser.pk,
@@ -33,6 +36,8 @@ class TestCreateProposition(APITestMixin):
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
         instance = Proposition.objects.get(pk=response_data['id'])
+        assert instance.created_by == self.user
+        assert instance.modified_by == self.user
         assert response_data == {
             'id': str(instance.pk),
             'investment_project': {
@@ -47,11 +52,11 @@ class TestCreateProposition(APITestMixin):
                 'id': str(adviser.pk),
             },
             'deadline': '2018-02-10',
-            'status': 'ongoing',
+            'status': PropositionStatus.ongoing,
             'name': 'My proposition.',
             'scope': 'Very broad scope.',
             'details': '',
-            'created_on': instance.created_on.isoformat().replace('+00:00', 'Z'),
+            'created_on': format_date_or_datetime(instance.created_on),
             'created_by': {
                 'first_name': instance.created_by.first_name,
                 'last_name': instance.created_by.last_name,
@@ -64,18 +69,21 @@ class TestCreateProposition(APITestMixin):
                 'name': instance.modified_by.name,
                 'id': str(instance.modified_by.pk),
             },
-            'modified_on': instance.modified_on.isoformat().replace('+00:00', 'Z'),
+            'modified_on': format_date_or_datetime(instance.modified_on),
         }
 
     def test_cannot_created_with_fields_missing(self):
         """Test that proposition cannot be created without required fields."""
-        url = reverse('api-v3:investment:proposition:collection')
+        investment_project = InvestmentProjectFactory()
+
+        url = reverse('api-v3:investment:proposition:collection', kwargs={
+            'project_pk': investment_project.pk
+        })
         response = self.api_client.post(url, {}, format='json')
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'investment_project': ['This field is required.'],
             'adviser': ['This field is required.'],
             'deadline': ['This field is required.'],
             'name': ['This field is required.'],
@@ -91,7 +99,10 @@ class TestUpdateProposition(APITestMixin):
     )
     def test_cannot_update_collection(self, method):
         """Test cannot update proposition."""
-        url = reverse('api-v3:investment:proposition:collection')
+        investment_project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:proposition:collection', kwargs={
+            'project_pk': investment_project.pk
+        })
         response = getattr(self.api_client, method)(url)
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
@@ -101,8 +112,11 @@ class TestUpdateProposition(APITestMixin):
     def test_cannot_update_item(self, method):
         """Test cannot update given proposition."""
         proposition = PropositionFactory()
-
-        url = reverse('api-v3:investment:proposition:item', kwargs={'pk': proposition.pk})
+        investment_project = InvestmentProjectFactory()
+        url = reverse('api-v3:investment:proposition:item', kwargs={
+            'pk': proposition.pk,
+            'project_pk': investment_project.pk,
+        })
         response = getattr(self.api_client, method)(url, {
             'name': 'hello!',
         }, format='json')
@@ -121,10 +135,10 @@ class TestListPropositions(APITestMixin):
             3, investment_project=investment_project
         )
 
-        url = reverse('api-v3:investment:proposition:collection')
-        response = self.api_client.get(url, {
-            'investment_project_id': investment_project.id
+        url = reverse('api-v3:investment:proposition:collection', kwargs={
+            'project_pk': investment_project.pk,
         })
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -136,13 +150,20 @@ class TestListPropositions(APITestMixin):
     def test_filtered_by_adviser(self):
         """List of propositions filtered by adviser."""
         adviser = AdviserFactory()
+        investment_project = InvestmentProjectFactory()
 
-        PropositionFactory.create_batch(3)
+        PropositionFactory.create_batch(
+            3, investment_project=investment_project
+        )
         propositions = PropositionFactory.create_batch(
-            3, adviser=adviser
+            3,
+            adviser=adviser,
+            investment_project=investment_project,
         )
 
-        url = reverse('api-v3:investment:proposition:collection')
+        url = reverse('api-v3:investment:proposition:collection', kwargs={
+            'project_pk': investment_project.pk,
+        })
         response = self.api_client.get(url, {
             'adviser_id': adviser.id
         })
@@ -157,20 +178,28 @@ class TestListPropositions(APITestMixin):
     @pytest.mark.parametrize(
         'proposition_status',
         (
-            'ongoing',
-            'abandoned',
-            'completed',
+            PropositionStatus.ongoing,
+            PropositionStatus.abandoned,
+            PropositionStatus.completed,
         )
     )
     def test_filtered_by_status(self, proposition_status):
         """List of propositions filtered by status."""
-        statuses = ('ongoing', 'abandoned', 'completed',)
-
+        statuses = (
+            PropositionStatus.ongoing,
+            PropositionStatus.abandoned,
+            PropositionStatus.completed,
+        )
+        investment_project = InvestmentProjectFactory()
         PropositionFactory.create_batch(
-            3, status=factory.Iterator(statuses)
+            3,
+            status=factory.Iterator(statuses),
+            investment_project=investment_project,
         )
 
-        url = reverse('api-v3:investment:proposition:collection')
+        url = reverse('api-v3:investment:proposition:collection', kwargs={
+            'project_pk': investment_project.pk,
+        })
         response = self.api_client.get(url, {
             'status': proposition_status
         })
@@ -187,7 +216,10 @@ class TestGetProposition(APITestMixin):
     def test_fails_without_permissions(self, api_client):
         """Should return 403"""
         proposition = PropositionFactory()
-        url = reverse('api-v3:investment:proposition:item', kwargs={'pk': proposition.pk})
+        url = reverse('api-v3:investment:proposition:item', kwargs={
+            'pk': proposition.pk,
+            'project_pk': proposition.investment_project.pk,
+        })
         response = api_client.get(url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -195,7 +227,10 @@ class TestGetProposition(APITestMixin):
         """Test get proposition."""
         proposition = PropositionFactory()
 
-        url = reverse('api-v3:investment:proposition:item', kwargs={'pk': proposition.pk})
+        url = reverse('api-v3:investment:proposition:item', kwargs={
+            'pk': proposition.pk,
+            'project_pk': proposition.investment_project.pk,
+        })
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -214,18 +249,18 @@ class TestGetProposition(APITestMixin):
                 'id': str(proposition.adviser.pk)
             },
             'deadline': proposition.deadline.isoformat(),
-            'status': 'ongoing',
+            'status': PropositionStatus.ongoing,
             'name': proposition.name,
             'scope': proposition.scope,
             'details': '',
-            'created_on': proposition.created_on.isoformat().replace('+00:00', 'Z'),
+            'created_on': format_date_or_datetime(proposition.created_on),
             'created_by': {
                 'first_name': proposition.created_by.first_name,
                 'last_name': proposition.created_by.last_name,
                 'name': proposition.created_by.name,
                 'id': str(proposition.created_by.pk),
             },
-            'modified_on': proposition.modified_on.isoformat().replace('+00:00', 'Z'),
+            'modified_on': format_date_or_datetime(proposition.modified_on),
             'modified_by': {
                 'first_name': proposition.modified_by.first_name,
                 'last_name': proposition.modified_by.last_name,
@@ -242,8 +277,13 @@ class TestCompleteProposition(APITestMixin):
         """Test completing proposition."""
         proposition = PropositionFactory()
 
-        url = reverse('api-v3:investment:proposition:complete', kwargs={'pk': proposition.pk})
-        response = self.api_client.post(
+        user = create_test_user()
+        api_client = self.create_api_client(user=user)
+        url = reverse('api-v3:investment:proposition:complete', kwargs={
+            'pk': proposition.pk,
+            'project_pk': proposition.investment_project.pk,
+        })
+        response = api_client.post(
             url,
             {
                 'details': 'All done 100% satisfaction.',
@@ -253,6 +293,7 @@ class TestCompleteProposition(APITestMixin):
         proposition.refresh_from_db()
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
+        assert proposition.modified_by == user
         assert response_data == {
             'id': str(proposition.pk),
             'investment_project': {
@@ -267,10 +308,10 @@ class TestCompleteProposition(APITestMixin):
                 'id': str(proposition.adviser.pk)
             },
             'deadline': proposition.deadline.isoformat(),
-            'status': 'completed',
+            'status': PropositionStatus.completed,
             'name': proposition.name,
             'scope': proposition.scope,
-            'created_on': proposition.created_on.isoformat().replace('+00:00', 'Z'),
+            'created_on': format_date_or_datetime(proposition.created_on),
             'created_by': {
                 'first_name': proposition.created_by.first_name,
                 'last_name': proposition.created_by.last_name,
@@ -278,7 +319,7 @@ class TestCompleteProposition(APITestMixin):
                 'id': str(proposition.created_by.pk),
             },
             'details': 'All done 100% satisfaction.',
-            'modified_on': proposition.modified_on.isoformat().replace('+00:00', 'Z'),
+            'modified_on': format_date_or_datetime(proposition.modified_on),
             'modified_by': {
                 'first_name': proposition.modified_by.first_name,
                 'last_name': proposition.modified_by.last_name,
@@ -288,14 +329,19 @@ class TestCompleteProposition(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'proposition_status', ('completed', 'abandoned',),
+        'proposition_status', (
+            PropositionStatus.completed, PropositionStatus.abandoned,
+        ),
     )
     def test_cannot_complete_proposition_without_ongoing_status(self, proposition_status):
         """Test cannot complete proposition that doesn't have ongoing status."""
         proposition = PropositionFactory(
             status=proposition_status
         )
-        url = reverse('api-v3:investment:proposition:complete', kwargs={'pk': proposition.pk})
+        url = reverse('api-v3:investment:proposition:complete', kwargs={
+            'pk': proposition.pk,
+            'project_pk': proposition.investment_project.pk,
+        })
         response = self.api_client.post(
             url,
             {
@@ -312,6 +358,26 @@ class TestCompleteProposition(APITestMixin):
         assert proposition.status == proposition_status
         assert proposition.details == ''
 
+    def test_cannot_complete_proposition_without_details(self):
+        """Test cannot complete proposition without giving details."""
+        proposition = PropositionFactory()
+        url = reverse('api-v3:investment:proposition:complete', kwargs={
+            'pk': proposition.pk,
+            'project_pk': proposition.investment_project.pk,
+        })
+        response = self.api_client.post(
+            url,
+            {
+                'details': '',
+            },
+            format='json',
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data['details'] == ['This field may not be blank.']
+        proposition.refresh_from_db()
+        assert proposition.status == PropositionStatus.ongoing
+
 
 class TestAbandonProposition(APITestMixin):
     """Tests for the abandon proposition view."""
@@ -320,8 +386,13 @@ class TestAbandonProposition(APITestMixin):
         """Test abandoning proposition."""
         proposition = PropositionFactory()
 
-        url = reverse('api-v3:investment:proposition:abandon', kwargs={'pk': proposition.pk})
-        response = self.api_client.post(
+        user = create_test_user()
+        api_client = self.create_api_client(user=user)
+        url = reverse('api-v3:investment:proposition:abandon', kwargs={
+            'pk': proposition.pk,
+            'project_pk': proposition.investment_project.pk,
+        })
+        response = api_client.post(
             url,
             {
                 'details': 'Not enough information.',
@@ -331,6 +402,7 @@ class TestAbandonProposition(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         proposition.refresh_from_db()
         response_data = response.json()
+        assert proposition.modified_by == user
         assert response_data == {
             'id': str(proposition.pk),
             'investment_project': {
@@ -345,10 +417,10 @@ class TestAbandonProposition(APITestMixin):
                 'id': str(proposition.adviser.pk)
             },
             'deadline': proposition.deadline.isoformat(),
-            'status': 'abandoned',
+            'status': PropositionStatus.abandoned,
             'name': proposition.name,
             'scope': proposition.scope,
-            'created_on': proposition.created_on.isoformat().replace('+00:00', 'Z'),
+            'created_on': format_date_or_datetime(proposition.created_on),
             'created_by': {
                 'first_name': proposition.created_by.first_name,
                 'last_name': proposition.created_by.last_name,
@@ -356,7 +428,7 @@ class TestAbandonProposition(APITestMixin):
                 'id': str(proposition.created_by.pk),
             },
             'details': proposition.details,
-            'modified_on': proposition.modified_on.isoformat().replace('+00:00', 'Z'),
+            'modified_on': format_date_or_datetime(proposition.modified_on),
             'modified_by': {
                 'first_name': proposition.modified_by.first_name,
                 'last_name': proposition.modified_by.last_name,
@@ -366,14 +438,19 @@ class TestAbandonProposition(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'proposition_status', ('completed', 'abandoned',),
+        'proposition_status', (
+            PropositionStatus.completed, PropositionStatus.abandoned,
+        ),
     )
     def test_cannot_abandon_proposition_without_ongoing_status(self, proposition_status):
         """Test cannot abandon proposition that doesn't have ongoing status."""
         proposition = PropositionFactory(
             status=proposition_status
         )
-        url = reverse('api-v3:investment:proposition:abandon', kwargs={'pk': proposition.pk})
+        url = reverse('api-v3:investment:proposition:abandon', kwargs={
+            'pk': proposition.pk,
+            'project_pk': proposition.investment_project.pk,
+        })
         response = self.api_client.post(
             url,
             {
@@ -389,3 +466,23 @@ class TestAbandonProposition(APITestMixin):
         proposition.refresh_from_db()
         assert proposition.status == proposition_status
         assert proposition.details == ''
+
+    def test_cannot_abandon_proposition_without_details(self):
+        """Test cannot abandon proposition without giving details."""
+        proposition = PropositionFactory()
+        url = reverse('api-v3:investment:proposition:abandon', kwargs={
+            'pk': proposition.pk,
+            'project_pk': proposition.investment_project.pk,
+        })
+        response = self.api_client.post(
+            url,
+            {
+                'details': '',
+            },
+            format='json',
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data['details'] == ['This field may not be blank.']
+        proposition.refresh_from_db()
+        assert proposition.status == PropositionStatus.ongoing

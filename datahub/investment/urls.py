@@ -80,7 +80,7 @@ urlpatterns = [
     path('investment/<uuid:pk>/unarchive', unarchive_item, name='unarchive-item'),
     path('investment/<uuid:pk>/audit', audit_item, name='audit-item'),
     path(
-        'investment/',
+        'investment/<uuid:project_pk>/',
         include(
             (proposition_urlpatterns, 'proposition',),
             namespace='proposition'
