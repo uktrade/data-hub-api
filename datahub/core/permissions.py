@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
+from datahub.core.exceptions import APIMethodNotAllowedException
 
 # View to model action mapping for standard model-based views
 _VIEW_TO_ACTION_MAPPING = {
@@ -15,6 +16,8 @@ _VIEW_TO_ACTION_MAPPING = {
     'archive': 'change',
     'unarchive': 'change',
     'metadata': 'read',
+    'complete': 'change',
+    'abandon': 'change',
 }
 
 
@@ -188,6 +191,9 @@ def get_model_action_for_view_action(http_method, view_action, many_to_many=Fals
     """Gets the model action corresponding to a view action."""
     if http_method == 'OPTIONS':
         return 'read'
+
+    if view_action is None:
+        raise APIMethodNotAllowedException()
 
     mapping = _MANY_TO_MANY_VIEW_TO_ACTION_MAPPING if many_to_many else _VIEW_TO_ACTION_MAPPING
 

@@ -8,9 +8,54 @@ from django.utils.timezone import now
 
 from datahub.core.exceptions import APIConflictException
 from datahub.core.models import BaseModel
+from datahub.core.utils import StrEnum
 from datahub.investment.proposition.constants import PropositionStatus
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
+
+class PropositionPermission(StrEnum):
+    """
+    Permission codename constants.
+
+    (Defined here rather than in permissions to avoid an import of that module.)
+
+
+    The following codenames mean that the user can read, change, add or delete any type of
+    proposition:
+
+    read_all_proposition
+    change_all_proposition
+    add_all_proposition
+    delete_proposition
+
+
+    The following codenames mean that the user can only read, change and add propositions for
+    investment projects that they are associated with:
+
+    read_associated_investmentproject_proposition
+    change_associated_investmentproject_proposition
+    add_associated_investmentproject_proposition
+
+    They cannot read, change or add propositions that do not relate to an investment project.
+
+    An associated project has the same meaning that it does in investment projects (that is a
+    project that was created by an adviser in the same team, or an adviser in the same team has
+    been linked to the project).
+
+
+    Note that permissions on other models are independent of permissions on propositions. Also
+    note that if both *_all_* and *_associated_investmentproject_* permissions are assigned to the
+    same user,  the *_all_* permission will be the effective one.
+    """
+
+    read_all = 'read_all_proposition'
+    read_associated_investmentproject = 'read_associated_investmentproject_proposition'
+    change_all = 'change_all_proposition'
+    change_associated_investmentproject = 'change_associated_investmentproject_proposition'
+    add_all = 'add_all_proposition'
+    add_associated_investmentproject = 'add_associated_investmentproject_proposition'
+    delete = 'delete_proposition'
 
 
 class Proposition(BaseModel):
@@ -66,3 +111,28 @@ class Proposition(BaseModel):
         :param details: reason of abandonment
         """
         self._change_status(PropositionStatus.abandoned, by, details)
+
+    class Meta:
+        permissions = (
+            (
+                PropositionPermission.read_all.value,
+                'Can read all proposition'
+            ),
+            (
+                PropositionPermission.read_associated_investmentproject.value,
+                'Can read proposition for associated investment projects'
+            ),
+            (
+                PropositionPermission.add_associated_investmentproject.value,
+                'Can add proposition for associated investment projects'
+            ),
+            (
+                PropositionPermission.change_associated_investmentproject.value,
+                'Can change proposition for associated investment projects'
+            ),
+        )
+        default_permissions = (
+            'add_all',
+            'change_all',
+            'delete',
+        )
