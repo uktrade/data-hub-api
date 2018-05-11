@@ -16,7 +16,6 @@ SHARED_FIXTURES = (
     SHARED_METADATA_FIXTURE_DIR / 'countries.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'investment.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'referrals.yaml',
-    SHARED_METADATA_FIXTURE_DIR / 'services.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'teams.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'titles.yaml',
     SHARED_METADATA_FIXTURE_DIR / 'uk_regions.yaml',
