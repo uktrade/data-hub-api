@@ -21,6 +21,7 @@ class CompanyPermission(StrEnum):
 
     read_company = 'read_company'
     read_company_document = 'read_company_document'
+    read_company_timeline = 'read_company_timeline'
 
 
 class ExportExperienceCategory(BaseConstantModel):
@@ -154,7 +155,8 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         verbose_name_plural = 'companies'
         permissions = (
             (CompanyPermission.read_company.value, 'Can read company'),
-            (CompanyPermission.read_company_document.value, 'Can read company document')
+            (CompanyPermission.read_company_document.value, 'Can read company document'),
+            (CompanyPermission.read_company_timeline.value, 'Can read company timeline'),
         )
 
     @property
