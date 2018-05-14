@@ -17,6 +17,7 @@ class _PermissionTemplate(StrEnum):
     all = '{app_label}.{action}_all_{model_name}'
     associated = '{app_label}.{action}_associated_{model_name}'
     standard = '{app_label}.{action}_{model_name}'
+    stage_to_won = '{app_label}.{action}_stage_to_won_{model_name}'
 
 
 class InvestmentProjectModelPermissions(ViewBasedModelPermissions):
@@ -43,6 +44,7 @@ class InvestmentProjectModelPermissions(ViewBasedModelPermissions):
         'change': (
             _PermissionTemplate.all,
             _PermissionTemplate.associated,
+            _PermissionTemplate.stage_to_won,
         ),
         'delete': (
             _PermissionTemplate.standard,
