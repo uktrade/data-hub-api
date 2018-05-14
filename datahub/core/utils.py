@@ -29,6 +29,21 @@ class Echo:
         return value
 
 
+class EchoUTF8:
+    """
+    Writer that echoes written data and encodes to utf-8 if necessary.
+
+    Used for streaming large CSV files, defined as per
+    https://docs.djangoproject.com/en/2.0/howto/outputting-csv/.
+    """
+
+    def write(self, value):
+        """Returns value that is being "written"."""
+        if isinstance(value, str):
+            return value.encode('utf-8')
+        return value
+
+
 def join_truthy_strings(*args, sep=' '):
     """Joins a list of strings using a separtor, omitting falsey values."""
     return sep.join(filter(None, args))
