@@ -39,11 +39,13 @@ class CSVBaseCommand(BaseCommand):
             help='If True it only simulates the command without saving the changes.',
         )
 
-    def handle(self, *args, **options):
-        """Process the CSV file."""
-        result = {True: 0, False: 0}
+    def _handle(self, *args, **options):
+        """
+        Internal version of the `handle` method.
 
-        logger.info(f'Started')
+        :returns: dict with count of records successful and failed updates
+        """
+        result = {True: 0, False: 0}
 
         s3_client = get_s3_client()
         response = s3_client.get_object(
@@ -58,6 +60,13 @@ class CSVBaseCommand(BaseCommand):
             for row in reader:
                 succeeded = self.process_row(row, **options)
                 result[succeeded] += 1
+        return result
+
+    def handle(self, *args, **options):
+        """Process the CSV file."""
+        logger.info(f'Started')
+
+        result = self._handle(*args, **options)
 
         logger.info(f'Finished - succeeded: {result[True]}, failed: {result[False]}')
 
