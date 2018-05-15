@@ -37,12 +37,9 @@ class PropositionPermission(StrEnum):
     change_associated_investmentproject_proposition
     add_associated_investmentproject_proposition
 
-    They cannot read, change or add propositions that do not relate to an investment project.
-
     An associated project has the same meaning that it does in investment projects (that is a
     project that was created by an adviser in the same team, or an adviser in the same team has
     been linked to the project).
-
 
     Note that permissions on other models are independent of permissions on propositions. Also
     note that if both *_all_* and *_associated_investmentproject_* permissions are assigned to the
