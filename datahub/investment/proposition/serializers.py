@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from datahub.company.serializers import NestedAdviserField
 from datahub.investment.proposition.models import Proposition
+from datahub.investment.proposition.permissions import HasAssociatedInvestmentProjectValidator
 from datahub.investment.serializers import NestedInvestmentProjectField
 
 
@@ -15,6 +16,9 @@ class CreatePropositionSerializer(serializers.ModelSerializer):
             'deadline',
             'name',
             'scope',
+        )
+        validators = (
+            HasAssociatedInvestmentProjectValidator(),
         )
 
 

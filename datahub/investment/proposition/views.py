@@ -56,10 +56,12 @@ class PropositionViewSet(CoreViewSet):
 
     def create(self, request, *args, **kwargs):
         """Creates proposition."""
-        serializer = CreatePropositionSerializer(data=request.data)
+        serializer = CreatePropositionSerializer(
+            data=request.data,
+            context=self.get_serializer_context(),
+        )
         serializer.is_valid(raise_exception=True)
-        extra_data = self.get_additional_data(True)
-        instance = serializer.save(**extra_data)
+        instance = serializer.save(**self.get_additional_data(True))
         return Response(
             self.get_serializer(instance=instance).data,
             status=status.HTTP_201_CREATED
@@ -94,10 +96,11 @@ class PropositionViewSet(CoreViewSet):
 
     def get_serializer_context(self):
         """Extra context provided to the serializer class."""
-        return {
+        context = {
             **super().get_serializer_context(),
             'current_user': self.request.user,
         }
+        return context
 
     def get_additional_data(self, create):
         """Set investment project id from url parameter."""
