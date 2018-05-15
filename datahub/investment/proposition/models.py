@@ -4,7 +4,6 @@ import uuid
 
 from django.conf import settings
 from django.db import models
-from django.utils.timezone import now
 
 from datahub.core.exceptions import APIConflictException
 from datahub.core.models import BaseModel
@@ -77,7 +76,7 @@ class Proposition(BaseModel):
 
     def __str__(self):
         """Human readable representation of the object."""
-        return self.name
+        return f'{self.investment_project.name} - {self.name}'
 
     def _change_status(self, status, by, details):
         """Change status of a proposition."""
