@@ -19,8 +19,10 @@ from datahub.company.test.factories import (
     ContactFactory
 )
 from datahub.core import constants
-from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_queryset
-from datahub.metadata.models import Sector
+from datahub.core.test_utils import (
+    APITestMixin, create_test_user, random_obj_for_model, random_obj_for_queryset
+)
+from datahub.metadata.models import CompanyClassification, Sector
 from datahub.metadata.test.factories import TeamFactory
 
 pytestmark = pytest.mark.django_db
@@ -566,8 +568,7 @@ class TestSearchExport(APITestMixin):
             'archived': archived,
             'business_type_id':
                 TestSearchExport._get_random_constant_id(BusinessTypeConstant),
-            'classification_id':
-                TestSearchExport._get_random_constant_id(constants.CompanyClassification),
+            'classification_id': random_obj_for_model(CompanyClassification).pk,
             'company_number': ch.company_number,
             'created_on': factory.Faker('date'),
             'description': factory.Faker('text'),
