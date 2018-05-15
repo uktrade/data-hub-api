@@ -319,6 +319,9 @@ class IProjectTeamAbstract(models.Model):
     project_manager = models.ForeignKey(
         'company.Advisor', null=True, related_name='+', blank=True, on_delete=models.SET_NULL
     )
+    # field project_manager_first_assigned_on is being used for SPI reporting
+    # it contains a datetime when first time a project manager has been assigned
+    project_manager_first_assigned_on = models.DateTimeField(null=True, blank=True)
     project_assurance_adviser = models.ForeignKey(
         'company.Advisor', null=True, related_name='+', blank=True, on_delete=models.SET_NULL
     )
@@ -386,6 +389,10 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
     def save(self, *args, **kwargs):
         """Updates the stage log after saving."""
         adding = self._state.adding
+
+        if self.project_manager and self.project_manager_first_assigned_on is None:
+            self.project_manager_first_assigned_on = self.modified_on
+
         super().save(*args, **kwargs)
         self._update_stage_log(adding)
 
