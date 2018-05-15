@@ -107,11 +107,6 @@ class HasAssociatedInvestmentProjectValidator:
 
         investment_project = attrs.get('investment_project')
 
-        if investment_project is None:
-            raise ValidationError({
-                'investment_project': self.required_message
-            }, code='null')
-
         if not checker.is_associated(request, investment_project):
             raise ValidationError({
                 'investment_project': self.non_associated_investment_project_message
