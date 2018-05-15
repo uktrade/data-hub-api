@@ -7,6 +7,8 @@ from datahub.interaction.permissions import (
     InteractionModelPermissions,
     IsAssociatedToInvestmentProjectInteractionFilter,
     IsAssociatedToInvestmentProjectInteractionPermission,
+    PolicyFeedbackObjectPermission,
+    PolicyFeedbackPermissionFilter,
 )
 from datahub.interaction.queryset import get_interaction_queryset
 from datahub.interaction.serializers import InteractionSerializer
@@ -21,6 +23,7 @@ class InteractionViewSet(CoreViewSet):
         IsAuthenticatedOrTokenHasScope,
         InteractionModelPermissions,
         IsAssociatedToInvestmentProjectInteractionPermission,
+        PolicyFeedbackObjectPermission,
     )
     serializer_class = InteractionSerializer
     queryset = get_interaction_queryset()
@@ -28,6 +31,7 @@ class InteractionViewSet(CoreViewSet):
         DjangoFilterBackend,
         IsAssociatedToInvestmentProjectInteractionFilter,
         OrderingFilter,
+        PolicyFeedbackPermissionFilter,
     )
     filter_fields = ['company_id', 'contact_id', 'investment_project_id']
     ordering_fields = ('date', 'created_on')

@@ -5,7 +5,9 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.core import constants
 from datahub.core.test_utils import random_obj_for_model
 from datahub.event.test.factories import EventFactory
-from datahub.interaction.models import CommunicationChannel, Interaction, ServiceDeliveryStatus
+from datahub.interaction.models import (
+    CommunicationChannel, Interaction, PolicyArea, PolicyIssueType, ServiceDeliveryStatus
+)
 from datahub.investment.test.factories import InvestmentProjectFactory
 
 
@@ -70,3 +72,18 @@ class EventServiceDeliveryFactory(InteractionFactoryBase):
 
     kind = Interaction.KINDS.service_delivery
     event = factory.SubFactory(EventFactory)
+
+
+class PolicyFeedbackFactory(InteractionFactoryBase):
+    """Factory for creating a policy feedback interaction."""
+
+    kind = Interaction.KINDS.policy_feedback
+    communication_channel = factory.LazyFunction(
+        lambda: random_obj_for_model(CommunicationChannel)
+    )
+    policy_area = factory.LazyFunction(
+        lambda: random_obj_for_model(PolicyArea)
+    )
+    policy_issue_type = factory.LazyFunction(
+        lambda: random_obj_for_model(PolicyIssueType)
+    )
