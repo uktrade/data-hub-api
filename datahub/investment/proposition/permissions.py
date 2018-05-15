@@ -2,6 +2,7 @@ from rest_framework.exceptions import ValidationError
 
 from datahub.core.permissions import IsAssociatedToObjectPermission, ViewBasedModelPermissions
 from datahub.core.utils import StrEnum
+from datahub.investment.models import InvestmentProject
 from datahub.investment.permissions import (
     InvestmentProjectAssociationCheckerBase, IsAssociatedToInvestmentProjectFilter
 )
@@ -49,6 +50,11 @@ class InvestmentProjectPropositionAssociationChecker(InvestmentProjectAssociatio
     all_permission_template = _PermissionTemplate.all
     associated_permission_template = _PermissionTemplate.associated_investmentproject
 
+    extra_view_to_action_mapping = {
+        'complete': 'change',
+        'abandon': 'change',
+    }
+
 
 class IsAssociatedToInvestmentProjectPropositionPermission(IsAssociatedToObjectPermission):
     """Permission class based on InvestmentProjectPropositionAssociationChecker."""
@@ -56,7 +62,7 @@ class IsAssociatedToInvestmentProjectPropositionPermission(IsAssociatedToObjectP
     checker_class = InvestmentProjectPropositionAssociationChecker
 
     def get_actual_object(self, obj):
-        """Returns the investment project from an Interaction object."""
+        """Returns the investment project from an Proposition object."""
         return obj.investment_project
 
 
@@ -68,7 +74,7 @@ class IsAssociatedToInvestmentProjectPropositionFilter(IsAssociatedToInvestmentP
 
 
 class HasAssociatedInvestmentProjectValidator:
-    """Validator which enforces association permissions when adding propositions."""
+    """Validator which enforces association permissions when adding or updating propositions."""
 
     required_message = 'This field is required.'
     non_associated_investment_project_message = (
@@ -89,6 +95,9 @@ class HasAssociatedInvestmentProjectValidator:
         """
         self.serializer = serializer
 
+    def _get_validation_error_message(self, action):
+        return f"You don't have permission to {action} a proposition for this investment project."
+
     def __call__(self, attrs):
         """
         Performs validation. Called by DRF.
@@ -105,11 +114,12 @@ class HasAssociatedInvestmentProjectValidator:
         if not checker.should_apply_restrictions(request, view.action):
             return
 
-        investment_project = attrs.get('investment_project')
+        project_pk = request.parser_context['kwargs']['project_pk']
+        investment_project = InvestmentProject.objects.get(pk=project_pk)
 
         if not checker.is_associated(request, investment_project):
             raise ValidationError({
-                'investment_project': self.non_associated_investment_project_message
+                'investment_project': self.non_associated_investment_project_message,
             }, code='access_denied')
 
     def __repr__(self):

@@ -61,10 +61,7 @@ class InvestmentProjectAssociationCheckerBase(ObjectAssociationCheckerBase):
     all_permission_template = None
     associated_permission_template = None
 
-    extra_view_to_action_mapping = {
-        'complete': 'change',
-        'abandon': 'change',
-    }
+    extra_view_to_action_mapping = None
 
     def is_associated(self, request, obj):
         """Check for connection."""
