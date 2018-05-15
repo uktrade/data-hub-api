@@ -1451,6 +1451,8 @@ class TestPartialUpdateView(APITestMixin):
             project_manager_id=adviser_1.id,
             project_assurance_adviser_id=adviser_2.id
         )
+        # to make sure new pm assigned will not change original date
+        project_manager_first_assigned_on = project.project_manager_first_assigned_on
         url = reverse('api-v3:investment:investment-item',
                       kwargs={'pk': project.pk})
         request_data = {
@@ -1485,6 +1487,9 @@ class TestPartialUpdateView(APITestMixin):
         assert response_data['team_members'] == []
         assert response_data['team_complete'] is True
 
+        project.refresh_from_db()
+        assert project.project_manager_first_assigned_on == project_manager_first_assigned_on
+
     def test_update_read_only_fields(self):
         """Test updating read-only fields."""
         project = InvestmentProjectFactory(
@@ -1492,6 +1497,7 @@ class TestPartialUpdateView(APITestMixin):
             comments='old_comment',
             allow_blank_estimated_land_date=False,
             allow_blank_possible_uk_regions=False,
+            project_manager_first_assigned_on=None,
         )
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
@@ -1500,6 +1506,7 @@ class TestPartialUpdateView(APITestMixin):
             'comments': 'new_comments',
             'allow_blank_estimated_land_date': True,
             'allow_blank_possible_uk_regions': True,
+            'project_manager_first_assigned_on': now(),
         })
 
         assert response.status_code == status.HTTP_200_OK
@@ -1507,6 +1514,9 @@ class TestPartialUpdateView(APITestMixin):
         assert response.data['comments'] == 'old_comment'
         assert response.data['allow_blank_estimated_land_date'] is False
         assert response.data['allow_blank_possible_uk_regions'] is False
+
+        project.refresh_from_db()
+        assert project.project_manager_first_assigned_on is None
 
     def test_restricted_user_cannot_update_project_if_not_associated(self):
         """Tests that a restricted user cannot update another team's project."""
