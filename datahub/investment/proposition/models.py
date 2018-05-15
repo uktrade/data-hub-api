@@ -87,7 +87,6 @@ class Proposition(BaseModel):
             )
         self.status = status
         self.modified_by = by
-        self.modified_on = now()
         self.details = details
         self.save()
 
