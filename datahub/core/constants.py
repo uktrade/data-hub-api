@@ -409,22 +409,6 @@ class HeadquarterType(Enum):
     ghq = Constant('ghq', '43281c5e-92a4-4794-867b-b4d5f801e6f3')
 
 
-class CompanyClassification(Enum):
-    """Company classification."""
-
-    tier_a = Constant('Tier A - Strategic Account', 'b91bf800-8d53-e311-aef3-441ea13961e2')
-    tier_a1 = Constant("Tier A1 – Tomorrow's Champions", '2b55bb11-9518-e411-985c-e4115bead28a')
-    tier_a2 = Constant('Tier A2 -Global Partners', '7e0c261a-d447-e411-985c-e4115bead28a')
-    tier_b = Constant('Tier B - Global Accounts', 'bb1bf800-8d53-e311-aef3-441ea13961e2')
-    tier_c = Constant(
-        'Tier C - Local Accounts (UKTI Managed)', 'bd1bf800-8d53-e311-aef3-441ea13961e2'
-    )
-    tier_dl = Constant(
-        'Tier D - LEP Managed Branch (not IST)', '12798372-8eb4-e511-88b6-e4115bead28a'
-    )
-    tier_dg = Constant('Tier D - POST Identified/Managed', '572dfefe-cd1d-e611-9bdc-e4115bead28a')
-
-
 class EmployeeRange(Enum):
     """Employee range constants."""
 

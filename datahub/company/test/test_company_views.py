@@ -8,11 +8,12 @@ from reversion.models import Version
 from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import CompaniesHouseCompany, Company
 from datahub.company.test.factories import CompaniesHouseCompanyFactory, CompanyFactory
-from datahub.core.constants import (
-    CompanyClassification, Country, HeadquarterType, Sector, UKRegion
-)
+from datahub.core.constants import Country, HeadquarterType, Sector, UKRegion
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
-from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
+from datahub.core.test_utils import (
+    APITestMixin, create_test_user, format_date_or_datetime, random_obj_for_model
+)
+from datahub.metadata.models import CompanyClassification
 from datahub.metadata.test.factories import TeamFactory
 
 
@@ -226,7 +227,7 @@ class TestGetCompany(APITestMixin):
             registered_address_town='Fooland',
             registered_address_country_id=Country.united_states.value.id,
             headquarter_type_id=HeadquarterType.ukhq.value.id,
-            classification_id=CompanyClassification.tier_a.value.id,
+            classification=random_obj_for_model(CompanyClassification)
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.id})
@@ -249,8 +250,10 @@ class TestGetCompany(APITestMixin):
         assert response.data['registered_address_postcode'] is None
         assert (response.data['headquarter_type']['id'] ==
                 HeadquarterType.ukhq.value.id)
-        assert (response.data['classification']['id'] ==
-                CompanyClassification.tier_a.value.id)
+        assert response.data['classification'] == {
+            'id': str(company.classification.pk),
+            'name': company.classification.name
+        }
 
     def test_get_company_without_registered_country(self):
         """Tests the company item view for a company without a registered
@@ -265,7 +268,7 @@ class TestGetCompany(APITestMixin):
             registered_address_town='Fooland',
             registered_address_country_id=None,
             headquarter_type_id=HeadquarterType.ukhq.value.id,
-            classification_id=CompanyClassification.tier_a.value.id,
+            classification=random_obj_for_model(CompanyClassification),
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.id})
@@ -587,7 +590,7 @@ class TestAddCompany(APITestMixin):
             'registered_address_town': 'London',
             'uk_region': {'id': UKRegion.england.value.id},
             'headquarter_type': {'id': HeadquarterType.ghq.value.id},
-            'classification': {'id': CompanyClassification.tier_a.value.id},
+            'classification': {'id': random_obj_for_model(CompanyClassification).pk},
         })
 
         assert response.status_code == status.HTTP_201_CREATED
@@ -817,7 +820,7 @@ class TestAddCompany(APITestMixin):
             'registered_address_town': 'London',
             'uk_region': {'id': UKRegion.england.value.id},
             'headquarter_type': {'id': HeadquarterType.ghq.value.id},
-            'classification': {'id': CompanyClassification.tier_a.value.id},
+            'classification': {'id': random_obj_for_model(CompanyClassification).pk},
         })
 
         assert response.status_code == status.HTTP_201_CREATED
@@ -839,7 +842,7 @@ class TestAddCompany(APITestMixin):
             'registered_address_town': 'London',
             'uk_region': {'id': UKRegion.england.value.id},
             'headquarter_type': {'id': HeadquarterType.ghq.value.id},
-            'classification': {'id': CompanyClassification.tier_a.value.id},
+            'classification': {'id': random_obj_for_model(CompanyClassification).pk},
         })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -863,7 +866,7 @@ class TestAddCompany(APITestMixin):
             'registered_address_town': 'London',
             'uk_region': {'id': UKRegion.england.value.id},
             'headquarter_type': {'id': HeadquarterType.ghq.value.id},
-            'classification': {'id': CompanyClassification.tier_a.value.id},
+            'classification': {'id': random_obj_for_model(CompanyClassification).pk},
         })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -890,7 +893,7 @@ class TestAddCompany(APITestMixin):
             'registered_address_town': 'London',
             'uk_region': {'id': UKRegion.england.value.id},
             'headquarter_type': {'id': HeadquarterType.ghq.value.id},
-            'classification': {'id': CompanyClassification.tier_a.value.id},
+            'classification': {'id': random_obj_for_model(CompanyClassification).pk},
         })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -918,7 +921,7 @@ class TestAddCompany(APITestMixin):
             'registered_address_town': 'London',
             'uk_region': {'id': UKRegion.england.value.id},
             'headquarter_type': {'id': HeadquarterType.ghq.value.id},
-            'classification': {'id': CompanyClassification.tier_a.value.id},
+            'classification': {'id': random_obj_for_model(CompanyClassification).pk},
         })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -944,7 +947,7 @@ class TestAddCompany(APITestMixin):
             'registered_address_town': 'London',
             'uk_region': {'id': UKRegion.england.value.id},
             'headquarter_type': {'id': HeadquarterType.ghq.value.id},
-            'classification': {'id': CompanyClassification.tier_a.value.id},
+            'classification': {'id': random_obj_for_model(CompanyClassification).pk},
         })
 
         assert response.status_code == status.HTTP_201_CREATED
