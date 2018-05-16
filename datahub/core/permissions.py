@@ -203,8 +203,10 @@ def get_model_action_for_view_action(
     if view_action is None:
         raise APIMethodNotAllowedException()
 
-    mapping = _MANY_TO_MANY_VIEW_TO_ACTION_MAPPING.copy() \
+    mapping = (
+        _MANY_TO_MANY_VIEW_TO_ACTION_MAPPING.copy()
         if many_to_many else _VIEW_TO_ACTION_MAPPING.copy()
+    )
 
     if extra_view_to_action_mapping is not None:
         mapping.update(extra_view_to_action_mapping)
