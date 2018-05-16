@@ -393,7 +393,7 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
         adding = self._state.adding
         if (
             self.__project_manager_id is None
-            and self.project_manager
+            and self.project_manager_id
             and self.project_manager_first_assigned_on is None
         ):
             self.project_manager_first_assigned_on = now()
