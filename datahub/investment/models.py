@@ -7,6 +7,7 @@ from itertools import chain
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, transaction
+from django.utils.timezone import now
 from model_utils import Choices
 from mptt.fields import TreeForeignKey
 
@@ -390,16 +391,17 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
     def save(self, *args, **kwargs):
         """Updates the stage log after saving."""
         adding = self._state.adding
-
         if (
             self.__project_manager_id is None
             and self.project_manager
             and self.project_manager_first_assigned_on is None
         ):
-            self.project_manager_first_assigned_on = self.modified_on
+            self.project_manager_first_assigned_on = now()
 
         super().save(*args, **kwargs)
+
         self._update_stage_log(adding)
+        self.__project_manager = self.project_manager
 
     def _update_stage_log(self, adding):
         """Creates a log of changes to stage field.
