@@ -190,7 +190,6 @@ def get_model_action_for_view_action(
     view_action,
     many_to_many=False,
     extra_view_to_action_mapping=None,
-    extra_many_to_many_action_mapping=None
 ):
     """Gets the model action corresponding to a view action."""
     if http_method == 'OPTIONS':
@@ -199,13 +198,10 @@ def get_model_action_for_view_action(
     if view_action is None:
         raise APIMethodNotAllowedException()
 
-    if many_to_many:
-        mapping = _MANY_TO_MANY_VIEW_TO_ACTION_MAPPING
-        if isinstance(extra_many_to_many_action_mapping, dict):
-            mapping.update(extra_many_to_many_action_mapping)
-    else:
-        mapping = _VIEW_TO_ACTION_MAPPING
-        if isinstance(extra_view_to_action_mapping, dict):
-            mapping.update(extra_view_to_action_mapping)
+    mapping = _MANY_TO_MANY_VIEW_TO_ACTION_MAPPING \
+        if many_to_many else _VIEW_TO_ACTION_MAPPING
+
+    if extra_view_to_action_mapping is not None:
+        mapping.update(extra_view_to_action_mapping)
 
     return mapping[view_action]

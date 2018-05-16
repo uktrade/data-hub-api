@@ -95,9 +95,6 @@ class HasAssociatedInvestmentProjectValidator:
         """
         self.serializer = serializer
 
-    def _get_validation_error_message(self, action):
-        return f"You don't have permission to {action} a proposition for this investment project."
-
     def __call__(self, attrs):
         """
         Performs validation. Called by DRF.
