@@ -16,7 +16,7 @@ def test_govuk_url(settings):
 class TestPayClientCreatePayment:
     """Tests related to the create payment method."""
 
-    def test_ok(self, requests_stubber):
+    def test_ok(self, requests_mock):
         """Test a successful call to the GOV.UK create payment endpoint."""
         # mock response
         json_response = {
@@ -30,7 +30,7 @@ class TestPayClientCreatePayment:
             }
         }
         url = govuk_url('payments')
-        requests_stubber.post(url, status_code=201, json=json_response)
+        requests_mock.post(url, status_code=201, json=json_response)
 
         # make API call
         pay = PayClient()
@@ -45,9 +45,9 @@ class TestPayClientCreatePayment:
         assert response == json_response
 
         # check the mocked object
-        assert requests_stubber.call_count == 1
-        assert requests_stubber.request_history[-1].url == url
-        assert requests_stubber.request_history[-1].json() == {
+        assert requests_mock.call_count == 1
+        assert requests_mock.request_history[-1].url == url
+        assert requests_mock.request_history[-1].json() == {
             'amount': 1234,
             'reference': 'payment reference',
             'description': 'payment description',
@@ -64,10 +64,10 @@ class TestPayClientCreatePayment:
             (500, '500 Server Error')
         )
     )
-    def test_http_error(self, status_code, error_msg, requests_stubber):
+    def test_http_error(self, status_code, error_msg, requests_mock):
         """Test that if GOV.UK Pay returns an HTTP error, an exception is raised."""
         url = govuk_url('payments')
-        requests_stubber.post(url, status_code=status_code, reason=error_msg)
+        requests_mock.post(url, status_code=status_code, reason=error_msg)
 
         with pytest.raises(GOVUKPayAPIException) as exc:
             pay = PayClient()
@@ -83,7 +83,7 @@ class TestPayClientCreatePayment:
 class TestPayClientGetPaymentById:
     """Tests related to the get payment by id method."""
 
-    def test_ok(self, requests_stubber):
+    def test_ok(self, requests_mock):
         """Test a successful call to get a GOV.UK payment."""
         # mock response
         payment_id = '123abc123abc123abc123abc12'
@@ -98,7 +98,7 @@ class TestPayClientGetPaymentById:
             }
         }
         url = govuk_url(f'payments/{payment_id}')
-        requests_stubber.get(url, status_code=200, json=json_response)
+        requests_mock.get(url, status_code=200, json=json_response)
 
         # make API call
         pay = PayClient()
@@ -106,8 +106,8 @@ class TestPayClientGetPaymentById:
 
         # check
         assert response == json_response
-        assert requests_stubber.call_count == 1
-        assert requests_stubber.request_history[-1].url == url
+        assert requests_mock.call_count == 1
+        assert requests_mock.request_history[-1].url == url
 
     @pytest.mark.parametrize(
         'status_code,error_msg',
@@ -117,11 +117,11 @@ class TestPayClientGetPaymentById:
             (500, '500 Server Error')
         )
     )
-    def test_http_error(self, status_code, error_msg, requests_stubber):
+    def test_http_error(self, status_code, error_msg, requests_mock):
         """Test that if GOV.UK Pay returns an HTTP error, an exception is raised."""
         payment_id = '123abc123abc123abc123abc12'
         url = govuk_url(f'payments/{payment_id}')
-        requests_stubber.get(url, status_code=status_code, reason=error_msg)
+        requests_mock.get(url, status_code=status_code, reason=error_msg)
 
         with pytest.raises(GOVUKPayAPIException) as exc:
             pay = PayClient()
@@ -132,20 +132,20 @@ class TestPayClientGetPaymentById:
 class TestPayClientCancelPayment:
     """Tests related to the cancel payment method."""
 
-    def test_ok(self, requests_stubber):
+    def test_ok(self, requests_mock):
         """Test a successful call to cancel a GOV.UK payment."""
         # mock response
         payment_id = '123abc123abc123abc123abc12'
         url = govuk_url(f'payments/{payment_id}/cancel')
-        requests_stubber.post(url, status_code=204)
+        requests_mock.post(url, status_code=204)
 
         # make API call
         pay = PayClient()
         pay.cancel_payment(payment_id)
 
         # check
-        assert requests_stubber.call_count == 1
-        assert requests_stubber.request_history[-1].url == url
+        assert requests_mock.call_count == 1
+        assert requests_mock.request_history[-1].url == url
 
     @pytest.mark.parametrize(
         'status_code,error_msg',
@@ -157,11 +157,11 @@ class TestPayClientCancelPayment:
             (500, '500 Server Error')
         )
     )
-    def test_http_error(self, status_code, error_msg, requests_stubber):
+    def test_http_error(self, status_code, error_msg, requests_mock):
         """Test that if GOV.UK Pay returns an HTTP error, an exception is raised."""
         payment_id = '123abc123abc123abc123abc12'
         url = govuk_url(f'payments/{payment_id}/cancel')
-        requests_stubber.post(url, status_code=status_code, reason=error_msg)
+        requests_mock.post(url, status_code=status_code, reason=error_msg)
 
         with pytest.raises(GOVUKPayAPIException) as exc:
             pay = PayClient()

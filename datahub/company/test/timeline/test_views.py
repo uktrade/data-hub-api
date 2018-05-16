@@ -14,7 +14,7 @@ from datahub.core.test_utils import APITestMixin, create_test_user
 class TestCompanyTimelineViews(APITestMixin):
     """Tests for the company timeline view."""
 
-    def test_list(self, requests_stubber):
+    def test_list(self, requests_mock):
         """Test the retrieval of the timeline for a company."""
         stubbed_url = urljoin(
             settings.DATA_SCIENCE_COMPANY_API_URL,
@@ -32,7 +32,7 @@ class TestCompanyTimelineViews(APITestMixin):
             }]
         }
 
-        requests_stubber.get(stubbed_url, json=stubbed_response_data)
+        requests_mock.get(stubbed_url, json=stubbed_response_data)
 
         company = CompanyFactory(company_number='0125694')
         url = reverse('api-v3:company:timeline-collection', kwargs={'pk': company.pk})
@@ -56,7 +56,7 @@ class TestCompanyTimelineViews(APITestMixin):
             }],
         }
 
-    def test_list_with_no_matching_company_in_reporting_service(self, requests_stubber):
+    def test_list_with_no_matching_company_in_reporting_service(self, requests_mock):
         """
         Test the retrieval of the timeline for a company with no matching record in the
         upstream service.
@@ -65,7 +65,7 @@ class TestCompanyTimelineViews(APITestMixin):
             settings.DATA_SCIENCE_COMPANY_API_URL,
             '/api/v1/company/events/?companies_house_id=125694',
         )
-        requests_stubber.get(stubbed_url, status_code=status.HTTP_404_NOT_FOUND)
+        requests_mock.get(stubbed_url, status_code=status.HTTP_404_NOT_FOUND)
 
         company = CompanyFactory(company_number='0125694')
         url = reverse('api-v3:company:timeline-collection', kwargs={'pk': company.pk})
@@ -105,7 +105,7 @@ class TestCompanyTimelineViews(APITestMixin):
     def test_list_with_error_from_upstream_server(
             self,
             monkeypatch,
-            requests_stubber,
+            requests_mock,
             status_code,
     ):
         """Test the behaviour when an error is returned from the upstream service."""
@@ -118,7 +118,7 @@ class TestCompanyTimelineViews(APITestMixin):
             settings.DATA_SCIENCE_COMPANY_API_URL,
             '/api/v1/company/events/?companies_house_id=125694',
         )
-        requests_stubber.get(stubbed_url, status_code=status_code)
+        requests_mock.get(stubbed_url, status_code=status_code)
 
         company = CompanyFactory(company_number='125694')
         url = reverse('api-v3:company:timeline-collection', kwargs={'pk': company.pk})
@@ -132,7 +132,7 @@ class TestCompanyTimelineViews(APITestMixin):
                       f'{error_reference}.'
         }
 
-    def test_list_with_invalid_upstream_response(self, monkeypatch, requests_stubber):
+    def test_list_with_invalid_upstream_response(self, monkeypatch, requests_mock):
         """
         Test the behaviour when an data is returned in an unexpected format from the
         upstream service.
@@ -159,7 +159,7 @@ class TestCompanyTimelineViews(APITestMixin):
             }]
         }
 
-        requests_stubber.get(stubbed_url, json=stubbed_response_data)
+        requests_mock.get(stubbed_url, json=stubbed_response_data)
 
         company = CompanyFactory(company_number='1000')
         url = reverse('api-v3:company:timeline-collection', kwargs={'pk': company.pk})

@@ -52,10 +52,10 @@ class TestHawkAuth:
 class TestAPIClient:
     """Tests APIClient."""
 
-    def test_successful_request(self, requests_stubber):
+    def test_successful_request(self, requests_mock):
         """Tests making a successful request."""
         api_url = 'http://test/v1/'
-        requests_stubber.get('http://test/v1/path/to/item', status_code=200)
+        requests_mock.get('http://test/v1/path/to/item', status_code=200)
 
         api_client = APIClient(api_url)
         response = api_client.request('GET', 'path/to/item')
@@ -64,10 +64,10 @@ class TestAPIClient:
         assert response.request.headers['Accept'] == APIClient.DEFAULT_ACCEPT
         assert response.request.timeout is None
 
-    def test_raises_exception_on_unsuccessful_request(self, requests_stubber):
+    def test_raises_exception_on_unsuccessful_request(self, requests_mock):
         """Tests that an exception is raised on an successful request."""
         api_url = 'http://test/v1/'
-        requests_stubber.get('http://test/v1/path/to/item', status_code=404)
+        requests_mock.get('http://test/v1/path/to/item', status_code=404)
 
         api_client = APIClient(api_url)
         with pytest.raises(HTTPError) as excinfo:
@@ -75,10 +75,10 @@ class TestAPIClient:
 
         assert excinfo.value.response.status_code == 404
 
-    def test_passes_through_arguments(self, requests_stubber):
+    def test_passes_through_arguments(self, requests_mock):
         """Tests that auth, accept and default_timeout are passed to the request."""
         api_url = 'http://test/v1/'
-        requests_stubber.get('http://test/v1/path/to/item', status_code=200)
+        requests_mock.get('http://test/v1/path/to/item', status_code=200)
 
         api_client = APIClient(
             api_url,
@@ -92,10 +92,10 @@ class TestAPIClient:
         assert response.request.headers['Accept'] == 'test-accept'
         assert response.request.timeout == 10
 
-    def test_omits_accept_if_none(self, requests_stubber):
+    def test_omits_accept_if_none(self, requests_mock):
         """Tests that the Accept header is not overridden when accept=None is passed."""
         api_url = 'http://test/v1/'
-        requests_stubber.get('http://test/v1/path/to/item', status_code=200)
+        requests_mock.get('http://test/v1/path/to/item', status_code=200)
 
         api_client = APIClient(
             api_url,
@@ -108,10 +108,10 @@ class TestAPIClient:
         assert response.request.headers['Accept'] == '*/*'
 
     @pytest.mark.parametrize('default_timeout', (10, None))
-    def test_can_override_timeout_per_request(self, requests_stubber, default_timeout):
+    def test_can_override_timeout_per_request(self, requests_mock, default_timeout):
         """Tests that the timeout can be overridden for a specific request."""
         api_url = 'http://test/v1/'
-        requests_stubber.get('http://test/v1/path/to/item', status_code=200)
+        requests_mock.get('http://test/v1/path/to/item', status_code=200)
 
         api_client = APIClient(
             api_url,
