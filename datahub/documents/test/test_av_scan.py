@@ -19,39 +19,39 @@ MOCK_S3_RESPONSE = {
 }
 
 
-def test_virus_scan_document_clean(s3_stubber, requests_stubber):
+def test_virus_scan_document_clean(s3_stubber, requests_mock):
     """Tests virus scanning a clean file."""
     document = DocumentFactory()
     s3_stubber.add_response('get_object', MOCK_S3_RESPONSE, expected_params={
         'Bucket': document.s3_bucket, 'Key': document.s3_key
     })
-    requests_stubber.post('http://av-service/', text='OK')
+    requests_mock.post('http://av-service/', text='OK')
 
     av_scan.virus_scan_document(str(document.id))
     document.refresh_from_db()
     assert document.av_clean is True
 
 
-def test_virus_scan_document_infected(s3_stubber, requests_stubber):
+def test_virus_scan_document_infected(s3_stubber, requests_mock):
     """Tests virus scanning a clean file."""
     document = DocumentFactory()
     s3_stubber.add_response('get_object', MOCK_S3_RESPONSE, expected_params={
         'Bucket': document.s3_bucket, 'Key': document.s3_key
     })
-    requests_stubber.post('http://av-service/', text='NOTOK')
+    requests_mock.post('http://av-service/', text='NOTOK')
 
     av_scan.virus_scan_document(str(document.id))
     document.refresh_from_db()
     assert document.av_clean is False
 
 
-def test_virus_scan_document_bad_response_body(s3_stubber, requests_stubber, caplog):
+def test_virus_scan_document_bad_response_body(s3_stubber, requests_mock, caplog):
     """Tests handling of unexpected response bodies from the AV service."""
     document = DocumentFactory()
     s3_stubber.add_response('get_object', MOCK_S3_RESPONSE, expected_params={
         'Bucket': document.s3_bucket, 'Key': document.s3_key
     })
-    requests_stubber.post('http://av-service/', text='BADRESPONSE')
+    requests_mock.post('http://av-service/', text='BADRESPONSE')
 
     with pytest.raises(VirusScanException):
         av_scan.virus_scan_document(str(document.id))
@@ -60,7 +60,7 @@ def test_virus_scan_document_bad_response_body(s3_stubber, requests_stubber, cap
     assert document.av_clean is None
 
 
-def test_virus_scan_document_s3_key_not_found(s3_stubber, requests_stubber, caplog):
+def test_virus_scan_document_s3_key_not_found(s3_stubber, requests_mock, caplog):
     """Tests handling of a not found error from S3."""
     document = DocumentFactory()
     s3_stubber.add_client_error(
@@ -75,14 +75,17 @@ def test_virus_scan_document_s3_key_not_found(s3_stubber, requests_stubber, capl
     assert exc.value.response['Error']['Code'] == 'NoSuchKey'
 
 
-def test_virus_scan_document_bad_response_status(s3_stubber, requests_stubber, caplog):
+def test_virus_scan_document_bad_response_status(s3_stubber, requests_mock, caplog):
     """Tests handling of error response statuses from the AV service."""
     document = DocumentFactory()
     s3_stubber.add_response('get_object', MOCK_S3_RESPONSE, expected_params={
         'Bucket': document.s3_bucket, 'Key': document.s3_key
     })
-    requests_stubber.post('http://av-service/', text='OK',
-                          status_code=status.HTTP_400_BAD_REQUEST)
+    requests_mock.post(
+        'http://av-service/',
+        text='OK',
+        status_code=status.HTTP_400_BAD_REQUEST,
+    )
 
     with pytest.raises(HTTPError) as exc:
         av_scan.virus_scan_document(str(document.id))
