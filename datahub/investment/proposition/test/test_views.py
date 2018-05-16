@@ -1,3 +1,5 @@
+import uuid
+
 import factory
 import pytest
 from rest_framework import status
@@ -109,6 +111,32 @@ class TestCreateProposition(APITestMixin):
             },
             'modified_on': format_date_or_datetime(instance.modified_on),
         }
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
+    def test_cannot_create_proposition_for_non_existent_investment_project(self, permissions):
+        """Test user cannot create proposition for non existent investment project."""
+        url = reverse('api-v3:investment:proposition:collection', kwargs={
+            'project_pk': uuid.uuid4(),
+        })
+
+        adviser = create_test_user(
+            permission_codenames=permissions,
+        )
+        api_client = self.create_api_client(user=adviser)
+
+        response = api_client.post(
+            url,
+            {
+                'name': 'My proposition.',
+                'scope': 'Very broad scope.',
+                'assigned_to': adviser.pk,
+                'deadline': '2018-02-10',
+            },
+            format='json',
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        response_data = response.json()
+        assert response_data == {'detail': 'Not found.'}
 
     def test_restricted_user_can_create_associated_investment_project_proposition(self):
         """Test restricted user can create associated invesment project proposition."""
@@ -284,6 +312,21 @@ class TestListPropositions(APITestMixin):
         expected_ids = {str(i.id) for i in propositions}
         assert actual_ids == expected_ids
 
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    def test_user_cannot_list_propositions_for_non_existent_investment_project(self, permissions):
+        """Test user cannot list propositions for a non existent investment project."""
+        url = reverse('api-v3:investment:proposition:collection', kwargs={
+            'project_pk': uuid.uuid4(),
+        })
+
+        user = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        response_data = response.json()
+        assert response_data == {'detail': 'Not found.'}
+
     def test_restricted_user_can_list_propositions(self):
         """List of propositions by a restricted user."""
         PropositionFactory.create_batch(3)
@@ -412,7 +455,7 @@ class TestGetProposition(APITestMixin):
     """Tests for get proposition view."""
 
     def test_fails_without_permissions(self, api_client):
-        """Should return 403"""
+        """Should return 401"""
         proposition = PropositionFactory()
         url = reverse('api-v3:investment:proposition:item', kwargs={
             'pk': proposition.pk,
@@ -558,6 +601,23 @@ class TestGetProposition(APITestMixin):
             'detail': 'You do not have permission to perform this action.'
         }
 
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    def test_user_cannot_get_proposition_for_non_existent_project(self, permissions):
+        """Test user cannot get proposition by a non restricted user."""
+        proposition = PropositionFactory()
+
+        url = reverse('api-v3:investment:proposition:item', kwargs={
+            'pk': proposition.pk,
+            'project_pk': uuid.uuid4(),
+        })
+        user = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        response_data = response.json()
+        assert response_data == {'detail': 'Not found.'}
+
 
 class TestCompleteProposition(APITestMixin):
     """Tests for the complete proposition view."""
@@ -618,6 +678,29 @@ class TestCompleteProposition(APITestMixin):
                 'id': str(proposition.modified_by.pk),
             }
         }
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
+    def test_user_cannot_complete_proposition_for_non_existent_project(self, permissions):
+        """Test user cannot complete proposition for non existent investment project."""
+        proposition = PropositionFactory()
+
+        url = reverse('api-v3:investment:proposition:complete', kwargs={
+            'pk': proposition.pk,
+            'project_pk': uuid.uuid4(),
+        })
+
+        user = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+        response = api_client.post(
+            url,
+            {
+                'details': 'All done 100% satisfaction.',
+            },
+            format='json',
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        response_data = response.json()
+        assert response_data == {'detail': 'Not found.'}
 
     def test_restricted_user_can_complete_proposition(self):
         """Test completing proposition by a restricted user."""
@@ -835,6 +918,29 @@ class TestAbandonProposition(APITestMixin):
                 'id': str(proposition.modified_by.pk),
             },
         }
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
+    def test_user_cannot_abandon_proposition_for_non_existent_project(self, permissions):
+        """Test user cannot abandon proposition for non existent investment project."""
+        proposition = PropositionFactory()
+
+        url = reverse('api-v3:investment:proposition:abandon', kwargs={
+            'pk': proposition.pk,
+            'project_pk': uuid.uuid4(),
+        })
+
+        user = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+        response = api_client.post(
+            url,
+            {
+                'details': 'Not enough information.',
+            },
+            format='json',
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        response_data = response.json()
+        assert response_data == {'detail': 'Not found.'}
 
     def test_restricted_user_can_abandon_proposition(self):
         """Test abandoning proposition by restricted user."""

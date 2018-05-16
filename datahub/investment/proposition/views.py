@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from rest_framework import status
@@ -7,6 +8,7 @@ from rest_framework.response import Response
 
 from datahub.core.exceptions import APIBadRequestException
 from datahub.core.viewsets import CoreViewSet
+from datahub.investment.models import InvestmentProject
 from datahub.investment.proposition.models import Proposition
 from datahub.investment.proposition.permissions import (
     IsAssociatedToInvestmentProjectPropositionFilter,
@@ -25,6 +27,8 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 class PropositionViewSet(CoreViewSet):
     """ViewSet for public facing proposition endpoint."""
+
+    non_existent_project_error_message = 'Specified investment project does not exist'
 
     required_scopes = (Scope.internal_front_end,)
     permission_classes = (
@@ -50,12 +54,16 @@ class PropositionViewSet(CoreViewSet):
 
     def get_queryset(self):
         """Filters the query set to the specified project."""
+        self._check_project_exists()
+
         return self.queryset.filter(
             investment_project_id=self.kwargs['project_pk']
         )
 
     def create(self, request, *args, **kwargs):
         """Creates proposition."""
+        self._check_project_exists()
+
         serializer = CreatePropositionSerializer(
             data=request.data,
             context=self.get_serializer_context(),
@@ -69,6 +77,8 @@ class PropositionViewSet(CoreViewSet):
 
     def _action(self, method, request, *args, **kwargs):
         """Invokes action for a proposition."""
+        self._check_project_exists()
+
         if method not in ('abandon', 'complete'):
             raise APIBadRequestException()
 
@@ -108,3 +118,7 @@ class PropositionViewSet(CoreViewSet):
         if create:
             data['investment_project_id'] = self.kwargs['project_pk']
         return data
+
+    def _check_project_exists(self):
+        if not InvestmentProject.objects.filter(pk=self.kwargs['project_pk']).exists():
+            raise Http404(self.non_existent_project_error_message)
