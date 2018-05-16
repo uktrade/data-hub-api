@@ -1509,7 +1509,9 @@ class TestPartialUpdateView(APITestMixin):
                 'id': str(adviser_1.id)
             }
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        with freeze_time(datetime(2017, 4, 30, 11, 25, tzinfo=utc)):
+            response = self.api_client.patch(url, data=request_data, format='json')
+
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
 
@@ -1524,7 +1526,7 @@ class TestPartialUpdateView(APITestMixin):
             'name': crm_team.name
         }
         project.refresh_from_db()
-        assigned_on = datetime(2017, 4, 28, 17, 35, tzinfo=utc)
+        assigned_on = datetime(2017, 4, 30, 11, 25, tzinfo=utc)
         assert project.project_manager_first_assigned_on == assigned_on
 
     def test_update_read_only_fields(self):
