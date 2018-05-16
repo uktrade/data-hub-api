@@ -28,7 +28,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
             None
         )
 
-    def test_create_first_session(self, requests_stubber):
+    def test_create_first_session(self, requests_mock):
         """
         Test a successful call to create a payment gateway session.
 
@@ -48,12 +48,12 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
                 },
             }
         }
-        requests_stubber.post(
+        requests_mock.post(
             govuk_url('payments'),  # create payment
             status_code=201,
             json=json_response
         )
-        requests_stubber.get(
+        requests_mock.get(
             govuk_url(f'payments/{govuk_payment_id}'),  # get payment
             status_code=200,
             json=json_response
@@ -88,7 +88,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
             'payment_url': next_url,
         }
 
-    def test_create_cancels_other_ongoing_sessions(self, requests_stubber):
+    def test_create_cancels_other_ongoing_sessions(self, requests_mock):
         """
         Test that creating a new payment gateway session cancels
         the other ongoing sessions and GOV.UK payments.
@@ -124,7 +124,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         # - cancel the GOV.UK payments
         # - refresh the payment gateway sessions again after the cancellation
         for session in existing_data:
-            requests_stubber.get(
+            requests_mock.get(
                 govuk_url(f'payments/{session.govuk_payment_id}'),
                 [
                     # this is for the initial refresh
@@ -139,7 +139,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
                     },
                 ]
             )
-            requests_stubber.post(
+            requests_mock.post(
                 govuk_url(f'payments/{session.govuk_payment_id}/cancel'),
                 status_code=204
             )
@@ -157,12 +157,12 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
                 },
             }
         }
-        requests_stubber.post(
+        requests_mock.post(
             govuk_url('payments'),  # create payment
             status_code=201,
             json=json_response
         )
-        requests_stubber.get(
+        requests_mock.get(
             govuk_url(f'payments/{govuk_payment_id}'),  # get payment
             status_code=200,
             json=json_response
@@ -199,7 +199,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         }
 
     @pytest.mark.parametrize('govuk_status_code', (400, 401, 404, 409, 500))
-    def test_500_if_govuk_pay_errors_when_cancelling(self, govuk_status_code, requests_stubber):
+    def test_500_if_govuk_pay_errors_when_cancelling(self, govuk_status_code, requests_mock):
         """
         Test that if GOV.UK Pay errors whilst cancelling some other ongoing
         sessions/payments, the endpoint returns 500 to keep the system consistent.
@@ -222,14 +222,14 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         # mock GOV.UK requests used to
         # - refresh the existing payment gateway session
         # - cancel the GOV.UK payment
-        requests_stubber.get(
+        requests_mock.get(
             govuk_url(f'payments/{existing_session.govuk_payment_id}'),
             status_code=200,
             json={
                 'state': {'status': existing_session.status},
             }
         )
-        requests_stubber.post(
+        requests_mock.post(
             govuk_url(f'payments/{existing_session.govuk_payment_id}/cancel'),
             status_code=govuk_status_code
         )
@@ -252,7 +252,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         assert PaymentGatewaySession.objects.count() == 1
 
     @pytest.mark.parametrize('govuk_status_code', (400, 401, 422, 500))
-    def test_500_if_govuk_pay_errors_when_creating(self, govuk_status_code, requests_stubber):
+    def test_500_if_govuk_pay_errors_when_creating(self, govuk_status_code, requests_mock):
         """
         Test that if GOV.UK Pay errors whilst creating a new payment, the endpoint returns 500.
 
@@ -265,7 +265,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         In all these cases we return 500 as all those GOV.UK errors are unexpected.
         """
         # mock GOV.UK response
-        requests_stubber.post(
+        requests_mock.post(
             govuk_url('payments'),
             status_code=govuk_status_code
         )
@@ -322,7 +322,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         # check no session created
         assert PaymentGatewaySession.objects.count() == 0
 
-    def test_409_if_refresh_updates_order_status_to_paid(self, requests_stubber):
+    def test_409_if_refresh_updates_order_status_to_paid(self, requests_mock):
         """
         Test that if the system is not up-to-date, the order is in quote_accepted
         but the GOV.UK payment happens, the endpoint triggers a check on existing
@@ -340,7 +340,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
 
         # mock GOV.UK requests used to refresh the payment session.
         # GOV.UK Pay says that the payment completed successfully
-        requests_stubber.get(
+        requests_mock.get(
             govuk_url(f'payments/{existing_session.govuk_payment_id}'),
             status_code=200,
             json={
@@ -462,7 +462,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
 
     @freeze_time('2018-03-01 00:00:00')
     def test_429_if_too_many_requests_made(
-        self, local_memory_cache, requests_stubber, monkeypatch
+        self, local_memory_cache, requests_mock, monkeypatch
     ):
         """Test that the throttling for the create endpoint works if its rate is set."""
         monkeypatch.setitem(
@@ -483,17 +483,17 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
                 },
             }
         }
-        requests_stubber.post(
+        requests_mock.post(
             govuk_url('payments'),  # create payment
             status_code=201,
             json=json_response
         )
-        requests_stubber.get(
+        requests_mock.get(
             govuk_url(f'payments/{govuk_payment_id}'),  # get payment
             status_code=200,
             json=json_response
         )
-        requests_stubber.post(
+        requests_mock.post(
             govuk_url(f'payments/{govuk_payment_id}/cancel'),  # cancel payment
             status_code=204
         )
@@ -536,7 +536,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
             PaymentGatewaySessionStatus.submitted,
         )
     )
-    def test_get(self, order_status, session_status, requests_stubber):
+    def test_get(self, order_status, session_status, requests_mock):
         """Test a successful call to get a payment gateway session."""
         order = OrderFactory(status=order_status)
         session = PaymentGatewaySessionFactory(
@@ -546,7 +546,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
 
         # mock GOV.UK Pay request used to get the existing session
         next_url = 'https://payment.example.com/123abc'
-        requests_stubber.get(
+        requests_mock.get(
             govuk_url(f'payments/{session.govuk_payment_id}'),
             status_code=200,
             json={
@@ -590,7 +590,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
             PaymentGatewaySessionStatus.error,
         )
     )
-    def test_doesnt_call_govuk_pay_if_session_finished(self, session_status, requests_stubber):
+    def test_doesnt_call_govuk_pay_if_session_finished(self, session_status, requests_mock):
         """
         Test a successful call to get a payment gateway session when the session is finished.
         The system does not call GOV.UK Pay as the record is up-to-date.
@@ -616,7 +616,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
             'status': session.status,
             'payment_url': '',
         }
-        assert not requests_stubber.called
+        assert not requests_mock.called
 
     @pytest.mark.parametrize(
         'govuk_status,payment_url',
@@ -630,7 +630,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         )
     )
     def test_with_different_govuk_payment_status_updates_session(
-        self, govuk_status, payment_url, requests_stubber
+        self, govuk_status, payment_url, requests_mock
     ):
         """
         Test that if the GOV.UK payment status is not the same as the payment gateway session one,
@@ -644,7 +644,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         session = PaymentGatewaySessionFactory(status=initial_status)
 
         # mock GOV.UK call used to get the existing session
-        requests_stubber.get(
+        requests_mock.get(
             govuk_url(f'payments/{session.govuk_payment_id}'),
             status_code=200,
             json={
@@ -680,7 +680,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
             'payment_url': payment_url,
         }
 
-    def test_with_govuk_payment_success_updates_order(self, requests_stubber):
+    def test_with_govuk_payment_success_updates_order(self, requests_mock):
         """
         Test that if the GOV.UK payment status is `success` and the payment gateway session is
         out of date, the record is updated, the related order marked as `paid` and an OMIS
@@ -694,7 +694,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
 
         # mock GOV.UK calls used to refresh the payment session
         # Pay says that the payment completed successfully
-        requests_stubber.get(
+        requests_mock.get(
             govuk_url(f'payments/{session.govuk_payment_id}'),
             status_code=200,
             json={
@@ -752,7 +752,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         assert Payment.objects.filter(order=order).count() == 1
 
     @pytest.mark.parametrize('govuk_status_code', (401, 404, 500))
-    def test_500_if_govuk_pay_errors(self, govuk_status_code, requests_stubber):
+    def test_500_if_govuk_pay_errors(self, govuk_status_code, requests_mock):
         """
         Test that if GOV.UK Pay errors whilst getting a payment, the endpoint returns 500.
 
@@ -767,7 +767,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
             status=PaymentGatewaySessionStatus.created
         )
 
-        requests_stubber.get(
+        requests_mock.get(
             govuk_url(f'payments/{session.govuk_payment_id}'),
             status_code=govuk_status_code
         )

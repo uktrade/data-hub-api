@@ -56,7 +56,7 @@ class TestPaymentManager:
 class TestPaymentGatewaySessionManager:
     """Tests for the Payment Gateway Session Manager."""
 
-    def test_create_first_session_from_order(self, requests_stubber, monkeypatch):
+    def test_create_first_session_from_order(self, requests_mock, monkeypatch):
         """
         Test the successful creation of the first payment gateway session for an order.
         """
@@ -68,7 +68,7 @@ class TestPaymentGatewaySessionManager:
         # mock request
         govuk_payment_id = '123abc123abc123abc123abc12'
         govuk_payments_url = govuk_url('payments')
-        requests_stubber.post(
+        requests_mock.post(
             govuk_payments_url,
             status_code=201,
             json={
@@ -102,9 +102,9 @@ class TestPaymentGatewaySessionManager:
         assert PaymentGatewaySession.objects.count() == 1
 
         # check mocked request
-        assert requests_stubber.call_count == 1
-        assert requests_stubber.request_history[-1].url == govuk_payments_url
-        assert requests_stubber.request_history[-1].json() == {
+        assert requests_mock.call_count == 1
+        assert requests_mock.request_history[-1].url == govuk_payments_url
+        assert requests_mock.request_history[-1].json() == {
             'amount': order.total_cost,
             'reference': f'{order.reference}-0123ABCD',
             'description': settings.GOVUK_PAY_PAYMENT_DESCRIPTION.format(
@@ -116,7 +116,7 @@ class TestPaymentGatewaySessionManager:
             )
         }
 
-    def test_create_cancels_other_sessions(self, requests_stubber):
+    def test_create_cancels_other_sessions(self, requests_mock):
         """
         Test that creating a new payment gateway session cancels
         the other ongoing sessions and GOV.UK payments.
@@ -152,7 +152,7 @@ class TestPaymentGatewaySessionManager:
         # - cancel the GOV.UK payments
         # - refresh the payment gateway sessions again after the cancellation
         for session in existing_data:
-            requests_stubber.get(
+            requests_mock.get(
                 govuk_url(f'payments/{session.govuk_payment_id}'),
                 [
                     # this is for the initial refresh
@@ -167,14 +167,14 @@ class TestPaymentGatewaySessionManager:
                     },
                 ]
             )
-            requests_stubber.post(
+            requests_mock.post(
                 govuk_url(f'payments/{session.govuk_payment_id}/cancel'),
                 status_code=204
             )
 
         # mock GOV.UK request used to create a new payment session
         govuk_payment_id = '123abc123abc123abc123abc12'
-        requests_stubber.post(
+        requests_mock.post(
             govuk_url('payments'),
             status_code=201,
             json={
@@ -206,8 +206,8 @@ class TestPaymentGatewaySessionManager:
 
         # check mocked requests:
         #   2 refresh / 2 cancel - 2 refresh / 1 create
-        assert requests_stubber.call_count == (2 + 2 + 2 + 1)
-        assert requests_stubber.request_history[-1].json() == {
+        assert requests_mock.call_count == (2 + 2 + 2 + 1)
+        assert requests_mock.request_history[-1].json() == {
             'amount': order.total_cost,
             'reference': f'{order.reference}-{str(session.id)[:8].upper()}',
             'description': settings.GOVUK_PAY_PAYMENT_DESCRIPTION.format(
@@ -243,7 +243,7 @@ class TestPaymentGatewaySessionManager:
         # test no session created
         assert PaymentGatewaySession.objects.count() == 0
 
-    def test_exception_if_refresh_updates_order_status_to_paid(self, requests_stubber):
+    def test_exception_if_refresh_updates_order_status_to_paid(self, requests_mock):
         """
         Test that if the system is not up-to-date, the order is in quote_accepted
         but the GOV.UK payment happens, the method triggers a check on existing
@@ -260,7 +260,7 @@ class TestPaymentGatewaySessionManager:
 
         # mock GOV.UK requests used to refresh the payment session,
         # GOV.UK Pay says that the payment completed successfully
-        requests_stubber.get(
+        requests_mock.get(
             govuk_url(f'payments/{existing_session.govuk_payment_id}'),
             status_code=200,
             json={
@@ -314,7 +314,7 @@ class TestPaymentGatewaySessionManager:
 
     @pytest.mark.parametrize('govuk_status_code', (400, 401, 422, 500))
     def test_exception_if_govuk_pay_errors_when_creating(
-        self, govuk_status_code, requests_stubber
+        self, govuk_status_code, requests_mock
     ):
         """
         Test that if GOV.UK Pay errors whilst creating a new payment, the method raises
@@ -326,7 +326,7 @@ class TestPaymentGatewaySessionManager:
         - 422 - UNPROCESSABLE ENTITY
         - 500 - INTERNAL SERVER ERROR
         """
-        requests_stubber.post(
+        requests_mock.post(
             govuk_url('payments'),
             status_code=govuk_status_code
         )
@@ -342,7 +342,7 @@ class TestPaymentGatewaySessionManager:
 
     @pytest.mark.parametrize('govuk_status_code', (400, 401, 404, 409, 500))
     def test_exception_if_govuk_pay_errors_when_cancelling(
-        self, govuk_status_code, requests_stubber
+        self, govuk_status_code, requests_mock
     ):
         """
         Test that if GOV.UK Pay errors whilst cancelling some other ongoing
@@ -364,14 +364,14 @@ class TestPaymentGatewaySessionManager:
         # mock GOV.UK requests used to
         # - refresh the existing payment gateway session
         # - cancel the GOV.UK payment
-        requests_stubber.get(
+        requests_mock.get(
             govuk_url(f'payments/{existing_session.govuk_payment_id}'),
             status_code=200,
             json={
                 'state': {'status': existing_session.status},
             }
         )
-        requests_stubber.post(
+        requests_mock.post(
             govuk_url(f'payments/{existing_session.govuk_payment_id}/cancel'),
             status_code=govuk_status_code
         )
