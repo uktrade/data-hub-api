@@ -17,7 +17,16 @@ class _PermissionTemplate(StrEnum):
     standard = '{app_label}.{action}_{model_name}'
 
 
-class PropositionModelPermissions(ViewBasedModelPermissions):
+class _PropositionViewToActionMapping:
+    """Proposition view to action mapping class."""
+
+    extra_view_to_action_mapping = {
+        'complete': 'change',
+        'abandon': 'change',
+    }
+
+
+class PropositionModelPermissions(_PropositionViewToActionMapping, ViewBasedModelPermissions):
     """Proposition model permissions class."""
 
     permission_mapping = {
@@ -39,7 +48,10 @@ class PropositionModelPermissions(ViewBasedModelPermissions):
     }
 
 
-class InvestmentProjectPropositionAssociationChecker(InvestmentProjectAssociationCheckerBase):
+class InvestmentProjectPropositionAssociationChecker(
+    _PropositionViewToActionMapping,
+    InvestmentProjectAssociationCheckerBase,
+):
     """
     Association checker for propositions, which checks association with the investment
     project linked to the proposition.
@@ -49,11 +61,6 @@ class InvestmentProjectPropositionAssociationChecker(InvestmentProjectAssociatio
     model = Proposition
     all_permission_template = _PermissionTemplate.all
     associated_permission_template = _PermissionTemplate.associated_investmentproject
-
-    extra_view_to_action_mapping = {
-        'complete': 'change',
-        'abandon': 'change',
-    }
 
 
 class IsAssociatedToInvestmentProjectPropositionPermission(IsAssociatedToObjectPermission):

@@ -95,6 +95,8 @@ class ViewBasedModelPermissions(BasePermission):
         ),
     }
 
+    extra_view_to_action_mapping = None
+
     def has_permission(self, request, view):
         """Returns whether the user has permission for a view."""
         if not request.user or not request.user.is_authenticated:
@@ -110,7 +112,10 @@ class ViewBasedModelPermissions(BasePermission):
         Returns the permissions that a user should have one of for a particular method.
         """
         action = get_model_action_for_view_action(
-            request.method, view.action, many_to_many=self.many_to_many
+            request.method,
+            view.action,
+            many_to_many=self.many_to_many,
+            extra_view_to_action_mapping=self.extra_view_to_action_mapping,
         )
 
         format_kwargs = {
@@ -198,8 +203,8 @@ def get_model_action_for_view_action(
     if view_action is None:
         raise APIMethodNotAllowedException()
 
-    mapping = _MANY_TO_MANY_VIEW_TO_ACTION_MAPPING \
-        if many_to_many else _VIEW_TO_ACTION_MAPPING
+    mapping = _MANY_TO_MANY_VIEW_TO_ACTION_MAPPING.copy() \
+        if many_to_many else _VIEW_TO_ACTION_MAPPING.copy()
 
     if extra_view_to_action_mapping is not None:
         mapping.update(extra_view_to_action_mapping)
