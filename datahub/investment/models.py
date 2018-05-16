@@ -385,12 +385,17 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
         """Keep the original stage value so that we can see if it changes when saving."""
         super().__init__(*args, **kwargs)
         self.__stage_id = self.stage_id
+        self.__project_manager_id = self.project_manager_id
 
     def save(self, *args, **kwargs):
         """Updates the stage log after saving."""
         adding = self._state.adding
 
-        if self.project_manager and self.project_manager_first_assigned_on is None:
+        if (
+            self.__project_manager_id is None
+            and self.project_manager
+            and self.project_manager_first_assigned_on is None
+        ):
             self.project_manager_first_assigned_on = self.modified_on
 
         super().save(*args, **kwargs)
