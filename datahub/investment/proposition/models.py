@@ -61,7 +61,8 @@ class Proposition(BaseModel):
     investment_project = models.ForeignKey(
         'investment.InvestmentProject', on_delete=models.CASCADE, related_name='proposition'
     )
-    assigned_to = models.ForeignKey(
+    # adviser to whom a proposition is assigned
+    adviser = models.ForeignKey(
         'company.Advisor', on_delete=models.CASCADE, related_name='+'
     )
     deadline = models.DateField()
