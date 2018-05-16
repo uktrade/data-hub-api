@@ -401,7 +401,7 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
         super().save(*args, **kwargs)
 
         self._update_stage_log(adding)
-        self.__project_manager = self.project_manager
+        self.__project_manager_id = self.project_manager_id
 
     def _update_stage_log(self, adding):
         """Creates a log of changes to stage field.
