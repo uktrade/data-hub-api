@@ -1451,8 +1451,6 @@ class TestPartialUpdateView(APITestMixin):
             project_manager_id=adviser_1.id,
             project_assurance_adviser_id=adviser_2.id
         )
-        # to make sure new pm assigned will not change original date
-        project_manager_first_assigned_on = project.project_manager_first_assigned_on
         url = reverse('api-v3:investment:investment-item',
                       kwargs={'pk': project.pk})
         request_data = {
@@ -1488,7 +1486,46 @@ class TestPartialUpdateView(APITestMixin):
         assert response_data['team_complete'] is True
 
         project.refresh_from_db()
-        assert project.project_manager_first_assigned_on == project_manager_first_assigned_on
+        # project manager already existed so that first assigned date couldn't be captured
+        # once project manager is changed it is no longer being the first change
+        # so project_manager_first_assigned_on should be null
+        assert project.project_manager_first_assigned_on is None
+
+    @freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc))
+    def test_assigning_project_manager_first_time_sets_date(self):
+        """Test that when project manager is first time assigned, a date is being recorded."""
+        crm_team = constants.Team.crm.value
+        adviser_1 = AdviserFactory(dit_team_id=crm_team.id)
+        adviser_2 = AdviserFactory()
+        project = InvestmentProjectFactory(
+            project_assurance_adviser_id=adviser_2.id
+        )
+        assert project.project_manager_first_assigned_on is None
+
+        url = reverse('api-v3:investment:investment-item',
+                      kwargs={'pk': project.pk})
+        request_data = {
+            'project_manager': {
+                'id': str(adviser_1.id)
+            }
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+
+        assert response_data['project_manager'] == {
+            'id': str(adviser_1.pk),
+            'first_name': adviser_1.first_name,
+            'last_name': adviser_1.last_name,
+            'name': adviser_1.name
+        }
+        assert response_data['project_manager_team'] == {
+            'id': str(crm_team.id),
+            'name': crm_team.name
+        }
+        project.refresh_from_db()
+        assigned_on = datetime(2017, 4, 28, 17, 35, tzinfo=utc)
+        assert project.project_manager_first_assigned_on == assigned_on
 
     def test_update_read_only_fields(self):
         """Test updating read-only fields."""
