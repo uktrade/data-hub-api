@@ -284,6 +284,19 @@
       - order
       - ordersubscriber
   model: auth.group
+- fields:
+    name: Policy feedback
+    permissions:
+    - - add_policy_feedback_interaction
+      - interaction
+      - interaction
+    - - read_policy_feedback_interaction
+      - interaction
+      - interaction
+    - - change_policy_feedback_interaction
+      - interaction
+      - interaction
+  model: auth.group
 
 
 # metadata.teamrole

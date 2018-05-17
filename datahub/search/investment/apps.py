@@ -69,9 +69,7 @@ class InvestmentSearchApp(SearchApp):
         dit_team_id = request.user.dit_team_id
         to_one_filters, to_many_filters = get_association_filters(dit_team_id)
 
-        filters = {f'{field}.dit_team.id': value for field, value in to_one_filters}
-        filters.update({
-            f'{field.es_field_name}.dit_team.id': value for field, value in to_many_filters
-        })
-
-        return filters
+        return [
+            *[(f'{field}.dit_team.id', value) for field, value in to_one_filters],
+            *[(f'{field.es_field_name}.dit_team.id', value) for field, value in to_many_filters],
+        ]
