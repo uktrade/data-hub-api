@@ -1,30 +1,7 @@
-from dateutil.parser import parse as dateutil_parse
 from rest_framework import serializers
 from rest_framework.settings import api_settings
 
 from datahub.search.query_builder import MAX_RESULTS
-
-
-class RelaxedDateTimeField(serializers.Field):
-    """
-    Relaxed DateTime field.
-
-    Front end uses free text field for data filters, that's why
-    we need to accept date/datetime in various different formats.
-    DRF DateTimeField doesn't offer that flexibility.
-    """
-
-    default_error_messages = {
-        'invalid': 'Date is in incorrect format.'
-    }
-
-    def to_internal_value(self, data):
-        """Parses data into datetime."""
-        try:
-            data = dateutil_parse(data)
-        except ValueError:
-            self.fail('invalid', value=data)
-        return data
 
 
 class SingleOrListField(serializers.ListField):

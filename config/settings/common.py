@@ -63,6 +63,7 @@ LOCAL_APPS = [
     'datahub.feature_flag.apps.FeatureFlagConfig',
     'datahub.interaction',
     'datahub.investment',
+    'datahub.investment.proposition',
     'datahub.leads',
     'datahub.metadata',
     'datahub.oauth',
@@ -290,6 +291,14 @@ if REDIS_BASE_URL:
 
 # FRONTEND
 DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://localhost:3000')
+
+# DT07 reporting service (used for company timeline)
+DATA_SCIENCE_COMPANY_API_URL = env('DATA_SCIENCE_COMPANY_API_URL', default='')
+DATA_SCIENCE_COMPANY_API_ID = env('DATA_SCIENCE_COMPANY_API_ID', default='')
+DATA_SCIENCE_COMPANY_API_KEY = env('DATA_SCIENCE_COMPANY_API_KEY', default='')
+DATA_SCIENCE_COMPANY_API_TIMEOUT = 15  # seconds
+# The company timeline API doesn't sign responses at present
+DATA_SCIENCE_COMPANY_API_VERIFY_RESPONSES = False
 
 # OMIS
 

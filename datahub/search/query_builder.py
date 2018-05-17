@@ -187,7 +187,7 @@ def _build_entity_permission_query(permission_filters):
     if permission_filters is EXCLUDE_ALL:
         return MatchNone()
 
-    subqueries = [Term(**{field: value}) for field, value in permission_filters.items()]
+    subqueries = [Term(**{field: value}) for field, value in permission_filters]
 
     # Check if there are any should subqueries (of which at least one should be matched).
     # If there are no conditions, return MatchNone() to ensure that all results are filtered out

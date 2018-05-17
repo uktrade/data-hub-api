@@ -407,7 +407,7 @@
     company: 0f5216e0-849f-11e6-ae22-56b6b6499611
     contact: 952232d2-1d25-4c3a-bcac-2f3a30a94da9
     event: ~
-    service: f56eb92b-3499-e211-a939-e4115bead28a
+    service: d89f24c7-e888-46c4-b36a-40ab54b6348b
     service_delivery_status: ~
     grant_amount_offered: ~
     net_company_receipt: ~
@@ -588,6 +588,50 @@
     proposal_deadline: '2017-08-31'
     created_on: '2017-06-15T10:00:00Z'
     modified_on: '2017-06-15T15:30:00Z'
+
+- model: proposition.proposition
+  pk: 74a7eafa-4582-4304-8027-022a75df4948
+  fields:
+    name: Superb prospect
+    scope: Everything
+    deadline: 2020-10-01
+    adviser: 5a644146-5298-4741-91f3-d5d7558adf47
+    created_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
+    created_on: '2017-06-15T12:00:00Z'
+    investment_project: 18750b26-a8c3-41b2-8d3a-fb0b930c2270
+    status: ongoing
+    modified_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
+    modified_on: '2017-06-15T12:00:00Z'
+
+- model: proposition.proposition
+  pk: 45eef900-bd85-4679-824b-a74369cb6f18
+  fields:
+    name: List of cities
+    scope: Parks
+    deadline: 2020-10-01
+    adviser: 5a644146-5298-4741-91f3-d5d7558adf47
+    created_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
+    created_on: '2017-06-15T14:00:00Z'
+    investment_project: 18750b26-a8c3-41b2-8d3a-fb0b930c2270
+    status: abandoned
+    details: Initial scope was wrong.
+    modified_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
+    modified_on: '2017-06-15T14:30:00Z'
+
+- model: proposition.proposition
+  pk: 3322750d-a645-4460-b584-8f9254459246
+  fields:
+    name: List of cities
+    scope: Parks and unemployment
+    deadline: 2020-10-01
+    adviser: 5a644146-5298-4741-91f3-d5d7558adf47
+    created_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
+    created_on: '2017-06-15T15:00:00Z'
+    investment_project: 18750b26-a8c3-41b2-8d3a-fb0b930c2270
+    status: completed
+    details: Provided all materials.
+    modified_by: d7493b4e-5d7b-4834-98d9-28b78a74052a
+    modified_on: '2017-06-15T16:00:00Z'
 
 - model: investment.investmentprojectteammember
   pk: 1

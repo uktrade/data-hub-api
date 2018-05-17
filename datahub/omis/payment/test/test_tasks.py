@@ -20,14 +20,14 @@ class TestRefreshPendingPaymentGatewaySessions:
     `refresh_payment_gateway_session` tasks.
     """
 
-    def test_refresh(self, requests_stubber):
+    def test_refresh(self, requests_mock):
         """
         Test that only ongoing sessions older than 60 minutes are refreshed against GOV.UK Pay.
         Note that the value '60 minutes' is a parameter initialised in the test
         and not part of the logic of the task.
         """
         # mock call to GOV.UK Pay
-        requests_stubber.register_uri(
+        requests_mock.register_uri(
             'GET',
             re.compile(govuk_url(f'payments/*')),
             json={'state': {'status': 'failed'}}
@@ -59,13 +59,13 @@ class TestRefreshPendingPaymentGatewaySessions:
             refresh_pending_payment_gateway_sessions(age_check=60)
 
         # check result
-        assert requests_stubber.call_count == 3
+        assert requests_mock.call_count == 3
         for session in sessions[-3:]:
             session.refresh_from_db()
             assert session.status == PaymentGatewaySessionStatus.failed
 
     @freeze_time('2017-04-18 20:00')
-    def test_one_failed_refresh_doesnt_stop_others(self, requests_stubber):
+    def test_one_failed_refresh_doesnt_stop_others(self, requests_mock):
         """
         Test that if one refresh fails, the other ones are still carried on
         and committed to the databasea.
@@ -75,14 +75,14 @@ class TestRefreshPendingPaymentGatewaySessions:
         """
         # mock calls to GOV.UK Pay
         govuk_payment_ids = ['pay-1', 'pay-2', 'pay-3']
-        requests_stubber.get(
+        requests_mock.get(
             govuk_url(f'payments/{govuk_payment_ids[0]}'), status_code=200,
             json={'state': {'status': 'failed'}}
         )
-        requests_stubber.get(
+        requests_mock.get(
             govuk_url(f'payments/{govuk_payment_ids[1]}'), status_code=500
         )
-        requests_stubber.get(
+        requests_mock.get(
             govuk_url(f'payments/{govuk_payment_ids[2]}'), status_code=200,
             json={'state': {'status': 'failed'}}
         )
@@ -101,7 +101,7 @@ class TestRefreshPendingPaymentGatewaySessions:
         for session in sessions:
             session.refresh_from_db()
 
-        assert requests_stubber.call_count == 3
+        assert requests_mock.call_count == 3
         assert sessions[0].status == PaymentGatewaySessionStatus.failed
         assert sessions[1].status == PaymentGatewaySessionStatus.started
         assert sessions[2].status == PaymentGatewaySessionStatus.failed
