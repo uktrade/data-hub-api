@@ -10,6 +10,7 @@ python /app/manage.py loadinitialmetadata
 
 # TODO abstract this into a method in ./manage.py
 echo "import datetime
+from django.contrib.auth.models import Group
 from django.utils.timezone import now
 from oauth2_provider.models import AccessToken
 from datahub.company.models import Advisor
@@ -26,6 +27,24 @@ dit_staff_user = Advisor.objects.create_user(
 AccessToken.objects.create(
     user=dit_staff_user,
     token='ditStaffToken',
+    expires=now() + datetime.timedelta(days=1),
+    scope='data-hub:internal-front-end',
+)
+
+policy_feedback_group = Group.objects.get(name='Policy feedback')
+
+policy_feedback_staff_user = Advisor.objects.create_user(
+    email='policy_feedback_staff@datahub.com',
+    first_name='Policy Feedback',
+    last_name='Staff',
+    dit_team_id=dit_east_midlands_id,
+)
+
+policy_feedback_staff_user.groups.add(policy_feedback_group)
+
+AccessToken.objects.create(
+    user=policy_feedback_staff_user,
+    token='policyFeedbackStaffToken',
     expires=now() + datetime.timedelta(days=1),
     scope='data-hub:internal-front-end',
 )
