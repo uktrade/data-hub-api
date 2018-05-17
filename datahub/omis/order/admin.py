@@ -22,10 +22,9 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_protect
 
 from datahub.core.admin import ReadOnlyAdmin
-from datahub.omis.core.exceptions import Conflict
+from datahub.core.exceptions import APIConflictException
 from . import validators
 from .models import CancellationReason, Order
-
 
 csrf_protect_m = method_decorator(csrf_protect)
 
@@ -50,7 +49,7 @@ class CancelOrderForm(forms.Form):
         validator.set_instance(self.order)
         try:
             validator()
-        except Conflict as e:
+        except APIConflictException as e:
             raise forms.ValidationError(e)
 
         return cleaned_data

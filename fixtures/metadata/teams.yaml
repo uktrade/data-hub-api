@@ -44,6 +44,15 @@
     - - read_associated_investmentproject_interaction
       - interaction
       - interaction
+    - - add_associated_investmentproject_proposition
+      - proposition
+      - proposition
+    - - change_associated_investmentproject_proposition
+      - proposition
+      - proposition
+    - - read_associated_investmentproject_proposition
+      - proposition
+      - proposition
   model: auth.group
 - fields:
     name: DA
@@ -135,6 +144,15 @@
     - - read_associated_investmentproject_interaction
       - interaction
       - interaction
+    - - add_associated_investmentproject_proposition
+      - proposition
+      - proposition
+    - - change_associated_investmentproject_proposition
+      - proposition
+      - proposition
+    - - read_associated_investmentproject_proposition
+      - proposition
+      - proposition
   model: auth.group
 - fields:
     name: DIT_staff
@@ -193,6 +211,15 @@
     - - read_all_interaction
       - interaction
       - interaction
+    - - add_all_proposition
+      - proposition
+      - proposition
+    - - change_all_proposition
+      - proposition
+      - proposition
+    - - read_all_proposition
+      - proposition
+      - proposition
     - - add_investmentproject
       - investment
       - investmentproject

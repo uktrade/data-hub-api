@@ -6,7 +6,7 @@ from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.omis.core.exceptions import Conflict
+from datahub.core.exceptions import APIConflictException
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import (
     OrderFactory, OrderPaidFactory, OrderWithAcceptedQuoteFactory
@@ -231,13 +231,13 @@ class TestPaymentGatewaySessionManager:
     def test_exception_if_order_in_disallowed_status(self, disallowed_status):
         """
         Test that if the order is not in one of the allowed statuses, the method raises
-        Conflict.
+        APIConflictException.
         """
         assert PaymentGatewaySession.objects.count() == 0
 
         order = OrderFactory(status=disallowed_status)
 
-        with pytest.raises(Conflict):
+        with pytest.raises(APIConflictException):
             PaymentGatewaySession.objects.create_from_order(order)
 
         # test no session created
@@ -249,7 +249,7 @@ class TestPaymentGatewaySessionManager:
         but the GOV.UK payment happens, the method triggers a check on existing
         sessions, realises that one finished successfully and records the payment
         marking the order as 'paid'.
-        For this reason, the method raises Conflict as no other payment can be started.
+        For this reason, the method raises APIConflictException as no other payment can be started.
         """
         # set up db
         order = OrderWithAcceptedQuoteFactory()
@@ -285,7 +285,7 @@ class TestPaymentGatewaySessionManager:
             }
         )
 
-        with pytest.raises(Conflict):
+        with pytest.raises(APIConflictException):
             PaymentGatewaySession.objects.create_from_order(order)
 
         # check session record

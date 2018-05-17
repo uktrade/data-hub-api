@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
+from datahub.core.exceptions import APIMethodNotAllowedException
 
 # View to model action mapping for standard model-based views
 _VIEW_TO_ACTION_MAPPING = {
@@ -94,6 +95,8 @@ class ViewBasedModelPermissions(BasePermission):
         ),
     }
 
+    extra_view_to_action_mapping = None
+
     def has_permission(self, request, view):
         """Returns whether the user has permission for a view."""
         if not request.user or not request.user.is_authenticated:
@@ -109,7 +112,10 @@ class ViewBasedModelPermissions(BasePermission):
         Returns the permissions that a user should have one of for a particular method.
         """
         action = get_model_action_for_view_action(
-            request.method, view.action, many_to_many=self.many_to_many
+            request.method,
+            view.action,
+            many_to_many=self.many_to_many,
+            extra_view_to_action_mapping=self.extra_view_to_action_mapping,
         )
 
         format_kwargs = {
@@ -184,11 +190,25 @@ class IsAssociatedToObjectPermission(BasePermission):
         return True
 
 
-def get_model_action_for_view_action(http_method, view_action, many_to_many=False):
+def get_model_action_for_view_action(
+    http_method,
+    view_action,
+    many_to_many=False,
+    extra_view_to_action_mapping=None,
+):
     """Gets the model action corresponding to a view action."""
     if http_method == 'OPTIONS':
         return 'read'
 
-    mapping = _MANY_TO_MANY_VIEW_TO_ACTION_MAPPING if many_to_many else _VIEW_TO_ACTION_MAPPING
+    if view_action is None:
+        raise APIMethodNotAllowedException()
+
+    mapping = (
+        _MANY_TO_MANY_VIEW_TO_ACTION_MAPPING.copy()
+        if many_to_many else _VIEW_TO_ACTION_MAPPING.copy()
+    )
+
+    if extra_view_to_action_mapping is not None:
+        mapping.update(extra_view_to_action_mapping)
 
     return mapping[view_action]

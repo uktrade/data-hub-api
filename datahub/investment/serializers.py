@@ -1,6 +1,6 @@
 """Investment serialisers for views."""
-
 from collections import Counter
+from functools import partial
 
 from django.utils.translation import ugettext_lazy
 from rest_framework import serializers
@@ -323,6 +323,12 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
             'archived_documents_url_path',
             'comments',
         )
+
+
+NestedInvestmentProjectField = partial(
+    NestedRelatedField, InvestmentProject,
+    extra_fields=('name', 'project_code')
+)
 
 
 class IProjectTeamMemberListSerializer(serializers.ListSerializer):

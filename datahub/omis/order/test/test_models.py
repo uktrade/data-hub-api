@@ -12,8 +12,8 @@ from rest_framework.exceptions import ValidationError
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
+from datahub.core.exceptions import APIConflictException
 from datahub.metadata.test.factories import TeamFactory
-from datahub.omis.core.exceptions import Conflict
 from datahub.omis.invoice.models import Invoice
 from datahub.omis.payment.models import Payment
 from datahub.omis.quote.models import Quote
@@ -27,7 +27,6 @@ from .factories import (
 )
 from ..constants import OrderStatus
 from ..models import CancellationReason
-
 
 pytestmark = pytest.mark.django_db
 
@@ -193,11 +192,11 @@ class TestGenerateQuote:
 
     @mock.patch('datahub.omis.order.models.validators')
     def test_fails_if_theres_already_an_active_quote(self, validators):
-        """Test raises Conflict if there's already an active quote."""
-        validators.NoOtherActiveQuoteExistsValidator.side_effect = Conflict('error')
+        """Test raises APIConflictException if there's already an active quote."""
+        validators.NoOtherActiveQuoteExistsValidator.side_effect = APIConflictException('error')
 
         order = OrderFactory()
-        with pytest.raises(Conflict):
+        with pytest.raises(APIConflictException):
             order.generate_quote(by=None)
 
     @pytest.mark.parametrize(
@@ -213,7 +212,7 @@ class TestGenerateQuote:
     def test_fails_if_order_not_in_draft(self, disallowed_status):
         """Test that if the order is not in `draft`, a quote cannot be generated."""
         order = OrderFactory(status=disallowed_status)
-        with pytest.raises(Conflict):
+        with pytest.raises(APIConflictException):
             order.generate_quote(by=None)
 
     def test_atomicity(self):
@@ -338,7 +337,7 @@ class TestReopen:
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
         """Test that if the order is in a disallowed status, it cannot be reopened."""
         order = OrderFactory(status=disallowed_status)
-        with pytest.raises(Conflict):
+        with pytest.raises(APIConflictException):
             order.reopen(by=None)
 
         assert order.status == disallowed_status
@@ -374,7 +373,7 @@ class TestUpdateInvoiceDetails:
         Test that if the order is in a disallowed status, the invoice details cannot be updated.
         """
         order = OrderFactory(status=disallowed_status)
-        with pytest.raises(Conflict):
+        with pytest.raises(APIConflictException):
             order.update_invoice_details()
 
         assert order.status == disallowed_status
@@ -424,7 +423,7 @@ class TestAcceptQuote:
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
         """Test that if the order is in a disallowed status, the quote cannot be accepted."""
         order = OrderFactory(status=disallowed_status)
-        with pytest.raises(Conflict):
+        with pytest.raises(APIConflictException):
             order.accept_quote(by=None)
 
         assert order.status == disallowed_status
@@ -499,7 +498,7 @@ class TestMarkOrderAsPaid:
         Test that if the order is in a disallowed status, the order cannot be marked as paid.
         """
         order = OrderFactory(status=disallowed_status)
-        with pytest.raises(Conflict):
+        with pytest.raises(APIConflictException):
             order.mark_as_paid(by=None, payments_data=[])
 
         assert order.status == disallowed_status
@@ -581,7 +580,7 @@ class TestCompleteOrder:
         Test that if the order is in a disallowed status, the order cannot be marked as complete.
         """
         order = OrderFactory(status=disallowed_status)
-        with pytest.raises(Conflict):
+        with pytest.raises(APIConflictException):
             order.complete(by=None)
 
         assert order.status == disallowed_status
@@ -671,7 +670,7 @@ class TestCancelOrder:
         reason = CancellationReason.objects.order_by('?').first()
         order = OrderFactory(status=disallowed_status)
 
-        with pytest.raises(Conflict):
+        with pytest.raises(APIConflictException):
             order.cancel(by=None, reason=reason, force=force)
 
         assert order.status == disallowed_status

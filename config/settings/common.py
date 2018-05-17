@@ -63,6 +63,7 @@ LOCAL_APPS = [
     'datahub.feature_flag.apps.FeatureFlagConfig',
     'datahub.interaction',
     'datahub.investment',
+    'datahub.investment.proposition',
     'datahub.leads',
     'datahub.metadata',
     'datahub.oauth',
