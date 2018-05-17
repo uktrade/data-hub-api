@@ -19,7 +19,7 @@ def test_mapping(setup_es):
 
     assert mapping.to_dict() == {
         'companieshousecompany': {
-            'dynamic': 'strict',
+            'dynamic': 'false',
             'properties': {
                 'company_category': {
                     'analyzer': 'lowercase_keyword_analyzer',
