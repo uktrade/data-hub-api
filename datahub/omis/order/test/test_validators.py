@@ -4,7 +4,7 @@ import pytest
 from django.db.models import Sum
 from rest_framework.exceptions import ValidationError
 
-from datahub.omis.core.exceptions import Conflict
+from datahub.core.exceptions import APIConflictException
 from .factories import (
     OrderFactory,
     OrderWithCancelledQuoteFactory,
@@ -279,7 +279,7 @@ class TestNoOtherActiveQuoteExistsValidator:
         validator = NoOtherActiveQuoteExistsValidator()
         validator.set_instance(order)
 
-        with pytest.raises(Conflict):
+        with pytest.raises(APIConflictException):
             validator()
 
     def test_without_any_active_quote(self):
@@ -345,7 +345,7 @@ class TestOrderInStatusValidator:
         )
         validator.set_instance(order)
 
-        with pytest.raises(Conflict):
+        with pytest.raises(APIConflictException):
             validator()
 
     def test_set_instance_via_serializer_instance(self):
@@ -628,7 +628,7 @@ class TestCancellableOrderValidator:
         if should_pass:
             validator()
         else:
-            with pytest.raises(Conflict):
+            with pytest.raises(APIConflictException):
                 validator()
 
 

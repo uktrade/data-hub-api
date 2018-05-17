@@ -61,6 +61,8 @@ class InvestmentProjectAssociationCheckerBase(ObjectAssociationCheckerBase):
     all_permission_template = None
     associated_permission_template = None
 
+    extra_view_to_action_mapping = None
+
     def is_associated(self, request, obj):
         """Check for connection."""
         if self.should_exclude_all(request):
@@ -72,7 +74,10 @@ class InvestmentProjectAssociationCheckerBase(ObjectAssociationCheckerBase):
     def should_apply_restrictions(self, request, view_action):
         """Check if restrictions should be applied."""
         action = get_model_action_for_view_action(
-            request.method, view_action, many_to_many=self.many_to_many
+            request.method,
+            view_action,
+            many_to_many=self.many_to_many,
+            extra_view_to_action_mapping=self.extra_view_to_action_mapping,
         )
         if action not in self.restricted_actions:
             return False
