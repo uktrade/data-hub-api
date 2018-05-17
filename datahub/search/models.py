@@ -14,7 +14,7 @@ class BaseESModel(DocType):
     SEARCH_FIELDS = ()
 
     class Meta:
-        dynamic = MetaField('strict')
+        dynamic = MetaField('false')
 
     @classmethod
     def es_document(cls, dbmodel):

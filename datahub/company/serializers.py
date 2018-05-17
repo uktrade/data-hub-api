@@ -293,14 +293,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     uk_region = NestedRelatedField(
         meta_models.UKRegion, required=False, allow_null=True
     )
-    investment_projects_invested_in = NestedRelatedField(
-        'investment.InvestmentProject', many=True, read_only=True,
-        extra_fields=('name', 'project_code'),
-        source='investor_investment_projects'
-    )
-    investment_projects_invested_in_count = serializers.IntegerField(
-        source='investor_investment_projects.count', read_only=True
-    )
     export_experience_category = NestedRelatedField(
         ExportExperienceCategory, required=False, allow_null=True
     )
@@ -415,8 +407,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'sector',
             'turnover_range',
             'uk_region',
-            'investment_projects_invested_in',
-            'investment_projects_invested_in_count',
             'export_experience_category',
         )
         read_only_fields = (

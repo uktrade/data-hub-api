@@ -20,7 +20,7 @@ def test_mapping(setup_es):
 
     assert mapping.to_dict() == {
         'order': {
-            'dynamic': 'strict',
+            'dynamic': 'false',
             'properties': {
                 'assignees': {
                     'include_in_parent': True,

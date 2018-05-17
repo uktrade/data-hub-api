@@ -1,6 +1,5 @@
 import factory
 import pytest
-import requests_mock
 from botocore.stub import Stubber
 from django.conf import settings
 from django.core.cache import CacheHandler
@@ -14,9 +13,7 @@ from datahub.core.utils import get_s3_client
 def django_db_setup(django_db_setup, django_db_blocker):
     """Fixture for DB setup."""
     with django_db_blocker.unblock():
-        # force=True is not necessary, but saves a few seconds as it doesn't check if there is
-        # any existing data
-        call_command('loadinitialmetadata', force=True)
+        call_command('loadinitialmetadata')
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -51,13 +48,6 @@ def s3_stubber():
     s3_client = get_s3_client()
     with Stubber(s3_client) as s3_stubber:
         yield s3_stubber
-
-
-@pytest.fixture()
-def requests_stubber():
-    """Requests stubber based on requests-mock"""
-    with requests_mock.mock() as requests_stubber:
-        yield requests_stubber
 
 
 @pytest.fixture()

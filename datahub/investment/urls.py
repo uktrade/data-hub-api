@@ -1,7 +1,8 @@
 """Investment views URL config."""
 
-from django.urls import path
+from django.urls import include, path
 
+from datahub.investment.proposition.urls import urlpatterns as proposition_urlpatterns
 from datahub.investment.views import (
     IProjectAuditViewSet, IProjectDocumentViewSet, IProjectModifiedSinceViewSet,
     IProjectTeamMembersViewSet, IProjectViewSet
@@ -59,6 +60,7 @@ project_document_callback = IProjectDocumentViewSet.as_view({
     'post': 'upload_complete_callback',
 })
 
+
 urlpatterns = [
     path('investment', project_collection, name='investment-collection'),
     path('investment/from', project_modified_since_collection,
@@ -77,4 +79,11 @@ urlpatterns = [
          project_document_callback, name='document-item-callback'),
     path('investment/<uuid:pk>/unarchive', unarchive_item, name='unarchive-item'),
     path('investment/<uuid:pk>/audit', audit_item, name='audit-item'),
+    path(
+        'investment/<uuid:project_pk>/',
+        include(
+            (proposition_urlpatterns, 'proposition',),
+            namespace='proposition'
+        )
+    ),
 ]

@@ -44,14 +44,26 @@ class InteractionPermission(StrEnum):
     Note that permissions on other models are independent of permissions on interactions. Also
     note that if both *_all_* and *_associated_investmentproject_* permissions are assigned to the
     same user,  the *_all_* permission will be the effective one.
+
+    The following permissions grant users additional permissions to manage policy-feedback
+    interactions:
+
+    read_policy_feedback_interaction
+    change_policy_feedback_interaction
+    add_policy_feedback_interaction
+
+    These are not effective without the standard *_all permissions.
     """
 
     read_all = 'read_all_interaction'
     read_associated_investmentproject = 'read_associated_investmentproject_interaction'
+    read_policy_feedback = 'read_policy_feedback_interaction'
     change_all = 'change_all_interaction'
     change_associated_investmentproject = 'change_associated_investmentproject_interaction'
+    change_policy_feedback = 'change_policy_feedback_interaction'
     add_all = 'add_all_interaction'
     add_associated_investmentproject = 'add_associated_investmentproject_interaction'
+    add_policy_feedback = 'add_policy_feedback_interaction'
     delete = 'delete_interaction'
 
 
@@ -83,6 +95,7 @@ class PolicyIssueType(BaseOrderedConstantModel):
 class Interaction(BaseModel):
     """Interaction."""
 
+    # Note: Kinds should also be added to _KIND_PERMISSION_MAPPING in the permissions module
     KINDS = Choices(
         ('interaction', 'Interaction'),
         ('service_delivery', 'Service delivery'),
@@ -199,6 +212,18 @@ class Interaction(BaseModel):
             (
                 InteractionPermission.change_associated_investmentproject.value,
                 'Can change interaction for associated investment projects'
+            ),
+            (
+                InteractionPermission.read_policy_feedback.value,
+                'Can read policy feedback interaction'
+            ),
+            (
+                InteractionPermission.add_policy_feedback.value,
+                'Can add policy feedback interaction'
+            ),
+            (
+                InteractionPermission.change_policy_feedback.value,
+                'Can change policy feedback interaction'
             ),
         )
         default_permissions = (

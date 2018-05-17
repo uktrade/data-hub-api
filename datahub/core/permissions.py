@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
+from datahub.core.exceptions import APIMethodNotAllowedException
 
 # View to model action mapping for standard model-based views
 _VIEW_TO_ACTION_MAPPING = {
@@ -40,6 +41,32 @@ class DjangoCrudPermission(DjangoModelPermissions):
     perms_map['GET'].append('%(app_label)s.read_%(model_name)s')
 
 
+class HasPermissions(BasePermission):
+    """Simple DRF permission class that checks if the user has all of a set of permissions."""
+
+    def __init__(self, *required_permissions):
+        """Initialises the instance with a list of permissions that the user must have."""
+        if not required_permissions:
+            raise ValueError('At least one permission must be provided.')
+        self.required_permissions = required_permissions
+
+    def __call__(self):
+        """
+        Used for compatibility with DRF.
+
+        (DRF instantiates permission classes, but we use instantiation to configure the class
+        here.)
+        """
+        return self
+
+    def has_permission(self, request, view):
+        """Returns whether the user has permission for a view."""
+        if not request.user or not request.user.is_authenticated:
+            return False
+
+        return all(request.user.has_perm(perm) for perm in self.required_permissions)
+
+
 class ViewBasedModelPermissions(BasePermission):
     """
     Model-permission-based permission class.
@@ -68,6 +95,8 @@ class ViewBasedModelPermissions(BasePermission):
         ),
     }
 
+    extra_view_to_action_mapping = None
+
     def has_permission(self, request, view):
         """Returns whether the user has permission for a view."""
         if not request.user or not request.user.is_authenticated:
@@ -83,7 +112,10 @@ class ViewBasedModelPermissions(BasePermission):
         Returns the permissions that a user should have one of for a particular method.
         """
         action = get_model_action_for_view_action(
-            request.method, view.action, many_to_many=self.many_to_many
+            request.method,
+            view.action,
+            many_to_many=self.many_to_many,
+            extra_view_to_action_mapping=self.extra_view_to_action_mapping,
         )
 
         format_kwargs = {
@@ -158,11 +190,25 @@ class IsAssociatedToObjectPermission(BasePermission):
         return True
 
 
-def get_model_action_for_view_action(http_method, view_action, many_to_many=False):
+def get_model_action_for_view_action(
+    http_method,
+    view_action,
+    many_to_many=False,
+    extra_view_to_action_mapping=None,
+):
     """Gets the model action corresponding to a view action."""
     if http_method == 'OPTIONS':
         return 'read'
 
-    mapping = _MANY_TO_MANY_VIEW_TO_ACTION_MAPPING if many_to_many else _VIEW_TO_ACTION_MAPPING
+    if view_action is None:
+        raise APIMethodNotAllowedException()
+
+    mapping = (
+        _MANY_TO_MANY_VIEW_TO_ACTION_MAPPING.copy()
+        if many_to_many else _VIEW_TO_ACTION_MAPPING.copy()
+    )
+
+    if extra_view_to_action_mapping is not None:
+        mapping.update(extra_view_to_action_mapping)
 
     return mapping[view_action]

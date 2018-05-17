@@ -15,13 +15,32 @@ from datahub.core import constants
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_queryset
 from datahub.interaction.models import CommunicationChannel, Interaction
 from datahub.interaction.test.factories import (
-    CompanyInteractionFactory, InvestmentProjectInteractionFactory, ServiceDeliveryFactory,
+    CompanyInteractionFactory,
+    InvestmentProjectInteractionFactory,
+    PolicyFeedbackFactory,
+    ServiceDeliveryFactory,
+)
+from datahub.interaction.test.views.utils import (
+    create_interaction_user_without_policy_feedback,
+    create_read_policy_feedback_user,
 )
 from datahub.investment.test.factories import ActiveInvestmentProjectFactory
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
 
 pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture
+def policy_feedback_user():
+    """User with full interaction and policy feedback permissions."""
+    yield create_read_policy_feedback_user()
+
+
+@pytest.fixture
+def non_policy_feedback_user():
+    """User with interaction permissions without policy feedback permissions."""
+    yield create_interaction_user_without_policy_feedback()
 
 
 @pytest.fixture
@@ -57,7 +76,15 @@ def interactions(setup_es):
     yield data
 
 
-class TestViews(APITestMixin):
+@pytest.fixture
+def policy_feedback_interactions(setup_es):
+    """Policy feedback interaction test data."""
+    interactions = PolicyFeedbackFactory.create_batch(3)
+    setup_es.indices.refresh()
+    yield interactions
+
+
+class TestInteractionEntitySearchView(APITestMixin):
     """Tests interaction search views."""
 
     def test_interaction_search_no_permissions(self):
@@ -80,6 +107,46 @@ class TestViews(APITestMixin):
         response_data = response.json()
         assert response_data['count'] == len(interactions)
         expected_ids = Counter(str(interaction.id) for interaction in interactions)
+        assert Counter([item['id'] for item in response_data['results']]) == expected_ids
+
+    def test_non_policy_feedback_user_cannot_access_policy_feedback(
+            self,
+            non_policy_feedback_user,
+            interactions,
+            policy_feedback_interactions,
+    ):
+        """
+        Test that users without specific policy feedback permissions don't get policy
+        feedback search results.
+        """
+        url = reverse('api-v3:search:interaction')
+
+        api_client = self.create_api_client(user=non_policy_feedback_user)
+        response = api_client.post(url, {}, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == len(interactions)
+        expected_ids = Counter(str(interaction.id) for interaction in interactions)
+        assert Counter([item['id'] for item in response_data['results']]) == expected_ids
+
+    def test_policy_feedback_user_can_access_policy_feedback(
+            self,
+            policy_feedback_user,
+            interactions,
+            policy_feedback_interactions,
+    ):
+        """Test that users with policy feedback permissions get policy feedback search results."""
+        url = reverse('api-v3:search:interaction')
+
+        api_client = self.create_api_client(user=policy_feedback_user)
+        response = api_client.post(url, {}, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        expected_interactions = interactions + policy_feedback_interactions
+        expected_ids = Counter(str(interaction.id) for interaction in expected_interactions)
+        assert response_data['count'] == len(expected_interactions)
         assert Counter([item['id'] for item in response_data['results']]) == expected_ids
 
     def test_limit(self, interactions):
@@ -685,3 +752,61 @@ class TestViews(APITestMixin):
             interaction.pk for interaction in investment_project_interactions[sector_level:]
         }
         assert actual_ids == expected_ids
+
+
+class TestInteractionGlobalSearchView(APITestMixin):
+    """Tests basic search view."""
+
+    def test_non_policy_feedback_user_cannot_access_policy_feedback(
+            self,
+            non_policy_feedback_user,
+            interactions,
+            policy_feedback_interactions,
+    ):
+        """
+        Test that users without specific policy feedback permissions don't get policy
+        feedback search results.
+        """
+        url = reverse('api-v3:search:basic')
+
+        api_client = self.create_api_client(user=non_policy_feedback_user)
+        response = api_client.get(url, {
+            'term': '',
+            'entity': 'interaction',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == len(interactions)
+        expected_ids = Counter(str(interaction.id) for interaction in interactions)
+        assert Counter([item['id'] for item in response_data['results']]) == expected_ids
+        assert response_data['aggregations'] == [{
+            'count': 5,
+            'entity': 'interaction'
+        }]
+
+    def test_policy_feedback_user_can_access_policy_feedback(
+            self,
+            policy_feedback_user,
+            interactions,
+            policy_feedback_interactions,
+    ):
+        """Test that users with policy feedback permissions get policy feedback search results."""
+        url = reverse('api-v3:search:basic')
+
+        api_client = self.create_api_client(user=policy_feedback_user)
+        response = api_client.get(url, {
+            'term': '',
+            'entity': 'interaction',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        expected_interactions = interactions + policy_feedback_interactions
+        expected_ids = Counter(str(interaction.id) for interaction in expected_interactions)
+        assert response_data['count'] == len(expected_interactions)
+        assert Counter([item['id'] for item in response_data['results']]) == expected_ids
+        assert response_data['aggregations'] == [{
+            'count': 8,
+            'entity': 'interaction'
+        }]
