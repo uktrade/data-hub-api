@@ -15,7 +15,7 @@ from datahub.investment.models import InvestmentProject
 from datahub.metadata.models import Service, Team
 from .models import (CommunicationChannel, Interaction, PolicyArea, PolicyIssueType,
                      ServiceDeliveryStatus)
-from .permissions import HasAssociatedInvestmentProjectValidator
+from .permissions import HasAssociatedInvestmentProjectValidator, KindPermissionValidator
 
 
 class InteractionSerializer(serializers.ModelSerializer):
@@ -116,6 +116,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             'archived_documents_url_path',
         )
         validators = [
+            KindPermissionValidator(),
             HasAssociatedInvestmentProjectValidator(),
             RulesBasedValidator(
                 ValidationRule(

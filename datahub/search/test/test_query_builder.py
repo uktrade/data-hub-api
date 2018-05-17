@@ -254,10 +254,10 @@ def test_date_range_fields():
 @pytest.mark.parametrize(
     'filters,expected',
     (
-        # An empty dict of conditions should mean that there are no conditions that would permit
+        # An empty list of conditions should mean that there are no conditions that would permit
         # access.
         (
-            {},
+            [],
             {
                 'match_none': {}
             }
@@ -267,9 +267,9 @@ def test_date_range_fields():
             None
         ),
         (
-            {
-                'field_name': 'field value'
-            },
+            [
+                ('field_name', 'field value'),
+            ],
             {
                 'bool': {
                     'should': [
@@ -279,10 +279,10 @@ def test_date_range_fields():
             }
         ),
         (
-            {
-                'field_name1': 'field value 1',
-                'field_name2': 'field value 2'
-            },
+            [
+                ('field_name1', 'field value 1'),
+                ('field_name2', 'field value 2'),
+            ],
             {
                 'bool': {
                     'should': [
