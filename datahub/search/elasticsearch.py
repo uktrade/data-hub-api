@@ -75,6 +75,14 @@ lowercase_analyzer = analysis.CustomAnalyzer(
 )
 
 
+ANALYZERS = (
+    lowercase_keyword_analyzer,
+    trigram_analyzer,
+    english_analyzer,
+    lowercase_analyzer,
+)
+
+
 def configure_connection():
     """Configure Elasticsearch default connection."""
     if settings.ES_USE_AWS_AUTH:
@@ -113,14 +121,6 @@ def configure_connection():
 def get_client():
     """Gets an instance of the Elasticsearch client from the connection cache."""
     return connections.get_connection()
-
-
-ANALYZERS = (
-    lowercase_keyword_analyzer,
-    trigram_analyzer,
-    english_analyzer,
-    lowercase_analyzer,
-)
 
 
 def configure_index(index_name, index_settings=None):
