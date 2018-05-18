@@ -6,16 +6,13 @@ from .. import elasticsearch
 
 
 @mock.patch('datahub.search.elasticsearch.es_bulk')
-@mock.patch('datahub.search.elasticsearch.connections')
-def test_bulk(connections, es_bulk):
+def test_bulk(es_bulk, mock_es_client):
     """Tests detailed company search."""
-    es_bulk.return_value = {}
-    connections.get_connection.return_value = None
     actions = []
     chunk_size = 10
     elasticsearch.bulk(actions=actions, chunk_size=chunk_size)
 
-    es_bulk.assert_called_with(None, actions=actions, chunk_size=chunk_size)
+    es_bulk.assert_called_with(mock_es_client.return_value, actions=actions, chunk_size=chunk_size)
 
 
 @mock.patch('datahub.search.elasticsearch.settings')
@@ -35,14 +32,13 @@ def test_configure_connection(connections, settings):
     })
 
 
-@mock.patch('elasticsearch_dsl.connections.connections.get_connection')
-def test_configure_index_creates_index_if_it_doesnt_exist(get_connection_mock):
+def test_configure_index_creates_index_if_it_doesnt_exist(mock_es_client):
     """Test that configure_index() creates the index when it doesn't exist."""
     index = 'test-index'
     index_settings = {
         'testsetting1': 'testval1'
     }
-    connection = get_connection_mock.return_value
+    connection = mock_es_client.return_value
     connection.indices.exists.return_value = False
     elasticsearch.configure_index(index, index_settings=index_settings)
     connection.indices.create.assert_called_once_with(
@@ -110,14 +106,13 @@ def test_configure_index_creates_index_if_it_doesnt_exist(get_connection_mock):
     )
 
 
-@mock.patch('elasticsearch_dsl.connections.connections.get_connection')
-def test_configure_index_doesnt_create_index_if_it_exists(get_connection_mock):
+def test_configure_index_doesnt_create_index_if_it_exists(mock_es_client):
     """Test that configure_index() doesn't create the index when it already exists."""
     index = 'test-index'
     index_settings = {
         'testsetting1': 'testval1'
     }
-    connection = get_connection_mock.return_value
+    connection = mock_es_client.return_value
     connection.indices.exists.return_value = True
     elasticsearch.configure_index(index, index_settings=index_settings)
     connection.indices.create.assert_not_called()
