@@ -10,7 +10,7 @@ def test_event_dbmodel_to_dict(setup_es):
     """Tests conversion of db model to dict."""
     event = EventFactory()
 
-    result = ESEvent.dbmodel_to_dict(event)
+    result = ESEvent.db_object_to_dict(event)
 
     keys = {
         'id',
@@ -44,6 +44,6 @@ def test_event_dbmodels_to_es_documents(setup_es):
     """Tests conversion of db models to Elasticsearch documents."""
     events = EventFactory.create_batch(2)
 
-    result = ESEvent.dbmodels_to_es_documents(events)
+    result = ESEvent.db_objects_to_es_documents(events)
 
     assert len(list(result)) == len(events)

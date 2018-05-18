@@ -28,7 +28,7 @@ def test_order_to_dict(Factory):
     OrderSubscriberFactory.create_batch(2, order=order)
     OrderAssigneeFactory.create_batch(2, order=order)
 
-    result = ESOrder.dbmodel_to_dict(order)
+    result = ESOrder.db_object_to_dict(order)
 
     assert result == {
         'id': str(order.pk),
@@ -161,6 +161,6 @@ def test_orders_to_es_documents():
     """Test converting 2 orders to Elasticsearch documents."""
     orders = OrderFactory.create_batch(2)
 
-    result = ESOrder.dbmodels_to_es_documents(orders)
+    result = ESOrder.db_objects_to_es_documents(orders)
 
     assert {item['_id'] for item in result} == {str(item.pk) for item in orders}

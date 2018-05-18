@@ -10,7 +10,7 @@ def test_company_dbmodel_to_dict(setup_es):
     """Tests conversion of db model to dict."""
     company = CompanyFactory()
 
-    result = ESCompany.dbmodel_to_dict(company)
+    result = ESCompany.db_object_to_dict(company)
 
     keys = {
         'account_manager',
@@ -65,6 +65,6 @@ def test_company_dbmodels_to_es_documents(setup_es):
     """Tests conversion of db models to Elasticsearch documents."""
     companies = CompanyFactory.create_batch(2)
 
-    result = ESCompany.dbmodels_to_es_documents(companies)
+    result = ESCompany.db_objects_to_es_documents(companies)
 
     assert len(list(result)) == len(companies)
