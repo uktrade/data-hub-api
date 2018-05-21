@@ -21,7 +21,7 @@ class MatchNone(Query):
 
 def delete_document(model, document_id):
     """Deletes specified model's document."""
-    doc = model.get(id=document_id, index=settings.ES_INDEX)
+    doc = model(_id=document_id, _index=settings.ES_INDEX)
     doc.delete()
 
 
