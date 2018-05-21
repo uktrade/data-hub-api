@@ -1,14 +1,15 @@
 from logging import getLogger
 
 from django.core.management.base import BaseCommand
-from elasticsearch_dsl.connections import connections
+
+from datahub.search.elasticsearch import get_client
 
 logger = getLogger(__name__)
 
 
 def delete_alias(current_index, alias_name):
     """Deletes alias for current index."""
-    es = connections.get_connection()
+    es = get_client()
     return es.indices.delete_alias(index=current_index, name=alias_name)
 
 
