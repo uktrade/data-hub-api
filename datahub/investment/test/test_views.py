@@ -1136,14 +1136,20 @@ class TestPartialUpdateView(APITestMixin):
 
     def test_change_stage_verify_win_failure(self):
         """Tests moving a partially complete project to the 'Verify win' stage."""
-        project = ActiveInvestmentProjectFactory(number_new_jobs=1)
+        project_manager, api_client = _create_user_and_api_client(
+            self, TeamFactory(), [InvestmentProjectPermission.change_associated]
+        )
+        project = ActiveInvestmentProjectFactory(
+            number_new_jobs=1,
+            project_manager=project_manager,
+        )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'stage': {
                 'id': constants.InvestmentProjectStage.verify_win.value.id
             }
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
@@ -1163,11 +1169,19 @@ class TestPartialUpdateView(APITestMixin):
             'foreign_equity_investment': ['This field is required.'],
         }
 
-    def test_change_stage_verify_win_success(self):
+    @pytest.mark.parametrize(
+        'field',
+        ('project_manager', 'project_assurance_adviser',),
+    )
+    def test_change_stage_verify_win_success(self, field):
         """Tests moving a complete project to the 'Verify win' stage."""
         strategic_drivers = [
             constants.InvestmentStrategicDriver.access_to_market.value.id
         ]
+        adviser, api_client = _create_user_and_api_client(
+            self, TeamFactory(), [InvestmentProjectPermission.change_associated]
+        )
+        extra = {field: adviser}
         project = ActiveInvestmentProjectFactory(
             client_cannot_provide_foreign_investment=False,
             foreign_equity_investment=200,
@@ -1187,6 +1201,24 @@ class TestPartialUpdateView(APITestMixin):
             address_postcode='SW1A 2AA',
             delivery_partners=[random_obj_for_model(InvestmentDeliveryPartner)],
             average_salary_id=constants.SalaryRange.below_25000.value.id,
+            **extra,
+        )
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.verify_win.value.id
+            }
+        }
+        response = api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_cannot_change_stage_verify_win_if_not_pm_or_paa(self):
+        """
+        Tests user other than pm or paa cannot move a complete project
+        to the 'Verify win' stage.
+        """
+        project = VerifyWinInvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.active.value.id
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
@@ -1195,7 +1227,12 @@ class TestPartialUpdateView(APITestMixin):
             }
         }
         response = self.api_client.patch(url, data=request_data, format='json')
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'stage': [
+                'Only Project Manager or Project Assurance Adviser can move project to Verify Win.'
+            ]
+        }
 
     def test_change_stage_to_won(self):
         """
