@@ -67,6 +67,7 @@ LOCAL_APPS = [
     'datahub.leads',
     'datahub.metadata',
     'datahub.oauth',
+    'datahub.admin_report',
     'datahub.search.apps.SearchConfig',
     'datahub.user',
     'datahub.dbmaintenance',
