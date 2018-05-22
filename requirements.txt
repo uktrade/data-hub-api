@@ -11,8 +11,8 @@ aws-requests-auth==0.4.1
 backcall==0.1.0           # via ipython
 billiard==3.5.0.3         # via celery
 boto3==1.7.24
-botocore==1.10.24         # via boto3, s3transfer
-celery==4.1.0
+botocore==1.10.25         # via boto3, s3transfer
+celery==4.1.1
 certifi==2018.4.16        # via requests
 chardet==3.0.4            # via chardet, requests
 click==6.7                # via click, pip-tools
@@ -69,8 +69,8 @@ mohawk==0.3.4
 monotonic==1.5            # via notifications-python-client
 more-itertools==4.1.0     # via pytest
 notifications-python-client==4.8.2
-oauthlib==2.0.7           # via django-oauth-toolkit
-parso==0.2.0              # via jedi
+oauthlib==2.1.0           # via django-oauth-toolkit
+parso==0.2.1              # via jedi
 pep8-naming==0.7.0
 pexpect==4.5.0            # via ipython
 pickleshare==0.7.4        # via ipython, pickleshare
