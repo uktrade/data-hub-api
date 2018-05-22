@@ -36,7 +36,7 @@ elasticsearch-dsl==5.4.0
 aws-requests-auth==0.4.1
 
 # Celery
-celery==4.1.0
+celery==4.1.1
 
 # Testing and dev
 pytest==3.5.1
