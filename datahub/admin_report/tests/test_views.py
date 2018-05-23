@@ -80,7 +80,7 @@ class TestReportAdmin(AdminTestMixin):
         response = client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    @freeze_time('2018-01-01 00:00:00')
+    @freeze_time('2018-01-01 11:12:13')
     def test_report_download(self):
         """Test the download of a report."""
         obj = MetadataModelFactory()
@@ -96,7 +96,7 @@ class TestReportAdmin(AdminTestMixin):
         response = client.get(url)
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Disposition')) == (
-            'attachment', {'filename': 'Test report - 2018-01-01.csv'}
+            'attachment', {'filename': 'Test report - 2018-01-01-11-12-13.csv'}
         )
         assert response.getvalue().decode('utf-8') == f"""ID,Name\r
 {str(obj.pk)},{obj.name}\r
