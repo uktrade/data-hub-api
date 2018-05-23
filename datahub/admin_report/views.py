@@ -1,10 +1,10 @@
 from csv import DictWriter
 
 from django.contrib.admin import site
-from django.http import FileResponse
+from django.http import FileResponse, Http404
 from django.template.response import TemplateResponse
 
-from datahub.admin_report.report import get_report_by_id, get_reports_by_model
+from datahub.admin_report.report import get_report_by_id, get_reports_by_model, report_exists
 from datahub.core.utils import Echo
 
 CSV_CONTENT_TYPE = 'text/csv'
@@ -31,6 +31,9 @@ def list_reports(request):
 
 def download_report(request, report_id=None):
     """Downloads a report."""
+    if not report_exists(report_id):
+        raise Http404
+
     report = get_report_by_id(report_id, request.user)
 
     # TODO: Use additional FileResponse.__init__() arguments when Django 2.1 is released

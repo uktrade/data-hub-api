@@ -110,6 +110,11 @@ def get_reports_by_model(user):
     return reports_by_model
 
 
+def report_exists(report_id):
+    """Checks if a report exists."""
+    return report_id in _registry
+
+
 def get_report_by_id(report_id, user):
     """
     Gets a report instance for using its ID.
