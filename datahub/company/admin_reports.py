@@ -25,7 +25,7 @@ class AllAdvisersReport(QuerySetReport):
         'pk',
     )
     field_titles = {
-        'id': 'ID',
+        'id': 'Adviser ID',
         'email': 'Username',
         'name': 'Name',
         'contact_email': 'Contact email',
