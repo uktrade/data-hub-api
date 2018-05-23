@@ -6,6 +6,7 @@ from django.utils.timezone import now
 
 from datahub.core.exceptions import DataHubException
 
+# Registry of all defined reports (mapping report IDs to Report instances)
 _registry = {}
 
 
@@ -41,7 +42,7 @@ class Report(metaclass=_ReportMeta):
     model: Model = None
     permissions_required: Sequence = None
     field_titles: dict = None
-    filename_template = '{name} - {today}'
+    filename_template = '{name} - {timestamp}'
     abstract = True
 
     _required_attrs = (
@@ -64,8 +65,8 @@ class Report(metaclass=_ReportMeta):
 
     def get_filename(self):
         """Gets the filename (excluding extension) to use for the report."""
-        today = now().date().isoformat()
-        return self.filename_template.format(name=self.name, today=today)
+        timestamp = now().strftime('%Y-%m-%d-%H-%M-%S')
+        return self.filename_template.format(name=self.name, timestamp=timestamp)
 
     def rows(self):
         """Returns an iterator of the rows for this report."""
