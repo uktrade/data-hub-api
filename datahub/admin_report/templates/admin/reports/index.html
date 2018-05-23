@@ -1,0 +1,23 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ media }}
+{% endblock %}
+
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+        &rsaquo; Reports
+    </div>
+{% endblock %}
+
+{% block content %}
+    {% for model, reports in reports_by_model.items %}
+        <h2>{{ model|capfirst }}</h2>
+        {% for report in reports %}
+            <a href="{% url 'admin-report:download-report' report_id=report.id %}">{{ report.name }}</a>
+        {% endfor %}
+    {% endfor %}
+{% endblock %}

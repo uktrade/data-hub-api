@@ -11,6 +11,7 @@ from rest_framework.fields import empty
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from datahub.core.utils import Echo
 from datahub.oauth.scopes import Scope
 from .apps import get_search_apps
 from .permissions import has_permissions_for_app, SearchAppPermissions
@@ -20,7 +21,7 @@ from .query_builder import (
     limit_search_query,
 )
 from .serializers import SearchSerializer
-from .utils import Echo, get_model_field_names
+from .utils import get_model_field_names
 
 EntitySearch = namedtuple('EntitySearch', ['model', 'name'])
 
