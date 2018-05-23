@@ -11,6 +11,6 @@ class MetadataReport(QuerySetReport):
     queryset = MetadataModel.objects.order_by('pk')
     permissions_required = ('support.change_metadatamodel',)
     field_titles = {
-        'id': 'ID',
+        'id': 'Test ID',
         'name': 'Name',
     }
