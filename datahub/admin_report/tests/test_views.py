@@ -56,6 +56,18 @@ class TestReportAdmin(AdminTestMixin):
         response = client.get(url)
         assert response.status_code == status.HTTP_200_OK
 
+    def test_non_existent_report_download(self):
+        """
+        Test that the view returns a 404 response if the report ID does not refer to a
+        registered report.
+        """
+        url = reverse('admin-report:download-report', kwargs={'report_id': 'non-existent-report'})
+        user = create_test_user(is_staff=True, password=self.PASSWORD)
+
+        client = self.create_client(user=user)
+        response = client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
     def test_report_download_without_permission(self):
         """
         Test that the view returns a 403 response if the staff user does not have the
