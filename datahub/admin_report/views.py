@@ -1,3 +1,4 @@
+from codecs import BOM_UTF8
 from csv import DictWriter
 
 from django.contrib.admin import site
@@ -47,6 +48,7 @@ def download_report(request, report_id=None):
 
 def _csv_iterator(report):
     """Returns an iterator over the generated CSV contents."""
+    yield BOM_UTF8
     writer = DictWriter(Echo(), fieldnames=report.field_titles.keys())
 
     yield writer.writerow(report.field_titles)
