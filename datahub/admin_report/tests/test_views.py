@@ -98,6 +98,6 @@ class TestReportAdmin(AdminTestMixin):
         assert parse_header(response.get('Content-Disposition')) == (
             'attachment', {'filename': 'Test report - 2018-01-01-11-12-13.csv'}
         )
-        assert response.getvalue().decode('utf-8') == f"""Test ID,Name\r
+        assert response.getvalue().decode('utf-8-sig') == f"""Test ID,Name\r
 {str(obj.pk)},{obj.name}\r
 """
