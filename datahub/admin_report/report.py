@@ -77,6 +77,11 @@ class Report(metaclass=_ReportMeta):
         missing_attrs = [attr for attr in cls._required_attrs if getattr(cls, attr, None) is None]
         if missing_attrs:
             raise DataHubException(f'Required report attributes {missing_attrs} not set')
+        if 'ID' in cls.field_titles.values():
+            raise DataHubException(
+                'ID cannot be used as a column title due to the potential confusion with SYLK '
+                'files in e.g. Excel'
+            )
 
 
 class QuerySetReport(Report):
