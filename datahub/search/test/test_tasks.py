@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 
-from datahub.search.apps import SEARCH_APPS
+from datahub.search.apps import get_search_apps
 from datahub.search.tasks import sync_all_models, sync_model
 
 
@@ -12,10 +12,10 @@ def test_sync_model(monkeypatch):
     sync_app_mock = Mock()
     monkeypatch.setattr('datahub.search.tasks.sync_app', sync_app_mock)
 
-    search_app_path = SEARCH_APPS[0]
-    sync_model.apply(args=(search_app_path,))
+    search_app = next(iter(get_search_apps()))
+    sync_model.apply(args=(search_app.name,))
 
-    get_search_app_mock.assert_called_once_with(search_app_path)
+    get_search_app_mock.assert_called_once_with(search_app.name)
     sync_app_mock.assert_called_once_with(get_search_app_mock.return_value)
 
 
@@ -26,4 +26,4 @@ def test_sync_all_models(monkeypatch):
 
     sync_all_models.apply()
     tasks_created = {call[1]['args'][0] for call in sync_model_mock.apply_async.call_args_list}
-    assert tasks_created == frozenset(SEARCH_APPS)
+    assert tasks_created == {app.name for app in get_search_apps()}

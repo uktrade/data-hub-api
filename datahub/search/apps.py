@@ -68,15 +68,26 @@ class SearchApp:
         return None
 
 
-@lru_cache(maxsize=None)
 def get_search_apps():
-    """Registers all search apps specified in `SEARCH_APPS`."""
-    return tuple(get_search_app(cls_path) for cls_path in SEARCH_APPS)
+    """Gets all registered search apps."""
+    return _load_search_apps().values()
+
+
+def get_search_app(app_name):
+    """Gets a single search app (by name)."""
+    return _load_search_apps()[app_name]
 
 
 @lru_cache(maxsize=None)
-def get_search_app(cls_path):
-    """Registers a single search app."""
+def _load_search_apps():
+    """Loads and registers all search apps specified in `SEARCH_APPS`."""
+    apps = (_load_search_app(cls_path) for cls_path in SEARCH_APPS)
+    return {app.name: app for app in apps}
+
+
+@lru_cache(maxsize=None)
+def _load_search_app(cls_path):
+    """Loads and registers a single search app."""
     mod_path, _, cls_name = cls_path.rpartition('.')
     mod = import_module(mod_path)
     cls = getattr(mod, cls_name)
