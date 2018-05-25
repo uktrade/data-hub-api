@@ -123,10 +123,18 @@ def get_client():
     return connections.get_connection()
 
 
+def index_exists(name=settings.ES_INDEX):
+    """
+    :param name: Name of the index
+
+    :returns: True if index_name exists
+    """
+    return get_client().indices.exists(index=name)
+
+
 def configure_index(index_name, index_settings=None):
     """Configures Elasticsearch index."""
-    client = get_client()
-    if not client.indices.exists(index=index_name):
+    if not index_exists(name=index_name):
         index = Index(index_name)
         for analyzer in ANALYZERS:
             index.analyzer(analyzer)
