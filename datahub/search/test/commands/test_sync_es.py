@@ -2,6 +2,7 @@ from unittest import mock
 
 import pytest
 from django.core import management
+from django.core.management.base import CommandError
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.test_utils import MockQuerySet
@@ -13,8 +14,22 @@ from ...contact.models import Contact as ESContact
 from ...investment.models import InvestmentProject as ESInvestmentProject
 
 
+@mock.patch(
+    'datahub.search.management.commands.sync_es.index_exists',
+    mock.Mock(return_value=False)
+)
+def test_fails_if_index_doesnt_exist():
+    """Tests that if the index doesn't exist, sync_es fails."""
+    with pytest.raises(CommandError):
+        management.call_command(sync_es.Command())
+
+
 @mock.patch('datahub.search.bulk_sync.bulk')
 @mock.patch('datahub.search.management.commands.sync_es.get_apps_to_sync')
+@mock.patch(
+    'datahub.search.management.commands.sync_es.index_exists',
+    mock.Mock(return_value=True)
+)
 @pytest.mark.django_db
 def test_sync_es(get_apps_to_sync, bulk):
     """Tests syncing app to Elasticsearch."""
@@ -37,6 +52,10 @@ def test_sync_es(get_apps_to_sync, bulk):
     (app.name for app in get_search_apps())
 )
 @mock.patch('datahub.search.management.commands.sync_es.sync_app')
+@mock.patch(
+    'datahub.search.management.commands.sync_es.index_exists',
+    mock.Mock(return_value=True)
+)
 def test_sync_one_model(sync_app_mock, search_model):
     """
     Test that --model can be used to specify what we weant to sync.
@@ -47,6 +66,10 @@ def test_sync_one_model(sync_app_mock, search_model):
 
 
 @mock.patch('datahub.search.management.commands.sync_es.sync_app')
+@mock.patch(
+    'datahub.search.management.commands.sync_es.index_exists',
+    mock.Mock(return_value=True)
+)
 def test_sync_all_models(sync_app_mock):
     """
     Test that if --model is not used, all the search apps are synced.
@@ -57,6 +80,10 @@ def test_sync_all_models(sync_app_mock):
 
 
 @mock.patch('datahub.search.management.commands.sync_es.sync_app')
+@mock.patch(
+    'datahub.search.management.commands.sync_es.index_exists',
+    mock.Mock(return_value=True)
+)
 def test_sync_invalid_model(sync_app_mock):
     """
     Test that if an invalid value is used with --model, nothing gets synced.

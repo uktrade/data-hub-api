@@ -15,6 +15,18 @@ def test_bulk(es_bulk, mock_es_client):
     es_bulk.assert_called_with(mock_es_client.return_value, actions=actions, chunk_size=chunk_size)
 
 
+@pytest.mark.parametrize('expected', (True, False))
+def test_index_exists(mock_es_client, expected):
+    """Tests that `index_exists` returns True if the index exists, False otherwise."""
+    index_name = 'test'
+
+    connection = mock_es_client.return_value
+    connection.indices.exists.return_value = expected
+
+    assert elasticsearch.index_exists(name=index_name) == expected
+    connection.indices.exists.assert_called_with(index=index_name)
+
+
 @mock.patch('datahub.search.elasticsearch.settings')
 @mock.patch('datahub.search.elasticsearch.connections')
 def test_configure_connection(connections, settings):
