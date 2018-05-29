@@ -30,6 +30,9 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
 
     required_scopes = (Scope.internal_front_end,)
     serializer_class = CompanySerializer
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filter_fields = ('global_headquarters_id',)
+    ordering_fields = ('name', 'created_on')
     queryset = Company.objects.select_related(
         'account_manager',
         'archived_by',
