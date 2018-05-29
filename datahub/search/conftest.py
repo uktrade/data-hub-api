@@ -24,12 +24,12 @@ def _es_client(worker_id):
     """
     Makes the ES test helper client available.
 
-    Also patches settings.ES_INDEX using the xdist worker ID so that each process gets a unique
-    index when running tests using multiple processes using pytest -n.
+    Also patches settings.ES_INDEX_PREFIX using the xdist worker ID so that each process
+    gets unique indices when running tests using multiple processes using pytest -n.
     """
     # pytest's monkeypatch does not work in session fixtures, but there is no need to restore
     # the value so we just overwrite it normally
-    settings.ES_INDEX = f'test_{worker_id}'
+    settings.ES_INDEX_PREFIX = f'test_{worker_id}'
 
     from elasticsearch_dsl.connections import connections
     client = get_test_client(nowait=False)

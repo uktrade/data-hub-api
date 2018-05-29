@@ -19,7 +19,7 @@ jobs:
       DEBUG: 'True'
       DJANGO_SECRET_KEY: changeme
       DJANGO_SETTINGS_MODULE: config.settings.local
-      ES_INDEX: test_index
+      ES_INDEX_PREFIX: test_index
       ES5_URL: http://localhost:9200
       AWS_DEFAULT_REGION: eu-west-2
       AWS_ACCESS_KEY_ID: foo
