@@ -107,13 +107,6 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSet):
         """Returns the view set name for the DRF UI."""
         return 'Investment projects'
 
-    def get_serializer_context(self):
-        """Extra context provided to the serializer class."""
-        return {
-            **super().get_serializer_context(),
-            'current_user': self.request.user,
-        }
-
 
 class _ModifiedOnFilter(FilterSet):
     """Filter set for the modified-since view."""
