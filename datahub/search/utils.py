@@ -1,11 +1,3 @@
-class Echo:
-    """Represents dummy writer."""
-
-    def write(self, value):
-        """Returns value that is being "written"."""
-        return value
-
-
 def get_model_fields(es_model):
     """Gets the field objects for an ES model."""
     return es_model._doc_type.mapping.properties._params['properties']

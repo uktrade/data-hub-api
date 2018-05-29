@@ -1,7 +1,6 @@
 import pytest
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.options import IS_POPUP_VAR
-from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.test.client import Client
 from django.urls import reverse
@@ -28,8 +27,7 @@ class TestCancelOrderAdmin(AdminTestMixin):
 
         assert response.status_code == 200
         assert len(response.redirect_chain) == 1
-        login_url = f'{reverse("admin:login")}?{REDIRECT_FIELD_NAME}={url}'
-        assert response.redirect_chain[0][0] == login_url
+        assert response.redirect_chain[0][0] == self.login_url_with_redirect(url)
 
     def test_403_if_no_permissions(self):
         """Test 403 if user doesn't have enough permissions."""
@@ -37,10 +35,11 @@ class TestCancelOrderAdmin(AdminTestMixin):
         url = reverse('admin:order_order_cancel', args=(order.pk,))
 
         # create user with all order permissions apart from change
-        user = create_test_user(permission_codenames=('add_order', 'delete_order', 'read_order'))
-        user.set_password(self.PASSWORD)
-        user.is_staff = True
-        user.save()
+        user = create_test_user(
+            is_staff=True,
+            password=self.PASSWORD,
+            permission_codenames=('add_order', 'delete_order', 'read_order')
+        )
 
         client = self.create_client(user=user)
         response = client.post(url, data={})

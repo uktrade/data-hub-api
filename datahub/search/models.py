@@ -19,7 +19,7 @@ class BaseESModel(DocType):
     @classmethod
     def es_document(cls, dbmodel):
         """Creates Elasticsearch document."""
-        source = cls.dbmodel_to_dict(dbmodel)
+        source = cls.db_object_to_dict(dbmodel)
 
         # TODO could get index and doc type from meta of other class
         return {
@@ -30,8 +30,8 @@ class BaseESModel(DocType):
         }
 
     @classmethod
-    def dbmodel_to_dict(cls, dbmodel):
-        """Converts dbmodel instance to a dictionary suitable for ElasticSearch."""
+    def db_object_to_dict(cls, dbmodel):
+        """Converts a DB model object to a dictionary suitable for Elasticsearch."""
         mapped_values = (
             (col, fn, getattr(dbmodel, col)) for col, fn in cls.MAPPINGS.items()
         )
@@ -46,7 +46,7 @@ class BaseESModel(DocType):
         return result
 
     @classmethod
-    def dbmodels_to_es_documents(cls, dbmodels):
-        """Converts db models to Elasticsearch documents."""
+    def db_objects_to_es_documents(cls, dbmodels):
+        """Converts DB model objects to Elasticsearch documents."""
         for dbmodel in dbmodels:
             yield cls.es_document(dbmodel)

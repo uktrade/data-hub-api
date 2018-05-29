@@ -15,7 +15,7 @@ pytestmark = pytest.mark.django_db
 def test_interaction_to_dict(setup_es, factory_cls):
     """Test converting an interaction to a dict."""
     interaction = factory_cls()
-    result = Interaction.dbmodel_to_dict(interaction)
+    result = Interaction.db_object_to_dict(interaction)
 
     assert result == {
         'id': str(interaction.pk),
@@ -84,7 +84,7 @@ def test_service_delivery_to_dict(setup_es):
     """Test converting an interaction to a dict."""
     interaction = ServiceDeliveryFactory()
 
-    result = Interaction.dbmodel_to_dict(interaction)
+    result = Interaction.db_object_to_dict(interaction)
 
     assert result == {
         'id': str(interaction.pk),
@@ -144,6 +144,6 @@ def test_interactions_to_es_documents(setup_es):
     """Test converting 2 orders to Elasticsearch documents."""
     interactions = CompanyInteractionFactory.create_batch(2)
 
-    result = Interaction.dbmodels_to_es_documents(interactions)
+    result = Interaction.db_objects_to_es_documents(interactions)
 
     assert {item['_id'] for item in result} == {str(item.pk) for item in interactions}

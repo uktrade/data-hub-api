@@ -3,9 +3,10 @@ from secrets import token_hex
 
 import factory
 import pytest
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Permission
 from django.test.client import Client
+from django.urls import reverse
 from django.utils.timezone import now
 from oauth2_provider.models import AccessToken, Application
 from rest_framework.fields import DateField, DateTimeField
@@ -33,7 +34,7 @@ def get_default_test_user():
     return test_user
 
 
-def create_test_user(permission_codenames=(), **user_attrs):
+def create_test_user(permission_codenames=(), password=None, **user_attrs):
     """
     :returns: user
     :param permission_codenames: list of codename permissions to be
@@ -50,6 +51,8 @@ def create_test_user(permission_codenames=(), **user_attrs):
 
     user_model = get_user_model()
     user = user_model(**user_defaults)
+    if password:
+        user.set_password(password)
     user.save()
 
     permissions = Permission.objects.filter(codename__in=permission_codenames)
@@ -95,6 +98,11 @@ class AdminTestMixin:
         client = Client()
         assert client.login(username=user.email, password=self.PASSWORD)
         return client
+
+    @staticmethod
+    def login_url_with_redirect(redirect_url):
+        """Returns the login URL with the redirect query param set."""
+        return f'{reverse("admin:login")}?{REDIRECT_FIELD_NAME}={redirect_url}'
 
 
 class APITestMixin:
