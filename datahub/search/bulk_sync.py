@@ -2,7 +2,6 @@ from logging import getLogger
 
 from datahub.core.exceptions import DataHubException
 from datahub.core.utils import slice_iterable_into_chunks
-from datahub.search.apps import get_search_apps
 from datahub.search.elasticsearch import bulk
 
 logger = getLogger(__name__)
@@ -10,18 +9,6 @@ logger = getLogger(__name__)
 PROGRESS_INTERVAL = 20000
 BULK_INDEX_TIMEOUT_SECS = 300
 BULK_DELETION_TIMEOUT_SECS = 300
-
-
-def get_apps_to_sync(models=None):
-    """
-    Returns apps that will be synchronised with Elasticsearch.
-
-    :param models: list of search app names to index, None for all
-    """
-    search_apps = get_search_apps()
-
-    # if models empty, assume all models
-    return [search_app for search_app in search_apps if not models or search_app.name in models]
 
 
 def sync_app(item, batch_size=None):
