@@ -165,12 +165,6 @@ class NestedInvestmentProjectStageLogSerializer(serializers.ModelSerializer):
 class IProjectSerializer(PermittedFieldsModelSerializer):
     """Serialiser for investment project endpoints."""
 
-    default_error_messages = {
-        'only_pm_or_paa_can_move_to_verify_win': ugettext_lazy(
-            'Only Project Manager or Project Assurance Adviser can move project to Verify Win.'
-        )
-    }
-
     incomplete_fields = serializers.SerializerMethodField()
     project_code = serializers.CharField(read_only=True)
     investment_type = NestedRelatedField(meta_models.InvestmentType)
@@ -256,8 +250,6 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
             data['allow_blank_estimated_land_date'] = False
             data['allow_blank_possible_uk_regions'] = False
 
-        self._check_if_investment_project_can_be_moved_to_verify_win(data)
-
         fields = None
         if self.partial and 'stage' not in data:
             fields = data.keys()
@@ -269,24 +261,6 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
         self._update_status(data)
 
         return data
-
-    def _check_if_investment_project_can_be_moved_to_verify_win(self, data):
-        # only project manager or project assurance adviser can move a project to verify win
-        if self.instance and 'stage' in data:
-            current_user_id = self.context['current_user'].id
-            allowed_users_ids = (
-                self.instance.project_manager_id, self.instance.project_assurance_adviser_id,
-            )
-
-            if (
-                str(data['stage'].id) == InvestmentProjectStage.verify_win.value.id
-                and self.instance.stage.order < data['stage'].order
-                and current_user_id not in allowed_users_ids
-            ):
-                errors = {
-                    'stage': self.default_error_messages['only_pm_or_paa_can_move_to_verify_win']
-                }
-                raise serializers.ValidationError(errors)
 
     def get_incomplete_fields(self, instance):
         """Returns the names of the fields that still need to be completed in order to
