@@ -1,5 +1,7 @@
 from unittest import mock
 
+import pytest
+
 from .. import elasticsearch
 
 
@@ -21,8 +23,8 @@ def test_index_exists(mock_es_client, expected):
     connection = mock_es_client.return_value
     connection.indices.exists.return_value = expected
 
-    assert elasticsearch.index_exists(name=index_name) == expected
-    connection.indices.exists.assert_called_with(index=index_name)
+    assert elasticsearch.index_exists(index_name) == expected
+    connection.indices.exists.assert_called_with(index_name)
 
 
 @mock.patch('datahub.search.elasticsearch.settings')
