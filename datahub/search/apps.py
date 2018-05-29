@@ -72,6 +72,21 @@ def get_search_apps():
     return tuple(_load_search_apps().values())
 
 
+def get_search_apps_by_name(app_names=None):
+    """
+    Returns the apps for a particular set of app names.
+
+    :param app_names: list of search app names to return app instances for, None for all
+    """
+    search_apps = get_search_apps()
+
+    # if app_names empty, assume all apps
+    return [
+        search_app for search_app in search_apps
+        if not app_names or search_app.name in app_names
+    ]
+
+
 def get_search_app(app_name):
     """Gets a single search app (by name)."""
     return _load_search_apps()[app_name]

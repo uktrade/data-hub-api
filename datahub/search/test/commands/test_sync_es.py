@@ -25,15 +25,15 @@ def test_fails_if_index_doesnt_exist():
 
 
 @mock.patch('datahub.search.bulk_sync.bulk')
-@mock.patch('datahub.search.management.commands.sync_es.get_apps_to_sync')
+@mock.patch('datahub.search.management.commands.sync_es.get_search_apps_by_name')
 @mock.patch(
     'datahub.search.management.commands.sync_es.index_exists',
     mock.Mock(return_value=True)
 )
 @pytest.mark.django_db
-def test_sync_es(get_apps_to_sync, bulk):
+def test_sync_es(get_search_apps_by_name, bulk):
     """Tests syncing app to Elasticsearch."""
-    get_apps_to_sync.return_value = (
+    get_search_apps_by_name.return_value = (
         mock.Mock(queryset=MockQuerySet([CompanyFactory(), CompanyFactory()]), es_model=ESCompany),
         mock.Mock(queryset=MockQuerySet([ContactFactory()]), es_model=ESContact),
         mock.Mock(

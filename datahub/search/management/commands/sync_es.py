@@ -2,8 +2,8 @@ from logging import getLogger, WARNING
 
 from django.core.management.base import BaseCommand, CommandError
 
-from datahub.search.bulk_sync import get_apps_to_sync, sync_app
-from ...apps import get_search_apps
+from datahub.search.bulk_sync import sync_app
+from ...apps import get_search_apps, get_search_apps_by_name
 from ...elasticsearch import index_exists
 
 logger = getLogger(__name__)
@@ -40,7 +40,7 @@ class Command(BaseCommand):
         es_logger = getLogger('elasticsearch')
         es_logger.setLevel(WARNING)
 
-        apps = get_apps_to_sync(options['model'])
+        apps = get_search_apps_by_name(options['model'])
 
         for app in apps:
             if not index_exists(app.es_model.get_write_alias()):
