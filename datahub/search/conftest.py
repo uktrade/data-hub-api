@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 from django.conf import settings
 from elasticsearch.helpers.test import get_test_client
 from pytest import fixture
@@ -73,6 +75,14 @@ def _create_test_index(client, index):
         client.indices.delete(index)
 
     elasticsearch.configure_index(index, index_settings=settings.ES_INDEX_SETTINGS)
+
+
+@fixture
+def mock_es_client(monkeypatch):
+    """Patches the Elasticsearch library so that a mock client is used."""
+    mock_client = Mock()
+    monkeypatch.setattr('elasticsearch_dsl.connections.connections.get_connection', mock_client)
+    yield mock_client
 
 
 @fixture

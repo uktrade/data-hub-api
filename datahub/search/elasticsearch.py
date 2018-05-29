@@ -75,6 +75,14 @@ lowercase_analyzer = analysis.CustomAnalyzer(
 )
 
 
+ANALYZERS = (
+    lowercase_keyword_analyzer,
+    trigram_analyzer,
+    english_analyzer,
+    lowercase_analyzer,
+)
+
+
 def configure_connection():
     """Configure Elasticsearch default connection."""
     if settings.ES_USE_AWS_AUTH:
@@ -110,18 +118,23 @@ def configure_connection():
     )
 
 
-ANALYZERS = (
-    lowercase_keyword_analyzer,
-    trigram_analyzer,
-    english_analyzer,
-    lowercase_analyzer,
-)
+def get_client():
+    """Gets an instance of the Elasticsearch client from the connection cache."""
+    return connections.get_connection()
+
+
+def index_exists(name=settings.ES_INDEX):
+    """
+    :param name: Name of the index
+
+    :returns: True if index_name exists
+    """
+    return get_client().indices.exists(index=name)
 
 
 def configure_index(index_name, index_settings=None):
     """Configures Elasticsearch index."""
-    client = connections.get_connection()
-    if not client.indices.exists(index=index_name):
+    if not index_exists(name=index_name):
         index = Index(index_name)
         for analyzer in ANALYZERS:
             index.analyzer(analyzer)
@@ -146,4 +159,4 @@ def init_es():
 
 def bulk(actions=None, chunk_size=None, **kwargs):
     """Send data in bulk to Elasticsearch."""
-    return es_bulk(connections.get_connection(), actions=actions, chunk_size=chunk_size, **kwargs)
+    return es_bulk(get_client(), actions=actions, chunk_size=chunk_size, **kwargs)

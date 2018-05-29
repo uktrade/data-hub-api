@@ -2,14 +2,15 @@ import json
 from logging import getLogger
 
 from django.core.management.base import BaseCommand
-from elasticsearch_dsl.connections import connections
+
+from datahub.search.elasticsearch import get_client
 
 logger = getLogger(__name__)
 
 
 def get_alias(current_index):
     """Gets alias for current index."""
-    es = connections.get_connection()
+    es = get_client()
     return es.indices.get_alias(index=current_index)
 
 

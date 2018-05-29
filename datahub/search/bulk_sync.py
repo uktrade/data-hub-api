@@ -32,7 +32,7 @@ def sync_app(item, batch_size=None):
     it = item.queryset.iterator(chunk_size=batch_size)
     batches = slice_iterable_into_chunks(it, batch_size)
     for batch in batches:
-        actions = list(item.es_model.dbmodels_to_es_documents(batch))
+        actions = list(item.es_model.db_objects_to_es_documents(batch))
         num_actions = len(actions)
         bulk(
             actions=actions,

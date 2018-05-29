@@ -11,6 +11,7 @@ from . import api_urls
 
 unversioned_urls = [
     path('admin/', admin.site.urls),
+    path('', include('datahub.admin_report.urls')),
     path('ping.xml', ping, name='ping'),
     path('metadata/', include('datahub.metadata.urls')),
     path('token/', TokenView.as_view(), name='token'),

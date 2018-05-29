@@ -9,7 +9,7 @@ pytestmark = pytest.mark.django_db
 def test_investment_project_to_dict(setup_es):
     """Tests conversion of db model to dict."""
     project = InvestmentProjectFactory()
-    result = ESInvestmentProject.dbmodel_to_dict(project)
+    result = ESInvestmentProject.db_object_to_dict(project)
 
     keys = {
         'id',
@@ -104,6 +104,6 @@ def test_investment_project_dbmodels_to_es_documents(setup_es):
     """Tests conversion of db models to Elasticsearch documents."""
     projects = InvestmentProjectFactory.create_batch(2)
 
-    result = ESInvestmentProject.dbmodels_to_es_documents(projects)
+    result = ESInvestmentProject.db_objects_to_es_documents(projects)
 
     assert len(list(result)) == len(projects)

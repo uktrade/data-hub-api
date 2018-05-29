@@ -16,6 +16,19 @@ class StrEnum(str, Enum):
     """
 
 
+class Echo:
+    """
+    Writer that echoes written data.
+
+    Used for streaming large CSV files, defined as per
+    https://docs.djangoproject.com/en/2.0/howto/outputting-csv/.
+    """
+
+    def write(self, value):
+        """Returns value that is being "written"."""
+        return value
+
+
 def join_truthy_strings(*args, sep=' '):
     """Joins a list of strings using a separtor, omitting falsey values."""
     return sep.join(filter(None, args))

@@ -1,9 +1,10 @@
 from logging import getLogger, WARNING
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 from datahub.search.bulk_sync import get_apps_to_sync, sync_app
 from ...apps import get_search_apps
+from ...elasticsearch import index_exists
 
 logger = getLogger(__name__)
 
@@ -38,6 +39,9 @@ class Command(BaseCommand):
         """Handle."""
         es_logger = getLogger('elasticsearch')
         es_logger.setLevel(WARNING)
+
+        if not index_exists():
+            raise CommandError(f'Index and mapping not initialised, please run `init_es` first.')
 
         sync_es(
             batch_size=options['batch_size'],
