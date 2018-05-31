@@ -1,3 +1,107 @@
+- model: company.advisor
+  pk: e83a608e-84a4-11e6-ae22-56b6b6499611
+  fields:
+    email: Puck.Head@example.com
+    first_name: Puck
+    last_name: Head
+    dit_team: 602b971d-5df6-e511-888e-e4115bead28a  # CBBC North EAST
+
+- model: company.advisor
+  pk: 7bad8082-4978-4fe8-a018-740257f01637
+  fields:
+    email: John.Rogers@example.com
+    first_name: John
+    last_name: Rogers
+    dit_team: 8248318c-9698-e211-a939-e4115bead28a  # Marketing - Marketing Team
+
+- model: company.advisor
+  pk: d7493b4e-5d7b-4834-98d9-28b78a74052a
+  fields:
+    email: michael.wining@example.com
+    first_name: Michael
+    last_name: Wining
+    dit_team: 8248318c-9698-e211-a939-e4115bead28a  # Marketing - Marketing Team
+
+- model: company.advisor
+  pk: 5a644146-5298-4741-91f3-d5d7558adf47
+  fields:
+    email: paula.churing@example.com
+    first_name: Paula
+    last_name: Churing
+    dit_team: 8248318c-9698-e211-a939-e4115bead28a  # Marketing - Marketing Team
+
+- model: company.advisor
+  pk: a80ff5fd-8904-4940-bf96-fe8047e34be5
+  fields:
+    email: barry.oling@example.com
+    first_name: Barry
+    last_name: Oling
+    dit_team: a4f924aa-9698-e211-a939-e4115bead28a  # Isle of Wight Chamber of Commerce
+
+- model: company.advisor
+  pk: f1eb4363-0a37-4344-bd96-e90abeaf483e
+  fields:
+    email: jenny.carey@example.com
+    first_name: Jenny
+    last_name: Carey
+    dit_team: c833d869-2f50-e311-a56a-e4115bead28a  # IG - Specialists - Knowledge Intensive Industry
+
+- model: company.advisor
+  pk: 379f390a-e083-4a2c-9cea-e3b9a08606a7
+  fields:
+    email: holly.collins@example.com
+    first_name: Holly
+    last_name: Collins
+    dit_team: 08d987f8-6525-e511-b6bc-e4115bead28a  # Heart of the South West LEP
+
+- model: company.advisor
+  pk: a6f39399-5bf4-46cb-a686-826f73e9f0ca
+  fields:
+    email: dennis.kennedy@example.com
+    first_name: Dennis
+    last_name: Kennedy
+    dit_team: 08d987f8-6525-e511-b6bc-e4115bead28a  # Heart of the South West LEP
+
+- model: company.advisor
+  pk: b4848b30-f532-4cfc-a063-b064d8435b65
+  fields:
+    email: jacob.webster@example.com
+    first_name: Jacob
+    last_name: Webster
+    dit_team: 1e68d89b-8225-e511-b6bc-e4115bead28a  # South East Midlands LEP
+
+- model: company.advisor
+  pk: 4b4e1553-4ed3-46b4-b52a-a1f07fea5352
+  fields:
+    email: jodie.matthews@example.com
+    first_name: Jodie
+    last_name: Matthews
+    dit_team: bc85aa17-fabd-e511-88b6-e4115bead28a  # Welsh Government (Investment)
+
+- model: company.advisor
+  pk: 8dcd2bb8-dc73-4a42-8655-4ae42d4d3c5a
+  fields:
+    email: bernard.harris-patel@example.com
+    first_name: Bernard
+    last_name: Harris-Patel
+    dit_team: bc85aa17-fabd-e511-88b6-e4115bead28a  # Welsh Government (Investment)
+
+- model: company.advisor
+  pk: b4ce0b40-25f0-4532-b78f-1e0345934a6d
+  fields:
+    email: kathryn.nicholls@example.com
+    first_name: Kathryn
+    last_name: Nicholls
+    dit_team: e53ade1c-9798-e211-a939-e4115bead28a  # Invest Northern Ireland
+
+- model: company.advisor
+  pk: 8eefe6b4-2816-4e47-94b5-a13409dcef70
+  fields:
+    email: travis.greene@example.com
+    first_name: Travis
+    last_name: Greene
+    dit_team: fc3a6667-cfe9-e511-8ffa-e4115bead28a  # IST - Sector Advisory Services
+
 - model: company.company
   pk: a73efeba-8499-11e6-ae22-56b6b6499611
   fields:
@@ -102,101 +206,24 @@
     created_on: '2015-10-26T11:00:00Z'
     modified_on: '2017-11-26T11:00:00Z'
 
-- model: company.advisor
-  pk: e83a608e-84a4-11e6-ae22-56b6b6499611
+- model: company.company
+  pk: 375094ac-f79a-43e5-9c88-059a7caa17f0
   fields:
-    email: Puck.Head@example.com
-    first_name: Puck
-    last_name: Head
-    dit_team: 602b971d-5df6-e511-888e-e4115bead28a  # CBBC North EAST
-
-- model: company.advisor
-  pk: 7bad8082-4978-4fe8-a018-740257f01637
-  fields:
-    email: John.Rogers@example.com
-    first_name: John
-    last_name: Rogers
-    dit_team: 8248318c-9698-e211-a939-e4115bead28a  # Marketing - Marketing Team
-
-- model: company.advisor
-  pk: d7493b4e-5d7b-4834-98d9-28b78a74052a
-  fields:
-    email: michael.wining@example.com
-    first_name: Michael
-    last_name: Wining
-    dit_team: 8248318c-9698-e211-a939-e4115bead28a  # Marketing - Marketing Team
-
-- model: company.advisor
-  pk: 5a644146-5298-4741-91f3-d5d7558adf47
-  fields:
-    email: paula.churing@example.com
-    first_name: Paula
-    last_name: Churing
-    dit_team: 8248318c-9698-e211-a939-e4115bead28a  # Marketing - Marketing Team
-
-- model: company.advisor
-  pk: a80ff5fd-8904-4940-bf96-fe8047e34be5
-  fields:
-    email: barry.oling@example.com
-    first_name: Barry
-    last_name: Oling
-    dit_team: a4f924aa-9698-e211-a939-e4115bead28a  # Isle of Wight Chamber of Commerce
-
-- model: company.advisor
-  pk: f1eb4363-0a37-4344-bd96-e90abeaf483e
-  fields:
-    email: jenny.carey@example.com
-    first_name: Jenny
-    last_name: Carey
-    dit_team: c833d869-2f50-e311-a56a-e4115bead28a  # IG - Specialists - Knowledge Intensive Industry
-
-- model: company.advisor
-  pk: 379f390a-e083-4a2c-9cea-e3b9a08606a7
-  fields:
-    email: holly.collins@example.com
-    first_name: Holly
-    last_name: Collins
-    dit_team: 08d987f8-6525-e511-b6bc-e4115bead28a  # Heart of the South West LEP
-
-- model: company.advisor
-  pk: a6f39399-5bf4-46cb-a686-826f73e9f0ca
-  fields:
-    email: dennis.kennedy@example.com
-    first_name: Dennis
-    last_name: Kennedy
-    dit_team: 08d987f8-6525-e511-b6bc-e4115bead28a  # Heart of the South West LEP
-
-- model: company.advisor
-  pk: b4848b30-f532-4cfc-a063-b064d8435b65
-  fields:
-    email: jacob.webster@example.com
-    first_name: Jacob
-    last_name: Webster
-    dit_team: 1e68d89b-8225-e511-b6bc-e4115bead28a  # South East Midlands LEP
-
-- model: company.advisor
-  pk: 4b4e1553-4ed3-46b4-b52a-a1f07fea5352
-  fields:
-    email: jodie.matthews@example.com
-    first_name: Jodie
-    last_name: Matthews
-    dit_team: bc85aa17-fabd-e511-88b6-e4115bead28a  # Welsh Government (Investment)
-
-- model: company.advisor
-  pk: 8dcd2bb8-dc73-4a42-8655-4ae42d4d3c5a
-  fields:
-    email: bernard.harris-patel@example.com
-    first_name: Bernard
-    last_name: Harris-Patel
-    dit_team: bc85aa17-fabd-e511-88b6-e4115bead28a  # Welsh Government (Investment)
-
-- model: company.advisor
-  pk: b4ce0b40-25f0-4532-b78f-1e0345934a6d
-  fields:
-    email: kathryn.nicholls@example.com
-    first_name: Kathryn
-    last_name: Nicholls
-    dit_team: e53ade1c-9798-e211-a939-e4115bead28a  # Invest Northern Ireland
+    name: One List Corp
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
+    turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
+    sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    registered_address_1: 12 St George's Road
+    registered_address_town: Paris
+    registered_address_postcode: 75001
+    registered_address_country: 82756b9a-5d95-e211-a939-e4115bead28a  # France
+    description: This is a dummy company for testing the One List
+    headquarter_type: 43281c5e-92a4-4794-867b-b4d5f801e6f3  # GHQ
+    classification: b91bf800-8d53-e311-aef3-441ea13961e2  # Tier A
+    one_list_account_owner: 8eefe6b4-2816-4e47-94b5-a13409dcef70
+    created_on: '2015-10-26T11:00:00Z'
+    modified_on: '2017-11-26T11:00:00Z'
 
 - model: company.contact
   pk: 9b1138ab-ec7b-497f-b8c3-27fed21694ef
