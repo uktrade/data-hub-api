@@ -152,7 +152,8 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:company')
         response = self.api_client.post(
             url,
-            query
+            query,
+            format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
