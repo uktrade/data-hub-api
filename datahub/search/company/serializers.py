@@ -17,7 +17,11 @@ class SearchCompanySerializer(SearchSerializer):
     export_to_country = SingleOrListField(child=StringUUIDField(), required=False)
     future_interest_country = SingleOrListField(child=StringUUIDField(), required=False)
     global_headquarters = SingleOrListField(child=StringUUIDField(), required=False)
-    headquarter_type = SingleOrListField(child=NullStringUUIDField(), required=False)
+    headquarter_type = SingleOrListField(
+        child=NullStringUUIDField(allow_null=True),
+        required=False,
+        allow_null=True
+    )
     name = serializers.CharField(required=False)
     sector = SingleOrListField(child=StringUUIDField(), required=False)
     sector_descends = SingleOrListField(child=StringUUIDField(), required=False)
