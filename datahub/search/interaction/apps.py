@@ -30,6 +30,10 @@ class InteractionSearchApp(SearchApp):
         'service',
         'service_delivery_status',
         'event',
+    ).defer(
+        # Deferred as policy_area is pending removal
+        # TODO: Remove policy_area once policy_areas has been released
+        'policy_area',
     )
 
     def get_permission_filters(self, request):

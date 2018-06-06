@@ -192,7 +192,7 @@ class TestAddServiceDelivery(APITestMixin):
                 },
                 {
                     'communication_channel': ['This field is not valid for service deliveries.'],
-                    'policy_area': ['This field is only valid for policy feedback.'],
+                    'policy_areas': ['This field is only valid for policy feedback.'],
                     'policy_issue_type': ['This field is only valid for policy feedback.'],
                     'investment_project': ['This field is only valid for interactions.']
                 }
