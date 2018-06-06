@@ -164,7 +164,7 @@ class TestAddPolicyFeedback(APITestMixin):
                     'dit_team': Team.healthcare_uk.value.id,
                 },
                 {
-                    'policy_area': ['This field is required.'],
+                    'policy_areas': ['This field is required.'],
                     'policy_issue_type': ['This field is required.'],
                     'communication_channel': ['This field is required.'],
                 }
@@ -274,6 +274,8 @@ class TestUpdatePolicyFeedback(APITestMixin):
         api_client = self.create_api_client(user=user)
         response = api_client.patch(url, {'notes': 'updated notes'})
 
+        first_policy_area = interaction.policy_areas.first()
+
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
             'id': str(interaction.pk),
@@ -283,8 +285,8 @@ class TestUpdatePolicyFeedback(APITestMixin):
             'grant_amount_offered': None,
             'net_company_receipt': None,
             'policy_area': {
-                'id': str(interaction.policy_area.pk),
-                'name': interaction.policy_area.name
+                'id': str(first_policy_area.pk),
+                'name': first_policy_area.name,
             },
             'policy_issue_type': {
                 'id': str(interaction.policy_issue_type.pk),
@@ -374,6 +376,8 @@ class TestGetPolicyFeedback(APITestMixin):
         api_client = self.create_api_client(user=user)
         response = api_client.get(url)
 
+        first_policy_area = interaction.policy_areas.first()
+
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
             'id': str(interaction.pk),
@@ -383,8 +387,8 @@ class TestGetPolicyFeedback(APITestMixin):
             'grant_amount_offered': None,
             'net_company_receipt': None,
             'policy_area': {
-                'id': str(interaction.policy_area.pk),
-                'name': interaction.policy_area.name
+                'id': str(first_policy_area.pk),
+                'name': first_policy_area.name,
             },
             'policy_issue_type': {
                 'id': str(interaction.policy_issue_type.pk),

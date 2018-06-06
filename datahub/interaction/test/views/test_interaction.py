@@ -232,7 +232,7 @@ class TestAddInteraction(APITestMixin):
                     ],
                     'grant_amount_offered': ['This field is only valid for service deliveries.'],
                     'net_company_receipt': ['This field is only valid for service deliveries.'],
-                    'policy_area': ['This field is only valid for policy feedback.'],
+                    'policy_areas': ['This field is only valid for policy feedback.'],
                     'policy_issue_type': ['This field is only valid for policy feedback.']
                 }
             ),
