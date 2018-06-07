@@ -2,6 +2,7 @@ from operator import not_
 
 from django.utils.translation import ugettext_lazy
 from rest_framework import serializers
+from rest_framework.settings import api_settings
 
 from datahub.company.models import Company, Contact
 from datahub.company.serializers import NestedAdviserField
@@ -64,6 +65,9 @@ class InteractionSerializer(serializers.ModelSerializer):
         'invalid_for_non_policy_feedback': ugettext_lazy(
             'This field is only valid for policy feedback.'
         ),
+        'one_policy_area_field': ugettext_lazy(
+            'Only one of policy_area and policy_areas should be provided.'
+        ),
     }
 
     company = NestedRelatedField(Company)
@@ -87,9 +91,20 @@ class InteractionSerializer(serializers.ModelSerializer):
     policy_area = _ManyRelatedAsSingleItemField(
         PolicyArea, required=False, allow_null=True, source='policy_areas',
     )
+    policy_areas = NestedRelatedField(PolicyArea, many=True, required=False, allow_empty=True)
     policy_issue_type = NestedRelatedField(
         PolicyIssueType, required=False, allow_null=True
     )
+
+    def to_internal_value(self, data):
+        """Checks that policy_area and policy_areas haven't both been provided."""
+        if 'policy_area' in data and 'policy_areas' in data:
+            error = {
+                api_settings.NON_FIELD_ERRORS_KEY: [self.error_messages['one_policy_area_field']]
+            }
+            raise serializers.ValidationError(error, code='one_policy_area_field')
+
+        return super().to_internal_value(data)
 
     def validate(self, data):
         """
@@ -137,6 +152,7 @@ class InteractionSerializer(serializers.ModelSerializer):
             'notes',
             'archived_documents_url_path',
             'policy_area',
+            'policy_areas',
             'policy_issue_type',
         )
         read_only_fields = (
