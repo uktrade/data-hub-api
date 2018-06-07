@@ -8,6 +8,7 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.core.constants import Service, Team
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
+from datahub.event.test.factories import EventFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 from ..factories import CompanyInteractionFactory, EventServiceDeliveryFactory
@@ -115,6 +116,25 @@ class TestListInteractions(APITestMixin):
         assert response_data['count'] == 2
         actual_ids = {i['id'] for i in response_data['results']}
         expected_ids = {str(i.id) for i in project_interactions}
+        assert actual_ids == expected_ids
+
+    def test_filtered_by_event(self):
+        """List of interactions filtered by event"""
+        contact = ContactFactory()
+        event = EventFactory()
+
+        CompanyInteractionFactory.create_batch(3, contact=contact)
+        service_deliveries = EventServiceDeliveryFactory.create_batch(3, event=event)
+
+        url = reverse('api-v3:interaction:collection')
+        response = self.api_client.get(url, {'event_id': event.id})
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 3
+
+        actual_ids = {i['id'] for i in response_data['results']}
+        expected_ids = {str(i.id) for i in service_deliveries}
         assert actual_ids == expected_ids
 
 
