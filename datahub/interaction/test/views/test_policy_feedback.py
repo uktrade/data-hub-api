@@ -293,6 +293,29 @@ class TestAddPolicyFeedback(APITestMixin):
                 }
             ),
 
+            # policy fields cannot be blank
+            (
+                {
+                    'kind': Interaction.KINDS.policy_feedback,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'notes': 'hello',
+                    'company': CompanyFactory,
+                    'contact': ContactFactory,
+                    'dit_adviser': AdviserFactory,
+                    'service': Service.trade_enquiry.value.id,
+                    'dit_team': Team.healthcare_uk.value.id,
+                    'policy_areas': [],
+                    'policy_issue_type': None,
+                    'communication_channel': None,
+                },
+                {
+                    'policy_areas': ['This field is required.'],
+                    'policy_issue_type': ['This field is required.'],
+                    'communication_channel': ['This field is required.'],
+                }
+            ),
+
             # fields not allowed
             (
                 {
