@@ -94,7 +94,10 @@ class TestAddServiceDelivery(APITestMixin):
             },
             'contact': {
                 'id': str(contact.pk),
-                'name': contact.name
+                'name': contact.name,
+                'first_name': contact.first_name,
+                'last_name': contact.last_name,
+                'job_title': contact.job_title,
             },
             'event': request_data.get('event'),
             'service': {
