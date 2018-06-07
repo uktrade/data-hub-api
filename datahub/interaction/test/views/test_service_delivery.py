@@ -78,6 +78,7 @@ class TestAddServiceDelivery(APITestMixin):
             'net_company_receipt': request_data.get('net_company_receipt'),
             'communication_channel': None,
             'policy_area': None,
+            'policy_areas': [],
             'policy_issue_type': None,
             'subject': 'whatever',
             'date': '2017-04-18',
