@@ -152,7 +152,7 @@ class BaseESModel(DocType):
         return result
 
     @classmethod
-    def db_objects_to_es_documents(cls, dbmodels):
+    def db_objects_to_es_documents(cls, dbmodels, index=None):
         """Converts DB model objects to Elasticsearch documents."""
         for dbmodel in dbmodels:
-            yield cls.es_document(dbmodel)
+            yield cls.es_document(dbmodel, index=index)
