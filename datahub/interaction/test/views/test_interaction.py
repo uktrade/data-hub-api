@@ -129,7 +129,10 @@ class TestAddInteraction(APITestMixin):
             },
             'contact': {
                 'id': str(contact.pk),
-                'name': contact.name
+                'name': contact.name,
+                'first_name': contact.first_name,
+                'last_name': contact.last_name,
+                'job_title': contact.job_title,
             },
             'event': None,
             'service': {
@@ -382,7 +385,10 @@ class TestGetInteraction(APITestMixin):
             },
             'contact': {
                 'id': str(interaction.contact.pk),
-                'name': interaction.contact.name
+                'name': interaction.contact.name,
+                'first_name': interaction.contact.first_name,
+                'last_name': interaction.contact.last_name,
+                'job_title': interaction.contact.job_title,
             },
             'event': None,
             'service': {
@@ -451,7 +457,10 @@ class TestGetInteraction(APITestMixin):
             },
             'contact': {
                 'id': str(interaction.contact.pk),
-                'name': interaction.contact.name
+                'name': interaction.contact.name,
+                'first_name': interaction.contact.first_name,
+                'last_name': interaction.contact.last_name,
+                'job_title': interaction.contact.job_title,
             },
             'event': None,
             'service': {
@@ -528,7 +537,10 @@ class TestGetInteraction(APITestMixin):
             },
             'contact': {
                 'id': str(interaction.contact.pk),
-                'name': interaction.contact.name
+                'name': interaction.contact.name,
+                'first_name': interaction.contact.first_name,
+                'last_name': interaction.contact.last_name,
+                'job_title': interaction.contact.job_title,
             },
             'event': None,
             'service': {
