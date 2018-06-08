@@ -40,7 +40,9 @@ class InteractionSerializer(serializers.ModelSerializer):
     }
 
     company = NestedRelatedField(Company)
-    contact = NestedRelatedField(Contact)
+    contact = NestedRelatedField(Contact, extra_fields=(
+        'name', 'first_name', 'last_name', 'job_title'
+    ))
     dit_adviser = NestedAdviserField()
     created_by = NestedAdviserField(read_only=True)
     dit_team = NestedRelatedField(Team)
