@@ -19,7 +19,7 @@ class Command(BaseCommand):
             '--model',
             action='append',
             choices=[search_app.name for search_app in get_search_apps()],
-            help='Search apps to migrate. If empty, all are migrated.',
+            help='Search apps to initialise. If empty, all are initialised.',
         )
 
     def handle(self, *args, **options):

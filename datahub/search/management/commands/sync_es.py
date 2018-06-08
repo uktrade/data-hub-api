@@ -3,8 +3,7 @@ from logging import getLogger, WARNING
 from django.core.management.base import BaseCommand, CommandError
 
 from datahub.search.bulk_sync import sync_app
-from ...apps import get_search_apps, get_search_apps_by_name
-from ...elasticsearch import index_exists
+from ...apps import are_apps_initialised, get_search_apps, get_search_apps_by_name
 
 logger = getLogger(__name__)
 
@@ -42,11 +41,10 @@ class Command(BaseCommand):
 
         apps = get_search_apps_by_name(options['model'])
 
-        for app in apps:
-            if not index_exists(app.es_model.get_write_alias()):
-                raise CommandError(
-                    f'Index and mapping not initialised, please run `init_es` first.'
-                )
+        if not are_apps_initialised(apps):
+            raise CommandError(
+                f'Index and mapping not initialised, please run `init_es` first.'
+            )
 
         sync_es(
             batch_size=options['batch_size'],

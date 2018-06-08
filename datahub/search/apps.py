@@ -3,6 +3,7 @@ from importlib import import_module
 
 from django.apps import AppConfig
 
+from datahub.search.elasticsearch import index_exists
 
 SEARCH_APPS = [
     'datahub.search.companieshousecompany.CompaniesHouseCompanySearchApp',
@@ -90,6 +91,11 @@ def get_search_apps_by_name(app_names=None):
 def get_search_app(app_name):
     """Gets a single search app (by name)."""
     return _load_search_apps()[app_name]
+
+
+def are_apps_initialised(apps):
+    """Determines whether the given apps have been initialised (by init_es)."""
+    return all(index_exists(app.es_model.get_write_alias()) for app in apps)
 
 
 @lru_cache(maxsize=None)
