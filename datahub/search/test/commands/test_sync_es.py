@@ -15,7 +15,7 @@ from ...investment.models import InvestmentProject as ESInvestmentProject
 
 
 @mock.patch(
-    'datahub.search.management.commands.sync_es.index_exists',
+    'datahub.search.apps.index_exists',
     mock.Mock(return_value=False)
 )
 def test_fails_if_index_doesnt_exist():
@@ -27,7 +27,7 @@ def test_fails_if_index_doesnt_exist():
 @mock.patch('datahub.search.bulk_sync.bulk')
 @mock.patch('datahub.search.management.commands.sync_es.get_search_apps_by_name')
 @mock.patch(
-    'datahub.search.management.commands.sync_es.index_exists',
+    'datahub.search.apps.index_exists',
     mock.Mock(return_value=True)
 )
 @pytest.mark.django_db
@@ -53,7 +53,7 @@ def test_sync_es(get_search_apps_by_name, bulk):
 )
 @mock.patch('datahub.search.management.commands.sync_es.sync_app')
 @mock.patch(
-    'datahub.search.management.commands.sync_es.index_exists',
+    'datahub.search.apps.index_exists',
     mock.Mock(return_value=True)
 )
 def test_sync_one_model(sync_app_mock, search_model):
@@ -67,7 +67,7 @@ def test_sync_one_model(sync_app_mock, search_model):
 
 @mock.patch('datahub.search.management.commands.sync_es.sync_app')
 @mock.patch(
-    'datahub.search.management.commands.sync_es.index_exists',
+    'datahub.search.apps.index_exists',
     mock.Mock(return_value=True)
 )
 def test_sync_all_models(sync_app_mock):
@@ -81,7 +81,7 @@ def test_sync_all_models(sync_app_mock):
 
 @mock.patch('datahub.search.management.commands.sync_es.sync_app')
 @mock.patch(
-    'datahub.search.management.commands.sync_es.index_exists',
+    'datahub.search.apps.index_exists',
     mock.Mock(return_value=True)
 )
 def test_sync_invalid_model(sync_app_mock):

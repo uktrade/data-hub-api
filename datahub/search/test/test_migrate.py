@@ -8,25 +8,13 @@ from datahub.search.migrate import migrate_app, migrate_apps
 from datahub.search.test.utils import create_mock_search_app
 
 
-@pytest.mark.parametrize(
-    'apps,expected',
-    (
-        (
-            [app.name for app in list(get_search_apps())[:2]],
-            set(get_search_apps()[:2]),
-        ),
-        (
-            None,
-            set(get_search_apps()),
-        ),
-    )
-)
-def test_migrate_apps(monkeypatch, apps, expected):
+def test_migrate_apps(monkeypatch):
     """Test that migrate_apps() migrates the correct apps."""
     migrate_app_mock = Mock()
     monkeypatch.setattr('datahub.search.migrate.migrate_app', migrate_app_mock)
+    apps = {app.name for app in list(get_search_apps())[:2]}
     migrate_apps(apps)
-    assert {args[0][0] for args in migrate_app_mock.call_args_list} == expected
+    assert {args[0][0] for args in migrate_app_mock.call_args_list} == apps
 
 
 def test_migrate_app_with_app_needing_migration(monkeypatch, mock_es_client):
