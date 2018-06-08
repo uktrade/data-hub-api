@@ -95,7 +95,7 @@ class BaseESModel(DocType):
         return f'{prefix}{mapping_hash}'
 
     @classmethod
-    def initialise_index(cls):
+    def initialise_index(cls, force_update_mapping=False):
         """Configures Elasticsearch index."""
         read_alias_exists = alias_exists(cls.get_read_alias())
         write_alias_exists = alias_exists(cls.get_write_alias())
@@ -110,6 +110,8 @@ class BaseESModel(DocType):
 
             with start_alias_transaction() as alias_transaction:
                 alias_transaction.add_indices_to_alias(cls.get_write_alias(), [index_name])
+        elif force_update_mapping:
+            cls.init(cls.get_write_alias())
 
         if not read_alias_exists:
             with start_alias_transaction() as alias_transaction:

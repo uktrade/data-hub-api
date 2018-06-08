@@ -35,12 +35,12 @@ class SearchApp:
         self.mod = mod
         self.mod_signals = f'{self.mod}.signals'
 
-    def init_es(self):
+    def init_es(self, force_update_mapping=False):
         """
         Makes sure mappings exist in Elasticsearch.
         This call is idempotent.
         """
-        self.es_model.initialise_index()
+        self.es_model.initialise_index(force_update_mapping=force_update_mapping)
 
     def connect_signals(self):
         """

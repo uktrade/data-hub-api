@@ -21,6 +21,11 @@ class Command(BaseCommand):
             choices=[search_app.name for search_app in get_search_apps()],
             help='Search apps to initialise. If empty, all are initialised.',
         )
+        parser.add_argument(
+            '--force-update-mapping',
+            action='store_true',
+            help='Attempts to update the mapping if the index and alias already exist.',
+        )
 
     def handle(self, *args, **options):
         """Executes the command."""
