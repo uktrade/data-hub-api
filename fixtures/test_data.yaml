@@ -441,9 +441,11 @@
     dit_adviser: 7bad8082-4978-4fe8-a018-740257f01637
     notes: This is a dummy interaction for testing
     dit_team: 8248318c-9698-e211-a939-e4115bead28a
-    communication_channel: ~
+    communication_channel: a5d71fdd-5d95-e211-a939-e4115bead28a
     investment_project: ~
-    policy_area: 9feefd50-7f4c-4b73-a33e-779121d40419
+    policy_area: ~
+    policy_areas:
+      - 9feefd50-7f4c-4b73-a33e-779121d40419
     policy_issue_type: fa35595d-780d-4faa-b575-35f1c319bfee
     created_by: 7bad8082-4978-4fe8-a018-740257f01637
     created_on: '2017-07-05T00:00:00Z'
