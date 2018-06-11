@@ -17,7 +17,7 @@ django-mptt==0.9.0
 django-oauth-toolkit==1.2.0
 whitenoise==3.3.1
 pyyaml==3.12
-python-dateutil==2.6.1
+python-dateutil==2.7.3
 
 # Persistency layer
 psycopg2==2.7.4
