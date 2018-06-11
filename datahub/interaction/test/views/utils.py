@@ -1,3 +1,5 @@
+from collections.abc import Sequence
+
 from datahub.core.test_utils import create_test_user
 from datahub.interaction.models import InteractionPermission
 
@@ -10,25 +12,33 @@ def resolve_data(data):
 
     It returns a new dict with resolved values.
     """
-    def resolve_value(value):
-        if callable(value):
-            resolved_value = value()
-        else:
-            resolved_value = value
+    return {key: _resolve_value(value) for key, value in data.items()}
 
-        if hasattr(resolved_value, 'pk'):
-            obj_value = resolved_value
-            resolved_value = {
-                'id': str(obj_value.id),
-                'name': obj_value.name
-            }
 
-            # this is here because of inconsistent endpoint :(
-            if hasattr(obj_value, 'project_code'):
-                resolved_value['project_code'] = obj_value.project_code
-        return resolved_value
+def _resolve_value(value):
+    if isinstance(value, Sequence) and not isinstance(value, str):
+        return [_resolve_single_value(item) for item in value]
 
-    return {key: resolve_value(value) for key, value in data.items()}
+    return _resolve_single_value(value)
+
+
+def _resolve_single_value(value):
+    if callable(value):
+        resolved_value = value()
+    else:
+        resolved_value = value
+
+    if hasattr(resolved_value, 'pk'):
+        obj_value = resolved_value
+        resolved_value = {
+            'id': str(obj_value.id),
+            'name': obj_value.name
+        }
+
+        # this is here because of inconsistent endpoint :(
+        if hasattr(obj_value, 'project_code'):
+            resolved_value['project_code'] = obj_value.project_code
+    return resolved_value
 
 
 def create_read_policy_feedback_user():

@@ -172,13 +172,29 @@ class Interaction(BaseModel):
         null=True, blank=True, max_digits=19, decimal_places=2,
         help_text='For service deliveries only.',
     )
+    # TODO: Remove policy_area once policy_areas has been released
     policy_area = models.ForeignKey(
-        'PolicyArea', blank=True, null=True, on_delete=models.PROTECT,
-        help_text='For policy feedback only.'
+        'PolicyArea',
+        blank=True,
+        help_text='Deprecated; replaced by policy areas.',
+        null=True,
+        on_delete=models.PROTECT,
+        verbose_name='legacy policy area',
+        related_name='+',
+    )
+    policy_areas = models.ManyToManyField(
+        'PolicyArea',
+        blank=True,
+        help_text='For policy feedback only.',
+        related_name='interactions',
     )
     policy_issue_type = models.ForeignKey(
-        'PolicyIssueType', blank=True, null=True, on_delete=models.PROTECT,
-        help_text='For policy feedback only.'
+        'PolicyIssueType',
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
+        help_text='For policy feedback only.',
+        related_name='interactions',
     )
 
     @property

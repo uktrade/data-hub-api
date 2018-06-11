@@ -5,6 +5,7 @@ import factory
 import pytest
 from django.contrib.auth import get_user_model, REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Permission
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.test.client import Client
 from django.urls import reverse
 from django.utils.timezone import now
@@ -205,10 +206,37 @@ class MockQuerySet:
         """Returns the number of items in the query set."""
         return len(self._items)
 
-    def iterator(self, chunk_size=None):
-        """Returns an iterator over the query set items."""
-        return iter(self._items)
+    def all(self):
+        """Returns self."""
+        return self
 
     def count(self):
         """Returns the number of items in the query set."""
         return len(self._items)
+
+    def exists(self):
+        """Returns whether there are any items in the query set."""
+        return bool(self._items)
+
+    def get(self, **kwargs):
+        """Gets an item matching the given kwargs."""
+        matches = [
+            item for item in self._items
+            if all(getattr(item, attr) == val for attr, val in kwargs.items())
+        ]
+
+        if not matches:
+            raise ObjectDoesNotExist()
+
+        if len(matches) > 1:
+            raise MultipleObjectsReturned()
+
+        return matches[0]
+
+    def first(self):
+        """Returns the first item."""
+        return self._items[0] if self._items else None
+
+    def iterator(self, chunk_size=None):
+        """Returns an iterator over the query set items."""
+        return iter(self._items)

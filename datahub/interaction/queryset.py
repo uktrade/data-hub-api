@@ -13,6 +13,11 @@ def get_interaction_queryset():
         'service',
         'service_delivery_status',
         'event',
-        'policy_area',
         'policy_issue_type',
+    ).prefetch_related(
+        'policy_areas',
+    ).defer(
+        # Deferred as policy_area is pending removal
+        # TODO: Remove policy_area once policy_areas has been released
+        'policy_area',
     )
