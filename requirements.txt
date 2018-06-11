@@ -93,7 +93,7 @@ pytest-forked==0.2        # via pytest-xdist
 pytest-sugar==0.9.1
 pytest-xdist==1.22.2
 pytest==3.6.1
-python-dateutil==2.6.1
+python-dateutil==2.7.3
 pytz==2018.4              # via celery, django
 pyyaml==3.12
 raven==6.9.0
