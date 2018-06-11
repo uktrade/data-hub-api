@@ -38,34 +38,6 @@ class StringUUIDField(serializers.UUIDField):
         return str(uuid)
 
 
-class NullStringUUIDField(StringUUIDField):
-    """
-    Null String UUID field.
-
-    We can't use UUID in ES queries, that's why we need to convert them back to string.
-    If input value is null-ish, we return None
-    """
-
-    NULL_VALUES = {'n', 'N', 'null', 'Null', 'NULL', '', None, 'None'}
-
-    def to_representation(self, value):
-        """Converts UUID to string or returns None if null-ish."""
-        if value in self.NULL_VALUES:
-            return None
-
-        return super().to_representation(value)
-
-    def to_internal_value(self, data):
-        """
-        Converts string to UUID and then back to string,
-        to ensure that string is valid UUID.
-        """
-        if data in self.NULL_VALUES:
-            return None
-
-        return super().to_internal_value(data)
-
-
 class LimitOffsetSerializer(serializers.Serializer):
     """Serialiser used to validate limit/offset values in POST bodies."""
 
