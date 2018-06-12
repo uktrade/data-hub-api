@@ -16,7 +16,10 @@ class BusinessTypeConstant(Enum):
 
     charity = Constant('Charity', '9dd14e94-5d95-e211-a939-e4115bead28a')
     company = Constant('Company', '98d14e94-5d95-e211-a939-e4115bead28a')
-    government_dept = Constant('Government Dept', '9cd14e94-5d95-e211-a939-e4115bead28a')
+    government_dept_or_other_public_body = Constant(
+        'Government department or other public body',
+        '9cd14e94-5d95-e211-a939-e4115bead28a'
+    )
     intermediary = Constant('Intermediary', '9bd14e94-5d95-e211-a939-e4115bead28a')
     limited_partnership = Constant(
         'Limited partnership', '8b6eaf7e-03e7-e611-bca1-e4115bead28a'
