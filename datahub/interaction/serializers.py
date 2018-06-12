@@ -2,7 +2,6 @@ from operator import not_
 
 from django.utils.translation import ugettext_lazy
 from rest_framework import serializers
-from rest_framework.settings import api_settings
 
 from datahub.company.models import Company, Contact
 from datahub.company.serializers import NestedAdviserField
@@ -17,33 +16,6 @@ from datahub.metadata.models import Service, Team
 from .models import (CommunicationChannel, Interaction, PolicyArea, PolicyIssueType,
                      ServiceDeliveryStatus)
 from .permissions import HasAssociatedInvestmentProjectValidator, KindPermissionValidator
-
-
-class _ManyRelatedAsSingleItemField(NestedRelatedField):
-    """
-    Serialiser field that makes a to-many field behave like a to-one field.
-
-    Use for temporary backwards compatibility when migrating a to-one field to be a to-many field
-    (so that a to-one field can be emulated using a to-many field).
-
-    This isn't intended to be used in any other way as if the to-many field contains multiple
-    items, only one of them will be returned, and all of them will overwritten on updates.
-
-    TODO Remove this once policy_area has been removed from interactions.
-    """
-
-    def to_internal_value(self, data):
-        """Converts a user-provided value to a list containing a model instance."""
-        if data is None:
-            return []
-        return [super().to_internal_value(data)]
-
-    def to_representation(self, value):
-        """Converts a query set to a dict representation of the first item in the query set."""
-        if not value.exists():
-            return None
-
-        return super().to_representation(value.first())
 
 
 class InteractionSerializer(serializers.ModelSerializer):
@@ -88,23 +60,10 @@ class InteractionSerializer(serializers.ModelSerializer):
     service_delivery_status = NestedRelatedField(
         ServiceDeliveryStatus, required=False, allow_null=True
     )
-    policy_area = _ManyRelatedAsSingleItemField(
-        PolicyArea, required=False, allow_null=True, source='policy_areas',
-    )
     policy_areas = NestedRelatedField(PolicyArea, many=True, required=False, allow_empty=True)
     policy_issue_type = NestedRelatedField(
         PolicyIssueType, required=False, allow_null=True
     )
-
-    def to_internal_value(self, data):
-        """Checks that policy_area and policy_areas haven't both been provided."""
-        if 'policy_area' in data and 'policy_areas' in data:
-            error = {
-                api_settings.NON_FIELD_ERRORS_KEY: [self.error_messages['one_policy_area_field']]
-            }
-            raise serializers.ValidationError(error, code='one_policy_area_field')
-
-        return super().to_internal_value(data)
 
     def validate(self, data):
         """
@@ -151,7 +110,6 @@ class InteractionSerializer(serializers.ModelSerializer):
             'subject',
             'notes',
             'archived_documents_url_path',
-            'policy_area',
             'policy_areas',
             'policy_issue_type',
         )
