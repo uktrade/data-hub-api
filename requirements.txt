@@ -11,8 +11,8 @@ attrs==18.1.0             # via pytest
 aws-requests-auth==0.4.1
 backcall==0.1.0           # via ipython
 billiard==3.5.0.3         # via celery
-boto3==1.7.32
-botocore==1.10.32         # via boto3, s3transfer
+boto3==1.7.35
+botocore==1.10.35         # via boto3, s3transfer
 celery==4.1.1
 certifi==2018.4.16        # via requests
 chardet==3.0.4            # via chardet, requests
@@ -54,7 +54,7 @@ flake8-string-format==0.2.3
 flake8==3.5.0
 freezegun==0.3.10
 future==0.16.0            # via future, notifications-python-client
-gevent==1.3.2.post0
+gevent==1.3.3
 greenlet==0.4.13          # via gevent
 gunicorn==19.8.1
 idna==2.6                 # via idna, requests
@@ -93,7 +93,7 @@ pytest-forked==0.2        # via pytest-xdist
 pytest-sugar==0.9.1
 pytest-xdist==1.22.2
 pytest==3.6.1
-python-dateutil==2.6.1
+python-dateutil==2.7.3
 pytz==2018.4              # via celery, django
 pyyaml==3.12
 raven==6.9.0
