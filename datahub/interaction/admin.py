@@ -46,8 +46,6 @@ class InteractionAdmin(VersionAdmin):
         'archived_documents_url_path',
         'created_on',
         'modified_on',
-        # TODO: Remove policy_area once policy_areas has been released
-        'policy_area',
     )
     list_select_related = (
         'company',
