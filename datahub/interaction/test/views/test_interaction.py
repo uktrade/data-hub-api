@@ -109,6 +109,7 @@ class TestAddInteraction(APITestMixin):
             'grant_amount_offered': None,
             'net_company_receipt': None,
             'policy_area': None,
+            'policy_areas': [],
             'policy_issue_type': None,
             'communication_channel': {
                 'id': str(communication_channel.pk),
@@ -129,7 +130,10 @@ class TestAddInteraction(APITestMixin):
             },
             'contact': {
                 'id': str(contact.pk),
-                'name': contact.name
+                'name': contact.name,
+                'first_name': contact.first_name,
+                'last_name': contact.last_name,
+                'job_title': contact.job_title,
             },
             'event': None,
             'service': {
@@ -218,7 +222,7 @@ class TestAddInteraction(APITestMixin):
                     ),
                     'grant_amount_offered': '1111.11',
                     'net_company_receipt': '8888.11',
-                    'policy_area': partial(random_obj_for_model, PolicyArea),
+                    'policy_areas': [partial(random_obj_for_model, PolicyArea)],
                     'policy_issue_type': partial(random_obj_for_model, PolicyIssueType),
                 },
                 {
@@ -229,8 +233,31 @@ class TestAddInteraction(APITestMixin):
                     ],
                     'grant_amount_offered': ['This field is only valid for service deliveries.'],
                     'net_company_receipt': ['This field is only valid for service deliveries.'],
-                    'policy_area': ['This field is only valid for policy feedback.'],
+                    'policy_areas': ['This field is only valid for policy feedback.'],
                     'policy_issue_type': ['This field is only valid for policy feedback.']
+                }
+            ),
+
+            # check that the legacy policy area field is not allowed
+            (
+                {
+                    'kind': Interaction.KINDS.interaction,
+                    'date': date.today().isoformat(),
+                    'subject': 'whatever',
+                    'notes': 'hello',
+                    'company': CompanyFactory,
+                    'contact': ContactFactory,
+                    'dit_adviser': AdviserFactory,
+                    'service': Service.trade_enquiry.value.id,
+                    'dit_team': Team.healthcare_uk.value.id,
+                    'communication_channel': partial(random_obj_for_model,
+                                                     CommunicationChannel),
+
+                    # field not allowed
+                    'policy_area': partial(random_obj_for_model, PolicyArea),
+                },
+                {
+                    'policy_areas': ['This field is only valid for policy feedback.'],
                 }
             ),
         )
@@ -362,6 +389,7 @@ class TestGetInteraction(APITestMixin):
             'grant_amount_offered': None,
             'net_company_receipt': None,
             'policy_area': None,
+            'policy_areas': [],
             'policy_issue_type': None,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
@@ -382,7 +410,10 @@ class TestGetInteraction(APITestMixin):
             },
             'contact': {
                 'id': str(interaction.contact.pk),
-                'name': interaction.contact.name
+                'name': interaction.contact.name,
+                'first_name': interaction.contact.first_name,
+                'last_name': interaction.contact.last_name,
+                'job_title': interaction.contact.job_title,
             },
             'event': None,
             'service': {
@@ -431,6 +462,7 @@ class TestGetInteraction(APITestMixin):
             'grant_amount_offered': None,
             'net_company_receipt': None,
             'policy_area': None,
+            'policy_areas': [],
             'policy_issue_type': None,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
@@ -451,7 +483,10 @@ class TestGetInteraction(APITestMixin):
             },
             'contact': {
                 'id': str(interaction.contact.pk),
-                'name': interaction.contact.name
+                'name': interaction.contact.name,
+                'first_name': interaction.contact.first_name,
+                'last_name': interaction.contact.last_name,
+                'job_title': interaction.contact.job_title,
             },
             'event': None,
             'service': {
@@ -508,6 +543,7 @@ class TestGetInteraction(APITestMixin):
             'grant_amount_offered': None,
             'net_company_receipt': None,
             'policy_area': None,
+            'policy_areas': [],
             'policy_issue_type': None,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
@@ -528,7 +564,10 @@ class TestGetInteraction(APITestMixin):
             },
             'contact': {
                 'id': str(interaction.contact.pk),
-                'name': interaction.contact.name
+                'name': interaction.contact.name,
+                'first_name': interaction.contact.first_name,
+                'last_name': interaction.contact.last_name,
+                'job_title': interaction.contact.job_title,
             },
             'event': None,
             'service': {
