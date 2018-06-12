@@ -78,6 +78,7 @@ class TestAddServiceDelivery(APITestMixin):
             'net_company_receipt': request_data.get('net_company_receipt'),
             'communication_channel': None,
             'policy_area': None,
+            'policy_areas': [],
             'policy_issue_type': None,
             'subject': 'whatever',
             'date': '2017-04-18',
@@ -94,7 +95,10 @@ class TestAddServiceDelivery(APITestMixin):
             },
             'contact': {
                 'id': str(contact.pk),
-                'name': contact.name
+                'name': contact.name,
+                'first_name': contact.first_name,
+                'last_name': contact.last_name,
+                'job_title': contact.job_title,
             },
             'event': request_data.get('event'),
             'service': {
@@ -189,7 +193,7 @@ class TestAddServiceDelivery(APITestMixin):
                 },
                 {
                     'communication_channel': ['This field is not valid for service deliveries.'],
-                    'policy_area': ['This field is only valid for policy feedback.'],
+                    'policy_areas': ['This field is only valid for policy feedback.'],
                     'policy_issue_type': ['This field is only valid for policy feedback.'],
                     'investment_project': ['This field is only valid for interactions.']
                 }

@@ -1,5 +1,7 @@
-from datetime import date
+from datetime import date, datetime
 
+import pytest
+from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 from reversion.models import Version
@@ -7,7 +9,10 @@ from reversion.models import Version
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core.constants import Service, Team
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
-from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
+from datahub.core.test_utils import (
+    APITestMixin, create_test_user, format_date_or_datetime, random_obj_for_model
+)
+from datahub.event.test.factories import EventFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 from ..factories import CompanyInteractionFactory, EventServiceDeliveryFactory
@@ -116,6 +121,74 @@ class TestListInteractions(APITestMixin):
         actual_ids = {i['id'] for i in response_data['results']}
         expected_ids = {str(i.id) for i in project_interactions}
         assert actual_ids == expected_ids
+
+    def test_filtered_by_event(self):
+        """List of interactions filtered by event"""
+        contact = ContactFactory()
+        event = EventFactory()
+
+        CompanyInteractionFactory.create_batch(3, contact=contact)
+        EventServiceDeliveryFactory.create_batch(3)
+        service_deliveries = EventServiceDeliveryFactory.create_batch(3, event=event)
+
+        url = reverse('api-v3:interaction:collection')
+        response = self.api_client.get(url, {'event_id': event.id})
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 3
+
+        actual_ids = {result['id'] for result in response_data['results']}
+        expected_ids = {str(service_delivery.id) for service_delivery in service_deliveries}
+        assert actual_ids == expected_ids
+
+    @pytest.mark.parametrize(
+        'sort', ('last_name', 'first_name')
+    )
+    def test_sort_by_contact_names(self, sort):
+        """List of interactions sorted by contact name"""
+        interactions = EventServiceDeliveryFactory.create_batch(3)
+
+        url = reverse('api-v3:interaction:collection')
+        response = self.api_client.get(url, data={
+            'sortby': f'contact__{sort}',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == len(interactions)
+        expected_names = sorted(getattr(interaction.contact, sort) for interaction in interactions)
+        actual_names = [result['contact'][sort] for result in response_data['results']]
+        assert expected_names == actual_names
+
+    def test_sort_by_created_on(self):
+        """Test sorting by created_on."""
+        creation_times = [
+            datetime(2015, 1, 1),
+            datetime(2016, 1, 1),
+            datetime(2019, 1, 1),
+            datetime(2020, 1, 1),
+            datetime(2005, 1, 1),
+        ]
+
+        for creation_time in creation_times:
+            with freeze_time(creation_time):
+                EventServiceDeliveryFactory()
+
+        url = reverse('api-v3:interaction:collection')
+        response = self.api_client.get(url, data={
+            'sortby': 'created_on',
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == len(creation_times)
+        expected_timestamps = [
+            format_date_or_datetime(creation_time)
+            for creation_time in sorted(creation_times)
+        ]
+        actual_timestamps = [result['created_on'] for result in response_data['results']]
+        assert expected_timestamps == actual_timestamps
 
 
 class TestInteractionVersioning(APITestMixin):
