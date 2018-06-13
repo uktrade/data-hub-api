@@ -12,6 +12,7 @@ class SearchOrderSerializer(SearchSerializer):
     """Serialiser used to validate OMIS search POST bodies."""
 
     primary_market = SingleOrListField(child=StringUUIDField(), required=False)
+    sector_descends = SingleOrListField(child=StringUUIDField(), required=False)
     uk_region = SingleOrListField(child=StringUUIDField(), required=False)
     created_on_before = RelaxedDateTimeField(required=False)
     created_on_after = RelaxedDateTimeField(required=False)
