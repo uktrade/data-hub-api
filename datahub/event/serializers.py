@@ -21,8 +21,8 @@ class EventSerializer(serializers.ModelSerializer):
     event_type = NestedRelatedField('event.EventType')
     location_type = NestedRelatedField('event.LocationType', required=False, allow_null=True)
     organiser = NestedAdviserField(required=False, allow_null=True)
-    lead_team = NestedRelatedField('metadata.Team', required=False, allow_null=True)
-    teams = NestedRelatedField('metadata.Team', many=True, required=False, allow_empty=True)
+    lead_team = NestedRelatedField('metadata.Team')
+    teams = NestedRelatedField('metadata.Team', many=True, allow_empty=False)
     address_country = NestedRelatedField('metadata.Country')
     uk_region = NestedRelatedField('metadata.UKRegion', required=False, allow_null=True)
     related_programmes = NestedRelatedField(
@@ -55,7 +55,7 @@ class EventSerializer(serializers.ModelSerializer):
         lead_team = combiner.get_value('lead_team')
         teams = combiner.get_value_to_many('teams')
 
-        if lead_team and lead_team not in teams:
+        if lead_team not in teams:
             errors['lead_team'] = self.error_messages['lead_team_not_in_teams']
 
         return errors
