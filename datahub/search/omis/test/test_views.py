@@ -1,3 +1,6 @@
+from uuid import UUID
+
+import factory
 import pytest
 from dateutil.parser import parse as dateutil_parse
 from freezegun import freeze_time
@@ -7,7 +10,8 @@ from rest_framework.reverse import reverse
 from datahub.company.models import Company
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
-from datahub.core.test_utils import APITestMixin, create_test_user
+from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_queryset
+from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.models import Order
@@ -285,6 +289,42 @@ class TestSearchOrder(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {'primary_market': ['"invalid" is not a valid UUID.']}
+
+    @pytest.mark.parametrize(
+        'sector_level',
+        (0, 1, 2),
+    )
+    def test_sector_descends_filter(self, hierarchical_sectors, setup_es, sector_level):
+        """Test the sector_descends filter."""
+        num_sectors = len(hierarchical_sectors)
+        sectors_ids = [sector.pk for sector in hierarchical_sectors]
+
+        orders = OrderFactory.create_batch(
+            num_sectors,
+            sector_id=factory.Iterator(sectors_ids)
+        )
+        OrderFactory.create_batch(
+            3,
+            sector=factory.LazyFunction(lambda: random_obj_for_queryset(
+                Sector.objects.exclude(pk__in=sectors_ids)
+            ))
+        )
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:order')
+        body = {
+            'sector_descends': hierarchical_sectors[sector_level].pk
+        }
+        response = self.api_client.post(url, body)
+        assert response.status_code == status.HTTP_200_OK
+
+        response_data = response.json()
+        assert response_data['count'] == num_sectors - sector_level
+
+        actual_ids = {UUID(order['id']) for order in response_data['results']}
+        expected_ids = {order.pk for order in orders[sector_level:]}
+        assert actual_ids == expected_ids
 
     def test_filter_by_assigned_to_assignee_adviser(self, setup_data):
         """Test that results can be filtered by assignee."""
