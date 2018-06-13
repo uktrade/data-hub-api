@@ -225,5 +225,10 @@ class InteractionSerializer(serializers.ModelSerializer):
                     OperatorRule('event', not_),
                     when=OperatorRule('is_event', not_),
                 ),
+                ValidationRule(
+                    'required',
+                    OperatorRule('notes', is_not_blank),
+                    when=OperatorRule('is_event', not_),
+                ),
             ),
         ]
