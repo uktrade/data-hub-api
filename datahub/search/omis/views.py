@@ -13,6 +13,7 @@ class SearchOrderParams:
 
     FILTER_FIELDS = [
         'primary_market',
+        'sector_descends',
         'uk_region',
         'created_on_before',
         'created_on_after',
@@ -46,6 +47,10 @@ class SearchOrderParams:
             'company.name_trigram',
             'company.trading_name',
             'company.trading_name_trigram',
+        ],
+        'sector_descends': [
+            'sector.id',
+            'sector.ancestors.id',
         ],
     }
 
