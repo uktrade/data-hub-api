@@ -148,7 +148,7 @@ class HeadquarterType(BaseOrderedConstantModel):
     """Headquarter type."""
 
 
-class CompanyClassification(BaseConstantModel):
+class CompanyClassification(BaseOrderedConstantModel):
     """Company classification."""
 
 
