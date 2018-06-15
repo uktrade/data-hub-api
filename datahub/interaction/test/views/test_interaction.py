@@ -173,7 +173,6 @@ class TestAddInteraction(APITestMixin):
                 {
                     'date': ['This field is required.'],
                     'subject': ['This field is required.'],
-                    'notes': ['This field is required.'],
                     'company': ['This field is required.'],
                     'contact': ['This field is required.'],
                     'dit_adviser': ['This field is required.'],
@@ -188,7 +187,6 @@ class TestAddInteraction(APITestMixin):
                     'kind': Interaction.KINDS.interaction,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
-                    'notes': 'hello',
                     'company': CompanyFactory,
                     'contact': ContactFactory,
                     'dit_adviser': AdviserFactory,
@@ -196,6 +194,7 @@ class TestAddInteraction(APITestMixin):
                     'dit_team': Team.healthcare_uk.value.id,
                 },
                 {
+                    'notes': ['This field is required.'],
                     'communication_channel': ['This field is required.'],
                 }
             ),
