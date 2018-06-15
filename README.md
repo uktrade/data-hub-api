@@ -243,6 +243,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `DATA_SCIENCE_COMPANY_API_URL` | No | URL for the [DT07 reporting service](https://github.com/uktrade/dt07-reporting). |
 | `DATA_SCIENCE_COMPANY_API_ID` | No | API ID for the DT07 reporting service. |
 | `DATA_SCIENCE_COMPANY_API_KEY` | No | API key for the DT07 reporting service. |
+| `DATA_SCIENCE_COMPANY_API_VERIFY_RESPONSES` | No | Whether to verify DT07 reporting service response signatures (default=True). |
 | `RESOURCE_SERVER_INTROSPECTION_URL` | If SSO enabled | RFC 7662 token introspection URL used for signle sign-on |
 | `RESOURCE_SERVER_AUTH_TOKEN` | If SSO enabled | Access token for RFC 7662 token introspection server |
 | `RESTRICT_ADMIN` | No | Whether to restrict access to the admin site by IP address. |
