@@ -6,7 +6,6 @@ from . import models
 
 
 MODELS_TO_REGISTER_DISABLEABLE = (
-    models.CompanyClassification,
     models.Country,
     models.FDIType,
     models.InvestmentBusinessActivity,
@@ -19,6 +18,7 @@ MODELS_TO_REGISTER_DISABLEABLE = (
 )
 
 MODELS_TO_REGISTER_WITH_ORDER = (
+    models.CompanyClassification,
     models.EmployeeRange,
     models.FDIValue,
     models.TurnoverRange,
