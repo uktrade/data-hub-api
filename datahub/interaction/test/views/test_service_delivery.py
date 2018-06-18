@@ -78,7 +78,6 @@ class TestAddServiceDelivery(APITestMixin):
             'grant_amount_offered': request_data.get('grant_amount_offered'),
             'net_company_receipt': request_data.get('net_company_receipt'),
             'communication_channel': None,
-            'policy_area': None,
             'policy_areas': [],
             'policy_issue_type': None,
             'subject': 'whatever',
@@ -187,7 +186,7 @@ class TestAddServiceDelivery(APITestMixin):
 
                     # fields not allowed
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
-                    'policy_area': partial(random_obj_for_model, PolicyArea),
+                    'policy_areas': [partial(random_obj_for_model, PolicyArea)],
                     'policy_issue_type': partial(random_obj_for_model, PolicyIssueType),
                     'investment_project': InvestmentProjectFactory,
                 },
