@@ -8,11 +8,13 @@ from rest_framework.reverse import reverse
 
 
 def _auth_sender(key_id, secret_key, url, method, content, content_type):
-    return mohawk.Sender({
+    credentials = {
         'id': key_id,
         'key': secret_key,
         'algorithm': 'sha256',
-    },
+    }
+    return mohawk.Sender(
+        credentials,
         url,
         method,
         content=content,
