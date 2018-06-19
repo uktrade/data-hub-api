@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
 from django.utils.crypto import constant_time_compare
+from django.utils.decorators import decorator_from_middleware
 from mohawk import Receiver
 from mohawk.exc import HawkFail
 from rest_framework.authentication import BaseAuthentication
@@ -46,7 +47,7 @@ def _seen_nonce(access_key_id, nonce, _):
 
 
 def _authorise(request):
-    Receiver(
+    return Receiver(
         _lookup_credentials,
         request.META['HTTP_AUTHORIZATION'],
         request.build_absolute_uri(),
@@ -59,6 +60,12 @@ def _authorise(request):
 
 class _ActivityStreamUser(AnonymousUser):
     username = 'activity_stream_user'
+
+    def __init__(self, hawk_receiver):
+        """Sets the hawk receiver, which is used to set the
+        Server-Authorization header
+        """
+        self.hawk_receiver = hawk_receiver
 
     @property
     def is_authenticated(self):
@@ -95,12 +102,28 @@ class _ActivityStreamAuthentication(BaseAuthentication):
             raise AuthenticationFailed(NO_CREDENTIALS_MESSAGE)
 
         try:
-            _authorise(request)
+            hawk_receiver = _authorise(request)
         except HawkFail as e:
             logger.warning(f'Failed authentication {e}')
             raise AuthenticationFailed(INCORRECT_CREDENTIALS_MESSAGE)
 
-        return (_ActivityStreamUser(), None)
+        return (_ActivityStreamUser(hawk_receiver), None)
+
+
+class _ActivityStreamHawkResponseMiddleware:
+    """Adds the Server-Authorization header to the response, so the originator
+    of the request can authenticate the response
+    """
+
+    def process_response(self, viewset, response):
+        """Adds the Server-Authorization header to the response, so the originator
+        of the request can authenticate the response
+        """
+        response['Server-Authorization'] = viewset.request.user.hawk_receiver.respond(
+            content=response.content,
+            content_type=response['Content-Type'],
+        )
+        return response
 
 
 class ActivityStreamViewSet(ViewSet):
@@ -109,6 +132,7 @@ class ActivityStreamViewSet(ViewSet):
     authentication_classes = (_ActivityStreamAuthentication,)
     permission_classes = (IsAuthenticated,)
 
+    @decorator_from_middleware(_ActivityStreamHawkResponseMiddleware)
     def list(self, request):
         """A single page of activities"""
         return Response({'secret': 'content-for-pen-test'})

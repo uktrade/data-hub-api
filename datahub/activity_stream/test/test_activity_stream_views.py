@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 
-def _auth_header(key_id, secret_key, url, method, content, content_type):
+def _auth_sender(key_id, secret_key, url, method, content, content_type):
     return mohawk.Sender({
         'id': key_id,
         'key': secret_key,
@@ -17,7 +17,7 @@ def _auth_header(key_id, secret_key, url, method, content, content_type):
         method,
         content=content,
         content_type=content_type,
-    ).request_header
+    )
 
 
 def _url():
@@ -39,9 +39,9 @@ def _url_incorrect_path():
             # If no X-Forwarded-For header
             dict(
                 content_type='',
-                HTTP_AUTHORIZATION=_auth_header(
+                HTTP_AUTHORIZATION=_auth_sender(
                     'some-id', 'some-secret', _url(), 'GET', '', '',
-                )
+                ).request_header
             ),
             {'detail': 'Incorrect authentication credentials.'},
         ),
@@ -49,9 +49,9 @@ def _url_incorrect_path():
             # If the first IP in X-Forwarded-For header isn't in the whitelist
             dict(
                 content_type='',
-                HTTP_AUTHORIZATION=_auth_header(
+                HTTP_AUTHORIZATION=_auth_sender(
                     'some-id', 'some-secret', _url(), 'GET', '', '',
-                ),
+                ).request_header,
                 HTTP_X_FORWARDED_FOR='9.9.9.9',
             ),
             {'detail': 'Incorrect authentication credentials.'},
@@ -68,9 +68,9 @@ def _url_incorrect_path():
             # If the Authorization header generated from an incorrect ID
             dict(
                 content_type='',
-                HTTP_AUTHORIZATION=_auth_header(
+                HTTP_AUTHORIZATION=_auth_sender(
                     'some-id-incorrect', 'some-secret', _url(), 'GET', '', '',
-                ),
+                ).request_header,
                 HTTP_X_FORWARDED_FOR='1.2.3.4',
             ),
             {'detail': 'Incorrect authentication credentials.'},
@@ -79,9 +79,9 @@ def _url_incorrect_path():
             # If the Authorization header generated from an incorrect secret
             dict(
                 content_type='',
-                HTTP_AUTHORIZATION=_auth_header(
+                HTTP_AUTHORIZATION=_auth_sender(
                     'some-id', 'some-secret-incorrect', _url(), 'GET', '', '',
-                ),
+                ).request_header,
                 HTTP_X_FORWARDED_FOR='1.2.3.4',
             ),
             {'detail': 'Incorrect authentication credentials.'},
@@ -90,10 +90,10 @@ def _url_incorrect_path():
             # If the Authorization header generated from an incorrect domain
             dict(
                 content_type='',
-                HTTP_AUTHORIZATION=_auth_header(
+                HTTP_AUTHORIZATION=_auth_sender(
                     'some-id', 'some-secret',
                     _url_incorrect_domain(), 'GET', '', '',
-                ),
+                ).request_header,
                 HTTP_X_FORWARDED_FOR='1.2.3.4',
             ),
             {'detail': 'Incorrect authentication credentials.'},
@@ -102,10 +102,10 @@ def _url_incorrect_path():
             # If the Authorization header generated from an incorrect path
             dict(
                 content_type='',
-                HTTP_AUTHORIZATION=_auth_header(
+                HTTP_AUTHORIZATION=_auth_sender(
                     'some-id', 'some-secret',
                     _url_incorrect_path(), 'GET', '', '',
-                ),
+                ).request_header,
                 HTTP_X_FORWARDED_FOR='1.2.3.4',
             ),
             {'detail': 'Incorrect authentication credentials.'},
@@ -114,10 +114,10 @@ def _url_incorrect_path():
             # If the Authorization header generated from an incorrect method
             dict(
                 content_type='',
-                HTTP_AUTHORIZATION=_auth_header(
+                HTTP_AUTHORIZATION=_auth_sender(
                     'some-id', 'some-secret',
                     _url_incorrect_path(), 'POST', '', '',
-                ),
+                ).request_header,
                 HTTP_X_FORWARDED_FOR='1.2.3.4',
             ),
             {'detail': 'Incorrect authentication credentials.'},
@@ -126,10 +126,10 @@ def _url_incorrect_path():
             # If the Authorization header generated from an incorrect content-type
             dict(
                 content_type='',
-                HTTP_AUTHORIZATION=_auth_header(
+                HTTP_AUTHORIZATION=_auth_sender(
                     'some-id', 'some-secret',
                     _url_incorrect_path(), 'GET', 'incorrect', '',
-                ),
+                ).request_header,
                 HTTP_X_FORWARDED_FOR='1.2.3.4',
             ),
             {'detail': 'Incorrect authentication credentials.'},
@@ -138,10 +138,10 @@ def _url_incorrect_path():
             # If the Authorization header generated from incorrect content
             dict(
                 content_type='',
-                HTTP_AUTHORIZATION=_auth_header(
+                HTTP_AUTHORIZATION=_auth_sender(
                     'some-id', 'some-secret',
                     _url_incorrect_path(), 'GET', '', 'incorrect',
-                ),
+                ).request_header,
                 HTTP_X_FORWARDED_FOR='1.2.3.4',
             ),
             {'detail': 'Incorrect authentication credentials.'},
@@ -167,9 +167,9 @@ def test_if_authentication_passed_but_61_seconds_in_past_401_returned(api_client
     """
     past = datetime.datetime.now() + datetime.timedelta(seconds=-61)
     with freeze_time(past):
-        auth = _auth_header(
+        auth = _auth_sender(
             'some-id', 'some-secret', _url(), 'GET', '', '',
-        )
+        ).request_header
     response = api_client.get(
         reverse('api-v3:activity-stream:index'),
         content_type='',
@@ -185,9 +185,9 @@ def test_if_authentication_passed_but_61_seconds_in_past_401_returned(api_client
 @pytest.mark.django_db
 def test_if_authentication_reused_401_returned(api_client):
     """If the Authorization header is reused, then a 401 is returned"""
-    auth = _auth_header(
+    auth = _auth_sender(
         'some-id', 'some-secret', _url(), 'GET', '', '',
-    )
+    ).request_header
 
     response_1 = api_client.get(
         _url(),
@@ -209,20 +209,48 @@ def test_if_authentication_reused_401_returned(api_client):
 
 
 @pytest.mark.django_db
-def test_empty_object_returned(api_client):
+def test_empty_object_returned_with_authentication(api_client):
     """If the Authorization and X-Forwarded-For headers are correct, then
-    the correct data is retuend
+    the correct, and authentic, data is returned
     """
-    auth = _auth_header(
-        'some-id', 'some-secret', _url(), 'GET', '', ''
+    sender = _auth_sender(
+        'some-id', 'some-secret', _url(), 'GET', '', '',
     )
+
     response = api_client.get(
         _url(),
         content_type='',
-        HTTP_AUTHORIZATION=auth,
+        HTTP_AUTHORIZATION=sender.request_header,
         HTTP_X_FORWARDED_FOR='1.2.3.4',
     )
 
     assert response.status_code == status.HTTP_200_OK
     content = {'secret': 'content-for-pen-test'}
     assert response.json() == content
+
+    # Just asserting that accept_response doesn't raise is a bit weak,
+    # so we also assert that it raises if the header, content, or
+    # content_type are incorrect
+    sender.accept_response(
+        response_header=response['Server-Authorization'],
+        content=response.content,
+        content_type=response['Content-Type'],
+    )
+    with pytest.raises(mohawk.exc.MacMismatch):
+        sender.accept_response(
+            response_header=response['Server-Authorization'] + 'incorrect',
+            content=response.content,
+            content_type=response['Content-Type'],
+        )
+    with pytest.raises(mohawk.exc.MisComputedContentHash):
+        sender.accept_response(
+            response_header=response['Server-Authorization'],
+            content='incorrect',
+            content_type=response['Content-Type'],
+        )
+    with pytest.raises(mohawk.exc.MisComputedContentHash):
+        sender.accept_response(
+            response_header=response['Server-Authorization'],
+            content=response.content,
+            content_type='incorrect',
+        )
