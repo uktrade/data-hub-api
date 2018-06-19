@@ -108,7 +108,6 @@ class TestAddInteraction(APITestMixin):
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
-            'policy_area': None,
             'policy_areas': [],
             'policy_issue_type': None,
             'communication_channel': {
@@ -173,7 +172,6 @@ class TestAddInteraction(APITestMixin):
                 {
                     'date': ['This field is required.'],
                     'subject': ['This field is required.'],
-                    'notes': ['This field is required.'],
                     'company': ['This field is required.'],
                     'contact': ['This field is required.'],
                     'dit_adviser': ['This field is required.'],
@@ -188,7 +186,6 @@ class TestAddInteraction(APITestMixin):
                     'kind': Interaction.KINDS.interaction,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
-                    'notes': 'hello',
                     'company': CompanyFactory,
                     'contact': ContactFactory,
                     'dit_adviser': AdviserFactory,
@@ -196,6 +193,7 @@ class TestAddInteraction(APITestMixin):
                     'dit_team': Team.healthcare_uk.value.id,
                 },
                 {
+                    'notes': ['This field is required.'],
                     'communication_channel': ['This field is required.'],
                 }
             ),
@@ -235,29 +233,6 @@ class TestAddInteraction(APITestMixin):
                     'net_company_receipt': ['This field is only valid for service deliveries.'],
                     'policy_areas': ['This field is only valid for policy feedback.'],
                     'policy_issue_type': ['This field is only valid for policy feedback.']
-                }
-            ),
-
-            # check that the legacy policy area field is not allowed
-            (
-                {
-                    'kind': Interaction.KINDS.interaction,
-                    'date': date.today().isoformat(),
-                    'subject': 'whatever',
-                    'notes': 'hello',
-                    'company': CompanyFactory,
-                    'contact': ContactFactory,
-                    'dit_adviser': AdviserFactory,
-                    'service': Service.trade_enquiry.value.id,
-                    'dit_team': Team.healthcare_uk.value.id,
-                    'communication_channel': partial(random_obj_for_model,
-                                                     CommunicationChannel),
-
-                    # field not allowed
-                    'policy_area': partial(random_obj_for_model, PolicyArea),
-                },
-                {
-                    'policy_areas': ['This field is only valid for policy feedback.'],
                 }
             ),
         )
@@ -388,7 +363,6 @@ class TestGetInteraction(APITestMixin):
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
-            'policy_area': None,
             'policy_areas': [],
             'policy_issue_type': None,
             'communication_channel': {
@@ -461,7 +435,6 @@ class TestGetInteraction(APITestMixin):
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
-            'policy_area': None,
             'policy_areas': [],
             'policy_issue_type': None,
             'communication_channel': {
@@ -542,7 +515,6 @@ class TestGetInteraction(APITestMixin):
             'service_delivery_status': None,
             'grant_amount_offered': None,
             'net_company_receipt': None,
-            'policy_area': None,
             'policy_areas': [],
             'policy_issue_type': None,
             'communication_channel': {

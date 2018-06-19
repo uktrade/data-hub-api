@@ -7,10 +7,11 @@ from reversion.models import Version
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import Country, Service, Team, UKRegion
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
-from datahub.core.test_utils import APITestMixin, create_test_user
+from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
 from datahub.event.constants import EventType, LocationType, Programme
 from datahub.event.models import Event
 from datahub.event.test.factories import EventFactory
+from datahub.metadata.models import Team as TeamModel
 from datahub.metadata.test.factories import TeamFactory
 
 
@@ -121,6 +122,7 @@ class TestCreateEventView(APITestMixin):
 
     def test_create_minimal_success(self):
         """Tests successfully creating an event with only the required fields."""
+        team = random_obj_for_model(TeamModel)
         url = reverse('api-v3:event:collection')
 
         request_data = {
@@ -132,6 +134,8 @@ class TestCreateEventView(APITestMixin):
             'service': Service.trade_enquiry.value.id,
             'start_date': '2010-09-12',
             'end_date': '2010-09-12',
+            'lead_team': team.pk,
+            'teams': [team.pk],
         }
         response = self.api_client.post(url, format='json', data=request_data)
 
@@ -159,8 +163,14 @@ class TestCreateEventView(APITestMixin):
             },
             'uk_region': None,
             'organiser': None,
-            'lead_team': None,
-            'teams': [],
+            'lead_team': {
+                'id': str(team.pk),
+                'name': team.name,
+            },
+            'teams': [{
+                'id': str(team.pk),
+                'name': team.name,
+            }],
             'related_programmes': [],
             'service': {
                 'id': Service.trade_enquiry.value.id,
@@ -278,6 +288,7 @@ class TestCreateEventView(APITestMixin):
 
     def test_create_uk_no_uk_region(self):
         """Tests UK region requirement for UK events."""
+        team = random_obj_for_model(TeamModel)
         url = reverse('api-v3:event:collection')
         request_data = {
             'name': 'Grand exhibition',
@@ -288,6 +299,8 @@ class TestCreateEventView(APITestMixin):
             'address_country': Country.united_kingdom.value.id,
             'service': Service.trade_enquiry.value.id,
             'start_date': '2010-09-12',
+            'lead_team': team.pk,
+            'teams': [team.pk],
         }
         response = self.api_client.post(url, format='json', data=request_data)
 
@@ -299,6 +312,7 @@ class TestCreateEventView(APITestMixin):
 
     def test_create_non_uk_with_uk_region(self):
         """Tests creating a non-UK event with a UK region."""
+        team = random_obj_for_model(TeamModel)
         url = reverse('api-v3:event:collection')
         request_data = {
             'name': 'Grand exhibition',
@@ -310,6 +324,8 @@ class TestCreateEventView(APITestMixin):
             'uk_region': UKRegion.east_of_england.value.id,
             'service': Service.trade_enquiry.value.id,
             'start_date': '2010-09-12',
+            'lead_team': team.pk,
+            'teams': [team.pk],
         }
         response = self.api_client.post(url, format='json', data=request_data)
 
@@ -321,6 +337,7 @@ class TestCreateEventView(APITestMixin):
 
     def test_create_end_date_without_start_date(self):
         """Tests specifying an end date without a start date."""
+        team = random_obj_for_model(TeamModel)
         url = reverse('api-v3:event:collection')
         request_data = {
             'name': 'Grand exhibition',
@@ -331,6 +348,8 @@ class TestCreateEventView(APITestMixin):
             'uk_region': UKRegion.east_of_england.value.id,
             'service': Service.trade_enquiry.value.id,
             'end_date': '2020-01-01',
+            'lead_team': team.pk,
+            'teams': [team.pk],
         }
         response = self.api_client.post(url, format='json', data=request_data)
 
@@ -342,6 +361,7 @@ class TestCreateEventView(APITestMixin):
 
     def test_create_end_date_before_start_date(self):
         """Tests specifying an end date before the start date."""
+        team = random_obj_for_model(TeamModel)
         url = reverse('api-v3:event:collection')
         request_data = {
             'name': 'Grand exhibition',
@@ -353,6 +373,8 @@ class TestCreateEventView(APITestMixin):
             'service': Service.trade_enquiry.value.id,
             'start_date': '2020-01-02',
             'end_date': '2020-01-01',
+            'lead_team': team.pk,
+            'teams': [team.pk],
         }
         response = self.api_client.post(url, format='json', data=request_data)
 
@@ -376,9 +398,11 @@ class TestCreateEventView(APITestMixin):
             'address_town': ['This field is required.'],
             'end_date': ['This field is required.'],
             'event_type': ['This field is required.'],
+            'lead_team': ['This field is required.'],
             'name': ['This field is required.'],
             'service': ['This field is required.'],
             'start_date': ['This field is required.'],
+            'teams': ['This field is required.'],
         }
 
     def test_create_blank_failure(self):
@@ -390,9 +414,11 @@ class TestCreateEventView(APITestMixin):
             'address_town': '',
             'end_date': None,
             'event_type': None,
+            'lead_team': None,
             'name': '',
             'service': None,
             'start_date': None,
+            'teams': []
         }
         response = self.api_client.post(url, format='json', data=request_data)
 
@@ -404,9 +430,11 @@ class TestCreateEventView(APITestMixin):
             'address_town': ['This field may not be blank.'],
             'end_date': ['This field may not be null.'],
             'event_type': ['This field may not be null.'],
+            'lead_team': ['This field may not be null.'],
             'name': ['This field may not be blank.'],
             'service': ['This field may not be null.'],
             'start_date': ['This field may not be null.'],
+            'teams': ['This list may not be empty.'],
         }
 
 
@@ -563,6 +591,7 @@ class TestEventVersioning(APITestMixin):
     def test_add_creates_a_new_version(self):
         """Test that creating an event creates a new version."""
         assert Version.objects.count() == 0
+        team = random_obj_for_model(TeamModel)
 
         response = self.api_client.post(
             reverse('api-v3:event:collection'),
@@ -575,6 +604,8 @@ class TestEventVersioning(APITestMixin):
                 'service': Service.trade_enquiry.value.id,
                 'start_date': '2010-09-12',
                 'end_date': '2010-09-12',
+                'lead_team': team.pk,
+                'teams': [team.pk],
             },
             format='json'
         )
