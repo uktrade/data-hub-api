@@ -1,7 +1,6 @@
 import logging
 
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
 from django.utils.crypto import constant_time_compare
 from django.utils.decorators import decorator_from_middleware
@@ -9,7 +8,6 @@ from mohawk import Receiver
 from mohawk.exc import HawkFail
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
@@ -65,25 +63,6 @@ def _authorise(request):
     )
 
 
-class _ActivityStreamUser(AnonymousUser):
-    """The User for Hawk-authenticated ActivityStream requests"""
-
-    username = 'activity_stream_user'
-
-    def __init__(self, hawk_receiver):
-        """Sets the hawk receiver, which is used to set the
-        Server-Authorization header
-        """
-        self.hawk_receiver = hawk_receiver
-
-    @property
-    def is_authenticated(self):
-        """Return True unconditionally, since the User is only created
-        after authentication
-        """
-        return True
-
-
 class _ActivityStreamAuthentication(BaseAuthentication):
 
     def authenticate_header(self, request):
@@ -127,7 +106,7 @@ class _ActivityStreamAuthentication(BaseAuthentication):
             logger.warning(f'Failed authentication {e}')
             raise AuthenticationFailed(INCORRECT_CREDENTIALS_MESSAGE)
 
-        return (_ActivityStreamUser(hawk_receiver), None)
+        return (None, hawk_receiver)
 
 
 class _ActivityStreamHawkResponseMiddleware:
@@ -139,7 +118,7 @@ class _ActivityStreamHawkResponseMiddleware:
         """Adds the Server-Authorization header to the response, so the originator
         of the request can authenticate the response
         """
-        response['Server-Authorization'] = viewset.request.user.hawk_receiver.respond(
+        response['Server-Authorization'] = viewset.request.auth.respond(
             content=response.content,
             content_type=response['Content-Type'],
         )
@@ -150,7 +129,7 @@ class ActivityStreamViewSet(ViewSet):
     """List-only view set for the activity stream"""
 
     authentication_classes = (_ActivityStreamAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = ()
 
     @decorator_from_middleware(_ActivityStreamHawkResponseMiddleware)
     def list(self, request):
