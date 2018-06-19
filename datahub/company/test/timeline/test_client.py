@@ -45,11 +45,11 @@ class TestDataScienceCompanyAPIClient:
     """Tests the data science company API client."""
 
     @pytest.fixture(autouse=True)
-    def fake_api(self, requests_mock):
+    def fake_api(self, requests_mock, response_signature):
         """Fixture that stubs the data science company API."""
         for path, kwargs in FAKE_RESPONSES.items():
             url = urljoin(settings.DATA_SCIENCE_COMPANY_API_URL, path)
-            requests_mock.get(url, **kwargs)
+            requests_mock.get(url, headers=response_signature, **kwargs)
 
     @pytest.mark.parametrize(
         'api_url,api_id,api_key',

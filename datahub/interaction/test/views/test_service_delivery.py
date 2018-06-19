@@ -30,6 +30,7 @@ class TestAddServiceDelivery(APITestMixin):
             # non-event service delivery
             {
                 'is_event': False,
+                'notes': 'hello',
             },
             # event service delivery
             {
@@ -39,6 +40,7 @@ class TestAddServiceDelivery(APITestMixin):
             # non-event service delivery with all fields filled in
             {
                 'is_event': False,
+                'notes': 'hello',
                 'service_delivery_status': partial(random_obj_for_model, ServiceDeliveryStatus),
                 'grant_amount_offered': '9999.99',
                 'net_company_receipt': '8888.99',
@@ -56,7 +58,6 @@ class TestAddServiceDelivery(APITestMixin):
             'subject': 'whatever',
             'date': date.today().isoformat(),
             'dit_adviser': adviser.pk,
-            'notes': 'hello',
             'company': company.pk,
             'contact': contact.pk,
             'service': Service.trade_enquiry.value.id,
@@ -77,7 +78,6 @@ class TestAddServiceDelivery(APITestMixin):
             'grant_amount_offered': request_data.get('grant_amount_offered'),
             'net_company_receipt': request_data.get('net_company_receipt'),
             'communication_channel': None,
-            'policy_area': None,
             'policy_areas': [],
             'policy_issue_type': None,
             'subject': 'whatever',
@@ -88,7 +88,7 @@ class TestAddServiceDelivery(APITestMixin):
                 'last_name': adviser.last_name,
                 'name': adviser.name
             },
-            'notes': 'hello',
+            'notes': request_data.get('notes', ''),
             'company': {
                 'id': str(company.pk),
                 'name': company.name
@@ -138,7 +138,6 @@ class TestAddServiceDelivery(APITestMixin):
                 {
                     'date': ['This field is required.'],
                     'subject': ['This field is required.'],
-                    'notes': ['This field is required.'],
                     'company': ['This field is required.'],
                     'contact': ['This field is required.'],
                     'dit_adviser': ['This field is required.'],
@@ -153,7 +152,6 @@ class TestAddServiceDelivery(APITestMixin):
                     'kind': Interaction.KINDS.service_delivery,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
-                    'notes': 'hello',
                     'company': CompanyFactory,
                     'contact': ContactFactory,
                     'dit_adviser': AdviserFactory,
@@ -162,6 +160,7 @@ class TestAddServiceDelivery(APITestMixin):
                 },
                 {
                     'is_event': ['This field is required.'],
+                    'notes': ['This field is required.'],
                 }
             ),
 
@@ -187,7 +186,7 @@ class TestAddServiceDelivery(APITestMixin):
 
                     # fields not allowed
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
-                    'policy_area': partial(random_obj_for_model, PolicyArea),
+                    'policy_areas': [partial(random_obj_for_model, PolicyArea)],
                     'policy_issue_type': partial(random_obj_for_model, PolicyIssueType),
                     'investment_project': InvestmentProjectFactory,
                 },
@@ -232,7 +231,6 @@ class TestAddServiceDelivery(APITestMixin):
                     'kind': Interaction.KINDS.service_delivery,
                     'date': date.today().isoformat(),
                     'subject': 'whatever',
-                    'notes': 'hello',
                     'company': CompanyFactory,
                     'contact': ContactFactory,
                     'dit_adviser': AdviserFactory,
