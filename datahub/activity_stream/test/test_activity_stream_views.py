@@ -145,7 +145,7 @@ def test_if_authentication_passed_but_61_seconds_in_past_401_returned(api_client
     """If the Authorization header is generated 61 seconds in the past, then a
     401 is returned
     """
-    past = datetime.datetime.now() + datetime.timedelta(seconds=-61)
+    past = datetime.datetime.now() - datetime.timedelta(seconds=61)
     with freeze_time(past):
         auth = _auth_sender().request_header
     response = api_client.get(
