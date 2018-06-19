@@ -45,7 +45,7 @@ def _seen_nonce(access_key_id, nonce, _):
     return seen_cache_key
 
 
-def _raise_exception_if_not_authentic(request):
+def _authorise(request):
     Receiver(
         _lookup_credentials,
         request.META['HTTP_AUTHORIZATION'],
@@ -95,7 +95,7 @@ class _ActivityStreamAuthentication(BaseAuthentication):
             raise AuthenticationFailed(NO_CREDENTIALS_MESSAGE)
 
         try:
-            _raise_exception_if_not_authentic(request)
+            _authorise(request)
         except HawkFail as e:
             logger.warning(f'Failed authentication {e}')
             raise AuthenticationFailed(INCORRECT_CREDENTIALS_MESSAGE)
