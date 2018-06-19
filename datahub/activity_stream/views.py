@@ -21,6 +21,9 @@ INCORRECT_CREDENTIALS_MESSAGE = 'Incorrect authentication credentials.'
 
 
 def _lookup_credentials(access_key_id):
+    """Raises a HawkFail if the passed ID is not equal to
+    settings.ACTIVITY_STREAM_ACCESS_KEY_ID
+    """
     if not constant_time_compare(access_key_id,
                                  settings.ACTIVITY_STREAM_ACCESS_KEY_ID):
         raise HawkFail(f'No Hawk ID of {access_key_id}')
@@ -33,6 +36,9 @@ def _lookup_credentials(access_key_id):
 
 
 def _seen_nonce(access_key_id, nonce, _):
+    """Returns if the passed access_key_id/nonce combination has been
+    used within settings.ACTIVITY_STREAM_NONCE_EXPIRY_SECONDS
+    """
     cache_key = f'activity_stream:{access_key_id}:{nonce}'
     seen_cache_key = cache.get(cache_key, False)
 
@@ -47,6 +53,7 @@ def _seen_nonce(access_key_id, nonce, _):
 
 
 def _authorise(request):
+    """Raises a HawkFail if the passed request cannot be authenticated"""
     return Receiver(
         _lookup_credentials,
         request.META['HTTP_AUTHORIZATION'],
@@ -59,6 +66,8 @@ def _authorise(request):
 
 
 class _ActivityStreamUser(AnonymousUser):
+    """The User for Hawk-authenticated ActivityStream requests"""
+
     username = 'activity_stream_user'
 
     def __init__(self, hawk_receiver):
@@ -69,6 +78,9 @@ class _ActivityStreamUser(AnonymousUser):
 
     @property
     def is_authenticated(self):
+        """Return True unconditionally, since the User is only created
+        after authentication
+        """
         return True
 
 
@@ -82,6 +94,14 @@ class _ActivityStreamAuthentication(BaseAuthentication):
         return 'Hawk'
 
     def authenticate(self, request):
+        """Authenticates a request using two mechanisms:
+
+        1. The X-Forwarded-For-Header, compared against a whitelist
+        2. A Hawk signature in the Authorization header
+
+        If either of these suggest we cannot authenticate, AuthenticationFailed
+        is raised, as required in the DRF authentication flow
+        """
         if 'HTTP_X_FORWARDED_FOR' not in request.META:
             logger.warning(
                 'Failed authentication: no X-Forwarded-For header passed'
