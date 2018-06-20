@@ -38,11 +38,11 @@ def _seen_nonce(access_key_id, nonce, _):
     used within settings.ACTIVITY_STREAM_NONCE_EXPIRY_SECONDS
     """
     cache_key = f'activity_stream:{access_key_id}:{nonce}'
-    seen_cache_key = cache.get(cache_key, False)
 
     # cache.add only adds key if it isn't present
-    cache.add(cache_key, True,
-              timeout=settings.ACTIVITY_STREAM_NONCE_EXPIRY_SECONDS)
+    seen_cache_key = not cache.add(
+        cache_key, True, timeout=settings.ACTIVITY_STREAM_NONCE_EXPIRY_SECONDS,
+    )
 
     if seen_cache_key:
         logger.warning(f'Already seen nonce {nonce}')
