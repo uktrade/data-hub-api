@@ -11,6 +11,9 @@ jobs:
           POSTGRES_DB=datahub
 
     environment:
+      ACTIVITY_STREAM_IP_WHITELIST: 1.2.3.4
+      ACTIVITY_STREAM_ACCESS_KEY_ID: some-id
+      ACTIVITY_STREAM_SECRET_ACCESS_KEY: some-secret
       DATABASE_URL: postgresql://postgres@localhost/datahub
       DATAHUB_SECRET: secret
       DEBUG: 'True'
