@@ -79,6 +79,7 @@ LOCAL_APPS = [
     'datahub.omis.quote',
     'datahub.omis.invoice',
     'datahub.omis.payment',
+    'datahub.activity_stream.apps.ActivityStreamConfig',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -325,3 +326,11 @@ GOVUK_PAY_AUTH_TOKEN = env('GOVUK_PAY_AUTH_TOKEN', default='')
 GOVUK_PAY_TIMEOUT = 15  # in seconds
 GOVUK_PAY_PAYMENT_DESCRIPTION = 'Overseas Market Introduction Service order {reference}'
 GOVUK_PAY_RETURN_URL = f'{OMIS_PUBLIC_ORDER_URL}/payment/card/{{session_id}}'
+
+# Activity Stream
+ACTIVITY_STREAM_IP_WHITELIST = env('ACTIVITY_STREAM_IP_WHITELIST', default='')
+# Defaults are not used so we don't accidentally expose the endpoint
+# with default credentials
+ACTIVITY_STREAM_ACCESS_KEY_ID = env('ACTIVITY_STREAM_ACCESS_KEY_ID')
+ACTIVITY_STREAM_SECRET_ACCESS_KEY = env('ACTIVITY_STREAM_SECRET_ACCESS_KEY')
+ACTIVITY_STREAM_NONCE_EXPIRY_SECONDS = 60
