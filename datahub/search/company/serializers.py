@@ -7,6 +7,7 @@ class SearchCompanySerializer(SearchSerializer):
     """Serialiser used to validate company search POST bodies."""
 
     account_manager = SingleOrListField(child=StringUUIDField(), required=False)
+    archived = serializers.BooleanField(required=False)
     trading_name = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
     export_to_country = SingleOrListField(child=StringUUIDField(), required=False)
