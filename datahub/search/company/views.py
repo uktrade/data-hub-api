@@ -13,6 +13,7 @@ class SearchCompanyParams:
 
     FILTER_FIELDS = (
         'account_manager',
+        'archived',
         'description',
         'export_to_country',
         'future_interest_country',
@@ -24,7 +25,7 @@ class SearchCompanyParams:
         'country',
         'trading_address_country',
         'uk_based',
-        'uk_region'
+        'uk_region',
     )
 
     REMAP_FIELDS = {
