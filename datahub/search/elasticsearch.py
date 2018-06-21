@@ -139,7 +139,7 @@ def create_index(index_name, index_settings=None):
 
 
 def delete_index(index_name):
-    """Deletes an index"""
+    """Deletes an index."""
     logger.info(f'Deleting the {index_name} index...')
     client = get_client()
     client.indices.delete(index_name)
@@ -175,6 +175,13 @@ def alias_exists(alias):
     """Checks if an alias exists."""
     client = get_client()
     return client.indices.exists_alias(name=alias)
+
+
+def delete_alias(alias_name):
+    """Deletes an alias."""
+    logger.info(f'Deleting the {alias_name} alias...')
+    client = get_client()
+    client.indices.delete_alias('_all', alias_name)
 
 
 class AliasUpdater:
