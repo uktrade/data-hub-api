@@ -57,7 +57,7 @@ jobs:
 
       - run:
           name: Run tests
-          command: python -m pytest -n 4 --cov -s --junitxml=test-reports/junit.xml
+          command: python -m pytest -n 4 -p no:sugar --cov --junitxml=test-reports/junit.xml
 
       - store_test_results:
           path: test-reports
