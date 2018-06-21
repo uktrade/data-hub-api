@@ -6,6 +6,7 @@ from pytest import fixture
 
 from datahub.metadata.test.factories import SectorFactory
 from .apps import get_search_apps
+from .elasticsearch import alias_exists, delete_alias, delete_index, index_exists
 
 
 def pytest_generate_tests(metafunc):
@@ -42,13 +43,28 @@ def _setup_es_indexes(_es_client):
     """Sets up ES and makes the client available."""
     # Create models in the test index
     for search_app in get_search_apps():
+        # Clean up in case of any aborted test runs
+        index = search_app.es_model.get_target_index_name()
+        read_alias = search_app.es_model.get_read_alias()
+        write_alias = search_app.es_model.get_write_alias()
+
+        if index_exists(index):
+            delete_index(index)
+
+        if alias_exists(read_alias):
+            delete_alias(read_alias)
+
+        if alias_exists(write_alias):
+            delete_alias(write_alias)
+
+        # Create indices and aliases
         search_app.init_es()
         search_app.connect_signals()
 
     yield _es_client
 
     for search_app in get_search_apps():
-        _es_client.indices.delete(search_app.es_model.get_target_index_name())
+        delete_index(search_app.es_model.get_target_index_name())
         search_app.disconnect_signals()
 
 

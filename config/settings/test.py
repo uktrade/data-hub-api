@@ -14,6 +14,7 @@ INSTALLED_APPS += [
 
 # The index is set dynamically in datahub/search/conftest.py, so that tests can be parallelised.
 ES_INDEX_PREFIX = None
+ES_LEGACY_INDEX = None
 ES_INDEX_SETTINGS = {
     'number_of_shards': 1,
     'number_of_replicas': 0,
