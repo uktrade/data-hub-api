@@ -38,8 +38,8 @@ def test_migrate_model(monkeypatch):
     resync_after_migrate_mock = Mock()
     monkeypatch.setattr('datahub.search.tasks.resync_after_migrate', resync_after_migrate_mock)
     mock_app = create_mock_search_app(
-        'current-hash',
-        'target-hash',
+        current_mapping_hash='current-hash',
+        target_mapping_hash='target-hash',
     )
     get_search_app_mock = Mock(return_value=mock_app)
     monkeypatch.setattr('datahub.search.tasks.get_search_app', get_search_app_mock)
@@ -63,8 +63,8 @@ def test_migrate_model_with_mapping_hash_mismatch(monkeypatch):
     resync_after_migrate_mock = Mock()
     monkeypatch.setattr('datahub.search.tasks.resync_after_migrate', resync_after_migrate_mock)
     mock_app = create_mock_search_app(
-        'current-hash',
-        'target-hash',
+        current_mapping_hash='current-hash',
+        target_mapping_hash='target-hash',
     )
     get_search_app_mock = Mock(return_value=mock_app)
     monkeypatch.setattr('datahub.search.tasks.get_search_app', get_search_app_mock)

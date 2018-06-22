@@ -28,8 +28,6 @@ class TestResyncAfterMigrate:
         read_indices = {'index1', 'index2', 'index3'}
         write_index = 'index1'
         mock_app = create_mock_search_app(
-            'target-hash',
-            'target-hash',
             read_indices=read_indices,
             write_index=write_index,
         )
@@ -80,8 +78,6 @@ class TestResyncAfterMigrate:
         read_indices = {'index1', 'index2'}
         write_index = 'index1'
         mock_app = create_mock_search_app(
-            'target-hash',
-            'target-hash',
             read_indices=read_indices,
             write_index=write_index,
         )
@@ -123,8 +119,6 @@ class TestResyncAfterMigrate:
         read_indices = {'index1'}
         write_index = 'index1'
         mock_app = create_mock_search_app(
-            'target-hash',
-            'target-hash',
             read_indices=read_indices,
             write_index=write_index,
         )
@@ -153,8 +147,6 @@ class TestResyncAfterMigrate:
         read_indices = {'index2'}
         write_index = 'index1'
         mock_app = create_mock_search_app(
-            'target-hash',
-            'target-hash',
             read_indices=read_indices,
             write_index=write_index,
         )
