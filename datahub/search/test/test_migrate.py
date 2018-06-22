@@ -27,7 +27,11 @@ def test_migrate_app_with_app_needing_migration(monkeypatch, mock_es_client):
     new_index = 'test-index-target-hash'
     current_hash = 'current-hash'
     target_hash = 'target-hash'
-    mock_app = create_mock_search_app(current_hash, target_hash, write_index=old_index)
+    mock_app = create_mock_search_app(
+        current_mapping_hash=current_hash,
+        target_mapping_hash=target_hash,
+        write_index=old_index,
+    )
 
     migrate_app(mock_app)
 
@@ -72,7 +76,11 @@ def test_migrate_app_with_app_not_needing_migration(monkeypatch, mock_es_client)
     old_index = 'test-index-current-hash'
     current_hash = 'current-hash'
     target_hash = 'current-hash'
-    mock_app = create_mock_search_app(current_hash, target_hash, write_index=old_index)
+    mock_app = create_mock_search_app(
+        current_mapping_hash=current_hash,
+        target_mapping_hash=target_hash,
+        write_index=old_index,
+    )
 
     migrate_app(mock_app)
 
@@ -98,8 +106,8 @@ def test_migrate_app_with_app_in_inconsistent_state(monkeypatch, mock_es_client)
     current_hash = 'current-hash'
     target_hash = 'current-hash'
     mock_app = create_mock_search_app(
-        current_hash,
-        target_hash,
+        current_mapping_hash=current_hash,
+        target_mapping_hash=target_hash,
         read_indices=read_indices,
         write_index=old_index,
     )
@@ -129,8 +137,8 @@ def test_migrate_app_with_app_in_invalid_state(monkeypatch, mock_es_client):
     current_hash = 'current-hash'
     target_hash = 'target-hash'
     mock_app = create_mock_search_app(
-        current_hash,
-        target_hash,
+        current_mapping_hash=current_hash,
+        target_mapping_hash=target_hash,
         read_indices=read_indices,
         write_index=write_index,
     )
