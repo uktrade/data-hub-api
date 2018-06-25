@@ -16,6 +16,7 @@ INSTALLED_APPS += [
 ES_INDEX_PREFIX = None
 ES_LEGACY_INDEX = None
 ES_INDEX_SETTINGS = {
+    **ES_INDEX_SETTINGS,
     'number_of_shards': 1,
     'number_of_replicas': 0,
 }
