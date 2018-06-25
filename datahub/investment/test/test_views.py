@@ -19,6 +19,7 @@ from reversion.models import Version
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
+from datahub.core.test.factories import GroupFactory
 from datahub.core.test_utils import (
     APITestMixin, create_test_user, format_date_or_datetime, random_obj_for_model,
 )
@@ -1136,14 +1137,20 @@ class TestPartialUpdateView(APITestMixin):
 
     def test_change_stage_verify_win_failure(self):
         """Tests moving a partially complete project to the 'Verify win' stage."""
-        project = ActiveInvestmentProjectFactory(number_new_jobs=1)
+        project_manager, api_client = _create_user_and_api_client(
+            self, TeamFactory(), [InvestmentProjectPermission.change_associated]
+        )
+        project = ActiveInvestmentProjectFactory(
+            number_new_jobs=1,
+            project_manager=project_manager,
+        )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'stage': {
                 'id': constants.InvestmentProjectStage.verify_win.value.id
             }
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
@@ -1163,11 +1170,19 @@ class TestPartialUpdateView(APITestMixin):
             'foreign_equity_investment': ['This field is required.'],
         }
 
-    def test_change_stage_verify_win_success(self):
+    @pytest.mark.parametrize(
+        'field',
+        ('project_manager', 'project_assurance_adviser',),
+    )
+    def test_change_stage_verify_win_success(self, field):
         """Tests moving a complete project to the 'Verify win' stage."""
         strategic_drivers = [
             constants.InvestmentStrategicDriver.access_to_market.value.id
         ]
+        adviser, api_client = _create_user_and_api_client(
+            self, TeamFactory(), [InvestmentProjectPermission.change_associated]
+        )
+        extra = {field: adviser}
         project = ActiveInvestmentProjectFactory(
             client_cannot_provide_foreign_investment=False,
             foreign_equity_investment=200,
@@ -1187,6 +1202,7 @@ class TestPartialUpdateView(APITestMixin):
             address_postcode='SW1A 2AA',
             delivery_partners=[random_obj_for_model(InvestmentDeliveryPartner)],
             average_salary_id=constants.SalaryRange.below_25000.value.id,
+            **extra,
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
@@ -1194,7 +1210,7 @@ class TestPartialUpdateView(APITestMixin):
                 'id': constants.InvestmentProjectStage.verify_win.value.id
             }
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
 
     def test_change_stage_to_won(self):
@@ -1210,7 +1226,16 @@ class TestPartialUpdateView(APITestMixin):
             },
             'actual_land_date': '2016-01-31',
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        adviser, api_client = _create_user_and_api_client(
+            self,
+            TeamFactory(),
+            [
+                InvestmentProjectPermission.change_all,
+                InvestmentProjectPermission.change_stage_to_won
+            ]
+        )
+
+        response = api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['stage'] == {
@@ -1218,6 +1243,25 @@ class TestPartialUpdateView(APITestMixin):
             'name': constants.InvestmentProjectStage.won.value.name,
         }
         assert response_data['status'] == 'won'
+
+    def test_change_stage_to_won_by_unauthorised_user(self):
+        """
+        Tests moving a complete project to the 'Won' stage by unauthorised user.
+        """
+        project = VerifyWinInvestmentProjectFactory()
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.won.value.id
+            },
+            'actual_land_date': '2016-01-31',
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data == {
+            'stage': ['Only Investment Verification Team can move project to Won.']
+        }
 
     def test_change_stage_to_won_failure(self):
         """
@@ -1231,7 +1275,19 @@ class TestPartialUpdateView(APITestMixin):
                 'id': constants.InvestmentProjectStage.won.value.id
             },
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+
+        adviser, api_client = _create_user_and_api_client(
+            self,
+            TeamFactory(),
+            [
+                InvestmentProjectPermission.change_all,
+                InvestmentProjectPermission.change_stage_to_won
+            ]
+        )
+        adviser.groups.add(GroupFactory(name='Investment Verification Team'))
+        adviser.save()
+
+        response = api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {

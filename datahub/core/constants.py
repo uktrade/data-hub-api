@@ -388,6 +388,43 @@ class Service(Enum):
     trade_enquiry = Constant('Trade - Enquiry', '330bba2b-3499-e211-a939-e4115bead28a')
     account_management = Constant('Account Management', '9484b82b-3499-e211-a939-e4115bead28a')
 
+    investment_enquiry_requested_more_information = Constant(
+        'Investment Enquiry – Requested more information from source (IST use only)',
+        '73ceedc1-c139-4bdf-9e47-17b1bae488da',
+    )
+    investment_enquiry_confirmed_prospect = Constant(
+        'Investment Enquiry – Confirmed prospect project status (IST use only)',
+        '4f142041-2b9d-4776-ace8-22612260eae6',
+    )
+    investment_enquiry_assigned_to_ist_sas = Constant(
+        'Investment Enquiry – Assigned to IST-SAS (IST use only)',
+        'c579b89b-d49d-4926-a6a4-0a1459cd25cb',
+    )
+    investment_enquiry_assigned_to_ist_cmc = Constant(
+        'Investment Enquiry – Assigned to IST-CMC (IST use only)',
+        '2591b204-8a31-4824-a93b-d7a03dca8cb5',
+    )
+    investment_enquiry_assigned_to_hq = Constant(
+        'Investment Enquiry – Assigned to HQ (IST use only)',
+        '38a67092-f485-4ea1-8a1a-402b949d2d13',
+    )
+    investment_enquiry_transferred_to_lep = Constant(
+        'Investment Enquiry – Transferred to LEP (IST use only)',
+        '48e6bc3e-56c5-4bdc-a718-093614547d73',
+    )
+    investment_enquiry_transferred_to_da = Constant(
+        'Investment Enquiry – Transferred to DA (IST use only)',
+        '05c8175a-abf5-4cc6-af34-bcee8699fd4b',
+    )
+    investment_enquiry_transferred_to_lp = Constant(
+        'Investment Enquiry – Transferred to L&P (IST use only)',
+        'c707f81d-ae66-490a-98f5-575438944c43',
+    )
+    investment_ist_aftercare_offered = Constant(
+        'Investment - IST Aftercare Offered (IST use only)',
+        '79824229-fd87-483f-b929-8f2b9531492b'
+    )
+
 
 class Team(Enum):
     """Team."""

@@ -36,6 +36,9 @@ class InvestmentProjectPermission(StrEnum):
     read_all_investmentproject
     change_all_investmentproject
 
+    User needs following permission to change investment project stage to Won:
+
+    change_stage_to_won_investment_project
 
     The following codenames mean that the user can only read or change investment projects that
     they are associated with:
@@ -60,6 +63,7 @@ class InvestmentProjectPermission(StrEnum):
     read_associated = 'read_associated_investmentproject'
     change_all = 'change_all_investmentproject'
     change_associated = 'change_associated_investmentproject'
+    change_stage_to_won = 'change_stage_to_won_investmentproject'
     add = 'add_investmentproject'
     delete = 'delete_investmentproject'
     read_investmentproject_document = 'read_investmentproject_document'
@@ -447,6 +451,10 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
                 InvestmentProjectPermission.read_investmentproject_document.value,
                 'Can read investment project document'
             ),
+            (
+                InvestmentProjectPermission.change_stage_to_won.value,
+                'Can change investment project stage to won',
+            )
         )
         default_permissions = (
             'add',
