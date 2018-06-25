@@ -226,7 +226,9 @@ ES_VERIFY_CERTS = env.bool('ES_VERIFY_CERTS', True)
 # TODO: Remove once all environments have been migrated to the new structure
 ES_LEGACY_INDEX = env.str('ES_INDEX', default='')
 ES_INDEX_PREFIX = env('ES_INDEX_PREFIX')
-ES_INDEX_SETTINGS = {}
+ES_INDEX_SETTINGS = {
+    'index.mapping.single_type': True,
+}
 DATAHUB_SECRET = env('DATAHUB_SECRET')
 CDMS_TEXT_MAX_LENGTH = 4000
 CHAR_FIELD_MAX_LENGTH = 255
