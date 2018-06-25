@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('metadata', '0010_update_companyclassification'),
+        ('metadata', '0010_auto_20180613_1553'),
     ]
 
     operations = [
