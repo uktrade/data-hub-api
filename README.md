@@ -232,6 +232,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `DJANGO_SETTINGS_MODULE`  | Yes | |
 | `DOCUMENTS_BUCKET`  | Yes | S3 bucket for document storage. |
 | `ENABLE_DAILY_ES_SYNC` | No | Whether to enable the daily ES sync (default=False). |
+| `ENABLE_SPI_REPORT_GENERATION` | No | Whether to enable daily SPI report (default=False). |
 | `ES_INDEX`  | Yes | |
 | `ES_URL`  | Yes | |
 | `ES_VERIFY_CERTS`  | No | |
@@ -247,6 +248,10 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `REDIS_BASE_URL`  | No | redis base URL without the db |
 | `REDIS_CACHE_DB`  | No | redis db for django cache (default 0) |
 | `REDIS_CELERY_DB`  | No | redis db for celery (default 1) |
+| `REPORT_AWS_ACCESS_KEY_ID` | No | Same use as AWS_ACCESS_KEY_ID, but for reports. |
+| `REPORT_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for reports. |
+| `REPORT_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for reports. |
+| `REPORT_BUCKET` | No | S3 bucket for report storage. |
 | `RESOURCE_SERVER_INTROSPECTION_URL` | If SSO enabled | RFC 7662 token introspection URL used for signle sign-on |
 | `RESOURCE_SERVER_AUTH_TOKEN` | If SSO enabled | Access token for RFC 7662 token introspection server |
 | `RESTRICT_ADMIN` | No | Whether to restrict access to the admin site by IP address. |

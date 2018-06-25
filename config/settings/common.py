@@ -80,6 +80,7 @@ LOCAL_APPS = [
     'datahub.omis.invoice',
     'datahub.omis.payment',
     'datahub.activity_stream.apps.ActivityStreamConfig',
+    'datahub.investment.report',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -287,6 +288,12 @@ if REDIS_BASE_URL:
             'schedule': crontab(minute=0, hour=1),
         }
 
+    if env.bool('ENABLE_SPI_REPORT_GENERATION', False):
+        CELERY_BEAT_SCHEDULE['spi_report'] = {
+            'task': 'datahub.investment.report.tasks.generate_spi_report',
+            'schedule': crontab(minute=0, hour=8),
+        }
+
     CELERY_WORKER_LOG_FORMAT = (
         "[%(asctime)s: %(levelname)s/%(processName)s] [%(name)s] %(message)s"
     )
@@ -334,3 +341,9 @@ ACTIVITY_STREAM_IP_WHITELIST = env('ACTIVITY_STREAM_IP_WHITELIST', default='')
 ACTIVITY_STREAM_ACCESS_KEY_ID = env('ACTIVITY_STREAM_ACCESS_KEY_ID')
 ACTIVITY_STREAM_SECRET_ACCESS_KEY = env('ACTIVITY_STREAM_SECRET_ACCESS_KEY')
 ACTIVITY_STREAM_NONCE_EXPIRY_SECONDS = 60
+
+# Investment Project reports
+REPORT_AWS_ACCESS_KEY_ID = env('REPORT_AWS_ACCESS_KEY_ID', default='')
+REPORT_AWS_SECRET_ACCESS_KEY = env('REPORT_AWS_SECRET_ACCESS_KEY', default='')
+REPORT_BUCKET = env('REPORT_BUCKET', default='')
+REPORT_AWS_REGION= env('REPORT_AWS_REGION', default='')
