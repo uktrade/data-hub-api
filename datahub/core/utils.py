@@ -2,7 +2,6 @@ from enum import Enum
 from itertools import islice
 from logging import getLogger
 
-import boto3
 import requests
 
 logger = getLogger(__name__)
@@ -75,43 +74,6 @@ def slice_iterable_into_chunks(iterable, batch_size):
         if not objects:
             break
         yield objects
-
-
-def get_s3_client():
-    """Get S3 client singleton."""
-    s3 = getattr(get_s3_client, 's3_instance', None)
-    if not s3:
-        get_s3_client.s3_instance = s3 = boto3.client('s3')
-
-    return s3
-
-
-def sign_s3_url(bucket_name, path, method='get_object', expires=3600, client=None):
-    """Sign s3 url using global config, and given expiry in seconds."""
-    if client is None:
-        client = get_s3_client()
-
-    return client.generate_presigned_url(
-        ClientMethod=method,
-        Params={
-            'Bucket': bucket_name,
-            'Key': path,
-        },
-        ExpiresIn=expires,
-    )
-
-
-def delete_s3_obj(bucket, key, client=None):
-    """Remove object from S3 Bucket."""
-    if client is None:
-        client = get_s3_client()
-
-    response = client.delete_object(
-        Bucket=bucket,
-        Key=key,
-    )
-
-    assert response['ResponseMetadata']['HTTPStatusCode'] == 204
 
 
 def load_constants_to_database(constants, model):

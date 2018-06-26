@@ -2,7 +2,6 @@
 from django.db import transaction
 from django.db.models import Prefetch
 from django.http import Http404
-from django.shortcuts import get_object_or_404
 from django_filters import IsoDateTimeFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
@@ -13,9 +12,8 @@ from rest_framework.response import Response
 
 from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
-from datahub.core.thread_pool import submit_to_thread_pool
 from datahub.core.viewsets import CoreViewSet
-from datahub.documents.av_scan import virus_scan_document
+from datahub.documents.views import BaseEntityDocumentModelViewSet
 from datahub.investment.models import (
     InvestmentProject, InvestmentProjectTeamMember, IProjectDocument
 )
@@ -26,7 +24,6 @@ from datahub.investment.permissions import (
 )
 from datahub.investment.serializers import (
     IProjectDocumentSerializer, IProjectSerializer, IProjectTeamMemberSerializer,
-    UploadStatusSerializer
 )
 from datahub.oauth.scopes import Scope
 
@@ -236,68 +233,18 @@ class IProjectTeamMembersViewSet(CoreViewSet):
             raise Http404(self.non_existent_project_error_message)
 
 
-class IProjectDocumentViewSet(CoreViewSet):
+class IProjectDocumentViewSet(BaseEntityDocumentModelViewSet):
     """Investment Project Documents ViewSet."""
 
     required_scopes = (Scope.internal_front_end,)
     serializer_class = IProjectDocumentSerializer
-    queryset = IProjectDocument.objects.all()
 
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('doc_type',)
 
-    def list(self, request, *args, **kwargs):
-        """Custom pre-filtered list."""
-        queryset = self.filter_queryset(self.get_queryset().filter(
-            project_id=self.kwargs['project_pk'])
-        )
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-    def create(self, request, *args, **kwargs):
-        """Create and one-time upload URL generation."""
-        response = super().create(request, *args, **kwargs)
-        document = IProjectDocument.objects.get(pk=response.data['id'])
-
-        response.data['signed_upload_url'] = document.signed_upload_url
-
-        return response
-
-    def upload_complete_callback(self, request, *args, **kwargs):
-        """File upload done callback."""
-        doc = self.get_object()
-        serializer = UploadStatusSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        submit_to_thread_pool(virus_scan_document, str(doc.pk))
-
-        return Response(
-            status=status.HTTP_200_OK,
-            data={
-                'status': 'accepted',
-            },
-        )
-
-    def perform_destroy(self, instance):
-        """Perform destroy in transaction/savepoint mode."""
-        with transaction.atomic():
-            return super().perform_destroy(instance)
-
-    def get_object(self):
-        """Ensures that object lookup honors the project pk."""
-        queryset = self.get_queryset().filter(project__id=self.kwargs['project_pk'])
-        queryset = self.filter_queryset(queryset)
-
-        obj = get_object_or_404(queryset, pk=self.kwargs['doc_pk'])
-        self.check_object_permissions(self.request, obj)
-
-        return obj
+    def get_queryset(self):
+        """Returns investment project documents queryset."""
+        return IProjectDocument.objects.filter(project__id=self.kwargs['project_pk'])
 
     def get_view_name(self):
         """Returns the view set name for the DRF UI."""

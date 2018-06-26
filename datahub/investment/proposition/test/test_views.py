@@ -1,4 +1,5 @@
 import uuid
+from unittest.mock import patch
 
 import factory
 import pytest
@@ -7,8 +8,11 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
+from datahub.documents.models import Document, UPLOAD_STATUSES
 from datahub.investment.proposition.constants import PropositionStatus
-from datahub.investment.proposition.models import Proposition, PropositionPermission
+from datahub.investment.proposition.models import (
+    Proposition, PropositionDocument, PropositionDocumentPermission, PropositionPermission
+)
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 from .factories import PropositionFactory
@@ -16,10 +20,13 @@ from .factories import PropositionFactory
 NON_RESTRICTED_READ_PERMISSIONS = (
     (
         PropositionPermission.read_all,
+        PropositionDocumentPermission.read_all
     ),
     (
         PropositionPermission.read_all,
+        PropositionDocumentPermission.read_all,
         PropositionPermission.read_associated_investmentproject,
+        PropositionDocumentPermission.read_associated_investmentproject,
     )
 )
 
@@ -27,10 +34,13 @@ NON_RESTRICTED_READ_PERMISSIONS = (
 NON_RESTRICTED_ADD_PERMISSIONS = (
     (
         PropositionPermission.add_all,
+        PropositionDocumentPermission.add_all,
     ),
     (
         PropositionPermission.add_all,
+        PropositionDocumentPermission.add_all,
         PropositionPermission.add_associated_investmentproject,
+        PropositionDocumentPermission.add_associated_investmentproject,
     )
 )
 
@@ -38,10 +48,24 @@ NON_RESTRICTED_ADD_PERMISSIONS = (
 NON_RESTRICTED_CHANGE_PERMISSIONS = (
     (
         PropositionPermission.change_all,
+        PropositionDocumentPermission.change_all,
     ),
     (
         PropositionPermission.change_all,
+        PropositionDocumentPermission.change_all,
         PropositionPermission.change_associated_investmentproject,
+        PropositionDocumentPermission.change_associated_investmentproject,
+    )
+)
+
+
+NON_RESTRICTED_DELETE_PERMISSIONS = (
+    (
+        PropositionDocumentPermission.delete,
+    ),
+    (
+        PropositionDocumentPermission.delete,
+        PropositionDocumentPermission.delete_associated_investmentproject,
     )
 )
 
@@ -275,7 +299,7 @@ class TestUpdateProposition(APITestMixin):
         proposition = PropositionFactory()
         investment_project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:proposition:item', kwargs={
-            'pk': proposition.pk,
+            'proposition_pk': proposition.pk,
             'project_pk': investment_project.pk,
         })
         response = getattr(self.api_client, method)(url, {
@@ -458,7 +482,7 @@ class TestGetProposition(APITestMixin):
         """Should return 401"""
         proposition = PropositionFactory()
         url = reverse('api-v3:investment:proposition:item', kwargs={
-            'pk': proposition.pk,
+            'proposition_pk': proposition.pk,
             'project_pk': proposition.investment_project.pk,
         })
         response = api_client.get(url)
@@ -470,7 +494,7 @@ class TestGetProposition(APITestMixin):
         proposition = PropositionFactory()
 
         url = reverse('api-v3:investment:proposition:item', kwargs={
-            'pk': proposition.pk,
+            'proposition_pk': proposition.pk,
             'project_pk': proposition.investment_project.pk,
         })
         user = create_test_user(permission_codenames=permissions)
@@ -524,7 +548,7 @@ class TestGetProposition(APITestMixin):
         )
 
         url = reverse('api-v3:investment:proposition:item', kwargs={
-            'pk': proposition.pk,
+            'proposition_pk': proposition.pk,
             'project_pk': proposition.investment_project.pk,
         })
         user = create_test_user(
@@ -583,7 +607,7 @@ class TestGetProposition(APITestMixin):
         )
 
         url = reverse('api-v3:investment:proposition:item', kwargs={
-            'pk': proposition.pk,
+            'proposition_pk': proposition.pk,
             'project_pk': proposition.investment_project.pk,
         })
         user = create_test_user(
@@ -607,7 +631,7 @@ class TestGetProposition(APITestMixin):
         proposition = PropositionFactory()
 
         url = reverse('api-v3:investment:proposition:item', kwargs={
-            'pk': proposition.pk,
+            'proposition_pk': proposition.pk,
             'project_pk': uuid.uuid4(),
         })
         user = create_test_user(permission_codenames=permissions)
@@ -628,7 +652,7 @@ class TestCompleteProposition(APITestMixin):
         proposition = PropositionFactory()
 
         url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'pk': proposition.pk,
+            'proposition_pk': proposition.pk,
             'project_pk': proposition.investment_project.pk,
         })
 
@@ -685,7 +709,7 @@ class TestCompleteProposition(APITestMixin):
         proposition = PropositionFactory()
 
         url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'pk': proposition.pk,
+            'proposition_pk': proposition.pk,
             'project_pk': uuid.uuid4(),
         })
 
@@ -713,7 +737,7 @@ class TestCompleteProposition(APITestMixin):
         )
 
         url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'pk': proposition.pk,
+            'proposition_pk': proposition.pk,
             'project_pk': proposition.investment_project.pk,
         })
 
@@ -780,7 +804,7 @@ class TestCompleteProposition(APITestMixin):
         )
 
         url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'pk': proposition.pk,
+            'proposition_pk': proposition.pk,
             'project_pk': proposition.investment_project.pk,
         })
 
@@ -819,7 +843,7 @@ class TestCompleteProposition(APITestMixin):
             status=proposition_status
         )
         url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'pk': proposition.pk,
+            'proposition_pk': proposition.pk,
             'project_pk': proposition.investment_project.pk,
         })
         response = self.api_client.post(
@@ -842,7 +866,7 @@ class TestCompleteProposition(APITestMixin):
         """Test cannot complete proposition without giving details."""
         proposition = PropositionFactory()
         url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'pk': proposition.pk,
+            'proposition_pk': proposition.pk,
             'project_pk': proposition.investment_project.pk,
         })
         response = self.api_client.post(
@@ -868,7 +892,7 @@ class TestAbandonProposition(APITestMixin):
         proposition = PropositionFactory()
 
         url = reverse('api-v3:investment:proposition:abandon', kwargs={
-            'pk': proposition.pk,
+            'proposition_pk': proposition.pk,
             'project_pk': proposition.investment_project.pk,
         })
 
@@ -925,7 +949,7 @@ class TestAbandonProposition(APITestMixin):
         proposition = PropositionFactory()
 
         url = reverse('api-v3:investment:proposition:abandon', kwargs={
-            'pk': proposition.pk,
+            'proposition_pk': proposition.pk,
             'project_pk': uuid.uuid4(),
         })
 
@@ -953,7 +977,7 @@ class TestAbandonProposition(APITestMixin):
         )
 
         url = reverse('api-v3:investment:proposition:abandon', kwargs={
-            'pk': proposition.pk,
+            'proposition_pk': proposition.pk,
             'project_pk': proposition.investment_project.pk,
         })
 
@@ -1020,7 +1044,7 @@ class TestAbandonProposition(APITestMixin):
         )
 
         url = reverse('api-v3:investment:proposition:abandon', kwargs={
-            'pk': proposition.pk,
+            'proposition_pk': proposition.pk,
             'project_pk': proposition.investment_project.pk,
         })
 
@@ -1059,7 +1083,7 @@ class TestAbandonProposition(APITestMixin):
             status=proposition_status
         )
         url = reverse('api-v3:investment:proposition:abandon', kwargs={
-            'pk': proposition.pk,
+            'proposition_pk': proposition.pk,
             'project_pk': proposition.investment_project.pk,
         })
         response = self.api_client.post(
@@ -1082,7 +1106,7 @@ class TestAbandonProposition(APITestMixin):
         """Test cannot abandon proposition without giving details."""
         proposition = PropositionFactory()
         url = reverse('api-v3:investment:proposition:abandon', kwargs={
-            'pk': proposition.pk,
+            'proposition_pk': proposition.pk,
             'project_pk': proposition.investment_project.pk,
         })
         response = self.api_client.post(
@@ -1097,3 +1121,375 @@ class TestAbandonProposition(APITestMixin):
         assert response_data['details'] == ['This field may not be blank.']
         proposition.refresh_from_db()
         assert proposition.status == PropositionStatus.ongoing
+
+
+class TestPropositionDocumentViews(APITestMixin):
+    """Tests for the proposition document views."""
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
+    @patch.object(Document, 'get_signed_upload_url')
+    def test_document_creation(self, get_signed_upload_url_mock, permissions):
+        """Test document creation."""
+        get_signed_upload_url_mock.return_value = 'http://document-about-ocelots'
+
+        proposition = PropositionFactory()
+
+        url = reverse('api-v3:investment:proposition:document-collection', kwargs={
+            'proposition_pk': proposition.pk,
+            'project_pk': proposition.investment_project.pk,
+        })
+
+        user = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+
+        response = api_client.post(url, format='json', data={
+            'original_filename': 'test.txt',
+        })
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.data
+
+        entity_document = PropositionDocument.objects.get(pk=response_data['id'])
+        assert entity_document.original_filename == 'test.txt'
+        assert entity_document.proposition.pk == proposition.pk
+
+        assert response_data == {
+            'id': str(entity_document.pk),
+            'av_clean': None,
+            'created_by': {
+                'id': str(entity_document.created_by.pk),
+                'first_name': entity_document.created_by.first_name,
+                'last_name': entity_document.created_by.last_name,
+                'name': entity_document.created_by.name
+            },
+            'original_filename': 'test.txt',
+            'url': _get_document_url(entity_document.proposition, entity_document),
+            'status': UPLOAD_STATUSES.not_virus_scanned,
+            'signed_upload_url': 'http://document-about-ocelots',
+            'created_on': format_date_or_datetime(entity_document.created_on),
+            'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
+        }
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    def test_documents_list(self, permissions):
+        """Tests list endpoint."""
+        user = create_test_user(permission_codenames=permissions)
+        proposition = PropositionFactory()
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=user,
+        )
+        entity_document.document.mark_as_scanned(True, '')
+        # document that is pending to be deleted, shouldn't be in the list
+        entity_document_to_be_deleted = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test2.txt',
+            created_by=user,
+        )
+        entity_document_to_be_deleted.document.mark_deletion_pending()
+
+        url = reverse(
+            'api-v3:investment:proposition:document-collection',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            }
+        )
+        user = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.data
+        assert response_data['count'] == 1
+        assert len(response_data['results']) == 1
+        assert response_data['results'][0] == {
+            'id': str(entity_document.pk),
+            'created_by': {
+                'id': str(entity_document.created_by.pk),
+                'first_name': entity_document.created_by.first_name,
+                'last_name': entity_document.created_by.last_name,
+                'name': entity_document.created_by.name
+            },
+            'av_clean': True,
+            'original_filename': 'test.txt',
+            'url': _get_document_url(entity_document.proposition, entity_document),
+            'status': UPLOAD_STATUSES.virus_scanned,
+            'created_on': format_date_or_datetime(entity_document.created_on),
+            'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
+        }
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    def test_document_retrieval(self, permissions):
+        """Tests retrieval of individual document."""
+        user = create_test_user(permission_codenames=permissions)
+        proposition = PropositionFactory()
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=user,
+        )
+
+        url = reverse(
+            'api-v3:investment:proposition:document-item',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+                'entity_document_pk': entity_document.pk
+            }
+        )
+
+        api_client = self.create_api_client(user=user)
+
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == {
+            'id': str(entity_document.pk),
+            'av_clean': None,
+            'created_by': {
+                'id': str(entity_document.created_by.pk),
+                'first_name': entity_document.created_by.first_name,
+                'last_name': entity_document.created_by.last_name,
+                'name': entity_document.created_by.name
+            },
+            'original_filename': 'test.txt',
+            'url': _get_document_url(entity_document.proposition, entity_document),
+            'status': UPLOAD_STATUSES.not_virus_scanned,
+            'created_on': format_date_or_datetime(entity_document.created_on),
+            'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
+        }
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    def test_document_with_deletion_pending_retrieval(self, permissions):
+        """Tests retrieval of individual document that is pending deletion."""
+        proposition = PropositionFactory()
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk, original_filename='test.txt'
+        )
+        entity_document.document.mark_deletion_pending()
+
+        url = reverse(
+            'api-v3:investment:proposition:document-item',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+                'entity_document_pk': entity_document.pk
+            }
+        )
+
+        user = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    @pytest.mark.parametrize(
+        'av_clean,expected_status', (
+            (True, status.HTTP_200_OK),
+            (False, status.HTTP_403_FORBIDDEN,)
+        )
+    )
+    @patch('datahub.documents.models.sign_s3_url')
+    def test_document_download(self, sign_s3_url, av_clean, expected_status):
+        """Tests download of individual document."""
+        sign_s3_url.return_value = 'http://what'
+
+        user = create_test_user(permission_codenames=NON_RESTRICTED_READ_PERMISSIONS[0])
+        proposition = PropositionFactory()
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=user,
+        )
+        entity_document.document.mark_as_scanned(av_clean, '')
+
+        url = reverse(
+            'api-v3:investment:proposition:document-item-download',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+                'entity_document_pk': entity_document.pk,
+            }
+        )
+
+        api_client = self.create_api_client(user=user)
+        response = api_client.get(url)
+        assert response.status_code == expected_status
+        if response.status_code == status.HTTP_200_OK:
+            assert response.data == {
+                'id': str(entity_document.pk),
+                'av_clean': True,
+                'created_by': {
+                    'id': str(entity_document.created_by.pk),
+                    'first_name': entity_document.created_by.first_name,
+                    'last_name': entity_document.created_by.last_name,
+                    'name': entity_document.created_by.name
+                },
+                'original_filename': 'test.txt',
+                'url': _get_document_url(entity_document.proposition, entity_document),
+                'status': UPLOAD_STATUSES.virus_scanned,
+                'document_url': 'http://what',
+                'created_on': format_date_or_datetime(entity_document.created_on),
+                'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
+            }
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    def test_document_download_when_not_scanned(self, permissions):
+        """Tests download of individual document when not yet virus scanned."""
+        proposition = PropositionFactory()
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk, original_filename='test.txt'
+        )
+
+        url = reverse(
+            'api-v3:investment:proposition:document-item-download',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+                'entity_document_pk': entity_document.pk,
+            }
+        )
+
+        user = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_503_SERVICE_UNAVAILABLE
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
+    @patch('datahub.documents.tasks.virus_scan_document.apply_async')
+    def test_document_upload_schedule_virus_scan(
+            self,
+            virus_scan_document_apply_async,
+            permissions
+    ):
+        """Tests scheduling virus scan after upload completion.
+
+        Checks that a virus scan of the document was scheduled. Virus scanning is
+        tested separately in the documents app.
+        """
+        user = create_test_user(permission_codenames=permissions)
+        proposition = PropositionFactory()
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=user,
+        )
+
+        url = reverse(
+            'api-v3:investment:proposition:document-item-callback',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+                'entity_document_pk': entity_document.pk
+            }
+        )
+
+        api_client = self.create_api_client(user=user)
+        response = api_client.post(url, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
+        entity_document.document.refresh_from_db()
+
+        assert response.data == {
+            'id': str(entity_document.pk),
+            'av_clean': None,
+            'created_by': {
+                'id': str(entity_document.created_by.pk),
+                'first_name': entity_document.created_by.first_name,
+                'last_name': entity_document.created_by.last_name,
+                'name': entity_document.created_by.name
+            },
+
+            'original_filename': 'test.txt',
+            'url': _get_document_url(entity_document.proposition, entity_document),
+            'status': UPLOAD_STATUSES.virus_scanning_scheduled,
+            'created_on': format_date_or_datetime(entity_document.created_on),
+            'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
+        }
+        virus_scan_document_apply_async.assert_called_once_with(
+            args=(str(entity_document.document.pk), )
+        )
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_DELETE_PERMISSIONS)
+    @patch('datahub.documents.tasks.delete_document.apply_async')
+    def test_document_delete(self, delete_document, permissions):
+        """Tests document deletion."""
+        proposition = PropositionFactory()
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk, original_filename='test.txt'
+        )
+        document = entity_document.document
+        document.mark_scan_scheduled()
+        document.mark_as_scanned(True, 'reason')
+
+        url = reverse(
+            'api-v3:investment:proposition:document-item',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+                'entity_document_pk': entity_document.pk
+            }
+        )
+
+        document_pk = entity_document.document.pk
+
+        user = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+
+        response = api_client.delete(url)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        delete_document.assert_called_once_with(args=(document_pk, ))
+
+    @patch('datahub.documents.tasks.delete_document.apply_async')
+    def test_document_delete_without_permission(self, delete_document):
+        """Tests user can't delete document without permissions."""
+        proposition = PropositionFactory()
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk, original_filename='test.txt'
+        )
+        entity_document.document.mark_scan_scheduled()
+        entity_document.document.mark_as_scanned(True, 'reason')
+
+        url = reverse(
+            'api-v3:investment:proposition:document-item',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+                'entity_document_pk': entity_document.pk
+            }
+        )
+        response = self.api_client.delete(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert delete_document.called is False
+
+    def test_document_upload_status_no_status_without_permission(self):
+        """Tests user without permission can't call upload status endpoint."""
+        proposition = PropositionFactory()
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk, original_filename='test.txt'
+        )
+
+        url = reverse(
+            'api-v3:investment:proposition:document-item-callback',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+                'entity_document_pk': entity_document.pk
+            }
+        )
+
+        response = self.api_client.post(url, format='json', data={})
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+def _get_document_url(proposition, entity_document):
+    return reverse(
+        'api-v3:investment:proposition:document-item-download',
+        kwargs={
+            'proposition_pk': proposition.pk,
+            'project_pk': proposition.investment_project.pk,
+            'entity_document_pk': entity_document.pk,
+        }
+    )
