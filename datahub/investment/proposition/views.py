@@ -8,17 +8,22 @@ from rest_framework.response import Response
 
 from datahub.core.exceptions import APIBadRequestException
 from datahub.core.viewsets import CoreViewSet
+from datahub.documents.views import BaseEntityDocumentModelViewSet
 from datahub.investment.models import InvestmentProject
-from datahub.investment.proposition.models import Proposition
+from datahub.investment.proposition.models import Proposition, PropositionDocument
 from datahub.investment.proposition.permissions import (
+    IsAssociatedToInvestmentProjectPropositionDocumentFilter,
+    IsAssociatedToInvestmentProjectPropositionDocumentPermission,
     IsAssociatedToInvestmentProjectPropositionFilter,
     IsAssociatedToInvestmentProjectPropositionPermission,
+    PropositionDocumentModelPermissions,
     PropositionModelPermissions,
 )
 from datahub.investment.proposition.serializers import (
     CompleteOrAbandonPropositionSerializer,
     CreatePropositionSerializer,
-    PropositionSerializer
+    PropositionDocumentSerializer,
+    PropositionSerializer,
 )
 from datahub.oauth.scopes import Scope
 
@@ -49,6 +54,9 @@ class PropositionViewSet(CoreViewSet):
         OrderingFilter,
     )
     filterset_fields = ('adviser_id', 'status',)
+
+    lookup_url_kwarg = 'proposition_pk'
+
     ordering_fields = ('deadline', 'created_on',)
     ordering = ('-deadline', '-created_on',)
 
@@ -122,3 +130,33 @@ class PropositionViewSet(CoreViewSet):
     def _check_project_exists(self):
         if not InvestmentProject.objects.filter(pk=self.kwargs['project_pk']).exists():
             raise Http404(self.non_existent_project_error_message)
+
+
+class PropositionDocumentViewSet(BaseEntityDocumentModelViewSet):
+    """Proposition Document ViewSet."""
+
+    required_scopes = (Scope.internal_front_end,)
+    permission_classes = (
+        IsAuthenticatedOrTokenHasScope,
+        PropositionDocumentModelPermissions,
+        IsAssociatedToInvestmentProjectPropositionDocumentPermission,
+    )
+    serializer_class = PropositionDocumentSerializer
+
+    filter_backends = (
+        DjangoFilterBackend,
+        IsAssociatedToInvestmentProjectPropositionDocumentFilter,
+    )
+
+    def get_queryset(self):
+        """Returns proposition documents queryset."""
+        return PropositionDocument.objects.select_related(
+            'proposition__investment_project'
+        ).filter(
+            proposition_id=self.kwargs['proposition_pk'],
+            proposition__investment_project_id=self.kwargs['project_pk'],
+        )
+
+    def get_view_name(self):
+        """Returns the view set name for the DRF UI."""
+        return 'Proposition documents'
