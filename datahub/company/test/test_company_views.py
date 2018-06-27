@@ -10,7 +10,11 @@ from reversion.models import Version
 
 from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import CompaniesHouseCompany, Company
-from datahub.company.test.factories import CompaniesHouseCompanyFactory, CompanyFactory
+from datahub.company.test.factories import (
+    ArchivedCompanyFactory,
+    CompaniesHouseCompanyFactory,
+    CompanyFactory,
+)
 from datahub.core.constants import Country, HeadquarterType, Sector, UKRegion
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
@@ -424,6 +428,20 @@ class TestUpdateCompany(APITestMixin):
         assert response.data['registered_address_1'] == update_data['registered_address_1']
         assert response.data['registered_address_town'] == update_data['registered_address_town']
         assert response.data['registered_address_country']['id'] == Country.united_states.value.id
+
+    def test_cannot_update_archived_company(self):
+        """Test that an archived company cannot be updated."""
+        company = ArchivedCompanyFactory()
+
+        url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, format='json', data={
+            'name': 'new name',
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'non_field_errors': ['This record has been archived and cannot be edited.'],
+        }
 
     def test_update_read_only_fields(self):
         """Test updating read-only fields."""
