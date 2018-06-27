@@ -11,21 +11,21 @@ BULK_INDEX_TIMEOUT_SECS = 300
 BULK_DELETION_TIMEOUT_SECS = 300
 
 
-def sync_app(item, batch_size=None):
+def sync_app(search_app, batch_size=None):
     """Syncs objects for an app to ElasticSearch in batches of batch_size."""
-    model_name = item.es_model.__name__
-    batch_size = batch_size or item.bulk_batch_size
+    model_name = search_app.es_model.__name__
+    batch_size = batch_size or search_app.bulk_batch_size
     logger.info(f'Processing {model_name} records, using batch size {batch_size}')
 
-    read_indices, write_index = item.es_model.get_read_and_write_indices()
+    read_indices, write_index = search_app.es_model.get_read_and_write_indices()
     remove_indices = read_indices - {write_index}
 
     rows_processed = 0
-    total_rows = item.queryset.count()
-    it = item.queryset.iterator(chunk_size=batch_size)
+    total_rows = search_app.queryset.count()
+    it = search_app.queryset.iterator(chunk_size=batch_size)
     batches = slice_iterable_into_chunks(it, batch_size)
     for batch in batches:
-        actions = list(item.es_model.db_objects_to_es_documents(batch, index=write_index))
+        actions = list(search_app.es_model.db_objects_to_es_documents(batch, index=write_index))
         num_actions = len(actions)
         bulk(
             actions=actions,
