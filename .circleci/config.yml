@@ -11,6 +11,9 @@ jobs:
           POSTGRES_DB=datahub
 
     environment:
+      ACTIVITY_STREAM_IP_WHITELIST: 1.2.3.4
+      ACTIVITY_STREAM_ACCESS_KEY_ID: some-id
+      ACTIVITY_STREAM_SECRET_ACCESS_KEY: some-secret
       DATABASE_URL: postgresql://postgres@localhost/datahub
       DATAHUB_SECRET: secret
       DEBUG: 'True'
@@ -25,6 +28,10 @@ jobs:
       SSO_ENABLED: 'True'
       RESOURCE_SERVER_INTROSPECTION_URL: http://sso/o/introspect/
       RESOURCE_SERVER_AUTH_TOKEN: sso-token
+      REPORT_AWS_ACCESS_KEY_ID: foo
+      REPORT_AWS_SECRET_ACCESS_KEY: bar
+      REPORT_BUCKET: report
+      REPORT_AWS_REGION: eu-west-2
 
     working_directory: ~/app
 
@@ -54,7 +61,7 @@ jobs:
 
       - run:
           name: Run tests
-          command: python -m pytest -n 4 --cov -s --junitxml=test-reports/junit.xml
+          command: python -m pytest -n 4 -p no:sugar --cov --junitxml=test-reports/junit.xml
 
       - store_test_results:
           path: test-reports

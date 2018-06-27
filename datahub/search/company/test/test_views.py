@@ -1,5 +1,6 @@
 import csv
 import random
+from collections import Counter
 from datetime import datetime
 from unittest import mock
 from uuid import UUID, uuid4
@@ -83,6 +84,33 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:company')
         response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @pytest.mark.parametrize(
+        'archived', (
+            True,
+            False,
+        )
+    )
+    def test_archived_filter(self, setup_es, archived):
+        """Tests filtering by archived."""
+        matching_companies = CompanyFactory.create_batch(5, archived=archived)
+        CompanyFactory.create_batch(2, archived=not archived)
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:company')
+
+        response = self.api_client.post(url, {
+            'archived': archived,
+        })
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data['count'] == 5
+
+        expected_ids = Counter(str(company.pk) for company in matching_companies)
+        actual_ids = Counter(result['id'] for result in response_data['results'])
+        assert expected_ids == actual_ids
 
     def test_trading_address_country_filter(self, setup_data):
         """Tests trading address country filter."""
