@@ -101,6 +101,10 @@ class TeamRole(BaseConstantModel):
 class Team(BaseConstantModel):
     """Team."""
 
+    TAGS = Choices(
+        ('investment_services_team', 'Investment Services Team'),
+    )
+
     role = models.ForeignKey(
         TeamRole,
         null=True, blank=True,
@@ -119,6 +123,16 @@ class Team(BaseConstantModel):
         related_name="%(class)ss",  # noqa: Q000
         on_delete=models.PROTECT,
     )
+    tags = MultipleChoiceField(
+        max_length=settings.CHAR_FIELD_MAX_LENGTH,
+        choices=TAGS,
+        blank=True,
+    )
+
+    class Meta(BaseConstantModel.Meta):
+        indexes = [
+            GinIndex(fields=['tags']),
+        ]
 
 
 class Service(BaseConstantModel):

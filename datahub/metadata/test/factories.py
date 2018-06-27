@@ -38,6 +38,7 @@ class TeamFactory(factory.django.DjangoModelFactory):
     role = factory.SubFactory(TeamRoleFactory)
     uk_region_id = constants.UKRegion.east_midlands.value.id
     country_id = constants.Country.france.value.id
+    tags = []
 
     class Meta:
         model = 'metadata.Team'
