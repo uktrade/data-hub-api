@@ -6,11 +6,11 @@ from elasticsearch_dsl import DocType, MetaField
 from datahub.core.exceptions import DataHubException
 from datahub.search.elasticsearch import (
     alias_exists,
+    create_alias,
     create_index,
     get_indices_for_alias,
     get_indices_for_aliases,
     index_exists,
-    start_alias_transaction,
 )
 from datahub.search.utils import get_model_non_mapped_field_names, serialise_mapping
 
@@ -108,17 +108,12 @@ class BaseESModel(DocType):
                 index_name = cls.get_target_index_name()
                 cls.create_index(index_name)
 
-            with start_alias_transaction() as alias_transaction:
-                alias_transaction.add_indices_to_alias(cls.get_write_alias(), [index_name])
+            create_alias(cls.get_write_alias(), index_name)
         elif force_update_mapping:
             cls.init(cls.get_write_alias())
 
         if not read_alias_exists:
-            with start_alias_transaction() as alias_transaction:
-                alias_transaction.add_indices_to_alias(
-                    cls.get_read_alias(),
-                    [cls.get_write_index()]
-                )
+            create_alias(cls.get_read_alias(), cls.get_write_index())
 
     @classmethod
     def create_index(cls, index_name):

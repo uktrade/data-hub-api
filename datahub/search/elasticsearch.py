@@ -226,6 +226,19 @@ def start_alias_transaction():
     alias_updater.commit()
 
 
+def create_alias(alias, index):
+    """
+    Creates an alias.
+
+    (If the alias already exists, the index is added to the set of indices the alias is
+    associated with.)
+
+    For more complex operations, see start_alias_transaction() and AliasUpdater.
+    """
+    client = get_client()
+    client.indices.put_alias(index, alias)
+
+
 def bulk(actions=None, chunk_size=None, **kwargs):
     """Send data in bulk to Elasticsearch."""
     return es_bulk(get_client(), actions=actions, chunk_size=chunk_size, **kwargs)
