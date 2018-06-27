@@ -49,11 +49,7 @@ class BaseESModel(DocType):
     def get_write_index(cls):
         """Gets the index currently referenced by the write alias."""
         indices = get_indices_for_alias(cls.get_write_alias())
-        if len(indices) != 1:
-            raise DataHubException(
-                'Unexpected alias state; write alias references multiple indices',
-            )
-        return next(iter(indices))
+        return _get_write_index(indices)
 
     @classmethod
     def get_read_and_write_indices(cls):
@@ -61,11 +57,7 @@ class BaseESModel(DocType):
         read_indices, write_indices = get_indices_for_aliases(
             cls.get_read_alias(), cls.get_write_alias()
         )
-        if len(write_indices) != 1:
-            raise DataHubException(
-                'Unexpected alias state; write alias references multiple indices',
-            )
-        return read_indices, next(iter(write_indices))
+        return read_indices, _get_write_index(write_indices)
 
     @classmethod
     def get_index_prefix(cls):
@@ -154,3 +146,11 @@ class BaseESModel(DocType):
         """Converts DB model objects to Elasticsearch documents."""
         for dbmodel in dbmodels:
             yield cls.es_document(dbmodel, index=index)
+
+
+def _get_write_index(indices):
+    if len(indices) != 1:
+        raise DataHubException(
+            'Unexpected alias state; write alias references multiple indices',
+        )
+    return next(iter(indices))
