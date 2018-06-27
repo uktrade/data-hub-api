@@ -1,4 +1,5 @@
 from .address import AddressValidator
+from .not_archived import NotArchivedValidator
 from .one_way_required import RequiredUnlessAlreadyBlankValidator
 from .rules_based import (
     AbstractRule,
@@ -24,6 +25,7 @@ __all__ = (
     'EqualsRule',
     'FieldAndError',
     'InRule',
+    'NotArchivedValidator',
     'OperatorRule',
     'RequiredUnlessAlreadyBlankValidator',
     'RulesBasedValidator',
