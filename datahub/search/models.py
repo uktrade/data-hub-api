@@ -1,4 +1,5 @@
 from hashlib import blake2b
+from logging import getLogger
 
 from django.conf import settings
 from elasticsearch_dsl import DocType, MetaField
@@ -13,6 +14,9 @@ from datahub.search.elasticsearch import (
     index_exists,
 )
 from datahub.search.utils import get_model_non_mapped_field_names, serialise_mapping
+
+
+logger = getLogger(__name__)
 
 
 class BaseESModel(DocType):
@@ -76,6 +80,8 @@ class BaseESModel(DocType):
         current_write_index = cls.get_write_index()
         prefix = cls.get_index_prefix()
         if not current_write_index.startswith(prefix):
+            logger.warning(f'Unexpected index prefix for search model {cls._doc_type.name} and '
+                           f'index {current_write_index}. It may be a legacy index.')
             return ''
         return current_write_index[len(prefix):]
 
