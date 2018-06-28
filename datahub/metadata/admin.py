@@ -107,8 +107,8 @@ class ServiceAdmin(DisableableMetadataAdmin):
 class TeamAdmin(admin.ModelAdmin):
     """Team Admin."""
 
-    fields = ('id', 'name', 'country', 'uk_region', 'role', 'disabled_on',)
-    list_display = ('name', 'role', 'disabled_on',)
+    fields = ('id', 'name', 'country', 'uk_region', 'role', 'tags', 'disabled_on',)
+    list_display = ('name', 'role', 'get_tags_display', 'disabled_on',)
     list_select_related = ('role',)
     readonly_fields = ('id',)
     search_fields = ('name', 'pk')
