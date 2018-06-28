@@ -19,7 +19,6 @@ from reversion.models import Version
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
-from datahub.core.test.factories import GroupFactory
 from datahub.core.test_utils import (
     APITestMixin, create_test_user, format_date_or_datetime, random_obj_for_model,
 )
@@ -1213,6 +1212,29 @@ class TestPartialUpdateView(APITestMixin):
         response = api_client.patch(url, data=request_data, format='json')
         assert response.status_code == status.HTTP_200_OK
 
+    def test_cannot_change_stage_verify_win_if_not_pm_or_paa(self):
+        """
+        Tests user other than pm or paa cannot move a complete project
+        to the 'Verify win' stage.
+        """
+        project = VerifyWinInvestmentProjectFactory(
+            stage_id=constants.InvestmentProjectStage.active.value.id
+        )
+        url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
+        request_data = {
+            'stage': {
+                'id': constants.InvestmentProjectStage.verify_win.value.id
+            }
+        }
+        response = self.api_client.patch(url, data=request_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'stage': [
+                'Only the Project Manager or Project Assurance Adviser can move the project'
+                ' to the ‘Verify win’ stage.'
+            ]
+        }
+
     def test_change_stage_to_won(self):
         """
         Tests moving a complete project to the 'Won' stage, when all required fields are
@@ -1260,7 +1282,9 @@ class TestPartialUpdateView(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'stage': ['Only Investment Verification Team can move project to Won.']
+            'stage': [
+                'Only the Investment Verification Team can move the project to the ‘Won’ stage.'
+            ]
         }
 
     def test_change_stage_to_won_failure(self):
@@ -1284,7 +1308,6 @@ class TestPartialUpdateView(APITestMixin):
                 InvestmentProjectPermission.change_stage_to_won
             ]
         )
-        adviser.groups.add(GroupFactory(name='Investment Verification Team'))
         adviser.save()
 
         response = api_client.patch(url, data=request_data, format='json')
