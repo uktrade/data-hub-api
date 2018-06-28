@@ -27,7 +27,6 @@ from datahub.core.validators import (
     AllIsBlankRule,
     AnyIsNotBlankRule,
     EqualsRule,
-    NotArchivedValidator,
     OperatorRule,
     RequiredUnlessAlreadyBlankValidator,
     RulesBasedValidator,
@@ -418,7 +417,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'reference_code',
         )
         validators = [
-            NotArchivedValidator(),
             RequiredUnlessAlreadyBlankValidator('sector', 'business_type'),
             RulesBasedValidator(
                 ValidationRule(
