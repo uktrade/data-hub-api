@@ -2,12 +2,13 @@ import uuid
 from random import choice
 
 import factory
-from django.utils.timezone import now
+from django.utils.timezone import now, utc
 
 from datahub.company.ch_constants import COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING
 from datahub.company.constants import BusinessTypeConstant
-from datahub.company.models import ExportExperienceCategory
+from datahub.company.models import Advisor, ExportExperienceCategory
 from datahub.core import constants
+from datahub.core.test_utils import random_obj_for_model
 from datahub.metadata.test.factories import TeamFactory
 
 
@@ -54,6 +55,15 @@ class CompanyFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'company.Company'
+
+
+class ArchivedCompanyFactory(CompanyFactory):
+    """Factory for an archived company."""
+
+    archived = True
+    archived_on = factory.Faker('past_datetime', tzinfo=utc)
+    archived_by = factory.LazyFunction(lambda: random_obj_for_model(Advisor))
+    archived_reason = factory.Faker('sentence')
 
 
 def _get_random_company_category():

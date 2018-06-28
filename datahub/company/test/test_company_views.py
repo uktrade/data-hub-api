@@ -10,7 +10,10 @@ from reversion.models import Version
 
 from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import CompaniesHouseCompany, Company
-from datahub.company.test.factories import CompaniesHouseCompanyFactory, CompanyFactory
+from datahub.company.test.factories import (
+    CompaniesHouseCompanyFactory,
+    CompanyFactory,
+)
 from datahub.core.constants import Country, HeadquarterType, Sector, UKRegion
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
