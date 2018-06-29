@@ -37,8 +37,10 @@ class SearchApp:
 
     def init_es(self, force_update_mapping=False):
         """
-        Makes sure mappings exist in Elasticsearch.
-        This call is idempotent.
+        Creates the index and aliases for this app if they don't already exist.
+
+        If force_update_mapping is True and the write alias already exists, an attempt
+        is made to update to update the existing mapping in place.
         """
         self.es_model.initialise_index(force_update_mapping=force_update_mapping)
 
