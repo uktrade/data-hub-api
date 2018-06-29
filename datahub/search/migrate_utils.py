@@ -14,6 +14,13 @@ logger = getLogger(__name__)
 
 def resync_after_migrate(search_app):
     """Resyncs all documents in an index following a migration."""
+    if not search_app.es_model.was_migration_started():
+        logger.warning(
+            f'No pending migration detected for the {search_app.name} search app, aborting '
+            f'resync...'
+        )
+        return
+
     sync_app(search_app)
 
     es_model = search_app.es_model

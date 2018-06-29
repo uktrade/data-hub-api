@@ -103,8 +103,7 @@ class TestResyncAfterMigrate:
 
     def test_resync_with_single_read_index(self, monkeypatch, mock_es_client):
         """
-        Test that if the there is only a single read index, no aliases are updated and no indices
-        are deleted.
+        Test that the function aborts if the there is only a single read index.
         """
         sync_app_mock = Mock()
         monkeypatch.setattr('datahub.search.migrate_utils.sync_app', sync_app_mock)
@@ -125,7 +124,7 @@ class TestResyncAfterMigrate:
 
         resync_after_migrate(mock_app)
 
-        sync_app_mock.assert_called_once_with(mock_app)
+        sync_app_mock.assert_not_called()
 
         mock_client.indices.update_aliases.assert_not_called()
         mock_client.indices.delete.assert_not_called()
@@ -144,7 +143,7 @@ class TestResyncAfterMigrate:
             get_aliases_for_index_mock,
         )
 
-        read_indices = {'index2'}
+        read_indices = {'index2', 'index3'}
         write_index = 'index1'
         mock_app = create_mock_search_app(
             read_indices=read_indices,
