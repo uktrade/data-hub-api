@@ -1,0 +1,45 @@
+- model: metadata.overseasregion
+  pk: 8d4c4f31-06ce-4320-8e2f-1c13559e125f
+  fields:
+    disabled_on: null
+    name: Africa
+- model: metadata.overseasregion
+  pk: 04a7cff0-03dd-4677-aa3c-12dd8426f0d7
+  fields:
+    disabled_on: null
+    name: Asia-Pacific
+- model: metadata.overseasregion
+  pk: b97749fb-2273-4447-a239-62dd8fb29e01
+  fields:
+    disabled_on: null
+    name: China
+- model: metadata.overseasregion
+  pk: cb2864aa-d19f-44b6-946c-d850a3fd7e3a
+  fields:
+    disabled_on: null
+    name: Eastern Europe and Central Asia
+- model: metadata.overseasregion
+  pk: 3e6809d6-89f6-4590-8458-1d0dab73ad1a
+  fields:
+    disabled_on: null
+    name: Europe
+- model: metadata.overseasregion
+  pk: 5616ccf5-ab4a-4c2c-9624-13c69be3c46b
+  fields:
+    disabled_on: null
+    name: Latin America
+- model: metadata.overseasregion
+  pk: c4679b44-079e-4394-8bf7-bb0881a5031d
+  fields:
+    disabled_on: null
+    name: Middle East
+- model: metadata.overseasregion
+  pk: fdfbbc8d-0e8a-479a-b10f-4979d582ff87
+  fields:
+    disabled_on: null
+    name: North America
+- model: metadata.overseasregion
+  pk: 12ed13cf-4b2c-4a46-b2f9-068e397d8c84
+  fields:
+    disabled_on: null
+    name: South Asia

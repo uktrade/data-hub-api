@@ -74,8 +74,20 @@ class UKRegion(BaseConstantModel):
     """UK region."""
 
 
+class OverseasRegion(BaseConstantModel):
+    """DIT regions for overseas countries."""
+
+
 class Country(BaseConstantModel):
     """Country."""
+
+    overseas_region = models.ForeignKey(
+        OverseasRegion,
+        null=True,
+        blank=True,
+        related_name='countries',
+        on_delete=models.PROTECT,
+    )
 
     class Meta(BaseConstantModel.Meta):
         verbose_name_plural = 'countries'
