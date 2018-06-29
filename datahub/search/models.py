@@ -99,6 +99,16 @@ class BaseESModel(DocType):
         return cls.get_current_mapping_hash() != target_mapping_hash
 
     @classmethod
+    def was_migration_started(cls):
+        """
+        Returns whether a migration was started and has not completed.
+
+        This could be a a migration still in progress, or an aborted migration.
+        """
+        read_indices, _ = cls.get_read_and_write_indices()
+        return len(read_indices) != 1
+
+    @classmethod
     def initialise_index(cls, force_update_mapping=False):
         """
         Creates the index and aliases for this model if they don't already exist.

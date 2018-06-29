@@ -23,7 +23,7 @@ def migrate_app(search_app):
         _perform_migration(search_app)
         return
 
-    if len(es_model.get_read_and_write_indices()[0]) != 1:
+    if es_model.was_migration_started():
         logger.info(f'Possibly incomplete {app_name} search app migration detected')
         _schedule_resync(search_app)
         return
