@@ -93,6 +93,12 @@ class BaseESModel(DocType):
         return f'{prefix}{mapping_hash}'
 
     @classmethod
+    def is_migration_needed(cls):
+        """Returns whether the active mapping is out of date and a migration is needed."""
+        target_mapping_hash = cls.get_target_mapping_hash()
+        return cls.get_current_mapping_hash() != target_mapping_hash
+
+    @classmethod
     def initialise_index(cls, force_update_mapping=False):
         """
         Creates the index and aliases for this model if they don't already exist.
