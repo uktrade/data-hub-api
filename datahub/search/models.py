@@ -94,7 +94,12 @@ class BaseESModel(DocType):
 
     @classmethod
     def initialise_index(cls, force_update_mapping=False):
-        """Configures Elasticsearch index."""
+        """
+        Creates the index and aliases for this model if they don't already exist.
+
+        If force_update_mapping is True and the write alias already exists, an attempt
+        is made to update to update the existing mapping in place.
+        """
         read_alias_exists = alias_exists(cls.get_read_alias())
         write_alias_exists = alias_exists(cls.get_write_alias())
         if not write_alias_exists:
