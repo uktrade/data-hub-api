@@ -19,9 +19,7 @@ def migrate_app(search_app):
     app_name = search_app.name
     es_model = search_app.es_model
 
-    target_mapping_hash = es_model.get_target_mapping_hash()
-    needs_migration = es_model.get_current_mapping_hash() != target_mapping_hash
-    if needs_migration:
+    if es_model.is_migration_needed():
         _perform_migration(search_app)
         return
 
