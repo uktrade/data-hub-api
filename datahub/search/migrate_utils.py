@@ -27,7 +27,7 @@ def resync_after_migrate(search_app):
 
     if indices_to_remove:
         with start_alias_transaction() as alias_transaction:
-            alias_transaction.remove_indices_from_alias(read_alias, indices_to_remove)
+            alias_transaction.dissociate_indices_from_alias(read_alias, indices_to_remove)
     else:
         logger.warning(f'No indices to remove for the {read_alias} alias')
 
