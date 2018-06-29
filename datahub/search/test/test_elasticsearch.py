@@ -229,9 +229,9 @@ def test_update_alias(mock_es_client, add_actions, remove_actions, expected_body
     client = mock_es_client.return_value
     with elasticsearch.start_alias_transaction() as alias_transaction:
         for action in add_actions:
-            alias_transaction.add_indices_to_alias(action[0], action[1])
+            alias_transaction.associate_indices_with_alias(action[0], action[1])
         for action in remove_actions:
-            alias_transaction.remove_indices_from_alias(action[0], action[1])
+            alias_transaction.dissociate_indices_from_alias(action[0], action[1])
     client.indices.update_aliases.assert_called_with(body=expected_body)
 
 
@@ -242,5 +242,5 @@ def test_create_alias(mock_es_client):
 
     client = mock_es_client.return_value
 
-    elasticsearch.create_alias(alias_name, index_name)
+    elasticsearch.associate_alias_with_index(alias_name, index_name)
     client.indices.put_alias.assert_called_with(index_name, alias_name)

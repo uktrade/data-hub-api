@@ -53,9 +53,9 @@ def _perform_migration(search_app):
     es_model.create_index(new_index_name)
 
     with start_alias_transaction() as alias_transaction:
-        alias_transaction.add_indices_to_alias(read_alias_name, [new_index_name])
-        alias_transaction.add_indices_to_alias(write_alias_name, [new_index_name])
-        alias_transaction.remove_indices_from_alias(write_alias_name, [current_write_index])
+        alias_transaction.associate_indices_with_alias(read_alias_name, [new_index_name])
+        alias_transaction.associate_indices_with_alias(write_alias_name, [new_index_name])
+        alias_transaction.dissociate_indices_from_alias(write_alias_name, [current_write_index])
 
     _schedule_resync(search_app)
 

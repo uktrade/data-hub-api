@@ -178,21 +178,21 @@ def alias_exists(alias):
 
 
 def delete_alias(alias_name):
-    """Deletes an alias."""
+    """Deletes an alias entirely (dissociating it from all indices)."""
     logger.info(f'Deleting the {alias_name} alias...')
     client = get_client()
     client.indices.delete_alias('_all', alias_name)
 
 
-class AliasUpdater:
+class _AliasUpdater:
     """Helper class for making multiple alias updates atomically."""
 
     def __init__(self):
         """Initialises the instance with an empty list of pending operations."""
         self.actions = []
 
-    def add_indices_to_alias(self, alias, indices):
-        """Adds a pending operation to add indices to an alias."""
+    def associate_indices_with_alias(self, alias, indices):
+        """Adds a pending operation to associate a new or existing alias with a set of indices."""
         self.actions.append({
             'add': {
                 'alias': alias,
@@ -200,8 +200,8 @@ class AliasUpdater:
             }
         })
 
-    def remove_indices_from_alias(self, alias, indices):
-        """Adds a pending operation to remove indices from an alias."""
+    def dissociate_indices_from_alias(self, alias, indices):
+        """Adds a pending operation to dissociate an existing alias from a set of indices."""
         self.actions.append({
             'remove': {
                 'alias': alias,
@@ -221,19 +221,17 @@ class AliasUpdater:
 @contextmanager
 def start_alias_transaction():
     """Returns a context manager that can be used to update indices atomically."""
-    alias_updater = AliasUpdater()
+    alias_updater = _AliasUpdater()
     yield alias_updater
     alias_updater.commit()
 
 
-def create_alias(alias, index):
+def associate_alias_with_index(alias, index):
     """
-    Creates an alias.
+    Associates a new or existing alias with an index.
 
-    (If the alias already exists, the index is added to the set of indices the alias is
-    associated with.)
-
-    For more complex operations, see start_alias_transaction() and AliasUpdater.
+    This is only intended to be a convenience function for simple operations. For more complex
+    operations, use start_alias_transaction().
     """
     client = get_client()
     client.indices.put_alias(index, alias)
