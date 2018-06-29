@@ -43,7 +43,7 @@ def migrate_model(self, search_app_name, new_mapping_hash):
     """Completes a migration by performing a full resync."""
     search_app = get_search_app(search_app_name)
     if search_app.es_model.get_target_mapping_hash() != new_mapping_hash:
-        logger.info(
+        logger.warning(
             f'Unexpected target mapping hash, an old app instance may have received this task. '
             f'Rescheduling {search_app_name} search app migration...'
         )
