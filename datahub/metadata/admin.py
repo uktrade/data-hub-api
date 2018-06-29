@@ -6,10 +6,10 @@ from . import models
 
 
 MODELS_TO_REGISTER_DISABLEABLE = (
-    models.Country,
     models.FDIType,
     models.InvestmentBusinessActivity,
     models.InvestmentStrategicDriver,
+    models.OverseasRegion,
     models.ReferralSourceActivity,
     models.ReferralSourceMarketing,
     models.ReferralSourceWebsite,
@@ -93,6 +93,17 @@ admin.site.register(
     MODELS_TO_REGISTER_EDITABLE_ORDER_ONLY,
     EditableOrderOnlyOrderedMetadataAdmin
 )
+
+
+@admin.register(models.Country)
+class CountryAdmin(admin.ModelAdmin):
+    """Admin for countries."""
+
+    fields = ('pk', 'name', 'overseas_region', 'disabled_on',)
+    list_display = ('name', 'overseas_region', 'disabled_on',)
+    readonly_fields = ('pk',)
+    search_fields = ('name', 'overseas_region', 'pk')
+    list_filter = (DisabledOnFilter,)
 
 
 @admin.register(models.Service)
