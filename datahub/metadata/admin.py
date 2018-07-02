@@ -102,7 +102,7 @@ class CountryAdmin(admin.ModelAdmin):
     fields = ('pk', 'name', 'overseas_region', 'disabled_on',)
     list_display = ('name', 'overseas_region', 'disabled_on',)
     readonly_fields = ('pk',)
-    search_fields = ('name', 'overseas_region', 'pk')
+    search_fields = ('name', 'pk')
     list_filter = (DisabledOnFilter,)
 
 
