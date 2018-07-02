@@ -15,7 +15,9 @@ logger = getLogger(__name__)
 
 
 def resync_after_migrate(search_app):
-    """Resyncs all documents in an index following a migration."""
+    """
+    Completes a migration by performing a full resync, updating aliases and removing old indices.
+    """
     if not search_app.es_model.was_migration_started():
         logger.warning(
             f'No pending migration detected for the {search_app.name} search app, aborting '
@@ -24,7 +26,10 @@ def resync_after_migrate(search_app):
         return
 
     sync_app(search_app, post_batch_callback=_sync_app_post_batch_callback)
+    _clean_up_aliases_and_indices(search_app)
 
+
+def _clean_up_aliases_and_indices(search_app):
     es_model = search_app.es_model
     read_alias = es_model.get_read_alias()
     read_indices, write_index = es_model.get_read_and_write_indices()
