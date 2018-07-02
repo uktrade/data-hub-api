@@ -42,7 +42,7 @@ class SearchApp:
         If force_update_mapping is True and the write alias already exists, an attempt
         is made to update to update the existing mapping in place.
         """
-        self.es_model.initialise_index(force_update_mapping=force_update_mapping)
+        self.es_model.set_up_index_and_aliases(force_update_mapping=force_update_mapping)
 
     def connect_signals(self):
         """
