@@ -21,6 +21,8 @@ def test_migrate_app_with_app_needing_migration(monkeypatch, mock_es_client):
     """Test that migrate_app() migrates an app needing migration."""
     migrate_model_task_mock = Mock()
     monkeypatch.setattr('datahub.search.migrate.complete_model_migration', migrate_model_task_mock)
+    create_index_mock = Mock()
+    monkeypatch.setattr('datahub.search.migrate.create_index', create_index_mock)
 
     mock_client = mock_es_client.return_value
     old_index = 'test-index'
@@ -35,7 +37,7 @@ def test_migrate_app_with_app_needing_migration(monkeypatch, mock_es_client):
 
     migrate_app(mock_app)
 
-    mock_app.es_model.create_index.assert_called_once_with(new_index)
+    create_index_mock.assert_called_once_with(new_index, mock_app.es_model)
 
     mock_client.indices.update_aliases.assert_called_once_with(
         body={
