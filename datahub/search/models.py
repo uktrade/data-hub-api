@@ -125,7 +125,7 @@ class BaseESModel(DocType):
                 index_name = settings.ES_LEGACY_INDEX
             else:
                 index_name = cls.get_target_index_name()
-                cls.create_index(index_name)
+                create_index(index_name, cls)
 
             associate_alias_with_index(cls.get_write_alias(), index_name)
         elif force_update_mapping:
@@ -133,12 +133,6 @@ class BaseESModel(DocType):
 
         if not read_alias_exists:
             associate_alias_with_index(cls.get_read_alias(), cls.get_write_index())
-
-    @classmethod
-    def create_index(cls, index_name):
-        """Creates an index with this model's mapping."""
-        create_index(index_name, index_settings=settings.ES_INDEX_SETTINGS)
-        cls.init(index_name)
 
     @classmethod
     def es_document(cls, dbmodel, index=None):

@@ -1,7 +1,7 @@
 from logging import getLogger
 
 from datahub.core.exceptions import DataHubException
-from datahub.search.elasticsearch import start_alias_transaction
+from datahub.search.elasticsearch import create_index, start_alias_transaction
 from datahub.search.tasks import complete_model_migration
 
 logger = getLogger(__name__)
@@ -48,7 +48,7 @@ def _perform_migration(search_app):
 
     logger.info(f'Updating aliases for the {app_name} search app')
 
-    es_model.create_index(new_index_name)
+    create_index(new_index_name, es_model)
 
     with start_alias_transaction() as alias_transaction:
         alias_transaction.associate_indices_with_alias(read_alias_name, [new_index_name])
