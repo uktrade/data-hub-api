@@ -6,10 +6,17 @@ env = environ.Env()
 from .common import *
 
 # We need to prevent Django from initialising datahub.search for tests.
+# Removing SearchConfig stops django from calling .ready() which initialises
+# the search signals
 INSTALLED_APPS.remove('datahub.search.apps.SearchConfig')
 INSTALLED_APPS += [
     'datahub.search',
-    'datahub.core.test.support'
+    'datahub.core.test.support',
+    'datahub.search.test.search_support',
+]
+
+SEARCH_APPS += [
+    'datahub.search.test.search_support.simplemodel.SimpleModelSearchApp',
 ]
 
 # The index is set dynamically in datahub/search/conftest.py, so that tests can be parallelised.
