@@ -109,7 +109,7 @@ class BaseESModel(DocType):
         return len(read_indices) != 1
 
     @classmethod
-    def initialise_index(cls, force_update_mapping=False):
+    def set_up_index_and_aliases(cls, force_update_mapping=False):
         """
         Creates the index and aliases for this model if they don't already exist.
 
