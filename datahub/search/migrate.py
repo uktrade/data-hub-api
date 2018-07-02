@@ -2,7 +2,7 @@ from logging import getLogger
 
 from datahub.core.exceptions import DataHubException
 from datahub.search.elasticsearch import start_alias_transaction
-from datahub.search.tasks import migrate_model
+from datahub.search.tasks import complete_model_migration
 
 logger = getLogger(__name__)
 
@@ -60,6 +60,6 @@ def _perform_migration(search_app):
 
 def _schedule_resync(search_app):
     logger.info(f'Scheduling resync and clean-up for the {search_app.name} search app')
-    migrate_model.apply_async(
+    complete_model_migration.apply_async(
         args=(search_app.name, search_app.es_model.get_target_mapping_hash())
     )

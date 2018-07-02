@@ -39,8 +39,10 @@ def sync_model(search_app_name):
 
 
 @shared_task(bind=True, acks_late=True, priority=7, max_retries=5, default_retry_delay=60)
-def migrate_model(self, search_app_name, new_mapping_hash):
-    """Completes a migration by performing a full resync."""
+def complete_model_migration(self, search_app_name, new_mapping_hash):
+    """
+    Completes a migration by performing a full resync, updating aliases and removing old indices.
+    """
     search_app = get_search_app(search_app_name)
     if search_app.es_model.get_target_mapping_hash() != new_mapping_hash:
         logger.warning(

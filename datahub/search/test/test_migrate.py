@@ -20,7 +20,7 @@ def test_migrate_apps(monkeypatch):
 def test_migrate_app_with_app_needing_migration(monkeypatch, mock_es_client):
     """Test that migrate_app() migrates an app needing migration."""
     migrate_model_task_mock = Mock()
-    monkeypatch.setattr('datahub.search.migrate.migrate_model', migrate_model_task_mock)
+    monkeypatch.setattr('datahub.search.migrate.complete_model_migration', migrate_model_task_mock)
 
     mock_client = mock_es_client.return_value
     old_index = 'test-index'
@@ -70,7 +70,7 @@ def test_migrate_app_with_app_needing_migration(monkeypatch, mock_es_client):
 def test_migrate_app_with_app_not_needing_migration(monkeypatch, mock_es_client):
     """Test that migrate_app() migrates an app needing migration."""
     migrate_model_task_mock = Mock()
-    monkeypatch.setattr('datahub.search.migrate.migrate_model', migrate_model_task_mock)
+    monkeypatch.setattr('datahub.search.migrate.complete_model_migration', migrate_model_task_mock)
 
     mock_client = mock_es_client.return_value
     old_index = 'test-index-current-hash'
@@ -98,7 +98,7 @@ def test_migrate_app_with_app_in_inconsistent_state(monkeypatch, mock_es_client)
     In this case, a resync should be scheduled to attempt to complete the migration.
     """
     migrate_model_task_mock = Mock()
-    monkeypatch.setattr('datahub.search.migrate.migrate_model', migrate_model_task_mock)
+    monkeypatch.setattr('datahub.search.migrate.complete_model_migration', migrate_model_task_mock)
 
     mock_client = mock_es_client.return_value
     old_index = 'test-index-current-hash'
@@ -130,7 +130,7 @@ def test_migrate_app_with_app_in_invalid_state(monkeypatch, mock_es_client):
     the read indices. This should never happen.
     """
     migrate_model_task_mock = Mock()
-    monkeypatch.setattr('datahub.search.migrate.migrate_model', migrate_model_task_mock)
+    monkeypatch.setattr('datahub.search.migrate.complete_model_migration', migrate_model_task_mock)
 
     read_indices = ('read-index',)
     write_index = 'write-index'
