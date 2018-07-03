@@ -1,12 +1,12 @@
 # For CH Sync
-lxml==4.2.2
+lxml==4.2.3
 cssselect==1.0.3
 
 # Django and django related
-Django==2.0.6
+Django==2.0.7
 djangorestframework==3.8.2
 django-admin-ip-restrictor==0.2.1
-django-environ==0.4.4
+django-environ==0.4.5
 django-extensions==2.0.7
 django-filter==1.1.0
 django-reversion==2.0.13
@@ -23,7 +23,7 @@ python-dateutil==2.7.3
 psycopg2==2.7.5
 psycogreen==1.0
 
-boto3==1.7.45
+boto3==1.7.49
 
 notifications-python-client==4.8.2
 
