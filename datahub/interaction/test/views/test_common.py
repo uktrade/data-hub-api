@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from operator import attrgetter
 
 import pytest
 from freezegun import freeze_time
@@ -143,22 +144,26 @@ class TestListInteractions(APITestMixin):
         assert actual_ids == expected_ids
 
     @pytest.mark.parametrize(
-        'sort', ('last_name', 'first_name')
+        'field,sub_field', (
+            ('contact', 'last_name',),
+            ('contact', 'first_name',),
+            ('company', 'name',),
+        )
     )
-    def test_sort_by_contact_names(self, sort):
-        """List of interactions sorted by contact name"""
+    def test_sort_by_name(self, field, sub_field):
+        """Test sorting interactions by various name fields."""
         interactions = EventServiceDeliveryFactory.create_batch(3)
 
         url = reverse('api-v3:interaction:collection')
         response = self.api_client.get(url, data={
-            'sortby': f'contact__{sort}',
+            'sortby': f'{field}__{sub_field}',
         })
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['count'] == len(interactions)
-        expected_names = sorted(getattr(interaction.contact, sort) for interaction in interactions)
-        actual_names = [result['contact'][sort] for result in response_data['results']]
+        expected_names = sorted(map(attrgetter(f'{field}.{sub_field}'), interactions))
+        actual_names = [result[field][sub_field] for result in response_data['results']]
         assert expected_names == actual_names
 
     def test_sort_by_created_on(self):
