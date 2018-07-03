@@ -87,6 +87,6 @@ def _ensure_no_existing_data(fixtures):
 
 def _get_models_for_fixture(path):
     with open(path, 'r') as file:
-        data = yaml.load(file)
+        data = yaml.safe_load(file)
         models = {item['model'] for item in data}
     return models
