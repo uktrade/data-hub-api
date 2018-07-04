@@ -27,6 +27,7 @@ from datahub.core.validators import (
     AllIsBlankRule,
     AnyIsNotBlankRule,
     EqualsRule,
+    NotArchivedValidator,
     OperatorRule,
     RequiredUnlessAlreadyBlankValidator,
     RulesBasedValidator,
@@ -182,6 +183,7 @@ class ContactSerializer(PermittedFieldsModelSerializer):
             'archived_documents_url_path',
         )
         validators = [
+            NotArchivedValidator(),
             RulesBasedValidator(
                 ValidationRule(
                     'contact_preferences_required',

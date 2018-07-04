@@ -109,3 +109,12 @@ class ContactFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'company.Contact'
+
+
+class ArchivedContactFactory(ContactFactory):
+    """Factory for an archived contact."""
+
+    archived = True
+    archived_on = factory.Faker('past_datetime', tzinfo=utc)
+    archived_by = factory.LazyFunction(lambda: random_obj_for_model(Advisor))
+    archived_reason = factory.Faker('sentence')
