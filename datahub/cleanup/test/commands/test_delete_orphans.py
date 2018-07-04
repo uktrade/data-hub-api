@@ -11,6 +11,7 @@ from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.cleanup.management.commands import delete_orphans
+from datahub.cleanup.query_utils import get_related_fields
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.exceptions import DataHubException
 from datahub.core.test.factories import to_many_field
@@ -122,7 +123,7 @@ def test_mappings(model_name):
     except KeyError:
         pytest.fail(f'Please add test cases for deleting orphaned {model}')
 
-    related_fields = delete_orphans.get_related_fields(model)
+    related_fields = get_related_fields(model)
     expected_related_deps = {(field.field.model, field.field.name) for field in related_fields}
     related_deps_in_mapping = {
         (dep_factory._meta.model, dep_field_name)
