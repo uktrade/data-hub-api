@@ -34,5 +34,11 @@ class InteractionViewSet(CoreViewSet):
         PolicyFeedbackPermissionFilter,
     )
     filter_fields = ['company_id', 'contact_id', 'event_id', 'investment_project_id']
-    ordering_fields = ('contact__first_name', 'contact__last_name', 'created_on', 'date')
+    ordering_fields = (
+        'company__name',
+        'contact__first_name',
+        'contact__last_name',
+        'created_on',
+        'date',
+    )
     ordering = ('-date', '-created_on')
