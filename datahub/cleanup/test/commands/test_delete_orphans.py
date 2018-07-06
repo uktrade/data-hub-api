@@ -1,20 +1,21 @@
-from datetime import timedelta
 from unittest import mock
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from dateutil.utils import today
 from django.apps import apps
 from django.conf import settings
 from django.core import management
 from django.core.management.base import CommandError
+from django.db.models import QuerySet
 from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.cleanup.management.commands import delete_orphans
 from datahub.cleanup.query_utils import get_related_fields
+from datahub.cleanup.test.commands.factories import ShallowInvestmentProjectFactory
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.exceptions import DataHubException
-from datahub.core.test.factories import to_many_field
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
@@ -26,25 +27,11 @@ from datahub.search.apps import get_search_app_by_model
 
 pytestmark = pytest.mark.django_db
 
-
-class ShallowInvestmentProjectFactory(InvestmentProjectFactory):
-    """
-    Same as InvestmentProjectFactory but with reduced dependencies
-    so that we can test specific references without extra noise.
-    """
-
-    intermediate_company = None
-    investor_company = None
-    uk_company = None
-
-    @to_many_field
-    def client_contacts(self):
-        """No client contacts."""
-        return []
+CONFIGS = delete_orphans.Command.CONFIGS
 
 
 """
-For each model in delete_orphans.ORPHANING_CONFIGS:
+For each model in the CONFIG attribute for clean-up management commands:
     - specify the factory class to create an instance
     - specify the list of dependent models as a tuple of:
         - dependent factory class to create an instance
@@ -59,7 +46,6 @@ MAPPINGS = {
             (QuoteFactory, 'accepted_by'),
             (InvestmentProjectFactory, 'client_contacts'),
         )
-
     },
     'company.Company': {
         'factory': CompanyFactory,
@@ -82,6 +68,10 @@ MAPPINGS = {
         )
 
     },
+    'interaction.Interaction': {
+        'factory': CompanyInteractionFactory,
+        'dependent_models': (),
+    }
 }
 
 
@@ -93,7 +83,7 @@ def pytest_generate_tests(metafunc):
     """
     if 'orphaning_mapping' in metafunc.fixturenames:
         view_data = []
-        for model_name in delete_orphans.ORPHANING_CONFIGS:
+        for model_name in CONFIGS:
             mapping = MAPPINGS[model_name]
             view_data += [
                 (model_name, mapping['factory'], dep_factory, dep_field_name)
@@ -110,7 +100,7 @@ def pytest_generate_tests(metafunc):
         )
 
 
-@pytest.mark.parametrize('model_name', delete_orphans.ORPHANING_CONFIGS)
+@pytest.mark.parametrize('model_name', CONFIGS)
 def test_mappings(model_name):
     """
     Test that `MAPPINGS` includes all the data necessary for covering all the cases.
@@ -163,12 +153,10 @@ def test_run(orphaning_mapping, setup_es):
         - a record with another object referencing it doesn't get deleted
     """
     model_name, model_factory, dep_factory, dep_field_name = orphaning_mapping
-    orphaning_config = delete_orphans.ORPHANING_CONFIGS[model_name]
+    orphaning_config = CONFIGS[model_name]
 
-    non_orphaning_datetime = (
-        today(tzinfo=utc) - timedelta(days=orphaning_config.days_before_orphaning)
-    )
-    orphaning_datetime = non_orphaning_datetime - timedelta(days=1)
+    non_orphaning_datetime = today(tzinfo=utc) - orphaning_config.age_threshold
+    orphaning_datetime = non_orphaning_datetime - relativedelta(days=1)
 
     # this orphan should NOT get deleted because not old enough
     create_orphanable_model(model_factory, orphaning_config, non_orphaning_datetime)
@@ -203,21 +191,20 @@ def test_run(orphaning_mapping, setup_es):
     assert setup_es.count(settings.ES_INDEX, doc_type=doc_type)['count'] == total_model_records - 1
 
 
-@freeze_time('2018-06-01 00:00')
-@pytest.mark.parametrize('model_name', delete_orphans.ORPHANING_CONFIGS)
-def test_simulate(model_name, caplog, setup_es):
+@freeze_time('2018-06-01 02:00')
+@pytest.mark.parametrize('model_name', CONFIGS)
+def test_simulate(model_name, track_return_values, setup_es, caplog):
     """
     Test that if --simulate=True is passed in, the command only simulates the action
     without making any actual changes.
     """
     caplog.set_level('INFO')
+    delete_return_value_tracker = track_return_values(QuerySet, 'delete')
 
-    orphaning_config = delete_orphans.ORPHANING_CONFIGS[model_name]
+    orphaning_config = CONFIGS[model_name]
     mapping = MAPPINGS[model_name]
     model_factory = mapping['factory']
-    orphaning_datetime = (
-        today(tzinfo=utc) - timedelta(days=orphaning_config.days_before_orphaning + 1)
-    )
+    orphaning_datetime = today(tzinfo=utc) - orphaning_config.age_threshold - relativedelta(days=1)
 
     for _ in range(3):
         create_orphanable_model(model_factory, orphaning_config, orphaning_datetime)
@@ -232,11 +219,16 @@ def test_simulate(model_name, caplog, setup_es):
 
     management.call_command(delete_orphans.Command(), model_name, simulate=True)
 
-    assert model.objects.count() == 3
-    assert setup_es.count(settings.ES_INDEX, doc_type=search_app.name)['count'] == 3
-
     # check that 3 records would have been deleted
     assert 'to delete: 3' in caplog.text
+    return_values = delete_return_value_tracker.return_values
+    assert len(return_values) == 1
+    _, deletions_by_model = return_values[0]
+    assert deletions_by_model[model._meta.label] == 3
+
+    # Nothing has actually been deleted
+    assert model.objects.count() == 3
+    assert setup_es.count(settings.ES_INDEX, doc_type=search_app.name)['count'] == 3
 
 
 def test_fails_with_invalid_model():
@@ -256,14 +248,11 @@ def test_with_es_exception(mocked_bulk):
     """
     mocked_bulk.return_value = (None, [{'delete': {'status': 500}}])
 
-    model_name = next(iter(delete_orphans.ORPHANING_CONFIGS))
+    model_name = next(iter(delete_orphans.Command.CONFIGS))
     model_factory = MAPPINGS[model_name]['factory']
-    orphaning_config = delete_orphans.ORPHANING_CONFIGS[model_name]
+    orphaning_config = delete_orphans.Command.CONFIGS[model_name]
 
-    orphaning_datetime = (
-        today(tzinfo=utc) - timedelta(days=orphaning_config.days_before_orphaning + 1)
-    )
-
+    orphaning_datetime = today(tzinfo=utc) - orphaning_config.age_threshold - relativedelta(days=1)
     create_orphanable_model(model_factory, orphaning_config, orphaning_datetime)
 
     with pytest.raises(DataHubException):

@@ -49,6 +49,42 @@ def api_client():
     return APIClient()
 
 
+class _ReturnValueTracker:
+    def __init__(self, cls, method_name):
+        self.return_values = []
+        self.original_method = getattr(cls, method_name)
+
+    def make_mock(self):
+        def _spy(obj, *args, **kwargs):
+            return_value = self.original_method(obj, *args, **kwargs)
+            self.return_values.append(return_value)
+            return return_value
+
+        return _spy
+
+
+@pytest.fixture
+def track_return_values(monkeypatch):
+    """
+    Fixture that can be used to track the return values of a method.
+
+    Usage example:
+
+        def test_something(track_return_values):
+            tracker = track_return_values(cls, 'method_name')
+
+            ...
+
+            assert tracker.return_values == [1, 2, 3]
+    """
+    def _patch(cls, method_name):
+        tracker = _ReturnValueTracker(cls, method_name)
+        monkeypatch.setattr(cls, method_name, tracker.make_mock())
+        return tracker
+
+    yield _patch
+
+
 @pytest.fixture()
 def s3_stubber():
     """S3 stubber using the botocore Stubber class"""
