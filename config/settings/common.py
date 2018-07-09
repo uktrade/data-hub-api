@@ -214,6 +214,16 @@ APPEND_SLASH = False
 
 MPTT_ADMIN_LEVEL_INDENT = 30
 
+SEARCH_APPS = [
+    'datahub.search.companieshousecompany.CompaniesHouseCompanySearchApp',
+    'datahub.search.company.CompanySearchApp',
+    'datahub.search.contact.ContactSearchApp',
+    'datahub.search.event.EventSearchApp',
+    'datahub.search.interaction.InteractionSearchApp',
+    'datahub.search.investment.InvestmentSearchApp',
+    'datahub.search.omis.OrderSearchApp',
+]
+
 # Leeloo stuff
 ES_USE_AWS_AUTH = env.bool('ES_USE_AWS_AUTH', False)
 if ES_USE_AWS_AUTH:
@@ -228,6 +238,7 @@ ES_INDEX = env('ES_INDEX')
 ES_INDEX_SETTINGS = {
     'index.mapping.nested_fields.limit': 100
 }
+ES_BULK_MAX_CHUNK_BYTES = 10 * 1024 * 1024  # 10MB
 DATAHUB_SECRET = env('DATAHUB_SECRET')
 CDMS_TEXT_MAX_LENGTH = 4000
 CHAR_FIELD_MAX_LENGTH = 255

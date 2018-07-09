@@ -1,14 +1,18 @@
 from datetime import timedelta
+from unittest import mock
 
 import pytest
+from dateutil.utils import today
 from django.apps import apps
+from django.conf import settings
 from django.core import management
 from django.core.management.base import CommandError
-from django.utils.timezone import now
+from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.cleanup.management.commands import delete_orphans
 from datahub.company.test.factories import CompanyFactory, ContactFactory
+from datahub.core.exceptions import DataHubException
 from datahub.core.test.factories import to_many_field
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
@@ -16,6 +20,7 @@ from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.leads.test.factories import BusinessLeadFactory
 from datahub.omis.order.test.factories import OrderFactory
 from datahub.omis.quote.test.factories import QuoteFactory
+from datahub.search.apps import get_search_app_by_model
 
 
 pytestmark = pytest.mark.django_db
@@ -146,8 +151,9 @@ def create_orphanable_model(factory, config, date_value):
         )
 
 
-@freeze_time('2018-06-01 02:00')
-def test_run(orphaning_mapping):
+@freeze_time('2018-06-01 00:00')
+@pytest.mark.usefixtures('synchronous_on_commit')
+def test_run(orphaning_mapping, setup_es):
     """
     Test that:
         - a record without any objects referencing it but not old enough
@@ -158,7 +164,9 @@ def test_run(orphaning_mapping):
     model_name, model_factory, dep_factory, dep_field_name = orphaning_mapping
     orphaning_config = delete_orphans.ORPHANING_CONFIGS[model_name]
 
-    non_orphaning_datetime = now() - timedelta(days=orphaning_config.days_before_orphaning)
+    non_orphaning_datetime = (
+        today(tzinfo=utc) - timedelta(days=orphaning_config.days_before_orphaning)
+    )
     orphaning_datetime = non_orphaning_datetime - timedelta(days=1)
 
     # this orphan should NOT get deleted because not old enough
@@ -177,15 +185,26 @@ def test_run(orphaning_mapping):
     # 3 + 1 in case of self-references
     total_model_records = 3 + (1 if dep_factory == model_factory else 0)
 
+    setup_es.indices.refresh()
+
     model = apps.get_model(model_name)
+    search_app = get_search_app_by_model(model)
+    doc_type = search_app.name
+
     assert model.objects.count() == total_model_records
+    assert setup_es.count(settings.ES_INDEX, doc_type=doc_type)['count'] == total_model_records
+
     management.call_command(delete_orphans.Command(), model_name)
+
+    setup_es.indices.refresh()
+
     assert model.objects.count() == total_model_records - 1
+    assert setup_es.count(settings.ES_INDEX, doc_type=doc_type)['count'] == total_model_records - 1
 
 
-@freeze_time('2018-06-01 02:00')
+@freeze_time('2018-06-01 00:00')
 @pytest.mark.parametrize('model_name', delete_orphans.ORPHANING_CONFIGS)
-def test_simulate(model_name, caplog):
+def test_simulate(model_name, caplog, setup_es):
     """
     Test that if --simulate=True is passed in, the command only simulates the action
     without making any actual changes.
@@ -195,19 +214,28 @@ def test_simulate(model_name, caplog):
     orphaning_config = delete_orphans.ORPHANING_CONFIGS[model_name]
     mapping = MAPPINGS[model_name]
     model_factory = mapping['factory']
-    orphaning_datetime = now() - timedelta(days=orphaning_config.days_before_orphaning + 1)
+    orphaning_datetime = (
+        today(tzinfo=utc) - timedelta(days=orphaning_config.days_before_orphaning + 1)
+    )
 
     for _ in range(3):
         create_orphanable_model(model_factory, orphaning_config, orphaning_datetime)
 
+    setup_es.indices.refresh()
+
     model = apps.get_model(model_name)
+    search_app = get_search_app_by_model(model)
+
     assert model.objects.count() == 3
+    assert setup_es.count(settings.ES_INDEX, doc_type=search_app.name)['count'] == 3
+
     management.call_command(delete_orphans.Command(), model_name, simulate=True)
+
     assert model.objects.count() == 3
+    assert setup_es.count(settings.ES_INDEX, doc_type=search_app.name)['count'] == 3
 
     # check that 3 records would have been deleted
-    assert len(caplog.records) == 2
-    assert 'to delete: 3' in caplog.records[0].message
+    assert 'to delete: 3' in caplog.text
 
 
 def test_fails_with_invalid_model():
@@ -216,3 +244,29 @@ def test_fails_with_invalid_model():
     """
     with pytest.raises(CommandError):
         management.call_command(delete_orphans.Command(), 'invalid')
+
+
+@mock.patch('datahub.search.deletion.bulk')
+@pytest.mark.usefixtures('synchronous_on_commit')
+def test_with_es_exception(mocked_bulk):
+    """
+    Test that if ES returns a 5xx error, the command completes but it also
+    raises a DataHubException with details of the error.
+    """
+    mocked_bulk.return_value = (None, [{'delete': {'status': 500}}])
+
+    model_name = next(iter(delete_orphans.ORPHANING_CONFIGS))
+    model_factory = MAPPINGS[model_name]['factory']
+    orphaning_config = delete_orphans.ORPHANING_CONFIGS[model_name]
+
+    orphaning_datetime = (
+        today(tzinfo=utc) - timedelta(days=orphaning_config.days_before_orphaning + 1)
+    )
+
+    create_orphanable_model(model_factory, orphaning_config, orphaning_datetime)
+
+    with pytest.raises(DataHubException):
+        management.call_command(delete_orphans.Command(), model_name)
+
+    model = apps.get_model(model_name)
+    assert model.objects.count() == 0
