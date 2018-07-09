@@ -6,7 +6,6 @@ from dateutil.utils import today
 from django.apps import apps
 from django.conf import settings
 from django.core import management
-from django.core.management.base import CommandError
 from django.db.models import QuerySet
 from django.utils.timezone import utc
 from freezegun import freeze_time
@@ -229,14 +228,6 @@ def test_simulate(model_name, track_return_values, setup_es, caplog):
     # Nothing has actually been deleted
     assert model.objects.count() == 3
     assert setup_es.count(settings.ES_INDEX, doc_type=search_app.name)['count'] == 3
-
-
-def test_fails_with_invalid_model():
-    """
-    Test that if an invalid value for model is passed in, the command errors.
-    """
-    with pytest.raises(CommandError):
-        management.call_command(delete_orphans.Command(), 'invalid')
 
 
 @mock.patch('datahub.search.deletion.bulk')
