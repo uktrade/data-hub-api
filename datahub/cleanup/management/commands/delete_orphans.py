@@ -2,12 +2,14 @@ from datetime import timedelta
 from logging import getLogger
 from secrets import token_urlsafe
 
+from dateutil.utils import today
 from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.db.models import Exists, OuterRef
 from django.template.defaultfilters import capfirst
-from django.utils.timezone import now
+from django.utils.timezone import utc
 
+from datahub.search.deletion import update_es_after_deletions
 
 logger = getLogger(__name__)
 
@@ -97,15 +99,18 @@ class Command(BaseCommand):
             help='If True it only simulates the command and prints the SQL query.',
         )
 
+    @update_es_after_deletions()
     def handle(self, *args, **options):
         """Main logic for the actual command."""
         model_name = options['model']
+
         model = apps.get_model(model_name)
         config = ORPHANING_CONFIGS[model_name]
 
+        orphaning_datetime = today(tzinfo=utc) - timedelta(config.days_before_orphaning)
         qs = get_unreferenced_objects_query(model)
         qs = qs.filter(
-            **{f'{config.date_field}__lt': now() - timedelta(config.days_before_orphaning)}
+            **{f'{config.date_field}__lt': orphaning_datetime}
         ).order_by('-modified_on')
 
         model_verbose_name = capfirst(model._meta.verbose_name_plural)
