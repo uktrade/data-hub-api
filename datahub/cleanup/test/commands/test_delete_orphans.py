@@ -4,14 +4,13 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from dateutil.utils import today
 from django.apps import apps
-from django.conf import settings
 from django.core import management
 from django.utils.timezone import utc
-from freezegun import freeze_time
 
 from datahub.cleanup.management.commands import delete_orphans
 from datahub.cleanup.query_utils import get_related_fields
 from datahub.cleanup.test.commands.factories import ShallowInvestmentProjectFactory
+from datahub.cleanup.test.commands.test_common import create_orphanable_model
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.exceptions import DataHubException
 from datahub.event.test.factories import EventFactory
@@ -20,8 +19,6 @@ from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.leads.test.factories import BusinessLeadFactory
 from datahub.omis.order.test.factories import OrderFactory
 from datahub.omis.quote.test.factories import QuoteFactory
-from datahub.search.apps import get_search_app_by_model
-
 
 pytestmark = pytest.mark.django_db
 
@@ -73,31 +70,6 @@ MAPPINGS = {
 }
 
 
-def pytest_generate_tests(metafunc):
-    """
-    Parametrizes the tests that use the `orphaning_mapping` fixture
-    by getting each individual mapping dependency so that it can be
-    tested separately.
-    """
-    if 'orphaning_mapping' in metafunc.fixturenames:
-        view_data = []
-        for model_name in CONFIGS:
-            mapping = MAPPINGS[model_name]
-            view_data += [
-                (model_name, mapping['factory'], dep_factory, dep_field_name)
-                for dep_factory, dep_field_name in mapping['dependent_models']
-            ]
-
-        metafunc.parametrize(
-            'orphaning_mapping',
-            view_data,
-            ids=[
-                f'{model_name}: {dep_factory._meta.model.__name__}.{dep_field_name}'
-                for model_name, _, dep_factory, dep_field_name in view_data
-            ]
-        )
-
-
 @pytest.mark.parametrize('model_name', CONFIGS)
 def test_mappings(model_name):
     """
@@ -126,67 +98,6 @@ def test_mappings(model_name):
             f'fields reference it: {", ".join(dep_list)}'
         )
         assert not missing_dep_mappings, error_msg
-
-
-def create_orphanable_model(factory, config, date_value):
-    """
-    Creates an orphanable model to use in tests.
-
-    The value of `date_value` would determine if the object is really an orphan or not.
-    """
-    with freeze_time(date_value):
-        return factory(
-            **{config.date_field: date_value}
-        )
-
-
-@freeze_time('2018-06-01 00:00')
-@pytest.mark.usefixtures('synchronous_on_commit')
-def test_run(orphaning_mapping, setup_es):
-    """
-    Test that:
-        - a record without any objects referencing it but not old enough
-            doesn't get deleted
-        - a record without any objets referencing it and old gets deleted
-        - a record with another object referencing it doesn't get deleted
-    """
-    model_name, model_factory, dep_factory, dep_field_name = orphaning_mapping
-    orphaning_config = CONFIGS[model_name]
-
-    non_orphaning_datetime = today(tzinfo=utc) - orphaning_config.age_threshold
-    orphaning_datetime = non_orphaning_datetime - relativedelta(days=1)
-
-    # this orphan should NOT get deleted because not old enough
-    create_orphanable_model(model_factory, orphaning_config, non_orphaning_datetime)
-
-    # this orphan should get deleted because old
-    create_orphanable_model(model_factory, orphaning_config, orphaning_datetime)
-
-    # this object should NOT get deleted because it has another object referencing it
-    non_orphan = create_orphanable_model(model_factory, orphaning_config, orphaning_datetime)
-    is_m2m = dep_factory._meta.model._meta.get_field(dep_field_name).many_to_many
-    dep_factory(
-        **{dep_field_name: [non_orphan] if is_m2m else non_orphan},
-    )
-
-    # 3 + 1 in case of self-references
-    total_model_records = 3 + (1 if dep_factory == model_factory else 0)
-
-    setup_es.indices.refresh()
-
-    model = apps.get_model(model_name)
-    search_app = get_search_app_by_model(model)
-    doc_type = search_app.name
-
-    assert model.objects.count() == total_model_records
-    assert setup_es.count(settings.ES_INDEX, doc_type=doc_type)['count'] == total_model_records
-
-    management.call_command(delete_orphans.Command(), model_name)
-
-    setup_es.indices.refresh()
-
-    assert model.objects.count() == total_model_records - 1
-    assert setup_es.count(settings.ES_INDEX, doc_type=doc_type)['count'] == total_model_records - 1
 
 
 @mock.patch('datahub.search.deletion.bulk')
