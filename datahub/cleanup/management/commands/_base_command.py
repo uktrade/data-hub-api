@@ -24,6 +24,11 @@ class BaseCleanupCommand(BaseCommand):
     CONFIGS = None
     requires_migrations_checks = True
 
+    def __repr__(self):
+        """Python representation (used for parametrised tests)."""
+        module_name = self.__class__.__module__.rsplit('.', maxsplit=1)[1]
+        return f'{module_name}.{self.__class__.__name__}()'
+
     def add_arguments(self, parser):
         """Define extra arguments."""
         parser.add_argument(
