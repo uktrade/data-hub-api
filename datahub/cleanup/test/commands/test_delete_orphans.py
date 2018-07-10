@@ -6,7 +6,6 @@ from dateutil.utils import today
 from django.apps import apps
 from django.conf import settings
 from django.core import management
-from django.db.models import QuerySet
 from django.utils.timezone import utc
 from freezegun import freeze_time
 
@@ -188,46 +187,6 @@ def test_run(orphaning_mapping, setup_es):
 
     assert model.objects.count() == total_model_records - 1
     assert setup_es.count(settings.ES_INDEX, doc_type=doc_type)['count'] == total_model_records - 1
-
-
-@freeze_time('2018-06-01 02:00')
-@pytest.mark.parametrize('model_name', CONFIGS)
-def test_simulate(model_name, track_return_values, setup_es, caplog):
-    """
-    Test that if --simulate=True is passed in, the command only simulates the action
-    without making any actual changes.
-    """
-    caplog.set_level('INFO')
-    delete_return_value_tracker = track_return_values(QuerySet, 'delete')
-
-    orphaning_config = CONFIGS[model_name]
-    mapping = MAPPINGS[model_name]
-    model_factory = mapping['factory']
-    orphaning_datetime = today(tzinfo=utc) - orphaning_config.age_threshold - relativedelta(days=1)
-
-    for _ in range(3):
-        create_orphanable_model(model_factory, orphaning_config, orphaning_datetime)
-
-    setup_es.indices.refresh()
-
-    model = apps.get_model(model_name)
-    search_app = get_search_app_by_model(model)
-
-    assert model.objects.count() == 3
-    assert setup_es.count(settings.ES_INDEX, doc_type=search_app.name)['count'] == 3
-
-    management.call_command(delete_orphans.Command(), model_name, simulate=True)
-
-    # check that 3 records would have been deleted
-    assert 'to delete: 3' in caplog.text
-    return_values = delete_return_value_tracker.return_values
-    assert len(return_values) == 1
-    _, deletions_by_model = return_values[0]
-    assert deletions_by_model[model._meta.label] == 3
-
-    # Nothing has actually been deleted
-    assert model.objects.count() == 3
-    assert setup_es.count(settings.ES_INDEX, doc_type=search_app.name)['count'] == 3
 
 
 @mock.patch('datahub.search.deletion.bulk')
