@@ -12,7 +12,7 @@ from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.cleanup.management.commands import delete_old_records, delete_orphans
-from datahub.cleanup.test.commands.test_delete_orphans import create_orphanable_model, MAPPINGS
+from datahub.cleanup.test.commands.test_delete_orphans import MAPPINGS
 from datahub.search.apps import get_search_app_by_model, get_search_apps
 
 COMMAND_CLASSES = [
@@ -21,6 +21,10 @@ COMMAND_CLASSES = [
 ]
 
 FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=utc)
+
+
+def _format_iterable(value):
+    return ', '.join(str(item) for item in value)
 
 
 @pytest.fixture
@@ -54,13 +58,92 @@ def disconnect_delete_search_signal_receivers(setup_es):
 
 
 @pytest.fixture(params=(
-    (command_cls(), model_name, config)
+    (command_cls, model_name, config)
     for command_cls in COMMAND_CLASSES
     for model_name, config in command_cls.CONFIGS.items()
-), ids=str)
+), ids=_format_iterable)
 def cleanup_args(request):
     """Fixture that parametrises tests for each clean-up command configuration."""
-    yield request.param
+    # Instantiate the command class
+    yield (request.param[0](), *request.param[1:])
+
+
+@pytest.fixture(params=(
+    (
+        command_cls,
+        model_name,
+        config,
+        MAPPINGS[model_name]['factory'],
+        dep_factory,
+        dep_field_name,
+    )
+    for command_cls in COMMAND_CLASSES
+    for model_name, config in command_cls.CONFIGS.items()
+    for dep_factory, dep_field_name in MAPPINGS[model_name]['dependent_models']
+), ids=_format_iterable)
+def cleanup_mapping(request):
+    """Fixture that parametrises tests for each clean-up command configuration."""
+    # Instantiate the command class
+    yield (request.param[0](), *request.param[1:])
+
+
+def create_orphanable_model(factory, config, date_value):
+    """
+    Creates an orphanable model to use in tests.
+
+    The value of `date_value` would determine if the object is really an orphan or not.
+    """
+    with freeze_time(date_value):
+        return factory(
+            **{config.date_field: date_value}
+        )
+
+
+@freeze_time(FROZEN_TIME)
+@pytest.mark.django_db
+def test_run(cleanup_mapping, setup_es):
+    """
+    Test that:
+        - a record without any objects referencing it but not old enough
+            doesn't get deleted
+        - a record without any objects referencing it and old gets deleted
+        - a record with another object referencing it doesn't get deleted
+    """
+    command, model_name, config, model_factory, dep_factory, dep_field_name = cleanup_mapping
+
+    datetime_within_threshold = FROZEN_TIME - config.age_threshold
+    datetime_older_than_threshold = datetime_within_threshold - relativedelta(days=1)
+
+    # this orphan should NOT get deleted because not old enough
+    create_orphanable_model(model_factory, config, datetime_within_threshold)
+
+    # this orphan should get deleted because old
+    create_orphanable_model(model_factory, config, datetime_older_than_threshold)
+
+    # this object should NOT get deleted because it has another object referencing it
+    non_orphan = create_orphanable_model(model_factory, config, datetime_older_than_threshold)
+    is_m2m = dep_factory._meta.model._meta.get_field(dep_field_name).many_to_many
+    dep_factory(
+        **{dep_field_name: [non_orphan] if is_m2m else non_orphan},
+    )
+
+    # 3 + 1 in case of self-references
+    total_model_records = 3 + (1 if dep_factory == model_factory else 0)
+
+    setup_es.indices.refresh()
+
+    model = apps.get_model(model_name)
+    search_app = get_search_app_by_model(model)
+    doc_type = search_app.name
+
+    assert model.objects.count() == total_model_records
+    assert setup_es.count(settings.ES_INDEX, doc_type=doc_type)['count'] == total_model_records
+
+    management.call_command(delete_orphans.Command(), model_name)
+    setup_es.indices.refresh()
+
+    assert model.objects.count() == total_model_records - 1
+    assert setup_es.count(settings.ES_INDEX, doc_type=doc_type)['count'] == total_model_records - 1
 
 
 @freeze_time(FROZEN_TIME)
