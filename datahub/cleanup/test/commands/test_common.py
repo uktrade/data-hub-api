@@ -1,4 +1,5 @@
 from datetime import datetime
+from unittest import mock
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -15,6 +16,7 @@ from datahub.cleanup.management.commands import delete_old_records, delete_orpha
 from datahub.cleanup.query_utils import get_related_fields
 from datahub.cleanup.test.commands.factories import ShallowInvestmentProjectFactory
 from datahub.company.test.factories import CompanyFactory, ContactFactory
+from datahub.core.exceptions import DataHubException
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
@@ -288,3 +290,29 @@ def test_fails_with_invalid_model(cleanup_command_cls):
     """Test that if an invalid value for model is passed in, the command errors."""
     with pytest.raises(CommandError):
         management.call_command(cleanup_command_cls(), 'invalid')
+
+
+@freeze_time(FROZEN_TIME)
+@mock.patch('datahub.search.deletion.bulk')
+@pytest.mark.usefixtures('synchronous_on_commit')
+@pytest.mark.django_db
+def test_with_es_exception(mocked_bulk):
+    """
+    Test that if ES returns a 5xx error, the command completes but it also
+    raises a DataHubException with details of the error.
+    """
+    mocked_bulk.return_value = (None, [{'delete': {'status': 500}}])
+
+    command_cls = COMMAND_CLASSES[0]
+    model_name = next(iter(command_cls.CONFIGS))
+    model_factory = MAPPINGS[model_name]['factory']
+    config = command_cls.CONFIGS[model_name]
+
+    datetime_older_than_threshold = FROZEN_TIME - config.age_threshold - relativedelta(days=1)
+    create_orphanable_model(model_factory, config, datetime_older_than_threshold)
+
+    with pytest.raises(DataHubException):
+        management.call_command(command_cls(), model_name)
+
+    model = apps.get_model(model_name)
+    assert model.objects.count() == 0
