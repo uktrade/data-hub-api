@@ -38,6 +38,8 @@ For each model in the CONFIG attribute for clean-up management commands:
     - specify the list of dependent models as a tuple of:
         - dependent factory class to create an instance
         - dependent field name referencing the main model
+    - specify any implicitly-defined related models (e.g. for many-to-many fields) that would be
+      deleted even for orphaned records
 """
 MAPPINGS = {
     'company.Contact': {
@@ -47,7 +49,8 @@ MAPPINGS = {
             (OrderFactory, 'contact'),
             (QuoteFactory, 'accepted_by'),
             (InvestmentProjectFactory, 'client_contacts'),
-        )
+        ),
+        'implicit_related_models': (),
     },
     'company.Company': {
         'factory': CompanyFactory,
@@ -61,19 +64,24 @@ MAPPINGS = {
             (CompanyFactory, 'global_headquarters'),
             (CompanyFactory, 'parent'),
             (BusinessLeadFactory, 'company'),
-        )
+        ),
+        'implicit_related_models': (),
     },
     'event.Event': {
         'factory': EventFactory,
         'dependent_models': (
             (CompanyInteractionFactory, 'event'),
-        )
-
+        ),
+        'implicit_related_models': (
+            'event.Event_teams',
+            'event.Event_related_programmes',
+        ),
     },
     'interaction.Interaction': {
         'factory': CompanyInteractionFactory,
         'dependent_models': (),
-    }
+        'implicit_related_models': (),
+    },
 }
 
 
@@ -132,7 +140,7 @@ def _format_cleanup_mapping(cleanup_mapping):
         command_cls,
         model_name,
         config,
-        MAPPINGS[model_name]['factory'],
+        MAPPINGS[model_name],
         dep_factory,
         dep_field_name,
     )
@@ -197,7 +205,7 @@ def create_orphanable_model(factory, config, date_value):
 
 @freeze_time(FROZEN_TIME)
 @pytest.mark.django_db
-def test_run(cleanup_mapping, setup_es):
+def test_run(cleanup_mapping, track_return_values, setup_es):
     """
     Test that:
         - a record without any objects referencing it but not old enough
@@ -205,7 +213,10 @@ def test_run(cleanup_mapping, setup_es):
         - a record without any objects referencing it and old gets deleted
         - a record with another object referencing it doesn't get deleted
     """
-    command, model_name, config, model_factory, dep_factory, dep_field_name = cleanup_mapping
+    command, model_name, config, mapping, dep_factory, dep_field_name = cleanup_mapping
+    model_factory = mapping['factory']
+
+    delete_return_value_tracker = track_return_values(QuerySet, 'delete')
 
     datetime_within_threshold = FROZEN_TIME - config.age_threshold
     datetime_older_than_threshold = datetime_within_threshold - relativedelta(days=1)
@@ -238,8 +249,17 @@ def test_run(cleanup_mapping, setup_es):
     management.call_command(delete_orphans.Command(), model_name)
     setup_es.indices.refresh()
 
+    # Check that the records have been deleted
     assert model.objects.count() == total_model_records - 1
     assert setup_es.count(settings.ES_INDEX, doc_type=doc_type)['count'] == total_model_records - 1
+
+    # Check which models were actually deleted
+    return_values = delete_return_value_tracker.return_values
+    assert len(return_values) == 1
+    _, deletions_by_model = return_values[0]
+    assert deletions_by_model[model._meta.label] == 1
+    expected_deleted_models = {model._meta.label} | set(mapping['implicit_related_models'])
+    assert set(deletions_by_model.keys()) == expected_deleted_models
 
 
 @freeze_time(FROZEN_TIME)
@@ -275,10 +295,14 @@ def test_simulate(cleanup_args, track_return_values, setup_es, caplog):
 
     # Check that 3 records would have been deleted
     assert 'to delete: 3' in caplog.text
+
+    # Check which models were actually deleted
     return_values = delete_return_value_tracker.return_values
     assert len(return_values) == 1
     _, deletions_by_model = return_values[0]
     assert deletions_by_model[model._meta.label] == 3
+    expected_deleted_models = {model._meta.label} | set(mapping['implicit_related_models'])
+    assert set(deletions_by_model.keys()) == expected_deleted_models
 
     # Check that nothing has actually been deleted
     assert model.objects.count() == 3
