@@ -309,6 +309,32 @@ def test_simulate(cleanup_args, track_return_values, setup_es, caplog):
     assert setup_es.count(settings.ES_INDEX, doc_type=search_app.name)['count'] == 3
 
 
+@freeze_time(FROZEN_TIME)
+@pytest.mark.django_db
+def test_only_print_query(cleanup_args, monkeypatch, caplog):
+    """
+    Test that if --only-print-query is passed, the SQL query is printed but no deletions or
+    simulation occurs.
+    """
+    caplog.set_level('INFO')
+    delete_mock = mock.Mock()
+    monkeypatch.setattr(QuerySet, 'delete', delete_mock)
+
+    command, model_name, config = cleanup_args
+
+    mapping = MAPPINGS[model_name]
+    model_factory = mapping['factory']
+    datetime_older_than_threshold = FROZEN_TIME - config.age_threshold - relativedelta(days=1)
+
+    for _ in range(3):
+        create_orphanable_model(model_factory, config, datetime_older_than_threshold)
+
+    management.call_command(command, model_name, only_print_query=True)
+
+    assert not delete_mock.called
+    assert 'SQL:' in caplog.text
+
+
 @pytest.mark.parametrize('cleanup_command_cls', COMMAND_CLASSES, ids=str)
 def test_fails_with_invalid_model(cleanup_command_cls):
     """Test that if an invalid value for model is passed in, the command errors."""
