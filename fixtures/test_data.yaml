@@ -225,6 +225,29 @@
     created_on: '2015-10-26T11:00:00Z'
     modified_on: '2017-11-26T11:00:00Z'
 
+- model: company.company
+  pk: 346f78a5-1d23-4213-b4c2-bf48246a13c3
+  fields:
+    name: Archived Ltd
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
+    turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
+    sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    registered_address_1: 16 Getabergsvagen
+    registered_address_town: Geta
+    registered_address_postcode: 22340
+    registered_address_country: 88756b9a-5d95-e211-a939-e4115bead28a  # Aland Islands
+    description: This is a dummy company for testing archived features
+    headquarter_type: 43281c5e-92a4-4794-867b-b4d5f801e6f3  # GHQ
+    classification: b91bf800-8d53-e311-aef3-441ea13961e2  # Tier A
+    one_list_account_owner: 8eefe6b4-2816-4e47-94b5-a13409dcef70
+    created_on: '2014-11-11T09:00:00Z'
+    modified_on: '2017-07-16T10:00:00Z'
+    archived: true
+    archived_on: '2018-07-06T10:44:56Z'
+    archived_by: 7bad8082-4978-4fe8-a018-740257f01637
+    archived_reason: 'Company is dissolved'
+
 - model: company.contact
   pk: 9b1138ab-ec7b-497f-b8c3-27fed21694ef
   fields:
