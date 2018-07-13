@@ -33,7 +33,7 @@ class InteractionViewSet(CoreViewSet):
         OrderingFilter,
         PolicyFeedbackPermissionFilter,
     )
-    filter_fields = ['company_id', 'contact_id', 'event_id', 'investment_project_id']
+    filterset_fields = ['company_id', 'contact_id', 'event_id', 'investment_project_id']
     ordering_fields = (
         'company__name',
         'contact__first_name',

@@ -6,7 +6,7 @@ from datahub.core.serializers import ConstantModelSerializer
 
 MetadataMapping = namedtuple(
     'MetadataMapping',
-    ['model', 'queryset', 'serializer', 'filter_fields', 'filter_class'],
+    ['model', 'queryset', 'serializer', 'filterset_fields', 'filterset_class'],
 )
 
 
@@ -40,7 +40,7 @@ class MetadataRegistry:
         self.metadata = {}
 
     def register(self, metadata_id, model, queryset=None, serializer=ConstantModelSerializer,
-                 filter_fields=None, filter_class=None):
+                 filterset_fields=None, filterset_class=None):
         """Registers a new metadata."""
         if metadata_id in self.metadata:
             raise ImproperlyConfigured(f'Metadata {metadata_id} already registered.')
@@ -50,8 +50,8 @@ class MetadataRegistry:
             model,
             queryset,
             serializer,
-            filter_fields,
-            filter_class,
+            filterset_fields,
+            filterset_class,
         )
 
     @property
