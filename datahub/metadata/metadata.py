@@ -8,7 +8,7 @@ registry.register(metadata_id='country', model=models.Country)
 registry.register(metadata_id='employee-range', model=models.EmployeeRange)
 registry.register(metadata_id='overseas-region', model=models.OverseasRegion)
 registry.register(
-    filter_fields={
+    filterset_fields={
         'level': ['lte'],
     },
     metadata_id='sector',
@@ -20,7 +20,7 @@ registry.register(
     serializer=SectorSerializer,
 )
 registry.register(
-    filter_class=ServiceFilterSet,
+    filterset_class=ServiceFilterSet,
     metadata_id='service',
     model=models.Service,
     serializer=ServiceSerializer

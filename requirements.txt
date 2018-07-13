@@ -24,7 +24,7 @@ django-admin-ip-restrictor==0.2.1
 django-debug-toolbar==1.9.1
 django-environ==0.4.5
 django-extensions==2.0.7
-django-filter==1.1.0
+django-filter==2.0.0
 django-ipware==2.1.0      # via django-admin-ip-restrictor
 django-js-asset==1.1.0    # via django-mptt
 django-model-utils==3.1.2

@@ -48,7 +48,7 @@ class PropositionViewSet(CoreViewSet):
         IsAssociatedToInvestmentProjectPropositionFilter,
         OrderingFilter,
     )
-    filter_fields = ('adviser_id', 'status',)
+    filterset_fields = ('adviser_id', 'status',)
     ordering_fields = ('deadline', 'created_on',)
     ordering = ('-deadline', '-created_on',)
 

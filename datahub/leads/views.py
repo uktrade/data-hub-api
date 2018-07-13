@@ -21,7 +21,7 @@ class BusinessLeadViewSet(ArchivableViewSetMixin, CoreViewSet):
     filter_backends = (
         DjangoFilterBackend,
     )
-    filter_fields = ['company_id', 'created_by_id']
+    filterset_fields = ['company_id', 'created_by_id']
 
     def get_queryset(self):
         """
