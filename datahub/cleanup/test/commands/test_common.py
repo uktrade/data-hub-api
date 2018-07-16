@@ -119,11 +119,14 @@ def disconnect_delete_search_signal_receivers(setup_es):
         receiver.connect()
 
 
-@pytest.fixture(params=(
-    (command_cls, model_name, config)
-    for command_cls in COMMAND_CLASSES
-    for model_name, config in command_cls.CONFIGS.items()
-), ids=_format_iterable)
+@pytest.fixture(
+    params=(
+        (command_cls, model_name, config)
+        for command_cls in COMMAND_CLASSES
+        for model_name, config in command_cls.CONFIGS.items()
+    ),
+    ids=_format_iterable,
+)
 def cleanup_args(request):
     """Fixture that parametrises tests for each clean-up command configuration."""
     # Instantiate the command class
@@ -135,19 +138,21 @@ def _format_cleanup_mapping(cleanup_mapping):
     return _format_iterable((command, model_name, dep_field_name))
 
 
-@pytest.fixture(params=(
-    (
-        command_cls,
-        model_name,
-        config,
-        MAPPINGS[model_name],
-        dep_factory,
-        dep_field_name,
-    )
-    for command_cls in COMMAND_CLASSES
-    for model_name, config in command_cls.CONFIGS.items()
-    for dep_factory, dep_field_name in MAPPINGS[model_name]['dependent_models']
-), ids=_format_cleanup_mapping
+@pytest.fixture(
+    params=(
+        (
+            command_cls,
+            model_name,
+            config,
+            MAPPINGS[model_name],
+            dep_factory,
+            dep_field_name,
+        )
+        for command_cls in COMMAND_CLASSES
+        for model_name, config in command_cls.CONFIGS.items()
+        for dep_factory, dep_field_name in MAPPINGS[model_name]['dependent_models']
+    ),
+    ids=_format_cleanup_mapping,
 )
 def cleanup_mapping(request):
     """Fixture that parametrises tests for each clean-up command, model and relationship field."""
