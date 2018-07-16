@@ -7,10 +7,15 @@ from reversion.models import Version
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.constants import Country, Service, Team, UKRegion
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
-from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_model
+from datahub.core.test_utils import (
+    APITestMixin,
+    create_test_user,
+    format_date_or_datetime,
+    random_obj_for_model,
+)
 from datahub.event.constants import EventType, LocationType, Programme
 from datahub.event.models import Event
-from datahub.event.test.factories import EventFactory
+from datahub.event.test.factories import DisabledEventFactory, EventFactory
 from datahub.metadata.models import Team as TeamModel
 from datahub.metadata.test.factories import TeamFactory
 
@@ -29,7 +34,7 @@ class TestGetEventView(APITestMixin):
 
     def test_get(self):
         """Test getting a single event."""
-        event = EventFactory()
+        event = DisabledEventFactory()
         url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
 
         response = self.api_client.get(url)
@@ -60,6 +65,7 @@ class TestGetEventView(APITestMixin):
                 'name': event.address_country.name,
             },
             'archived_documents_url_path': event.archived_documents_url_path,
+            'disabled_on': format_date_or_datetime(event.disabled_on),
             'uk_region': {
                 'id': UKRegion.east_of_england.value.id,
                 'name': UKRegion.east_of_england.value.name,
@@ -161,6 +167,7 @@ class TestCreateEventView(APITestMixin):
                 'id': Country.united_states.value.id,
                 'name': Country.united_states.value.name,
             },
+            'disabled_on': None,
             'uk_region': None,
             'organiser': None,
             'lead_team': {
@@ -230,6 +237,7 @@ class TestCreateEventView(APITestMixin):
                 'id': Country.united_kingdom.value.id,
                 'name': Country.united_kingdom.value.name,
             },
+            'disabled_on': None,
             'uk_region': {
                 'id': UKRegion.east_of_england.value.id,
                 'name': UKRegion.east_of_england.value.name,
@@ -495,6 +503,7 @@ class TestUpdateEventView(APITestMixin):
                 'id': Country.isle_of_man.value.id,
                 'name': Country.isle_of_man.value.name,
             },
+            'disabled_on': None,
             'uk_region': None,
             'organiser': {
                 'id': str(organiser.pk),
@@ -570,17 +579,17 @@ class TestUpdateEventView(APITestMixin):
 
     def test_update_read_only_fields(self):
         """Test updating read-only fields."""
-        event = EventFactory(
-            archived_documents_url_path='old_path',
-        )
+        event = DisabledEventFactory(archived_documents_url_path='old_path')
 
         url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
         response = self.api_client.patch(url, format='json', data={
-            'archived_documents_url_path': 'new_path'
+            'archived_documents_url_path': 'new_path',
+            'disabled_on': None,
         })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived_documents_url_path'] == 'old_path'
+        assert response.data['disabled_on'] == format_date_or_datetime(event.disabled_on)
 
 
 class TestEventVersioning(APITestMixin):
