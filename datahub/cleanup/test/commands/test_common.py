@@ -134,8 +134,8 @@ def cleanup_args(request):
 
 
 def _format_cleanup_mapping(cleanup_mapping):
-    command, model_name, config, mapping, dep_factory, dep_field_name = cleanup_mapping
-    return _format_iterable((command, model_name, dep_field_name))
+    command_cls, model_name, _, _, _, dep_field_name = cleanup_mapping
+    return _format_iterable((command_cls, model_name, dep_field_name))
 
 
 @pytest.fixture(
