@@ -1,6 +1,7 @@
 from secrets import token_urlsafe
 
 from django.db.models import Exists, OuterRef
+from django.db.models.deletion import CASCADE, get_candidate_relations_to_delete
 
 
 def get_related_fields(model):
@@ -40,3 +41,18 @@ def get_unreferenced_objects_query(model):
     filter_args = {identifier: False for identifier in identifiers}
 
     return qs.filter(**filter_args)
+
+
+def get_relations_to_delete(model):
+    """
+    Returns all the fields of `model` that point to models which would get deleted
+    (on cascade) as a result this model getting deleted.
+
+    :param model: model class
+    :returns: list of fields of `model` that point to models deleted in cascade
+    """
+    candidates = get_candidate_relations_to_delete(model._meta)
+    return [
+        field for field in candidates
+        if field.field.remote_field.on_delete == CASCADE
+    ]
