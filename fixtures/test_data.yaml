@@ -225,6 +225,29 @@
     created_on: '2015-10-26T11:00:00Z'
     modified_on: '2017-11-26T11:00:00Z'
 
+- model: company.company
+  pk: 346f78a5-1d23-4213-b4c2-bf48246a13c3
+  fields:
+    name: Archived Ltd
+    business_type: 98d14e94-5d95-e211-a939-e4115bead28a  # Company
+    employee_range: 41afd8d0-5d95-e211-a939-e4115bead28a
+    turnover_range: 7a4cd12a-6095-e211-a939-e4115bead28a
+    sector: 355f977b-8ac3-e211-a646-e4115bead28a
+    registered_address_1: 16 Getabergsvagen
+    registered_address_town: Geta
+    registered_address_postcode: 22340
+    registered_address_country: 88756b9a-5d95-e211-a939-e4115bead28a  # Aland Islands
+    description: This is a dummy company for testing archived features
+    headquarter_type: 43281c5e-92a4-4794-867b-b4d5f801e6f3  # GHQ
+    classification: b91bf800-8d53-e311-aef3-441ea13961e2  # Tier A
+    one_list_account_owner: 8eefe6b4-2816-4e47-94b5-a13409dcef70
+    created_on: '2014-11-11T09:00:00Z'
+    modified_on: '2017-07-16T10:00:00Z'
+    archived: true
+    archived_on: '2018-07-06T10:44:56Z'
+    archived_by: 7bad8082-4978-4fe8-a018-740257f01637
+    archived_reason: 'Company is dissolved'
+
 - model: company.contact
   pk: 9b1138ab-ec7b-497f-b8c3-27fed21694ef
   fields:
@@ -1241,3 +1264,31 @@
     archived_documents_url_path: '/documents/123'
     created_on: '2017-01-25T00:00:00Z'
     modified_on: '2017-01-25T00:00:00Z'
+
+- model: event.event
+  pk: b93d4274-36fe-4008-ac40-fbc197910791
+  fields:
+    name: Teddy bear expo
+    event_type: 2fade471-e868-4ea9-b125-945eb90ae5d4
+    start_date: 2021-01-01
+    end_date: 2021-01-01
+    location_type: b71fa81c-0c22-44c6-ab6f-13b9e045dc10
+    notes: This is a dummy event for testing.
+    address_1: Day Court Exhibition Centre
+    address_2: Day Court Lane
+    address_town: China
+    address_county: ''
+    address_postcode: SW9 9AB
+    address_country: 63af72a6-5d95-e211-a939-e4115bead28a
+    organiser: 7bad8082-4978-4fe8-a018-740257f01637
+    lead_team: 5d4d24c2-9698-e211-a939-e4115bead28a
+    teams:
+      - 5d4d24c2-9698-e211-a939-e4115bead28a
+      - 4e4d24c2-9698-e211-a939-e4115bead28a
+    related_programmes:
+      - d352a68f-aaf4-4c43-b39d-9bca67a8322e
+    service: 9484b82b-3499-e211-a939-e4115bead28a
+    archived_documents_url_path: '/documents/123'
+    created_on: '2017-01-25T00:00:00Z'
+    modified_on: '2017-01-25T00:00:00Z'
+    disabled_on: '2017-09-05T00:00:00Z'
