@@ -41,8 +41,7 @@ class BaseCleanupCommand(BaseCommand):
         simulation_group.add_argument(
             '--simulate',
             action='store_true',
-            help='Simulates the command by performing the deletions and rolling them back. Also'
-                 'prints the SQL query.',
+            help='Simulates the command by performing the deletions and rolling them back.',
         )
         simulation_group.add_argument(
             '--only-print-queries',
@@ -60,10 +59,8 @@ class BaseCleanupCommand(BaseCommand):
         model = apps.get_model(model_name)
         qs = self._get_query(model)
 
-        if is_simulation or only_print_queries:
-            self._print_queries(model, qs)
-
         if only_print_queries:
+            self._print_queries(model, qs)
             return
 
         try:

@@ -272,7 +272,7 @@ def test_run(cleanup_mapping, track_return_values, setup_es):
 @pytest.mark.django_db
 def test_simulate(cleanup_commands_and_configs, track_return_values, setup_es, caplog):
     """
-    Test that if --simulate=True is passed in, the command only simulates the action
+    Test that if --simulate is passed in, the command only simulates the action
     without making any actual changes.
     """
     caplog.set_level('INFO')
@@ -297,15 +297,6 @@ def test_simulate(cleanup_commands_and_configs, track_return_values, setup_es, c
     management.call_command(command, model_name, simulate=True)
 
     setup_es.indices.refresh()
-
-    # Check that 3 records would have been deleted and the related objects
-    log_text = caplog.text.lower()
-    assert f'{model._meta.verbose_name_plural} to delete: 3' in log_text
-
-    for relation in get_relations_to_delete(model):
-        related_meta = relation.related_model._meta
-        assert f'{related_meta.verbose_name_plural} to delete: ' in log_text
-        assert f'from "{related_meta.db_table}"' in log_text
 
     # Check which models were actually deleted
     return_values = delete_return_value_tracker.return_values
