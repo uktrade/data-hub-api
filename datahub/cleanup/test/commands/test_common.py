@@ -316,9 +316,9 @@ def test_simulate(cleanup_args, track_return_values, setup_es, caplog):
 
 @freeze_time(FROZEN_TIME)
 @pytest.mark.django_db
-def test_only_print_query(cleanup_args, monkeypatch, caplog):
+def test_only_print_queries(cleanup_args, monkeypatch, caplog):
     """
-    Test that if --only-print-query is passed, the SQL query is printed but no deletions or
+    Test that if --only-print-queries is passed, the SQL query is printed but no deletions or
     simulation occurs.
     """
     caplog.set_level('INFO')
@@ -334,7 +334,7 @@ def test_only_print_query(cleanup_args, monkeypatch, caplog):
     for _ in range(3):
         create_orphanable_model(model_factory, config, datetime_older_than_threshold)
 
-    management.call_command(command, model_name, only_print_query=True)
+    management.call_command(command, model_name, only_print_queries=True)
 
     assert not delete_mock.called
     assert 'SQL:' in caplog.text

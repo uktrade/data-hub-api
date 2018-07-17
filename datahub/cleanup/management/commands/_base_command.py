@@ -44,7 +44,7 @@ class BaseCleanupCommand(BaseCommand):
                  'prints the SQL query.',
         )
         simulation_group.add_argument(
-            '--only-print-query',
+            '--only-print-queries',
             action='store_true',
             help='Only prints the SQL query and number of matching records. Does not delete '
                  'records or simulate deletions.',
@@ -53,7 +53,7 @@ class BaseCleanupCommand(BaseCommand):
     def handle(self, *args, **options):
         """Main logic for the actual command."""
         is_simulation = options['simulate']
-        only_print_query = options['only_print_query']
+        only_print_queries = options['only_print_queries']
         model_name = options['model_label']
 
         model = apps.get_model(model_name)
@@ -62,10 +62,10 @@ class BaseCleanupCommand(BaseCommand):
         model_verbose_name = capfirst(model._meta.verbose_name_plural)
         logger.info(f'{model_verbose_name} to delete: {qs.count()}')
 
-        if is_simulation or only_print_query:
+        if is_simulation or only_print_queries:
             logger.info(f'SQL:\n{qs.query}')
 
-        if only_print_query:
+        if only_print_queries:
             return
 
         try:
