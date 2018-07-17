@@ -4,11 +4,12 @@ from logging import getLogger
 from dateutil.utils import today
 from django.apps import apps
 from django.core.management import BaseCommand
+from django.db.models import Subquery
 from django.db.transaction import atomic
 from django.template.defaultfilters import capfirst
 from django.utils.timezone import utc
 
-from datahub.cleanup.query_utils import get_unreferenced_objects_query
+from datahub.cleanup.query_utils import get_relations_to_delete, get_unreferenced_objects_query
 from datahub.search.deletion import update_es_after_deletions
 
 logger = getLogger(__name__)
@@ -59,11 +60,8 @@ class BaseCleanupCommand(BaseCommand):
         model = apps.get_model(model_name)
         qs = self._get_query(model)
 
-        model_verbose_name = capfirst(model._meta.verbose_name_plural)
-        logger.info(f'{model_verbose_name} to delete: {qs.count()}')
-
         if is_simulation or only_print_queries:
-            logger.info(f'SQL:\n{qs.query}')
+            self._print_queries(model, qs)
 
         if only_print_queries:
             return
@@ -86,6 +84,18 @@ class BaseCleanupCommand(BaseCommand):
         except SimulationRollback:
             logger.info(f'Deletions rolled back')
 
+    def _print_queries(self, model, qs):
+        # relationships that would get deleted in cascade
+        for related in get_relations_to_delete(model):
+            related_model = related.related_model
+            related_qs = related_model._base_manager.filter(
+                **{f'{related.field.name}__in': Subquery(qs.values('pk'))}
+            )
+            _print_query(related_model, related_qs, related)
+
+        # main model
+        _print_query(model, qs)
+
     def _get_query(self, model):
         config = self.CONFIGS[model._meta.label]
 
@@ -94,3 +104,18 @@ class BaseCleanupCommand(BaseCommand):
         ).order_by(
             f'-{config.date_field}'
         )
+
+
+def _print_query(model, qs, relation=None):
+    model_verbose_name = capfirst(model._meta.verbose_name_plural)
+
+    logger.info(
+        ''.join((
+            f'{model_verbose_name} to delete',
+            f' (via {model._meta.model_name}.{relation.remote_field.name})' if relation else '',
+            f': {qs.count()}'
+        ))
+    )
+
+    logger.info('SQL:')
+    logger.info(qs.query)
