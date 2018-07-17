@@ -127,7 +127,7 @@ def disconnect_delete_search_signal_receivers(setup_es):
     ),
     ids=_format_iterable,
 )
-def cleanup_args(request):
+def cleanup_commands_and_configs(request):
     """Fixture that parametrises tests for each clean-up command configuration."""
     # Instantiate the command class
     yield (request.param[0](), *request.param[1:])
@@ -270,7 +270,7 @@ def test_run(cleanup_mapping, track_return_values, setup_es):
 @freeze_time(FROZEN_TIME)
 @pytest.mark.usefixtures('disconnect_delete_search_signal_receivers')
 @pytest.mark.django_db
-def test_simulate(cleanup_args, track_return_values, setup_es, caplog):
+def test_simulate(cleanup_commands_and_configs, track_return_values, setup_es, caplog):
     """
     Test that if --simulate=True is passed in, the command only simulates the action
     without making any actual changes.
@@ -278,7 +278,7 @@ def test_simulate(cleanup_args, track_return_values, setup_es, caplog):
     caplog.set_level('INFO')
     delete_return_value_tracker = track_return_values(QuerySet, 'delete')
 
-    command, model_name, config = cleanup_args
+    command, model_name, config = cleanup_commands_and_configs
 
     mapping = MAPPINGS[model_name]
     model_factory = mapping['factory']
@@ -316,7 +316,7 @@ def test_simulate(cleanup_args, track_return_values, setup_es, caplog):
 
 @freeze_time(FROZEN_TIME)
 @pytest.mark.django_db
-def test_only_print_queries(cleanup_args, monkeypatch, caplog):
+def test_only_print_queries(cleanup_commands_and_configs, monkeypatch, caplog):
     """
     Test that if --only-print-queries is passed, the SQL query is printed but no deletions or
     simulation occurs.
@@ -325,7 +325,7 @@ def test_only_print_queries(cleanup_args, monkeypatch, caplog):
     delete_mock = mock.Mock()
     monkeypatch.setattr(QuerySet, 'delete', delete_mock)
 
-    command, model_name, config = cleanup_args
+    command, model_name, config = cleanup_commands_and_configs
 
     mapping = MAPPINGS[model_name]
     model_factory = mapping['factory']
