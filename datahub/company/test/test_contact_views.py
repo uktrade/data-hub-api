@@ -13,7 +13,7 @@ from datahub.core import constants
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 from datahub.metadata.test.factories import TeamFactory
-from .factories import CompanyFactory, ContactFactory
+from .factories import ArchivedContactFactory, CompanyFactory, ContactFactory
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
@@ -388,6 +388,20 @@ class TestEditContact(APITestMixin):
             'archived_reason': None,
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-19T13:25:30.986208Z',
+        }
+
+    def test_cannot_update_if_archived(self):
+        """Test that an archived contact cannot be updated."""
+        company = ArchivedContactFactory()
+
+        url = reverse('api-v3:contact:detail', kwargs={'pk': company.pk})
+        response = self.api_client.patch(url, format='json', data={
+            'first_name': 'new name',
+        })
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {
+            'non_field_errors': ['This record has been archived and cannot be edited.'],
         }
 
     def test_update_read_only_fields(self):

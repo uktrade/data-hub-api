@@ -2,19 +2,9 @@ from functools import lru_cache
 from importlib import import_module
 
 from django.apps import AppConfig
+from django.conf import settings
 
 from datahub.search.elasticsearch import index_exists
-
-SEARCH_APPS = [
-    'datahub.search.companieshousecompany.CompaniesHouseCompanySearchApp',
-    'datahub.search.company.CompanySearchApp',
-    'datahub.search.contact.ContactSearchApp',
-    'datahub.search.event.EventSearchApp',
-    'datahub.search.investment.InvestmentSearchApp',
-    'datahub.search.interaction.InteractionSearchApp',
-    'datahub.search.omis.OrderSearchApp',
-]
-
 
 EXCLUDE_ALL = object()
 
@@ -44,18 +34,20 @@ class SearchApp:
         """
         self.es_model.set_up_index_and_aliases(force_update_mapping=force_update_mapping)
 
+    def get_signals_receivers(self):
+        """Returns the signals receivers for this search app."""
+        return import_module(self.mod_signals).receivers
+
     def connect_signals(self):
         """
         Connects all signal handlers so DB models can be synced with Elasticsearch on save.
         """
-        signals_mod = import_module(self.mod_signals)
-        for receiver in signals_mod.receivers:
+        for receiver in self.get_signals_receivers():
             receiver.connect()
 
     def disconnect_signals(self):
         """Disconnects all signal handlers."""
-        signals_mod = import_module(self.mod_signals)
-        for receiver in signals_mod.receivers:
+        for receiver in self.get_signals_receivers():
             receiver.disconnect()
 
     def get_permission_filters(self, request):
@@ -101,9 +93,22 @@ def are_apps_initialised(apps):
 
 
 @lru_cache(maxsize=None)
+def get_search_app_by_model(model):
+    """
+    :returns: a single search app (by django model)
+    :param model: django model for the search app
+    :raises LookupError: if it can't find the search app
+    """
+    for search_app in get_search_apps():
+        if search_app.queryset.model is model:
+            return search_app
+    raise LookupError(f'search app for {model} not found.')
+
+
+@lru_cache(maxsize=None)
 def _load_search_apps():
     """Loads and registers all search apps specified in `SEARCH_APPS`."""
-    apps = (_load_search_app(cls_path) for cls_path in SEARCH_APPS)
+    apps = (_load_search_app(cls_path) for cls_path in settings.SEARCH_APPS)
     return {app.name: app for app in apps}
 
 

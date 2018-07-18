@@ -1,19 +1,26 @@
+from unittest.mock import Mock
+
 import factory
 import pytest
 from botocore.stub import Stubber
 from django.conf import settings
 from django.core.cache import CacheHandler
 from django.core.management import call_command
+from elasticsearch.helpers.test import get_test_client
 from pytest_django.lazy_django import skip_if_no_django
 
 from datahub.core.utils import get_s3_client
+from datahub.metadata.test.factories import SectorFactory
+from datahub.search.apps import get_search_apps
+from datahub.search.elasticsearch import alias_exists, delete_alias, delete_index, index_exists
 
 
 @pytest.fixture(scope='session')
-def django_db_setup(django_db_setup, django_db_blocker):
+def django_db_setup(pytestconfig, django_db_setup, django_db_blocker):
     """Fixture for DB setup."""
+    reuse_db = pytestconfig.getoption('reuse_db')
     with django_db_blocker.unblock():
-        call_command('loadinitialmetadata')
+        call_command('loadinitialmetadata', force=reuse_db)
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -40,6 +47,42 @@ def api_client():
 
     from rest_framework.test import APIClient
     return APIClient()
+
+
+class _ReturnValueTracker:
+    def __init__(self, cls, method_name):
+        self.return_values = []
+        self.original_method = getattr(cls, method_name)
+
+    def make_mock(self):
+        def _spy(obj, *args, **kwargs):
+            return_value = self.original_method(obj, *args, **kwargs)
+            self.return_values.append(return_value)
+            return return_value
+
+        return _spy
+
+
+@pytest.fixture
+def track_return_values(monkeypatch):
+    """
+    Fixture that can be used to track the return values of a method.
+
+    Usage example:
+
+        def test_something(track_return_values):
+            tracker = track_return_values(cls, 'method_name')
+
+            ...
+
+            assert tracker.return_values == [1, 2, 3]
+    """
+    def _patch(cls, method_name):
+        tracker = _ReturnValueTracker(cls, method_name)
+        monkeypatch.setattr(cls, method_name, tracker.make_mock())
+        return tracker
+
+    yield _patch
 
 
 @pytest.fixture()
@@ -82,3 +125,104 @@ def _synchronous_submit_to_thread_pool(fn, *args, **kwargs):
 
 def _synchronous_on_commit(fn):
     fn()
+
+
+@pytest.fixture
+def hierarchical_sectors():
+    """Creates three test sectors in a hierarchy."""
+    parent = None
+    sectors = []
+
+    for _ in range(3):
+        sector = SectorFactory(parent=parent)
+        sectors.append(sector)
+        parent = sector
+
+    yield sectors
+
+
+# SEARCH
+
+def pytest_generate_tests(metafunc):
+    """Parametrises tests that use the `search_app` fixture."""
+    if 'search_app' in metafunc.fixturenames:
+        apps = get_search_apps()
+        metafunc.parametrize(
+            'search_app',
+            apps,
+            ids=[app.__class__.__name__ for app in apps]
+        )
+
+
+@pytest.fixture(scope='session')
+def _es_client(worker_id):
+    """
+    Makes the ES test helper client available.
+
+    Also patches settings.ES_INDEX_PREFIX using the xdist worker ID so that each process
+    gets unique indices when running tests using multiple processes using pytest -n.
+    """
+    # pytest's monkeypatch does not work in session fixtures, but there is no need to restore
+    # the value so we just overwrite it normally
+    settings.ES_INDEX_PREFIX = f'test_{worker_id}'
+
+    from elasticsearch_dsl.connections import connections
+    client = get_test_client(nowait=False)
+    connections.add_connection('default', client)
+    yield client
+
+
+@pytest.fixture(scope='session')
+def _setup_es_indexes(_es_client):
+    """Sets up ES and makes the client available."""
+    # Create models in the test index
+    for search_app in get_search_apps():
+        # Clean up in case of any aborted test runs
+        index = search_app.es_model.get_target_index_name()
+        read_alias = search_app.es_model.get_read_alias()
+        write_alias = search_app.es_model.get_write_alias()
+
+        if index_exists(index):
+            delete_index(index)
+
+        if alias_exists(read_alias):
+            delete_alias(read_alias)
+
+        if alias_exists(write_alias):
+            delete_alias(write_alias)
+
+        # Create indices and aliases
+        search_app.init_es()
+
+    yield _es_client
+
+    for search_app in get_search_apps():
+        delete_index(search_app.es_model.get_target_index_name())
+
+
+@pytest.fixture
+def setup_es(_setup_es_indexes, synchronous_on_commit, synchronous_thread_pool):
+    """Sets up ES and deletes all the records after each run."""
+    for search_app in get_search_apps():
+        search_app.connect_signals()
+
+    yield _setup_es_indexes
+
+    for search_app in get_search_apps():
+        search_app.disconnect_signals()
+
+    _setup_es_indexes.indices.refresh()
+    indices = [search_app.es_model.get_target_index_name() for search_app in get_search_apps()]
+    _setup_es_indexes.delete_by_query(
+        indices,
+        body={'query': {'match_all': {}}}
+    )
+    _setup_es_indexes.indices.refresh()
+
+
+@pytest.fixture
+def mock_es_client(monkeypatch):
+    """Patches the Elasticsearch library so that a mock client is used."""
+    mock_client = Mock()
+    monkeypatch.setattr('elasticsearch_dsl.connections.connections.get_connection', mock_client)
+    yield mock_client

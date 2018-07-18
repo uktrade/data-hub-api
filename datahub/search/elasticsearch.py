@@ -238,6 +238,17 @@ def associate_alias_with_index(alias, index):
     client.indices.put_alias(index, alias)
 
 
-def bulk(actions=None, chunk_size=None, **kwargs):
+def bulk(
+    actions=None,
+    chunk_size=500,
+    max_chunk_bytes=settings.ES_BULK_MAX_CHUNK_BYTES,
+    **kwargs
+):
     """Send data in bulk to Elasticsearch."""
-    return es_bulk(get_client(), actions=actions, chunk_size=chunk_size, **kwargs)
+    return es_bulk(
+        get_client(),
+        actions=actions,
+        chunk_size=chunk_size,
+        max_chunk_bytes=max_chunk_bytes,
+        **kwargs
+    )

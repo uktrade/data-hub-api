@@ -100,7 +100,7 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSet):
     filter_backends = (DjangoFilterBackend,
                        OrderingFilter,
                        IsAssociatedToInvestmentProjectFilter)
-    filter_fields = ('investor_company_id',)
+    filterset_fields = ('investor_company_id',)
     ordering = ('-created_on',)
 
     def get_view_name(self):
@@ -151,8 +151,8 @@ class IProjectModifiedSinceViewSet(IProjectViewSet):
     pagination_class = _SinglePagePaginator
 
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = None
-    filter_class = _ModifiedOnFilter
+    filterset_fields = None
+    filterset_class = _ModifiedOnFilter
 
 
 class IProjectTeamMembersViewSet(CoreViewSet):
@@ -244,7 +244,7 @@ class IProjectDocumentViewSet(CoreViewSet):
     queryset = IProjectDocument.objects.all()
 
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('doc_type',)
+    filterset_fields = ('doc_type',)
 
     def list(self, request, *args, **kwargs):
         """Custom pre-filtered list."""

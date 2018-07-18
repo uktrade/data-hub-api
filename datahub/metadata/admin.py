@@ -6,10 +6,10 @@ from . import models
 
 
 MODELS_TO_REGISTER_DISABLEABLE = (
-    models.Country,
     models.FDIType,
     models.InvestmentBusinessActivity,
     models.InvestmentStrategicDriver,
+    models.OverseasRegion,
     models.ReferralSourceActivity,
     models.ReferralSourceMarketing,
     models.ReferralSourceWebsite,
@@ -95,6 +95,17 @@ admin.site.register(
 )
 
 
+@admin.register(models.Country)
+class CountryAdmin(admin.ModelAdmin):
+    """Admin for countries."""
+
+    fields = ('pk', 'name', 'overseas_region', 'disabled_on',)
+    list_display = ('name', 'overseas_region', 'disabled_on',)
+    readonly_fields = ('pk',)
+    search_fields = ('name', 'pk')
+    list_filter = (DisabledOnFilter, 'overseas_region')
+
+
 @admin.register(models.Service)
 class ServiceAdmin(DisableableMetadataAdmin):
     """Admin for services."""
@@ -107,8 +118,8 @@ class ServiceAdmin(DisableableMetadataAdmin):
 class TeamAdmin(admin.ModelAdmin):
     """Team Admin."""
 
-    fields = ('id', 'name', 'country', 'uk_region', 'role', 'disabled_on',)
-    list_display = ('name', 'role', 'disabled_on',)
+    fields = ('id', 'name', 'country', 'uk_region', 'role', 'tags', 'disabled_on',)
+    list_display = ('name', 'role', 'get_tags_display', 'disabled_on',)
     list_select_related = ('role',)
     readonly_fields = ('id',)
     search_fields = ('name', 'pk')

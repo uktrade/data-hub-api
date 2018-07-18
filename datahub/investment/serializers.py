@@ -167,10 +167,11 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
 
     default_error_messages = {
         'only_pm_or_paa_can_move_to_verify_win': ugettext_lazy(
-            'Only Project Manager or Project Assurance Adviser can move project to Verify Win.'
+            'Only the Project Manager or Project Assurance Adviser can move the project'
+            ' to the ‘Verify win’ stage.'
         ),
         'only_ivt_can_move_to_won': ugettext_lazy(
-            'Only Investment Verification Team can move project to Won.'
+            'Only the Investment Verification Team can move the project to the ‘Won’ stage.'
         )
     }
 

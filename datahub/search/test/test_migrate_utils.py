@@ -19,7 +19,7 @@ class TestResyncAfterMigrate:
         index_bulk_mock = Mock()
         delete_bulk_mock = Mock(return_value=(True, ({'delete': {'status': 404}},)))
         monkeypatch.setattr('datahub.search.bulk_sync.bulk', index_bulk_mock)
-        monkeypatch.setattr('datahub.search.migrate_utils.bulk', delete_bulk_mock)
+        monkeypatch.setattr('datahub.search.deletion.bulk', delete_bulk_mock)
 
         get_aliases_for_index_mock = Mock(return_value=set())
         monkeypatch.setattr(
@@ -99,7 +99,7 @@ class TestResyncAfterMigrate:
         index_bulk_mock = Mock()
         delete_bulk_mock = Mock(return_value=(True, ({'delete': {'status': 500}},)))
         monkeypatch.setattr('datahub.search.bulk_sync.bulk', index_bulk_mock)
-        monkeypatch.setattr('datahub.search.migrate_utils.bulk', delete_bulk_mock)
+        monkeypatch.setattr('datahub.search.deletion.bulk', delete_bulk_mock)
 
         get_aliases_for_index_mock = Mock(return_value=set())
         monkeypatch.setattr(
