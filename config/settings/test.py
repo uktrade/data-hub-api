@@ -6,10 +6,17 @@ env = environ.Env()
 from .common import *
 
 # We need to prevent Django from initialising datahub.search for tests.
+# Removing SearchConfig stops django from calling .ready() which initialises
+# the search signals
 INSTALLED_APPS.remove('datahub.search.apps.SearchConfig')
 INSTALLED_APPS += [
     'datahub.search',
-    'datahub.core.test.support'
+    'datahub.core.test.support',
+    'datahub.search.test.search_support',
+]
+
+SEARCH_APPS += [
+    'datahub.search.test.search_support.simplemodel.SimpleModelSearchApp',
 ]
 
 # The index is set dynamically in datahub/search/conftest.py, so that tests can be parallelised.
@@ -45,3 +52,8 @@ CELERY_TASK_ALWAYS_EAGER = True
 ACTIVITY_STREAM_IP_WHITELIST = '1.2.3.4'
 ACTIVITY_STREAM_ACCESS_KEY_ID = 'some-id'
 ACTIVITY_STREAM_SECRET_ACCESS_KEY = 'some-secret'
+
+REPORT_AWS_ACCESS_KEY_ID = 'foo'
+REPORT_AWS_SECRET_ACCESS_KEY = 'bar'
+REPORT_BUCKET = 'report'
+REPORT_AWS_REGION = 'eu-west-2'

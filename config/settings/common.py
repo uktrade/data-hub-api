@@ -71,6 +71,7 @@ LOCAL_APPS = [
     'datahub.search.apps.SearchConfig',
     'datahub.user',
     'datahub.dbmaintenance',
+    'datahub.cleanup',
     'datahub.omis.core',
     'datahub.omis.order',
     'datahub.omis.market',
@@ -213,6 +214,16 @@ APPEND_SLASH = False
 
 MPTT_ADMIN_LEVEL_INDENT = 30
 
+SEARCH_APPS = [
+    'datahub.search.companieshousecompany.CompaniesHouseCompanySearchApp',
+    'datahub.search.company.CompanySearchApp',
+    'datahub.search.contact.ContactSearchApp',
+    'datahub.search.event.EventSearchApp',
+    'datahub.search.interaction.InteractionSearchApp',
+    'datahub.search.investment.InvestmentSearchApp',
+    'datahub.search.omis.OrderSearchApp',
+]
+
 # Leeloo stuff
 ES_USE_AWS_AUTH = env.bool('ES_USE_AWS_AUTH', False)
 if ES_USE_AWS_AUTH:
@@ -229,6 +240,7 @@ ES_INDEX_PREFIX = env('ES_INDEX_PREFIX')
 ES_INDEX_SETTINGS = {
     'index.mapping.single_type': True,
 }
+ES_BULK_MAX_CHUNK_BYTES = 10 * 1024 * 1024  # 10MB
 DATAHUB_SECRET = env('DATAHUB_SECRET')
 CDMS_TEXT_MAX_LENGTH = 4000
 CHAR_FIELD_MAX_LENGTH = 255

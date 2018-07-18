@@ -1,6 +1,7 @@
 from unittest import mock
 
 import pytest
+from django.conf import settings
 
 from .. import elasticsearch
 
@@ -12,7 +13,12 @@ def test_bulk(es_bulk, mock_es_client):
     chunk_size = 10
     elasticsearch.bulk(actions=actions, chunk_size=chunk_size)
 
-    es_bulk.assert_called_with(mock_es_client.return_value, actions=actions, chunk_size=chunk_size)
+    es_bulk.assert_called_with(
+        mock_es_client.return_value,
+        actions=actions,
+        chunk_size=chunk_size,
+        max_chunk_bytes=settings.ES_BULK_MAX_CHUNK_BYTES
+    )
 
 
 @pytest.mark.parametrize('expected', (True, False))

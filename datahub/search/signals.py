@@ -23,29 +23,29 @@ class SignalReceiver:
 
     def __init__(self, signal, sender, receiver_func):
         """Initialises the instance."""
-        self._signal = signal
-        self._sender = sender
+        self.signal = signal
+        self.sender = sender
         self._receiver_func = receiver_func
 
     @property
     def _dispatch_uid(self):
-        return (f'{id(self._signal):x}'
+        return (f'{id(self.signal):x}'
                 f'__{self._receiver_func.__module__}.{self._receiver_func.__name__}'
-                f'__{self._sender.__name__}')
+                f'__{self.sender.__name__}')
 
     def connect(self):
         """Connects the signal receiver."""
-        self._signal.connect(
+        self.signal.connect(
             self._receiver_func,
-            sender=self._sender,
+            sender=self.sender,
             dispatch_uid=self._dispatch_uid
         )
 
     def disconnect(self):
         """Disconnects the signal receiver."""
-        self._signal.disconnect(
+        self.signal.disconnect(
             self._receiver_func,
-            sender=self._sender,
+            sender=self.sender,
             dispatch_uid=self._dispatch_uid
         )
 

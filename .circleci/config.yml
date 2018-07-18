@@ -28,10 +28,6 @@ jobs:
       SSO_ENABLED: 'True'
       RESOURCE_SERVER_INTROSPECTION_URL: http://sso/o/introspect/
       RESOURCE_SERVER_AUTH_TOKEN: sso-token
-      REPORT_AWS_ACCESS_KEY_ID: foo
-      REPORT_AWS_SECRET_ACCESS_KEY: bar
-      REPORT_BUCKET: report
-      REPORT_AWS_REGION: eu-west-2
 
     working_directory: ~/app
 
