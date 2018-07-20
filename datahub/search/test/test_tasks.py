@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import MagicMock, Mock
 
 import pytest
 
@@ -46,6 +46,32 @@ def test_migrate_model(monkeypatch):
 
     complete_model_migration.apply(args=('test-app', 'target-hash'))
     resync_after_migrate_mock.assert_called_once_with(mock_app)
+
+
+@pytest.mark.django_db
+def test_complete_model_migration_aborts_when_already_in_progress(monkeypatch):
+    """
+    Test that the complete_model_migration task aborts when the lock for the same search app is
+    already held.
+    """
+    resync_after_migrate_mock = Mock()
+    monkeypatch.setattr('datahub.search.tasks.resync_after_migrate', resync_after_migrate_mock)
+    mock_app = create_mock_search_app(
+        current_mapping_hash='current-hash',
+        target_mapping_hash='target-hash',
+    )
+    get_search_app_mock = Mock(return_value=mock_app)
+    monkeypatch.setattr('datahub.search.tasks.get_search_app', get_search_app_mock)
+
+    # Have to mock rather than acquire the lock as locks are per connection (if the lock is
+    # already held by the current connection, the current connection can still acquire it again).
+    advisory_lock_mock = MagicMock()
+    advisory_lock_mock.return_value.__enter__.return_value = False
+    monkeypatch.setattr('datahub.search.tasks.advisory_lock', advisory_lock_mock)
+    complete_model_migration.apply(args=('test-app', 'target-hash'))
+
+    # resync_after_migrate_mock should not have been called as the task should've exited instead
+    resync_after_migrate_mock.assert_not_called()
 
 
 class MockRetryError(Exception):
