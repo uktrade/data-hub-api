@@ -1,9 +1,5 @@
 from logging import getLogger
 
-from datahub.core.thread_pool import submit_to_thread_pool
-from datahub.search.bulk_sync import sync_objects
-
-
 logger = getLogger(__name__)
 
 
@@ -48,24 +44,3 @@ class SignalReceiver:
             sender=self.sender,
             dispatch_uid=self._dispatch_uid
         )
-
-
-def _sync_es(es_model, db_model, pk):
-    """Sync to ES by instance pk and type."""
-    from datahub.search.migrate_utils import delete_from_secondary_indices_callback
-
-    read_indices, write_index = es_model.get_read_and_write_indices()
-
-    instance = db_model.objects.get(pk=pk)
-    sync_objects(
-        es_model,
-        [instance],
-        read_indices,
-        write_index,
-        post_batch_callback=delete_from_secondary_indices_callback,
-    )
-
-
-def sync_es(search_model, db_model, pk):
-    """Sync to ES by instance pk and type."""
-    return submit_to_thread_pool(_sync_es, search_model, db_model, pk)

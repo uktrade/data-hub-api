@@ -7,13 +7,14 @@ from datahub.omis.order.models import (
     OrderSubscriber as DBOrderSubscriber
 )
 from .models import Order as ESOrder
-from ..signals import SignalReceiver, sync_es
+from ..signals import SignalReceiver
+from ..sync_async import sync_object_async
 
 
 def order_sync_es(sender, instance, **kwargs):
     """Sync an order to the Elasticsearch."""
     transaction.on_commit(
-        lambda: sync_es(ESOrder, DBOrder, str(instance.pk))
+        lambda: sync_object_async(ESOrder, DBOrder, str(instance.pk))
     )
 
 

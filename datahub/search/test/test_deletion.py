@@ -15,7 +15,7 @@ from ..deletion import (
     delete_documents,
     update_es_after_deletions
 )
-from ..signals import sync_es
+from ..sync_async import sync_object_async
 
 
 @mock.patch('datahub.search.elasticsearch.es_bulk')
@@ -80,7 +80,7 @@ def test_collector(monkeypatch, setup_es):
     Test that the collector collects and deletes all the django objects deleted.
     """
     obj = SimpleModel.objects.create()
-    sync_es(ESSimpleModel, SimpleModel, str(obj.pk))
+    sync_object_async(ESSimpleModel, SimpleModel, str(obj.pk))
     setup_es.indices.refresh()
 
     search_app = get_search_app_by_model(SimpleModel)
@@ -144,7 +144,7 @@ def test_update_es_after_deletions(setup_es):
     all the django objects deleted.
     """
     obj = SimpleModel.objects.create()
-    sync_es(ESSimpleModel, SimpleModel, str(obj.pk))
+    sync_object_async(ESSimpleModel, SimpleModel, str(obj.pk))
     setup_es.indices.refresh()
     search_app = get_search_app_by_model(SimpleModel)
     read_alias = search_app.es_model.get_read_alias()
