@@ -25,7 +25,7 @@ def resync_after_migrate(search_app):
         )
         return
 
-    sync_app(search_app, post_batch_callback=_sync_app_post_batch_callback)
+    sync_app(search_app, post_batch_callback=delete_from_secondary_indices_callback)
     _clean_up_aliases_and_indices(search_app)
 
 
@@ -54,7 +54,14 @@ def _delete_old_index(index):
         delete_index(index)
 
 
-def _sync_app_post_batch_callback(read_indices, write_index, actions):
+def delete_from_secondary_indices_callback(read_indices, write_index, actions):
+    """
+    Callback for sync_app() and sync_objects() that deletes synced documents from any indices
+    that are currently being migrated from.
+
+    This is used to avoid multiple, differing copies of documents existing at the same time
+    whilst documents are being migrated from one index to another.
+    """
     remove_indices = read_indices - {write_index}
     for index in remove_indices:
         delete_documents(index, actions)
