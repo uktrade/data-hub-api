@@ -5,14 +5,15 @@ from datahub.company.models import Company as DBCompany, Contact as DBContact
 from datahub.interaction.models import Interaction as DBInteraction
 from datahub.investment.models import InvestmentProject as DBInvestmentProject
 from datahub.search.query_builder import delete_document
-from datahub.search.signals import SignalReceiver, sync_es
+from datahub.search.signals import SignalReceiver
+from datahub.search.sync_async import sync_object_async
 from .models import Interaction as ESInteraction
 
 
 def sync_interaction_to_es(sender, instance, **kwargs):
     """Sync interaction to the Elasticsearch."""
     transaction.on_commit(
-        lambda: sync_es(ESInteraction, DBInteraction, str(instance.pk))
+        lambda: sync_object_async(ESInteraction, DBInteraction, str(instance.pk))
     )
 
 
