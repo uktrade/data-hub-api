@@ -51,5 +51,12 @@ def complete_model_migration(self, search_app_name, new_mapping_hash):
         )
         raise self.retry()
 
-    with advisory_lock(f'leeloo-resync_after_migrate-{search_app_name}'):
+    with advisory_lock(f'leeloo-resync_after_migrate-{search_app_name}', wait=False) as lock_held:
+        if not lock_held:
+            logger.warning(
+                f'Another complete_model_migration task is in progress for the {search_app_name} '
+                f'search app. Aborting...'
+            )
+            return
+
         resync_after_migrate(search_app)
