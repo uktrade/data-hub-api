@@ -4,7 +4,10 @@ import pytest
 
 from datahub.core.exceptions import DataHubException
 from datahub.core.test_utils import MockQuerySet
-from datahub.search.migrate_utils import _sync_app_post_batch_callback, resync_after_migrate
+from datahub.search.migrate_utils import (
+    delete_from_secondary_indices_callback,
+    resync_after_migrate,
+)
 from datahub.search.test.utils import create_mock_search_app
 
 
@@ -143,7 +146,7 @@ class TestResyncAfterMigrate:
 
         sync_app_mock.assert_called_once_with(
             mock_app,
-            post_batch_callback=_sync_app_post_batch_callback,
+            post_batch_callback=delete_from_secondary_indices_callback,
         )
 
         mock_client.indices.update_aliases.assert_called_once_with(
@@ -217,5 +220,5 @@ class TestResyncAfterMigrate:
         # changed while sync_app was running
         sync_app_mock.assert_called_once_with(
             mock_app,
-            post_batch_callback=_sync_app_post_batch_callback,
+            post_batch_callback=delete_from_secondary_indices_callback,
         )

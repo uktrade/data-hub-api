@@ -22,16 +22,13 @@ def sync_app(search_app, batch_size=None, post_batch_callback=None):
     it = search_app.queryset.iterator(chunk_size=batch_size)
     batches = slice_iterable_into_chunks(it, batch_size)
     for batch in batches:
-        actions = list(search_app.es_model.db_objects_to_es_documents(batch, index=write_index))
-        num_actions = len(actions)
-        bulk(
-            actions=actions,
-            chunk_size=num_actions,
-            request_timeout=BULK_INDEX_TIMEOUT_SECS,
+        num_actions = sync_objects(
+            search_app.es_model,
+            batch,
+            read_indices,
+            write_index,
+            post_batch_callback=post_batch_callback,
         )
-
-        if post_batch_callback:
-            post_batch_callback(read_indices, write_index, actions)
 
         emit_progress = (
             (rows_processed + num_actions) // PROGRESS_INTERVAL
@@ -46,3 +43,21 @@ def sync_app(search_app, batch_size=None, post_batch_callback=None):
                         f'{rows_processed*100//total_rows}%')
 
     logger.info(f'{model_name} rows processed: {rows_processed}/{total_rows} 100%.')
+
+
+def sync_objects(es_model, model_objects, read_indices, write_index, post_batch_callback=None):
+    """Syncs an iterable of model instances to Elasticsearch."""
+    actions = list(
+        es_model.db_objects_to_es_documents(model_objects, index=write_index)
+    )
+    num_actions = len(actions)
+    bulk(
+        actions=actions,
+        chunk_size=num_actions,
+        request_timeout=BULK_INDEX_TIMEOUT_SECS,
+    )
+
+    if post_batch_callback:
+        post_batch_callback(read_indices, write_index, actions)
+
+    return num_actions
