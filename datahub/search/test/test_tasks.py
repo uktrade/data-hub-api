@@ -33,7 +33,7 @@ def test_sync_all_models(monkeypatch):
 
 
 @pytest.mark.django_db
-def test_migrate_model(monkeypatch):
+def test_complete_model_migration(monkeypatch):
     """Test that the complete_model_migration task calls resync_after_migrate()."""
     resync_after_migrate_mock = Mock()
     monkeypatch.setattr('datahub.search.tasks.resync_after_migrate', resync_after_migrate_mock)
@@ -79,7 +79,7 @@ class MockRetryError(Exception):
 
 
 @pytest.mark.django_db
-def test_migrate_model_with_mapping_hash_mismatch(monkeypatch):
+def test_complete_model_migration_with_mapping_hash_mismatch(monkeypatch):
     """
     Test that the complete_model_migration task calls self.retry() when the target mapping hash is
     not the expected one.
