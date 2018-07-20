@@ -31,7 +31,8 @@ def create_mock_search_app(
         queryset=None,
 ):
     """Creates a mock search app."""
-    return Mock(
+    mock = Mock()
+    mock.configure_mock(
         name='test-app',
         es_model=_create_mock_es_model(
             current_mapping_hash,
@@ -42,6 +43,7 @@ def create_mock_search_app(
         bulk_batch_size=bulk_batch_size,
         queryset=queryset,
     )
+    return mock
 
 
 def _create_mock_es_model(
