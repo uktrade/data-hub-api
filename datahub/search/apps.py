@@ -30,7 +30,7 @@ class SearchApp:
         Creates the index and aliases for this app if they don't already exist.
 
         If force_update_mapping is True and the write alias already exists, an attempt
-        is made to update to update the existing mapping in place.
+        is made to update the existing mapping in place.
         """
         self.es_model.set_up_index_and_aliases(force_update_mapping=force_update_mapping)
 
