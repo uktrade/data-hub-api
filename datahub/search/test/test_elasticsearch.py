@@ -256,5 +256,5 @@ def test_create_alias(mock_es_client):
 
     client = mock_es_client.return_value
 
-    elasticsearch.associate_alias_with_index(alias_name, index_name)
+    elasticsearch.associate_index_with_alias(alias_name, index_name)
     client.indices.put_alias.assert_called_with(index_name, alias_name)

@@ -226,7 +226,7 @@ def start_alias_transaction():
     alias_updater.commit()
 
 
-def associate_alias_with_index(alias, index):
+def associate_index_with_alias(alias, index):
     """
     Associates a new or existing alias with an index.
 
