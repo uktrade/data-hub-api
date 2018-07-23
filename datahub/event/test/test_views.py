@@ -48,8 +48,8 @@ class TestGetEventView(APITestMixin):
                 'id': str(event.event_type.id),
                 'name': str(event.event_type.name),
             },
-            'start_date': event.start_date,
-            'end_date': event.end_date,
+            'start_date': event.start_date.isoformat(),
+            'end_date': event.end_date.isoformat(),
             'location_type': {
                 'id': str(event.location_type.id),
                 'name': event.location_type.name,
