@@ -33,6 +33,6 @@ class Command(BaseCommand):
             logger.info('Creating Elasticsearch indices and initialising mappings...')
 
             for app in get_search_apps_by_name(options['model']):
-                app.init_es()
+                app.init_es(force_update_mapping=options['force_update_mapping'])
 
             logger.info('Elasticsearch indices and mappings initialised')
