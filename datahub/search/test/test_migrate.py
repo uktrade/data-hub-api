@@ -37,7 +37,7 @@ def test_migrate_app_with_app_needing_migration(monkeypatch, mock_es_client):
 
     migrate_app(mock_app)
 
-    create_index_mock.assert_called_once_with(new_index, mock_app.es_model)
+    create_index_mock.assert_called_once_with(new_index, mock_app.es_model._doc_type.mapping)
 
     mock_client.indices.update_aliases.assert_called_once_with(
         body={

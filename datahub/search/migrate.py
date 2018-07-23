@@ -48,7 +48,7 @@ def _perform_migration(search_app):
 
     logger.info(f'Updating aliases for the {app_name} search app')
 
-    create_index(new_index_name, es_model)
+    create_index(new_index_name, es_model._doc_type.mapping)
 
     with start_alias_transaction() as alias_transaction:
         alias_transaction.associate_indices_with_alias(read_alias_name, [new_index_name])

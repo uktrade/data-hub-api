@@ -55,11 +55,14 @@ def test_creates_index(monkeypatch, mock_es_client):
     monkeypatch.setattr('django.conf.settings.ES_INDEX_SETTINGS', {
         'testsetting1': 'testval1'
     })
-    mock_es_model = mock.Mock()
+    mock_mapping = mock.Mock(
+        _collect_analysis=mock.Mock(return_value={}),
+        to_dict=mock.Mock(return_value={'mapping': 'test-mapping'}),
+    )
 
     index = 'test-index'
     connection = mock_es_client.return_value
-    elasticsearch.create_index(index, mock_es_model)
+    elasticsearch.create_index(index, mock_mapping)
     connection.indices.create.assert_called_once_with(
         index='test-index',
         body={
@@ -120,10 +123,12 @@ def test_creates_index(monkeypatch, mock_es_client):
                         }
                     }
                 }
+            },
+            'mappings': {
+                'mapping': 'test-mapping'
             }
         }
     )
-    mock_es_model.init.assert_called_once_with(index)
 
 
 def test_delete_index(mock_es_client):
