@@ -139,16 +139,39 @@ def test_delete_index(mock_es_client):
     client.indices.delete.assert_called_once_with(index)
 
 
-def test_get_indices_for_alias(mock_es_client):
-    """Test get_indices_for_alias()."""
-    alias = 'test-index'
+@pytest.mark.parametrize(
+    'aliases,response,result',
+    (
+        (
+            ('alias1',),
+            {
+                'index1': {'aliases': {'alias1': {}}},
+            },
+            [{'index1'}],
+        ),
+        (
+            ('alias2',),
+            {
+                'index2': {'aliases': {'alias2': {}}},
+            },
+            [{'index2'}],
+        ),
+        (
+            ('alias1', 'alias2',),
+            {
+                'index1': {'aliases': {'alias1': {}}},
+                'index2': {'aliases': {'alias2': {}}},
+            },
+            [{'index1'}, {'index2'}],
+        ),
+    ),
+    ids=lambda params: f'{params[0]-params[2]}',
+)
+def test_get_indices_for_aliases(mock_es_client, aliases, response, result):
+    """Test get_indices_for_aliases()."""
     client = mock_es_client.return_value
-    client.indices.get_alias.return_value = {
-        'index1': {'aliases': {'alias1': {}}},
-        'index2': {'aliases': {'alias2': {}}},
-    }
-    assert elasticsearch.get_indices_for_alias(alias) == {'index1', 'index2'}
-    client.indices.get_alias.assert_called_with(name=alias)
+    client.indices.get_alias.return_value = response
+    assert elasticsearch.get_indices_for_aliases(*aliases) == result
 
 
 def test_get_aliases_for_index(mock_es_client):

@@ -9,7 +9,6 @@ from datahub.search.elasticsearch import (
     alias_exists,
     associate_index_with_alias,
     create_index,
-    get_indices_for_alias,
     get_indices_for_aliases,
     index_exists,
 )
@@ -52,7 +51,7 @@ class BaseESModel(DocType):
     @classmethod
     def get_write_index(cls):
         """Gets the index currently referenced by the write alias."""
-        indices = get_indices_for_alias(cls.get_write_alias())
+        indices, = get_indices_for_aliases(cls.get_write_alias())
         return _get_write_index(indices)
 
     @classmethod
