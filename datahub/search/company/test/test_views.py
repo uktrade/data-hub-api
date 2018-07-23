@@ -599,13 +599,13 @@ class TestSearchExport(APITestMixin):
                 TestSearchExport._get_random_constant_id(BusinessTypeConstant),
             'classification_id': random_obj_for_model(CompanyClassification).pk,
             'company_number': ch.company_number,
-            'created_on': factory.Faker('date'),
+            'created_on': factory.Faker('date_object'),
             'description': factory.Faker('text'),
             'employee_range_id':
                 TestSearchExport._get_random_constant_id(constants.EmployeeRange),
             'headquarter_type_id':
                 TestSearchExport._get_random_constant_id(constants.HeadquarterType),
-            'modified_on': factory.Faker('date'),
+            'modified_on': factory.Faker('date_object'),
             'name': name,
             'one_list_account_owner': AdviserFactory(),
             'registered_address_1': factory.Faker('street_name'),
@@ -629,7 +629,7 @@ class TestSearchExport(APITestMixin):
         if archived:
             data.update({
                 'archived_by': AdviserFactory(),
-                'archived_on': factory.Faker('date'),
+                'archived_on': factory.Faker('date_object'),
                 'archived_reason': factory.Faker('text'),
             })
 

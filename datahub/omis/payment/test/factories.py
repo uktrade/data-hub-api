@@ -20,7 +20,7 @@ class PaymentFactory(factory.django.DjangoModelFactory):
     additional_reference = factory.Faker('pystr')
     amount = factory.Faker('random_int', max=100)
     method = constants.PaymentMethod.bacs
-    received_on = factory.Faker('date')
+    received_on = factory.Faker('date_object')
 
     class Meta:
         model = 'omis-payment.Payment'
