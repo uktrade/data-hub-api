@@ -125,7 +125,7 @@ class BaseESModel(DocType):
                 index_name = settings.ES_LEGACY_INDEX
             else:
                 index_name = cls.get_target_index_name()
-                create_index(index_name, cls)
+                create_index(index_name, cls._doc_type.mapping)
 
             associate_alias_with_index(cls.get_write_alias(), index_name)
         elif force_update_mapping:

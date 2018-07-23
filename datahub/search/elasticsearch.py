@@ -127,16 +127,15 @@ def index_exists(index_name):
     return client.indices.exists(index_name)
 
 
-def create_index(index_name, es_model):
+def create_index(index_name, mapping):
     """Creates an index and initialises it with a mapping."""
     index = Index(index_name)
     for analyzer in ANALYZERS:
         index.analyzer(analyzer)
 
     index.settings(**settings.ES_INDEX_SETTINGS)
+    index.mapping(mapping)
     index.create()
-
-    es_model.init(index_name)
 
 
 def delete_index(index_name):
