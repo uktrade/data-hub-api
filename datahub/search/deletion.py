@@ -153,3 +153,14 @@ def update_es_after_deletions():
         collector.disconnect()
 
     collector.delete_from_es()
+
+
+def delete_document(model, document_id, indices=None, ignore_404_responses=True):
+    """Deletes specified model's document."""
+    if indices is None:
+        indices = [model.get_write_alias()]
+    ignored_response_statuses = (404,) if ignore_404_responses else ()
+    doc = model(_id=document_id)
+
+    for index in indices:
+        doc.delete(index=index, ignore=ignored_response_statuses)
