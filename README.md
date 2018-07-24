@@ -316,6 +316,15 @@ For more details including all the available choices:
 ./manage.py sync_es --help
 ```
 
+Migrate modified mappings:
+
+```shell
+./manage.py migrate_es
+```
+
+Elasticsearch mapping migrations are fairly complex – see [docs/Elasticsearch migrations.md](docs/Elasticsearch migrations.md) for more detail.
+
+
 ### Companies House
 
 Update Companies House records:
