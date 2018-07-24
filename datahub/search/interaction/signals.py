@@ -4,7 +4,7 @@ from django.db.models.signals import post_delete, post_save
 from datahub.company.models import Company as DBCompany, Contact as DBContact
 from datahub.interaction.models import Interaction as DBInteraction
 from datahub.investment.models import InvestmentProject as DBInvestmentProject
-from datahub.search.query_builder import delete_document
+from datahub.search.deletion import delete_document
 from datahub.search.signals import SignalReceiver
 from datahub.search.sync_async import sync_object_async
 from .models import Interaction as ESInteraction
