@@ -10,9 +10,21 @@ logger = getLogger(__name__)
 
 
 class Command(BaseCommand):
-    """Command for migrating an Elasticsearch index."""
+    """
+    Command for migrating an Elasticsearch index.
 
-    help = "Creates the Elasticsearch index (if necessary) and updates the index's mapping."
+    At present, init_es must be run before this command, but the intention is to merge these two
+    commands at a later time.
+    """
+
+    help = """Migrates the mapping for Elasticsearch indices.
+
+This creates new indices for modified search models, synchronises data to the new indices and \
+then deletes the old indices.
+
+init_es must be run before this command.
+
+See docs/Elasticsearch migrations.md for further details."""
 
     def add_arguments(self, parser):
         """Handle arguments."""
