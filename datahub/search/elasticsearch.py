@@ -214,7 +214,22 @@ class _AliasUpdater:
 
 @contextmanager
 def start_alias_transaction():
-    """Returns a context manager that can be used to update indices atomically."""
+    """
+    Returns a context manager that can be used to create and update aliases atomically.
+
+    Changes are committed when the context manager exits.
+
+    Usage example:
+        with start_alias_transaction() as alias_transaction:
+            alias_transaction.dissociate_indices_from_alias(
+                'some-alias',
+                ['an-index', 'another-index],
+            )
+            alias_transaction.associate_indices_with_alias(
+                'another-alias',
+                ['new-index],
+            )
+    """
     alias_updater = _AliasUpdater()
     yield alias_updater
     alias_updater.commit()
