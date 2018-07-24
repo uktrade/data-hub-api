@@ -46,12 +46,8 @@ def _clean_up_aliases_and_indices(search_app):
         logger.warning(f'No indices to remove for the {read_alias} alias')
 
     for index in indices_to_remove:
-        _delete_old_index(index)
-
-
-def _delete_old_index(index):
-    if not get_aliases_for_index(index):
-        delete_index(index)
+        if not get_aliases_for_index(index):
+            delete_index(index)
 
 
 def delete_from_secondary_indices_callback(read_indices, write_index, actions):
