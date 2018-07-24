@@ -12,7 +12,14 @@ from pytest_django.lazy_django import skip_if_no_django
 from datahub.core.utils import get_s3_client
 from datahub.metadata.test.factories import SectorFactory
 from datahub.search.apps import get_search_apps
-from datahub.search.elasticsearch import alias_exists, delete_alias, delete_index, index_exists
+from datahub.search.elasticsearch import (
+    alias_exists,
+    associate_index_with_alias,
+    create_index,
+    delete_alias,
+    delete_index,
+    index_exists,
+)
 
 
 @pytest.fixture(scope='session')
@@ -192,7 +199,9 @@ def _setup_es_indexes(_es_client):
             delete_alias(write_alias)
 
         # Create indices and aliases
-        search_app.init_es()
+        create_index(index_name, search_app.es_model._doc_type.mapping)
+        associate_index_with_alias(write_alias, index_name)
+        associate_index_with_alias(read_alias, index_name)
 
     yield _es_client
 
