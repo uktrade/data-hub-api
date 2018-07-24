@@ -178,12 +178,12 @@ def _setup_es_indexes(_es_client):
     # Create models in the test index
     for search_app in get_search_apps():
         # Clean up in case of any aborted test runs
-        index = search_app.es_model.get_target_index_name()
+        index_name = search_app.es_model.get_target_index_name()
         read_alias = search_app.es_model.get_read_alias()
         write_alias = search_app.es_model.get_write_alias()
 
-        if index_exists(index):
-            delete_index(index)
+        if index_exists(index_name):
+            delete_index(index_name)
 
         if alias_exists(read_alias):
             delete_alias(read_alias)

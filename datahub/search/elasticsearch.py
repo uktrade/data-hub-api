@@ -145,30 +145,30 @@ def delete_index(index_name):
     client.indices.delete(index_name)
 
 
-def get_indices_for_aliases(*aliases):
+def get_indices_for_aliases(*alias_names):
     """Gets the indices referenced by one or more aliases."""
     client = get_client()
-    alias_to_index_mapping = {alias: set() for alias in aliases}
-    index_to_alias_mapping = client.indices.get_alias(name=aliases)
+    alias_to_index_mapping = {alias_name: set() for alias_name in alias_names}
+    index_to_alias_mapping = client.indices.get_alias(name=alias_names)
 
     for index_name, index_properties in index_to_alias_mapping.items():
-        for alias in index_properties['aliases']:
-            alias_to_index_mapping[alias].add(index_name)
+        for alias_name in index_properties['aliases']:
+            alias_to_index_mapping[alias_name].add(index_name)
 
-    return [alias_to_index_mapping[alias] for alias in aliases]
+    return [alias_to_index_mapping[alias_name] for alias_name in alias_names]
 
 
-def get_aliases_for_index(index):
+def get_aliases_for_index(index_name):
     """Gets the aliases referencing an index."""
     client = get_client()
-    alias_response = client.indices.get_alias(index=index)
-    return alias_response[index]['aliases'].keys()
+    alias_response = client.indices.get_alias(index=index_name)
+    return alias_response[index_name]['aliases'].keys()
 
 
-def alias_exists(alias):
+def alias_exists(alias_name):
     """Checks if an alias exists."""
     client = get_client()
-    return client.indices.exists_alias(name=alias)
+    return client.indices.exists_alias(name=alias_name)
 
 
 def delete_alias(alias_name):
@@ -185,21 +185,21 @@ class _AliasUpdater:
         """Initialises the instance with an empty list of pending operations."""
         self.actions = []
 
-    def associate_indices_with_alias(self, alias, indices):
+    def associate_indices_with_alias(self, alias_name, index_names):
         """Adds a pending operation to associate a new or existing alias with a set of indices."""
         self.actions.append({
             'add': {
-                'alias': alias,
-                'indices': list(indices)
+                'alias': alias_name,
+                'indices': list(index_names)
             }
         })
 
-    def dissociate_indices_from_alias(self, alias, indices):
+    def dissociate_indices_from_alias(self, alias_name, index_names):
         """Adds a pending operation to dissociate an existing alias from a set of indices."""
         self.actions.append({
             'remove': {
-                'alias': alias,
-                'indices': list(indices)
+                'alias': alias_name,
+                'indices': list(index_names)
             }
         })
 
@@ -220,7 +220,7 @@ def start_alias_transaction():
     alias_updater.commit()
 
 
-def associate_index_with_alias(alias, index):
+def associate_index_with_alias(alias_name, index_name):
     """
     Associates a new or existing alias with an index.
 
@@ -228,7 +228,7 @@ def associate_index_with_alias(alias, index):
     operations, use start_alias_transaction().
     """
     client = get_client()
-    client.indices.put_alias(index, alias)
+    client.indices.put_alias(index_name, alias_name)
 
 
 def bulk(
