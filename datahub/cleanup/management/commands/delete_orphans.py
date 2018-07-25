@@ -4,7 +4,7 @@ from datahub.cleanup.cleanup_config import ModelCleanupConfig
 from datahub.cleanup.management.commands._base_command import BaseCleanupCommand
 
 
-ORPHAN_AGE_THRESHOLD = relativedelta(days=30 * 6)
+ORPHAN_AGE_THRESHOLD = relativedelta(months=6)
 
 
 class Command(BaseCleanupCommand):
@@ -18,5 +18,8 @@ class Command(BaseCleanupCommand):
     CONFIGS = {
         'company.Contact': ModelCleanupConfig(ORPHAN_AGE_THRESHOLD),
         'company.Company': ModelCleanupConfig(ORPHAN_AGE_THRESHOLD),
-        'event.Event': ModelCleanupConfig(ORPHAN_AGE_THRESHOLD, date_field='end_date')
+        'event.Event': ModelCleanupConfig(
+            age_threshold=relativedelta(months=18),
+            date_field='end_date'
+        )
     }

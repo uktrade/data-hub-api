@@ -12,7 +12,7 @@ from django.utils.timezone import utc
 from freezegun import freeze_time
 
 from datahub.cleanup.management.commands import delete_old_records, delete_orphans
-from datahub.cleanup.query_utils import get_related_fields
+from datahub.cleanup.query_utils import get_related_fields, get_relations_to_delete
 from datahub.cleanup.test.commands.factories import ShallowInvestmentProjectFactory
 from datahub.company.test.factories import CompanyFactory, ContactFactory
 from datahub.core.exceptions import DataHubException
@@ -272,7 +272,7 @@ def test_run(cleanup_mapping, track_return_values, setup_es):
 @pytest.mark.django_db
 def test_simulate(cleanup_commands_and_configs, track_return_values, setup_es, caplog):
     """
-    Test that if --simulate=True is passed in, the command only simulates the action
+    Test that if --simulate is passed in, the command only simulates the action
     without making any actual changes.
     """
     caplog.set_level('INFO')
@@ -298,9 +298,6 @@ def test_simulate(cleanup_commands_and_configs, track_return_values, setup_es, c
     management.call_command(command, model_name, simulate=True)
 
     setup_es.indices.refresh()
-
-    # Check that 3 records would have been deleted
-    assert 'to delete: 3' in caplog.text
 
     # Check which models were actually deleted
     return_values = delete_return_value_tracker.return_values
@@ -328,6 +325,7 @@ def test_only_print_queries(cleanup_commands_and_configs, monkeypatch, caplog):
 
     command, model_name, config = cleanup_commands_and_configs
 
+    model = apps.get_model(model_name)
     mapping = MAPPINGS[model_name]
     model_factory = mapping['factory']
     datetime_older_than_threshold = FROZEN_TIME - config.age_threshold - relativedelta(days=1)
@@ -338,7 +336,17 @@ def test_only_print_queries(cleanup_commands_and_configs, monkeypatch, caplog):
     management.call_command(command, model_name, only_print_queries=True)
 
     assert not delete_mock.called
-    assert 'SQL:' in caplog.text
+
+    log_text = caplog.text.lower()
+    assert f'{model._meta.verbose_name_plural} to delete:' in log_text
+
+    for relation in get_relations_to_delete(model):
+        related_meta = relation.related_model._meta
+        assert (
+            f'{related_meta.verbose_name_plural} to delete '
+            f'(via {related_meta.model_name}.{relation.remote_field.name}): '
+        ) in log_text
+        assert f'from "{related_meta.db_table}"' in log_text
 
 
 @pytest.mark.parametrize('cleanup_command_cls', COMMAND_CLASSES, ids=str)
