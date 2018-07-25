@@ -1,15 +1,13 @@
+from contextlib import contextmanager
 from logging import getLogger
 from urllib.parse import urlparse
 
 from aws_requests_auth.aws_auth import AWSRequestsAuth
 from django.conf import settings
-from django_pglocks import advisory_lock
 from elasticsearch import RequestsHttpConnection
 from elasticsearch.helpers import bulk as es_bulk
 from elasticsearch_dsl import analysis, Index
 from elasticsearch_dsl.connections import connections
-
-from datahub.search.apps import get_search_apps
 
 
 logger = getLogger(__name__)
@@ -123,38 +121,129 @@ def get_client():
     return connections.get_connection()
 
 
-def index_exists(name=settings.ES_INDEX):
+def index_exists(index_name):
+    """Checks if an index exists."""
+    client = get_client()
+    return client.indices.exists(index_name)
+
+
+def create_index(index_name, mapping):
+    """Creates an index and initialises it with a mapping."""
+    index = Index(index_name)
+    for analyzer in ANALYZERS:
+        index.analyzer(analyzer)
+
+    index.settings(**settings.ES_INDEX_SETTINGS)
+    index.mapping(mapping)
+    index.create()
+
+
+def delete_index(index_name):
+    """Deletes an index."""
+    logger.info(f'Deleting the {index_name} index...')
+    client = get_client()
+    client.indices.delete(index_name)
+
+
+def get_indices_for_aliases(*alias_names):
+    """Gets the indices referenced by one or more aliases."""
+    client = get_client()
+    alias_to_index_mapping = {alias_name: set() for alias_name in alias_names}
+    index_to_alias_mapping = client.indices.get_alias(name=alias_names)
+
+    for index_name, index_properties in index_to_alias_mapping.items():
+        for alias_name in index_properties['aliases']:
+            alias_to_index_mapping[alias_name].add(index_name)
+
+    return [alias_to_index_mapping[alias_name] for alias_name in alias_names]
+
+
+def get_aliases_for_index(index_name):
+    """Gets the aliases referencing an index."""
+    client = get_client()
+    alias_response = client.indices.get_alias(index=index_name)
+    return alias_response[index_name]['aliases'].keys()
+
+
+def alias_exists(alias_name):
+    """Checks if an alias exists."""
+    client = get_client()
+    return client.indices.exists_alias(name=alias_name)
+
+
+def delete_alias(alias_name):
+    """Deletes an alias entirely (dissociating it from all indices)."""
+    logger.info(f'Deleting the {alias_name} alias...')
+    client = get_client()
+    client.indices.delete_alias('_all', alias_name)
+
+
+class _AliasUpdater:
+    """Helper class for making multiple alias updates atomically."""
+
+    def __init__(self):
+        """Initialises the instance with an empty list of pending operations."""
+        self.actions = []
+
+    def associate_indices_with_alias(self, alias_name, index_names):
+        """Adds a pending operation to associate a new or existing alias with a set of indices."""
+        self.actions.append({
+            'add': {
+                'alias': alias_name,
+                'indices': list(index_names)
+            }
+        })
+
+    def dissociate_indices_from_alias(self, alias_name, index_names):
+        """Adds a pending operation to dissociate an existing alias from a set of indices."""
+        self.actions.append({
+            'remove': {
+                'alias': alias_name,
+                'indices': list(index_names)
+            }
+        })
+
+    def commit(self):
+        """Commits (flushes) pending operations."""
+        client = get_client()
+        client.indices.update_aliases(body={
+            'actions': self.actions
+        })
+        self.actions = []
+
+
+@contextmanager
+def start_alias_transaction():
     """
-    :param name: Name of the index
+    Returns a context manager that can be used to create and update aliases atomically.
 
-    :returns: True if index_name exists
+    Changes are committed when the context manager exits.
+
+    Usage example:
+        with start_alias_transaction() as alias_transaction:
+            alias_transaction.dissociate_indices_from_alias(
+                'some-alias',
+                ['an-index', 'another-index],
+            )
+            alias_transaction.associate_indices_with_alias(
+                'another-alias',
+                ['new-index],
+            )
     """
-    return get_client().indices.exists(index=name)
+    alias_updater = _AliasUpdater()
+    yield alias_updater
+    alias_updater.commit()
 
 
-def configure_index(index_name, index_settings=None):
-    """Configures Elasticsearch index."""
-    if not index_exists(name=index_name):
-        index = Index(index_name)
-        for analyzer in ANALYZERS:
-            index.analyzer(analyzer)
+def associate_index_with_alias(alias_name, index_name):
+    """
+    Associates a new or existing alias with an index.
 
-        if index_settings:
-            index.settings(**index_settings)
-        index.create()
-
-
-def init_es():
-    """Creates the Elasticsearch index if it doesn't exist, and updates the mapping."""
-    logger.info('Creating Elasticsearch index and initialising mapping...')
-
-    with advisory_lock('leeloo_init_es'):
-        configure_index(settings.ES_INDEX, index_settings=settings.ES_INDEX_SETTINGS)
-
-        for search_app in get_search_apps():
-            search_app.init_es()
-
-    logger.info('Elasticsearch index and mapping initialised')
+    This is only intended to be a convenience function for simple operations. For more complex
+    operations, use start_alias_transaction().
+    """
+    client = get_client()
+    client.indices.put_alias(index_name, alias_name)
 
 
 def bulk(

@@ -10,7 +10,7 @@ from datahub.metadata.test.factories import TeamFactory
 from datahub.search.companieshousecompany.models import (
     CompaniesHouseCompany as ESCompaniesHouseCompany
 )
-from datahub.search.signals import sync_es
+from datahub.search.sync_async import sync_object_async
 
 pytestmark = pytest.mark.django_db
 
@@ -40,7 +40,7 @@ def setup_data(setup_es):
     )
 
     for company in companies:
-        sync_es(ESCompaniesHouseCompany, DBCompaniesHouseCompany, company.pk)
+        sync_object_async(ESCompaniesHouseCompany, DBCompaniesHouseCompany, company.pk)
 
     setup_es.indices.refresh()
 

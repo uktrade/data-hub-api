@@ -8,7 +8,8 @@ from datahub.investment.models import (
     InvestmentProjectTeamMember
 )
 from .models import InvestmentProject as ESInvestmentProject
-from ..signals import SignalReceiver, sync_es
+from ..signals import SignalReceiver
+from ..sync_async import sync_object_async
 
 
 def investment_project_sync_es(sender, instance, **kwargs):
@@ -19,7 +20,7 @@ def investment_project_sync_es(sender, instance, **kwargs):
         else:
             pk = instance.pk
 
-        sync_es(
+        sync_object_async(
             ESInvestmentProject,
             DBInvestmentProject,
             str(pk),
@@ -45,7 +46,7 @@ def investment_project_sync_es_adviser_change(sender, instance, **kwargs):
         )
 
         for project in queryset:
-            sync_es(
+            sync_object_async(
                 ESInvestmentProject,
                 DBInvestmentProject,
                 str(project.pk),

@@ -234,9 +234,11 @@ if ES_USE_AWS_AUTH:
 
 ES_URL = env('ES5_URL')
 ES_VERIFY_CERTS = env.bool('ES_VERIFY_CERTS', True)
-ES_INDEX = env('ES_INDEX')
+# TODO: Remove once all environments have been migrated to the new structure
+ES_LEGACY_INDEX = env.str('ES_INDEX', default='')
+ES_INDEX_PREFIX = env('ES_INDEX_PREFIX')
 ES_INDEX_SETTINGS = {
-    'index.mapping.nested_fields.limit': 100
+    'index.mapping.single_type': True,
 }
 ES_BULK_MAX_CHUNK_BYTES = 10 * 1024 * 1024  # 10MB
 DATAHUB_SECRET = env('DATAHUB_SECRET')

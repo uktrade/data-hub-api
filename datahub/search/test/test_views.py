@@ -108,6 +108,7 @@ class TestValidateViewAttributes:
             for field_list in view.COMPOSITE_FILTERS.values()
             for field in field_list
             if not model_has_field_path(search_app.es_model, field)
+            and field not in search_app.es_model.PREVIOUS_MAPPING_FIELDS
         }
 
         assert not invalid_fields

@@ -1,5 +1,4 @@
 import pytest
-from django.conf import settings
 from elasticsearch_dsl import Mapping
 
 from datahub.omis.order.test.factories import (
@@ -16,7 +15,7 @@ pytestmark = pytest.mark.django_db
 
 def test_mapping(setup_es):
     """Test the ES mapping for an order."""
-    mapping = Mapping.from_es(settings.ES_INDEX, OrderSearchApp.name)
+    mapping = Mapping.from_es(OrderSearchApp.es_model.get_write_index(), OrderSearchApp.name)
 
     assert mapping.to_dict() == {
         'order': {
@@ -524,13 +523,13 @@ def test_indexed_doc(Factory, setup_es):
     setup_es.indices.refresh()
 
     indexed_order = setup_es.get(
-        index=settings.ES_INDEX,
+        index=OrderSearchApp.es_model.get_write_index(),
         doc_type=OrderSearchApp.name,
         id=order.pk
     )
 
     assert indexed_order == {
-        '_index': settings.ES_INDEX,
+        '_index': OrderSearchApp.es_model.get_target_index_name(),
         '_type': OrderSearchApp.name,
         '_id': str(order.pk),
         '_version': indexed_order['_version'],

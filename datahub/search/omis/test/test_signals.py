@@ -1,5 +1,4 @@
 import pytest
-from django.conf import settings
 
 from datahub.omis.order.test.factories import (
     OrderAssigneeFactory, OrderFactory,
@@ -16,7 +15,7 @@ def test_creating_order_syncs_to_es(setup_es):
     setup_es.indices.refresh()
 
     assert setup_es.get(
-        index=settings.ES_INDEX,
+        index=OrderSearchApp.es_model.get_write_index(),
         doc_type=OrderSearchApp.name,
         id=order.pk
     )
@@ -31,7 +30,7 @@ def test_updating_order_updates_es(setup_es):
     setup_es.indices.refresh()
 
     result = setup_es.get(
-        index=settings.ES_INDEX,
+        index=OrderSearchApp.es_model.get_write_index(),
         doc_type=OrderSearchApp.name,
         id=order.pk
     )
@@ -47,7 +46,7 @@ def test_accepting_quote_updates_es(setup_es):
     setup_es.indices.refresh()
 
     result = setup_es.get(
-        index=settings.ES_INDEX,
+        index=OrderSearchApp.es_model.get_write_index(),
         doc_type=OrderSearchApp.name,
         id=order.pk
     )
@@ -57,7 +56,7 @@ def test_accepting_quote_updates_es(setup_es):
     setup_es.indices.refresh()
 
     result = setup_es.get(
-        index=settings.ES_INDEX,
+        index=OrderSearchApp.es_model.get_write_index(),
         doc_type=OrderSearchApp.name,
         id=order.pk
     )
@@ -74,7 +73,7 @@ def test_adding_subscribers_syncs_order_to_es(setup_es):
     setup_es.indices.refresh()
 
     result = setup_es.get(
-        index=settings.ES_INDEX,
+        index=OrderSearchApp.es_model.get_write_index(),
         doc_type=OrderSearchApp.name,
         id=order.pk
     )
@@ -96,7 +95,7 @@ def test_removing_subscribers_syncs_order_to_es(setup_es):
     setup_es.indices.refresh()
 
     result = setup_es.get(
-        index=settings.ES_INDEX,
+        index=OrderSearchApp.es_model.get_write_index(),
         doc_type=OrderSearchApp.name,
         id=order.pk
     )
@@ -117,7 +116,7 @@ def test_adding_assignees_syncs_order_to_es(setup_es):
     setup_es.indices.refresh()
 
     result = setup_es.get(
-        index=settings.ES_INDEX,
+        index=OrderSearchApp.es_model.get_write_index(),
         doc_type=OrderSearchApp.name,
         id=order.pk
     )
@@ -139,7 +138,7 @@ def test_removing_assignees_syncs_order_to_es(setup_es):
     setup_es.indices.refresh()
 
     result = setup_es.get(
-        index=settings.ES_INDEX,
+        index=OrderSearchApp.es_model.get_write_index(),
         doc_type=OrderSearchApp.name,
         id=order.pk
     )

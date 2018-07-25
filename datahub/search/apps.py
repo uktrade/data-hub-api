@@ -4,6 +4,8 @@ from importlib import import_module
 from django.apps import AppConfig
 from django.conf import settings
 
+from datahub.search.elasticsearch import index_exists
+
 EXCLUDE_ALL = object()
 
 
@@ -23,12 +25,14 @@ class SearchApp:
         self.mod = mod
         self.mod_signals = f'{self.mod}.signals'
 
-    def init_es(self):
+    def init_es(self, force_update_mapping=False):
         """
-        Makes sure mappings exist in Elasticsearch.
-        This call is idempotent.
+        Creates the index and aliases for this app if they don't already exist.
+
+        If force_update_mapping is True and the write alias already exists, an attempt
+        is made to update the existing mapping in place.
         """
-        self.es_model.init(index=settings.ES_INDEX)
+        self.es_model.set_up_index_and_aliases(force_update_mapping=force_update_mapping)
 
     def get_signals_receivers(self):
         """Returns the signals receivers for this search app."""
@@ -60,12 +64,32 @@ class SearchApp:
 
 def get_search_apps():
     """Gets all registered search apps."""
-    return _load_search_apps().values()
+    return tuple(_load_search_apps().values())
+
+
+def get_search_apps_by_name(app_names=None):
+    """
+    Returns the apps for a particular set of app names.
+
+    :param app_names: list of search app names to return app instances for, falsey value for
+                      all apps
+    """
+    search_apps = get_search_apps()
+
+    return [
+        search_app for search_app in search_apps
+        if not app_names or search_app.name in app_names
+    ]
 
 
 def get_search_app(app_name):
     """Gets a single search app (by name)."""
     return _load_search_apps()[app_name]
+
+
+def are_apps_initialised(apps):
+    """Determines whether the given apps have been initialised (by init_es)."""
+    return all(index_exists(app.es_model.get_write_alias()) for app in apps)
 
 
 @lru_cache(maxsize=None)
