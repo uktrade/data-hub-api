@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import factory
 import pytest
 import reversion
 from django.utils.timezone import now
@@ -63,19 +64,37 @@ class TestListCompanies(APITestMixin):
 
     def test_sort_by_name(self):
         """Test sorting by name."""
-        companies = CompanyFactory.create_batch(5)
+        companies = CompanyFactory.create_batch(
+            5,
+            name=factory.Iterator(
+                (
+                    'Mercury Ltd',
+                    'Venus Ltd',
+                    'Mars Components Ltd',
+                    'Exports Ltd',
+                    'Lambda Plc'
+                )
+            )
+        )
 
         url = reverse('api-v3:company:collection')
-        response = self.api_client.get(url, data={
-            'sortby': 'name',
-        })
+        response = self.api_client.get(
+            url,
+            data={'sortby': 'name'}
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['count'] == len(companies)
-        expected_names = sorted(company.name for company in companies)
+
         actual_names = [result['name'] for result in response_data['results']]
-        assert expected_names == actual_names
+        assert actual_names == [
+            'Exports Ltd',
+            'Lambda Plc',
+            'Mars Components Ltd',
+            'Mercury Ltd',
+            'Venus Ltd'
+        ]
 
     def test_sort_by_created_on(self):
         """Test sorting by created_on."""
