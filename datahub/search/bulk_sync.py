@@ -1,45 +1,33 @@
 from logging import getLogger
 
 from datahub.core.utils import slice_iterable_into_chunks
-from datahub.search.apps import get_search_apps
 from datahub.search.elasticsearch import bulk
 
 logger = getLogger(__name__)
 
 PROGRESS_INTERVAL = 20000
+BULK_INDEX_TIMEOUT_SECS = 300
 
 
-def get_apps_to_sync(models=None):
-    """
-    Returns apps that will be synchronised with Elasticsearch.
-
-    :param models: list of search app names to index, None for all
-    """
-    search_apps = get_search_apps()
-
-    # if models empty, assume all models
-    return [search_app for search_app in search_apps if not models or search_app.name in models]
-
-
-def sync_app(item, batch_size=None):
+def sync_app(search_app, batch_size=None, post_batch_callback=None):
     """Syncs objects for an app to ElasticSearch in batches of batch_size."""
-    model_name = item.es_model.__name__
-    batch_size = batch_size or item.bulk_batch_size
+    model_name = search_app.es_model.__name__
+    batch_size = batch_size or search_app.bulk_batch_size
     logger.info(f'Processing {model_name} records, using batch size {batch_size}')
 
+    read_indices, write_index = search_app.es_model.get_read_and_write_indices()
+
     rows_processed = 0
-    total_rows = item.queryset.count()
-    it = item.queryset.iterator(chunk_size=batch_size)
+    total_rows = search_app.queryset.count()
+    it = search_app.queryset.iterator(chunk_size=batch_size)
     batches = slice_iterable_into_chunks(it, batch_size)
     for batch in batches:
-        actions = list(item.es_model.db_objects_to_es_documents(batch))
-        num_actions = len(actions)
-        bulk(
-            actions=actions,
-            chunk_size=num_actions,
-            request_timeout=300,
-            raise_on_error=True,
-            raise_on_exception=True,
+        num_actions = sync_objects(
+            search_app.es_model,
+            batch,
+            read_indices,
+            write_index,
+            post_batch_callback=post_batch_callback,
         )
 
         emit_progress = (
@@ -55,3 +43,21 @@ def sync_app(item, batch_size=None):
                         f'{rows_processed*100//total_rows}%')
 
     logger.info(f'{model_name} rows processed: {rows_processed}/{total_rows} 100%.')
+
+
+def sync_objects(es_model, model_objects, read_indices, write_index, post_batch_callback=None):
+    """Syncs an iterable of model instances to Elasticsearch."""
+    actions = list(
+        es_model.db_objects_to_es_documents(model_objects, index=write_index)
+    )
+    num_actions = len(actions)
+    bulk(
+        actions=actions,
+        chunk_size=num_actions,
+        request_timeout=BULK_INDEX_TIMEOUT_SECS,
+    )
+
+    if post_batch_callback:
+        post_batch_callback(read_indices, write_index, actions)
+
+    return num_actions

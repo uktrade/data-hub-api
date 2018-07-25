@@ -11,8 +11,15 @@ from pytest_django.lazy_django import skip_if_no_django
 
 from datahub.core.utils import get_s3_client
 from datahub.metadata.test.factories import SectorFactory
-from datahub.search import elasticsearch
 from datahub.search.apps import get_search_apps
+from datahub.search.elasticsearch import (
+    alias_exists,
+    associate_index_with_alias,
+    create_index,
+    delete_alias,
+    delete_index,
+    index_exists,
+)
 
 
 @pytest.fixture(scope='session')
@@ -159,12 +166,12 @@ def _es_client(worker_id):
     """
     Makes the ES test helper client available.
 
-    Also patches settings.ES_INDEX using the xdist worker ID so that each process gets a unique
-    index when running tests using multiple processes using pytest -n.
+    Also patches settings.ES_INDEX_PREFIX using the xdist worker ID so that each process
+    gets unique indices when running tests using multiple processes using pytest -n.
     """
     # pytest's monkeypatch does not work in session fixtures, but there is no need to restore
     # the value so we just overwrite it normally
-    settings.ES_INDEX = f'test_{worker_id}'
+    settings.ES_INDEX_PREFIX = f'test_{worker_id}'
 
     from elasticsearch_dsl.connections import connections
     client = get_test_client(nowait=False)
@@ -175,15 +182,31 @@ def _es_client(worker_id):
 @pytest.fixture(scope='session')
 def _setup_es_indexes(_es_client):
     """Sets up ES and makes the client available."""
-    _create_test_index(_es_client, settings.ES_INDEX)
-
     # Create models in the test index
     for search_app in get_search_apps():
-        search_app.init_es()
+        # Clean up in case of any aborted test runs
+        index_name = search_app.es_model.get_target_index_name()
+        read_alias = search_app.es_model.get_read_alias()
+        write_alias = search_app.es_model.get_write_alias()
+
+        if index_exists(index_name):
+            delete_index(index_name)
+
+        if alias_exists(read_alias):
+            delete_alias(read_alias)
+
+        if alias_exists(write_alias):
+            delete_alias(write_alias)
+
+        # Create indices and aliases
+        create_index(index_name, search_app.es_model._doc_type.mapping)
+        associate_index_with_alias(write_alias, index_name)
+        associate_index_with_alias(read_alias, index_name)
 
     yield _es_client
 
-    _es_client.indices.delete(settings.ES_INDEX)
+    for search_app in get_search_apps():
+        delete_index(search_app.es_model.get_target_index_name())
 
 
 @pytest.fixture
@@ -198,19 +221,12 @@ def setup_es(_setup_es_indexes, synchronous_on_commit, synchronous_thread_pool):
         search_app.disconnect_signals()
 
     _setup_es_indexes.indices.refresh()
+    indices = [search_app.es_model.get_target_index_name() for search_app in get_search_apps()]
     _setup_es_indexes.delete_by_query(
-        settings.ES_INDEX,
+        indices,
         body={'query': {'match_all': {}}}
     )
     _setup_es_indexes.indices.refresh()
-
-
-def _create_test_index(client, index):
-    """Creates/configures the test index."""
-    if client.indices.exists(index=index):
-        client.indices.delete(index)
-
-    elasticsearch.configure_index(index, index_settings=settings.ES_INDEX_SETTINGS)
 
 
 @pytest.fixture

@@ -233,7 +233,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `DOCUMENTS_BUCKET`  | Yes | S3 bucket for document storage. |
 | `ENABLE_DAILY_ES_SYNC` | No | Whether to enable the daily ES sync (default=False). |
 | `ENABLE_SPI_REPORT_GENERATION` | No | Whether to enable daily SPI report (default=False). |
-| `ES_INDEX`  | Yes | |
+| `ES_INDEX_PREFIX`  | Yes | Prefix to use for indices and aliases |
 | `ES_URL`  | Yes | |
 | `ES_VERIFY_CERTS`  | No | |
 | `GUNICORN_ACCESSLOG`  | No | File to direct Gunicorn logs to (default=stdout). |
@@ -315,6 +315,15 @@ For more details including all the available choices:
 ```shell
 ./manage.py sync_es --help
 ```
+
+Migrate modified mappings:
+
+```shell
+./manage.py migrate_es
+```
+
+Elasticsearch mapping migrations are fairly complex – see [docs/Elasticsearch migrations.md](docs/Elasticsearch migrations.md) for more detail.
+
 
 ### Companies House
 

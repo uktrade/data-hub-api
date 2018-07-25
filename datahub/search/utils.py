@@ -1,3 +1,6 @@
+import json
+
+
 def get_model_fields(es_model):
     """Gets the field objects for an ES model."""
     return es_model._doc_type.mapping.properties._params['properties']
@@ -29,3 +32,8 @@ def get_model_non_mapped_field_names(es_model):
         - es_model.MAPPINGS.keys()
         - es_model.COMPUTED_MAPPINGS.keys()
     )
+
+
+def serialise_mapping(mapping_dict):
+    """Serialises a mapping as JSON."""
+    return json.dumps(mapping_dict, sort_keys=True, separators=(',', ':')).encode('utf-8')

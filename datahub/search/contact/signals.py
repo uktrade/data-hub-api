@@ -3,13 +3,14 @@ from django.db.models.signals import post_save
 
 from datahub.company.models import Company as DBCompany, Contact as DBContact
 from .models import Contact as ESContact
-from ..signals import SignalReceiver, sync_es
+from ..signals import SignalReceiver
+from ..sync_async import sync_object_async
 
 
 def contact_sync_es(sender, instance, **kwargs):
     """Sync contact to the Elasticsearch."""
     transaction.on_commit(
-        lambda: sync_es(ESContact, DBContact, str(instance.pk))
+        lambda: sync_object_async(ESContact, DBContact, str(instance.pk))
     )
 
 
