@@ -12,6 +12,7 @@ from reversion.models import Version
 from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import CompaniesHouseCompany, Company
 from datahub.company.test.factories import (
+    AdviserFactory,
     CompaniesHouseCompanyFactory,
     CompanyFactory,
 )
@@ -1398,3 +1399,78 @@ class TestCHCompany(APITestMixin):
         response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+class TestCompanyCoreTeam(APITestMixin):
+    """Tests for getting the core team of a company."""
+
+    def test_empty_list(self):
+        """
+        Test that if company.one_list_account_owner is null, the endpoint
+        returns an empty list.
+        """
+        company = CompanyFactory(one_list_account_owner=None)
+
+        url = reverse(
+            'api-v3:company:core-team',
+            kwargs={'pk': company.pk}
+        )
+        response = self.api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == []
+
+    def test_with_global_account_manager(self):
+        """
+        Test that if company.one_list_account_owner is not null, the endpoint
+        returns a list with only that adviser in it.
+        """
+        dit_team = TeamFactory(
+            uk_region_id=UKRegion.east_midlands.value.id,
+            country_id=Country.united_kingdom.value.id
+        )
+        adviser = AdviserFactory(dit_team=dit_team)
+        company = CompanyFactory(one_list_account_owner=adviser)
+
+        url = reverse(
+            'api-v3:company:core-team',
+            kwargs={'pk': company.pk}
+        )
+        response = self.api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == [
+            {
+                'adviser': {
+                    'id': str(adviser.pk),
+                    'name': adviser.name,
+                    'first_name': adviser.first_name,
+                    'last_name': adviser.last_name,
+                    'dit_team': {
+                        'id': str(dit_team.pk),
+                        'name': dit_team.name,
+                        'uk_region': {
+                            'id': str(dit_team.uk_region.pk),
+                            'name': dit_team.uk_region.name
+                        },
+                        'country': {
+                            'id': str(dit_team.country.pk),
+                            'name': dit_team.country.name
+                        },
+                    }
+                },
+                'is_global_account_manager': True
+            }
+        ]
+
+    def test_404_with_invalid_company(self):
+        """
+        Test that if the company doesn't exist, the endpoint returns 404.
+        """
+        url = reverse(
+            'api-v3:company:core-team',
+            kwargs={'pk': '00000000-0000-0000-0000-000000000000'}
+        )
+        response = self.api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND

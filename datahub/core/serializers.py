@@ -1,10 +1,8 @@
-from uuid import UUID
-
 from dateutil.parser import parse as dateutil_parse
 from django.apps import apps
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
-from rest_framework.fields import UUIDField
+from rest_framework.fields import ReadOnlyField, UUIDField
 
 
 class ConstantModelSerializer(serializers.Serializer):
@@ -65,7 +63,10 @@ class NestedRelatedField(serializers.RelatedField):
         """Initialises the related field.
 
         :param model:           Model of the related field.
-        :param extra_fields:    Extra fields to include in the representation.
+        :param extra_fields:    List of extra fields to include in the representation.
+                                Can contain field names as strings or as tuples of
+                                (field name, DRF field).
+                                E.g. ['field1', ('field2', CharField())]
         :param kwargs:          Keyword arguments to pass to
                                 RelatedField.__init__()
         """
@@ -75,7 +76,10 @@ class NestedRelatedField(serializers.RelatedField):
                        model)
 
         self.pk_field = UUIDField()
-        self._fields = extra_fields
+        self._fields = [
+            field if isinstance(field, tuple) else (field, ReadOnlyField())
+            for field in extra_fields
+        ]
         self._model = model_class
 
     def get_queryset(self):
@@ -100,8 +104,13 @@ class NestedRelatedField(serializers.RelatedField):
 
     def to_representation(self, value):
         """Converts a model instance to a dict representation."""
-        extra = {field: _value_for_json(getattr(value, field)) for field in
-                 self._fields}
+        if not value:
+            return value
+
+        extra = {
+            field_name: field.to_representation(getattr(value, field_name))
+            for field_name, field in self._fields
+        }
         return {
             **extra,
             'id': self.pk_field.to_representation(value.pk)
@@ -172,13 +181,6 @@ class RelaxedURLField(serializers.URLField):
         if value and '://' not in value:
             return f'http://{value}'
         return value
-
-
-def _value_for_json(val):
-    """Returns a JSON-serialisable version of a value."""
-    if isinstance(val, UUID):
-        return str(val)
-    return val
 
 
 class _Choices:
