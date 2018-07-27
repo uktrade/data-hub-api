@@ -1,7 +1,20 @@
+from functools import partial
+
 from rest_framework import serializers
 
 from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
 from .models import Country, Service, TeamRole, UKRegion
+
+
+TeamWithGeographyField = partial(
+    NestedRelatedField,
+    'metadata.Team',
+    extra_fields=(
+        'name',
+        ('uk_region', NestedRelatedField(UKRegion, read_only=True)),
+        ('country', NestedRelatedField(Country, read_only=True)),
+    )
+)
 
 
 class ServiceSerializer(ConstantModelSerializer):

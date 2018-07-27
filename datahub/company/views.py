@@ -4,6 +4,7 @@ from django_filters import FilterSet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, viewsets
 from rest_framework.filters import OrderingFilter
+from rest_framework.response import Response
 
 from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
@@ -20,6 +21,7 @@ from .queryset import get_contact_queryset
 from .serializers import (
     AdviserSerializer,
     CompaniesHouseCompanySerializer,
+    CompanyCoreTeamMemberSerializer,
     CompanySerializer,
     ContactSerializer,
 )
@@ -56,6 +58,55 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         'sector__parent',
         'sector__parent__parent',
     )
+
+
+class CompanyCoreTeamViewSet(CoreViewSet):
+    """
+    Views for the core team of a company.
+
+    When a company is account managed, a core team is established.
+    This usually includes:
+    - one and only one global account manager
+    - a local account manager from the country where the company is based
+    - one or more local account managers from the country where the company
+        is exporting to or investing in
+
+    However, this layout is not always as strict.
+    Other roles might exist and an single person can also have multiple roles.
+
+    This team is called "core team" because it's official and does not change
+    often. Usually, a wider team around a company is established as well.
+    This team includes specialists and other advisers needed for short-term
+    and more reactive support.
+
+
+    At the moment, this endpoint only includes company.one_list_account_owner
+    representing the global account manager.
+    """
+
+    required_scopes = (Scope.internal_front_end,)
+    queryset = Company.objects.select_related(
+        'one_list_account_owner',
+        'one_list_account_owner__dit_team',
+        'one_list_account_owner__dit_team__uk_region',
+        'one_list_account_owner__dit_team__country',
+    )
+    serializer_class = CompanyCoreTeamMemberSerializer
+
+    def list(self, request, *args, **kwargs):
+        """Lists core team members."""
+        company = self.get_object()
+        objs = []
+        if company.one_list_account_owner:
+            objs.append(
+                {
+                    'adviser': company.one_list_account_owner,
+                    'is_global_account_manager': True
+                }
+            )
+
+        serializer = self.get_serializer(objs, many=True)
+        return Response(serializer.data)
 
 
 class CompanyAuditViewSet(AuditViewSet):
