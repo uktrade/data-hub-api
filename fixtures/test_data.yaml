@@ -248,6 +248,18 @@
     archived_by: 7bad8082-4978-4fe8-a018-740257f01637
     archived_reason: 'Company is dissolved'
 
+- model: company.companycoreteammember
+  pk: 58fb3504-3e39-4f76-8662-2f4ef2387bbb
+  fields:
+    company: 375094ac-f79a-43e5-9c88-059a7caa17f0
+    adviser: f1eb4363-0a37-4344-bd96-e90abeaf483e
+
+- model: company.companycoreteammember
+  pk: 60c90e67-fdd5-4b2d-9ad0-4b1994bd9b9d
+  fields:
+    company: 375094ac-f79a-43e5-9c88-059a7caa17f0
+    adviser: 379f390a-e083-4a2c-9cea-e3b9a08606a7
+
 - model: company.contact
   pk: 9b1138ab-ec7b-497f-b8c3-27fed21694ef
   fields:
