@@ -1317,3 +1317,12 @@
     created_on: '2017-01-25T00:00:00Z'
     modified_on: '2017-01-25T00:00:00Z'
     disabled_on: '2017-09-05T00:00:00Z'
+
+- model: feature_flag.featureflag
+  pk: e14f907e-6488-4e43-8f9b-9089a02112a4
+  fields:
+    code: companies-advisers
+    description: This is a flag to show company advisers
+    is_active: true
+    created_by: 7bad8082-4978-4fe8-a018-740257f01637
+    created_on: '2018-01-23T00:00:00Z'
