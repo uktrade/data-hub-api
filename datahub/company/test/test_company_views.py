@@ -9,13 +9,6 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from reversion.models import Version
 
-from datahub.company.constants import BusinessTypeConstant
-from datahub.company.models import CompaniesHouseCompany, Company
-from datahub.company.test.factories import (
-    AdviserFactory,
-    CompaniesHouseCompanyFactory,
-    CompanyFactory,
-)
 from datahub.core.constants import Country, HeadquarterType, Sector, UKRegion
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
@@ -23,6 +16,14 @@ from datahub.core.test_utils import (
 )
 from datahub.metadata.models import CompanyClassification
 from datahub.metadata.test.factories import TeamFactory
+from .factories import (
+    AdviserFactory,
+    CompaniesHouseCompanyFactory,
+    CompanyCoreTeamMemberFactory,
+    CompanyFactory,
+)
+from ..constants import BusinessTypeConstant
+from ..models import CompaniesHouseCompany, Company
 
 
 class TestListCompanies(APITestMixin):
@@ -1406,8 +1407,8 @@ class TestCompanyCoreTeam(APITestMixin):
 
     def test_empty_list(self):
         """
-        Test that if company.one_list_account_owner is null, the endpoint
-        returns an empty list.
+        Test that if company.one_list_account_owner is null and no CompanyCoreTeamMember
+        records for that company exist, the endpoint returns an empty list.
         """
         company = CompanyFactory(one_list_account_owner=None)
 
@@ -1420,17 +1421,71 @@ class TestCompanyCoreTeam(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == []
 
-    def test_with_global_account_manager(self):
+    def test_with_only_global_account_manager(self):
         """
-        Test that if company.one_list_account_owner is not null, the endpoint
-        returns a list with only that adviser in it.
+        Test that if company.one_list_account_owner is not null and no CompanyCoreTeamMember
+        records for that company exist, the endpoint returns a list with only that adviser in it.
         """
-        dit_team = TeamFactory(
-            uk_region_id=UKRegion.east_midlands.value.id,
-            country_id=Country.united_kingdom.value.id
+        global_account_manager = AdviserFactory()
+        company = CompanyFactory(one_list_account_owner=global_account_manager)
+
+        url = reverse(
+            'api-v3:company:core-team',
+            kwargs={'pk': company.pk}
         )
-        adviser = AdviserFactory(dit_team=dit_team)
-        company = CompanyFactory(one_list_account_owner=adviser)
+        response = self.api_client.get(url, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == [
+            {
+                'adviser': {
+                    'id': str(global_account_manager.pk),
+                    'name': global_account_manager.name,
+                    'first_name': global_account_manager.first_name,
+                    'last_name': global_account_manager.last_name,
+                    'dit_team': {
+                        'id': str(global_account_manager.dit_team.pk),
+                        'name': global_account_manager.dit_team.name,
+                        'uk_region': {
+                            'id': str(global_account_manager.dit_team.uk_region.pk),
+                            'name': global_account_manager.dit_team.uk_region.name
+                        },
+                        'country': {
+                            'id': str(global_account_manager.dit_team.country.pk),
+                            'name': global_account_manager.dit_team.country.name
+                        },
+                    }
+                },
+                'is_global_account_manager': True
+            }
+        ]
+
+    @pytest.mark.parametrize(
+        'with_global_account_manager',
+        (True, False),
+        ids=lambda val: f'{"With" if val else "Without"} global account manager'
+    )
+    def test_with_core_team_members(self, with_global_account_manager):
+        """
+        Test that if CompanyCoreTeamMember records for this company exist, the endpoint
+        returns a list with all team members in it.
+        company.one_list_account_owner (the global account manager) is included and counted
+        only once if set.
+        """
+        team_member_advisers = AdviserFactory.create_batch(
+            3,
+            first_name=factory.Iterator(
+                ('Adam', 'Barbara', 'Chris')
+            )
+        )
+        global_account_manager = team_member_advisers[0] if with_global_account_manager else None
+
+        company = CompanyFactory(one_list_account_owner=global_account_manager)
+        CompanyCoreTeamMemberFactory.create_batch(
+            len(team_member_advisers),
+            company=company,
+            adviser=factory.Iterator(team_member_advisers)
+        )
 
         url = reverse(
             'api-v3:company:core-team',
@@ -1447,20 +1502,21 @@ class TestCompanyCoreTeam(APITestMixin):
                     'first_name': adviser.first_name,
                     'last_name': adviser.last_name,
                     'dit_team': {
-                        'id': str(dit_team.pk),
-                        'name': dit_team.name,
+                        'id': str(adviser.dit_team.pk),
+                        'name': adviser.dit_team.name,
                         'uk_region': {
-                            'id': str(dit_team.uk_region.pk),
-                            'name': dit_team.uk_region.name
+                            'id': str(adviser.dit_team.uk_region.pk),
+                            'name': adviser.dit_team.uk_region.name
                         },
                         'country': {
-                            'id': str(dit_team.country.pk),
-                            'name': dit_team.country.name
+                            'id': str(adviser.dit_team.country.pk),
+                            'name': adviser.dit_team.country.name
                         },
                     }
                 },
-                'is_global_account_manager': True
+                'is_global_account_manager': adviser is global_account_manager
             }
+            for adviser in team_member_advisers
         ]
 
     def test_404_with_invalid_company(self):
