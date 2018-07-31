@@ -14,7 +14,6 @@ from datahub.metadata.test.factories import SectorFactory
 from datahub.search.apps import get_search_apps
 from datahub.search.elasticsearch import (
     alias_exists,
-    associate_index_with_alias,
     create_index,
     delete_alias,
     delete_index,
@@ -199,9 +198,8 @@ def _setup_es_indexes(_es_client):
             delete_alias(write_alias)
 
         # Create indices and aliases
-        create_index(index_name, search_app.es_model._doc_type.mapping)
-        associate_index_with_alias(write_alias, index_name)
-        associate_index_with_alias(read_alias, index_name)
+        alias_names = (read_alias, write_alias)
+        create_index(index_name, search_app.es_model._doc_type.mapping, alias_names=alias_names)
 
     yield _es_client
 
