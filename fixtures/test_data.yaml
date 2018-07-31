@@ -387,6 +387,31 @@
     created_on: '2017-04-28T15:00:00Z'
     modified_on: '2017-06-05T00:00:00Z'
 
+- model: company.contact
+  pk: 435f9fa1-2e54-4205-8500-f23de614620e
+  fields:
+    first_name: Archie
+    last_name: Arakelian
+    company: 346f78a5-1d23-4213-b4c2-bf48246a13c3  # Archived Ltd
+    primary: false
+    telephone_countrycode: +44
+    telephone_number: 78801234322
+    email: archie@arakelian.com
+    address_1: 94 Great North Road
+    address_town: Ampton
+    address_postcode: IP31 2RH
+    address_country: 80756b9a-5d95-e211-a939-e4115bead28a
+    contactable_by_dit: false
+    contactable_by_uk_dit_partners: false
+    contactable_by_overseas_dit_partners: false
+    accepts_dit_email_marketing: false
+    contactable_by_email: false
+    contactable_by_phone: true
+    notes: This is a dummy contact for testing
+    created_on: '2018-02-28T15:00:00Z'
+    modified_on: '2018-06-05T00:00:00Z'
+    archived_documents_url_path: '/documents/123'
+
 - model: interaction.interaction
   pk: 236b656c-ae26-43ca-bb51-c72d553383f3
   fields:

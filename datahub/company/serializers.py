@@ -34,8 +34,34 @@ from datahub.core.validators import (
     ValidationRule,
 )
 from datahub.metadata import models as meta_models
+from datahub.metadata.serializers import TeamWithGeographyField
+
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+
+
+NestedAdviserField = partial(
+    NestedRelatedField,
+    'company.Advisor',
+    extra_fields=(
+        'name',
+        'first_name',
+        'last_name',
+    )
+)
+
+
+# like NestedAdviserField but includes dit_team with uk_region and country
+NestedAdviserWithTeamGeographyField = partial(
+    NestedRelatedField,
+    'company.Advisor',
+    extra_fields=(
+        'name',
+        'first_name',
+        'last_name',
+        ('dit_team', TeamWithGeographyField()),
+    )
+)
 
 
 class AdviserSerializer(serializers.ModelSerializer):
@@ -100,12 +126,6 @@ class CompaniesHouseCompanySerializer(NestedCompaniesHouseCompanySerializer):
             'business_type',
         )
         read_only_fields = fields
-
-
-NestedAdviserField = partial(
-    NestedRelatedField, 'company.Advisor',
-    extra_fields=('first_name', 'last_name', 'name')
-)
 
 
 class ContactSerializer(PermittedFieldsModelSerializer):
@@ -457,3 +477,10 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         permissions = {
             f'company.{CompanyPermission.read_company_document}': 'archived_documents_url_path',
         }
+
+
+class CompanyCoreTeamMemberSerializer(serializers.Serializer):
+    """Core Team Member Serializer."""
+
+    adviser = NestedAdviserWithTeamGeographyField()
+    is_global_account_manager = serializers.BooleanField()
