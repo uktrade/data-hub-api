@@ -62,7 +62,7 @@ def test_creates_index(monkeypatch, mock_es_client):
 
     index = 'test-index'
     connection = mock_es_client.return_value
-    elasticsearch.create_index(index, mock_mapping)
+    elasticsearch.create_index(index, mock_mapping, alias_names=('alias1', 'alias2'))
     connection.indices.create.assert_called_once_with(
         index='test-index',
         body={
@@ -123,6 +123,10 @@ def test_creates_index(monkeypatch, mock_es_client):
                         }
                     }
                 }
+            },
+            'aliases': {
+                'alias1': {},
+                'alias2': {}
             },
             'mappings': {
                 'mapping': 'test-mapping'
