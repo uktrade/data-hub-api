@@ -4,7 +4,6 @@ from unittest import mock
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.apps import apps
-from django.conf import settings
 from django.core import management
 from django.core.management import CommandError
 from django.db.models import QuerySet
@@ -247,16 +246,17 @@ def test_run(cleanup_mapping, track_return_values, setup_es):
     model = apps.get_model(model_name)
     search_app = get_search_app_by_model(model)
     doc_type = search_app.name
+    read_alias = search_app.es_model.get_read_alias()
 
     assert model.objects.count() == total_model_records
-    assert setup_es.count(settings.ES_INDEX, doc_type=doc_type)['count'] == total_model_records
+    assert setup_es.count(read_alias, doc_type=doc_type)['count'] == total_model_records
 
     management.call_command(delete_orphans.Command(), model_name)
     setup_es.indices.refresh()
 
     # Check that the records have been deleted
     assert model.objects.count() == total_model_records - 1
-    assert setup_es.count(settings.ES_INDEX, doc_type=doc_type)['count'] == total_model_records - 1
+    assert setup_es.count(read_alias, doc_type=doc_type)['count'] == total_model_records - 1
 
     # Check which models were actually deleted
     return_values = delete_return_value_tracker.return_values
@@ -291,9 +291,10 @@ def test_simulate(cleanup_commands_and_configs, track_return_values, setup_es, c
 
     model = apps.get_model(model_name)
     search_app = get_search_app_by_model(model)
+    read_alias = search_app.es_model.get_read_alias()
 
     assert model.objects.count() == 3
-    assert setup_es.count(settings.ES_INDEX, doc_type=search_app.name)['count'] == 3
+    assert setup_es.count(read_alias, doc_type=search_app.name)['count'] == 3
     management.call_command(command, model_name, simulate=True)
 
     setup_es.indices.refresh()
@@ -308,7 +309,7 @@ def test_simulate(cleanup_commands_and_configs, track_return_values, setup_es, c
 
     # Check that nothing has actually been deleted
     assert model.objects.count() == 3
-    assert setup_es.count(settings.ES_INDEX, doc_type=search_app.name)['count'] == 3
+    assert setup_es.count(read_alias, doc_type=search_app.name)['count'] == 3
 
 
 @freeze_time(FROZEN_TIME)

@@ -1,5 +1,4 @@
 import pytest
-from django.conf import settings
 from elasticsearch.exceptions import NotFoundError
 
 from datahub.interaction.test.factories import (
@@ -16,7 +15,7 @@ def test_new_interaction_synced(setup_es):
     setup_es.indices.refresh()
 
     assert setup_es.get(
-        index=settings.ES_INDEX,
+        index=InteractionSearchApp.es_model.get_write_index(),
         doc_type=InteractionSearchApp.name,
         id=interaction.pk
     )
@@ -31,7 +30,7 @@ def test_updated_interaction_synced(setup_es):
     setup_es.indices.refresh()
 
     result = setup_es.get(
-        index=settings.ES_INDEX,
+        index=InteractionSearchApp.es_model.get_write_index(),
         doc_type=InteractionSearchApp.name,
         id=interaction.pk
     )
@@ -47,7 +46,7 @@ def test_deleted_interaction_deleted_from_es(setup_es):
     setup_es.indices.refresh()
 
     assert setup_es.get(
-        index=settings.ES_INDEX,
+        index=InteractionSearchApp.es_model.get_write_index(),
         doc_type=InteractionSearchApp.name,
         id=interaction.pk
     )
@@ -58,7 +57,7 @@ def test_deleted_interaction_deleted_from_es(setup_es):
 
     with pytest.raises(NotFoundError):
         assert setup_es.get(
-            index=settings.ES_INDEX,
+            index=InteractionSearchApp.es_model.get_write_index(),
             doc_type=InteractionSearchApp.name,
             id=interaction_id
         ) is None
@@ -73,7 +72,7 @@ def test_updating_company_name_updates_interaction(setup_es):
     setup_es.indices.refresh()
 
     result = setup_es.get(
-        index=settings.ES_INDEX,
+        index=InteractionSearchApp.es_model.get_write_index(),
         doc_type=InteractionSearchApp.name,
         id=interaction.pk
     )
@@ -91,7 +90,7 @@ def test_updating_contact_name_updates_interaction(setup_es):
     setup_es.indices.refresh()
 
     result = setup_es.get(
-        index=settings.ES_INDEX,
+        index=InteractionSearchApp.es_model.get_write_index(),
         doc_type=InteractionSearchApp.name,
         id=interaction.pk
     )
@@ -115,7 +114,7 @@ def test_updating_project_name_updates_interaction(setup_es):
     setup_es.indices.refresh()
 
     result = setup_es.get(
-        index=settings.ES_INDEX,
+        index=InteractionSearchApp.es_model.get_write_index(),
         doc_type=InteractionSearchApp.name,
         id=interaction.pk
     )
