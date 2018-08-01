@@ -141,6 +141,7 @@
     archived_documents_url_path: '/documents/123'
     created_on: '2016-06-15T10:00:00Z'
     modified_on: '2016-07-15T10:00:00Z'
+    global_headquarters: 346f78a5-1d23-4213-b4c2-bf48246a13c3
 
 - model: company.company
   pk: 731bdcc1-f685-4c8e-bd66-b356b2c16995
