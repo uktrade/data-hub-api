@@ -108,15 +108,6 @@ def nested_ch_company_field():
     })
 
 
-def nested_investment_project_field():
-    """Nested field for lists of investment projects."""
-    return Nested(properties={
-        'id': Keyword(),
-        'name': SortableCaseInsensitiveKeywordText(),
-        'project_code': SortableCaseInsensitiveKeywordText(),
-    })
-
-
 def nested_sector_field():
     """Nested field for lists of sectors."""
     return Nested(

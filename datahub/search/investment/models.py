@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Boolean, Date, Double, Integer, Keyword, Long, Text
+from elasticsearch_dsl import Boolean, Date, Double, Integer, Keyword, Long, Nested, Text
 
 from .. import dict_utils
 from .. import dsl_utils
@@ -28,6 +28,15 @@ def _country_lost_to_mapping():
     return dsl_utils.object_field('id', 'name')
 
 
+def _nested_investment_project_field():
+    """Nested field for lists of investment projects."""
+    return Nested(properties={
+        'id': Keyword(),
+        'name': dsl_utils.SortableCaseInsensitiveKeywordText(),
+        'project_code': dsl_utils.SortableCaseInsensitiveKeywordText(),
+    })
+
+
 class InvestmentProject(BaseESModel):
     """Elasticsearch representation of InvestmentProject."""
 
@@ -51,7 +60,7 @@ class InvestmentProject(BaseESModel):
     archived_by = dsl_utils.nested_contact_or_adviser_field('archived_by')
     archived_on = Date()
     archived_reason = Text()
-    associated_non_fdi_r_and_d_project = dsl_utils.nested_investment_project_field()
+    associated_non_fdi_r_and_d_project = _nested_investment_project_field()
     average_salary = dsl_utils.nested_id_name_field()
     business_activities = dsl_utils.nested_id_name_field()
     client_cannot_provide_foreign_investment = Boolean()
