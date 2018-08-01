@@ -26,7 +26,7 @@ class Event(BaseESModel):
     name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
     name_trigram = dsl_utils.TrigramText()
     notes = dsl_utils.EnglishText()
-    organiser = dsl_utils.nested_contact_or_adviser_partial_field('organiser')
+    organiser = dsl_utils.nested_contact_or_adviser_field('organiser')
     related_programmes = dsl_utils.nested_id_name_partial_field('related_programmes')
     service = dsl_utils.nested_id_name_field()
     start_date = Date()

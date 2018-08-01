@@ -50,21 +50,6 @@ def nested_contact_or_adviser_field(field, include_dit_team=False):
     )
 
 
-def nested_contact_or_adviser_partial_field(field):
-    """Nested field for lists of advisers or contacts that allows partial matching."""
-    props = {
-        'id': Keyword(),
-        'first_name': SortableCaseInsensitiveKeywordText(),
-        'last_name': SortableCaseInsensitiveKeywordText(),
-        'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
-        'name_trigram': TrigramText(),
-    }
-    return Nested(
-        properties=props,
-        include_in_parent=True,
-    )
-
-
 def nested_id_name_field():
     """Nested field for lists of objects with id and name sub-fields."""
     return Nested(

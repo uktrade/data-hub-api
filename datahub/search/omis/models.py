@@ -13,7 +13,7 @@ class Order(BaseESModel):
     reference_trigram = dsl_utils.TrigramText()
     status = dsl_utils.SortableCaseInsensitiveKeywordText()
     company = dsl_utils.nested_company_field('company')
-    contact = dsl_utils.nested_contact_or_adviser_partial_field('contact')
+    contact = dsl_utils.nested_contact_or_adviser_field('contact')
     created_by = dsl_utils.nested_contact_or_adviser_field('created_by', include_dit_team=True)
     created_on = Date()
     modified_on = Date()
