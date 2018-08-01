@@ -6,7 +6,7 @@ from django.template.response import TemplateResponse
 from django.utils.timezone import now
 from reversion.admin import VersionAdmin
 
-from datahub.core.admin import DisabledOnFilter
+from datahub.core.admin import BaseModelAdminMixin, DisabledOnFilter
 from datahub.event.models import Event, EventType, LocationType, Programme
 from datahub.metadata.admin import DisableableMetadataAdmin
 
@@ -40,11 +40,13 @@ def confirm_action(title, action_message):
 
 
 @admin.register(Event)
-class EventAdmin(VersionAdmin):
+class EventAdmin(BaseModelAdminMixin, VersionAdmin):
     """Admin for Events."""
 
     fields = (
         'name',
+        'created',
+        'modified',
         'event_type',
         'start_date',
         'end_date',
@@ -78,6 +80,8 @@ class EventAdmin(VersionAdmin):
     )
     readonly_fields = (
         'id',
+        'created',
+        'modified',
         'archived_documents_url_path',
     )
     search_fields = ('name', 'pk')
@@ -86,8 +90,6 @@ class EventAdmin(VersionAdmin):
         'lead_team',
         'teams',
         'organiser',
-        'modified_by',
-        'created_by',
     )
 
     actions = ('disable_selected', 'enable_selected',)
