@@ -14,7 +14,11 @@ from freezegun import freeze_time
 from datahub.cleanup.management.commands import delete_old_records, delete_orphans
 from datahub.cleanup.query_utils import get_related_fields, get_relations_to_delete
 from datahub.cleanup.test.commands.factories import ShallowInvestmentProjectFactory
-from datahub.company.test.factories import CompanyFactory, ContactFactory
+from datahub.company.test.factories import (
+    CompanyCoreTeamMemberFactory,
+    CompanyFactory,
+    ContactFactory,
+)
 from datahub.core.exceptions import DataHubException
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
@@ -63,8 +67,11 @@ MAPPINGS = {
             (CompanyFactory, 'global_headquarters'),
             (CompanyFactory, 'parent'),
             (BusinessLeadFactory, 'company'),
+            (CompanyCoreTeamMemberFactory, 'company'),
         ),
-        'implicit_related_models': (),
+        'implicit_related_models': (
+            'company.CompanyCoreTeamMember',
+        ),
     },
     'event.Event': {
         'factory': EventFactory,

@@ -1,13 +1,36 @@
+from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.db import models
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import ReadOnlyAdmin
 from datahub.metadata.admin import DisableableMetadataAdmin
-from .models import Advisor, CompaniesHouseCompany, Company, Contact, ExportExperienceCategory
+from .models import (
+    Advisor,
+    CompaniesHouseCompany,
+    Company,
+    CompanyCoreTeamMember,
+    Contact,
+    ExportExperienceCategory,
+)
 
 
 admin.site.register(ExportExperienceCategory, DisableableMetadataAdmin)
+
+
+class CompanyCoreTeamMemberInline(admin.TabularInline):
+    """Inline admin for CompanyCoreTeamMember"""
+
+    model = CompanyCoreTeamMember
+    fields = ('id', 'adviser', )
+    extra = 1
+    formfield_overrides = {
+        models.UUIDField: {'widget': forms.HiddenInput},
+    }
+    raw_id_fields = (
+        'adviser',
+    )
 
 
 @admin.register(Company)
@@ -35,6 +58,9 @@ class CompanyAdmin(VersionAdmin):
     list_display = (
         'name',
         'registered_address_country',
+    )
+    inlines = (
+        CompanyCoreTeamMemberInline,
     )
 
 
