@@ -32,8 +32,8 @@ class TextWithKeyword(Text):
         })
 
 
-def contact_or_adviser_mapping(field, include_dit_team=False):
-    """Mapping for Adviser/Contact fields."""
+def nested_contact_or_adviser_field(field, include_dit_team=False):
+    """Nested field for lists of advisers or contacts."""
     props = {
         'id': Keyword(),
         'first_name': SortableCaseInsensitiveKeywordText(),
@@ -43,15 +43,15 @@ def contact_or_adviser_mapping(field, include_dit_team=False):
     }
 
     if include_dit_team:
-        props['dit_team'] = id_name_mapping()
+        props['dit_team'] = nested_id_name_field()
     return Nested(
         properties=props,
         include_in_parent=True,
     )
 
 
-def contact_or_adviser_partial_mapping(field):
-    """Mapping for Adviser/Contact fields that allows partial matching."""
+def nested_contact_or_adviser_partial_field(field):
+    """Nested field for lists of advisers or contacts that allows partial matching."""
     props = {
         'id': Keyword(),
         'first_name': SortableCaseInsensitiveKeywordText(),
@@ -65,8 +65,8 @@ def contact_or_adviser_partial_mapping(field):
     )
 
 
-def id_name_mapping():
-    """Mapping for id name fields."""
+def nested_id_name_field():
+    """Nested field for lists of objects with id and name sub-fields."""
     return Nested(
         properties={
             'id': Keyword(),
@@ -76,8 +76,11 @@ def id_name_mapping():
     )
 
 
-def id_name_partial_mapping(field):
-    """Mapping for id name fields."""
+def nested_id_name_partial_field(field):
+    """
+    Nested field for lists of objects with id and name sub-fields, and with partial matching on
+    name.
+    """
     return Nested(
         properties={
             'id': Keyword(),
@@ -88,16 +91,16 @@ def id_name_partial_mapping(field):
     )
 
 
-def id_uri_mapping():
-    """Mapping for id uri fields."""
+def nested_id_uri_field():
+    """Nested field for lists of objects with id and uri sub-fields."""
     return Nested(properties={
         'id': Keyword(),
         'uri': SortableCaseInsensitiveKeywordText()
     })
 
 
-def company_mapping(field):
-    """Mapping for company fields."""
+def nested_company_field(field):
+    """Nested field for lists of companies."""
     return Nested(
         properties={
             'id': Keyword(),
@@ -112,16 +115,16 @@ def company_mapping(field):
     )
 
 
-def ch_company_mapping():
-    """Mapping for id company_number fields."""
+def nested_ch_company_field():
+    """Nested field for lists of objects with id and company_number sub-fields."""
     return Nested(properties={
         'id': Keyword(),
         'company_number': SortableCaseInsensitiveKeywordText()
     })
 
 
-def investment_project_mapping():
-    """Mapping for investment project relations."""
+def nested_investment_project_field():
+    """Nested field for lists of investment projects."""
     return Nested(properties={
         'id': Keyword(),
         'name': SortableCaseInsensitiveKeywordText(),
@@ -129,27 +132,31 @@ def investment_project_mapping():
     })
 
 
-def sector_mapping():
-    """Mapping for sector fields."""
+def nested_sector_field():
+    """Nested field for lists of sectors."""
     return Nested(
         properties={
             'id': Keyword(),
             'name': SortableCaseInsensitiveKeywordText(),
-            'ancestors': _ancestor_sector_mapping(),
+            'ancestors': _nested_ancestor_sector_field(),
         },
         include_in_parent=True,
     )
 
 
-def object_mapping(*fields):
+def object_field(*fields):
     """This is a mapping that reflects how Elasticsearch auto-creates mappings for objects."""
     return Object(
         properties={field: TextWithKeyword() for field in fields}
     )
 
 
-def _ancestor_sector_mapping():
-    """Mapping for ancestral sector fields."""
+def _nested_ancestor_sector_field():
+    """
+    Nested field for ancestral sectors.
+
+    (Note: This should not in fact have been nested, as it only has one property.)
+    """
     return Nested(
         properties={
             'id': Keyword(),
