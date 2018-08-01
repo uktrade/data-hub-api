@@ -2,10 +2,13 @@
 import csv
 from collections import namedtuple
 from datetime import datetime
+from logging import getLogger
 
+from django.conf import settings
 from django.http import StreamingHttpResponse
 from django.utils.text import slugify
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
+from raven.contrib.django.raven_compat.models import client
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import empty
 from rest_framework.response import Response
@@ -22,6 +25,8 @@ from .query_builder import (
 )
 from .serializers import SearchSerializer
 from .utils import get_model_field_names
+
+logger = getLogger(__name__)
 
 EntitySearch = namedtuple('EntitySearch', ['model', 'name'])
 
@@ -78,7 +83,7 @@ class SearchBasicAPIView(APIView):
         offset = int(request.query_params.get('offset', 0))
         limit = int(request.query_params.get('limit', 100))
 
-        results = get_basic_search_query(
+        query = get_basic_search_query(
             term=term,
             entities=(self.entity_by_name[entity].model,),
             permission_filters_by_entity=dict(_get_permission_filters(request)),
@@ -86,7 +91,9 @@ class SearchBasicAPIView(APIView):
             ignored_entities=self.IGNORED_ENTITIES,
             offset=offset,
             limit=limit
-        ).execute()
+        )
+
+        results = _execute_search_query(query)
 
         response = {
             'count': results.hits.total,
@@ -191,11 +198,13 @@ class SearchAPIView(APIView):
             aggregation_fields=aggregation_fields,
         )
 
-        results = limit_search_query(
+        limited_query = limit_search_query(
             query,
             offset=validated_data['offset'],
             limit=validated_data['limit'],
-        ).execute()
+        )
+
+        results = _execute_search_query(limited_query)
 
         response = {
             'count': results.hits.total,
@@ -289,3 +298,17 @@ class SearchExportAPIView(SearchAPIView):
 
         response['Content-Disposition'] = f'attachment; filename="{base_filename}.csv"'
         return response
+
+
+def _execute_search_query(query):
+    response = query.params(request_timeout=settings.ES_SEARCH_REQUEST_TIMEOUT).execute()
+
+    if response.took >= settings.ES_SEARCH_REQUEST_WARNING_THRESHOLD * 1000:
+        logger.warning(f'Elasticsearch query took a long time ({response.took/1000:.2f} seconds)')
+        client.captureMessage('Elasticsearch query took a long time', extra={
+            'query': query.to_dict(),
+            'took': response.took,
+            'timed_out': response.timed_out
+        })
+
+    return response
