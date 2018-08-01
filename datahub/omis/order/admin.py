@@ -10,7 +10,6 @@ from django.contrib.admin.utils import quote, unquote
 from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
 from django.http import HttpResponseRedirect
-from django.template.defaultfilters import date as date_filter, time as time_filter
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.decorators import method_decorator
@@ -21,7 +20,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_protect
 
-from datahub.core.admin import ReadOnlyAdmin
+from datahub.core.admin import BaseModelAdminMixin, ReadOnlyAdmin
 from datahub.core.exceptions import APIConflictException
 from . import validators
 from .models import CancellationReason, Order
@@ -64,7 +63,7 @@ class CancelOrderForm(forms.Form):
 
 
 @admin.register(Order)
-class OrderAdmin(ReadOnlyAdmin):
+class OrderAdmin(BaseModelAdminMixin, ReadOnlyAdmin):
     """Admin for orders."""
 
     list_display = ('reference', 'company', 'status', 'created_on', 'modified_on')
@@ -92,21 +91,6 @@ class OrderAdmin(ReadOnlyAdmin):
         'uk_advisers', 'post_advisers'
     )
     readonly_fields = fields
-
-    def _get_description_for_timed_event(self, event_on, event_by):
-        return (
-            f'on {date_filter(event_on)} '
-            f'at {time_filter(event_on)} '
-            f'by {event_by or "Unknown"}'
-        )
-
-    def created(self, order):
-        """:returns: created on/by details."""
-        return self._get_description_for_timed_event(order.created_on, order.created_by)
-
-    def modified(self, order):
-        """:returns: modified on/by details."""
-        return self._get_description_for_timed_event(order.modified_on, order.modified_by)
 
     def completed(self, order):
         """:returns: completed on/by details."""
