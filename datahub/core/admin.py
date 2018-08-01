@@ -1,6 +1,10 @@
 from collections import OrderedDict
 
 from django.contrib import admin
+from django.template.defaultfilters import date as date_filter, time as time_filter
+from django.urls import reverse
+from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
 
 class DisabledOnFilter(admin.SimpleListFilter):
@@ -63,6 +67,55 @@ class ReadOnlyAdmin(admin.ModelAdmin):
         if 'is_submitted' in readonly_fields:
             readonly_fields.remove('is_submitted')
         return readonly_fields
+
+
+class BaseModelAdminMixin:
+    """
+    Mixin for ModelAdmins which adds extra functionalities.
+    Useful when the model extends core.BaseModel
+
+    It updates created_by and modified_by automatically from the logged in user.
+
+    It also adds support for descriptive versions of created_on/by and modified_on/by,
+    using only two admin "fields": 'created' and 'modified'.
+    To use them just add 'created' and 'modified' to `readonly_fields` and `fields`
+    instead of created_on/by and modified_on/by.
+    """
+
+    def _get_description_for_timed_event(self, event_on, event_by):
+        text_parts = []
+        if event_on:
+            text_parts.extend((
+                f'on {date_filter(event_on)}',
+                f'at {time_filter(event_on)}'
+            ))
+        if event_by:
+            adviser_admin_url = format_html(
+                '<a href="{0}">{1}</a>',
+                reverse('admin:company_advisor_change', args=(event_by.id,)),
+                event_by
+            )
+            text_parts.append(f'by {adviser_admin_url}')
+
+        return mark_safe(' '.join(text_parts) or '-')
+
+    def created(self, obj):
+        """:returns: created on/by details."""
+        return self._get_description_for_timed_event(obj.created_on, obj.created_by)
+
+    def modified(self, obj):
+        """:returns: modified on/by details."""
+        return self._get_description_for_timed_event(obj.modified_on, obj.modified_by)
+
+    def save_model(self, request, obj, form, change):
+        """
+        Populate created_by/modified_by from the logged in user.
+        """
+        if not change:
+            obj.created_by = request.user
+        obj.modified_by = request.user
+
+        super().save_model(request, obj, form, change)
 
 
 def custom_add_permission(permission_codename):
