@@ -69,9 +69,7 @@ MAPPINGS = {
             (BusinessLeadFactory, 'company'),
             (CompanyCoreTeamMemberFactory, 'company'),
         ),
-        'implicit_related_models': (
-            'company.CompanyCoreTeamMember',
-        ),
+        'implicit_related_models': (),
     },
     'event.Event': {
         'factory': EventFactory,
@@ -271,7 +269,12 @@ def test_run(cleanup_mapping, track_return_values, setup_es):
     _, deletions_by_model = return_values[0]
     assert deletions_by_model[model._meta.label] == 1
     expected_deleted_models = {model._meta.label} | set(mapping['implicit_related_models'])
-    assert set(deletions_by_model.keys()) == expected_deleted_models
+    actual_deleted_models = {  # only include models actually deleted
+        deleted_model
+        for deleted_model, deleted_count in deletions_by_model.items()
+        if deleted_count
+    }
+    assert actual_deleted_models == expected_deleted_models
 
 
 @freeze_time(FROZEN_TIME)
@@ -312,7 +315,12 @@ def test_simulate(cleanup_commands_and_configs, track_return_values, setup_es, c
     _, deletions_by_model = return_values[0]
     assert deletions_by_model[model._meta.label] == 3
     expected_deleted_models = {model._meta.label} | set(mapping['implicit_related_models'])
-    assert set(deletions_by_model.keys()) == expected_deleted_models
+    actual_deleted_models = {  # only include models actually deleted
+        deleted_model
+        for deleted_model, deleted_count in deletions_by_model.items()
+        if deleted_count
+    }
+    assert actual_deleted_models == expected_deleted_models
 
     # Check that nothing has actually been deleted
     assert model.objects.count() == 3
