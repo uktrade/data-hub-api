@@ -2,6 +2,7 @@ from .adviser import Advisor
 from .company import (
     CompaniesHouseCompany,
     Company,
+    CompanyCoreTeamMember,
     CompanyPermission,
     ExportExperienceCategory
 )
@@ -14,5 +15,6 @@ __all__ = (
     'CompanyPermission',
     'Contact',
     'ContactPermission',
+    'CompanyCoreTeamMember',
     'ExportExperienceCategory',
 )

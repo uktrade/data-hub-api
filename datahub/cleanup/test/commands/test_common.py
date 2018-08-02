@@ -14,7 +14,11 @@ from freezegun import freeze_time
 from datahub.cleanup.management.commands import delete_old_records, delete_orphans
 from datahub.cleanup.query_utils import get_related_fields, get_relations_to_delete
 from datahub.cleanup.test.commands.factories import ShallowInvestmentProjectFactory
-from datahub.company.test.factories import CompanyFactory, ContactFactory
+from datahub.company.test.factories import (
+    CompanyCoreTeamMemberFactory,
+    CompanyFactory,
+    ContactFactory,
+)
 from datahub.core.exceptions import DataHubException
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
@@ -63,6 +67,7 @@ MAPPINGS = {
             (CompanyFactory, 'global_headquarters'),
             (CompanyFactory, 'parent'),
             (BusinessLeadFactory, 'company'),
+            (CompanyCoreTeamMemberFactory, 'company'),
         ),
         'implicit_related_models': (),
     },
@@ -264,7 +269,12 @@ def test_run(cleanup_mapping, track_return_values, setup_es):
     _, deletions_by_model = return_values[0]
     assert deletions_by_model[model._meta.label] == 1
     expected_deleted_models = {model._meta.label} | set(mapping['implicit_related_models'])
-    assert set(deletions_by_model.keys()) == expected_deleted_models
+    actual_deleted_models = {  # only include models actually deleted
+        deleted_model
+        for deleted_model, deleted_count in deletions_by_model.items()
+        if deleted_count
+    }
+    assert actual_deleted_models == expected_deleted_models
 
 
 @freeze_time(FROZEN_TIME)
@@ -305,7 +315,12 @@ def test_simulate(cleanup_commands_and_configs, track_return_values, setup_es, c
     _, deletions_by_model = return_values[0]
     assert deletions_by_model[model._meta.label] == 3
     expected_deleted_models = {model._meta.label} | set(mapping['implicit_related_models'])
-    assert set(deletions_by_model.keys()) == expected_deleted_models
+    actual_deleted_models = {  # only include models actually deleted
+        deleted_model
+        for deleted_model, deleted_count in deletions_by_model.items()
+        if deleted_count
+    }
+    assert actual_deleted_models == expected_deleted_models
 
     # Check that nothing has actually been deleted
     assert model.objects.count() == 3
