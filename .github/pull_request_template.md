@@ -1,5 +1,3 @@
-Issue number: 
-
 ### Description of change
 
 
