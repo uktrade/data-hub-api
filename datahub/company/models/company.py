@@ -93,7 +93,8 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     )
     account_manager = models.ForeignKey(
         'Advisor', blank=True, null=True, on_delete=models.SET_NULL,
-        related_name='companies'
+        related_name='companies',
+        help_text='Legacy field, do not use'
     )
     export_to_countries = models.ManyToManyField(
         metadata_models.Country,
@@ -141,7 +142,8 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     )
     one_list_account_owner = models.ForeignKey(
         'Advisor', blank=True, null=True, on_delete=models.SET_NULL,
-        related_name='one_list_owned_companies'
+        related_name='one_list_owned_companies',
+        help_text='Global account manager'
     )
     export_experience_category = models.ForeignKey(
         ExportExperienceCategory, blank=True, null=True, on_delete=models.SET_NULL,
@@ -185,6 +187,49 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
 
         return all(
             getattr(self, field) for field, rules in field_mapping.items() if rules['required']
+        )
+
+
+class CompanyCoreTeamMember(models.Model):
+    """
+    Adviser who is a member of the core team of a company.
+
+    When a company is account managed, a core team is established.
+    This usually includes:
+    - one and only one global account manager
+    - a local account manager from the country where the company is based
+    - one or more local account managers from the country where the company
+        is exporting to or investing in
+
+    However, this layout is not always as strict.
+    Other roles might exist and a single person can also have multiple roles.
+
+    This team is called "core team" because it's official and does not change
+    often. Usually, a wider team around a company is established as well.
+    This team includes specialists and other advisers needed for short-term
+    and more reactive support.
+
+    Company.one_list_account_owner who represents the global account manager
+    is kept on the company record for now even though it's in theory part of
+    the core team.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+
+    company = models.ForeignKey(
+        Company, on_delete=models.CASCADE, related_name='core_team_members'
+    )
+    adviser = models.ForeignKey(
+        'company.Advisor', on_delete=models.CASCADE, related_name='core_team_memberships'
+    )
+
+    def __str__(self):
+        """Human-readable representation."""
+        return f'{self.adviser} - core team member of {self.company}'
+
+    class Meta:
+        unique_together = (
+            ('company', 'adviser'),
         )
 
 

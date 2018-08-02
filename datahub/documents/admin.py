@@ -1,10 +1,11 @@
 from django.contrib import admin
 
+from datahub.core.admin import BaseModelAdminMixin
 from datahub.documents import models
 
 
 @admin.register(models.Document)
-class DocumentsAdmin(admin.ModelAdmin):
+class DocumentsAdmin(BaseModelAdminMixin, admin.ModelAdmin):
     """Documents admin."""
 
     list_display = (
@@ -12,10 +13,18 @@ class DocumentsAdmin(admin.ModelAdmin):
     )
     raw_id_fields = (
         'archived_by',
-        'created_by',
-        'modified_by',
     )
     list_filter = (
         'av_clean',
     )
+    readonly_fields = (
+        'created',
+        'modified',
+    )
     date_hierarchy = 'created_on'
+    exclude = (
+        'created_on',
+        'created_by',
+        'modified_on',
+        'modified_by',
+    )

@@ -64,24 +64,10 @@ class CompanyCoreTeamViewSet(CoreViewSet):
     """
     Views for the core team of a company.
 
-    When a company is account managed, a core team is established.
-    This usually includes:
-    - one and only one global account manager
-    - a local account manager from the country where the company is based
-    - one or more local account managers from the country where the company
-        is exporting to or investing in
+    The permissions to access this resource are inherited from the company resourse.
 
-    However, this layout is not always as strict.
-    Other roles might exist and an single person can also have multiple roles.
-
-    This team is called "core team" because it's official and does not change
-    often. Usually, a wider team around a company is established as well.
-    This team includes specialists and other advisers needed for short-term
-    and more reactive support.
-
-
-    At the moment, this endpoint only includes company.one_list_account_owner
-    representing the global account manager.
+    E.g. user only needs `read_company` permission to GET this collection and
+    companycoreteam permissions are ignored for now.
     """
 
     required_scopes = (Scope.internal_front_end,)
@@ -96,14 +82,39 @@ class CompanyCoreTeamViewSet(CoreViewSet):
     def list(self, request, *args, **kwargs):
         """Lists core team members."""
         company = self.get_object()
+        global_account_manager = company.one_list_account_owner
+
         objs = []
+        # add global account manager first
         if company.one_list_account_owner:
             objs.append(
                 {
-                    'adviser': company.one_list_account_owner,
+                    'adviser': global_account_manager,
                     'is_global_account_manager': True
                 }
             )
+
+        # add all other core members excluding the global account manager
+        # who might have already been added
+        team_members = company.core_team_members.exclude(
+            adviser=global_account_manager
+        ).select_related(
+            'adviser',
+            'adviser__dit_team',
+            'adviser__dit_team__uk_region',
+            'adviser__dit_team__country',
+        ).order_by(
+            'adviser__first_name',
+            'adviser__last_name',
+        )
+
+        objs.extend(
+            {
+                'adviser': team_member.adviser,
+                'is_global_account_manager': False
+            }
+            for team_member in team_members
+        )
 
         serializer = self.get_serializer(objs, many=True)
         return Response(serializer.data)

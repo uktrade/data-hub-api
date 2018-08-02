@@ -57,6 +57,16 @@ class CompanyFactory(factory.django.DjangoModelFactory):
         model = 'company.Company'
 
 
+class CompanyCoreTeamMemberFactory(factory.django.DjangoModelFactory):
+    """Company core team member factory."""
+
+    company = factory.SubFactory(CompanyFactory)
+    adviser = factory.SubFactory(AdviserFactory)
+
+    class Meta:
+        model = 'company.CompanyCoreTeamMember'
+
+
 class ArchivedCompanyFactory(CompanyFactory):
     """Factory for an archived company."""
 

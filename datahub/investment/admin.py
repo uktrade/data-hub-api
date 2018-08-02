@@ -4,6 +4,7 @@ from django.contrib import admin
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import (
+    BaseModelAdminMixin,
     custom_add_permission,
     custom_change_permission,
     custom_delete_permission,
@@ -23,7 +24,7 @@ from datahub.metadata.admin import DisableableMetadataAdmin
 
 @admin.register(InvestmentProject)
 @custom_change_permission(InvestmentProjectPermission.change_all)
-class InvestmentProjectAdmin(VersionAdmin):
+class InvestmentProjectAdmin(BaseModelAdminMixin, VersionAdmin):
     """Investment project admin."""
 
     search_fields = (
@@ -41,19 +42,25 @@ class InvestmentProjectAdmin(VersionAdmin):
         'project_manager',
         'project_assurance_adviser',
         'uk_company',
-        'created_by',
-        'modified_by',
     )
     readonly_fields = (
         'allow_blank_estimated_land_date',
         'allow_blank_possible_uk_regions',
         'archived_documents_url_path',
         'comments',
+        'created',
+        'modified',
     )
     list_display = (
         'name',
         'investor_company',
         'stage',
+    )
+    exclude = (
+        'created_on',
+        'created_by',
+        'modified_on',
+        'modified_by',
     )
 
 
@@ -71,7 +78,7 @@ class InvestmentProjectTeamMemberAdmin(VersionAdmin):
 
 
 @admin.register(IProjectDocument)
-class IProjectDocumentAdmin(admin.ModelAdmin):
+class IProjectDocumentAdmin(BaseModelAdminMixin, admin.ModelAdmin):
     """Investment project document admin."""
 
     list_display = (
@@ -84,10 +91,18 @@ class IProjectDocumentAdmin(admin.ModelAdmin):
         'archived_by',
         'project',
         'document',
-        'created_by',
-        'modified_by',
     )
     date_hierarchy = 'created_on'
+    readonly_fields = (
+        'created',
+        'modified',
+    )
+    exclude = (
+        'created_on',
+        'created_by',
+        'modified_on',
+        'modified_by',
+    )
 
 
 admin.site.register((

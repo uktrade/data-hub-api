@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.template.defaultfilters import date as date_formatter
 from django.utils.translation import ugettext_lazy as _
 
+from datahub.core.admin import BaseModelAdminMixin
 from datahub.omis.order.constants import OrderStatus
 from .constants import RefundStatus
 from .models import Refund
@@ -171,7 +172,7 @@ class RefundForm(forms.ModelForm):
 
 
 @admin.register(Refund)
-class RefundAdmin(admin.ModelAdmin):
+class RefundAdmin(BaseModelAdminMixin, admin.ModelAdmin):
     """Refund admin."""
 
     form = RefundForm
@@ -193,18 +194,14 @@ class RefundAdmin(admin.ModelAdmin):
     raw_id_fields = (
         'order',
         'requested_by',
-        'created_by',
-        'modified_by',
         'level1_approved_by',
         'level2_approved_by',
     )
     readonly_fields = (
         'id',
         'reference',
-        'created_by',
-        'created_on',
-        'modified_by',
-        'modified_on',
+        'created',
+        'modified',
         'total_amount',
     )
     list_select_related = (
@@ -212,15 +209,8 @@ class RefundAdmin(admin.ModelAdmin):
     )
 
     def save_model(self, request, obj, form, change):
-        """
-        Populate total_amount from other fields and
-        created_by/modified_by from the logged in user.
-        """
+        """Populate total_amount from other fields."""
         if 'total_amount' in form.cleaned_data:
             obj.total_amount = form.cleaned_data['total_amount']
-
-        if not change:
-            obj.created_by = request.user
-        obj.modified_by = request.user
 
         super().save_model(request, obj, form, change)
