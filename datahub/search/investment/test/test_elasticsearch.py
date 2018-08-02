@@ -190,14 +190,9 @@ def test_limited_get_search_by_entity_query():
                         'bool': {
                             'should': [
                                 {
-                                    'nested': {
-                                        'path': 'trading_address_country',
-                                        'query': {
-                                            'match_phrase': {
-                                                'trading_address_country.id':
-                                                    '80756b9a-5d95-e211-a939-e4115bead28a'
-                                            }
-                                        }
+                                    'match_phrase': {
+                                        'trading_address_country.id':
+                                            '80756b9a-5d95-e211-a939-e4115bead28a'
                                     }
                                 }
                             ],
