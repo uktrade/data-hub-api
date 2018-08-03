@@ -70,7 +70,6 @@ class SearchInvestmentProjectSerializer(SearchSerializer):
         'sector.name',
         'site_decided',
         'stage.name',
-        'team_members.name',
         'total_investment',
         'uk_company.name'
     )
