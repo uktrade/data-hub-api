@@ -90,6 +90,21 @@ def nested_id_name_partial_field(field):
     )
 
 
+def company_field(field):
+    """Company field."""
+    return Object(
+        properties={
+            'id': Keyword(),
+            'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+            'name_trigram': TrigramText(),
+            'trading_name': SortableCaseInsensitiveKeywordText(
+                copy_to=f'{field}.trading_name_trigram',
+            ),
+            'trading_name_trigram': TrigramText(),
+        },
+    )
+
+
 def nested_company_field(field):
     """Nested field for lists of companies."""
     return Nested(
