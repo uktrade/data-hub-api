@@ -1,7 +1,7 @@
 from elasticsearch_dsl import Boolean, Date, Integer, Keyword, Text
 
 from .. import dict_utils
-from .. import dsl_utils
+from .. import fields
 from ..models import BaseESModel
 
 
@@ -9,27 +9,27 @@ class Order(BaseESModel):
     """Elasticsearch representation of Order model."""
 
     id = Keyword()
-    reference = dsl_utils.SortableCaseInsensitiveKeywordText(copy_to=['reference_trigram'])
-    reference_trigram = dsl_utils.TrigramText()
-    status = dsl_utils.SortableCaseInsensitiveKeywordText()
-    company = dsl_utils.nested_company_field('company')
-    contact = dsl_utils.nested_contact_or_adviser_field('contact')
-    created_by = dsl_utils.nested_contact_or_adviser_field('created_by', include_dit_team=True)
+    reference = fields.SortableCaseInsensitiveKeywordText(copy_to=['reference_trigram'])
+    reference_trigram = fields.TrigramText()
+    status = fields.SortableCaseInsensitiveKeywordText()
+    company = fields.nested_company_field('company')
+    contact = fields.nested_contact_or_adviser_field('contact')
+    created_by = fields.nested_contact_or_adviser_field('created_by', include_dit_team=True)
     created_on = Date()
     modified_on = Date()
-    primary_market = dsl_utils.nested_id_name_field()
-    sector = dsl_utils.nested_sector_field()
-    uk_region = dsl_utils.nested_id_name_field()
-    description = dsl_utils.EnglishText()
+    primary_market = fields.nested_id_name_field()
+    sector = fields.nested_sector_field()
+    uk_region = fields.nested_id_name_field()
+    description = fields.EnglishText()
     contacts_not_to_approach = Text()
     further_info = Text()
     existing_agents = Text(index=False)
     delivery_date = Date()
-    service_types = dsl_utils.nested_id_name_field()
-    contact_email = dsl_utils.SortableCaseInsensitiveKeywordText()
+    service_types = fields.nested_id_name_field()
+    contact_email = fields.SortableCaseInsensitiveKeywordText()
     contact_phone = Keyword()
-    subscribers = dsl_utils.nested_contact_or_adviser_field('subscribers', include_dit_team=True)
-    assignees = dsl_utils.nested_contact_or_adviser_field('assignees', include_dit_team=True)
+    subscribers = fields.nested_contact_or_adviser_field('subscribers', include_dit_team=True)
+    assignees = fields.nested_contact_or_adviser_field('assignees', include_dit_team=True)
     po_number = Keyword(index=False)
     discount_value = Integer(index=False)
     vat_status = Keyword(index=False)
@@ -43,22 +43,22 @@ class Order(BaseESModel):
     total_cost = Integer(copy_to=['total_cost_string'])
     payment_due_date = Date()
     paid_on = Date()
-    completed_by = dsl_utils.nested_contact_or_adviser_field('completed_by')
+    completed_by = fields.nested_contact_or_adviser_field('completed_by')
     completed_on = Date()
-    cancelled_by = dsl_utils.nested_contact_or_adviser_field('cancelled_by')
+    cancelled_by = fields.nested_contact_or_adviser_field('cancelled_by')
     cancelled_on = Date()
-    cancellation_reason = dsl_utils.nested_id_name_field()
+    cancellation_reason = fields.nested_id_name_field()
 
     billing_company_name = Text()
     billing_contact_name = Text()
-    billing_email = dsl_utils.SortableCaseInsensitiveKeywordText()
-    billing_phone = dsl_utils.SortableCaseInsensitiveKeywordText()
+    billing_email = fields.SortableCaseInsensitiveKeywordText()
+    billing_phone = fields.SortableCaseInsensitiveKeywordText()
     billing_address_1 = Text()
     billing_address_2 = Text()
-    billing_address_town = dsl_utils.SortableCaseInsensitiveKeywordText()
-    billing_address_county = dsl_utils.SortableCaseInsensitiveKeywordText()
+    billing_address_town = fields.SortableCaseInsensitiveKeywordText()
+    billing_address_county = fields.SortableCaseInsensitiveKeywordText()
     billing_address_postcode = Text()
-    billing_address_country = dsl_utils.nested_id_name_field()
+    billing_address_country = fields.nested_id_name_field()
 
     MAPPINGS = {
         'id': str,
