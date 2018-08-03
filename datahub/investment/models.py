@@ -30,19 +30,19 @@ class InvestmentProjectPermission(StrEnum):
     (Defined here rather than in permissions to avoid an import of that module.)
 
 
-    The following codenames mean that the user can read or change all investment projects:
+    The following codenames mean that the user can view or change all investment projects:
 
-    read_all_investmentproject
+    view_all_investmentproject
     change_all_investmentproject
 
     User needs following permission to change investment project stage to Won:
 
     change_stage_to_won_investment_project
 
-    The following codenames mean that the user can only read or change investment projects that
+    The following codenames mean that the user can only view or change investment projects that
     they are associated with:
 
-    read_associated_investmentproject
+    view_associated_investmentproject
     change_associated_investmentproject
 
     An associated project means one that was created by an adviser in the same team,
@@ -58,14 +58,14 @@ class InvestmentProjectPermission(StrEnum):
     project can be added, and any project can be deleted.
     """
 
-    read_all = 'read_all_investmentproject'
-    read_associated = 'read_associated_investmentproject'
+    view_all = 'view_all_investmentproject'
+    view_associated = 'view_associated_investmentproject'
     change_all = 'change_all_investmentproject'
     change_associated = 'change_associated_investmentproject'
     change_stage_to_won = 'change_stage_to_won_investmentproject'
     add = 'add_investmentproject'
     delete = 'delete_investmentproject'
-    read_investmentproject_document = 'read_investmentproject_document'
+    view_investmentproject_document = 'view_investmentproject_document'
 
 
 class IProjectAbstract(models.Model):
@@ -435,20 +435,16 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
     class Meta:
         permissions = (
             (
-                InvestmentProjectPermission.read_all.value,
-                'Can read all investment project'
-            ),
-            (
-                InvestmentProjectPermission.read_associated.value,
-                'Can read associated investment project'
+                InvestmentProjectPermission.view_associated.value,
+                'Can view associated investment project'
             ),
             (
                 InvestmentProjectPermission.change_associated.value,
                 'Can change associated investment project'
             ),
             (
-                InvestmentProjectPermission.read_investmentproject_document.value,
-                'Can read investment project document'
+                InvestmentProjectPermission.view_investmentproject_document.value,
+                'Can view investment project document'
             ),
             (
                 InvestmentProjectPermission.change_stage_to_won.value,
@@ -459,6 +455,7 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
             'add',
             'change_all',
             'delete',
+            'view_all',
         )
 
     def get_associated_advisers(self):
@@ -501,9 +498,9 @@ class InvestmentProjectTeamMember(models.Model):
 
     No default permissions are defined on this model as permissions from the InvestmentProject
     model are used and enforced instead. This is to avoid unnecessary complexity in the
-    permissions model, where permissions on both models would need to be checked. (A custom read
-    permission is also not defined for the same reason, but also because team members are
-    returned in investment project responses in the investment and search APIs.)
+    permissions model, where permissions on both models would need to be checked. (A view
+    permission is also omitted because team members are returned in investment project responses
+    in the investment and search APIs.)
     """
 
     investment_project = models.ForeignKey(

@@ -25,7 +25,7 @@ from datahub.interaction.test.factories import (
 )
 from datahub.interaction.test.views.utils import (
     create_interaction_user_without_policy_feedback,
-    create_read_policy_feedback_user,
+    create_view_policy_feedback_user,
 )
 from datahub.investment.test.factories import ActiveInvestmentProjectFactory
 from datahub.metadata.models import Sector
@@ -37,7 +37,7 @@ pytestmark = pytest.mark.django_db
 @pytest.fixture
 def policy_feedback_user():
     """User with full interaction and policy feedback permissions."""
-    yield create_read_policy_feedback_user()
+    yield create_view_policy_feedback_user()
 
 
 @pytest.fixture
@@ -763,7 +763,7 @@ class TestInteractionExportView(APITestMixin):
     @pytest.mark.parametrize(
         'permissions', (
             (),
-            (InteractionPermission.read_all,),
+            (InteractionPermission.view_all,),
             (InteractionPermission.export,),
         )
     )

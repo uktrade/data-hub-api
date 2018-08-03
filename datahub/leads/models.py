@@ -70,6 +70,3 @@ class BusinessLead(ArchivableModel, BaseModel):
     def __str__(self):
         """Formatted name."""
         return self.name
-
-    class Meta:
-        permissions = (('read_businesslead', 'Can read business lead'),)

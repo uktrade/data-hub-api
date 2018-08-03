@@ -2,10 +2,10 @@
 - fields:
     name: LEP
     permissions:
-    - - read_advisor
+    - - view_advisor
       - company
       - advisor
-    - - read_companieshousecompany
+    - - view_companieshousecompany
       - company
       - companieshousecompany
     - - add_company
@@ -14,7 +14,7 @@
     - - change_company
       - company
       - company
-    - - read_company
+    - - view_company
       - company
       - company
     - - add_contact
@@ -23,7 +23,7 @@
     - - change_contact
       - company
       - contact
-    - - read_contact
+    - - view_contact
       - company
       - contact
     - - add_investmentproject
@@ -32,7 +32,7 @@
     - - change_associated_investmentproject
       - investment
       - investmentproject
-    - - read_associated_investmentproject
+    - - view_associated_investmentproject
       - investment
       - investmentproject
     - - add_associated_investmentproject_interaction
@@ -41,7 +41,7 @@
     - - change_associated_investmentproject_interaction
       - interaction
       - interaction
-    - - read_associated_investmentproject_interaction
+    - - view_associated_investmentproject_interaction
       - interaction
       - interaction
     - - add_associated_investmentproject_proposition
@@ -50,17 +50,17 @@
     - - change_associated_investmentproject_proposition
       - proposition
       - proposition
-    - - read_associated_investmentproject_proposition
+    - - view_associated_investmentproject_proposition
       - proposition
       - proposition
   model: auth.group
 - fields:
     name: DA
     permissions:
-    - - read_advisor
+    - - view_advisor
       - company
       - advisor
-    - - read_companieshousecompany
+    - - view_companieshousecompany
       - company
       - companieshousecompany
     - - add_company
@@ -69,7 +69,7 @@
     - - change_company
       - company
       - company
-    - - read_company
+    - - view_company
       - company
       - company
     - - add_contact
@@ -78,16 +78,16 @@
     - - change_contact
       - company
       - contact
-    - - read_contact
+    - - view_contact
       - company
       - contact
-    - - read_invoice
+    - - view_invoice
       - omis-invoice
       - invoice
     - - add_payment
       - omis-payment
       - payment
-    - - read_payment
+    - - view_payment
       - omis-payment
       - payment
     - - add_quote
@@ -96,7 +96,7 @@
     - - change_quote
       - omis-quote
       - quote
-    - - read_quote
+    - - view_quote
       - omis-quote
       - quote
     - - add_order
@@ -105,7 +105,7 @@
     - - change_order
       - order
       - order
-    - - read_order
+    - - view_order
       - order
       - order
     - - add_orderassignee
@@ -132,7 +132,7 @@
     - - change_associated_investmentproject
       - investment
       - investmentproject
-    - - read_associated_investmentproject
+    - - view_associated_investmentproject
       - investment
       - investmentproject
     - - add_associated_investmentproject_interaction
@@ -141,7 +141,7 @@
     - - change_associated_investmentproject_interaction
       - interaction
       - interaction
-    - - read_associated_investmentproject_interaction
+    - - view_associated_investmentproject_interaction
       - interaction
       - interaction
     - - add_associated_investmentproject_proposition
@@ -150,17 +150,17 @@
     - - change_associated_investmentproject_proposition
       - proposition
       - proposition
-    - - read_associated_investmentproject_proposition
+    - - view_associated_investmentproject_proposition
       - proposition
       - proposition
   model: auth.group
 - fields:
     name: DIT_staff
     permissions:
-    - - read_advisor
+    - - view_advisor
       - company
       - advisor
-    - - read_companieshousecompany
+    - - view_companieshousecompany
       - company
       - companieshousecompany
     - - add_company
@@ -169,10 +169,10 @@
     - - change_company
       - company
       - company
-    - - read_company
+    - - view_company
       - company
       - company
-    - - read_company_timeline
+    - - view_company_timeline
       - company
       - company
     - - add_contact
@@ -181,7 +181,7 @@
     - - change_contact
       - company
       - contact
-    - - read_contact
+    - - view_contact
       - company
       - contact
     - - add_document
@@ -199,7 +199,7 @@
     - - change_event
       - event
       - event
-    - - read_event
+    - - view_event
       - event
       - event
     - - add_all_interaction
@@ -208,7 +208,7 @@
     - - change_all_interaction
       - interaction
       - interaction
-    - - read_all_interaction
+    - - view_all_interaction
       - interaction
       - interaction
     - - export_interaction
@@ -220,7 +220,7 @@
     - - change_all_proposition
       - proposition
       - proposition
-    - - read_all_proposition
+    - - view_all_proposition
       - proposition
       - proposition
     - - add_investmentproject
@@ -229,16 +229,16 @@
     - - change_all_investmentproject
       - investment
       - investmentproject
-    - - read_all_investmentproject
+    - - view_all_investmentproject
       - investment
       - investmentproject
-    - - read_company_document
+    - - view_company_document
       - company
       - company
-    - - read_contact_document
+    - - view_contact_document
       - company
       - contact
-    - - read_investmentproject_document
+    - - view_investmentproject_document
       - investment
       - investmentproject
     - - add_investmentprojectcode
@@ -253,16 +253,16 @@
     - - change_businesslead
       - leads
       - businesslead
-    - - read_businesslead
+    - - view_businesslead
       - leads
       - businesslead
-    - - read_invoice
+    - - view_invoice
       - omis-invoice
       - invoice
     - - add_payment
       - omis-payment
       - payment
-    - - read_payment
+    - - view_payment
       - omis-payment
       - payment
     - - add_quote
@@ -271,7 +271,7 @@
     - - change_quote
       - omis-quote
       - quote
-    - - read_quote
+    - - view_quote
       - omis-quote
       - quote
     - - add_order
@@ -280,7 +280,7 @@
     - - change_order
       - order
       - order
-    - - read_order
+    - - view_order
       - order
       - order
     - - add_orderassignee
@@ -308,7 +308,7 @@
     - - add_policy_feedback_interaction
       - interaction
       - interaction
-    - - read_policy_feedback_interaction
+    - - view_policy_feedback_interaction
       - interaction
       - interaction
     - - change_policy_feedback_interaction

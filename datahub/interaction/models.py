@@ -18,23 +18,23 @@ class InteractionPermission(StrEnum):
     (Defined here rather than in permissions to avoid an import of that module.)
 
 
-    The following codenames mean that the user can read, change, add or delete any type of
+    The following codenames mean that the user can view, change, add or delete any type of
     interaction:
 
-    read_all_interaction
+    view_all_interaction
     change_all_interaction
     add_all_interaction
     delete_interaction
 
 
-    The following codenames mean that the user can only read, change and add interactions for
+    The following codenames mean that the user can only view, change and add interactions for
     investment projects that they are associated with:
 
-    read_associated_investmentproject_interaction
+    view_associated_investmentproject_interaction
     change_associated_investmentproject_interaction
     add_associated_investmentproject_interaction
 
-    They cannot read, change or add interactions that do not relate to an investment project.
+    They cannot view, change or add interactions that do not relate to an investment project.
 
     An associated project has the same meaning that it does in investment projects (that is a
     project that was created by an adviser in the same team, or an adviser in the same team has
@@ -48,16 +48,16 @@ class InteractionPermission(StrEnum):
     The following permissions grant users additional permissions to manage policy-feedback
     interactions:
 
-    read_policy_feedback_interaction
+    view_policy_feedback_interaction
     change_policy_feedback_interaction
     add_policy_feedback_interaction
 
     These are not effective without the standard *_all permissions.
     """
 
-    read_all = 'read_all_interaction'
-    read_associated_investmentproject = 'read_associated_investmentproject_interaction'
-    read_policy_feedback = 'read_policy_feedback_interaction'
+    view_all = 'view_all_interaction'
+    view_associated_investmentproject = 'view_associated_investmentproject_interaction'
+    view_policy_feedback = 'view_policy_feedback_interaction'
     change_all = 'change_all_interaction'
     change_associated_investmentproject = 'change_associated_investmentproject_interaction'
     change_policy_feedback = 'change_policy_feedback_interaction'
@@ -205,12 +205,8 @@ class Interaction(BaseModel):
         ]
         permissions = (
             (
-                InteractionPermission.read_all.value,
-                'Can read all interaction'
-            ),
-            (
-                InteractionPermission.read_associated_investmentproject.value,
-                'Can read interaction for associated investment projects'
+                InteractionPermission.view_associated_investmentproject.value,
+                'Can view interaction for associated investment projects'
             ),
             (
                 InteractionPermission.add_associated_investmentproject.value,
@@ -221,8 +217,8 @@ class Interaction(BaseModel):
                 'Can change interaction for associated investment projects'
             ),
             (
-                InteractionPermission.read_policy_feedback.value,
-                'Can read policy feedback interaction'
+                InteractionPermission.view_policy_feedback.value,
+                'Can view policy feedback interaction'
             ),
             (
                 InteractionPermission.add_policy_feedback.value,
@@ -241,4 +237,5 @@ class Interaction(BaseModel):
             'add_all',
             'change_all',
             'delete',
+            'view_all',
         )

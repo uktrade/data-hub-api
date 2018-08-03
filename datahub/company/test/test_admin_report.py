@@ -28,7 +28,7 @@ class TestReportAdmin(AdminTestMixin):
         url = reverse('admin-report:download-report', kwargs={'report_id': 'all-advisers'})
 
         user = create_test_user(
-            permission_codenames=('read_advisor',),
+            permission_codenames=('view_advisor',),
             is_staff=True,
             password=self.PASSWORD,
         )
@@ -70,7 +70,7 @@ class TestReportAdmin(AdminTestMixin):
         url = reverse('admin-report:download-report', kwargs={'report_id': 'one-list'})
 
         user = create_test_user(
-            permission_codenames=('read_company',),
+            permission_codenames=('view_company',),
             is_staff=True,
             password=self.PASSWORD,
         )

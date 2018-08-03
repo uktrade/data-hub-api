@@ -53,9 +53,6 @@ class Event(BaseModel, DisableableModel):
         """Human-readable representation"""
         return self.name
 
-    class Meta:
-        permissions = (('read_event', 'Can read event'),)
-
 
 class Programme(BaseConstantModel):
     """Related programmes for events."""

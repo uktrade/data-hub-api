@@ -14,8 +14,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 class ContactPermission(StrEnum):
     """Permission codename constants."""
 
-    read_contact = 'read_contact'
-    read_contact_document = 'read_contact_document'
+    view_contact_document = 'view_contact_document'
 
 
 @reversion.register_base_model()
@@ -80,8 +79,7 @@ class Contact(ArchivableModel, BaseModel):
 
     class Meta:
         permissions = (
-            (ContactPermission.read_contact.value, 'Can read contact'),
-            (ContactPermission.read_contact_document.value, 'Can read contact document'),
+            (ContactPermission.view_contact_document.value, 'Can view contact document'),
         )
 
     @property
