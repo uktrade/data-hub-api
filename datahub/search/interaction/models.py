@@ -13,7 +13,7 @@ class Interaction(BaseESModel):
     """Elasticsearch representation of Interaction model."""
 
     id = Keyword()
-    company = fields.nested_company_field('company')
+    company = fields.company_field('company')
     company_sector = fields.nested_sector_field()
     communication_channel = fields.nested_id_name_field()
     contact = fields.nested_contact_or_adviser_field('contact')
