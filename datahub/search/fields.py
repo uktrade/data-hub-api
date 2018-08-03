@@ -91,6 +91,17 @@ def nested_id_name_field():
     )
 
 
+def id_name_partial_field(field):
+    """Object field with id and name sub-fields, and with partial matching on name."""
+    return Object(
+        properties={
+            'id': Keyword(),
+            'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+            'name_trigram': TrigramText(),
+        },
+    )
+
+
 def nested_id_name_partial_field(field):
     """
     Nested field for lists of objects with id and name sub-fields, and with partial matching on
