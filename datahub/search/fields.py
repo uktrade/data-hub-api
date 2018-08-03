@@ -36,6 +36,22 @@ class TextWithKeyword(Text):
         )
 
 
+def contact_or_adviser_field(field, include_dit_team=False):
+    """Object field for advisers and contacts."""
+    props = {
+        'id': Keyword(),
+        'first_name': SortableCaseInsensitiveKeywordText(),
+        'last_name': SortableCaseInsensitiveKeywordText(),
+        'name': SortableCaseInsensitiveKeywordText(copy_to=f'{field}.name_trigram'),
+        'name_trigram': TrigramText(),
+    }
+
+    if include_dit_team:
+        props['dit_team'] = id_name_field()
+
+    return Object(properties=props)
+
+
 def nested_contact_or_adviser_field(field, include_dit_team=False):
     """Nested field for lists of advisers or contacts."""
     props = {
