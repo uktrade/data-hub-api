@@ -14,7 +14,7 @@ class Interaction(BaseESModel):
 
     id = Keyword()
     company = fields.company_field('company')
-    company_sector = fields.nested_sector_field()
+    company_sector = fields.sector_field()
     communication_channel = fields.nested_id_name_field()
     contact = fields.nested_contact_or_adviser_field('contact')
     created_on = Date()
@@ -23,7 +23,7 @@ class Interaction(BaseESModel):
     dit_team = fields.nested_id_name_partial_field('dit_team')
     event = fields.nested_id_name_partial_field('event')
     investment_project = fields.nested_id_name_field()
-    investment_project_sector = fields.nested_sector_field()
+    investment_project_sector = fields.sector_field()
     is_event = Boolean()
     grant_amount_offered = Double()
     kind = Keyword()

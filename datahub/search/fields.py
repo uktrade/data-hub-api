@@ -129,6 +129,23 @@ def nested_ch_company_field():
     })
 
 
+def sector_field():
+    """Sector field."""
+    ancestors = Object(
+        properties={
+            'id': Keyword(),
+        },
+    )
+
+    return Object(
+        properties={
+            'id': Keyword(),
+            'name': SortableCaseInsensitiveKeywordText(),
+            'ancestors': ancestors,
+        },
+    )
+
+
 def nested_sector_field():
     """Nested field for lists of sectors."""
     return Nested(
