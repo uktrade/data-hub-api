@@ -17,7 +17,7 @@ class TestPermissions(APITestMixin):
         """
         Tests view returns 200
         """
-        permission = Permission.objects.get(codename='read_permissionmodel')
+        permission = Permission.objects.get(codename='view_permissionmodel')
         permission_group = GroupFactory()
         permission_group.permissions.add(permission)
         team = TeamFactory()

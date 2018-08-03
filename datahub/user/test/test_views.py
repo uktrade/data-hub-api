@@ -14,8 +14,8 @@ class TestUserView(APITestMixin):
     def test_who_am_i_authenticated(self):
         """Who am I."""
         permission_names = [
-            'read_lorem',
-            'read_ipsum',
+            'view_lorem',
+            'view_ipsum',
             'add_cats',
         ]
         content_type = ContentType.objects.first()

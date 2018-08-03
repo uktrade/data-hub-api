@@ -10,7 +10,7 @@ class CompanySearchApp(SearchApp):
     name = 'company'
     es_model = Company
     view = SearchCompanyAPIView
-    view_permissions = ('company.read_company',)
+    view_permissions = ('company.view_company',)
     queryset = DBCompany.objects.select_related(
         'account_manager',
         'archived_by',

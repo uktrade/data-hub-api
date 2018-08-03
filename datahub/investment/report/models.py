@@ -14,7 +14,7 @@ class SPIReportPermission(StrEnum):
     """
     Permission codename constants.
 
-    The following codename means that the user can read any type of spi report:
+    The following codename means that the user can view any type of spi report:
 
     change_spireport
 

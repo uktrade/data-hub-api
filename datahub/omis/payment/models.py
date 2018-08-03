@@ -37,7 +37,6 @@ class PaymentGatewaySession(BaseModel):
 
     class Meta:
         ordering = ('-created_on', )
-        permissions = (('read_paymentgatewaysession', 'Can read payment gateway session'),)
 
     def __str__(self):
         """Human-readable representation"""
@@ -177,7 +176,6 @@ class Payment(BaseModel):
 
     class Meta:
         ordering = ('created_on', )
-        permissions = (('read_payment', 'Can read payment'),)
 
     def __str__(self):
         """Human-readable representation"""

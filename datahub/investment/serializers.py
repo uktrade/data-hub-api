@@ -356,7 +356,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer):
             'likelihood_of_landing': {'min_value': 0, 'max_value': 100},
         }
         permissions = {
-            f'investment.{InvestmentProjectPermission.read_investmentproject_document}':
+            f'investment.{InvestmentProjectPermission.view_investmentproject_document}':
                 'archived_documents_url_path'
         }
         read_only_fields = (
