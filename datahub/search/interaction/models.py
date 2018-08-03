@@ -24,7 +24,7 @@ class Interaction(BaseESModel):
     event = fields.id_name_partial_field('event')
     investment_project = fields.id_name_field()
     investment_project_sector = fields.sector_field()
-    is_event = Boolean()
+    is_event = Boolean(index=False)
     grant_amount_offered = Double()
     kind = Keyword()
     modified_on = Date()
