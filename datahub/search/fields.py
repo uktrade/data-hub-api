@@ -76,14 +76,6 @@ def nested_id_name_partial_field(field):
     )
 
 
-def nested_id_uri_field():
-    """Nested field for lists of objects with id and uri sub-fields."""
-    return Nested(properties={
-        'id': Keyword(),
-        'uri': SortableCaseInsensitiveKeywordText()
-    })
-
-
 def nested_company_field(field):
     """Nested field for lists of companies."""
     return Nested(
