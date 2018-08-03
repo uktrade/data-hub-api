@@ -25,7 +25,7 @@ class CompaniesHouseCompany(BaseESModel):
     registered_address_county = Text()
     registered_address_postcode = Text(copy_to='registered_address_postcode_trigram')
     registered_address_postcode_trigram = dsl_utils.TrigramText()
-    registered_address_country = dsl_utils.id_name_mapping()
+    registered_address_country = dsl_utils.nested_id_name_field()
     sic_code_1 = Text()
     sic_code_2 = Text()
     sic_code_3 = Text()

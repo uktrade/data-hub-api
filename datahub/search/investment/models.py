@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Boolean, Date, Double, Integer, Keyword, Long, Text
+from elasticsearch_dsl import Boolean, Date, Double, Integer, Keyword, Long, Nested, Text
 
 from .. import dict_utils
 from .. import dsl_utils
@@ -15,7 +15,7 @@ def _referral_source_adviser_mapping():
     The mapping here reflects how it has been auto-created. Further down the line, this mapping
     and contact_or_adviser_mapping will be harmonised.
     """
-    return dsl_utils.object_mapping('id', 'first_name', 'last_name', 'name')
+    return dsl_utils.object_field('id', 'first_name', 'last_name', 'name')
 
 
 def _country_lost_to_mapping():
@@ -25,7 +25,16 @@ def _country_lost_to_mapping():
     The mapping for country_lost_to was implicitly auto-created. This reflects how it was
     auto-created so that we can explicitly define it in the model.
     """
-    return dsl_utils.object_mapping('id', 'name')
+    return dsl_utils.object_field('id', 'name')
+
+
+def _nested_investment_project_field():
+    """Nested field for lists of investment projects."""
+    return Nested(properties={
+        'id': Keyword(),
+        'name': dsl_utils.SortableCaseInsensitiveKeywordText(),
+        'project_code': dsl_utils.SortableCaseInsensitiveKeywordText(),
+    })
 
 
 class InvestmentProject(BaseESModel):
@@ -33,7 +42,7 @@ class InvestmentProject(BaseESModel):
 
     id = Keyword()
     actual_land_date = Date()
-    actual_uk_regions = dsl_utils.id_name_mapping()
+    actual_uk_regions = dsl_utils.nested_id_name_field()
     address_1 = Text()
     address_2 = Text()
     address_town = dsl_utils.SortableCaseInsensitiveKeywordText()
@@ -48,46 +57,46 @@ class InvestmentProject(BaseESModel):
     allow_blank_possible_uk_regions = Boolean(index=False)
     anonymous_description = dsl_utils.EnglishText()
     archived = Boolean()
-    archived_by = dsl_utils.contact_or_adviser_mapping('archived_by')
+    archived_by = dsl_utils.nested_contact_or_adviser_field('archived_by')
     archived_on = Date()
     archived_reason = Text()
-    associated_non_fdi_r_and_d_project = dsl_utils.investment_project_mapping()
-    average_salary = dsl_utils.id_name_mapping()
-    business_activities = dsl_utils.id_name_mapping()
+    associated_non_fdi_r_and_d_project = _nested_investment_project_field()
+    average_salary = dsl_utils.nested_id_name_field()
+    business_activities = dsl_utils.nested_id_name_field()
     client_cannot_provide_foreign_investment = Boolean()
     client_cannot_provide_total_investment = Boolean()
-    client_contacts = dsl_utils.contact_or_adviser_mapping('client_contacts')
-    client_relationship_manager = dsl_utils.contact_or_adviser_mapping(
+    client_contacts = dsl_utils.nested_contact_or_adviser_field('client_contacts')
+    client_relationship_manager = dsl_utils.nested_contact_or_adviser_field(
         'client_relationship_manager', include_dit_team=True
     )
     client_requirements = dsl_utils.TextWithKeyword()
     comments = dsl_utils.EnglishText()
     country_lost_to = _country_lost_to_mapping()
     created_on = Date()
-    created_by = dsl_utils.contact_or_adviser_mapping(
+    created_by = dsl_utils.nested_contact_or_adviser_field(
         'created_by', include_dit_team=True
     )
     date_abandoned = Date()
     date_lost = Date()
-    delivery_partners = dsl_utils.id_name_mapping()
+    delivery_partners = dsl_utils.nested_id_name_field()
     description = dsl_utils.EnglishText()
     estimated_land_date = Date()
     export_revenue = Boolean()
-    fdi_type = dsl_utils.id_name_mapping()
-    fdi_value = dsl_utils.id_name_mapping()
+    fdi_type = dsl_utils.nested_id_name_field()
+    fdi_value = dsl_utils.nested_id_name_field()
     foreign_equity_investment = Double()
     government_assistance = Boolean()
-    intermediate_company = dsl_utils.id_name_mapping()
-    investor_company = dsl_utils.id_name_partial_mapping('investor_company')
-    investor_company_country = dsl_utils.id_name_mapping()
-    investment_type = dsl_utils.id_name_mapping()
-    investor_type = dsl_utils.id_name_mapping()
-    level_of_involvement = dsl_utils.id_name_mapping()
+    intermediate_company = dsl_utils.nested_id_name_field()
+    investor_company = dsl_utils.nested_id_name_partial_field('investor_company')
+    investor_company_country = dsl_utils.nested_id_name_field()
+    investment_type = dsl_utils.nested_id_name_field()
+    investor_type = dsl_utils.nested_id_name_field()
+    level_of_involvement = dsl_utils.nested_id_name_field()
     likelihood_of_landing = Long()
-    project_assurance_adviser = dsl_utils.contact_or_adviser_mapping(
+    project_assurance_adviser = dsl_utils.nested_contact_or_adviser_field(
         'project_assurance_adviser', include_dit_team=True
     )
-    project_manager = dsl_utils.contact_or_adviser_mapping(
+    project_manager = dsl_utils.nested_contact_or_adviser_field(
         'project_manager', include_dit_team=True
     )
     name = dsl_utils.SortableText(copy_to=['name_keyword', 'name_trigram'])
@@ -108,22 +117,22 @@ class InvestmentProject(BaseESModel):
     reason_abandoned = dsl_utils.TextWithKeyword()
     reason_delayed = dsl_utils.TextWithKeyword()
     reason_lost = dsl_utils.TextWithKeyword()
-    referral_source_activity = dsl_utils.id_name_mapping()
+    referral_source_activity = dsl_utils.nested_id_name_field()
     referral_source_activity_event = dsl_utils.SortableCaseInsensitiveKeywordText()
-    referral_source_activity_marketing = dsl_utils.id_name_mapping()
-    referral_source_activity_website = dsl_utils.id_name_mapping()
+    referral_source_activity_marketing = dsl_utils.nested_id_name_field()
+    referral_source_activity_website = dsl_utils.nested_id_name_field()
     referral_source_adviser = _referral_source_adviser_mapping()
-    sector = dsl_utils.sector_mapping()
+    sector = dsl_utils.nested_sector_field()
     site_decided = Boolean()
     some_new_jobs = Boolean()
-    specific_programme = dsl_utils.id_name_mapping()
-    stage = dsl_utils.id_name_mapping()
+    specific_programme = dsl_utils.nested_id_name_field()
+    stage = dsl_utils.nested_id_name_field()
     status = dsl_utils.SortableCaseInsensitiveKeywordText()
-    team_members = dsl_utils.contact_or_adviser_mapping('team_members', include_dit_team=True)
+    team_members = dsl_utils.nested_contact_or_adviser_field('team_members', include_dit_team=True)
     total_investment = Double()
-    uk_company = dsl_utils.id_name_partial_mapping('uk_company')
+    uk_company = dsl_utils.nested_id_name_partial_field('uk_company')
     uk_company_decided = Boolean()
-    uk_region_locations = dsl_utils.id_name_mapping()
+    uk_region_locations = dsl_utils.nested_id_name_field()
     will_new_jobs_last_two_years = Boolean()
 
     MAPPINGS = {
