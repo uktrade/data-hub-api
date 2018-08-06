@@ -169,7 +169,7 @@ def test_delete_index(mock_es_client):
             [{'index1'}, {'index2'}],
         ),
     ),
-    ids=lambda params: f'{params[0]-params[2]}',
+    ids=['(alias1,)', '(alias1,alias2)', '(alias2,)'],
 )
 def test_get_indices_for_aliases(mock_es_client, aliases, response, result):
     """Test get_indices_for_aliases()."""
