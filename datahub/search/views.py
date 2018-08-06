@@ -217,9 +217,6 @@ class SearchAPIView(APIView):
                 es_field = self.REMAP_FIELDS.get(field, field)
                 if es_field in results.aggregations:
                     aggregation = results.aggregations[es_field]
-                    if '.' in es_field:
-                        aggregation = aggregation[es_field]
-
                     aggregations[field] = [bucket.to_dict() for bucket in aggregation['buckets']]
 
             response['aggregations'] = aggregations
