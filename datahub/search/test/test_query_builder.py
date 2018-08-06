@@ -31,13 +31,8 @@ from datahub.search.query_builder import (
             'field_name.id',
             'field value',
             {
-                'nested': {
-                    'path': 'field_name',
-                    'query': {
-                        'match_phrase': {
-                            'field_name.id': 'field value'
-                        }
-                    }
+                'match_phrase': {
+                    'field_name.id': 'field value'
                 }
             }
         ),
@@ -45,13 +40,8 @@ from datahub.search.query_builder import (
             'field_name.name_keyword',
             'field value',
             {
-                'nested': {
-                    'path': 'field_name',
-                    'query': {
-                        'match_phrase': {
-                            'field_name.name_keyword': 'field value'
-                        }
-                    }
+                'match_phrase': {
+                    'field_name.name_keyword': 'field value'
                 }
             }
         ),
@@ -59,15 +49,10 @@ from datahub.search.query_builder import (
             'field_name.prop',
             'field value',
             {
-                'nested': {
-                    'path': 'field_name',
-                    'query': {
-                        'match': {
-                            'field_name.prop': {
-                                'query': 'field value',
-                                'operator': 'and'
-                            }
-                        }
+                'match': {
+                    'field_name.prop': {
+                        'query': 'field value',
+                        'operator': 'and'
                     }
                 }
             }
