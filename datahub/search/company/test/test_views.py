@@ -1,18 +1,14 @@
-import csv
 import random
 from collections import Counter
-from datetime import datetime
 from unittest import mock
 from uuid import UUID, uuid4
 
 import factory
 import pytest
-from django.utils.text import slugify
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.constants import BusinessTypeConstant
-from datahub.company.models import Company
 from datahub.company.test.factories import (
     AdviserFactory,
     CompaniesHouseCompanyFactory,
@@ -647,88 +643,3 @@ class TestSearchExport(APITestMixin):
         )
         company.save()
         return company
-
-    def test_company_export(self, setup_es):
-        """Tests export of detailed company search."""
-        term = 'xxxxxxxxxxxx'
-
-        companies = [self._create_company(term)]
-
-        setup_es.indices.refresh()
-
-        url = reverse('api-v3:search:company-export')
-
-        response = self.api_client.post(url, {
-            'original_query': term,
-        })
-
-        assert response.status_code == status.HTTP_200_OK
-
-        # check if filename contains data-hub, current date, term and entity
-        filename_parts = [
-            slugify(term),
-            'company',
-            datetime.utcnow().strftime('%Y-%m-%d'),
-            'data-hub'
-        ]
-        for filename_part in filename_parts:
-            assert filename_part in response['Content-Disposition']
-
-        csv_file = csv.DictReader(line.decode('utf-8') for line in response.streaming_content)
-
-        rows = list(csv_file)
-
-        assert len(rows) == len(companies)
-
-        # checks if we have alphabetically ordered headers in the CSV file
-        assert ['account_manager',
-                'archived',
-                'archived_by',
-                'archived_on',
-                'archived_reason',
-                'business_type',
-                'classification',
-                'companies_house_data',
-                'company_number',
-                'contacts',
-                'created_on',
-                'description',
-                'employee_range',
-                'export_experience_category',
-                'export_to_countries',
-                'future_interest_countries',
-                'global_headquarters',
-                'headquarter_type',
-                'id',
-                'modified_on',
-                'name',
-                'one_list_account_owner',
-                'reference_code',
-                'registered_address_1',
-                'registered_address_2',
-                'registered_address_country',
-                'registered_address_county',
-                'registered_address_postcode',
-                'registered_address_town',
-                'sector',
-                'trading_address_1',
-                'trading_address_2',
-                'trading_address_country',
-                'trading_address_county',
-                'trading_address_postcode',
-                'trading_address_town',
-                'trading_name',
-                'turnover_range',
-                'uk_based',
-                'uk_region',
-                'vat_number',
-                'website'] == csv_file.fieldnames
-
-        for row in rows:
-            company = Company.objects.get(pk=UUID(row['id']))
-            # checks if first and last column match
-            assert company.account_manager.name == row['account_manager']
-            assert company.website == row['website']
-
-            assert company.name == row['name']
-            assert company.registered_address_country.name == row['registered_address_country']
