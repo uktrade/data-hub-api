@@ -10,7 +10,6 @@ from datahub.search.elasticsearch import (
     associate_index_with_alias,
     create_index,
     get_indices_for_aliases,
-    index_exists,
 )
 from datahub.search.utils import get_model_non_mapped_field_names, serialise_mapping
 
@@ -115,22 +114,17 @@ class BaseESModel(DocType):
         If force_update_mapping is True and the write alias already exists, an attempt
         is made to update to update the existing mapping in place.
         """
-        read_alias_exists = alias_exists(cls.get_read_alias())
-        write_alias_exists = alias_exists(cls.get_write_alias())
-        if not write_alias_exists:
-            # Handle migration from the legacy single-index set-up
-            # TODO: Remove once all environments have been migrated to the new structure
-            if settings.ES_LEGACY_INDEX and index_exists(settings.ES_LEGACY_INDEX):
-                index_name = settings.ES_LEGACY_INDEX
-            else:
-                index_name = cls.get_target_index_name()
-                create_index(index_name, cls._doc_type.mapping)
-
-            associate_index_with_alias(cls.get_write_alias(), index_name)
+        if not alias_exists(cls.get_write_alias()):
+            index_name = cls.get_target_index_name()
+            alias_names = (cls.get_write_alias(), cls.get_read_alias())
+            create_index(index_name, cls._doc_type.mapping, alias_names=alias_names)
         elif force_update_mapping:
             cls.init(cls.get_write_alias())
 
-        if not read_alias_exists:
+        # Should not normally happen
+        if not alias_exists(cls.get_read_alias()):
+            logger.warning(f'Missing read alias {cls.get_read_alias()} detected, recreating '
+                           f'the alias...')
             associate_index_with_alias(cls.get_read_alias(), cls.get_write_index())
 
     @classmethod
