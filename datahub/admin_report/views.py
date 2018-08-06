@@ -4,8 +4,8 @@ from django.contrib.admin import site
 from django.http import FileResponse, Http404
 from django.template.response import TemplateResponse
 
-from datahub.admin_report.csv import csv_iterator
 from datahub.admin_report.report import get_report_by_id, get_reports_by_model, report_exists
+from datahub.core.csv import csv_iterator
 
 CSV_CONTENT_TYPE = 'text/csv'
 REPORT_INDEX_TEMPLATE = 'admin/reports/index.html'
