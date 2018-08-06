@@ -2,7 +2,7 @@ from operator import attrgetter
 
 from elasticsearch_dsl import Boolean, Date, Double, Keyword
 
-from datahub.search import dict_utils, dsl_utils
+from datahub.search import dict_utils, fields
 from datahub.search.models import BaseESModel
 
 
@@ -10,29 +10,29 @@ class Interaction(BaseESModel):
     """Elasticsearch representation of Interaction model."""
 
     id = Keyword()
-    company = dsl_utils.nested_company_field('company')
-    company_sector = dsl_utils.nested_sector_field()
-    communication_channel = dsl_utils.nested_id_name_field()
-    contact = dsl_utils.nested_contact_or_adviser_field('contact')
+    company = fields.nested_company_field('company')
+    company_sector = fields.nested_sector_field()
+    communication_channel = fields.nested_id_name_field()
+    contact = fields.nested_contact_or_adviser_field('contact')
     created_on = Date()
     date = Date()
-    dit_adviser = dsl_utils.nested_contact_or_adviser_field('dit_adviser')
-    dit_team = dsl_utils.nested_id_name_partial_field('dit_team')
-    event = dsl_utils.nested_id_name_partial_field('event')
-    investment_project = dsl_utils.nested_id_name_field()
-    investment_project_sector = dsl_utils.nested_sector_field()
+    dit_adviser = fields.nested_contact_or_adviser_field('dit_adviser')
+    dit_team = fields.nested_id_name_partial_field('dit_team')
+    event = fields.nested_id_name_partial_field('event')
+    investment_project = fields.nested_id_name_field()
+    investment_project_sector = fields.nested_sector_field()
     is_event = Boolean()
     grant_amount_offered = Double()
     kind = Keyword()
     modified_on = Date()
     net_company_receipt = Double()
-    notes = dsl_utils.EnglishText()
-    service = dsl_utils.nested_id_name_field()
-    service_delivery_status = dsl_utils.nested_id_name_field()
-    subject = dsl_utils.SortableCaseInsensitiveKeywordText(
+    notes = fields.EnglishText()
+    service = fields.nested_id_name_field()
+    service_delivery_status = fields.nested_id_name_field()
+    subject = fields.SortableCaseInsensitiveKeywordText(
         copy_to=['subject_english']
     )
-    subject_english = dsl_utils.EnglishText()
+    subject_english = fields.EnglishText()
 
     MAPPINGS = {
         'id': str,

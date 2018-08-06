@@ -1,6 +1,6 @@
 from elasticsearch_dsl import Date, Keyword, Text
 
-from datahub.search import dict_utils, dsl_utils
+from datahub.search import dict_utils, fields
 from datahub.search.models import BaseESModel
 
 
@@ -10,28 +10,28 @@ class Event(BaseESModel):
     id = Keyword()
     address_1 = Text()
     address_2 = Text()
-    address_town = dsl_utils.SortableCaseInsensitiveKeywordText()
-    address_county = dsl_utils.SortableCaseInsensitiveKeywordText()
+    address_town = fields.SortableCaseInsensitiveKeywordText()
+    address_county = fields.SortableCaseInsensitiveKeywordText()
     address_postcode = Text(copy_to='address_postcode_trigram')
-    address_postcode_trigram = dsl_utils.TrigramText()
-    address_country = dsl_utils.nested_id_name_partial_field('address_country')
+    address_postcode_trigram = fields.TrigramText()
+    address_country = fields.nested_id_name_partial_field('address_country')
     created_on = Date()
     disabled_on = Date()
     end_date = Date()
-    event_type = dsl_utils.nested_id_name_field()
-    lead_team = dsl_utils.nested_id_name_field()
-    location_type = dsl_utils.nested_id_name_field()
+    event_type = fields.nested_id_name_field()
+    lead_team = fields.nested_id_name_field()
+    location_type = fields.nested_id_name_field()
     modified_on = Date()
-    name = dsl_utils.SortableText(copy_to=['name_keyword', 'name_trigram'])
-    name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
-    name_trigram = dsl_utils.TrigramText()
-    notes = dsl_utils.EnglishText()
-    organiser = dsl_utils.nested_contact_or_adviser_field('organiser')
-    related_programmes = dsl_utils.nested_id_name_partial_field('related_programmes')
-    service = dsl_utils.nested_id_name_field()
+    name = fields.SortableText(copy_to=['name_keyword', 'name_trigram'])
+    name_keyword = fields.SortableCaseInsensitiveKeywordText()
+    name_trigram = fields.TrigramText()
+    notes = fields.EnglishText()
+    organiser = fields.nested_contact_or_adviser_field('organiser')
+    related_programmes = fields.nested_id_name_partial_field('related_programmes')
+    service = fields.nested_id_name_field()
     start_date = Date()
-    teams = dsl_utils.nested_id_name_partial_field('teams')
-    uk_region = dsl_utils.nested_id_name_partial_field('uk_region')
+    teams = fields.nested_id_name_partial_field('teams')
+    uk_region = fields.nested_id_name_partial_field('uk_region')
 
     MAPPINGS = {
         'id': str,
