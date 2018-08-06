@@ -1,7 +1,7 @@
 from datahub.oauth.scopes import Scope
 from .models import InvestmentProject
 from .serializers import SearchInvestmentProjectSerializer
-from ..views import SearchAPIView, SearchExportAPIView
+from ..views import SearchAPIView
 
 
 class SearchInvestmentProjectParams:
@@ -59,7 +59,3 @@ class SearchInvestmentProjectParams:
 
 class SearchInvestmentProjectAPIView(SearchInvestmentProjectParams, SearchAPIView):
     """Filtered investment project search view."""
-
-
-class SearchInvestmentProjectExportAPIView(SearchInvestmentProjectParams, SearchExportAPIView):
-    """Filtered investment project search export view."""
