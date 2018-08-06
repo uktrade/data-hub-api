@@ -1,13 +1,12 @@
 
 
 from django.contrib.admin import site
-from django.http import FileResponse, Http404
+from django.http import Http404
 from django.template.response import TemplateResponse
 
 from datahub.admin_report.report import get_report_by_id, get_reports_by_model, report_exists
-from datahub.core.csv import csv_iterator
+from datahub.core.csv import create_csv_response
 
-CSV_CONTENT_TYPE = 'text/csv'
 REPORT_INDEX_TEMPLATE = 'admin/reports/index.html'
 
 
@@ -36,13 +35,4 @@ def download_report(request, report_id=None):
 
     report = get_report_by_id(report_id, request.user)
 
-    # TODO: Use additional FileResponse.__init__() arguments when Django 2.1 is released
-    # See https://code.djangoproject.com/ticket/16470
-    response = FileResponse(
-        csv_iterator(report.rows(), report.field_titles),
-        content_type=CSV_CONTENT_TYPE
-    )
-
-    filename = report.get_filename()
-    response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
-    return response
+    return create_csv_response(report.rows(), report.field_titles, report.get_filename())
