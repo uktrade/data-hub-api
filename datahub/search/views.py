@@ -167,6 +167,26 @@ class SearchAPIView(APIView):
         })
         return cleaned_data
 
+    def get_base_query(self, request, validated_data):
+        """Gets a filtered Elasticsearch query for the provided search parameters."""
+        filter_data = self._get_filter_data(validated_data)
+        permission_filters = self.search_app.get_permission_filters(request)
+
+        aggregation_fields = (
+            self.REMAP_FIELDS.get(field, field)
+            for field in self.FILTER_FIELDS
+        ) if self.include_aggregations else None
+
+        return get_search_by_entity_query(
+            entity=self.entity,
+            term=validated_data['original_query'],
+            filter_data=filter_data,
+            composite_field_mapping=self.COMPOSITE_FILTERS,
+            permission_filters=permission_filters,
+            ordering=validated_data['sortby'],
+            aggregation_fields=aggregation_fields,
+        )
+
     def post(self, request, format=None):
         """Performs search."""
         data = request.data.copy()
@@ -178,23 +198,7 @@ class SearchAPIView(APIView):
                 data[legacy_query_param] = request.query_params[legacy_query_param]
 
         validated_data = self.validate_data(data)
-        filter_data = self._get_filter_data(validated_data)
-        permission_filters = self.search_app.get_permission_filters(request)
-
-        aggregation_fields = (
-            self.REMAP_FIELDS.get(field, field)
-            for field in self.FILTER_FIELDS
-        ) if self.include_aggregations else None
-
-        query = get_search_by_entity_query(
-            entity=self.entity,
-            term=validated_data['original_query'],
-            filter_data=filter_data,
-            composite_field_mapping=self.COMPOSITE_FILTERS,
-            permission_filters=permission_filters,
-            ordering=validated_data['sortby'],
-            aggregation_fields=aggregation_fields,
-        )
+        query = self.get_base_query(request, validated_data)
 
         limited_query = limit_search_query(
             query,
@@ -227,13 +231,13 @@ class SearchExportAPIView(SearchAPIView):
 
     queryset = None
     field_titles = None
+    include_aggregations = False
 
     def post(self, request, format=None):
         """Performs search and returns CSV file."""
         validated_data = self.validate_data(request.data)
-        filter_data = self._get_filter_data(validated_data)
 
-        es_query = self._get_es_query(validated_data, filter_data)
+        es_query = self._get_es_query(request, validated_data)
         db_queryset = self._get_rows(es_query, validated_data['sortby'])
         base_filename = self._get_base_filename()
 
@@ -257,13 +261,11 @@ class SearchExportAPIView(SearchAPIView):
         for hit in islice(es_query.scan(), settings.SEARCH_EXPORT_MAX_RESULTS):
             yield hit.meta.id
 
-    def _get_es_query(self, validated_data, filter_data):
+    def _get_es_query(self, request, validated_data):
         """Gets a scannable Elasticsearch query for the current request."""
-        return get_search_by_entity_query(
-            entity=self.entity,
-            term=validated_data['original_query'],
-            filter_data=filter_data,
-            ordering=validated_data['sortby'],
+        return self.get_base_query(
+            request,
+            validated_data,
         ).source(
             # Stops _source from being returned in the responses
             fields=False
