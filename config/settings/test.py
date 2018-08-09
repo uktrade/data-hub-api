@@ -18,6 +18,7 @@ INSTALLED_APPS += [
 
 SEARCH_APPS += [
     'datahub.search.test.search_support.simplemodel.SimpleModelSearchApp',
+    'datahub.search.test.search_support.relatedmodel.RelatedModelSearchApp',
 ]
 
 # The index is set dynamically in datahub/search/conftest.py, so that tests can be parallelised.

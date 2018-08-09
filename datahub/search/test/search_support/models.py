@@ -9,3 +9,9 @@ class SimpleModel(BaseModel):
     """
 
     name = models.CharField(max_length=500)
+
+
+class RelatedModel(BaseModel):
+    """A model related to SimpleModel."""
+
+    simpleton = models.ForeignKey(SimpleModel, null=True, blank=True, on_delete=models.CASCADE)
