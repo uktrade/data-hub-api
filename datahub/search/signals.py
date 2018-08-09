@@ -62,7 +62,7 @@ def disable_search_signal_receivers(model):
     """
     signal_receivers = [
         receiver for search_app in get_search_apps()
-        for receiver in search_app.get_signals_receivers()
+        for receiver in search_app.get_signal_receivers()
         if receiver.sender == model and receiver.is_connected
     ]
 

@@ -34,20 +34,20 @@ class SearchApp:
         """
         self.es_model.set_up_index_and_aliases(force_update_mapping=force_update_mapping)
 
-    def get_signals_receivers(self):
-        """Returns the signals receivers for this search app."""
+    def get_signal_receivers(self):
+        """Returns the signal receivers for this search app."""
         return import_module(self.mod_signals).receivers
 
     def connect_signals(self):
         """
         Connects all signal handlers so DB models can be synced with Elasticsearch on save.
         """
-        for receiver in self.get_signals_receivers():
+        for receiver in self.get_signal_receivers():
             receiver.connect()
 
     def disconnect_signals(self):
         """Disconnects all signal handlers."""
-        for receiver in self.get_signals_receivers():
+        for receiver in self.get_signal_receivers():
             receiver.disconnect()
 
     def get_permission_filters(self, request):
