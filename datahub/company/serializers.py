@@ -51,6 +51,17 @@ NestedAdviserField = partial(
 )
 
 
+NestedAdviserWithTeamField = partial(
+    NestedRelatedField,
+    'company.Advisor',
+    extra_fields=(
+        'name',
+        'first_name',
+        'last_name',
+        ('dit_team', NestedRelatedField('metadata.Team'))
+    )
+)
+
 # like NestedAdviserField but includes dit_team with uk_region and country
 NestedAdviserWithTeamGeographyField = partial(
     NestedRelatedField,
@@ -280,7 +291,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     trading_address_country = NestedRelatedField(
         meta_models.Country, required=False, allow_null=True
     )
-    account_manager = NestedAdviserField(required=False, allow_null=True)
+    account_manager = NestedAdviserWithTeamField(required=False, allow_null=True)
     archived_by = NestedAdviserField(read_only=True)
     business_type = NestedRelatedField(
         meta_models.BusinessType, required=False, allow_null=True
@@ -302,7 +313,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     headquarter_type = NestedRelatedField(
         meta_models.HeadquarterType, required=False, allow_null=True
     )
-    one_list_account_owner = NestedAdviserField(
+    one_list_account_owner = NestedAdviserWithTeamField(
         required=False, allow_null=True
     )
     global_headquarters = NestedRelatedField(
