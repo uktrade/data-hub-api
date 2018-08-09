@@ -4,8 +4,8 @@ from celery.task import task
 from django.conf import settings
 from django.utils.timezone import now
 
+from datahub.documents.utils import get_bucket_name, get_s3_client_for_bucket
 from datahub.investment.report.models import SPIReport
-from datahub.investment.report.utils import get_report_s3_client
 from .spi import write_report
 
 
@@ -24,10 +24,10 @@ def generate_spi_report():
         file.seek(0)
 
         report_key = _get_report_key()
-        s3_client = get_report_s3_client()
+        s3_client = get_s3_client_for_bucket('report')
         s3_client.upload_fileobj(
             file,
-            settings.REPORT_BUCKET,
+            get_bucket_name('report'),
             report_key,
             ExtraArgs={
                 'ServerSideEncryption': 'AES256'

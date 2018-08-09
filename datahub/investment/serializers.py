@@ -464,6 +464,8 @@ class IProjectDocumentSerializer(serializers.ModelSerializer):
     project = NestedRelatedField(
         InvestmentProject,
     )
+    signed_url = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
 
     class Meta:
         model = IProjectDocument
@@ -471,21 +473,24 @@ class IProjectDocumentSerializer(serializers.ModelSerializer):
             'id',
             'project',
             'doc_type',
-            'filename',
+            'original_filename',
             'signed_url',
+            'status',
         )
-        read_only_fields = ('signed_url', )
+        read_only_fields = ('signed_url', 'status', )
 
     def create(self, validated_data):
         """Create investment document."""
-        return IProjectDocument.create_from_declaration_request(
+        return IProjectDocument.objects.create(
             project=validated_data['project'],
-            field=validated_data['doc_type'],
-            filename=validated_data['filename'],
+            doc_type=validated_data['doc_type'],
+            original_filename=validated_data['original_filename'],
         )
 
+    def get_signed_url(self, obj):
+        """Gets signed URL."""
+        return obj.document.get_signed_url()
 
-class UploadStatusSerializer(serializers.Serializer):
-    """Serializer for upload status endpoints."""
-
-    status = serializers.ChoiceField(choices=('success',))
+    def get_status(self, instance):
+        """Get document status."""
+        return instance.document.status

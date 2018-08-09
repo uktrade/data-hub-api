@@ -1,97 +1,81 @@
-from contextlib import closing
 from logging import getLogger
 
 import requests
 from django.conf import settings
-from django.utils.timezone import now
-from django_pglocks import advisory_lock
-from raven.contrib.django.raven_compat.models import client
+from requests.exceptions import HTTPError
 from requests_toolbelt.multipart.encoder import MultipartEncoder
+from requests_toolbelt.streaming_iterator import StreamingIterator
 
-from datahub.core.exceptions import DataHubException
-from datahub.core.utils import get_s3_client
-from datahub.documents.models import Document
+from .exceptions import VirusScanException
+from .utils import get_document_by_pk
 
 logger = getLogger(__name__)
 
 
-class S3StreamingBodyWrapper:
-    """S3 Object wrapper that plays nice with streamed multipart/form-data."""
-
-    def __init__(self, s3_obj):
-        """Init wrapper, and grab interesting bits from s3 object."""
-        self._obj = s3_obj
-        self._body = s3_obj['Body']
-        self._remaining_bytes = s3_obj['ContentLength']
-
-    def read(self, amt=-1):
-        """Read given amount of bytes, and decrease remaining len."""
-        content = self._body.read(amt)
-        self._remaining_bytes -= len(content)
-
-        return content
-
-    def __len__(self):
-        """Return remaining bytes, that have not been read yet.
-
-        requests-toolbelt expects this to return the number of unread bytes (rather than
-        the total length of the stream).
-        """
-        return self._remaining_bytes
-
-
-def virus_scan_document(document_pk: str):
-    """Virus scans an uploaded document.
-
-    This is intended to be run in the thread pool executor. The file is streamed from S3 to the
-    anti-virus service.
-
-    Any errors are logged and sent to Sentry.
+def perform_virus_scan(document_pk: str, download_url: str):
     """
-    with advisory_lock(f'av-scan-{document_pk}'):
-        _process_document(document_pk)
+    Virus scans an uploaded document.
 
+    :param document_pk: pk of a document to be scanned
+    :param download_url: URL to a file to be scanned
 
-def _process_document(document_pk: str):
-    """Virus scans an uploaded document."""
+    :raises VirusScanException: when one following of happens:
+        - AV service is not configured
+        - file couldn't be downloaded
+        - unknown response returned by the AV service
+    """
     if not settings.AV_SERVICE_URL:
         raise VirusScanException(f'Cannot scan document with ID {document_pk}; AV service URL not'
                                  f'configured')
 
-    doc = Document.objects.get(pk=document_pk)
-    if doc.scan_initiated_on is not None:
-        warn_msg = f'Skipping scan of doc:{document_pk}, scan already initiated'
-        logger.warning(warn_msg)
-        client.captureMessage(warn_msg)
+    logger.info(f'Virus scanning of Document with ID {document_pk} started.')
+
+    document = get_document_by_pk(document_pk)
+    if not document or document.scanned_on or document.scan_initiated_on:
         return
 
-    doc.scan_initiated_on = now()
-    doc.save()
+    document.mark_scan_initiated()
 
-    is_file_clean = _scan_s3_object(doc.filename, doc.s3_bucket, doc.s3_key)
+    try:
+        is_file_clean = _download_and_scan_file(str(document.pk), download_url)
+    except Exception as exc:
+        document.mark_scan_failed(str(exc))
+        logger.error(f'Virus scanning of document with ID {document_pk} failed.')
+        raise
 
-    doc.scanned_on = now()
-    doc.av_clean = is_file_clean
-    doc.save()
+    # TODO: add reason from v2 API response
+    document.mark_as_scanned(is_file_clean, '')
+
+    logger.info(f'Virus scanning of Document with ID {document_pk} '
+                f'completed (av_clean={is_file_clean}).')
 
 
-def _scan_s3_object(original_filename, bucket, key):
-    """Virus scans a file stored in S3."""
-    s3_client = get_s3_client()
-    response = s3_client.get_object(Bucket=bucket, Key=key)
-    with closing(response['Body']):
-        return _scan_raw_file(
-            original_filename, S3StreamingBodyWrapper(response), response['ContentType']
+def _download_and_scan_file(document_pk: str, download_url: str):
+    """Virus scans a file stored on remote server."""
+    with requests.get(download_url, stream=True) as response:
+        try:
+            response.raise_for_status()
+        except HTTPError as exc:
+            raise VirusScanException(
+                f'Unable to download the document with ID {document_pk} '
+                f'for scanning (status_code={exc.response.status_code}).'
+            ) from exc
+        length = response.headers['content-length']
+
+        content = StreamingIterator(
+            length,
+            response.iter_content(chunk_size=settings.AV_SERVICE_CHUNK_SIZE)
         )
+        return _scan_raw_file(document_pk, content, response.headers['content-type'])
 
 
-def _scan_raw_file(filename, file_object, content_type):
+def _scan_raw_file(document_pk, content, content_type):
     """Virus scans a file-like object."""
     multipart_fields = {
         'file': (
-            filename,
-            file_object,
+            document_pk,
             content_type,
+            content,
         )
     }
     encoder = MultipartEncoder(fields=multipart_fields)
@@ -105,9 +89,8 @@ def _scan_raw_file(filename, file_object, content_type):
     )
     response.raise_for_status()
     if response.text not in ('OK', 'NOTOK'):
-        raise VirusScanException(f'Unexpected response from AV service: {response.content}')
+        raise VirusScanException(
+            f'Unexpected response from AV service: {response.text} '
+            f'when scanning document with ID {document_pk}'
+        )
     return response.text == 'OK'
-
-
-class VirusScanException(DataHubException):
-    """Exceptions raised when scanning documents for viruses."""
