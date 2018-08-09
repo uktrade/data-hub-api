@@ -82,7 +82,7 @@ class IProjectDocumentAdmin(BaseModelAdminMixin, admin.ModelAdmin):
     """Investment project document admin."""
 
     list_display = (
-        'id', 'doc_type', 'filename'
+        'id', 'doc_type', 'original_filename'
     )
     list_filter = (
         'doc_type',

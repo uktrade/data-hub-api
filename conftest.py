@@ -9,7 +9,7 @@ from django.core.management import call_command
 from elasticsearch.helpers.test import get_test_client
 from pytest_django.lazy_django import skip_if_no_django
 
-from datahub.core.utils import get_s3_client
+from datahub.documents.utils import get_s3_client_for_bucket
 from datahub.metadata.test.factories import SectorFactory
 from datahub.search.apps import get_search_apps
 from datahub.search.elasticsearch import (
@@ -93,8 +93,8 @@ def track_return_values(monkeypatch):
 
 @pytest.fixture()
 def s3_stubber():
-    """S3 stubber using the botocore Stubber class"""
-    s3_client = get_s3_client()
+    """S3 stubber using the botocore Stubber class."""
+    s3_client = get_s3_client_for_bucket('default')
     with Stubber(s3_client) as s3_stubber:
         yield s3_stubber
 
