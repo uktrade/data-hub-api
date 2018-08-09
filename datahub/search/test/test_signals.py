@@ -65,7 +65,7 @@ class TestDisableSignalsForModel:
         assert all(
             receiver.is_connected
             for search_app in get_search_apps()
-            for receiver in search_app.get_signals_receivers()
+            for receiver in search_app.get_signal_receivers()
             if receiver.sender is SimpleModel
         )
 
@@ -83,7 +83,7 @@ class TestDisableSignalsForModel:
         assert all(
             receiver.is_connected
             for search_app in get_search_apps()
-            for receiver in search_app.get_signals_receivers()
+            for receiver in search_app.get_signal_receivers()
             if receiver.sender is SimpleModel
         )
 
@@ -99,6 +99,6 @@ class TestDisableSignalsForModel:
         assert not any(
             receiver.is_connected
             for search_app in get_search_apps()
-            for receiver in search_app.get_signals_receivers()
+            for receiver in search_app.get_signal_receivers()
             if receiver.sender is SimpleModel
         )
