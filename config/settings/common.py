@@ -362,7 +362,7 @@ ACTIVITY_STREAM_NONCE_EXPIRY_SECONDS = 60
 
 DOCUMENT_BUCKETS = {
     'default': {
-        'bucket': env('DOCUMENTS_BUCKET'),
+        'bucket': env('DEFAULT_BUCKET'),
         'aws_access_key_id': env('AWS_ACCESS_KEY_ID', default=''),
         'aws_secret_access_key': env('AWS_SECRET_ACCESS_KEY', default=''),
         'aws_region': env('AWS_DEFAULT_REGION', default=''),

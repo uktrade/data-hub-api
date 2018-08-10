@@ -5,7 +5,6 @@ import uuid
 from collections import Counter
 from datetime import date, datetime
 from operator import attrgetter
-from unittest.mock import patch
 
 import pytest
 import reversion
@@ -22,11 +21,10 @@ from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
     APITestMixin, create_test_user, format_date_or_datetime, random_obj_for_model,
 )
-from datahub.documents.models import Document
 from datahub.investment import views
 from datahub.investment.models import (
-    InvestmentDeliveryPartner, InvestmentProject, InvestmentProjectPermission,
-    InvestmentProjectTeamMember, IProjectDocument
+    InvestmentDeliveryPartner, InvestmentProject,
+    InvestmentProjectPermission, InvestmentProjectTeamMember
 )
 from datahub.investment.test.factories import (
     ActiveInvestmentProjectFactory, AssignPMInvestmentProjectFactory,
@@ -3201,120 +3199,6 @@ class TestArchiveViews(APITestMixin):
         response = api_client.post(url)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
-
-
-class TestDocumentViews(APITestMixin):
-    """Tests for the document views."""
-
-    def test_documents_list_is_filtered_by_project(self):
-        """Tests viewset filtering."""
-        project1 = InvestmentProjectFactory()
-        project2 = InvestmentProjectFactory()
-
-        IProjectDocument.objects.create(
-            project=project1, doc_type='total_investment', original_filename='test.txt'
-        )
-        doc2 = IProjectDocument.objects.create(
-            project=project2, doc_type='total_investment', original_filename='test.txt'
-        )
-
-        url = reverse('api-v3:investment:document-collection',
-                      kwargs={'project_pk': project2.pk})
-
-        response = self.api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.data
-        assert response_data['count'] == 1
-        assert len(response_data['results']) == 1
-        assert response_data['results'][0]['id'] == str(doc2.pk)
-
-    @patch.object(Document, 'get_signed_upload_url')
-    def test_document_creation(self, get_signed_upload_url_mock):
-        """Test document creation can omit project PK (Will be inferred from URL)."""
-        get_signed_upload_url_mock.return_value = 'http://document-about-ocelots'
-
-        project = InvestmentProjectFactory()
-
-        url = reverse('api-v3:investment:document-collection',
-                      kwargs={'project_pk': project.pk})
-
-        response = self.api_client.post(url, format='json', data={
-            'original_filename': 'test.txt',
-            'doc_type': 'total_investment',
-            'project': str(project.pk),
-        })
-
-        assert response.status_code == status.HTTP_201_CREATED
-        response_data = response.data
-        assert response_data['doc_type'] == 'total_investment'
-        assert response_data['original_filename'] == 'test.txt'
-        assert response_data['project']['id'] == str(project.pk)
-
-        doc = IProjectDocument.objects.get(pk=response_data['id'])
-        assert doc.original_filename == 'test.txt'
-        assert doc.doc_type == 'total_investment'
-        assert doc.project.pk == project.pk
-        assert response_data['signed_upload_url'] == 'http://document-about-ocelots'
-
-    def test_document_retrieval(self):
-        """Tests retrieval of individual document."""
-        project = InvestmentProjectFactory()
-        entity_document = IProjectDocument.objects.create(
-            project=project, doc_type='total_investment', original_filename='test.txt'
-        )
-
-        url = reverse('api-v3:investment:document-item',
-                      kwargs={'project_pk': project.pk, 'entity_document_pk': entity_document.pk})
-
-        response = self.api_client.get(url)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['id'] == str(entity_document.pk)
-        assert response.data['project'] == {
-            'id': str(project.pk),
-            'name': project.name,
-        }
-        assert response.data['doc_type'] == 'total_investment'
-        assert response.data['original_filename'] == 'test.txt'
-        assert 'signed_url' in response.data
-
-    @patch('datahub.documents.tasks.virus_scan_document.apply_async')
-    def test_document_upload_status(self, virus_scan_document_apply_async):
-        """Tests setting of document upload status to complete.
-
-        Checks that a virus scan of the document was scheduled. Virus scanning is
-        tested separately in the documents app.
-        """
-        project = InvestmentProjectFactory()
-        entity_document = IProjectDocument.objects.create(
-            project=project, doc_type='total_investment', original_filename='test.txt'
-        )
-
-        url = reverse('api-v3:investment:document-item-callback',
-                      kwargs={'project_pk': project.pk, 'entity_document_pk': entity_document.pk})
-
-        response = self.api_client.post(url, format='json')
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['status'] == 'virus_scanning_scheduled'
-        virus_scan_document_apply_async.assert_called_once_with(
-            args=(str(entity_document.document.pk),)
-        )
-
-    def test_document_delete(self):
-        """Tests document deletion."""
-        project = InvestmentProjectFactory()
-        entity_document = IProjectDocument.objects.create(
-            project=project, doc_type='total_investment', original_filename='test.txt'
-        )
-        entity_document.document.mark_scan_scheduled()
-        entity_document.document.mark_as_scanned(True, 'reason')
-
-        url = reverse('api-v3:investment:document-item',
-                      kwargs={'project_pk': project.pk, 'entity_document_pk': entity_document.pk})
-
-        response = self.api_client.delete(url)
-        assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
 @pytest.mark.parametrize('view_set', (views.IProjectAuditViewSet,))
