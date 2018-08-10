@@ -82,10 +82,11 @@ class IsAssociatedToInvestmentProjectPropositionFilter(IsAssociatedToInvestmentP
 
 class _HasAssociatedInvestmentProjectValidator:
     """
-    Validator which enforces association permissions when adding or updating associated object.
+    Validator which enforces association permissions when adding associated object.
+
+    When subclassing, checker and non_associated_investment_project_message have to be overridden.
     """
 
-    required_message = 'This field is required.'
     non_associated_investment_project_message = None
     checker = None
 
@@ -98,7 +99,6 @@ class _HasAssociatedInvestmentProjectValidator:
     def set_context(self, serializer):
         """
         Saves a reference to the serializer object.
-
         Called by DRF.
         """
         self.serializer = serializer
@@ -106,7 +106,6 @@ class _HasAssociatedInvestmentProjectValidator:
     def __call__(self, attrs):
         """
         Performs validation. Called by DRF.
-
         :param attrs:   Serializer data (post-field-validation/processing)
         """
         if self.serializer.instance:
@@ -220,3 +219,4 @@ class PropositionDocumentHasAssociatedInvestmentProjectValidator(
     non_associated_investment_project_message = (
         "You don't have permission to add a proposition document for this investment project."
     )
+    checker = InvestmentProjectPropositionDocumentAssociationChecker()

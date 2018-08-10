@@ -1,0 +1,149 @@
+- model: evidence.evidencetag
+  pk: 2b10e341-590d-43ec-b592-e44ca48220c6
+  fields:
+    name: "Check A - FDI eligibility: New or additional funding"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: d5145304-cacd-47ec-b808-4306a151b7d5
+  fields:
+    name: "Check A - FDI eligibility: 10% ownership of UK company"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: b7fea6c5-8dce-4f68-b036-0badad43d127
+  fields:
+    name: "Check A - FDI eligibility: Business will last for 3 years"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: e8bc969c-d675-4282-acae-1a0535626896
+  fields:
+    name: "Check A - FDI eligibility: New permanent jobs"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: c1e208ea-c9a6-4fd2-ac5d-a09dd86d7758
+  fields:
+    name: "Check A - FDI eligibility: Safeguarded jobs"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: 74d2739c-4806-4a5c-ba2e-56081c2edf43
+  fields:
+    name: "Check B - Non-FDI: New intellectual property"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: 9bc91433-27ca-453e-aed1-4cbeaf477c76
+  fields:
+    name: "Check B - Non-FDI: Create or maintain jobs"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: 65a3d711-7d6e-4733-ae4c-a41c53574da1
+  fields:
+    name: "Check B - Non-FDI: Continuation of R&D or partnership"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: 1340b97e-8368-443c-b4d6-b8f317a7912e
+  fields:
+    name: "Check C - FDI validation: UK company registered (if not already linked through Data Hub)"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: 23e2e337-336d-4887-88ad-44773cfcfcb6
+  fields:
+    name: "Check C - FDI validation: Investment funds secured"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: 1bc1286c-372e-409d-9749-14e817004a77
+  fields:
+    name: "Check C - FDI validation: Visit report"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: 85847439-008f-4a11-9c74-8f27ee4a0a65
+  fields:
+    name: "Check C - FDI validation: Press release"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: 74e8d272-ccdc-4070-b90a-2f0da54c8ef0
+  fields:
+    name: "Check C - FDI validation: UK operational address"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: afbd5ece-c2b3-4441-90f9-dcf3b2e252d5
+  fields:
+    name: "Check C - FDI validation: New permanent jobs"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: cd0e4fb0-79df-4f2a-ae2b-7b849d315551
+  fields:
+    name: "Check C - FDI validation: Government assistance"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: cb0d96d6-4192-4784-9358-7372883e1602
+  fields:
+    name: "Check D - Value categorisation: Total investment value"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: 4fe23548-9c7d-4888-a965-6d5fe170620e
+  fields:
+    name: "Check D - Value categorisation: New jobs (created or additional)"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: f12032a3-a6f5-4c9d-84a1-19e403ba4d15
+  fields:
+    name: "Check D - Value categorisation: Salaries of new jobs"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: 337f050d-49de-474f-b5e3-5980b606e5f1
+  fields:
+    name: "Check D - Value categorisation: R&D"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: 2ac9125a-fc72-46dc-9e5e-696b42751601
+  fields:
+    name: "Check D - Value categorisation: Global HQ"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: bcdbc110-179e-49cb-85ee-7dad415bcdb1
+  fields:
+    name: "Check D - Value categorisation: European HQ"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: 4bc0f296-df29-4935-a202-eca3786c3a6f
+  fields:
+    name: "Check D - Value categorisation: Export-oriented FDI"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: 8310073f-3cd5-4b18-ace9-03e164944cb4
+  fields:
+    name: "Check D - Value categorisation: Investor quality"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: d3652023-785c-4925-93f9-dc4caa0fe86e
+  fields:
+    name: "Check D - Commitment to Invest: Public commitment to invest"
+    disabled_on: null
+
+- model: evidence.evidencetag
+  pk: e77fae4a-f337-4401-b735-cadc88bfff29
+  fields:
+    name: "Check D - Commitment to Invest: Expected to land"
+    disabled_on: null

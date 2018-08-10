@@ -3,7 +3,8 @@ from rest_framework import serializers
 from datahub.company.serializers import NestedAdviserField
 from datahub.investment.proposition.models import Proposition, PropositionDocument
 from datahub.investment.proposition.permissions import (
-    PropositionHasAssociatedInvestmentProjectValidator
+    PropositionDocumentHasAssociatedInvestmentProjectValidator,
+    PropositionHasAssociatedInvestmentProjectValidator,
 )
 from datahub.investment.serializers import NestedInvestmentProjectField
 
@@ -71,6 +72,9 @@ class PropositionDocumentSerializer(serializers.ModelSerializer):
             'status',
         )
         read_only_fields = ('url', 'created_on', )
+        validators = (
+            PropositionDocumentHasAssociatedInvestmentProjectValidator(),
+        )
 
     def create(self, validated_data):
         """Create proposition document."""
