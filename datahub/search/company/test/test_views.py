@@ -703,7 +703,6 @@ class TestSearchExport(APITestMixin):
                 'modified_on',
                 'name',
                 'one_list_account_owner',
-                'parent',
                 'reference_code',
                 'registered_address_1',
                 'registered_address_2',

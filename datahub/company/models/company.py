@@ -132,10 +132,6 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         metadata_models.CompanyClassification, blank=True, null=True,
         on_delete=models.SET_NULL
     )
-    parent = models.ForeignKey(
-        'self', blank=True, null=True, on_delete=models.SET_NULL,
-        related_name='children'
-    )
     global_headquarters = models.ForeignKey(
         'self', blank=True, null=True, on_delete=models.SET_NULL,
         related_name='subsidiaries',

@@ -65,7 +65,6 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
             'HIERARCHY',
             {
                 'fields': (
-                    'parent',
                     'headquarter_type',
                     'global_headquarters',
                 )
@@ -129,7 +128,6 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
         'company_number',
     )
     raw_id_fields = (
-        'parent',
         'global_headquarters',
         'one_list_account_owner',
         'account_manager',
