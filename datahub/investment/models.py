@@ -19,7 +19,6 @@ from datahub.core.models import (
     BaseModel,
 )
 from datahub.core.utils import StrEnum
-from datahub.documents.models import AbstractEntityDocumentModel
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -556,37 +555,6 @@ class InvestmentProjectCode(models.Model):
     """
 
     project = models.OneToOneField(InvestmentProject, on_delete=models.CASCADE)
-
-
-class IProjectDocument(AbstractEntityDocumentModel, ArchivableModel):
-    """Investment Project Document."""
-
-    DOC_TYPES = Choices(
-        ('actual_land_date', 'Actual land date'),
-        ('hq', 'Global/European HQ evidence'),
-        ('foreign_ownership', 'Foreign ownership evidence'),
-        ('operations_commenced', 'Operations commenced'),
-        ('total_investment', 'Total investment'),
-        ('foreign_equity_investment', 'Foreign equity investment'),
-        ('number_new_jobs', 'Number new jobs'),
-        ('number_safeguarded_jobs', 'Number safeguarded jobs'),
-        ('r_and_d_budget', 'R and D budget'),
-        ('new_tech_to_uk', 'New tech to uk'),
-        ('export_revenue', 'Export revenue'),
-        ('average_salary', 'Average salary'),
-    )
-
-    project = models.ForeignKey(
-        InvestmentProject,
-        related_name='documents',
-        on_delete=models.CASCADE,
-    )
-    doc_type = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH, choices=DOC_TYPES)
-
-    class Meta:
-        verbose_name = 'investment project document'
-        verbose_name_plural = 'investment project documents'
-        permissions = (('read_iprojectdocument', 'Can read investment project document'),)
 
 
 class SpecificProgramme(BaseConstantModel):
