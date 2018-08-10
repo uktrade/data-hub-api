@@ -40,3 +40,7 @@ class EvidenceDocument(AbstractEntityDocumentModel):
 
     class Meta:
         verbose_name = 'investment project evidence document'
+
+    def __str__(self):
+        """Human readable representation of the object."""
+        return f'{self.evidence.name} - {self.original_filename}'
