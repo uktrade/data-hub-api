@@ -13,18 +13,13 @@ from rest_framework.response import Response
 from datahub.core.audit import AuditViewSet
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.viewsets import CoreViewSet
-from datahub.documents.views import BaseEntityDocumentModelViewSet
-from datahub.investment.models import (
-    InvestmentProject, InvestmentProjectTeamMember, IProjectDocument
-)
+from datahub.investment.models import InvestmentProject, InvestmentProjectTeamMember
 from datahub.investment.permissions import (
     InvestmentProjectModelPermissions, InvestmentProjectTeamMemberModelPermissions,
     IsAssociatedToInvestmentProjectFilter, IsAssociatedToInvestmentProjectPermission,
     IsAssociatedToInvestmentProjectTeamMemberPermission,
 )
-from datahub.investment.serializers import (
-    IProjectDocumentSerializer, IProjectSerializer, IProjectTeamMemberSerializer,
-)
+from datahub.investment.serializers import IProjectSerializer, IProjectTeamMemberSerializer
 from datahub.oauth.scopes import Scope
 
 _team_member_queryset = InvestmentProjectTeamMember.objects.select_related('adviser')
@@ -231,21 +226,3 @@ class IProjectTeamMembersViewSet(CoreViewSet):
     def _check_project_exists(self):
         if not InvestmentProject.objects.filter(pk=self.kwargs['project_pk']).exists():
             raise Http404(self.non_existent_project_error_message)
-
-
-class IProjectDocumentViewSet(BaseEntityDocumentModelViewSet):
-    """Investment Project Documents ViewSet."""
-
-    required_scopes = (Scope.internal_front_end,)
-    serializer_class = IProjectDocumentSerializer
-
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('doc_type',)
-
-    def get_queryset(self):
-        """Returns investment project documents queryset."""
-        return IProjectDocument.objects.filter(project__id=self.kwargs['project_pk'])
-
-    def get_view_name(self):
-        """Returns the view set name for the DRF UI."""
-        return 'Investment project documents'
