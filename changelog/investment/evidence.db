@@ -1,0 +1,1 @@
+New tables ``evidence_evidencedocuments``, ``evidence_evidence_tag`` and ``evidence_evidencedocument_tags`` have been added to enable evidence document upload.
