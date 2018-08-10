@@ -34,7 +34,6 @@ class Company(BaseESModel):
     name_keyword = fields.SortableCaseInsensitiveKeywordText()
     name_trigram = fields.TrigramText()
     one_list_account_owner = fields.nested_contact_or_adviser_field('one_list_account_owner')
-    parent = fields.nested_id_name_field()
     reference_code = fields.SortableCaseInsensitiveKeywordText()
     registered_address_1 = Text()
     registered_address_2 = Text()
@@ -94,7 +93,6 @@ class Company(BaseESModel):
         'global_headquarters': dict_utils.id_name_dict,
         'headquarter_type': dict_utils.id_name_dict,
         'one_list_account_owner': dict_utils.contact_or_adviser_dict,
-        'parent': dict_utils.id_name_dict,
         'registered_address_country': dict_utils.id_name_dict,
         'sector': dict_utils.sector_dict,
         'trading_address_country': dict_utils.id_name_dict,
