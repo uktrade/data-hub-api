@@ -4,7 +4,7 @@ from django.urls import include, path
 
 from datahub.investment.proposition.urls import urlpatterns as proposition_urlpatterns
 from datahub.investment.views import (
-    IProjectAuditViewSet, IProjectDocumentViewSet, IProjectModifiedSinceViewSet,
+    IProjectAuditViewSet, IProjectModifiedSinceViewSet,
     IProjectTeamMembersViewSet, IProjectViewSet
 )
 
@@ -46,20 +46,6 @@ unarchive_item = IProjectViewSet.as_view({
     'post': 'unarchive',
 })
 
-project_document_collection = IProjectDocumentViewSet.as_view({
-    'get': 'list',
-    'post': 'create',
-})
-
-project_document_item = IProjectDocumentViewSet.as_view({
-    'get': 'retrieve',
-    'delete': 'destroy',
-})
-
-project_document_callback = IProjectDocumentViewSet.as_view({
-    'post': 'upload_complete_callback',
-})
-
 
 urlpatterns = [
     path(
@@ -91,21 +77,6 @@ urlpatterns = [
         'investment/<uuid:project_pk>/team-member/<uuid:adviser_pk>',
         project_team_member_item,
         name='team-member-item'
-    ),
-    path(
-        'investment/<uuid:project_pk>/document',
-        project_document_collection,
-        name='document-collection'
-    ),
-    path(
-        'investment/<uuid:project_pk>/document/<uuid:entity_document_pk>',
-        project_document_item,
-        name='document-item'
-    ),
-    path(
-        'investment/<uuid:project_pk>/document/<uuid:entity_document_pk>/upload-callback',
-        project_document_callback,
-        name='document-item-callback'
     ),
     path(
         'investment/<uuid:pk>/unarchive',
