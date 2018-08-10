@@ -1,4 +1,7 @@
+from contextlib import contextmanager
 from logging import getLogger
+
+from datahub.search.apps import get_search_apps
 
 logger = getLogger(__name__)
 
@@ -19,6 +22,7 @@ class SignalReceiver:
 
     def __init__(self, signal, sender, receiver_func):
         """Initialises the instance."""
+        self.is_connected = False
         self.signal = signal
         self.sender = sender
         self._receiver_func = receiver_func
@@ -36,6 +40,7 @@ class SignalReceiver:
             sender=self.sender,
             dispatch_uid=self._dispatch_uid
         )
+        self.is_connected = True
 
     def disconnect(self):
         """Disconnects the signal receiver."""
@@ -44,3 +49,28 @@ class SignalReceiver:
             sender=self.sender,
             dispatch_uid=self._dispatch_uid
         )
+        self.is_connected = False
+
+
+@contextmanager
+def disable_search_signal_receivers(model):
+    """
+    Context manager that disables search signals receivers for a particular model.
+
+    This disables any signal receivers for that model in all search apps, not just the search
+    app corresponding to that model.
+    """
+    signal_receivers = [
+        receiver for search_app in get_search_apps()
+        for receiver in search_app.get_signal_receivers()
+        if receiver.sender == model and receiver.is_connected
+    ]
+
+    for receiver in signal_receivers:
+        receiver.disconnect()
+
+    try:
+        yield
+    finally:
+        for receiver in signal_receivers:
+            receiver.connect()
