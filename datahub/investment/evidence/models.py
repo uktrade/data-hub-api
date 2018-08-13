@@ -12,8 +12,8 @@ from datahub.documents.models import AbstractEntityDocumentModel
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-class Evidence(BaseModel):
-    """Evidence model."""
+class EvidenceDocumentCollection(BaseModel):
+    """Evidence document collection model."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     investment_project = models.ForeignKey(
@@ -32,8 +32,8 @@ class EvidenceDocument(AbstractEntityDocumentModel):
 
     BUCKET = 'investment'
 
-    evidence = models.ForeignKey(
-        Evidence,
+    evidence_document_collection = models.ForeignKey(
+        EvidenceDocumentCollection,
         related_name='documents',
         on_delete=models.CASCADE,
     )
