@@ -134,4 +134,4 @@ def test_audit_log(s3_stubber):
 
     versions = Version.objects.get_for_object(company_with_change)
     assert versions.count() == 1
-    assert versions[0].revision.comment == 'Company name correction.'
+    assert versions[0].revision.get_comment() == 'Company name correction.'
