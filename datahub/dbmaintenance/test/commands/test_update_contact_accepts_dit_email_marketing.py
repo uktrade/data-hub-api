@@ -148,4 +148,4 @@ def test_audit_log(s3_stubber):
 
     versions = Version.objects.get_for_object(contact_with_change)
     assert versions.count() == 1
-    assert versions[0].revision.comment == 'Accepts DIT email marketing correction.'
+    assert versions[0].revision.get_comment() == 'Accepts DIT email marketing correction.'

@@ -263,7 +263,7 @@ def test_audit_log(s3_stubber):
 
     versions = Version.objects.get_for_object(company_needs_global_hq)
     assert len(versions) == 1
-    assert versions[0].revision.comment == 'Global HQ data correction.'
+    assert versions[0].revision.get_comment() == 'Global HQ data correction.'
 
     versions = Version.objects.get_for_object(company_ghq_set_already)
     assert len(versions) == 0
@@ -304,11 +304,11 @@ def test_override_audit_log(s3_stubber):
 
     versions = Version.objects.get_for_object(company_needs_global_hq)
     assert len(versions) == 1
-    assert versions[0].revision.comment == 'Global HQ data correction.'
+    assert versions[0].revision.get_comment() == 'Global HQ data correction.'
 
     versions = Version.objects.get_for_object(company_ghq_set_already)
     assert len(versions) == 1
-    assert versions[0].revision.comment == 'Global HQ data correction.'
+    assert versions[0].revision.get_comment() == 'Global HQ data correction.'
 
 
 def test_validation(s3_stubber, caplog):
