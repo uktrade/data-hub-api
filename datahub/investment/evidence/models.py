@@ -13,7 +13,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 class EvidenceGroup(BaseModel):
-    """Evidence document collection model."""
+    """Evidence Group model."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     investment_project = models.ForeignKey(
