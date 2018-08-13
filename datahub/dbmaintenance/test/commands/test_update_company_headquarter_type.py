@@ -156,7 +156,7 @@ def test_audit_log(s3_stubber):
 
     versions = Version.objects.get_for_object(company_no_hq_type)
     assert len(versions) == 1
-    assert versions[0].revision.comment == 'Headquarter type data migration correction.'
+    assert versions[0].revision.get_comment() == 'Headquarter type data migration correction.'
 
     versions = Version.objects.get_for_object(company_ehq)
     assert len(versions) == 0
