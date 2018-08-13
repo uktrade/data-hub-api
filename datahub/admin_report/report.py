@@ -10,27 +10,7 @@ from datahub.core.exceptions import DataHubException
 _registry = {}
 
 
-class _ReportMeta(type):
-    """
-    Metaclass for report definitions.
-
-    Used to auto-register report definitions.
-    """
-
-    def __new__(mcs, name, bases, namespace, **kwargs):  # noqa: N804
-        """
-        Creates the metaclass instance.
-
-        Called whenever a subclass of Report is defined.
-        """
-        is_abstract = namespace.pop('abstract', False)
-        cls = type.__new__(mcs, name, bases, namespace)
-        if not is_abstract:
-            cls.register()
-        return cls
-
-
-class Report(metaclass=_ReportMeta):
+class Report:
     """
     Base class for reports.
 
@@ -43,7 +23,6 @@ class Report(metaclass=_ReportMeta):
     permissions_required: Sequence = None
     field_titles: dict = None
     filename_template = '{name} - {timestamp}'
-    abstract = True
 
     _required_attrs = (
         'id',
@@ -54,10 +33,12 @@ class Report(metaclass=_ReportMeta):
     )
 
     @classmethod
-    def register(cls):
+    def __init_subclass__(cls, is_abstract=False, **kwargs):
         """Called on class declaration to register the report."""
-        cls._validate_attrs()
-        _registry[cls.id] = cls()
+        super().__init_subclass__(**kwargs)
+        if not is_abstract:
+            cls._validate_attrs()
+            _registry[cls.id] = cls()
 
     def check_permission(self, user):
         """Checks whether the user has permission for this report."""
@@ -84,11 +65,10 @@ class Report(metaclass=_ReportMeta):
             )
 
 
-class QuerySetReport(Report):
+class QuerySetReport(Report, is_abstract=True):
     """Base class for reports based on a QuerySet."""
 
     queryset = None
-    abstract = True
 
     _required_attrs = (
         *Report._required_attrs,

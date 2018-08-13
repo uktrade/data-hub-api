@@ -4,32 +4,15 @@ from pathlib import PurePath
 _registry = []
 
 
-class FixtureMeta(type):
-    """
-    Metaclass for metadata fixtures.
-
-    Used to auto-register metadata fixtures.
-    """
-
-    def __new__(mcs, name, bases, namespace, **kwargs):  # noqa: N804
-        """
-        Creates the metaclass instance.
-
-        Called on Fixture subclass declaration.
-        """
-        cls = type.__new__(mcs, name, bases, namespace)
-        cls.register()
-        return cls
-
-
-class Fixture(metaclass=FixtureMeta):
+class Fixture:
     """Class to register metadata fixtures."""
 
     files = []
 
     @classmethod
-    def register(cls):
+    def __init_subclass__(cls, **kwargs):
         """Called on class declaration to register the class's fixtures."""
+        super().__init_subclass__(**kwargs)
         directory_path = PurePath(inspect.getsourcefile(cls)).parent
         _registry.extend(directory_path / file for file in cls.files)
 
