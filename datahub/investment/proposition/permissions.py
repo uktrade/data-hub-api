@@ -1,10 +1,9 @@
-from rest_framework.exceptions import ValidationError
-
 from datahub.core.permissions import IsAssociatedToObjectPermission, ViewBasedModelPermissions
 from datahub.core.utils import StrEnum
-from datahub.investment.models import InvestmentProject
 from datahub.investment.permissions import (
-    InvestmentProjectAssociationCheckerBase, IsAssociatedToInvestmentProjectFilter
+    HasAssociatedInvestmentProjectValidator,
+    InvestmentProjectAssociationCheckerBase,
+    IsAssociatedToInvestmentProjectFilter
 )
 from datahub.investment.proposition.models import Proposition, PropositionDocument
 
@@ -80,58 +79,7 @@ class IsAssociatedToInvestmentProjectPropositionFilter(IsAssociatedToInvestmentP
     checker_class = InvestmentProjectPropositionAssociationChecker
 
 
-class _HasAssociatedInvestmentProjectValidator:
-    """
-    Validator which enforces association permissions when adding or updating associated object.
-    """
-
-    required_message = 'This field is required.'
-    non_associated_investment_project_message = None
-    checker = None
-
-    def __init__(self):
-        """
-        Initialises the validator.
-        """
-        self.serializer = None
-
-    def set_context(self, serializer):
-        """
-        Saves a reference to the serializer object.
-
-        Called by DRF.
-        """
-        self.serializer = serializer
-
-    def __call__(self, attrs):
-        """
-        Performs validation. Called by DRF.
-
-        :param attrs:   Serializer data (post-field-validation/processing)
-        """
-        if self.serializer.instance:
-            return
-
-        request = self.serializer.context['request']
-        view = self.serializer.context['view']
-
-        if not self.checker.should_apply_restrictions(request, view.action):
-            return
-
-        project_pk = request.parser_context['kwargs']['project_pk']
-        investment_project = InvestmentProject.objects.get(pk=project_pk)
-
-        if not self.checker.is_associated(request, investment_project):
-            raise ValidationError({
-                'investment_project': self.non_associated_investment_project_message,
-            }, code='access_denied')
-
-    def __repr__(self):
-        """Returns the string representation of this object."""
-        return f'{self.__class__.__name__}()'
-
-
-class PropositionHasAssociatedInvestmentProjectValidator(_HasAssociatedInvestmentProjectValidator):
+class PropositionHasAssociatedInvestmentProjectValidator(HasAssociatedInvestmentProjectValidator):
     """Validator which enforces association permissions when adding or updating propositions."""
 
     non_associated_investment_project_message = (
@@ -212,7 +160,7 @@ class IsAssociatedToInvestmentProjectPropositionDocumentFilter(
 
 
 class PropositionDocumentHasAssociatedInvestmentProjectValidator(
-    _HasAssociatedInvestmentProjectValidator
+    HasAssociatedInvestmentProjectValidator
 ):
     """Validator which enforces association permissions when adding or updating propositions."""
 

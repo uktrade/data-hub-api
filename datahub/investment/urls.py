@@ -2,6 +2,7 @@
 
 from django.urls import include, path
 
+from datahub.investment.evidence.urls import urlpatterns as evidence_group_urlpatterns
 from datahub.investment.proposition.urls import urlpatterns as proposition_urlpatterns
 from datahub.investment.views import (
     IProjectAuditViewSet, IProjectModifiedSinceViewSet,
@@ -93,6 +94,13 @@ urlpatterns = [
         include(
             (proposition_urlpatterns, 'proposition',),
             namespace='proposition'
+        )
+    ),
+    path(
+        'investment/<uuid:project_pk>/',
+        include(
+            (evidence_group_urlpatterns, 'evidence-group',),
+            namespace='evidence-group'
         )
     ),
 ]

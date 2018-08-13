@@ -1,4 +1,5 @@
 from django.db.models.query_utils import Q
+from rest_framework.exceptions import ValidationError
 from rest_framework.filters import BaseFilterBackend
 
 from datahub.core.permissions import (
@@ -161,6 +162,57 @@ class IsAssociatedToInvestmentProjectFilter(BaseFilterBackend):
 
     def _get_filter_field_prefix(self):
         return f'{self.model_attribute}__' if self.model_attribute else ''
+
+
+class HasAssociatedInvestmentProjectValidator:
+    """
+    Validator which enforces association permissions when adding or updating associated object.
+    """
+
+    required_message = 'This field is required.'
+    non_associated_investment_project_message = None
+    checker = None
+
+    def __init__(self):
+        """
+        Initialises the validator.
+        """
+        self.serializer = None
+
+    def set_context(self, serializer):
+        """
+        Saves a reference to the serializer object.
+
+        Called by DRF.
+        """
+        self.serializer = serializer
+
+    def __call__(self, attrs):
+        """
+        Performs validation. Called by DRF.
+
+        :param attrs:   Serializer data (post-field-validation/processing)
+        """
+        if self.serializer.instance:
+            return
+
+        request = self.serializer.context['request']
+        view = self.serializer.context['view']
+
+        if not self.checker.should_apply_restrictions(request, view.action):
+            return
+
+        project_pk = request.parser_context['kwargs']['project_pk']
+        investment_project = InvestmentProject.objects.get(pk=project_pk)
+
+        if not self.checker.is_associated(request, investment_project):
+            raise ValidationError({
+                'investment_project': self.non_associated_investment_project_message,
+            }, code='access_denied')
+
+    def __repr__(self):
+        """Returns the string representation of this object."""
+        return f'{self.__class__.__name__}()'
 
 
 class InvestmentProjectTeamMemberModelPermissions(InvestmentProjectModelPermissions):
