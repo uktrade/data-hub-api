@@ -16,7 +16,6 @@ from datahub.investment.models import (
     InvestmentProjectTeamMember,
     InvestorType,
     Involvement,
-    IProjectDocument,
     SpecificProgramme,
 )
 from datahub.metadata.admin import DisableableMetadataAdmin
@@ -74,34 +73,6 @@ class InvestmentProjectTeamMemberAdmin(VersionAdmin):
     raw_id_fields = (
         'investment_project',
         'adviser',
-    )
-
-
-@admin.register(IProjectDocument)
-class IProjectDocumentAdmin(BaseModelAdminMixin, admin.ModelAdmin):
-    """Investment project document admin."""
-
-    list_display = (
-        'id', 'doc_type', 'filename'
-    )
-    list_filter = (
-        'doc_type',
-    )
-    raw_id_fields = (
-        'archived_by',
-        'project',
-        'document',
-    )
-    date_hierarchy = 'created_on'
-    readonly_fields = (
-        'created',
-        'modified',
-    )
-    exclude = (
-        'created_on',
-        'created_by',
-        'modified_on',
-        'modified_by',
     )
 
 

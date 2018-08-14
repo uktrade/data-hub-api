@@ -9,12 +9,11 @@ from django.core.management import call_command
 from elasticsearch.helpers.test import get_test_client
 from pytest_django.lazy_django import skip_if_no_django
 
-from datahub.core.utils import get_s3_client
+from datahub.documents.utils import get_s3_client_for_bucket
 from datahub.metadata.test.factories import SectorFactory
 from datahub.search.apps import get_search_apps
 from datahub.search.elasticsearch import (
     alias_exists,
-    associate_index_with_alias,
     create_index,
     delete_alias,
     delete_index,
@@ -94,8 +93,8 @@ def track_return_values(monkeypatch):
 
 @pytest.fixture()
 def s3_stubber():
-    """S3 stubber using the botocore Stubber class"""
-    s3_client = get_s3_client()
+    """S3 stubber using the botocore Stubber class."""
+    s3_client = get_s3_client_for_bucket('default')
     with Stubber(s3_client) as s3_stubber:
         yield s3_stubber
 
@@ -199,9 +198,8 @@ def _setup_es_indexes(_es_client):
             delete_alias(write_alias)
 
         # Create indices and aliases
-        create_index(index_name, search_app.es_model._doc_type.mapping)
-        associate_index_with_alias(write_alias, index_name)
-        associate_index_with_alias(read_alias, index_name)
+        alias_names = (read_alias, write_alias)
+        create_index(index_name, search_app.es_model._doc_type.mapping, alias_names=alias_names)
 
     yield _es_client
 

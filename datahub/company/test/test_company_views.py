@@ -205,7 +205,9 @@ class TestGetCompany(APITestMixin):
             vat_number='009485769',
             registered_address_1='Goodbye St',
             registered_address_town='Barland',
-            registered_address_country_id=Country.united_kingdom.value.id
+            registered_address_country_id=Country.united_kingdom.value.id,
+            account_manager=AdviserFactory(),
+            one_list_account_owner=AdviserFactory()
         )
         user = create_test_user(
             permission_codenames=(
@@ -255,7 +257,16 @@ class TestGetCompany(APITestMixin):
                 'id': str(Country.united_kingdom.value.id),
                 'name': Country.united_kingdom.value.name,
             },
-            'account_manager': None,
+            'account_manager': {
+                'id': str(company.account_manager.pk),
+                'name': company.account_manager.name,
+                'first_name': company.account_manager.first_name,
+                'last_name': company.account_manager.last_name,
+                'dit_team': {
+                    'id': str(company.account_manager.dit_team.id),
+                    'name': company.account_manager.dit_team.name,
+                },
+            },
             'archived': False,
             'archived_by': None,
             'archived_documents_url_path': company.archived_documents_url_path,
@@ -279,7 +290,16 @@ class TestGetCompany(APITestMixin):
             'future_interest_countries': [],
             'headquarter_type': None,
             'modified_on': format_date_or_datetime(company.modified_on),
-            'one_list_account_owner': None,
+            'one_list_account_owner': {
+                'id': str(company.one_list_account_owner.pk),
+                'name': company.one_list_account_owner.name,
+                'first_name': company.one_list_account_owner.first_name,
+                'last_name': company.one_list_account_owner.last_name,
+                'dit_team': {
+                    'id': str(company.one_list_account_owner.dit_team.id),
+                    'name': company.one_list_account_owner.dit_team.name,
+                },
+            },
             'global_headquarters': None,
             'sector': {
                 'id': str(company.sector.id),
@@ -377,7 +397,10 @@ class TestGetCompany(APITestMixin):
         )
     )
     def test_get_company_with_website(self, input_website, expected_website):
-        """Test add new company with trading_address."""
+        """
+        Test that if the website field on a company doesn't have any scheme
+        specified, the endpoint adds it automatically.
+        """
         company = CompanyFactory(
             website=input_website
         )

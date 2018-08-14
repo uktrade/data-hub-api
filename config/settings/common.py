@@ -234,8 +234,6 @@ if ES_USE_AWS_AUTH:
 
 ES_URL = env('ES5_URL')
 ES_VERIFY_CERTS = env.bool('ES_VERIFY_CERTS', True)
-# TODO: Remove once all environments have been migrated to the new structure
-ES_LEGACY_INDEX = env.str('ES_INDEX', default='')
 ES_INDEX_PREFIX = env('ES_INDEX_PREFIX')
 ES_INDEX_SETTINGS = {
     'index.mapping.single_type': True,
@@ -251,8 +249,9 @@ CDMS_TEXT_MAX_LENGTH = 4000
 CHAR_FIELD_MAX_LENGTH = 255
 HEROKU = False
 BULK_INSERT_BATCH_SIZE = env.int('BULK_INSERT_BATCH_SIZE', default=25000)
-DOCUMENTS_BUCKET = env('DOCUMENTS_BUCKET')
+
 AV_SERVICE_URL = env('AV_SERVICE_URL', default=None)
+AV_SERVICE_CHUNK_SIZE = env.int('AV_SERVICE_CHUNK_SIZE', default=1024)
 
 # CACHE / REDIS
 REDIS_BASE_URL = env('REDIS_BASE_URL', default=None)
@@ -361,8 +360,23 @@ ACTIVITY_STREAM_ACCESS_KEY_ID = env('ACTIVITY_STREAM_ACCESS_KEY_ID')
 ACTIVITY_STREAM_SECRET_ACCESS_KEY = env('ACTIVITY_STREAM_SECRET_ACCESS_KEY')
 ACTIVITY_STREAM_NONCE_EXPIRY_SECONDS = 60
 
-# Investment Project reports
-REPORT_AWS_ACCESS_KEY_ID = env('REPORT_AWS_ACCESS_KEY_ID', default='')
-REPORT_AWS_SECRET_ACCESS_KEY = env('REPORT_AWS_SECRET_ACCESS_KEY', default='')
-REPORT_BUCKET = env('REPORT_BUCKET', default='')
-REPORT_AWS_REGION= env('REPORT_AWS_REGION', default='')
+DOCUMENT_BUCKETS = {
+    'default': {
+        'bucket': env('DEFAULT_BUCKET'),
+        'aws_access_key_id': env('AWS_ACCESS_KEY_ID', default=''),
+        'aws_secret_access_key': env('AWS_SECRET_ACCESS_KEY', default=''),
+        'aws_region': env('AWS_DEFAULT_REGION', default=''),
+    },
+    'investment': {
+        'bucket': env('INVESTMENT_DOCUMENT_BUCKET', default=''),
+        'aws_access_key_id': env('INVESTMENT_DOCUMENT_AWS_ACCESS_KEY_ID', default=''),
+        'aws_secret_access_key': env('INVESTMENT_DOCUMENT_AWS_SECRET_ACCESS_KEY', default=''),
+        'aws_region': env('INVESTMENT_DOCUMENT_AWS_REGION', default=''),
+    },
+    'report': {
+        'bucket': env('REPORT_BUCKET', default=''),
+        'aws_access_key_id': env('REPORT_AWS_ACCESS_KEY_ID', default=''),
+        'aws_secret_access_key': env('REPORT_AWS_SECRET_ACCESS_KEY', default=''),
+        'aws_region': env('REPORT_AWS_REGION', default=''),
+    }
+}

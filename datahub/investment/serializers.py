@@ -19,7 +19,6 @@ from datahub.investment.models import (
     InvestmentProjectTeamMember,
     InvestorType,
     Involvement,
-    IProjectDocument,
     SpecificProgramme
 )
 from datahub.investment.validate import validate
@@ -456,36 +455,3 @@ class IProjectTeamMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvestmentProjectTeamMember
         fields = ('investment_project', 'adviser', 'role')
-
-
-class IProjectDocumentSerializer(serializers.ModelSerializer):
-    """Serializer for Investment Project Documents."""
-
-    project = NestedRelatedField(
-        InvestmentProject,
-    )
-
-    class Meta:
-        model = IProjectDocument
-        fields = (
-            'id',
-            'project',
-            'doc_type',
-            'filename',
-            'signed_url',
-        )
-        read_only_fields = ('signed_url', )
-
-    def create(self, validated_data):
-        """Create investment document."""
-        return IProjectDocument.create_from_declaration_request(
-            project=validated_data['project'],
-            field=validated_data['doc_type'],
-            filename=validated_data['filename'],
-        )
-
-
-class UploadStatusSerializer(serializers.Serializer):
-    """Serializer for upload status endpoints."""
-
-    status = serializers.ChoiceField(choices=('success',))

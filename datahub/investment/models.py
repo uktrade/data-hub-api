@@ -6,7 +6,7 @@ from itertools import chain
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import models, transaction
+from django.db import models
 from django.utils.timezone import now
 from model_utils import Choices
 from mptt.fields import TreeForeignKey
@@ -19,7 +19,6 @@ from datahub.core.models import (
     BaseModel,
 )
 from datahub.core.utils import StrEnum
-from datahub.documents.models import Document
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -556,78 +555,6 @@ class InvestmentProjectCode(models.Model):
     """
 
     project = models.OneToOneField(InvestmentProject, on_delete=models.CASCADE)
-
-
-class IProjectDocument(BaseModel, ArchivableModel):
-    """Investment Project Document."""
-
-    BUCKET_PREFIX = 'investment-documents'
-    DOC_TYPES = Choices(
-        ('actual_land_date', 'Actual land date'),
-        ('hq', 'Global/European HQ evidence'),
-        ('foreign_ownership', 'Foreign ownership evidence'),
-        ('operations_commenced', 'Operations commenced'),
-        ('total_investment', 'Total investment'),
-        ('foreign_equity_investment', 'Foreign equity investment'),
-        ('number_new_jobs', 'Number new jobs'),
-        ('number_safeguarded_jobs', 'Number safeguarded jobs'),
-        ('r_and_d_budget', 'R and D budget'),
-        ('new_tech_to_uk', 'New tech to uk'),
-        ('export_revenue', 'Export revenue'),
-        ('average_salary', 'Average salary'),
-    )
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    project = models.ForeignKey(
-        InvestmentProject,
-        related_name='documents',
-        on_delete=models.CASCADE,
-    )
-    doc_type = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH, choices=DOC_TYPES)
-    filename = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
-    document = models.OneToOneField(Document, on_delete=models.PROTECT)
-
-    class Meta:
-        verbose_name = 'investment project document'
-        verbose_name_plural = 'investment project documents'
-        unique_together = (
-            ('project', 'doc_type', 'filename'),
-        )
-        permissions = (('read_iprojectdocument', 'Can read investment project document'),)
-
-    @property
-    def signed_url(self):
-        """Generate pre-signed download URL."""
-        return self.document.generate_signed_url()
-
-    @property
-    def signed_upload_url(self):
-        """Generate pre-signed upload URL."""
-        return self.document.generate_signed_upload_url()
-
-    def delete(self, using=None, keep_parents=False):
-        """Ensure document is removed when parent is being deleted."""
-        result = super().delete(using, keep_parents)
-        self.document.delete(using, keep_parents)
-        return result
-
-    @classmethod
-    def create_from_declaration_request(cls, project, field, filename):
-        """Create investment document along with correct Document creation."""
-        with transaction.atomic():
-            doc = Document(
-                path=f'{cls.BUCKET_PREFIX}/{project.id}/{field}/{filename}',
-            )
-            doc.save()
-            investment_doc = cls(
-                project=project,
-                doc_type=field,
-                filename=filename,
-                document=doc,
-            )
-            investment_doc.save()
-
-        return investment_doc
 
 
 class SpecificProgramme(BaseConstantModel):

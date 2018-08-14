@@ -1,6 +1,6 @@
 from elasticsearch_dsl import Date, Keyword, Text
 
-from datahub.search import dict_utils, dsl_utils
+from datahub.search import dict_utils, fields
 from datahub.search.models import BaseESModel
 
 
@@ -8,24 +8,24 @@ class CompaniesHouseCompany(BaseESModel):
     """Elasticsearch representation of CompaniesHouseCompany model."""
 
     id = Keyword()
-    company_category = dsl_utils.SortableCaseInsensitiveKeywordText()
-    company_number = dsl_utils.SortableCaseInsensitiveKeywordText()
-    company_status = dsl_utils.SortableCaseInsensitiveKeywordText()
+    company_category = fields.SortableCaseInsensitiveKeywordText()
+    company_number = fields.SortableCaseInsensitiveKeywordText()
+    company_status = fields.SortableCaseInsensitiveKeywordText()
     incorporation_date = Date()
-    name = dsl_utils.SortableText(
+    name = fields.SortableText(
         copy_to=[
             'name_keyword', 'name_trigram'
         ]
     )
-    name_keyword = dsl_utils.SortableCaseInsensitiveKeywordText()
-    name_trigram = dsl_utils.TrigramText()
+    name_keyword = fields.SortableCaseInsensitiveKeywordText()
+    name_trigram = fields.TrigramText()
     registered_address_1 = Text()
     registered_address_2 = Text()
-    registered_address_town = dsl_utils.SortableCaseInsensitiveKeywordText()
+    registered_address_town = fields.SortableCaseInsensitiveKeywordText()
     registered_address_county = Text()
     registered_address_postcode = Text(copy_to='registered_address_postcode_trigram')
-    registered_address_postcode_trigram = dsl_utils.TrigramText()
-    registered_address_country = dsl_utils.id_name_mapping()
+    registered_address_postcode_trigram = fields.TrigramText()
+    registered_address_country = fields.nested_id_name_field()
     sic_code_1 = Text()
     sic_code_2 = Text()
     sic_code_3 = Text()

@@ -21,23 +21,3 @@ def test_company_can_have_one_list_owner_assigned():
     company_refetch = Company.objects.get(pk=str(company.pk))
 
     assert company_refetch.one_list_account_owner_id == adviser.pk
-
-
-def test_company_can_have_hierarchy():
-    """Test that company can have hierarchy."""
-    first_company = CompanyFactory()
-    second_company = CompanyFactory()
-
-    assert first_company.parent is None
-    assert first_company.children.count() == 0
-    assert second_company.parent is None
-    assert second_company.children.count() == 0
-
-    second_company.parent = first_company
-    second_company.save()
-
-    first_company.refresh_from_db()
-    second_company.refresh_from_db()
-
-    assert second_company.parent is first_company
-    assert second_company in first_company.children.all()

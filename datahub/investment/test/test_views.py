@@ -5,7 +5,6 @@ import uuid
 from collections import Counter
 from datetime import date, datetime
 from operator import attrgetter
-from unittest.mock import patch
 
 import pytest
 import reversion
@@ -22,11 +21,10 @@ from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
     APITestMixin, create_test_user, format_date_or_datetime, random_obj_for_model,
 )
-from datahub.documents.av_scan import virus_scan_document
 from datahub.investment import views
 from datahub.investment.models import (
-    InvestmentDeliveryPartner, InvestmentProject, InvestmentProjectPermission,
-    InvestmentProjectTeamMember, IProjectDocument
+    InvestmentDeliveryPartner, InvestmentProject,
+    InvestmentProjectPermission, InvestmentProjectTeamMember
 )
 from datahub.investment.test.factories import (
     ActiveInvestmentProjectFactory, AssignPMInvestmentProjectFactory,
@@ -3201,168 +3199,6 @@ class TestArchiveViews(APITestMixin):
         response = api_client.post(url)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
-
-
-class TestDocumentViews(APITestMixin):
-    """Tests for the document views."""
-
-    def test_documents_list_is_filtered_by_project(self):
-        """Tests viewset filtering."""
-        project1 = InvestmentProjectFactory()
-        project2 = InvestmentProjectFactory()
-
-        IProjectDocument.create_from_declaration_request(project1, 'total_investment', 'test.txt')
-        doc2 = IProjectDocument.create_from_declaration_request(
-            project2, 'total_investment', 'test.txt'
-        )
-
-        url = reverse('api-v3:investment:document-collection',
-                      kwargs={'project_pk': project2.pk})
-
-        response = self.api_client.get(url)
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.data
-        assert response_data['count'] == 1
-        assert len(response_data['results']) == 1
-        assert response_data['results'][0]['id'] == str(doc2.pk)
-
-    def test_document_creation(self):
-        """Test document creation can omit project PK (Will be inferred from URL)."""
-        project = InvestmentProjectFactory()
-
-        url = reverse('api-v3:investment:document-collection',
-                      kwargs={'project_pk': project.pk})
-
-        response = self.api_client.post(url, format='json', data={
-            'filename': 'test.txt',
-            'doc_type': 'total_investment',
-            'project': str(project.pk),
-        })
-
-        assert response.status_code == status.HTTP_201_CREATED
-        response_data = response.data
-        assert response_data['doc_type'] == 'total_investment'
-        assert response_data['filename'] == 'test.txt'
-        assert response_data['project']['id'] == str(project.pk)
-
-        doc = IProjectDocument.objects.get(pk=response_data['id'])
-        assert doc.filename == 'test.txt'
-        assert doc.doc_type == 'total_investment'
-        assert doc.project.pk == project.pk
-        assert 'signed_upload_url' in response.data
-
-    def test_document_retrieval(self):
-        """Tests retrieval of individual document."""
-        project = InvestmentProjectFactory()
-        doc = IProjectDocument.create_from_declaration_request(
-            project, 'total_investment', 'test.txt'
-        )
-
-        url = reverse('api-v3:investment:document-item',
-                      kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
-
-        response = self.api_client.get(url)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['id'] == str(doc.pk)
-        assert response.data['project'] == {
-            'id': str(project.pk),
-            'name': project.name,
-        }
-        assert response.data['doc_type'] == 'total_investment'
-        assert response.data['filename'] == 'test.txt'
-        assert 'signed_url' in response.data
-
-    @patch('datahub.core.thread_pool._submit_to_thread_pool')
-    def test_document_upload_status(self, mock_submit):
-        """Tests setting of document upload status to complete.
-
-        Checks that a virus scan of the document was scheduled. Virus scanning is
-        tested separately in the documents app.
-        """
-        project = InvestmentProjectFactory()
-        doc = IProjectDocument.create_from_declaration_request(
-            project, 'total_investment', 'test.txt'
-        )
-
-        url = reverse('api-v3:investment:document-item-callback',
-                      kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
-
-        response = self.api_client.post(url, format='json', data={
-            'status': 'success'
-        })
-        assert response.status_code == status.HTTP_200_OK
-        mock_submit.assert_called_once_with(virus_scan_document, str(doc.pk))
-
-    @patch('datahub.core.thread_pool._submit_to_thread_pool')
-    @pytest.mark.usefixtures('synchronous_on_commit')
-    def test_document_delete_of_not_uploaded_doc_does_not_trigger_s3_delete(self, mock_submit):
-        """Tests document deletion."""
-        project = InvestmentProjectFactory()
-        doc = IProjectDocument.create_from_declaration_request(
-            project, 'total_investment', 'test.txt'
-        )
-
-        url = reverse('api-v3:investment:document-item',
-                      kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
-
-        response = self.api_client.delete(url)
-        assert response.status_code == status.HTTP_204_NO_CONTENT
-        assert mock_submit.called is False
-
-    @pytest.mark.usefixtures('synchronous_thread_pool', 'synchronous_on_commit')
-    def test_document_delete(self, s3_stubber):
-        """Tests document deletion."""
-        project = InvestmentProjectFactory()
-        doc = IProjectDocument.create_from_declaration_request(
-            project, 'total_investment', 'test.txt'
-        )
-        doc.document.uploaded_on = now()
-        doc.document.save()
-
-        s3_stubber.add_response('delete_object', {
-            'ResponseMetadata': {
-                'HTTPStatusCode': 204,
-            }
-        }, expected_params={
-            'Bucket': doc.document.s3_bucket, 'Key': doc.document.s3_key
-        })
-
-        url = reverse('api-v3:investment:document-item',
-                      kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
-
-        response = self.api_client.delete(url)
-        assert response.status_code == status.HTTP_204_NO_CONTENT
-
-    def test_document_upload_status_wrong_status(self):
-        """Tests request validation in the document status endpoint."""
-        project = InvestmentProjectFactory()
-        doc = IProjectDocument.create_from_declaration_request(
-            project, 'total_investment', 'test.txt'
-        )
-
-        url = reverse('api-v3:investment:document-item-callback',
-                      kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
-
-        response = self.api_client.post(url, format='json', data={
-            'status': '123456'
-        })
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert 'status' in response.json()
-
-    def test_document_upload_status_no_status(self):
-        """Tests request validation in the document status endpoint."""
-        project = InvestmentProjectFactory()
-        doc = IProjectDocument.create_from_declaration_request(
-            project, 'total_investment', 'test.txt'
-        )
-
-        url = reverse('api-v3:investment:document-item-callback',
-                      kwargs={'project_pk': project.pk, 'doc_pk': doc.pk})
-
-        response = self.api_client.post(url, format='json', data={})
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert 'status' in response.json()
 
 
 @pytest.mark.parametrize('view_set', (views.IProjectAuditViewSet,))

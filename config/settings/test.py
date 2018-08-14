@@ -12,16 +12,17 @@ INSTALLED_APPS.remove('datahub.search.apps.SearchConfig')
 INSTALLED_APPS += [
     'datahub.search',
     'datahub.core.test.support',
+    'datahub.documents.test.my_entity_document',
     'datahub.search.test.search_support',
 ]
 
 SEARCH_APPS += [
     'datahub.search.test.search_support.simplemodel.SimpleModelSearchApp',
+    'datahub.search.test.search_support.relatedmodel.RelatedModelSearchApp',
 ]
 
 # The index is set dynamically in datahub/search/conftest.py, so that tests can be parallelised.
 ES_INDEX_PREFIX = None
-ES_LEGACY_INDEX = None
 ES_INDEX_SETTINGS = {
     **ES_INDEX_SETTINGS,
     'number_of_shards': 1,
@@ -53,7 +54,23 @@ ACTIVITY_STREAM_IP_WHITELIST = '1.2.3.4'
 ACTIVITY_STREAM_ACCESS_KEY_ID = 'some-id'
 ACTIVITY_STREAM_SECRET_ACCESS_KEY = 'some-secret'
 
-REPORT_AWS_ACCESS_KEY_ID = 'foo'
-REPORT_AWS_SECRET_ACCESS_KEY = 'bar'
-REPORT_BUCKET = 'report'
-REPORT_AWS_REGION = 'eu-west-2'
+DOCUMENT_BUCKETS = {
+    'default': {
+        'bucket': 'foo',
+        'aws_access_key_id': 'bar',
+        'aws_secret_access_key': 'baz',
+        'aws_region': 'eu-west-2',
+    },
+    'investment': {
+        'bucket': 'foo',
+        'aws_access_key_id': 'bar',
+        'aws_secret_access_key': 'baz',
+        'aws_region': 'eu-west-2',
+    },
+    'report': {
+        'bucket': 'foo',
+        'aws_access_key_id': 'bar',
+        'aws_secret_access_key': 'baz',
+        'aws_region': 'eu-west-2',
+    }
+}
