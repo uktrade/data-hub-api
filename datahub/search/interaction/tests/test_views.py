@@ -16,7 +16,7 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_queryset
-from datahub.interaction.models import CommunicationChannel, Interaction
+from datahub.interaction.models import CommunicationChannel, Interaction, InteractionPermission
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
     InvestmentProjectInteractionFactory,
@@ -760,9 +760,16 @@ class TestInteractionEntitySearchView(APITestMixin):
 class TestInteractionExportView(APITestMixin):
     """Tests the interaction export view."""
 
-    def test_user_without_permission_cannot_export(self, setup_es):
-        """Test that a user without interaction permissions cannot export data."""
-        user = create_test_user(dit_team=TeamFactory())
+    @pytest.mark.parametrize(
+        'permissions', (
+            (),
+            (InteractionPermission.read_all,),
+            (InteractionPermission.export,),
+        )
+    )
+    def test_user_without_permission_cannot_export(self, setup_es, permissions):
+        """Test that a user without the correct permissions cannot export data."""
+        user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
 
         url = reverse('api-v3:search:interaction-export')

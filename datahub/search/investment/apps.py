@@ -21,7 +21,7 @@ class InvestmentSearchApp(SearchApp):
     # EC2 instance type.)
     bulk_batch_size = 1000
     view = SearchInvestmentProjectAPIView
-    permission_required = (
+    view_permissions = (
         f'investment.{InvestmentProjectPermission.read_all}',
         f'investment.{InvestmentProjectPermission.read_associated}'
     )

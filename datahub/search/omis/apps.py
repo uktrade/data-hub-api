@@ -10,7 +10,7 @@ class OrderSearchApp(SearchApp):
     name = 'order'
     es_model = Order
     view = SearchOrderAPIView
-    permission_required = ('order.read_order',)
+    view_permissions = ('order.read_order',)
     queryset = DBOrder.objects.select_related(
         'company',
         'contact',
