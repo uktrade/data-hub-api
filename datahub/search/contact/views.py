@@ -1,7 +1,7 @@
 from datahub.oauth.scopes import Scope
 from .models import Contact
 from .serializers import SearchContactSerializer
-from ..views import SearchAPIView, SearchExportAPIView
+from ..views import SearchAPIView
 
 
 class SearchContactParams:
@@ -52,8 +52,3 @@ class SearchContactParams:
 
 class SearchContactAPIView(SearchContactParams, SearchAPIView):
     """Filtered contact search view."""
-
-
-class SearchContactExportAPIView(SearchContactParams,
-                                 SearchExportAPIView):
-    """Filtered contact search export view."""

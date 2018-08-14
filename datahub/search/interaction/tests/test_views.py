@@ -1,5 +1,8 @@
-from collections import Counter
+from cgi import parse_header
+from collections import Counter, OrderedDict
+from csv import DictReader
 from datetime import datetime
+from io import StringIO
 from uuid import UUID
 
 import factory
@@ -752,6 +755,93 @@ class TestInteractionEntitySearchView(APITestMixin):
             interaction.pk for interaction in investment_project_interactions[sector_level:]
         }
         assert actual_ids == expected_ids
+
+
+class TestInteractionExportView(APITestMixin):
+    """Tests the interaction export view."""
+
+    def test_user_without_permission_cannot_export(self, setup_es):
+        """Test that a user without interaction permissions cannot export data."""
+        user = create_test_user(dit_team=TeamFactory())
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('api-v3:search:interaction-export')
+        response = api_client.post(url, format='json')
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_policy_feedback_excluded_for_non_policy_feedback_user(
+        self,
+        setup_es,
+        non_policy_feedback_user
+    ):
+        """
+        Test that a user without policy feedback interaction permissions cannot export
+        policy feedback interactions.
+        """
+        PolicyFeedbackFactory()
+
+        api_client = self.create_api_client(user=non_policy_feedback_user)
+        url = reverse('api-v3:search:interaction-export')
+        response = api_client.post(url, format='json')
+        assert response.status_code == status.HTTP_200_OK
+        assert response.getvalue().decode('utf-8-sig') == f"""Date,Company,Service,Subject,Adviser,Service provider\r
+"""
+
+    @pytest.mark.parametrize(
+        'request_sortby,orm_ordering',
+        (
+            (None, '-date'),
+            ('date', 'date'),
+            ('company.name', 'company__name'),
+        )
+    )
+    def test_interaction_export(self, setup_es, interactions, request_sortby, orm_ordering):
+        """Test export of interaction search results."""
+        url = reverse('api-v3:search:interaction-export')
+
+        with freeze_time('2018-01-01 11:12:13'):
+            data = {}
+            if request_sortby:
+                data['sortby'] = request_sortby
+
+            response = self.api_client.post(url, format='json', data=data)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert parse_header(response.get('Content-Disposition')) == (
+            'attachment', {'filename': 'Data Hub - Interactions - 2018-01-01-11-12-13.csv'}
+        )
+
+        sorted_interactions = Interaction.objects.filter(
+            pk__in=[interaction.pk for interaction in interactions],
+        ).order_by(
+            orm_ordering,
+        )
+        reader = DictReader(StringIO(response.getvalue().decode('utf-8-sig')))
+
+        assert reader.fieldnames == [
+            'Date',
+            'Company',
+            'Service',
+            'Subject',
+            'Adviser',
+            'Service provider',
+        ]
+
+        expected_rows = [
+            OrderedDict(
+                (
+                    ('Date', str(interaction.date)),
+                    ('Company', interaction.company.name),
+                    ('Service', interaction.service.name),
+                    ('Subject', interaction.subject),
+                    ('Adviser', interaction.dit_adviser.name),
+                    ('Service provider', interaction.dit_team.name),
+                )
+            )
+            for interaction in sorted_interactions
+        ]
+
+        assert list(reader) == expected_rows
 
 
 class TestInteractionGlobalSearchView(APITestMixin):
