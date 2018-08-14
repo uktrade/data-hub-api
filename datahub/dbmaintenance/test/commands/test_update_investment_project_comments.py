@@ -105,7 +105,7 @@ def test_audit_log(s3_stubber):
 
     versions = Version.objects.get_for_object(investment_projects[0])
     assert len(versions) == 1
-    assert versions[0].revision.comment == 'Comments migration.'
+    assert versions[0].revision.get_comment() == 'Comments migration.'
 
     versions = Version.objects.get_for_object(investment_projects[1])
     assert len(versions) == 0

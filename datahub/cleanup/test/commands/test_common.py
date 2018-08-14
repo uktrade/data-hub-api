@@ -65,7 +65,6 @@ MAPPINGS = {
             (ShallowInvestmentProjectFactory, 'uk_company'),
             (OrderFactory, 'company'),
             (CompanyFactory, 'global_headquarters'),
-            (CompanyFactory, 'parent'),
             (BusinessLeadFactory, 'company'),
             (CompanyCoreTeamMemberFactory, 'company'),
         ),
@@ -109,7 +108,7 @@ def disconnect_delete_search_signal_receivers(setup_es):
     search_apps = get_search_apps()
     for search_app in search_apps:
         app_db_model = search_app.queryset.model
-        for receiver in search_app.get_signals_receivers():
+        for receiver in search_app.get_signal_receivers():
             if receiver.signal is post_delete and receiver.sender is app_db_model:
                 receiver.disconnect()
                 disconnected_signal_receivers.append(receiver)

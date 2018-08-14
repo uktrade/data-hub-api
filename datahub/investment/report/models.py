@@ -4,8 +4,8 @@ from django.conf import settings
 from django.db import models
 
 from datahub.core.models import BaseModel
-from datahub.core.utils import sign_s3_url, StrEnum
-from datahub.investment.report.utils import get_report_s3_client
+from datahub.core.utils import StrEnum
+from datahub.documents.utils import sign_s3_url
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -41,4 +41,4 @@ class SPIReport(BaseModel):
 
     def get_absolute_url(self):
         """Generate pre-signed download URL."""
-        return sign_s3_url(settings.REPORT_BUCKET, self.s3_key, client=get_report_s3_client())
+        return sign_s3_url('report', self.s3_key)

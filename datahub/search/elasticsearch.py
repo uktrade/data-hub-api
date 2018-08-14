@@ -127,14 +127,25 @@ def index_exists(index_name):
     return client.indices.exists(index_name)
 
 
-def create_index(index_name, mapping):
-    """Creates an index and initialises it with a mapping."""
+def create_index(index_name, mapping, alias_names=()):
+    """
+    Creates an index, initialises it with a mapping, and optionally associates aliases with it.
+
+    Note: If you need to perform multiple alias operations atomically, you should use
+    start_alias_transaction() instead of specifying aliases when creating an index.
+    """
     index = Index(index_name)
     for analyzer in ANALYZERS:
         index.analyzer(analyzer)
 
     index.settings(**settings.ES_INDEX_SETTINGS)
     index.mapping(mapping)
+
+    # ES allows you to specify filter criteria for aliases but we don't make use of that –
+    # hence the empty dict for each alias
+    alias_mapping = {alias_name: {} for alias_name in alias_names}
+    index.aliases(**alias_mapping)
+
     index.create()
 
 

@@ -146,7 +146,7 @@ def test_audit_log(s3_stubber):
 
     versions = Version.objects.get_for_object(advisers[1])
     assert versions.count() == 1
-    assert versions[0].revision.comment == 'Loaded contact email from spreadsheet.'
+    assert versions[0].revision.get_comment() == 'Loaded contact email from spreadsheet.'
 
     versions = Version.objects.get_for_object(advisers[2])
     assert versions.count() == 0

@@ -90,7 +90,7 @@ class Collector:
 
             # get the existing post/pre_delete receivers that need to be
             # disabled in the meantime
-            for receiver in search_app.get_signals_receivers():
+            for receiver in search_app.get_signal_receivers():
                 if receiver.signal in (post_delete, pre_delete):
                     self.signal_receivers_to_disable.append(receiver)
 

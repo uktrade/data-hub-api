@@ -231,29 +231,22 @@ def _build_single_field_query(field, value):
     Used by _build_field_query and always expecting value as a single value.
     You should never need to use this, it's more likely you want _build_field_query instead.
     """
-    # define field and value
-    real_field, real_value = field, value
-    if real_value is None:
-        real_value = False
-        if not real_field.endswith('_exists'):
-            real_field = f"{real_field.rsplit('.', maxsplit=1)[0]}_exists"
+    if field.endswith('_exists'):
+        return _build_exists_query(field, value)
 
-    # build initial query
-    if any(real_field.endswith(suffix) for suffix in ('.id', '_keyword')):
-        query = Q('match_phrase', **{real_field: real_value})
-    elif real_field.endswith('_exists'):
-        query = _build_exists_query(real_field, real_value)
-    else:
-        field_query = {
-            'query': real_value,
-            'operator': 'and',
-        }
-        query = Q('match', **{real_field: field_query})
+    # Implicit exists query
+    if value is None:
+        parent_field = field.rsplit('.', maxsplit=1)[0]
+        return _build_exists_query(f'{parent_field}_exists', False)
 
-    # return nested or plain query
-    if '.' in real_field:
-        return Q('nested', path=real_field.rsplit('.', maxsplit=1)[0], query=query)
-    return query
+    if any(field.endswith(suffix) for suffix in ('.id', '_keyword')):
+        return Q('match_phrase', **{field: value})
+
+    field_query = {
+        'query': value,
+        'operator': 'and',
+    }
+    return Q('match', **{field: field_query})
 
 
 def _build_field_query(field, value):
@@ -348,11 +341,6 @@ def _apply_sorting_to_query(query, ordering):
         'missing': '_first' if order == 'asc' else '_last'
     }
 
-    # check if we sort by field in nested document (example: 'stage.name')
-    if '.' in field_name:
-        # extract and add path to nested document (example: 'stage')
-        sort_params['nested_path'] = field_name.split('.', 1)[0]
-
     # remap field name if necessary
     field_name = FIELD_REMAPPING.get(field_name, field_name)
 
@@ -369,13 +357,5 @@ def _add_aggs_to_query(query, aggregation_fields):
         if any(field.endswith(x) for x in ('_before', '_after', '_trigram', '_exists')):
             continue
 
-        query_aggs = query.aggs
-        if '.' in field:
-            query_aggs = query_aggs.bucket(
-                field,
-                'nested',
-                path=field.split('.', 1)[0]
-            )
-
-        query_aggs.bucket(field, 'terms', field=field)
+        query.aggs.bucket(field, 'terms', field=field)
     return query

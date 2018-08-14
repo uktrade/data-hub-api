@@ -5,8 +5,7 @@ from logging import getLogger
 
 from django.core.management.base import BaseCommand
 
-from datahub.core.utils import get_s3_client
-
+from datahub.documents.utils import get_s3_client_for_bucket
 
 logger = getLogger(__name__)
 
@@ -47,7 +46,7 @@ class CSVBaseCommand(BaseCommand):
         """
         result = {True: 0, False: 0}
 
-        s3_client = get_s3_client()
+        s3_client = get_s3_client_for_bucket('default')
         response = s3_client.get_object(
             Bucket=options['bucket'],
             Key=options['object_key']

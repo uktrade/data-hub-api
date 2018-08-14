@@ -213,6 +213,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `ACTIVITY_STREAM_SECRET_ACCESS_KEY` | Yes | A secret key, corresponding to `ACTIVITY_STREAM_ACCESS_KEY_ID`. The holder of this key can access the activity stream endpoint by Hawk authentication. |
 | `ALLOWED_ADMIN_IPS` | No | IP addresses (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
 | `ALLOWED_ADMIN_IP_RANGES` | No | IP address ranges (comma-separated) that can access the admin site when RESTRICT_ADMIN is True. |
+| `AV_SERVICE_CHUNK_SIZE` | No | Used when transferring file to ClamAV service, specifies chunk size of the stream (default=1024). |
 | `AV_SERVICE_URL` | Yes | URL for ClamAV service. If not configured, virus scanning will fail. |
 | `AWS_ACCESS_KEY_ID` | No | Used as part of [boto3 auto-configuration](http://boto3.readthedocs.io/en/latest/guide/configuration.html#configuring-credentials). |
 | `AWS_DEFAULT_REGION` | No | [Default region used by boto3.](http://boto3.readthedocs.io/en/latest/guide/configuration.html#environment-variable-configuration) |
@@ -230,7 +231,7 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `DJANGO_SECRET_KEY`  | Yes | |
 | `DJANGO_SENTRY_DSN`  | Yes | |
 | `DJANGO_SETTINGS_MODULE`  | Yes | |
-| `DOCUMENTS_BUCKET`  | Yes | S3 bucket for document storage. |
+| `DEFAULT_BUCKET`  | Yes | S3 bucket for object storage. |
 | `ENABLE_DAILY_ES_SYNC` | No | Whether to enable the daily ES sync (default=False). |
 | `ENABLE_SPI_REPORT_GENERATION` | No | Whether to enable daily SPI report (default=False). |
 | `ES_INDEX_PREFIX`  | Yes | Prefix to use for indices and aliases |
@@ -243,6 +244,10 @@ Leeloo can run on any Heroku-style platform. Configuration is performed via the 
 | `GUNICORN_ENABLE_ASYNC_PSYCOPG2` | No | Whether to enabled asynchronous psycopg2 when the worker class is 'gevent'. |
 | `GUNICORN_WORKER_CLASS`  | No | [Type of Gunicorn worker.](http://docs.gunicorn.org/en/stable/settings.html#worker-class) Uses async workers via gevent by default. |
 | `GUNICORN_WORKER_CONNECTIONS`  | No | Maximum no. of connections for async workers (default=10). |
+| `INVESTMENT_DOCUMENT_AWS_ACCESS_KEY_ID` | No | Same use as AWS_ACCESS_KEY_ID, but for investment project documents. |
+| `INVESTMENT_DOCUMENT_AWS_SECRET_ACCESS_KEY` | No | Same use as AWS_SECRET_ACCESS_KEY, but for investment project documents. |
+| `INVESTMENT_DOCUMENT_AWS_REGION` | No | Same use as AWS_DEFAULT_REGION, but for investment project documents. |
+| `INVESTMENT_DOCUMENT_BUCKET` | No | S3 bucket for investment project documents storage. |
 | `OMIS_NOTIFICATION_ADMIN_EMAIL`  | Yes | |
 | `OMIS_NOTIFICATION_API_KEY`  | Yes | |
 | `OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL`  | No | |
