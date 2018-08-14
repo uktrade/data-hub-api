@@ -65,6 +65,7 @@ class InteractionPermission(StrEnum):
     add_associated_investmentproject = 'add_associated_investmentproject_interaction'
     add_policy_feedback = 'add_policy_feedback_interaction'
     delete = 'delete_interaction'
+    export = 'export_interaction'
 
 
 class CommunicationChannel(BaseConstantModel):
@@ -230,6 +231,10 @@ class Interaction(BaseModel):
             (
                 InteractionPermission.change_policy_feedback.value,
                 'Can change policy feedback interaction'
+            ),
+            (
+                InteractionPermission.export.value,
+                'Can export interaction'
             ),
         )
         default_permissions = (

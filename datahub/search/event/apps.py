@@ -10,7 +10,7 @@ class EventSearchApp(SearchApp):
     name = 'event'
     es_model = Event
     view = SearchEventAPIView
-    permission_required = ('event.read_event',)
+    view_permissions = ('event.read_event',)
     queryset = DBEvent.objects.select_related(
         'address_country',
         'event_type',

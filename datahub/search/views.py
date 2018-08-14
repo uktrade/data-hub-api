@@ -16,7 +16,7 @@ from rest_framework.views import APIView
 from datahub.core.csv import create_csv_response
 from datahub.oauth.scopes import Scope
 from .apps import get_search_apps
-from .permissions import has_permissions_for_app, SearchAppPermissions
+from .permissions import has_permissions_for_app, SearchAndExportPermissions, SearchPermissions
 from .query_builder import (
     get_basic_search_query,
     get_search_by_entity_query,
@@ -122,7 +122,7 @@ class SearchAPIView(APIView):
     """Filtered search view."""
 
     search_app = None
-    permission_classes = (IsAuthenticatedOrTokenHasScope, SearchAppPermissions)
+    permission_classes = (IsAuthenticatedOrTokenHasScope, SearchPermissions)
     FILTER_FIELDS = []
     REMAP_FIELDS = {}
 
@@ -229,6 +229,7 @@ class SearchAPIView(APIView):
 class SearchExportAPIView(SearchAPIView):
     """Returns CSV file with all search results."""
 
+    permission_classes = (IsAuthenticatedOrTokenHasScope, SearchAndExportPermissions)
     queryset = None
     field_titles = None
     include_aggregations = False
