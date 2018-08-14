@@ -6,7 +6,7 @@ from datahub.investment.permissions import (
     get_association_filters, InvestmentProjectAssociationChecker
 )
 from .models import InvestmentProject
-from .views import SearchInvestmentProjectAPIView, SearchInvestmentProjectExportAPIView
+from .views import SearchInvestmentProjectAPIView
 from ..apps import EXCLUDE_ALL, SearchApp
 
 
@@ -21,7 +21,6 @@ class InvestmentSearchApp(SearchApp):
     # EC2 instance type.)
     bulk_batch_size = 1000
     view = SearchInvestmentProjectAPIView
-    export_view = SearchInvestmentProjectExportAPIView
     permission_required = (
         f'investment.{InvestmentProjectPermission.read_all}',
         f'investment.{InvestmentProjectPermission.read_associated}'

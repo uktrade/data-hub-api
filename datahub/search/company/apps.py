@@ -1,6 +1,6 @@
 from datahub.company.models import Company as DBCompany
 from .models import Company
-from .views import SearchCompanyAPIView, SearchCompanyExportAPIView
+from .views import SearchCompanyAPIView
 from ..apps import SearchApp
 
 
@@ -10,7 +10,6 @@ class CompanySearchApp(SearchApp):
     name = 'company'
     es_model = Company
     view = SearchCompanyAPIView
-    export_view = SearchCompanyExportAPIView
     permission_required = ('company.read_company',)
     queryset = DBCompany.objects.select_related(
         'account_manager',

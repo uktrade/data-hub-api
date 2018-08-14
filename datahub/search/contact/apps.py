@@ -1,6 +1,6 @@
 from datahub.company.models import Contact as DBContact
 from .models import Contact
-from .views import SearchContactAPIView, SearchContactExportAPIView
+from .views import SearchContactAPIView
 from ..apps import SearchApp
 
 
@@ -10,7 +10,6 @@ class ContactSearchApp(SearchApp):
     name = 'contact'
     es_model = Contact
     view = SearchContactAPIView
-    export_view = SearchContactExportAPIView
     permission_required = ('company.read_contact',)
     queryset = DBContact.objects.select_related(
         'title',

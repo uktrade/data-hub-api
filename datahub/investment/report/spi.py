@@ -13,8 +13,8 @@ SPI5_END    - earliest interaction when aftercare was offered, only for new inve
               only for IST managed projects
 """
 
-from datahub.admin_report.csv import csv_iterator
 from datahub.core.constants import InvestmentProjectStage as Stage, Service
+from datahub.core.csv import csv_iterator
 from datahub.interaction.models import Interaction
 from datahub.investment.constants import InvestorType
 from datahub.investment.models import InvestmentProject
