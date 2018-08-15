@@ -1,3 +1,7 @@
+from django.db.models import Value
+from django.db.models.functions import Concat
+
+from datahub.interaction.models import Interaction as DBInteraction
 from datahub.oauth.scopes import Scope
 from .models import Interaction
 from .serializers import SearchInteractionSerializer
@@ -69,3 +73,15 @@ class SearchInteractionAPIView(SearchInteractionParams, SearchAPIView):
 
 class SearchInteractionExportAPIView(SearchInteractionParams, SearchExportAPIView):
     """Filtered interaction search export view."""
+
+    queryset = DBInteraction.objects.annotate(
+        dit_adviser_name=Concat('dit_adviser__first_name', Value(' '), 'dit_adviser__last_name'),
+    )
+    field_titles = {
+        'date': 'Date',
+        'company__name': 'Company',
+        'service__name': 'Service',
+        'subject': 'Subject',
+        'dit_adviser_name': 'Adviser',
+        'dit_team__name': 'Service provider',
+    }

@@ -1,12 +1,11 @@
 """Search views."""
-import csv
 from collections import namedtuple
-from datetime import datetime
+from itertools import islice
 from logging import getLogger
 
 from django.conf import settings
-from django.http import StreamingHttpResponse
-from django.utils.text import slugify
+from django.utils.text import capfirst
+from django.utils.timezone import now
 from oauth2_provider.contrib.rest_framework.permissions import IsAuthenticatedOrTokenHasScope
 from raven.contrib.django.raven_compat.models import client
 from rest_framework.exceptions import ValidationError
@@ -14,7 +13,7 @@ from rest_framework.fields import empty
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from datahub.core.utils import Echo
+from datahub.core.csv import create_csv_response
 from datahub.oauth.scopes import Scope
 from .apps import get_search_apps
 from .permissions import has_permissions_for_app, SearchAppPermissions
@@ -24,7 +23,6 @@ from .query_builder import (
     limit_search_query,
 )
 from .serializers import SearchSerializer
-from .utils import get_model_field_names
 
 logger = getLogger(__name__)
 
@@ -169,6 +167,26 @@ class SearchAPIView(APIView):
         })
         return cleaned_data
 
+    def get_base_query(self, request, validated_data):
+        """Gets a filtered Elasticsearch query for the provided search parameters."""
+        filter_data = self._get_filter_data(validated_data)
+        permission_filters = self.search_app.get_permission_filters(request)
+
+        aggregation_fields = (
+            self.REMAP_FIELDS.get(field, field)
+            for field in self.FILTER_FIELDS
+        ) if self.include_aggregations else None
+
+        return get_search_by_entity_query(
+            entity=self.entity,
+            term=validated_data['original_query'],
+            filter_data=filter_data,
+            composite_field_mapping=self.COMPOSITE_FILTERS,
+            permission_filters=permission_filters,
+            ordering=validated_data['sortby'],
+            aggregation_fields=aggregation_fields,
+        )
+
     def post(self, request, format=None):
         """Performs search."""
         data = request.data.copy()
@@ -180,23 +198,7 @@ class SearchAPIView(APIView):
                 data[legacy_query_param] = request.query_params[legacy_query_param]
 
         validated_data = self.validate_data(data)
-        filter_data = self._get_filter_data(validated_data)
-        permission_filters = self.search_app.get_permission_filters(request)
-
-        aggregation_fields = (
-            self.REMAP_FIELDS.get(field, field)
-            for field in self.FILTER_FIELDS
-        ) if self.include_aggregations else None
-
-        query = get_search_by_entity_query(
-            entity=self.entity,
-            term=validated_data['original_query'],
-            filter_data=filter_data,
-            composite_field_mapping=self.COMPOSITE_FILTERS,
-            permission_filters=permission_filters,
-            ordering=validated_data['sortby'],
-            aggregation_fields=aggregation_fields,
-        )
+        query = self.get_base_query(request, validated_data)
 
         limited_query = limit_search_query(
             query,
@@ -227,74 +229,90 @@ class SearchAPIView(APIView):
 class SearchExportAPIView(SearchAPIView):
     """Returns CSV file with all search results."""
 
-    IGNORED_SUFFIXES = ('_trigram', '_keyword')
-
-    def _clean_fieldnames(self, fieldnames):
-        """Remove special fields from the export."""
-        return [field for field in fieldnames
-                if not any(field.endswith(suffix) for suffix in self.IGNORED_SUFFIXES)]
-
-    def _format_cell(self, cell):
-        """Gets cell or name from cell and flattens the cell if necessary."""
-        if isinstance(cell, dict):
-            for k in ('name', 'type', 'company_number', 'uri', 'id',):
-                if k in cell:
-                    return cell[k]
-            return str(cell)
-
-        if isinstance(cell, list):
-            return ','.join(self._format_cell(item) for item in cell)
-
-        return cell
-
-    def _get_csv(self, writer, query):
-        """Generates header and formatted search results."""
-        # we want to keep the same order of rows that is in the search results
-        query.params(preserve_order=True)
-        # work around bug: https://bugs.python.org/issue27497
-        header = dict(zip(writer.fieldnames, writer.fieldnames))
-        yield writer.writerow(header)
-        for hit in query.scan():
-            yield writer.writerow({k: self._format_cell(v)
-                                   for k, v in hit.to_dict().items() if k in writer.fieldnames})
-
-    def _get_base_filename(self, original_query):
-        """Gets base filename that contains sanitized entity name and original_query."""
-        filename_parts = [
-            datetime.utcnow().strftime('%Y-%m-%d'),
-            'data-hub',
-            self.entity.__name__
-        ]
-        if original_query:
-            filename_parts.append(original_query)
-
-        return slugify('-'.join(filename_parts))
-
-    def _get_fieldnames(self):
-        """Gets cleaned list of entity field names."""
-        field_names = get_model_field_names(self.entity)
-        return self._clean_fieldnames(field_names)
+    queryset = None
+    field_titles = None
+    include_aggregations = False
 
     def post(self, request, format=None):
         """Performs search and returns CSV file."""
         validated_data = self.validate_data(request.data)
-        filter_data = self._get_filter_data(validated_data)
 
-        results = get_search_by_entity_query(
-            entity=self.entity,
-            term=validated_data['original_query'],
-            filter_data=filter_data,
-            ordering=validated_data['sortby'],
+        es_query = self._get_es_query(request, validated_data)
+        db_queryset = self._get_rows(es_query, validated_data['sortby'])
+        base_filename = self._get_base_filename()
+
+        return create_csv_response(db_queryset, self.field_titles, base_filename)
+
+    def _get_base_filename(self):
+        """Gets the filename (without the .csv suffix) for the CSV file download."""
+        filename_parts = [
+            'Data Hub',
+            str(capfirst(self.queryset.model._meta.verbose_name_plural)),
+            now().strftime('%Y-%m-%d-%H-%M-%S'),
+        ]
+        return ' - '.join(filename_parts)
+
+    def _get_ids(self, es_query):
+        """
+        Gets the document IDs from an Elasticsearch query using the scroll API.
+
+        The number of IDs returned is limited by settings.SEARCH_EXPORT_MAX_RESULTS.
+        """
+        for hit in islice(es_query.scan(), settings.SEARCH_EXPORT_MAX_RESULTS):
+            yield hit.meta.id
+
+    def _get_es_query(self, request, validated_data):
+        """Gets a scannable Elasticsearch query for the current request."""
+        return self.get_base_query(
+            request,
+            validated_data,
+        ).source(
+            # Stops _source from being returned in the responses
+            fields=False
+        ).params(
+            # Keeps the sort order that the user specified
+            preserve_order=True,
+            # Number of results in each scroll response
+            size=settings.SEARCH_EXPORT_SCROLL_CHUNK_SIZE,
         )
 
-        base_filename = self._get_base_filename(validated_data['original_query'])
+    def _get_rows(self, es_query, sort_by):
+        """
+        Returns an iterable using QuerySet.iterator() over the search results.
 
-        writer = csv.DictWriter(Echo(), fieldnames=sorted(self._get_fieldnames()))
+        The search sort-by value is translated to a value compatible with the Django ORM and
+        applied to the query set to preserve the original sort order.
 
-        response = StreamingHttpResponse(self._get_csv(writer, results), content_type='text/csv')
+        At the moment, all rows are fetched in one query (using a server-side cursor) as
+        settings.SEARCH_EXPORT_MAX_RESULTS is set to a (relatively) low value.
+        """
+        ordering = _translate_search_sortby_to_django_ordering(sort_by)
 
-        response['Content-Disposition'] = f'attachment; filename="{base_filename}.csv"'
-        return response
+        return self.queryset.filter(
+            pk__in=self._get_ids(es_query)
+        ).order_by(
+            *ordering
+        ).values(
+            *self.field_titles.keys()
+        ).iterator()
+
+
+def _translate_search_sortby_to_django_ordering(sort_by):
+    """
+    Converts a sort-by value as used in the search API to a tuple of values that can be
+    passed to QuerySet.order_by().
+
+    Note that this relies on the same field names having been used; if they differ then this
+    will not work.
+    """
+    if not sort_by:
+        return ()
+
+    field, _, direction = sort_by.replace('.', '__').partition(':')
+    if direction == 'desc':
+        return (f'-{field}',)
+
+    return (field,)
 
 
 def _execute_search_query(query):
