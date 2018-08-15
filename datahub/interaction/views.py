@@ -40,5 +40,8 @@ class InteractionViewSet(CoreViewSet):
         'contact__last_name',
         'created_on',
         'date',
+        'dit_adviser__first_name',
+        'dit_adviser__last_name',
+        'subject',
     )
     ordering = ('-date', '-created_on')
