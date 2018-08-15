@@ -63,6 +63,7 @@ LOCAL_APPS = [
     'datahub.feature_flag.apps.FeatureFlagConfig',
     'datahub.interaction',
     'datahub.investment',
+    'datahub.investment.evidence',
     'datahub.investment.proposition',
     'datahub.leads',
     'datahub.metadata',
@@ -244,6 +245,8 @@ ES_SEARCH_REQUEST_WARNING_THRESHOLD = env.int(
     'ES_SEARCH_REQUEST_WARNING_THRESHOLD',
     default=10,  # seconds
 )
+SEARCH_EXPORT_MAX_RESULTS = 5000
+SEARCH_EXPORT_SCROLL_CHUNK_SIZE = 1000
 DATAHUB_SECRET = env('DATAHUB_SECRET')
 CDMS_TEXT_MAX_LENGTH = 4000
 CHAR_FIELD_MAX_LENGTH = 255
