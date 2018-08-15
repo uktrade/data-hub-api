@@ -232,6 +232,9 @@
     - - view_all_investmentproject
       - investment
       - investmentproject
+    - - export_investmentproject
+      - investment
+      - investmentproject
     - - view_company_document
       - company
       - company

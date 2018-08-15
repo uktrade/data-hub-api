@@ -6,7 +6,7 @@ from datahub.investment.permissions import (
     get_association_filters, InvestmentProjectAssociationChecker
 )
 from .models import InvestmentProject
-from .views import SearchInvestmentProjectAPIView
+from .views import SearchInvestmentExportAPIView, SearchInvestmentProjectAPIView
 from ..apps import EXCLUDE_ALL, SearchApp
 
 
@@ -21,10 +21,12 @@ class InvestmentSearchApp(SearchApp):
     # EC2 instance type.)
     bulk_batch_size = 1000
     view = SearchInvestmentProjectAPIView
+    export_view = SearchInvestmentExportAPIView
     view_permissions = (
         f'investment.{InvestmentProjectPermission.view_all}',
         f'investment.{InvestmentProjectPermission.view_associated}'
     )
+    export_permission = f'investment.{InvestmentProjectPermission.export}'
     queryset = DBInvestmentProject.objects.select_related(
         'archived_by',
         'average_salary',
