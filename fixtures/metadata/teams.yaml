@@ -211,6 +211,9 @@
     - - read_all_interaction
       - interaction
       - interaction
+    - - export_interaction
+      - interaction
+      - interaction
     - - add_all_proposition
       - proposition
       - proposition
