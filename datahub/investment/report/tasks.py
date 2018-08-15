@@ -10,8 +10,7 @@ from .spi import write_report
 
 def _get_report_key():
     report_id = now().strftime('%Y-%m-%d %H%M%S')
-    bucket_name = get_bucket_name('report')
-    key = f'{bucket_name}/spi-reports/SPI Report {report_id}.csv'
+    key = f'spi-reports/SPI Report {report_id}.csv'
     return key
 
 
