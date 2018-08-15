@@ -1,7 +1,6 @@
 import tempfile
 
 from celery.task import task
-from django.conf import settings
 from django.utils.timezone import now
 
 from datahub.documents.utils import get_bucket_name, get_s3_client_for_bucket
@@ -11,7 +10,7 @@ from .spi import write_report
 
 def _get_report_key():
     report_id = now().strftime('%Y-%m-%d %H%M%S')
-    key = f'{settings.REPORT_BUCKET}/spi-reports/SPI Report {report_id}.csv'
+    key = f'spi-reports/SPI Report {report_id}.csv'
     return key
 
 
