@@ -48,6 +48,7 @@ def create_read_policy_feedback_user():
             InteractionPermission.read_all,
             InteractionPermission.add_all,
             InteractionPermission.change_all,
+            InteractionPermission.export,
             InteractionPermission.read_policy_feedback,
         ],
     )
@@ -60,6 +61,7 @@ def create_add_policy_feedback_user():
             InteractionPermission.read_all,
             InteractionPermission.add_all,
             InteractionPermission.change_all,
+            InteractionPermission.export,
             InteractionPermission.add_policy_feedback,
         ],
     )
@@ -72,6 +74,7 @@ def create_change_policy_feedback_user():
             InteractionPermission.read_all,
             InteractionPermission.add_all,
             InteractionPermission.change_all,
+            InteractionPermission.export,
             InteractionPermission.change_policy_feedback,
         ],
     )
@@ -84,6 +87,7 @@ def create_interaction_user_without_policy_feedback():
             InteractionPermission.read_all,
             InteractionPermission.add_all,
             InteractionPermission.change_all,
+            InteractionPermission.export,
         ],
     )
 

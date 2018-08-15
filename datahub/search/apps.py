@@ -18,7 +18,11 @@ class SearchApp:
     view = None
     export_view = None
     queryset = None
-    permission_required = None
+    # A sequence of permissions. The user must have one of these permissions to perform searches.
+    view_permissions = None
+    # A single permission. The user must have this permission and a permission in view_permissions
+    # in order to export search results.
+    export_permission = None
 
     def __init__(self, mod):
         """Create this search app without initialising any ES config."""

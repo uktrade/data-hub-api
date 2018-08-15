@@ -10,7 +10,7 @@ class ContactSearchApp(SearchApp):
     name = 'contact'
     es_model = Contact
     view = SearchContactAPIView
-    permission_required = ('company.read_contact',)
+    view_permissions = ('company.read_contact',)
     queryset = DBContact.objects.select_related(
         'title',
         'company',

@@ -11,4 +11,4 @@ class RelatedModelSearchApp(SearchApp):
     view = SearchRelatedModelAPIView
     es_model = ESRelatedModel
     queryset = DBRelatedModel.objects
-    permission_required = []
+    view_permissions = []
