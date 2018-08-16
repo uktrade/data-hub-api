@@ -5,7 +5,7 @@ from django.http import FileResponse
 
 from datahub.core.utils import EchoUTF8
 
-CSV_CONTENT_TYPE = 'text/csv'
+CSV_CONTENT_TYPE = 'text/csv; charset=utf-8'
 INCOMPLETE_CSV_MESSAGE = (
     '\r\n'
     'An error occurred while generating the CSV file. The file is incomplete.'
