@@ -207,7 +207,7 @@ class TestListView(APITestMixin):
         _, api_client = _create_user_and_api_client(
             self, team,
             (
-                InvestmentProjectPermission.read_associated,
+                InvestmentProjectPermission.view_associated,
             )
         )
         advisers = AdviserFactory.create_batch(3, dit_team_id=team.id)
@@ -236,8 +236,8 @@ class TestListView(APITestMixin):
         assert response_data['results'][0]['id'] == str(investment_project.id)
 
     @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.read_all,),
-        (InvestmentProjectPermission.read_associated, InvestmentProjectPermission.read_all),
+        (InvestmentProjectPermission.view_all,),
+        (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
     ))
     def test_non_restricted_user_can_see_all_projects(self, permissions):
         """Test that normal users can see all projects."""
@@ -272,7 +272,7 @@ class TestListView(APITestMixin):
         adviser_same_team = AdviserFactory(dit_team_id=team.id)
 
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.read_associated]
+            self, team, [InvestmentProjectPermission.view_associated]
         )
 
         project_other = InvestmentProjectFactory()
@@ -305,7 +305,7 @@ class TestListView(APITestMixin):
         """
         adviser_other = AdviserFactory(dit_team_id=None)
         request_user = create_test_user(
-            permission_codenames=['read_associated_investmentproject']
+            permission_codenames=['view_associated_investmentproject']
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -793,7 +793,7 @@ class TestRetrieveView(APITestMixin):
         adviser_1 = AdviserFactory(dit_team_id=team_associated.id)
 
         _, api_client = _create_user_and_api_client(
-            self, team_requester, [InvestmentProjectPermission.read_associated]
+            self, team_requester, [InvestmentProjectPermission.view_associated]
         )
 
         iproject_1 = InvestmentProjectFactory()
@@ -805,8 +805,8 @@ class TestRetrieveView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.read_all,),
-        (InvestmentProjectPermission.read_associated, InvestmentProjectPermission.read_all),
+        (InvestmentProjectPermission.view_all,),
+        (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
     ))
     def test_non_restricted_user_can_see_project_if_not_associated(self, permissions):
         """Tests that non-restricted users can access projects they aren't associated with."""
@@ -829,7 +829,7 @@ class TestRetrieveView(APITestMixin):
         team = TeamFactory()
         adviser_1 = AdviserFactory(dit_team_id=team.id)
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.read_associated]
+            self, team, [InvestmentProjectPermission.view_associated]
         )
 
         iproject_1 = InvestmentProjectFactory()
@@ -851,7 +851,7 @@ class TestRetrieveView(APITestMixin):
         adviser_1 = AdviserFactory(dit_team_id=team.id)
 
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.read_associated]
+            self, team, [InvestmentProjectPermission.view_associated]
         )
 
         iproject_1 = InvestmentProjectFactory(**{field: adviser_1})
@@ -868,7 +868,7 @@ class TestRetrieveView(APITestMixin):
         """
         adviser_other = AdviserFactory(dit_team_id=None)
         request_user = create_test_user(
-            permission_codenames=['read_associated_investmentproject']
+            permission_codenames=['view_associated_investmentproject']
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -879,9 +879,9 @@ class TestRetrieveView(APITestMixin):
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_get_project_without_read_document_permission(self):
+    def test_get_project_without_view_document_permission(self):
         """
-        Tests that the archived documents path is not returned for users without the read document
+        Tests that the archived documents path is not returned for users without the view document
         permission.
         """
         project = InvestmentProjectFactory(
@@ -889,7 +889,7 @@ class TestRetrieveView(APITestMixin):
         )
         user = create_test_user(
             permission_codenames=(
-                InvestmentProjectPermission.read_all,
+                InvestmentProjectPermission.view_all,
             )
         )
         api_client = self.create_api_client(user=user)
@@ -902,7 +902,7 @@ class TestRetrieveView(APITestMixin):
 
     def test_get_project_with_read_document_permission(self):
         """
-        Tests that the archived documents path is returned for users without the read document
+        Tests that the archived documents path is returned for users without the view document
         permission.
         """
         project = InvestmentProjectFactory(
@@ -910,8 +910,8 @@ class TestRetrieveView(APITestMixin):
         )
         user = create_test_user(
             permission_codenames=(
-                InvestmentProjectPermission.read_all,
-                InvestmentProjectPermission.read_investmentproject_document,
+                InvestmentProjectPermission.view_all,
+                InvestmentProjectPermission.view_investmentproject_document,
             )
         )
         api_client = self.create_api_client(user=user)
@@ -2473,8 +2473,8 @@ class TestGetTeamMemberView(APITestMixin):
     """Tests for the get team member view."""
 
     @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.read_all,),
-        (InvestmentProjectPermission.read_associated, InvestmentProjectPermission.read_all),
+        (InvestmentProjectPermission.view_all,),
+        (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
     ))
     def test_non_restricted_user_can_get_team_member(self, permissions):
         """Test that a non-restricted user can get a team member."""
@@ -2500,7 +2500,7 @@ class TestGetTeamMemberView(APITestMixin):
         })
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.read_associated]
+            self, team, [InvestmentProjectPermission.view_associated]
         )
         response = api_client.get(url, format='json')
 
@@ -2516,7 +2516,7 @@ class TestGetTeamMemberView(APITestMixin):
             'adviser_pk': team_member.adviser.pk
         })
         _, api_client = _create_user_and_api_client(
-            self, creator.dit_team, [InvestmentProjectPermission.read_associated]
+            self, creator.dit_team, [InvestmentProjectPermission.view_associated]
         )
         response = api_client.get(url, format='json')
 
@@ -2922,8 +2922,8 @@ class TestAuditLogView(APITestMixin):
     """Tests for the audit log view."""
 
     @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.read_all,),
-        (InvestmentProjectPermission.read_associated, InvestmentProjectPermission.read_all),
+        (InvestmentProjectPermission.view_all,),
+        (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
     ))
     def test_audit_log_non_restricted_user(self, permissions):
         """Test retrieval of audit log for a non-restricted user."""
@@ -2975,7 +2975,7 @@ class TestAuditLogView(APITestMixin):
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
         user, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.read_associated]
+            self, team, [InvestmentProjectPermission.view_associated]
         )
 
         initial_datetime = now()
@@ -3023,7 +3023,7 @@ class TestAuditLogView(APITestMixin):
         """Test retrieval of audit log for a restricted user and a non-associated project."""
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.read_associated]
+            self, team, [InvestmentProjectPermission.view_associated]
         )
 
         iproject = InvestmentProjectFactory(

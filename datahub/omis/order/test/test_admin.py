@@ -38,7 +38,7 @@ class TestCancelOrderAdmin(AdminTestMixin):
         user = create_test_user(
             is_staff=True,
             password=self.PASSWORD,
-            permission_codenames=('add_order', 'delete_order', 'read_order')
+            permission_codenames=('add_order', 'delete_order', 'view_order')
         )
 
         client = self.create_client(user=user)

@@ -66,9 +66,9 @@ class TestDashboard(APITestMixin):
         assert len(response_data['interactions']) == 10
 
     def test_contact_permission(self, setup_es):
-        """Test that the contact read permission is enforced."""
+        """Test that the contact view permission is enforced."""
         requester = create_test_user(
-            permission_codenames=(InteractionPermission.read_all,)
+            permission_codenames=(InteractionPermission.view_all,)
         )
         CompanyInteractionFactory.create_batch(5, dit_adviser=requester)
         ContactFactory.create_batch(5, created_by=requester)
@@ -88,9 +88,9 @@ class TestDashboard(APITestMixin):
         assert len(response_data['interactions']) == 5
 
     def test_interaction_permission(self, setup_es):
-        """Test that the interaction read permission is enforced."""
+        """Test that the interaction view permission is enforced."""
         requester = create_test_user(
-            permission_codenames=('read_contact',)
+            permission_codenames=('view_contact',)
         )
         CompanyInteractionFactory.create_batch(5, dit_adviser=requester)
         ContactFactory.create_batch(5, created_by=requester)

@@ -575,14 +575,14 @@ class TestViewContact(APITestMixin):
             'modified_on': '2017-04-18T13:25:30.986208Z',
         }
 
-    def test_get_contact_without_read_document_permission(self):
-        """Tests the contact detail view without read document permission."""
+    def test_get_contact_without_view_document_permission(self):
+        """Tests the contact detail view without view document permission."""
         contact = ContactFactory(
             archived_documents_url_path='http://some-documents',
         )
         user = create_test_user(
             permission_codenames=(
-                'read_contact',
+                'view_contact',
             )
         )
         api_client = self.create_api_client(user=user)
@@ -615,13 +615,13 @@ class TestContactList(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 5
 
-    def test_all_without_read_document_permission(self):
-        """Test getting all contacts without read document permission."""
+    def test_all_without_view_document_permission(self):
+        """Test getting all contacts without view document permission."""
         ContactFactory.create_batch(5, archived_documents_url_path='https://some-docs')
 
         user = create_test_user(
             permission_codenames=(
-                'read_contact',
+                'view_contact',
             )
         )
         api_client = self.create_api_client(user=user)
@@ -636,14 +636,14 @@ class TestContactList(APITestMixin):
             for contact in response.data['results']
         )
 
-    def test_all_with_read_document_permission(self):
-        """Test getting all contacts with read document permission."""
+    def test_all_with_view_document_permission(self):
+        """Test getting all contacts with view document permission."""
         ContactFactory.create_batch(5, archived_documents_url_path='https://some-docs')
 
         user = create_test_user(
             permission_codenames=(
-                'read_contact',
-                'read_contact_document',
+                'view_contact',
+                'view_contact_document',
             )
         )
         api_client = self.create_api_client(user=user)

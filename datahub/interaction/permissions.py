@@ -34,7 +34,7 @@ class InteractionModelPermissions(ViewBasedModelPermissions):
     """Interaction model permissions class."""
 
     permission_mapping = {
-        'read': (
+        'view': (
             _PermissionTemplate.all,
             _PermissionTemplate.associated_investmentproject,
         ),
@@ -58,7 +58,7 @@ class InvestmentProjectInteractionAssociationChecker(InvestmentProjectAssociatio
     project linked to the interaction.
     """
 
-    restricted_actions = {'add', 'read', 'change'}
+    restricted_actions = {'add', 'view', 'change'}
     model = Interaction
     all_permission_template = _PermissionTemplate.all
     associated_permission_template = _PermissionTemplate.associated_investmentproject

@@ -64,9 +64,9 @@ class CompanyCoreTeamViewSet(CoreViewSet):
     """
     Views for the core team of a company.
 
-    The permissions to access this resource are inherited from the company resourse.
+    The permissions to access this resource are inherited from the company resource.
 
-    E.g. user only needs `read_company` permission to GET this collection and
+    E.g. user only needs `view_company` permission to GET this collection and
     companycoreteam permissions are ignored for now.
     """
 

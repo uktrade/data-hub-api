@@ -14,8 +14,8 @@ class TestUserView(APITestMixin):
     def test_who_am_i_authenticated(self):
         """Who am I."""
         permission_names = [
-            'read_lorem',
-            'read_ipsum',
+            'view_lorem',
+            'view_ipsum',
             'add_cats',
         ]
         content_type = ContentType.objects.first()
@@ -47,11 +47,13 @@ class TestUserView(APITestMixin):
         if 'permissions' in response_data:
             response_data['permissions'].sort()
 
-        serialized_permissions = [
-            f'{permission.content_type.app_label}.{permission.codename}'
-            for permission in permissions
+        expected_permissions = [
+            'admin.add_cats',
+            'admin.read_ipsum',
+            'admin.read_lorem',
+            'admin.view_ipsum',
+            'admin.view_lorem',
         ]
-        serialized_permissions.sort()
 
         assert response_data == {
             'id': str(user_test.id),
@@ -79,5 +81,5 @@ class TestUserView(APITestMixin):
                 },
                 'disabled_on': None,
             },
-            'permissions': serialized_permissions
+            'permissions': expected_permissions,
         }
