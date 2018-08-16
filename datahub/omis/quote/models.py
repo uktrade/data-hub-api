@@ -75,9 +75,6 @@ class Quote(BaseModel):
 
     objects = QuoteManager()
 
-    class Meta:
-        permissions = (('read_quote', 'Can read quote'),)
-
     def cancel(self, by):
         """
         Cancel the current quote.

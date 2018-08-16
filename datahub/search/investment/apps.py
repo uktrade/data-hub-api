@@ -22,8 +22,8 @@ class InvestmentSearchApp(SearchApp):
     bulk_batch_size = 1000
     view = SearchInvestmentProjectAPIView
     view_permissions = (
-        f'investment.{InvestmentProjectPermission.read_all}',
-        f'investment.{InvestmentProjectPermission.read_associated}'
+        f'investment.{InvestmentProjectPermission.view_all}',
+        f'investment.{InvestmentProjectPermission.view_associated}'
     )
     queryset = DBInvestmentProject.objects.select_related(
         'archived_by',

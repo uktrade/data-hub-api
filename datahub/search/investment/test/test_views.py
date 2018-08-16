@@ -569,8 +569,8 @@ class TestSearchPermissions(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.read_all,),
-        (InvestmentProjectPermission.read_associated, InvestmentProjectPermission.read_all),
+        (InvestmentProjectPermission.view_all,),
+        (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
     ))
     def test_non_restricted_user_can_see_all_projects(self, setup_es, permissions):
         """Test that normal users can see all projects."""
@@ -612,7 +612,7 @@ class TestSearchPermissions(APITestMixin):
 
         adviser_other = AdviserFactory(dit_team_id=None)
         request_user = create_test_user(
-            permission_codenames=['read_associated_investmentproject']
+            permission_codenames=['view_associated_investmentproject']
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -636,7 +636,7 @@ class TestSearchPermissions(APITestMixin):
         adviser_other = AdviserFactory(dit_team_id=team_other.id)
         adviser_same_team = AdviserFactory(dit_team_id=team.id)
         request_user = create_test_user(
-            permission_codenames=['read_associated_investmentproject'],
+            permission_codenames=['view_associated_investmentproject'],
             dit_team=team
         )
         api_client = self.create_api_client(user=request_user)
@@ -703,8 +703,8 @@ class TestBasicSearchPermissions(APITestMixin):
     """Tests basic search view permissions."""
 
     @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.read_all,),
-        (InvestmentProjectPermission.read_associated, InvestmentProjectPermission.read_all),
+        (InvestmentProjectPermission.view_all,),
+        (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
     ))
     def test_global_non_restricted_user_can_see_all_projects(self, setup_es, permissions):
         """Test that normal users can see all projects."""
@@ -749,7 +749,7 @@ class TestBasicSearchPermissions(APITestMixin):
         adviser_other = AdviserFactory(dit_team_id=team_other.id)
         adviser_same_team = AdviserFactory(dit_team_id=team.id)
         request_user = create_test_user(
-            permission_codenames=['read_associated_investmentproject'],
+            permission_codenames=['view_associated_investmentproject'],
             dit_team=team
         )
         api_client = self.create_api_client(user=request_user)
@@ -789,7 +789,7 @@ class TestBasicSearchPermissions(APITestMixin):
         """
         adviser_other = AdviserFactory(dit_team_id=None)
         request_user = create_test_user(
-            permission_codenames=['read_associated_investmentproject']
+            permission_codenames=['view_associated_investmentproject']
         )
         api_client = self.create_api_client(user=request_user)
 

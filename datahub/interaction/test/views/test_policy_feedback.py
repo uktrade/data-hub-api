@@ -18,8 +18,8 @@ from .utils import (
     create_add_policy_feedback_user,
     create_change_policy_feedback_user,
     create_interaction_user_without_policy_feedback,
-    create_read_policy_feedback_user,
     create_restricted_investment_project_user,
+    create_view_policy_feedback_user,
     resolve_data,
 )
 from ..factories import PolicyFeedbackFactory
@@ -398,7 +398,7 @@ class TestGetPolicyFeedback(APITestMixin):
         """Test retrieving a policy feedback interaction."""
         interaction = PolicyFeedbackFactory()
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        user = create_read_policy_feedback_user()
+        user = create_view_policy_feedback_user()
         api_client = self.create_api_client(user=user)
         response = api_client.get(url)
 

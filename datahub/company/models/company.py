@@ -19,9 +19,9 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 class CompanyPermission(StrEnum):
     """Permission codename constants."""
 
-    read_company = 'read_company'
-    read_company_document = 'read_company_document'
-    read_company_timeline = 'read_company_timeline'
+    view_company = 'view_company'
+    view_company_document = 'view_company_document'
+    view_company_timeline = 'view_company_timeline'
 
 
 class ExportExperienceCategory(BaseConstantModel):
@@ -152,9 +152,8 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     class Meta:
         verbose_name_plural = 'companies'
         permissions = (
-            (CompanyPermission.read_company.value, 'Can read company'),
-            (CompanyPermission.read_company_document.value, 'Can read company document'),
-            (CompanyPermission.read_company_timeline.value, 'Can read company timeline'),
+            (CompanyPermission.view_company_document.value, 'Can view company document'),
+            (CompanyPermission.view_company_timeline.value, 'Can view company timeline'),
         )
 
     @property
@@ -258,4 +257,3 @@ class CompaniesHouseCompany(CompanyAbstract):
 
     class Meta:
         verbose_name_plural = 'Companies House companies'
-        permissions = (('read_companieshousecompany', 'Can read companies house companies'),)

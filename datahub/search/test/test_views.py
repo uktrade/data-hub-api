@@ -460,13 +460,13 @@ class TestSearch(APITestMixin):
         assert all(aggregation in response.data['aggregations'] for aggregation in aggregations)
 
     @pytest.mark.parametrize('permission,permission_entity', (
-        ('read_company', 'company'),
-        ('read_contact', 'contact'),
-        ('read_event', 'event'),
-        ('read_all_interaction', 'interaction'),
-        ('read_all_investmentproject', 'investment_project'),
-        ('read_associated_investmentproject', 'investment_project'),
-        ('read_order', 'order'),
+        ('view_company', 'company'),
+        ('view_contact', 'contact'),
+        ('view_event', 'event'),
+        ('view_all_interaction', 'interaction'),
+        ('view_all_investmentproject', 'investment_project'),
+        ('view_associated_investmentproject', 'investment_project'),
+        ('view_order', 'order'),
     ))
     @pytest.mark.parametrize('entity', (
         'company',

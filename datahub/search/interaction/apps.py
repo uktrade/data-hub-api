@@ -13,7 +13,7 @@ class InteractionSearchApp(SearchApp):
     es_model = Interaction
     view = SearchInteractionAPIView
     export_view = SearchInteractionExportAPIView
-    view_permissions = (f'interaction.{InteractionPermission.read_all}',)
+    view_permissions = (f'interaction.{InteractionPermission.view_all}',)
     export_permission = f'interaction.{InteractionPermission.export}'
     queryset = DBInteraction.objects.select_related(
         'company',

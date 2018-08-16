@@ -13,7 +13,7 @@ class AllAdvisersReport(QuerySetReport):
     id = 'all-advisers'
     name = 'All advisers'
     model = Advisor
-    permissions_required = ('company.read_advisor',)
+    permissions_required = ('company.view_advisor',)
     queryset = Advisor.objects.annotate(
         name=Concat('first_name', Value(' '), 'last_name'),
         is_team_active=Case(
@@ -44,7 +44,7 @@ class OneListReport(QuerySetReport):
     id = 'one-list'
     name = 'One List'
     model = Company
-    permissions_required = ('company.read_company',)
+    permissions_required = ('company.view_company',)
     queryset = Company.objects.filter(
         headquarter_type_id=constants.HeadquarterType.ghq.value.id,
         classification__id__isnull=False,

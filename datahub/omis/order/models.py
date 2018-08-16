@@ -278,9 +278,6 @@ class Order(BaseModel):
 
     objects = OrderQuerySet.as_manager()
 
-    class Meta:
-        permissions = (('read_order', 'Can read order'),)
-
     def __str__(self):
         """Human-readable representation"""
         return self.reference
