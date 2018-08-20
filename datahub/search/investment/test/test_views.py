@@ -17,7 +17,12 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core import constants
-from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_queryset
+from datahub.core.test_utils import (
+    APITestMixin,
+    create_test_user,
+    get_attr_or_none,
+    random_obj_for_queryset,
+)
 from datahub.investment.models import InvestmentProject, InvestmentProjectPermission
 from datahub.investment.test.factories import (
     InvestmentProjectFactory,
@@ -675,13 +680,6 @@ class TestSearchPermissions(APITestMixin):
         assert {result['id'] for result in results} == expected_ids
 
 
-def _get_attr_or_none(obj, attr):
-    try:
-        return attrgetter(attr)(obj)
-    except AttributeError:
-        return None
-
-
 def _join_values(iterable, attr='name', separator=', '):
     getter = attrgetter(attr)
     return separator.join(sorted(getter(value) for value in iterable))
@@ -803,37 +801,37 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Project name': project.name,
                 'Investor company': project.investor_company.name,
                 'Country of origin':
-                    _get_attr_or_none(project, 'investor_company.registered_address_country.name'),
-                'Investment type': _get_attr_or_none(project, 'investment_type.name'),
+                    get_attr_or_none(project, 'investor_company.registered_address_country.name'),
+                'Investment type': get_attr_or_none(project, 'investment_type.name'),
                 'Status': project.get_status_display(),
-                'Stage': _get_attr_or_none(project, 'stage.name'),
+                'Stage': get_attr_or_none(project, 'stage.name'),
                 'Actual land date': project.actual_land_date,
                 'Estimated land date': project.estimated_land_date,
-                'FDI value': _get_attr_or_none(project, 'fdi_value.name'),
-                'Sector': _get_attr_or_none(project, 'sector.name'),
+                'FDI value': get_attr_or_none(project, 'fdi_value.name'),
+                'Sector': get_attr_or_none(project, 'sector.name'),
                 'Date of latest interaction': None,
-                'Project manager': _get_attr_or_none(project, 'project_manager.name'),
+                'Project manager': get_attr_or_none(project, 'project_manager.name'),
                 'Client relationship manager':
-                    _get_attr_or_none(project, 'client_relationship_manager.name'),
+                    get_attr_or_none(project, 'client_relationship_manager.name'),
                 'Global account manager':
-                    _get_attr_or_none(project, 'investor_company.one_list_account_owner.name'),
+                    get_attr_or_none(project, 'investor_company.one_list_account_owner.name'),
                 'Project assurance adviser':
-                    _get_attr_or_none(project, 'project_assurance_adviser.name'),
+                    get_attr_or_none(project, 'project_assurance_adviser.name'),
                 'Other team members': _join_values(project.team_members.all(), 'adviser.name'),
                 'Delivery partners': _join_values(project.delivery_partners.all()),
                 'Possible UK regions': _join_values(project.uk_region_locations.all()),
                 'Actual UK regions': _join_values(project.actual_uk_regions.all()),
                 'Specific investment programme':
-                    _get_attr_or_none(project, 'specific_programme.name'),
+                    get_attr_or_none(project, 'specific_programme.name'),
                 'Referral source activity':
-                    _get_attr_or_none(project, 'referral_source_activity.name'),
+                    get_attr_or_none(project, 'referral_source_activity.name'),
                 'Referral source activity website':
-                    _get_attr_or_none(project, 'referral_source_activity_website.name'),
+                    get_attr_or_none(project, 'referral_source_activity_website.name'),
                 'Total investment': project.total_investment,
                 'New jobs': project.number_new_jobs,
-                'Average salary of new jobs': _get_attr_or_none(project, 'average_salary.name'),
+                'Average salary of new jobs': get_attr_or_none(project, 'average_salary.name'),
                 'Safeguarded jobs': project.number_safeguarded_jobs,
-                'Level of involvement': _get_attr_or_none(project, 'level_of_involvement.name'),
+                'Level of involvement': get_attr_or_none(project, 'level_of_involvement.name'),
                 'R&D budget': project.r_and_d_budget,
                 'Associated non-FDI R&D project': project.non_fdi_r_and_d_budget,
                 'New to world tech': project.new_tech_to_uk,
