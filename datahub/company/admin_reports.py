@@ -4,7 +4,7 @@ from django.db.models.functions import Concat
 from datahub.admin_report.report import QuerySetReport
 from datahub.company.models import Advisor, Company
 from datahub.core import constants
-from datahub.core.query_utils import get_front_end_url_expression
+from datahub.core.query_utils import get_front_end_url_expression, get_full_name_expression
 
 
 class AllAdvisersReport(QuerySetReport):
@@ -50,11 +50,7 @@ class OneListReport(QuerySetReport):
         classification__id__isnull=False,
         one_list_account_owner_id__isnull=False,
     ).annotate(
-        primary_contact_name=Concat(
-            'one_list_account_owner__first_name',
-            Value(' '),
-            'one_list_account_owner__last_name'
-        ),
+        primary_contact_name=get_full_name_expression('one_list_account_owner'),
         url=get_front_end_url_expression('company', 'pk'),
     ).order_by(
         'classification__order',
