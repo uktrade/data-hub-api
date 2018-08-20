@@ -257,3 +257,22 @@ class MockQuerySet:
     def iterator(self, chunk_size=None):
         """Returns an iterator over the query set items."""
         return iter(self._items)
+
+
+def format_csv_data(rows):
+    """
+    Converts source data into formatted strings as should be written to CSV exports.
+
+    Expects an iterable of dictionaries with arbitrary objects as values, and outputs a list of
+    dictionaries with strings as values.
+    """
+    return [
+        {key: _format_csv_value(val) for key, val in row.items()} for row in rows
+    ]
+
+
+def _format_csv_value(value):
+    """Converts a value to a string in the way that is expected in CSV exports."""
+    if value is None:
+        return ''
+    return str(value)
