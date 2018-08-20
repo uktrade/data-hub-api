@@ -20,6 +20,7 @@ from datahub.core import constants
 from datahub.core.test_utils import (
     APITestMixin,
     create_test_user,
+    format_csv_data,
     get_attr_or_none,
     random_obj_for_queryset,
 )
@@ -685,12 +686,6 @@ def _join_values(iterable, attr='name', separator=', '):
     return separator.join(sorted(getter(value) for value in iterable))
 
 
-def _format_value(value):
-    if value is None:
-        return ''
-    return str(value)
-
-
 class TestInvestmentProjectExportView(APITestMixin):
     """Tests the investment project export view."""
 
@@ -839,10 +834,7 @@ class TestInvestmentProjectExportView(APITestMixin):
             for project in sorted_projects
         ]
 
-        expected_rows = [
-            {key: _format_value(val) for key, val in row.items()} for row in expected_row_data
-        ]
-
+        expected_rows = format_csv_data(expected_row_data)
         actual_rows = [dict(item) for item in reader]
 
         # Support for ordering will be added to StringAgg in Django 2.2. In the meantime,
