@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from operator import attrgetter
 from secrets import token_hex
 
 import factory
@@ -185,6 +186,22 @@ def random_obj_for_model(model):
 def random_obj_for_queryset(queryset):
     """Returns a random object for a queryset."""
     return queryset.order_by('?').first()
+
+
+def get_attr_or_none(obj, attr):
+    """
+    Gets an attribute of an object, or None if the attribute does not exist.
+
+    Dotted paths to attributes can be provided to specify nested attributes.
+
+    Usage example:
+        # Returns company.contact.name or None if contact is None
+        get_attr_or_none(company, 'contact.name')
+    """
+    try:
+        return attrgetter(attr)(obj)
+    except AttributeError:
+        return None
 
 
 class MockQuerySet:
