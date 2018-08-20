@@ -65,6 +65,7 @@ class InvestmentProjectPermission(StrEnum):
     change_stage_to_won = 'change_stage_to_won_investmentproject'
     add = 'add_investmentproject'
     delete = 'delete_investmentproject'
+    export = 'export_investmentproject'
     view_investmentproject_document = 'view_investmentproject_document'
 
 
@@ -441,6 +442,10 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
             (
                 InvestmentProjectPermission.change_associated.value,
                 'Can change associated investment project'
+            ),
+            (
+                InvestmentProjectPermission.export.value,
+                'Can export investment project'
             ),
             (
                 InvestmentProjectPermission.view_investmentproject_document.value,

@@ -26,4 +26,31 @@ class MyDisableableModel(DisableableModel):
 
 
 class PermissionModel(models.Model):
-    """Simple Model with Permission"""
+    """Simple Model with Permission."""
+
+
+class Person(models.Model):
+    """Person model."""
+
+    first_name = models.TextField()
+    last_name = models.TextField()
+
+
+class Book(models.Model):
+    """Book model."""
+
+    GENRES = (
+        ('horror', 'Horror'),
+        ('non_fiction', 'Non-fiction'),
+    )
+
+    name = models.TextField()
+    proofreader = models.ForeignKey(
+        Person,
+        null=True,
+        related_name='proofread_books',
+        on_delete=models.CASCADE,
+    )
+    authors = models.ManyToManyField(Person, related_name='books')
+    published_on = models.DateField()
+    genre = models.CharField(null=True, max_length=255, choices=GENRES)
