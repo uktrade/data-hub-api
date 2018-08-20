@@ -1,10 +1,10 @@
-from django.conf import settings
 from django.db.models import Case, NullBooleanField, Value, When
 from django.db.models.functions import Concat
 
 from datahub.admin_report.report import QuerySetReport
 from datahub.company.models import Advisor, Company
 from datahub.core import constants
+from datahub.core.query_utils import get_front_end_url_expression
 
 
 class AllAdvisersReport(QuerySetReport):
@@ -55,9 +55,7 @@ class OneListReport(QuerySetReport):
             Value(' '),
             'one_list_account_owner__last_name'
         ),
-        url=Concat(
-            Value(f'{settings.DATAHUB_FRONTEND_BASE_URL}/companies/'), 'id'
-        ),
+        url=get_front_end_url_expression('company', 'pk'),
     ).order_by(
         'classification__order',
         'name',
