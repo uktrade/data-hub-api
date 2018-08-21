@@ -1,2 +1,2 @@
-The field ``account_manager`` is deprecated. Please check the API and Database schema categories
+The field ``account_manager`` has been deprecated. Please check the API and Database schema categories
 for more details.
