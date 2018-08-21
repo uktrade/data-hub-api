@@ -1,0 +1,68 @@
+[tool.towncrier]
+    package_dir = "datahub"
+    filename = "CHANGELOG.rst"
+    directory = "changelog/"
+    title_format = "Data Hub API {version} ({project_date})"
+    template = "changelog/_template.rst"
+
+    [[tool.towncrier.type]]
+        directory = "removal"
+        name = "Deprecations and removals"
+        showcontent = true
+
+    [[tool.towncrier.type]]
+        directory = "feature"
+        name = "Features"
+        showcontent = true
+
+    [[tool.towncrier.type]]
+        directory = "bugfix"
+        name = "Bug fixes"
+        showcontent = true
+
+    [[tool.towncrier.type]]
+        directory = "internal"
+        name = "Internal changes"
+        showcontent = true
+
+    [[tool.towncrier.type]]
+        directory = "api"
+        name = "API"
+        showcontent = true
+
+    [[tool.towncrier.type]]
+        directory = "db"
+        name = "Database schema"
+        showcontent = true
+
+    [[tool.towncrier.section]]
+        path = "adviser"
+        name = "Advisers"
+
+    [[tool.towncrier.section]]
+        path = "company"
+        name = "Companies"
+
+    [[tool.towncrier.section]]
+        path = "contact"
+        name = "Contacts"
+
+    [[tool.towncrier.section]]
+        path = "event"
+        name = "Events"
+
+    [[tool.towncrier.section]]
+        path = "interaction"
+        name = "Interactions"
+
+    [[tool.towncrier.section]]
+        path = "investment"
+        name = "Investment"
+
+    [[tool.towncrier.section]]
+        path = "omis"
+        name = "OMIS"
+
+    [[tool.towncrier.section]]
+        path = ""
+        name = ""
