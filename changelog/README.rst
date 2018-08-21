@@ -1,14 +1,20 @@
 This directory contains "newsfragments" which are short files that contain a small **ReST**-formatted
 text that will be added to the next ``CHANGELOG``.
 
-Make sure to use full sentences with correct case and punctuation, for example::
+Make sure to use full sentences with correct case, punctuation and avoid starting with verbs. For example::
 
-    Fix issue with non-ascii messages from the ``warnings`` module.
+    BAD
+    Allow people to export search results.
+    Added the ability to export search results.
+
+    GOOD
+    It's now possible to export search results as a CSV file.
+
 
 Each file should be named like ``<SLUG>.<TYPE>.rst``, where:
 
-``<SLUG>`` is ignored in the compiled ``CHANGELOG`` but it has to be unique within a changelog folder.
-A good candidate would be your branch name.
+``<SLUG>`` is ignored in the compiled ``CHANGELOG`` but it has to be unique within a changelog folder
+and should not contain any full stops. A good candidate would be your branch name.
 
 ``<TYPE>`` is one of:
 
