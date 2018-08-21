@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.postgres.aggregates import StringAgg
 from django.db.models import Case, OuterRef, Subquery, Value, When
 from django.db.models.functions import Concat
@@ -83,3 +84,13 @@ def get_full_name_expression(field_name):
         ),
         default=None,
     )
+
+
+def get_front_end_url_expression(model_name, pk_expression):
+    """
+    Gets an SQL expression that returns a front-end URL for an object.
+
+    :param model_name:      key in settings.DATAHUB_FRONTEND_URL_PREFIXES
+    :param pk_expression:   expression that resolves to the pk for the model
+    """
+    return Concat(Value(f'{settings.DATAHUB_FRONTEND_URL_PREFIXES[model_name]}/'), pk_expression)

@@ -320,6 +320,11 @@ if REDIS_BASE_URL:
 
 # FRONTEND
 DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://localhost:3000')
+DATAHUB_FRONTEND_URL_PREFIXES = {
+    'company': f'{DATAHUB_FRONTEND_BASE_URL}/companies',
+    'interaction': f'{DATAHUB_FRONTEND_BASE_URL}/interactions',
+    'order': f'{DATAHUB_FRONTEND_BASE_URL}/omis',
+}
 
 # DT07 reporting service (used for company timeline)
 DATA_SCIENCE_COMPANY_API_URL = env('DATA_SCIENCE_COMPANY_API_URL', default='')
