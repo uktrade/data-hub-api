@@ -1,10 +1,12 @@
 import pytest
+from django.conf import settings
 from django.db.models import Max
 from django.db.models.functions import Left
 
 from datahub.core.query_utils import (
     get_aggregate_subquery,
     get_choices_as_case_expression,
+    get_front_end_url_expression,
     get_full_name_expression,
     get_string_agg_subquery,
 )
@@ -97,3 +99,14 @@ class TestGetFullNameExpression:
             proofreader_name=get_full_name_expression('proofreader')
         )
         assert queryset.first().proofreader_name is None
+
+
+def test_get_front_end_url_expression(monkeypatch):
+    """Test that get_front_end_url_expression() generates URLs correctly."""
+    monkeypatch.setitem(settings.DATAHUB_FRONTEND_URL_PREFIXES, 'book', 'http://test')
+
+    book = BookFactory()
+    queryset = Book.objects.annotate(
+        url=get_front_end_url_expression('book', 'pk')
+    )
+    assert queryset.first().url == f'http://test/{book.pk}'
