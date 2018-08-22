@@ -9,6 +9,7 @@ from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import Advisor, ExportExperienceCategory
 from datahub.core import constants
 from datahub.core.test_utils import random_obj_for_model
+from datahub.metadata.models import EmployeeRange, HeadquarterType, TurnoverRange
 from datahub.metadata.test.factories import TeamFactory
 
 
@@ -50,8 +51,15 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     export_experience_category = factory.LazyFunction(
         ExportExperienceCategory.objects.order_by('?').first
     )
+    turnover_range = factory.LazyFunction(lambda: random_obj_for_model(TurnoverRange))
+    employee_range = factory.LazyFunction(lambda: random_obj_for_model(EmployeeRange))
     archived_documents_url_path = factory.Faker('uri_path')
     created_on = now()
+
+    class Params:
+        hq = factory.Trait(
+            headquarter_type=factory.LazyFunction(lambda: random_obj_for_model(HeadquarterType)),
+        )
 
     class Meta:
         model = 'company.Company'

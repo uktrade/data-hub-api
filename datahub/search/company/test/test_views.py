@@ -1,14 +1,20 @@
 import random
+from cgi import parse_header
 from collections import Counter
+from csv import DictReader
+from io import StringIO
 from unittest import mock
 from uuid import UUID, uuid4
 
 import factory
 import pytest
+from django.conf import settings
+from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.constants import BusinessTypeConstant
+from datahub.company.models import Company, CompanyPermission
 from datahub.company.test.factories import (
     AdviserFactory,
     CompaniesHouseCompanyFactory,
@@ -17,10 +23,16 @@ from datahub.company.test.factories import (
 )
 from datahub.core import constants
 from datahub.core.test_utils import (
-    APITestMixin, create_test_user, random_obj_for_model, random_obj_for_queryset
+    APITestMixin,
+    create_test_user,
+    format_csv_data,
+    get_attr_or_none,
+    random_obj_for_model,
+    random_obj_for_queryset,
 )
 from datahub.metadata.models import CompanyClassification, Sector
 from datahub.metadata.test.factories import TeamFactory
+from datahub.search.company.views import SearchCompanyExportAPIView
 
 pytestmark = pytest.mark.django_db
 
@@ -474,6 +486,84 @@ class TestSearch(APITestMixin):
         assert response.data['count'] == 1
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['uk_based'] is False
+
+
+class TestCompanyExportView(APITestMixin):
+    """Tests the company export view."""
+
+    @pytest.mark.parametrize(
+        'permissions', (
+            (),
+            (CompanyPermission.view_company,),
+            (CompanyPermission.export_company,),
+        )
+    )
+    def test_user_without_permission_cannot_export(self, setup_es, permissions):
+        """Test that a user without the correct permissions cannot export data."""
+        user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('api-v3:search:company-export')
+        response = api_client.post(url, format='json')
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @pytest.mark.parametrize(
+        'request_sortby,orm_ordering',
+        (
+            ('name', 'name'),
+            ('modified_on', 'modified_on'),
+            ('modified_on:desc', '-modified_on'),
+        )
+    )
+    def test_export(
+        self,
+        setup_es,
+        request_sortby,
+        orm_ordering,
+    ):
+        """Test export of company search results."""
+        CompanyFactory.create_batch(3)
+        CompanyFactory.create_batch(2, hq=True)
+
+        setup_es.indices.refresh()
+
+        data = {}
+        if request_sortby:
+            data['sortby'] = request_sortby
+
+        url = reverse('api-v3:search:company-export')
+
+        with freeze_time('2018-01-01 11:12:13'):
+            response = self.api_client.post(url, format='json', data=data)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})
+        assert parse_header(response.get('Content-Disposition')) == (
+            'attachment', {'filename': 'Data Hub - Companies - 2018-01-01-11-12-13.csv'}
+        )
+
+        sorted_company = Company.objects.order_by(orm_ordering)
+        reader = DictReader(StringIO(response.getvalue().decode('utf-8-sig')))
+
+        assert reader.fieldnames == list(SearchCompanyExportAPIView.field_titles.values())
+
+        expected_row_data = [
+            {
+                'Name': company.name,
+                'Link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{company.pk}',
+                'Sector': get_attr_or_none(company, 'sector.name'),
+                'Country': get_attr_or_none(company, 'registered_address_country.name'),
+                'UK region': get_attr_or_none(company, 'uk_region.name'),
+                'Archived': company.archived,
+                'Date created': company.created_on,
+                'Number of employees': get_attr_or_none(company, 'employee_range.name'),
+                'Annual turnover': get_attr_or_none(company, 'turnover_range.name'),
+                'Headquarter type': get_attr_or_none(company, 'headquarter_type.name'),
+            }
+            for company in sorted_company
+        ]
+
+        assert list(dict(row) for row in reader) == format_csv_data(expected_row_data)
 
 
 class TestBasicSearch(APITestMixin):
