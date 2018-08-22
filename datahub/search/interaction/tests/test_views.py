@@ -853,7 +853,7 @@ class TestInteractionExportView(APITestMixin):
 
         expected_row_data = [
             {
-                'Date': str(interaction.date),
+                'Date': interaction.date,
                 'Type': interaction.get_kind_display(),
                 'Service': get_attr_or_none(interaction, 'service.name'),
                 'Subject': interaction.subject,
