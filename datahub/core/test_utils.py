@@ -275,4 +275,6 @@ def _format_csv_value(value):
     """Converts a value to a string in the way that is expected in CSV exports."""
     if value is None:
         return ''
+    if isinstance(value, datetime):
+        return value.strftime('%Y-%m-%d %H:%M:%S')
     return str(value)
