@@ -550,7 +550,8 @@ class TestCompanyExportView(APITestMixin):
                 'Date created': company.created_on,
                 'Number of employees': get_attr_or_none(company, 'employee_range.name'),
                 'Annual turnover': get_attr_or_none(company, 'turnover_range.name'),
-                'Headquarter type': get_attr_or_none(company, 'headquarter_type.name'),
+                'Headquarter type':
+                    (get_attr_or_none(company, 'headquarter_type.name') or '').upper(),
             }
             for company in sorted_company
         ]

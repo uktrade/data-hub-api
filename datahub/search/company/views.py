@@ -1,3 +1,5 @@
+from django.db.models.functions import Upper
+
 from datahub.company.models import Company as DBCompany
 from datahub.core.query_utils import get_front_end_url_expression
 from datahub.metadata.query_utils import get_sector_name_subquery
@@ -58,6 +60,7 @@ class SearchCompanyExportAPIView(SearchCompanyParams, SearchExportAPIView):
 
     queryset = DBCompany.objects.annotate(
         link=get_front_end_url_expression('company', 'pk'),
+        upper_headquarter_type_name=Upper('headquarter_type__name'),
         sector_name=get_sector_name_subquery('sector'),
     )
     field_titles = {
@@ -70,5 +73,5 @@ class SearchCompanyExportAPIView(SearchCompanyParams, SearchExportAPIView):
         'created_on': 'Date created',
         'employee_range__name': 'Number of employees',
         'turnover_range__name': 'Annual turnover',
-        'headquarter_type__name': 'Headquarter type',
+        'upper_headquarter_type_name': 'Headquarter type',
     }
