@@ -129,6 +129,16 @@ class ContactFactory(factory.django.DjangoModelFactory):
         model = 'company.Contact'
 
 
+class ContactWithOwnAddressFactory(ContactFactory):
+    """Factory for a contact with an address different from the contact's company."""
+
+    address_same_as_company = False
+    address_1 = factory.Faker('street_address')
+    address_town = factory.Faker('city')
+    address_postcode = factory.Faker('postcode')
+    address_country_id = constants.Country.united_kingdom.value.id
+
+
 class ArchivedContactFactory(ContactFactory):
     """Factory for an archived contact."""
 

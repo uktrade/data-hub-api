@@ -1,0 +1,3 @@
+``POST /v3/search/contact/export`` was added for exporting contact search
+results as a CSV file with up to 5000 rows. The ``company.export_contact``
+permission was also added and is required to use this endpoint.
