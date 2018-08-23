@@ -1,3 +1,0 @@
-``POST /v3/search/investment_project/export`` was added for exporting investment project search
-results as a CSV file with up to 5000 rows. The ``investment.export_investmentproject``
-permission was also added and is required to use this endpoint.
