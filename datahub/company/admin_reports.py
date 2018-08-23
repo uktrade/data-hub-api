@@ -1,10 +1,10 @@
-from django.conf import settings
 from django.db.models import Case, NullBooleanField, Value, When
 from django.db.models.functions import Concat
 
 from datahub.admin_report.report import QuerySetReport
 from datahub.company.models import Advisor, Company
 from datahub.core import constants
+from datahub.core.query_utils import get_front_end_url_expression, get_full_name_expression
 
 
 class AllAdvisersReport(QuerySetReport):
@@ -13,7 +13,7 @@ class AllAdvisersReport(QuerySetReport):
     id = 'all-advisers'
     name = 'All advisers'
     model = Advisor
-    permissions_required = ('company.read_advisor',)
+    permissions_required = ('company.view_advisor',)
     queryset = Advisor.objects.annotate(
         name=Concat('first_name', Value(' '), 'last_name'),
         is_team_active=Case(
@@ -44,20 +44,14 @@ class OneListReport(QuerySetReport):
     id = 'one-list'
     name = 'One List'
     model = Company
-    permissions_required = ('company.read_company',)
+    permissions_required = ('company.view_company',)
     queryset = Company.objects.filter(
         headquarter_type_id=constants.HeadquarterType.ghq.value.id,
         classification__id__isnull=False,
         one_list_account_owner_id__isnull=False,
     ).annotate(
-        primary_contact_name=Concat(
-            'one_list_account_owner__first_name',
-            Value(' '),
-            'one_list_account_owner__last_name'
-        ),
-        url=Concat(
-            Value(f'{settings.DATAHUB_FRONTEND_BASE_URL}/companies/'), 'id'
-        ),
+        primary_contact_name=get_full_name_expression('one_list_account_owner'),
+        url=get_front_end_url_expression('company', 'pk'),
     ).order_by(
         'classification__order',
         'name',

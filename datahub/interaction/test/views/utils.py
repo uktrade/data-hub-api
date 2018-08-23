@@ -41,14 +41,15 @@ def _resolve_single_value(value):
     return resolved_value
 
 
-def create_read_policy_feedback_user():
-    """Creates a user with standard interaction and read policy feedback permissions."""
+def create_view_policy_feedback_user():
+    """Creates a user with standard interaction and view policy feedback permissions."""
     return create_test_user(
         permission_codenames=[
-            InteractionPermission.read_all,
+            InteractionPermission.view_all,
             InteractionPermission.add_all,
             InteractionPermission.change_all,
-            InteractionPermission.read_policy_feedback,
+            InteractionPermission.export,
+            InteractionPermission.view_policy_feedback,
         ],
     )
 
@@ -57,9 +58,10 @@ def create_add_policy_feedback_user():
     """Creates a user with standard interaction and add policy feedback permissions."""
     return create_test_user(
         permission_codenames=[
-            InteractionPermission.read_all,
+            InteractionPermission.view_all,
             InteractionPermission.add_all,
             InteractionPermission.change_all,
+            InteractionPermission.export,
             InteractionPermission.add_policy_feedback,
         ],
     )
@@ -69,9 +71,10 @@ def create_change_policy_feedback_user():
     """Creates a user with standard interaction and change policy feedback permissions."""
     return create_test_user(
         permission_codenames=[
-            InteractionPermission.read_all,
+            InteractionPermission.view_all,
             InteractionPermission.add_all,
             InteractionPermission.change_all,
+            InteractionPermission.export,
             InteractionPermission.change_policy_feedback,
         ],
     )
@@ -81,9 +84,10 @@ def create_interaction_user_without_policy_feedback():
     """Creates a user with standard interaction permissions but no policy feedback permissions."""
     return create_test_user(
         permission_codenames=[
-            InteractionPermission.read_all,
+            InteractionPermission.view_all,
             InteractionPermission.add_all,
             InteractionPermission.change_all,
+            InteractionPermission.export,
         ],
     )
 
@@ -95,7 +99,7 @@ def create_restricted_investment_project_user():
     """
     return create_test_user(
         permission_codenames=[
-            InteractionPermission.read_associated_investmentproject,
+            InteractionPermission.view_associated_investmentproject,
             InteractionPermission.add_associated_investmentproject,
             InteractionPermission.change_associated_investmentproject,
         ],

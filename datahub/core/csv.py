@@ -1,11 +1,12 @@
 from codecs import BOM_UTF8
 from csv import DictWriter
+from datetime import datetime
 
-from django.http import FileResponse
+from django.http import StreamingHttpResponse
 
 from datahub.core.utils import EchoUTF8
 
-CSV_CONTENT_TYPE = 'text/csv'
+CSV_CONTENT_TYPE = 'text/csv; charset=utf-8'
 INCOMPLETE_CSV_MESSAGE = (
     '\r\n'
     'An error occurred while generating the CSV file. The file is incomplete.'
@@ -21,7 +22,7 @@ def csv_iterator(rows, field_titles):
 
         yield writer.writerow(field_titles)
         for row in rows:
-            yield writer.writerow(row)
+            yield writer.writerow(_transform_csv_row(row))
     except Exception:
         # Because CSV responses are normally streamed, a 200 response will already have been
         # returned if an error occurs at this point. Hence we append an error to the CSV
@@ -32,13 +33,32 @@ def csv_iterator(rows, field_titles):
 
 def create_csv_response(rows, field_titles, filename):
     """Creates a CSV HTTP response."""
-    # TODO: Use additional FileResponse.__init__() arguments when Django 2.1 is released
-    # See https://code.djangoproject.com/ticket/16470
-    response = FileResponse(
+    # Note: FileResponse is not used as it is designed for file-like objects, while we are using
+    # a generator here.
+    response = StreamingHttpResponse(
         csv_iterator(rows, field_titles),
         content_type=CSV_CONTENT_TYPE
     )
 
-    filename = filename
     response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
     return response
+
+
+def _transform_csv_row(row):
+    return {key: _transform_csv_value(val) for key, val in row.items()}
+
+
+def _transform_csv_value(value):
+    """
+    Transforms values before they are written to a CSV file for better compatibility with Excel.
+
+    In particular, datetimes are formatted in a way that results in better compatibility with
+    Excel. Other values are passed through unchanged (the csv module automatically formats None
+    as an empty string).
+
+    These transformations are specific to CSV files and won't necessarily apply to other file
+    formats.
+    """
+    if isinstance(value, datetime):
+        return value.strftime('%Y-%m-%d %H:%M:%S')
+    return value

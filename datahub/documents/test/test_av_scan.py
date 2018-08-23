@@ -3,21 +3,15 @@ from unittest.mock import patch
 
 import pytest
 from requests.exceptions import HTTPError
+from requests_toolbelt.multipart.decoder import MultipartDecoder
 from rest_framework import status
 
 from .factories import DocumentFactory
-from ..av_scan import VirusScanException
+from ..av_scan import _multipart_encoder, StreamWrapper, VirusScanException
 from ..models import Document, UPLOAD_STATUSES
 from ..tasks import virus_scan_document
 
 pytestmark = pytest.mark.django_db
-
-
-MOCK_S3_RESPONSE = {
-    'Body': BytesIO(b'123456'),
-    'ContentLength': 6,
-    'ContentType': 'text/plain'
-}
 
 
 @patch.object(Document, 'get_signed_url')
@@ -33,7 +27,11 @@ def test_virus_scan_document_clean(get_signed_url_mock, requests_mock):
             'Content-Length': '1000',
         }
     )
-    requests_mock.post('http://av-service/', text='OK')
+    requests_mock.post('http://av-service/', json={
+        'malware': False,
+        'reason': None,
+        'time': 0.2,
+    })
 
     virus_scan_document.apply(args=(str(document.id), )).get()
     document.refresh_from_db()
@@ -53,7 +51,11 @@ def test_virus_scan_document_infected(get_signed_url_mock, requests_mock):
             'Content-Length': '1000',
         }
     )
-    requests_mock.post('http://av-service/', text='NOTOK')
+    requests_mock.post('http://av-service/', json={
+        'malware': True,
+        'reason': 'File contains ransomware.',
+        'time': 0.1,
+    })
 
     virus_scan_document.apply(args=(str(document.id), )).get()
     document.refresh_from_db()
@@ -73,10 +75,12 @@ def test_virus_scan_document_bad_response_body(get_signed_url_mock, requests_moc
             'Content-Length': '1000',
         }
     )
-    requests_mock.post('http://av-service/', text='BADRESPONSE')
+    requests_mock.post('http://av-service/', json={
+        'too_many_cats': 'never',
+    })
 
     error_message = (
-        f'Unexpected response from AV service: BADRESPONSE '
+        f'Unexpected response from AV service: {{\'too_many_cats\': \'never\'}} '
         f'when scanning document with ID {document.pk}'
     )
 
@@ -126,7 +130,6 @@ def test_virus_scan_document_bad_response_status(get_signed_url_mock, requests_m
     )
     requests_mock.post(
         'http://av-service/',
-        text='OK',
         status_code=status.HTTP_400_BAD_REQUEST,
     )
 
@@ -135,3 +138,16 @@ def test_virus_scan_document_bad_response_status(get_signed_url_mock, requests_m
     document.refresh_from_db()
     assert document.av_clean is None
     assert str(excinfo.value) == '400 Client Error: None for url: http://av-service/'
+
+
+def test_file_is_being_encoded():
+    """Test if file is being encoded."""
+    data = bytes([0x13] * 1024)
+
+    stream = StreamWrapper(BytesIO(data), 1024)
+
+    form = _multipart_encoder('test', stream, 'application/x-binary')
+    response_data = form.read()
+    decoder = MultipartDecoder(response_data, form.content_type)
+
+    assert decoder.parts[0].content == data

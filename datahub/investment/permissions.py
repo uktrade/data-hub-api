@@ -37,7 +37,7 @@ class InvestmentProjectModelPermissions(ViewBasedModelPermissions):
         'add': (
             _PermissionTemplate.standard,
         ),
-        'read': (
+        'view': (
             _PermissionTemplate.all,
             _PermissionTemplate.associated,
         ),
@@ -111,7 +111,7 @@ class InvestmentProjectAssociationChecker(InvestmentProjectAssociationCheckerBas
     """
 
     many_to_many = False
-    restricted_actions = {'read', 'change'}
+    restricted_actions = {'view', 'change'}
     model = InvestmentProject
     all_permission_template = _PermissionTemplate.all
     associated_permission_template = _PermissionTemplate.associated
@@ -180,7 +180,7 @@ class InvestmentProjectTeamMemberAssociationChecker(InvestmentProjectAssociation
     """
 
     many_to_many = True
-    restricted_actions = {'read', 'change'}
+    restricted_actions = {'view', 'change'}
     model = InvestmentProject
     all_permission_template = _PermissionTemplate.all
     associated_permission_template = _PermissionTemplate.associated

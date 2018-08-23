@@ -30,7 +30,7 @@ class PropositionModelPermissions(_PropositionViewToActionMapping, ViewBasedMode
     """Proposition model permissions class."""
 
     permission_mapping = {
-        'read': (
+        'view': (
             _PermissionTemplate.all,
             _PermissionTemplate.associated_investmentproject,
         ),
@@ -57,7 +57,7 @@ class InvestmentProjectPropositionAssociationChecker(
     project linked to the proposition.
     """
 
-    restricted_actions = {'add', 'read', 'change'}
+    restricted_actions = {'add', 'view', 'change'}
     model = Proposition
     all_permission_template = _PermissionTemplate.all
     associated_permission_template = _PermissionTemplate.associated_investmentproject
@@ -144,7 +144,7 @@ class _PropositionDocumentViewToActionMapping:
     """Proposition Document view to action mapping class."""
 
     extra_view_to_action_mapping = {
-        'download': 'read',
+        'download': 'view',
         'upload_complete_callback': 'change',
     }
 
@@ -156,7 +156,7 @@ class PropositionDocumentModelPermissions(
     """Proposition Document model permissions class."""
 
     permission_mapping = {
-        'read': (
+        'view': (
             _PermissionTemplate.all,
             _PermissionTemplate.associated_investmentproject,
         ),
@@ -184,7 +184,7 @@ class InvestmentProjectPropositionDocumentAssociationChecker(
     project linked to the proposition.
     """
 
-    restricted_actions = {'add', 'read', 'change'}
+    restricted_actions = {'add', 'view', 'change'}
     model = PropositionDocument
     all_permission_template = _PermissionTemplate.all
     associated_permission_template = _PermissionTemplate.associated_investmentproject

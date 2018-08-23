@@ -7,15 +7,15 @@ from datahub.core.exceptions import APIMethodNotAllowedException
 # View to model action mapping for standard model-based views
 _VIEW_TO_ACTION_MAPPING = {
     'create': 'add',
-    'list': 'read',
-    'detail': 'read',
-    'retrieve': 'read',
+    'list': 'view',
+    'detail': 'view',
+    'retrieve': 'view',
     'destroy': 'delete',
     'destroy_all': 'delete',
     'partial_update': 'change',
     'archive': 'change',
     'unarchive': 'change',
-    'metadata': 'read',
+    'metadata': 'view',
 }
 
 
@@ -24,21 +24,21 @@ _VIEW_TO_ACTION_MAPPING = {
 # InvestmentProject
 _MANY_TO_MANY_VIEW_TO_ACTION_MAPPING = {
     'create': 'change',
-    'list': 'read',
-    'retrieve': 'read',
+    'list': 'view',
+    'retrieve': 'view',
     'destroy': 'change',
     'destroy_all': 'change',
     'partial_update': 'change',
     'replace_all': 'change',
-    'metadata': 'read',
+    'metadata': 'view',
 }
 
 
 class DjangoCrudPermission(DjangoModelPermissions):
-    """Extension of Permission class to include read permissions"""
+    """Extension of Permission class to include view permissions"""
 
     perms_map = DjangoModelPermissions.perms_map.copy()
-    perms_map['GET'].append('%(app_label)s.read_%(model_name)s')
+    perms_map['GET'].append('%(app_label)s.view_%(model_name)s')
 
 
 class HasPermissions(BasePermission):
@@ -84,7 +84,7 @@ class ViewBasedModelPermissions(BasePermission):
         'add': (
             permission_template,
         ),
-        'read': (
+        'view': (
             permission_template,
         ),
         'change': (
@@ -198,7 +198,7 @@ def get_model_action_for_view_action(
 ):
     """Gets the model action corresponding to a view action."""
     if http_method == 'OPTIONS':
-        return 'read'
+        return 'view'
 
     if view_action is None:
         raise APIMethodNotAllowedException()

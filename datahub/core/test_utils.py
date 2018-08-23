@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from operator import attrgetter
 from secrets import token_hex
 
 import factory
@@ -187,6 +188,22 @@ def random_obj_for_queryset(queryset):
     return queryset.order_by('?').first()
 
 
+def get_attr_or_none(obj, attr):
+    """
+    Gets an attribute of an object, or None if the attribute does not exist.
+
+    Dotted paths to attributes can be provided to specify nested attributes.
+
+    Usage example:
+        # Returns company.contact.name or None if contact is None
+        get_attr_or_none(company, 'contact.name')
+    """
+    try:
+        return attrgetter(attr)(obj)
+    except AttributeError:
+        return None
+
+
 class MockQuerySet:
     """Mock version of QuerySet that represents a fixed set of items."""
 
@@ -240,3 +257,24 @@ class MockQuerySet:
     def iterator(self, chunk_size=None):
         """Returns an iterator over the query set items."""
         return iter(self._items)
+
+
+def format_csv_data(rows):
+    """
+    Converts source data into formatted strings as should be written to CSV exports.
+
+    Expects an iterable of dictionaries with arbitrary objects as values, and outputs a list of
+    dictionaries with strings as values.
+    """
+    return [
+        {key: _format_csv_value(val) for key, val in row.items()} for row in rows
+    ]
+
+
+def _format_csv_value(value):
+    """Converts a value to a string in the way that is expected in CSV exports."""
+    if value is None:
+        return ''
+    if isinstance(value, datetime):
+        return value.strftime('%Y-%m-%d %H:%M:%S')
+    return str(value)
