@@ -28,7 +28,7 @@ class TestReportAdmin(AdminTestMixin):
         url = reverse('admin-report:download-report', kwargs={'report_id': 'all-advisers'})
 
         user = create_test_user(
-            permission_codenames=('read_advisor',),
+            permission_codenames=('view_advisor',),
             is_staff=True,
             password=self.PASSWORD,
         )
@@ -70,7 +70,7 @@ class TestReportAdmin(AdminTestMixin):
         url = reverse('admin-report:download-report', kwargs={'report_id': 'one-list'})
 
         user = create_test_user(
-            permission_codenames=('read_company',),
+            permission_codenames=('view_company',),
             is_staff=True,
             password=self.PASSWORD,
         )
@@ -150,5 +150,5 @@ def test_one_list_report_generation():
         'one_list_account_owner__contact_email': company.one_list_account_owner.contact_email,
         'registered_address_country__name': company.registered_address_country.name,
         'registered_address_town': company.registered_address_town,
-        'url': f'{settings.DATAHUB_FRONTEND_BASE_URL}/companies/{company.id}',
+        'url': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{company.id}',
     } for company in companies]

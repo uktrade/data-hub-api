@@ -16,8 +16,8 @@ class CompanyTimelineViewSet(CoreViewSet):
     permission_classes = (
         IsAuthenticatedOrTokenHasScope,
         HasPermissions(
-            f'company.{CompanyPermission.read_company}',
-            f'company.{CompanyPermission.read_company_timeline}',
+            f'company.{CompanyPermission.view_company}',
+            f'company.{CompanyPermission.view_company_timeline}',
         ),
     )
     queryset = Company.objects.all()

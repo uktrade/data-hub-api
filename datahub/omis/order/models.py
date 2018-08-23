@@ -278,9 +278,6 @@ class Order(BaseModel):
 
     objects = OrderQuerySet.as_manager()
 
-    class Meta:
-        permissions = (('read_order', 'Can read order'),)
-
     def __str__(self):
         """Human-readable representation"""
         return self.reference
@@ -336,7 +333,7 @@ class Order(BaseModel):
 
     def get_datahub_frontend_url(self):
         """Return the url to the Data Hub frontend order page."""
-        return f'{settings.DATAHUB_FRONTEND_BASE_URL}/omis/{self.pk}'
+        return f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["order"]}/{self.pk}'
 
     def get_public_facing_url(self):
         """Return the url to the OMIS public facing order page."""

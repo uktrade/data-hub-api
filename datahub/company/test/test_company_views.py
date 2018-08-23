@@ -126,13 +126,13 @@ class TestListCompanies(APITestMixin):
         actual_timestamps = [result['created_on'] for result in response_data['results']]
         assert expected_timestamps == actual_timestamps
 
-    def test_list_companies_without_read_document_permission(self):
-        """List the companies by user without read document permission."""
+    def test_list_companies_without_view_document_permission(self):
+        """List the companies by user without view document permission."""
         CompanyFactory.create_batch(5, archived_documents_url_path='hello world')
 
         user = create_test_user(
             permission_codenames=(
-                'read_company',
+                'view_company',
             )
         )
         api_client = self.create_api_client(user=user)
@@ -146,14 +146,14 @@ class TestListCompanies(APITestMixin):
             for company in response.data['results']
         )
 
-    def test_list_companies_with_read_document_permission(self):
-        """List the companies by user with read document permission."""
+    def test_list_companies_with_view_document_permission(self):
+        """List the companies by user with view document permission."""
         CompanyFactory.create_batch(5, archived_documents_url_path='hello world')
 
         user = create_test_user(
             permission_codenames=(
-                'read_company',
-                'read_company_document',
+                'view_company',
+                'view_company_document',
             )
         )
         api_client = self.create_api_client(user=user)
@@ -171,14 +171,14 @@ class TestListCompanies(APITestMixin):
 class TestGetCompany(APITestMixin):
     """Tests for getting a company."""
 
-    def test_get_company_without_read_document_permission(self):
-        """Tests the company item view without read document permission."""
+    def test_get_company_without_view_document_permission(self):
+        """Tests the company item view without view document permission."""
         company = CompanyFactory(
             archived_documents_url_path='http://some-documents',
         )
         user = create_test_user(
             permission_codenames=(
-                'read_company',
+                'view_company',
             )
         )
         api_client = self.create_api_client(user=user)
@@ -211,8 +211,8 @@ class TestGetCompany(APITestMixin):
         )
         user = create_test_user(
             permission_codenames=(
-                'read_company',
-                'read_company_document',
+                'view_company',
+                'view_company_document',
             )
         )
         api_client = self.create_api_client(user=user)

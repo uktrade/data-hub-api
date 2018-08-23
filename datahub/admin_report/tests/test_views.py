@@ -95,6 +95,7 @@ class TestReportAdmin(AdminTestMixin):
         client = self.create_client(user=user)
         response = client.get(url)
         assert response.status_code == status.HTTP_200_OK
+        assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})
         assert parse_header(response.get('Content-Disposition')) == (
             'attachment', {'filename': 'Test report - 2018-01-01-11-12-13.csv'}
         )

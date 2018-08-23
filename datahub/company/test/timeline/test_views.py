@@ -185,8 +185,8 @@ class TestCompanyTimelineViews(APITestMixin):
     @pytest.mark.parametrize(
         'permission_codenames',
         (
-            (CompanyPermission.read_company,),
-            (CompanyPermission.read_company_timeline,),
+            (CompanyPermission.view_company,),
+            (CompanyPermission.view_company_timeline,),
             (),
         )
     )

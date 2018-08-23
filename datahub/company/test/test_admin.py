@@ -13,14 +13,15 @@ from .factories import (
     CompanyFactory,
 )
 from ..admin import CompanyAdmin
+from ..admin_reports import OneListReport
 from ..models import Company
 
 
 pytestmark = pytest.mark.django_db
 
 
-class TestCompanyAdmin(AdminTestMixin):
-    """Tests for the company admin."""
+class TestChangeCompanyAdmin(AdminTestMixin):
+    """Tests for the company admin change form."""
 
     def test_add_core_team_members(self):
         """Test that core team members can be added to a company."""
@@ -102,3 +103,23 @@ class TestCompanyAdmin(AdminTestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert company.core_team_members.count() == team_size - 1
+
+
+class TestOneListLink(AdminTestMixin):
+    """
+    Tests for the one list export.
+    """
+
+    def test_one_list_link_exists(self):
+        """
+        Test that there is a link to export the one list on the company change list.
+        """
+        url = reverse('admin:company_company_changelist')
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+        one_list_url = reverse(
+            'admin-report:download-report',
+            kwargs={'report_id': OneListReport.id}
+        )
+        assert one_list_url in response.rendered_content

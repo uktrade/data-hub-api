@@ -10,7 +10,7 @@ class CompaniesHouseCompanySearchApp(SearchApp):
     name = 'companieshousecompany'
     es_model = CompaniesHouseCompany
     view = SearchCompaniesHouseCompanyAPIView
-    permission_required = ('company.read_companieshousecompany',)
+    view_permissions = ('company.view_companieshousecompany',)
     queryset = DBCompaniesHouseCompany.objects.select_related(
         'registered_address_country',
     )

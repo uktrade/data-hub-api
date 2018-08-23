@@ -1,5 +1,10 @@
 import datetime
+from cgi import parse_header
 from collections import Counter
+from csv import DictReader
+from io import StringIO
+from itertools import chain
+from operator import attrgetter
 from uuid import UUID
 
 import factory
@@ -12,13 +17,23 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core import constants
-from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_queryset
+from datahub.core.test_utils import (
+    APITestMixin,
+    create_test_user,
+    format_csv_data,
+    get_attr_or_none,
+    random_obj_for_queryset,
+)
 from datahub.investment.models import InvestmentProject, InvestmentProjectPermission
 from datahub.investment.test.factories import (
-    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
+    InvestmentProjectFactory,
+    InvestmentProjectTeamMemberFactory,
+    VerifyWinInvestmentProjectFactory,
+    WonInvestmentProjectFactory,
 )
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
+from datahub.search.investment.views import SearchInvestmentExportAPIView
 
 pytestmark = pytest.mark.django_db
 
@@ -569,8 +584,8 @@ class TestSearchPermissions(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.read_all,),
-        (InvestmentProjectPermission.read_associated, InvestmentProjectPermission.read_all),
+        (InvestmentProjectPermission.view_all,),
+        (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
     ))
     def test_non_restricted_user_can_see_all_projects(self, setup_es, permissions):
         """Test that normal users can see all projects."""
@@ -612,7 +627,7 @@ class TestSearchPermissions(APITestMixin):
 
         adviser_other = AdviserFactory(dit_team_id=None)
         request_user = create_test_user(
-            permission_codenames=['read_associated_investmentproject']
+            permission_codenames=['view_associated_investmentproject']
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -636,7 +651,7 @@ class TestSearchPermissions(APITestMixin):
         adviser_other = AdviserFactory(dit_team_id=team_other.id)
         adviser_same_team = AdviserFactory(dit_team_id=team.id)
         request_user = create_test_user(
-            permission_codenames=['read_associated_investmentproject'],
+            permission_codenames=['view_associated_investmentproject'],
             dit_team=team
         )
         api_client = self.create_api_client(user=request_user)
@@ -664,6 +679,178 @@ class TestSearchPermissions(APITestMixin):
                         str(project_4.id), str(project_5.id)}
 
         assert {result['id'] for result in results} == expected_ids
+
+
+def _join_values(iterable, attr='name', separator=', '):
+    getter = attrgetter(attr)
+    return separator.join(sorted(getter(value) for value in iterable))
+
+
+class TestInvestmentProjectExportView(APITestMixin):
+    """Tests the investment project export view."""
+
+    @pytest.mark.parametrize(
+        'permissions', (
+            (),
+            (InvestmentProjectPermission.view_all,),
+            (InvestmentProjectPermission.export,),
+        )
+    )
+    def test_user_without_permission_cannot_export(self, setup_es, permissions):
+        """Test that a user without the correct permissions cannot export data."""
+        user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('api-v3:search:investment_project-export')
+        response = api_client.post(url, format='json')
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_restricted_users_cannot_see_other_teams_projects(self, setup_es):
+        """Test that restricted users cannot see other teams' projects in the export."""
+        team = TeamFactory()
+        team_other = TeamFactory()
+        adviser_other = AdviserFactory(dit_team_id=team_other.id)
+        adviser_same_team = AdviserFactory(dit_team_id=team.id)
+        request_user = create_test_user(
+            permission_codenames=(
+                InvestmentProjectPermission.view_associated,
+                InvestmentProjectPermission.export,
+            ),
+            dit_team=team,
+        )
+        api_client = self.create_api_client(user=request_user)
+
+        project_other = InvestmentProjectFactory()
+        team_projects = [
+            InvestmentProjectFactory(),
+            InvestmentProjectFactory(created_by=adviser_same_team),
+            InvestmentProjectFactory(client_relationship_manager=adviser_same_team),
+            InvestmentProjectFactory(project_manager=adviser_same_team),
+            InvestmentProjectFactory(project_assurance_adviser=adviser_same_team),
+        ]
+
+        InvestmentProjectTeamMemberFactory(adviser=adviser_other, investment_project=project_other)
+        InvestmentProjectTeamMemberFactory(
+            adviser=adviser_same_team,
+            investment_project=team_projects[0],
+        )
+
+        setup_es.indices.refresh()
+
+        url = reverse('api-v3:search:investment_project-export')
+        response = api_client.post(url, {}, format='json')
+
+        assert response.status_code == status.HTTP_200_OK
+
+        response_text = response.getvalue().decode('utf-8-sig')
+        reader = DictReader(StringIO(response_text))
+        actual_rows = [dict(item) for item in reader]
+
+        assert len(actual_rows) == 5
+
+        expected_names = {project.name for project in team_projects}
+
+        assert {row['Project name'] for row in actual_rows} == expected_names
+
+    @pytest.mark.parametrize(
+        'request_sortby,orm_ordering',
+        (
+            ('created_on:desc', '-created_on'),
+            ('investor_company.name', 'investor_company__name'),
+        )
+    )
+    def test_export(self, setup_es, request_sortby, orm_ordering):
+        """Test export of investment project search results."""
+        url = reverse('api-v3:search:investment_project-export')
+
+        InvestmentProjectFactory()
+        InvestmentProjectFactory(cdms_project_code='cdms-code')
+        VerifyWinInvestmentProjectFactory()
+        won_project = WonInvestmentProjectFactory()
+        InvestmentProjectTeamMemberFactory.create_batch(3, investment_project=won_project)
+
+        setup_es.indices.refresh()
+
+        data = {}
+        if request_sortby:
+            data['sortby'] = request_sortby
+
+        with freeze_time('2018-01-01 11:12:13'):
+            response = self.api_client.post(url, format='json', data=data)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert parse_header(response.get('Content-Disposition')) == (
+            'attachment', {'filename': 'Data Hub - Investment projects - 2018-01-01-11-12-13.csv'}
+        )
+
+        sorted_projects = InvestmentProject.objects.order_by(orm_ordering)
+        response_text = response.getvalue().decode('utf-8-sig')
+        reader = DictReader(StringIO(response_text))
+
+        assert reader.fieldnames == list(SearchInvestmentExportAPIView.field_titles.values())
+
+        expected_row_data = [
+            {
+                'Date created': project.created_on,
+                'Project reference': project.project_code,
+                'Project name': project.name,
+                'Investor company': project.investor_company.name,
+                'Country of origin':
+                    get_attr_or_none(project, 'investor_company.registered_address_country.name'),
+                'Investment type': get_attr_or_none(project, 'investment_type.name'),
+                'Status': project.get_status_display(),
+                'Stage': get_attr_or_none(project, 'stage.name'),
+                'Actual land date': project.actual_land_date,
+                'Estimated land date': project.estimated_land_date,
+                'FDI value': get_attr_or_none(project, 'fdi_value.name'),
+                'Sector': get_attr_or_none(project, 'sector.name'),
+                'Date of latest interaction': None,
+                'Project manager': get_attr_or_none(project, 'project_manager.name'),
+                'Client relationship manager':
+                    get_attr_or_none(project, 'client_relationship_manager.name'),
+                'Global account manager':
+                    get_attr_or_none(project, 'investor_company.one_list_account_owner.name'),
+                'Project assurance adviser':
+                    get_attr_or_none(project, 'project_assurance_adviser.name'),
+                'Other team members': _join_values(project.team_members.all(), 'adviser.name'),
+                'Delivery partners': _join_values(project.delivery_partners.all()),
+                'Possible UK regions': _join_values(project.uk_region_locations.all()),
+                'Actual UK regions': _join_values(project.actual_uk_regions.all()),
+                'Specific investment programme':
+                    get_attr_or_none(project, 'specific_programme.name'),
+                'Referral source activity':
+                    get_attr_or_none(project, 'referral_source_activity.name'),
+                'Referral source activity website':
+                    get_attr_or_none(project, 'referral_source_activity_website.name'),
+                'Total investment': project.total_investment,
+                'New jobs': project.number_new_jobs,
+                'Average salary of new jobs': get_attr_or_none(project, 'average_salary.name'),
+                'Safeguarded jobs': project.number_safeguarded_jobs,
+                'Level of involvement': get_attr_or_none(project, 'level_of_involvement.name'),
+                'R&D budget': project.r_and_d_budget,
+                'Associated non-FDI R&D project': project.non_fdi_r_and_d_budget,
+                'New to world tech': project.new_tech_to_uk,
+            }
+            for project in sorted_projects
+        ]
+
+        expected_rows = format_csv_data(expected_row_data)
+        actual_rows = [dict(item) for item in reader]
+
+        # Support for ordering will be added to StringAgg in Django 2.2. In the meantime,
+        # StringAgg fields are unordered and we use this workaround to compare them.
+        unordered_fields = (
+            'Other team members',
+            'Delivery partners',
+            'Possible UK regions',
+            'Actual UK regions',
+        )
+
+        for row in chain(actual_rows, expected_rows):
+            for field in unordered_fields:
+                row[field] = frozenset(row[field].split(', '))
+
+        assert actual_rows == expected_rows
 
 
 class TestBasicSearch(APITestMixin):
@@ -703,8 +890,8 @@ class TestBasicSearchPermissions(APITestMixin):
     """Tests basic search view permissions."""
 
     @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.read_all,),
-        (InvestmentProjectPermission.read_associated, InvestmentProjectPermission.read_all),
+        (InvestmentProjectPermission.view_all,),
+        (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
     ))
     def test_global_non_restricted_user_can_see_all_projects(self, setup_es, permissions):
         """Test that normal users can see all projects."""
@@ -749,7 +936,7 @@ class TestBasicSearchPermissions(APITestMixin):
         adviser_other = AdviserFactory(dit_team_id=team_other.id)
         adviser_same_team = AdviserFactory(dit_team_id=team.id)
         request_user = create_test_user(
-            permission_codenames=['read_associated_investmentproject'],
+            permission_codenames=['view_associated_investmentproject'],
             dit_team=team
         )
         api_client = self.create_api_client(user=request_user)
@@ -789,7 +976,7 @@ class TestBasicSearchPermissions(APITestMixin):
         """
         adviser_other = AdviserFactory(dit_team_id=None)
         request_user = create_test_user(
-            permission_codenames=['read_associated_investmentproject']
+            permission_codenames=['view_associated_investmentproject']
         )
         api_client = self.create_api_client(user=request_user)
 

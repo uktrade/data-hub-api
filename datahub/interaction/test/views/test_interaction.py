@@ -23,13 +23,13 @@ from ...models import (
 )
 
 
-NON_RESTRICTED_READ_PERMISSIONS = (
+NON_RESTRICTED_VIEW_PERMISSIONS = (
     (
-        InteractionPermission.read_all,
+        InteractionPermission.view_all,
     ),
     (
-        InteractionPermission.read_all,
-        InteractionPermission.read_associated_investmentproject,
+        InteractionPermission.view_all,
+        InteractionPermission.view_associated_investmentproject,
     )
 )
 
@@ -344,7 +344,7 @@ class TestAddInteraction(APITestMixin):
 class TestGetInteraction(APITestMixin):
     """Tests for the get interaction view."""
 
-    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_non_restricted_user_can_get_company_interaction(self, permissions):
         """Test that a non-restricted user can get a company interaction."""
@@ -416,7 +416,7 @@ class TestGetInteraction(APITestMixin):
             'modified_on': '2017-04-18T13:25:30.986208Z'
         }
 
-    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_non_restricted_user_can_get_investment_project_interaction(self, permissions):
         """Test that a non-restricted user can get an investment project interaction."""
@@ -499,7 +499,7 @@ class TestGetInteraction(APITestMixin):
         project = InvestmentProjectFactory(created_by=project_creator)
         interaction = InvestmentProjectInteractionFactory(investment_project=project)
         requester = create_test_user(
-            permission_codenames=[InteractionPermission.read_associated_investmentproject],
+            permission_codenames=[InteractionPermission.view_associated_investmentproject],
             dit_team=project_creator.dit_team,
         )
         api_client = self.create_api_client(user=requester)
@@ -579,7 +579,7 @@ class TestGetInteraction(APITestMixin):
         """
         interaction = InvestmentProjectInteractionFactory()
         requester = create_test_user(
-            permission_codenames=[InteractionPermission.read_associated_investmentproject],
+            permission_codenames=[InteractionPermission.view_associated_investmentproject],
             dit_team=TeamFactory()
         )
         api_client = self.create_api_client(user=requester)
@@ -592,7 +592,7 @@ class TestGetInteraction(APITestMixin):
         """Test that a restricted user cannot get a company interaction."""
         interaction = CompanyInteractionFactory()
         requester = create_test_user(
-            permission_codenames=[InteractionPermission.read_associated_investmentproject],
+            permission_codenames=[InteractionPermission.view_associated_investmentproject],
             dit_team=TeamFactory()
         )
         api_client = self.create_api_client(user=requester)
@@ -684,7 +684,7 @@ class TestUpdateInteraction(APITestMixin):
 class TestListInteractions(APITestMixin):
     """Tests for the list interactions view."""
 
-    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     def test_non_restricted_user_can_only_list_relevant_interactions(self, permissions):
         """Test that a non-restricted user can list all interactions"""
         requester = create_test_user(permission_codenames=permissions)
@@ -714,7 +714,7 @@ class TestListInteractions(APITestMixin):
         """
         creator = AdviserFactory()
         requester = create_test_user(
-            permission_codenames=[InteractionPermission.read_associated_investmentproject],
+            permission_codenames=[InteractionPermission.view_associated_investmentproject],
             dit_team=creator.dit_team
         )
         api_client = self.create_api_client(user=requester)

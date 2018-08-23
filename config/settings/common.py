@@ -253,8 +253,7 @@ CHAR_FIELD_MAX_LENGTH = 255
 HEROKU = False
 BULK_INSERT_BATCH_SIZE = env.int('BULK_INSERT_BATCH_SIZE', default=25000)
 
-AV_SERVICE_URL = env('AV_SERVICE_URL', default=None)
-AV_SERVICE_CHUNK_SIZE = env.int('AV_SERVICE_CHUNK_SIZE', default=1024)
+AV_V2_SERVICE_URL = env('AV_V2_SERVICE_URL', default=None)
 
 # CACHE / REDIS
 REDIS_BASE_URL = env('REDIS_BASE_URL', default=None)
@@ -321,6 +320,11 @@ if REDIS_BASE_URL:
 
 # FRONTEND
 DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://localhost:3000')
+DATAHUB_FRONTEND_URL_PREFIXES = {
+    'company': f'{DATAHUB_FRONTEND_BASE_URL}/companies',
+    'interaction': f'{DATAHUB_FRONTEND_BASE_URL}/interactions',
+    'order': f'{DATAHUB_FRONTEND_BASE_URL}/omis',
+}
 
 # DT07 reporting service (used for company timeline)
 DATA_SCIENCE_COMPANY_API_URL = env('DATA_SCIENCE_COMPANY_API_URL', default='')

@@ -17,16 +17,16 @@ from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 from .factories import PropositionFactory
 
-NON_RESTRICTED_READ_PERMISSIONS = (
+NON_RESTRICTED_VIEW_PERMISSIONS = (
     (
-        PropositionPermission.read_all,
-        PropositionDocumentPermission.read_all
+        PropositionPermission.view_all,
+        PropositionDocumentPermission.view_all
     ),
     (
-        PropositionPermission.read_all,
-        PropositionDocumentPermission.read_all,
-        PropositionPermission.read_associated_investmentproject,
-        PropositionDocumentPermission.read_associated_investmentproject,
+        PropositionPermission.view_all,
+        PropositionDocumentPermission.view_all,
+        PropositionPermission.view_associated_investmentproject,
+        PropositionDocumentPermission.view_associated_investmentproject,
     )
 )
 
@@ -311,7 +311,7 @@ class TestUpdateProposition(APITestMixin):
 class TestListPropositions(APITestMixin):
     """Tests for the list propositions view."""
 
-    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     def test_non_restricted_user_can_list_propositions(self, permissions):
         """List of propositions by a non restricted user."""
         investment_project = InvestmentProjectFactory()
@@ -336,7 +336,7 @@ class TestListPropositions(APITestMixin):
         expected_ids = {str(i.id) for i in propositions}
         assert actual_ids == expected_ids
 
-    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     def test_user_cannot_list_propositions_for_non_existent_investment_project(self, permissions):
         """Test user cannot list propositions for a non existent investment project."""
         url = reverse('api-v3:investment:proposition:collection', kwargs={
@@ -369,7 +369,7 @@ class TestListPropositions(APITestMixin):
 
         user = create_test_user(
             permission_codenames=(
-                PropositionPermission.read_associated_investmentproject,
+                PropositionPermission.view_associated_investmentproject,
             ),
             dit_team=project_creator.dit_team,
         )
@@ -399,7 +399,7 @@ class TestListPropositions(APITestMixin):
 
         user = create_test_user(
             permission_codenames=(
-                PropositionPermission.read_associated_investmentproject
+                PropositionPermission.view_associated_investmentproject
             ),
             dit_team=TeamFactory(),
         )
@@ -488,7 +488,7 @@ class TestGetProposition(APITestMixin):
         response = api_client.get(url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     def test_non_restricted_user_can_get_proposition(self, permissions):
         """Test get proposition by a non restricted user."""
         proposition = PropositionFactory()
@@ -553,7 +553,7 @@ class TestGetProposition(APITestMixin):
         })
         user = create_test_user(
             permission_codenames=(
-                PropositionPermission.read_associated_investmentproject,
+                PropositionPermission.view_associated_investmentproject,
             ),
             dit_team=project_creator.dit_team,
         )
@@ -612,7 +612,7 @@ class TestGetProposition(APITestMixin):
         })
         user = create_test_user(
             permission_codenames=(
-                PropositionPermission.read_associated_investmentproject,
+                PropositionPermission.view_associated_investmentproject,
             ),
             dit_team=TeamFactory(),
         )
@@ -625,7 +625,7 @@ class TestGetProposition(APITestMixin):
             'detail': 'You do not have permission to perform this action.'
         }
 
-    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     def test_user_cannot_get_proposition_for_non_existent_project(self, permissions):
         """Test user cannot get proposition by a non restricted user."""
         proposition = PropositionFactory()
@@ -1169,7 +1169,7 @@ class TestPropositionDocumentViews(APITestMixin):
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
 
-    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     def test_documents_list(self, permissions):
         """Tests list endpoint."""
         user = create_test_user(permission_codenames=permissions)
@@ -1220,7 +1220,7 @@ class TestPropositionDocumentViews(APITestMixin):
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
 
-    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     def test_document_retrieval(self, permissions):
         """Tests retrieval of individual document."""
         user = create_test_user(permission_codenames=permissions)
@@ -1260,7 +1260,7 @@ class TestPropositionDocumentViews(APITestMixin):
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
 
-    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     def test_document_with_deletion_pending_retrieval(self, permissions):
         """Tests retrieval of individual document that is pending deletion."""
         proposition = PropositionFactory()
@@ -1295,7 +1295,7 @@ class TestPropositionDocumentViews(APITestMixin):
         """Tests download of individual document."""
         sign_s3_url.return_value = 'http://what'
 
-        user = create_test_user(permission_codenames=NON_RESTRICTED_READ_PERMISSIONS[0])
+        user = create_test_user(permission_codenames=NON_RESTRICTED_VIEW_PERMISSIONS[0])
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
             proposition_id=proposition.pk,
@@ -1334,7 +1334,7 @@ class TestPropositionDocumentViews(APITestMixin):
                 'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
             }
 
-    @pytest.mark.parametrize('permissions', NON_RESTRICTED_READ_PERMISSIONS)
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     def test_document_download_when_not_scanned(self, permissions):
         """Tests download of individual document when not yet virus scanned."""
         proposition = PropositionFactory()

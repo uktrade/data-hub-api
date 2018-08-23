@@ -11,4 +11,4 @@ class SimpleModelSearchApp(SearchApp):
     view = SearchSimpleModelAPIView
     es_model = ESSimpleModel
     queryset = DBSimpleModel.objects
-    permission_required = []
+    view_permissions = []

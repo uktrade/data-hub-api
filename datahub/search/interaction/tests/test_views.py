@@ -1,5 +1,5 @@
 from cgi import parse_header
-from collections import Counter, OrderedDict
+from collections import Counter
 from csv import DictReader
 from datetime import datetime
 from io import StringIO
@@ -8,6 +8,7 @@ from uuid import UUID
 import factory
 import pytest
 from dateutil.parser import parse as dateutil_parse
+from django.conf import settings
 from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
@@ -15,21 +16,29 @@ from rest_framework.reverse import reverse
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
-from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_queryset
-from datahub.interaction.models import CommunicationChannel, Interaction
+from datahub.core.test_utils import (
+    APITestMixin,
+    create_test_user,
+    format_csv_data,
+    get_attr_or_none,
+    random_obj_for_queryset,
+)
+from datahub.interaction.models import CommunicationChannel, Interaction, InteractionPermission
 from datahub.interaction.test.factories import (
     CompanyInteractionFactory,
+    EventServiceDeliveryFactory,
     InvestmentProjectInteractionFactory,
     PolicyFeedbackFactory,
     ServiceDeliveryFactory,
 )
 from datahub.interaction.test.views.utils import (
     create_interaction_user_without_policy_feedback,
-    create_read_policy_feedback_user,
+    create_view_policy_feedback_user,
 )
 from datahub.investment.test.factories import ActiveInvestmentProjectFactory
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
+from datahub.search.interaction.views import SearchInteractionExportAPIView
 
 pytestmark = pytest.mark.django_db
 
@@ -37,7 +46,7 @@ pytestmark = pytest.mark.django_db
 @pytest.fixture
 def policy_feedback_user():
     """User with full interaction and policy feedback permissions."""
-    yield create_read_policy_feedback_user()
+    yield create_view_policy_feedback_user()
 
 
 @pytest.fixture
@@ -760,9 +769,16 @@ class TestInteractionEntitySearchView(APITestMixin):
 class TestInteractionExportView(APITestMixin):
     """Tests the interaction export view."""
 
-    def test_user_without_permission_cannot_export(self, setup_es):
-        """Test that a user without interaction permissions cannot export data."""
-        user = create_test_user(dit_team=TeamFactory())
+    @pytest.mark.parametrize(
+        'permissions', (
+            (),
+            (InteractionPermission.view_all,),
+            (InteractionPermission.export,),
+        )
+    )
+    def test_user_without_permission_cannot_export(self, setup_es, permissions):
+        """Test that a user without the correct permissions cannot export data."""
+        user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
 
         url = reverse('api-v3:search:interaction-export')
@@ -784,8 +800,11 @@ class TestInteractionExportView(APITestMixin):
         url = reverse('api-v3:search:interaction-export')
         response = api_client.post(url, format='json')
         assert response.status_code == status.HTTP_200_OK
-        assert response.getvalue().decode('utf-8-sig') == f"""Date,Company,Service,Subject,Adviser,Service provider\r
-"""
+
+        reader = DictReader(StringIO(response.getvalue().decode('utf-8-sig')))
+
+        assert reader.fieldnames == list(SearchInteractionExportAPIView.field_titles.values())
+        assert list(reader) == []
 
     @pytest.mark.parametrize(
         'request_sortby,orm_ordering',
@@ -795,53 +814,76 @@ class TestInteractionExportView(APITestMixin):
             ('company.name', 'company__name'),
         )
     )
-    def test_interaction_export(self, setup_es, interactions, request_sortby, orm_ordering):
+    def test_interaction_export(
+        self,
+        setup_es,
+        request_sortby,
+        orm_ordering,
+        policy_feedback_user,
+    ):
         """Test export of interaction search results."""
+        CompanyInteractionFactory()
+        EventServiceDeliveryFactory()
+        InvestmentProjectInteractionFactory()
+        PolicyFeedbackFactory()
+        ServiceDeliveryFactory()
+
+        setup_es.indices.refresh()
+
+        data = {}
+        if request_sortby:
+            data['sortby'] = request_sortby
+
         url = reverse('api-v3:search:interaction-export')
+        api_client = self.create_api_client(user=policy_feedback_user)
 
         with freeze_time('2018-01-01 11:12:13'):
-            data = {}
-            if request_sortby:
-                data['sortby'] = request_sortby
-
-            response = self.api_client.post(url, format='json', data=data)
+            response = api_client.post(url, format='json', data=data)
 
         assert response.status_code == status.HTTP_200_OK
+        assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})
         assert parse_header(response.get('Content-Disposition')) == (
             'attachment', {'filename': 'Data Hub - Interactions - 2018-01-01-11-12-13.csv'}
         )
 
-        sorted_interactions = Interaction.objects.filter(
-            pk__in=[interaction.pk for interaction in interactions],
-        ).order_by(
-            orm_ordering,
-        )
+        sorted_interactions = Interaction.objects.order_by(orm_ordering)
         reader = DictReader(StringIO(response.getvalue().decode('utf-8-sig')))
 
-        assert reader.fieldnames == [
-            'Date',
-            'Company',
-            'Service',
-            'Subject',
-            'Adviser',
-            'Service provider',
-        ]
+        assert reader.fieldnames == list(SearchInteractionExportAPIView.field_titles.values())
 
-        expected_rows = [
-            OrderedDict(
-                (
-                    ('Date', str(interaction.date)),
-                    ('Company', interaction.company.name),
-                    ('Service', interaction.service.name),
-                    ('Subject', interaction.subject),
-                    ('Adviser', interaction.dit_adviser.name),
-                    ('Service provider', interaction.dit_team.name),
-                )
-            )
+        expected_row_data = [
+            {
+                'Date': interaction.date,
+                'Type': interaction.get_kind_display(),
+                'Service': get_attr_or_none(interaction, 'service.name'),
+                'Subject': interaction.subject,
+                'Link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["interaction"]}'
+                        f'/{interaction.pk}',
+                'Company': get_attr_or_none(interaction, 'company.name'),
+                'Company link':
+                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}'
+                    f'/{interaction.company.pk}',
+                'Company country': get_attr_or_none(
+                    interaction,
+                    'company.registered_address_country.name',
+                ),
+                'Company UK region': get_attr_or_none(interaction, 'company.uk_region.name'),
+                'Company sector': get_attr_or_none(interaction, 'company.sector.name'),
+                'Contact': get_attr_or_none(interaction, 'contact.name'),
+                'Contact job title': get_attr_or_none(interaction, 'contact.job_title'),
+                'Adviser': get_attr_or_none(interaction, 'dit_adviser.name'),
+                'Service provider': get_attr_or_none(interaction, 'dit_team.name'),
+                'Event': get_attr_or_none(interaction, 'event.name'),
+                'Service delivery status': get_attr_or_none(
+                    interaction,
+                    'service_delivery_status.name',
+                ),
+                'Net company receipt': interaction.net_company_receipt,
+            }
             for interaction in sorted_interactions
         ]
 
-        assert list(reader) == expected_rows
+        assert list(dict(row) for row in reader) == format_csv_data(expected_row_data)
 
 
 class TestInteractionGlobalSearchView(APITestMixin):

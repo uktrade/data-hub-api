@@ -28,8 +28,8 @@ ES_INDEX_SETTINGS = {
     'number_of_shards': 1,
     'number_of_replicas': 0,
 }
-DOCUMENT_BUCKET='test-bucket'
-AV_SERVICE_URL='http://av-service/'
+DOCUMENT_BUCKET = 'test-bucket'
+AV_V2_SERVICE_URL = 'http://av-service/'
 
 DATA_SCIENCE_COMPANY_API_URL = 'http://company-timeline/'
 DATA_SCIENCE_COMPANY_API_ID = 'company-timeline-api-id'
@@ -40,7 +40,7 @@ OMIS_NOTIFICATION_OVERRIDE_RECIPIENT_EMAIL = ''
 OMIS_NOTIFICATION_ADMIN_EMAIL = 'fake-omis-admin@digital.trade.gov.uk'
 OMIS_NOTIFICATION_API_KEY = ''
 
-GOVUK_PAY_URL='https://payments.example.com/'
+GOVUK_PAY_URL = 'https://payments.example.com/'
 
 CACHES = {
     'default': {

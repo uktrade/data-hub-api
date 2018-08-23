@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from functools import reduce
 from operator import attrgetter
 from random import sample
 
@@ -146,82 +147,139 @@ class TestListInteractions(APITestMixin):
         assert actual_ids == expected_ids
 
     @pytest.mark.parametrize(
-        'field,sub_field', (
-            ('contact', 'last_name',),
-            ('contact', 'first_name',),
-            ('company', 'name',),
+        'field',
+        (
+            'company.name',
+            'contact.first_name',
+            'contact.last_name',
+            'created_on',
+            'dit_adviser.first_name',
+            'dit_adviser.last_name',
+            'subject',
         )
     )
-    def test_sort_by_name(self, field, sub_field):
-        """Test sorting interactions by various name fields."""
-        interactions = EventServiceDeliveryFactory.create_batch(3)
+    def test_sorting(self, field):
+        """Test sorting interactions by various fields."""
+        data_list = [
+            {
+                'created_on': datetime(2015, 1, 1),
+                'company__name': 'Black Group',
+                'contact': factory.LazyAttribute(
+                    lambda i: ContactFactory(
+                        company=i.company,
+                        first_name='Holly',
+                        last_name='Taylor'
+                    )
+                ),
+                'dit_adviser__first_name': 'Elaine',
+                'dit_adviser__last_name': 'Johnston',
+                'subject': 'lorem',
+            },
+            {
+                'created_on': datetime(2005, 4, 1),
+                'company__name': 'Hicks Ltd',
+                'contact': factory.LazyAttribute(
+                    lambda i: ContactFactory(
+                        company=i.company,
+                        first_name='Conor',
+                        last_name='Webb'
+                    )
+                ),
+                'dit_adviser__first_name': 'Connor',
+                'dit_adviser__last_name': 'Webb',
+                'subject': 'ipsum',
+            },
+            {
+                'created_on': datetime(2019, 1, 1),
+                'company__name': 'Sheppard LLC',
+                'contact': factory.LazyAttribute(
+                    lambda i: ContactFactory(
+                        company=i.company,
+                        first_name='Suzanne',
+                        last_name='Palmer'
+                    )
+                ),
+                'dit_adviser__first_name': 'Hayley',
+                'dit_adviser__last_name': 'Hunt',
+                'subject': 'dolor',
+            },
+        ]
+
+        interactions = []
+        for data in data_list:
+            creation_time = data.pop('created_on')
+            with freeze_time(creation_time):
+                interactions.append(
+                    EventServiceDeliveryFactory(**data)
+                )
 
         url = reverse('api-v3:interaction:collection')
-        response = self.api_client.get(url, data={
-            'sortby': f'{field}__{sub_field}',
-        })
+        response = self.api_client.get(
+            url,
+            data={
+                'sortby': field.replace('.', '__')
+            }
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['count'] == len(interactions)
-        expected_names = sorted(map(attrgetter(f'{field}.{sub_field}'), interactions))
-        actual_names = [result[field][sub_field] for result in response_data['results']]
-        assert expected_names == actual_names
 
-    def test_sort_by_first_and_last_name(self):
+        expected = sorted(map(attrgetter(field), interactions))
+        if isinstance(expected[0], datetime):
+            expected = [format_date_or_datetime(item) for item in expected]
+
+        actual = [
+            reduce(  # get nested items if needed
+                lambda data, key: data.get(key),
+                field.split('.'),
+                result
+            )
+            for result in response_data['results']
+        ]
+        assert expected == actual
+
+    @pytest.mark.parametrize(
+        'field,factory_class',
+        (
+            ('contact', ContactFactory),
+            ('dit_adviser', AdviserFactory),
+        )
+    )
+    def test_sort_by_first_and_last_name(self, field, factory_class):
         """Test sorting interactions by first_name with a secondary last_name sort."""
-        contacts = [
-            ContactFactory(first_name='Alfred', last_name='Jones'),
-            ContactFactory(first_name='Alfred', last_name='Terry'),
-            ContactFactory(first_name='Thomas', last_name='Richards'),
-            ContactFactory(first_name='Thomas', last_name='West'),
+        people = [
+            factory_class(first_name='Alfred', last_name='Jones'),
+            factory_class(first_name='Alfred', last_name='Terry'),
+            factory_class(first_name='Thomas', last_name='Richards'),
+            factory_class(first_name='Thomas', last_name='West'),
         ]
         interactions = EventServiceDeliveryFactory.create_batch(
-            len(contacts),
-            contact=factory.Iterator(sample(contacts, k=len(contacts)))
+            len(people),
+            **{
+                field: factory.Iterator(sample(people, k=len(people)))
+            }
         )
 
         url = reverse('api-v3:interaction:collection')
-        response = self.api_client.get(url, data={
-            'sortby': 'contact__first_name,contact__last_name',
-        })
+        response = self.api_client.get(
+            url,
+            data={
+                'sortby': f'{field}__first_name,{field}__last_name',
+            }
+        )
 
         assert response.status_code == status.HTTP_200_OK
+
         response_data = response.json()
         assert response_data['count'] == len(interactions)
-        results = response_data['results']
-        actual_contact_ids = [interaction['contact']['id'] for interaction in results]
-        expected_contact_ids = [str(contact.pk) for contact in contacts]
-        assert actual_contact_ids == expected_contact_ids
 
-    def test_sort_by_created_on(self):
-        """Test sorting by created_on."""
-        creation_times = [
-            datetime(2015, 1, 1),
-            datetime(2016, 1, 1),
-            datetime(2019, 1, 1),
-            datetime(2020, 1, 1),
-            datetime(2005, 1, 1),
+        actual_ids = [
+            interaction[field]['id']
+            for interaction in response_data['results']
         ]
-
-        for creation_time in creation_times:
-            with freeze_time(creation_time):
-                EventServiceDeliveryFactory()
-
-        url = reverse('api-v3:interaction:collection')
-        response = self.api_client.get(url, data={
-            'sortby': 'created_on',
-        })
-
-        assert response.status_code == status.HTTP_200_OK
-        response_data = response.json()
-        assert response_data['count'] == len(creation_times)
-        expected_timestamps = [
-            format_date_or_datetime(creation_time)
-            for creation_time in sorted(creation_times)
-        ]
-        actual_timestamps = [result['created_on'] for result in response_data['results']]
-        assert expected_timestamps == actual_timestamps
+        expected_ids = [str(person.pk) for person in people]
+        assert actual_ids == expected_ids
 
 
 class TestInteractionVersioning(APITestMixin):

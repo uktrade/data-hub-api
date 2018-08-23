@@ -22,19 +22,19 @@ class PropositionPermission(StrEnum):
     (Defined here rather than in permissions to avoid an import of that module.)
 
 
-    The following codenames mean that the user can read, change, add or delete any type of
+    The following codenames mean that the user can view, change, add or delete any type of
     proposition:
 
-    read_all_proposition
+    view_all_proposition
     change_all_proposition
     add_all_proposition
     delete_proposition
 
 
-    The following codenames mean that the user can only read, change and add propositions for
+    The following codenames mean that the user can only view, change and add propositions for
     investment projects that they are associated with:
 
-    read_associated_investmentproject_proposition
+    view_associated_investmentproject_proposition
     change_associated_investmentproject_proposition
     add_associated_investmentproject_proposition
 
@@ -47,8 +47,8 @@ class PropositionPermission(StrEnum):
     same user,  the *_all_* permission will be the effective one.
     """
 
-    read_all = 'read_all_proposition'
-    read_associated_investmentproject = 'read_associated_investmentproject_proposition'
+    view_all = 'view_all_proposition'
+    view_associated_investmentproject = 'view_associated_investmentproject_proposition'
     change_all = 'change_all_proposition'
     change_associated_investmentproject = 'change_associated_investmentproject_proposition'
     add_all = 'add_all_proposition'
@@ -63,19 +63,19 @@ class PropositionDocumentPermission(StrEnum):
     (Defined here rather than in permissions to avoid an import of that module.)
 
 
-    The following codenames mean that the user can read, change, add or delete any type of
+    The following codenames mean that the user can view, change, add or delete any type of
     proposition document:
 
-    read_all_propositiondocument
+    view_all_propositiondocument
     change_all_propositiondocument
     add_all_propositiondocument
     delete_propositiondocument
 
 
-    The following codenames mean that the user can only read, change and add proposition
+    The following codenames mean that the user can only view, change and add proposition
     documents for investment projects that they are associated with:
 
-    read_associated__propositiondocument
+    view_associated__propositiondocument
     change_associated_propositiondocument
     add_associated_propositiondocument
     delete_associated_propositiondocument
@@ -89,8 +89,8 @@ class PropositionDocumentPermission(StrEnum):
     assigned to the same user,  the *_all_* permission will be the effective one.
     """
 
-    read_all = 'read_all_propositiondocument'
-    read_associated_investmentproject = 'read_associated_propositiondocument'
+    view_all = 'view_all_propositiondocument'
+    view_associated_investmentproject = 'view_associated_propositiondocument'
     change_all = 'change_all_propositiondocument'
     change_associated_investmentproject = 'change_associated_propositiondocument'
     add_all = 'add_all_propositiondocument'
@@ -157,12 +157,12 @@ class Proposition(BaseModel):
     class Meta:
         permissions = (
             (
-                PropositionPermission.read_all.value,
-                'Can read all proposition'
+                PropositionPermission.view_all.value,
+                'Can view all proposition'
             ),
             (
-                PropositionPermission.read_associated_investmentproject.value,
-                'Can read proposition for associated investment projects'
+                PropositionPermission.view_associated_investmentproject.value,
+                'Can view proposition for associated investment projects'
             ),
             (
                 PropositionPermission.add_associated_investmentproject.value,
@@ -195,12 +195,12 @@ class PropositionDocument(AbstractEntityDocumentModel):
         verbose_name = 'investment project proposition document'
         permissions = (
             (
-                PropositionDocumentPermission.read_all.value,
-                'Can read all proposition document'
+                PropositionDocumentPermission.view_all.value,
+                'Can view all proposition document'
             ),
             (
-                PropositionDocumentPermission.read_associated_investmentproject.value,
-                'Can read proposition document for associated investment projects'
+                PropositionDocumentPermission.view_associated_investmentproject.value,
+                'Can view proposition document for associated investment projects'
             ),
             (
                 PropositionDocumentPermission.add_associated_investmentproject.value,
