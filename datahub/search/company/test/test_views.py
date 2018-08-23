@@ -1,4 +1,3 @@
-import random
 from cgi import parse_header
 from collections import Counter
 from csv import DictReader
@@ -13,24 +12,17 @@ from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.constants import BusinessTypeConstant
 from datahub.company.models import Company, CompanyPermission
-from datahub.company.test.factories import (
-    AdviserFactory,
-    CompaniesHouseCompanyFactory,
-    CompanyFactory,
-    ContactFactory
-)
+from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
 from datahub.core.test_utils import (
     APITestMixin,
     create_test_user,
     format_csv_data,
     get_attr_or_none,
-    random_obj_for_model,
     random_obj_for_queryset,
 )
-from datahub.metadata.models import CompanyClassification, Sector
+from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.company.views import SearchCompanyExportAPIView
 
@@ -658,78 +650,3 @@ class TestBasicSearch(APITestMixin):
         response = self.api_client.get(url, {})
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-
-
-class TestSearchExport(APITestMixin):
-    """Tests search export views."""
-
-    @staticmethod
-    def _get_random_constant_id(constant):
-        """Gets random constant id."""
-        return random.choice(list(constant)).value.id
-
-    @staticmethod
-    def _get_random_list_of_constant_ids(constant, max=10):
-        """Gets list of random constant ids."""
-        return {TestSearchExport._get_random_constant_id(constant) for _ in range(max)}
-
-    def _create_company(self, name_prefix, archived=False):
-        country = TestSearchExport._get_random_constant_id(constants.Country)
-        ch = CompaniesHouseCompanyFactory()
-        name = f"{name_prefix} {factory.Faker('word').generate({})}"
-        data = {
-            'account_manager': AdviserFactory(),
-            'alias': factory.Faker('text'),
-            'archived': archived,
-            'business_type_id':
-                TestSearchExport._get_random_constant_id(BusinessTypeConstant),
-            'classification_id': random_obj_for_model(CompanyClassification).pk,
-            'company_number': ch.company_number,
-            'created_on': factory.Faker('date_object'),
-            'description': factory.Faker('text'),
-            'employee_range_id':
-                TestSearchExport._get_random_constant_id(constants.EmployeeRange),
-            'headquarter_type_id':
-                TestSearchExport._get_random_constant_id(constants.HeadquarterType),
-            'modified_on': factory.Faker('date_object'),
-            'name': name,
-            'one_list_account_owner': AdviserFactory(),
-            'registered_address_1': factory.Faker('street_name'),
-            'registered_address_country_id': country,
-            'registered_address_county': factory.Faker('name'),
-            'registered_address_postcode': factory.Faker('postcode'),
-            'registered_address_town': factory.Faker('city'),
-            'sector_id': TestSearchExport._get_random_constant_id(constants.Sector),
-            'trading_address_1': factory.Faker('street_name'),
-            'trading_address_country_id':
-                TestSearchExport._get_random_constant_id(constants.Country),
-            'trading_address_county': factory.Faker('name'),
-            'trading_address_postcode': factory.Faker('postcode'),
-            'trading_address_town': factory.Faker('city'),
-            'turnover_range_id':
-                TestSearchExport._get_random_constant_id(constants.TurnoverRange),
-            'website': factory.Faker('url'),
-        }
-        if country == constants.Country.united_kingdom.value.id:
-            data['uk_region_id'] = TestSearchExport._get_random_constant_id(constants.UKRegion)
-        if archived:
-            data.update({
-                'archived_by': AdviserFactory(),
-                'archived_on': factory.Faker('date_object'),
-                'archived_reason': factory.Faker('text'),
-            })
-
-        company = CompanyFactory(
-            **data
-        )
-        company.contacts.set(
-            ContactFactory.create_batch(2)
-        )
-        company.export_to_countries.set(
-            TestSearchExport._get_random_list_of_constant_ids(constants.Country)
-        )
-        company.future_interest_countries.set(
-            TestSearchExport._get_random_list_of_constant_ids(constants.Country)
-        )
-        company.save()
-        return company
