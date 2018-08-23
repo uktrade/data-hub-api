@@ -1,7 +1,7 @@
 from django.contrib import admin
 from mptt.admin import MPTTModelAdmin
 
-from datahub.core.admin import DisabledOnFilter, ReadOnlyAdmin
+from datahub.core.admin import DisabledOnFilter, ViewAndChangeOnlyAdmin, ViewOnlyAdmin
 from . import models
 
 
@@ -50,7 +50,7 @@ class DisableableMetadataAdmin(admin.ModelAdmin):
     list_filter = (DisabledOnFilter,)
 
 
-class ReadOnlyMetadataAdmin(ReadOnlyAdmin):
+class ReadOnlyMetadataAdmin(ViewOnlyAdmin):
     """
     Generic admin for metadata models that shouldn't be edited.
 
@@ -76,7 +76,7 @@ class OrderedMetadataAdmin(admin.ModelAdmin):
     list_filter = (DisabledOnFilter,)
 
 
-class EditableOrderOnlyOrderedMetadataAdmin(OrderedMetadataAdmin, ReadOnlyAdmin):
+class EditableOrderOnlyOrderedMetadataAdmin(OrderedMetadataAdmin, ViewAndChangeOnlyAdmin):
     """
     Generic admin for ordered metadata models with editable order.
 
