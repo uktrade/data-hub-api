@@ -211,6 +211,9 @@
     - - view_contact
       - company
       - contact
+    - - export_contact
+      - company
+      - contact
     - - add_document
       - documents
       - document
