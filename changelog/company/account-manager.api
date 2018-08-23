@@ -1,3 +1,0 @@
-``GET,POST /v3/company/<uuid:pk>`` and ``GET /v3/search/company``: the field
-``account_manager`` has been deprecated and will be removed on or after August 30.
-Please use ``one_list_account_owner`` instead.

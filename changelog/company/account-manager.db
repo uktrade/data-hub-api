@@ -1,2 +1,0 @@
-The column ``company_company.account_manager_id`` has been deprecated and will be removed on or after August 30.
-Please use ``company_company.one_list_account_owner_id`` instead.
