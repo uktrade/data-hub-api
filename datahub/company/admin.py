@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.db import models
 from reversion.admin import VersionAdmin
 
-from datahub.core.admin import BaseModelAdminMixin, ReadOnlyAdmin
+from datahub.core.admin import BaseModelAdminMixin, ViewOnlyAdmin
 from datahub.metadata.admin import DisableableMetadataAdmin
 from .models import (
     Advisor,
@@ -183,7 +183,7 @@ class ContactAdmin(BaseModelAdminMixin, VersionAdmin):
 
 
 @admin.register(CompaniesHouseCompany)
-class CHCompany(ReadOnlyAdmin):
+class CHCompany(ViewOnlyAdmin):
     """Companies House company admin."""
 
     search_fields = ['name', 'company_number']
