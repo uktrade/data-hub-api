@@ -1,1 +1,0 @@
-``GET /whoami/`` endpoint: ``read_*`` permissions have been renamed to ``view_*``. This endpoint will return both ``view_*`` and ``read_*`` permissions for now but ``read_*`` permissions are deprecated and will soon be removed.
