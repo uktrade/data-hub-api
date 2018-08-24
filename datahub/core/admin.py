@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.template.defaultfilters import date as date_filter, time as time_filter
 from django.urls import reverse
 from django.utils.html import format_html
@@ -165,6 +166,15 @@ def custom_delete_permission(permission_codename):
         return admin_cls
 
     return decorator
+
+
+def get_change_link(obj):
+    """Returns a link to the admin change page for an object."""
+    if not obj or not obj.pk:
+        return ''
+
+    url = reverse(admin_urlname(obj._meta, 'change'), args=(obj.pk,))
+    return format_html('<a href="{url}">{name}</a>'.format(url=url, name=obj))
 
 
 def _make_admin_permission_getter(codename):
