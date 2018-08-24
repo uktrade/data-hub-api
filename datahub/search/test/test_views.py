@@ -3,6 +3,8 @@ from uuid import UUID, uuid4
 
 import factory
 import pytest
+from django.utils.timezone import utc
+from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -14,7 +16,12 @@ from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.order.test.factories import OrderFactory
+from datahub.search.sync_async import sync_object_async
+from datahub.search.test.search_support.models import SimpleModel
+from datahub.search.test.search_support.simplemodel.models import ESSimpleModel
 from datahub.search.test.utils import model_has_field_path
+from datahub.user_event_log.constants import USER_EVENT_TYPES
+from datahub.user_event_log.models import UserEvent
 
 pytestmark = pytest.mark.django_db
 
@@ -548,3 +555,45 @@ class TestSearch(APITestMixin):
         assert response_data['count'] == 0
 
         assert len(response_data['aggregations']) == 0
+
+
+class TestSearchExportAPIView(APITestMixin):
+    """Tests for SearchExportAPIView."""
+
+    def test_creates_user_event_log_entries(self, setup_es):
+        """Tests that when an export is performed, a user event is recorded."""
+        user = create_test_user(permission_codenames=['view_simplemodel'])
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('api-v3:search:simplemodel-export')
+
+        simple_obj = SimpleModel(name='test')
+        simple_obj.save()
+        sync_object_async(ESSimpleModel, SimpleModel, simple_obj.pk)
+
+        setup_es.indices.refresh()
+
+        frozen_time = datetime.datetime(2018, 1, 2, 12, 30, 50, tzinfo=utc)
+        with freeze_time(frozen_time):
+            response = api_client.post(url, {
+                'name': 'test',
+            })
+
+        assert response.status_code == status.HTTP_200_OK
+        assert UserEvent.objects.count() == 1
+
+        user_event = UserEvent.objects.first()
+        assert user_event.adviser == user
+        assert user_event.type == USER_EVENT_TYPES.search_export
+        assert user_event.timestamp == frozen_time
+        assert user_event.api_url_path == '/v3/search/simplemodel/export'
+        assert user_event.data == {
+            'args': {
+                'limit': 100,
+                'name': 'test',
+                'offset': 0,
+                'original_query': '',
+                'sortby': None,
+            },
+            'num_results': 1,
+        }

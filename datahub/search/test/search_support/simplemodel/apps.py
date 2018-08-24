@@ -1,5 +1,5 @@
 from .models import ESSimpleModel
-from .views import SearchSimpleModelAPIView
+from .views import SearchSimpleModelAPIView, SearchSimpleModelExportAPIView
 from ..models import SimpleModel as DBSimpleModel
 from ....apps import SearchApp
 
@@ -9,6 +9,8 @@ class SimpleModelSearchApp(SearchApp):
 
     name = 'simplemodel'
     view = SearchSimpleModelAPIView
+    export_view = SearchSimpleModelExportAPIView
     es_model = ESSimpleModel
     queryset = DBSimpleModel.objects
-    view_permissions = []
+    view_permissions = ['search_support.view_simplemodel']
+    export_permission = 'search_support.view_simplemodel'
