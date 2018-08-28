@@ -67,20 +67,27 @@ def get_choices_as_case_expression(model, field_name):
     return Case(*whens, default=field.name)
 
 
-def get_full_name_expression(field_name):
+def get_full_name_expression(field_name=None):
     """
-    Gets an SQL expression that returns the full name for a contact or adviser related field on
-    another model.
+    Gets an SQL expression that returns the full name for a contact or adviser.
 
-    Usage example:
+    Can both be used directly on a Contact or Adviser query set and on related fields.
+
+    Usage examples:
+        Contact.objects.annotate(
+            name=get_full_name_expression(),
+        )
         Interaction.objects.annotate(
             dit_adviser_name=get_full_name_expression('dit_adviser'),
         )
     """
+    if field_name is None:
+        return _full_name_concat('first_name', 'last_name')
+
     return Case(
         When(
             **{f'{field_name}__isnull': False},
-            then=Concat(f'{field_name}__first_name', Value(' '), f'{field_name}__last_name'),
+            then=_full_name_concat(f'{field_name}__first_name', f'{field_name}__last_name'),
         ),
         default=None,
     )
@@ -94,3 +101,7 @@ def get_front_end_url_expression(model_name, pk_expression):
     :param pk_expression:   expression that resolves to the pk for the model
     """
     return Concat(Value(f'{settings.DATAHUB_FRONTEND_URL_PREFIXES[model_name]}/'), pk_expression)
+
+
+def _full_name_concat(first_name_field, last_name_field):
+    return Concat(first_name_field, Value(' '), last_name_field)

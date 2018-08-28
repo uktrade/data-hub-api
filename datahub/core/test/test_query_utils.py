@@ -80,6 +80,15 @@ class TestGetFullNameExpression:
     """Tests for get_full_name_expression()."""
 
     def test_full_name_annotation(self):
+        """Tests that a Person query set can be annotated with full names."""
+        person = PersonFactory()
+        queryset = Person.objects.annotate(
+            name=get_full_name_expression()
+        )
+        expected_name = f'{person.first_name} {person.last_name}'
+        assert queryset.first().name == expected_name
+
+    def test_full_name_related_annotation(self):
         """
         Tests that a Book query set can be annotated with the full name of the proofreader
         of each book.
