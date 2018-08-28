@@ -1,6 +1,6 @@
-from datahub.company.models import Company as DBCompany
+from datahub.company.models import Company as DBCompany, CompanyPermission
 from .models import Company
-from .views import SearchCompanyAPIView
+from .views import SearchCompanyAPIView, SearchCompanyExportAPIView
 from ..apps import SearchApp
 
 
@@ -10,7 +10,9 @@ class CompanySearchApp(SearchApp):
     name = 'company'
     es_model = Company
     view = SearchCompanyAPIView
-    view_permissions = ('company.view_company',)
+    export_view = SearchCompanyExportAPIView
+    view_permissions = (f'company.{CompanyPermission.view_company}',)
+    export_permission = f'company.{CompanyPermission.export_company}'
     queryset = DBCompany.objects.select_related(
         'account_manager',
         'archived_by',

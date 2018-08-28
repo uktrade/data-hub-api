@@ -281,7 +281,10 @@ class TestGetCompany(APITestMixin):
             'contacts': [],
             'created_on': format_date_or_datetime(company.created_on),
             'description': None,
-            'employee_range': None,
+            'employee_range': {
+                'id': str(company.employee_range.id),
+                'name': company.employee_range.name,
+            },
             'export_experience_category': {
                 'id': str(company.export_experience_category.id),
                 'name': company.export_experience_category.name,
@@ -314,7 +317,10 @@ class TestGetCompany(APITestMixin):
             'trading_address_county': None,
             'trading_address_postcode': None,
             'trading_address_town': 'Woodside',
-            'turnover_range': None,
+            'turnover_range': {
+                'id': str(company.turnover_range.id),
+                'name': company.turnover_range.name,
+            },
             'uk_based': True,
             'uk_region': {
                 'id': str(company.uk_region.id),
