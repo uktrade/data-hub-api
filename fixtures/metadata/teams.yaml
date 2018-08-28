@@ -53,6 +53,18 @@
     - - view_associated_investmentproject_proposition
       - proposition
       - proposition
+    - - add_associated_evidencedocument
+      - evidence
+      - evidencedocument
+    - - change_associated_evidencedocument
+      - evidence
+      - evidencedocument
+    - - view_associated_evidencedocument
+      - evidence
+      - evidencedocument
+    - - delete_associated_evidencedocument
+      - evidence
+      - evidencedocument
   model: auth.group
 - fields:
     name: DA
@@ -153,6 +165,18 @@
     - - view_associated_investmentproject_proposition
       - proposition
       - proposition
+    - - add_associated_evidencedocument
+      - evidence
+      - evidencedocument
+    - - change_associated_evidencedocument
+      - evidence
+      - evidencedocument
+    - - view_associated_evidencedocument
+      - evidence
+      - evidencedocument
+    - - delete_associated_evidencedocument
+      - evidence
+      - evidencedocument
   model: auth.group
 - fields:
     name: DIT_staff
@@ -226,6 +250,18 @@
     - - view_all_proposition
       - proposition
       - proposition
+    - - add_all_evidencedocument
+      - evidence
+      - evidencedocument
+    - - change_all_evidencedocument
+      - evidence
+      - evidencedocument
+    - - view_all_evidencedocument
+      - evidence
+      - evidencedocument
+    - - delete_all_evidencedocument
+      - evidence
+      - evidencedocument
     - - add_investmentproject
       - investment
       - investmentproject
