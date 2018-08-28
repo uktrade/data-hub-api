@@ -1,5 +1,4 @@
-from django.db.models import Case, NullBooleanField, Value, When
-from django.db.models.functions import Concat
+from django.db.models import Case, NullBooleanField, When
 
 from datahub.admin_report.report import QuerySetReport
 from datahub.company.models import Advisor, Company
@@ -15,7 +14,7 @@ class AllAdvisersReport(QuerySetReport):
     model = Advisor
     permissions_required = ('company.view_advisor',)
     queryset = Advisor.objects.annotate(
-        name=Concat('first_name', Value(' '), 'last_name'),
+        name=get_full_name_expression(),
         is_team_active=Case(
             When(dit_team__disabled_on__isnull=True, dit_team__isnull=False, then=True),
             When(dit_team__disabled_on__isnull=False, then=False),
