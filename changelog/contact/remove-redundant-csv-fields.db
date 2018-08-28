@@ -1,0 +1,9 @@
+The column ```contact.contactable_by_dit``` is deprecated and may be removed on or after 11 September.
+
+The column ```contact.contactable_by_uk_dit_partners```  is deprecated and may be removed on or after 11 September.
+
+The column ```contact.contactable_by_overseas_dit_partners```  is deprecated and may be removed on or after 11 September.
+
+The column ```contact.contactable_by_email```  is deprecated and may be removed on or after 11 September.
+
+The column ```contact.contactable_by_phone```  is deprecated and may be removed on or after 11 September.
