@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from django.contrib import admin
 from django.template.defaultfilters import date as date_filter, time as time_filter
 from django.urls import reverse
@@ -29,8 +27,8 @@ class DisabledOnFilter(admin.SimpleListFilter):
         return queryset
 
 
-class ReadOnlyAdmin(admin.ModelAdmin):
-    """ModelAdmin subclass that makes models viewable but not editable."""
+class ViewAndChangeOnlyAdmin(admin.ModelAdmin):
+    """ModelAdmin subclass that restricts adding and deletion at all times."""
 
     def has_add_permission(self, request, obj=None):
         """
@@ -48,25 +46,22 @@ class ReadOnlyAdmin(admin.ModelAdmin):
         """
         return False
 
-    def get_readonly_fields(self, request, obj=None):
+
+class ViewOnlyAdmin(ViewAndChangeOnlyAdmin):
+    """
+    ModelAdmin subclass that restricts adding, changing and deleting at all times.
+
+    The user must have the relevant view or change permission in order to be able to view the
+    model.
+    """
+
+    def has_change_permission(self, request, obj=None):
         """
-        Gets the read-only fields for this model.
+        Gets whether the user can change objects for this model.
 
-        Always returns all fields.
+        Always returns False.
         """
-        # if reaonly_fields defined explicitly, use that
-        if self.readonly_fields:
-            return self.readonly_fields
-
-        # OrderedDict used instead of set to preserve order
-        readonly_fields = list(OrderedDict.fromkeys(
-            [field.name for field in self.opts.local_fields] +
-            [field.name for field in self.opts.local_many_to_many]
-        ))
-
-        if 'is_submitted' in readonly_fields:
-            readonly_fields.remove('is_submitted')
-        return readonly_fields
+        return False
 
 
 class BaseModelAdminMixin:

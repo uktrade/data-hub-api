@@ -20,7 +20,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_protect
 
-from datahub.core.admin import BaseModelAdminMixin, ReadOnlyAdmin
+from datahub.core.admin import BaseModelAdminMixin, ViewAndChangeOnlyAdmin
 from datahub.core.exceptions import APIConflictException
 from . import validators
 from .models import CancellationReason, Order
@@ -63,7 +63,7 @@ class CancelOrderForm(forms.Form):
 
 
 @admin.register(Order)
-class OrderAdmin(BaseModelAdminMixin, ReadOnlyAdmin):
+class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
     """Admin for orders."""
 
     list_display = ('reference', 'company', 'status', 'created_on', 'modified_on')
