@@ -175,6 +175,9 @@
     - - view_company_timeline
       - company
       - company
+    - - export_company
+      - company
+      - company
     - - add_contact
       - company
       - contact
