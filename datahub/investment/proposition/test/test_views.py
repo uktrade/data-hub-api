@@ -649,25 +649,25 @@ class TestCompleteProposition(APITestMixin):
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
     def test_non_restricted_user_can_complete_proposition(self, permissions):
         """Test completing proposition by non restricted user."""
+        user = create_test_user(permission_codenames=permissions)
         proposition = PropositionFactory()
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=user,
+        )
+        entity_document.document.mark_as_scanned(True, '')
 
         url = reverse('api-v3:investment:proposition:complete', kwargs={
             'proposition_pk': proposition.pk,
             'project_pk': proposition.investment_project.pk,
         })
 
-        user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
-        response = api_client.post(
-            url,
-            {
-                'details': 'All done 100% satisfaction.',
-            },
-            format='json',
-        )
+        response = api_client.post(url, format='json')
         proposition.refresh_from_db()
-        assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
+        assert response.status_code == status.HTTP_200_OK
         assert proposition.modified_by == user
         assert response_data == {
             'id': str(proposition.pk),
@@ -693,7 +693,7 @@ class TestCompleteProposition(APITestMixin):
                 'name': proposition.created_by.name,
                 'id': str(proposition.created_by.pk),
             },
-            'details': 'All done 100% satisfaction.',
+            'details': '',
             'modified_on': format_date_or_datetime(proposition.modified_on),
             'modified_by': {
                 'first_name': proposition.modified_by.first_name,
@@ -706,22 +706,21 @@ class TestCompleteProposition(APITestMixin):
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
     def test_user_cannot_complete_proposition_for_non_existent_project(self, permissions):
         """Test user cannot complete proposition for non existent investment project."""
+        user = create_test_user(permission_codenames=permissions)
         proposition = PropositionFactory()
-
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=user,
+        )
+        entity_document.document.mark_as_scanned(True, '')
         url = reverse('api-v3:investment:proposition:complete', kwargs={
             'proposition_pk': proposition.pk,
             'project_pk': uuid.uuid4(),
         })
 
-        user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
-        response = api_client.post(
-            url,
-            {
-                'details': 'All done 100% satisfaction.',
-            },
-            format='json',
-        )
+        response = api_client.post(url, format='json')
         assert response.status_code == status.HTTP_404_NOT_FOUND
         response_data = response.json()
         assert response_data == {'detail': 'Not found.'}
@@ -729,32 +728,32 @@ class TestCompleteProposition(APITestMixin):
     def test_restricted_user_can_complete_proposition(self):
         """Test completing proposition by a restricted user."""
         project_creator = AdviserFactory()
-        investment_project = InvestmentProjectFactory(
-            created_by=project_creator
-        )
-        proposition = PropositionFactory(
-            investment_project=investment_project
-        )
-
-        url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
-
         user = create_test_user(
             permission_codenames=(
                 PropositionPermission.change_associated_investmentproject,
             ),
             dit_team=project_creator.dit_team,
         )
-        api_client = self.create_api_client(user=user)
-        response = api_client.post(
-            url,
-            {
-                'details': 'All done 100% satisfaction.',
-            },
-            format='json',
+        investment_project = InvestmentProjectFactory(
+            created_by=project_creator
         )
+        proposition = PropositionFactory(
+            investment_project=investment_project
+        )
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=user,
+        )
+        entity_document.document.mark_as_scanned(True, '')
+
+        url = reverse('api-v3:investment:proposition:complete', kwargs={
+            'proposition_pk': proposition.pk,
+            'project_pk': proposition.investment_project.pk,
+        })
+
+        api_client = self.create_api_client(user=user)
+        response = api_client.post(url, format='json')
         proposition.refresh_from_db()
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -783,7 +782,7 @@ class TestCompleteProposition(APITestMixin):
                 'name': proposition.created_by.name,
                 'id': str(proposition.created_by.pk),
             },
-            'details': 'All done 100% satisfaction.',
+            'details': '',
             'modified_on': format_date_or_datetime(proposition.modified_on),
             'modified_by': {
                 'first_name': proposition.modified_by.first_name,
@@ -796,32 +795,31 @@ class TestCompleteProposition(APITestMixin):
     def test_restricted_user_cannot_complete_non_associated_ip_proposition(self):
         """Test restricted user cannot complete non associated investment project proposition."""
         project_creator = AdviserFactory()
-        investment_project = InvestmentProjectFactory(
-            created_by=project_creator
-        )
-        proposition = PropositionFactory(
-            investment_project=investment_project
-        )
-
-        url = reverse('api-v3:investment:proposition:complete', kwargs={
-            'proposition_pk': proposition.pk,
-            'project_pk': proposition.investment_project.pk,
-        })
-
         user = create_test_user(
             permission_codenames=(
                 PropositionPermission.change_associated_investmentproject,
             ),
             dit_team=TeamFactory(),
         )
-        api_client = self.create_api_client(user=user)
-        response = api_client.post(
-            url,
-            {
-                'details': 'All done 100% satisfaction.',
-            },
-            format='json',
+        investment_project = InvestmentProjectFactory(
+            created_by=project_creator
         )
+        proposition = PropositionFactory(
+            investment_project=investment_project
+        )
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=user,
+        )
+        entity_document.document.mark_as_scanned(True, '')
+
+        url = reverse('api-v3:investment:proposition:complete', kwargs={
+            'proposition_pk': proposition.pk,
+            'project_pk': proposition.investment_project.pk,
+        })
+        api_client = self.create_api_client(user=user)
+        response = api_client.post(url, format='json')
         assert response.status_code == status.HTTP_403_FORBIDDEN
         response_data = response.json()
         assert response_data == {
@@ -839,22 +837,29 @@ class TestCompleteProposition(APITestMixin):
     )
     def test_cannot_complete_proposition_without_ongoing_status(self, proposition_status):
         """Test cannot complete proposition that doesn't have ongoing status."""
+        user = create_test_user(
+            permission_codenames=(
+                PropositionPermission.change_all,
+            ),
+            dit_team=TeamFactory(),
+        )
         proposition = PropositionFactory(
             status=proposition_status
         )
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=user,
+        )
+        entity_document.document.mark_as_scanned(True, '')
         url = reverse('api-v3:investment:proposition:complete', kwargs={
             'proposition_pk': proposition.pk,
             'project_pk': proposition.investment_project.pk,
         })
-        response = self.api_client.post(
-            url,
-            {
-                'details': 'All done 100% satisfaction.',
-            },
-            format='json',
-        )
-        assert response.status_code == status.HTTP_409_CONFLICT
+        api_client = self.create_api_client(user=user)
+        response = api_client.post(url, format='json')
         response_data = response.json()
+        assert response.status_code == status.HTTP_409_CONFLICT
         detail = f'The action cannot be performed in the current status {proposition_status}.'
         assert response_data['detail'] == detail
 
@@ -862,23 +867,17 @@ class TestCompleteProposition(APITestMixin):
         assert proposition.status == proposition_status
         assert proposition.details == ''
 
-    def test_cannot_complete_proposition_without_details(self):
-        """Test cannot complete proposition without giving details."""
+    def test_cannot_complete_proposition_without_uploading_documents(self):
+        """Test cannot complete proposition without uploading documents."""
         proposition = PropositionFactory()
         url = reverse('api-v3:investment:proposition:complete', kwargs={
             'proposition_pk': proposition.pk,
             'project_pk': proposition.investment_project.pk,
         })
-        response = self.api_client.post(
-            url,
-            {
-                'details': '',
-            },
-            format='json',
-        )
+        response = self.api_client.post(url, format='json')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
-        assert response_data['details'] == ['This field may not be blank.']
+        assert response_data['non_field_errors'] == ['Proposition has no documents uploaded.']
         proposition.refresh_from_db()
         assert proposition.status == PropositionStatus.ongoing
 
