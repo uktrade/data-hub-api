@@ -88,6 +88,14 @@ class TestGetFullNameExpression:
         expected_name = f'{person.first_name} {person.last_name}'
         assert queryset.first().name == expected_name
 
+    def test_ignores_blank_first_name(self):
+        """Tests that a blank first_name is ignored."""
+        person = PersonFactory(first_name='')
+        queryset = Person.objects.annotate(
+            name=get_full_name_expression()
+        )
+        assert queryset.first().name == person.last_name
+
     def test_full_name_related_annotation(self):
         """
         Tests that a Book query set can be annotated with the full name of the proofreader
