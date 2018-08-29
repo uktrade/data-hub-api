@@ -4,12 +4,13 @@ import uuid
 
 from django.conf import settings
 from django.db import models
+from rest_framework.exceptions import ValidationError
 from rest_framework.reverse import reverse
 
 from datahub.core.exceptions import APIConflictException
 from datahub.core.models import BaseModel
 from datahub.core.utils import StrEnum
-from datahub.documents.models import AbstractEntityDocumentModel
+from datahub.documents.models import AbstractEntityDocumentModel, UPLOAD_STATUSES
 from datahub.investment.proposition.constants import PropositionStatus
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -119,7 +120,7 @@ class Proposition(BaseModel):
     name = models.CharField(max_length=MAX_LENGTH)
     scope = models.TextField()
 
-    details = models.TextField()
+    details = models.TextField(blank=True)
 
     def __str__(self):
         """Human readable representation of the object."""
@@ -142,7 +143,13 @@ class Proposition(BaseModel):
 
         :param by: the adviser who marked the proposition as complete
         :param details: details of completion
+        :raises ValidationError: when trying to complete proposition without uploaded documents
+        :raises APIConflictException: when proposition status is not ongoing
         """
+        if self.documents.filter(document__status=UPLOAD_STATUSES.virus_scanned).count() == 0:
+            raise ValidationError({
+                'non_field_errors': ['Proposition has no documents uploaded.']
+            })
         self._change_status(PropositionStatus.completed, by, details)
 
     def abandon(self, by, details):

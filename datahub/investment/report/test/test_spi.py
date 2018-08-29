@@ -6,6 +6,7 @@ from datahub.core.constants import InvestmentProjectStage
 from datahub.core.constants import Service
 from datahub.interaction.test.factories import InvestmentProjectInteractionFactory
 from datahub.investment.constants import InvestorType
+from datahub.investment.proposition.models import PropositionDocument
 from datahub.investment.proposition.test.factories import PropositionFactory
 from datahub.investment.report.spi import SPIReport
 from datahub.investment.test.factories import (
@@ -64,7 +65,14 @@ def propositions(ist_adviser):
     ]
 
     with freeze_time('2017-01-04 11:11:11'):
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=items[1].pk,
+            original_filename='test.txt',
+            created_by=adviser,
+        )
+        entity_document.document.mark_as_scanned(True, '')
         items[1].complete(by=adviser, details='what')
+
         items[2].abandon(by=adviser, details='what')
 
     yield items
