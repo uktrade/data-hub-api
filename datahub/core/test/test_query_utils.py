@@ -29,8 +29,8 @@ def test_get_string_agg_subquery(num_authors):
         author_names=get_string_agg_subquery(Book, 'authors__first_name')
     )
     author_names_str = queryset.first().author_names
-    actual_author_names = author_names_str.split(', ') if author_names_str else []
-    expected_author_names = [author.first_name for author in authors]
+    actual_author_names = sorted(author_names_str.split(', ')) if author_names_str else []
+    expected_author_names = sorted(author.first_name for author in authors)
     assert actual_author_names == expected_author_names
 
 
