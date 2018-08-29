@@ -1,6 +1,9 @@
+from datetime import date
+from random import shuffle
+
 import pytest
 from django.conf import settings
-from django.db.models import Max
+from django.db.models import F, Max
 from django.db.models.functions import Left
 
 from datahub.core.query_utils import (
@@ -9,6 +12,7 @@ from datahub.core.query_utils import (
     get_front_end_url_expression,
     get_full_name_expression,
     get_string_agg_subquery,
+    get_top_related_expression_subquery,
 )
 from datahub.core.test.support.factories import BookFactory, PersonFactory
 from datahub.core.test.support.models import Book, Person
@@ -60,6 +64,35 @@ class TestGetAggregateSubquery:
         """
         with pytest.raises(ValueError):
             get_aggregate_subquery(Person, Left('proofread_books__name', 5))
+
+
+@pytest.mark.parametrize('expression', ('name', F('name')))
+def test_get_top_related_expression_subquery(expression):
+    """
+    Test that get_top_related_expression_subquery() can be used to get the name of the most
+    recently published book.
+    """
+    person = PersonFactory()
+    book_data = [
+        {'name': 'oldest', 'published_on': date(2010, 1, 1)},
+        {'name': 'in the middle', 'published_on': date(2013, 1, 1)},
+        {'name': 'newest', 'published_on': date(2015, 1, 1)},
+    ]
+    shuffle(book_data)
+
+    for item_data in book_data:
+        BookFactory(
+            proofreader=person,
+            authors=[],
+            **item_data,
+        )
+
+    queryset = Person.objects.annotate(
+        name_of_latest_book=get_top_related_expression_subquery(
+            Book.proofreader.field, expression, ('-published_on',),
+        ),
+    )
+    assert queryset.first().name_of_latest_book == 'newest'
 
 
 @pytest.mark.parametrize('genre', ('horror', 'non_fiction', 'invalid-option', None))

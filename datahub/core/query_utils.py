@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.postgres.aggregates import StringAgg
-from django.db.models import Case, Func, OuterRef, Subquery, Value, When
+from django.db.models import Case, F, Func, OuterRef, Subquery, Value, When
 from django.db.models.functions import Concat
 
 
@@ -72,6 +72,36 @@ def get_aggregate_subquery(model, expression):
     ).values(
         '_annotated_value',
     )
+
+    return Subquery(queryset)
+
+
+def get_top_related_expression_subquery(related_field, expression, ordering):
+    """
+    Returns an expression that gets a particular field of the top row for a particular ordering
+    of a related model.
+
+    expression could be a string referring to a field, or an instance of Expression.
+
+    Usage example:
+        Company.objects.annotate(
+            team_of_latest_interaction=get_top_related_expression_subquery(
+                Interaction.investment_project.field,
+                'dit_team__name',
+                ('-date',),
+            ),
+        )
+    """
+    wrapped_expression = F(expression) if isinstance(expression, str) else expression
+    queryset = related_field.model.objects.annotate(
+        _annotated_value=wrapped_expression,
+    ).filter(
+        **{related_field.name: OuterRef('pk')},
+    ).order_by(
+        *ordering
+    ).values(
+        '_annotated_value',
+    )[:1]
 
     return Subquery(queryset)
 
