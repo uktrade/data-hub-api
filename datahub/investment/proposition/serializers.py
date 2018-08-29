@@ -25,14 +25,17 @@ class CreatePropositionSerializer(serializers.ModelSerializer):
         )
 
 
-class CompleteOrAbandonPropositionSerializer(serializers.ModelSerializer):
-    """Proposition serialiser for complete and abandon endpoint."""
+class CompletePropositionSerializer(serializers.ModelSerializer):
+    """Proposition serialiser for complete endpoint."""
 
     class Meta:
         model = Proposition
         fields = (
             'details',
         )
+        extra_kwargs = {
+            'details': {'default': ''},
+        }
 
     def complete(self):
         """Complete a proposition."""
@@ -41,6 +44,19 @@ class CompleteOrAbandonPropositionSerializer(serializers.ModelSerializer):
             details=self.validated_data['details']
         )
         return self.instance
+
+
+class AbandonPropositionSerializer(serializers.ModelSerializer):
+    """Proposition serialiser for abandon endpoint."""
+
+    class Meta:
+        model = Proposition
+        fields = (
+            'details',
+        )
+        extra_kwargs = {
+            'details': {'allow_blank': False}
+        }
 
     def abandon(self):
         """Abandon a proposition."""
