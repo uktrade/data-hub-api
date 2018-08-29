@@ -1,7 +1,32 @@
 from django.conf import settings
 from django.contrib.postgres.aggregates import StringAgg
-from django.db.models import Case, OuterRef, Subquery, Value, When
+from django.db.models import Case, Func, OuterRef, Subquery, Value, When
 from django.db.models.functions import Concat
+
+
+class ConcatWS(Func):
+    """
+    Concatenates text fields together with a separator.
+
+    The first argument is the separator. Null arguments are ignored.
+
+    Usage example:
+        ConcatWS(Value(' '), 'first_name', 'last_name')
+    """
+
+    function = 'concat_ws'
+
+
+class NullIf(Func):
+    """
+    Returns None if a field equals a particular expression.
+
+    Usage example:
+        NullIf('first_name', Value(''))  # returns None if first_name is an empty string
+    """
+
+    function = 'nullif'
+    arity = 2
 
 
 def get_string_agg_subquery(model, expression, delimiter=', '):
@@ -104,4 +129,8 @@ def get_front_end_url_expression(model_name, pk_expression):
 
 
 def _full_name_concat(first_name_field, last_name_field):
-    return Concat(first_name_field, Value(' '), last_name_field)
+    return ConcatWS(
+        Value(' '),
+        NullIf(first_name_field, Value('')),
+        NullIf(last_name_field, Value('')),
+    )
