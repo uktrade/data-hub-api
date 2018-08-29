@@ -114,6 +114,26 @@ class TestValidateViewAttributes:
         assert not invalid_fields
 
 
+class TestValidateExportViewAttributes:
+    """Validates the field names specified in class attributes on export views."""
+
+    def test_validate_sort_by_remappings(self, search_app):
+        """Validate that the values of sort_by_remappings are valid field paths."""
+        view = search_app.export_view
+
+        if not view:
+            return
+
+        invalid_fields = {
+            field
+            for field in view.sort_by_remappings
+            if not model_has_field_path(search_app.es_model, field)
+            and field not in search_app.es_model.PREVIOUS_MAPPING_FIELDS
+        }
+
+        assert not invalid_fields
+
+
 class TestSearch(APITestMixin):
     """Tests search views."""
 
