@@ -20,7 +20,8 @@ from datahub.investment.proposition.permissions import (
     PropositionModelPermissions,
 )
 from datahub.investment.proposition.serializers import (
-    CompleteOrAbandonPropositionSerializer,
+    AbandonPropositionSerializer,
+    CompletePropositionSerializer,
     CreatePropositionSerializer,
     PropositionDocumentSerializer,
     PropositionSerializer,
@@ -83,7 +84,7 @@ class PropositionViewSet(CoreViewSet):
             status=status.HTTP_201_CREATED
         )
 
-    def _action(self, method, request, *args, **kwargs):
+    def _action(self, method, action_serializer, request, *args, **kwargs):
         """Invokes action for a proposition."""
         self._check_project_exists()
 
@@ -92,7 +93,7 @@ class PropositionViewSet(CoreViewSet):
 
         instance = self.get_object()
 
-        serializer = CompleteOrAbandonPropositionSerializer(
+        serializer = action_serializer(
             instance,
             data=request.data,
             context=self.get_serializer_context(),
@@ -106,11 +107,11 @@ class PropositionViewSet(CoreViewSet):
 
     def complete(self, request, *args, **kwargs):
         """Completes proposition."""
-        return self._action('complete', request, *args, **kwargs)
+        return self._action('complete', CompletePropositionSerializer, request, *args, **kwargs)
 
     def abandon(self, request, *args, **kwargs):
         """Abandons proposition."""
-        return self._action('abandon', request, *args, **kwargs)
+        return self._action('abandon', AbandonPropositionSerializer, request, *args, **kwargs)
 
     def get_serializer_context(self):
         """Extra context provided to the serializer class."""
