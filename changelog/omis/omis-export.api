@@ -1,0 +1,1 @@
+``POST /v3/search/order/export`` was added for exporting OMIS order search results as a CSV file with up to 5000 rows. The ``order.export_order`` permission was also added and is required to use this endpoint.
