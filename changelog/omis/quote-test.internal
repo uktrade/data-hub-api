@@ -1,0 +1,1 @@
+Improves ``test_content`` test so it's now possible to run all tests on Windows.
