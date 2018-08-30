@@ -1,6 +1,6 @@
-from datahub.company.models import Contact as DBContact
+from datahub.company.models import Contact as DBContact, ContactPermission
 from .models import Contact
-from .views import SearchContactAPIView
+from .views import SearchContactAPIView, SearchContactExportAPIView
 from ..apps import SearchApp
 
 
@@ -10,7 +10,9 @@ class ContactSearchApp(SearchApp):
     name = 'contact'
     es_model = Contact
     view = SearchContactAPIView
-    view_permissions = ('company.view_contact',)
+    export_view = SearchContactExportAPIView
+    view_permissions = (f'company.{ContactPermission.view_contact}',)
+    export_permission = f'company.{ContactPermission.export_contact}'
     queryset = DBContact.objects.select_related(
         'title',
         'company',
