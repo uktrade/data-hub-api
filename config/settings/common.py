@@ -322,7 +322,7 @@ if REDIS_BASE_URL:
 DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://localhost:3000')
 DATAHUB_FRONTEND_URL_PREFIXES = {
     'company': f'{DATAHUB_FRONTEND_BASE_URL}/companies',
-    'contact': f'{DATAHUB_FRONTEND_BASE_URL}/contact',
+    'contact': f'{DATAHUB_FRONTEND_BASE_URL}/contacts',
     'interaction': f'{DATAHUB_FRONTEND_BASE_URL}/interactions',
     'order': f'{DATAHUB_FRONTEND_BASE_URL}/omis',
 }
