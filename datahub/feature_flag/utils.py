@@ -7,9 +7,4 @@ def is_feature_flag_active(code):
 
     If feature flag doesn't exist, it returns False.
     """
-    try:
-        feature_flag = FeatureFlag.objects.get(code=code)
-    except FeatureFlag.DoesNotExist:
-        return False
-
-    return feature_flag.is_active
+    return FeatureFlag.objects.filter(code=code, is_active=True).exists()
