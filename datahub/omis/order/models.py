@@ -278,6 +278,11 @@ class Order(BaseModel):
 
     objects = OrderQuerySet.as_manager()
 
+    class Meta:
+        permissions = (
+            ('export_order', 'Can export order'),
+        )
+
     def __str__(self):
         """Human-readable representation"""
         return self.reference

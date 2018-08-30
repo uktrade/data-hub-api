@@ -1,6 +1,7 @@
 from codecs import BOM_UTF8
 from csv import DictWriter
 from datetime import datetime
+from decimal import Decimal
 
 from django.http import StreamingHttpResponse
 
@@ -61,4 +62,6 @@ def _transform_csv_value(value):
     """
     if isinstance(value, datetime):
         return value.strftime('%Y-%m-%d %H:%M:%S')
+    if isinstance(value, Decimal):
+        return value.normalize()
     return value
