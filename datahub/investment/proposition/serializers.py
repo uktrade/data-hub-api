@@ -1,6 +1,9 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from datahub.company.serializers import NestedAdviserField
+from datahub.feature_flag.utils import is_feature_flag_active
+from datahub.investment.proposition.constants import FEATURE_FLAG_PROPOSITION_DOCUMENT
 from datahub.investment.proposition.models import Proposition, PropositionDocument
 from datahub.investment.proposition.permissions import (
     PropositionDocumentHasAssociatedInvestmentProjectValidator,
@@ -39,6 +42,13 @@ class CompletePropositionSerializer(serializers.ModelSerializer):
 
     def complete(self):
         """Complete a proposition."""
+        if not is_feature_flag_active(FEATURE_FLAG_PROPOSITION_DOCUMENT):
+            # if proposition documents are not enabled, "details" field is mandatory
+            if self.validated_data['details'] == '':
+                raise ValidationError({
+                    'details': ['This field may not be blank.']
+                })
+
         self.instance.complete(
             by=self.context['current_user'],
             details=self.validated_data['details']
