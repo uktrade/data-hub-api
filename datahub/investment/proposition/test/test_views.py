@@ -74,7 +74,7 @@ NON_RESTRICTED_DELETE_PERMISSIONS = (
 
 
 @pytest.fixture
-def get_proposition_document_feature_flag():
+def proposition_document_feature_flag():
     """Gets proposition document feature flag."""
     yield FeatureFlagFactory(code=FEATURE_FLAG_PROPOSITION_DOCUMENT)
 
@@ -652,15 +652,12 @@ class TestGetProposition(APITestMixin):
         assert response_data == {'detail': 'Not found.'}
 
 
+@pytest.mark.usefixtures('proposition_document_feature_flag')
 class TestCompleteProposition(APITestMixin):
     """Tests for the complete proposition view."""
 
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
-    def test_non_restricted_user_can_complete_proposition(
-        self,
-        permissions,
-        get_proposition_document_feature_flag
-    ):
+    def test_non_restricted_user_can_complete_proposition(self, permissions):
         """Test completing proposition by non restricted user."""
         user = create_test_user(permission_codenames=permissions)
         proposition = PropositionFactory()
@@ -717,11 +714,7 @@ class TestCompleteProposition(APITestMixin):
         }
 
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
-    def test_user_cannot_complete_proposition_for_non_existent_project(
-        self,
-        permissions,
-        get_proposition_document_feature_flag
-    ):
+    def test_user_cannot_complete_proposition_for_non_existent_project(self, permissions):
         """Test user cannot complete proposition for non existent investment project."""
         user = create_test_user(permission_codenames=permissions)
         proposition = PropositionFactory()
@@ -742,10 +735,7 @@ class TestCompleteProposition(APITestMixin):
         response_data = response.json()
         assert response_data == {'detail': 'Not found.'}
 
-    def test_restricted_user_can_complete_proposition(
-        self,
-        get_proposition_document_feature_flag
-    ):
+    def test_restricted_user_can_complete_proposition(self):
         """Test completing proposition by a restricted user."""
         project_creator = AdviserFactory()
         user = create_test_user(
@@ -812,10 +802,7 @@ class TestCompleteProposition(APITestMixin):
             }
         }
 
-    def test_restricted_user_cannot_complete_non_associated_ip_proposition(
-        self,
-        get_proposition_document_feature_flag
-    ):
+    def test_restricted_user_cannot_complete_non_associated_ip_proposition(self):
         """Test restricted user cannot complete non associated investment project proposition."""
         project_creator = AdviserFactory()
         user = create_test_user(
@@ -858,11 +845,7 @@ class TestCompleteProposition(APITestMixin):
             PropositionStatus.completed, PropositionStatus.abandoned,
         ),
     )
-    def test_cannot_complete_proposition_without_ongoing_status(
-        self,
-        proposition_status,
-        get_proposition_document_feature_flag
-    ):
+    def test_cannot_complete_proposition_without_ongoing_status(self, proposition_status):
         """Test cannot complete proposition that doesn't have ongoing status."""
         user = create_test_user(
             permission_codenames=(
@@ -894,10 +877,7 @@ class TestCompleteProposition(APITestMixin):
         assert proposition.status == proposition_status
         assert proposition.details == ''
 
-    def test_cannot_complete_proposition_without_uploading_documents(
-        self,
-        get_proposition_document_feature_flag
-    ):
+    def test_cannot_complete_proposition_without_uploading_documents(self):
         """Test cannot complete proposition without uploading documents."""
         proposition = PropositionFactory()
         url = reverse('api-v3:investment:proposition:complete', kwargs={
