@@ -1,4 +1,4 @@
-from operator import attrgetter
+from operator import attrgetter, itemgetter
 from unittest.mock import patch
 
 import pytest
@@ -186,7 +186,8 @@ class TestEvidenceDocumentViews(APITestMixin):
         entity_document = EvidenceDocument.objects.get(pk=response_data['id'])
         assert entity_document.original_filename == 'test.txt'
         assert entity_document.investment_project.pk == investment_project.pk
-
+        assert 'tags' in response_data
+        response_data['tags'] = sorted(response_data['tags'], key=itemgetter('name'))
         assert response_data == {
             'id': str(entity_document.pk),
             'av_clean': None,
@@ -248,7 +249,10 @@ class TestEvidenceDocumentViews(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response_data['count'] == 1
         assert len(response_data['results']) == 1
-        assert response_data['results'][0] == {
+        result = response_data['results'][0]
+        assert 'tags' in result
+        result['tags'] = sorted(result['tags'], key=itemgetter('name'))
+        assert result == {
             'id': str(entity_document.pk),
             'av_clean': True,
             'comment': entity_document.comment,
@@ -302,6 +306,8 @@ class TestEvidenceDocumentViews(APITestMixin):
             return
 
         assert response.status_code == status.HTTP_200_OK
+        assert 'tags' in response_data
+        response_data['tags'] = sorted(response_data['tags'], key=itemgetter('name'))
         assert response_data == {
             'id': str(entity_document.pk),
             'av_clean': None,
@@ -398,6 +404,8 @@ class TestEvidenceDocumentViews(APITestMixin):
 
         assert response.status_code == expected_status
         if response.status_code == status.HTTP_200_OK:
+            assert 'tags' in response_data
+            response_data['tags'] = sorted(response_data['tags'], key=itemgetter('name'))
             assert response_data == {
                 'id': str(entity_document.pk),
                 'av_clean': True,
@@ -492,6 +500,8 @@ class TestEvidenceDocumentViews(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         entity_document.document.refresh_from_db()
+        assert 'tags' in response_data
+        response_data['tags'] = sorted(response_data['tags'], key=itemgetter('name'))
         assert response_data == {
             'id': str(entity_document.pk),
             'av_clean': None,
