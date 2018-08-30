@@ -232,6 +232,7 @@ class SearchExportAPIView(SearchAPIView):
     permission_classes = (IsAuthenticatedOrTokenHasScope, SearchAndExportPermissions)
     queryset = None
     field_titles = None
+    sort_by_remappings = {}
     include_aggregations = False
 
     def post(self, request, format=None):
@@ -287,7 +288,7 @@ class SearchExportAPIView(SearchAPIView):
         At the moment, all rows are fetched in one query (using a server-side cursor) as
         settings.SEARCH_EXPORT_MAX_RESULTS is set to a (relatively) low value.
         """
-        ordering = _translate_search_sortby_to_django_ordering(sort_by)
+        ordering = self._translate_search_sortby_to_django_ordering(sort_by)
 
         return self.queryset.filter(
             pk__in=self._get_ids(es_query)
@@ -297,23 +298,22 @@ class SearchExportAPIView(SearchAPIView):
             *self.field_titles.keys()
         ).iterator()
 
+    def _translate_search_sortby_to_django_ordering(self, sort_by):
+        """
+        Converts a sort-by value as used in the search API to a tuple of values that can be
+        passed to QuerySet.order_by().
 
-def _translate_search_sortby_to_django_ordering(sort_by):
-    """
-    Converts a sort-by value as used in the search API to a tuple of values that can be
-    passed to QuerySet.order_by().
+        Note that this relies on the same field names having been used; if they differ then you
+        should manually specify a remapping in the sort_by_remappings class attribute.
+        """
+        if not sort_by:
+            return ()
 
-    Note that this relies on the same field names having been used; if they differ then this
-    will not work.
-    """
-    if not sort_by:
-        return ()
+        es_field, _, direction = sort_by.partition(':')
+        field = self.sort_by_remappings.get(es_field, es_field.replace('.', '__'))
+        prefix = '-' if direction == 'desc' else ''
 
-    field, _, direction = sort_by.replace('.', '__').partition(':')
-    if direction == 'desc':
-        return (f'-{field}',)
-
-    return (field,)
+        return f'{prefix}{field}', 'pk'
 
 
 def _execute_search_query(query):

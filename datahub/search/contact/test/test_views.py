@@ -1,15 +1,37 @@
 import uuid
+from cgi import parse_header
+from csv import DictReader
+from io import StringIO
+from operator import attrgetter
 
 import factory
 import pytest
+from django.conf import settings
+from django.db.models.functions import Coalesce
+from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
+from datahub.company.models import Contact, ContactPermission
+from datahub.company.test.factories import (
+    AdviserFactory,
+    ArchivedContactFactory,
+    CompanyFactory,
+    ContactFactory,
+    ContactWithOwnAddressFactory,
+)
 from datahub.core.constants import Country, Sector, UKRegion
-from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_queryset
+from datahub.core.test_utils import (
+    APITestMixin,
+    create_test_user,
+    format_csv_data,
+    get_attr_or_none,
+    random_obj_for_queryset,
+)
+from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.metadata.models import Sector as SectorModel
 from datahub.metadata.test.factories import TeamFactory
+from datahub.search.contact.views import SearchContactExportAPIView
 
 pytestmark = pytest.mark.django_db
 
@@ -394,6 +416,118 @@ class TestSearch(APITestMixin):
         assert [company1.sector.id,
                 company2.sector.id] == [uuid.UUID(contact['company_sector']['id'])
                                         for contact in response.data['results']]
+
+
+class TestContactExportView(APITestMixin):
+    """Tests the contact export view."""
+
+    @pytest.mark.parametrize(
+        'permissions', (
+            (),
+            (ContactPermission.view_contact,),
+            (ContactPermission.export_contact,),
+        )
+    )
+    def test_user_without_permission_cannot_export(self, setup_es, permissions):
+        """Test that a user without the correct permissions cannot export data."""
+        user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('api-v3:search:contact-export')
+        response = api_client.post(url, format='json')
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @pytest.mark.parametrize(
+        'request_sortby,orm_ordering',
+        (
+            ('modified_on', 'modified_on'),
+            ('modified_on:desc', '-modified_on'),
+            ('created_on', 'created_on'),
+            ('created_on:desc', '-created_on'),
+            ('last_name', 'last_name'),
+            ('company.name', 'company__name'),
+            ('address_country.name', 'computed_address_country_name'),
+        )
+    )
+    def test_export(
+        self,
+        setup_es,
+        request_sortby,
+        orm_ordering,
+    ):
+        """Test export of contact search results."""
+        ArchivedContactFactory.create_batch(2)
+        ContactWithOwnAddressFactory.create_batch(2)
+        ContactFactory.create_batch(2)
+        contact_with_interactions = ContactFactory()
+        CompanyInteractionFactory.create_batch(10, contact=contact_with_interactions)
+        CompanyInteractionFactory.create_batch(10)
+
+        setup_es.indices.refresh()
+
+        data = {}
+        if request_sortby:
+            data['sortby'] = request_sortby
+
+        url = reverse('api-v3:search:contact-export')
+
+        with freeze_time('2018-01-01 11:12:13'):
+            response = self.api_client.post(url, format='json', data=data)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})
+        assert parse_header(response.get('Content-Disposition')) == (
+            'attachment', {'filename': 'Data Hub - Contacts - 2018-01-01-11-12-13.csv'}
+        )
+
+        sorted_contacts = Contact.objects.annotate(
+            computed_address_country_name=Coalesce(
+                'address_country__name',
+                'company__registered_address_country__name',
+            ),
+        ).order_by(
+            orm_ordering, 'pk',
+        )
+        reader = DictReader(StringIO(response.getvalue().decode('utf-8-sig')))
+
+        assert reader.fieldnames == list(SearchContactExportAPIView.field_titles.values())
+
+        expected_row_data = [
+            {
+                'Name': contact.name,
+                'Job title': contact.job_title,
+                'Date created': contact.created_on,
+                'Archived': contact.archived,
+                'Link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["contact"]}/{contact.pk}',
+                'Company': get_attr_or_none(contact, 'company.name'),
+                'Company sector': get_attr_or_none(contact, 'company.sector.name'),
+                'Company link':
+                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{contact.company.pk}',
+                'Company UK region': get_attr_or_none(contact, 'company.uk_region.name'),
+                'Country':
+                    contact.company.registered_address_country.name
+                    if contact.address_same_as_company
+                    else contact.address_country.name,
+                'Postcode':
+                    contact.company.registered_address_postcode
+                    if contact.address_same_as_company
+                    else contact.address_postcode,
+                'Phone number':
+                    ' '.join((contact.telephone_countrycode, contact.telephone_number)),
+                'Email address': contact.email,
+                'Accepts DIT email marketing': contact.accepts_dit_email_marketing,
+                'Date of latest interaction':
+                    max(contact.interactions.all(), key=attrgetter('date')).date
+                    if contact.interactions.all() else None,
+                'Team of latest interaction':
+                    max(contact.interactions.all(), key=attrgetter('date')).dit_team.name
+                    if contact.interactions.all() else None,
+                'Created by team': get_attr_or_none(contact, 'created_by.dit_team.name'),
+            }
+            for contact in sorted_contacts
+        ]
+
+        assert list(dict(row) for row in reader) == format_csv_data(expected_row_data)
 
 
 class TestBasicSearch(APITestMixin):
