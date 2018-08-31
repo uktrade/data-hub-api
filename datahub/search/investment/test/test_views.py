@@ -783,7 +783,7 @@ class TestInvestmentProjectExportView(APITestMixin):
             'attachment', {'filename': 'Data Hub - Investment projects - 2018-01-01-11-12-13.csv'}
         )
 
-        sorted_projects = InvestmentProject.objects.order_by(orm_ordering)
+        sorted_projects = InvestmentProject.objects.order_by(orm_ordering, 'pk')
         response_text = response.getvalue().decode('utf-8-sig')
         reader = DictReader(StringIO(response_text))
 
