@@ -36,7 +36,6 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
     filterset_fields = ('global_headquarters_id',)
     ordering_fields = ('name', 'created_on')
     queryset = Company.objects.select_related(
-        'account_manager',
         'archived_by',
         'business_type',
         'classification',

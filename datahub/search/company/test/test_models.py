@@ -13,7 +13,6 @@ def test_company_dbmodel_to_dict(setup_es):
     result = ESCompany.db_object_to_dict(company)
 
     keys = {
-        'account_manager',
         'archived',
         'archived_by',
         'archived_on',
