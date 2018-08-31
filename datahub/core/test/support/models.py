@@ -54,3 +54,7 @@ class Book(models.Model):
     authors = models.ManyToManyField(Person, related_name='books')
     published_on = models.DateField()
     genre = models.CharField(null=True, max_length=255, choices=GENRES)
+
+    def __str__(self):
+        """Human-friendly string representation."""
+        return self.name

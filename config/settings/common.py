@@ -83,6 +83,7 @@ LOCAL_APPS = [
     'datahub.omis.payment',
     'datahub.activity_stream.apps.ActivityStreamConfig',
     'datahub.investment.report',
+    'datahub.user_event_log',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
