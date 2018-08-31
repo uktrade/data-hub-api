@@ -1,1 +1,0 @@
-It's now possible to use utility function ``is_feature_flag_active`` from **feature_flag** app to check the state of the feature flag.
