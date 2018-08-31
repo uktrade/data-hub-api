@@ -498,11 +498,16 @@ class TestContactExportView(APITestMixin):
                 'Job title': contact.job_title,
                 'Date created': contact.created_on,
                 'Archived': contact.archived,
-                'Link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["contact"]}/{contact.pk}',
+                'Link':
+                    f'=HYPERLINK("'
+                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["contact"]}/{contact.pk}'
+                    f'")',
                 'Company': get_attr_or_none(contact, 'company.name'),
                 'Company sector': get_attr_or_none(contact, 'company.sector.name'),
                 'Company link':
-                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{contact.company.pk}',
+                    f'=HYPERLINK("'
+                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{contact.company.pk}'
+                    f'")',
                 'Company UK region': get_attr_or_none(contact, 'company.uk_region.name'),
                 'Country':
                     contact.company.registered_address_country.name
