@@ -105,7 +105,6 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
             {
                 'fields': (
                     'reference_code',
-                    'account_manager',
                     'archived_documents_url_path',
                 )
             }
@@ -130,7 +129,6 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
     raw_id_fields = (
         'global_headquarters',
         'one_list_account_owner',
-        'account_manager',
         'archived_by',
     )
     readonly_fields = (

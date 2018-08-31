@@ -92,11 +92,6 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         metadata_models.TurnoverRange, blank=True, null=True,
         on_delete=models.SET_NULL
     )
-    account_manager = models.ForeignKey(
-        'Advisor', blank=True, null=True, on_delete=models.SET_NULL,
-        related_name='companies',
-        help_text='Legacy field, do not use'
-    )
     export_to_countries = models.ManyToManyField(
         metadata_models.Country,
         blank=True,
