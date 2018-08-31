@@ -534,7 +534,7 @@ class TestCompanyExportView(APITestMixin):
             'attachment', {'filename': 'Data Hub - Companies - 2018-01-01-11-12-13.csv'}
         )
 
-        sorted_company = Company.objects.order_by(orm_ordering)
+        sorted_company = Company.objects.order_by(orm_ordering, 'pk')
         reader = DictReader(StringIO(response.getvalue().decode('utf-8-sig')))
 
         assert reader.fieldnames == list(SearchCompanyExportAPIView.field_titles.values())
