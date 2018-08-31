@@ -7,6 +7,7 @@ from datahub.core.admin import (
     custom_change_permission,
     custom_delete_permission,
     get_change_link,
+    get_change_url,
 )
 from datahub.core.test.support.factories import BookFactory
 
@@ -57,6 +58,27 @@ def test_custom_delete_permission():
     admin.has_delete_permission(request)
 
     request.user.has_perm.assert_called_once_with('admin.custom_permission')
+
+
+class TestGetChangeURL:
+    """Tests for get_change_url()."""
+
+    @pytest.mark.django_db
+    def test_generates_urls_for_saved_objects(self):
+        """Test that a valid change URL is generated."""
+        book = BookFactory()
+        assert get_change_url(book) == (
+            f'/admin/support/book/{book.pk}/change/'
+        )
+
+    def test_returns_empty_string_if_no_pk(self):
+        """Test that if the object has no pk, an empty URL is returned."""
+        book = BookFactory.build()
+        assert get_change_url(book) == ''
+
+    def test_returns_empty_string_if_obj_is_none(self):
+        """Test that if None is passed, an empty URL is returned."""
+        assert get_change_url(None) == ''
 
 
 class TestGetChangeLink:
