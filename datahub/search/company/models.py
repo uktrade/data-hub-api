@@ -11,7 +11,6 @@ class Company(BaseESModel):
     """Elasticsearch representation of Company model."""
 
     id = Keyword()
-    account_manager = fields.nested_contact_or_adviser_field('account_manager')
     archived = Boolean()
     archived_by = fields.nested_contact_or_adviser_field('archived_by')
     archived_on = Date()
@@ -80,7 +79,6 @@ class Company(BaseESModel):
 
     MAPPINGS = {
         'id': str,
-        'account_manager': dict_utils.contact_or_adviser_dict,
         'archived_by': dict_utils.contact_or_adviser_dict,
         'business_type': dict_utils.id_name_dict,
         'classification': dict_utils.id_name_dict,

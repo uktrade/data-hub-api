@@ -17,7 +17,6 @@ class SearchCompanyParams:
     serializer_class = SearchCompanySerializer
 
     FILTER_FIELDS = (
-        'account_manager',
         'archived',
         'description',
         'export_to_country',
@@ -34,7 +33,6 @@ class SearchCompanyParams:
     )
 
     REMAP_FIELDS = {
-        'account_manager': 'account_manager.id',
         'export_to_country': 'export_to_countries.id',
         'future_interest_country': 'future_interest_countries.id',
         'global_headquarters': 'global_headquarters.id',

@@ -291,7 +291,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     trading_address_country = NestedRelatedField(
         meta_models.Country, required=False, allow_null=True
     )
-    account_manager = NestedAdviserWithTeamField(required=False, allow_null=True)
     archived_by = NestedAdviserField(read_only=True)
     business_type = NestedRelatedField(
         meta_models.BusinessType, required=False, allow_null=True
@@ -426,7 +425,6 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             'trading_address_county',
             'trading_address_postcode',
             'trading_address_country',
-            'account_manager',
             'business_type',
             'classification',
             'companies_house_data',

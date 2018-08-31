@@ -14,7 +14,6 @@ class CompanySearchApp(SearchApp):
     view_permissions = (f'company.{CompanyPermission.view_company}',)
     export_permission = f'company.{CompanyPermission.export_company}'
     queryset = DBCompany.objects.select_related(
-        'account_manager',
         'archived_by',
         'business_type',
         'classification',
