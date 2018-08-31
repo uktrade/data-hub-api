@@ -3,6 +3,7 @@ from django.db.models import Max
 from datahub.core.query_utils import (
     get_aggregate_subquery,
     get_choices_as_case_expression,
+    get_front_end_url_expression,
     get_full_name_expression,
     get_string_agg_subquery,
 )
@@ -80,6 +81,7 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectParams, SearchExportA
     queryset = DBInvestmentProject.objects.annotate(
         computed_project_code=get_project_code_expression(),
         status_name=get_choices_as_case_expression(DBInvestmentProject, 'status'),
+        link=get_front_end_url_expression('investment-project', 'pk'),
         date_of_latest_interaction=get_aggregate_subquery(
             DBInvestmentProject,
             Max('interactions__date'),
@@ -117,6 +119,7 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectParams, SearchExportA
         'investment_type__name': 'Investment type',
         'status_name': 'Status',
         'stage__name': 'Stage',
+        'link': 'Link',
         'actual_land_date': 'Actual land date',
         'estimated_land_date': 'Estimated land date',
         'fdi_value__name': 'FDI value',
