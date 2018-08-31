@@ -25,7 +25,7 @@ from datahub.core.test_utils import (
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.order.constants import OrderStatus
-from datahub.omis.order.models import Order
+from datahub.omis.order.models import Order, OrderPermission
 from datahub.omis.order.test.factories import (
     OrderAssigneeFactory,
     OrderCancelledFactory,
@@ -385,8 +385,8 @@ class TestOrderExportView(APITestMixin):
     @pytest.mark.parametrize(
         'permissions', (
             (),
-            ('order.view_order',),
-            ('order.export_order',),
+            (f'order.{OrderPermission.view}',),
+            (f'order.{OrderPermission.export}',),
         )
     )
     def test_user_without_permission_cannot_export(self, setup_es, permissions):
