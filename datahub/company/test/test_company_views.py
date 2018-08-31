@@ -206,7 +206,6 @@ class TestGetCompany(APITestMixin):
             registered_address_1='Goodbye St',
             registered_address_town='Barland',
             registered_address_country_id=Country.united_kingdom.value.id,
-            account_manager=AdviserFactory(),
             one_list_account_owner=AdviserFactory()
         )
         user = create_test_user(
@@ -256,16 +255,6 @@ class TestGetCompany(APITestMixin):
             'registered_address_country': {
                 'id': str(Country.united_kingdom.value.id),
                 'name': Country.united_kingdom.value.name,
-            },
-            'account_manager': {
-                'id': str(company.account_manager.pk),
-                'name': company.account_manager.name,
-                'first_name': company.account_manager.first_name,
-                'last_name': company.account_manager.last_name,
-                'dit_team': {
-                    'id': str(company.account_manager.dit_team.id),
-                    'name': company.account_manager.dit_team.name,
-                },
             },
             'archived': False,
             'archived_by': None,
