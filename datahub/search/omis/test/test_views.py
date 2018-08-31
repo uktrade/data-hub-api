@@ -481,7 +481,7 @@ class TestOrderExportView(APITestMixin):
                     sum(refund.net_amount for refund in refunds)
                 ) / 100 if refunds else None,
                 'Status': order.get_status_display(),
-                'Link': order.get_datahub_frontend_url(),
+                'Link': f'=HYPERLINK("{order.get_datahub_frontend_url()}")',
                 'Sector': order.sector.name,
                 'Market': order.primary_market.name,
                 'UK region': order.uk_region.name,
@@ -490,13 +490,15 @@ class TestOrderExportView(APITestMixin):
                     order.company.registered_address_country.name,
                 'Company UK region': get_attr_or_none(order, 'company.uk_region.name'),
                 'Company link':
-                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}'
-                    f'/{order.company.pk}',
+                    f'=HYPERLINK("'
+                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{order.company.pk}'
+                    f'")',
                 'Contact': order.contact.name,
                 'Contact job title': order.contact.job_title,
                 'Contact link':
-                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["contact"]}'
-                    f'/{order.contact.pk}',
+                    f'=HYPERLINK("'
+                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["contact"]}/{order.contact.pk}'
+                    f'")',
                 'Created by team': get_attr_or_none(order, 'created_by.dit_team.name'),
                 'Date created': order.created_on,
                 'Delivery date': order.delivery_date,
