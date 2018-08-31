@@ -86,11 +86,7 @@ class BaseModelAdminMixin:
                 f'at {time_filter(event_on)}'
             ))
         if event_by:
-            adviser_admin_url = format_html(
-                '<a href="{0}">{1}</a>',
-                reverse('admin:company_advisor_change', args=(event_by.id,)),
-                event_by
-            )
+            adviser_admin_url = get_change_link(event_by)
             text_parts.append(f'by {adviser_admin_url}')
 
         return mark_safe(' '.join(text_parts) or '-')
@@ -168,12 +164,21 @@ def custom_delete_permission(permission_codename):
     return decorator
 
 
-def get_change_link(obj):
-    """Returns a link to the admin change page for an object."""
+def get_change_url(obj, site=admin.site):
+    """Returns the URL to the admin change page for an object."""
     if not obj or not obj.pk:
         return ''
 
-    url = reverse(admin_urlname(obj._meta, 'change'), args=(obj.pk,))
+    return reverse(admin_urlname(obj._meta, 'change'), args=(obj.pk,), current_app=site.name)
+
+
+def get_change_link(obj, site=admin.site):
+    """Returns a link to the admin change page for an object."""
+    url = get_change_url(obj, site=site)
+
+    if not url:
+        return ''
+
     return format_html('<a href="{url}">{name}</a>'.format(url=url, name=obj))
 
 

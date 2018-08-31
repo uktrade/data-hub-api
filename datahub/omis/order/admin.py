@@ -6,12 +6,12 @@ from django.contrib import messages
 from django.contrib.admin.exceptions import SuspiciousOperation
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
-from django.contrib.admin.utils import quote, unquote
+from django.contrib.admin.utils import unquote
 from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.urls import path, reverse
+from django.urls import path
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text
 from django.utils.html import format_html, format_html_join
@@ -20,7 +20,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_protect
 
-from datahub.core.admin import BaseModelAdminMixin, ViewAndChangeOnlyAdmin
+from datahub.core.admin import BaseModelAdminMixin, get_change_url, ViewAndChangeOnlyAdmin
 from datahub.core.exceptions import APIConflictException
 from . import validators
 from .models import CancellationReason, Order
@@ -225,13 +225,8 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
         self.message_user(request, msg, messages.SUCCESS)
 
         preserved_filters = self.get_preserved_filters(request)
-        redirect_url = reverse(
-            'admin:%s_%s_change' % (opts.app_label, opts.model_name),
-            args=(quote(obj._get_pk_val()),),
-            current_app=self.admin_site.name,
-        )
         redirect_url = add_preserved_filters(
             {'preserved_filters': preserved_filters, 'opts': opts},
-            redirect_url
+            get_change_url(obj),
         )
         return HttpResponseRedirect(redirect_url)
