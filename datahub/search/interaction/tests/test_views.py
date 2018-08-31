@@ -846,7 +846,7 @@ class TestInteractionExportView(APITestMixin):
             'attachment', {'filename': 'Data Hub - Interactions - 2018-01-01-11-12-13.csv'}
         )
 
-        sorted_interactions = Interaction.objects.order_by(orm_ordering)
+        sorted_interactions = Interaction.objects.order_by(orm_ordering, 'pk')
         reader = DictReader(StringIO(response.getvalue().decode('utf-8-sig')))
 
         assert reader.fieldnames == list(SearchInteractionExportAPIView.field_titles.values())

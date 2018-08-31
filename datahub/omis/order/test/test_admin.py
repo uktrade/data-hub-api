@@ -12,7 +12,7 @@ from .factories import (
     OrderWithAcceptedQuoteFactory, OrderWithOpenQuoteFactory
 )
 from ..constants import OrderStatus
-from ..models import CancellationReason, Order
+from ..models import CancellationReason, Order, OrderPermission
 
 
 class TestCancelOrderAdmin(AdminTestMixin):
@@ -38,7 +38,11 @@ class TestCancelOrderAdmin(AdminTestMixin):
         user = create_test_user(
             is_staff=True,
             password=self.PASSWORD,
-            permission_codenames=('add_order', 'delete_order', 'view_order')
+            permission_codenames=(
+                OrderPermission.add,
+                OrderPermission.delete,
+                OrderPermission.view,
+            )
         )
 
         client = self.create_client(user=user)

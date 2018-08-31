@@ -1,8 +1,13 @@
+from cgi import parse_header
+from csv import DictReader
+from decimal import Decimal
+from io import StringIO
 from uuid import UUID
 
 import factory
 import pytest
 from dateutil.parser import parse as dateutil_parse
+from django.conf import settings
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -10,15 +15,34 @@ from rest_framework.reverse import reverse
 from datahub.company.models import Company
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
-from datahub.core.test_utils import APITestMixin, create_test_user, random_obj_for_queryset
+from datahub.core.test_utils import (
+    APITestMixin,
+    create_test_user,
+    format_csv_data,
+    get_attr_or_none,
+    random_obj_for_queryset,
+)
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import TeamFactory
 from datahub.omis.order.constants import OrderStatus
-from datahub.omis.order.models import Order
+from datahub.omis.order.models import Order, OrderPermission
 from datahub.omis.order.test.factories import (
-    OrderAssigneeFactory, OrderFactory,
-    OrderSubscriberFactory, OrderWithAcceptedQuoteFactory
+    OrderAssigneeFactory,
+    OrderCancelledFactory,
+    OrderCompleteFactory,
+    OrderFactory,
+    OrderPaidFactory,
+    OrderSubscriberFactory,
+    OrderWithAcceptedQuoteFactory,
+    OrderWithCancelledQuoteFactory,
+    OrderWithOpenQuoteFactory,
 )
+from datahub.omis.payment.constants import RefundStatus
+from datahub.omis.payment.test.factories import (
+    ApprovedRefundFactory,
+    RequestedRefundFactory,
+)
+from datahub.search.omis.views import SearchOrderExportAPIView
 
 pytestmark = pytest.mark.django_db
 
@@ -353,6 +377,138 @@ class TestSearchOrder(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()['results']) == 1
         assert response.json()['results'][0]['reference'] == 'efgh'
+
+
+class TestOrderExportView(APITestMixin):
+    """Tests the OMIS order export view."""
+
+    @pytest.mark.parametrize(
+        'permissions', (
+            (),
+            (f'order.{OrderPermission.view}',),
+            (f'order.{OrderPermission.export}',),
+        )
+    )
+    def test_user_without_permission_cannot_export(self, setup_es, permissions):
+        """Test that a user without the correct permissions cannot export data."""
+        user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+
+        url = reverse('api-v3:search:order-export')
+        response = api_client.post(url, format='json')
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @pytest.mark.parametrize(
+        'request_sortby,orm_ordering',
+        (
+            ('created_on', 'created_on'),
+            ('created_on:desc', '-created_on'),
+            ('modified_on', 'modified_on'),
+            ('modified_on:desc', '-modified_on'),
+            ('delivery_date', 'delivery_date'),
+            ('delivery_date:desc', '-delivery_date'),
+        )
+    )
+    def test_export(
+        self,
+        setup_es,
+        request_sortby,
+        orm_ordering,
+    ):
+        """Test export of interaction search results."""
+        factories = (
+            OrderCancelledFactory,
+            OrderCompleteFactory,
+            OrderFactory,
+            OrderPaidFactory,
+            OrderSubscriberFactory,
+            OrderWithAcceptedQuoteFactory,
+            OrderWithCancelledQuoteFactory,
+            OrderWithOpenQuoteFactory,
+            ApprovedRefundFactory,
+            ApprovedRefundFactory,
+            RequestedRefundFactory,
+        )
+
+        order_with_multiple_refunds = OrderPaidFactory()
+        ApprovedRefundFactory(
+            order=order_with_multiple_refunds,
+            requested_amount=order_with_multiple_refunds.total_cost / 5,
+        )
+        ApprovedRefundFactory(
+            order=order_with_multiple_refunds,
+            requested_amount=order_with_multiple_refunds.total_cost / 4,
+        )
+        ApprovedRefundFactory(
+            order=order_with_multiple_refunds,
+            requested_amount=order_with_multiple_refunds.total_cost / 3,
+        )
+
+        for factory_ in factories:
+            factory_.create_batch(2)
+
+        setup_es.indices.refresh()
+
+        data = {}
+        if request_sortby:
+            data['sortby'] = request_sortby
+
+        url = reverse('api-v3:search:order-export')
+
+        with freeze_time('2018-01-01 11:12:13'):
+            response = self.api_client.post(url, format='json', data=data)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})
+        assert parse_header(response.get('Content-Disposition')) == (
+            'attachment', {'filename': 'Data Hub - Orders - 2018-01-01-11-12-13.csv'}
+        )
+
+        sorted_orders = Order.objects.order_by(orm_ordering, 'pk')
+        reader = DictReader(StringIO(response.getvalue().decode('utf-8-sig')))
+
+        assert reader.fieldnames == list(SearchOrderExportAPIView.field_titles.values())
+        sorted_orders_and_refunds = (
+            (order, order.refunds.filter(status=RefundStatus.approved))
+            for order in sorted_orders
+        )
+
+        expected_row_data = [
+            {
+                'Order reference': order.reference,
+                'Net price': Decimal(order.subtotal_cost) / 100,
+                'Net refund': Decimal(
+                    sum(refund.net_amount for refund in refunds)
+                ) / 100 if refunds else None,
+                'Status': order.get_status_display(),
+                'Link': order.get_datahub_frontend_url(),
+                'Sector': order.sector.name,
+                'Market': order.primary_market.name,
+                'UK region': order.uk_region.name,
+                'Company': order.company.name,
+                'Company country':
+                    order.company.registered_address_country.name,
+                'Company UK region': get_attr_or_none(order, 'company.uk_region.name'),
+                'Company link':
+                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}'
+                    f'/{order.company.pk}',
+                'Contact': order.contact.name,
+                'Contact job title': order.contact.job_title,
+                'Contact link':
+                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["contact"]}'
+                    f'/{order.contact.pk}',
+                'Created by team': get_attr_or_none(order, 'created_by.dit_team.name'),
+                'Date created': order.created_on,
+                'Delivery date': order.delivery_date,
+                'Date quote sent': get_attr_or_none(order, 'quote.created_on'),
+                'Date quote accepted': get_attr_or_none(order, 'quote.accepted_on'),
+                'Date payment received': order.paid_on,
+                'Date completed': order.completed_on,
+            }
+            for order, refunds in sorted_orders_and_refunds
+        ]
+
+        assert list(dict(row) for row in reader) == format_csv_data(expected_row_data)
 
 
 class TestGlobalSearch(APITestMixin):

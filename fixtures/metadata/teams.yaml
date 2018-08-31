@@ -328,6 +328,9 @@
     - - view_order
       - order
       - order
+    - - export_order
+      - order
+      - order
     - - add_orderassignee
       - order
       - orderassignee
