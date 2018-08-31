@@ -46,13 +46,13 @@ class EvidenceDocumentPermission(StrEnum):
     """
 
     view_all = 'view_all_evidencedocument'
-    view_associated_investmentproject = 'view_associated_evidencedocument'
+    view_associated = 'view_associated_evidencedocument'
     change_all = 'change_all_evidencedocument'
-    change_associated_investmentproject = 'change_associated_evidencedocument'
+    change_associated = 'change_associated_evidencedocument'
     add_all = 'add_all_evidencedocument'
-    add_associated_investmentproject = 'add_associated_evidencedocument'
+    add_associated = 'add_associated_evidencedocument'
     delete_all = 'delete_all_evidencedocument'
-    delete_associated_investmentproject = 'delete_associated_evidencedocument'
+    delete_associated = 'delete_associated_evidencedocument'
 
 
 class EvidenceDocument(AbstractEntityDocumentModel):
@@ -76,20 +76,20 @@ class EvidenceDocument(AbstractEntityDocumentModel):
         verbose_name = 'investment project evidence document'
         permissions = (
             (
-                EvidenceDocumentPermission.view_associated_investmentproject.value,
-                'Can view evidence document for associated investment projects'
-            ),
-            (
-                EvidenceDocumentPermission.add_associated_investmentproject.value,
+                EvidenceDocumentPermission.add_associated.value,
                 'Can add evidence document for associated investment projects'
             ),
             (
-                EvidenceDocumentPermission.change_associated_investmentproject.value,
+                EvidenceDocumentPermission.change_associated.value,
                 'Can change evidence document for associated investment projects'
             ),
             (
-                EvidenceDocumentPermission.delete_associated_investmentproject.value,
+                EvidenceDocumentPermission.delete_associated.value,
                 'Can delete evidence document for associated investment projects'
+            ),
+            (
+                EvidenceDocumentPermission.view_associated.value,
+                'Can view evidence document for associated investment projects'
             ),
         )
         default_permissions = (

@@ -26,21 +26,21 @@ VIEW_PERMISSIONS = (
     (
         (
             EvidenceDocumentPermission.view_all,
-            EvidenceDocumentPermission.view_associated_investmentproject,
+            EvidenceDocumentPermission.view_associated,
         ),
         False,  # associated to investment project?
         True,  # should be allowed?
     ),
     (
         (
-            EvidenceDocumentPermission.view_associated_investmentproject,
+            EvidenceDocumentPermission.view_associated,
         ),
         True,  # associated to investment project?
         True,  # should be allowed?
     ),
     (
         (
-            EvidenceDocumentPermission.view_associated_investmentproject,
+            EvidenceDocumentPermission.view_associated,
         ),
         False,  # associated to investment project?
         False,  # should be allowed?
@@ -59,21 +59,21 @@ ADD_PERMISSIONS = (
     (
         (
             EvidenceDocumentPermission.add_all,
-            EvidenceDocumentPermission.add_associated_investmentproject,
+            EvidenceDocumentPermission.add_associated,
         ),
         False,  # associated to investment project?
         True,  # should be allowed?
     ),
     (
         (
-            EvidenceDocumentPermission.add_associated_investmentproject,
+            EvidenceDocumentPermission.add_associated,
         ),
         True,  # associated to investment project?
         True,  # should be allowed?
     ),
     (
         (
-            EvidenceDocumentPermission.add_associated_investmentproject,
+            EvidenceDocumentPermission.add_associated,
         ),
         False,  # associated to investment project?
         False,  # should be allowed?
@@ -92,21 +92,21 @@ CHANGE_PERMISSIONS = (
     (
         (
             EvidenceDocumentPermission.change_all,
-            EvidenceDocumentPermission.change_associated_investmentproject,
+            EvidenceDocumentPermission.change_associated,
         ),
         False,  # associated to investment project?
         True,  # should be allowed?
     ),
     (
         (
-            EvidenceDocumentPermission.change_associated_investmentproject,
+            EvidenceDocumentPermission.change_associated,
         ),
         True,  # associated to investment project?
         True,  # should be allowed?
     ),
     (
         (
-            EvidenceDocumentPermission.change_associated_investmentproject,
+            EvidenceDocumentPermission.change_associated,
         ),
         False,  # associated to investment project?
         False,  # should be allowed?
@@ -125,21 +125,21 @@ DELETE_PERMISSIONS = (
     (
         (
             EvidenceDocumentPermission.delete_all,
-            EvidenceDocumentPermission.delete_associated_investmentproject,
+            EvidenceDocumentPermission.delete_associated,
         ),
         False,  # associated to investment project?
         True,  # should be allowed?
     ),
     (
         (
-            EvidenceDocumentPermission.delete_associated_investmentproject,
+            EvidenceDocumentPermission.delete_associated,
         ),
         True,  # associated to investment project?
         True,  # should be allowed?
     ),
     (
         (
-            EvidenceDocumentPermission.delete_associated_investmentproject,
+            EvidenceDocumentPermission.delete_associated,
         ),
         False,  # associated to investment project?
         False,  # should be allowed?
