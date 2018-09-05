@@ -1,0 +1,1 @@
+The ``delete_propositiondocument`` permission has been renamed to ``delete_all_propositiondocument`` to be consistent with other entities.

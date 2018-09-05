@@ -13,8 +13,8 @@ class _PermissionTemplate(StrEnum):
     """Permission codename templates."""
 
     all = '{app_label}.{action}_all_{model_name}'
-    associated_investmentproject = '{app_label}.{action}_associated_investmentproject_{model_name}'
-    standard = '{app_label}.{action}_{model_name}'
+    associated = '{app_label}.{action}_associated_{model_name}'
+    not_allowed = '{app_label}.{action}_not_allowed_{model_name}'
 
 
 class _PropositionViewToActionMapping:
@@ -32,18 +32,19 @@ class PropositionModelPermissions(_PropositionViewToActionMapping, ViewBasedMode
     permission_mapping = {
         'view': (
             _PermissionTemplate.all,
-            _PermissionTemplate.associated_investmentproject,
+            _PermissionTemplate.associated,
         ),
         'add': (
             _PermissionTemplate.all,
-            _PermissionTemplate.associated_investmentproject,
+            _PermissionTemplate.associated,
         ),
         'change': (
             _PermissionTemplate.all,
-            _PermissionTemplate.associated_investmentproject,
+            _PermissionTemplate.associated,
         ),
         'delete': (
-            _PermissionTemplate.standard,
+            # user is not allowed to delete a proposition. Proposition can only be abandoned.
+            _PermissionTemplate.not_allowed,
         ),
     }
 
@@ -60,7 +61,7 @@ class InvestmentProjectPropositionAssociationChecker(
     restricted_actions = {'add', 'view', 'change'}
     model = Proposition
     all_permission_template = _PermissionTemplate.all
-    associated_permission_template = _PermissionTemplate.associated_investmentproject
+    associated_permission_template = _PermissionTemplate.associated
 
 
 class IsAssociatedToInvestmentProjectPropositionPermission(IsAssociatedToObjectPermission):
@@ -157,19 +158,19 @@ class PropositionDocumentModelPermissions(
     permission_mapping = {
         'view': (
             _PermissionTemplate.all,
-            _PermissionTemplate.associated_investmentproject,
+            _PermissionTemplate.associated,
         ),
         'add': (
             _PermissionTemplate.all,
-            _PermissionTemplate.associated_investmentproject,
+            _PermissionTemplate.associated,
         ),
         'change': (
             _PermissionTemplate.all,
-            _PermissionTemplate.associated_investmentproject,
+            _PermissionTemplate.associated,
         ),
         'delete': (
-            _PermissionTemplate.standard,
-            _PermissionTemplate.associated_investmentproject,
+            _PermissionTemplate.all,
+            _PermissionTemplate.associated,
         ),
     }
 
@@ -186,7 +187,7 @@ class InvestmentProjectPropositionDocumentAssociationChecker(
     restricted_actions = {'add', 'view', 'change'}
     model = PropositionDocument
     all_permission_template = _PermissionTemplate.all
-    associated_permission_template = _PermissionTemplate.associated_investmentproject
+    associated_permission_template = _PermissionTemplate.associated
 
 
 class IsAssociatedToInvestmentProjectPropositionDocumentPermission(IsAssociatedToObjectPermission):
