@@ -28,8 +28,8 @@ NON_RESTRICTED_VIEW_PERMISSIONS = (
     (
         PropositionPermission.view_all,
         PropositionDocumentPermission.view_all,
-        PropositionPermission.view_associated_investmentproject,
-        PropositionDocumentPermission.view_associated_investmentproject,
+        PropositionPermission.view_associated,
+        PropositionDocumentPermission.view_associated,
     )
 )
 
@@ -42,8 +42,8 @@ NON_RESTRICTED_ADD_PERMISSIONS = (
     (
         PropositionPermission.add_all,
         PropositionDocumentPermission.add_all,
-        PropositionPermission.add_associated_investmentproject,
-        PropositionDocumentPermission.add_associated_investmentproject,
+        PropositionPermission.add_associated,
+        PropositionDocumentPermission.add_associated,
     )
 )
 
@@ -56,19 +56,21 @@ NON_RESTRICTED_CHANGE_PERMISSIONS = (
     (
         PropositionPermission.change_all,
         PropositionDocumentPermission.change_all,
-        PropositionPermission.change_associated_investmentproject,
-        PropositionDocumentPermission.change_associated_investmentproject,
+        PropositionPermission.change_associated,
+        PropositionDocumentPermission.change_associated,
     )
 )
 
 
 NON_RESTRICTED_DELETE_PERMISSIONS = (
     (
-        PropositionDocumentPermission.delete,
+        PropositionPermission.delete_all,
+        PropositionDocumentPermission.delete_all,
     ),
     (
-        PropositionDocumentPermission.delete,
-        PropositionDocumentPermission.delete_associated_investmentproject,
+        PropositionPermission.delete_all,
+        PropositionDocumentPermission.delete_all,
+        PropositionDocumentPermission.delete_associated,
     )
 )
 
@@ -181,7 +183,7 @@ class TestCreateProposition(APITestMixin):
         })
 
         adviser = create_test_user(
-            permission_codenames=[PropositionPermission.add_associated_investmentproject],
+            permission_codenames=[PropositionPermission.add_associated],
             dit_team=project_creator.dit_team,
         )
         api_client = self.create_api_client(user=adviser)
@@ -244,7 +246,7 @@ class TestCreateProposition(APITestMixin):
         })
 
         adviser = create_test_user(
-            permission_codenames=[PropositionPermission.add_associated_investmentproject],
+            permission_codenames=[PropositionPermission.add_associated],
             dit_team=TeamFactory(),
         )
         api_client = self.create_api_client(user=adviser)
@@ -378,7 +380,7 @@ class TestListPropositions(APITestMixin):
 
         user = create_test_user(
             permission_codenames=(
-                PropositionPermission.view_associated_investmentproject,
+                PropositionPermission.view_associated,
             ),
             dit_team=project_creator.dit_team,
         )
@@ -408,7 +410,7 @@ class TestListPropositions(APITestMixin):
 
         user = create_test_user(
             permission_codenames=(
-                PropositionPermission.view_associated_investmentproject
+                PropositionPermission.view_associated
             ),
             dit_team=TeamFactory(),
         )
@@ -562,7 +564,7 @@ class TestGetProposition(APITestMixin):
         })
         user = create_test_user(
             permission_codenames=(
-                PropositionPermission.view_associated_investmentproject,
+                PropositionPermission.view_associated,
             ),
             dit_team=project_creator.dit_team,
         )
@@ -621,7 +623,7 @@ class TestGetProposition(APITestMixin):
         })
         user = create_test_user(
             permission_codenames=(
-                PropositionPermission.view_associated_investmentproject,
+                PropositionPermission.view_associated,
             ),
             dit_team=TeamFactory(),
         )
@@ -650,6 +652,36 @@ class TestGetProposition(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
         response_data = response.json()
         assert response_data == {'detail': 'Not found.'}
+
+
+class TestDeleteProposition(APITestMixin):
+    """Tests for delete proposition view."""
+
+    def test_fails_without_permissions(self, api_client):
+        """Should return 401"""
+        proposition = PropositionFactory()
+        url = reverse('api-v3:investment:proposition:item', kwargs={
+            'proposition_pk': proposition.pk,
+            'project_pk': proposition.investment_project.pk,
+        })
+        response = api_client.delete(url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_DELETE_PERMISSIONS)
+    def test_non_restricted_user_cannot_delete_proposition(self, permissions):
+        """Test that non restricted user cannot delete proposition."""
+        proposition = PropositionFactory()
+
+        url = reverse('api-v3:investment:proposition:item', kwargs={
+            'proposition_pk': proposition.pk,
+            'project_pk': proposition.investment_project.pk,
+        })
+        user = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+        response = api_client.delete(url)
+
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+        assert response.json() == {'detail': 'Method is not allowed.'}
 
 
 @pytest.mark.usefixtures('proposition_document_feature_flag')
@@ -740,7 +772,7 @@ class TestCompleteProposition(APITestMixin):
         project_creator = AdviserFactory()
         user = create_test_user(
             permission_codenames=(
-                PropositionPermission.change_associated_investmentproject,
+                PropositionPermission.change_associated,
             ),
             dit_team=project_creator.dit_team,
         )
@@ -807,7 +839,7 @@ class TestCompleteProposition(APITestMixin):
         project_creator = AdviserFactory()
         user = create_test_user(
             permission_codenames=(
-                PropositionPermission.change_associated_investmentproject,
+                PropositionPermission.change_associated,
             ),
             dit_team=TeamFactory(),
         )
@@ -992,7 +1024,7 @@ class TestLegacyCompleteProposition(APITestMixin):
 
         user = create_test_user(
             permission_codenames=(
-                PropositionPermission.change_associated_investmentproject,
+                PropositionPermission.change_associated,
             ),
             dit_team=project_creator.dit_team,
         )
@@ -1059,7 +1091,7 @@ class TestLegacyCompleteProposition(APITestMixin):
 
         user = create_test_user(
             permission_codenames=(
-                PropositionPermission.change_associated_investmentproject,
+                PropositionPermission.change_associated,
             ),
             dit_team=TeamFactory(),
         )
@@ -1232,7 +1264,7 @@ class TestAbandonProposition(APITestMixin):
 
         user = create_test_user(
             permission_codenames=(
-                PropositionPermission.change_associated_investmentproject,
+                PropositionPermission.change_associated,
             ),
             dit_team=project_creator.dit_team,
         )
@@ -1299,7 +1331,7 @@ class TestAbandonProposition(APITestMixin):
 
         user = create_test_user(
             permission_codenames=(
-                PropositionPermission.change_associated_investmentproject,
+                PropositionPermission.change_associated,
             ),
             dit_team=TeamFactory(),
         )

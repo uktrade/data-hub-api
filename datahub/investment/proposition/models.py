@@ -26,38 +26,39 @@ class PropositionPermission(StrEnum):
     (Defined here rather than in permissions to avoid an import of that module.)
 
 
-    The following codenames mean that the user can view, change, add or delete any type of
+    The following codenames mean that the user can view, change, add any type of
     proposition:
 
     view_all_proposition
     change_all_proposition
     add_all_proposition
-    delete_proposition
+    delete_all_proposition
 
+    (user is not allowed to delete a proposition, it can only be abandoned)
 
     The following codenames mean that the user can only view, change and add propositions for
     investment projects that they are associated with:
 
-    view_associated_investmentproject_proposition
-    change_associated_investmentproject_proposition
-    add_associated_investmentproject_proposition
+    view_associated_proposition
+    change_associated_proposition
+    add_associated_proposition
 
     An associated project has the same meaning that it does in investment projects (that is a
     project that was created by an adviser in the same team, or an adviser in the same team has
     been linked to the project).
 
     Note that permissions on other models are independent of permissions on propositions. Also
-    note that if both *_all_* and *_associated_investmentproject_* permissions are assigned to the
+    note that if both *_all_* and *_associated__* permissions are assigned to the
     same user,  the *_all_* permission will be the effective one.
     """
 
     view_all = 'view_all_proposition'
-    view_associated_investmentproject = 'view_associated_investmentproject_proposition'
+    view_associated = 'view_associated_proposition'
     change_all = 'change_all_proposition'
-    change_associated_investmentproject = 'change_associated_investmentproject_proposition'
+    change_associated = 'change_associated_proposition'
     add_all = 'add_all_proposition'
-    add_associated_investmentproject = 'add_associated_investmentproject_proposition'
-    delete = 'delete_proposition'
+    add_associated = 'add_associated_proposition'
+    delete_all = 'delete_all_proposition'
 
 
 class PropositionDocumentPermission(StrEnum):
@@ -73,7 +74,7 @@ class PropositionDocumentPermission(StrEnum):
     view_all_propositiondocument
     change_all_propositiondocument
     add_all_propositiondocument
-    delete_propositiondocument
+    delete_all_propositiondocument
 
 
     The following codenames mean that the user can only view, change and add proposition
@@ -94,14 +95,13 @@ class PropositionDocumentPermission(StrEnum):
     """
 
     view_all = 'view_all_propositiondocument'
-    view_associated_investmentproject = 'view_associated_propositiondocument'
+    view_associated = 'view_associated_propositiondocument'
     change_all = 'change_all_propositiondocument'
-    change_associated_investmentproject = 'change_associated_propositiondocument'
+    change_associated = 'change_associated_propositiondocument'
     add_all = 'add_all_propositiondocument'
-    add_associated_investmentproject = 'add_associated_propositiondocument'
-    delete = 'delete_propositiondocument'
-    delete_associated_investmentproject = \
-        'deleted_associated_propositiondocument'
+    add_associated = 'add_associated_propositiondocument'
+    delete_all = 'delete_all_propositiondocument'
+    delete_associated = 'delete_associated_propositiondocument'
 
 
 class Proposition(BaseModel):
@@ -168,26 +168,23 @@ class Proposition(BaseModel):
     class Meta:
         permissions = (
             (
-                PropositionPermission.view_all.value,
-                'Can view all proposition'
-            ),
-            (
-                PropositionPermission.view_associated_investmentproject.value,
+                PropositionPermission.view_associated.value,
                 'Can view proposition for associated investment projects'
             ),
             (
-                PropositionPermission.add_associated_investmentproject.value,
+                PropositionPermission.add_associated.value,
                 'Can add proposition for associated investment projects'
             ),
             (
-                PropositionPermission.change_associated_investmentproject.value,
+                PropositionPermission.change_associated.value,
                 'Can change proposition for associated investment projects'
             ),
         )
         default_permissions = (
             'add_all',
             'change_all',
-            'delete',
+            'delete_all',
+            'view_all',
         )
 
 
@@ -206,30 +203,27 @@ class PropositionDocument(AbstractEntityDocumentModel):
         verbose_name = 'investment project proposition document'
         permissions = (
             (
-                PropositionDocumentPermission.view_all.value,
-                'Can view all proposition document'
-            ),
-            (
-                PropositionDocumentPermission.view_associated_investmentproject.value,
-                'Can view proposition document for associated investment projects'
-            ),
-            (
-                PropositionDocumentPermission.add_associated_investmentproject.value,
+                PropositionDocumentPermission.add_associated.value,
                 'Can add proposition document for associated investment projects'
             ),
             (
-                PropositionDocumentPermission.change_associated_investmentproject.value,
+                PropositionDocumentPermission.change_associated.value,
                 'Can change proposition document for associated investment projects'
             ),
             (
-                PropositionDocumentPermission.delete_associated_investmentproject.value,
+                PropositionDocumentPermission.delete_associated.value,
                 'Can delete proposition document for associated investment projects'
+            ),
+            (
+                PropositionDocumentPermission.view_associated.value,
+                'Can view proposition document for associated investment projects'
             ),
         )
         default_permissions = (
             'add_all',
             'change_all',
-            'delete',
+            'delete_all',
+            'view_all',
         )
 
     @property
