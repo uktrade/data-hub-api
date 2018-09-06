@@ -53,6 +53,7 @@ THIRD_PARTY_APPS = [
     'oauth2_provider',
     'django_filters',
     'mptt',
+    'corsheaders',
 ]
 
 LOCAL_APPS = [
@@ -90,6 +91,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -389,3 +391,5 @@ DOCUMENT_BUCKETS = {
         'aws_region': env('REPORT_AWS_REGION', default=''),
     }
 }
+
+CORS_ORIGIN_ALLOW_ALL = True
