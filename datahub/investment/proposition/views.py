@@ -27,6 +27,8 @@ from datahub.investment.proposition.serializers import (
     PropositionSerializer,
 )
 from datahub.oauth.scopes import Scope
+from datahub.user_event_log.constants import USER_EVENT_TYPES
+from datahub.user_event_log.utils import record_user_event
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -161,3 +163,11 @@ class PropositionDocumentViewSet(BaseEntityDocumentModelViewSet):
     def get_view_name(self):
         """Returns the view set name for the DRF UI."""
         return 'Proposition documents'
+
+    def destroy(self, request, *args, **kwargs):
+        """Record delete event."""
+        entity_document = self.get_object()
+        data = self.serializer_class(entity_document).data
+        data['proposition_id'] = entity_document.proposition_id
+        record_user_event(request, USER_EVENT_TYPES.proposition_document_delete, data=data)
+        return super().destroy(request, *args, **kwargs)

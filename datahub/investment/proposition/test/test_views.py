@@ -1,8 +1,11 @@
+import datetime
 import uuid
 from unittest.mock import patch
 
 import factory
 import pytest
+from django.utils.timezone import utc
+from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -18,6 +21,7 @@ from datahub.investment.proposition.models import (
 )
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
+from datahub.user_event_log.models import USER_EVENT_TYPES, UserEvent
 from .factories import PropositionFactory
 
 NON_RESTRICTED_VIEW_PERMISSIONS = (
@@ -1718,8 +1722,8 @@ class TestPropositionDocumentViews(APITestMixin):
 
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
-
         response = api_client.delete(url)
+
         assert response.status_code == status.HTTP_204_NO_CONTENT
         delete_document.assert_called_once_with(args=(document_pk, ))
 
@@ -1744,6 +1748,93 @@ class TestPropositionDocumentViews(APITestMixin):
         response = self.api_client.delete(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
         assert delete_document.called is False
+
+    @pytest.mark.parametrize('permissions', NON_RESTRICTED_DELETE_PERMISSIONS)
+    @patch('datahub.documents.tasks.delete_document.apply_async')
+    def test_document_delete_creates_user_event_log(self, delete_document, permissions):
+        """Tests document deletion creates user event log."""
+        proposition = PropositionFactory()
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk, original_filename='test.txt'
+        )
+        document = entity_document.document
+        document.mark_scan_scheduled()
+        document.mark_as_scanned(True, 'reason')
+
+        url = reverse(
+            'api-v3:investment:proposition:document-item',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+                'entity_document_pk': entity_document.pk
+            }
+        )
+
+        document_pk = entity_document.document.pk
+
+        expected_user_event_data = {
+            'id': str(entity_document.pk),
+            'url': entity_document.url,
+            'status': entity_document.document.status,
+            'av_clean': entity_document.document.av_clean,
+            'created_by': None,
+            'created_on': format_date_or_datetime(entity_document.created_on),
+            'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
+            'original_filename': entity_document.original_filename,
+            'proposition_id': str(entity_document.proposition_id),
+        }
+
+        user = create_test_user(permission_codenames=permissions)
+        api_client = self.create_api_client(user=user)
+
+        frozen_time = datetime.datetime(2018, 1, 2, 12, 30, 50, tzinfo=utc)
+        with freeze_time(frozen_time):
+            response = api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        delete_document.assert_called_once_with(args=(document_pk, ))
+
+        assert UserEvent.objects.count() == 1
+
+        user_event = UserEvent.objects.first()
+        assert user_event.adviser == user
+        assert user_event.type == USER_EVENT_TYPES.proposition_document_delete
+        assert user_event.timestamp == frozen_time
+        assert user_event.api_url_path == url
+        assert user_event.data == expected_user_event_data
+
+    @patch.object(Document, 'mark_deletion_pending')
+    def test_document_delete_failure_wont_create_user_event_log(
+        self,
+        mark_deletion_pending,
+    ):
+        """Tests document deletion failure won't create user event log."""
+        mark_deletion_pending.side_effect = Exception('No way!')
+        proposition = PropositionFactory()
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk, original_filename='test.txt'
+        )
+        document = entity_document.document
+        document.mark_scan_scheduled()
+        document.mark_as_scanned(True, 'reason')
+
+        url = reverse(
+            'api-v3:investment:proposition:document-item',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+                'entity_document_pk': entity_document.pk
+            }
+        )
+        user = create_test_user(
+            permission_codenames=(PropositionDocumentPermission.delete_all,),
+            dit_team=TeamFactory()
+        )
+        api_client = self.create_api_client(user=user)
+        with pytest.raises(Exception):
+            api_client.delete(url)
+
+        assert UserEvent.objects.count() == 0
 
     def test_document_upload_status_no_status_without_permission(self):
         """Tests user without permission can't call upload status endpoint."""
