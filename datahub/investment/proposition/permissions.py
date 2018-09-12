@@ -13,8 +13,8 @@ class _PermissionTemplate(StrEnum):
     """Permission codename templates."""
 
     all = '{app_label}.{action}_all_{model_name}'
-    associated_investmentproject = '{app_label}.{action}_associated_investmentproject_{model_name}'
-    standard = '{app_label}.{action}_{model_name}'
+    associated = '{app_label}.{action}_associated_{model_name}'
+    not_allowed = '{app_label}.{action}_not_allowed_{model_name}'
 
 
 class _PropositionViewToActionMapping:
@@ -32,18 +32,19 @@ class PropositionModelPermissions(_PropositionViewToActionMapping, ViewBasedMode
     permission_mapping = {
         'view': (
             _PermissionTemplate.all,
-            _PermissionTemplate.associated_investmentproject,
+            _PermissionTemplate.associated,
         ),
         'add': (
             _PermissionTemplate.all,
-            _PermissionTemplate.associated_investmentproject,
+            _PermissionTemplate.associated,
         ),
         'change': (
             _PermissionTemplate.all,
-            _PermissionTemplate.associated_investmentproject,
+            _PermissionTemplate.associated,
         ),
         'delete': (
-            _PermissionTemplate.standard,
+            # user is not allowed to delete a proposition. Proposition can only be abandoned.
+            _PermissionTemplate.not_allowed,
         ),
     }
 
@@ -60,7 +61,7 @@ class InvestmentProjectPropositionAssociationChecker(
     restricted_actions = {'add', 'view', 'change'}
     model = Proposition
     all_permission_template = _PermissionTemplate.all
-    associated_permission_template = _PermissionTemplate.associated_investmentproject
+    associated_permission_template = _PermissionTemplate.associated
 
 
 class IsAssociatedToInvestmentProjectPropositionPermission(IsAssociatedToObjectPermission):
@@ -82,10 +83,11 @@ class IsAssociatedToInvestmentProjectPropositionFilter(IsAssociatedToInvestmentP
 
 class _HasAssociatedInvestmentProjectValidator:
     """
-    Validator which enforces association permissions when adding or updating associated object.
+    Validator which enforces association permissions when adding associated object.
+
+    When subclassing, checker and non_associated_investment_project_message have to be overridden.
     """
 
-    required_message = 'This field is required.'
     non_associated_investment_project_message = None
     checker = None
 
@@ -98,7 +100,6 @@ class _HasAssociatedInvestmentProjectValidator:
     def set_context(self, serializer):
         """
         Saves a reference to the serializer object.
-
         Called by DRF.
         """
         self.serializer = serializer
@@ -106,7 +107,6 @@ class _HasAssociatedInvestmentProjectValidator:
     def __call__(self, attrs):
         """
         Performs validation. Called by DRF.
-
         :param attrs:   Serializer data (post-field-validation/processing)
         """
         if self.serializer.instance:
@@ -158,19 +158,19 @@ class PropositionDocumentModelPermissions(
     permission_mapping = {
         'view': (
             _PermissionTemplate.all,
-            _PermissionTemplate.associated_investmentproject,
+            _PermissionTemplate.associated,
         ),
         'add': (
             _PermissionTemplate.all,
-            _PermissionTemplate.associated_investmentproject,
+            _PermissionTemplate.associated,
         ),
         'change': (
             _PermissionTemplate.all,
-            _PermissionTemplate.associated_investmentproject,
+            _PermissionTemplate.associated,
         ),
         'delete': (
-            _PermissionTemplate.standard,
-            _PermissionTemplate.associated_investmentproject,
+            _PermissionTemplate.all,
+            _PermissionTemplate.associated,
         ),
     }
 
@@ -187,7 +187,7 @@ class InvestmentProjectPropositionDocumentAssociationChecker(
     restricted_actions = {'add', 'view', 'change'}
     model = PropositionDocument
     all_permission_template = _PermissionTemplate.all
-    associated_permission_template = _PermissionTemplate.associated_investmentproject
+    associated_permission_template = _PermissionTemplate.associated
 
 
 class IsAssociatedToInvestmentProjectPropositionDocumentPermission(IsAssociatedToObjectPermission):
@@ -220,3 +220,4 @@ class PropositionDocumentHasAssociatedInvestmentProjectValidator(
     non_associated_investment_project_message = (
         "You don't have permission to add a proposition document for this investment project."
     )
+    checker = InvestmentProjectPropositionDocumentAssociationChecker()

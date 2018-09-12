@@ -206,7 +206,6 @@ class TestGetCompany(APITestMixin):
             registered_address_1='Goodbye St',
             registered_address_town='Barland',
             registered_address_country_id=Country.united_kingdom.value.id,
-            account_manager=AdviserFactory(),
             one_list_account_owner=AdviserFactory()
         )
         user = create_test_user(
@@ -257,16 +256,6 @@ class TestGetCompany(APITestMixin):
                 'id': str(Country.united_kingdom.value.id),
                 'name': Country.united_kingdom.value.name,
             },
-            'account_manager': {
-                'id': str(company.account_manager.pk),
-                'name': company.account_manager.name,
-                'first_name': company.account_manager.first_name,
-                'last_name': company.account_manager.last_name,
-                'dit_team': {
-                    'id': str(company.account_manager.dit_team.id),
-                    'name': company.account_manager.dit_team.name,
-                },
-            },
             'archived': False,
             'archived_by': None,
             'archived_documents_url_path': company.archived_documents_url_path,
@@ -281,7 +270,10 @@ class TestGetCompany(APITestMixin):
             'contacts': [],
             'created_on': format_date_or_datetime(company.created_on),
             'description': None,
-            'employee_range': None,
+            'employee_range': {
+                'id': str(company.employee_range.id),
+                'name': company.employee_range.name,
+            },
             'export_experience_category': {
                 'id': str(company.export_experience_category.id),
                 'name': company.export_experience_category.name,
@@ -314,7 +306,10 @@ class TestGetCompany(APITestMixin):
             'trading_address_county': None,
             'trading_address_postcode': None,
             'trading_address_town': 'Woodside',
-            'turnover_range': None,
+            'turnover_range': {
+                'id': str(company.turnover_range.id),
+                'name': company.turnover_range.name,
+            },
             'uk_based': True,
             'uk_region': {
                 'id': str(company.uk_region.id),

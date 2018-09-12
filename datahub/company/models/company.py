@@ -22,6 +22,7 @@ class CompanyPermission(StrEnum):
     view_company = 'view_company'
     view_company_document = 'view_company_document'
     view_company_timeline = 'view_company_timeline'
+    export_company = 'export_company'
 
 
 class ExportExperienceCategory(BaseConstantModel):
@@ -91,11 +92,6 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         metadata_models.TurnoverRange, blank=True, null=True,
         on_delete=models.SET_NULL
     )
-    account_manager = models.ForeignKey(
-        'Advisor', blank=True, null=True, on_delete=models.SET_NULL,
-        related_name='companies',
-        help_text='Legacy field, do not use'
-    )
     export_to_countries = models.ManyToManyField(
         metadata_models.Country,
         blank=True,
@@ -154,6 +150,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         permissions = (
             (CompanyPermission.view_company_document.value, 'Can view company document'),
             (CompanyPermission.view_company_timeline.value, 'Can view company timeline'),
+            (CompanyPermission.export_company.value, 'Can export company'),
         )
 
     @property

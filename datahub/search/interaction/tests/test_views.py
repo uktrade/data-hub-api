@@ -846,7 +846,7 @@ class TestInteractionExportView(APITestMixin):
             'attachment', {'filename': 'Data Hub - Interactions - 2018-01-01-11-12-13.csv'}
         )
 
-        sorted_interactions = Interaction.objects.order_by(orm_ordering)
+        sorted_interactions = Interaction.objects.order_by(orm_ordering, 'pk')
         reader = DictReader(StringIO(response.getvalue().decode('utf-8-sig')))
 
         assert reader.fieldnames == list(SearchInteractionExportAPIView.field_titles.values())
@@ -857,12 +857,16 @@ class TestInteractionExportView(APITestMixin):
                 'Type': interaction.get_kind_display(),
                 'Service': get_attr_or_none(interaction, 'service.name'),
                 'Subject': interaction.subject,
-                'Link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["interaction"]}'
-                        f'/{interaction.pk}',
+                'Link':
+                    f'=HYPERLINK("'
+                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["interaction"]}/{interaction.pk}'
+                    f'")',
                 'Company': get_attr_or_none(interaction, 'company.name'),
                 'Company link':
+                    f'=HYPERLINK("'
                     f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}'
-                    f'/{interaction.company.pk}',
+                    f'/{interaction.company.pk}'
+                    f'")',
                 'Company country': get_attr_or_none(
                     interaction,
                     'company.registered_address_country.name',

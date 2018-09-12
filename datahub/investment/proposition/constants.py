@@ -6,3 +6,6 @@ PropositionStatus = Choices(
     ('abandoned', 'Abandoned'),
     ('completed', 'Completed'),
 )
+
+
+FEATURE_FLAG_PROPOSITION_DOCUMENT = 'proposition-documents'

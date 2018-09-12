@@ -6,7 +6,6 @@ from ..serializers import SearchSerializer, SingleOrListField, StringUUIDField
 class SearchCompanySerializer(SearchSerializer):
     """Serialiser used to validate company search POST bodies."""
 
-    account_manager = SingleOrListField(child=StringUUIDField(), required=False)
     archived = serializers.BooleanField(required=False)
     trading_name = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
@@ -27,7 +26,6 @@ class SearchCompanySerializer(SearchSerializer):
     uk_region = SingleOrListField(child=StringUUIDField(), required=False)
 
     SORT_BY_FIELDS = (
-        'account_manager.name',
         'trading_name',
         'archived',
         'archived_by',
