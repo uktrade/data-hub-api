@@ -1,3 +1,110 @@
+Data Hub API 6.3.0 (2018-09-12)
+===============================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Companies** The field `account_manager` was removed from the API, from the Django admin and from the model definition. The database column will be deleted with the next release.
+- **Contacts** The field ``contactable_by_dit`` is deprecated. Please check the API and Database schema categories
+  for more details.
+
+  The field ``contactable_by_uk_dit_partners`` is deprecated. Please check the API and Database schema categories
+
+  The field ``contactable_by_overseas_dit_partners`` is deprecated. Please check the API and Database schema categories
+  for more details.
+
+  The field ``contactable_by_email`` is deprecated. Please check the API and Database schema categories
+  for more details.
+
+  The field ``contactable_by_phone`` is deprecated. Please check the API and Database schema categories
+  for more details.
+
+Features
+--------
+
+- **Companies** It's now possible to export company search results as a CSV file (up to a maximum of 5000 results).
+- **Contacts** It's now possible to export contact search results as a CSV file (up to a maximum of 5000 results).
+- **Investment** It is now possible to upload evidence documents for a given investment project.
+- **OMIS** It's now possible to export OMIS order search results as a CSV file (up to a maximum of 5000 results).
+- URLs in all CSV exports and reports were made clickable when the CSV file is opened in Excel. This was achieved by using the Excel HYPERLINK() function.
+- Existing read-only model views in the admin site were updated to disable the change button
+  that previously had no purpose.
+- Performed exports of search results are now logged in a new model called UserEvent. UserEvent records can be viewed from the admin site.
+
+Bug fixes
+---------
+
+- **Investment** Proposition now needs to have at least one document uploaded in order to be completed.
+  It is now optional to provide details when completing a proposition.
+  This functionality is behind ``proposition-documents`` feature flag, that needs to be active in order for the new behaviour to work.
+
+API
+---
+
+- **Companies** The field `account_manager` was removed from all company endpoints.
+- **Companies** ``POST /v3/search/company/export`` was added for exporting company search
+  results as a CSV file with up to 5000 rows. The ``company.export_company``
+  permission was also added and is required to use this endpoint.
+- **Contacts** ``POST /v3/search/contact/export`` was added for exporting contact search
+  results as a CSV file with up to 5000 rows. The ``company.export_contact``
+  permission was also added and is required to use this endpoint.
+- **Contacts** ```GET,POST /v3/contact``` and ```GET,POST /v3/contact/<uuid:pk>``` the fields contactable_by_dit, contactable_by_uk_dit_partners, contactable_by_overseas_dit_partners, contactable_by_email, contactable_by_phone are deprecated and will be removed on or after September 11
+- **Investment** ``GET /v3/investment/<investment project pk>/evidence`` gets list of evidence documents.
+
+  ``POST /v3/investment/<investment project pk>/evidence`` creates new evidence document upload.
+
+  ``GET /v3/investment/<investment project pk>/evidence/<evidence document pk>`` gets details of evidence document
+
+  ``DELETE /v3/investment/<investment project pk>/evidence/<evidence document pk>`` deletes given evidence document.
+
+  ``POST /v3/investment/<investment project pk>/evidence/<evidence document pk>/upload_callback`` notifies that file upload has been completed and initiates virus scanning.
+
+  ``GET /v3/investment/<investment project pk>/evidence/<evidence document pk>/download`` returns a signed URL to the document file object.
+
+  Following permissions are required to use the endpoints:
+
+  ``evidence.add_all_evidencedocument``
+
+  ``evidence.view_all_evidencedocument``
+
+  ``evidence.change_all_evidencedocument``
+
+  ``evidence.delete_all_evidencedocument``
+
+  For DA and LEP:
+
+  ``evidence.add_associated_evidencedocument``
+
+  ``evidence.view_associated_evidencedocument``
+
+  ``evidence.change_associated_evidencedocument``
+
+  ``evidence.delete_associated_evidencedocument``
+- **OMIS** ``POST /v3/search/order/export`` was added for exporting OMIS order search results as a CSV file with up to 5000 rows. The ``order.export_order`` permission was also added and is required to use this endpoint.
+
+Database schema
+---------------
+
+- **Contacts** The column ```contact.contactable_by_dit``` is deprecated and may be removed on or after 11 September.
+
+  The column ```contact.contactable_by_uk_dit_partners```  is deprecated and may be removed on or after 11 September.
+
+  The column ```contact.contactable_by_overseas_dit_partners```  is deprecated and may be removed on or after 11 September.
+
+  The column ```contact.contactable_by_email```  is deprecated and may be removed on or after 11 September.
+
+  The column ```contact.contactable_by_phone```  is deprecated and may be removed on or after 11 September.
+- **Investment** New tables ``evidence_evidencedocuments``, ``evidence_evidence_tag`` and ``evidence_evidencedocument_tags`` have been added to enable evidence document upload.
+- **Investment** The ``details`` field in ``proposition_proposition`` table can now be blank.
+- **Investment** The ``add_associated_investmentproject_proposition`` permission has been renamed to ``add_associated_proposition`` to be consistent with other entities.
+- **Investment** The ``change_associated_investmentproject_proposition`` permission has been renamed to ``change_associated_proposition`` to be consistent with other entities.
+- **Investment** The ``view_associated_investmentproject_proposition`` permission has been renamed to ``view_associated_proposition`` to be consistent with other entities.
+- **Investment** The ``delete_propositiondocument`` permission has been renamed to ``delete_all_propositiondocument`` to be consistent with other entities.
+- **Investment** The ``deleted_associated_propositiondocument`` permission has been renamed to ``delete_associated_propositiondocument``.
+
+
 Data Hub API 6.2.0 (2018-08-23)
 ===============================
 
