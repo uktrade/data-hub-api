@@ -1,9 +1,13 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from datahub.company.serializers import NestedAdviserField
+from datahub.feature_flag.utils import is_feature_flag_active
+from datahub.investment.proposition.constants import FEATURE_FLAG_PROPOSITION_DOCUMENT
 from datahub.investment.proposition.models import Proposition, PropositionDocument
 from datahub.investment.proposition.permissions import (
-    PropositionHasAssociatedInvestmentProjectValidator
+    PropositionDocumentHasAssociatedInvestmentProjectValidator,
+    PropositionHasAssociatedInvestmentProjectValidator,
 )
 from datahub.investment.serializers import NestedInvestmentProjectField
 
@@ -24,22 +28,45 @@ class CreatePropositionSerializer(serializers.ModelSerializer):
         )
 
 
-class CompleteOrAbandonPropositionSerializer(serializers.ModelSerializer):
-    """Proposition serialiser for complete and abandon endpoint."""
+class CompletePropositionSerializer(serializers.ModelSerializer):
+    """Proposition serialiser for complete endpoint."""
 
     class Meta:
         model = Proposition
         fields = (
             'details',
         )
+        extra_kwargs = {
+            'details': {'default': ''},
+        }
 
     def complete(self):
         """Complete a proposition."""
+        if not is_feature_flag_active(FEATURE_FLAG_PROPOSITION_DOCUMENT):
+            # if proposition documents are not enabled, "details" field is mandatory
+            if self.validated_data['details'] == '':
+                raise ValidationError({
+                    'details': ['This field may not be blank.']
+                })
+
         self.instance.complete(
             by=self.context['current_user'],
             details=self.validated_data['details']
         )
         return self.instance
+
+
+class AbandonPropositionSerializer(serializers.ModelSerializer):
+    """Proposition serialiser for abandon endpoint."""
+
+    class Meta:
+        model = Proposition
+        fields = (
+            'details',
+        )
+        extra_kwargs = {
+            'details': {'allow_blank': False}
+        }
 
     def abandon(self):
         """Abandon a proposition."""
@@ -71,6 +98,9 @@ class PropositionDocumentSerializer(serializers.ModelSerializer):
             'status',
         )
         read_only_fields = ('url', 'created_on', )
+        validators = (
+            PropositionDocumentHasAssociatedInvestmentProjectValidator(),
+        )
 
     def create(self, validated_data):
         """Create proposition document."""

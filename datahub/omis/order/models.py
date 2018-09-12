@@ -14,6 +14,7 @@ from datahub.company.models import Advisor, Company, Contact
 from datahub.core.models import (
     BaseConstantModel, BaseModel, BaseOrderedConstantModel
 )
+from datahub.core.utils import StrEnum
 from datahub.metadata.models import Country, Sector, Team, UKRegion
 from datahub.omis.core.utils import generate_reference
 from datahub.omis.invoice.models import Invoice
@@ -66,6 +67,16 @@ class HourlyRate(BaseConstantModel):
 
 class CancellationReason(BaseOrderedConstantModel):
     """Reasons for cancelling an order."""
+
+
+class OrderPermission(StrEnum):
+    """Order permission codename constants."""
+
+    view = 'view_order'
+    add = 'add_order'
+    change = 'change_order'
+    delete = 'delete_order'
+    export = 'export_order'
 
 
 class Order(BaseModel):
@@ -277,6 +288,11 @@ class Order(BaseModel):
     )
 
     objects = OrderQuerySet.as_manager()
+
+    class Meta:
+        permissions = (
+            ('export_order', 'Can export order'),
+        )
 
     def __str__(self):
         """Human-readable representation"""

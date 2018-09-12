@@ -1,7 +1,32 @@
 from django.conf import settings
 from django.contrib.postgres.aggregates import StringAgg
-from django.db.models import Case, OuterRef, Subquery, Value, When
+from django.db.models import Case, F, Func, OuterRef, Subquery, Value, When
 from django.db.models.functions import Concat
+
+
+class ConcatWS(Func):
+    """
+    Concatenates text fields together with a separator.
+
+    The first argument is the separator. Null arguments are ignored.
+
+    Usage example:
+        ConcatWS(Value(' '), 'first_name', 'last_name')
+    """
+
+    function = 'concat_ws'
+
+
+class NullIf(Func):
+    """
+    Returns None if a field equals a particular expression.
+
+    Usage example:
+        NullIf('first_name', Value(''))  # returns None if first_name is an empty string
+    """
+
+    function = 'nullif'
+    arity = 2
 
 
 def get_string_agg_subquery(model, expression, delimiter=', '):
@@ -51,6 +76,36 @@ def get_aggregate_subquery(model, expression):
     return Subquery(queryset)
 
 
+def get_top_related_expression_subquery(related_field, expression, ordering):
+    """
+    Returns an expression that gets a particular field of the top row for a particular ordering
+    of a related model.
+
+    expression could be a string referring to a field, or an instance of Expression.
+
+    Usage example:
+        Company.objects.annotate(
+            team_of_latest_interaction=get_top_related_expression_subquery(
+                Interaction.investment_project.field,
+                'dit_team__name',
+                ('-date',),
+            ),
+        )
+    """
+    wrapped_expression = F(expression) if isinstance(expression, str) else expression
+    queryset = related_field.model.objects.annotate(
+        _annotated_value=wrapped_expression,
+    ).filter(
+        **{related_field.name: OuterRef('pk')},
+    ).order_by(
+        *ordering
+    ).values(
+        '_annotated_value',
+    )[:1]
+
+    return Subquery(queryset)
+
+
 def get_choices_as_case_expression(model, field_name):
     """
     Gets an SQL expression that returns the display name for a field with choices.
@@ -67,20 +122,27 @@ def get_choices_as_case_expression(model, field_name):
     return Case(*whens, default=field.name)
 
 
-def get_full_name_expression(field_name):
+def get_full_name_expression(field_name=None):
     """
-    Gets an SQL expression that returns the full name for a contact or adviser related field on
-    another model.
+    Gets an SQL expression that returns the full name for a contact or adviser.
 
-    Usage example:
+    Can both be used directly on a Contact or Adviser query set and on related fields.
+
+    Usage examples:
+        Contact.objects.annotate(
+            name=get_full_name_expression(),
+        )
         Interaction.objects.annotate(
             dit_adviser_name=get_full_name_expression('dit_adviser'),
         )
     """
+    if field_name is None:
+        return _full_name_concat('first_name', 'last_name')
+
     return Case(
         When(
             **{f'{field_name}__isnull': False},
-            then=Concat(f'{field_name}__first_name', Value(' '), f'{field_name}__last_name'),
+            then=_full_name_concat(f'{field_name}__first_name', f'{field_name}__last_name'),
         ),
         default=None,
     )
@@ -93,4 +155,17 @@ def get_front_end_url_expression(model_name, pk_expression):
     :param model_name:      key in settings.DATAHUB_FRONTEND_URL_PREFIXES
     :param pk_expression:   expression that resolves to the pk for the model
     """
-    return Concat(Value(f'{settings.DATAHUB_FRONTEND_URL_PREFIXES[model_name]}/'), pk_expression)
+    return Concat(
+        Value('=HYPERLINK("'),
+        Value(f'{settings.DATAHUB_FRONTEND_URL_PREFIXES[model_name]}/'),
+        pk_expression,
+        Value('")'),
+    )
+
+
+def _full_name_concat(first_name_field, last_name_field):
+    return ConcatWS(
+        Value(' '),
+        NullIf(first_name_field, Value('')),
+        NullIf(last_name_field, Value('')),
+    )

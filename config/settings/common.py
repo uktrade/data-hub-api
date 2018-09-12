@@ -83,6 +83,7 @@ LOCAL_APPS = [
     'datahub.omis.payment',
     'datahub.activity_stream.apps.ActivityStreamConfig',
     'datahub.investment.report',
+    'datahub.user_event_log',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -322,7 +323,9 @@ if REDIS_BASE_URL:
 DATAHUB_FRONTEND_BASE_URL = env('DATAHUB_FRONTEND_BASE_URL', default='http://localhost:3000')
 DATAHUB_FRONTEND_URL_PREFIXES = {
     'company': f'{DATAHUB_FRONTEND_BASE_URL}/companies',
+    'contact': f'{DATAHUB_FRONTEND_BASE_URL}/contacts',
     'interaction': f'{DATAHUB_FRONTEND_BASE_URL}/interactions',
+    'investment-project': f'{DATAHUB_FRONTEND_BASE_URL}/investment-projects',
     'order': f'{DATAHUB_FRONTEND_BASE_URL}/omis',
 }
 

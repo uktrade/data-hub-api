@@ -15,6 +15,8 @@ from rest_framework.views import APIView
 
 from datahub.core.csv import create_csv_response
 from datahub.oauth.scopes import Scope
+from datahub.user_event_log.constants import USER_EVENT_TYPES
+from datahub.user_event_log.utils import record_user_event
 from .apps import get_search_apps
 from .permissions import has_permissions_for_app, SearchAndExportPermissions, SearchPermissions
 from .query_builder import (
@@ -232,6 +234,7 @@ class SearchExportAPIView(SearchAPIView):
     permission_classes = (IsAuthenticatedOrTokenHasScope, SearchAndExportPermissions)
     queryset = None
     field_titles = None
+    sort_by_remappings = {}
     include_aggregations = False
 
     def post(self, request, format=None):
@@ -239,8 +242,16 @@ class SearchExportAPIView(SearchAPIView):
         validated_data = self.validate_data(request.data)
 
         es_query = self._get_es_query(request, validated_data)
-        db_queryset = self._get_rows(es_query, validated_data['sortby'])
+        ids = tuple(self._get_ids(es_query))
+        db_queryset = self._get_rows(ids, validated_data['sortby'])
         base_filename = self._get_base_filename()
+
+        user_event_data = {
+            'num_results': len(ids),
+            'args': validated_data,
+        }
+
+        record_user_event(request, USER_EVENT_TYPES.search_export, data=user_event_data)
 
         return create_csv_response(db_queryset, self.field_titles, base_filename)
 
@@ -277,7 +288,7 @@ class SearchExportAPIView(SearchAPIView):
             size=settings.SEARCH_EXPORT_SCROLL_CHUNK_SIZE,
         )
 
-    def _get_rows(self, es_query, sort_by):
+    def _get_rows(self, ids, sort_by):
         """
         Returns an iterable using QuerySet.iterator() over the search results.
 
@@ -287,33 +298,32 @@ class SearchExportAPIView(SearchAPIView):
         At the moment, all rows are fetched in one query (using a server-side cursor) as
         settings.SEARCH_EXPORT_MAX_RESULTS is set to a (relatively) low value.
         """
-        ordering = _translate_search_sortby_to_django_ordering(sort_by)
+        ordering = self._translate_search_sortby_to_django_ordering(sort_by)
 
         return self.queryset.filter(
-            pk__in=self._get_ids(es_query)
+            pk__in=ids
         ).order_by(
             *ordering
         ).values(
             *self.field_titles.keys()
         ).iterator()
 
+    def _translate_search_sortby_to_django_ordering(self, sort_by):
+        """
+        Converts a sort-by value as used in the search API to a tuple of values that can be
+        passed to QuerySet.order_by().
 
-def _translate_search_sortby_to_django_ordering(sort_by):
-    """
-    Converts a sort-by value as used in the search API to a tuple of values that can be
-    passed to QuerySet.order_by().
+        Note that this relies on the same field names having been used; if they differ then you
+        should manually specify a remapping in the sort_by_remappings class attribute.
+        """
+        if not sort_by:
+            return ()
 
-    Note that this relies on the same field names having been used; if they differ then this
-    will not work.
-    """
-    if not sort_by:
-        return ()
+        es_field, _, direction = sort_by.partition(':')
+        field = self.sort_by_remappings.get(es_field, es_field.replace('.', '__'))
+        prefix = '-' if direction == 'desc' else ''
 
-    field, _, direction = sort_by.replace('.', '__').partition(':')
-    if direction == 'desc':
-        return (f'-{field}',)
-
-    return (field,)
+        return f'{prefix}{field}', 'pk'
 
 
 def _execute_search_query(query):

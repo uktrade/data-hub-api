@@ -10,6 +10,7 @@ from uuid import UUID
 import factory
 import pytest
 from dateutil.parser import parse as dateutil_parse
+from django.conf import settings
 from django.utils.timezone import utc
 from freezegun import freeze_time
 from rest_framework import status
@@ -783,7 +784,7 @@ class TestInvestmentProjectExportView(APITestMixin):
             'attachment', {'filename': 'Data Hub - Investment projects - 2018-01-01-11-12-13.csv'}
         )
 
-        sorted_projects = InvestmentProject.objects.order_by(orm_ordering)
+        sorted_projects = InvestmentProject.objects.order_by(orm_ordering, 'pk')
         response_text = response.getvalue().decode('utf-8-sig')
         reader = DictReader(StringIO(response_text))
 
@@ -800,6 +801,11 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Investment type': get_attr_or_none(project, 'investment_type.name'),
                 'Status': project.get_status_display(),
                 'Stage': get_attr_or_none(project, 'stage.name'),
+                'Link':
+                    f'=HYPERLINK("'
+                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["investment-project"]}'
+                    f'/{project.pk}'
+                    f'")',
                 'Actual land date': project.actual_land_date,
                 'Estimated land date': project.estimated_land_date,
                 'FDI value': get_attr_or_none(project, 'fdi_value.name'),

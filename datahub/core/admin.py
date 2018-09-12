@@ -1,6 +1,5 @@
-from collections import OrderedDict
-
 from django.contrib import admin
+from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.template.defaultfilters import date as date_filter, time as time_filter
 from django.urls import reverse
 from django.utils.html import format_html
@@ -29,8 +28,8 @@ class DisabledOnFilter(admin.SimpleListFilter):
         return queryset
 
 
-class ReadOnlyAdmin(admin.ModelAdmin):
-    """ModelAdmin subclass that makes models viewable but not editable."""
+class ViewAndChangeOnlyAdmin(admin.ModelAdmin):
+    """ModelAdmin subclass that restricts adding and deletion at all times."""
 
     def has_add_permission(self, request, obj=None):
         """
@@ -48,25 +47,22 @@ class ReadOnlyAdmin(admin.ModelAdmin):
         """
         return False
 
-    def get_readonly_fields(self, request, obj=None):
+
+class ViewOnlyAdmin(ViewAndChangeOnlyAdmin):
+    """
+    ModelAdmin subclass that restricts adding, changing and deleting at all times.
+
+    The user must have the relevant view or change permission in order to be able to view the
+    model.
+    """
+
+    def has_change_permission(self, request, obj=None):
         """
-        Gets the read-only fields for this model.
+        Gets whether the user can change objects for this model.
 
-        Always returns all fields.
+        Always returns False.
         """
-        # if reaonly_fields defined explicitly, use that
-        if self.readonly_fields:
-            return self.readonly_fields
-
-        # OrderedDict used instead of set to preserve order
-        readonly_fields = list(OrderedDict.fromkeys(
-            [field.name for field in self.opts.local_fields] +
-            [field.name for field in self.opts.local_many_to_many]
-        ))
-
-        if 'is_submitted' in readonly_fields:
-            readonly_fields.remove('is_submitted')
-        return readonly_fields
+        return False
 
 
 class BaseModelAdminMixin:
@@ -90,11 +86,7 @@ class BaseModelAdminMixin:
                 f'at {time_filter(event_on)}'
             ))
         if event_by:
-            adviser_admin_url = format_html(
-                '<a href="{0}">{1}</a>',
-                reverse('admin:company_advisor_change', args=(event_by.id,)),
-                event_by
-            )
+            adviser_admin_url = get_change_link(event_by)
             text_parts.append(f'by {adviser_admin_url}')
 
         return mark_safe(' '.join(text_parts) or '-')
@@ -170,6 +162,24 @@ def custom_delete_permission(permission_codename):
         return admin_cls
 
     return decorator
+
+
+def get_change_url(obj, site=admin.site):
+    """Returns the URL to the admin change page for an object."""
+    if not obj or not obj.pk:
+        return ''
+
+    return reverse(admin_urlname(obj._meta, 'change'), args=(obj.pk,), current_app=site.name)
+
+
+def get_change_link(obj, site=admin.site):
+    """Returns a link to the admin change page for an object."""
+    url = get_change_url(obj, site=site)
+
+    if not url:
+        return ''
+
+    return format_html('<a href="{url}">{name}</a>'.format(url=url, name=obj))
 
 
 def _make_admin_permission_getter(codename):
