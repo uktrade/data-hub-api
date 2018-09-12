@@ -150,5 +150,8 @@ def test_one_list_report_generation():
         'one_list_account_owner__contact_email': company.one_list_account_owner.contact_email,
         'registered_address_country__name': company.registered_address_country.name,
         'registered_address_town': company.registered_address_town,
-        'url': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{company.id}',
+        'url':
+            f'=HYPERLINK("'
+            f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{company.id}'
+            f'")',
     } for company in companies]

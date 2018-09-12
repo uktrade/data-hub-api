@@ -159,4 +159,4 @@ def test_get_front_end_url_expression(monkeypatch):
     queryset = Book.objects.annotate(
         url=get_front_end_url_expression('book', 'pk')
     )
-    assert queryset.first().url == f'http://test/{book.pk}'
+    assert queryset.first().url == f'=HYPERLINK("http://test/{book.pk}")'

@@ -325,6 +325,7 @@ DATAHUB_FRONTEND_URL_PREFIXES = {
     'company': f'{DATAHUB_FRONTEND_BASE_URL}/companies',
     'contact': f'{DATAHUB_FRONTEND_BASE_URL}/contacts',
     'interaction': f'{DATAHUB_FRONTEND_BASE_URL}/interactions',
+    'investment-project': f'{DATAHUB_FRONTEND_BASE_URL}/investment-projects',
     'order': f'{DATAHUB_FRONTEND_BASE_URL}/omis',
 }
 
