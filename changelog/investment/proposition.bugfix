@@ -1,3 +1,0 @@
-Proposition now needs to have at least one document uploaded in order to be completed.
-It is now optional to provide details when completing a proposition.
-This functionality is behind ``proposition-documents`` feature flag, that needs to be active in order for the new behaviour to work.

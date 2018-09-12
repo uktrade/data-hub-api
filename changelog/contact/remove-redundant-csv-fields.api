@@ -1,2 +1,0 @@
-```GET,POST /v3/contact``` and ```GET,POST /v3/contact/<uuid:pk>``` the fields contactable_by_dit, contactable_by_uk_dit_partners, contactable_by_overseas_dit_partners, contactable_by_email, contactable_by_phone are deprecated and will be removed on or after September 11
-
