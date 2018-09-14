@@ -1,5 +1,6 @@
 from base64 import b64encode
 from unittest import mock
+from urllib.parse import urlencode
 
 import pytest
 from django.test.utils import override_settings
@@ -14,7 +15,6 @@ from datahub.core.test_utils import APITestMixin
 from datahub.oauth.scopes import SCOPES_DESCS
 from datahub.oauth.test.factories import AccessTokenFactory, OAuthApplicationScopeFactory
 from datahub.oauth.test.scopes import TEST_SCOPES_DESC, TestScope
-
 
 pytestmark = pytest.mark.django_db
 
@@ -31,10 +31,13 @@ class TestOAuthScopeBackend:
         client.credentials(
             HTTP_AUTHORIZATION=_create_auth_header(app.client_id, app.client_secret)
         )
+        data = {'grant_type': 'client_credentials'}
         url = reverse('token')
-        response = client.post(url, data={
-            'grant_type': 'client_credentials',
-        })
+        response = client.post(
+            url,
+            data=urlencode(data),
+            content_type='application/x-www-form-urlencoded',
+        )
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['scope'] == TestScope.test_scope_1
 
@@ -49,13 +52,18 @@ class TestOAuthScopeBackend:
         client.credentials(
             HTTP_AUTHORIZATION=_create_auth_header(app.client_id, app.client_secret)
         )
-        url = reverse('token')
-        response = client.post(url, data={
+        data = {
             'grant_type': 'client_credentials',
-            'scope': TestScope.test_scope_1,
-        })
+            'scope': TestScope.test_scope_1.value,
+        }
+        url = reverse('token')
+        response = client.post(
+            url,
+            data=urlencode(data),
+            content_type='application/x-www-form-urlencoded',
+        )
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()['scope'] == TestScope.test_scope_1
+        assert response.json()['scope'] == TestScope.test_scope_1.value
 
     def test_creating_a_token_disallowed_scope(self):
         """
@@ -69,11 +77,16 @@ class TestOAuthScopeBackend:
         client.credentials(
             HTTP_AUTHORIZATION=_create_auth_header(app.client_id, app.client_secret)
         )
-        url = reverse('token')
-        response = client.post(url, data={
+        data = {
             'grant_type': 'client_credentials',
-            'scope': TestScope.test_scope_2,
-        })
+            'scope': TestScope.test_scope_2.value,
+        }
+        url = reverse('token')
+        response = client.post(
+            url,
+            data=urlencode(data),
+            content_type='application/x-www-form-urlencoded',
+        )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert response.json() == {
             'error': 'invalid_scope'
@@ -120,9 +133,11 @@ class TestOAuthViewScope(APITestMixin):
     def test_expired_token(self, test_urls, grant_type):
         """Tests a test view with an expired token and the required scope."""
         application = self.get_application(grant_type=grant_type)
-        access_token = AccessTokenFactory(application=application,
-                                          scope=TestScope.test_scope_1,
-                                          expires=Faker('past_datetime', tzinfo=utc))
+        access_token = AccessTokenFactory(
+            application=application,
+            scope=TestScope.test_scope_1,
+            expires=Faker('past_datetime', tzinfo=utc),
+        )
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION=f'bearer {access_token.token}')
         url = reverse('test-disableable-collection')

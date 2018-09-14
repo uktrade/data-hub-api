@@ -6,7 +6,6 @@ from .support.models import EmptyModel, InheritedModel
 from ..test_utils import APITestMixin
 from ..viewsets import CoreViewSet
 
-
 factory = APIRequestFactory()
 
 
