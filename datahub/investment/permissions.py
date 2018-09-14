@@ -123,6 +123,25 @@ class IsAssociatedToInvestmentProjectPermission(IsAssociatedToObjectPermission):
     checker_class = InvestmentProjectAssociationChecker
 
 
+class IsAssociatedToInvestmentProjectPermissionMixin:
+    """
+    This checks if user has permission to access a view attached to Investment Project.
+
+    It is meant to be used with IsAssociatedToObjectPermission.
+    """
+
+    def has_permission(self, request, view):
+        """Returns whether the user has permissions for a view."""
+        if self.checker.should_apply_restrictions(request, view.action):
+            investment_project = InvestmentProject.objects.get(
+                pk=request.parser_context['kwargs']['project_pk']
+            )
+            if not self.checker.is_associated(request, investment_project):
+                return False
+
+        return super().has_permission(request, view)
+
+
 class IsAssociatedToInvestmentProjectFilter(BaseFilterBackend):
     """Filter for LEPs users to see only associated InvestmentProjects."""
 

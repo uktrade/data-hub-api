@@ -5,10 +5,6 @@ from datahub.company.serializers import NestedAdviserField
 from datahub.feature_flag.utils import is_feature_flag_active
 from datahub.investment.proposition.constants import FEATURE_FLAG_PROPOSITION_DOCUMENT
 from datahub.investment.proposition.models import Proposition, PropositionDocument
-from datahub.investment.proposition.permissions import (
-    PropositionDocumentHasAssociatedInvestmentProjectValidator,
-    PropositionHasAssociatedInvestmentProjectValidator,
-)
 from datahub.investment.serializers import NestedInvestmentProjectField
 
 
@@ -22,9 +18,6 @@ class CreatePropositionSerializer(serializers.ModelSerializer):
             'deadline',
             'name',
             'scope',
-        )
-        validators = (
-            PropositionHasAssociatedInvestmentProjectValidator(),
         )
 
 
@@ -98,9 +91,6 @@ class PropositionDocumentSerializer(serializers.ModelSerializer):
             'status',
         )
         read_only_fields = ('url', 'created_on', )
-        validators = (
-            PropositionDocumentHasAssociatedInvestmentProjectValidator(),
-        )
 
     def create(self, validated_data):
         """Create proposition document."""
