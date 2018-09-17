@@ -21,6 +21,7 @@ coverage==4.5.1           # via pytest-cov
 cssselect==1.0.3
 decorator==4.3.0          # via ipython, traitlets
 django-admin-ip-restrictor==0.2.1
+django-cors-headers==2.4.0
 django-debug-toolbar==1.9.1
 django-environ==0.4.5
 django-extensions==2.1.0
