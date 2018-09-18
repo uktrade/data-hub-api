@@ -857,16 +857,12 @@ class TestInteractionExportView(APITestMixin):
                 'Type': interaction.get_kind_display(),
                 'Service': get_attr_or_none(interaction, 'service.name'),
                 'Subject': interaction.subject,
-                'Link':
-                    f'=HYPERLINK("'
-                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["interaction"]}/{interaction.pk}'
-                    f'")',
+                'Link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["interaction"]}'
+                        f'/{interaction.pk}',
                 'Company': get_attr_or_none(interaction, 'company.name'),
                 'Company link':
-                    f'=HYPERLINK("'
                     f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}'
-                    f'/{interaction.company.pk}'
-                    f'")',
+                    f'/{interaction.company.pk}',
                 'Company country': get_attr_or_none(
                     interaction,
                     'company.registered_address_country.name',
