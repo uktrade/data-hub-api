@@ -542,10 +542,7 @@ class TestCompanyExportView(APITestMixin):
         expected_row_data = [
             {
                 'Name': company.name,
-                'Link':
-                    f'=HYPERLINK("'
-                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{company.pk}'
-                    f'")',
+                'Link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{company.pk}',
                 'Sector': get_attr_or_none(company, 'sector.name'),
                 'Country': get_attr_or_none(company, 'registered_address_country.name'),
                 'UK region': get_attr_or_none(company, 'uk_region.name'),
