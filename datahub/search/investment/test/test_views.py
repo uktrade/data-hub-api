@@ -802,10 +802,8 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Status': project.get_status_display(),
                 'Stage': get_attr_or_none(project, 'stage.name'),
                 'Link':
-                    f'=HYPERLINK("'
                     f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["investment-project"]}'
-                    f'/{project.pk}'
-                    f'")',
+                    f'/{project.pk}',
                 'Actual land date': project.actual_land_date,
                 'Estimated land date': project.estimated_land_date,
                 'FDI value': get_attr_or_none(project, 'fdi_value.name'),
