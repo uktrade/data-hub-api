@@ -12,9 +12,7 @@ from datahub.documents.views import BaseEntityDocumentModelViewSet
 from datahub.investment.models import InvestmentProject
 from datahub.investment.proposition.models import Proposition, PropositionDocument
 from datahub.investment.proposition.permissions import (
-    IsAssociatedToInvestmentProjectPropositionDocumentFilter,
     IsAssociatedToInvestmentProjectPropositionDocumentPermission,
-    IsAssociatedToInvestmentProjectPropositionFilter,
     IsAssociatedToInvestmentProjectPropositionPermission,
     PropositionDocumentModelPermissions,
     PropositionModelPermissions,
@@ -53,7 +51,6 @@ class PropositionViewSet(CoreViewSet):
     )
     filter_backends = (
         DjangoFilterBackend,
-        IsAssociatedToInvestmentProjectPropositionFilter,
         OrderingFilter,
     )
     filterset_fields = ('adviser_id', 'status',)
@@ -138,6 +135,8 @@ class PropositionViewSet(CoreViewSet):
 class PropositionDocumentViewSet(BaseEntityDocumentModelViewSet):
     """Proposition Document ViewSet."""
 
+    non_existent_proposition_error_message = 'Specified proposition does not exist'
+
     required_scopes = (Scope.internal_front_end,)
     permission_classes = (
         IsAuthenticatedOrTokenHasScope,
@@ -148,8 +147,12 @@ class PropositionDocumentViewSet(BaseEntityDocumentModelViewSet):
 
     filter_backends = (
         DjangoFilterBackend,
-        IsAssociatedToInvestmentProjectPropositionDocumentFilter,
     )
+
+    def create(self, request, *args, **kwargs):
+        """Creates proposition document."""
+        self._check_proposition_exists()
+        return super().create(request, *args, **kwargs)
 
     def get_queryset(self):
         """Returns proposition documents queryset."""
@@ -171,3 +174,7 @@ class PropositionDocumentViewSet(BaseEntityDocumentModelViewSet):
         data['proposition_id'] = entity_document.proposition_id
         record_user_event(request, USER_EVENT_TYPES.proposition_document_delete, data=data)
         return super().destroy(request, *args, **kwargs)
+
+    def _check_proposition_exists(self):
+        if not Proposition.objects.filter(pk=self.kwargs['proposition_pk']).exists():
+            raise Http404(self.non_existent_proposition_error_message)
