@@ -265,11 +265,9 @@ class TestCreateProposition(APITestMixin):
             format='json',
         )
         response_data = response.json()
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_403_FORBIDDEN
         assert response_data == {
-            'investment_project': [
-                "You don't have permission to add a proposition for this investment project."
-            ]
+            'detail': 'You do not have permission to perform this action.'
         }
 
     def test_cannot_created_with_fields_missing(self):
@@ -1454,6 +1452,102 @@ class TestPropositionDocumentViews(APITestMixin):
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
 
+    @patch.object(Document, 'get_signed_upload_url')
+    def test_restricted_user_can_create_associated_document(self, get_signed_upload_url_mock):
+        """Test that restricted user can create associated document."""
+        get_signed_upload_url_mock.return_value = 'http://document-about-ocelots'
+
+        user = create_test_user(
+            permission_codenames=(PropositionDocumentPermission.add_associated,),
+            dit_team=TeamFactory(),
+        )
+        investment_project = InvestmentProjectFactory(
+            created_by=user
+        )
+        proposition = PropositionFactory(
+            investment_project=investment_project
+        )
+
+        url = reverse('api-v3:investment:proposition:document-collection', kwargs={
+            'proposition_pk': proposition.pk,
+            'project_pk': proposition.investment_project.pk,
+        })
+
+        api_client = self.create_api_client(user=user)
+
+        response = api_client.post(url, format='json', data={
+            'original_filename': 'test.txt',
+        })
+        assert response.status_code == status.HTTP_201_CREATED
+        response_data = response.data
+
+        entity_document = PropositionDocument.objects.get(pk=response_data['id'])
+        assert entity_document.original_filename == 'test.txt'
+        assert entity_document.proposition.pk == proposition.pk
+
+        assert response_data == {
+            'id': str(entity_document.pk),
+            'av_clean': None,
+            'created_by': {
+                'id': str(entity_document.created_by.pk),
+                'first_name': entity_document.created_by.first_name,
+                'last_name': entity_document.created_by.last_name,
+                'name': entity_document.created_by.name
+            },
+            'original_filename': 'test.txt',
+            'url': _get_document_url(entity_document.proposition, entity_document),
+            'status': UPLOAD_STATUSES.not_virus_scanned,
+            'signed_upload_url': 'http://document-about-ocelots',
+            'created_on': format_date_or_datetime(entity_document.created_on),
+            'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
+        }
+
+    def test_restricted_user_cannot_create_non_associated_documents(self):
+        """Test that restricted user cannot create non associated document."""
+        project_creator = AdviserFactory()
+        investment_project = InvestmentProjectFactory(
+            created_by=project_creator
+        )
+        proposition = PropositionFactory(
+            investment_project=investment_project
+        )
+
+        url = reverse('api-v3:investment:proposition:document-collection', kwargs={
+            'proposition_pk': proposition.pk,
+            'project_pk': proposition.investment_project.pk,
+        })
+
+        user = create_test_user(
+            permission_codenames=(PropositionDocumentPermission.add_associated,),
+            dit_team=TeamFactory(),
+        )
+        api_client = self.create_api_client(user=user)
+
+        response = api_client.post(url, format='json', data={
+            'original_filename': 'test.txt',
+        })
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.data == {
+            'detail': 'You do not have permission to perform this action.'
+        }
+
+    def test_cannot_create_document_for_non_existent_proposition(self):
+        """Test that user cannot create document for non existent proposition."""
+        investment_project = InvestmentProjectFactory()
+
+        url = reverse('api-v3:investment:proposition:document-collection', kwargs={
+            'proposition_pk': uuid.uuid4(),
+            'project_pk': investment_project.pk,
+        })
+
+        user = create_test_user(permission_codenames=(PropositionDocumentPermission.add_all,))
+        api_client = self.create_api_client(user=user)
+
+        response = api_client.post(url, format='json', data={
+            'original_filename': 'test.txt',
+        })
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     def test_documents_list(self, permissions):
         """Tests list endpoint."""
@@ -1505,6 +1599,97 @@ class TestPropositionDocumentViews(APITestMixin):
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
 
+    def test_restricted_user_can_list_associated_documents(self):
+        """Test that restricted user can list associated documents."""
+        user = create_test_user(
+            permission_codenames=(PropositionDocumentPermission.view_associated,),
+            dit_team=TeamFactory(),
+        )
+        investment_project = InvestmentProjectFactory(
+            created_by=user
+        )
+        proposition = PropositionFactory(
+            investment_project=investment_project
+        )
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=user,
+        )
+        entity_document.document.mark_as_scanned(True, '')
+        # document that is pending to be deleted, shouldn't be in the list
+        entity_document_to_be_deleted = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test2.txt',
+            created_by=user,
+        )
+        entity_document_to_be_deleted.document.mark_deletion_pending()
+
+        url = reverse(
+            'api-v3:investment:proposition:document-collection',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            }
+        )
+        api_client = self.create_api_client(user=user)
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.data
+        assert response_data['count'] == 1
+        assert len(response_data['results']) == 1
+        assert response_data['results'][0] == {
+            'id': str(entity_document.pk),
+            'created_by': {
+                'id': str(entity_document.created_by.pk),
+                'first_name': entity_document.created_by.first_name,
+                'last_name': entity_document.created_by.last_name,
+                'name': entity_document.created_by.name
+            },
+            'av_clean': True,
+            'original_filename': 'test.txt',
+            'url': _get_document_url(entity_document.proposition, entity_document),
+            'status': UPLOAD_STATUSES.virus_scanned,
+            'created_on': format_date_or_datetime(entity_document.created_on),
+            'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
+        }
+
+    def test_restricted_user_cannot_list_non_associated_documents(self):
+        """Tests that restricted user cannot list non associated documents."""
+        project_creator = AdviserFactory()
+        investment_project = InvestmentProjectFactory(
+            created_by=project_creator
+        )
+        proposition = PropositionFactory(
+            investment_project=investment_project
+        )
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=project_creator,
+        )
+        entity_document.document.mark_as_scanned(True, '')
+
+        url = reverse(
+            'api-v3:investment:proposition:document-collection',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+            }
+        )
+        user = create_test_user(
+            permission_codenames=(PropositionDocumentPermission.view_associated,),
+            dit_team=TeamFactory(),
+        )
+        api_client = self.create_api_client(user=user)
+        response = api_client.get(url)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.data == {
+            'detail': 'You do not have permission to perform this action.'
+        }
+
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     def test_document_retrieval(self, permissions):
         """Tests retrieval of individual document."""
@@ -1545,6 +1730,88 @@ class TestPropositionDocumentViews(APITestMixin):
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
 
+    def test_restricted_user_can_retrieve_associated_document(self):
+        """Test that restricted user can retrieve individual associated document."""
+        user = create_test_user(
+            permission_codenames=(PropositionDocumentPermission.view_associated,),
+            dit_team=TeamFactory(),
+        )
+        investment_project = InvestmentProjectFactory(
+            created_by=user
+        )
+        proposition = PropositionFactory(
+            investment_project=investment_project
+        )
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=user,
+        )
+
+        url = reverse(
+            'api-v3:investment:proposition:document-item',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+                'entity_document_pk': entity_document.pk
+            }
+        )
+
+        api_client = self.create_api_client(user=user)
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == {
+            'id': str(entity_document.pk),
+            'av_clean': None,
+            'created_by': {
+                'id': str(entity_document.created_by.pk),
+                'first_name': entity_document.created_by.first_name,
+                'last_name': entity_document.created_by.last_name,
+                'name': entity_document.created_by.name
+            },
+            'original_filename': 'test.txt',
+            'url': _get_document_url(entity_document.proposition, entity_document),
+            'status': UPLOAD_STATUSES.not_virus_scanned,
+            'created_on': format_date_or_datetime(entity_document.created_on),
+            'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
+        }
+
+    def test_restricted_user_cannot_retrieve_non_associated_document(self):
+        """Test that restricted user cannot retrieve individual non associated document."""
+        user = create_test_user(
+            permission_codenames=(PropositionDocumentPermission.view_associated,),
+            dit_team=TeamFactory(),
+        )
+        project_creator = AdviserFactory()
+        investment_project = InvestmentProjectFactory(
+            created_by=project_creator
+        )
+        proposition = PropositionFactory(
+            investment_project=investment_project
+        )
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=project_creator,
+        )
+        entity_document.document.mark_as_scanned(True, '')
+
+        url = reverse(
+            'api-v3:investment:proposition:document-item',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+                'entity_document_pk': entity_document.pk
+            }
+        )
+
+        api_client = self.create_api_client(user=user)
+        response = api_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.data == {
+            'detail': 'You do not have permission to perform this action.'
+        }
+
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     def test_document_with_deletion_pending_retrieval(self, permissions):
         """Tests retrieval of individual document that is pending deletion."""
@@ -1580,7 +1847,9 @@ class TestPropositionDocumentViews(APITestMixin):
         """Tests download of individual document."""
         sign_s3_url.return_value = 'http://what'
 
-        user = create_test_user(permission_codenames=NON_RESTRICTED_VIEW_PERMISSIONS[0])
+        user = create_test_user(
+            permission_codenames=(PropositionDocumentPermission.view_all,)
+        )
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
             proposition_id=proposition.pk,
@@ -1645,9 +1914,9 @@ class TestPropositionDocumentViews(APITestMixin):
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
     @patch('datahub.documents.tasks.virus_scan_document.apply_async')
     def test_document_upload_schedule_virus_scan(
-            self,
-            virus_scan_document_apply_async,
-            permissions
+        self,
+        virus_scan_document_apply_async,
+        permissions
     ):
         """Tests scheduling virus scan after upload completion.
 
@@ -1697,6 +1966,103 @@ class TestPropositionDocumentViews(APITestMixin):
             args=(str(entity_document.document.pk), )
         )
 
+    @patch('datahub.documents.tasks.virus_scan_document.apply_async')
+    def test_restricted_user_can_schedule_virus_scan_for_associated_document(
+        self,
+        virus_scan_document_apply_async,
+    ):
+        """
+        Test that restricted user can schedule a virus scan for associated document.
+        """
+        user = create_test_user(
+            permission_codenames=(PropositionDocumentPermission.change_associated,),
+            dit_team=TeamFactory(),
+        )
+        investment_project = InvestmentProjectFactory(
+            created_by=user
+        )
+        proposition = PropositionFactory(
+            investment_project=investment_project
+        )
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=user,
+        )
+
+        url = reverse(
+            'api-v3:investment:proposition:document-item-callback',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+                'entity_document_pk': entity_document.pk
+            }
+        )
+
+        api_client = self.create_api_client(user=user)
+        response = api_client.post(url, format='json')
+        assert response.status_code == status.HTTP_200_OK
+
+        entity_document.document.refresh_from_db()
+
+        assert response.data == {
+            'id': str(entity_document.pk),
+            'av_clean': None,
+            'created_by': {
+                'id': str(entity_document.created_by.pk),
+                'first_name': entity_document.created_by.first_name,
+                'last_name': entity_document.created_by.last_name,
+                'name': entity_document.created_by.name
+            },
+
+            'original_filename': 'test.txt',
+            'url': _get_document_url(entity_document.proposition, entity_document),
+            'status': UPLOAD_STATUSES.virus_scanning_scheduled,
+            'created_on': format_date_or_datetime(entity_document.created_on),
+            'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
+        }
+        virus_scan_document_apply_async.assert_called_once_with(
+            args=(str(entity_document.document.pk), )
+        )
+
+    def test_restricted_user_cannot_schedule_virus_scan_for_non_associated_document(self):
+        """Test that restricted user cannot schedule a virus scan for non associated document."""
+        user = create_test_user(
+            permission_codenames=(PropositionDocumentPermission.change_associated,),
+            dit_team=TeamFactory(),
+        )
+        project_creator = AdviserFactory()
+        investment_project = InvestmentProjectFactory(
+            created_by=project_creator
+        )
+        proposition = PropositionFactory(
+            investment_project=investment_project
+        )
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=project_creator,
+        )
+
+        url = reverse(
+            'api-v3:investment:proposition:document-item-callback',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+                'entity_document_pk': entity_document.pk,
+            }
+        )
+
+        api_client = self.create_api_client(user=user)
+        response = api_client.post(url, format='json')
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.data == {
+            'detail': 'You do not have permission to perform this action.'
+        }
+
+        entity_document.document.refresh_from_db()
+        assert entity_document.document.status == UPLOAD_STATUSES.not_virus_scanned
+
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_DELETE_PERMISSIONS)
     @patch('datahub.documents.tasks.delete_document.apply_async')
     def test_document_delete(self, delete_document, permissions):
@@ -1726,6 +2092,87 @@ class TestPropositionDocumentViews(APITestMixin):
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
         delete_document.assert_called_once_with(args=(document_pk, ))
+
+    @patch('datahub.documents.tasks.delete_document.apply_async')
+    def test_restricted_user_can_delete_associated_document(self, delete_document):
+        """Test that restricted user can delete associated document."""
+        user = create_test_user(
+            permission_codenames=(PropositionDocumentPermission.delete_associated,),
+            dit_team=TeamFactory(),
+        )
+        investment_project = InvestmentProjectFactory(
+            created_by=user
+        )
+        proposition = PropositionFactory(
+            investment_project=investment_project
+        )
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=user,
+        )
+        document = entity_document.document
+        document.mark_scan_scheduled()
+        document.mark_as_scanned(True, 'reason')
+
+        url = reverse(
+            'api-v3:investment:proposition:document-item',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+                'entity_document_pk': entity_document.pk
+            }
+        )
+
+        document_pk = entity_document.document.pk
+
+        api_client = self.create_api_client(user=user)
+        response = api_client.delete(url)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        delete_document.assert_called_once_with(args=(document_pk, ))
+
+    @patch('datahub.documents.tasks.delete_document.apply_async')
+    def test_restricted_user_cannot_delete_non_associated_document(self, delete_document):
+        """Test that restricted user cannot delete non associated document."""
+        user = create_test_user(
+            permission_codenames=(PropositionDocumentPermission.delete_associated,),
+            dit_team=TeamFactory(),
+        )
+        project_creator = AdviserFactory()
+        investment_project = InvestmentProjectFactory(
+            created_by=project_creator
+        )
+        proposition = PropositionFactory(
+            investment_project=investment_project
+        )
+        entity_document = PropositionDocument.objects.create(
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
+            created_by=project_creator,
+        )
+        document = entity_document.document
+        document.mark_scan_scheduled()
+        document.mark_as_scanned(True, 'reason')
+
+        url = reverse(
+            'api-v3:investment:proposition:document-item',
+            kwargs={
+                'proposition_pk': proposition.pk,
+                'project_pk': proposition.investment_project.pk,
+                'entity_document_pk': entity_document.pk
+            }
+        )
+
+        api_client = self.create_api_client(user=user)
+        response = api_client.delete(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.data == {
+            'detail': 'You do not have permission to perform this action.'
+        }
+
+        entity_document.document.refresh_from_db()
+        assert entity_document.document.status == UPLOAD_STATUSES.virus_scanned
+        assert delete_document.called is False
 
     @patch('datahub.documents.tasks.delete_document.apply_async')
     def test_document_delete_without_permission(self, delete_document):
@@ -1804,10 +2251,7 @@ class TestPropositionDocumentViews(APITestMixin):
         assert user_event.data == expected_user_event_data
 
     @patch.object(Document, 'mark_deletion_pending')
-    def test_document_delete_failure_wont_create_user_event_log(
-        self,
-        mark_deletion_pending,
-    ):
+    def test_document_delete_failure_wont_create_user_event_log(self, mark_deletion_pending):
         """Tests document deletion failure won't create user event log."""
         mark_deletion_pending.side_effect = Exception('No way!')
         proposition = PropositionFactory()

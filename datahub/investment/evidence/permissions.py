@@ -1,9 +1,9 @@
 from datahub.core.permissions import IsAssociatedToObjectPermission, ViewBasedModelPermissions
 from datahub.core.utils import StrEnum
 from datahub.investment.evidence.models import EvidenceDocument
-from datahub.investment.models import InvestmentProject
 from datahub.investment.permissions import (
     InvestmentProjectAssociationCheckerBase,
+    IsAssociatedToInvestmentProjectPermissionMixin
 )
 
 
@@ -64,7 +64,9 @@ class InvestmentProjectEvidenceDocumentAssociationChecker(
     associated_permission_template = _PermissionTemplate.associated_investmentproject
 
 
-class IsAssociatedToInvestmentProjectEvidenceDocumentPermission(IsAssociatedToObjectPermission):
+class IsAssociatedToInvestmentProjectEvidenceDocumentPermission(
+    IsAssociatedToInvestmentProjectPermissionMixin, IsAssociatedToObjectPermission,
+):
     """Permission class based on InvestmentProjectEvidenceDocumentAssociationChecker."""
 
     checker_class = InvestmentProjectEvidenceDocumentAssociationChecker
@@ -72,20 +74,3 @@ class IsAssociatedToInvestmentProjectEvidenceDocumentPermission(IsAssociatedToOb
     def get_actual_object(self, obj):
         """Returns the investment project from an EvidenceDocument object."""
         return obj.investment_project
-
-    def has_permission(self, request, view):
-        """
-        Returns whether the user has permissions for a view.
-
-        Evidence documents view is attached to their parent investment project.
-        If user has no permissions to view the investment project, access to the
-        evidence documents endpoints should be blocked.
-        """
-        if self.checker.should_apply_restrictions(request, view.action):
-            investment_project = InvestmentProject.objects.get(
-                pk=request.parser_context['kwargs']['project_pk']
-            )
-            if not self.checker.is_associated(request, investment_project):
-                return False
-
-        return super().has_permission(request, view)
