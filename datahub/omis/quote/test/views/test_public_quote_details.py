@@ -40,7 +40,7 @@ class TestPublicGetQuote(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.get(url, format='json')
+        response = client.get(url)
 
         quote = order.quote
         assert response.status_code == status.HTTP_200_OK
@@ -68,7 +68,7 @@ class TestPublicGetQuote(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.get(url, format='json')
+        response = client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['terms_and_conditions'] == ''
@@ -88,7 +88,7 @@ class TestPublicGetQuote(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.get(url, format='json')
+        response = client.get(url)
 
         quote = order.quote
         assert response.status_code == status.HTTP_200_OK
@@ -111,7 +111,7 @@ class TestPublicGetQuote(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.get(url, format='json')
+        response = client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -128,7 +128,7 @@ class TestPublicGetQuote(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.get(url, format='json')
+        response = client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -207,7 +207,7 @@ class TestAcceptOrder(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.post(url, format='json')
+        response = client.post(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -239,7 +239,7 @@ class TestAcceptOrder(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.post(url, format='json')
+        response = client.post(url)
 
         assert response.status_code == status.HTTP_409_CONFLICT
         assert response.json() == {
@@ -264,7 +264,7 @@ class TestAcceptOrder(APITestMixin):
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
         with freeze_time('2017-07-12 13:00'):
-            response = client.post(url, format='json')
+            response = client.post(url)
 
             assert response.status_code == status.HTTP_200_OK
             assert response.json() == {

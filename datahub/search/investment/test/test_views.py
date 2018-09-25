@@ -123,7 +123,7 @@ class TestSearch(APITestMixin):
 
         response = self.api_client.post(url, {
             'original_query': 'abc defg',
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -164,7 +164,7 @@ class TestSearch(APITestMixin):
 
         response = self.api_client.post(url, {
             'adviser': adviser.pk,
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -214,7 +214,7 @@ class TestSearch(APITestMixin):
         """Tests detailed investment project search."""
         url = reverse('api-v3:search:investment_project')
 
-        response = self.api_client.post(url, query, format='json')
+        response = self.api_client.post(url, query)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == num_results
@@ -295,7 +295,7 @@ class TestSearch(APITestMixin):
         """Tests the actual land date filter."""
         url = reverse('api-v3:search:investment_project')
 
-        response = self.api_client.post(url, query, format='json')
+        response = self.api_client.post(url, query)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == len(expected_results)
@@ -348,7 +348,7 @@ class TestSearch(APITestMixin):
         """Tests detailed investment project search."""
         url = reverse('api-v3:search:investment_project')
 
-        response = self.api_client.post(url, query, format='json')
+        response = self.api_client.post(url, query)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == num_results
@@ -370,7 +370,7 @@ class TestSearch(APITestMixin):
 
         response = self.api_client.post(url, {
             'estimated_land_date_before': 'this is definitely not a valid date',
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
@@ -380,7 +380,7 @@ class TestSearch(APITestMixin):
 
         response = self.api_client.post(url, {
             'status': ['delayed', 'won'],
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
@@ -394,7 +394,7 @@ class TestSearch(APITestMixin):
 
         response = self.api_client.post(url, {
             'investor_company_country': constants.Country.japan.value.id,
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -407,7 +407,7 @@ class TestSearch(APITestMixin):
 
         response = self.api_client.post(url, {
             'uk_region_location': constants.UKRegion.east_midlands.value.id,
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -499,7 +499,7 @@ class TestSearch(APITestMixin):
                 constants.InvestmentProjectStage.won.value.id,
                 constants.InvestmentProjectStage.active.value.id,
             ],
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
@@ -560,7 +560,7 @@ class TestSearch(APITestMixin):
                 constants.InvestmentProjectStage.prospect.value.id,
                 constants.InvestmentProjectStage.active.value.id,
             ],
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 3
@@ -610,7 +610,7 @@ class TestSearchPermissions(APITestMixin):
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:investment_project')
-        response = api_client.post(url, {}, format='json')
+        response = api_client.post(url, {})
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -637,7 +637,7 @@ class TestSearchPermissions(APITestMixin):
 
         setup_es.indices.refresh()
 
-        response = api_client.post(url, {}, format='json')
+        response = api_client.post(url, {})
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -669,7 +669,7 @@ class TestSearchPermissions(APITestMixin):
 
         setup_es.indices.refresh()
 
-        response = api_client.post(url, {}, format='json')
+        response = api_client.post(url, {})
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -703,7 +703,7 @@ class TestInvestmentProjectExportView(APITestMixin):
         api_client = self.create_api_client(user=user)
 
         url = reverse('api-v3:search:investment_project-export')
-        response = api_client.post(url, format='json')
+        response = api_client.post(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_restricted_users_cannot_see_other_teams_projects(self, setup_es):
@@ -739,7 +739,7 @@ class TestInvestmentProjectExportView(APITestMixin):
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:investment_project-export')
-        response = api_client.post(url, {}, format='json')
+        response = api_client.post(url, {})
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -777,7 +777,7 @@ class TestInvestmentProjectExportView(APITestMixin):
             data['sortby'] = request_sortby
 
         with freeze_time('2018-01-01 11:12:13'):
-            response = self.api_client.post(url, format='json', data=data)
+            response = self.api_client.post(url, data=data)
 
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Disposition')) == (

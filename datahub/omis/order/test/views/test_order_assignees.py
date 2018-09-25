@@ -24,7 +24,7 @@ class TestGetOrderAssignees(APITestMixin):
             'api-v3:omis:order:assignee',
             kwargs={'order_pk': order.id}
         )
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == []
@@ -46,7 +46,7 @@ class TestGetOrderAssignees(APITestMixin):
             'api-v3:omis:order:assignee',
             kwargs={'order_pk': order.id}
         )
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [
@@ -70,7 +70,7 @@ class TestGetOrderAssignees(APITestMixin):
             'api-v3:omis:order:assignee',
             kwargs={'order_pk': '00000000-0000-0000-0000-000000000000'}
         )
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -163,7 +163,6 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
                     'is_lead': True
                 }
             ],
-            format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -284,7 +283,6 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
                     'estimated_time': 250
                 }
             ],
-            format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -353,7 +351,6 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
                     'is_lead': assignee1.is_lead
                 }
             ],
-            format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -438,7 +435,6 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
                     'estimated_time': 300
                 },
             ],
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -484,7 +480,6 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
                     'actual_time': 200,
                 },
             ],
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -569,7 +564,6 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
                     'estimated_time': 0
                 },
             ],
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -597,7 +591,6 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
             [{
                 'adviser': {'id': AdviserFactory().id}
             }],
-            format='json'
         )
 
         assert response.status_code == status.HTTP_409_CONFLICT
@@ -662,7 +655,6 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
                     'actual_time': 100
                 },
             ],
-            format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -709,7 +701,6 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
                     'adviser': {'id': assignee.adviser.id},
                 },
             ],
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -763,7 +754,6 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
                     'actual_time': 220
                 },
             ],
-            format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -818,7 +808,6 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
                     **data
                 },
             ],
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -859,7 +848,6 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
                     **data
                 },
             ],
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -929,7 +917,6 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
                     'adviser': {'id': new_adviser.id},
                 },
             ],
-            format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -982,7 +969,6 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
                     'adviser': {'id': assignee.adviser.id},
                 },
             ],
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -1025,7 +1011,6 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
                     **data
                 },
             ],
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -1070,7 +1055,6 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
                     **data
                 },
             ],
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST

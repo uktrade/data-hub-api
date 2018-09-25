@@ -420,7 +420,7 @@ class TestUpdateCompany(APITestMixin):
 
         # now update it
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.patch(url, format='json', data={
+        response = self.api_client.patch(url, data={
             'name': 'Acme',
         })
 
@@ -459,7 +459,7 @@ class TestUpdateCompany(APITestMixin):
             'registered_address_country': Country.united_states.value.id,
         }
 
-        response = self.api_client.patch(url, format='json', data=update_data)
+        response = self.api_client.patch(url, data=update_data)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['name'] == update_data['name']
@@ -479,7 +479,7 @@ class TestUpdateCompany(APITestMixin):
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.patch(url, format='json', data={
+        response = self.api_client.patch(url, data={
             'reference_code': 'XYZ',
             'archived_documents_url_path': 'new_path'
         })
@@ -498,7 +498,7 @@ class TestUpdateCompany(APITestMixin):
         )
 
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.patch(url, format='json', data={
+        response = self.api_client.patch(url, data={
             'trading_name': 'a' * 600,
         })
 
@@ -527,7 +527,7 @@ class TestUpdateCompany(APITestMixin):
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
         response = self.api_client.patch(url, {
             field: None,
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
@@ -552,7 +552,7 @@ class TestUpdateCompany(APITestMixin):
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
         response = self.api_client.patch(url, {
             field: None,
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()[field] is None
@@ -572,7 +572,7 @@ class TestUpdateCompany(APITestMixin):
 
         # now update it
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.patch(url, format='json', data={
+        response = self.api_client.patch(url, data={
             'global_headquarters': headquarter.id,
         })
         if is_valid:
@@ -595,7 +595,7 @@ class TestUpdateCompany(APITestMixin):
 
         # now update it
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.patch(url, format='json', data={
+        response = self.api_client.patch(url, data={
             'global_headquarters': None,
         })
 
@@ -612,7 +612,7 @@ class TestUpdateCompany(APITestMixin):
 
         # now update it
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.patch(url, format='json', data={
+        response = self.api_client.patch(url, data={
             'global_headquarters': company.id,
         })
 
@@ -634,7 +634,7 @@ class TestUpdateCompany(APITestMixin):
 
         # now update it
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.patch(url, format='json', data={
+        response = self.api_client.patch(url, data={
             'headquarter_type': HeadquarterType.ghq.value.id,
         })
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -664,7 +664,7 @@ class TestUpdateCompany(APITestMixin):
 
         # now update it
         url = reverse('api-v3:company:item', kwargs={'pk': company.pk})
-        response = self.api_client.patch(url, format='json', data={
+        response = self.api_client.patch(url, data={
             'headquarter_type': changed_to,
         })
 
@@ -685,7 +685,7 @@ class TestAddCompany(APITestMixin):
     def test_add_uk_company(self):
         """Test add new UK company."""
         url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, format='json', data={
+        response = self.api_client.post(url, data={
             'name': 'Acme',
             'trading_name': 'Trading name',
             'business_type': {'id': BusinessTypeConstant.company.value.id},
@@ -721,14 +721,14 @@ class TestAddCompany(APITestMixin):
             'trading_address_1': '1 Hello st.',
             'trading_address_town': 'Dublin',
             'uk_region': UKRegion.england.value.id
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_201_CREATED
 
     def test_add_uk_company_without_uk_region(self):
         """Test add new UK without UK region company."""
         url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, format='json', data={
+        response = self.api_client.post(url, data={
             'name': 'Acme',
             'trading_name': None,
             'business_type': {'id': BusinessTypeConstant.company.value.id},
@@ -746,7 +746,7 @@ class TestAddCompany(APITestMixin):
     def test_add_not_uk_company(self):
         """Test add new not UK company."""
         url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, format='json', data={
+        response = self.api_client.post(url, data={
             'name': 'Acme',
             'trading_name': None,
             'business_type': {'id': BusinessTypeConstant.company.value.id},
@@ -764,7 +764,7 @@ class TestAddCompany(APITestMixin):
     def test_add_company_partial_trading_address(self):
         """Test add new company with partial trading address."""
         url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, format='json', data={
+        response = self.api_client.post(url, data={
             'name': 'Acme',
             'business_type': {'id': BusinessTypeConstant.company.value.id},
             'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
@@ -786,7 +786,7 @@ class TestAddCompany(APITestMixin):
     def test_add_company_with_trading_address(self):
         """Test add new company with trading_address."""
         url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, format='json', data={
+        response = self.api_client.post(url, data={
             'name': 'Acme',
             'business_type': {'id': BusinessTypeConstant.company.value.id},
             'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
@@ -831,7 +831,7 @@ class TestAddCompany(APITestMixin):
             'registered_address_1': None,
             'registered_address_town': None,
             'registered_address_country': None
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
@@ -851,7 +851,7 @@ class TestAddCompany(APITestMixin):
             'registered_address_1': '',
             'registered_address_town': '',
             'registered_address_country': None,
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
@@ -875,7 +875,7 @@ class TestAddCompany(APITestMixin):
             'registered_address_town': 'London',
             'registered_address_country': Country.united_kingdom.value.id,
             'uk_region': UKRegion.england.value.id,
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json()[field] == ['This field is required.']
@@ -892,7 +892,7 @@ class TestAddCompany(APITestMixin):
     def test_add_company_with_website(self, input_website, expected_website):
         """Test add new company with trading_address."""
         url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, format='json', data={
+        response = self.api_client.post(url, data={
             'name': 'Acme',
             'business_type': {'id': BusinessTypeConstant.company.value.id},
             'sector': {'id': Sector.aerospace_assembly_aircraft.value.id},
@@ -914,7 +914,7 @@ class TestAddCompany(APITestMixin):
     def test_add_uk_establishment(self):
         """Test adding a UK establishment."""
         url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, format='json', data={
+        response = self.api_client.post(url, data={
             'name': 'Acme',
             'trading_name': 'Trading name',
             'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
@@ -936,7 +936,7 @@ class TestAddCompany(APITestMixin):
     def test_cannot_add_uk_establishment_without_number(self):
         """Test that a UK establishment cannot be added without a company number."""
         url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, format='json', data={
+        response = self.api_client.post(url, data={
             'name': 'Acme',
             'trading_name': 'Trading name',
             'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
@@ -960,7 +960,7 @@ class TestAddCompany(APITestMixin):
     def test_cannot_add_uk_establishment_as_foreign_company(self):
         """Test that adding a UK establishment fails if its country is not UK."""
         url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, format='json', data={
+        response = self.api_client.post(url, data={
             'name': 'Acme',
             'trading_name': 'Trading name',
             'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
@@ -987,7 +987,7 @@ class TestAddCompany(APITestMixin):
         Test that adding a UK establishment fails if its company number does not start with BR.
         """
         url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, format='json', data={
+        response = self.api_client.post(url, data={
             'name': 'Acme',
             'trading_name': 'Trading name',
             'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
@@ -1015,7 +1015,7 @@ class TestAddCompany(APITestMixin):
         characters.
         """
         url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, format='json', data={
+        response = self.api_client.post(url, data={
             'name': 'Acme',
             'trading_name': 'Trading name',
             'business_type': {'id': BusinessTypeConstant.uk_establishment.value.id},
@@ -1041,7 +1041,7 @@ class TestAddCompany(APITestMixin):
     def test_no_company_number_validation_for_normal_uk_companies(self):
         """Test that no validation is done on company number for normal companies."""
         url = reverse('api-v3:company:collection')
-        response = self.api_client.post(url, format='json', data={
+        response = self.api_client.post(url, data={
             'name': 'Acme',
             'trading_name': 'Trading name',
             'business_type': {'id': BusinessTypeConstant.private_limited_company.value.id},
@@ -1068,7 +1068,7 @@ class TestArchiveCompany(APITestMixin):
         """Test company archive."""
         company = CompanyFactory()
         url = reverse('api-v3:company:archive', kwargs={'pk': company.id})
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
@@ -1079,7 +1079,7 @@ class TestArchiveCompany(APITestMixin):
         """Test company archive."""
         company = CompanyFactory()
         url = reverse('api-v3:company:archive', kwargs={'pk': company.id})
-        response = self.api_client.post(url, {'reason': 'foo'}, format='json')
+        response = self.api_client.post(url, {'reason': 'foo'})
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived']
@@ -1097,7 +1097,7 @@ class TestArchiveCompany(APITestMixin):
             uk_region_id=None,
         )
         url = reverse('api-v3:company:archive', kwargs={'pk': company.id})
-        response = self.api_client.post(url, {'reason': 'foo'}, format='json')
+        response = self.api_client.post(url, {'reason': 'foo'})
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived']
@@ -1120,7 +1120,7 @@ class TestUnarchiveCompany(APITestMixin):
             archived_reason='Dissolved',
         )
         url = reverse('api-v3:company:unarchive', kwargs={'pk': company.id})
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert not response.data['archived']
@@ -1162,7 +1162,6 @@ class TestCompanyVersioning(APITestMixin):
                 'registered_address_town': 'London',
                 'uk_region': {'id': UKRegion.england.value.id},
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_201_CREATED
@@ -1196,7 +1195,6 @@ class TestCompanyVersioning(APITestMixin):
                 'registered_address_town': 'London',
                 'uk_region': UKRegion.england.value.id
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_201_CREATED
@@ -1215,7 +1213,6 @@ class TestCompanyVersioning(APITestMixin):
         response = self.api_client.post(
             reverse('api-v3:company:collection'),
             data={'name': 'Acme'},
-            format='json',
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -1230,7 +1227,6 @@ class TestCompanyVersioning(APITestMixin):
         response = self.api_client.patch(
             reverse('api-v3:company:item', kwargs={'pk': company.pk}),
             data={'name': 'Acme'},
-            format='json',
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -1249,7 +1245,6 @@ class TestCompanyVersioning(APITestMixin):
         response = self.api_client.patch(
             reverse('api-v3:company:item', kwargs={'pk': company.pk}),
             data={'trading_name': 'a' * 600},
-            format='json',
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -1261,7 +1256,7 @@ class TestCompanyVersioning(APITestMixin):
         assert Version.objects.get_for_object(company).count() == 0
 
         url = reverse('api-v3:company:archive', kwargs={'pk': company.id})
-        response = self.api_client.post(url, {'reason': 'foo'}, format='json')
+        response = self.api_client.post(url, {'reason': 'foo'})
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived']
@@ -1280,7 +1275,7 @@ class TestCompanyVersioning(APITestMixin):
         assert Version.objects.get_for_object(company).count() == 0
 
         url = reverse('api-v3:company:archive', kwargs={'pk': company.id})
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert Version.objects.get_for_object(company).count() == 0
@@ -1434,7 +1429,7 @@ class TestCompanyCoreTeam(APITestMixin):
             'api-v3:company:core-team',
             kwargs={'pk': company.pk}
         )
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == []
@@ -1451,7 +1446,7 @@ class TestCompanyCoreTeam(APITestMixin):
             'api-v3:company:core-team',
             kwargs={'pk': company.pk}
         )
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [
@@ -1509,7 +1504,7 @@ class TestCompanyCoreTeam(APITestMixin):
             'api-v3:company:core-team',
             kwargs={'pk': company.pk}
         )
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [
@@ -1545,6 +1540,6 @@ class TestCompanyCoreTeam(APITestMixin):
             'api-v3:company:core-team',
             kwargs={'pk': '00000000-0000-0000-0000-000000000000'}
         )
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND

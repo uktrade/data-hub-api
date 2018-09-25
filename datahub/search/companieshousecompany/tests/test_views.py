@@ -133,7 +133,7 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
         """Test search results."""
         url = reverse('api-v3:search:companieshousecompany')
 
-        response = self.api_client.post(url, data, format='json')
+        response = self.api_client.post(url, data)
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()['results']) == len(results)
         assert {
@@ -147,7 +147,7 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
         response = self.api_client.post(url, {
             'incorporation_date_after': 'invalid',
             'incorporation_date_before': 'invalid',
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
