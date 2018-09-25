@@ -60,7 +60,7 @@ class TestAddContact(APITestMixin):
             'accepts_dit_email_marketing': True,
             'contactable_by_email': True,
             'contactable_by_phone': True
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == {
@@ -129,7 +129,7 @@ class TestAddContact(APITestMixin):
             'telephone_number': '123456789',
             'address_same_as_company': True,
             'primary': True
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
@@ -156,7 +156,7 @@ class TestAddContact(APITestMixin):
             'telephone_number': '123456789',
             'address_same_as_company': True,
             'primary': True
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.data
@@ -192,7 +192,7 @@ class TestAddContact(APITestMixin):
             'telephone_number': '123456789',
             'address_same_as_company': True,
             'primary': True
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
@@ -212,7 +212,7 @@ class TestAddContact(APITestMixin):
             'telephone_countrycode': '+44',
             'telephone_number': '123456789',
             'primary': True
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
@@ -235,7 +235,7 @@ class TestAddContact(APITestMixin):
             'telephone_number': '123456789',
             'address_1': 'test',
             'primary': True
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
@@ -259,7 +259,7 @@ class TestAddContact(APITestMixin):
             'contactable_by_email': False,
             'contactable_by_phone': False,
             'primary': True
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
@@ -286,7 +286,7 @@ class TestAddContact(APITestMixin):
             'telephone_countrycode': '+44',
             'telephone_number': '123456789',
             'address_same_as_company': True,
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
@@ -335,7 +335,7 @@ class TestEditContact(APITestMixin):
         with freeze_time('2017-04-19 13:25:30.986208'):
             response = self.api_client.patch(url, {
                 'first_name': 'New Oratio',
-            }, format='json')
+            })
 
         assert response.status_code == status.HTTP_200_OK, response.data
         assert response.json() == {
@@ -395,7 +395,7 @@ class TestEditContact(APITestMixin):
         company = ArchivedContactFactory()
 
         url = reverse('api-v3:contact:detail', kwargs={'pk': company.pk})
-        response = self.api_client.patch(url, format='json', data={
+        response = self.api_client.patch(url, data={
             'first_name': 'new name',
         })
 
@@ -411,7 +411,7 @@ class TestEditContact(APITestMixin):
         )
 
         url = reverse('api-v3:contact:detail', kwargs={'pk': contact.pk})
-        response = self.api_client.patch(url, format='json', data={
+        response = self.api_client.patch(url, data={
             'archived_documents_url_path': 'new_path'
         })
 
@@ -718,7 +718,6 @@ class TestContactVersioning(APITestMixin):
                 'address_same_as_company': True,
                 'primary': True
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_201_CREATED
@@ -745,7 +744,6 @@ class TestContactVersioning(APITestMixin):
                 'first_name': 'Oratio',
                 'last_name': 'Nelson',
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -761,7 +759,6 @@ class TestContactVersioning(APITestMixin):
         response = self.api_client.patch(
             reverse('api-v3:contact:detail', kwargs={'pk': contact.pk}),
             data={'first_name': 'New Oratio'},
-            format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -783,7 +780,6 @@ class TestContactVersioning(APITestMixin):
         response = self.api_client.patch(
             reverse('api-v3:contact:detail', kwargs={'pk': contact.pk}),
             data={'email': 'invalid'},
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -795,7 +791,7 @@ class TestContactVersioning(APITestMixin):
         assert Version.objects.get_for_object(contact).count() == 0
 
         url = reverse('api-v3:contact:archive', kwargs={'pk': contact.id})
-        response = self.api_client.post(url, {'reason': 'foo'}, format='json')
+        response = self.api_client.post(url, {'reason': 'foo'})
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived']
@@ -814,7 +810,7 @@ class TestContactVersioning(APITestMixin):
         assert Version.objects.get_for_object(contact).count() == 0
 
         url = reverse('api-v3:contact:archive', kwargs={'pk': contact.id})
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert Version.objects.get_for_object(contact).count() == 0

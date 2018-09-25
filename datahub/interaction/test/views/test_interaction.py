@@ -97,7 +97,7 @@ class TestAddInteraction(APITestMixin):
         }
 
         api_client = self.create_api_client(user=adviser)
-        response = api_client.post(url, request_data, format='json')
+        response = api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
@@ -241,7 +241,7 @@ class TestAddInteraction(APITestMixin):
         """Test validation errors."""
         data = resolve_data(data)
         url = reverse('api-v3:interaction:collection')
-        response = self.api_client.post(url, data, format='json')
+        response = self.api_client.post(url, data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == errors
@@ -273,7 +273,7 @@ class TestAddInteraction(APITestMixin):
             'investment_project': project.pk,
             'service': Service.trade_enquiry.value.id,
             'dit_team': Team.healthcare_uk.value.id
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
@@ -307,7 +307,7 @@ class TestAddInteraction(APITestMixin):
             'investment_project': project.pk,
             'service': Service.trade_enquiry.value.id,
             'dit_team': Team.healthcare_uk.value.id
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
@@ -333,7 +333,7 @@ class TestAddInteraction(APITestMixin):
             'notes': 'hello',
             'service': Service.trade_enquiry.value.id,
             'dit_team': Team.healthcare_uk.value.id
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
@@ -615,7 +615,7 @@ class TestUpdateInteraction(APITestMixin):
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
         response = api_client.patch(url, {
             'subject': 'I am another subject',
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['subject'] == 'I am another subject'
@@ -631,7 +631,7 @@ class TestUpdateInteraction(APITestMixin):
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
         response = api_client.patch(url, {
             'subject': 'I am another subject',
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -650,7 +650,7 @@ class TestUpdateInteraction(APITestMixin):
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
         response = api_client.patch(url, {
             'subject': 'I am another subject',
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -675,7 +675,7 @@ class TestUpdateInteraction(APITestMixin):
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
         response = api_client.patch(url, {
             'subject': 'I am another subject',
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['subject'] == 'I am another subject'

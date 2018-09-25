@@ -143,7 +143,7 @@ class TestCreateEventView(APITestMixin):
             'lead_team': team.pk,
             'teams': [team.pk],
         }
-        response = self.api_client.post(url, format='json', data=request_data)
+        response = self.api_client.post(url, data=request_data)
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = _get_canonical_response_data(response)
@@ -209,7 +209,7 @@ class TestCreateEventView(APITestMixin):
             'related_programmes': [Programme.great_branded.value.id],
             'service': Service.trade_enquiry.value.id,
         }
-        response = self.api_client.post(url, format='json', data=request_data)
+        response = self.api_client.post(url, data=request_data)
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = _get_canonical_response_data(response)
@@ -286,7 +286,7 @@ class TestCreateEventView(APITestMixin):
             'service': Service.trade_enquiry.value.id,
             'start_date': '2010-09-12',
         }
-        response = self.api_client.post(url, format='json', data=request_data)
+        response = self.api_client.post(url, data=request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -310,7 +310,7 @@ class TestCreateEventView(APITestMixin):
             'lead_team': team.pk,
             'teams': [team.pk],
         }
-        response = self.api_client.post(url, format='json', data=request_data)
+        response = self.api_client.post(url, data=request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -335,7 +335,7 @@ class TestCreateEventView(APITestMixin):
             'lead_team': team.pk,
             'teams': [team.pk],
         }
-        response = self.api_client.post(url, format='json', data=request_data)
+        response = self.api_client.post(url, data=request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -359,7 +359,7 @@ class TestCreateEventView(APITestMixin):
             'lead_team': team.pk,
             'teams': [team.pk],
         }
-        response = self.api_client.post(url, format='json', data=request_data)
+        response = self.api_client.post(url, data=request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -384,7 +384,7 @@ class TestCreateEventView(APITestMixin):
             'lead_team': team.pk,
             'teams': [team.pk],
         }
-        response = self.api_client.post(url, format='json', data=request_data)
+        response = self.api_client.post(url, data=request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -396,7 +396,7 @@ class TestCreateEventView(APITestMixin):
         """Tests creating an event without required fields."""
         url = reverse('api-v3:event:collection')
         request_data = {}
-        response = self.api_client.post(url, format='json', data=request_data)
+        response = self.api_client.post(url, data=request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -428,7 +428,7 @@ class TestCreateEventView(APITestMixin):
             'start_date': None,
             'teams': []
         }
-        response = self.api_client.post(url, format='json', data=request_data)
+        response = self.api_client.post(url, data=request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -475,7 +475,7 @@ class TestUpdateEventView(APITestMixin):
             'related_programmes': [Programme.great_challenge_fund.value.id],
             'service': Service.account_management.value.id,
         }
-        response = self.api_client.patch(url, request_data, format='json')
+        response = self.api_client.patch(url, request_data)
         assert response.status_code == status.HTTP_200_OK
 
         response_data = _get_canonical_response_data(response)
@@ -541,7 +541,7 @@ class TestUpdateEventView(APITestMixin):
         request_data = {
             'lead_team': Team.healthcare_uk.value.id,
         }
-        response = self.api_client.patch(url, request_data, format='json')
+        response = self.api_client.patch(url, request_data)
         assert response.status_code == status.HTTP_200_OK
 
         response_data = _get_canonical_response_data(response)
@@ -555,7 +555,7 @@ class TestUpdateEventView(APITestMixin):
         request_data = {
             'end_date': None,
         }
-        response = self.api_client.patch(url, request_data, format='json')
+        response = self.api_client.patch(url, request_data)
 
         response_data = response.json()
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -569,7 +569,7 @@ class TestUpdateEventView(APITestMixin):
         request_data = {
             'lead_team': Team.food_from_britain.value.id,
         }
-        response = self.api_client.patch(url, request_data, format='json')
+        response = self.api_client.patch(url, request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
         response_data = response.json()
@@ -582,7 +582,7 @@ class TestUpdateEventView(APITestMixin):
         event = DisabledEventFactory(archived_documents_url_path='old_path')
 
         url = reverse('api-v3:event:item', kwargs={'pk': event.pk})
-        response = self.api_client.patch(url, format='json', data={
+        response = self.api_client.patch(url, data={
             'archived_documents_url_path': 'new_path',
             'disabled_on': None,
         })
@@ -616,7 +616,6 @@ class TestEventVersioning(APITestMixin):
                 'lead_team': team.pk,
                 'teams': [team.pk],
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_201_CREATED
@@ -638,7 +637,6 @@ class TestEventVersioning(APITestMixin):
         response = self.api_client.post(
             reverse('api-v3:event:collection'),
             data={'name': 'Grand exhibition'},
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -653,7 +651,6 @@ class TestEventVersioning(APITestMixin):
         response = self.api_client.patch(
             reverse('api-v3:event:item', kwargs={'pk': event.pk}),
             data={'name': 'Annual exhibition'},
-            format='json'
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.data['name'] == 'Annual exhibition'
@@ -673,7 +670,6 @@ class TestEventVersioning(APITestMixin):
         response = self.api_client.patch(
             reverse('api-v3:event:item', kwargs={'pk': event.pk}),
             data={'event_type': 'invalid'},
-            format='json'
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert Version.objects.get_for_object(event).count() == 0
