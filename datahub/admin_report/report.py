@@ -61,7 +61,7 @@ class Report:
         if 'ID' in cls.field_titles.values():
             raise DataHubException(
                 'ID cannot be used as a column title due to the potential confusion with SYLK '
-                'files in e.g. Excel'
+                'files in e.g. Excel',
             )
 
 
