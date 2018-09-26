@@ -6,6 +6,6 @@ activity_stream_urls = [
     path(
         'activity-stream/',
         ActivityStreamViewSet.as_view({'get': 'list'}),
-        name='index'
+        name='index',
     ),
 ]

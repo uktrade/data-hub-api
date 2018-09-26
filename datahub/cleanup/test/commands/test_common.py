@@ -167,8 +167,8 @@ def cleanup_mapping(request):
     'model_name',
     # Get unique models only – must be in a consistent order for parallelised tests
     sorted(
-        {model_name for command_cls in COMMAND_CLASSES for model_name in command_cls.CONFIGS}
-    )
+        {model_name for command_cls in COMMAND_CLASSES for model_name in command_cls.CONFIGS},
+    ),
 )
 def test_mappings(model_name):
     """
@@ -207,7 +207,7 @@ def create_orphanable_model(factory, config, date_value):
     """
     with freeze_time(date_value):
         return factory(
-            **{config.date_field: date_value}
+            **{config.date_field: date_value},
         )
 
 

@@ -7,13 +7,15 @@ from ..utils import is_feature_flag_active
 pytestmark = pytest.mark.django_db
 
 
-@pytest.mark.parametrize('code,is_active,lookup,expected', (
-    ('test_flag', True, 'test_flag', True),
-    ('test_flag', False, 'test_flag', False),
-    ('', None, 'test_flag', False),
-    ('test_flag', True, 'test', False)
-
-))
+@pytest.mark.parametrize(
+    'code,is_active,lookup,expected',
+    (
+        ('test_flag', True, 'test_flag', True),
+        ('test_flag', False, 'test_flag', False),
+        ('', None, 'test_flag', False),
+        ('test_flag', True, 'test', False),
+    ),
+)
 def test_is_feature_flag(code, is_active, lookup, expected):
     """Tests if is_feature_flag returns correct state of feature flag."""
     if code != '':

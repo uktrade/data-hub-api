@@ -12,7 +12,7 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.event.test.factories import EventFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.test.factories import (
-    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
+    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
 )
 from ...management.commands import delete_orphaned_versions
 
@@ -24,7 +24,7 @@ MAPPINGS = {
     'event.Event': EventFactory,
     'interaction.Interaction': CompanyInteractionFactory,
     'investment.InvestmentProject': InvestmentProjectFactory,
-    'investment.InvestmentProjectTeamMember': InvestmentProjectTeamMemberFactory
+    'investment.InvestmentProjectTeamMember': InvestmentProjectTeamMemberFactory,
 }
 
 
@@ -39,7 +39,7 @@ def test_mappings():
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     'model_label,model_factory',
-    MAPPINGS.items()
+    MAPPINGS.items(),
 )
 def test_with_one_model(model_label, model_factory):
     """
@@ -113,7 +113,7 @@ def test_delete_revisions_without_versions(caplog):
     # delete all versions indirectly created
     Version.objects.exclude(
         content_type=ContentType.objects.get_for_model(model),
-        object_id=obj.pk
+        object_id=obj.pk,
     ).delete()
 
     # check that only 1 version and revision exist
