@@ -10,6 +10,6 @@ urlpatterns = [
     path(
         'admin/investment-report/spi/<uuid:pk>',
         site.admin_view(download_spi_report),
-        name='download-spi-report'
+        name='download-spi-report',
     ),
 ]

@@ -63,7 +63,7 @@ class EvidenceDocument(AbstractEntityDocumentModel):
     investment_project = models.ForeignKey(
         'investment.InvestmentProject',
         on_delete=models.CASCADE,
-        related_name='evidence_documents'
+        related_name='evidence_documents',
     )
     comment = models.TextField(blank=True)
 
@@ -77,19 +77,19 @@ class EvidenceDocument(AbstractEntityDocumentModel):
         permissions = (
             (
                 EvidenceDocumentPermission.add_associated.value,
-                'Can add evidence document for associated investment projects'
+                'Can add evidence document for associated investment projects',
             ),
             (
                 EvidenceDocumentPermission.change_associated.value,
-                'Can change evidence document for associated investment projects'
+                'Can change evidence document for associated investment projects',
             ),
             (
                 EvidenceDocumentPermission.delete_associated.value,
-                'Can delete evidence document for associated investment projects'
+                'Can delete evidence document for associated investment projects',
             ),
             (
                 EvidenceDocumentPermission.view_associated.value,
-                'Can view evidence document for associated investment projects'
+                'Can view evidence document for associated investment projects',
             ),
         )
         default_permissions = (
@@ -106,7 +106,10 @@ class EvidenceDocument(AbstractEntityDocumentModel):
     @property
     def url(self):
         """Returns URL to download endpoint."""
-        return reverse('api-v3:investment:evidence-document:document-item-download', kwargs={
-            'project_pk': self.investment_project.pk,
-            'entity_document_pk': self.pk,
-        })
+        return reverse(
+            'api-v3:investment:evidence-document:document-item-download',
+            kwargs={
+                'project_pk': self.investment_project.pk,
+                'entity_document_pk': self.pk,
+            },
+        )
