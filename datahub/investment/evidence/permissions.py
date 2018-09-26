@@ -3,7 +3,7 @@ from datahub.core.utils import StrEnum
 from datahub.investment.evidence.models import EvidenceDocument
 from datahub.investment.permissions import (
     InvestmentProjectAssociationCheckerBase,
-    IsAssociatedToInvestmentProjectPermissionMixin
+    IsAssociatedToInvestmentProjectPermissionMixin,
 )
 
 
@@ -25,7 +25,7 @@ class _EvidenceDocumentViewToActionMapping:
 
 class EvidenceDocumentModelPermissions(
     _EvidenceDocumentViewToActionMapping,
-    ViewBasedModelPermissions
+    ViewBasedModelPermissions,
 ):
     """Evidence Document model permissions class."""
 

@@ -14,9 +14,12 @@ class TestGetSPIReport(AdminTestMixin):
     def test_fails_without_permissions(self, api_client):
         """Should redirect to login page."""
         report = SPIReportFactory()
-        url = reverse('investment-report:download-spi-report', kwargs={
-            'pk': report.pk,
-        })
+        url = reverse(
+            'investment-report:download-spi-report',
+            kwargs={
+                'pk': report.pk,
+            },
+        )
         response = api_client.get(url, follow=True)
         assert response.status_code == status.HTTP_200_OK
         assert len(response.redirect_chain) == 1
@@ -26,9 +29,12 @@ class TestGetSPIReport(AdminTestMixin):
         """Test get report by a user with permission."""
         report = SPIReportFactory()
 
-        url = reverse('investment-report:download-spi-report', kwargs={
-            'pk': report.pk,
-        })
+        url = reverse(
+            'investment-report:download-spi-report',
+            kwargs={
+                'pk': report.pk,
+            },
+        )
         user = create_test_user(
             is_staff=True,
             password=self.PASSWORD,
@@ -45,9 +51,12 @@ class TestGetSPIReport(AdminTestMixin):
     def test_user_without_permission_cannot_get_report(self):
         """Test that user without permission cannot get a report."""
         report = SPIReportFactory()
-        url = reverse('investment-report:download-spi-report', kwargs={
-            'pk': report.pk,
-        })
+        url = reverse(
+            'investment-report:download-spi-report',
+            kwargs={
+                'pk': report.pk,
+            },
+        )
         user = create_test_user(
             is_staff=True,
             password=self.PASSWORD,
@@ -59,9 +68,12 @@ class TestGetSPIReport(AdminTestMixin):
 
     def test_non_restricted_user_cannot_get_non_existent_report(self):
         """Test user cannot get a report that doesn't exist."""
-        url = reverse('investment-report:download-spi-report', kwargs={
-            'pk': uuid4(),
-        })
+        url = reverse(
+            'investment-report:download-spi-report',
+            kwargs={
+                'pk': uuid4(),
+            },
+        )
         user = create_test_user(
             is_staff=True,
             password=self.PASSWORD,

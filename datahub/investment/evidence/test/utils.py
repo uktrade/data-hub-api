@@ -8,7 +8,7 @@ def create_evidence_document(user=None, associated=False, investment_project=Non
     evidence_tags = EvidenceTagFactory.create_batch(2)
     if not investment_project:
         investment_project = InvestmentProjectFactory(
-            **{'created_by': user} if associated else {}
+            **{'created_by': user} if associated else {},
         )
     entity_document = EvidenceDocument.objects.create(
         investment_project_id=investment_project.pk,

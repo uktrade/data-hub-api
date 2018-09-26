@@ -6,7 +6,7 @@ from datahub.investment.proposition.views import PropositionDocumentViewSet, Pro
 
 proposition_collection = PropositionViewSet.as_view({
     'get': 'list',
-    'post': 'create'
+    'post': 'create',
 })
 
 proposition_item = PropositionViewSet.as_view({
@@ -47,21 +47,21 @@ urlpatterns = [
     path(
         'proposition/<uuid:proposition_pk>/document',
         proposition_document_collection,
-        name='document-collection'
+        name='document-collection',
     ),
     path(
         'proposition/<uuid:proposition_pk>/document/<uuid:entity_document_pk>',
         proposition_document_item,
-        name='document-item'
+        name='document-item',
     ),
     path(
         'proposition/<uuid:proposition_pk>/document/<uuid:entity_document_pk>/upload-callback',
         proposition_document_callback,
-        name='document-item-callback'
+        name='document-item-callback',
     ),
     path(
         'proposition/<uuid:proposition_pk>/document/<uuid:entity_document_pk>/download',
         proposition_document_download,
-        name='document-item-download'
+        name='document-item-download',
     ),
 ]
