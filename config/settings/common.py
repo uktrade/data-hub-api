@@ -171,6 +171,7 @@ ALLOWED_ADMIN_IP_RANGES = env.list('ALLOWED_ADMIN_IP_RANGES', default=[])
 SSO_ENABLED = env.bool('SSO_ENABLED')
 
 OAUTH2_PROVIDER = {
+    'OAUTH2_BACKEND_CLASS': 'datahub.oauth.backend.ContentTypeAwareOAuthLibCore',
     'SCOPES_BACKEND_CLASS': 'datahub.oauth.scopes.ApplicationScopesBackend',
 }
 
