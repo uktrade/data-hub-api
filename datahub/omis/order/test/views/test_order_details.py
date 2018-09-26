@@ -66,7 +66,6 @@ class TestAddOrder(APITestMixin):
                 'billing_address_postcode': 'SW1A1AA',
                 'billing_address_country': Country.united_kingdom.value.id,
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_201_CREATED
@@ -165,7 +164,6 @@ class TestAddOrder(APITestMixin):
                 'contact': {'id': contact.pk},
                 'primary_market': {'id': country.id},
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_201_CREATED
@@ -214,7 +212,6 @@ class TestAddOrder(APITestMixin):
                 'contact': {'id': contact.pk},
                 'primary_market': {'id': country.id},
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -225,7 +222,7 @@ class TestAddOrder(APITestMixin):
     def test_general_validation(self):
         """Test create an Order general validation."""
         url = reverse('api-v3:omis:order:list')
-        response = self.api_client.post(url, {}, format='json')
+        response = self.api_client.post(url, {})
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
@@ -251,7 +248,6 @@ class TestAddOrder(APITestMixin):
                     {'id': disabled_service_type.pk},
                 ],
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -272,7 +268,6 @@ class TestAddOrder(APITestMixin):
                 'contact': {'id': ContactFactory(company=company).pk},
                 'primary_market': {'id': disabled_country.pk}
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -299,7 +294,6 @@ class TestAddOrder(APITestMixin):
                 'contact': {'id': ContactFactory(company=company).pk},
                 'primary_market': {'id': non_market_country.pk}
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -331,7 +325,6 @@ class TestAddOrder(APITestMixin):
                 'contact_email': 'JohnDoe@example.com',
                 'contact_phone': '0123456789',
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_201_CREATED
@@ -368,7 +361,6 @@ class TestAddOrder(APITestMixin):
                 'vat_number': '0123456789',
                 'vat_verified': True,
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_201_CREATED
@@ -394,7 +386,6 @@ class TestAddOrder(APITestMixin):
                 'primary_market': {'id': country.id},
                 'billing_address_2': 'London Street',
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -423,7 +414,7 @@ class TestGeneralChangeOrder(APITestMixin):
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
         response = self.api_client.patch(
-            url, {'description': 'Updated description'}, format='json'
+            url, {'description': 'Updated description'}
         )
 
         order.refresh_from_db()
@@ -443,7 +434,6 @@ class TestGeneralChangeOrder(APITestMixin):
             {
                 'contact': {'id': other_contact.pk},
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -461,7 +451,6 @@ class TestGeneralChangeOrder(APITestMixin):
             {
                 'contact': {'id': '00000000-0000-0000-0000-000000000000'},
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -485,7 +474,6 @@ class TestGeneralChangeOrder(APITestMixin):
                     {'id': disabled_service_type.pk},
                 ]
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -523,7 +511,6 @@ class TestGeneralChangeOrder(APITestMixin):
                     {'id': disabled_in_feb.pk},
                 ]
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -566,7 +553,6 @@ class TestGeneralChangeOrder(APITestMixin):
                 'billing_email': 'JohnDoe@example.com',
                 'billing_phone': '0123456789',
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -612,7 +598,6 @@ class TestGeneralChangeOrder(APITestMixin):
         response = self.api_client.patch(
             url,
             {'vat_status': vat_status},
-            format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -639,7 +624,6 @@ class TestGeneralChangeOrder(APITestMixin):
             {
                 'billing_address_2': 'London Street',
             },
-            format='json'
         )
 
         order.refresh_from_db()
@@ -692,7 +676,6 @@ class TestChangeOrderInDraft(APITestMixin):
                 'billing_address_postcode': 'SW1A1AA',
                 'billing_address_country': Country.united_kingdom.value.id,
             },
-            format='json'
         )
 
         order.refresh_from_db()
@@ -790,7 +773,7 @@ class TestChangeOrderInDraft(APITestMixin):
         value = value(order) if callable(value) else value
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(url, {field: value}, format='json')
+        response = self.api_client.patch(url, {field: value})
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {field: ['This field cannot be changed at this stage.']}
 
@@ -805,7 +788,6 @@ class TestChangeOrderInDraft(APITestMixin):
                 'company': order.company.pk,
                 'primary_market': order.primary_market.pk
             },
-            format='json'
         )
         assert response.status_code == status.HTTP_200_OK
 
@@ -848,7 +830,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
         }
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(url, data, format='json')
+        response = self.api_client.patch(url, data)
         assert response.status_code == status.HTTP_200_OK
         assert {
             k: v for k, v in response.json().items() if k in data
@@ -896,7 +878,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
         value = value(order) if callable(value) else value
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(url, {field: value}, format='json')
+        response = self.api_client.patch(url, {field: value})
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {field: ['This field cannot be changed at this stage.']}
 
@@ -927,7 +909,6 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
                 'description': order.description,
                 'delivery_date': order.delivery_date.isoformat(),
             },
-            format='json'
         )
         assert response.status_code == status.HTTP_200_OK
 
@@ -959,7 +940,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
         old_invoice = order.invoice
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(url, {field: value}, format='json')
+        response = self.api_client.patch(url, {field: value})
         assert response.status_code == status.HTTP_200_OK
 
         order.refresh_from_db()
@@ -984,7 +965,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
         old_invoice = order.invoice
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(url, {'vat_verified': False}, format='json')
+        response = self.api_client.patch(url, {'vat_verified': False})
         assert response.status_code == status.HTTP_200_OK
 
         order.refresh_from_db()
@@ -1032,7 +1013,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
             for field, value in data.items()
         }
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(url, data, format='json')
+        response = self.api_client.patch(url, data)
         assert response.status_code == status.HTTP_200_OK
 
         order.refresh_from_db()
@@ -1052,7 +1033,7 @@ class TestChangeOrderInPaid(APITestMixin):
         }
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(url, data, format='json')
+        response = self.api_client.patch(url, data)
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['contact'] == {
             'id': str(new_contact.pk),
@@ -1095,7 +1076,7 @@ class TestChangeOrderInPaid(APITestMixin):
         value = value(order) if callable(value) else value
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(url, {field: value}, format='json')
+        response = self.api_client.patch(url, {field: value})
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {field: ['This field cannot be changed at this stage.']}
 
@@ -1131,7 +1112,6 @@ class TestChangeOrderInPaid(APITestMixin):
                 'vat_verified': order.vat_verified,
                 'po_number': order.po_number,
             },
-            format='json'
         )
         assert response.status_code == status.HTTP_200_OK
 
@@ -1184,7 +1164,7 @@ class TestChangeOrderInEndStatuses(APITestMixin):
         value = value(order) if callable(value) else value
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
-        response = self.api_client.patch(url, {field: value}, format='json')
+        response = self.api_client.patch(url, {field: value})
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {field: ['This field cannot be changed at this stage.']}
 
@@ -1229,7 +1209,6 @@ class TestChangeOrderInEndStatuses(APITestMixin):
 
                 'contact': order.contact.pk,
             },
-            format='json'
         )
         assert response.status_code == status.HTTP_200_OK
 
@@ -1248,7 +1227,7 @@ class TestMarkOrderAsComplete(APITestMixin):
         OrderAssigneeCompleteFactory(order=order)
 
         url = reverse('api-v3:omis:order:complete', kwargs={'pk': order.pk})
-        response = self.api_client.post(url, {}, format='json')
+        response = self.api_client.post(url, {})
 
         expected_completed_on = dateutil_parse('2017-04-18T13:00Z')
         assert response.status_code == status.HTTP_200_OK
@@ -1282,7 +1261,7 @@ class TestMarkOrderAsComplete(APITestMixin):
         OrderAssigneeCompleteFactory(order=order)
 
         url = reverse('api-v3:omis:order:complete', kwargs={'pk': order.pk})
-        response = self.api_client.post(url, {}, format='json')
+        response = self.api_client.post(url, {})
 
         assert response.status_code == status.HTTP_409_CONFLICT
         order.refresh_from_db()
@@ -1298,7 +1277,7 @@ class TestMarkOrderAsComplete(APITestMixin):
         OrderAssigneeFactory(order=order)
 
         url = reverse('api-v3:omis:order:complete', kwargs={'pk': order.pk})
-        response = self.api_client.post(url, {}, format='json')
+        response = self.api_client.post(url, {})
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
@@ -1329,7 +1308,6 @@ class TestCancelOrder(APITestMixin):
                     'id': reason.pk
                 }
             },
-            format='json'
         )
 
         expected_cancelled_on = dateutil_parse('2017-04-18T13:00Z')
@@ -1375,7 +1353,6 @@ class TestCancelOrder(APITestMixin):
                     'id': reason.pk
                 }
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_409_CONFLICT
@@ -1404,7 +1381,7 @@ class TestCancelOrder(APITestMixin):
         order = OrderFactory(status=OrderStatus.draft)
 
         url = reverse('api-v3:omis:order:cancel', kwargs={'pk': order.pk})
-        response = self.api_client.post(url, data, format='json')
+        response = self.api_client.post(url, data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == errors

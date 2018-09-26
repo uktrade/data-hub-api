@@ -165,7 +165,7 @@ class TestSearch(APITestMixin):
 
         response = self.api_client.post(url, {
             'lead_team': team.id,
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 5
@@ -190,7 +190,7 @@ class TestSearch(APITestMixin):
 
         response = self.api_client.post(url, {
             'teams': (team_a.id, team_c.id,)
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 6
@@ -218,7 +218,7 @@ class TestSearch(APITestMixin):
                 'exists': False,
                 'after': current_datetime,
             },
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 7
@@ -241,7 +241,7 @@ class TestSearch(APITestMixin):
 
         response = self.api_client.post(url, {
             'disabled_on_exists': False,
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 5
@@ -262,7 +262,7 @@ class TestSearch(APITestMixin):
 
         response = self.api_client.post(url, {
             'disabled_on_exists': True,
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         # We should get at least 5 disabled events, as some already exist

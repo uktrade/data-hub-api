@@ -181,7 +181,6 @@ class TestSearch(APITestMixin):
         response = self.api_client.post(
             url,
             query,
-            format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -275,7 +274,7 @@ class TestSearch(APITestMixin):
 
         response = self.api_client.post(url, {
             'country': country,
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         if match:
@@ -307,7 +306,7 @@ class TestSearch(APITestMixin):
 
         response = self.api_client.post(url, {
             'name': name,
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         if match:
@@ -329,7 +328,7 @@ class TestSearch(APITestMixin):
         response = self.api_client.post(url, {
             'original_query': term,
             'trading_address_country': [united_states_id, united_kingdom_id],
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
@@ -395,7 +394,7 @@ class TestSearch(APITestMixin):
 
         response = self.api_client.post(url, {
             'uk_region': None,
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {'uk_region': ['This field may not be null.']}
@@ -472,7 +471,7 @@ class TestSearch(APITestMixin):
 
         response = self.api_client.post(url, {
             'uk_based': False,
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -496,7 +495,7 @@ class TestCompanyExportView(APITestMixin):
         api_client = self.create_api_client(user=user)
 
         url = reverse('api-v3:search:company-export')
-        response = api_client.post(url, format='json')
+        response = api_client.post(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize(
@@ -526,7 +525,7 @@ class TestCompanyExportView(APITestMixin):
         url = reverse('api-v3:search:company-export')
 
         with freeze_time('2018-01-01 11:12:13'):
-            response = self.api_client.post(url, format='json', data=data)
+            response = self.api_client.post(url, data=data)
 
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})

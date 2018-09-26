@@ -285,7 +285,7 @@ class TestSearch(APITestMixin):
         request_data = {
             'created_on_exists': created_on_exists,
         }
-        response = self.api_client.post(url, request_data, format='json')
+        response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -434,7 +434,7 @@ class TestContactExportView(APITestMixin):
         api_client = self.create_api_client(user=user)
 
         url = reverse('api-v3:search:contact-export')
-        response = api_client.post(url, format='json')
+        response = api_client.post(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize(
@@ -472,7 +472,7 @@ class TestContactExportView(APITestMixin):
         url = reverse('api-v3:search:contact-export')
 
         with freeze_time('2018-01-01 11:12:13'):
-            response = self.api_client.post(url, format='json', data=data)
+            response = self.api_client.post(url, data=data)
 
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})

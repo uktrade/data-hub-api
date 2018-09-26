@@ -65,7 +65,7 @@ class TestAddServiceDelivery(APITestMixin):
 
             **resolve_data(extra_data)
         }
-        response = self.api_client.post(url, request_data, format='json')
+        response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
@@ -255,7 +255,7 @@ class TestAddServiceDelivery(APITestMixin):
         """Test validation errors."""
         data = resolve_data(data)
         url = reverse('api-v3:interaction:collection')
-        response = self.api_client.post(url, data, format='json')
+        response = self.api_client.post(url, data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == errors
@@ -273,7 +273,7 @@ class TestUpdateServiceDelivery(APITestMixin):
         response = self.api_client.patch(url, {
             'is_event': True,
             'event': event.pk
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -291,7 +291,7 @@ class TestUpdateServiceDelivery(APITestMixin):
         response = self.api_client.patch(url, {
             'is_event': False,
             'event': None
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -305,7 +305,7 @@ class TestUpdateServiceDelivery(APITestMixin):
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
         response = self.api_client.patch(url, {
             'grant_amount_offered': '-100.00',
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -320,7 +320,7 @@ class TestUpdateServiceDelivery(APITestMixin):
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
         response = self.api_client.patch(url, {
             'net_company_receipt': '-100.00',
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
