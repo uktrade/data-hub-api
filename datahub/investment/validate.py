@@ -8,7 +8,7 @@ from datahub.core.constants import (
     InvestmentBusinessActivity as BusinessActivity,
     InvestmentProjectStage as Stage,
     InvestmentType,
-    ReferralSourceActivity as Activity
+    ReferralSourceActivity as Activity,
 )
 from datahub.core.validate_utils import DataCombiner
 from datahub.investment.models import InvestmentProject
@@ -64,8 +64,10 @@ CONDITIONAL_VALIDATION_MAPPING = {
     'referral_source_activity_event':
         CondValRule('referral_source_activity', Activity.event.value.id, Stage.prospect.value),
     'other_business_activity':
-        CondValRule('business_activities', partial(_contains_id, BusinessActivity.other.value.id),
-                    Stage.prospect.value),
+        CondValRule(
+            'business_activities', partial(_contains_id, BusinessActivity.other.value.id),
+            Stage.prospect.value,
+        ),
     'referral_source_activity_marketing':
         CondValRule('referral_source_activity', Activity.marketing.value.id, Stage.prospect.value),
     'referral_source_activity_website':
