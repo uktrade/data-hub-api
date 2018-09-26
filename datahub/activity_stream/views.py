@@ -22,8 +22,10 @@ def _lookup_credentials(access_key_id):
     """Raises a HawkFail if the passed ID is not equal to
     settings.ACTIVITY_STREAM_ACCESS_KEY_ID
     """
-    if not constant_time_compare(access_key_id,
-                                 settings.ACTIVITY_STREAM_ACCESS_KEY_ID):
+    if not constant_time_compare(
+        access_key_id,
+        settings.ACTIVITY_STREAM_ACCESS_KEY_ID,
+    ):
         raise HawkFail(f'No Hawk ID of {access_key_id}')
 
     return {
@@ -83,7 +85,7 @@ class _ActivityStreamAuthentication(BaseAuthentication):
         """
         if 'HTTP_X_FORWARDED_FOR' not in request.META:
             logger.warning(
-                'Failed authentication: no X-Forwarded-For header passed'
+                'Failed authentication: no X-Forwarded-For header passed',
             )
             raise AuthenticationFailed(INCORRECT_CREDENTIALS_MESSAGE)
 
@@ -93,7 +95,7 @@ class _ActivityStreamAuthentication(BaseAuthentication):
         if remote_address not in settings.ACTIVITY_STREAM_IP_WHITELIST:
             logger.warning(
                 'Failed authentication: the X-Forwarded-For header did not '
-                'start with an IP in the whitelist'
+                'start with an IP in the whitelist',
             )
             raise AuthenticationFailed(INCORRECT_CREDENTIALS_MESSAGE)
 

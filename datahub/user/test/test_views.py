@@ -23,7 +23,7 @@ class TestUserView(APITestMixin):
         permissions = PermissionFactory.create_batch(
             len(permission_names),
             codename=factory.Iterator(permission_names),
-            content_type=content_type
+            content_type=content_type,
         )
 
         group = GroupFactory()

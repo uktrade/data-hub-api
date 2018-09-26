@@ -7,9 +7,11 @@ from datahub.cleanup.management.commands._base_command import BaseCleanupCommand
 class Command(BaseCleanupCommand):
     """Command for deleting very old records (as per the data retention policy)."""
 
-    help = ('Irrevocably deletes very old records for a model, using the criteria defined in the '
-            'DIT Data Hub retention policy. A simulation can be performed using the --simulate '
-            'argument.')
+    help = (
+        'Irrevocably deletes very old records for a model, using the criteria defined in the '
+        'DIT Data Hub retention policy. A simulation can be performed using the --simulate '
+        'argument.'
+    )
 
     CONFIGS = {
         # TODO: Before adding any more configurations, get_unreferenced_objects_query()

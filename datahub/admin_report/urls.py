@@ -9,11 +9,11 @@ urlpatterns = [
     path(
         'admin/reports/',
         site.admin_view(list_reports),
-        name='index'
+        name='index',
     ),
     path(
         'admin/reports/<report_id>/download',
         site.admin_view(download_report),
-        name='download-report'
+        name='download-report',
     ),
 ]

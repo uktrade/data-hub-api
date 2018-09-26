@@ -12,8 +12,7 @@ pytestmark = pytest.mark.django_db
     (
         ((), {}),
         (('change_metadatamodel',), {'MetadataModel': ['MetadataReport']}),
-    )
-
+    ),
 )
 def test_get_reports_by_model(permission_codenames, expected_result):
     """Test get_reports_by_model() for various cases."""
@@ -30,8 +29,7 @@ def test_get_reports_by_model(permission_codenames, expected_result):
     (
         ((), True),
         (('change_metadatamodel',), False),
-    )
-
+    ),
 )
 def test_get_report_by_id(permission_codenames, should_raise):
     """Test get_report_by_id() for various cases."""
