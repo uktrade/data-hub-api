@@ -6,15 +6,15 @@ from django.contrib.admin.sites import site
 from django.urls import reverse
 from rest_framework import status
 
-from datahub.core.test_utils import AdminTestMixin
-from .factories import (
+from datahub.company.admin.company import CompanyAdmin
+from datahub.company.admin_reports import OneListReport
+from datahub.company.models import Company
+from datahub.company.test.factories import (
     AdviserFactory,
     CompanyCoreTeamMemberFactory,
     CompanyFactory,
 )
-from ..admin import CompanyAdmin
-from ..admin_reports import OneListReport
-from ..models import Company
+from datahub.core.test_utils import AdminTestMixin
 
 
 pytestmark = pytest.mark.django_db
