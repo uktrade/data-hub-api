@@ -58,7 +58,7 @@ class TestDocumentViews(APITestMixin):
 
         url = reverse('test-document-collection')
 
-        response = self.api_client.post(url, format='json', data={
+        response = self.api_client.post(url, data={
             'original_filename': 'test.txt',
             'my_field': 'cats cannot taste sweet',
         })
@@ -130,7 +130,7 @@ class TestDocumentViews(APITestMixin):
             'entity_document_pk': entity_document.pk
         })
 
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['status'] == 'virus_scanning_scheduled'

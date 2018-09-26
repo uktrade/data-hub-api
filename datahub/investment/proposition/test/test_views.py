@@ -110,7 +110,6 @@ class TestCreateProposition(APITestMixin):
                 'adviser': adviser.pk,
                 'deadline': '2018-02-10',
             },
-            format='json',
         )
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
@@ -171,7 +170,6 @@ class TestCreateProposition(APITestMixin):
                 'adviser': adviser.pk,
                 'deadline': '2018-02-10',
             },
-            format='json',
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
         response_data = response.json()
@@ -199,7 +197,6 @@ class TestCreateProposition(APITestMixin):
                 'adviser': adviser.pk,
                 'deadline': '2018-02-10',
             },
-            format='json',
         )
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
@@ -262,7 +259,6 @@ class TestCreateProposition(APITestMixin):
                 'adviser': adviser.pk,
                 'deadline': '2018-02-10',
             },
-            format='json',
         )
         response_data = response.json()
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -277,7 +273,7 @@ class TestCreateProposition(APITestMixin):
         url = reverse('api-v3:investment:proposition:collection', kwargs={
             'project_pk': investment_project.pk
         })
-        response = self.api_client.post(url, {}, format='json')
+        response = self.api_client.post(url, {})
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -317,7 +313,7 @@ class TestUpdateProposition(APITestMixin):
         })
         response = getattr(self.api_client, method)(url, {
             'name': 'hello!',
-        }, format='json')
+        })
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
@@ -708,7 +704,7 @@ class TestCompleteProposition(APITestMixin):
         })
 
         api_client = self.create_api_client(user=user)
-        response = api_client.post(url, format='json')
+        response = api_client.post(url)
         proposition.refresh_from_db()
         response_data = response.json()
         assert response.status_code == status.HTTP_200_OK
@@ -764,7 +760,7 @@ class TestCompleteProposition(APITestMixin):
         })
 
         api_client = self.create_api_client(user=user)
-        response = api_client.post(url, format='json')
+        response = api_client.post(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
         response_data = response.json()
         assert response_data == {'detail': 'Not found.'}
@@ -797,7 +793,7 @@ class TestCompleteProposition(APITestMixin):
         })
 
         api_client = self.create_api_client(user=user)
-        response = api_client.post(url, format='json')
+        response = api_client.post(url)
         proposition.refresh_from_db()
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -863,7 +859,7 @@ class TestCompleteProposition(APITestMixin):
             'project_pk': proposition.investment_project.pk,
         })
         api_client = self.create_api_client(user=user)
-        response = api_client.post(url, format='json')
+        response = api_client.post(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
         response_data = response.json()
         assert response_data == {
@@ -901,7 +897,7 @@ class TestCompleteProposition(APITestMixin):
             'project_pk': proposition.investment_project.pk,
         })
         api_client = self.create_api_client(user=user)
-        response = api_client.post(url, format='json')
+        response = api_client.post(url)
         response_data = response.json()
         assert response.status_code == status.HTTP_409_CONFLICT
         detail = f'The action cannot be performed in the current status {proposition_status}.'
@@ -918,7 +914,7 @@ class TestCompleteProposition(APITestMixin):
             'proposition_pk': proposition.pk,
             'project_pk': proposition.investment_project.pk,
         })
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data['non_field_errors'] == ['Proposition has no documents uploaded.']
@@ -946,7 +942,6 @@ class TestLegacyCompleteProposition(APITestMixin):
             {
                 'details': 'All done 100% satisfaction.',
             },
-            format='json',
         )
         proposition.refresh_from_db()
         assert response.status_code == status.HTTP_200_OK
@@ -1003,7 +998,6 @@ class TestLegacyCompleteProposition(APITestMixin):
             {
                 'details': 'All done 100% satisfaction.',
             },
-            format='json',
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
         response_data = response.json()
@@ -1036,7 +1030,6 @@ class TestLegacyCompleteProposition(APITestMixin):
             {
                 'details': 'All done 100% satisfaction.',
             },
-            format='json',
         )
         proposition.refresh_from_db()
         assert response.status_code == status.HTTP_200_OK
@@ -1103,7 +1096,6 @@ class TestLegacyCompleteProposition(APITestMixin):
             {
                 'details': 'All done 100% satisfaction.',
             },
-            format='json',
         )
         assert response.status_code == status.HTTP_403_FORBIDDEN
         response_data = response.json()
@@ -1134,7 +1126,6 @@ class TestLegacyCompleteProposition(APITestMixin):
             {
                 'details': 'All done 100% satisfaction.',
             },
-            format='json',
         )
         assert response.status_code == status.HTTP_409_CONFLICT
         response_data = response.json()
@@ -1157,7 +1148,6 @@ class TestLegacyCompleteProposition(APITestMixin):
             {
                 'details': '',
             },
-            format='json',
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -1186,7 +1176,6 @@ class TestAbandonProposition(APITestMixin):
             {
                 'details': 'Not enough information.',
             },
-            format='json',
         )
         assert response.status_code == status.HTTP_200_OK
         proposition.refresh_from_db()
@@ -1243,7 +1232,6 @@ class TestAbandonProposition(APITestMixin):
             {
                 'details': 'Not enough information.',
             },
-            format='json',
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
         response_data = response.json()
@@ -1276,7 +1264,6 @@ class TestAbandonProposition(APITestMixin):
             {
                 'details': 'Not enough information.',
             },
-            format='json',
         )
         assert response.status_code == status.HTTP_200_OK
         proposition.refresh_from_db()
@@ -1343,7 +1330,6 @@ class TestAbandonProposition(APITestMixin):
             {
                 'details': 'Not enough information.',
             },
-            format='json',
         )
         assert response.status_code == status.HTTP_403_FORBIDDEN
         response_data = response.json()
@@ -1374,7 +1360,6 @@ class TestAbandonProposition(APITestMixin):
             {
                 'details': 'Too many cats.',
             },
-            format='json',
         )
         assert response.status_code == status.HTTP_409_CONFLICT
         response_data = response.json()
@@ -1397,7 +1382,6 @@ class TestAbandonProposition(APITestMixin):
             {
                 'details': '',
             },
-            format='json',
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -1425,7 +1409,7 @@ class TestPropositionDocumentViews(APITestMixin):
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
 
-        response = api_client.post(url, format='json', data={
+        response = api_client.post(url, data={
             'original_filename': 'test.txt',
         })
         assert response.status_code == status.HTTP_201_CREATED
@@ -1475,7 +1459,7 @@ class TestPropositionDocumentViews(APITestMixin):
 
         api_client = self.create_api_client(user=user)
 
-        response = api_client.post(url, format='json', data={
+        response = api_client.post(url, data={
             'original_filename': 'test.txt',
         })
         assert response.status_code == status.HTTP_201_CREATED
@@ -1523,7 +1507,7 @@ class TestPropositionDocumentViews(APITestMixin):
         )
         api_client = self.create_api_client(user=user)
 
-        response = api_client.post(url, format='json', data={
+        response = api_client.post(url, data={
             'original_filename': 'test.txt',
         })
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -1543,7 +1527,7 @@ class TestPropositionDocumentViews(APITestMixin):
         user = create_test_user(permission_codenames=(PropositionDocumentPermission.add_all,))
         api_client = self.create_api_client(user=user)
 
-        response = api_client.post(url, format='json', data={
+        response = api_client.post(url, data={
             'original_filename': 'test.txt',
         })
         assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -1941,7 +1925,7 @@ class TestPropositionDocumentViews(APITestMixin):
         )
 
         api_client = self.create_api_client(user=user)
-        response = api_client.post(url, format='json')
+        response = api_client.post(url)
         assert response.status_code == status.HTTP_200_OK
 
         entity_document.document.refresh_from_db()
@@ -2000,7 +1984,7 @@ class TestPropositionDocumentViews(APITestMixin):
         )
 
         api_client = self.create_api_client(user=user)
-        response = api_client.post(url, format='json')
+        response = api_client.post(url)
         assert response.status_code == status.HTTP_200_OK
 
         entity_document.document.refresh_from_db()
@@ -2054,7 +2038,7 @@ class TestPropositionDocumentViews(APITestMixin):
         )
 
         api_client = self.create_api_client(user=user)
-        response = api_client.post(url, format='json')
+        response = api_client.post(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
         assert response.data == {
             'detail': 'You do not have permission to perform this action.'
@@ -2296,7 +2280,7 @@ class TestPropositionDocumentViews(APITestMixin):
             }
         )
 
-        response = self.api_client.post(url, format='json', data={})
+        response = self.api_client.post(url, data={})
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
 

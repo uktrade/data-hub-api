@@ -25,7 +25,7 @@ class TestGetSubscriberList(APITestMixin):
             'api-v3:omis:order:subscriber-list',
             kwargs={'order_pk': order.id}
         )
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == []
@@ -43,7 +43,7 @@ class TestGetSubscriberList(APITestMixin):
             'api-v3:omis:order:subscriber-list',
             kwargs={'order_pk': order.id}
         )
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [
@@ -70,7 +70,7 @@ class TestGetSubscriberList(APITestMixin):
             'api-v3:omis:order:subscriber-list',
             kwargs={'order_pk': '00000000-0000-0000-0000-000000000000'}
         )
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -93,7 +93,6 @@ class TestChangeSubscriberList(APITestMixin):
         response = self.api_client.put(
             url,
             [{'id': adviser.id} for adviser in advisers],
-            format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -134,7 +133,6 @@ class TestChangeSubscriberList(APITestMixin):
         response = self.api_client.put(
             url,
             [{'id': adviser.id} for adviser in final_advisers],
-            format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -164,7 +162,7 @@ class TestChangeSubscriberList(APITestMixin):
             'api-v3:omis:order:subscriber-list',
             kwargs={'order_pk': order.id}
         )
-        response = self.api_client.put(url, [], format='json')
+        response = self.api_client.put(url, [])
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == []
@@ -186,7 +184,7 @@ class TestChangeSubscriberList(APITestMixin):
             'id': '00000000-0000-0000-0000-000000000000'
         })
 
-        response = self.api_client.put(url, data, format='json')
+        response = self.api_client.put(url, data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == [
@@ -214,7 +212,6 @@ class TestChangeSubscriberList(APITestMixin):
         response = self.api_client.put(
             url,
             [{'id': AdviserFactory().id}],
-            format='json'
         )
 
         assert response.status_code == status.HTTP_409_CONFLICT

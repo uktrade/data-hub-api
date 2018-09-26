@@ -71,7 +71,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.post(url, format='json')
+        response = client.post(url)
         assert response.status_code == status.HTTP_201_CREATED
 
         # check payment gateway session record created
@@ -177,7 +177,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.post(url, format='json')
+        response = client.post(url)
         assert response.status_code == status.HTTP_201_CREATED
 
         # check sessions cancelled
@@ -245,7 +245,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.post(url, format='json')
+        response = client.post(url)
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
 
         # check no session created
@@ -282,7 +282,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.post(url, format='json')
+        response = client.post(url)
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
 
         # check no session created
@@ -310,7 +310,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.post(url, format='json')
+        response = client.post(url)
         assert response.status_code == status.HTTP_409_CONFLICT
         assert response.json() == {
             'detail': (
@@ -374,7 +374,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.post(url, format='json')
+        response = client.post(url)
         assert response.status_code == status.HTTP_409_CONFLICT
 
         # check session record
@@ -409,7 +409,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.post(url, format='json')
+        response = client.post(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_404_if_order_doesnt_exist(self):
@@ -422,7 +422,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.post(url, format='json')
+        response = client.post(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @pytest.mark.parametrize('verb', ('get', 'patch', 'delete'))
@@ -457,7 +457,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
             scope=scope,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.post(url, format='json')
+        response = client.post(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @freeze_time('2018-03-01 00:00:00')
@@ -511,10 +511,10 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
 
         # the 4th time it should error
         for dummy in range(3):
-            response = client.post(url, format='json')
+            response = client.post(url)
             assert response.status_code == status.HTTP_201_CREATED
 
-        response = client.post(url, format='json')
+        response = client.post(url)
         assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
 
 
@@ -570,7 +570,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.get(url, format='json')
+        response = client.get(url)
         assert response.status_code == status.HTTP_200_OK
 
         # check API response
@@ -606,7 +606,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.get(url, format='json')
+        response = client.get(url)
         assert response.status_code == status.HTTP_200_OK
 
         # check API response
@@ -665,7 +665,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.get(url, format='json')
+        response = client.get(url)
         assert response.status_code == status.HTTP_200_OK
 
         # refresh record
@@ -731,7 +731,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.get(url, format='json')
+        response = client.get(url)
         assert response.status_code == status.HTTP_200_OK
 
         # check API response
@@ -781,7 +781,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.get(url, format='json')
+        response = client.get(url)
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
 
     @pytest.mark.parametrize(
@@ -806,7 +806,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.get(url, format='json')
+        response = client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_404_if_order_doesnt_exist(self):
@@ -822,7 +822,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.get(url, format='json')
+        response = client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_404_if_session_doesnt_exist(self):
@@ -839,7 +839,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.get(url, format='json')
+        response = client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_404_if_session_belongs_to_another_order(self):
@@ -860,7 +860,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.get(url, format='json')
+        response = client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @pytest.mark.parametrize('verb', ('post', 'patch', 'delete'))
@@ -897,5 +897,5 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
             scope=scope,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.get(url, format='json')
+        response = client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN

@@ -386,7 +386,7 @@ class TestCreateView(APITestMixin):
                 'id': str(aerospace_id)
             }
         }
-        response = self.api_client.post(url, data=request_data, format='json')
+        response = self.api_client.post(url, data=request_data)
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
         assert response_data['name'] == request_data['name']
@@ -416,7 +416,7 @@ class TestCreateView(APITestMixin):
         """Test creating a project with missing required values."""
         url = reverse('api-v3:investment:investment-collection')
         request_data = {}
-        response = self.api_client.post(url, data=request_data, format='json')
+        response = self.api_client.post(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
@@ -447,7 +447,7 @@ class TestCreateView(APITestMixin):
             'referral_source_adviser': None,
             'sector': None
         }
-        response = self.api_client.post(url, data=request_data, format='json')
+        response = self.api_client.post(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
@@ -470,7 +470,7 @@ class TestCreateView(APITestMixin):
             'business_activities': [],
             'client_contacts': []
         }
-        response = self.api_client.post(url, data=request_data, format='json')
+        response = self.api_client.post(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data.keys() >= {
@@ -524,7 +524,7 @@ class TestCreateView(APITestMixin):
                 'id': str(aerospace_id)
             }
         }
-        response = self.api_client.post(url, data=request_data, format='json')
+        response = self.api_client.post(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
@@ -942,7 +942,7 @@ class TestPartialUpdateView(APITestMixin):
             },
             'fdi_type': None
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
@@ -956,7 +956,7 @@ class TestPartialUpdateView(APITestMixin):
         request_data = {
             'likelihood_of_landing': -10
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
@@ -970,7 +970,7 @@ class TestPartialUpdateView(APITestMixin):
         request_data = {
             'likelihood_of_landing': 110
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
@@ -984,7 +984,7 @@ class TestPartialUpdateView(APITestMixin):
         request_data = {
             'priority': '6_extremely_urgent'
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
@@ -1003,7 +1003,7 @@ class TestPartialUpdateView(APITestMixin):
                 'id': str(new_contact.id)
             }]
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['name'] == request_data['name']
@@ -1019,7 +1019,7 @@ class TestPartialUpdateView(APITestMixin):
             'project_arrived_in_triage_on': '2017-04-18',
             'proposal_deadline': '2017-04-19',
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = self.api_client.patch(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -1041,7 +1041,7 @@ class TestPartialUpdateView(APITestMixin):
         request_data = {
             'estimated_land_date': None,
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
 
     def test_change_stage_assign_pm_failure(self):
@@ -1053,7 +1053,7 @@ class TestPartialUpdateView(APITestMixin):
                 'id': constants.InvestmentProjectStage.assign_pm.value.id
             }
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
@@ -1088,7 +1088,7 @@ class TestPartialUpdateView(APITestMixin):
                 'id': constants.InvestmentProjectStage.assign_pm.value.id
             }
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
 
     def test_change_stage_active_failure(self):
@@ -1100,7 +1100,7 @@ class TestPartialUpdateView(APITestMixin):
                 'id': constants.InvestmentProjectStage.active.value.id
             }
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
@@ -1129,7 +1129,7 @@ class TestPartialUpdateView(APITestMixin):
                 'id': constants.InvestmentProjectStage.active.value.id
             }
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
 
     def test_change_stage_verify_win_failure(self):
@@ -1147,7 +1147,7 @@ class TestPartialUpdateView(APITestMixin):
                 'id': constants.InvestmentProjectStage.verify_win.value.id
             }
         }
-        response = api_client.patch(url, data=request_data, format='json')
+        response = api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
@@ -1207,7 +1207,7 @@ class TestPartialUpdateView(APITestMixin):
                 'id': constants.InvestmentProjectStage.verify_win.value.id
             }
         }
-        response = api_client.patch(url, data=request_data, format='json')
+        response = api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
 
     def test_cannot_change_stage_verify_win_if_not_pm_or_paa(self):
@@ -1224,7 +1224,7 @@ class TestPartialUpdateView(APITestMixin):
                 'id': constants.InvestmentProjectStage.verify_win.value.id
             }
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
             'stage': [
@@ -1255,7 +1255,7 @@ class TestPartialUpdateView(APITestMixin):
             ]
         )
 
-        response = api_client.patch(url, data=request_data, format='json')
+        response = api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['stage'] == {
@@ -1276,7 +1276,7 @@ class TestPartialUpdateView(APITestMixin):
             },
             'actual_land_date': '2016-01-31',
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
@@ -1308,7 +1308,7 @@ class TestPartialUpdateView(APITestMixin):
         )
         adviser.save()
 
-        response = api_client.patch(url, data=request_data, format='json')
+        response = api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
@@ -1324,7 +1324,7 @@ class TestPartialUpdateView(APITestMixin):
                 'id': constants.InvestmentProjectStage.verify_win.value.id
             }
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['stage'] == {
@@ -1361,7 +1361,7 @@ class TestPartialUpdateView(APITestMixin):
         }
 
         with freeze_time(next(date_iter)):
-            response = self.api_client.patch(url, data=request_data, format='json')
+            response = self.api_client.patch(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -1414,7 +1414,7 @@ class TestPartialUpdateView(APITestMixin):
         }
 
         with freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc)):
-            response = self.api_client.patch(url, data=request_data, format='json')
+            response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
 
         response_data = response.json()
@@ -1454,7 +1454,7 @@ class TestPartialUpdateView(APITestMixin):
         request_data = {
             'project_manager': None
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
@@ -1472,7 +1472,7 @@ class TestPartialUpdateView(APITestMixin):
             'average_salary': {'id': salary_id},
             'government_assistance': True
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['number_new_jobs'] == 555
@@ -1492,7 +1492,7 @@ class TestPartialUpdateView(APITestMixin):
             'address_1': 'address 1 new',
             'address_2': 'address 2 new'
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['requirements_complete'] is False
@@ -1515,7 +1515,7 @@ class TestPartialUpdateView(APITestMixin):
         request_data = {
             'uk_region_locations': [],
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
 
     def test_patch_team_success(self):
@@ -1535,7 +1535,7 @@ class TestPartialUpdateView(APITestMixin):
                 'id': str(adviser_2.id)
             }
         }
-        response = self.api_client.patch(url, data=request_data, format='json')
+        response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
 
@@ -1587,7 +1587,7 @@ class TestPartialUpdateView(APITestMixin):
             }
         }
         with freeze_time(datetime(2017, 4, 30, 11, 25, tzinfo=utc)):
-            response = self.api_client.patch(url, data=request_data, format='json')
+            response = self.api_client.patch(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -1617,7 +1617,7 @@ class TestPartialUpdateView(APITestMixin):
         )
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
-        response = self.api_client.patch(url, format='json', data={
+        response = self.api_client.patch(url, data={
             'archived_documents_url_path': 'new_path',
             'comments': 'new_comments',
             'allow_blank_estimated_land_date': True,
@@ -1764,7 +1764,6 @@ class TestInvestmentProjectVersioning(APITestMixin):
                     'id': str(constants.Sector.aerospace_assembly_aircraft.value.id)
                 }
             },
-            format='json'
         )
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data['name'] == 'project name'
@@ -1787,7 +1786,6 @@ class TestInvestmentProjectVersioning(APITestMixin):
             data={
                 'name': 'project name'
             },
-            format='json'
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert Version.objects.count() == 0
@@ -1804,7 +1802,6 @@ class TestInvestmentProjectVersioning(APITestMixin):
                 'name': 'new name',
                 'description': 'new description',
             },
-            format='json'
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.data['name'] == 'new name'
@@ -1826,7 +1823,6 @@ class TestInvestmentProjectVersioning(APITestMixin):
         response = self.api_client.patch(
             reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk}),
             data={'likelihood_of_landing': -10},
-            format='json'
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert Version.objects.get_for_object(project).count() == 0
@@ -1840,7 +1836,6 @@ class TestInvestmentProjectVersioning(APITestMixin):
         response = self.api_client.post(
             reverse('api-v3:investment:archive-item', kwargs={'pk': project.pk}),
             data={'reason': 'foo'},
-            format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -1861,7 +1856,7 @@ class TestInvestmentProjectVersioning(APITestMixin):
         assert Version.objects.get_for_object(project).count() == 0
 
         url = reverse('api-v3:investment:archive-item', kwargs={'pk': project.pk})
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert Version.objects.get_for_object(project).count() == 0
@@ -1874,7 +1869,7 @@ class TestInvestmentProjectVersioning(APITestMixin):
         assert Version.objects.get_for_object(project).count() == 0
 
         url = reverse('api-v3:investment:unarchive-item', kwargs={'pk': project.pk})
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert not response.data['archived']
@@ -1985,7 +1980,7 @@ class TestAddTeamMemberView(APITestMixin):
         """Tests adding a team member to a non-existent project."""
         url = reverse('api-v3:investment:team-member-collection',
                       kwargs={'project_pk': uuid.uuid4()})
-        response = self.api_client.post(url, format='json', data={})
+        response = self.api_client.post(url, data={})
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -1994,7 +1989,7 @@ class TestAddTeamMemberView(APITestMixin):
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:team-member-collection',
                       kwargs={'project_pk': project.pk})
-        response = self.api_client.post(url, format='json', data={})
+        response = self.api_client.post(url, data={})
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -2008,7 +2003,7 @@ class TestAddTeamMemberView(APITestMixin):
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:team-member-collection',
                       kwargs={'project_pk': project.pk})
-        response = self.api_client.post(url, format='json', data={
+        response = self.api_client.post(url, data={
             'adviser': None,
             'role': None
         })
@@ -2026,7 +2021,7 @@ class TestAddTeamMemberView(APITestMixin):
         adviser = AdviserFactory()
         url = reverse('api-v3:investment:team-member-collection',
                       kwargs={'project_pk': project.pk})
-        response = self.api_client.post(url, format='json', data={
+        response = self.api_client.post(url, data={
             'adviser': {'id': str(adviser.pk)},
             'role': ''
         })
@@ -2057,7 +2052,7 @@ class TestAddTeamMemberView(APITestMixin):
             },
             'role': 'Sector adviser'
         }
-        response = api_client.post(url, format='json', data=request_data)
+        response = api_client.post(url, data=request_data)
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
@@ -2082,7 +2077,7 @@ class TestAddTeamMemberView(APITestMixin):
             },
             'role': 'Sector adviser'
         }
-        response = api_client.post(url, format='json', data=request_data)
+        response = api_client.post(url, data=request_data)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -2103,7 +2098,7 @@ class TestAddTeamMemberView(APITestMixin):
             },
             'role': 'Sector adviser'
         }
-        response = api_client.post(url, format='json', data=request_data)
+        response = api_client.post(url, data=request_data)
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
@@ -2122,7 +2117,7 @@ class TestAddTeamMemberView(APITestMixin):
             },
             'role': 'Sector adviser'
         }
-        response = self.api_client.post(url, format='json', data=request_data)
+        response = self.api_client.post(url, data=request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -2153,7 +2148,7 @@ class TestReplaceAllTeamMembersView(APITestMixin):
             },
             'role': 'Sector adviser'
         } for adviser in advisers]
-        response = self.api_client.put(url, format='json', data=request_data)
+        response = self.api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -2192,7 +2187,7 @@ class TestReplaceAllTeamMembersView(APITestMixin):
             },
             'role': 'New role'
         } for team_member in team_members]
-        response = self.api_client.put(url, format='json', data=request_data)
+        response = self.api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -2230,7 +2225,7 @@ class TestReplaceAllTeamMembersView(APITestMixin):
             },
             'role': 'Sector adviser'
         }]
-        response = api_client.put(url, format='json', data=request_data)
+        response = api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -2266,7 +2261,7 @@ class TestReplaceAllTeamMembersView(APITestMixin):
             },
             'role': 'Sector adviser',
         }]
-        response = api_client.put(url, format='json', data=request_data)
+        response = api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -2287,7 +2282,7 @@ class TestReplaceAllTeamMembersView(APITestMixin):
             },
             'role': 'Sector adviser'
         }]
-        response = api_client.put(url, format='json', data=request_data)
+        response = api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -2314,7 +2309,7 @@ class TestReplaceAllTeamMembersView(APITestMixin):
         url = reverse('api-v3:investment:team-member-collection',
                       kwargs={'project_pk': project.pk})
         request_data = []
-        response = self.api_client.put(url, format='json', data=request_data)
+        response = self.api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -2342,7 +2337,7 @@ class TestReplaceAllTeamMembersView(APITestMixin):
             },
             'role': ''
         }]
-        response = self.api_client.put(url, format='json', data=request_data)
+        response = self.api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -2375,7 +2370,7 @@ class TestReplaceAllTeamMembersView(APITestMixin):
             },
             'role': 'Development adviser'
         }]
-        response = self.api_client.put(url, format='json', data=request_data)
+        response = self.api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -2390,7 +2385,7 @@ class TestReplaceAllTeamMembersView(APITestMixin):
         url = reverse('api-v3:investment:team-member-collection',
                       kwargs={'project_pk': uuid.uuid4()})
         request_data = []
-        response = self.api_client.put(url, format='json', data=request_data)
+        response = self.api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -2485,7 +2480,7 @@ class TestGetTeamMemberView(APITestMixin):
         })
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(self, team, permissions)
-        response = api_client.get(url, format='json')
+        response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -2502,7 +2497,7 @@ class TestGetTeamMemberView(APITestMixin):
         _, api_client = _create_user_and_api_client(
             self, team, [InvestmentProjectPermission.view_associated]
         )
-        response = api_client.get(url, format='json')
+        response = api_client.get(url)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -2518,7 +2513,7 @@ class TestGetTeamMemberView(APITestMixin):
         _, api_client = _create_user_and_api_client(
             self, creator.dit_team, [InvestmentProjectPermission.view_associated]
         )
-        response = api_client.get(url, format='json')
+        response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -2531,7 +2526,7 @@ class TestGetTeamMemberView(APITestMixin):
             'project_pk': project.pk,
             'adviser_pk': uuid.uuid4()
         })
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -2542,7 +2537,7 @@ class TestGetTeamMemberView(APITestMixin):
             'project_pk': uuid.uuid4(),
             'adviser_pk': adviser.pk
         })
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -2566,7 +2561,7 @@ class TestUpdateTeamMemberView(APITestMixin):
         }
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(self, team, permissions)
-        response = api_client.patch(url, format='json', data=request_data)
+        response = api_client.patch(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -2586,7 +2581,7 @@ class TestUpdateTeamMemberView(APITestMixin):
         _, api_client = _create_user_and_api_client(
             self, team, [InvestmentProjectPermission.change_associated]
         )
-        response = api_client.patch(url, format='json', data=request_data)
+        response = api_client.patch(url, data=request_data)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -2605,7 +2600,7 @@ class TestUpdateTeamMemberView(APITestMixin):
         _, api_client = _create_user_and_api_client(
             self, creator.dit_team, [InvestmentProjectPermission.change_associated]
         )
-        response = api_client.patch(url, format='json', data=request_data)
+        response = api_client.patch(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -2706,7 +2701,6 @@ class TestTeamMemberVersioning(APITestMixin):
                 },
                 'role': 'Sector adviser'
             },
-            format='json',
         )
 
         assert response.status_code == status.HTTP_201_CREATED
@@ -2737,7 +2731,6 @@ class TestTeamMemberVersioning(APITestMixin):
             data={
                 'adviser': {'id': 'invalid'},
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -2764,7 +2757,7 @@ class TestTeamMemberVersioning(APITestMixin):
             },
             'role': 'Sector adviser'
         } for adviser in advisers]
-        response = self.api_client.put(url, format='json', data=request_data)
+        response = self.api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response.data.sort(key=_get_adviser_id)
@@ -2812,7 +2805,7 @@ class TestTeamMemberVersioning(APITestMixin):
             },
             'role': 'New role'
         } for team_member in team_members]
-        response = self.api_client.put(url, format='json', data=request_data)
+        response = self.api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data == [{
@@ -2862,7 +2855,7 @@ class TestTeamMemberVersioning(APITestMixin):
             },
             'role': ''
         }]
-        response = self.api_client.put(url, format='json', data=request_data)
+        response = self.api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert Version.objects.count() == 0
@@ -2905,7 +2898,6 @@ class TestTeamMemberVersioning(APITestMixin):
             data={
                 'role': 'updated role'
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -3050,7 +3042,7 @@ class TestArchiveViews(APITestMixin):
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:archive-item',
                       kwargs={'pk': project.pk})
-        response = api_client.post(url, format='json', data={
+        response = api_client.post(url, data={
             'reason': 'archive reason'
         })
 
@@ -3071,7 +3063,7 @@ class TestArchiveViews(APITestMixin):
         project = InvestmentProjectFactory(created_by=adviser)
         url = reverse('api-v3:investment:archive-item',
                       kwargs={'pk': project.pk})
-        response = api_client.post(url, format='json', data={
+        response = api_client.post(url, data={
             'reason': 'archive reason'
         })
 
@@ -3091,7 +3083,7 @@ class TestArchiveViews(APITestMixin):
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:archive-item',
                       kwargs={'pk': project.pk})
-        response = api_client.post(url, format='json', data={
+        response = api_client.post(url, data={
             'reason': 'archive reason'
         })
 
@@ -3102,7 +3094,7 @@ class TestArchiveViews(APITestMixin):
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:archive-item',
                       kwargs={'pk': project.pk})
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
@@ -3114,7 +3106,7 @@ class TestArchiveViews(APITestMixin):
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:archive-item',
                       kwargs={'pk': project.pk})
-        response = self.api_client.post(url, format='json', data={
+        response = self.api_client.post(url, data={
             'reason': ''
         })
 
@@ -3128,7 +3120,7 @@ class TestArchiveViews(APITestMixin):
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:archive-item',
                       kwargs={'pk': project.pk})
-        response = self.api_client.post(url, format='json', data={
+        response = self.api_client.post(url, data={
             'reason': None
         })
 

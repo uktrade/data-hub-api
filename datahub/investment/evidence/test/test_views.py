@@ -172,7 +172,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         })
 
         api_client = self.create_api_client(user=user)
-        response = api_client.post(url, format='json', data={
+        response = api_client.post(url, data={
             'original_filename': 'test.txt',
             'tags': [tag.pk for tag in evidence_tags],
         })
@@ -492,7 +492,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         )
 
         api_client = self.create_api_client(user=user)
-        response = api_client.post(url, format='json')
+        response = api_client.post(url)
         response_data = response.json()
 
         if not allowed:
@@ -715,7 +715,7 @@ class TestEvidenceDocumentViews(APITestMixin):
 
         user = create_test_user(permission_codenames=[], dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
-        response = api_client.post(url, format='json', data={})
+        response = api_client.post(url, data={})
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
 

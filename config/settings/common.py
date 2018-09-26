@@ -204,7 +204,8 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'payment_gateway_session.create': '5/min',
     },
-    'ORDERING_PARAM': 'sortby'
+    'ORDERING_PARAM': 'sortby',
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
 # Simplified static file serving.

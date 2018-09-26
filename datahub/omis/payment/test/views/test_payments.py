@@ -26,7 +26,7 @@ class TestGetPayments(APITestMixin):
         PaymentFactory.create_batch(5)  # create some extra ones not linked to `order`
 
         url = reverse('api-v3:omis:payment:collection', kwargs={'order_pk': order.pk})
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [
             {
@@ -44,7 +44,7 @@ class TestGetPayments(APITestMixin):
     def test_404_if_order_doesnt_exist(self):
         """Test that if the order doesn't exist, the endpoint returns 404."""
         url = reverse('api-v3:omis:payment:collection', kwargs={'order_pk': uuid.uuid4()})
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -54,7 +54,7 @@ class TestGetPayments(APITestMixin):
         PaymentFactory.create_batch(5)  # create some payments not linked to `order`
 
         url = reverse('api-v3:omis:payment:collection', kwargs={'order_pk': order.pk})
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == []
@@ -90,7 +90,6 @@ class TestCreatePayments(APITestMixin):
                     'received_on': '2017-04-21'
                 }
             ],
-            format='json'
         )
         assert response.status_code == status.HTTP_201_CREATED
         response_items = sorted(response.json(), key=itemgetter('transaction_reference'))
@@ -164,7 +163,7 @@ class TestCreatePayments(APITestMixin):
         order = OrderWithAcceptedQuoteFactory()
 
         url = reverse('api-v3:omis:payment:collection', kwargs={'order_pk': order.pk})
-        response = self.api_client.post(url, data, format='json')
+        response = self.api_client.post(url, data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == errors
 
@@ -190,7 +189,6 @@ class TestCreatePayments(APITestMixin):
                     'received_on': '2017-04-21'
                 }
             ],
-            format='json'
         )
         assert response.status_code == status.HTTP_201_CREATED
 
@@ -211,11 +209,11 @@ class TestCreatePayments(APITestMixin):
         order = OrderFactory(status=disallowed_status)
 
         url = reverse('api-v3:omis:payment:collection', kwargs={'order_pk': order.pk})
-        response = self.api_client.post(url, [], format='json')
+        response = self.api_client.post(url, [])
         assert response.status_code == status.HTTP_409_CONFLICT
 
     def test_404_if_order_doesnt_exist(self):
         """Test that if the order doesn't exist, the endpoint returns 404."""
         url = reverse('api-v3:omis:payment:collection', kwargs={'order_pk': uuid.uuid4()})
-        response = self.api_client.post(url, [], format='json')
+        response = self.api_client.post(url, [])
         assert response.status_code == status.HTTP_404_NOT_FOUND
