@@ -1,22 +1,10 @@
 from django import forms
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
 from django.db import models
 from reversion.admin import VersionAdmin
 
-from datahub.core.admin import BaseModelAdminMixin, ViewOnlyAdmin
-from datahub.metadata.admin import DisableableMetadataAdmin
-from .models import (
-    Advisor,
-    CompaniesHouseCompany,
-    Company,
-    CompanyCoreTeamMember,
-    Contact,
-    ExportExperienceCategory,
-)
-
-
-admin.site.register(ExportExperienceCategory, DisableableMetadataAdmin)
+from datahub.company.models import Company, CompanyCoreTeamMember
+from datahub.core.admin import BaseModelAdminMixin
 
 
 class CompanyCoreTeamMemberInline(admin.TabularInline):
@@ -145,97 +133,3 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
     inlines = (
         CompanyCoreTeamMemberInline,
     )
-
-
-@admin.register(Contact)
-class ContactAdmin(BaseModelAdminMixin, VersionAdmin):
-    """Contact admin."""
-
-    search_fields = (
-        'pk',
-        'first_name',
-        'last_name',
-        'company__pk',
-        'company__name',
-    )
-    raw_id_fields = (
-        'company',
-        'adviser',
-        'archived_by',
-    )
-    readonly_fields = (
-        'created',
-        'modified',
-        'archived_documents_url_path',
-    )
-    list_display = (
-        '__str__',
-        'company',
-    )
-    exclude = (
-        'created_on',
-        'created_by',
-        'modified_on',
-        'modified_by',
-    )
-
-
-@admin.register(CompaniesHouseCompany)
-class CHCompany(ViewOnlyAdmin):
-    """Companies House company admin."""
-
-    search_fields = ['name', 'company_number']
-
-
-@admin.register(Advisor)
-class AdviserAdmin(VersionAdmin, UserAdmin):
-    """Adviser admin."""
-
-    fieldsets = (
-        (None, {
-            'fields': (
-                'email',
-                'password'
-            )
-        }),
-        ('PERSONAL INFO', {
-            'fields': (
-                'first_name',
-                'last_name',
-                'contact_email',
-                'telephone_number',
-                'dit_team'
-            )
-        }),
-        ('PERMISSIONS', {
-            'fields': (
-                'is_active',
-                'is_staff',
-                'is_superuser',
-                'groups',
-                'user_permissions'
-            )
-        }),
-        ('IMPORTANT DATES', {
-            'fields': (
-                'last_login',
-                'date_joined'
-            )
-        }),
-    )
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2'),
-        }),
-    )
-    list_display = ('email', 'first_name', 'last_name', 'dit_team', 'is_active', 'is_staff',)
-    search_fields = (
-        '=pk',
-        'first_name',
-        'last_name',
-        'email',
-        '=dit_team__pk',
-        'dit_team__name',
-    )
-    ordering = ('email',)
