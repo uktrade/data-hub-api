@@ -10,7 +10,7 @@ class SpecificProgramme(Enum):
     space = Constant('Space', '1c91dd94-cae4-4ea4-b37e-8ef88cb10e7f')
     advanced_engineering_supply_chain = Constant(
         'Advanced Engineering Supply Chain',
-        '6513f918-4263-4516-8abb-8e4a6a4de857'
+        '6513f918-4263-4516-8abb-8e4a6a4de857',
     )
 
 
