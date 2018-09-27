@@ -21,13 +21,16 @@ def test_delete_document(s3_stubber):
 
     bucket_name = get_bucket_name(document.bucket_id)
 
-    s3_stubber.add_response('delete_object', {
-        'ResponseMetadata': {
-            'HTTPStatusCode': 204,
-        }
-    }, expected_params={
-        'Bucket': bucket_name, 'Key': document.path
-    })
+    s3_stubber.add_response(
+        'delete_object',
+        {
+            'ResponseMetadata': {
+                'HTTPStatusCode': 204,
+            },
+        }, expected_params={
+            'Bucket': bucket_name, 'Key': document.path,
+        },
+    )
 
     result = delete_document.apply(args=(document.pk, )).get()
     assert result is None
@@ -55,8 +58,8 @@ def test_delete_document_s3_failure(s3_stubber):
         'delete_object',
         service_error_code=500,
         expected_params={
-            'Bucket': bucket_name, 'Key': document.path
-        }
+            'Bucket': bucket_name, 'Key': document.path,
+        },
     )
 
     with pytest.raises(Exception):

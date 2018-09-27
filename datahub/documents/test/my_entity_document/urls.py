@@ -26,21 +26,21 @@ urlpatterns = [
     path(
         'test-my-entity-document',
         my_entity_document_collection,
-        name='test-document-collection'
+        name='test-document-collection',
     ),
     path(
         'test-my-entity-document/<uuid:entity_document_pk>',
         my_entity_document_item,
-        name='test-document-item'
+        name='test-document-item',
     ),
     path(
         'test-my-entity-document/<uuid:entity_document_pk>/upload-callback',
         my_entity_document_callback,
-        name='test-document-item-callback'
+        name='test-document-item-callback',
     ),
     path(
         'test-my-entity-document/<uuid:entity_document_pk>/download',
         my_entity_document_download,
-        name='test-document-item-download'
+        name='test-document-item-download',
     ),
 ]

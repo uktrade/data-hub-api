@@ -19,7 +19,7 @@ UPLOAD_STATUSES = Choices(
     ('virus_scanning_in_progress', 'Virus scanning in progress'),
     ('virus_scanning_failed', 'Virus scanning failed.'),
     ('virus_scanned', 'Virus scanned'),
-    ('deletion_pending', 'Deletion pending')
+    ('deletion_pending', 'Deletion pending'),
 )
 
 
@@ -31,7 +31,7 @@ class Document(BaseModel, ArchivableModel):
     path = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
 
     uploaded_on = models.DateTimeField(
-        null=True, blank=True
+        null=True, blank=True,
     )
     scan_initiated_on = models.DateTimeField(
         null=True, blank=True,
@@ -51,7 +51,7 @@ class Document(BaseModel, ArchivableModel):
 
     class Meta:
         unique_together = (
-            ('bucket_id', 'path',),
+            ('bucket_id', 'path'),
         )
 
     @property

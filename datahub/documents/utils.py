@@ -86,12 +86,12 @@ def perform_delete_document(document_pk):
     document = get_document_by_pk(document_pk)
     if not document:
         raise DocumentDeleteException(
-            f'Document with ID {document_pk} not found.'
+            f'Document with ID {document_pk} not found.',
         )
 
     if document.status != UPLOAD_STATUSES.deletion_pending:
         raise DocumentDeleteException(
-            f'Document with ID {document_pk} is not pending deletion.'
+            f'Document with ID {document_pk} is not pending deletion.',
         )
 
     if document.uploaded_on:
