@@ -26,15 +26,18 @@ class Command(CSVBaseCommand):
         interaction = Interaction.objects.get(pk=pk)
 
         something_updated = _update_fields(
-            interaction, status_id, grant_amount_offered, net_company_receipt, overwrite
+            interaction, status_id, grant_amount_offered, net_company_receipt, overwrite,
         )
 
         if simulate or not something_updated:
             return
 
         interaction.save(
-            update_fields=('service_delivery_status', 'grant_amount_offered',
-                           'net_company_receipt')
+            update_fields=(
+                'service_delivery_status',
+                'grant_amount_offered',
+                'net_company_receipt',
+            ),
         )
 
 
@@ -43,13 +46,13 @@ def _update_fields(interaction, status_id, grant_amount_offered, net_company_rec
         raise ValueError('Cannot set grant fields on interactions without kind==service_delivery')
 
     status_updated = _update_field(
-        interaction, 'service_delivery_status_id', status_id, overwrite
+        interaction, 'service_delivery_status_id', status_id, overwrite,
     )
     grant_amount_offered_updated = _update_field(
-        interaction, 'grant_amount_offered', grant_amount_offered, overwrite
+        interaction, 'grant_amount_offered', grant_amount_offered, overwrite,
     )
     net_company_receipt_updated = _update_field(
-        interaction, 'net_company_receipt', net_company_receipt, overwrite
+        interaction, 'net_company_receipt', net_company_receipt, overwrite,
     )
 
     return status_updated or grant_amount_offered_updated or net_company_receipt_updated

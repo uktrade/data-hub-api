@@ -8,7 +8,7 @@ from reversion.models import Version
 from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import (
     ReferralSourceActivityFactory,
-    ReferralSourceWebsiteFactory
+    ReferralSourceWebsiteFactory,
 )
 
 pytestmark = pytest.mark.django_db
@@ -25,27 +25,27 @@ def test_run(s3_stubber):
         # referral_source_activity and referral_source_website should get updated
         InvestmentProjectFactory(
             referral_source_activity_id=referral_source_activities[0].id,
-            referral_source_activity_website=referral_source_websites[0]
+            referral_source_activity_website=referral_source_websites[0],
         ),
         # referral_source_activity and referral_source_website should get updated
         InvestmentProjectFactory(
             referral_source_activity_id=referral_source_activities[1].id,
-            referral_source_activity_website=referral_source_websites[1]
+            referral_source_activity_website=referral_source_websites[1],
         ),
         # should be ignored
         InvestmentProjectFactory(
             referral_source_activity_id=referral_source_activities[2].id,
-            referral_source_activity_website=referral_source_websites[2]
+            referral_source_activity_website=referral_source_websites[2],
         ),
         # referral_source_activity is invalid so it should fail
         InvestmentProjectFactory(
             referral_source_activity_id=referral_source_activities[3].id,
-            referral_source_activity_website=referral_source_websites[3]
+            referral_source_activity_website=referral_source_websites[3],
         ),
         # referral_source_website is invalid so it should fail
         InvestmentProjectFactory(
             referral_source_activity_id=referral_source_activities[4].id,
-            referral_source_activity_website=referral_source_websites[4]
+            referral_source_activity_website=referral_source_websites[4],
         ),
     ]
 
@@ -65,12 +65,12 @@ def test_run(s3_stubber):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(bytes(csv_content, encoding='utf-8'))
+            'Body': BytesIO(bytes(csv_content, encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command('update_investment_project_referral_source_activity_website', bucket, object_key)
@@ -114,19 +114,19 @@ def test_simulate(s3_stubber):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(bytes(csv_content, encoding='utf-8'))
+            'Body': BytesIO(bytes(csv_content, encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command(
         'update_investment_project_referral_source_activity_website',
         bucket,
         object_key,
-        simulate=True
+        simulate=True,
     )
 
     for investment_project in investment_projects:
@@ -155,12 +155,12 @@ def test_audit_log(s3_stubber):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(bytes(csv_content, encoding='utf-8'))
+            'Body': BytesIO(bytes(csv_content, encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command(

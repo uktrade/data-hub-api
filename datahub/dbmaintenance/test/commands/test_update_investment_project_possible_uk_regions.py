@@ -25,7 +25,7 @@ def test_run_with_old_regions(s3_stubber, caplog):
 
     investment_projects = InvestmentProjectFactory.create_batch(
         4,
-        allow_blank_possible_uk_regions=factory.Iterator(old_allow_blank_possible_uk_regions)
+        allow_blank_possible_uk_regions=factory.Iterator(old_allow_blank_possible_uk_regions),
     )
 
     for project, project_regions in zip(investment_projects, old_uk_region_locations):
@@ -44,12 +44,12 @@ def test_run_with_old_regions(s3_stubber, caplog):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command(
@@ -65,7 +65,7 @@ def test_run_with_old_regions(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert [project.allow_blank_possible_uk_regions for project in investment_projects] == [
-        True, False, False, True
+        True, False, False, True,
     ]
     assert [list(project.uk_region_locations.all()) for project in investment_projects] == [
         [],
@@ -88,7 +88,7 @@ def test_run_ignore_old_regions(s3_stubber, caplog):
 
     investment_projects = InvestmentProjectFactory.create_batch(
         4,
-        allow_blank_possible_uk_regions=factory.Iterator(old_allow_blank_possible_uk_regions)
+        allow_blank_possible_uk_regions=factory.Iterator(old_allow_blank_possible_uk_regions),
     )
 
     for project, project_regions in zip(investment_projects, old_uk_region_locations):
@@ -107,12 +107,12 @@ def test_run_ignore_old_regions(s3_stubber, caplog):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command(
@@ -129,10 +129,10 @@ def test_run_ignore_old_regions(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert [project.allow_blank_possible_uk_regions for project in investment_projects] == [
-        True, False, False, True
+        True, False, False, True,
     ]
     assert [list(project.uk_region_locations.all()) for project in investment_projects] == [
-        [], regions[2:3], regions[0:2], regions[0:4]
+        [], regions[2:3], regions[0:2], regions[0:4],
     ]
 
 
@@ -147,7 +147,7 @@ def test_simulate(s3_stubber, caplog):
 
     investment_projects = InvestmentProjectFactory.create_batch(
         4,
-        allow_blank_possible_uk_regions=factory.Iterator(old_allow_blank_possible_uk_regions)
+        allow_blank_possible_uk_regions=factory.Iterator(old_allow_blank_possible_uk_regions),
     )
 
     for project, project_regions in zip(investment_projects, old_uk_region_locations):
@@ -166,12 +166,12 @@ def test_simulate(s3_stubber, caplog):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command(
@@ -217,12 +217,12 @@ def test_audit_log(s3_stubber):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command(

@@ -16,7 +16,7 @@ class Command(CSVBaseCommand):
             '--overwrite',
             action='store_true',
             default=False,
-            help='If true it will overwrite all provided records.'
+            help='If true it will overwrite all provided records.',
         )
 
     def _should_update(self, company, overwrite=False):
@@ -35,7 +35,7 @@ class Command(CSVBaseCommand):
         if self._should_update(company, overwrite=overwrite):
             global_hq_id = parse_uuid(row['global_hq_id'])
             global_hq = {
-                'id': global_hq_id
+                'id': global_hq_id,
             } if global_hq_id is not None else None
 
             data = {
@@ -45,7 +45,7 @@ class Command(CSVBaseCommand):
             serializer = CompanySerializer(
                 instance=company,
                 data=data,
-                partial=True
+                partial=True,
             )
             serializer.is_valid(raise_exception=True)
             if simulate:

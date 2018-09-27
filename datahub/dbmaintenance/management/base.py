@@ -49,7 +49,7 @@ class CSVBaseCommand(BaseCommand):
         s3_client = get_s3_client_for_bucket('default')
         response = s3_client.get_object(
             Bucket=options['bucket'],
-            Key=options['object_key']
+            Key=options['object_key'],
         )['Body']
 
         with closing(response):

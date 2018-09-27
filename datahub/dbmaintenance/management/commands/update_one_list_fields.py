@@ -33,7 +33,7 @@ class Command(CSVBaseCommand):
             help=(
                 'If true, Data Hub records not present '
                 'in the CSV will have classification and one_list_account_owner set to None.'
-            )
+            ),
         )
 
     def _handle(self, *args, simulate=False, reset_unmatched=False, **options):
@@ -47,7 +47,7 @@ class Command(CSVBaseCommand):
         # as we process them and reset the remaining items.
         if reset_unmatched:
             qs = Company.objects.filter(
-                Q(classification_id__isnull=False) | Q(one_list_account_owner_id__isnull=False)
+                Q(classification_id__isnull=False) | Q(one_list_account_owner_id__isnull=False),
             )
             self.companies_to_reset = {company.id: company for company in qs}
         else:
@@ -58,7 +58,7 @@ class Command(CSVBaseCommand):
             *args,
             reset_unmatched=reset_unmatched,
             simulate=simulate,
-            **options
+            **options,
         )
 
         # reset all remaining unmatched companies
@@ -82,7 +82,7 @@ class Command(CSVBaseCommand):
                 company,
                 new_classification_id=None,
                 new_one_list_account_owner_id=None,
-                simulate=simulate
+                simulate=simulate,
             )
         except Exception as e:
             logger.exception(f'Resetting company {company} - Failed')
@@ -112,7 +112,7 @@ class Command(CSVBaseCommand):
         return Advisor.objects.get(pk=pk)
 
     def _update_company(
-        self, company, new_classification_id, new_one_list_account_owner_id, simulate
+        self, company, new_classification_id, new_one_list_account_owner_id, simulate,
     ):
         """
         Update `company` with the new values.
@@ -132,7 +132,7 @@ class Command(CSVBaseCommand):
                 update_fields=(
                     'classification_id',
                     'one_list_account_owner_id',
-                )
+                ),
             )
             reversion.set_comment('Classification and One List account owner correction.')
 
