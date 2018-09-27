@@ -55,7 +55,7 @@ class TestChangeCompanyAdmin(AdminTestMixin):
                 f'initial-core_team_members-{index}-id': team_member_id,
                 f'core_team_members-{index}-id': team_member_id,
                 f'core_team_members-{index}-company': company.pk,
-                f'core_team_members-{index}-adviser': adviser.pk
+                f'core_team_members-{index}-adviser': adviser.pk,
             })
 
         response = self.client.post(url, data, follow=True)
@@ -92,7 +92,7 @@ class TestChangeCompanyAdmin(AdminTestMixin):
                 f'initial-core_team_members-{index}-id': team_member.pk,
                 f'core_team_members-{index}-id': team_member.pk,
                 f'core_team_members-{index}-company': company.pk,
-                f'core_team_members-{index}-adviser': team_member.adviser.pk
+                f'core_team_members-{index}-adviser': team_member.adviser.pk,
 
             })
 
@@ -120,6 +120,6 @@ class TestOneListLink(AdminTestMixin):
 
         one_list_url = reverse(
             'admin-report:download-report',
-            kwargs={'report_id': OneListReport.id}
+            kwargs={'report_id': OneListReport.id},
         )
         assert one_list_url in response.rendered_content

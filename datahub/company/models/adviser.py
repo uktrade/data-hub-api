@@ -64,7 +64,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     telephone_number = models.CharField(max_length=MAX_LENGTH, blank=True)
     contact_email = models.EmailField(max_length=MAX_LENGTH, blank=True)
     dit_team = models.ForeignKey(
-        metadata_models.Team, blank=True, null=True, on_delete=models.SET_NULL
+        metadata_models.Team, blank=True, null=True, on_delete=models.SET_NULL,
     )
     is_staff = models.BooleanField(
         'staff status',
@@ -83,7 +83,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     # TODO: Remove post-schema freeze
     use_cdms_auth = models.BooleanField(
         default=False,
-        help_text='No longer used'
+        help_text='No longer used',
     )
 
     objects = AdviserManager()
