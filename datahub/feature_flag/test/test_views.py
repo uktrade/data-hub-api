@@ -32,7 +32,7 @@ class TestListFeatureFlags(APITestMixin):
             (
                 {
                     'code': feature_flag.code,
-                    'is_active': feature_flag.is_active
+                    'is_active': feature_flag.is_active,
                 } for feature_flag in feature_flags
             ),
             key=lambda item: item['code'],

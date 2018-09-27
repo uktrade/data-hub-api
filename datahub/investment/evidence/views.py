@@ -11,6 +11,8 @@ from datahub.investment.evidence.permissions import (
 from datahub.investment.evidence.serializers import EvidenceDocumentSerializer
 from datahub.investment.models import InvestmentProject
 from datahub.oauth.scopes import Scope
+from datahub.user_event_log.constants import USER_EVENT_TYPES
+from datahub.user_event_log.utils import record_user_event
 
 
 class EvidenceDocumentViewSet(BaseEntityDocumentModelViewSet):
@@ -50,6 +52,13 @@ class EvidenceDocumentViewSet(BaseEntityDocumentModelViewSet):
     def get_view_name(self):
         """Returns the view set name for the DRF UI."""
         return 'Evidence documents'
+
+    def destroy(self, request, *args, **kwargs):
+        """Record delete event."""
+        entity_document = self.get_object()
+        data = self.serializer_class(entity_document).data
+        record_user_event(request, USER_EVENT_TYPES.evidence_document_delete, data=data)
+        return super().destroy(request, *args, **kwargs)
 
     def _check_project_exists(self):
         if not InvestmentProject.objects.filter(pk=self.kwargs['project_pk']).exists():

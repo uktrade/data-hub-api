@@ -86,7 +86,7 @@ class BaseCleanupCommand(BaseCommand):
         for related in get_relations_to_delete(model):
             related_model = related.related_model
             related_qs = related_model._base_manager.filter(
-                **{f'{related.field.name}__in': Subquery(qs.values('pk'))}
+                **{f'{related.field.name}__in': Subquery(qs.values('pk'))},
             )
             _print_query(related_model, related_qs, related)
 
@@ -97,9 +97,9 @@ class BaseCleanupCommand(BaseCommand):
         config = self.CONFIGS[model._meta.label]
 
         return get_unreferenced_objects_query(model).filter(
-            **{f'{config.date_field}__lt': today(tzinfo=utc) - config.age_threshold}
+            **{f'{config.date_field}__lt': today(tzinfo=utc) - config.age_threshold},
         ).order_by(
-            f'-{config.date_field}'
+            f'-{config.date_field}',
         )
 
 
@@ -110,8 +110,8 @@ def _print_query(model, qs, relation=None):
         ''.join((
             f'{model_verbose_name} to delete',
             f' (via {model._meta.model_name}.{relation.remote_field.name})' if relation else '',
-            f': {qs.count()}'
-        ))
+            f': {qs.count()}',
+        )),
     )
 
     logger.info('SQL:')

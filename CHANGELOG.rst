@@ -1,3 +1,37 @@
+Data Hub API 6.4.0 (2018-09-27)
+===============================
+
+
+
+Deprecations and removals
+-------------------------
+
+- **Companies** The column ``company_company.account_manager_id`` was deleted from the database.
+
+Features
+--------
+
+- **Contacts** A list of email addresses to opt out of marketing emails can now be loaded via the admin site.
+- URLs in CSV exports and reports are no longer clickable when the CSV file is opened in Excel. This is because the links do not behave correctly when clicked on in Excel (see https://support.microsoft.com/kb/899927 for further information on why).
+
+Bug fixes
+---------
+
+- **Companies** The link in the admin site to export the One List was removed from the adviser, Companies House company, contact and export experience category lists. (It still appears on the company list as originally intended.)
+- **Investment** Restricted users can now list proposition documents associated to their team's investment projects.
+
+Internal changes
+----------------
+
+- **Investment** Deletion of proposition or evidence document is now logged in UserEvent model. UserEvent records can be viewed from the admin site.
+- Various dependencies were updated.
+
+Database schema
+---------------
+
+- **Companies** The column ``company_company.account_manager_id`` was deleted from the database.
+
+
 Data Hub API 6.3.0 (2018-09-12)
 ===============================
 

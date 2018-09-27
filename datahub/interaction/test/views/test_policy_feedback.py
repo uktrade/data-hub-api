@@ -63,7 +63,7 @@ class TestAddPolicyFeedback(APITestMixin):
 
         user = create_add_policy_feedback_user()
         api_client = self.create_api_client(user=user)
-        response = api_client.post(url, request_data, format='json')
+        response = api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
@@ -242,7 +242,7 @@ class TestAddPolicyFeedback(APITestMixin):
         url = reverse('api-v3:interaction:collection')
         user = create_add_policy_feedback_user()
         api_client = self.create_api_client(user=user)
-        response = api_client.post(url, data, format='json')
+        response = api_client.post(url, data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == errors
@@ -280,7 +280,7 @@ class TestAddPolicyFeedback(APITestMixin):
         }
         user = create_user()
         api_client = self.create_api_client(user=user)
-        response = api_client.post(url, request_data, format='json')
+        response = api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {

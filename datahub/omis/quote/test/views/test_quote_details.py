@@ -31,7 +31,7 @@ class TestCreatePreviewOrder(APITestMixin):
             f'api-v3:omis:quote:{quote_view_name}',
             kwargs={'order_pk': uuid.uuid4()}
         )
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -44,7 +44,7 @@ class TestCreatePreviewOrder(APITestMixin):
             f'api-v3:omis:quote:{quote_view_name}',
             kwargs={'order_pk': order.pk}
         )
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_409_CONFLICT
         assert response.json() == {'detail': "There's already an active quote."}
@@ -70,7 +70,7 @@ class TestCreatePreviewOrder(APITestMixin):
             f'api-v3:omis:quote:{quote_view_name}',
             kwargs={'order_pk': order.pk}
         )
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_409_CONFLICT
         assert response.json() == {
@@ -98,7 +98,7 @@ class TestCreatePreviewOrder(APITestMixin):
             f'api-v3:omis:quote:{quote_view_name}',
             kwargs={'order_pk': order.pk}
         )
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
@@ -120,7 +120,7 @@ class TestCreatePreviewOrder(APITestMixin):
             f'api-v3:omis:quote:{quote_view_name}',
             kwargs={'order_pk': order.pk}
         )
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
@@ -143,7 +143,7 @@ class TestCreatePreviewOrder(APITestMixin):
         orig_quote = order.quote
 
         url = reverse('api-v3:omis:quote:detail', kwargs={'order_pk': order.pk})
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
 
         order.refresh_from_db()
         assert response.status_code == status.HTTP_201_CREATED
@@ -180,7 +180,7 @@ class TestCreatePreviewOrder(APITestMixin):
             mocked_save.side_effect = Exception()
 
             with pytest.raises(Exception):
-                self.api_client.post(url, format='json')
+                self.api_client.post(url)
 
         order.refresh_from_db()
         assert not order.quote
@@ -202,7 +202,7 @@ class TestCreatePreviewOrder(APITestMixin):
         orig_quote = order.quote
 
         url = reverse('api-v3:omis:quote:preview', kwargs={'order_pk': order.pk})
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert order.reference in response.json()['content']
@@ -231,7 +231,7 @@ class TestGetQuote(APITestMixin):
         quote = order.quote
 
         url = reverse('api-v3:omis:quote:detail', kwargs={'order_pk': order.pk})
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
@@ -259,7 +259,7 @@ class TestGetQuote(APITestMixin):
         )
 
         url = reverse('api-v3:omis:quote:detail', kwargs={'order_pk': order.pk})
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['terms_and_conditions'] == ''
@@ -267,7 +267,7 @@ class TestGetQuote(APITestMixin):
     def test_404_if_order_doesnt_exist(self):
         """Test that if the order doesn't exist, the endpoint returns 404."""
         url = reverse('api-v3:omis:quote:detail', kwargs={'order_pk': uuid.uuid4()})
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -277,7 +277,7 @@ class TestGetQuote(APITestMixin):
         assert not order.quote
 
         url = reverse('api-v3:omis:quote:detail', kwargs={'order_pk': order.pk})
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -291,7 +291,7 @@ class TestCancelOrder(APITestMixin):
             f'api-v3:omis:quote:cancel',
             kwargs={'order_pk': uuid.uuid4()}
         )
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -317,7 +317,7 @@ class TestCancelOrder(APITestMixin):
             f'api-v3:omis:quote:cancel',
             kwargs={'order_pk': order.pk}
         )
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_409_CONFLICT
         assert response.json() == {
@@ -335,7 +335,7 @@ class TestCancelOrder(APITestMixin):
             f'api-v3:omis:quote:cancel',
             kwargs={'order_pk': order.pk}
         )
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -349,7 +349,7 @@ class TestCancelOrder(APITestMixin):
             kwargs={'order_pk': order.pk}
         )
         with freeze_time('2017-07-12 13:00') as mocked_now:
-            response = self.api_client.post(url, format='json')
+            response = self.api_client.post(url)
 
             assert response.status_code == status.HTTP_200_OK
             assert response.json() == {

@@ -36,7 +36,7 @@ class TestPublicGetPayments(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.get(url, format='json')
+        response = client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [
@@ -62,7 +62,7 @@ class TestPublicGetPayments(APITestMixin):
             scope=Scope.public_omis_front_end,
             grant_type=Application.GRANT_CLIENT_CREDENTIALS
         )
-        response = client.get(url, format='json')
+        response = client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 

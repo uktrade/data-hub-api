@@ -8,7 +8,7 @@ from datahub.feature_flag.models import FeatureFlag
 class FeatureFlagAdmin(BaseModelAdminMixin, admin.ModelAdmin):
     """Feature flag admin."""
 
-    list_display = ('code', 'description', 'is_active', 'created_by', 'created_on',)
+    list_display = ('code', 'description', 'is_active', 'created_by', 'created_on')
     search_fields = ('code',)
     readonly_fields = (
         'id',
