@@ -132,7 +132,7 @@ class SPIReport:
         Earliest date counts.
         """
         stage_log = investment_project.stage_log.filter(
-            stage_id=Stage.won.value.id
+            stage_id=Stage.won.value.id,
         ).order_by('created_on').first()
 
         return stage_log.created_on if stage_log else None
@@ -141,12 +141,12 @@ class SPIReport:
         """Gets project's propositions."""
         qs = investment_project.proposition.select_related(
             'adviser',
-            'created_by__dit_team'
+            'created_by__dit_team',
         )
         if ist_only:
             # Only teams tagged with investment services team
             qs = qs.filter(
-                created_by__dit_team__tags__overlap=[Team.TAGS.investment_services_team]
+                created_by__dit_team__tags__overlap=[Team.TAGS.investment_services_team],
             )
         return qs.order_by('created_on')
 

@@ -26,21 +26,21 @@ urlpatterns = [
     path(
         'evidence-document',
         evidence_document_collection,
-        name='document-collection'
+        name='document-collection',
     ),
     path(
         'evidence-document/<uuid:entity_document_pk>',
         evidence_document_item,
-        name='document-item'
+        name='document-item',
     ),
     path(
         'evidence-document/<uuid:entity_document_pk>/upload-callback',
         evidence_document_callback,
-        name='document-item-callback'
+        name='document-item-callback',
     ),
     path(
         'evidence-document/<uuid:entity_document_pk>/download',
         evidence_document_download,
-        name='document-item-download'
+        name='document-item-download',
     ),
 ]
