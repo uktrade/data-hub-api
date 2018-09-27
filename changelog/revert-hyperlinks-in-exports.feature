@@ -1,1 +1,0 @@
-URLs in CSV exports and reports are no longer clickable when the CSV file is opened in Excel. This is because the links do not behave correctly when clicked on in Excel (see https://support.microsoft.com/kb/899927 for further information on why).
