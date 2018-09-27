@@ -18,7 +18,7 @@ def delete_document(document_pk):
         perform_delete_document(document_pk)
     except Exception:
         logger.error(
-            f'Deletion from S3 of document with ID {document_pk} failed.'
+            f'Deletion from S3 of document with ID {document_pk} failed.',
         )
         raise
 
