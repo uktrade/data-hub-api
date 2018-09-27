@@ -14,8 +14,9 @@ class EventSerializer(serializers.ModelSerializer):
     default_error_messages = {
         'lead_team_not_in_teams': ugettext_lazy('Lead team must be in teams array.'),
         'end_date_before_start_date': ugettext_lazy('End date cannot be before start date.'),
-        'uk_region_non_uk_country': ugettext_lazy('Cannot specify a UK region for a non-UK '
-                                                  'country.')
+        'uk_region_non_uk_country': ugettext_lazy(
+            'Cannot specify a UK region for a non-UK country.',
+        ),
     }
     end_date = serializers.DateField()
     event_type = NestedRelatedField('event.EventType')
@@ -26,7 +27,7 @@ class EventSerializer(serializers.ModelSerializer):
     address_country = NestedRelatedField('metadata.Country')
     uk_region = NestedRelatedField('metadata.UKRegion', required=False, allow_null=True)
     related_programmes = NestedRelatedField(
-        'event.Programme', many=True, required=False, allow_empty=True
+        'event.Programme', many=True, required=False, allow_empty=True,
     )
     service = NestedRelatedField('metadata.Service')
     start_date = serializers.DateField()
