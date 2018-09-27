@@ -10,7 +10,7 @@ from datahub.investment.proposition.models import PropositionDocument
 from datahub.investment.proposition.test.factories import PropositionFactory
 from datahub.investment.report.spi import SPIReport
 from datahub.investment.test.factories import (
-    InvestmentProjectFactory, VerifyWinInvestmentProjectFactory
+    InvestmentProjectFactory, VerifyWinInvestmentProjectFactory,
 )
 from datahub.metadata.models import Team
 
@@ -89,18 +89,21 @@ def test_can_see_spi1_start(spi_report):
     assert 'Enquiry processed' not in rows[0]
 
 
-@pytest.mark.parametrize('service_id,visible', (
-    (Service.investment_enquiry_requested_more_information.value.id, True),
-    (Service.investment_enquiry_confirmed_prospect.value.id, True),
-    (Service.investment_enquiry_assigned_to_ist_cmc.value.id, True),
-    (Service.investment_enquiry_assigned_to_ist_sas.value.id, True),
-    (Service.investment_enquiry_assigned_to_hq.value.id, True),
-    (Service.investment_enquiry_transferred_to_lep.value.id, True),
-    (Service.investment_enquiry_transferred_to_da.value.id, True),
-    (Service.investment_enquiry_transferred_to_lp.value.id, True),
-    (Service.trade_enquiry.value.id, False),
-    (Service.account_management.value.id, False),
-))
+@pytest.mark.parametrize(
+    'service_id,visible',
+    (
+        (Service.investment_enquiry_requested_more_information.value.id, True),
+        (Service.investment_enquiry_confirmed_prospect.value.id, True),
+        (Service.investment_enquiry_assigned_to_ist_cmc.value.id, True),
+        (Service.investment_enquiry_assigned_to_ist_sas.value.id, True),
+        (Service.investment_enquiry_assigned_to_hq.value.id, True),
+        (Service.investment_enquiry_transferred_to_lep.value.id, True),
+        (Service.investment_enquiry_transferred_to_da.value.id, True),
+        (Service.investment_enquiry_transferred_to_lp.value.id, True),
+        (Service.trade_enquiry.value.id, False),
+        (Service.account_management.value.id, False),
+    ),
+)
 def test_interaction_would_end_spi1_or_not(spi_report, service_id, visible):
     """Checks if specified interaction ends spi1 or not."""
     investment_project = InvestmentProjectFactory()
@@ -119,18 +122,21 @@ def test_interaction_would_end_spi1_or_not(spi_report, service_id, visible):
         assert 'Enquiry processed' not in rows[0]
 
 
-@pytest.mark.parametrize('service_id,visible', (
-    (Service.investment_enquiry_requested_more_information.value.id, False),
-    (Service.investment_enquiry_confirmed_prospect.value.id, False),
-    (Service.investment_enquiry_assigned_to_ist_cmc.value.id, True),
-    (Service.investment_enquiry_assigned_to_ist_sas.value.id, True),
-    (Service.investment_enquiry_assigned_to_hq.value.id, False),
-    (Service.investment_enquiry_transferred_to_lep.value.id, False),
-    (Service.investment_enquiry_transferred_to_da.value.id, False),
-    (Service.investment_enquiry_transferred_to_lp.value.id, False),
-    (Service.trade_enquiry.value.id, False),
-    (Service.account_management.value.id, False),
-))
+@pytest.mark.parametrize(
+    'service_id,visible',
+    (
+        (Service.investment_enquiry_requested_more_information.value.id, False),
+        (Service.investment_enquiry_confirmed_prospect.value.id, False),
+        (Service.investment_enquiry_assigned_to_ist_cmc.value.id, True),
+        (Service.investment_enquiry_assigned_to_ist_sas.value.id, True),
+        (Service.investment_enquiry_assigned_to_hq.value.id, False),
+        (Service.investment_enquiry_transferred_to_lep.value.id, False),
+        (Service.investment_enquiry_transferred_to_da.value.id, False),
+        (Service.investment_enquiry_transferred_to_lp.value.id, False),
+        (Service.trade_enquiry.value.id, False),
+        (Service.account_management.value.id, False),
+    ),
+)
 def test_interaction_would_start_spi2_or_not(spi_report, ist_adviser, service_id, visible):
     """Checks if specified interaction starts spi2 or not."""
     investment_project = InvestmentProjectFactory(
@@ -236,7 +242,7 @@ def test_can_get_spi5_start_and_end(spi_report, ist_adviser):
     with freeze_time('2017-01-15'):
         InvestmentProjectInteractionFactory(
             service_id=Service.investment_ist_aftercare_offered.value.id,
-            investment_project=investment_project
+            investment_project=investment_project,
         )
 
     rows = list(spi_report.rows())
@@ -247,7 +253,7 @@ def test_can_get_spi5_start_and_end(spi_report, ist_adviser):
 
 def test_cannot_get_spi5_start_and_end_for_non_new_investor(
     spi_report,
-    ist_adviser
+    ist_adviser,
 ):
     """Tests if we are not going to see spi5 start and end dates if investor is not new."""
     investment_project = VerifyWinInvestmentProjectFactory(
@@ -262,7 +268,7 @@ def test_cannot_get_spi5_start_and_end_for_non_new_investor(
     with freeze_time('2017-01-15'):
         InvestmentProjectInteractionFactory(
             service_id=Service.investment_ist_aftercare_offered.value.id,
-            investment_project=investment_project
+            investment_project=investment_project,
         )
 
     rows = list(spi_report.rows())

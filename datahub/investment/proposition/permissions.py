@@ -86,7 +86,7 @@ class _PropositionDocumentViewToActionMapping:
 
 class PropositionDocumentModelPermissions(
     _PropositionDocumentViewToActionMapping,
-    ViewBasedModelPermissions
+    ViewBasedModelPermissions,
 ):
     """Proposition Document model permissions class."""
 

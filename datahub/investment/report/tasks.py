@@ -29,11 +29,11 @@ def generate_spi_report():
             get_bucket_name('report'),
             report_key,
             ExtraArgs={
-                'ServerSideEncryption': 'AES256'
-            }
+                'ServerSideEncryption': 'AES256',
+            },
         )
 
         report = SPIReport(
-            s3_key=report_key
+            s3_key=report_key,
         )
         report.save()

@@ -8,7 +8,7 @@ from datahub.investment.report.models import SPIReport, SPIReportPermission
 def download_spi_report(request, pk=None):
     """Downloads SPI report."""
     if not request.user or not request.user.has_perm(
-        f'report.{SPIReportPermission.change}'
+        f'report.{SPIReportPermission.change}',
     ):
         raise PermissionDenied
 
