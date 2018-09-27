@@ -14,29 +14,32 @@ from datahub.company.timeline.exceptions import InvalidCompanyNumberError
 FAKE_RESPONSES = {
     '/api/v1/company/events/?companies_house_id=125694': {
         'json': {
-            'events': [{
-                'data_source': 'companies_house.companies',
-                'datetime': 'Mon, 31 Dec 2018 00:00:00 GMT',
-                'description': 'Accounts next due date',
-            }, {
-                'data_source': 'companies_house.companies',
-                'datetime': 'Mon, 31 Dec 2017 00:00:00 GMT',
-                'description': 'Accounts filed',
-            }]
-        }
+            'events': [
+                {
+                    'data_source': 'companies_house.companies',
+                    'datetime': 'Mon, 31 Dec 2018 00:00:00 GMT',
+                    'description': 'Accounts next due date',
+                },
+                {
+                    'data_source': 'companies_house.companies',
+                    'datetime': 'Mon, 31 Dec 2017 00:00:00 GMT',
+                    'description': 'Accounts filed',
+                },
+            ],
+        },
     },
     '/api/v1/company/events/?companies_house_id=989087': {
         'json': {
             'events': [{
                 'invalid_response': 'Accounts filed',
-            }]
-        }
+            }],
+        },
     },
     '/api/v1/company/events/?companies_house_id=356812': {
-        'status_code': status.HTTP_404_NOT_FOUND
+        'status_code': status.HTTP_404_NOT_FOUND,
     },
     '/api/v1/company/events/?companies_house_id=886423': {
-        'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR
+        'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
     },
 }
 
@@ -57,7 +60,7 @@ class TestDataScienceCompanyAPIClient:
             ('', 'api-id', 'api-key'),
             ('api-url', '', 'api-key'),
             ('api-url', 'api-id', ''),
-        )
+        ),
     )
     def test_raises_an_error_on_invalid_configuration(self, monkeypatch, api_url, api_id, api_key):
         """Test that ImproperlyConfigured if the API connection details are not configured."""
@@ -68,7 +71,7 @@ class TestDataScienceCompanyAPIClient:
         with pytest.raises(ImproperlyConfigured):
             DataScienceCompanyAPIClient()
 
-    @pytest.mark.parametrize('company_number', (None, '', '00', ))
+    @pytest.mark.parametrize('company_number', (None, '', '00'))
     def test_raises_an_error_on_blank_like_company_numbers(self, company_number):
         """Test that an error is raised for company numbers that are blank or only zeroes."""
         client = DataScienceCompanyAPIClient()
@@ -99,12 +102,15 @@ class TestDataScienceCompanyAPIClient:
     def test_transforms_the_api_response(self, company_number):
         """Test the re-formatting of the API response."""
         client = DataScienceCompanyAPIClient()
-        assert client.get_timeline_events_by_company_number(company_number) == [{
-            'data_source': 'companies_house.companies',
-            'datetime': datetime(2018, 12, 31, tzinfo=utc),
-            'description': 'Accounts next due date',
-        }, {
-            'data_source': 'companies_house.companies',
-            'datetime': datetime(2017, 12, 31, tzinfo=utc),
-            'description': 'Accounts filed',
-        }]
+        assert client.get_timeline_events_by_company_number(company_number) == [
+            {
+                'data_source': 'companies_house.companies',
+                'datetime': datetime(2018, 12, 31, tzinfo=utc),
+                'description': 'Accounts next due date',
+            },
+            {
+                'data_source': 'companies_house.companies',
+                'datetime': datetime(2017, 12, 31, tzinfo=utc),
+                'description': 'Accounts filed',
+            },
+        ]

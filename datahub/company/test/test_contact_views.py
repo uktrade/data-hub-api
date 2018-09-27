@@ -28,46 +28,49 @@ class TestAddContact(APITestMixin):
         company = CompanyFactory()
 
         url = reverse('api-v3:contact:list')
-        response = self.api_client.post(url, {
-            'title': {
-                'id': constants.Title.admiral_of_the_fleet.value.id
+        response = self.api_client.post(
+            url,
+            data={
+                'title': {
+                    'id': constants.Title.admiral_of_the_fleet.value.id,
+                },
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+                'job_title': 'Head of Sales',
+                'company': {
+                    'id': str(company.pk),
+                },
+                'email': 'foo@bar.com',
+                'email_alternative': 'foo2@bar.com',
+                'primary': True,
+                'telephone_countrycode': '+44',
+                'telephone_number': '123456789',
+                'telephone_alternative': '987654321',
+                'address_same_as_company': False,
+                'address_1': 'Foo st.',
+                'address_2': 'adr 2',
+                'address_town': 'London',
+                'address_county': 'London',
+                'address_country': {
+                    'id': constants.Country.united_kingdom.value.id,
+                },
+                'address_postcode': 'SW1A1AA',
+                'notes': 'lorem ipsum',
+                'contactable_by_dit': True,
+                'contactable_by_uk_dit_partners': True,
+                'contactable_by_overseas_dit_partners': True,
+                'accepts_dit_email_marketing': True,
+                'contactable_by_email': True,
+                'contactable_by_phone': True,
             },
-            'first_name': 'Oratio',
-            'last_name': 'Nelson',
-            'job_title': 'Head of Sales',
-            'company': {
-                'id': str(company.pk)
-            },
-            'email': 'foo@bar.com',
-            'email_alternative': 'foo2@bar.com',
-            'primary': True,
-            'telephone_countrycode': '+44',
-            'telephone_number': '123456789',
-            'telephone_alternative': '987654321',
-            'address_same_as_company': False,
-            'address_1': 'Foo st.',
-            'address_2': 'adr 2',
-            'address_town': 'London',
-            'address_county': 'London',
-            'address_country': {
-                'id': constants.Country.united_kingdom.value.id
-            },
-            'address_postcode': 'SW1A1AA',
-            'notes': 'lorem ipsum',
-            'contactable_by_dit': True,
-            'contactable_by_uk_dit_partners': True,
-            'contactable_by_overseas_dit_partners': True,
-            'accepts_dit_email_marketing': True,
-            'contactable_by_email': True,
-            'contactable_by_phone': True
-        })
+        )
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == {
             'id': response.json()['id'],
             'title': {
                 'id': constants.Title.admiral_of_the_fleet.value.id,
-                'name': constants.Title.admiral_of_the_fleet.value.name
+                'name': constants.Title.admiral_of_the_fleet.value.name,
             },
             'first_name': 'Oratio',
             'last_name': 'Nelson',
@@ -75,13 +78,13 @@ class TestAddContact(APITestMixin):
             'job_title': 'Head of Sales',
             'company': {
                 'id': str(company.pk),
-                'name': company.name
+                'name': company.name,
             },
             'adviser': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
                 'last_name': self.user.last_name,
-                'name': self.user.name
+                'name': self.user.name,
             },
             'email': 'foo@bar.com',
             'email_alternative': 'foo2@bar.com',
@@ -96,7 +99,7 @@ class TestAddContact(APITestMixin):
             'address_county': 'London',
             'address_country': {
                 'id': constants.Country.united_kingdom.value.id,
-                'name': constants.Country.united_kingdom.value.name
+                'name': constants.Country.united_kingdom.value.name,
             },
             'address_postcode': 'SW1A1AA',
             'notes': 'lorem ipsum',
@@ -118,18 +121,21 @@ class TestAddContact(APITestMixin):
     def test_with_address_same_as_company(self):
         """Test add new contact with same address as company."""
         url = reverse('api-v3:contact:list')
-        response = self.api_client.post(url, {
-            'first_name': 'Oratio',
-            'last_name': 'Nelson',
-            'company': {
-                'id': CompanyFactory().pk
+        response = self.api_client.post(
+            url,
+            data={
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+                'company': {
+                    'id': CompanyFactory().pk,
+                },
+                'email': 'foo@bar.com',
+                'telephone_countrycode': '+44',
+                'telephone_number': '123456789',
+                'address_same_as_company': True,
+                'primary': True,
             },
-            'email': 'foo@bar.com',
-            'telephone_countrycode': '+44',
-            'telephone_number': '123456789',
-            'address_same_as_company': True,
-            'primary': True
-        })
+        )
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
@@ -145,18 +151,21 @@ class TestAddContact(APITestMixin):
     def test_defaults(self):
         """Test defaults when adding an item."""
         url = reverse('api-v3:contact:list')
-        response = self.api_client.post(url, {
-            'first_name': 'Oratio',
-            'last_name': 'Nelson',
-            'company': {
-                'id': CompanyFactory().pk
+        response = self.api_client.post(
+            url,
+            data={
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+                'company': {
+                    'id': CompanyFactory().pk,
+                },
+                'email': 'foo@bar.com',
+                'telephone_countrycode': '+44',
+                'telephone_number': '123456789',
+                'address_same_as_company': True,
+                'primary': True,
             },
-            'email': 'foo@bar.com',
-            'telephone_countrycode': '+44',
-            'telephone_number': '123456789',
-            'address_same_as_company': True,
-            'primary': True
-        })
+        )
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.data
@@ -181,116 +190,131 @@ class TestAddContact(APITestMixin):
     def test_fails_with_invalid_email_address(self):
         """Test that fails if the email address is invalid."""
         url = reverse('api-v3:contact:list')
-        response = self.api_client.post(url, {
-            'first_name': 'Oratio',
-            'last_name': 'Nelson',
-            'company': {
-                'id': CompanyFactory().pk
+        response = self.api_client.post(
+            url,
+            data={
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+                'company': {
+                    'id': CompanyFactory().pk,
+                },
+                'email': 'invalid dot com',
+                'telephone_countrycode': '+44',
+                'telephone_number': '123456789',
+                'address_same_as_company': True,
+                'primary': True,
             },
-            'email': 'invalid dot com',
-            'telephone_countrycode': '+44',
-            'telephone_number': '123456789',
-            'address_same_as_company': True,
-            'primary': True
-        })
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
-            'email': ['Enter a valid email address.']
+            'email': ['Enter a valid email address.'],
         }
 
     def test_fails_without_address(self):
         """Test that fails without any address."""
         url = reverse('api-v3:contact:list')
-        response = self.api_client.post(url, {
-            'first_name': 'Oratio',
-            'last_name': 'Nelson',
-            'company': {
-                'id': CompanyFactory().pk
+        response = self.api_client.post(
+            url,
+            data={
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+                'company': {
+                    'id': CompanyFactory().pk,
+                },
+                'email': 'foo@bar.com',
+                'telephone_countrycode': '+44',
+                'telephone_number': '123456789',
+                'primary': True,
             },
-            'email': 'foo@bar.com',
-            'telephone_countrycode': '+44',
-            'telephone_number': '123456789',
-            'primary': True
-        })
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
             'address_same_as_company': [
-                'Please select either address_same_as_company or enter an address manually.'
-            ]
+                'Please select either address_same_as_company or enter an address manually.',
+            ],
         }
 
     def test_fails_with_only_partial_manual_address(self):
         """Test that fails if only partial manual address supplied."""
         url = reverse('api-v3:contact:list')
-        response = self.api_client.post(url, {
-            'first_name': 'Oratio',
-            'last_name': 'Nelson',
-            'company': {
-                'id': CompanyFactory().pk
+        response = self.api_client.post(
+            url,
+            data={
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+                'company': {
+                    'id': CompanyFactory().pk,
+                },
+                'email': 'foo@bar.com',
+                'telephone_countrycode': '+44',
+                'telephone_number': '123456789',
+                'address_1': 'test',
+                'primary': True,
             },
-            'email': 'foo@bar.com',
-            'telephone_countrycode': '+44',
-            'telephone_number': '123456789',
-            'address_1': 'test',
-            'primary': True
-        })
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
             'address_country': ['This field is required.'],
-            'address_town': ['This field is required.']
+            'address_town': ['This field is required.'],
         }
 
     def test_fails_with_contact_preferences_not_set(self):
         """Test that fails without any contact preference."""
         url = reverse('api-v3:contact:list')
-        response = self.api_client.post(url, {
-            'first_name': 'Oratio',
-            'last_name': 'Nelson',
-            'company': {
-                'id': CompanyFactory().pk
+        response = self.api_client.post(
+            url,
+            data={
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+                'company': {
+                    'id': CompanyFactory().pk,
+                },
+                'email': 'foo@bar.com',
+                'telephone_countrycode': '+44',
+                'telephone_number': '123456789',
+                'address_same_as_company': True,
+                'contactable_by_email': False,
+                'contactable_by_phone': False,
+                'primary': True,
             },
-            'email': 'foo@bar.com',
-            'telephone_countrycode': '+44',
-            'telephone_number': '123456789',
-            'address_same_as_company': True,
-            'contactable_by_email': False,
-            'contactable_by_phone': False,
-            'primary': True
-        })
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
             'contactable_by_email': [
                 'A contact should have at least one way of being contacted. '
-                'Please select either email or phone, or both.'
+                'Please select either email or phone, or both.',
             ],
             'contactable_by_phone': [
                 'A contact should have at least one way of being contacted. '
-                'Please select either email or phone, or both.'
-            ]
+                'Please select either email or phone, or both.',
+            ],
         }
 
     def test_fails_without_primary_specified(self):
         """Test that fails if primary is not specified."""
         url = reverse('api-v3:contact:list')
-        response = self.api_client.post(url, {
-            'first_name': 'Oratio',
-            'last_name': 'Nelson',
-            'company': {
-                'id': CompanyFactory().pk
+        response = self.api_client.post(
+            url,
+            data={
+                'first_name': 'Oratio',
+                'last_name': 'Nelson',
+                'company': {
+                    'id': CompanyFactory().pk,
+                },
+                'email': 'foo@bar.com',
+                'telephone_countrycode': '+44',
+                'telephone_number': '123456789',
+                'address_same_as_company': True,
             },
-            'email': 'foo@bar.com',
-            'telephone_countrycode': '+44',
-            'telephone_number': '123456789',
-            'address_same_as_company': True,
-        })
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
-            'primary': ['This field is required.']
+            'primary': ['This field is required.'],
         }
 
 
@@ -328,21 +352,24 @@ class TestEditContact(APITestMixin):
                 contactable_by_overseas_dit_partners=False,
                 accepts_dit_email_marketing=False,
                 contactable_by_email=True,
-                contactable_by_phone=True
+                contactable_by_phone=True,
             )
 
         url = reverse('api-v3:contact:detail', kwargs={'pk': contact.pk})
         with freeze_time('2017-04-19 13:25:30.986208'):
-            response = self.api_client.patch(url, {
-                'first_name': 'New Oratio',
-            })
+            response = self.api_client.patch(
+                url,
+                data={
+                    'first_name': 'New Oratio',
+                },
+            )
 
         assert response.status_code == status.HTTP_200_OK, response.data
         assert response.json() == {
             'id': response.json()['id'],
             'title': {
                 'id': constants.Title.admiral_of_the_fleet.value.id,
-                'name': constants.Title.admiral_of_the_fleet.value.name
+                'name': constants.Title.admiral_of_the_fleet.value.name,
             },
             'first_name': 'New Oratio',
             'last_name': 'Nelson',
@@ -350,7 +377,7 @@ class TestEditContact(APITestMixin):
             'job_title': 'Head of Sales',
             'company': {
                 'id': str(company.pk),
-                'name': company.name
+                'name': company.name,
             },
             'email': 'foo@bar.com',
             'email_alternative': 'foo2@bar.com',
@@ -359,7 +386,7 @@ class TestEditContact(APITestMixin):
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
                 'last_name': self.user.last_name,
-                'name': self.user.name
+                'name': self.user.name,
             },
             'telephone_countrycode': '+44',
             'telephone_number': '123456789',
@@ -371,7 +398,7 @@ class TestEditContact(APITestMixin):
             'address_county': 'London',
             'address_country': {
                 'id': constants.Country.united_kingdom.value.id,
-                'name': constants.Country.united_kingdom.value.name
+                'name': constants.Country.united_kingdom.value.name,
             },
             'address_postcode': 'SW1A1AA',
             'notes': 'lorem ipsum',
@@ -395,9 +422,12 @@ class TestEditContact(APITestMixin):
         company = ArchivedContactFactory()
 
         url = reverse('api-v3:contact:detail', kwargs={'pk': company.pk})
-        response = self.api_client.patch(url, data={
-            'first_name': 'new name',
-        })
+        response = self.api_client.patch(
+            url,
+            data={
+                'first_name': 'new name',
+            },
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
@@ -411,9 +441,12 @@ class TestEditContact(APITestMixin):
         )
 
         url = reverse('api-v3:contact:detail', kwargs={'pk': contact.pk})
-        response = self.api_client.patch(url, data={
-            'archived_documents_url_path': 'new_path'
-        })
+        response = self.api_client.patch(
+            url,
+            data={
+                'archived_documents_url_path': 'new_path',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived_documents_url_path'] == 'old_path'
@@ -430,14 +463,14 @@ class TestArchiveContact(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
-            'reason': ['This field is required.']
+            'reason': ['This field is required.'],
         }
 
     def test_archive_with_reason(self):
         """Test archive contact providing a reason."""
         contact = ContactFactory()
         url = reverse('api-v3:contact:archive', kwargs={'pk': contact.pk})
-        response = self.api_client.post(url, {'reason': 'foo'})
+        response = self.api_client.post(url, data={'reason': 'foo'})
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived']
@@ -445,7 +478,7 @@ class TestArchiveContact(APITestMixin):
             'id': str(self.user.pk),
             'first_name': self.user.first_name,
             'last_name': self.user.last_name,
-            'name': self.user.name
+            'name': self.user.name,
         }
         assert response.data['archived_reason'] == 'foo'
         assert response.data['id'] == str(contact.pk)
@@ -457,7 +490,7 @@ class TestArchiveContact(APITestMixin):
             address_1='',
         )
         url = reverse('api-v3:contact:archive', kwargs={'pk': contact.pk})
-        response = self.api_client.post(url, {'reason': 'foo'})
+        response = self.api_client.post(url, data={'reason': 'foo'})
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived']
@@ -517,7 +550,7 @@ class TestViewContact(APITestMixin):
             contactable_by_overseas_dit_partners=False,
             accepts_dit_email_marketing=False,
             contactable_by_email=True,
-            contactable_by_phone=True
+            contactable_by_phone=True,
         )
         url = reverse('api-v3:contact:detail', kwargs={'pk': contact.pk})
         response = self.api_client.get(url)
@@ -527,7 +560,7 @@ class TestViewContact(APITestMixin):
             'id': response.json()['id'],
             'title': {
                 'id': constants.Title.admiral_of_the_fleet.value.id,
-                'name': constants.Title.admiral_of_the_fleet.value.name
+                'name': constants.Title.admiral_of_the_fleet.value.name,
             },
             'first_name': 'Oratio',
             'last_name': 'Nelson',
@@ -535,13 +568,13 @@ class TestViewContact(APITestMixin):
             'job_title': 'Head of Sales',
             'company': {
                 'id': str(company.pk),
-                'name': company.name
+                'name': company.name,
             },
             'adviser': {
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
                 'last_name': self.user.last_name,
-                'name': self.user.name
+                'name': self.user.name,
             },
             'email': 'foo@bar.com',
             'email_alternative': 'foo2@bar.com',
@@ -556,7 +589,7 @@ class TestViewContact(APITestMixin):
             'address_county': 'London',
             'address_country': {
                 'id': constants.Country.united_kingdom.value.id,
-                'name': constants.Country.united_kingdom.value.name
+                'name': constants.Country.united_kingdom.value.name,
             },
             'address_postcode': 'SW1A1AA',
             'notes': 'lorem ipsum',
@@ -583,7 +616,7 @@ class TestViewContact(APITestMixin):
         user = create_test_user(
             permission_codenames=(
                 'view_contact',
-            )
+            ),
         )
         api_client = self.create_api_client(user=user)
 
@@ -622,7 +655,7 @@ class TestContactList(APITestMixin):
         user = create_test_user(
             permission_codenames=(
                 'view_contact',
-            )
+            ),
         )
         api_client = self.create_api_client(user=user)
 
@@ -644,7 +677,7 @@ class TestContactList(APITestMixin):
             permission_codenames=(
                 'view_contact',
                 'view_contact_document',
-            )
+            ),
         )
         api_client = self.create_api_client(user=user)
 
@@ -666,7 +699,7 @@ class TestContactList(APITestMixin):
         for creation_datetime in datetimes:
             with freeze_time(creation_datetime):
                 contacts.append(
-                    ContactFactory()
+                    ContactFactory(),
                 )
 
         url = reverse('api-v3:contact:list')
@@ -689,7 +722,7 @@ class TestContactList(APITestMixin):
         contacts = ContactFactory.create_batch(2, company=company2)
 
         url = reverse('api-v3:contact:list')
-        response = self.api_client.get(url, {'company_id': company2.id})
+        response = self.api_client.get(url, data={'company_id': company2.id})
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
@@ -716,7 +749,7 @@ class TestContactVersioning(APITestMixin):
                 'telephone_countrycode': '+44',
                 'telephone_number': '123456789',
                 'address_same_as_company': True,
-                'primary': True
+                'primary': True,
             },
         )
 
@@ -753,7 +786,7 @@ class TestContactVersioning(APITestMixin):
         """Test that updating a contact creates a new version."""
         contact = ContactFactory(
             first_name='Oratio',
-            last_name='Nelson'
+            last_name='Nelson',
         )
 
         response = self.api_client.patch(
@@ -774,7 +807,7 @@ class TestContactVersioning(APITestMixin):
         """Test that if the endpoint returns 400, no version is created."""
         contact = ContactFactory(
             first_name='Oratio',
-            last_name='Nelson'
+            last_name='Nelson',
         )
 
         response = self.api_client.patch(
@@ -791,7 +824,7 @@ class TestContactVersioning(APITestMixin):
         assert Version.objects.get_for_object(contact).count() == 0
 
         url = reverse('api-v3:contact:archive', kwargs={'pk': contact.id})
-        response = self.api_client.post(url, {'reason': 'foo'})
+        response = self.api_client.post(url, data={'reason': 'foo'})
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived']
@@ -818,7 +851,7 @@ class TestContactVersioning(APITestMixin):
     def test_unarchive_creates_a_new_version(self):
         """Test that unarchiving a contact creates a new version."""
         contact = ContactFactory(
-            archived=True, archived_on=now(), archived_reason='foo'
+            archived=True, archived_on=now(), archived_reason='foo',
         )
         assert Version.objects.get_for_object(contact).count() == 0
 

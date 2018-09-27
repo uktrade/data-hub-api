@@ -44,7 +44,7 @@ class CompanyAbstract(models.Model):
         metadata_models.Country,
         related_name="%(class)ss",  # noqa: Q000
         null=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
     )
     registered_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
 
@@ -74,39 +74,39 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     vat_number = models.CharField(max_length=MAX_LENGTH, blank=True)
     alias = models.CharField(
-        max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name'
+        max_length=MAX_LENGTH, blank=True, null=True, help_text='Trading name',
     )
     business_type = models.ForeignKey(
         metadata_models.BusinessType, blank=True, null=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
     )
     sector = TreeForeignKey(
         metadata_models.Sector, blank=True, null=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
     )
     employee_range = models.ForeignKey(
         metadata_models.EmployeeRange, blank=True, null=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
     )
     turnover_range = models.ForeignKey(
         metadata_models.TurnoverRange, blank=True, null=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
     )
     export_to_countries = models.ManyToManyField(
         metadata_models.Country,
         blank=True,
-        related_name='company_export_to_countries'
+        related_name='company_export_to_countries',
     )
     future_interest_countries = models.ManyToManyField(
         metadata_models.Country,
         blank=True,
-        related_name='company_future_interest_countries'
+        related_name='company_future_interest_countries',
     )
     description = models.TextField(blank=True, null=True)
     website = models.URLField(max_length=MAX_LENGTH, blank=True, null=True)
     uk_region = models.ForeignKey(
         metadata_models.UKRegion, blank=True, null=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
     )
     trading_address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     trading_address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -117,16 +117,16 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
-        related_name='company_trading_address_country'
+        related_name='company_trading_address_country',
     )
     trading_address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     headquarter_type = models.ForeignKey(
         metadata_models.HeadquarterType, blank=True, null=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
     )
     classification = models.ForeignKey(
         metadata_models.CompanyClassification, blank=True, null=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
     )
     global_headquarters = models.ForeignKey(
         'self', blank=True, null=True, on_delete=models.SET_NULL,
@@ -135,14 +135,14 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
     one_list_account_owner = models.ForeignKey(
         'Advisor', blank=True, null=True, on_delete=models.SET_NULL,
         related_name='one_list_owned_companies',
-        help_text='Global account manager'
+        help_text='Global account manager',
     )
     export_experience_category = models.ForeignKey(
         ExportExperienceCategory, blank=True, null=True, on_delete=models.SET_NULL,
     )
     archived_documents_url_path = models.CharField(
         max_length=MAX_LENGTH, blank=True,
-        help_text='Legacy field. File browser path to the archived documents for this company.'
+        help_text='Legacy field. File browser path to the archived documents for this company.',
     )
 
     class Meta:
@@ -168,7 +168,7 @@ class Company(ArchivableModel, BaseModel, CompanyAbstract):
         if self.company_number:
             try:
                 return CompaniesHouseCompany.objects.get(
-                    company_number=self.company_number
+                    company_number=self.company_number,
                 )
             except CompaniesHouseCompany.DoesNotExist:
                 return None
@@ -209,10 +209,10 @@ class CompanyCoreTeamMember(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
     company = models.ForeignKey(
-        Company, on_delete=models.CASCADE, related_name='core_team_members'
+        Company, on_delete=models.CASCADE, related_name='core_team_members',
     )
     adviser = models.ForeignKey(
-        'company.Advisor', on_delete=models.CASCADE, related_name='core_team_memberships'
+        'company.Advisor', on_delete=models.CASCADE, related_name='core_team_memberships',
     )
 
     def __str__(self):
@@ -246,7 +246,7 @@ class CompaniesHouseCompany(CompanyAbstract):
     def business_type(self):
         """The business type associated with the company category provided by Companies House."""
         business_type = COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING.get(
-            self.company_category.lower()
+            self.company_category.lower(),
         )
         if business_type:
             return BusinessType.objects.get(pk=business_type.value.id)
