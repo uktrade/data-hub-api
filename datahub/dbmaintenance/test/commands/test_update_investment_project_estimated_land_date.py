@@ -20,7 +20,7 @@ def test_run(s3_stubber, caplog):
     investment_projects = InvestmentProjectFactory.create_batch(
         4,
         allow_blank_estimated_land_date=factory.Iterator(allow_blank_estimated_land_date),
-        estimated_land_date=factory.Iterator(estimated_land_date)
+        estimated_land_date=factory.Iterator(estimated_land_date),
     )
 
     bucket = 'test_bucket'
@@ -36,12 +36,12 @@ def test_run(s3_stubber, caplog):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command('update_investment_project_estimated_land_date', bucket, object_key)
@@ -53,10 +53,10 @@ def test_run(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert [project.allow_blank_estimated_land_date for project in investment_projects] == [
-        True, False, False, True
+        True, False, False, True,
     ]
     assert [project.estimated_land_date for project in investment_projects] == [
-        None, date(2018, 1, 1), date(2017, 1, 5), date(2016, 8, 23)
+        None, date(2018, 1, 1), date(2017, 1, 5), date(2016, 8, 23),
     ]
 
 
@@ -69,7 +69,7 @@ def test_simulate(s3_stubber, caplog):
     investment_projects = InvestmentProjectFactory.create_batch(
         4,
         allow_blank_estimated_land_date=factory.Iterator(allow_blank_estimated_land_date),
-        estimated_land_date=factory.Iterator(estimated_land_date)
+        estimated_land_date=factory.Iterator(estimated_land_date),
     )
 
     bucket = 'test_bucket'
@@ -85,16 +85,16 @@ def test_simulate(s3_stubber, caplog):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command(
-        'update_investment_project_estimated_land_date', bucket, object_key, simulate=True
+        'update_investment_project_estimated_land_date', bucket, object_key, simulate=True,
     )
 
     for project in investment_projects:
@@ -129,12 +129,12 @@ def test_audit_log(s3_stubber):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command('update_investment_project_estimated_land_date', bucket, object_key)

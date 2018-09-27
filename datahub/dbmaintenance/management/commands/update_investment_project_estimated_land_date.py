@@ -35,6 +35,6 @@ class Command(CSVBaseCommand):
 
         with reversion.create_revision():
             investment_project.save(
-                update_fields=('estimated_land_date', 'allow_blank_estimated_land_date')
+                update_fields=('estimated_land_date', 'allow_blank_estimated_land_date'),
             )
             reversion.set_comment('Estimated land date migration correction.')

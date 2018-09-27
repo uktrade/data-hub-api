@@ -32,8 +32,10 @@ class Command(CSVBaseCommand):
             return
 
         if investment_project.stage_id == UUID(InvestmentProjectStage.won.value.id):
-            logger.warning('Not updating project in Won stage: %s, %s',
-                           investment_project.project_code, investment_project)
+            logger.warning(
+                'Not updating project in Won stage: %s, %s',
+                investment_project.project_code, investment_project,
+            )
             return
 
         investment_project.actual_land_date = new_actual_land_date
