@@ -6,7 +6,7 @@ import pytest
 from datahub.core.constants import Constant
 from datahub.core.test.support.models import MetadataModel
 from datahub.core.utils import (
-    join_truthy_strings, load_constants_to_database, slice_iterable_into_chunks
+    join_truthy_strings, load_constants_to_database, slice_iterable_into_chunks,
 )
 
 
@@ -19,7 +19,7 @@ from datahub.core.utils import (
         (('abc', None), ' ', 'abc'),
         ((None, ''), ' ', ''),
         ((), ' ', ''),
-    )
+    ),
 )
 def test_join_truthy_strings(args, sep, res):
     """Tests joining turthy strings."""
@@ -64,7 +64,7 @@ def test_load_constants_to_database():
         {
             'id': 'c8ecf162-f14a-4ab2-a570-fb70a2435e6b',
             'name': 'Object 4',
-        }
+        },
     ]
 
     MetadataModel.objects.bulk_create([MetadataModel(**data) for data in initial_objects])

@@ -13,7 +13,7 @@ class TestRegisterBaseModel:
         """Test that the default exclude is used if no argument is passed in."""
         register_base_model()
         assert mocked_reversion.register.call_args_list == [
-            mock.call(exclude=EXCLUDED_BASE_MODEL_FIELDS)
+            mock.call(exclude=EXCLUDED_BASE_MODEL_FIELDS),
         ]
 
     @mock.patch('datahub.core.reversion.reversion')
@@ -21,7 +21,7 @@ class TestRegisterBaseModel:
         """Test that if extra_exclude is passed in, it is appended to the default exclude list."""
         register_base_model(extra_exclude=('other',))
         assert mocked_reversion.register.call_args_list == [
-            mock.call(exclude=(*EXCLUDED_BASE_MODEL_FIELDS, 'other'))
+            mock.call(exclude=(*EXCLUDED_BASE_MODEL_FIELDS, 'other')),
         ]
 
     @mock.patch('datahub.core.reversion.reversion')
@@ -29,7 +29,7 @@ class TestRegisterBaseModel:
         """Test that if exclude is passed in, it overrides the default one."""
         register_base_model(exclude=('other',))
         assert mocked_reversion.register.call_args_list == [
-            mock.call(exclude=('other',))
+            mock.call(exclude=('other',)),
         ]
 
     @mock.patch('datahub.core.reversion.reversion')
@@ -45,6 +45,6 @@ class TestRegisterBaseModel:
         assert mocked_reversion.register.call_args_list == [
             mock.call(
                 exclude=EXCLUDED_BASE_MODEL_FIELDS,
-                ignore_duplicates=False
-            )
+                ignore_duplicates=False,
+            ),
         ]
