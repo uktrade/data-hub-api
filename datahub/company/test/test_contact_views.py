@@ -56,12 +56,7 @@ class TestAddContact(APITestMixin):
                 },
                 'address_postcode': 'SW1A1AA',
                 'notes': 'lorem ipsum',
-                'contactable_by_dit': True,
-                'contactable_by_uk_dit_partners': True,
-                'contactable_by_overseas_dit_partners': True,
                 'accepts_dit_email_marketing': True,
-                'contactable_by_email': True,
-                'contactable_by_phone': True,
             },
         )
 
@@ -103,12 +98,7 @@ class TestAddContact(APITestMixin):
             },
             'address_postcode': 'SW1A1AA',
             'notes': 'lorem ipsum',
-            'contactable_by_dit': True,
-            'contactable_by_uk_dit_partners': True,
-            'contactable_by_overseas_dit_partners': True,
             'accepts_dit_email_marketing': True,
-            'contactable_by_email': True,
-            'contactable_by_phone': True,
             'archived': False,
             'archived_by': None,
             'archived_documents_url_path': '',
@@ -180,12 +170,7 @@ class TestAddContact(APITestMixin):
         assert not response_data['address_country']
         assert not response_data['address_postcode']
         assert not response_data['notes']
-        assert not response_data['contactable_by_dit']
-        assert not response_data['contactable_by_uk_dit_partners']
-        assert not response_data['contactable_by_overseas_dit_partners']
         assert not response_data['accepts_dit_email_marketing']
-        assert response_data['contactable_by_email']
-        assert response_data['contactable_by_phone']
 
     def test_fails_with_invalid_email_address(self):
         """Test that fails if the email address is invalid."""
@@ -261,39 +246,6 @@ class TestAddContact(APITestMixin):
             'address_town': ['This field is required.'],
         }
 
-    def test_fails_with_contact_preferences_not_set(self):
-        """Test that fails without any contact preference."""
-        url = reverse('api-v3:contact:list')
-        response = self.api_client.post(
-            url,
-            data={
-                'first_name': 'Oratio',
-                'last_name': 'Nelson',
-                'company': {
-                    'id': CompanyFactory().pk,
-                },
-                'email': 'foo@bar.com',
-                'telephone_countrycode': '+44',
-                'telephone_number': '123456789',
-                'address_same_as_company': True,
-                'contactable_by_email': False,
-                'contactable_by_phone': False,
-                'primary': True,
-            },
-        )
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data == {
-            'contactable_by_email': [
-                'A contact should have at least one way of being contacted. '
-                'Please select either email or phone, or both.',
-            ],
-            'contactable_by_phone': [
-                'A contact should have at least one way of being contacted. '
-                'Please select either email or phone, or both.',
-            ],
-        }
-
     def test_fails_without_primary_specified(self):
         """Test that fails if primary is not specified."""
         url = reverse('api-v3:contact:list')
@@ -347,12 +299,7 @@ class TestEditContact(APITestMixin):
                 address_country_id=constants.Country.united_kingdom.value.id,
                 address_postcode='SW1A1AA',
                 notes='lorem ipsum',
-                contactable_by_dit=False,
-                contactable_by_uk_dit_partners=False,
-                contactable_by_overseas_dit_partners=False,
                 accepts_dit_email_marketing=False,
-                contactable_by_email=True,
-                contactable_by_phone=True,
             )
 
         url = reverse('api-v3:contact:detail', kwargs={'pk': contact.pk})
@@ -402,12 +349,7 @@ class TestEditContact(APITestMixin):
             },
             'address_postcode': 'SW1A1AA',
             'notes': 'lorem ipsum',
-            'contactable_by_dit': False,
-            'contactable_by_uk_dit_partners': False,
-            'contactable_by_overseas_dit_partners': False,
             'accepts_dit_email_marketing': False,
-            'contactable_by_email': True,
-            'contactable_by_phone': True,
             'archived': False,
             'archived_by': None,
             'archived_documents_url_path': contact.archived_documents_url_path,
@@ -545,12 +487,7 @@ class TestViewContact(APITestMixin):
             address_country_id=constants.Country.united_kingdom.value.id,
             address_postcode='SW1A1AA',
             notes='lorem ipsum',
-            contactable_by_dit=False,
-            contactable_by_uk_dit_partners=False,
-            contactable_by_overseas_dit_partners=False,
             accepts_dit_email_marketing=False,
-            contactable_by_email=True,
-            contactable_by_phone=True,
         )
         url = reverse('api-v3:contact:detail', kwargs={'pk': contact.pk})
         response = self.api_client.get(url)
@@ -593,12 +530,7 @@ class TestViewContact(APITestMixin):
             },
             'address_postcode': 'SW1A1AA',
             'notes': 'lorem ipsum',
-            'contactable_by_dit': False,
-            'contactable_by_uk_dit_partners': False,
-            'contactable_by_overseas_dit_partners': False,
             'accepts_dit_email_marketing': False,
-            'contactable_by_email': True,
-            'contactable_by_phone': True,
             'archived': False,
             'archived_by': None,
             'archived_documents_url_path': contact.archived_documents_url_path,

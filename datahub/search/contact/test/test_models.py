@@ -42,12 +42,7 @@ def test_contact_dbmodel_to_dict(setup_es):
         'telephone_alternative',
         'email_alternative',
         'notes',
-        'contactable_by_dit',
-        'contactable_by_uk_dit_partners',
-        'contactable_by_overseas_dit_partners',
         'accepts_dit_email_marketing',
-        'contactable_by_email',
-        'contactable_by_phone',
         'company_sector',
         'company_uk_region'
     }

@@ -122,7 +122,6 @@ class ContactFactory(factory.django.DjangoModelFactory):
     telephone_number = '123456789'
     address_same_as_company = True
     created_on = now()
-    contactable_by_email = True
     archived_documents_url_path = factory.Faker('uri_path')
 
     class Meta:
