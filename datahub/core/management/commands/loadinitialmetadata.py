@@ -81,7 +81,7 @@ def _ensure_no_existing_data(fixtures):
         if model.objects.exists():
             raise ExistingDataFoundError(
                 f'Cannot run loadinitialmetadata when metadata already exists. Existing data '
-                f'found for the {model_name} model.'
+                f'found for the {model_name} model.',
             )
 
 

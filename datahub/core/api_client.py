@@ -32,7 +32,7 @@ class HawkAuth(AuthBase):
             request.url,
             request.method,
             content=request.body or '',
-            content_type=request.headers.get('Content-Type', '')
+            content_type=request.headers.get('Content-Type', ''),
         )
 
         request.headers['Authorization'] = sender.request_header
@@ -78,7 +78,12 @@ class APIClient:
             headers['Accept'] = self._accept
 
         response = requests.request(
-            method, url, auth=self._auth, headers=headers, timeout=timeout, **kwargs
+            method,
+            url,
+            auth=self._auth,
+            headers=headers,
+            timeout=timeout,
+            **kwargs,
         )
         logger.info(f'Response received: {response.status_code} {method.upper()} {url}')
         response.raise_for_status()

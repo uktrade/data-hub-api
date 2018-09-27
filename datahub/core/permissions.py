@@ -121,7 +121,7 @@ class ViewBasedModelPermissions(BasePermission):
         format_kwargs = {
             'app_label': model_cls._meta.app_label,
             'model_name': model_cls._meta.model_name,
-            'action': action
+            'action': action,
         }
 
         return [perm.format(**format_kwargs) for perm in self.permission_mapping[action]]

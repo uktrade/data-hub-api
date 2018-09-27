@@ -26,13 +26,13 @@ def get_default_test_user():
         test_user = user_model.objects.get(email='Testo@Useri.com')
     except user_model.DoesNotExist:
         team = Team.objects.filter(
-            role__groups__name='DIT_staff'
+            role__groups__name='DIT_staff',
         ).first()
         test_user = create_test_user(
             first_name='Testo',
             last_name='Useri',
             email='Testo@Useri.com',
-            dit_team=team
+            dit_team=team,
         )
     return test_user
 
@@ -48,7 +48,7 @@ def create_test_user(permission_codenames=(), password=None, **user_attrs):
         'first_name': factory.Faker('first_name').generate({}),
         'last_name': factory.Faker('last_name').generate({}),
         'email': factory.Faker('email').generate({}),
-        'date_joined': now()
+        'date_joined': now(),
     }
     user_defaults.update(user_attrs)
 
@@ -137,7 +137,7 @@ class APITestMixin:
                 application=self.get_application(grant_type),
                 token=token_hex(16),
                 expires=now() + timedelta(hours=1),
-                scope=scope
+                scope=scope,
             )
         return self._tokens[token_cache_key]
 
@@ -163,7 +163,7 @@ class APITestMixin:
             self._applications[grant_type] = Application.objects.create(
                 client_type=Application.CLIENT_CONFIDENTIAL,
                 authorization_grant_type=grant_type,
-                name=f'Test client ({grant_type})'
+                name=f'Test client ({grant_type})',
             )
         return self._applications[grant_type]
 

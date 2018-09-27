@@ -16,8 +16,10 @@ class DataCombiner:
     def __init__(self, instance, update_data, serializer=None, model=None):
         """Initialises the combiner."""
         if instance is None and update_data is None:
-            raise TypeError('One of instance and update_data must be provided '
-                            'and not None')
+            raise TypeError(
+                'One of instance and update_data must be provided '
+                'and not None',
+            )
 
         if update_data is None:
             update_data = {}
