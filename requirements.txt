@@ -12,11 +12,11 @@ aws-requests-auth==0.4.2
 backcall==0.1.0           # via ipython
 billiard==3.5.0.4         # via celery
 boto3==1.9.4
-botocore==1.12.7          # via boto3, s3transfer
+botocore==1.12.12         # via boto3, s3transfer
 celery==4.2.1
 certifi==2018.8.24        # via requests
 chardet==3.0.4
-click==6.7                # via click, pip-tools, towncrier
+click==7.0                # via pip-tools, towncrier
 coverage==4.5.1           # via pytest-cov
 cssselect==1.0.3
 decorator==4.3.0          # via ipython, traitlets
@@ -77,7 +77,7 @@ oauthlib==2.1.0           # via django-oauth-toolkit
 parso==0.3.1              # via jedi
 pep8-naming==0.7.0
 pexpect==4.6.0            # via ipython
-pickleshare==0.7.4        # via ipython, pickleshare
+pickleshare==0.7.5        # via ipython
 pip-tools==2.0.2
 pluggy==0.7.1             # via pytest
 prompt-toolkit==1.0.15    # via ipython, prompt-toolkit
@@ -118,4 +118,4 @@ urllib3==1.23             # via botocore, elasticsearch, requests
 vine==1.1.4               # via amqp
 wcwidth==0.1.7            # via prompt-toolkit, wcwidth
 werkzeug==0.14.1
-whitenoise==3.3.1
+whitenoise==4.1
