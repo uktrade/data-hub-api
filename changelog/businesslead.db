@@ -1,0 +1,5 @@
+The column ```businesslead.contactable_by_dit``` is nullable.
+The column ```businesslead.contactable_by_uk_dit_partners``` is nullable.
+The column ```businesslead.contactable_by_overseas_dit_partners``` is nullable.
+The column ```businesslead.contactable_by_email``` is nullable.
+The column ```businesslead.contactable_by_phone``` is nullable.
