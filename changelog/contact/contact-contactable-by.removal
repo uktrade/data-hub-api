@@ -1,0 +1,5 @@
+The field ```contactable_by_dit``` was removed from the API. The database column will be deleted with the next release.
+The field ```contactable_by_uk_dit_partners``` was removed from the API. The database column will be deleted with the next release.
+The field ```contactable_by_overseas_dit_partners``` was removed from the API. The database column will be deleted with the next release.
+The field ```contactable_by_email``` was removed from the API. The database column will be deleted with the next release.
+The field ```contactable_by_phone``` was removed from the API. The database column will be deleted with the next release.

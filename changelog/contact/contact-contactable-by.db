@@ -1,0 +1,5 @@
+The column ```company_contact.contactable_by_dit``` was made nullable in preparation for its removal.
+The column ```company_contact.contactable_by_uk_dit_partners``` was made nullable in preparation for its removal.
+The column ```company_contact.contactable_by_overseas_dit_partners``` was made nullable in preparation for its removal.
+The column ```company_contact.contactable_by_email``` was made nullable in preparation for its removal.
+The column ```company_contact.contactable_by_phone``` was made nullable in preparation for its removal.
