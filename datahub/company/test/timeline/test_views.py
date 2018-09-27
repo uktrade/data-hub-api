@@ -21,15 +21,18 @@ class TestCompanyTimelineViews(APITestMixin):
             '/api/v1/company/events/?companies_house_id=125694',
         )
         stubbed_response_data = {
-            'events': [{
-                'data_source': 'companies_house.companies',
-                'datetime': 'Mon, 31 Dec 2018 00:00:00 GMT',
-                'description': 'Accounts next due date',
-            }, {
-                'data_source': 'companies_house.companies',
-                'datetime': 'Mon, 31 Dec 2017 00:00:00 GMT',
-                'description': 'Accounts filed',
-            }]
+            'events': [
+                {
+                    'data_source': 'companies_house.companies',
+                    'datetime': 'Mon, 31 Dec 2018 00:00:00 GMT',
+                    'description': 'Accounts next due date',
+                },
+                {
+                    'data_source': 'companies_house.companies',
+                    'datetime': 'Mon, 31 Dec 2017 00:00:00 GMT',
+                    'description': 'Accounts filed',
+                },
+            ],
         }
 
         requests_mock.get(
@@ -49,15 +52,18 @@ class TestCompanyTimelineViews(APITestMixin):
             'count': 2,
             'next': None,
             'previous': None,
-            'results': [{
-                'data_source': 'companies_house.companies',
-                'datetime': '2018-12-31T00:00:00Z',
-                'description': 'Accounts next due date',
-            }, {
-                'data_source': 'companies_house.companies',
-                'datetime': '2017-12-31T00:00:00Z',
-                'description': 'Accounts filed',
-            }],
+            'results': [
+                {
+                    'data_source': 'companies_house.companies',
+                    'datetime': '2018-12-31T00:00:00Z',
+                    'description': 'Accounts next due date',
+                },
+                {
+                    'data_source': 'companies_house.companies',
+                    'datetime': '2017-12-31T00:00:00Z',
+                    'description': 'Accounts filed',
+                },
+            ],
         }
 
     def test_list_with_no_matching_company_in_reporting_service(self, requests_mock):
@@ -102,10 +108,13 @@ class TestCompanyTimelineViews(APITestMixin):
             'results': [],
         }
 
-    @pytest.mark.parametrize('status_code', (
-        status.HTTP_400_BAD_REQUEST,
-        status.HTTP_500_INTERNAL_SERVER_ERROR,
-    ))
+    @pytest.mark.parametrize(
+        'status_code',
+        (
+            status.HTTP_400_BAD_REQUEST,
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ),
+    )
     def test_list_with_error_from_upstream_server(
             self,
             monkeypatch,
@@ -133,14 +142,14 @@ class TestCompanyTimelineViews(APITestMixin):
 
         assert response_data == {
             'detail': f'Error communicating with the company timeline API. Error reference: '
-                      f'{error_reference}.'
+                      f'{error_reference}.',
         }
 
     def test_list_with_invalid_upstream_response(
             self,
             monkeypatch,
             requests_mock,
-            response_signature
+            response_signature,
     ):
         """
         Test the behaviour when an data is returned in an unexpected format from the
@@ -157,15 +166,18 @@ class TestCompanyTimelineViews(APITestMixin):
             '/api/v1/company/events/?companies_house_id=1000',
         )
         stubbed_response_data = {
-            'events': [{
-                'data_source_wrong': 'companies_house.companies',
-                'datetime_wrong': 'Mon, 31 Dec 2018 00:00:00 GMT',
-                'description_wrong': 'Accounts next due date',
-            }, {
-                'data_source_wrong': 'companies_house.companies',
-                'datetime_wrong': 'Mon, 31 Dec 2017 00:00:00 GMT',
-                'description_wrong': 'Accounts filed',
-            }]
+            'events': [
+                {
+                    'data_source_wrong': 'companies_house.companies',
+                    'datetime_wrong': 'Mon, 31 Dec 2018 00:00:00 GMT',
+                    'description_wrong': 'Accounts next due date',
+                },
+                {
+                    'data_source_wrong': 'companies_house.companies',
+                    'datetime_wrong': 'Mon, 31 Dec 2017 00:00:00 GMT',
+                    'description_wrong': 'Accounts filed',
+                },
+            ],
         }
 
         requests_mock.get(stubbed_url, json=stubbed_response_data, headers=response_signature)
@@ -179,7 +191,7 @@ class TestCompanyTimelineViews(APITestMixin):
 
         assert response_data == {
             'detail': f'Unexpected response data format received from the company timeline API. '
-                      f'Error reference: {error_reference}.'
+                      f'Error reference: {error_reference}.',
         }
 
     @pytest.mark.parametrize(
@@ -188,7 +200,7 @@ class TestCompanyTimelineViews(APITestMixin):
             (CompanyPermission.view_company,),
             (CompanyPermission.view_company_timeline,),
             (),
-        )
+        ),
     )
     def test_permission_is_denied(self, permission_codenames):
         """Test that a 403 is returned for users without the correct permissions."""

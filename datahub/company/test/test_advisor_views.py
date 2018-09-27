@@ -44,9 +44,12 @@ class TestAdviser(APITestMixin):
         AdviserFactory(first_name='z', last_name='sorted adviser')
         AdviserFactory(first_name='f', last_name='sorted adviser')
         url = reverse('api-v1:advisor-list')
-        response = self.api_client.get(url, data={
-            'last_name__icontains': 'sorted'
-        })
+        response = self.api_client.get(
+            url,
+            data={
+                'last_name__icontains': 'sorted',
+            },
+        )
         assert response.status_code == status.HTTP_200_OK
         result = response.json()
         assert len(result['results']) == 3

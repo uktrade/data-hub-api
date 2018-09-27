@@ -86,14 +86,14 @@ class TestReportAdmin(AdminTestMixin):
 def test_adviser_report_generation():
     """Test the generation of the report."""
     disabled_team = TeamFactory(
-        disabled_on=datetime(1980, 1, 1, tzinfo=timezone.utc)
+        disabled_on=datetime(1980, 1, 1, tzinfo=timezone.utc),
     )
     advisers = [
         AdviserFactory(date_joined=datetime(1980, 1, 1, tzinfo=timezone.utc)),
         AdviserFactory(date_joined=datetime(1990, 1, 1, tzinfo=timezone.utc), dit_team=None),
         AdviserFactory(
             date_joined=datetime(2000, 1, 1, tzinfo=timezone.utc),
-            dit_team=disabled_team
+            dit_team=disabled_team,
         ),
     ]
 
@@ -116,7 +116,7 @@ def test_one_list_report_generation():
         2,
         headquarter_type_id=constants.HeadquarterType.ghq.value.id,
         classification=factory.Iterator(
-            CompanyClassification.objects.all()  # keeps the ordering
+            CompanyClassification.objects.all(),  # keeps the ordering
         ),
         one_list_account_owner=AdviserFactory(),
     )

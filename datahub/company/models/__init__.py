@@ -4,7 +4,7 @@ from .company import (
     Company,
     CompanyCoreTeamMember,
     CompanyPermission,
-    ExportExperienceCategory
+    ExportExperienceCategory,
 )
 from .contact import Contact, ContactPermission
 

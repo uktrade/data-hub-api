@@ -89,14 +89,14 @@ class CompanyCoreTeamViewSet(CoreViewSet):
             objs.append(
                 {
                     'adviser': global_account_manager,
-                    'is_global_account_manager': True
-                }
+                    'is_global_account_manager': True,
+                },
             )
 
         # add all other core members excluding the global account manager
         # who might have already been added
         team_members = company.core_team_members.exclude(
-            adviser=global_account_manager
+            adviser=global_account_manager,
         ).select_related(
             'adviser',
             'adviser__dit_team',
@@ -110,7 +110,7 @@ class CompanyCoreTeamViewSet(CoreViewSet):
         objs.extend(
             {
                 'adviser': team_member.adviser,
-                'is_global_account_manager': False
+                'is_global_account_manager': False,
             }
             for team_member in team_members
         )
@@ -127,7 +127,8 @@ class CompanyAuditViewSet(AuditViewSet):
 
 
 class CompaniesHouseCompanyViewSet(
-        mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+        mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet,
+):
     """Companies House company read-only GET only views."""
 
     required_scopes = (Scope.internal_front_end,)
@@ -143,7 +144,7 @@ class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):
     serializer_class = ContactSerializer
     queryset = get_contact_queryset()
     filter_backends = (
-        DjangoFilterBackend, OrderingFilter
+        DjangoFilterBackend, OrderingFilter,
     )
     filterset_fields = ['company_id']
     ordering = ('-created_on',)
@@ -176,7 +177,8 @@ class AdviserFilter(FilterSet):
 
 
 class AdviserReadOnlyViewSetV1(
-        mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+        mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet,
+):
     """Adviser GET only views."""
 
     required_scopes = (Scope.internal_front_end,)
