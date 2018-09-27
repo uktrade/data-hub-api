@@ -92,11 +92,11 @@ class EventAdmin(BaseModelAdminMixin, VersionAdmin):
         'organiser',
     )
 
-    actions = ('disable_selected', 'enable_selected',)
+    actions = ('disable_selected', 'enable_selected')
 
     @confirm_action(
         title='Disable selected events',
-        action_message='disable the selected events'
+        action_message='disable the selected events',
     )
     def disable_selected(self, request, queryset):
         """Disables selected objects."""
@@ -111,7 +111,7 @@ class EventAdmin(BaseModelAdminMixin, VersionAdmin):
 
     @confirm_action(
         title='Enable selected events',
-        action_message='enable the selected events'
+        action_message='enable the selected events',
     )
     def enable_selected(self, request, queryset):
         """Enables selected objects."""

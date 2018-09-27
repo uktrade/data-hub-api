@@ -19,7 +19,7 @@ class TestEventAdmin(AdminTestMixin):
         url = reverse('admin:event_event_changelist')
         data = {
             'action': 'disable_selected',
-            helpers.ACTION_CHECKBOX_NAME: ids
+            helpers.ACTION_CHECKBOX_NAME: ids,
         }
         response = self.client.post(url, data)
 
@@ -50,8 +50,8 @@ class TestEventAdmin(AdminTestMixin):
         for _ in range(5):
             events.append(
                 EventFactory(
-                    disabled_on=now()
-                )
+                    disabled_on=now(),
+                ),
             )
 
         ids = [event.id for event in events]
@@ -59,7 +59,7 @@ class TestEventAdmin(AdminTestMixin):
         url = reverse('admin:event_event_changelist')
         data = {
             'action': 'enable_selected',
-            helpers.ACTION_CHECKBOX_NAME: ids
+            helpers.ACTION_CHECKBOX_NAME: ids,
         }
         response = self.client.post(url, data)
 
