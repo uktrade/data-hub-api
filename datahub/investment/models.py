@@ -98,12 +98,12 @@ class IProjectAbstract(models.Model):
         default=False,
         help_text='Controls whether estimated land date is a required field. Intended for '
                   'projects migrated from CDMS in the verify win and won stages where legacy '
-                  'data for estimated land date does not exist.'
+                  'data for estimated land date does not exist.',
     )
     estimated_land_date = models.DateField(null=True, blank=True)
     investment_type = models.ForeignKey(
         'metadata.InvestmentType', on_delete=models.PROTECT,
-        related_name='investment_projects'
+        related_name='investment_projects',
     )
 
     cdms_project_code = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
@@ -122,10 +122,10 @@ class IProjectAbstract(models.Model):
     stage = models.ForeignKey(
         'metadata.InvestmentProjectStage', on_delete=models.PROTECT,
         related_name='investment_projects',
-        default=InvestmentProjectStage.prospect.value.id
+        default=InvestmentProjectStage.prospect.value.id,
     )
     status = models.CharField(
-        max_length=MAX_LENGTH, choices=STATUSES, default=STATUSES.ongoing
+        max_length=MAX_LENGTH, choices=STATUSES, default=STATUSES.ongoing,
     )
     reason_delayed = models.TextField(blank=True, null=True)
     reason_abandoned = models.TextField(blank=True, null=True)
@@ -133,68 +133,68 @@ class IProjectAbstract(models.Model):
     reason_lost = models.TextField(blank=True, null=True)
     date_lost = models.DateField(blank=True, null=True)
     country_lost_to = models.ForeignKey(
-        'metadata.Country', related_name='+', null=True, blank=True, on_delete=models.SET_NULL
+        'metadata.Country', related_name='+', null=True, blank=True, on_delete=models.SET_NULL,
     )
 
     investor_company = models.ForeignKey(
         'company.Company', related_name='investor_investment_projects',
-        null=True, blank=True, on_delete=models.CASCADE
+        null=True, blank=True, on_delete=models.CASCADE,
     )
     investor_type = models.ForeignKey(
         'investment.InvestorType', related_name='+',
-        null=True, blank=True, on_delete=models.SET_NULL
+        null=True, blank=True, on_delete=models.SET_NULL,
     )
     intermediate_company = models.ForeignKey(
         'company.Company', related_name='intermediate_investment_projects',
-        null=True, blank=True, on_delete=models.SET_NULL
+        null=True, blank=True, on_delete=models.SET_NULL,
     )
     level_of_involvement = models.ForeignKey(
         'investment.Involvement', related_name='+',
-        null=True, blank=True, on_delete=models.SET_NULL
+        null=True, blank=True, on_delete=models.SET_NULL,
     )
     specific_programme = models.ForeignKey(
         'investment.SpecificProgramme', related_name='+',
-        null=True, blank=True, on_delete=models.SET_NULL
+        null=True, blank=True, on_delete=models.SET_NULL,
     )
     client_contacts = models.ManyToManyField(
-        'company.Contact', related_name='investment_projects', blank=True
+        'company.Contact', related_name='investment_projects', blank=True,
     )
     client_relationship_manager = models.ForeignKey(
         'company.Advisor', related_name='investment_projects', null=True,
-        blank=True, on_delete=models.SET_NULL
+        blank=True, on_delete=models.SET_NULL,
     )
     referral_source_adviser = models.ForeignKey(
         'company.Advisor', related_name='referred_investment_projects',
-        null=True, blank=True, on_delete=models.SET_NULL
+        null=True, blank=True, on_delete=models.SET_NULL,
     )
     referral_source_activity = models.ForeignKey(
         'metadata.ReferralSourceActivity', related_name='investment_projects',
-        null=True, blank=True, on_delete=models.SET_NULL
+        null=True, blank=True, on_delete=models.SET_NULL,
     )
     referral_source_activity_website = models.ForeignKey(
         'metadata.ReferralSourceWebsite', related_name='investment_projects',
-        null=True, blank=True, on_delete=models.SET_NULL
+        null=True, blank=True, on_delete=models.SET_NULL,
     )
     referral_source_activity_marketing = models.ForeignKey(
         'metadata.ReferralSourceMarketing', related_name='investment_projects',
-        null=True, blank=True, on_delete=models.SET_NULL
+        null=True, blank=True, on_delete=models.SET_NULL,
     )
     referral_source_activity_event = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
     fdi_type = models.ForeignKey(
         'metadata.FDIType', related_name='investment_projects', null=True,
-        blank=True, on_delete=models.SET_NULL
+        blank=True, on_delete=models.SET_NULL,
     )
     sector = TreeForeignKey(
         'metadata.Sector', related_name='+', null=True, blank=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
     )
     business_activities = models.ManyToManyField(
         'metadata.InvestmentBusinessActivity',
         related_name='+',
-        blank=True
+        blank=True,
     )
     other_business_activity = models.CharField(
-        max_length=MAX_LENGTH, null=True, blank=True
+        max_length=MAX_LENGTH, null=True, blank=True,
     )
 
     @property
@@ -235,14 +235,16 @@ class IProjectValueAbstract(models.Model):
 
     fdi_value = models.ForeignKey(
         'metadata.FDIValue', related_name='investment_projects', null=True, blank=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
     )
     client_cannot_provide_total_investment = models.NullBooleanField()
-    total_investment = models.DecimalField(null=True, max_digits=19,
-                                           decimal_places=0, blank=True)
+    total_investment = models.DecimalField(
+        null=True, max_digits=19,
+        decimal_places=0, blank=True,
+    )
     client_cannot_provide_foreign_investment = models.NullBooleanField()
     foreign_equity_investment = models.DecimalField(
-        null=True, max_digits=19, decimal_places=0, blank=True
+        null=True, max_digits=19, decimal_places=0, blank=True,
     )
     government_assistance = models.NullBooleanField()
     some_new_jobs = models.NullBooleanField()
@@ -250,12 +252,12 @@ class IProjectValueAbstract(models.Model):
     will_new_jobs_last_two_years = models.NullBooleanField()
     average_salary = models.ForeignKey(
         'metadata.SalaryRange', related_name='+', null=True, blank=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
     )
     number_safeguarded_jobs = models.IntegerField(null=True, blank=True)
     r_and_d_budget = models.NullBooleanField()
     non_fdi_r_and_d_budget = models.NullBooleanField(
-        verbose_name='has associated non-FDI R&D project'
+        verbose_name='has associated non-FDI R&D project',
     )
     associated_non_fdi_r_and_d_project = models.ForeignKey(
         'InvestmentProject', related_name='+', null=True, blank=True, on_delete=models.SET_NULL,
@@ -282,14 +284,14 @@ class IProjectRequirementsAbstract(models.Model):
     uk_company_decided = models.NullBooleanField()
     uk_company = models.ForeignKey(
         'company.Company', related_name='investee_projects',
-        null=True, blank=True, on_delete=models.SET_NULL
+        null=True, blank=True, on_delete=models.SET_NULL,
     )
     competitor_countries = models.ManyToManyField('metadata.Country', related_name='+', blank=True)
     allow_blank_possible_uk_regions = models.BooleanField(
         default=False,
         help_text='Controls whether possible UK regions is a required field (after the prospect '
                   'stage). Intended for projects migrated from CDMS in the verify win and won '
-                  'stages where legacy data for possible UK regions does not exist.'
+                  'stages where legacy data for possible UK regions does not exist.',
     )
     uk_region_locations = models.ManyToManyField(
         'metadata.UKRegion', related_name='+', blank=True,
@@ -306,12 +308,12 @@ class IProjectRequirementsAbstract(models.Model):
     )
     strategic_drivers = models.ManyToManyField(
         'metadata.InvestmentStrategicDriver',
-        related_name='investment_projects', blank=True
+        related_name='investment_projects', blank=True,
     )
     archived_documents_url_path = models.CharField(
         max_length=MAX_LENGTH, blank=True,
         help_text='Legacy field. File browser path to the archived documents for this '
-                  'investment project.'
+                  'investment project.',
     )
 
 
@@ -322,13 +324,13 @@ class IProjectTeamAbstract(models.Model):
         abstract = True
 
     project_manager = models.ForeignKey(
-        'company.Advisor', null=True, related_name='+', blank=True, on_delete=models.SET_NULL
+        'company.Advisor', null=True, related_name='+', blank=True, on_delete=models.SET_NULL,
     )
     # field project_manager_first_assigned_on is being used for SPI reporting
     # it contains a datetime when first time a project manager has been assigned
     project_manager_first_assigned_on = models.DateTimeField(null=True, blank=True)
     project_assurance_adviser = models.ForeignKey(
-        'company.Advisor', null=True, related_name='+', blank=True, on_delete=models.SET_NULL
+        'company.Advisor', null=True, related_name='+', blank=True, on_delete=models.SET_NULL,
     )
 
     @property
@@ -361,14 +363,20 @@ class IProjectSPIAbstract(models.Model):
 
 
 _AssociatedToManyField = namedtuple(
-    '_AssociatedToManyField', ('field_name', 'subfield_name', 'es_field_name')
+    '_AssociatedToManyField', ('field_name', 'subfield_name', 'es_field_name'),
 )
 
 
 @reversion.register_base_model()
-class InvestmentProject(ArchivableModel, IProjectAbstract,
-                        IProjectValueAbstract, IProjectRequirementsAbstract,
-                        IProjectTeamAbstract, IProjectSPIAbstract, BaseModel):
+class InvestmentProject(
+    ArchivableModel,
+    IProjectAbstract,
+    IProjectValueAbstract,
+    IProjectRequirementsAbstract,
+    IProjectTeamAbstract,
+    IProjectSPIAbstract,
+    BaseModel,
+):
     """An investment project."""
 
     _ASSOCIATED_ADVISER_TO_ONE_FIELDS = (
@@ -380,7 +388,7 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
 
     _ASSOCIATED_ADVISER_TO_MANY_FIELDS = (
         _AssociatedToManyField(
-            field_name='team_members', subfield_name='adviser', es_field_name='team_members'
+            field_name='team_members', subfield_name='adviser', es_field_name='team_members',
         ),
     )
 
@@ -437,24 +445,24 @@ class InvestmentProject(ArchivableModel, IProjectAbstract,
         permissions = (
             (
                 InvestmentProjectPermission.view_associated.value,
-                'Can view associated investment project'
+                'Can view associated investment project',
             ),
             (
                 InvestmentProjectPermission.change_associated.value,
-                'Can change associated investment project'
+                'Can change associated investment project',
             ),
             (
                 InvestmentProjectPermission.export.value,
-                'Can export investment project'
+                'Can export investment project',
             ),
             (
                 InvestmentProjectPermission.view_investmentproject_document.value,
-                'Can view investment project document'
+                'Can view investment project document',
             ),
             (
                 InvestmentProjectPermission.change_stage_to_won.value,
                 'Can change investment project stage to won',
-            )
+            ),
         )
         default_permissions = (
             'add',
@@ -509,7 +517,7 @@ class InvestmentProjectTeamMember(models.Model):
     """
 
     investment_project = models.ForeignKey(
-        InvestmentProject, on_delete=models.CASCADE, related_name='team_members'
+        InvestmentProject, on_delete=models.CASCADE, related_name='team_members',
     )
     adviser = models.ForeignKey('company.Advisor', on_delete=models.CASCADE, related_name='+')
     role = models.CharField(max_length=MAX_LENGTH)
@@ -530,7 +538,7 @@ class InvestmentProjectStageLog(models.Model):
     """
 
     investment_project = models.ForeignKey(
-        InvestmentProject, on_delete=models.CASCADE, related_name='stage_log'
+        InvestmentProject, on_delete=models.CASCADE, related_name='stage_log',
     )
     stage = models.ForeignKey(
         'metadata.InvestmentProjectStage', on_delete=models.PROTECT,

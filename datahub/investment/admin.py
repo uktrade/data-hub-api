@@ -76,9 +76,12 @@ class InvestmentProjectTeamMemberAdmin(VersionAdmin):
     )
 
 
-admin.site.register((
-    InvestmentDeliveryPartner,
-    InvestorType,
-    Involvement,
-    SpecificProgramme,
-), DisableableMetadataAdmin)
+admin.site.register(
+    (
+        InvestmentDeliveryPartner,
+        InvestorType,
+        Involvement,
+        SpecificProgramme,
+    ),
+    DisableableMetadataAdmin,
+)
