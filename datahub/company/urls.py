@@ -5,23 +5,23 @@ from django.urls import path
 from datahub.company.timeline.views import CompanyTimelineViewSet
 from datahub.company.views import (
     CompaniesHouseCompanyViewSet, CompanyAuditViewSet, CompanyCoreTeamViewSet,
-    CompanyViewSet, ContactAuditViewSet, ContactViewSet
+    CompanyViewSet, ContactAuditViewSet, ContactViewSet,
 )
 
 # CONTACT
 
 contact_collection = ContactViewSet.as_view({
     'get': 'list',
-    'post': 'create'
+    'post': 'create',
 })
 
 contact_item = ContactViewSet.as_view({
     'get': 'retrieve',
-    'patch': 'partial_update'
+    'patch': 'partial_update',
 })
 
 contact_archive = ContactViewSet.as_view({
-    'post': 'archive'
+    'post': 'archive',
 })
 
 contact_unarchive = ContactViewSet.as_view({
@@ -44,12 +44,12 @@ contact_urls = [
 
 company_collection = CompanyViewSet.as_view({
     'get': 'list',
-    'post': 'create'
+    'post': 'create',
 })
 
 company_item = CompanyViewSet.as_view({
     'get': 'retrieve',
-    'patch': 'partial_update'
+    'patch': 'partial_update',
 })
 
 company_audit = CompanyAuditViewSet.as_view({
@@ -61,7 +61,7 @@ company_timeline = CompanyTimelineViewSet.as_view({
 })
 
 company_archive = CompanyViewSet.as_view({
-    'post': 'archive'
+    'post': 'archive',
 })
 
 company_unarchive = CompanyViewSet.as_view({
@@ -69,15 +69,15 @@ company_unarchive = CompanyViewSet.as_view({
 })
 
 company_core_team = CompanyCoreTeamViewSet.as_view({
-    'get': 'list'
+    'get': 'list',
 })
 
 ch_company_list = CompaniesHouseCompanyViewSet.as_view({
-    'get': 'list'
+    'get': 'list',
 })
 
 ch_company_item = CompaniesHouseCompanyViewSet.as_view({
-    'get': 'retrieve'
+    'get': 'retrieve',
 })
 
 company_urls = [

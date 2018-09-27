@@ -31,7 +31,7 @@ class DataScienceCompanyAPIClient:
 
         if not all((api_url, api_id, api_key)):
             raise ImproperlyConfigured(
-                'Data science company API connection details not configured'
+                'Data science company API connection details not configured',
             )
 
         timeout = settings.DATA_SCIENCE_COMPANY_API_TIMEOUT
@@ -46,9 +46,12 @@ class DataScienceCompanyAPIClient:
         if not transformed_company_number:
             raise InvalidCompanyNumberError
 
-        data = self._request('/api/v1/company/events/', params={
-            'companies_house_id': transformed_company_number,
-        })
+        data = self._request(
+            '/api/v1/company/events/',
+            params={
+                'companies_house_id': transformed_company_number,
+            },
+        )
 
         return _transform_events_response(data)
 
@@ -58,8 +61,10 @@ class DataScienceCompanyAPIClient:
         except HTTPError as exc:
             if exc.response.status_code != status.HTTP_404_NOT_FOUND:
                 event_id = client.captureException()
-                raise APIException(f'Error communicating with the company timeline API. Error '
-                                   f'reference: {event_id}.') from exc
+                raise APIException(
+                    f'Error communicating with the company timeline API. Error '
+                    f'reference: {event_id}.',
+                ) from exc
             return {}
         else:
             return response.json()
@@ -71,8 +76,10 @@ def _transform_events_response(data):
         serializer.is_valid(raise_exception=True)
     except ValidationError as exc:
         event_id = client.captureException()
-        raise APIException(f'Unexpected response data format received from the company '
-                           f'timeline API. Error reference: {event_id}.') from exc
+        raise APIException(
+            f'Unexpected response data format received from the company '
+            f'timeline API. Error reference: {event_id}.',
+        ) from exc
 
     return serializer.validated_data
 

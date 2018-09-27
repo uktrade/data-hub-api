@@ -7,7 +7,7 @@ class InteractionFixtures(Fixture):
     """Metadata fixtures (for the loadinitialmetadata command)."""
 
     files = [
-        'fixtures/export_experience_categories.yaml'
+        'fixtures/export_experience_categories.yaml',
     ]
 
 

@@ -153,7 +153,7 @@ def transform_ch_row(row):
     # Nasty... copied from korben
     try:
         ret['incorporation_date'] = datetime.strptime(
-            ret['incorporation_date'], '%d/%m/%Y'
+            ret['incorporation_date'], '%d/%m/%Y',
         ).date()
     except (TypeError, ValueError):
         ret['incorporation_date'] = None
@@ -229,7 +229,7 @@ class CHSynchroniser:
             ch_company_rows = iter_ch_csv_from_url(csv_url, tmp_file_creator)
 
             batch_iter = slice_iterable_into_chunks(
-                ch_company_rows, settings.BULK_INSERT_BATCH_SIZE
+                ch_company_rows, settings.BULK_INSERT_BATCH_SIZE,
             )
             with connection.cursor() as cursor:
                 for batch in batch_iter:

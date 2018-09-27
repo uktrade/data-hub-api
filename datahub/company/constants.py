@@ -18,11 +18,11 @@ class BusinessTypeConstant(Enum):
     company = Constant('Company', '98d14e94-5d95-e211-a939-e4115bead28a')
     government_dept_or_other_public_body = Constant(
         'Government department or other public body',
-        '9cd14e94-5d95-e211-a939-e4115bead28a'
+        '9cd14e94-5d95-e211-a939-e4115bead28a',
     )
     intermediary = Constant('Intermediary', '9bd14e94-5d95-e211-a939-e4115bead28a')
     limited_partnership = Constant(
-        'Limited partnership', '8b6eaf7e-03e7-e611-bca1-e4115bead28a'
+        'Limited partnership', '8b6eaf7e-03e7-e611-bca1-e4115bead28a',
     )
     limited_liability_partnership = Constant(
         'Limited liability partnership', 'b70764b9-e523-46cf-8297-4c694ecbc5ce',
@@ -30,16 +30,16 @@ class BusinessTypeConstant(Enum):
     partnership = Constant('Partnership', '9ad14e94-5d95-e211-a939-e4115bead28a')
     sole_trader = Constant('Sole Trader', '99d14e94-5d95-e211-a939-e4115bead28a')
     private_limited_company = Constant(
-        'Private limited company', '6f75408b-03e7-e611-bca1-e4115bead28a'
+        'Private limited company', '6f75408b-03e7-e611-bca1-e4115bead28a',
     )
     public_limited_company = Constant(
-        'Public limited company', 'dac8c591-03e7-e611-bca1-e4115bead28a'
+        'Public limited company', 'dac8c591-03e7-e611-bca1-e4115bead28a',
     )
     # These are called UK establishments by Companies House and in law, but we are calling them
     # branches in the front end.
     uk_establishment = Constant(
-        'UK branch of foreign company (BR)', 'b0730fc6-fcce-4071-bdab-ba8de4f4fc98'
+        'UK branch of foreign company (BR)', 'b0730fc6-fcce-4071-bdab-ba8de4f4fc98',
     )
     community_interest_company = Constant(
-        'Community interest company', '34e4cb83-e5e1-421e-ac90-8a52edcc209c'
+        'Community interest company', '34e4cb83-e5e1-421e-ac90-8a52edcc209c',
     )
