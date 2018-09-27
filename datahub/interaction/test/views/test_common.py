@@ -46,7 +46,7 @@ class TestUpdateInteraction(APITestMixin):
         )
 
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        response = self.api_client.patch(url, format='json', data={
+        response = self.api_client.patch(url, data={
             'archived_documents_url_path': 'new_path'
         })
 
@@ -60,7 +60,7 @@ class TestUpdateInteraction(APITestMixin):
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
         response = self.api_client.patch(url, {
             'date': 'abcd-de-fe',
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -305,7 +305,6 @@ class TestInteractionVersioning(APITestMixin):
                 'service': Service.trade_enquiry.value.id,
                 'dit_team': Team.healthcare_uk.value.id
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_201_CREATED
@@ -329,7 +328,6 @@ class TestInteractionVersioning(APITestMixin):
             data={
                 'kind': Interaction.KINDS.interaction,
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -344,7 +342,6 @@ class TestInteractionVersioning(APITestMixin):
         response = self.api_client.patch(
             reverse('api-v3:interaction:item', kwargs={'pk': service_delivery.pk}),
             data={'subject': 'new subject'},
-            format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -365,7 +362,6 @@ class TestInteractionVersioning(APITestMixin):
         response = self.api_client.patch(
             reverse('api-v3:interaction:item', kwargs={'pk': service_delivery.pk}),
             data={'kind': 'invalid'},
-            format='json'
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST

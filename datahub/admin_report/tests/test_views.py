@@ -18,7 +18,7 @@ class TestReportAdmin(AdminTestMixin):
         (
             reverse('admin-report:index'),
             reverse('admin-report:download-report', kwargs={'report_id': 'test-report'}),
-        )
+        ),
     )
     def test_redirects_to_login_page_if_not_logged_in(self, url):
         """Test that the view redirects to the login page if the user isn't authenticated."""
@@ -34,7 +34,7 @@ class TestReportAdmin(AdminTestMixin):
         (
             reverse('admin-report:index'),
             reverse('admin-report:download-report', kwargs={'report_id': 'test-report'}),
-        )
+        ),
     )
     def test_redirects_to_login_page_if_not_staff(self, url):
         """Test that the view redirects to the login page if the user isn't a member of staff."""
@@ -97,7 +97,7 @@ class TestReportAdmin(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})
         assert parse_header(response.get('Content-Disposition')) == (
-            'attachment', {'filename': 'Test report - 2018-01-01-11-12-13.csv'}
+            'attachment', {'filename': 'Test report - 2018-01-01-11-12-13.csv'},
         )
         assert response.getvalue().decode('utf-8-sig') == f"""Test ID,Name\r
 {str(obj.pk)},{obj.name}\r

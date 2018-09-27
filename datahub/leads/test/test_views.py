@@ -102,7 +102,7 @@ class TestBusinessLeadViews(APITestMixin):
             'last_name': 'Last name',
             'telephone_number': '+44 7000 123456'
         }
-        response = self.api_client.post(url, format='json', data=request_data)
+        response = self.api_client.post(url, data=request_data)
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
@@ -116,7 +116,7 @@ class TestBusinessLeadViews(APITestMixin):
         """Tests creating a business lead without required fields."""
         url = reverse('api-v3:business-leads:lead-collection')
         request_data = {}
-        response = self.api_client.post(url, format='json', data=request_data)
+        response = self.api_client.post(url, data=request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -140,7 +140,7 @@ class TestBusinessLeadViews(APITestMixin):
             'first_name': 'New first name',
             'email_alternative': 'altemail@blah.com'
         }
-        response = self.api_client.patch(url, format='json', data=request_data)
+        response = self.api_client.patch(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -159,7 +159,7 @@ class TestBusinessLeadViews(APITestMixin):
             'company_name': None,
             'company': None
         }
-        response = self.api_client.patch(url, format='json', data=request_data)
+        response = self.api_client.patch(url, data=request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -181,7 +181,7 @@ class TestBusinessLeadViews(APITestMixin):
         request_data = {
             'reason': 'archive test'
         }
-        response = self.api_client.post(url, format='json', data=request_data)
+        response = self.api_client.post(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -199,7 +199,7 @@ class TestBusinessLeadViews(APITestMixin):
         url = reverse('api-v3:business-leads:unarchive-lead-item', kwargs={
             'pk': lead.pk
         })
-        response = self.api_client.post(url, format='json')
+        response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()

@@ -266,7 +266,7 @@ class TestSearchOrder(APITestMixin):
         """Test search results."""
         url = reverse('api-v3:search:order')
 
-        response = self.api_client.post(url, data, format='json')
+        response = self.api_client.post(url, data)
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()['results']) == len(results)
@@ -282,7 +282,6 @@ class TestSearchOrder(APITestMixin):
             url, {
                 'company': Company.objects.get(name='Venus Ltd').pk
             },
-            format='json'
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -295,7 +294,7 @@ class TestSearchOrder(APITestMixin):
 
         response = self.api_client.post(url, {
             'created_on_before': 'invalid',
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {'created_on_before': ['Date is in incorrect format.']}
@@ -309,7 +308,7 @@ class TestSearchOrder(APITestMixin):
 
         response = self.api_client.post(url, {
             'primary_market': 'invalid',
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {'primary_market': ['"invalid" is not a valid UUID.']}
@@ -358,7 +357,7 @@ class TestSearchOrder(APITestMixin):
 
         response = self.api_client.post(url, {
             'assigned_to_adviser': assignee.adviser.pk
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()['results']) == 1
@@ -372,7 +371,7 @@ class TestSearchOrder(APITestMixin):
 
         response = self.api_client.post(url, {
             'assigned_to_team': assignee.adviser.dit_team.pk
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()['results']) == 1
@@ -395,7 +394,7 @@ class TestOrderExportView(APITestMixin):
         api_client = self.create_api_client(user=user)
 
         url = reverse('api-v3:search:order-export')
-        response = api_client.post(url, format='json')
+        response = api_client.post(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize(
@@ -456,7 +455,7 @@ class TestOrderExportView(APITestMixin):
         url = reverse('api-v3:search:order-export')
 
         with freeze_time('2018-01-01 11:12:13'):
-            response = self.api_client.post(url, format='json', data=data)
+            response = self.api_client.post(url, data=data)
 
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})
@@ -481,7 +480,7 @@ class TestOrderExportView(APITestMixin):
                     sum(refund.net_amount for refund in refunds)
                 ) / 100 if refunds else None,
                 'Status': order.get_status_display(),
-                'Link': f'=HYPERLINK("{order.get_datahub_frontend_url()}")',
+                'Link': order.get_datahub_frontend_url(),
                 'Sector': order.sector.name,
                 'Market': order.primary_market.name,
                 'UK region': order.uk_region.name,
@@ -490,15 +489,13 @@ class TestOrderExportView(APITestMixin):
                     order.company.registered_address_country.name,
                 'Company UK region': get_attr_or_none(order, 'company.uk_region.name'),
                 'Company link':
-                    f'=HYPERLINK("'
-                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{order.company.pk}'
-                    f'")',
+                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}'
+                    f'/{order.company.pk}',
                 'Contact': order.contact.name,
                 'Contact job title': order.contact.job_title,
                 'Contact link':
-                    f'=HYPERLINK("'
-                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["contact"]}/{order.contact.pk}'
-                    f'")',
+                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["contact"]}'
+                    f'/{order.contact.pk}',
                 'Created by team': get_attr_or_none(order, 'created_by.dit_team.name'),
                 'Date created': order.created_on,
                 'Delivery date': order.delivery_date,
@@ -565,7 +562,7 @@ class TestGlobalSearch(APITestMixin):
             'term': term,
             'sortby': 'created_on:asc',
             'entity': 'order'
-        }, format='json')
+        })
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()['results']) == len(results)

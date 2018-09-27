@@ -1,7 +1,10 @@
+import datetime
 from operator import attrgetter, itemgetter
 from unittest.mock import patch
 
 import pytest
+from django.utils.timezone import utc
+from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -9,6 +12,7 @@ from datahub.company.test.factories import TeamFactory
 from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 from datahub.documents.models import Document, UPLOAD_STATUSES
 from datahub.investment.test.factories import InvestmentProjectFactory
+from datahub.user_event_log.models import USER_EVENT_TYPES, UserEvent
 from .factories import EvidenceTagFactory
 from .utils import create_evidence_document
 from ..models import EvidenceDocument, EvidenceDocumentPermission
@@ -168,7 +172,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         })
 
         api_client = self.create_api_client(user=user)
-        response = api_client.post(url, format='json', data={
+        response = api_client.post(url, data={
             'original_filename': 'test.txt',
             'tags': [tag.pk for tag in evidence_tags],
         })
@@ -488,7 +492,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         )
 
         api_client = self.create_api_client(user=user)
-        response = api_client.post(url, format='json')
+        response = api_client.post(url)
         response_data = response.json()
 
         if not allowed:
@@ -586,6 +590,117 @@ class TestEvidenceDocumentViews(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
         assert delete_document.called is False
 
+    @pytest.mark.parametrize('permissions,associated,allowed', DELETE_PERMISSIONS)
+    @patch('datahub.documents.tasks.delete_document.apply_async')
+    def test_document_delete_creates_user_event_log(
+        self,
+        delete_document,
+        permissions,
+        associated,
+        allowed
+    ):
+        """Tests document deletion creates user event log."""
+        user = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
+        entity_document = create_evidence_document(user, associated=associated)
+        document = entity_document.document
+        document.mark_scan_scheduled()
+        document.mark_as_scanned(True, 'reason')
+
+        url = reverse(
+            'api-v3:investment:evidence-document:document-item',
+            kwargs={
+                'project_pk': entity_document.investment_project.pk,
+                'entity_document_pk': entity_document.pk
+            }
+        )
+
+        document_pk = entity_document.document.pk
+
+        expected_user_event_data = {
+            'id': str(entity_document.pk),
+            'url': entity_document.url,
+            'status': entity_document.document.status,
+            'av_clean': entity_document.document.av_clean,
+            'created_by': {
+                'id': str(entity_document.created_by.id),
+                'first_name': entity_document.created_by.first_name,
+                'last_name': entity_document.created_by.last_name,
+                'name': entity_document.created_by.name,
+            },
+            'created_on': format_date_or_datetime(entity_document.created_on),
+            'modified_by': None,
+            'modified_on': format_date_or_datetime(entity_document.modified_on),
+            'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
+            'original_filename': entity_document.original_filename,
+            'comment': entity_document.comment,
+            'investment_project': {
+                'id': str(entity_document.investment_project.id),
+                'name': entity_document.investment_project.name,
+                'project_code': entity_document.investment_project.project_code,
+            },
+            'tags': [
+                {'id': str(tag.id), 'name': tag.name}
+                for tag in entity_document.tags.order_by('name')
+            ],
+        }
+
+        api_client = self.create_api_client(user=user)
+
+        frozen_time = datetime.datetime(2018, 1, 2, 12, 30, 50, tzinfo=utc)
+        with freeze_time(frozen_time):
+            response = api_client.delete(url)
+
+        if not allowed:
+            assert response.status_code == status.HTTP_403_FORBIDDEN
+            assert response.json() == {
+                'detail': 'You do not have permission to perform this action.'
+            }
+            return
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        delete_document.assert_called_once_with(args=(document_pk, ))
+
+        assert UserEvent.objects.count() == 1
+
+        user_event = UserEvent.objects.first()
+
+        assert user_event.adviser == user
+        assert user_event.type == USER_EVENT_TYPES.evidence_document_delete
+        assert user_event.timestamp == frozen_time
+        assert user_event.api_url_path == url
+        user_event.data['tags'] = sorted(user_event.data['tags'], key=itemgetter('name'))
+        assert user_event.data == expected_user_event_data
+
+    @patch.object(Document, 'mark_deletion_pending')
+    def test_document_delete_failure_wont_create_user_event_log(
+        self,
+        mark_deletion_pending,
+    ):
+        """Tests document deletion failure won't create user event log."""
+        mark_deletion_pending.side_effect = Exception('No way!')
+        user = create_test_user(
+            permission_codenames=(EvidenceDocumentPermission.delete_all,),
+            dit_team=TeamFactory()
+        )
+        entity_document = create_evidence_document(user, False)
+        document = entity_document.document
+        document.mark_scan_scheduled()
+        document.mark_as_scanned(True, 'reason')
+
+        url = reverse(
+            'api-v3:investment:evidence-document:document-item',
+            kwargs={
+                'project_pk': entity_document.investment_project.pk,
+                'entity_document_pk': entity_document.pk
+            }
+        )
+
+        api_client = self.create_api_client(user=user)
+        with pytest.raises(Exception):
+            api_client.delete(url)
+
+        assert UserEvent.objects.count() == 0
+
     def test_document_upload_status_no_status_without_permission(self):
         """Tests user without permission can't call upload status endpoint."""
         entity_document = create_evidence_document()
@@ -600,7 +715,7 @@ class TestEvidenceDocumentViews(APITestMixin):
 
         user = create_test_user(permission_codenames=[], dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
-        response = api_client.post(url, format='json', data={})
+        response = api_client.post(url, data={})
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
 

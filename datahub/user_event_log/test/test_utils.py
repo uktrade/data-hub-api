@@ -16,19 +16,19 @@ from datahub.user_event_log.utils import record_user_event
         (None, None),
         (
             {'a': 'b'},
-            {'a': 'b'}
+            {'a': 'b'},
         ),
         (
             {'a': datetime(2016, 10, 10, 1, 0, 2, tzinfo=utc)},
-            {'a': '2016-10-10T01:00:02Z'}
+            {'a': '2016-10-10T01:00:02Z'},
         ),
         (
             {'a': UUID('73c18056-c592-478b-baf9-3b1322dd0dcf')},
-            {'a': '73c18056-c592-478b-baf9-3b1322dd0dcf'}
+            {'a': '73c18056-c592-478b-baf9-3b1322dd0dcf'},
         ),
         ('string', 'string'),
         ([0, 2, 3], [0, 2, 3]),
-    )
+    ),
 )
 @pytest.mark.django_db
 def test_record_user_event(data, expected_data):

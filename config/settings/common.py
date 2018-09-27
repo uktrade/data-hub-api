@@ -171,6 +171,7 @@ ALLOWED_ADMIN_IP_RANGES = env.list('ALLOWED_ADMIN_IP_RANGES', default=[])
 SSO_ENABLED = env.bool('SSO_ENABLED')
 
 OAUTH2_PROVIDER = {
+    'OAUTH2_BACKEND_CLASS': 'datahub.oauth.backend.ContentTypeAwareOAuthLibCore',
     'SCOPES_BACKEND_CLASS': 'datahub.oauth.scopes.ApplicationScopesBackend',
 }
 
@@ -203,7 +204,8 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'payment_gateway_session.create': '5/min',
     },
-    'ORDERING_PARAM': 'sortby'
+    'ORDERING_PARAM': 'sortby',
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
 # Simplified static file serving.

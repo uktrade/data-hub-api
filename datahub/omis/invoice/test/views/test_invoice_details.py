@@ -16,7 +16,7 @@ class TestGetInvoice(APITestMixin):
         invoice = order.invoice
 
         url = reverse('api-v3:omis:invoice:detail', kwargs={'order_pk': order.pk})
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
@@ -59,7 +59,7 @@ class TestGetInvoice(APITestMixin):
     def test_404_if_order_doesnt_exist(self):
         """Test that if the order doesn't exist, the endpoint returns 404."""
         url = reverse('api-v3:omis:invoice:detail', kwargs={'order_pk': uuid.uuid4()})
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -69,6 +69,6 @@ class TestGetInvoice(APITestMixin):
         assert not order.invoice
 
         url = reverse('api-v3:omis:invoice:detail', kwargs={'order_pk': order.pk})
-        response = self.api_client.get(url, format='json')
+        response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND

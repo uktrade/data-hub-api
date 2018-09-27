@@ -12,9 +12,7 @@ from datahub.documents.views import BaseEntityDocumentModelViewSet
 from datahub.investment.models import InvestmentProject
 from datahub.investment.proposition.models import Proposition, PropositionDocument
 from datahub.investment.proposition.permissions import (
-    IsAssociatedToInvestmentProjectPropositionDocumentFilter,
     IsAssociatedToInvestmentProjectPropositionDocumentPermission,
-    IsAssociatedToInvestmentProjectPropositionFilter,
     IsAssociatedToInvestmentProjectPropositionPermission,
     PropositionDocumentModelPermissions,
     PropositionModelPermissions,
@@ -27,6 +25,8 @@ from datahub.investment.proposition.serializers import (
     PropositionSerializer,
 )
 from datahub.oauth.scopes import Scope
+from datahub.user_event_log.constants import USER_EVENT_TYPES
+from datahub.user_event_log.utils import record_user_event
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -51,7 +51,6 @@ class PropositionViewSet(CoreViewSet):
     )
     filter_backends = (
         DjangoFilterBackend,
-        IsAssociatedToInvestmentProjectPropositionFilter,
         OrderingFilter,
     )
     filterset_fields = ('adviser_id', 'status',)
@@ -136,6 +135,8 @@ class PropositionViewSet(CoreViewSet):
 class PropositionDocumentViewSet(BaseEntityDocumentModelViewSet):
     """Proposition Document ViewSet."""
 
+    non_existent_proposition_error_message = 'Specified proposition does not exist'
+
     required_scopes = (Scope.internal_front_end,)
     permission_classes = (
         IsAuthenticatedOrTokenHasScope,
@@ -146,8 +147,12 @@ class PropositionDocumentViewSet(BaseEntityDocumentModelViewSet):
 
     filter_backends = (
         DjangoFilterBackend,
-        IsAssociatedToInvestmentProjectPropositionDocumentFilter,
     )
+
+    def create(self, request, *args, **kwargs):
+        """Creates proposition document."""
+        self._check_proposition_exists()
+        return super().create(request, *args, **kwargs)
 
     def get_queryset(self):
         """Returns proposition documents queryset."""
@@ -161,3 +166,15 @@ class PropositionDocumentViewSet(BaseEntityDocumentModelViewSet):
     def get_view_name(self):
         """Returns the view set name for the DRF UI."""
         return 'Proposition documents'
+
+    def destroy(self, request, *args, **kwargs):
+        """Record delete event."""
+        entity_document = self.get_object()
+        data = self.serializer_class(entity_document).data
+        data['proposition_id'] = entity_document.proposition_id
+        record_user_event(request, USER_EVENT_TYPES.proposition_document_delete, data=data)
+        return super().destroy(request, *args, **kwargs)
+
+    def _check_proposition_exists(self):
+        if not Proposition.objects.filter(pk=self.kwargs['proposition_pk']).exists():
+            raise Http404(self.non_existent_proposition_error_message)

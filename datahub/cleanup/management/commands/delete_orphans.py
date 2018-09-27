@@ -20,6 +20,6 @@ class Command(BaseCleanupCommand):
         'company.Company': ModelCleanupConfig(ORPHAN_AGE_THRESHOLD),
         'event.Event': ModelCleanupConfig(
             age_threshold=relativedelta(months=18),
-            date_field='end_date'
-        )
+            date_field='end_date',
+        ),
     }

@@ -19,8 +19,14 @@ def _url_incorrect_path():
     return 'http://testserver' + reverse('api-v3:activity-stream:index') + 'incorrect/'
 
 
-def _auth_sender(key_id='some-id', secret_key='some-secret', url=_url,
-                 method='GET', content='', content_type=''):
+def _auth_sender(
+    key_id='some-id',
+    secret_key='some-secret',
+    url=_url,
+    method='GET',
+    content='',
+    content_type='',
+):
     credentials = {
         'id': key_id,
         'key': secret_key,
@@ -42,7 +48,7 @@ def _auth_sender(key_id='some-id', secret_key='some-secret', url=_url,
             # If no X-Forwarded-For header
             dict(
                 content_type='',
-                HTTP_AUTHORIZATION=_auth_sender().request_header
+                HTTP_AUTHORIZATION=_auth_sender().request_header,
             ),
             {'detail': 'Incorrect authentication credentials.'},
         ),

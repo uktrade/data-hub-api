@@ -113,7 +113,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         """
         url = reverse('api-v3:search:interaction')
 
-        response = self.api_client.post(url, {}, format='json')
+        response = self.api_client.post(url, {})
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -134,7 +134,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         url = reverse('api-v3:search:interaction')
 
         api_client = self.create_api_client(user=non_policy_feedback_user)
-        response = api_client.post(url, {}, format='json')
+        response = api_client.post(url, {})
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -152,7 +152,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         url = reverse('api-v3:search:interaction')
 
         api_client = self.create_api_client(user=policy_feedback_user)
-        response = api_client.post(url, {}, format='json')
+        response = api_client.post(url, {})
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -168,7 +168,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         request_data = {
             'limit': 1
         }
-        response = self.api_client.post(url, request_data, format='json')
+        response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -181,7 +181,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         request_data = {
             'offset': 1
         }
-        response = self.api_client.post(url, request_data, format='json')
+        response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -204,7 +204,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         )
         setup_es.indices.refresh()
 
-        response = self.api_client.post(url, {}, format='json')
+        response = self.api_client.post(url, {})
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -221,7 +221,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         request_data = {
             'sortby': 'subject:asc'
         }
-        response = self.api_client.post(url, request_data, format='json')
+        response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -237,7 +237,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         request_data = {
             'sortby': 'subject:desc'
         }
-        response = self.api_client.post(url, request_data, format='json')
+        response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -253,7 +253,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         request_data = {
             'sortby': 'gyratory:backwards'
         }
-        response = self.api_client.post(url, request_data, format='json')
+        response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
@@ -273,7 +273,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         request_data = {
             'original_query': term
         }
-        response = self.api_client.post(url, request_data, format='json')
+        response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -343,7 +343,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         request_data = {
             'kind': Interaction.KINDS.service_delivery,
         }
-        response = self.api_client.post(url, request_data, format='json')
+        response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -368,7 +368,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         request_data = {
             'company': companies[5].id
         }
-        response = self.api_client.post(url, request_data, format='json')
+        response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -394,7 +394,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         request_data = {
             'company_name': getattr(companies[5], attr)
         }
-        response = self.api_client.post(url, request_data, format='json')
+        response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -420,7 +420,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         request_data = {
             'contact': contacts[5].id
         }
-        response = self.api_client.post(url, request_data, format='json')
+        response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -444,7 +444,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         request_data = {
             'contact_name': contacts[5].name
         }
-        response = self.api_client.post(url, request_data, format='json')
+        response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -475,7 +475,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         request_data = {
             'created_on_exists': created_on_exists,
         }
-        response = self.api_client.post(url, request_data, format='json')
+        response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -499,7 +499,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         request_data = {
             'dit_adviser': advisers[5].id
         }
-        response = self.api_client.post(url, request_data, format='json')
+        response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -526,7 +526,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         request_data = {
             'dit_adviser_name': advisers[5].name
         }
-        response = self.api_client.post(url, request_data, format='json')
+        response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -551,7 +551,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         request_data = {
             'dit_team': dit_team_id
         }
-        response = self.api_client.post(url, request_data, format='json')
+        response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -580,7 +580,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             'original_query': '',
             'communication_channel': communication_channels[1].pk
         }
-        response = self.api_client.post(url, request_data, format='json')
+        response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -609,7 +609,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         request_data = {
             'service': service_id
         }
-        response = self.api_client.post(url, request_data, format='json')
+        response = self.api_client.post(url, request_data)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -655,7 +655,7 @@ class TestInteractionEntitySearchView(APITestMixin):
     def test_filter_by_date(self, interactions, data, results):
         """Tests filtering interaction by date."""
         url = reverse('api-v3:search:interaction')
-        response = self.api_client.post(url, data, format='json')
+        response = self.api_client.post(url, data)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -782,7 +782,7 @@ class TestInteractionExportView(APITestMixin):
         api_client = self.create_api_client(user=user)
 
         url = reverse('api-v3:search:interaction-export')
-        response = api_client.post(url, format='json')
+        response = api_client.post(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_policy_feedback_excluded_for_non_policy_feedback_user(
@@ -798,7 +798,7 @@ class TestInteractionExportView(APITestMixin):
 
         api_client = self.create_api_client(user=non_policy_feedback_user)
         url = reverse('api-v3:search:interaction-export')
-        response = api_client.post(url, format='json')
+        response = api_client.post(url)
         assert response.status_code == status.HTTP_200_OK
 
         reader = DictReader(StringIO(response.getvalue().decode('utf-8-sig')))
@@ -838,7 +838,7 @@ class TestInteractionExportView(APITestMixin):
         api_client = self.create_api_client(user=policy_feedback_user)
 
         with freeze_time('2018-01-01 11:12:13'):
-            response = api_client.post(url, format='json', data=data)
+            response = api_client.post(url, data=data)
 
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})
@@ -857,16 +857,12 @@ class TestInteractionExportView(APITestMixin):
                 'Type': interaction.get_kind_display(),
                 'Service': get_attr_or_none(interaction, 'service.name'),
                 'Subject': interaction.subject,
-                'Link':
-                    f'=HYPERLINK("'
-                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["interaction"]}/{interaction.pk}'
-                    f'")',
+                'Link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["interaction"]}'
+                        f'/{interaction.pk}',
                 'Company': get_attr_or_none(interaction, 'company.name'),
                 'Company link':
-                    f'=HYPERLINK("'
                     f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}'
-                    f'/{interaction.company.pk}'
-                    f'")',
+                    f'/{interaction.company.pk}',
                 'Company country': get_attr_or_none(
                     interaction,
                     'company.registered_address_country.name',

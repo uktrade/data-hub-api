@@ -155,12 +155,7 @@ def get_front_end_url_expression(model_name, pk_expression):
     :param model_name:      key in settings.DATAHUB_FRONTEND_URL_PREFIXES
     :param pk_expression:   expression that resolves to the pk for the model
     """
-    return Concat(
-        Value('=HYPERLINK("'),
-        Value(f'{settings.DATAHUB_FRONTEND_URL_PREFIXES[model_name]}/'),
-        pk_expression,
-        Value('")'),
-    )
+    return Concat(Value(f'{settings.DATAHUB_FRONTEND_URL_PREFIXES[model_name]}/'), pk_expression)
 
 
 def _full_name_concat(first_name_field, last_name_field):
