@@ -1,1 +1,0 @@
-Deletion of proposition or evidence document is now logged in UserEvent model. UserEvent records can be viewed from the admin site.
