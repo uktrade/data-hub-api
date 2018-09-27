@@ -11,7 +11,7 @@ from freezegun import freeze_time
 from datahub.company.test.factories import AdviserFactory
 from datahub.core import constants
 from datahub.investment.test.factories import (
-    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
+    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
 )
 
 pytestmark = pytest.mark.django_db
@@ -106,17 +106,20 @@ def test_project_assurance_team_valid():
     assert str(project.project_assurance_team.id) == huk_team.id
 
 
-@pytest.mark.parametrize('field', (
-    'client_relationship_manager',
-    'project_assurance_adviser',
-    'project_manager',
-    'created_by',
-))
+@pytest.mark.parametrize(
+    'field',
+    (
+        'client_relationship_manager',
+        'project_assurance_adviser',
+        'project_manager',
+        'created_by',
+    ),
+)
 def test_associated_advisers_specific_roles(field):
     """Tests that get_associated_advisers() includes advisers in specific roles."""
     adviser = AdviserFactory()
     factory_kwargs = {
-        field: adviser
+        field: adviser,
     }
     project = InvestmentProjectFactory(**factory_kwargs)
     assert adviser in tuple(project.get_associated_advisers())
@@ -152,10 +155,10 @@ def test_creates_stage_log_if_stage_was_modified():
 
     date_iter = iter(dates)
     assert [
-        (entry.stage.id, entry.created_on,) for entry in project.stage_log.order_by('created_on')
+        (entry.stage.id, entry.created_on) for entry in project.stage_log.order_by('created_on')
     ] == [
-        (UUID(constants.InvestmentProjectStage.prospect.value.id), next(date_iter),),
-        (UUID(constants.InvestmentProjectStage.assign_pm.value.id), next(date_iter),)
+        (UUID(constants.InvestmentProjectStage.prospect.value.id), next(date_iter)),
+        (UUID(constants.InvestmentProjectStage.assign_pm.value.id), next(date_iter)),
     ]
 
 
@@ -172,10 +175,10 @@ def test_stage_log_added_when_investment_project_is_created():
     """Tests that stage is being logged when Investment Projects is created."""
     project = InvestmentProjectFactory()
     assert [
-        (entry.stage.id, entry.created_on,) for entry in project.stage_log.all()
+        (entry.stage.id, entry.created_on) for entry in project.stage_log.all()
     ] == [
         (
             UUID(constants.InvestmentProjectStage.prospect.value.id),
             datetime(2017, 4, 28, 17, 35, tzinfo=utc),
-        )
+        ),
     ]

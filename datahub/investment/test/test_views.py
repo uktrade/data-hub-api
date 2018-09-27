@@ -24,12 +24,12 @@ from datahub.core.test_utils import (
 from datahub.investment import views
 from datahub.investment.models import (
     InvestmentDeliveryPartner, InvestmentProject,
-    InvestmentProjectPermission, InvestmentProjectTeamMember
+    InvestmentProjectPermission, InvestmentProjectTeamMember,
 )
 from datahub.investment.test.factories import (
     ActiveInvestmentProjectFactory, AssignPMInvestmentProjectFactory,
     InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
-    VerifyWinInvestmentProjectFactory, WonInvestmentProjectFactory
+    VerifyWinInvestmentProjectFactory, WonInvestmentProjectFactory,
 )
 from datahub.metadata.models import UKRegion
 from datahub.metadata.test.factories import TeamFactory
@@ -167,7 +167,7 @@ class TestListView(APITestMixin):
         for creation_datetime in datetimes:
             with freeze_time(creation_datetime):
                 investment_projects.append(
-                    InvestmentProjectFactory()
+                    InvestmentProjectFactory(),
                 )
 
         url = reverse('api-v3:investment:investment-collection')
@@ -180,7 +180,7 @@ class TestListView(APITestMixin):
         investment_projects = sorted(
             investment_projects,
             key=lambda key: key.created_on,
-            reverse=True
+            reverse=True,
         )
         ids = [str(ip.id) for ip in investment_projects]
         assert [ip['id'] for ip in response_data] == ids
@@ -191,9 +191,12 @@ class TestListView(APITestMixin):
         project = InvestmentProjectFactory(investor_company_id=company.id)
         InvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-collection')
-        response = self.api_client.get(url, {
-            'investor_company_id': str(company.id)
-        })
+        response = self.api_client.get(
+            url,
+            data={
+                'investor_company_id': str(company.id),
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -208,7 +211,7 @@ class TestListView(APITestMixin):
             self, team,
             (
                 InvestmentProjectPermission.view_associated,
-            )
+            ),
         )
         advisers = AdviserFactory.create_batch(3, dit_team_id=team.id)
 
@@ -216,29 +219,35 @@ class TestListView(APITestMixin):
 
         investor_company = CompanyFactory()
         investment_project = InvestmentProjectFactory(
-            investor_company=investor_company
+            investor_company=investor_company,
         )
 
         for adviser in advisers:
             InvestmentProjectTeamMemberFactory(
                 adviser=adviser,
-                investment_project=investment_project
+                investment_project=investment_project,
             )
 
         url = reverse('api-v3:investment:investment-collection')
-        response = api_client.get(url, {
-            'investor_company_id': str(investor_company.id)
-        })
+        response = api_client.get(
+            url,
+            data={
+                'investor_company_id': str(investor_company.id),
+            },
+        )
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['count'] == 1
         assert len(response_data['results']) == 1
         assert response_data['results'][0]['id'] == str(investment_project.id)
 
-    @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.view_all,),
-        (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
-    ))
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            (InvestmentProjectPermission.view_all,),
+            (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
+        ),
+    )
     def test_non_restricted_user_can_see_all_projects(self, permissions):
         """Test that normal users can see all projects."""
         team = TeamFactory()
@@ -272,7 +281,7 @@ class TestListView(APITestMixin):
         adviser_same_team = AdviserFactory(dit_team_id=team.id)
 
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.view_associated]
+            self, team, [InvestmentProjectPermission.view_associated],
         )
 
         project_other = InvestmentProjectFactory()
@@ -293,8 +302,10 @@ class TestListView(APITestMixin):
         assert response_data['count'] == 5
 
         results = response_data['results']
-        expected_ids = {str(project_1.id), str(project_2.id), str(project_3.id),
-                        str(project_4.id), str(project_5.id)}
+        expected_ids = {
+            str(project_1.id), str(project_2.id), str(project_3.id),
+            str(project_4.id), str(project_5.id),
+        }
 
         assert {result['id'] for result in results} == expected_ids
 
@@ -305,7 +316,7 @@ class TestListView(APITestMixin):
         """
         adviser_other = AdviserFactory(dit_team_id=None)
         request_user = create_test_user(
-            permission_codenames=['view_associated_investmentproject']
+            permission_codenames=['view_associated_investmentproject'],
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -338,11 +349,14 @@ class TestCreateView(APITestMixin):
         new_site_id = constants.FDIType.creation_of_new_site_or_activity.value.id
         retail_business_activity_id = constants.InvestmentBusinessActivity.retail.value.id
         other_business_activity_id = constants.InvestmentBusinessActivity.other.value.id
-        activities = [{
-            'id': retail_business_activity_id
-        }, {
-            'id': other_business_activity_id
-        }]
+        activities = [
+            {
+                'id': retail_business_activity_id,
+            },
+            {
+                'id': other_business_activity_id,
+            },
+        ]
         request_data = {
             'name': 'project name',
             'description': 'project description',
@@ -352,39 +366,42 @@ class TestCreateView(APITestMixin):
             'likelihood_of_landing': 60,
             'priority': '1_low',
             'investment_type': {
-                'id': constants.InvestmentType.fdi.value.id
+                'id': constants.InvestmentType.fdi.value.id,
             },
             'stage': {
-                'id': constants.InvestmentProjectStage.prospect.value.id
+                'id': constants.InvestmentProjectStage.prospect.value.id,
             },
             'business_activities': activities,
             'other_business_activity': 'New innovation centre',
-            'client_contacts': [{
-                'id': str(contacts[0].id)
-            }, {
-                'id': str(contacts[1].id)
-            }],
+            'client_contacts': [
+                {
+                    'id': str(contacts[0].id),
+                },
+                {
+                    'id': str(contacts[1].id),
+                },
+            ],
             'client_relationship_manager': {
-                'id': str(adviser.id)
+                'id': str(adviser.id),
             },
             'fdi_type': {
-                'id': new_site_id
+                'id': new_site_id,
             },
             'investor_company': {
-                'id': str(investor_company.id)
+                'id': str(investor_company.id),
             },
             'intermediate_company': {
-                'id': str(intermediate_company.id)
+                'id': str(intermediate_company.id),
             },
             'referral_source_activity': {
-                'id': constants.ReferralSourceActivity.cold_call.value.id
+                'id': constants.ReferralSourceActivity.cold_call.value.id,
             },
             'referral_source_adviser': {
-                'id': str(adviser.id)
+                'id': str(adviser.id),
             },
             'sector': {
-                'id': str(aerospace_id)
-            }
+                'id': str(aerospace_id),
+            },
         }
         response = self.api_client.post(url, data=request_data)
         assert response.status_code == status.HTTP_201_CREATED
@@ -429,7 +446,7 @@ class TestCreateView(APITestMixin):
             'name': ['This field is required.'],
             'referral_source_activity': ['This field is required.'],
             'referral_source_adviser': ['This field is required.'],
-            'sector': ['This field is required.']
+            'sector': ['This field is required.'],
         }
 
     def test_create_project_fail_none(self):
@@ -445,7 +462,7 @@ class TestCreateView(APITestMixin):
             'name': None,
             'referral_source_activity': None,
             'referral_source_adviser': None,
-            'sector': None
+            'sector': None,
         }
         response = self.api_client.post(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -460,7 +477,7 @@ class TestCreateView(APITestMixin):
             'name': ['This field may not be null.'],
             'referral_source_activity': ['This field may not be null.'],
             'referral_source_adviser': ['This field may not be null.'],
-            'sector': ['This field may not be null.']
+            'sector': ['This field may not be null.'],
         }
 
     def test_create_project_fail_empty_to_many(self):
@@ -468,13 +485,13 @@ class TestCreateView(APITestMixin):
         url = reverse('api-v3:investment:investment-collection')
         request_data = {
             'business_activities': [],
-            'client_contacts': []
+            'client_contacts': [],
         }
         response = self.api_client.post(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data.keys() >= {
-            'business_activities', 'client_contacts'
+            'business_activities', 'client_contacts',
         }
         assert response_data['business_activities'] == ['This list may not be empty.']
         assert response_data['client_contacts'] == ['This list may not be empty.']
@@ -492,44 +509,47 @@ class TestCreateView(APITestMixin):
             'name': 'project name',
             'description': 'project description',
             'investment_type': {
-                'id': constants.InvestmentType.fdi.value.id
+                'id': constants.InvestmentType.fdi.value.id,
             },
             'stage': {
-                'id': constants.InvestmentProjectStage.prospect.value.id
+                'id': constants.InvestmentProjectStage.prospect.value.id,
             },
             'business_activities': [{
-                'id': retail_business_activity_id
+                'id': retail_business_activity_id,
             }],
-            'client_contacts': [{
-                'id': str(contacts[0].id)
-            }, {
-                'id': str(contacts[1].id)
-            }],
+            'client_contacts': [
+                {
+                    'id': str(contacts[0].id),
+                },
+                {
+                    'id': str(contacts[1].id),
+                },
+            ],
             'client_relationship_manager': {
-                'id': str(adviser.id)
+                'id': str(adviser.id),
             },
             'investor_company': {
-                'id': str(investor_company.id)
+                'id': str(investor_company.id),
             },
             'intermediate_company': {
-                'id': str(intermediate_company.id)
+                'id': str(intermediate_company.id),
             },
             'referral_source_activity': {
-                'id': constants.ReferralSourceActivity.cold_call.value.id
+                'id': constants.ReferralSourceActivity.cold_call.value.id,
             },
             'referral_source_adviser': {
-                'id': str(adviser.id)
+                'id': str(adviser.id),
             },
             'sector': {
-                'id': str(aerospace_id)
-            }
+                'id': str(aerospace_id),
+            },
         }
         response = self.api_client.post(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
             'estimated_land_date': ['This field is required.'],
-            'fdi_type': ['This field is required.']
+            'fdi_type': ['This field is required.'],
         }
 
 
@@ -559,11 +579,11 @@ class TestRetrieveView(APITestMixin):
         investor_company = project.investor_company
         assert response_data['investor_company'] == {
             'id': str(investor_company.id),
-            'name': investor_company.name
+            'name': investor_company.name,
         }
         assert response_data['investor_company_country'] == {
             'id': str(investor_company.registered_address_country.id),
-            'name': investor_company.registered_address_country.name
+            'name': investor_company.registered_address_country.name,
         }
         client_relationship_manager = project.client_relationship_manager
         assert response_data['client_relationship_manager'] == {
@@ -574,10 +594,10 @@ class TestRetrieveView(APITestMixin):
         }
         assert response_data['client_relationship_manager_team'] == {
             'id': str(client_relationship_manager.dit_team.id),
-            'name': client_relationship_manager.dit_team.name
+            'name': client_relationship_manager.dit_team.name,
         }
         expected_client_contact_ids = sorted(
-            [str(contact.id) for contact in project.client_contacts.all()]
+            [str(contact.id) for contact in project.client_contacts.all()],
         )
         assert sorted(contact['id'] for contact in response_data[
             'client_contacts']) == expected_client_contact_ids
@@ -641,7 +661,7 @@ class TestRetrieveView(APITestMixin):
             r_and_d_budget=False,
             non_fdi_r_and_d_budget=False,
             new_tech_to_uk=False,
-            export_revenue=True
+            export_revenue=True,
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         response = self.api_client.get(url)
@@ -669,10 +689,10 @@ class TestRetrieveView(APITestMixin):
         """Test successfully getting a project requirements object."""
         countries = [
             constants.Country.united_kingdom.value.id,
-            constants.Country.united_states.value.id
+            constants.Country.united_states.value.id,
         ]
         strategic_drivers = [
-            constants.InvestmentStrategicDriver.access_to_market.value.id
+            constants.InvestmentStrategicDriver.access_to_market.value.id,
         ]
         uk_region_locations = [random_obj_for_model(UKRegion)]
         actual_uk_regions = [random_obj_for_model(UKRegion)]
@@ -689,8 +709,10 @@ class TestRetrieveView(APITestMixin):
             actual_uk_regions=actual_uk_regions,
             delivery_partners=delivery_partners,
         )
-        url = reverse('api-v3:investment:investment-item',
-                      kwargs={'pk': project.pk})
+        url = reverse(
+            'api-v3:investment:investment-item',
+            kwargs={'pk': project.pk},
+        )
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -721,10 +743,12 @@ class TestRetrieveView(APITestMixin):
         pa_adviser = AdviserFactory(dit_team_id=huk_team.id)
         project = InvestmentProjectFactory(
             project_manager_id=pm_adviser.id,
-            project_assurance_adviser_id=pa_adviser.id
+            project_assurance_adviser_id=pa_adviser.id,
         )
-        url = reverse('api-v3:investment:investment-item',
-                      kwargs={'pk': project.pk})
+        url = reverse(
+            'api-v3:investment:investment-item',
+            kwargs={'pk': project.pk},
+        )
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -733,7 +757,7 @@ class TestRetrieveView(APITestMixin):
             'id': str(pm_adviser.pk),
             'first_name': pm_adviser.first_name,
             'last_name': pm_adviser.last_name,
-            'name': pm_adviser.name
+            'name': pm_adviser.name,
         }
         assert response_data['project_assurance_adviser'] == {
             'id': str(pa_adviser.pk),
@@ -743,11 +767,11 @@ class TestRetrieveView(APITestMixin):
         }
         assert response_data['project_manager_team'] == {
             'id': str(crm_team.id),
-            'name': crm_team.name
+            'name': crm_team.name,
         }
         assert response_data['project_assurance_team'] == {
             'id': str(huk_team.id),
-            'name': huk_team.name
+            'name': huk_team.name,
         }
         assert response_data['team_members'] == []
         assert response_data['team_complete'] is True
@@ -755,10 +779,12 @@ class TestRetrieveView(APITestMixin):
     def test_get_team_empty(self):
         """Test successfully getting an empty project requirements object."""
         project = InvestmentProjectFactory(
-            stage_id=constants.InvestmentProjectStage.assign_pm.value.id
+            stage_id=constants.InvestmentProjectStage.assign_pm.value.id,
         )
-        url = reverse('api-v3:investment:investment-item',
-                      kwargs={'pk': project.pk})
+        url = reverse(
+            'api-v3:investment:investment-item',
+            kwargs={'pk': project.pk},
+        )
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -793,7 +819,7 @@ class TestRetrieveView(APITestMixin):
         adviser_1 = AdviserFactory(dit_team_id=team_associated.id)
 
         _, api_client = _create_user_and_api_client(
-            self, team_requester, [InvestmentProjectPermission.view_associated]
+            self, team_requester, [InvestmentProjectPermission.view_associated],
         )
 
         iproject_1 = InvestmentProjectFactory()
@@ -804,10 +830,13 @@ class TestRetrieveView(APITestMixin):
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.view_all,),
-        (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
-    ))
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            (InvestmentProjectPermission.view_all,),
+            (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
+        ),
+    )
     def test_non_restricted_user_can_see_project_if_not_associated(self, permissions):
         """Tests that non-restricted users can access projects they aren't associated with."""
         team_requester = TeamFactory()
@@ -829,7 +858,7 @@ class TestRetrieveView(APITestMixin):
         team = TeamFactory()
         adviser_1 = AdviserFactory(dit_team_id=team.id)
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.view_associated]
+            self, team, [InvestmentProjectPermission.view_associated],
         )
 
         iproject_1 = InvestmentProjectFactory()
@@ -840,18 +869,22 @@ class TestRetrieveView(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
 
-    @pytest.mark.parametrize('field', (
-        'created_by',
-        'client_relationship_manager',
-        'project_assurance_adviser',
-        'project_manager'))
+    @pytest.mark.parametrize(
+        'field',
+        (
+            'created_by',
+            'client_relationship_manager',
+            'project_assurance_adviser',
+            'project_manager',
+        ),
+    )
     def test_restricted_user_can_see_project_if_associated_via_field(self, field):
         """Tests that restricted users can see a project when in the team of the creator."""
         team = TeamFactory()
         adviser_1 = AdviserFactory(dit_team_id=team.id)
 
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.view_associated]
+            self, team, [InvestmentProjectPermission.view_associated],
         )
 
         iproject_1 = InvestmentProjectFactory(**{field: adviser_1})
@@ -868,7 +901,7 @@ class TestRetrieveView(APITestMixin):
         """
         adviser_other = AdviserFactory(dit_team_id=None)
         request_user = create_test_user(
-            permission_codenames=['view_associated_investmentproject']
+            permission_codenames=['view_associated_investmentproject'],
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -890,7 +923,7 @@ class TestRetrieveView(APITestMixin):
         user = create_test_user(
             permission_codenames=(
                 InvestmentProjectPermission.view_all,
-            )
+            ),
         )
         api_client = self.create_api_client(user=user)
 
@@ -912,7 +945,7 @@ class TestRetrieveView(APITestMixin):
             permission_codenames=(
                 InvestmentProjectPermission.view_all,
                 InvestmentProjectPermission.view_investmentproject_document,
-            )
+            ),
         )
         api_client = self.create_api_client(user=user)
 
@@ -938,15 +971,15 @@ class TestPartialUpdateView(APITestMixin):
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'investment_type': {
-                'id': str(constants.InvestmentType.fdi.value.id)
+                'id': str(constants.InvestmentType.fdi.value.id),
             },
-            'fdi_type': None
+            'fdi_type': None,
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'fdi_type': ['This field is required.']
+            'fdi_type': ['This field is required.'],
         }
 
     def test_patch_likelihood_of_landing_too_low(self):
@@ -954,13 +987,13 @@ class TestPartialUpdateView(APITestMixin):
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
-            'likelihood_of_landing': -10
+            'likelihood_of_landing': -10,
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'likelihood_of_landing': ['Ensure this value is greater than or equal to 0.']
+            'likelihood_of_landing': ['Ensure this value is greater than or equal to 0.'],
         }
 
     def test_patch_likelihood_of_landing_too_high(self):
@@ -968,13 +1001,13 @@ class TestPartialUpdateView(APITestMixin):
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
-            'likelihood_of_landing': 110
+            'likelihood_of_landing': 110,
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'likelihood_of_landing': ['Ensure this value is less than or equal to 100.']
+            'likelihood_of_landing': ['Ensure this value is less than or equal to 100.'],
         }
 
     def test_patch_priority_invalid_value(self):
@@ -982,13 +1015,13 @@ class TestPartialUpdateView(APITestMixin):
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
-            'priority': '6_extremely_urgent'
+            'priority': '6_extremely_urgent',
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'priority': ['"6_extremely_urgent" is not a valid choice.']
+            'priority': ['"6_extremely_urgent" is not a valid choice.'],
         }
 
     def test_patch_project_success(self):
@@ -1000,8 +1033,8 @@ class TestPartialUpdateView(APITestMixin):
             'name': 'new name',
             'description': 'new description',
             'client_contacts': [{
-                'id': str(new_contact.id)
-            }]
+                'id': str(new_contact.id),
+            }],
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
@@ -1036,8 +1069,10 @@ class TestPartialUpdateView(APITestMixin):
             allow_blank_estimated_land_date=True,
             estimated_land_date=None,
         )
-        url = reverse('api-v3:investment:investment-item',
-                      kwargs={'pk': project.pk})
+        url = reverse(
+            'api-v3:investment:investment-item',
+            kwargs={'pk': project.pk},
+        )
         request_data = {
             'estimated_land_date': None,
         }
@@ -1050,15 +1085,16 @@ class TestPartialUpdateView(APITestMixin):
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'stage': {
-                'id': constants.InvestmentProjectStage.assign_pm.value.id
-            }
+                'id': constants.InvestmentProjectStage.assign_pm.value.id,
+            },
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
             'client_cannot_provide_total_investment': [
-                'This field is required.'],
+                'This field is required.',
+            ],
             'number_new_jobs': ['This field is required.'],
             'total_investment': ['This field is required.'],
             'client_considering_other_countries': ['This field is required.'],
@@ -1070,7 +1106,7 @@ class TestPartialUpdateView(APITestMixin):
     def test_change_stage_assign_pm_success(self):
         """Tests moving a complete project to the Assign PM stage."""
         strategic_drivers = [
-            constants.InvestmentStrategicDriver.access_to_market.value.id
+            constants.InvestmentStrategicDriver.access_to_market.value.id,
         ]
         project = InvestmentProjectFactory(
             client_cannot_provide_total_investment=False,
@@ -1080,13 +1116,13 @@ class TestPartialUpdateView(APITestMixin):
             client_requirements='client reqs',
             site_decided=False,
             strategic_drivers=strategic_drivers,
-            uk_region_locations=[random_obj_for_model(UKRegion)]
+            uk_region_locations=[random_obj_for_model(UKRegion)],
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'stage': {
-                'id': constants.InvestmentProjectStage.assign_pm.value.id
-            }
+                'id': constants.InvestmentProjectStage.assign_pm.value.id,
+            },
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
@@ -1097,15 +1133,16 @@ class TestPartialUpdateView(APITestMixin):
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'stage': {
-                'id': constants.InvestmentProjectStage.active.value.id
-            }
+                'id': constants.InvestmentProjectStage.active.value.id,
+            },
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
             'client_cannot_provide_total_investment': [
-                'This field is required.'],
+                'This field is required.',
+            ],
             'number_new_jobs': ['This field is required.'],
             'total_investment': ['This field is required.'],
             'client_considering_other_countries': ['This field is required.'],
@@ -1126,8 +1163,8 @@ class TestPartialUpdateView(APITestMixin):
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'stage': {
-                'id': constants.InvestmentProjectStage.active.value.id
-            }
+                'id': constants.InvestmentProjectStage.active.value.id,
+            },
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
@@ -1135,7 +1172,7 @@ class TestPartialUpdateView(APITestMixin):
     def test_change_stage_verify_win_failure(self):
         """Tests moving a partially complete project to the 'Verify win' stage."""
         project_manager, api_client = _create_user_and_api_client(
-            self, TeamFactory(), [InvestmentProjectPermission.change_associated]
+            self, TeamFactory(), [InvestmentProjectPermission.change_associated],
         )
         project = ActiveInvestmentProjectFactory(
             number_new_jobs=1,
@@ -1144,8 +1181,8 @@ class TestPartialUpdateView(APITestMixin):
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'stage': {
-                'id': constants.InvestmentProjectStage.verify_win.value.id
-            }
+                'id': constants.InvestmentProjectStage.verify_win.value.id,
+            },
         }
         response = api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -1169,15 +1206,15 @@ class TestPartialUpdateView(APITestMixin):
 
     @pytest.mark.parametrize(
         'field',
-        ('project_manager', 'project_assurance_adviser',),
+        ('project_manager', 'project_assurance_adviser'),
     )
     def test_change_stage_verify_win_success(self, field):
         """Tests moving a complete project to the 'Verify win' stage."""
         strategic_drivers = [
-            constants.InvestmentStrategicDriver.access_to_market.value.id
+            constants.InvestmentStrategicDriver.access_to_market.value.id,
         ]
         adviser, api_client = _create_user_and_api_client(
-            self, TeamFactory(), [InvestmentProjectPermission.change_associated]
+            self, TeamFactory(), [InvestmentProjectPermission.change_associated],
         )
         extra = {field: adviser}
         project = ActiveInvestmentProjectFactory(
@@ -1204,8 +1241,8 @@ class TestPartialUpdateView(APITestMixin):
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'stage': {
-                'id': constants.InvestmentProjectStage.verify_win.value.id
-            }
+                'id': constants.InvestmentProjectStage.verify_win.value.id,
+            },
         }
         response = api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
@@ -1216,21 +1253,21 @@ class TestPartialUpdateView(APITestMixin):
         to the 'Verify win' stage.
         """
         project = VerifyWinInvestmentProjectFactory(
-            stage_id=constants.InvestmentProjectStage.active.value.id
+            stage_id=constants.InvestmentProjectStage.active.value.id,
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'stage': {
-                'id': constants.InvestmentProjectStage.verify_win.value.id
-            }
+                'id': constants.InvestmentProjectStage.verify_win.value.id,
+            },
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
             'stage': [
                 'Only the Project Manager or Project Assurance Adviser can move the project'
-                ' to the ‘Verify win’ stage.'
-            ]
+                ' to the ‘Verify win’ stage.',
+            ],
         }
 
     def test_change_stage_to_won(self):
@@ -1242,7 +1279,7 @@ class TestPartialUpdateView(APITestMixin):
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'stage': {
-                'id': constants.InvestmentProjectStage.won.value.id
+                'id': constants.InvestmentProjectStage.won.value.id,
             },
             'actual_land_date': '2016-01-31',
         }
@@ -1251,8 +1288,8 @@ class TestPartialUpdateView(APITestMixin):
             TeamFactory(),
             [
                 InvestmentProjectPermission.change_all,
-                InvestmentProjectPermission.change_stage_to_won
-            ]
+                InvestmentProjectPermission.change_stage_to_won,
+            ],
         )
 
         response = api_client.patch(url, data=request_data)
@@ -1272,7 +1309,7 @@ class TestPartialUpdateView(APITestMixin):
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'stage': {
-                'id': constants.InvestmentProjectStage.won.value.id
+                'id': constants.InvestmentProjectStage.won.value.id,
             },
             'actual_land_date': '2016-01-31',
         }
@@ -1281,8 +1318,8 @@ class TestPartialUpdateView(APITestMixin):
         response_data = response.json()
         assert response_data == {
             'stage': [
-                'Only the Investment Verification Team can move the project to the ‘Won’ stage.'
-            ]
+                'Only the Investment Verification Team can move the project to the ‘Won’ stage.',
+            ],
         }
 
     def test_change_stage_to_won_failure(self):
@@ -1294,7 +1331,7 @@ class TestPartialUpdateView(APITestMixin):
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'stage': {
-                'id': constants.InvestmentProjectStage.won.value.id
+                'id': constants.InvestmentProjectStage.won.value.id,
             },
         }
 
@@ -1303,8 +1340,8 @@ class TestPartialUpdateView(APITestMixin):
             TeamFactory(),
             [
                 InvestmentProjectPermission.change_all,
-                InvestmentProjectPermission.change_stage_to_won
-            ]
+                InvestmentProjectPermission.change_stage_to_won,
+            ],
         )
         adviser.save()
 
@@ -1321,8 +1358,8 @@ class TestPartialUpdateView(APITestMixin):
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'stage': {
-                'id': constants.InvestmentProjectStage.verify_win.value.id
-            }
+                'id': constants.InvestmentProjectStage.verify_win.value.id,
+            },
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
@@ -1356,8 +1393,8 @@ class TestPartialUpdateView(APITestMixin):
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project2.pk})
         request_data = {
             'stage': {
-                'id': constants.InvestmentProjectStage.active.value.id
-            }
+                'id': constants.InvestmentProjectStage.active.value.id,
+            },
         }
 
         with freeze_time(next(date_iter)):
@@ -1386,11 +1423,11 @@ class TestPartialUpdateView(APITestMixin):
 
         date_iter = iter(dates)
         assert [
-            (entry.stage.id, entry.created_on,)
+            (entry.stage.id, entry.created_on)
             for entry in project2.stage_log.order_by('created_on')
         ] == [
             (uuid.UUID(constants.InvestmentProjectStage.assign_pm.value.id), next(date_iter)),
-            (uuid.UUID(constants.InvestmentProjectStage.active.value.id), next(date_iter),),
+            (uuid.UUID(constants.InvestmentProjectStage.active.value.id), next(date_iter)),
         ]
 
     def test_change_stage_log_when_log_is_empty(self):
@@ -1409,8 +1446,8 @@ class TestPartialUpdateView(APITestMixin):
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project2.pk})
         request_data = {
             'stage': {
-                'id': constants.InvestmentProjectStage.active.value.id
-            }
+                'id': constants.InvestmentProjectStage.active.value.id,
+            },
         }
 
         with freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=utc)):
@@ -1429,7 +1466,7 @@ class TestPartialUpdateView(APITestMixin):
         ]
 
         assert [
-            (entry.stage.id, entry.created_on,)
+            (entry.stage.id, entry.created_on)
             for entry in project2.stage_log.order_by('created_on')
         ] == [
             (
@@ -1448,11 +1485,11 @@ class TestPartialUpdateView(APITestMixin):
         """
         project = InvestmentProjectFactory(
             stage_id=constants.InvestmentProjectStage.active.value.id,
-            project_manager=None
+            project_manager=None,
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
-            'project_manager': None
+            'project_manager': None,
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -1464,13 +1501,15 @@ class TestPartialUpdateView(APITestMixin):
     def test_patch_value_success(self):
         """Test successfully partially updating a project value object."""
         salary_id = constants.SalaryRange.below_25000.value.id
-        project = InvestmentProjectFactory(total_investment=999,
-                                           number_new_jobs=100)
+        project = InvestmentProjectFactory(
+            total_investment=999,
+            number_new_jobs=100,
+        )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
             'number_new_jobs': 555,
             'average_salary': {'id': salary_id},
-            'government_assistance': True
+            'government_assistance': True,
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
@@ -1483,14 +1522,18 @@ class TestPartialUpdateView(APITestMixin):
 
     def test_patch_requirements_success(self):
         """Test successfully partially updating a requirements object."""
-        project = InvestmentProjectFactory(client_requirements='client reqs',
-                                           site_decided=True,
-                                           address_1='address 1')
-        url = reverse('api-v3:investment:investment-item',
-                      kwargs={'pk': project.pk})
+        project = InvestmentProjectFactory(
+            client_requirements='client reqs',
+            site_decided=True,
+            address_1='address 1',
+        )
+        url = reverse(
+            'api-v3:investment:investment-item',
+            kwargs={'pk': project.pk},
+        )
         request_data = {
             'address_1': 'address 1 new',
-            'address_2': 'address 2 new'
+            'address_2': 'address 2 new',
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
@@ -1510,8 +1553,10 @@ class TestPartialUpdateView(APITestMixin):
             allow_blank_possible_uk_regions=True,
             uk_region_locations=[],
         )
-        url = reverse('api-v3:investment:investment-item',
-                      kwargs={'pk': project.pk})
+        url = reverse(
+            'api-v3:investment:investment-item',
+            kwargs={'pk': project.pk},
+        )
         request_data = {
             'uk_region_locations': [],
         }
@@ -1526,14 +1571,16 @@ class TestPartialUpdateView(APITestMixin):
         adviser_2 = AdviserFactory(dit_team_id=huk_team.id)
         project = InvestmentProjectFactory(
             project_manager_id=adviser_1.id,
-            project_assurance_adviser_id=adviser_2.id
+            project_assurance_adviser_id=adviser_2.id,
         )
-        url = reverse('api-v3:investment:investment-item',
-                      kwargs={'pk': project.pk})
+        url = reverse(
+            'api-v3:investment:investment-item',
+            kwargs={'pk': project.pk},
+        )
         request_data = {
             'project_manager': {
-                'id': str(adviser_2.id)
-            }
+                'id': str(adviser_2.id),
+            },
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status.HTTP_200_OK
@@ -1543,21 +1590,21 @@ class TestPartialUpdateView(APITestMixin):
             'id': str(adviser_2.pk),
             'first_name': adviser_2.first_name,
             'last_name': adviser_2.last_name,
-            'name': adviser_2.name
+            'name': adviser_2.name,
         }
         assert response_data['project_assurance_adviser'] == {
             'id': str(adviser_2.pk),
             'first_name': adviser_2.first_name,
             'last_name': adviser_2.last_name,
-            'name': adviser_2.name
+            'name': adviser_2.name,
         }
         assert response_data['project_manager_team'] == {
             'id': str(huk_team.id),
-            'name': huk_team.name
+            'name': huk_team.name,
         }
         assert response_data['project_assurance_team'] == {
             'id': str(huk_team.id),
-            'name': huk_team.name
+            'name': huk_team.name,
         }
         assert response_data['team_members'] == []
         assert response_data['team_complete'] is True
@@ -1575,16 +1622,18 @@ class TestPartialUpdateView(APITestMixin):
         adviser_1 = AdviserFactory(dit_team_id=crm_team.id)
         adviser_2 = AdviserFactory()
         project = InvestmentProjectFactory(
-            project_assurance_adviser_id=adviser_2.id
+            project_assurance_adviser_id=adviser_2.id,
         )
         assert project.project_manager_first_assigned_on is None
 
-        url = reverse('api-v3:investment:investment-item',
-                      kwargs={'pk': project.pk})
+        url = reverse(
+            'api-v3:investment:investment-item',
+            kwargs={'pk': project.pk},
+        )
         request_data = {
             'project_manager': {
-                'id': str(adviser_1.id)
-            }
+                'id': str(adviser_1.id),
+            },
         }
         with freeze_time(datetime(2017, 4, 30, 11, 25, tzinfo=utc)):
             response = self.api_client.patch(url, data=request_data)
@@ -1596,11 +1645,11 @@ class TestPartialUpdateView(APITestMixin):
             'id': str(adviser_1.pk),
             'first_name': adviser_1.first_name,
             'last_name': adviser_1.last_name,
-            'name': adviser_1.name
+            'name': adviser_1.name,
         }
         assert response_data['project_manager_team'] == {
             'id': str(crm_team.id),
-            'name': crm_team.name
+            'name': crm_team.name,
         }
         project.refresh_from_db()
         assigned_on = datetime(2017, 4, 30, 11, 25, tzinfo=utc)
@@ -1617,13 +1666,16 @@ class TestPartialUpdateView(APITestMixin):
         )
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
-        response = self.api_client.patch(url, data={
-            'archived_documents_url_path': 'new_path',
-            'comments': 'new_comments',
-            'allow_blank_estimated_land_date': True,
-            'allow_blank_possible_uk_regions': True,
-            'project_manager_first_assigned_on': now(),
-        })
+        response = self.api_client.patch(
+            url,
+            data={
+                'archived_documents_url_path': 'new_path',
+                'comments': 'new_comments',
+                'allow_blank_estimated_land_date': True,
+                'allow_blank_possible_uk_regions': True,
+                'project_manager_first_assigned_on': now(),
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['archived_documents_url_path'] == 'old_path'
@@ -1641,23 +1693,32 @@ class TestPartialUpdateView(APITestMixin):
         adviser = AdviserFactory(dit_team_id=team_associated.id)
 
         _, api_client = _create_user_and_api_client(
-            self, team_requester, [InvestmentProjectPermission.change_associated]
+            self, team_requester, [InvestmentProjectPermission.change_associated],
         )
 
         project = InvestmentProjectFactory(name='old name')
         InvestmentProjectTeamMemberFactory(adviser=adviser, investment_project=project)
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
-        response = api_client.patch(url, {
-            'name': 'new name'
-        })
+        response = api_client.patch(
+            url,
+            data={
+                'name': 'new name',
+            },
+        )
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.change_all,),
-        (InvestmentProjectPermission.change_all, InvestmentProjectPermission.change_associated),
-    ))
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            (InvestmentProjectPermission.change_all,),
+            (
+                InvestmentProjectPermission.change_all,
+                InvestmentProjectPermission.change_associated,
+            ),
+        ),
+    )
     def test_non_restricted_user_can_update_project_if_not_associated(self, permissions):
         """Tests that non-restricted users can update projects they aren't associated with."""
         team_requester = TeamFactory()
@@ -1670,9 +1731,12 @@ class TestPartialUpdateView(APITestMixin):
         InvestmentProjectTeamMemberFactory(adviser=adviser, investment_project=project)
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
-        response = api_client.patch(url, {
-            'name': 'new name'
-        })
+        response = api_client.patch(
+            url,
+            data={
+                'name': 'new name',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -1685,41 +1749,51 @@ class TestPartialUpdateView(APITestMixin):
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated]
+            self, team, [InvestmentProjectPermission.change_associated],
         )
 
         project = InvestmentProjectFactory(name='old name')
         InvestmentProjectTeamMemberFactory(adviser=adviser, investment_project=project)
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
-        response = api_client.patch(url, {
-            'name': 'new name'
-        })
+        response = api_client.patch(
+            url,
+            data={
+                'name': 'new name',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['name'] == 'new name'
 
-    @pytest.mark.parametrize('field', (
-        'created_by',
-        'client_relationship_manager',
-        'project_assurance_adviser',
-        'project_manager'))
+    @pytest.mark.parametrize(
+        'field',
+        (
+            'created_by',
+            'client_relationship_manager',
+            'project_assurance_adviser',
+            'project_manager',
+        ),
+    )
     def test_restricted_user_can_update_project_if_associated_via_field(self, field):
         """Tests that restricted users can update a project when in the team of the creator."""
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
 
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated]
+            self, team, [InvestmentProjectPermission.change_associated],
         )
 
         project = InvestmentProjectFactory(name='old name', **{field: adviser})
 
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
-        response = api_client.patch(url, {
-            'name': 'new name'
-        })
+        response = api_client.patch(
+            url,
+            data={
+                'name': 'new name',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -1744,25 +1818,25 @@ class TestInvestmentProjectVersioning(APITestMixin):
                 'description': 'project description',
                 'estimated_land_date': '2020-12-12',
                 'investment_type': {
-                    'id': constants.InvestmentType.fdi.value.id
+                    'id': constants.InvestmentType.fdi.value.id,
                 },
                 'business_activities': [{
-                    'id': constants.InvestmentBusinessActivity.retail.value.id
+                    'id': constants.InvestmentBusinessActivity.retail.value.id,
                 }],
                 'other_business_activity': 'New innovation centre',
                 'client_contacts': [{'id': str(ContactFactory().id)}],
                 'client_relationship_manager': {'id': str(adviser.id)},
                 'fdi_type': {
-                    'id': constants.FDIType.creation_of_new_site_or_activity.value.id
+                    'id': constants.FDIType.creation_of_new_site_or_activity.value.id,
                 },
                 'investor_company': {'id': str(CompanyFactory().id)},
                 'referral_source_activity': {
-                    'id': constants.ReferralSourceActivity.cold_call.value.id
+                    'id': constants.ReferralSourceActivity.cold_call.value.id,
                 },
                 'referral_source_adviser': {'id': str(adviser.id)},
                 'sector': {
-                    'id': str(constants.Sector.aerospace_assembly_aircraft.value.id)
-                }
+                    'id': str(constants.Sector.aerospace_assembly_aircraft.value.id),
+                },
             },
         )
         assert response.status_code == status.HTTP_201_CREATED
@@ -1784,7 +1858,7 @@ class TestInvestmentProjectVersioning(APITestMixin):
         response = self.api_client.post(
             reverse('api-v3:investment:investment-collection'),
             data={
-                'name': 'project name'
+                'name': 'project name',
             },
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -1864,7 +1938,7 @@ class TestInvestmentProjectVersioning(APITestMixin):
     def test_unarchive_creates_a_new_version(self):
         """Test that unarchiving an investment project creates a new version."""
         project = InvestmentProjectFactory(
-            archived=True, archived_on=now(), archived_reason='foo'
+            archived=True, archived_on=now(), archived_reason='foo',
         )
         assert Version.objects.get_for_object(project).count() == 0
 
@@ -1889,16 +1963,17 @@ class TestModifiedSinceView(APITestMixin):
         url = reverse('api-v3:investment:investment-modified-since-collection')
         client = self.create_api_client(
             scope=Scope.mi,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
         )
         return client.get(url, data=data)
 
     @pytest.mark.parametrize(
-        'timestamp,num_results', (
+        'timestamp,num_results',
+        (
             (datetime(2017, 12, 31), 5),
             (datetime(2018, 1, 1), 5),
             (datetime(2018, 1, 2), 0),
-        )
+        ),
     )
     def test_get_modified_since_filter(self, timestamp: datetime, num_results: int):
         """Test the that results are correctly filtered."""
@@ -1908,7 +1983,7 @@ class TestModifiedSinceView(APITestMixin):
             InvestmentProjectFactory.create_batch(5)
 
         response = self._make_request({
-            'modified_on__gte': timestamp.isoformat()
+            'modified_on__gte': timestamp.isoformat(),
         })
 
         assert response.status_code == status.HTTP_200_OK
@@ -1916,11 +1991,12 @@ class TestModifiedSinceView(APITestMixin):
         assert response_data['count'] == num_results
 
     @pytest.mark.parametrize(
-        'timestamp,num_results', (
+        'timestamp,num_results',
+        (
             (datetime(2016, 12, 31), 0),
             (datetime(2017, 1, 2), 4),
             (datetime(2018, 1, 2), 9),
-        )
+        ),
     )
     def test_get_modified_until_filter(self, timestamp: datetime, num_results: int):
         """Test the that results are correctly filtered."""
@@ -1930,7 +2006,7 @@ class TestModifiedSinceView(APITestMixin):
             InvestmentProjectFactory.create_batch(5)
 
         response = self._make_request({
-            'modified_on__lte': timestamp.isoformat()
+            'modified_on__lte': timestamp.isoformat(),
         })
 
         assert response.status_code == status.HTTP_200_OK
@@ -1938,15 +2014,17 @@ class TestModifiedSinceView(APITestMixin):
         assert response_data['count'] == num_results
 
     @pytest.mark.parametrize(
-        'from_,until,num_results', (
+        'from_,until,num_results',
+        (
             (datetime(2016, 12, 31), datetime(2017, 1, 3), 4),
             (datetime(2018, 1, 1), datetime(2018, 1, 2), 5),
             (datetime(2017, 1, 1), datetime(2018, 1, 1), 9),
             (datetime(2017, 3, 1), datetime(2017, 3, 2), 0),
-        )
+        ),
     )
     def test_get_modified_from_and_modified_until_filter(
-            self, from_: datetime, until: datetime, num_results: int):
+            self, from_: datetime, until: datetime, num_results: int,
+    ):
         """Test the that results are correctly filtered."""
         with freeze_time(datetime(2017, 1, 1)):
             InvestmentProjectFactory.create_batch(4)
@@ -1955,7 +2033,7 @@ class TestModifiedSinceView(APITestMixin):
 
         response = self._make_request({
             'modified_on__gte': from_.isoformat(),
-            'modified_on__lte': until.isoformat()
+            'modified_on__lte': until.isoformat(),
         })
 
         assert response.status_code == status.HTTP_200_OK
@@ -1978,8 +2056,10 @@ class TestAddTeamMemberView(APITestMixin):
 
     def test_add_team_member_nonexistent_project(self):
         """Tests adding a team member to a non-existent project."""
-        url = reverse('api-v3:investment:team-member-collection',
-                      kwargs={'project_pk': uuid.uuid4()})
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': uuid.uuid4()},
+        )
         response = self.api_client.post(url, data={})
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -1987,55 +2067,73 @@ class TestAddTeamMemberView(APITestMixin):
     def test_add_team_member_missing_data(self):
         """Tests adding a team member to a project without specifying an adviser and role."""
         project = InvestmentProjectFactory()
-        url = reverse('api-v3:investment:team-member-collection',
-                      kwargs={'project_pk': project.pk})
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': project.pk},
+        )
         response = self.api_client.post(url, data={})
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
             'adviser': ['This field is required.'],
-            'role': ['This field is required.']
+            'role': ['This field is required.'],
         }
 
     def test_add_team_member_null_data(self):
         """Tests adding a team member to a project specifying a null adviser and role."""
         project = InvestmentProjectFactory()
-        url = reverse('api-v3:investment:team-member-collection',
-                      kwargs={'project_pk': project.pk})
-        response = self.api_client.post(url, data={
-            'adviser': None,
-            'role': None
-        })
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': project.pk},
+        )
+        response = self.api_client.post(
+            url,
+            data={
+                'adviser': None,
+                'role': None,
+            },
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
             'adviser': ['This field may not be null.'],
-            'role': ['This field may not be null.']
+            'role': ['This field may not be null.'],
         }
 
     def test_add_team_member_blank_role(self):
         """Tests adding a team member to a project specifying a blank role."""
         project = InvestmentProjectFactory()
         adviser = AdviserFactory()
-        url = reverse('api-v3:investment:team-member-collection',
-                      kwargs={'project_pk': project.pk})
-        response = self.api_client.post(url, data={
-            'adviser': {'id': str(adviser.pk)},
-            'role': ''
-        })
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': project.pk},
+        )
+        response = self.api_client.post(
+            url,
+            data={
+                'adviser': {'id': str(adviser.pk)},
+                'role': '',
+            },
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'role': ['This field may not be blank.']
+            'role': ['This field may not be blank.'],
         }
 
-    @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.change_all,),
-        (InvestmentProjectPermission.change_associated, InvestmentProjectPermission.change_all),
-    ))
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            (InvestmentProjectPermission.change_all,),
+            (
+                InvestmentProjectPermission.change_associated,
+                InvestmentProjectPermission.change_all,
+            ),
+        ),
+    )
     def test_non_restricted_user_can_add_team_member(self, permissions):
         """Test that a non-restricted user can add a team member to a project."""
         project = InvestmentProjectFactory()
@@ -2044,13 +2142,15 @@ class TestAddTeamMemberView(APITestMixin):
 
         _, api_client = _create_user_and_api_client(self, team, permissions)
 
-        url = reverse('api-v3:investment:team-member-collection',
-                      kwargs={'project_pk': project.pk})
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': project.pk},
+        )
         request_data = {
             'adviser': {
-                'id': str(adviser.pk)
+                'id': str(adviser.pk),
             },
-            'role': 'Sector adviser'
+            'role': 'Sector adviser',
         }
         response = api_client.post(url, data=request_data)
 
@@ -2066,16 +2166,18 @@ class TestAddTeamMemberView(APITestMixin):
         team = TeamFactory()
 
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated]
+            self, team, [InvestmentProjectPermission.change_associated],
         )
 
-        url = reverse('api-v3:investment:team-member-collection',
-                      kwargs={'project_pk': project.pk})
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': project.pk},
+        )
         request_data = {
             'adviser': {
-                'id': str(adviser.pk)
+                'id': str(adviser.pk),
             },
-            'role': 'Sector adviser'
+            'role': 'Sector adviser',
         }
         response = api_client.post(url, data=request_data)
 
@@ -2088,15 +2190,17 @@ class TestAddTeamMemberView(APITestMixin):
         project = InvestmentProjectFactory(created_by=creator)
 
         _, api_client = _create_user_and_api_client(
-            self, creator.dit_team, [InvestmentProjectPermission.change_associated]
+            self, creator.dit_team, [InvestmentProjectPermission.change_associated],
         )
-        url = reverse('api-v3:investment:team-member-collection',
-                      kwargs={'project_pk': project.pk})
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': project.pk},
+        )
         request_data = {
             'adviser': {
-                'id': str(adviser.pk)
+                'id': str(adviser.pk),
             },
-            'role': 'Sector adviser'
+            'role': 'Sector adviser',
         }
         response = api_client.post(url, data=request_data)
 
@@ -2108,21 +2212,24 @@ class TestAddTeamMemberView(APITestMixin):
     def test_add_duplicate_team_member(self):
         """Tests adding a duplicate team member to a project."""
         team_member = InvestmentProjectTeamMemberFactory()
-        url = reverse('api-v3:investment:team-member-collection', kwargs={
-            'project_pk': team_member.investment_project.pk,
-        })
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={
+                'project_pk': team_member.investment_project.pk,
+            },
+        )
         request_data = {
             'adviser': {
-                'id': str(team_member.adviser.pk)
+                'id': str(team_member.adviser.pk),
             },
-            'role': 'Sector adviser'
+            'role': 'Sector adviser',
         }
         response = self.api_client.post(url, data=request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         response_data = response.json()
         assert response_data == {
-            'non_field_errors': ['The fields investment_project, adviser must make a unique set.']
+            'non_field_errors': ['The fields investment_project, adviser must make a unique set.'],
         }
 
 
@@ -2137,16 +2244,18 @@ class TestReplaceAllTeamMembersView(APITestMixin):
         advisers = AdviserFactory.create_batch(2)
         advisers.sort(key=attrgetter('id'))
         InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project
+            2, investment_project=project,
         )
 
-        url = reverse('api-v3:investment:team-member-collection',
-                      kwargs={'project_pk': project.pk})
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': project.pk},
+        )
         request_data = [{
             'adviser': {
-                'id': str(adviser.pk)
+                'id': str(adviser.pk),
             },
-            'role': 'Sector adviser'
+            'role': 'Sector adviser',
         } for adviser in advisers]
         response = self.api_client.put(url, data=request_data)
 
@@ -2176,17 +2285,21 @@ class TestReplaceAllTeamMembersView(APITestMixin):
         """Test that existing team members can be updated."""
         project = InvestmentProjectFactory()
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project, role='Old role'
+            2, investment_project=project, role='Old role',
         )
 
-        url = reverse('api-v3:investment:team-member-collection',
-                      kwargs={'project_pk': project.pk})
-        request_data = [{
-            'adviser': {
-                'id': str(team_member.adviser.pk)
-            },
-            'role': 'New role'
-        } for team_member in team_members]
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': project.pk},
+        )
+        request_data = [
+            {
+                'adviser': {
+                    'id': str(team_member.adviser.pk),
+                },
+                'role': 'New role',
+            } for team_member in team_members
+        ]
         response = self.api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
@@ -2205,10 +2318,16 @@ class TestReplaceAllTeamMembersView(APITestMixin):
             'role': 'New role',
         } for team_member in team_members]
 
-    @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.change_all,),
-        (InvestmentProjectPermission.change_associated, InvestmentProjectPermission.change_all),
-    ))
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            (InvestmentProjectPermission.change_all,),
+            (
+                InvestmentProjectPermission.change_associated,
+                InvestmentProjectPermission.change_all,
+            ),
+        ),
+    )
     def test_non_restricted_user_can_replace_team_members(self, permissions):
         """Test that a non-restricted user can replace team members of a project."""
         project = InvestmentProjectFactory()
@@ -2217,13 +2336,15 @@ class TestReplaceAllTeamMembersView(APITestMixin):
 
         _, api_client = _create_user_and_api_client(self, team, permissions)
 
-        url = reverse('api-v3:investment:team-member-collection',
-                      kwargs={'project_pk': project.pk})
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': project.pk},
+        )
         request_data = [{
             'adviser': {
-                'id': str(adviser.pk)
+                'id': str(adviser.pk),
             },
-            'role': 'Sector adviser'
+            'role': 'Sector adviser',
         }]
         response = api_client.put(url, data=request_data)
 
@@ -2250,14 +2371,16 @@ class TestReplaceAllTeamMembersView(APITestMixin):
         team = TeamFactory()
 
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated]
+            self, team, [InvestmentProjectPermission.change_associated],
         )
 
-        url = reverse('api-v3:investment:team-member-collection',
-                      kwargs={'project_pk': project.pk})
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': project.pk},
+        )
         request_data = [{
             'adviser': {
-                'id': str(adviser.pk)
+                'id': str(adviser.pk),
             },
             'role': 'Sector adviser',
         }]
@@ -2272,15 +2395,17 @@ class TestReplaceAllTeamMembersView(APITestMixin):
         project = InvestmentProjectFactory(created_by=creator)
 
         _, api_client = _create_user_and_api_client(
-            self, creator.dit_team, [InvestmentProjectPermission.change_associated]
+            self, creator.dit_team, [InvestmentProjectPermission.change_associated],
         )
-        url = reverse('api-v3:investment:team-member-collection',
-                      kwargs={'project_pk': project.pk})
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': project.pk},
+        )
         request_data = [{
             'adviser': {
-                'id': str(adviser.pk)
+                'id': str(adviser.pk),
             },
-            'role': 'Sector adviser'
+            'role': 'Sector adviser',
         }]
         response = api_client.put(url, data=request_data)
 
@@ -2306,8 +2431,10 @@ class TestReplaceAllTeamMembersView(APITestMixin):
         other_project = InvestmentProjectFactory()
         InvestmentProjectTeamMemberFactory(investment_project=other_project)
 
-        url = reverse('api-v3:investment:team-member-collection',
-                      kwargs={'project_pk': project.pk})
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': project.pk},
+        )
         request_data = []
         response = self.api_client.put(url, data=request_data)
 
@@ -2321,22 +2448,28 @@ class TestReplaceAllTeamMembersView(APITestMixin):
         project = InvestmentProjectFactory()
         advisers = AdviserFactory.create_batch(2)
 
-        url = reverse('api-v3:investment:team-member-collection',
-                      kwargs={'project_pk': project.pk})
-        request_data = [{
-            'adviser': None,
-            'role': 'Sector adviser'
-        }, {
-            'adviser': {
-                'id': str(advisers[0].pk)
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': project.pk},
+        )
+        request_data = [
+            {
+                'adviser': None,
+                'role': 'Sector adviser',
             },
-            'role': 'Sector adviser'
-        }, {
-            'adviser': {
-                'id': str(advisers[1].pk)
+            {
+                'adviser': {
+                    'id': str(advisers[0].pk),
+                },
+                'role': 'Sector adviser',
             },
-            'role': ''
-        }]
+            {
+                'adviser': {
+                    'id': str(advisers[1].pk),
+                },
+                'role': '',
+            },
+        ]
         response = self.api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -2344,7 +2477,7 @@ class TestReplaceAllTeamMembersView(APITestMixin):
         assert response_data == [
             {'adviser': ['This field may not be null.']},
             {},
-            {'role': ['This field may not be blank.']}
+            {'role': ['This field may not be blank.']},
         ]
 
     def test_replace_all_team_members_duplicate(self):
@@ -2352,24 +2485,30 @@ class TestReplaceAllTeamMembersView(APITestMixin):
         project = InvestmentProjectFactory()
         advisers = AdviserFactory.create_batch(2)
 
-        url = reverse('api-v3:investment:team-member-collection',
-                      kwargs={'project_pk': project.pk})
-        request_data = [{
-            'adviser': {
-                'id': str(advisers[0].pk)
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': project.pk},
+        )
+        request_data = [
+            {
+                'adviser': {
+                    'id': str(advisers[0].pk),
+                },
+                'role': 'Sector adviser',
             },
-            'role': 'Sector adviser'
-        }, {
-            'adviser': {
-                'id': str(advisers[1].pk)
+            {
+                'adviser': {
+                    'id': str(advisers[1].pk),
+                },
+                'role': 'Area adviser',
             },
-            'role': 'Area adviser'
-        }, {
-            'adviser': {
-                'id': str(advisers[0].pk)
+            {
+                'adviser': {
+                    'id': str(advisers[0].pk),
+                },
+                'role': 'Development adviser',
             },
-            'role': 'Development adviser'
-        }]
+        ]
         response = self.api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -2382,8 +2521,10 @@ class TestReplaceAllTeamMembersView(APITestMixin):
 
     def test_replace_all_team_members_non_existent_project(self):
         """Test that a 404 is returned for a non-existent project."""
-        url = reverse('api-v3:investment:team-member-collection',
-                      kwargs={'project_pk': uuid.uuid4()})
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={'project_pk': uuid.uuid4()},
+        )
         request_data = []
         response = self.api_client.put(url, data=request_data)
 
@@ -2393,24 +2534,33 @@ class TestReplaceAllTeamMembersView(APITestMixin):
 class TestDeleteAllTeamMembersView(APITestMixin):
     """Tests for the delete all team members view."""
 
-    @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.change_all,),
-        (InvestmentProjectPermission.change_associated, InvestmentProjectPermission.change_all),
-    ))
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            (InvestmentProjectPermission.change_all,),
+            (
+                InvestmentProjectPermission.change_associated,
+                InvestmentProjectPermission.change_all,
+            ),
+        ),
+    )
     def test_non_restricted_user_can_delete_all_team_members(self, permissions):
         """Test that a non-restricted user can remove all team members from a project."""
         project = InvestmentProjectFactory()
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project
+            2, investment_project=project,
         )
         InvestmentProjectTeamMemberFactory()
 
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(self, team, permissions)
 
-        url = reverse('api-v3:investment:team-member-collection', kwargs={
-            'project_pk': team_members[0].investment_project.pk
-        })
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={
+                'project_pk': team_members[0].investment_project.pk,
+            },
+        )
         response = api_client.delete(url)
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -2423,18 +2573,21 @@ class TestDeleteAllTeamMembersView(APITestMixin):
         """
         project = InvestmentProjectFactory()
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project
+            2, investment_project=project,
         )
         InvestmentProjectTeamMemberFactory()
 
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated]
+            self, team, [InvestmentProjectPermission.change_associated],
         )
 
-        url = reverse('api-v3:investment:team-member-collection', kwargs={
-            'project_pk': team_members[0].investment_project.pk
-        })
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={
+                'project_pk': team_members[0].investment_project.pk,
+            },
+        )
         response = api_client.delete(url)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -2446,17 +2599,20 @@ class TestDeleteAllTeamMembersView(APITestMixin):
         creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=creator)
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project
+            2, investment_project=project,
         )
         InvestmentProjectTeamMemberFactory()
 
         _, api_client = _create_user_and_api_client(
-            self, creator.dit_team, [InvestmentProjectPermission.change_associated]
+            self, creator.dit_team, [InvestmentProjectPermission.change_associated],
         )
 
-        url = reverse('api-v3:investment:team-member-collection', kwargs={
-            'project_pk': team_members[0].investment_project.pk
-        })
+        url = reverse(
+            'api-v3:investment:team-member-collection',
+            kwargs={
+                'project_pk': team_members[0].investment_project.pk,
+            },
+        )
         response = api_client.delete(url)
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -2467,17 +2623,23 @@ class TestDeleteAllTeamMembersView(APITestMixin):
 class TestGetTeamMemberView(APITestMixin):
     """Tests for the get team member view."""
 
-    @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.view_all,),
-        (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
-    ))
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            (InvestmentProjectPermission.view_all,),
+            (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
+        ),
+    )
     def test_non_restricted_user_can_get_team_member(self, permissions):
         """Test that a non-restricted user can get a team member."""
         team_member = InvestmentProjectTeamMemberFactory()
-        url = reverse('api-v3:investment:team-member-item', kwargs={
-            'project_pk': team_member.investment_project.pk,
-            'adviser_pk': team_member.adviser.pk
-        })
+        url = reverse(
+            'api-v3:investment:team-member-item',
+            kwargs={
+                'project_pk': team_member.investment_project.pk,
+                'adviser_pk': team_member.adviser.pk,
+            },
+        )
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(self, team, permissions)
         response = api_client.get(url)
@@ -2489,13 +2651,16 @@ class TestGetTeamMemberView(APITestMixin):
     def test_restricted_user_cannot_get_team_member_of_non_associated_project(self):
         """Test that a restricted user cannot get a team member of a non-associated project."""
         team_member = InvestmentProjectTeamMemberFactory()
-        url = reverse('api-v3:investment:team-member-item', kwargs={
-            'project_pk': team_member.investment_project.pk,
-            'adviser_pk': team_member.adviser.pk
-        })
+        url = reverse(
+            'api-v3:investment:team-member-item',
+            kwargs={
+                'project_pk': team_member.investment_project.pk,
+                'adviser_pk': team_member.adviser.pk,
+            },
+        )
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.view_associated]
+            self, team, [InvestmentProjectPermission.view_associated],
         )
         response = api_client.get(url)
 
@@ -2506,12 +2671,15 @@ class TestGetTeamMemberView(APITestMixin):
         creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=creator)
         team_member = InvestmentProjectTeamMemberFactory(investment_project=project)
-        url = reverse('api-v3:investment:team-member-item', kwargs={
-            'project_pk': team_member.investment_project.pk,
-            'adviser_pk': team_member.adviser.pk
-        })
+        url = reverse(
+            'api-v3:investment:team-member-item',
+            kwargs={
+                'project_pk': team_member.investment_project.pk,
+                'adviser_pk': team_member.adviser.pk,
+            },
+        )
         _, api_client = _create_user_and_api_client(
-            self, creator.dit_team, [InvestmentProjectPermission.view_associated]
+            self, creator.dit_team, [InvestmentProjectPermission.view_associated],
         )
         response = api_client.get(url)
 
@@ -2522,10 +2690,13 @@ class TestGetTeamMemberView(APITestMixin):
     def test_get_team_member_nonexistent_adviser(self):
         """Tests getting a non-existent project team member."""
         project = InvestmentProjectFactory()
-        url = reverse('api-v3:investment:team-member-item', kwargs={
-            'project_pk': project.pk,
-            'adviser_pk': uuid.uuid4()
-        })
+        url = reverse(
+            'api-v3:investment:team-member-item',
+            kwargs={
+                'project_pk': project.pk,
+                'adviser_pk': uuid.uuid4(),
+            },
+        )
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -2533,10 +2704,13 @@ class TestGetTeamMemberView(APITestMixin):
     def test_get_team_member_nonexistent_project(self):
         """Tests getting a project team member for a non-existent project."""
         adviser = AdviserFactory()
-        url = reverse('api-v3:investment:team-member-item', kwargs={
-            'project_pk': uuid.uuid4(),
-            'adviser_pk': adviser.pk
-        })
+        url = reverse(
+            'api-v3:investment:team-member-item',
+            kwargs={
+                'project_pk': uuid.uuid4(),
+                'adviser_pk': adviser.pk,
+            },
+        )
         response = self.api_client.get(url)
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -2545,19 +2719,28 @@ class TestGetTeamMemberView(APITestMixin):
 class TestUpdateTeamMemberView(APITestMixin):
     """Tests for the update team member view."""
 
-    @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.change_all,),
-        (InvestmentProjectPermission.change_associated, InvestmentProjectPermission.change_all),
-    ))
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            (InvestmentProjectPermission.change_all,),
+            (
+                InvestmentProjectPermission.change_associated,
+                InvestmentProjectPermission.change_all,
+            ),
+        ),
+    )
     def test_non_restricted_user_can_patch_team_member(self, permissions):
         """Test that a non-restricted user can update a team member."""
         team_member = InvestmentProjectTeamMemberFactory()
-        url = reverse('api-v3:investment:team-member-item', kwargs={
-            'project_pk': team_member.investment_project.pk,
-            'adviser_pk': team_member.adviser.pk
-        })
+        url = reverse(
+            'api-v3:investment:team-member-item',
+            kwargs={
+                'project_pk': team_member.investment_project.pk,
+                'adviser_pk': team_member.adviser.pk,
+            },
+        )
         request_data = {
-            'role': 'updated role'
+            'role': 'updated role',
         }
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(self, team, permissions)
@@ -2570,16 +2753,19 @@ class TestUpdateTeamMemberView(APITestMixin):
     def test_restricted_user_cannot_patch_team_member_of_non_associated_project(self):
         """Test that a restricted user cannot update a team member of a non-associated project."""
         team_member = InvestmentProjectTeamMemberFactory()
-        url = reverse('api-v3:investment:team-member-item', kwargs={
-            'project_pk': team_member.investment_project.pk,
-            'adviser_pk': team_member.adviser.pk
-        })
+        url = reverse(
+            'api-v3:investment:team-member-item',
+            kwargs={
+                'project_pk': team_member.investment_project.pk,
+                'adviser_pk': team_member.adviser.pk,
+            },
+        )
         request_data = {
-            'role': 'updated role'
+            'role': 'updated role',
         }
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated]
+            self, team, [InvestmentProjectPermission.change_associated],
         )
         response = api_client.patch(url, data=request_data)
 
@@ -2590,15 +2776,18 @@ class TestUpdateTeamMemberView(APITestMixin):
         creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=creator)
         team_member = InvestmentProjectTeamMemberFactory(investment_project=project)
-        url = reverse('api-v3:investment:team-member-item', kwargs={
-            'project_pk': team_member.investment_project.pk,
-            'adviser_pk': team_member.adviser.pk
-        })
+        url = reverse(
+            'api-v3:investment:team-member-item',
+            kwargs={
+                'project_pk': team_member.investment_project.pk,
+                'adviser_pk': team_member.adviser.pk,
+            },
+        )
         request_data = {
-            'role': 'updated role'
+            'role': 'updated role',
         }
         _, api_client = _create_user_and_api_client(
-            self, creator.dit_team, [InvestmentProjectPermission.change_associated]
+            self, creator.dit_team, [InvestmentProjectPermission.change_associated],
         )
         response = api_client.patch(url, data=request_data)
 
@@ -2610,20 +2799,29 @@ class TestUpdateTeamMemberView(APITestMixin):
 class TestDeleteTeamMemberView(APITestMixin):
     """Tests for the delete team member views."""
 
-    @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.change_all,),
-        (InvestmentProjectPermission.change_associated, InvestmentProjectPermission.change_all),
-    ))
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            (InvestmentProjectPermission.change_all,),
+            (
+                InvestmentProjectPermission.change_associated,
+                InvestmentProjectPermission.change_all,
+            ),
+        ),
+    )
     def test_non_restricted_user_can_delete_team_member(self, permissions):
         """Test that a non-restricted user can remove a team member from a project."""
         project = InvestmentProjectFactory()
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project
+            2, investment_project=project,
         )
-        url = reverse('api-v3:investment:team-member-item', kwargs={
-            'project_pk': team_members[0].investment_project.pk,
-            'adviser_pk': team_members[0].adviser.pk
-        })
+        url = reverse(
+            'api-v3:investment:team-member-item',
+            kwargs={
+                'project_pk': team_members[0].investment_project.pk,
+                'adviser_pk': team_members[0].adviser.pk,
+            },
+        )
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(self, team, permissions)
         response = api_client.delete(url)
@@ -2640,15 +2838,18 @@ class TestDeleteTeamMemberView(APITestMixin):
         """
         project = InvestmentProjectFactory()
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project
+            2, investment_project=project,
         )
-        url = reverse('api-v3:investment:team-member-item', kwargs={
-            'project_pk': team_members[0].investment_project.pk,
-            'adviser_pk': team_members[0].adviser.pk
-        })
+        url = reverse(
+            'api-v3:investment:team-member-item',
+            kwargs={
+                'project_pk': team_members[0].investment_project.pk,
+                'adviser_pk': team_members[0].adviser.pk,
+            },
+        )
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated]
+            self, team, [InvestmentProjectPermission.change_associated],
         )
         response = api_client.delete(url)
 
@@ -2662,14 +2863,17 @@ class TestDeleteTeamMemberView(APITestMixin):
         creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=creator)
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project
+            2, investment_project=project,
         )
-        url = reverse('api-v3:investment:team-member-item', kwargs={
-            'project_pk': team_members[0].investment_project.pk,
-            'adviser_pk': team_members[0].adviser.pk
-        })
+        url = reverse(
+            'api-v3:investment:team-member-item',
+            kwargs={
+                'project_pk': team_members[0].investment_project.pk,
+                'adviser_pk': team_members[0].adviser.pk,
+            },
+        )
         _, api_client = _create_user_and_api_client(
-            self, creator.dit_team, [InvestmentProjectPermission.change_associated]
+            self, creator.dit_team, [InvestmentProjectPermission.change_associated],
         )
         response = api_client.delete(url)
 
@@ -2691,15 +2895,15 @@ class TestTeamMemberVersioning(APITestMixin):
 
         url = reverse(
             'api-v3:investment:team-member-collection',
-            kwargs={'project_pk': project.pk}
+            kwargs={'project_pk': project.pk},
         )
         response = self.api_client.post(
             url,
             data={
                 'adviser': {
-                    'id': str(adviser.pk)
+                    'id': str(adviser.pk),
                 },
-                'role': 'Sector adviser'
+                'role': 'Sector adviser',
             },
         )
 
@@ -2724,7 +2928,7 @@ class TestTeamMemberVersioning(APITestMixin):
 
         url = reverse(
             'api-v3:investment:team-member-collection',
-            kwargs={'project_pk': InvestmentProjectFactory().pk}
+            kwargs={'project_pk': InvestmentProjectFactory().pk},
         )
         response = self.api_client.post(
             url,
@@ -2744,18 +2948,18 @@ class TestTeamMemberVersioning(APITestMixin):
         advisers = AdviserFactory.create_batch(2)
         advisers.sort(key=attrgetter('id'))
         InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project
+            2, investment_project=project,
         )
 
         url = reverse(
             'api-v3:investment:team-member-collection',
-            kwargs={'project_pk': project.pk}
+            kwargs={'project_pk': project.pk},
         )
         request_data = [{
             'adviser': {
-                'id': str(adviser.pk)
+                'id': str(adviser.pk),
             },
-            'role': 'Sector adviser'
+            'role': 'Sector adviser',
         } for adviser in advisers]
         response = self.api_client.put(url, data=request_data)
 
@@ -2792,35 +2996,39 @@ class TestTeamMemberVersioning(APITestMixin):
 
         project = InvestmentProjectFactory()
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project, role='Old role'
+            2, investment_project=project, role='Old role',
         )
 
         url = reverse(
             'api-v3:investment:team-member-collection',
-            kwargs={'project_pk': project.pk}
+            kwargs={'project_pk': project.pk},
         )
-        request_data = [{
-            'adviser': {
-                'id': str(team_member.adviser.pk)
-            },
-            'role': 'New role'
-        } for team_member in team_members]
+        request_data = [
+            {
+                'adviser': {
+                    'id': str(team_member.adviser.pk),
+                },
+                'role': 'New role',
+            } for team_member in team_members
+        ]
         response = self.api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data == [{
-            'adviser': {
-                'id': str(team_member.adviser.pk),
-                'first_name': team_member.adviser.first_name,
-                'last_name': team_member.adviser.last_name,
-                'name': team_member.adviser.name,
-            },
-            'investment_project': {
-                'id': str(project.pk),
-                'name': project.name,
-            },
-            'role': 'New role',
-        } for team_member in team_members]
+        assert response.data == [
+            {
+                'adviser': {
+                    'id': str(team_member.adviser.pk),
+                    'first_name': team_member.adviser.first_name,
+                    'last_name': team_member.adviser.last_name,
+                    'name': team_member.adviser.name,
+                },
+                'investment_project': {
+                    'id': str(project.pk),
+                    'name': project.name,
+                },
+                'role': 'New role',
+            } for team_member in team_members
+        ]
 
         # check version created
         assert Version.objects.count() == 2
@@ -2839,22 +3047,26 @@ class TestTeamMemberVersioning(APITestMixin):
 
         url = reverse(
             'api-v3:investment:team-member-collection',
-            kwargs={'project_pk': project.pk}
+            kwargs={'project_pk': project.pk},
         )
-        request_data = [{
-            'adviser': None,
-            'role': 'Sector adviser'
-        }, {
-            'adviser': {
-                'id': str(advisers[0].pk)
+        request_data = [
+            {
+                'adviser': None,
+                'role': 'Sector adviser',
             },
-            'role': 'Sector adviser'
-        }, {
-            'adviser': {
-                'id': str(advisers[1].pk)
+            {
+                'adviser': {
+                    'id': str(advisers[0].pk),
+                },
+                'role': 'Sector adviser',
             },
-            'role': ''
-        }]
+            {
+                'adviser': {
+                    'id': str(advisers[1].pk),
+                },
+                'role': '',
+            },
+        ]
         response = self.api_client.put(url, data=request_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -2866,15 +3078,15 @@ class TestTeamMemberVersioning(APITestMixin):
 
         project = InvestmentProjectFactory()
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project
+            2, investment_project=project,
         )
         InvestmentProjectTeamMemberFactory()
 
         url = reverse(
             'api-v3:investment:team-member-collection',
             kwargs={
-                'project_pk': team_members[0].investment_project.pk
-            }
+                'project_pk': team_members[0].investment_project.pk,
+            },
         )
         response = self.api_client.delete(url)
 
@@ -2890,13 +3102,13 @@ class TestTeamMemberVersioning(APITestMixin):
             'api-v3:investment:team-member-item',
             kwargs={
                 'project_pk': team_member.investment_project.pk,
-                'adviser_pk': team_member.adviser.pk
-            }
+                'adviser_pk': team_member.adviser.pk,
+            },
         )
         response = self.api_client.patch(
             url,
             data={
-                'role': 'updated role'
+                'role': 'updated role',
             },
         )
 
@@ -2913,10 +3125,13 @@ class TestTeamMemberVersioning(APITestMixin):
 class TestAuditLogView(APITestMixin):
     """Tests for the audit log view."""
 
-    @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.view_all,),
-        (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
-    ))
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            (InvestmentProjectPermission.view_all,),
+            (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
+        ),
+    )
     def test_audit_log_non_restricted_user(self, permissions):
         """Test retrieval of audit log for a non-restricted user."""
         team = TeamFactory()
@@ -2943,8 +3158,10 @@ class TestAuditLogView(APITestMixin):
 
         versions = Version.objects.get_for_object(iproject)
         version_id = versions[0].id
-        url = reverse('api-v3:investment:audit-item',
-                      kwargs={'pk': iproject.pk})
+        url = reverse(
+            'api-v3:investment:audit-item',
+            kwargs={'pk': iproject.pk},
+        )
 
         response = api_client.get(url)
         response_data = response.json()['results']
@@ -2967,7 +3184,7 @@ class TestAuditLogView(APITestMixin):
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
         user, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.view_associated]
+            self, team, [InvestmentProjectPermission.view_associated],
         )
 
         initial_datetime = now()
@@ -2992,8 +3209,10 @@ class TestAuditLogView(APITestMixin):
 
         versions = Version.objects.get_for_object(iproject)
         version_id = versions[0].id
-        url = reverse('api-v3:investment:audit-item',
-                      kwargs={'pk': iproject.pk})
+        url = reverse(
+            'api-v3:investment:audit-item',
+            kwargs={'pk': iproject.pk},
+        )
 
         response = api_client.get(url)
         response_data = response.json()['results']
@@ -3015,7 +3234,7 @@ class TestAuditLogView(APITestMixin):
         """Test retrieval of audit log for a restricted user and a non-associated project."""
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.view_associated]
+            self, team, [InvestmentProjectPermission.view_associated],
         )
 
         iproject = InvestmentProjectFactory(
@@ -3030,21 +3249,32 @@ class TestAuditLogView(APITestMixin):
 class TestArchiveViews(APITestMixin):
     """Tests for the archive and unarchive views."""
 
-    @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.change_all,),
-        (InvestmentProjectPermission.change_associated, InvestmentProjectPermission.change_all),
-    ))
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            (InvestmentProjectPermission.change_all,),
+            (
+                InvestmentProjectPermission.change_associated,
+                InvestmentProjectPermission.change_all,
+            ),
+        ),
+    )
     def test_archive_project_non_restricted_user(self, permissions):
         """Tests archiving a project for a non-restricted user."""
         team = TeamFactory()
         user, api_client = _create_user_and_api_client(self, team, permissions)
 
         project = InvestmentProjectFactory()
-        url = reverse('api-v3:investment:archive-item',
-                      kwargs={'pk': project.pk})
-        response = api_client.post(url, data={
-            'reason': 'archive reason'
-        })
+        url = reverse(
+            'api-v3:investment:archive-item',
+            kwargs={'pk': project.pk},
+        )
+        response = api_client.post(
+            url,
+            data={
+                'reason': 'archive reason',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -3057,15 +3287,20 @@ class TestArchiveViews(APITestMixin):
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
         user, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated]
+            self, team, [InvestmentProjectPermission.change_associated],
         )
 
         project = InvestmentProjectFactory(created_by=adviser)
-        url = reverse('api-v3:investment:archive-item',
-                      kwargs={'pk': project.pk})
-        response = api_client.post(url, data={
-            'reason': 'archive reason'
-        })
+        url = reverse(
+            'api-v3:investment:archive-item',
+            kwargs={'pk': project.pk},
+        )
+        response = api_client.post(
+            url,
+            data={
+                'reason': 'archive reason',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -3077,72 +3312,97 @@ class TestArchiveViews(APITestMixin):
         """Test that a restricted user cannot archive a non-associated project."""
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated]
+            self, team, [InvestmentProjectPermission.change_associated],
         )
 
         project = InvestmentProjectFactory()
-        url = reverse('api-v3:investment:archive-item',
-                      kwargs={'pk': project.pk})
-        response = api_client.post(url, data={
-            'reason': 'archive reason'
-        })
+        url = reverse(
+            'api-v3:investment:archive-item',
+            kwargs={'pk': project.pk},
+        )
+        response = api_client.post(
+            url,
+            data={
+                'reason': 'archive reason',
+            },
+        )
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_archive_fail_no_reason(self):
         """Test archive a project without providing a reason."""
         project = InvestmentProjectFactory()
-        url = reverse('api-v3:investment:archive-item',
-                      kwargs={'pk': project.pk})
+        url = reverse(
+            'api-v3:investment:archive-item',
+            kwargs={'pk': project.pk},
+        )
         response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
-            'reason': ['This field is required.']
+            'reason': ['This field is required.'],
         }
 
     def test_archive_fail_blank_reason(self):
         """Test archive a project without providing a reason."""
         project = InvestmentProjectFactory()
-        url = reverse('api-v3:investment:archive-item',
-                      kwargs={'pk': project.pk})
-        response = self.api_client.post(url, data={
-            'reason': ''
-        })
+        url = reverse(
+            'api-v3:investment:archive-item',
+            kwargs={'pk': project.pk},
+        )
+        response = self.api_client.post(
+            url,
+            data={
+                'reason': '',
+            },
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
-            'reason': ['This field may not be blank.']
+            'reason': ['This field may not be blank.'],
         }
 
     def test_archive_fail_null_reason(self):
         """Test archive a project with a null reason."""
         project = InvestmentProjectFactory()
-        url = reverse('api-v3:investment:archive-item',
-                      kwargs={'pk': project.pk})
-        response = self.api_client.post(url, data={
-            'reason': None
-        })
+        url = reverse(
+            'api-v3:investment:archive-item',
+            kwargs={'pk': project.pk},
+        )
+        response = self.api_client.post(
+            url,
+            data={
+                'reason': None,
+            },
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data == {
-            'reason': ['This field may not be null.']
+            'reason': ['This field may not be null.'],
         }
 
-    @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.change_all,),
-        (InvestmentProjectPermission.change_associated, InvestmentProjectPermission.change_all),
-    ))
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            (InvestmentProjectPermission.change_all,),
+            (
+                InvestmentProjectPermission.change_associated,
+                InvestmentProjectPermission.change_all,
+            ),
+        ),
+    )
     def test_unarchive_project_non_restricted_user(self, permissions):
         """Tests unarchiving a project for a non-restricted user."""
         team = TeamFactory()
         _, api_client = _create_user_and_api_client(self, team, permissions)
 
         project = InvestmentProjectFactory(
-            archived=True, archived_reason='reason'
+            archived=True, archived_reason='reason',
         )
-        url = reverse('api-v3:investment:unarchive-item',
-                      kwargs={'pk': project.pk})
+        url = reverse(
+            'api-v3:investment:unarchive-item',
+            kwargs={'pk': project.pk},
+        )
         response = api_client.post(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -3156,7 +3416,7 @@ class TestArchiveViews(APITestMixin):
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated]
+            self, team, [InvestmentProjectPermission.change_associated],
         )
 
         project = InvestmentProjectFactory(
@@ -3164,8 +3424,10 @@ class TestArchiveViews(APITestMixin):
             archived_reason='reason',
             created_by=adviser,
         )
-        url = reverse('api-v3:investment:unarchive-item',
-                      kwargs={'pk': project.pk})
+        url = reverse(
+            'api-v3:investment:unarchive-item',
+            kwargs={'pk': project.pk},
+        )
         response = api_client.post(url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -3179,15 +3441,17 @@ class TestArchiveViews(APITestMixin):
         team = TeamFactory()
         AdviserFactory(dit_team_id=team.id)
         _, api_client = _create_user_and_api_client(
-            self, team, [InvestmentProjectPermission.change_associated]
+            self, team, [InvestmentProjectPermission.change_associated],
         )
 
         project = InvestmentProjectFactory(
             archived=True,
             archived_reason='reason',
         )
-        url = reverse('api-v3:investment:unarchive-item',
-                      kwargs={'pk': project.pk})
+        url = reverse(
+            'api-v3:investment:unarchive-item',
+            kwargs={'pk': project.pk},
+        )
         response = api_client.post(url)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
