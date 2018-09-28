@@ -143,10 +143,6 @@ class ContactSerializer(PermittedFieldsModelSerializer):
     """Contact serializer for writing operations V3."""
 
     default_error_messages = {
-        'contact_preferences_required': ugettext_lazy(
-            'A contact should have at least one way of being contacted. Please select either '
-            'email or phone, or both.',
-        ),
         'address_same_as_company_and_has_address': ugettext_lazy(
             'Please select either address_same_as_company or enter an address manually, not both!',
         ),
@@ -196,12 +192,7 @@ class ContactSerializer(PermittedFieldsModelSerializer):
             'telephone_alternative',
             'email_alternative',
             'notes',
-            'contactable_by_dit',
-            'contactable_by_uk_dit_partners',
-            'contactable_by_overseas_dit_partners',
             'accepts_dit_email_marketing',
-            'contactable_by_email',
-            'contactable_by_phone',
             'archived',
             'archived_documents_url_path',
             'archived_on',
@@ -217,16 +208,6 @@ class ContactSerializer(PermittedFieldsModelSerializer):
             NotArchivedValidator(),
             RulesBasedValidator(
                 ValidationRule(
-                    'contact_preferences_required',
-                    OperatorRule('contactable_by_email', bool),
-                    when=OperatorRule('contactable_by_phone', not_),
-                ),
-                ValidationRule(
-                    'contact_preferences_required',
-                    OperatorRule('contactable_by_phone', bool),
-                    when=OperatorRule('contactable_by_email', not_),
-                ),
-                ValidationRule(
                     'address_same_as_company_and_has_address',
                     OperatorRule('address_same_as_company', not_),
                     when=AnyIsNotBlankRule(*Contact.ADDRESS_VALIDATION_MAPPING.keys()),
@@ -241,10 +222,6 @@ class ContactSerializer(PermittedFieldsModelSerializer):
             # address_same_as_company rules run first.
             AddressValidator(lazy=True, fields_mapping=Contact.ADDRESS_VALIDATION_MAPPING),
         ]
-        extra_kwargs = {
-            'contactable_by_email': {'default': True},
-            'contactable_by_phone': {'default': True},
-        }
         permissions = {
             f'company.{ContactPermission.view_contact_document}': 'archived_documents_url_path',
         }
