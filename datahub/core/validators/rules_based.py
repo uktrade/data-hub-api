@@ -39,9 +39,11 @@ class BaseRule(AbstractRule):
 class OperatorRule(BaseRule):
     """Simple operator-based rule for a field."""
 
-    def __init__(self,
-                 field: str,
-                 operator_: Callable):
+    def __init__(
+        self,
+        field: str,
+        operator_: Callable,
+    ):
         """
         Initialises the rule.
 
@@ -170,10 +172,12 @@ class ValidationRule(AbstractValidationRule):
     Used with RulesBasedValidator.
     """
 
-    def __init__(self,
-                 error_key: str,
-                 *rules: AbstractRule,
-                 when: AbstractRule=None):
+    def __init__(
+        self,
+        error_key: str,
+        *rules: AbstractRule,
+        when: AbstractRule=None,
+    ):
         """
         Initialises a validation rule.
 
@@ -192,7 +196,7 @@ class ValidationRule(AbstractValidationRule):
             if not rule(combiner):
                 error = FieldAndError(
                     rule.field or api_settings.NON_FIELD_ERRORS_KEY,
-                    self._error_key
+                    self._error_key,
                 )
                 errors.append(error)
         return errors

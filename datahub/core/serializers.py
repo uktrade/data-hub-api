@@ -30,7 +30,7 @@ class PermittedFieldsModelSerializer(serializers.ModelSerializer):
         """Gets filtered dictionary of fields based on permissions."""
         assert hasattr(self.Meta, 'permissions'), (
             'Class {serializer_class} missing "Meta.permissions" attribute'.format(
-                serializer_class=self.__class__.__name__
+                serializer_class=self.__class__.__name__,
             )
         )
 
@@ -113,7 +113,7 @@ class NestedRelatedField(serializers.RelatedField):
         }
         return {
             **extra,
-            'id': self.pk_field.to_representation(value.pk)
+            'id': self.pk_field.to_representation(value.pk),
         }
 
     def get_choices(self, cutoff=None):
@@ -132,7 +132,7 @@ class NestedRelatedField(serializers.RelatedField):
         return _Choices(
             (
                 self.pk_field.to_representation(item.pk),
-                self.display_value(item)
+                self.display_value(item),
             )
             for item in queryset
         )
@@ -148,7 +148,7 @@ class RelaxedDateTimeField(serializers.Field):
     """
 
     default_error_messages = {
-        'invalid': 'Date is in incorrect format.'
+        'invalid': 'Date is in incorrect format.',
     }
 
     def to_internal_value(self, data):

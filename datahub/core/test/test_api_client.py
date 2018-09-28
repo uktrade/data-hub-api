@@ -32,10 +32,14 @@ class TestHawkAuth:
         auth(request)
 
         request.register_hook.assert_called_once()
-        response = Mock(content=b'', ok=True, headers={
-            'Server-Authorization': 'test',
-            'Content-Type': 'test/test',
-        })
+        response = Mock(
+            content=b'',
+            ok=True,
+            headers={
+                'Server-Authorization': 'test',
+                'Content-Type': 'test/test',
+            },
+        )
 
         with pytest.raises(ValueError):
             request.register_hook.call_args[0][1](response)

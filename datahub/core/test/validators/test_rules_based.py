@@ -16,10 +16,13 @@ from datahub.core.validators import (
 )
 
 
-@pytest.mark.parametrize('data,field,op,res', (
-    ({'colour': 'red'}, 'colour', lambda val: val == 'red', True),
-    ({'colour': 'red'}, 'colour', lambda val: val == 'blue', False),
-))
+@pytest.mark.parametrize(
+    'data,field,op,res',
+    (
+        ({'colour': 'red'}, 'colour', lambda val: val == 'red', True),
+        ({'colour': 'red'}, 'colour', lambda val: val == 'blue', False),
+    ),
+)
 def test_operator_rule(data, field, op, res):
     """Tests ValidationCondition for various cases."""
     combiner = Mock(spec_set=DataCombiner, __getitem__=lambda self, field_: data[field_])
@@ -27,10 +30,13 @@ def test_operator_rule(data, field, op, res):
     assert condition(combiner) == res
 
 
-@pytest.mark.parametrize('data,field,test_value,res', (
-    ({'colour': 'red'}, 'colour', 'red', True),
-    ({'colour': 'red'}, 'colour', 'blue', False),
-))
+@pytest.mark.parametrize(
+    'data,field,test_value,res',
+    (
+        ({'colour': 'red'}, 'colour', 'red', True),
+        ({'colour': 'red'}, 'colour', 'blue', False),
+    ),
+)
 def test_equals_rule(data, field, test_value, res):
     """Tests ValidationCondition for various cases."""
     combiner = Mock(spec_set=DataCombiner, __getitem__=lambda self, field_: data[field_])
@@ -38,10 +44,13 @@ def test_equals_rule(data, field, test_value, res):
     assert condition(combiner) == res
 
 
-@pytest.mark.parametrize('data,field,test_value,res', (
-    ({'colour': 'red'}, 'colour', ['red', 'green'], True),
-    ({'colour': 'red'}, 'colour', ['blue', 'green'], False),
-))
+@pytest.mark.parametrize(
+    'data,field,test_value,res',
+    (
+        ({'colour': 'red'}, 'colour', ['red', 'green'], True),
+        ({'colour': 'red'}, 'colour', ['blue', 'green'], False),
+    ),
+)
 def test_in_rule(data, field, test_value, res):
     """Tests InRule for various cases."""
     combiner = Mock(spec_set=DataCombiner, __getitem__=lambda self, field_: data[field_])
@@ -49,12 +58,15 @@ def test_in_rule(data, field, test_value, res):
     assert condition(combiner) == res
 
 
-@pytest.mark.parametrize('rule_res,when_res,res', (
-    (True, True, True),
-    (False, True, False),
-    (True, False, True),
-    (False, False, True),
-))
+@pytest.mark.parametrize(
+    'rule_res,when_res,res',
+    (
+        (True, True, True),
+        (False, True, False),
+        (True, False, True),
+        (False, False, True),
+    ),
+)
 def test_conditional_rule(rule_res, when_res, res):
     """Tests ConditionalRule for various cases."""
     combiner = Mock(spec_set=DataCombiner)
@@ -70,38 +82,41 @@ def _make_stub_rule(field, is_valid):
     return Mock(return_value=is_valid, field=field)
 
 
-@pytest.mark.parametrize('rules,when,res', (
+@pytest.mark.parametrize(
+    'rules,when,res',
     (
-        (_make_stub_rule('field1', False),),
-        _make_stub_rule('field_when', True),
-        [FieldAndError('field1', 'error')],
+        (
+            (_make_stub_rule('field1', False),),
+            _make_stub_rule('field_when', True),
+            [FieldAndError('field1', 'error')],
+        ),
+        (
+            (_make_stub_rule('field1', False), _make_stub_rule('field2', False)),
+            _make_stub_rule('field_when', True),
+            [FieldAndError('field1', 'error'), FieldAndError('field2', 'error')],
+        ),
+        (
+            (_make_stub_rule('field1', True), _make_stub_rule('field2', False)),
+            _make_stub_rule('field_when', True),
+            [FieldAndError('field2', 'error')],
+        ),
+        (
+            (_make_stub_rule('field1', True),),
+            _make_stub_rule('field_when', False),
+            [],
+        ),
+        (
+            (_make_stub_rule('field1', False),),
+            _make_stub_rule('field_when', False),
+            [],
+        ),
+        (
+            (_make_stub_rule(None, False),),
+            _make_stub_rule('field_when', True),
+            [FieldAndError('non_field_errors', 'error')],
+        ),
     ),
-    (
-        (_make_stub_rule('field1', False), _make_stub_rule('field2', False),),
-        _make_stub_rule('field_when', True),
-        [FieldAndError('field1', 'error'), FieldAndError('field2', 'error')],
-    ),
-    (
-        (_make_stub_rule('field1', True), _make_stub_rule('field2', False),),
-        _make_stub_rule('field_when', True),
-        [FieldAndError('field2', 'error')],
-    ),
-    (
-        (_make_stub_rule('field1', True),),
-        _make_stub_rule('field_when', False),
-        [],
-    ),
-    (
-        (_make_stub_rule('field1', False),),
-        _make_stub_rule('field_when', False),
-        [],
-    ),
-    (
-        (_make_stub_rule(None, False),),
-        _make_stub_rule('field_when', True),
-        [FieldAndError('non_field_errors', 'error')],
-    ),
-))
+)
 def test_validation_rule(rules, when, res):
     """Tests ValidationRule for various cases."""
     combiner = Mock(spec_set=DataCombiner)
@@ -116,10 +131,13 @@ def _make_stub_validation_rule(errors=None):
 class TestRulesBasedValidator:
     """RulesBasedValidator tests."""
 
-    @pytest.mark.parametrize('rules', (
-        (_make_stub_validation_rule([]),),
-        (_make_stub_validation_rule([]), _make_stub_validation_rule([])),
-    ))
+    @pytest.mark.parametrize(
+        'rules',
+        (
+            (_make_stub_validation_rule([]),),
+            (_make_stub_validation_rule([]), _make_stub_validation_rule([])),
+        ),
+    )
     def test_validation_passes(self, rules):
         """Test that validation passes when the rules pass."""
         instance = Mock()
@@ -128,42 +146,47 @@ class TestRulesBasedValidator:
         validator.set_context(serializer)
         assert validator({}) is None
 
-    @pytest.mark.parametrize('rules,errors', (
+    @pytest.mark.parametrize(
+        'rules,errors',
         (
             (
-                _make_stub_validation_rule([FieldAndError('field1', 'error')]),
+                (
+                    _make_stub_validation_rule([FieldAndError('field1', 'error')]),
+                ),
+                {'field1': ['test error']},
             ),
-            {'field1': ['test error']}
-        ),
-        (
             (
-                _make_stub_validation_rule([FieldAndError('field1', 'error')]),
-                _make_stub_validation_rule([FieldAndError('field2', 'error')]),
+                (
+                    _make_stub_validation_rule([FieldAndError('field1', 'error')]),
+                    _make_stub_validation_rule([FieldAndError('field2', 'error')]),
+                ),
+                {'field1': ['test error'], 'field2': ['test error']},
             ),
-            {'field1': ['test error'], 'field2': ['test error']}
-        ),
-        (
             (
-                _make_stub_validation_rule([FieldAndError('field1', 'error')]),
-                _make_stub_validation_rule([]),
+                (
+                    _make_stub_validation_rule([FieldAndError('field1', 'error')]),
+                    _make_stub_validation_rule([]),
+                ),
+                {'field1': ['test error']},
             ),
-            {'field1': ['test error']}
-        ),
-        (
             (
-                _make_stub_validation_rule([FieldAndError('field1', 'error')]),
-                _make_stub_validation_rule([FieldAndError('field1', 'error2')]),
+                (
+                    _make_stub_validation_rule([FieldAndError('field1', 'error')]),
+                    _make_stub_validation_rule([FieldAndError('field1', 'error2')]),
+                ),
+                {'field1': ['test error', 'test error 2']},
             ),
-            {'field1': ['test error', 'test error 2']}
         ),
-    ))
+    )
     def test_validation_fails(self, rules, errors):
         """Test that validation fails when any rule fails."""
         instance = Mock()
-        serializer = Mock(instance=instance, error_messages={
-            'error': 'test error',
-            'error2': 'test error 2',
-        })
+        serializer = Mock(
+            instance=instance, error_messages={
+                'error': 'test error',
+                'error2': 'test error 2',
+            },
+        )
         validator = RulesBasedValidator(*rules)
         validator.set_context(serializer)
         with pytest.raises(ValidationError) as excinfo:
@@ -174,20 +197,23 @@ class TestRulesBasedValidator:
 class TestRequiredUnlessAlreadyBlankValidator:
     """RequiredUnlessAlreadyBlank tests."""
 
-    @pytest.mark.parametrize('create_data,update_data,partial,should_raise', (
-        ({'field1': None}, {'field1': None}, False, False),
-        ({'field1': None}, {'field1': None}, True, False),
-        ({'field1': None}, {'field1': 'blah'}, False, False),
-        ({'field1': None}, {'field1': 'blah'}, True, False),
-        ({'field1': None}, {}, False, False),
-        ({'field1': None}, {}, True, False),
-        ({'field1': 'blah'}, {'field1': None}, False, True),
-        ({'field1': 'blah'}, {'field1': None}, True, True),
-        ({'field1': 'blah'}, {'field1': 'blah'}, False, False),
-        ({'field1': 'blah'}, {'field1': 'blah'}, True, False),
-        ({'field1': 'blah'}, {}, False, True),
-        ({'field1': 'blah'}, {}, True, False),
-    ))
+    @pytest.mark.parametrize(
+        'create_data,update_data,partial,should_raise',
+        (
+            ({'field1': None}, {'field1': None}, False, False),
+            ({'field1': None}, {'field1': None}, True, False),
+            ({'field1': None}, {'field1': 'blah'}, False, False),
+            ({'field1': None}, {'field1': 'blah'}, True, False),
+            ({'field1': None}, {}, False, False),
+            ({'field1': None}, {}, True, False),
+            ({'field1': 'blah'}, {'field1': None}, False, True),
+            ({'field1': 'blah'}, {'field1': None}, True, True),
+            ({'field1': 'blah'}, {'field1': 'blah'}, False, False),
+            ({'field1': 'blah'}, {'field1': 'blah'}, True, False),
+            ({'field1': 'blah'}, {}, False, True),
+            ({'field1': 'blah'}, {}, True, False),
+        ),
+    )
     def test_update(self, create_data, update_data, partial, should_raise):
         """Tests validation during updates."""
         instance = Mock(**create_data)
@@ -201,11 +227,14 @@ class TestRequiredUnlessAlreadyBlankValidator:
         else:
             validator(update_data)
 
-    @pytest.mark.parametrize('create_data,should_raise', (
-        ({}, True),
-        ({'field1': None}, True),
-        ({'field1': 'blah'}, False),
-    ))
+    @pytest.mark.parametrize(
+        'create_data,should_raise',
+        (
+            ({}, True),
+            ({'field1': None}, True),
+            ({'field1': 'blah'}, False),
+        ),
+    )
     def test_create(self, create_data, should_raise):
         """Tests validation during instance creation."""
         serializer = Mock(instance=None, partial=False)
