@@ -32,7 +32,7 @@ def _resolve_single_value(value):
         obj_value = resolved_value
         resolved_value = {
             'id': str(obj_value.id),
-            'name': obj_value.name
+            'name': obj_value.name,
         }
 
         # this is here because of inconsistent endpoint :(

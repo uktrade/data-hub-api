@@ -4,12 +4,12 @@ from datahub.interaction.views import InteractionViewSet
 
 collection = InteractionViewSet.as_view({
     'get': 'list',
-    'post': 'create'
+    'post': 'create',
 })
 
 item = InteractionViewSet.as_view({
     'get': 'retrieve',
-    'patch': 'partial_update'
+    'patch': 'partial_update',
 })
 
 urlpatterns = [
