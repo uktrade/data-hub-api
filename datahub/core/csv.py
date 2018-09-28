@@ -38,7 +38,7 @@ def create_csv_response(rows, field_titles, filename):
     # a generator here.
     response = StreamingHttpResponse(
         csv_iterator(rows, field_titles),
-        content_type=CSV_CONTENT_TYPE
+        content_type=CSV_CONTENT_TYPE,
     )
 
     response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'

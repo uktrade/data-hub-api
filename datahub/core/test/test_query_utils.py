@@ -30,7 +30,7 @@ def test_get_string_agg_subquery(num_authors):
     authors = PersonFactory.create_batch(num_authors)
     BookFactory(authors=authors)
     queryset = Book.objects.annotate(
-        author_names=get_string_agg_subquery(Book, 'authors__first_name')
+        author_names=get_string_agg_subquery(Book, 'authors__first_name'),
     )
     author_names_str = queryset.first().author_names
     actual_author_names = sorted(author_names_str.split(', ')) if author_names_str else []
@@ -50,7 +50,7 @@ class TestGetAggregateSubquery:
         proofreader = PersonFactory()
         books = BookFactory.create_batch(num_books, proofreader=proofreader)
         queryset = Person.objects.annotate(
-            max_published=get_aggregate_subquery(Person, Max('proofread_books__published_on'))
+            max_published=get_aggregate_subquery(Person, Max('proofread_books__published_on')),
         ).filter(
             pk=proofreader.pk,
         )
@@ -103,7 +103,7 @@ def test_get_choices_as_case_expression(genre):
     """
     book = BookFactory(genre=genre)
     queryset = Book.objects.annotate(
-        genre_name=get_choices_as_case_expression(Book, 'genre')
+        genre_name=get_choices_as_case_expression(Book, 'genre'),
     )
     annotated_book = queryset.first()
     assert annotated_book.genre_name == book.get_genre_display()
@@ -116,7 +116,7 @@ class TestGetFullNameExpression:
         """Tests that a Person query set can be annotated with full names."""
         person = PersonFactory()
         queryset = Person.objects.annotate(
-            name=get_full_name_expression()
+            name=get_full_name_expression(),
         )
         expected_name = f'{person.first_name} {person.last_name}'
         assert queryset.first().name == expected_name
@@ -125,7 +125,7 @@ class TestGetFullNameExpression:
         """Tests that a blank first_name is ignored."""
         person = PersonFactory(first_name='')
         queryset = Person.objects.annotate(
-            name=get_full_name_expression()
+            name=get_full_name_expression(),
         )
         assert queryset.first().name == person.last_name
 
@@ -137,7 +137,7 @@ class TestGetFullNameExpression:
         book = BookFactory()
         proofreader = book.proofreader
         queryset = Book.objects.annotate(
-            proofreader_name=get_full_name_expression('proofreader')
+            proofreader_name=get_full_name_expression('proofreader'),
         )
         expected_name = f'{proofreader.first_name} {proofreader.last_name}'
         assert queryset.first().proofreader_name == expected_name
@@ -146,7 +146,7 @@ class TestGetFullNameExpression:
         """Tests that None is returned for an unset foreign key."""
         BookFactory(proofreader=None)
         queryset = Book.objects.annotate(
-            proofreader_name=get_full_name_expression('proofreader')
+            proofreader_name=get_full_name_expression('proofreader'),
         )
         assert queryset.first().proofreader_name is None
 
@@ -157,6 +157,6 @@ def test_get_front_end_url_expression(monkeypatch):
 
     book = BookFactory()
     queryset = Book.objects.annotate(
-        url=get_front_end_url_expression('book', 'pk')
+        url=get_front_end_url_expression('book', 'pk'),
     )
     assert queryset.first().url == f'http://test/{book.pk}'

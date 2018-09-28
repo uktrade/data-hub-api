@@ -16,7 +16,7 @@ class TestHasPermissions:
             ({'perm1', 'perm2'}, {'perm2', 'perm3'}, False),
             ({'perm1', 'perm2'}, {'perm2'}, False),
             ({'perm1', 'perm2'}, (), False),
-        )
+        ),
     )
     def test_has_permissions(self, required_permissions, user_permissions, expected_result):
         """Tests has_permission() for various cases."""
