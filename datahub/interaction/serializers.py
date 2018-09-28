@@ -8,13 +8,22 @@ from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.validate_utils import is_blank, is_not_blank
 from datahub.core.validators import (
-    EqualsRule, InRule, OperatorRule, RulesBasedValidator, ValidationRule
+    EqualsRule,
+    InRule,
+    OperatorRule,
+    RulesBasedValidator,
+    ValidationRule,
 )
 from datahub.event.models import Event
 from datahub.investment.serializers import NestedInvestmentProjectField
 from datahub.metadata.models import Service, Team
-from .models import (CommunicationChannel, Interaction, PolicyArea, PolicyIssueType,
-                     ServiceDeliveryStatus)
+from .models import (
+    CommunicationChannel,
+    Interaction,
+    PolicyArea,
+    PolicyIssueType,
+    ServiceDeliveryStatus,
+)
 from .permissions import HasAssociatedInvestmentProjectValidator, KindPermissionValidator
 
 
@@ -23,34 +32,40 @@ class InteractionSerializer(serializers.ModelSerializer):
 
     default_error_messages = {
         'invalid_for_non_service_delivery': ugettext_lazy(
-            'This field is only valid for service deliveries.'
+            'This field is only valid for service deliveries.',
         ),
         'invalid_for_service_delivery': ugettext_lazy(
-            'This field is not valid for service deliveries.'
+            'This field is not valid for service deliveries.',
         ),
         'invalid_for_non_interaction': ugettext_lazy(
-            'This field is only valid for interactions.'
+            'This field is only valid for interactions.',
         ),
         'invalid_for_non_event': ugettext_lazy(
-            'This field is only valid for event service deliveries.'
+            'This field is only valid for event service deliveries.',
         ),
         'invalid_for_non_policy_feedback': ugettext_lazy(
-            'This field is only valid for policy feedback.'
+            'This field is only valid for policy feedback.',
         ),
         'one_policy_area_field': ugettext_lazy(
-            'Only one of policy_area and policy_areas should be provided.'
+            'Only one of policy_area and policy_areas should be provided.',
         ),
     }
 
     company = NestedRelatedField(Company)
-    contact = NestedRelatedField(Contact, extra_fields=(
-        'name', 'first_name', 'last_name', 'job_title'
-    ))
+    contact = NestedRelatedField(
+        Contact,
+        extra_fields=(
+            'name',
+            'first_name',
+            'last_name',
+            'job_title',
+        ),
+    )
     dit_adviser = NestedAdviserField()
     created_by = NestedAdviserField(read_only=True)
     dit_team = NestedRelatedField(Team)
     communication_channel = NestedRelatedField(
-        CommunicationChannel, required=False, allow_null=True
+        CommunicationChannel, required=False, allow_null=True,
     )
     is_event = serializers.NullBooleanField(required=False)
     event = NestedRelatedField(Event, required=False, allow_null=True)
@@ -58,11 +73,11 @@ class InteractionSerializer(serializers.ModelSerializer):
     modified_by = NestedAdviserField(read_only=True)
     service = NestedRelatedField(Service)
     service_delivery_status = NestedRelatedField(
-        ServiceDeliveryStatus, required=False, allow_null=True
+        ServiceDeliveryStatus, required=False, allow_null=True,
     )
     policy_areas = NestedRelatedField(PolicyArea, many=True, required=False, allow_empty=True)
     policy_issue_type = NestedRelatedField(
-        PolicyIssueType, required=False, allow_null=True
+        PolicyIssueType, required=False, allow_null=True,
     )
 
     def validate(self, data):
@@ -123,18 +138,24 @@ class InteractionSerializer(serializers.ModelSerializer):
                 ValidationRule(
                     'required',
                     OperatorRule('communication_channel', bool),
-                    when=InRule('kind', [
-                        Interaction.KINDS.interaction,
-                        Interaction.KINDS.policy_feedback
-                    ]),
+                    when=InRule(
+                        'kind',
+                        [
+                            Interaction.KINDS.interaction,
+                            Interaction.KINDS.policy_feedback,
+                        ],
+                    ),
                 ),
                 ValidationRule(
                     'invalid_for_non_interaction',
                     OperatorRule('investment_project', not_),
-                    when=InRule('kind', [
-                        Interaction.KINDS.service_delivery,
-                        Interaction.KINDS.policy_feedback
-                    ]),
+                    when=InRule(
+                        'kind',
+                        [
+                            Interaction.KINDS.service_delivery,
+                            Interaction.KINDS.policy_feedback,
+                        ],
+                    ),
                 ),
                 ValidationRule(
                     'invalid_for_service_delivery',
@@ -148,19 +169,25 @@ class InteractionSerializer(serializers.ModelSerializer):
                     OperatorRule('service_delivery_status', is_blank),
                     OperatorRule('grant_amount_offered', is_blank),
                     OperatorRule('net_company_receipt', is_blank),
-                    when=InRule('kind', [
-                        Interaction.KINDS.interaction,
-                        Interaction.KINDS.policy_feedback
-                    ]),
+                    when=InRule(
+                        'kind',
+                        [
+                            Interaction.KINDS.interaction,
+                            Interaction.KINDS.policy_feedback,
+                        ],
+                    ),
                 ),
                 ValidationRule(
                     'invalid_for_non_policy_feedback',
                     OperatorRule('policy_areas', not_),
                     OperatorRule('policy_issue_type', is_blank),
-                    when=InRule('kind', [
-                        Interaction.KINDS.interaction,
-                        Interaction.KINDS.service_delivery,
-                    ])
+                    when=InRule(
+                        'kind',
+                        [
+                            Interaction.KINDS.interaction,
+                            Interaction.KINDS.service_delivery,
+                        ],
+                    ),
                 ),
                 ValidationRule(
                     'required',
