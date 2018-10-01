@@ -2,7 +2,7 @@ import pytest
 from elasticsearch.exceptions import NotFoundError
 
 from datahub.interaction.test.factories import (
-    CompanyInteractionFactory, InvestmentProjectInteractionFactory
+    CompanyInteractionFactory, InvestmentProjectInteractionFactory,
 )
 from datahub.search.interaction.apps import InteractionSearchApp
 
@@ -17,7 +17,7 @@ def test_new_interaction_synced(setup_es):
     assert setup_es.get(
         index=InteractionSearchApp.es_model.get_write_index(),
         doc_type=InteractionSearchApp.name,
-        id=interaction.pk
+        id=interaction.pk,
     )
 
 
@@ -32,7 +32,7 @@ def test_updated_interaction_synced(setup_es):
     result = setup_es.get(
         index=InteractionSearchApp.es_model.get_write_index(),
         doc_type=InteractionSearchApp.name,
-        id=interaction.pk
+        id=interaction.pk,
     )
     assert result['_source']['subject'] == new_subject
 
@@ -48,7 +48,7 @@ def test_deleted_interaction_deleted_from_es(setup_es):
     assert setup_es.get(
         index=InteractionSearchApp.es_model.get_write_index(),
         doc_type=InteractionSearchApp.name,
-        id=interaction.pk
+        id=interaction.pk,
     )
 
     interaction_id = interaction.pk
@@ -59,7 +59,7 @@ def test_deleted_interaction_deleted_from_es(setup_es):
         assert setup_es.get(
             index=InteractionSearchApp.es_model.get_write_index(),
             doc_type=InteractionSearchApp.name,
-            id=interaction_id
+            id=interaction_id,
         ) is None
 
 
@@ -74,7 +74,7 @@ def test_updating_company_name_updates_interaction(setup_es):
     result = setup_es.get(
         index=InteractionSearchApp.es_model.get_write_index(),
         doc_type=InteractionSearchApp.name,
-        id=interaction.pk
+        id=interaction.pk,
     )
     assert result['_source']['company']['name'] == new_company_name
 
@@ -92,7 +92,7 @@ def test_updating_contact_name_updates_interaction(setup_es):
     result = setup_es.get(
         index=InteractionSearchApp.es_model.get_write_index(),
         doc_type=InteractionSearchApp.name,
-        id=interaction.pk
+        id=interaction.pk,
     )
     assert result['_source']['contact'] == {
         'id': str(interaction.contact.id),
@@ -116,6 +116,6 @@ def test_updating_project_name_updates_interaction(setup_es):
     result = setup_es.get(
         index=InteractionSearchApp.es_model.get_write_index(),
         doc_type=InteractionSearchApp.name,
-        id=interaction.pk
+        id=interaction.pk,
     )
     assert result['_source']['investment_project']['name'] == new_project_name

@@ -71,5 +71,5 @@ class SearchInvestmentProjectSerializer(SearchSerializer):
         'site_decided',
         'stage.name',
         'total_investment',
-        'uk_company.name'
+        'uk_company.name',
     )

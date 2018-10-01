@@ -71,7 +71,7 @@ class SearchBasicAPIView(APIView):
         entity = request.query_params.get('entity', self.DEFAULT_ENTITY)
         if entity not in (self.entity_by_name):
             raise ValidationError(
-                f'Entity is not one of {", ".join(self.entity_by_name)}'
+                f'Entity is not one of {", ".join(self.entity_by_name)}',
             )
 
         sortby = request.query_params.get('sortby')
@@ -90,7 +90,7 @@ class SearchBasicAPIView(APIView):
             ordering=sortby,
             ignored_entities=self.IGNORED_ENTITIES,
             offset=offset,
-            limit=limit
+            limit=limit,
         )
 
         results = _execute_search_query(query)
@@ -194,7 +194,7 @@ class SearchAPIView(APIView):
         data = request.data.copy()
 
         # to support legacy paging parameters that can be in query_string
-        for legacy_query_param in ('limit', 'offset',):
+        for legacy_query_param in ('limit', 'offset'):
             if legacy_query_param in request.query_params \
                     and legacy_query_param not in request.data:
                 data[legacy_query_param] = request.query_params[legacy_query_param]
@@ -280,7 +280,7 @@ class SearchExportAPIView(SearchAPIView):
             validated_data,
         ).source(
             # Stops _source from being returned in the responses
-            fields=False
+            fields=False,
         ).params(
             # Keeps the sort order that the user specified
             preserve_order=True,
@@ -301,11 +301,11 @@ class SearchExportAPIView(SearchAPIView):
         ordering = self._translate_search_sortby_to_django_ordering(sort_by)
 
         return self.queryset.filter(
-            pk__in=ids
+            pk__in=ids,
         ).order_by(
-            *ordering
+            *ordering,
         ).values(
-            *self.field_titles.keys()
+            *self.field_titles.keys(),
         ).iterator()
 
     def _translate_search_sortby_to_django_ordering(self, sort_by):
@@ -331,10 +331,13 @@ def _execute_search_query(query):
 
     if response.took >= settings.ES_SEARCH_REQUEST_WARNING_THRESHOLD * 1000:
         logger.warning(f'Elasticsearch query took a long time ({response.took/1000:.2f} seconds)')
-        client.captureMessage('Elasticsearch query took a long time', extra={
-            'query': query.to_dict(),
-            'took': response.took,
-            'timed_out': response.timed_out
-        })
+        client.captureMessage(
+            'Elasticsearch query took a long time',
+            extra={
+                'query': query.to_dict(),
+                'took': response.took,
+                'timed_out': response.timed_out,
+            },
+        )
 
     return response

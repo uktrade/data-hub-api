@@ -13,14 +13,14 @@ from .models import Interaction as ESInteraction
 def sync_interaction_to_es(sender, instance, **kwargs):
     """Sync interaction to the Elasticsearch."""
     transaction.on_commit(
-        lambda: sync_object_async(ESInteraction, DBInteraction, str(instance.pk))
+        lambda: sync_object_async(ESInteraction, DBInteraction, str(instance.pk)),
     )
 
 
 def remove_interaction_from_es(sender, instance, **kwargs):
     """Remove interaction from es."""
     transaction.on_commit(
-        lambda pk=instance.pk: delete_document(ESInteraction, str(pk))
+        lambda pk=instance.pk: delete_document(ESInteraction, str(pk)),
     )
 
 
