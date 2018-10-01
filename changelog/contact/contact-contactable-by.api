@@ -1,5 +1,9 @@
-The field ```contactable_by_dit``` was removed from all contact endpoints.
-The field ```contactable_by_uk_dit_partners``` was removed from all contact endpoints.
-The field ```contactable_by_overseas_dit_partners``` was removed from all contact endpoints.
-The field ```contactable_by_email``` was removed from all contact endpoints.
-The field ```contactable_by_phone``` was removed from all contact endpoints.
+The field ``contactable_by_dit`` was removed from all contact endpoints.
+
+The field ``contactable_by_uk_dit_partners`` was removed from all contact endpoints.
+
+The field ``contactable_by_overseas_dit_partners`` was removed from all contact endpoints.
+
+The field ``contactable_by_email`` was removed from all contact endpoints.
+
+The field ``contactable_by_phone`` was removed from all contact endpoints.
