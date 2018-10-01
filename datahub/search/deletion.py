@@ -36,7 +36,7 @@ def delete_documents(index, es_docs):
     if non_404_errors:
         raise DataHubException(
             f'One or more errors during an Elasticsearch bulk deletion operation: '
-            f'{non_404_errors!r}'
+            f'{non_404_errors!r}',
         )
 
 
@@ -85,7 +85,7 @@ class Collector:
 
             # set up the receivers to add when collecting the deleted objects
             self.signal_receivers_to_add.append(
-                SignalReceiver(post_delete, model, self._collect)
+                SignalReceiver(post_delete, model, self._collect),
             )
 
             # get the existing post/pre_delete receivers that need to be

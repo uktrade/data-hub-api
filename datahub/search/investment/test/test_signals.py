@@ -2,7 +2,7 @@ import pytest
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.investment.test.factories import (
-    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory
+    InvestmentProjectFactory, InvestmentProjectTeamMemberFactory,
 )
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.query_builder import (
@@ -17,14 +17,14 @@ def test_investment_project_auto_sync_to_es(setup_es):
     """Tests if investment project gets synced to Elasticsearch."""
     test_name = 'very_hard_to_find_project'
     InvestmentProjectFactory(
-        name=test_name
+        name=test_name,
     )
     setup_es.indices.refresh()
 
     result = get_search_by_entity_query(
         term='',
         filter_data={'name': test_name},
-        entity=InvestmentProject
+        entity=InvestmentProject,
     ).execute()
 
     assert result.hits.total == 1
@@ -41,7 +41,7 @@ def test_investment_project_auto_updates_to_es(setup_es):
     result = get_search_by_entity_query(
         term='',
         filter_data={'name': new_test_name},
-        entity=InvestmentProject
+        entity=InvestmentProject,
     ).execute()
 
     assert result.hits.total == 1
@@ -107,12 +107,15 @@ def test_investment_project_team_member_deleted_sync_to_es(setup_es, team_member
     assert len(result['team_members']) == 0
 
 
-@pytest.mark.parametrize('field', (
-    'created_by',
-    'client_relationship_manager',
-    'project_manager',
-    'project_assurance_adviser',
-))
+@pytest.mark.parametrize(
+    'field',
+    (
+        'created_by',
+        'client_relationship_manager',
+        'project_manager',
+        'project_assurance_adviser',
+    ),
+)
 def test_investment_project_syncs_when_adviser_changes(setup_es, field):
     """
     Tests that when an adviser is updated, investment projects related to that adviser are
@@ -129,7 +132,7 @@ def test_investment_project_syncs_when_adviser_changes(setup_es, field):
     result = get_search_by_entity_query(
         term='',
         filter_data={'id': project.pk},
-        entity=InvestmentProject
+        entity=InvestmentProject,
     ).execute()
 
     assert result.hits.total == 1
@@ -152,7 +155,7 @@ def test_investment_project_syncs_when_team_member_adviser_changes(setup_es, tea
     result = get_search_by_entity_query(
         term='',
         filter_data={'id': team_member.investment_project.pk},
-        entity=InvestmentProject
+        entity=InvestmentProject,
     ).execute()
 
     assert result.hits.total == 1

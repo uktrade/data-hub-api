@@ -67,14 +67,14 @@ class InvestmentProject(BaseESModel):
     client_cannot_provide_total_investment = Boolean()
     client_contacts = fields.nested_contact_or_adviser_field('client_contacts')
     client_relationship_manager = fields.nested_contact_or_adviser_field(
-        'client_relationship_manager', include_dit_team=True
+        'client_relationship_manager', include_dit_team=True,
     )
     client_requirements = fields.TextWithKeyword()
     comments = fields.EnglishText()
     country_lost_to = _country_lost_to_mapping()
     created_on = Date()
     created_by = fields.nested_contact_or_adviser_field(
-        'created_by', include_dit_team=True
+        'created_by', include_dit_team=True,
     )
     date_abandoned = Date()
     date_lost = Date()
@@ -94,10 +94,10 @@ class InvestmentProject(BaseESModel):
     level_of_involvement = fields.nested_id_name_field()
     likelihood_of_landing = Long()
     project_assurance_adviser = fields.nested_contact_or_adviser_field(
-        'project_assurance_adviser', include_dit_team=True
+        'project_assurance_adviser', include_dit_team=True,
     )
     project_manager = fields.nested_contact_or_adviser_field(
-        'project_manager', include_dit_team=True
+        'project_manager', include_dit_team=True,
     )
     name = fields.SortableText(copy_to=['name_keyword', 'name_trigram'])
     name_keyword = fields.SortableCaseInsensitiveKeywordText()
@@ -179,7 +179,7 @@ class InvestmentProject(BaseESModel):
 
     COMPUTED_MAPPINGS = {
         'investor_company_country': dict_utils.computed_nested_id_name_dict(
-            'investor_company.registered_address_country'
+            'investor_company.registered_address_country',
         ),
     }
 

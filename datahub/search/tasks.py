@@ -58,7 +58,7 @@ Rescheduling the {search_app_name} search app migration to attempt to resolve th
         if not lock_held:
             logger.warning(
                 f'Another complete_model_migration task is in progress for the {search_app_name} '
-                f'search app. Aborting...'
+                f'search app. Aborting...',
             )
             return
 

@@ -39,8 +39,10 @@ def sync_app(search_app, batch_size=None, post_batch_callback=None):
         rows_processed += num_actions
 
         if emit_progress:
-            logger.info(f'{model_name} rows processed: {rows_processed}/{total_rows} '
-                        f'{rows_processed*100//total_rows}%')
+            logger.info(
+                f'{model_name} rows processed: {rows_processed}/{total_rows} '
+                f'{rows_processed*100//total_rows}%',
+            )
 
     logger.info(f'{model_name} rows processed: {rows_processed}/{total_rows} 100%.')
 
@@ -48,7 +50,7 @@ def sync_app(search_app, batch_size=None, post_batch_callback=None):
 def sync_objects(es_model, model_objects, read_indices, write_index, post_batch_callback=None):
     """Syncs an iterable of model instances to Elasticsearch."""
     actions = list(
-        es_model.db_objects_to_es_documents(model_objects, index=write_index)
+        es_model.db_objects_to_es_documents(model_objects, index=write_index),
     )
     num_actions = len(actions)
     bulk(

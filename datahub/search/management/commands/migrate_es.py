@@ -41,7 +41,7 @@ See docs/Elasticsearch migrations.md for further details."""
 
         if not are_apps_initialised(apps):
             raise CommandError(
-                f'Index and mapping not initialised, please run `init_es` first.'
+                f'Index and mapping not initialised, please run `init_es` first.',
             )
 
         with advisory_lock('leeloo_migrate_es'):

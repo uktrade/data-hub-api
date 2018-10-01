@@ -16,7 +16,7 @@ def id_type_dict(obj):
 
     return {
         'id': str(obj.id),
-        'type': obj.type
+        'type': obj.type,
     }
 
 
@@ -27,7 +27,7 @@ def id_uri_dict(obj):
 
     return {
         'id': str(obj.id),
-        'uri': obj.uri
+        'uri': obj.uri,
     }
 
 

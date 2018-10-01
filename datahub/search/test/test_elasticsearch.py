@@ -17,7 +17,7 @@ def test_bulk(es_bulk, mock_es_client):
         mock_es_client.return_value,
         actions=actions,
         chunk_size=chunk_size,
-        max_chunk_bytes=settings.ES_BULK_MAX_CHUNK_BYTES
+        max_chunk_bytes=settings.ES_BULK_MAX_CHUNK_BYTES,
     )
 
 
@@ -46,15 +46,18 @@ def test_configure_connection(connections, settings):
 
     connections.configure.assert_called_with(default={
         'hosts': [settings.ES_URL],
-        'verify_certs': settings.ES_VERIFY_CERTS
+        'verify_certs': settings.ES_VERIFY_CERTS,
     })
 
 
 def test_creates_index(monkeypatch, mock_es_client):
     """Test creates_index()."""
-    monkeypatch.setattr('django.conf.settings.ES_INDEX_SETTINGS', {
-        'testsetting1': 'testval1'
-    })
+    monkeypatch.setattr(
+        'django.conf.settings.ES_INDEX_SETTINGS',
+        {
+            'testsetting1': 'testval1',
+        },
+    )
     mock_mapping = mock.Mock(
         _collect_analysis=mock.Mock(return_value={}),
         to_dict=mock.Mock(return_value={'mapping': 'test-mapping'}),
@@ -73,13 +76,13 @@ def test_creates_index(monkeypatch, mock_es_client):
                         'lowercase_keyword_analyzer': {
                             'tokenizer': 'keyword',
                             'filter': ['lowercase'],
-                            'type': 'custom'
+                            'type': 'custom',
                         },
                         'trigram_analyzer': {
                             'tokenizer': 'trigram',
                             'char_filter': ['special_chars'],
                             'filter': ['lowercase'],
-                            'type': 'custom'
+                            'type': 'custom',
                         },
                         'english_analyzer': {
                             'tokenizer': 'standard',
@@ -87,51 +90,52 @@ def test_creates_index(monkeypatch, mock_es_client):
                                 'english_possessive_stemmer',
                                 'lowercase',
                                 'english_stop',
-                                'english_stemmer'
+                                'english_stemmer',
                             ],
-                            'type': 'custom'
+                            'type': 'custom',
                         },
                         'lowercase_analyzer': {
                             'tokenizer': 'standard',
                             'filter': ['lowercase'],
-                            'type': 'custom'
-                        }
+                            'type': 'custom',
+                        },
                     },
                     'tokenizer': {
                         'trigram': {
                             'min_gram': 3,
                             'max_gram': 3,
                             'token_chars': ('letter', 'digit'),
-                            'type': 'nGram'
-                        }
+                            'type': 'nGram',
+                        },
                     },
                     'char_filter': {
                         'special_chars': {
                             'mappings': ('-=>',),
-                            'type': 'mapping'}
+                            'type': 'mapping',
+                        },
                     },
                     'filter': {
                         'english_possessive_stemmer': {
                             'language': 'possessive_english',
-                            'type': 'stemmer'
+                            'type': 'stemmer',
                         },
                         'english_stop': {
-                            'stopwords': '_english_', 'type': 'stop'
+                            'stopwords': '_english_', 'type': 'stop',
                         },
                         'english_stemmer': {
-                            'language': 'english', 'type': 'stemmer'
-                        }
-                    }
-                }
+                            'language': 'english', 'type': 'stemmer',
+                        },
+                    },
+                },
             },
             'aliases': {
                 'alias1': {},
-                'alias2': {}
+                'alias2': {},
             },
             'mappings': {
-                'mapping': 'test-mapping'
-            }
-        }
+                'mapping': 'test-mapping',
+            },
+        },
     )
 
 
@@ -161,7 +165,7 @@ def test_delete_index(mock_es_client):
             [{'index2'}],
         ),
         (
-            ('alias1', 'alias2',),
+            ('alias1', 'alias2'),
             {
                 'index1': {'aliases': {'alias1': {}}},
                 'index2': {'aliases': {'alias2': {}}},
@@ -187,8 +191,8 @@ def test_get_aliases_for_index(mock_es_client):
             'aliases': {
                 'alias1': {},
                 'alias2': {},
-            }
-        }
+            },
+        },
     }
     assert elasticsearch.get_aliases_for_index(index) == {'alias1', 'alias2'}
     client.indices.get_alias.assert_called_with(index=index)
@@ -220,9 +224,9 @@ def test_alias_exists(mock_es_client, expected):
                         'remove': {
                             'alias': 'test-alias',
                             'indices': ['index1', 'index2'],
-                        }
-                    }]
-                }
+                        },
+                    }],
+                },
             ),
             (
                 (
@@ -234,9 +238,9 @@ def test_alias_exists(mock_es_client, expected):
                         'add': {
                             'alias': 'test-alias',
                             'indices': ['index1', 'index2'],
-                        }
-                    }]
-                }
+                        },
+                    }],
+                },
             ),
             (
                 (
@@ -251,19 +255,19 @@ def test_alias_exists(mock_es_client, expected):
                             'add': {
                                 'alias': 'test-alias',
                                 'indices': ['index1', 'index2'],
-                            }
+                            },
                         },
                         {
                             'remove': {
                                 'alias': 'test-alias-2',
                                 'indices': ['index3', 'index4'],
-                            }
+                            },
                         },
-                    ]
-                }
+                    ],
+                },
             ),
         )
-    )
+    ),
 )
 def test_update_alias(mock_es_client, add_actions, remove_actions, expected_body):
     """Test get_aliases_for_index()."""

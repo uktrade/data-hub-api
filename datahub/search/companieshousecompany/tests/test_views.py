@@ -8,7 +8,7 @@ from datahub.company.test.factories import CompaniesHouseCompanyFactory
 from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.companieshousecompany.models import (
-    CompaniesHouseCompany as ESCompaniesHouseCompany
+    CompaniesHouseCompany as ESCompaniesHouseCompany,
 )
 from datahub.search.sync_async import sync_object_async
 
@@ -61,7 +61,7 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
         (
             (  # no filter => return all records
                 {},
-                {'111', '222', '333'}
+                {'111', '222', '333'},
             ),
             (  # pagination
                 {
@@ -69,37 +69,37 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
                     'offset': 1,
                     'sortby': 'name:asc',
                 },
-                {'222'}
+                {'222'},
             ),
             (  # company number filter
                 {
-                    'company_number': '222'
+                    'company_number': '222',
                 },
                 {'222'},
             ),
             (  # incorporation date filter
                 {
-                    'incorporation_date_after': '2014'
+                    'incorporation_date_after': '2014',
                 },
                 {'222', '333'},
             ),
             (  # incorporation date filter
                 {
-                    'incorporation_date_before': '2014'
+                    'incorporation_date_before': '2014',
                 },
                 {'111'},
             ),
             (  # incorporation date filter
                 {
                     'incorporation_date_after': '2014',
-                    'incorporation_date_before': '2017'
+                    'incorporation_date_before': '2017',
                 },
                 {'222', '333'},
             ),
             (  # incorporation date filter
                 {
                     'incorporation_date_after': '2010',
-                    'incorporation_date_before': '2015-10-01'
+                    'incorporation_date_before': '2015-10-01',
                 },
                 {'111', '222'},
             ),
@@ -127,7 +127,7 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
                 },
                 {'222'},
             ),
-        )
+        ),
     )
     def test_search(self, setup_data, data, results):
         """Test search results."""
@@ -144,13 +144,16 @@ class TestSearchCompaniesHouseCompany(APITestMixin):
         """Test that if the date is not in a valid format, the API return a validation error."""
         url = reverse('api-v3:search:companieshousecompany')
 
-        response = self.api_client.post(url, {
-            'incorporation_date_after': 'invalid',
-            'incorporation_date_before': 'invalid',
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'incorporation_date_after': 'invalid',
+                'incorporation_date_before': 'invalid',
+            },
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
             'incorporation_date_after': ['Date is in incorrect format.'],
-            'incorporation_date_before': ['Date is in incorrect format.']
+            'incorporation_date_before': ['Date is in incorrect format.'],
         }

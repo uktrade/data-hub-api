@@ -44,7 +44,7 @@ def test_contact_dbmodel_to_dict(setup_es):
         'notes',
         'accepts_dit_email_marketing',
         'company_sector',
-        'company_uk_region'
+        'company_uk_region',
     }
 
     assert set(result.keys()) == keys
@@ -67,7 +67,7 @@ def test_contact_dbmodels_to_es_documents_without_country(setup_es):
     # We want to bypass any validation
     contact = Contact(
         address_same_as_company=False,
-        address_country=None
+        address_country=None,
     )
     result = ESContact.es_document(contact)
 

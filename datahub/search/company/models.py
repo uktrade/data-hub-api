@@ -39,12 +39,12 @@ class Company(BaseESModel):
     registered_address_town = fields.SortableCaseInsensitiveKeywordText()
     registered_address_county = Text()
     registered_address_country = fields.nested_id_name_partial_field(
-        'registered_address_country'
+        'registered_address_country',
     )
     registered_address_postcode = Text(
         copy_to=[
-            'registered_address_postcode_trigram'
-        ]
+            'registered_address_postcode_trigram',
+        ],
     )
     registered_address_postcode_trigram = fields.TrigramText()
     sector = fields.nested_sector_field()
@@ -53,17 +53,17 @@ class Company(BaseESModel):
     trading_address_town = fields.SortableCaseInsensitiveKeywordText()
     trading_address_county = Text()
     trading_address_postcode = Text(
-        copy_to=['trading_address_postcode_trigram']
+        copy_to=['trading_address_postcode_trigram'],
     )
     trading_address_postcode_trigram = fields.TrigramText()
     trading_address_country = fields.nested_id_name_partial_field(
-        'trading_address_country'
+        'trading_address_country',
     )
     trading_name = fields.SortableText(
         copy_to=[
             'trading_name_keyword',
             'trading_name_trigram',
-        ]
+        ],
     )
     trading_name_keyword = fields.SortableCaseInsensitiveKeywordText()
     trading_name_trigram = fields.TrigramText()
@@ -74,7 +74,7 @@ class Company(BaseESModel):
     website = Text()
 
     COMPUTED_MAPPINGS = {
-        'trading_name': attrgetter('alias')
+        'trading_name': attrgetter('alias'),
     }
 
     MAPPINGS = {
@@ -110,7 +110,7 @@ class Company(BaseESModel):
         'registered_address_postcode_trigram',
         'trading_address_country.name_trigram',
         'trading_address_postcode_trigram',
-        'uk_region.name_trigram'
+        'uk_region.name_trigram',
     )
 
     class Meta:

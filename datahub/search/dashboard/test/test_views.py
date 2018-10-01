@@ -56,9 +56,12 @@ class TestDashboard(APITestMixin):
         setup_es.indices.refresh()
 
         url = reverse('dashboard:intelligent-homepage')
-        response = self.api_client.get(url, data={
-            'limit': 10
-        })
+        response = self.api_client.get(
+            url,
+            data={
+                'limit': 10,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -68,7 +71,7 @@ class TestDashboard(APITestMixin):
     def test_contact_permission(self, setup_es):
         """Test that the contact view permission is enforced."""
         requester = create_test_user(
-            permission_codenames=(InteractionPermission.view_all,)
+            permission_codenames=(InteractionPermission.view_all,),
         )
         CompanyInteractionFactory.create_batch(5, dit_adviser=requester)
         ContactFactory.create_batch(5, created_by=requester)
@@ -78,9 +81,12 @@ class TestDashboard(APITestMixin):
         api_client = self.create_api_client(user=requester)
 
         url = reverse('dashboard:intelligent-homepage')
-        response = api_client.get(url, data={
-            'limit': 10
-        })
+        response = api_client.get(
+            url,
+            data={
+                'limit': 10,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -90,7 +96,7 @@ class TestDashboard(APITestMixin):
     def test_interaction_permission(self, setup_es):
         """Test that the interaction view permission is enforced."""
         requester = create_test_user(
-            permission_codenames=('view_contact',)
+            permission_codenames=('view_contact',),
         )
         CompanyInteractionFactory.create_batch(5, dit_adviser=requester)
         ContactFactory.create_batch(5, created_by=requester)
@@ -100,9 +106,12 @@ class TestDashboard(APITestMixin):
         api_client = self.create_api_client(user=requester)
 
         url = reverse('dashboard:intelligent-homepage')
-        response = api_client.get(url, data={
-            'limit': 10
-        })
+        response = api_client.get(
+            url,
+            data={
+                'limit': 10,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()

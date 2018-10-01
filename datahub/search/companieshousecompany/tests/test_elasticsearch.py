@@ -2,7 +2,7 @@ import pytest
 from elasticsearch_dsl import Mapping
 
 from datahub.company.test.factories import (
-    CompaniesHouseCompanyFactory
+    CompaniesHouseCompanyFactory,
 )
 from datahub.core.test_utils import format_date_or_datetime
 from .. import CompaniesHouseCompanySearchApp
@@ -26,91 +26,91 @@ def test_mapping(setup_es):
                 'company_category': {
                     'analyzer': 'lowercase_keyword_analyzer',
                     'fielddata': True,
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'company_number': {
                     'analyzer': 'lowercase_keyword_analyzer',
                     'fielddata': True,
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'company_status': {
                     'analyzer': 'lowercase_keyword_analyzer',
                     'fielddata': True,
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'id': {
-                    'type': 'keyword'
+                    'type': 'keyword',
                 },
                 'incorporation_date': {
-                    'type': 'date'
+                    'type': 'date',
                 },
                 'name': {
                     'copy_to': ['name_keyword', 'name_trigram'],
                     'fielddata': True,
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'name_keyword': {
                     'analyzer': 'lowercase_keyword_analyzer',
                     'fielddata': True,
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'name_trigram': {
                     'analyzer': 'trigram_analyzer',
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'registered_address_1': {
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'registered_address_2': {
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'registered_address_country': {
                     'include_in_parent': True,
                     'properties': {
                         'id': {
-                            'type': 'keyword'
+                            'type': 'keyword',
                         },
                         'name': {
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
-                        }
+                            'type': 'text',
+                        },
                     },
-                    'type': 'nested'
+                    'type': 'nested',
                 },
                 'registered_address_county': {
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'registered_address_postcode': {
                     'copy_to': ['registered_address_postcode_trigram'],
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'registered_address_postcode_trigram': {
                     'analyzer': 'trigram_analyzer',
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'registered_address_town': {
                     'analyzer': 'lowercase_keyword_analyzer',
                     'fielddata': True,
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'sic_code_1': {
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'sic_code_2': {
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'sic_code_3': {
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'sic_code_4': {
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'uri': {
-                    'type': 'text'
-                }
-            }
-        }
+                    'type': 'text',
+                },
+            },
+        },
     }
 
 
@@ -126,7 +126,7 @@ def test_indexed_doc(setup_es):
     indexed_ch_company = setup_es.get(
         index=ESCompaniesHouseCompany.get_write_index(),
         doc_type=CompaniesHouseCompanySearchApp.name,
-        id=ch_company.pk
+        id=ch_company.pk,
     )
 
     assert indexed_ch_company == {
@@ -145,7 +145,7 @@ def test_indexed_doc(setup_es):
             'registered_address_postcode': ch_company.registered_address_postcode,
             'registered_address_country': {
                 'id': str(ch_company.registered_address_country.pk),
-                'name': ch_company.registered_address_country.name
+                'name': ch_company.registered_address_country.name,
             },
             'company_number': ch_company.company_number,
             'company_category': ch_company.company_category,
@@ -156,5 +156,5 @@ def test_indexed_doc(setup_es):
             'sic_code_4': ch_company.sic_code_4,
             'uri': ch_company.uri,
             'incorporation_date': format_date_or_datetime(ch_company.incorporation_date),
-        }
+        },
     }

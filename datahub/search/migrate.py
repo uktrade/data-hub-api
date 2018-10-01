@@ -43,8 +43,10 @@ def _perform_migration(search_app):
     current_read_indices, current_write_index = es_model.get_read_and_write_indices()
 
     if current_write_index not in current_read_indices:
-        raise DataHubException('Cannot migrate Elasticsearch index with a read alias referencing '
-                               'a different index to the write alias')
+        raise DataHubException(
+            'Cannot migrate Elasticsearch index with a read alias referencing '
+            'a different index to the write alias',
+        )
 
     logger.info(f'Updating aliases for the {app_name} search app')
 
@@ -61,5 +63,5 @@ def _perform_migration(search_app):
 def _schedule_resync(search_app):
     logger.info(f'Scheduling resync and clean-up for the {search_app.name} search app')
     complete_model_migration.apply_async(
-        args=(search_app.name, search_app.es_model.get_target_mapping_hash())
+        args=(search_app.name, search_app.es_model.get_target_mapping_hash()),
     )

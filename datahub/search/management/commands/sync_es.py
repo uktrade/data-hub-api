@@ -43,10 +43,10 @@ class Command(BaseCommand):
 
         if not are_apps_initialised(apps):
             raise CommandError(
-                f'Index and mapping not initialised, please run `init_es` first.'
+                f'Index and mapping not initialised, please run `init_es` first.',
             )
 
         sync_es(
             batch_size=options['batch_size'],
-            search_apps=apps
+            search_apps=apps,
         )

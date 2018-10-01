@@ -10,7 +10,7 @@ from ..sync_async import sync_object_async
 def contact_sync_es(sender, instance, **kwargs):
     """Sync contact to the Elasticsearch."""
     transaction.on_commit(
-        lambda: sync_object_async(ESContact, DBContact, str(instance.pk))
+        lambda: sync_object_async(ESContact, DBContact, str(instance.pk)),
     )
 
 

@@ -4,7 +4,7 @@ from elasticsearch_dsl import Mapping
 from datahub.omis.order.test.factories import (
     OrderCancelledFactory, OrderCompleteFactory,
     OrderFactory, OrderPaidFactory,
-    OrderWithAcceptedQuoteFactory
+    OrderWithAcceptedQuoteFactory,
 )
 from .. import OrderSearchApp
 from ..models import Order as ESOrder
@@ -28,104 +28,104 @@ def test_mapping(setup_es):
                             'include_in_parent': True,
                             'properties': {
                                 'id': {
-                                    'type': 'keyword'
+                                    'type': 'keyword',
                                 },
                                 'name': {
                                     'analyzer': 'lowercase_keyword_analyzer',
                                     'fielddata': True,
-                                    'type': 'text'
-                                }
+                                    'type': 'text',
+                                },
                             },
-                            'type': 'nested'
+                            'type': 'nested',
                         },
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'id': {
-                            'type': 'keyword'
+                            'type': 'keyword',
                         },
                         'last_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'name': {
                             'copy_to': ['assignees.name_trigram'],
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
-                            'type': 'text'
-                        }
+                            'type': 'text',
+                        },
                     },
-                    'type': 'nested'
+                    'type': 'nested',
                 },
                 'billing_address_1': {
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'billing_address_2': {
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'billing_address_country': {
                     'include_in_parent': True,
                     'properties': {
                         'id': {
-                            'type': 'keyword'
+                            'type': 'keyword',
                         },
                         'name': {
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
-                        }
+                            'type': 'text',
+                        },
                     },
-                    'type': 'nested'
+                    'type': 'nested',
                 },
                 'billing_address_county': {
                     'analyzer': 'lowercase_keyword_analyzer',
                     'fielddata': True,
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'billing_address_postcode': {
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'billing_address_town': {
                     'analyzer': 'lowercase_keyword_analyzer',
                     'fielddata': True,
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'billing_contact_name': {
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'billing_company_name': {
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'billing_email': {
                     'analyzer': 'lowercase_keyword_analyzer',
                     'fielddata': True,
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'billing_phone': {
                     'analyzer': 'lowercase_keyword_analyzer',
                     'fielddata': True,
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'cancellation_reason': {
                     'include_in_parent': True,
                     'properties': {
                         'id': {
-                            'type': 'keyword'
+                            'type': 'keyword',
                         },
                         'name': {
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
-                        }
+                            'type': 'text',
+                        },
                     },
-                    'type': 'nested'
+                    'type': 'nested',
                 },
                 'cancelled_by': {
                     'include_in_parent': True,
@@ -133,60 +133,60 @@ def test_mapping(setup_es):
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'id': {
-                            'type': 'keyword'
+                            'type': 'keyword',
                         },
                         'last_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'name': {
                             'copy_to': ['cancelled_by.name_trigram'],
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
-                            'type': 'text'
-                        }
+                            'type': 'text',
+                        },
                     },
-                    'type': 'nested'
+                    'type': 'nested',
                 },
                 'cancelled_on': {
-                    'type': 'date'
+                    'type': 'date',
                 },
                 'company': {
                     'include_in_parent': True,
                     'properties': {
                         'id': {
-                            'type': 'keyword'
+                            'type': 'keyword',
                         },
                         'name': {
                             'copy_to': ['company.name_trigram'],
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'trading_name': {
                             'copy_to': ['company.trading_name_trigram'],
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'trading_name_trigram': {
                             'analyzer': 'trigram_analyzer',
-                            'type': 'text'
-                        }
+                            'type': 'text',
+                        },
                     },
-                    'type': 'nested'
+                    'type': 'nested',
                 },
                 'completed_by': {
                     'include_in_parent': True,
@@ -194,31 +194,31 @@ def test_mapping(setup_es):
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'id': {
-                            'type': 'keyword'
+                            'type': 'keyword',
                         },
                         'last_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'name': {
                             'copy_to': ['completed_by.name_trigram'],
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
-                            'type': 'text'
-                        }
+                            'type': 'text',
+                        },
                     },
-                    'type': 'nested'
+                    'type': 'nested',
                 },
                 'completed_on': {
-                    'type': 'date'
+                    'type': 'date',
                 },
                 'contact': {
                     'include_in_parent': True,
@@ -226,39 +226,39 @@ def test_mapping(setup_es):
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'id': {
-                            'type': 'keyword'
+                            'type': 'keyword',
                         },
                         'last_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'name': {
                             'copy_to': ['contact.name_trigram'],
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
-                            'type': 'text'
-                        }
+                            'type': 'text',
+                        },
                     },
-                    'type': 'nested'
+                    'type': 'nested',
                 },
                 'contact_email': {
                     'analyzer': 'lowercase_keyword_analyzer',
                     'fielddata': True,
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'contact_phone': {
-                    'type': 'keyword'
+                    'type': 'keyword',
                 },
                 'contacts_not_to_approach': {
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'created_by': {
                     'include_in_parent': True,
@@ -266,163 +266,163 @@ def test_mapping(setup_es):
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'id': {
-                            'type': 'keyword'
+                            'type': 'keyword',
                         },
                         'last_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'name': {
                             'copy_to': ['created_by.name_trigram'],
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'dit_team': {
                             'include_in_parent': True,
                             'properties': {
                                 'id': {
-                                    'type': 'keyword'
+                                    'type': 'keyword',
                                 },
                                 'name': {
                                     'analyzer': 'lowercase_keyword_analyzer',
                                     'fielddata': True,
-                                    'type': 'text'
-                                }
+                                    'type': 'text',
+                                },
                             },
-                            'type': 'nested'
-                        }
+                            'type': 'nested',
+                        },
                     },
-                    'type': 'nested'
+                    'type': 'nested',
                 },
                 'created_on': {
-                    'type': 'date'
+                    'type': 'date',
                 },
                 'delivery_date': {
-                    'type': 'date'
+                    'type': 'date',
                 },
                 'description': {
                     'analyzer': 'english_analyzer',
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'discount_value': {
                     'index': False,
-                    'type': 'integer'
+                    'type': 'integer',
                 },
                 'existing_agents': {
                     'index': False,
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'further_info': {
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'id': {
-                    'type': 'keyword'
+                    'type': 'keyword',
                 },
                 'modified_on': {
-                    'type': 'date'
+                    'type': 'date',
                 },
                 'net_cost': {
                     'index': False,
-                    'type': 'integer'
+                    'type': 'integer',
                 },
                 'paid_on': {
-                    'type': 'date'
+                    'type': 'date',
                 },
                 'payment_due_date': {
-                    'type': 'date'
+                    'type': 'date',
                 },
                 'po_number': {
                     'index': False,
-                    'type': 'keyword'
+                    'type': 'keyword',
                 },
                 'primary_market': {
                     'include_in_parent': True,
                     'properties': {
                         'id': {
-                            'type': 'keyword'
+                            'type': 'keyword',
                         },
                         'name': {
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
-                        }
+                            'type': 'text',
+                        },
                     },
-                    'type': 'nested'
+                    'type': 'nested',
                 },
                 'reference': {
                     'copy_to': ['reference_trigram'],
                     'analyzer': 'lowercase_keyword_analyzer',
                     'fielddata': True,
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'reference_trigram': {
                     'analyzer': 'trigram_analyzer',
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'sector': {
                     'include_in_parent': True,
                     'properties': {
                         'id': {
-                            'type': 'keyword'
+                            'type': 'keyword',
                         },
                         'name': {
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'ancestors': {
                             'include_in_parent': True,
                             'properties': {
                                 'id': {
-                                    'type': 'keyword'
-                                }
+                                    'type': 'keyword',
+                                },
                             },
-                            'type': 'nested'
-                        }
+                            'type': 'nested',
+                        },
                     },
-                    'type': 'nested'
+                    'type': 'nested',
                 },
                 'uk_region': {
                     'include_in_parent': True,
                     'properties': {
                         'id': {
-                            'type': 'keyword'
+                            'type': 'keyword',
                         },
                         'name': {
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
-                        }
+                            'type': 'text',
+                        },
                     },
-                    'type': 'nested'
+                    'type': 'nested',
                 },
                 'service_types': {
                     'include_in_parent': True,
                     'properties': {
                         'id': {
-                            'type': 'keyword'
+                            'type': 'keyword',
                         },
                         'name': {
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
-                        }
+                            'type': 'text',
+                        },
                     },
-                    'type': 'nested'
+                    'type': 'nested',
                 },
                 'status': {
                     'analyzer': 'lowercase_keyword_analyzer',
                     'fielddata': True,
-                    'type': 'text'
+                    'type': 'text',
                 },
                 'subscribers': {
                     'include_in_parent': True,
@@ -431,74 +431,74 @@ def test_mapping(setup_es):
                             'include_in_parent': True,
                             'properties': {
                                 'id': {
-                                    'type': 'keyword'
+                                    'type': 'keyword',
                                 },
                                 'name': {
                                     'analyzer': 'lowercase_keyword_analyzer',
                                     'fielddata': True,
-                                    'type': 'text'
-                                }
+                                    'type': 'text',
+                                },
                             },
-                            'type': 'nested'
+                            'type': 'nested',
                         },
                         'first_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'id': {
-                            'type': 'keyword'
+                            'type': 'keyword',
                         },
                         'last_name': {
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'name': {
                             'copy_to': ['subscribers.name_trigram'],
                             'analyzer': 'lowercase_keyword_analyzer',
                             'fielddata': True,
-                            'type': 'text'
+                            'type': 'text',
                         },
                         'name_trigram': {
                             'analyzer': 'trigram_analyzer',
-                            'type': 'text'
-                        }
+                            'type': 'text',
+                        },
                     },
-                    'type': 'nested'
+                    'type': 'nested',
                 },
                 'subtotal_cost': {
                     'copy_to': ['subtotal_cost_string'],
-                    'type': 'integer'
+                    'type': 'integer',
                 },
                 'subtotal_cost_string': {
-                    'type': 'keyword'
+                    'type': 'keyword',
                 },
                 'total_cost': {
                     'copy_to': ['total_cost_string'],
-                    'type': 'integer'
+                    'type': 'integer',
                 },
                 'total_cost_string': {
-                    'type': 'keyword'
+                    'type': 'keyword',
                 },
                 'vat_cost': {
                     'index': False,
-                    'type': 'integer'
+                    'type': 'integer',
                 },
                 'vat_number': {
                     'index': False,
-                    'type': 'keyword'
+                    'type': 'keyword',
                 },
                 'vat_status': {
                     'index': False,
-                    'type': 'keyword'
+                    'type': 'keyword',
                 },
                 'vat_verified': {
                     'index': False,
-                    'type': 'boolean'
-                }
-            }
-        }
+                    'type': 'boolean',
+                },
+            },
+        },
     }
 
 
@@ -510,7 +510,7 @@ def test_mapping(setup_es):
         OrderCancelledFactory,
         OrderCompleteFactory,
         OrderPaidFactory,
-    )
+    ),
 )
 def test_indexed_doc(Factory, setup_es):
     """Test the ES data of an indexed order."""
@@ -525,7 +525,7 @@ def test_indexed_doc(Factory, setup_es):
     indexed_order = setup_es.get(
         index=OrderSearchApp.es_model.get_write_index(),
         doc_type=OrderSearchApp.name,
-        id=order.pk
+        id=order.pk,
     )
 
     assert indexed_order == {
@@ -543,8 +543,8 @@ def test_indexed_doc(Factory, setup_es):
                 'name': order.created_by.name,
                 'dit_team': {
                     'id': str(order.created_by.dit_team.id),
-                    'name': order.created_by.dit_team.name
-                }
+                    'name': order.created_by.dit_team.name,
+                },
             },
             'company': {
                 'id': str(order.company.pk),
@@ -555,27 +555,27 @@ def test_indexed_doc(Factory, setup_es):
                 'id': str(order.contact.pk),
                 'first_name': order.contact.first_name,
                 'last_name': order.contact.last_name,
-                'name': order.contact.name
+                'name': order.contact.name,
             },
             'primary_market': {
                 'id': str(order.primary_market.pk),
-                'name': order.primary_market.name
+                'name': order.primary_market.name,
             },
             'sector': {
                 'id': str(order.sector.pk),
                 'name': order.sector.name,
                 'ancestors': [{
                     'id': str(ancestor.pk),
-                } for ancestor in order.sector.get_ancestors()]
+                } for ancestor in order.sector.get_ancestors()],
             },
             'uk_region': {
                 'id': str(order.uk_region.pk),
-                'name': order.uk_region.name
+                'name': order.uk_region.name,
             },
             'service_types': [
                 {
                     'id': str(service_type.pk),
-                    'name': service_type.name
+                    'name': service_type.name,
                 }
                 for service_type in order.service_types.all()
             ],
@@ -608,7 +608,7 @@ def test_indexed_doc(Factory, setup_es):
                     'dit_team': {
                         'id': str(assignee.adviser.dit_team.id),
                         'name': assignee.adviser.dit_team.name,
-                    }
+                    },
                 }
                 for assignee in order.assignees.all()
             ],
@@ -633,26 +633,26 @@ def test_indexed_doc(Factory, setup_es):
             'billing_address_postcode': order.billing_address_postcode,
             'billing_address_country': {
                 'id': str(order.billing_address_country.pk),
-                'name': order.billing_address_country.name
+                'name': order.billing_address_country.name,
             },
             'paid_on': order.paid_on.isoformat() if order.paid_on else None,
             'completed_by': {
                 'id': str(order.completed_by.pk),
                 'first_name': order.completed_by.first_name,
                 'last_name': order.completed_by.last_name,
-                'name': order.completed_by.name
+                'name': order.completed_by.name,
             } if order.completed_by else None,
             'completed_on': order.completed_on.isoformat() if order.completed_on else None,
             'cancelled_by': {
                 'id': str(order.cancelled_by.pk),
                 'first_name': order.cancelled_by.first_name,
                 'last_name': order.cancelled_by.last_name,
-                'name': order.cancelled_by.name
+                'name': order.cancelled_by.name,
             } if order.cancelled_by else None,
             'cancelled_on': order.cancelled_on.isoformat() if order.cancelled_on else None,
             'cancellation_reason': {
                 'id': str(order.cancellation_reason.pk),
-                'name': order.cancellation_reason.name
+                'name': order.cancellation_reason.name,
             } if order.cancellation_reason else None,
-        }
+        },
     }

@@ -16,7 +16,7 @@ logger = getLogger(__name__)
 lowercase_keyword_analyzer = analysis.CustomAnalyzer(
     'lowercase_keyword_analyzer',
     tokenizer='keyword',
-    filter=('lowercase',)
+    filter=('lowercase',),
 )
 
 # Trigram tokenizer enables us to support partial matching
@@ -25,7 +25,7 @@ trigram = analysis.tokenizer(
     'nGram',
     min_gram=3,
     max_gram=3,
-    token_chars=('letter', 'digit',)
+    token_chars=('letter', 'digit'),
 )
 
 # Filters out "-" so that t-shirt and tshirt can be matched
@@ -40,19 +40,19 @@ trigram_analyzer = analysis.CustomAnalyzer(
 english_possessive_stemmer = analysis.token_filter(
     'english_possessive_stemmer',
     type='stemmer',
-    language='possessive_english'
+    language='possessive_english',
 )
 
 english_stemmer = analysis.token_filter(
     'english_stemmer',
     type='stemmer',
-    language='english'
+    language='english',
 )
 
 english_stop = analysis.token_filter(
     'english_stop',
     type='stop',
-    stopwords='_english_'
+    stopwords='_english_',
 )
 
 english_analyzer = analysis.CustomAnalyzer(
@@ -63,13 +63,13 @@ english_analyzer = analysis.CustomAnalyzer(
         'lowercase',
         english_stop,
         english_stemmer,
-    ]
+    ],
 )
 
 lowercase_analyzer = analysis.CustomAnalyzer(
     'lowercase_analyzer',
     tokenizer='standard',
-    filter=('lowercase',)
+    filter=('lowercase',),
 )
 
 
@@ -86,7 +86,7 @@ def configure_connection():
     if settings.ES_USE_AWS_AUTH:
         es_protocol = {
             'http': 80,
-            'https': 443
+            'https': 443,
         }
         es_host = urlparse(settings.ES_URL)
         es_port = es_host.port if es_host.port else es_protocol.get(es_host.scheme)
@@ -95,7 +95,7 @@ def configure_connection():
             aws_secret_access_key=settings.AWS_ELASTICSEARCH_SECRET,
             aws_host=es_host.netloc,
             aws_region=settings.AWS_ELASTICSEARCH_REGION,
-            aws_service='es'
+            aws_service='es',
         )
         connections_default = {
             'hosts': [es_host.netloc],
@@ -103,16 +103,16 @@ def configure_connection():
             'use_ssl': settings.ES_USE_SSL,
             'verify_certs': settings.ES_VERIFY_CERTS,
             'http_auth': auth,
-            'connection_class': RequestsHttpConnection
+            'connection_class': RequestsHttpConnection,
         }
     else:
         connections_default = {
             'hosts': [settings.ES_URL],
-            'verify_certs': settings.ES_VERIFY_CERTS
+            'verify_certs': settings.ES_VERIFY_CERTS,
         }
 
     connections.configure(
-        default=connections_default
+        default=connections_default,
     )
 
 
@@ -201,8 +201,8 @@ class _AliasUpdater:
         self.actions.append({
             'add': {
                 'alias': alias_name,
-                'indices': list(index_names)
-            }
+                'indices': list(index_names),
+            },
         })
 
     def dissociate_indices_from_alias(self, alias_name, index_names):
@@ -210,15 +210,15 @@ class _AliasUpdater:
         self.actions.append({
             'remove': {
                 'alias': alias_name,
-                'indices': list(index_names)
-            }
+                'indices': list(index_names),
+            },
         })
 
     def commit(self):
         """Commits (flushes) pending operations."""
         client = get_client()
         client.indices.update_aliases(body={
-            'actions': self.actions
+            'actions': self.actions,
         })
         self.actions = []
 
@@ -261,7 +261,7 @@ def bulk(
     actions=None,
     chunk_size=500,
     max_chunk_bytes=settings.ES_BULK_MAX_CHUNK_BYTES,
-    **kwargs
+    **kwargs,
 ):
     """Send data in bulk to Elasticsearch."""
     return es_bulk(
@@ -269,5 +269,5 @@ def bulk(
         actions=actions,
         chunk_size=chunk_size,
         max_chunk_bytes=max_chunk_bytes,
-        **kwargs
+        **kwargs,
     )

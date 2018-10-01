@@ -35,7 +35,7 @@ class Contact(BaseESModel):
             'name',
             'name_keyword',
             'name_trigram',
-        ]
+        ],
     )
     job_title = fields.SortableCaseInsensitiveKeywordText()
     last_name = fields.SortableText(
@@ -43,7 +43,8 @@ class Contact(BaseESModel):
             'name',
             'name_keyword',
             'name_trigram',
-        ])
+        ],
+    )
     modified_on = Date()
     name = fields.SortableText()
     name_keyword = fields.SortableCaseInsensitiveKeywordText()
