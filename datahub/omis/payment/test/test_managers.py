@@ -9,7 +9,7 @@ from datahub.company.test.factories import AdviserFactory
 from datahub.core.exceptions import APIConflictException
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import (
-    OrderFactory, OrderPaidFactory, OrderWithAcceptedQuoteFactory
+    OrderFactory, OrderPaidFactory, OrderWithAcceptedQuoteFactory,
 )
 from .factories import PaymentGatewaySessionFactory
 from ..constants import PaymentGatewaySessionStatus, PaymentMethod
@@ -27,7 +27,7 @@ class TestPaymentManager:
     @mock.patch('datahub.omis.payment.managers.generate_datetime_based_reference')
     def test_create_from_order(
         self,
-        mocked_generate_datetime_based_reference
+        mocked_generate_datetime_based_reference,
     ):
         """Test that Payment.objects.create_from_order creates a payment."""
         mocked_generate_datetime_based_reference.return_value = '201702010004'
@@ -37,10 +37,10 @@ class TestPaymentManager:
         attrs = {
             'transaction_reference': 'lorem ipsum',
             'amount': 1001,
-            'received_on': dateutil_parse('2017-01-01').date()
+            'received_on': dateutil_parse('2017-01-01').date(),
         }
         payment = Payment.objects.create_from_order(
-            order=order, by=by, attrs=attrs
+            order=order, by=by, attrs=attrs,
         )
 
         payment.refresh_from_db()
@@ -62,7 +62,7 @@ class TestPaymentGatewaySessionManager:
         """
         monkeypatch.setattr(
             'uuid.uuid4',
-            mock.Mock(return_value='0123abcd-0000-0000-0000-000000000000')
+            mock.Mock(return_value='0123abcd-0000-0000-0000-000000000000'),
         )
 
         # mock request
@@ -77,10 +77,10 @@ class TestPaymentGatewaySessionManager:
                 '_links': {
                     'next_url': {
                         'href': 'https://payment.example.com/123abc',
-                        'method': 'GET'
+                        'method': 'GET',
                     },
-                }
-            }
+                },
+            },
         )
 
         assert PaymentGatewaySession.objects.count() == 0
@@ -90,7 +90,7 @@ class TestPaymentGatewaySessionManager:
         order = OrderWithAcceptedQuoteFactory()
         session = PaymentGatewaySession.objects.create_from_order(
             order=order,
-            attrs={'created_by': adviser}
+            attrs={'created_by': adviser},
         )
 
         # check session
@@ -108,12 +108,12 @@ class TestPaymentGatewaySessionManager:
             'amount': order.total_cost,
             'reference': f'{order.reference}-0123ABCD',
             'description': settings.GOVUK_PAY_PAYMENT_DESCRIPTION.format(
-                reference=order.reference
+                reference=order.reference,
             ),
             'return_url': settings.GOVUK_PAY_RETURN_URL.format(
                 public_token=order.public_token,
-                session_id=session.pk
-            )
+                session_id=session.pk,
+            ),
         }
 
     def test_create_cancels_other_sessions(self, requests_mock):
@@ -144,7 +144,7 @@ class TestPaymentGatewaySessionManager:
                 PaymentGatewaySessionStatus.created,
                 PaymentGatewaySessionStatus.started,
                 PaymentGatewaySessionStatus.failed,
-            ])
+            ]),
         )
 
         # mock GOV.UK requests used to:
@@ -165,11 +165,11 @@ class TestPaymentGatewaySessionManager:
                         'status_code': 200,
                         'json': {'state': {'status': 'cancelled'}},
                     },
-                ]
+                ],
             )
             requests_mock.post(
                 govuk_url(f'payments/{session.govuk_payment_id}/cancel'),
-                status_code=204
+                status_code=204,
             )
 
         # mock GOV.UK request used to create a new payment session
@@ -183,10 +183,10 @@ class TestPaymentGatewaySessionManager:
                 '_links': {
                     'next_url': {
                         'href': 'https://payment.example.com/123abc',
-                        'method': 'GET'
+                        'method': 'GET',
                     },
-                }
-            }
+                },
+            },
         )
 
         assert PaymentGatewaySession.objects.count() == 3
@@ -211,12 +211,12 @@ class TestPaymentGatewaySessionManager:
             'amount': order.total_cost,
             'reference': f'{order.reference}-{str(session.id)[:8].upper()}',
             'description': settings.GOVUK_PAY_PAYMENT_DESCRIPTION.format(
-                reference=order.reference
+                reference=order.reference,
             ),
             'return_url': settings.GOVUK_PAY_RETURN_URL.format(
                 public_token=order.public_token,
-                session_id=session.id
-            )
+                session_id=session.id,
+            ),
         }
 
     @pytest.mark.parametrize(
@@ -226,7 +226,7 @@ class TestPaymentGatewaySessionManager:
             OrderStatus.paid,
             OrderStatus.complete,
             OrderStatus.cancelled,
-        )
+        ),
     )
     def test_exception_if_order_in_disallowed_status(self, disallowed_status):
         """
@@ -255,7 +255,7 @@ class TestPaymentGatewaySessionManager:
         order = OrderWithAcceptedQuoteFactory()
         existing_session = PaymentGatewaySessionFactory(
             order=order,
-            status=PaymentGatewaySessionStatus.started
+            status=PaymentGatewaySessionStatus.started,
         )
 
         # mock GOV.UK requests used to refresh the payment session,
@@ -278,11 +278,11 @@ class TestPaymentGatewaySessionManager:
                         'line2': 'line 2 address',
                         'postcode': 'SW1A 1AA',
                         'city': 'London',
-                        'country': 'GB'
+                        'country': 'GB',
                     },
                     'card_brand': 'Visa',
                 },
-            }
+            },
         )
 
         with pytest.raises(APIConflictException):
@@ -314,7 +314,7 @@ class TestPaymentGatewaySessionManager:
 
     @pytest.mark.parametrize('govuk_status_code', (400, 401, 422, 500))
     def test_exception_if_govuk_pay_errors_when_creating(
-        self, govuk_status_code, requests_mock
+        self, govuk_status_code, requests_mock,
     ):
         """
         Test that if GOV.UK Pay errors whilst creating a new payment, the method raises
@@ -328,7 +328,7 @@ class TestPaymentGatewaySessionManager:
         """
         requests_mock.post(
             govuk_url('payments'),
-            status_code=govuk_status_code
+            status_code=govuk_status_code,
         )
 
         assert PaymentGatewaySession.objects.count() == 0
@@ -342,7 +342,7 @@ class TestPaymentGatewaySessionManager:
 
     @pytest.mark.parametrize('govuk_status_code', (400, 401, 404, 409, 500))
     def test_exception_if_govuk_pay_errors_when_cancelling(
-        self, govuk_status_code, requests_mock
+        self, govuk_status_code, requests_mock,
     ):
         """
         Test that if GOV.UK Pay errors whilst cancelling some other ongoing
@@ -358,7 +358,7 @@ class TestPaymentGatewaySessionManager:
         order = OrderWithAcceptedQuoteFactory()
         existing_session = PaymentGatewaySessionFactory(
             order=order,
-            status=PaymentGatewaySessionStatus.created
+            status=PaymentGatewaySessionStatus.created,
         )
 
         # mock GOV.UK requests used to
@@ -369,11 +369,11 @@ class TestPaymentGatewaySessionManager:
             status_code=200,
             json={
                 'state': {'status': existing_session.status},
-            }
+            },
         )
         requests_mock.post(
             govuk_url(f'payments/{existing_session.govuk_payment_id}/cancel'),
-            status_code=govuk_status_code
+            status_code=govuk_status_code,
         )
 
         assert PaymentGatewaySession.objects.count() == 1
@@ -405,7 +405,7 @@ class TestPaymentGatewaySessionManager:
                 PaymentGatewaySessionStatus.created,
                 PaymentGatewaySessionStatus.submitted,
                 PaymentGatewaySessionStatus.failed,
-            ])
+            ]),
         )
         order2_sessions = PaymentGatewaySessionFactory.create_batch(
             3,
@@ -414,7 +414,7 @@ class TestPaymentGatewaySessionManager:
                 PaymentGatewaySessionStatus.started,
                 PaymentGatewaySessionStatus.success,
                 PaymentGatewaySessionStatus.cancelled,
-            ])
+            ]),
         )
 
         # test qs without filters

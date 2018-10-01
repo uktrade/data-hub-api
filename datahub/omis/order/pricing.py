@@ -9,7 +9,7 @@ from .validators import VATValidator
 
 OrderPricing = namedtuple(
     'OrderPricing',
-    ('net_cost', 'subtotal_cost', 'vat_cost', 'total_cost')
+    ('net_cost', 'subtotal_cost', 'vat_cost', 'total_cost'),
 )
 
 ZERO_PRICING = OrderPricing(0, 0, 0, 0)
@@ -28,7 +28,7 @@ def get_pricing_from_order(order, in_pence=True):
         transform(order.net_cost),
         transform(order.subtotal_cost),
         transform(order.vat_cost),
-        transform(order.total_cost)
+        transform(order.total_cost),
     )
 
 
@@ -128,7 +128,7 @@ def calculate_order_pricing(order):
         estimated_time=tot_estimated_time,
         hourly_rate=order.hourly_rate.rate_value,
         vat_value=vat_value,
-        discount_value=order.discount_value
+        discount_value=order.discount_value,
     )
 
 

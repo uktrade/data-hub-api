@@ -9,7 +9,7 @@ from datahub.core.test_utils import AdminTestMixin, create_test_user
 from .factories import (
     OrderCancelledFactory, OrderCompleteFactory,
     OrderFactory, OrderPaidFactory,
-    OrderWithAcceptedQuoteFactory, OrderWithOpenQuoteFactory
+    OrderWithAcceptedQuoteFactory, OrderWithOpenQuoteFactory,
 )
 from ..constants import OrderStatus
 from ..models import CancellationReason, Order, OrderPermission
@@ -42,7 +42,7 @@ class TestCancelOrderAdmin(AdminTestMixin):
                 OrderPermission.add,
                 OrderPermission.delete,
                 OrderPermission.view,
-            )
+            ),
         )
 
         client = self.create_client(user=user)
@@ -57,7 +57,7 @@ class TestCancelOrderAdmin(AdminTestMixin):
         response = self.client.get(url, follow=True)
         assert response.status_code == 200
         assert [msg.message for msg in response.context['messages']] == [
-            f'order with ID "{order_id}" doesn\'t exist. Perhaps it was deleted?'
+            f'order with ID "{order_id}" doesn\'t exist. Perhaps it was deleted?',
         ]
 
     def test_400_popup_not_allowed(self):
@@ -73,15 +73,15 @@ class TestCancelOrderAdmin(AdminTestMixin):
         (
             (
                 {'reason': ''},
-                {'reason': ['This field is required.']}
+                {'reason': ['This field is required.']},
             ),
             (
                 {'reason': '00000000-0000-0000-0000-000000000000'},
                 {'reason': [
-                    'Select a valid choice. That choice is not one of the available choices.'
-                ]}
+                    'Select a valid choice. That choice is not one of the available choices.',
+                ]},
             ),
-        )
+        ),
     )
     def test_400_validaton_error(self, data, errors):
         """Test validation errors."""
@@ -101,7 +101,7 @@ class TestCancelOrderAdmin(AdminTestMixin):
         (
             OrderCompleteFactory,
             OrderCancelledFactory,
-        )
+        ),
     )
     def test_400_if_in_disallowed_status(self, order_factory):
         """
@@ -114,7 +114,7 @@ class TestCancelOrderAdmin(AdminTestMixin):
         assert response.status_code == 200
 
         reason = CancellationReason.objects.filter(
-            disabled_on__isnull=True
+            disabled_on__isnull=True,
         ).order_by('?').first()
 
         response = self.client.post(url, data={'reason': reason.pk})
@@ -129,7 +129,7 @@ class TestCancelOrderAdmin(AdminTestMixin):
             f'in the current status {order.get_status_display()}.'
         )
         assert response.context['form'].errors == {
-            NON_FIELD_ERRORS: [err_msg]
+            NON_FIELD_ERRORS: [err_msg],
         }
 
         # check that nothing has changed in the db
@@ -149,7 +149,7 @@ class TestCancelOrderAdmin(AdminTestMixin):
             OrderWithOpenQuoteFactory,
             OrderWithAcceptedQuoteFactory,
             OrderPaidFactory,
-        )
+        ),
     )
     def test_200_if_in_allowed_status(self, order_factory):
         """
@@ -162,7 +162,7 @@ class TestCancelOrderAdmin(AdminTestMixin):
         assert response.status_code == 200
 
         reason = CancellationReason.objects.filter(
-            disabled_on__isnull=True
+            disabled_on__isnull=True,
         ).order_by('?').first()
 
         response = self.client.post(url, data={'reason': reason.pk}, follow=True)

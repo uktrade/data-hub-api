@@ -51,7 +51,7 @@ class RequestedRefundFactory(factory.django.DjangoModelFactory):
     requested_by = factory.SubFactory(AdviserFactory)
     refund_reason = factory.Faker('text')
     requested_amount = factory.LazyAttribute(
-        lambda refund: random.randint(1, refund.order.total_cost)
+        lambda refund: random.randint(1, refund.order.total_cost),
     )
 
     class Meta:
@@ -74,13 +74,13 @@ class ApprovedRefundFactory(RequestedRefundFactory):
     method = constants.PaymentMethod.bacs
 
     vat_amount = factory.LazyAttribute(
-        lambda refund: int(refund.requested_amount * 0.2)
+        lambda refund: int(refund.requested_amount * 0.2),
     )
     net_amount = factory.LazyAttribute(
-        lambda refund: refund.requested_amount - refund.vat_amount
+        lambda refund: refund.requested_amount - refund.vat_amount,
     )
     total_amount = factory.LazyAttribute(
-        lambda refund: refund.requested_amount
+        lambda refund: refund.requested_amount,
     )
     additional_reference = factory.Faker('pystr')
 

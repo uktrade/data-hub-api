@@ -36,7 +36,7 @@ class PayClient:
         """GOV.UK common headers including the Authorization one."""
         return {
             'Accept': 'application/json',
-            'Authorization': f'Bearer {settings.GOVUK_PAY_AUTH_TOKEN}'
+            'Authorization': f'Bearer {settings.GOVUK_PAY_AUTH_TOKEN}',
         }
 
     def _raise_for_status(self, response):
@@ -65,7 +65,7 @@ class PayClient:
         request_kwargs = {
             'headers': self._headers,
             'timeout': settings.GOVUK_PAY_TIMEOUT,
-            **kwargs
+            **kwargs,
         }
         url = govuk_url(path)
 
@@ -73,7 +73,7 @@ class PayClient:
         response = requests.request(method, url, **request_kwargs)
         logger.info(
             f'GOV.UK Pay - {method} call for url {url} '
-            f'- DONE - status code {response.status_code}'
+            f'- DONE - status code {response.status_code}',
         )
 
         self._raise_for_status(response)
@@ -99,7 +99,7 @@ class PayClient:
                 'reference': reference,
                 'description': description,
                 'return_url': return_url,
-            }
+            },
         ).json()
 
     def get_payment_by_id(self, payment_id):

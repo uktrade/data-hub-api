@@ -8,7 +8,7 @@ from datahub.omis.notification.client import notify
 from datahub.omis.order.models import Order, OrderAssignee, OrderSubscriber
 from datahub.omis.order.signals import (
     order_cancelled, order_completed, order_paid,
-    quote_accepted, quote_cancelled, quote_generated
+    quote_accepted, quote_cancelled, quote_generated,
 )
 
 
@@ -36,8 +36,8 @@ def notify_post_save_order_adviser(sender, instance, created, raw=False, **kwarg
                 order=instance.order,
                 adviser=instance.adviser,
                 by=instance.created_by,
-                creation_date=instance.created_on
-            )
+                creation_date=instance.created_on,
+            ),
         )
 
 
@@ -51,7 +51,7 @@ def notify_post_delete_order_adviser(sender, instance, **kwargs):
     so be very careful what you do with it.
     """
     transaction.on_commit(
-        partial(notify.adviser_removed, order=instance.order, adviser=instance.adviser)
+        partial(notify.adviser_removed, order=instance.order, adviser=instance.adviser),
     )
 
 

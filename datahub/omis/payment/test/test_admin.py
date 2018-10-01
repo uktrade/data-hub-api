@@ -86,7 +86,7 @@ class TestRefundAdmin(AdminTestMixin):
             RequestedRefundFactory,
             ApprovedRefundFactory,
             RejectedRefundFactory,
-        )
+        ),
     )
     def test_change(self, refund_factory):
         """Test changing a refund record, its status cannot change at this point."""
@@ -156,15 +156,15 @@ class TestRefundAdmin(AdminTestMixin):
                 {'status': RefundStatus.rejected},
                 {
                     'status': [
-                        'Select a valid choice. rejected is not one of the available choices.'
-                    ]
-                }
+                        'Select a valid choice. rejected is not one of the available choices.',
+                    ],
+                },
             ),
 
             # invalid order status
             (
                 {'order': lambda *_: OrderWithOpenQuoteFactory()},
-                {'order': ['This order has not been paid for.']}
+                {'order': ['This order has not been paid for.']},
             ),
 
             # requested on < order.paid_on
@@ -178,9 +178,9 @@ class TestRefundAdmin(AdminTestMixin):
                 },
                 {
                     'requested_on': [
-                        'Please specify a value greater than or equal to Jan. 1, 2018, 1 p.m..'
-                    ]
-                }
+                        'Please specify a value greater than or equal to Jan. 1, 2018, 1 p.m..',
+                    ],
+                },
             ),
 
             # level1 approved on < order.paid_on
@@ -194,9 +194,9 @@ class TestRefundAdmin(AdminTestMixin):
                 },
                 {
                     'level1_approved_on': [
-                        'Please specify a value greater than or equal to Jan. 1, 2018, 1 p.m..'
-                    ]
-                }
+                        'Please specify a value greater than or equal to Jan. 1, 2018, 1 p.m..',
+                    ],
+                },
             ),
 
             # level2 approved on < order.paid_on
@@ -210,35 +210,35 @@ class TestRefundAdmin(AdminTestMixin):
                 },
                 {
                     'level2_approved_on': [
-                        'Please specify a value greater than or equal to Jan. 1, 2018, 1 p.m..'
-                    ]
-                }
+                        'Please specify a value greater than or equal to Jan. 1, 2018, 1 p.m..',
+                    ],
+                },
             ),
 
             # same level1 and level2 approver
             (
                 {
                     'level1_approved_by': lambda *_: AdviserFactory().pk,
-                    'level2_approved_by': lambda _, d: d['level1_approved_by']
+                    'level2_approved_by': lambda _, d: d['level1_approved_by'],
                 },
                 {
-                    'level1_approved_by': ['Approvers level1 and level2 have to be different.']
-                }
+                    'level1_approved_by': ['Approvers level1 and level2 have to be different.'],
+                },
             ),
 
             # net_amount + vat_amount > order.total_cost
             (
                 {
                     'net_amount': lambda o, _: o.total_cost,
-                    'vat_amount': lambda *_: 1
+                    'vat_amount': lambda *_: 1,
                 },
                 {
                     'net_amount': lambda o, _: [
-                        f'Remaining amount that can be refunded: {o.total_cost}.'
-                    ]
-                }
+                        f'Remaining amount that can be refunded: {o.total_cost}.',
+                    ],
+                },
             ),
-        )
+        ),
     )
     def test_validation_error(self, data_delta, errors):
         """Test validation errors."""
@@ -300,7 +300,7 @@ class TestRefundAdmin(AdminTestMixin):
                     'status',
                     'requested_on',
                     'requested_amount',
-                )
+                ),
             ),
             (
                 ApprovedRefundFactory,
@@ -316,7 +316,7 @@ class TestRefundAdmin(AdminTestMixin):
                     'method',
                     'net_amount',
                     'vat_amount',
-                )
+                ),
             ),
             (
                 RejectedRefundFactory,
@@ -325,9 +325,9 @@ class TestRefundAdmin(AdminTestMixin):
                     'status',
                     'requested_on',
                     'requested_amount',
-                )
+                ),
             ),
-        )
+        ),
     )
     def test_required_fields(self, refund_factory, required_fields):
         """Test required fields depending on the status of the refund."""
@@ -372,7 +372,7 @@ class TestRefundAdmin(AdminTestMixin):
             RequestedRefundFactory,
             ApprovedRefundFactory,
             RejectedRefundFactory,
-        )
+        ),
     )
     def test_cannot_change_status(self, refund_factory):
         """Test that the status field cannot be changed at any point."""
@@ -415,6 +415,7 @@ class TestRefundAdmin(AdminTestMixin):
             assert not form.is_valid()
             assert form.errors == {
                 'status': [
-                    f'Select a valid choice. {changed_status} is not one of the available choices.'
-                ]
+                    f'Select a valid choice. {changed_status} is not one of the available '
+                    f'choices.',
+                ],
             }

@@ -46,7 +46,7 @@ class RefundForm(forms.ModelForm):
             'vat_amount',
             'total_amount',
             'rejection_reason',
-            'additional_reference'
+            'additional_reference',
         )
 
     def __init__(self, *args, **kwargs):
@@ -78,7 +78,7 @@ class RefundForm(forms.ModelForm):
         if order.status not in (OrderStatus.complete, OrderStatus.paid, OrderStatus.cancelled):
             self.add_error(
                 'order',
-                ValidationError(_('This order has not been paid for.'), code='not_paid')
+                ValidationError(_('This order has not been paid for.'), code='not_paid'),
             )
 
     def _clean_datetime_field_gte_value(self, field, compared_value):
@@ -94,11 +94,11 @@ class RefundForm(forms.ModelForm):
                     _('Please specify a value greater than or equal to %(compared_value)s.'),
                     params={
                         'compared_value': date_formatter(
-                            compared_value, settings.DATETIME_FORMAT
-                        )
+                            compared_value, settings.DATETIME_FORMAT,
+                        ),
                     },
-                    code='invalid_date'
-                )
+                    code='invalid_date',
+                ),
             )
 
     def _clean_amounts(self):
@@ -125,10 +125,10 @@ class RefundForm(forms.ModelForm):
                 ValidationError(
                     _('Remaining amount that can be refunded: %(refund_remaining)s.'),
                     params={
-                        'refund_remaining': refund_remaining
+                        'refund_remaining': refund_remaining,
                     },
-                    code='refund_limit_exceeded'
-                )
+                    code='refund_limit_exceeded',
+                ),
             )
         else:
             self.cleaned_data['total_amount'] = total_amount
@@ -143,8 +143,8 @@ class RefundForm(forms.ModelForm):
                 'level1_approved_by',
                 ValidationError(
                     _('Approvers level1 and level2 have to be different.'),
-                    code='invalid_approvers'
-                )
+                    code='invalid_approvers',
+                ),
             )
 
     def clean(self):

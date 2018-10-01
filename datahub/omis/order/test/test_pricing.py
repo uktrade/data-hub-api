@@ -11,7 +11,7 @@ from ..pricing import (
     _calculate_pricing, calculate_order_pricing,
     can_pricing_be_calculated, get_pricing_from_order,
     OrderPricing, should_vat_be_applied,
-    update_order_pricing, ZERO_PRICING
+    update_order_pricing, ZERO_PRICING,
 )
 
 
@@ -27,7 +27,7 @@ class TestGetPricingFromOrder:
             net_cost=1101,
             subtotal_cost=1001,
             vat_cost=302,
-            total_cost=1303
+            total_cost=1303,
         )
         pricing = get_pricing_from_order(order, in_pence=True)
         assert pricing.net_cost == 1101
@@ -44,7 +44,7 @@ class TestGetPricingFromOrder:
             net_cost=1101,
             subtotal_cost=1001,
             vat_cost=302,
-            total_cost=1303
+            total_cost=1303,
         )
         pricing = get_pricing_from_order(order, in_pence=False)
         assert pricing.net_cost == 11.01
@@ -104,8 +104,8 @@ class TestShouldVATBeApplied:
         'fields',
         (
             {'vat_status': VATStatus.outside_eu},
-            {'vat_status': VATStatus.eu, 'vat_verified': True, 'vat_number': '123'}
-        )
+            {'vat_status': VATStatus.eu, 'vat_verified': True, 'vat_number': '123'},
+        ),
     )
     def test_shouldnt(self, fields):
         """Test the cases where the VAT should not be applied."""
@@ -116,8 +116,8 @@ class TestShouldVATBeApplied:
         'fields',
         (
             {'vat_status': VATStatus.uk},
-            {'vat_status': VATStatus.eu, 'vat_verified': False}
-        )
+            {'vat_status': VATStatus.eu, 'vat_verified': False},
+        ),
     )
     def test_should(self, fields):
         """Test the cases where the VAT should be applied."""
@@ -136,7 +136,7 @@ class TestCalculatePricing:
             estimated_time=0,
             hourly_rate=1000,
             vat_value=Decimal(20),
-            discount_value=100
+            discount_value=100,
         )
         assert pricing == OrderPricing(0, 0, 0, 0)
 
@@ -164,7 +164,7 @@ class TestCalculatePricing:
             estimated_time=130,
             hourly_rate=1000,
             vat_value=Decimal(19.5),
-            discount_value=100
+            discount_value=100,
         )
         assert pricing.net_cost == 2167
         assert pricing.subtotal_cost == 2067
@@ -195,7 +195,7 @@ class TestCalculatePricing:
             estimated_time=130,
             hourly_rate=1000,
             vat_value=0,
-            discount_value=100
+            discount_value=100,
         )
         assert pricing.net_cost == 2167
         assert pricing.subtotal_cost == 2067
@@ -233,7 +233,7 @@ class TestCalculateOrderPricing:
         (
             {'vat_status': VATStatus.uk},
             {'vat_status': VATStatus.eu, 'vat_verified': False},
-        )
+        ),
     )
     def test_with_applied_vat(self, fields):
         """Test when the VAT status requires the VAT to be applied."""
@@ -242,7 +242,7 @@ class TestCalculateOrderPricing:
             **fields,
             discount_value=100,
             hourly_rate=hourly_rate,
-            assignees=[]
+            assignees=[],
         )
         OrderAssigneeFactory(order=order, estimated_time=140)
 
@@ -258,7 +258,7 @@ class TestCalculateOrderPricing:
         (
             {'vat_status': VATStatus.outside_eu},
             {'vat_status': VATStatus.eu, 'vat_verified': True},
-        )
+        ),
     )
     def test_without_applied_vat(self, fields):
         """Test when the VAT status doesn't require the VAT to be applied."""
@@ -267,7 +267,7 @@ class TestCalculateOrderPricing:
             **fields,
             discount_value=100,
             hourly_rate=hourly_rate,
-            assignees=[]
+            assignees=[],
         )
         OrderAssigneeFactory(order=order, estimated_time=140)
 

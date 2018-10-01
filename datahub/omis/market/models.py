@@ -10,7 +10,7 @@ class Market(DisableableModel):
     country = models.OneToOneField(
         Country,
         primary_key=True,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     manager_email = models.EmailField(blank=True)
 

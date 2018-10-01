@@ -30,7 +30,7 @@ class TestRefreshPendingPaymentGatewaySessions:
         requests_mock.register_uri(
             'GET',
             re.compile(govuk_url(f'payments/*')),
-            json={'state': {'status': 'failed'}}
+            json={'state': {'status': 'failed'}},
         )
 
         # populate db
@@ -77,21 +77,21 @@ class TestRefreshPendingPaymentGatewaySessions:
         govuk_payment_ids = ['pay-1', 'pay-2', 'pay-3']
         requests_mock.get(
             govuk_url(f'payments/{govuk_payment_ids[0]}'), status_code=200,
-            json={'state': {'status': 'failed'}}
+            json={'state': {'status': 'failed'}},
         )
         requests_mock.get(
-            govuk_url(f'payments/{govuk_payment_ids[1]}'), status_code=500
+            govuk_url(f'payments/{govuk_payment_ids[1]}'), status_code=500,
         )
         requests_mock.get(
             govuk_url(f'payments/{govuk_payment_ids[2]}'), status_code=200,
-            json={'state': {'status': 'failed'}}
+            json={'state': {'status': 'failed'}},
         )
 
         # populate db
         sessions = PaymentGatewaySessionFactory.create_batch(
             3,
             status=PaymentGatewaySessionStatus.started,
-            govuk_payment_id=factory.Iterator(govuk_payment_ids)
+            govuk_payment_id=factory.Iterator(govuk_payment_ids),
         )
 
         # make call

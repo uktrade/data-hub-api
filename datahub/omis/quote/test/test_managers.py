@@ -21,7 +21,7 @@ class TestQuoteManager:
         self,
         mocked_generate_quote_content,
         mocked_generate_quote_reference,
-        mocked_calculate_quote_expiry_date
+        mocked_calculate_quote_expiry_date,
     ):
         """
         Test that Quote.objects.create_from_order creates a quote
@@ -37,7 +37,7 @@ class TestQuoteManager:
         quote = Quote.objects.create_from_order(
             order=mock.MagicMock(),
             by=by,
-            commit=True
+            commit=True,
         )
 
         quote.refresh_from_db()
@@ -54,7 +54,7 @@ class TestQuoteManager:
         self,
         mocked_generate_quote_content,
         mocked_generate_quote_reference,
-        mocked_calculate_quote_expiry_date
+        mocked_calculate_quote_expiry_date,
     ):
         """
         Test that Quote.objects.create_from_order with commit=False builds a quote
@@ -69,7 +69,7 @@ class TestQuoteManager:
         quote = Quote.objects.create_from_order(
             order=mock.MagicMock(),
             by=AdviserFactory(),
-            commit=False
+            commit=False,
         )
 
         assert quote.reference == 'ABC123'
