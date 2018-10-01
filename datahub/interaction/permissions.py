@@ -3,12 +3,12 @@ from rest_framework.filters import BaseFilterBackend
 from rest_framework.permissions import BasePermission
 
 from datahub.core.permissions import (
-    get_model_action_for_view_action, IsAssociatedToObjectPermission, ViewBasedModelPermissions
+    get_model_action_for_view_action, IsAssociatedToObjectPermission, ViewBasedModelPermissions,
 )
 from datahub.core.utils import StrEnum
 from datahub.interaction.models import Interaction
 from datahub.investment.permissions import (
-    InvestmentProjectAssociationCheckerBase, IsAssociatedToInvestmentProjectFilter
+    InvestmentProjectAssociationCheckerBase, IsAssociatedToInvestmentProjectFilter,
 )
 
 
@@ -26,7 +26,7 @@ class _PermissionTemplate(StrEnum):
 _KIND_PERMISSION_MAPPING = {
     Interaction.KINDS.interaction: None,
     Interaction.KINDS.service_delivery: None,
-    Interaction.KINDS.policy_feedback: _PermissionTemplate.policy_feedback
+    Interaction.KINDS.policy_feedback: _PermissionTemplate.policy_feedback,
 }
 
 
@@ -122,14 +122,20 @@ class HasAssociatedInvestmentProjectValidator:
         investment_project = attrs.get('investment_project')
 
         if investment_project is None:
-            raise ValidationError({
-                'investment_project': self.required_message
-            }, code='null')
+            raise ValidationError(
+                {
+                    'investment_project': self.required_message,
+                },
+                code='null',
+            )
 
         if not checker.is_associated(request, investment_project):
-            raise ValidationError({
-                'investment_project': self.non_associated_investment_project_message
-            }, code='access_denied')
+            raise ValidationError(
+                {
+                    'investment_project': self.non_associated_investment_project_message,
+                },
+                code='access_denied',
+            )
 
     def __repr__(self):
         """Returns the string representation of this object."""
@@ -190,9 +196,12 @@ class KindPermissionValidator:
         allowed_kinds = get_allowed_kinds(request, view.action)
 
         if attrs['kind'] not in allowed_kinds:
-            raise ValidationError({
-                'kind': self.access_denied_message
-            }, code='access_denied')
+            raise ValidationError(
+                {
+                    'kind': self.access_denied_message,
+                },
+                code='access_denied',
+            )
 
     def __repr__(self):
         """Returns the string representation of this object."""
@@ -218,7 +227,7 @@ def _is_kind_allowed(kind, request, view_action):
     format_kwargs = {
         'app_label': Interaction._meta.app_label,
         'model_name': Interaction._meta.model_name,
-        'action': action
+        'action': action,
     }
 
     permission = permission_template.format(**format_kwargs)

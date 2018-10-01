@@ -15,11 +15,11 @@ from datahub.investment.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 from .utils import resolve_data
 from ..factories import (
-    CompanyInteractionFactory, InvestmentProjectInteractionFactory
+    CompanyInteractionFactory, InvestmentProjectInteractionFactory,
 )
 from ...models import (
     CommunicationChannel, Interaction, InteractionPermission, PolicyArea,
-    PolicyIssueType, ServiceDeliveryStatus
+    PolicyIssueType, ServiceDeliveryStatus,
 )
 
 
@@ -30,7 +30,7 @@ NON_RESTRICTED_VIEW_PERMISSIONS = (
     (
         InteractionPermission.view_all,
         InteractionPermission.view_associated_investmentproject,
-    )
+    ),
 )
 
 
@@ -41,7 +41,7 @@ NON_RESTRICTED_ADD_PERMISSIONS = (
     (
         InteractionPermission.add_all,
         InteractionPermission.add_associated_investmentproject,
-    )
+    ),
 )
 
 
@@ -52,7 +52,7 @@ NON_RESTRICTED_CHANGE_PERMISSIONS = (
     (
         InteractionPermission.change_all,
         InteractionPermission.change_associated_investmentproject,
-    )
+    ),
 )
 
 
@@ -69,9 +69,9 @@ class TestAddInteraction(APITestMixin):
             # investment project interaction
             {
                 'investment_project': InvestmentProjectFactory,
-            }
+            },
 
-        )
+        ),
     )
     def test_add(self, extra_data, permissions):
         """Test add a new interaction."""
@@ -112,7 +112,7 @@ class TestAddInteraction(APITestMixin):
             'policy_issue_type': None,
             'communication_channel': {
                 'id': str(communication_channel.pk),
-                'name': communication_channel.name
+                'name': communication_channel.name,
             },
             'subject': 'whatever',
             'date': '2017-04-18',
@@ -120,12 +120,12 @@ class TestAddInteraction(APITestMixin):
                 'id': str(adviser.pk),
                 'first_name': adviser.first_name,
                 'last_name': adviser.last_name,
-                'name': adviser.name
+                'name': adviser.name,
             },
             'notes': 'hello',
             'company': {
                 'id': str(company.pk),
-                'name': company.name
+                'name': company.name,
             },
             'contact': {
                 'id': str(contact.pk),
@@ -149,13 +149,13 @@ class TestAddInteraction(APITestMixin):
                 'id': str(adviser.pk),
                 'first_name': adviser.first_name,
                 'last_name': adviser.last_name,
-                'name': adviser.name
+                'name': adviser.name,
             },
             'modified_by': {
                 'id': str(adviser.pk),
                 'first_name': adviser.first_name,
                 'last_name': adviser.last_name,
-                'name': adviser.name
+                'name': adviser.name,
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
             'modified_on': '2017-04-18T13:25:30.986208Z',
@@ -177,7 +177,7 @@ class TestAddInteraction(APITestMixin):
                     'dit_adviser': ['This field is required.'],
                     'service': ['This field is required.'],
                     'dit_team': ['This field is required.'],
-                }
+                },
             ),
 
             # interaction fields required
@@ -195,7 +195,7 @@ class TestAddInteraction(APITestMixin):
                 {
                     'notes': ['This field is required.'],
                     'communication_channel': ['This field is required.'],
-                }
+                },
             ),
 
             # fields not allowed
@@ -216,7 +216,7 @@ class TestAddInteraction(APITestMixin):
                     'is_event': True,
                     'event': EventFactory,
                     'service_delivery_status': partial(
-                        random_obj_for_model, ServiceDeliveryStatus
+                        random_obj_for_model, ServiceDeliveryStatus,
                     ),
                     'grant_amount_offered': '1111.11',
                     'net_company_receipt': '8888.11',
@@ -227,15 +227,15 @@ class TestAddInteraction(APITestMixin):
                     'is_event': ['This field is only valid for service deliveries.'],
                     'event': ['This field is only valid for service deliveries.'],
                     'service_delivery_status': [
-                        'This field is only valid for service deliveries.'
+                        'This field is only valid for service deliveries.',
                     ],
                     'grant_amount_offered': ['This field is only valid for service deliveries.'],
                     'net_company_receipt': ['This field is only valid for service deliveries.'],
                     'policy_areas': ['This field is only valid for policy feedback.'],
-                    'policy_issue_type': ['This field is only valid for policy feedback.']
-                }
+                    'policy_issue_type': ['This field is only valid for policy feedback.'],
+                },
             ),
-        )
+        ),
     )
     def test_validation(self, data, errors):
         """Test validation errors."""
@@ -261,19 +261,22 @@ class TestAddInteraction(APITestMixin):
         contact = ContactFactory()
         url = reverse('api-v3:interaction:collection')
         api_client = self.create_api_client(user=requester)
-        response = api_client.post(url, {
-            'kind': Interaction.KINDS.interaction,
-            'company': company.pk,
-            'contact': contact.pk,
-            'communication_channel': random_obj_for_model(CommunicationChannel).pk,
-            'subject': 'whatever',
-            'date': date.today().isoformat(),
-            'dit_adviser': requester.pk,
-            'notes': 'hello',
-            'investment_project': project.pk,
-            'service': Service.trade_enquiry.value.id,
-            'dit_team': Team.healthcare_uk.value.id
-        })
+        response = api_client.post(
+            url,
+            data={
+                'kind': Interaction.KINDS.interaction,
+                'company': company.pk,
+                'contact': contact.pk,
+                'communication_channel': random_obj_for_model(CommunicationChannel).pk,
+                'subject': 'whatever',
+                'date': date.today().isoformat(),
+                'dit_adviser': requester.pk,
+                'notes': 'hello',
+                'investment_project': project.pk,
+                'service': Service.trade_enquiry.value.id,
+                'dit_team': Team.healthcare_uk.value.id,
+            },
+        )
 
         assert response.status_code == status.HTTP_201_CREATED
         response_data = response.json()
@@ -295,49 +298,57 @@ class TestAddInteraction(APITestMixin):
         )
         url = reverse('api-v3:interaction:collection')
         api_client = self.create_api_client(user=requester)
-        response = api_client.post(url, {
-            'kind': Interaction.KINDS.interaction,
-            'company': CompanyFactory().pk,
-            'contact': ContactFactory().pk,
-            'communication_channel': random_obj_for_model(CommunicationChannel).pk,
-            'subject': 'whatever',
-            'date': date.today().isoformat(),
-            'dit_adviser': requester.pk,
-            'notes': 'hello',
-            'investment_project': project.pk,
-            'service': Service.trade_enquiry.value.id,
-            'dit_team': Team.healthcare_uk.value.id
-        })
+        response = api_client.post(
+            url,
+            data={
+                'kind': Interaction.KINDS.interaction,
+                'company': CompanyFactory().pk,
+                'contact': ContactFactory().pk,
+                'communication_channel': random_obj_for_model(CommunicationChannel).pk,
+                'subject': 'whatever',
+                'date': date.today().isoformat(),
+                'dit_adviser': requester.pk,
+                'notes': 'hello',
+                'investment_project': project.pk,
+                'service': Service.trade_enquiry.value.id,
+                'dit_team': Team.healthcare_uk.value.id,
+            },
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            'investment_project': ["You don't have permission to add an interaction for this "
-                                   'investment project.']
+            'investment_project': [
+                "You don't have permission to add an interaction for this "
+                'investment project.',
+            ],
         }
 
     def test_restricted_user_cannot_add_company_interaction(self):
         """Test that a restricted user cannot add a company interaction."""
         requester = create_test_user(
-            permission_codenames=[InteractionPermission.add_associated_investmentproject]
+            permission_codenames=[InteractionPermission.add_associated_investmentproject],
         )
         url = reverse('api-v3:interaction:collection')
         api_client = self.create_api_client(user=requester)
-        response = api_client.post(url, {
-            'kind': Interaction.KINDS.interaction,
-            'company': CompanyFactory().pk,
-            'contact': ContactFactory().pk,
-            'communication_channel': random_obj_for_model(CommunicationChannel).pk,
-            'subject': 'whatever',
-            'date': date.today().isoformat(),
-            'dit_adviser': requester.pk,
-            'notes': 'hello',
-            'service': Service.trade_enquiry.value.id,
-            'dit_team': Team.healthcare_uk.value.id
-        })
+        response = api_client.post(
+            url,
+            data={
+                'kind': Interaction.KINDS.interaction,
+                'company': CompanyFactory().pk,
+                'contact': ContactFactory().pk,
+                'communication_channel': random_obj_for_model(CommunicationChannel).pk,
+                'subject': 'whatever',
+                'date': date.today().isoformat(),
+                'dit_adviser': requester.pk,
+                'notes': 'hello',
+                'service': Service.trade_enquiry.value.id,
+                'dit_team': Team.healthcare_uk.value.id,
+            },
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            'investment_project': ['This field is required.']
+            'investment_project': ['This field is required.'],
         }
 
 
@@ -367,7 +378,7 @@ class TestGetInteraction(APITestMixin):
             'policy_issue_type': None,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
-                'name': interaction.communication_channel.name
+                'name': interaction.communication_channel.name,
             },
             'subject': interaction.subject,
             'date': interaction.date.date().isoformat(),
@@ -375,12 +386,12 @@ class TestGetInteraction(APITestMixin):
                 'id': str(interaction.dit_adviser.pk),
                 'first_name': interaction.dit_adviser.first_name,
                 'last_name': interaction.dit_adviser.last_name,
-                'name': interaction.dit_adviser.name
+                'name': interaction.dit_adviser.name,
             },
             'notes': interaction.notes,
             'company': {
                 'id': str(interaction.company.pk),
-                'name': interaction.company.name
+                'name': interaction.company.name,
             },
             'contact': {
                 'id': str(interaction.contact.pk),
@@ -404,16 +415,16 @@ class TestGetInteraction(APITestMixin):
                 'id': str(interaction.created_by.pk),
                 'first_name': interaction.created_by.first_name,
                 'last_name': interaction.created_by.last_name,
-                'name': interaction.created_by.name
+                'name': interaction.created_by.name,
             },
             'modified_by': {
                 'id': str(interaction.modified_by.pk),
                 'first_name': interaction.modified_by.first_name,
                 'last_name': interaction.modified_by.last_name,
-                'name': interaction.modified_by.name
+                'name': interaction.modified_by.name,
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
-            'modified_on': '2017-04-18T13:25:30.986208Z'
+            'modified_on': '2017-04-18T13:25:30.986208Z',
         }
 
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
@@ -439,7 +450,7 @@ class TestGetInteraction(APITestMixin):
             'policy_issue_type': None,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
-                'name': interaction.communication_channel.name
+                'name': interaction.communication_channel.name,
             },
             'subject': interaction.subject,
             'date': interaction.date.date().isoformat(),
@@ -447,12 +458,12 @@ class TestGetInteraction(APITestMixin):
                 'id': str(interaction.dit_adviser.pk),
                 'first_name': interaction.dit_adviser.first_name,
                 'last_name': interaction.dit_adviser.last_name,
-                'name': interaction.dit_adviser.name
+                'name': interaction.dit_adviser.name,
             },
             'notes': interaction.notes,
             'company': {
                 'id': str(interaction.company.pk),
-                'name': interaction.company.name
+                'name': interaction.company.name,
             },
             'contact': {
                 'id': str(interaction.contact.pk),
@@ -480,16 +491,16 @@ class TestGetInteraction(APITestMixin):
                 'id': str(interaction.created_by.pk),
                 'first_name': interaction.created_by.first_name,
                 'last_name': interaction.created_by.last_name,
-                'name': interaction.created_by.name
+                'name': interaction.created_by.name,
             },
             'modified_by': {
                 'id': str(interaction.modified_by.pk),
                 'first_name': interaction.modified_by.first_name,
                 'last_name': interaction.modified_by.last_name,
-                'name': interaction.modified_by.name
+                'name': interaction.modified_by.name,
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
-            'modified_on': '2017-04-18T13:25:30.986208Z'
+            'modified_on': '2017-04-18T13:25:30.986208Z',
         }
 
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -519,7 +530,7 @@ class TestGetInteraction(APITestMixin):
             'policy_issue_type': None,
             'communication_channel': {
                 'id': str(interaction.communication_channel.pk),
-                'name': interaction.communication_channel.name
+                'name': interaction.communication_channel.name,
             },
             'subject': interaction.subject,
             'date': interaction.date.date().isoformat(),
@@ -527,12 +538,12 @@ class TestGetInteraction(APITestMixin):
                 'id': str(interaction.dit_adviser.pk),
                 'first_name': interaction.dit_adviser.first_name,
                 'last_name': interaction.dit_adviser.last_name,
-                'name': interaction.dit_adviser.name
+                'name': interaction.dit_adviser.name,
             },
             'notes': interaction.notes,
             'company': {
                 'id': str(interaction.company.pk),
-                'name': interaction.company.name
+                'name': interaction.company.name,
             },
             'contact': {
                 'id': str(interaction.contact.pk),
@@ -560,16 +571,16 @@ class TestGetInteraction(APITestMixin):
                 'id': str(interaction.created_by.pk),
                 'first_name': interaction.created_by.first_name,
                 'last_name': interaction.created_by.last_name,
-                'name': interaction.created_by.name
+                'name': interaction.created_by.name,
             },
             'modified_by': {
                 'id': str(interaction.modified_by.pk),
                 'first_name': interaction.modified_by.first_name,
                 'last_name': interaction.modified_by.last_name,
-                'name': interaction.modified_by.name
+                'name': interaction.modified_by.name,
             },
             'created_on': '2017-04-18T13:25:30.986208Z',
-            'modified_on': '2017-04-18T13:25:30.986208Z'
+            'modified_on': '2017-04-18T13:25:30.986208Z',
         }
 
     def test_restricted_user_cannot_get_non_associated_investment_project_interaction(self):
@@ -580,7 +591,7 @@ class TestGetInteraction(APITestMixin):
         interaction = InvestmentProjectInteractionFactory()
         requester = create_test_user(
             permission_codenames=[InteractionPermission.view_associated_investmentproject],
-            dit_team=TeamFactory()
+            dit_team=TeamFactory(),
         )
         api_client = self.create_api_client(user=requester)
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
@@ -593,7 +604,7 @@ class TestGetInteraction(APITestMixin):
         interaction = CompanyInteractionFactory()
         requester = create_test_user(
             permission_codenames=[InteractionPermission.view_associated_investmentproject],
-            dit_team=TeamFactory()
+            dit_team=TeamFactory(),
         )
         api_client = self.create_api_client(user=requester)
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
@@ -613,9 +624,12 @@ class TestUpdateInteraction(APITestMixin):
 
         api_client = self.create_api_client(user=requester)
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        response = api_client.patch(url, {
-            'subject': 'I am another subject',
-        })
+        response = api_client.patch(
+            url,
+            data={
+                'subject': 'I am another subject',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['subject'] == 'I am another subject'
@@ -623,15 +637,18 @@ class TestUpdateInteraction(APITestMixin):
     def test_restricted_user_cannot_update_company_interaction(self):
         """Test that a restricted user cannot update a company interaction."""
         requester = create_test_user(
-            permission_codenames=[InteractionPermission.change_associated_investmentproject]
+            permission_codenames=[InteractionPermission.change_associated_investmentproject],
         )
         interaction = CompanyInteractionFactory(subject='I am a subject')
 
         api_client = self.create_api_client(user=requester)
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        response = api_client.patch(url, {
-            'subject': 'I am another subject',
-        })
+        response = api_client.patch(
+            url,
+            data={
+                'subject': 'I am another subject',
+            },
+        )
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -643,14 +660,17 @@ class TestUpdateInteraction(APITestMixin):
             subject='I am a subject',
         )
         requester = create_test_user(
-            permission_codenames=[InteractionPermission.change_associated_investmentproject]
+            permission_codenames=[InteractionPermission.change_associated_investmentproject],
         )
 
         api_client = self.create_api_client(user=requester)
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        response = api_client.patch(url, {
-            'subject': 'I am another subject',
-        })
+        response = api_client.patch(
+            url,
+            data={
+                'subject': 'I am another subject',
+            },
+        )
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -662,20 +682,23 @@ class TestUpdateInteraction(APITestMixin):
         project = InvestmentProjectFactory(created_by=project_creator)
         interaction = CompanyInteractionFactory(
             subject='I am a subject',
-            investment_project=project
+            investment_project=project,
         )
         requester = create_test_user(
             permission_codenames=[
-                InteractionPermission.change_associated_investmentproject
+                InteractionPermission.change_associated_investmentproject,
             ],
-            dit_team=project_creator.dit_team
+            dit_team=project_creator.dit_team,
         )
 
         api_client = self.create_api_client(user=requester)
         url = reverse('api-v3:interaction:item', kwargs={'pk': interaction.pk})
-        response = api_client.patch(url, {
-            'subject': 'I am another subject',
-        })
+        response = api_client.patch(
+            url,
+            data={
+                'subject': 'I am another subject',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['subject'] == 'I am another subject'
@@ -694,7 +717,7 @@ class TestListInteractions(APITestMixin):
         company = CompanyFactory()
         company_interactions = CompanyInteractionFactory.create_batch(3, company=company)
         project_interactions = CompanyInteractionFactory.create_batch(
-            3, investment_project=project
+            3, investment_project=project,
         )
 
         url = reverse('api-v3:interaction:collection')
@@ -715,7 +738,7 @@ class TestListInteractions(APITestMixin):
         creator = AdviserFactory()
         requester = create_test_user(
             permission_codenames=[InteractionPermission.view_associated_investmentproject],
-            dit_team=creator.dit_team
+            dit_team=creator.dit_team,
         )
         api_client = self.create_api_client(user=requester)
 
@@ -725,10 +748,10 @@ class TestListInteractions(APITestMixin):
 
         CompanyInteractionFactory.create_batch(3, company=company)
         CompanyInteractionFactory.create_batch(
-            3, investment_project=non_associated_project
+            3, investment_project=non_associated_project,
         )
         associated_project_interactions = CompanyInteractionFactory.create_batch(
-            2, investment_project=associated_project
+            2, investment_project=associated_project,
         )
 
         url = reverse('api-v3:interaction:collection')
