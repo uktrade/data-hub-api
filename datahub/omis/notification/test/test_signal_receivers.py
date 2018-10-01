@@ -6,7 +6,7 @@ from datahub.omis.order.models import CancellationReason
 from datahub.omis.order.test.factories import (
     OrderAssigneeCompleteFactory, OrderAssigneeFactory, OrderFactory,
     OrderPaidFactory, OrderSubscriberFactory,
-    OrderWithAcceptedQuoteFactory, OrderWithOpenQuoteFactory
+    OrderWithAcceptedQuoteFactory, OrderWithOpenQuoteFactory,
 )
 from ..client import notify
 from ..constants import Template
@@ -125,9 +125,9 @@ class TestNofityPostOrderPaid:
             payments_data=[
                 {
                     'amount': order.total_cost,
-                    'received_on': dateutil_parse('2017-01-02').date()
+                    'received_on': dateutil_parse('2017-01-02').date(),
                 },
-            ]
+            ],
         )
 
         #  1 = customer, 3 = assignees/subscribers

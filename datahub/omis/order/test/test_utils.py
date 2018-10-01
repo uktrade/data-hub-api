@@ -2,7 +2,7 @@ import factory
 import pytest
 
 from datahub.company.test.factories import (
-    CompaniesHouseCompanyFactory, CompanyFactory, ContactFactory
+    CompaniesHouseCompanyFactory, CompanyFactory, ContactFactory,
 )
 from datahub.core import constants
 from .factories import OrderFactory
@@ -21,7 +21,7 @@ class CompanyWithRegAddressFactory(CompanyFactory):
     registered_address_postcode = factory.Faker('text')
     registered_address_country_id = constants.Country.japan.value.id
     company_number = factory.LazyFunction(
-        lambda: CompaniesHouseCompanyFactory().company_number
+        lambda: CompaniesHouseCompanyFactory().company_number,
     )
 
 
@@ -52,7 +52,7 @@ class TestPopulateBillingData:
         company = CompanyWithRegAddressFactory()
         order = OrderWithoutBillingDataFactory(
             company=company,
-            contact=contact
+            contact=contact,
         )
 
         populate_billing_data(order)
@@ -80,14 +80,14 @@ class TestPopulateBillingData:
             registered_address_2=None,
             registered_address_county=None,
             registered_address_postcode=None,
-            registered_address_country_id=None
+            registered_address_country_id=None,
         )
         order = OrderFactory(
             company=company,
             billing_address_2='',
             billing_address_county='',
             billing_address_postcode='',
-            billing_address_country=None
+            billing_address_country=None,
         )
 
         populate_billing_data(order)
@@ -123,7 +123,7 @@ class TestPopulateBillingData:
                 'billing_address_town': 'Populated address town',
                 'billing_address_county': 'Populated address county',
                 'billing_address_postcode': 'Populated address postcode',
-                'billing_address_country_id': constants.Country.italy.value.id
+                'billing_address_country_id': constants.Country.italy.value.id,
             },
             {
                 'billing_address_1': '',
@@ -131,9 +131,9 @@ class TestPopulateBillingData:
                 'billing_address_town': 'Populated address town',
                 'billing_address_county': '',
                 'billing_address_postcode': '',
-                'billing_address_country_id': constants.Country.italy.value.id
+                'billing_address_country_id': constants.Country.italy.value.id,
             },
-        )
+        ),
     )
     def test_with_already_populated_billing_address(self, billing_address):
         """
@@ -143,7 +143,7 @@ class TestPopulateBillingData:
         company = CompanyWithRegAddressFactory()
         order = OrderFactory(
             company=company,
-            **billing_address
+            **billing_address,
         )
 
         populate_billing_data(order)

@@ -47,7 +47,7 @@ def generate_datetime_based_reference(model, field='reference', prefix='', max_r
         # but it's unlikely and if the transaction is atomic, it would not put
         # the db in an inconsistent state.
         start_count = len(
-            model.objects.select_for_update().filter(created_on__date=current_date.date())
+            model.objects.select_for_update().filter(created_on__date=current_date.date()),
         )
 
         while True:
@@ -59,5 +59,5 @@ def generate_datetime_based_reference(model, field='reference', prefix='', max_r
         gen=gen().__next__,
         prefix=f'{prefix}{dt_prefix}',
         field=field,
-        max_retries=max_retries
+        max_retries=max_retries,
     )

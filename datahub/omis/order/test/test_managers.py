@@ -13,7 +13,7 @@ class TestOrderManager:
     """Tests for the Order Manager."""
 
     @pytest.mark.parametrize(
-        'include_reopened', (False, True)
+        'include_reopened', (False, True),
     )
     def test_publicly_accessible(self, include_reopened):
         """
@@ -24,12 +24,12 @@ class TestOrderManager:
             order_status = order_status_choice[0]
             OrderFactory(
                 status=order_status,
-                reference=f'{order_status}'
+                reference=f'{order_status}',
             )
         OrderFactory(
             status=OrderStatus.draft,
             quote=CancelledQuoteFactory(),
-            reference='draft_with_cancelled_quote'
+            reference='draft_with_cancelled_quote',
         )
 
         # define expectation
@@ -44,7 +44,7 @@ class TestOrderManager:
 
         # get result
         publicly_accessible_qs = Order.objects.publicly_accessible(
-            include_reopened=include_reopened
+            include_reopened=include_reopened,
         )
         publicly_accessible_refs = set(publicly_accessible_qs.values_list('reference', flat=True))
         assert publicly_accessible_refs == expected_orders

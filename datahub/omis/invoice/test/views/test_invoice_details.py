@@ -30,7 +30,7 @@ class TestGetInvoice(APITestMixin):
             'invoice_address_postcode': invoice.invoice_address_postcode,
             'invoice_address_country': {
                 'id': str(invoice.invoice_address_country.pk),
-                'name': invoice.invoice_address_country.name
+                'name': invoice.invoice_address_country.name,
             },
             'invoice_vat_number': invoice.invoice_vat_number,
             'payment_due_date': invoice.payment_due_date.isoformat(),
@@ -44,7 +44,7 @@ class TestGetInvoice(APITestMixin):
             'billing_address_town': invoice.billing_address_town,
             'billing_address_country': {
                 'id': str(invoice.billing_address_country.pk),
-                'name': invoice.billing_address_country.name
+                'name': invoice.billing_address_country.name,
             },
             'po_number': invoice.po_number,
             'vat_status': invoice.vat_status,

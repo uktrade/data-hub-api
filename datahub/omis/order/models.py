@@ -12,7 +12,7 @@ from mptt.fields import TreeForeignKey
 
 from datahub.company.models import Advisor, Company, Contact
 from datahub.core.models import (
-    BaseConstantModel, BaseModel, BaseOrderedConstantModel
+    BaseConstantModel, BaseModel, BaseOrderedConstantModel,
 )
 from datahub.core.utils import StrEnum
 from datahub.metadata.models import Country, Sector, Team, UKRegion
@@ -26,7 +26,7 @@ from .constants import DEFAULT_HOURLY_RATE, OrderStatus, VATStatus
 from .managers import OrderQuerySet
 from .signals import (
     order_cancelled, order_completed, order_paid,
-    quote_accepted, quote_cancelled, quote_generated
+    quote_accepted, quote_cancelled, quote_generated,
 )
 from .utils import populate_billing_data
 
@@ -50,7 +50,7 @@ class HourlyRate(BaseConstantModel):
     modified_on = models.DateTimeField(auto_now=True)
 
     rate_value = models.PositiveIntegerField(
-        help_text='Rate in pence. E.g. 1 pound should be stored as 100 (100 pence).'
+        help_text='Rate in pence. E.g. 1 pound should be stored as 100 (100 pence).',
     )
     vat_value = models.DecimalField(
         max_digits=5, decimal_places=2,
@@ -58,7 +58,7 @@ class HourlyRate(BaseConstantModel):
         validators=[
             MinValueValidator(0),
             MaxValueValidator(100),
-        ]
+        ],
     )
 
     class Meta(BaseConstantModel.Meta):
@@ -112,13 +112,13 @@ class Order(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     reference = models.CharField(max_length=100)
     public_token = models.CharField(
-        max_length=100, unique=True, help_text='Used for public facing access.'
+        max_length=100, unique=True, help_text='Used for public facing access.',
     )
 
     status = models.CharField(
         max_length=100,
         choices=OrderStatus,
-        default=OrderStatus.draft
+        default=OrderStatus.draft,
     )
 
     company = models.ForeignKey(
@@ -129,48 +129,48 @@ class Order(BaseModel):
     contact = models.ForeignKey(
         Contact,
         related_name="%(class)ss",  # noqa: Q000
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
     )
 
     primary_market = models.ForeignKey(
         Country,
         related_name="%(class)ss",  # noqa: Q000
         null=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
     )
     sector = TreeForeignKey(
         Sector,
         related_name='+',
         null=True, blank=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
     )
     uk_region = models.ForeignKey(
         UKRegion,
         related_name="%(class)ss",  # noqa: Q000
         null=True, blank=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
     )
 
     service_types = models.ManyToManyField(
         ServiceType,
         related_name="%(class)ss",  # noqa: Q000
-        blank=True
+        blank=True,
     )
     description = models.TextField(
         blank=True,
-        help_text='Description of the work needed.'
+        help_text='Description of the work needed.',
     )
     contacts_not_to_approach = models.TextField(
         blank=True,
-        help_text='Specific people or organisations the company does not want DIT to talk to.'
+        help_text='Specific people or organisations the company does not want DIT to talk to.',
     )
     further_info = models.TextField(
         blank=True,
-        help_text='Additional notes and useful information.'
+        help_text='Additional notes and useful information.',
     )
     existing_agents = models.TextField(
         blank=True,
-        help_text='Contacts the company already has in the market.'
+        help_text='Contacts the company already has in the market.',
     )
 
     delivery_date = models.DateField(blank=True, null=True)
@@ -178,13 +178,13 @@ class Order(BaseModel):
     quote = models.OneToOneField(
         Quote,
         null=True, blank=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
     )
 
     invoice = models.OneToOneField(
         Invoice,
         null=True, blank=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
     )
 
     po_number = models.CharField(max_length=100, blank=True)
@@ -193,7 +193,7 @@ class Order(BaseModel):
         HourlyRate,
         related_name="%(class)ss",  # noqa: Q000
         on_delete=models.PROTECT,
-        default=DEFAULT_HOURLY_RATE
+        default=DEFAULT_HOURLY_RATE,
     )
     discount_value = models.PositiveIntegerField(default=0)
     discount_label = models.CharField(max_length=100, blank=True)
@@ -203,16 +203,16 @@ class Order(BaseModel):
     vat_verified = models.NullBooleanField()
 
     net_cost = models.PositiveIntegerField(
-        default=0, help_text='Total hours * hourly rate in pence.'
+        default=0, help_text='Total hours * hourly rate in pence.',
     )
     subtotal_cost = models.PositiveIntegerField(
-        default=0, help_text='Net cost - discount value in pence.'
+        default=0, help_text='Net cost - discount value in pence.',
     )
     vat_cost = models.PositiveIntegerField(
-        default=0, help_text='VAT amount of subtotal in pence.'
+        default=0, help_text='VAT amount of subtotal in pence.',
     )
     total_cost = models.PositiveIntegerField(
-        default=0, help_text='Subtotal + VAT cost in pence.'
+        default=0, help_text='Subtotal + VAT cost in pence.',
     )
 
     billing_company_name = models.CharField(max_length=MAX_LENGTH, blank=True)
@@ -226,7 +226,7 @@ class Order(BaseModel):
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
-        related_name='+'
+        related_name='+',
     )
 
     paid_on = models.DateTimeField(null=True, blank=True)
@@ -236,7 +236,7 @@ class Order(BaseModel):
         settings.AUTH_USER_MODEL,
         null=True, blank=True,
         on_delete=models.SET_NULL,
-        related_name='+'
+        related_name='+',
     )
 
     cancelled_on = models.DateTimeField(null=True, blank=True)
@@ -244,47 +244,47 @@ class Order(BaseModel):
         settings.AUTH_USER_MODEL,
         null=True, blank=True,
         on_delete=models.SET_NULL,
-        related_name='+'
+        related_name='+',
     )
     cancellation_reason = models.ForeignKey(
         CancellationReason,
         null=True, blank=True,
         on_delete=models.SET_NULL,
-        related_name='+'
+        related_name='+',
     )
 
     # legacy fields, only meant to be used in readonly mode as reference
     product_info = models.TextField(
         blank=True, editable=False,
-        help_text='Legacy field. What is the product?'
+        help_text='Legacy field. What is the product?',
     )
     permission_to_approach_contacts = models.TextField(
         blank=True, editable=False,
-        help_text='Legacy field. Can DIT speak to the contacts?'
+        help_text='Legacy field. Can DIT speak to the contacts?',
     )
     archived_documents_url_path = models.CharField(
         max_length=MAX_LENGTH, blank=True, editable=False,
-        help_text='Legacy field. Link to the archived documents for this order.'
+        help_text='Legacy field. Link to the archived documents for this order.',
     )
     billing_contact_name = models.CharField(
         max_length=MAX_LENGTH, blank=True, editable=False,
-        help_text='Legacy field. Billing contact name.'
+        help_text='Legacy field. Billing contact name.',
     )
     billing_email = models.EmailField(
         max_length=MAX_LENGTH, blank=True, editable=False,
-        help_text='Legacy field. Billing email address.'
+        help_text='Legacy field. Billing email address.',
     )
     billing_phone = models.CharField(
         max_length=150, blank=True, editable=False,
-        help_text='Legacy field. Billing phone number.'
+        help_text='Legacy field. Billing phone number.',
     )
     contact_email = models.EmailField(
         blank=True, editable=False,
-        help_text='Legacy field. Contact email specified for this order.'
+        help_text='Legacy field. Contact email specified for this order.',
     )
     contact_phone = models.CharField(
         max_length=254, blank=True, editable=False,
-        help_text='Legacy field. Contact phone number specified for this order.'
+        help_text='Legacy field. Contact phone number specified for this order.',
     )
 
     objects = OrderQuerySet.as_manager()
@@ -316,7 +316,7 @@ class Order(BaseModel):
             return '{letters}{numbers}/{year}'.format(
                 letters=get_random_string(length=3, allowed_chars='ACEFHJKMNPRTUVWXY'),
                 numbers=get_random_string(length=3, allowed_chars='123456789'),
-                year=year_suffix
+                year=year_suffix,
             )
 
         return generate_reference(model=cls, gen=gen)
@@ -376,8 +376,8 @@ class Order(BaseModel):
             validators.OrderDetailsFilledInValidator(),
             validators.NoOtherActiveQuoteExistsValidator(),
             validators.OrderInStatusValidator(
-                allowed_statuses=(OrderStatus.draft,)
-            )
+                allowed_statuses=(OrderStatus.draft,),
+            ),
         ]:
             validator.set_instance(self)
             validator()
@@ -407,8 +407,8 @@ class Order(BaseModel):
                 allowed_statuses=(
                     OrderStatus.quote_awaiting_acceptance,
                     OrderStatus.quote_accepted,
-                )
-            )
+                ),
+            ),
         ]:
             validator.set_instance(self)
             validator()
@@ -425,7 +425,7 @@ class Order(BaseModel):
     def update_invoice_details(self):
         """Generate a new invoice and link it to this order."""
         for validator in [
-            validators.OrderInStatusValidator(allowed_statuses=(OrderStatus.quote_accepted,))
+            validators.OrderInStatusValidator(allowed_statuses=(OrderStatus.quote_accepted,)),
         ]:
             validator.set_instance(self)
             validator()
@@ -444,8 +444,8 @@ class Order(BaseModel):
             validators.OrderInStatusValidator(
                 allowed_statuses=(
                     OrderStatus.quote_awaiting_acceptance,
-                )
-            )
+                ),
+            ),
         ]:
             validator.set_instance(self)
             validator()
@@ -486,8 +486,8 @@ class Order(BaseModel):
             validators.OrderInStatusValidator(
                 allowed_statuses=(
                     OrderStatus.quote_accepted,
-                )
-            )
+                ),
+            ),
         ]:
             order_validator.set_instance(self)
             order_validator()
@@ -518,8 +518,8 @@ class Order(BaseModel):
             validators.OrderInStatusValidator(
                 allowed_statuses=(
                     OrderStatus.paid,
-                )
-            )
+                ),
+            ),
         ]:
             order_validator.set_instance(self)
             order_validator()
@@ -567,10 +567,10 @@ class OrderSubscriber(BaseModel):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     order = models.ForeignKey(
-        Order, on_delete=models.CASCADE, related_name='subscribers'
+        Order, on_delete=models.CASCADE, related_name='subscribers',
     )
     adviser = models.ForeignKey(
-        Advisor, on_delete=models.CASCADE, related_name='+'
+        Advisor, on_delete=models.CASCADE, related_name='+',
     )
 
     class Meta:
@@ -604,7 +604,7 @@ class OrderAssignee(BaseModel):
     actual_time = models.IntegerField(
         blank=True, null=True,
         validators=(MinValueValidator(0),),
-        help_text='Actual time in minutes.'
+        help_text='Actual time in minutes.',
     )
     is_lead = models.BooleanField(default=False)
 

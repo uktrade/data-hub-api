@@ -46,5 +46,5 @@ def refresh_pending_payment_gateway_sessions(age_check=60, refresh_rate=0.5):
     for index, session_id in enumerate(session_ids):
         refresh_payment_gateway_session.apply_async(
             args=(session_id, ),
-            countdown=(refresh_rate * index)
+            countdown=(refresh_rate * index),
         )
