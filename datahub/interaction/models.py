@@ -111,14 +111,14 @@ class Interaction(BaseModel):
         related_name="%(class)ss",  # noqa: Q000
         blank=True,
         null=True,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     contact = models.ForeignKey(
         'company.Contact',
         related_name="%(class)ss",  # noqa: Q000
         blank=True,
         null=True,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     event = models.ForeignKey(
         'event.Event',
@@ -126,10 +126,10 @@ class Interaction(BaseModel):
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
-        help_text='For service deliveries only.'
+        help_text='For service deliveries only.',
     )
     service = models.ForeignKey(
-        'metadata.Service', blank=True, null=True, on_delete=models.SET_NULL
+        'metadata.Service', blank=True, null=True, on_delete=models.SET_NULL,
     )
     subject = models.TextField()
     dit_adviser = models.ForeignKey(
@@ -137,11 +137,11 @@ class Interaction(BaseModel):
         related_name="%(class)ss",  # noqa: Q000
         blank=True,
         null=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
     )
     notes = models.TextField(max_length=settings.CDMS_TEXT_MAX_LENGTH, blank=True)
     dit_team = models.ForeignKey(
-        'metadata.Team', blank=True, null=True, on_delete=models.SET_NULL
+        'metadata.Team', blank=True, null=True, on_delete=models.SET_NULL,
     )
     communication_channel = models.ForeignKey(
         'CommunicationChannel', blank=True, null=True,
@@ -158,12 +158,13 @@ class Interaction(BaseModel):
     )
     archived_documents_url_path = models.CharField(
         max_length=MAX_LENGTH, blank=True,
-        help_text='Legacy field. File browser path to the archived documents for this interaction.'
+        help_text='Legacy field. File browser path to the archived documents for this '
+                  'interaction.',
     )
     service_delivery_status = models.ForeignKey(
         'ServiceDeliveryStatus', blank=True, null=True, on_delete=models.PROTECT,
         verbose_name='status',
-        help_text='For service deliveries only.'
+        help_text='For service deliveries only.',
     )
     grant_amount_offered = models.DecimalField(
         null=True, blank=True, max_digits=19, decimal_places=2,
@@ -206,31 +207,31 @@ class Interaction(BaseModel):
         permissions = (
             (
                 InteractionPermission.view_associated_investmentproject.value,
-                'Can view interaction for associated investment projects'
+                'Can view interaction for associated investment projects',
             ),
             (
                 InteractionPermission.add_associated_investmentproject.value,
-                'Can add interaction for associated investment projects'
+                'Can add interaction for associated investment projects',
             ),
             (
                 InteractionPermission.change_associated_investmentproject.value,
-                'Can change interaction for associated investment projects'
+                'Can change interaction for associated investment projects',
             ),
             (
                 InteractionPermission.view_policy_feedback.value,
-                'Can view policy feedback interaction'
+                'Can view policy feedback interaction',
             ),
             (
                 InteractionPermission.add_policy_feedback.value,
-                'Can add policy feedback interaction'
+                'Can add policy feedback interaction',
             ),
             (
                 InteractionPermission.change_policy_feedback.value,
-                'Can change policy feedback interaction'
+                'Can change policy feedback interaction',
             ),
             (
                 InteractionPermission.export.value,
-                'Can export interaction'
+                'Can export interaction',
             ),
         )
         default_permissions = (
