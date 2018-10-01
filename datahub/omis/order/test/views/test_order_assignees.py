@@ -22,7 +22,7 @@ class TestGetOrderAssignees(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:assignee',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.get(url)
 
@@ -39,12 +39,12 @@ class TestGetOrderAssignees(APITestMixin):
             OrderAssigneeFactory(
                 order=order,
                 adviser=adviser,
-                estimated_time=(120 * i)
+                estimated_time=(120 * i),
             )
 
         url = reverse(
             'api-v3:omis:order:assignee',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.get(url)
 
@@ -55,11 +55,11 @@ class TestGetOrderAssignees(APITestMixin):
                     'id': str(adviser.id),
                     'first_name': adviser.first_name,
                     'last_name': adviser.last_name,
-                    'name': adviser.name
+                    'name': adviser.name,
                 },
                 'estimated_time': (120 * i),
                 'actual_time': None,
-                'is_lead': False
+                'is_lead': False,
             }
             for i, adviser in enumerate(advisers[:2])
         ]
@@ -68,7 +68,7 @@ class TestGetOrderAssignees(APITestMixin):
         """Test that calling GET on an invalid order returns 404."""
         url = reverse(
             'api-v3:omis:order:assignee',
-            kwargs={'order_pk': '00000000-0000-0000-0000-000000000000'}
+            kwargs={'order_pk': '00000000-0000-0000-0000-000000000000'},
         )
         response = self.api_client.get(url)
 
@@ -138,16 +138,16 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
 
         assignee1 = OrderAssigneeFactory(
             order=order, adviser=adviser1, estimated_time=100, is_lead=True,
-            created_by=created_by, modified_by=created_by
+            created_by=created_by, modified_by=created_by,
         )
         assignee2 = OrderAssigneeFactory(
             order=order, adviser=adviser2, estimated_time=250, is_lead=False,
-            created_by=created_by, modified_by=created_by
+            created_by=created_by, modified_by=created_by,
         )
 
         url = reverse(
             'api-v3:omis:order:assignee',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.patch(
             url,
@@ -155,13 +155,13 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
                 {
                     'adviser': {'id': adviser1.id},
                     'estimated_time': 200,
-                    'is_lead': False
+                    'is_lead': False,
                 },
                 {
                     'adviser': {'id': adviser3.id},
                     'estimated_time': 250,
-                    'is_lead': True
-                }
+                    'is_lead': True,
+                },
             ],
         )
 
@@ -176,7 +176,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
                 },
                 'estimated_time': 200,
                 'actual_time': None,
-                'is_lead': False
+                'is_lead': False,
             },
             {
                 'adviser': {
@@ -187,7 +187,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
                 },
                 'estimated_time': assignee2.estimated_time,
                 'actual_time': None,
-                'is_lead': False
+                'is_lead': False,
             },
             {
                 'adviser': {
@@ -198,7 +198,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
                 },
                 'estimated_time': 250,
                 'actual_time': None,
-                'is_lead': True
+                'is_lead': True,
             },
         ]
 
@@ -269,19 +269,19 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:assignee',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.patch(
             f'{url}?{AssigneeView.FORCE_DELETE_PARAM}=1',
             [
                 {
                     'adviser': {'id': adviser1.id},
-                    'estimated_time': 200
+                    'estimated_time': 200,
                 },
                 {
                     'adviser': {'id': adviser3.id},
-                    'estimated_time': 250
-                }
+                    'estimated_time': 250,
+                },
             ],
         )
 
@@ -334,13 +334,13 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
 
         assignee1 = OrderAssigneeFactory(
             order=order, adviser=adviser1,
-            created_by=created_by, modified_by=created_by
+            created_by=created_by, modified_by=created_by,
         )
         OrderAssigneeFactory(order=order, adviser=adviser2)
 
         url = reverse(
             'api-v3:omis:order:assignee',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.patch(
             url,
@@ -348,8 +348,8 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
                 {
                     'adviser': {'id': adviser1.id},
                     'estimated_time': assignee1.estimated_time,
-                    'is_lead': assignee1.is_lead
-                }
+                    'is_lead': assignee1.is_lead,
+                },
             ],
         )
 
@@ -415,7 +415,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:assignee',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.patch(
             url,
@@ -423,16 +423,16 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
                 {
                     'adviser': {'id': adviser1.id},
                     'estimated_time': 200,
-                    'is_lead': False
+                    'is_lead': False,
                 },
                 {
                     'adviser': {'id': adviser3.id},
                     'estimated_time': 250,
-                    'is_lead': True
+                    'is_lead': True,
                 },
                 {
                     'adviser': {'id': '00000000-0000-0000-0000-000000000000'},
-                    'estimated_time': 300
+                    'estimated_time': 300,
                 },
             ],
         )
@@ -443,9 +443,9 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
             {},
             {
                 'adviser': [
-                    'Invalid pk "00000000-0000-0000-0000-000000000000" - object does not exist.'
-                ]
-            }
+                    'Invalid pk "00000000-0000-0000-0000-000000000000" - object does not exist.',
+                ],
+            },
         ]
 
         # check db consistency
@@ -470,7 +470,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:assignee',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.patch(
             url,
@@ -486,9 +486,9 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
         assert response.json() == [
             {
                 'actual_time': [
-                    'This field cannot be changed at this stage.'
-                ]
-            }
+                    'This field cannot be changed at this stage.',
+                ],
+            },
         ]
 
     def test_only_one_lead_allowed(self):
@@ -546,22 +546,22 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:assignee',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.patch(
             url,
             [
                 {
                     'adviser': {'id': adviser2.id},
-                    'is_lead': True
+                    'is_lead': True,
                 },
                 {
                     'adviser': {'id': adviser3.id},
-                    'estimated_time': 0
+                    'estimated_time': 0,
                 },
                 {
                     'adviser': {'id': adviser4.id},
-                    'estimated_time': 0
+                    'estimated_time': 0,
                 },
             ],
         )
@@ -573,7 +573,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
         'disallowed_status', (
             OrderStatus.complete,
             OrderStatus.cancelled,
-        )
+        ),
     )
     def test_409_if_order_not_in_allowed_status(self, disallowed_status):
         """
@@ -584,12 +584,12 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:assignee',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.patch(
             url,
             [{
-                'adviser': {'id': AdviserFactory().id}
+                'adviser': {'id': AdviserFactory().id},
             }],
         )
 
@@ -598,7 +598,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
             'detail': (
                 'The action cannot be performed '
                 f'in the current status {OrderStatus[disallowed_status]}.'
-            )
+            ),
         }
 
 
@@ -645,14 +645,14 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:assignee',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.patch(
             url,
             [
                 {
                     'adviser': {'id': new_adviser.id},
-                    'actual_time': 100
+                    'actual_time': 100,
                 },
             ],
         )
@@ -692,7 +692,7 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:assignee',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.patch(
             f'{url}?{AssigneeView.FORCE_DELETE_PARAM}=1',
@@ -706,8 +706,8 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
             'non_field_errors': [
-                'You cannot delete any assignees at this stage.'
-            ]
+                'You cannot delete any assignees at this stage.',
+            ],
         }
 
     def test_set_actual_time(self):
@@ -744,14 +744,14 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:assignee',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.patch(
             url,
             [
                 {
                     'adviser': {'id': assignee2.adviser.id},
-                    'actual_time': 220
+                    'actual_time': 220,
                 },
             ],
         )
@@ -767,7 +767,7 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
                 },
                 'estimated_time': assignee1.estimated_time,
                 'actual_time': None,
-                'is_lead': assignee1.is_lead
+                'is_lead': assignee1.is_lead,
             },
             {
                 'adviser': {
@@ -778,8 +778,8 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
                 },
                 'estimated_time': assignee2.estimated_time,
                 'actual_time': 220,
-                'is_lead': assignee2.is_lead
-            }
+                'is_lead': assignee2.is_lead,
+            },
         ]
 
     @pytest.mark.parametrize(
@@ -787,7 +787,7 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
         (
             {'estimated_time': 100},
             {'is_lead': True},
-        )
+        ),
     )
     def test_400_if_readonly_fields_changed(self, data):
         """
@@ -798,14 +798,14 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:assignee',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.patch(
             url,
             [
                 {
                     'adviser': {'id': assignee.adviser.id},
-                    **data
+                    **data,
                 },
             ],
         )
@@ -814,9 +814,9 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
         assert response.json() == [
             {
                 list(data)[0]: [
-                    'This field cannot be changed at this stage.'
-                ]
-            }
+                    'This field cannot be changed at this stage.',
+                ],
+            },
         ]
 
     @pytest.mark.parametrize(
@@ -824,7 +824,7 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
         (
             {'estimated_time': 100},
             {'is_lead': True},
-        )
+        ),
     )
     def test_400_if_assignee_added_with_extra_field(self, data):
         """
@@ -836,7 +836,7 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:assignee',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.patch(
             url,
@@ -845,7 +845,7 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
                     'adviser': {
                         'id': new_adviser.id,
                     },
-                    **data
+                    **data,
                 },
             ],
         )
@@ -854,9 +854,9 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
         assert response.json() == [
             {
                 list(data)[0]: [
-                    'This field cannot be changed at this stage.'
-                ]
-            }
+                    'This field cannot be changed at this stage.',
+                ],
+            },
         ]
 
 
@@ -873,8 +873,8 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
     @pytest.mark.parametrize(
         'order_status', (
             OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted
-        )
+            OrderStatus.quote_accepted,
+        ),
     )
     def test_ok_if_assignee_added(self, order_status):
         """
@@ -908,7 +908,7 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:assignee',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.patch(
             url,
@@ -925,8 +925,8 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
     @pytest.mark.parametrize(
         'order_status', (
             OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted
-        )
+            OrderStatus.quote_accepted,
+        ),
     )
     def test_400_if_assignee_deleted(self, order_status):
         """
@@ -960,7 +960,7 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:assignee',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.patch(
             f'{url}?{AssigneeView.FORCE_DELETE_PARAM}=1',
@@ -974,22 +974,22 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
             'non_field_errors': [
-                'You cannot delete any assignees at this stage.'
-            ]
+                'You cannot delete any assignees at this stage.',
+            ],
         }
 
     @pytest.mark.parametrize(
         'order_status', (
             OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted
-        )
+            OrderStatus.quote_accepted,
+        ),
     )
     @pytest.mark.parametrize(
         'data', (
             {'estimated_time': 100},
             {'actual_time': 100},
             {'is_lead': True},
-        )
+        ),
     )
     def test_400_if_readonly_fields_changed(self, order_status, data):
         """
@@ -1001,14 +1001,14 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:assignee',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.patch(
             url,
             [
                 {
                     'adviser': {'id': assignee.adviser.id},
-                    **data
+                    **data,
                 },
             ],
         )
@@ -1017,23 +1017,23 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
         assert response.json() == [
             {
                 list(data)[0]: [
-                    'This field cannot be changed at this stage.'
-                ]
+                    'This field cannot be changed at this stage.',
+                ],
             },
         ]
 
     @pytest.mark.parametrize(
         'order_status', (
             OrderStatus.quote_awaiting_acceptance,
-            OrderStatus.quote_accepted
-        )
+            OrderStatus.quote_accepted,
+        ),
     )
     @pytest.mark.parametrize(
         'data', (
             {'estimated_time': 100},
             {'actual_time': 100},
             {'is_lead': True},
-        )
+        ),
     )
     def test_400_if_assignee_added_with_extra_field(self, order_status, data):
         """
@@ -1045,14 +1045,14 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
 
         url = reverse(
             'api-v3:omis:order:assignee',
-            kwargs={'order_pk': order.id}
+            kwargs={'order_pk': order.id},
         )
         response = self.api_client.patch(
             url,
             [
                 {
                     'adviser': {'id': new_adviser.id},
-                    **data
+                    **data,
                 },
             ],
         )
@@ -1061,7 +1061,7 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
         assert response.json() == [
             {
                 list(data)[0]: [
-                    'This field cannot be changed at this stage.'
-                ]
+                    'This field cannot be changed at this stage.',
+                ],
             },
         ]

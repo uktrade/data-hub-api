@@ -9,7 +9,7 @@ from datahub.core.constants import Country, Sector, UKRegion
 from datahub.core.test.factories import to_many_field
 from datahub.omis.invoice.models import Invoice
 from datahub.omis.quote.test.factories import (
-    AcceptedQuoteFactory, CancelledQuoteFactory, QuoteFactory
+    AcceptedQuoteFactory, CancelledQuoteFactory, QuoteFactory,
 )
 from ..constants import OrderStatus, VATStatus
 from ..models import CancellationReason, ServiceType
@@ -33,7 +33,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
     existing_agents = factory.Faker('text')
     permission_to_approach_contacts = factory.Faker('text')
     delivery_date = factory.LazyFunction(
-        lambda: (now() + datetime.timedelta(days=60)).date()
+        lambda: (now() + datetime.timedelta(days=60)).date(),
     )
     contact_email = factory.Faker('email')
     contact_phone = '+44 (0)7123 123456'

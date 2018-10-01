@@ -13,7 +13,7 @@ class QuoteSerializer(serializers.ModelSerializer):
     cancelled_by = NestedAdviserField(read_only=True)
     accepted_by = NestedRelatedField(Contact, read_only=True)
     terms_and_conditions = serializers.CharField(
-        source='terms_and_conditions.content', default=''
+        source='terms_and_conditions.content', default='',
     )
 
     def preview(self):
@@ -58,7 +58,7 @@ class PublicQuoteSerializer(serializers.ModelSerializer):
     """Public Quote DRF serializer."""
 
     terms_and_conditions = serializers.CharField(
-        source='terms_and_conditions.content', default=''
+        source='terms_and_conditions.content', default='',
     )
 
     def accept(self):

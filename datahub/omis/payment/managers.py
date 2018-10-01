@@ -29,7 +29,7 @@ class BasePaymentGatewaySessionManager(models.Manager):
         # validate that the order is in `quote_accepted`
         order.refresh_from_db()
         validator = OrderInStatusValidator(
-            allowed_statuses=(OrderStatus.quote_accepted,)
+            allowed_statuses=(OrderStatus.quote_accepted,),
         )
         validator.set_instance(order)
         validator()
@@ -49,19 +49,19 @@ class BasePaymentGatewaySessionManager(models.Manager):
             amount=order.total_cost,
             reference=f'{order.reference}-{str(session_id)[:8].upper()}',
             description=settings.GOVUK_PAY_PAYMENT_DESCRIPTION.format(
-                reference=order.reference
+                reference=order.reference,
             ),
             return_url=settings.GOVUK_PAY_RETURN_URL.format(
                 public_token=order.public_token,
-                session_id=session_id
-            )
+                session_id=session_id,
+            ),
         )
 
         session = self.create(
             id=session_id,
             order=order,
             govuk_payment_id=govuk_payment['payment_id'],
-            **(attrs or {})
+            **(attrs or {}),
         )
 
         return session
@@ -79,13 +79,13 @@ class PaymentGatewaySessionQuerySet(models.QuerySet):
                 PaymentGatewaySessionStatus.created,
                 PaymentGatewaySessionStatus.started,
                 PaymentGatewaySessionStatus.submitted,
-            ]
+            ],
         )
 
 
 # We use this style because some of the methods make sense only on the manager
 PaymentGatewaySessionManager = BasePaymentGatewaySessionManager.from_queryset(
-    PaymentGatewaySessionQuerySet
+    PaymentGatewaySessionQuerySet,
 )
 
 
@@ -104,5 +104,5 @@ class PaymentManager(models.Manager):
             **attrs,
             reference=generate_datetime_based_reference(self.model),
             order=order,
-            created_by=by
+            created_by=by,
         )

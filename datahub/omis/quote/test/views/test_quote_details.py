@@ -11,7 +11,7 @@ from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.models import Order
 from datahub.omis.order.test.factories import (
-    OrderFactory, OrderWithCancelledQuoteFactory, OrderWithOpenQuoteFactory
+    OrderFactory, OrderWithCancelledQuoteFactory, OrderWithOpenQuoteFactory,
 )
 from ..factories import QuoteFactory
 from ...models import Quote, TermsAndConditions
@@ -29,7 +29,7 @@ class TestCreatePreviewOrder(APITestMixin):
         """Test that if the order doesn't exist, the endpoint returns 404."""
         url = reverse(
             f'api-v3:omis:quote:{quote_view_name}',
-            kwargs={'order_pk': uuid.uuid4()}
+            kwargs={'order_pk': uuid.uuid4()},
         )
         response = self.api_client.post(url)
 
@@ -42,7 +42,7 @@ class TestCreatePreviewOrder(APITestMixin):
 
         url = reverse(
             f'api-v3:omis:quote:{quote_view_name}',
-            kwargs={'order_pk': order.pk}
+            kwargs={'order_pk': order.pk},
         )
         response = self.api_client.post(url)
 
@@ -57,7 +57,7 @@ class TestCreatePreviewOrder(APITestMixin):
             OrderStatus.paid,
             OrderStatus.complete,
             OrderStatus.cancelled,
-        )
+        ),
     )
     def test_409_if_order_in_disallowed_status(self, quote_view_name, disallowed_status):
         """
@@ -68,7 +68,7 @@ class TestCreatePreviewOrder(APITestMixin):
 
         url = reverse(
             f'api-v3:omis:quote:{quote_view_name}',
-            kwargs={'order_pk': order.pk}
+            kwargs={'order_pk': order.pk},
         )
         response = self.api_client.post(url)
 
@@ -77,7 +77,7 @@ class TestCreatePreviewOrder(APITestMixin):
             'detail': (
                 'The action cannot be performed '
                 f'in the current status {OrderStatus[disallowed_status]}.'
-            )
+            ),
         }
 
     @pytest.mark.parametrize('quote_view_name', ('detail', 'preview'))
@@ -87,7 +87,7 @@ class TestCreatePreviewOrder(APITestMixin):
             ('service_types', []),
             ('description', ''),
             ('delivery_date', None),
-        )
+        ),
     )
     @freeze_time('2017-04-18 13:00:00.000000')
     def test_400_if_incomplete_order(self, quote_view_name, field, value):
@@ -96,13 +96,13 @@ class TestCreatePreviewOrder(APITestMixin):
 
         url = reverse(
             f'api-v3:omis:quote:{quote_view_name}',
-            kwargs={'order_pk': order.pk}
+            kwargs={'order_pk': order.pk},
         )
         response = self.api_client.post(url)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            field: ['This field is required.']
+            field: ['This field is required.'],
         }
 
     @pytest.mark.parametrize('quote_view_name', ('detail', 'preview'))
@@ -113,12 +113,12 @@ class TestCreatePreviewOrder(APITestMixin):
         is too close, return 400.
         """
         order = OrderFactory(
-            delivery_date=dateutil_parse('2017-04-20').date()
+            delivery_date=dateutil_parse('2017-04-20').date(),
         )
 
         url = reverse(
             f'api-v3:omis:quote:{quote_view_name}',
-            kwargs={'order_pk': order.pk}
+            kwargs={'order_pk': order.pk},
         )
         response = self.api_client.post(url)
 
@@ -126,19 +126,19 @@ class TestCreatePreviewOrder(APITestMixin):
         assert response.json() == {
             'delivery_date': [
                 'The calculated expiry date for the quote is in the past. '
-                'You might be able to fix this by changing the delivery date.'
-            ]
+                'You might be able to fix this by changing the delivery date.',
+            ],
         }
 
     @freeze_time('2017-04-18 13:00:00.000000')
     @pytest.mark.parametrize(
         'OrderFactoryClass',  # noqa: N803
-        (OrderFactory, OrderWithCancelledQuoteFactory)
+        (OrderFactory, OrderWithCancelledQuoteFactory),
     )
     def test_create_success(self, OrderFactoryClass):
         """Test a successful call to create a quote."""
         order = OrderFactoryClass(
-            delivery_date=dateutil_parse('2017-06-18').date()
+            delivery_date=dateutil_parse('2017-06-18').date(),
         )
         orig_quote = order.quote
 
@@ -155,7 +155,7 @@ class TestCreatePreviewOrder(APITestMixin):
                 'id': str(self.user.pk),
                 'first_name': self.user.first_name,
                 'last_name': self.user.last_name,
-                'name': self.user.name
+                'name': self.user.name,
             },
             'cancelled_on': None,
             'cancelled_by': None,
@@ -189,7 +189,7 @@ class TestCreatePreviewOrder(APITestMixin):
     @freeze_time('2017-04-18 13:00:00.000000')
     @pytest.mark.parametrize(
         'OrderFactoryClass',  # noqa: N803
-        (OrderFactory, OrderWithCancelledQuoteFactory)
+        (OrderFactory, OrderWithCancelledQuoteFactory),
     )
     def test_preview_success(self, OrderFactoryClass):
         """
@@ -197,7 +197,7 @@ class TestCreatePreviewOrder(APITestMixin):
         Changes are not saved in the db.
         """
         order = OrderFactoryClass(
-            delivery_date=dateutil_parse('2017-06-18').date()
+            delivery_date=dateutil_parse('2017-06-18').date(),
         )
         orig_quote = order.quote
 
@@ -240,7 +240,7 @@ class TestGetQuote(APITestMixin):
                 'id': str(quote.created_by.pk),
                 'first_name': quote.created_by.first_name,
                 'last_name': quote.created_by.last_name,
-                'name': quote.created_by.name
+                'name': quote.created_by.name,
             },
             'cancelled_on': None,
             'cancelled_by': None,
@@ -255,7 +255,7 @@ class TestGetQuote(APITestMixin):
         """Test a successful call to get a quote without Ts and Cs."""
         order = OrderFactory(
             quote=QuoteFactory(terms_and_conditions=None),
-            status=OrderStatus.quote_awaiting_acceptance
+            status=OrderStatus.quote_awaiting_acceptance,
         )
 
         url = reverse('api-v3:omis:quote:detail', kwargs={'order_pk': order.pk})
@@ -289,7 +289,7 @@ class TestCancelOrder(APITestMixin):
         """Test that if the order doesn't exist, the endpoint returns 404."""
         url = reverse(
             f'api-v3:omis:quote:cancel',
-            kwargs={'order_pk': uuid.uuid4()}
+            kwargs={'order_pk': uuid.uuid4()},
         )
         response = self.api_client.post(url)
 
@@ -300,7 +300,7 @@ class TestCancelOrder(APITestMixin):
             OrderStatus.paid,
             OrderStatus.complete,
             OrderStatus.cancelled,
-        )
+        ),
     )
     def test_409_if_order_in_disallowed_status(self, disallowed_status):
         """
@@ -310,12 +310,12 @@ class TestCancelOrder(APITestMixin):
         quote = QuoteFactory()
         order = OrderFactory(
             status=disallowed_status,
-            quote=quote
+            quote=quote,
         )
 
         url = reverse(
             f'api-v3:omis:quote:cancel',
-            kwargs={'order_pk': order.pk}
+            kwargs={'order_pk': order.pk},
         )
         response = self.api_client.post(url)
 
@@ -324,7 +324,7 @@ class TestCancelOrder(APITestMixin):
             'detail': (
                 'The action cannot be performed '
                 f'in the current status {OrderStatus[disallowed_status]}.'
-            )
+            ),
         }
 
     def test_without_quote(self):
@@ -333,7 +333,7 @@ class TestCancelOrder(APITestMixin):
 
         url = reverse(
             f'api-v3:omis:quote:cancel',
-            kwargs={'order_pk': order.pk}
+            kwargs={'order_pk': order.pk},
         )
         response = self.api_client.post(url)
 
@@ -346,7 +346,7 @@ class TestCancelOrder(APITestMixin):
 
         url = reverse(
             f'api-v3:omis:quote:cancel',
-            kwargs={'order_pk': order.pk}
+            kwargs={'order_pk': order.pk},
         )
         with freeze_time('2017-07-12 13:00') as mocked_now:
             response = self.api_client.post(url)
@@ -358,14 +358,14 @@ class TestCancelOrder(APITestMixin):
                     'id': str(quote.created_by.pk),
                     'first_name': quote.created_by.first_name,
                     'last_name': quote.created_by.last_name,
-                    'name': quote.created_by.name
+                    'name': quote.created_by.name,
                 },
                 'cancelled_on': format_date_or_datetime(mocked_now()),
                 'cancelled_by': {
                     'id': str(self.user.pk),
                     'first_name': self.user.first_name,
                     'last_name': self.user.last_name,
-                    'name': self.user.name
+                    'name': self.user.name,
                 },
                 'accepted_on': None,
                 'accepted_by': None,

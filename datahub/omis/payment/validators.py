@@ -22,5 +22,5 @@ class ReconcilablePaymentsValidator:
         """Validate that payments data can be reconciled."""
         if sum(item_data['amount'] for item_data in data) < self.order.total_cost:
             raise ValidationError({
-                api_settings.NON_FIELD_ERRORS_KEY: self.message
+                api_settings.NON_FIELD_ERRORS_KEY: self.message,
             })

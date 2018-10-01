@@ -42,7 +42,7 @@ class Notify:
         """Init underlying notification client."""
         if settings.OMIS_NOTIFICATION_API_KEY:
             self.client = NotificationsAPIClient(
-                settings.OMIS_NOTIFICATION_API_KEY
+                settings.OMIS_NOTIFICATION_API_KEY,
             )
         else:
             self.client = mock.Mock(spec_set=NotificationsAPIClient)
@@ -52,7 +52,7 @@ class Notify:
                 "You might want to change this if it's not a "
                 'testing or development environment.',
                 RuntimeWarning,
-                stacklevel=2
+                stacklevel=2,
             )
 
     def _send_email(self, **kwargs):
@@ -72,7 +72,7 @@ class Notify:
             'embedded link': order.get_datahub_frontend_url(),
             'primary market': primary_market,
             'omis team email': settings.OMIS_GENERIC_CONTACT_EMAIL,
-            **(data or {})
+            **(data or {}),
         }
 
     def _get_all_advisers(self, order):
@@ -81,7 +81,7 @@ class Notify:
         """
         return itertools.chain(
             (item.adviser for item in order.assignees.all()),
-            (item.adviser for item in order.subscribers.all())
+            (item.adviser for item in order.subscribers.all()),
         )
 
     def order_info(self, order, what_happened, why, to_email=None, to_name=None):
@@ -99,9 +99,9 @@ class Notify:
                 {
                     'what has happened': what_happened,
                     'reason': why,
-                    'recipient name': to_name or receipient_email
-                }
-            )
+                    'recipient name': to_name or receipient_email,
+                },
+            ),
         )
 
     def _order_created_for_post_managers(self, order):
@@ -126,13 +126,13 @@ class Notify:
                     {
                         'recipient name': manager_email,
                         'creator': order.created_by.name if order.created_by else None,
-                    }
-                )
+                    },
+                ),
             )
         else:
             data = {
                 'order': order,
-                'what_happened': "We couldn't notify the overseas manager"
+                'what_happened': "We couldn't notify the overseas manager",
             }
 
             if not market:
@@ -175,8 +175,8 @@ class Notify:
                     {
                         'recipient name': manager_email,
                         'creator': order.created_by.name if order.created_by else None,
-                    }
-                )
+                    },
+                ),
             )
 
     def order_created(self, order):
@@ -196,9 +196,9 @@ class Notify:
                 {
                     'recipient name': adviser.name,
                     'creator': by.name,
-                    'creation date': creation_date.strftime('%d/%m/%Y')
-                }
-            )
+                    'creation date': creation_date.strftime('%d/%m/%Y'),
+                },
+            ),
         )
 
     def adviser_removed(self, order, adviser):
@@ -207,8 +207,8 @@ class Notify:
             email_address=adviser.get_current_email(),
             template_id=Template.you_have_been_removed_for_adviser.value,
             personalisation=self._prepare_personalisation(
-                order, {'recipient name': adviser.name}
-            )
+                order, {'recipient name': adviser.name},
+            ),
         )
 
     def order_paid(self, order):
@@ -225,8 +225,8 @@ class Notify:
                 {
                     'recipient name': order.contact.name,
                     'embedded link': order.get_public_facing_url(),
-                }
-            )
+                },
+            ),
         )
 
         #  notify advisers
@@ -235,8 +235,8 @@ class Notify:
                 email_address=adviser.get_current_email(),
                 template_id=Template.order_paid_for_adviser.value,
                 personalisation=self._prepare_personalisation(
-                    order, {'recipient name': adviser.name}
-                )
+                    order, {'recipient name': adviser.name},
+                ),
             )
 
     def order_completed(self, order):
@@ -249,8 +249,8 @@ class Notify:
                 email_address=adviser.get_current_email(),
                 template_id=Template.order_completed_for_adviser.value,
                 personalisation=self._prepare_personalisation(
-                    order, {'recipient name': adviser.name}
-                )
+                    order, {'recipient name': adviser.name},
+                ),
             )
 
     def order_cancelled(self, order):
@@ -267,8 +267,8 @@ class Notify:
                 {
                     'recipient name': order.contact.name,
                     'embedded link': order.get_public_facing_url(),
-                }
-            )
+                },
+            ),
         )
 
         #  notify advisers
@@ -277,8 +277,8 @@ class Notify:
                 email_address=adviser.get_current_email(),
                 template_id=Template.order_cancelled_for_adviser.value,
                 personalisation=self._prepare_personalisation(
-                    order, {'recipient name': adviser.name}
-                )
+                    order, {'recipient name': adviser.name},
+                ),
             )
 
     def quote_generated(self, order):
@@ -295,8 +295,8 @@ class Notify:
                 {
                     'recipient name': order.contact.name,
                     'embedded link': order.get_public_facing_url(),
-                }
-            )
+                },
+            ),
         )
 
         #  notify advisers
@@ -305,8 +305,8 @@ class Notify:
                 email_address=adviser.get_current_email(),
                 template_id=Template.quote_sent_for_adviser.value,
                 personalisation=self._prepare_personalisation(
-                    order, {'recipient name': adviser.name}
-                )
+                    order, {'recipient name': adviser.name},
+                ),
             )
 
     def quote_accepted(self, order):
@@ -323,8 +323,8 @@ class Notify:
                 {
                     'recipient name': order.contact.name,
                     'embedded link': order.get_public_facing_url(),
-                }
-            )
+                },
+            ),
         )
 
         #  notify advisers
@@ -333,8 +333,8 @@ class Notify:
                 email_address=adviser.get_current_email(),
                 template_id=Template.quote_accepted_for_adviser.value,
                 personalisation=self._prepare_personalisation(
-                    order, {'recipient name': adviser.name}
-                )
+                    order, {'recipient name': adviser.name},
+                ),
             )
 
     def quote_cancelled(self, order, by):
@@ -351,8 +351,8 @@ class Notify:
                 {
                     'recipient name': order.contact.name,
                     'embedded link': order.get_public_facing_url(),
-                }
-            )
+                },
+            ),
         )
 
         #  notify advisers
@@ -364,9 +364,9 @@ class Notify:
                     order,
                     {
                         'recipient name': adviser.name,
-                        'canceller': by.name
-                    }
-                )
+                        'canceller': by.name,
+                    },
+                ),
             )
 
 

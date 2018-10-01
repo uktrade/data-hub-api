@@ -16,8 +16,8 @@ class TestGetOmisPaymentDataFromGovukPayment:
         """
         govuk_payment = {
             'state': {
-                'status': 'created'
-            }
+                'status': 'created',
+            },
         }
         assert not trasform_govuk_payment_to_omis_payment_data(govuk_payment)
 
@@ -38,7 +38,7 @@ class TestGetOmisPaymentDataFromGovukPayment:
                     'line2': 'line 2 address',
                     'postcode': 'SW1A 1AA',
                     'city': 'London',
-                    'country': 'GB'
+                    'country': 'GB',
                 },
                 'card_brand': 'Visa',
             },

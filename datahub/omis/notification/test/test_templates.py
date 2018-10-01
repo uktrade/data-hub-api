@@ -7,7 +7,7 @@ from datahub.core.constants import UKRegion
 from datahub.omis.market.models import Market
 from datahub.omis.order.test.factories import (
     OrderCompleteFactory, OrderFactory,
-    OrderPaidFactory, OrderWithOpenQuoteFactory
+    OrderPaidFactory, OrderWithOpenQuoteFactory,
 )
 from datahub.omis.region.models import UKRegionalSettings
 from ..client import Notify
@@ -18,7 +18,7 @@ pytestmark = pytest.mark.django_db
 
 @pytest.mark.skipif(
     not settings.OMIS_NOTIFICATION_TEST_API_KEY,
-    reason='`settings.OMIS_NOTIFICATION_TEST_API_KEY` not set (optional).'
+    reason='`settings.OMIS_NOTIFICATION_TEST_API_KEY` not set (optional).',
 )
 @pytest.mark.usefixtures('synchronous_thread_pool')
 class TestTemplates:
@@ -57,12 +57,12 @@ class TestTemplates:
 
         UKRegionalSettings.objects.create(
             uk_region_id=UKRegion.london.value.id,
-            manager_emails=['reg_test@test.com']
+            manager_emails=['reg_test@test.com'],
         )
 
         order = OrderFactory(
             primary_market_id=market.country.pk,
-            uk_region_id=UKRegion.london.value.id
+            uk_region_id=UKRegion.london.value.id,
         )
 
         notify.order_created(order)
@@ -82,7 +82,7 @@ class TestTemplates:
             order=order,
             adviser=AdviserFactory(),
             by=AdviserFactory(),
-            creation_date=dateutil_parse('2017-05-18')
+            creation_date=dateutil_parse('2017-05-18'),
         )
 
     def test_you_have_been_removed_for_adviser(self, settings):

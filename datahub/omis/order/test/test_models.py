@@ -82,7 +82,7 @@ class TestOrderGenerateReference:
         Test that if an Order is saved without reference, the system generates one automatically.
         """
         mock_get_random_string.side_effect = [
-            'ABC', '123', 'CBA', '321'
+            'ABC', '123', 'CBA', '321',
         ]
 
         # create 1st
@@ -104,7 +104,7 @@ class TestOrderGenerateReference:
         OrderWithRandomPublicTokenFactory(reference='ABC123/17')
 
         mock_get_random_string.side_effect = [
-            'ABC', '123', 'CBA', '321'
+            'ABC', '123', 'CBA', '321',
         ]
 
         # ABC123/17 already exists so create CBA321/17 instead
@@ -207,7 +207,7 @@ class TestGenerateQuote:
             OrderStatus.paid,
             OrderStatus.complete,
             OrderStatus.cancelled,
-        )
+        ),
     )
     def test_fails_if_order_not_in_draft(self, disallowed_status):
         """Test that if the order is not in `draft`, a quote cannot be generated."""
@@ -233,7 +233,7 @@ class TestGenerateQuote:
             registered_address_town='Reg address town',
             registered_address_county='Reg address county',
             registered_address_postcode='Reg address postcode',
-            registered_address_country_id=constants.Country.japan.value.id
+            registered_address_country_id=constants.Country.japan.value.id,
         )
         order = OrderFactory(
             company=company,
@@ -246,7 +246,7 @@ class TestGenerateQuote:
             billing_address_town='',
             billing_address_county='',
             billing_address_postcode='',
-            billing_address_country_id=None
+            billing_address_country_id=None,
         )
         adviser = AdviserFactory()
         order.generate_quote(by=adviser)
@@ -296,7 +296,7 @@ class TestReopen:
         (
             OrderStatus.quote_awaiting_acceptance,
             OrderStatus.quote_accepted,
-        )
+        ),
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
         """
@@ -332,7 +332,7 @@ class TestReopen:
             OrderStatus.paid,
             OrderStatus.complete,
             OrderStatus.cancelled,
-        )
+        ),
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
         """Test that if the order is in a disallowed status, it cannot be reopened."""
@@ -366,7 +366,7 @@ class TestUpdateInvoiceDetails:
             OrderStatus.paid,
             OrderStatus.complete,
             OrderStatus.cancelled,
-        )
+        ),
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
         """
@@ -384,7 +384,7 @@ class TestAcceptQuote:
 
     @pytest.mark.parametrize(
         'allowed_status',
-        (OrderStatus.quote_awaiting_acceptance,)
+        (OrderStatus.quote_awaiting_acceptance,),
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
         """
@@ -418,7 +418,7 @@ class TestAcceptQuote:
             OrderStatus.paid,
             OrderStatus.complete,
             OrderStatus.cancelled,
-        )
+        ),
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
         """Test that if the order is in a disallowed status, the quote cannot be accepted."""
@@ -450,7 +450,7 @@ class TestMarkOrderAsPaid:
 
     @pytest.mark.parametrize(
         'allowed_status',
-        (OrderStatus.quote_accepted,)
+        (OrderStatus.quote_accepted,),
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
         """
@@ -464,20 +464,20 @@ class TestMarkOrderAsPaid:
             payments_data=[
                 {
                     'amount': 1,
-                    'received_on': dateutil_parse('2017-01-01').date()
+                    'received_on': dateutil_parse('2017-01-01').date(),
                 },
                 {
                     'amount': order.total_cost - 1,
-                    'received_on': dateutil_parse('2017-01-02').date()
+                    'received_on': dateutil_parse('2017-01-02').date(),
                 },
-            ]
+            ],
         )
 
         order.refresh_from_db()
         assert order.status == OrderStatus.paid
         assert order.paid_on == dateutil_parse('2017-01-02T00:00:00Z')
         assert list(
-            order.payments.order_by('received_on').values_list('amount', 'received_on')
+            order.payments.order_by('received_on').values_list('amount', 'received_on'),
         ) == [
             (1, dateutil_parse('2017-01-01').date()),
             (order.total_cost - 1, dateutil_parse('2017-01-02').date()),
@@ -491,7 +491,7 @@ class TestMarkOrderAsPaid:
             OrderStatus.paid,
             OrderStatus.complete,
             OrderStatus.cancelled,
-        )
+        ),
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
         """
@@ -516,8 +516,8 @@ class TestMarkOrderAsPaid:
                     by=None,
                     payments_data=[{
                         'amount': order.total_cost,
-                        'received_on': dateutil_parse('2017-01-02').date()
-                    }]
+                        'received_on': dateutil_parse('2017-01-02').date(),
+                    }],
                 )
 
             order.refresh_from_db()
@@ -536,9 +536,9 @@ class TestMarkOrderAsPaid:
                 payments_data=[
                     {
                         'amount': order.total_cost - 1,
-                        'received_on': dateutil_parse('2017-01-02').date()
-                    }
-                ]
+                        'received_on': dateutil_parse('2017-01-02').date(),
+                    },
+                ],
             )
 
 
@@ -547,7 +547,7 @@ class TestCompleteOrder:
 
     @pytest.mark.parametrize(
         'allowed_status',
-        (OrderStatus.paid,)
+        (OrderStatus.paid,),
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
         """
@@ -573,7 +573,7 @@ class TestCompleteOrder:
             OrderStatus.quote_accepted,
             OrderStatus.complete,
             OrderStatus.cancelled,
-        )
+        ),
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
         """
@@ -630,7 +630,7 @@ class TestCancelOrder:
             (OrderStatus.quote_awaiting_acceptance, True),
             (OrderStatus.quote_accepted, True),
             (OrderStatus.paid, True),
-        )
+        ),
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status, force):
         """
@@ -661,7 +661,7 @@ class TestCancelOrder:
             # force=True
             (OrderStatus.complete, True),
             (OrderStatus.cancelled, True),
-        )
+        ),
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status, force):
         """

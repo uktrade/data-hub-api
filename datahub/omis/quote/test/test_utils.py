@@ -9,18 +9,18 @@ from rest_framework.exceptions import ValidationError
 
 from datahub.company.test.factories import (
     AdviserFactory, CompaniesHouseCompanyFactory,
-    CompanyFactory, ContactFactory
+    CompanyFactory, ContactFactory,
 )
 from datahub.core.constants import Country
 from datahub.omis.order.constants import VATStatus
 from datahub.omis.order.test.factories import (
-    HourlyRateFactory, OrderAssigneeFactory, OrderFactory
+    HourlyRateFactory, OrderAssigneeFactory, OrderFactory,
 )
 from ..utils import (
     calculate_quote_expiry_date,
     escape_markdown,
     generate_quote_content,
-    generate_quote_reference
+    generate_quote_reference,
 )
 
 
@@ -37,7 +37,7 @@ class TestGenerateQuoteReference:
         get_random_string.side_effect = ['DE', 4]
 
         order = mock.Mock(
-            reference='ABC123'
+            reference='ABC123',
         )
 
         reference = generate_quote_reference(order)
@@ -60,12 +60,12 @@ class TestGenerateQuoteContent:
             registered_address_county='County',
             registered_address_postcode='SW1A 1AA',
             registered_address_country_id=Country.united_kingdom.value.id,
-            company_number=CompaniesHouseCompanyFactory().company_number
+            company_number=CompaniesHouseCompanyFactory().company_number,
         )
         contact = ContactFactory(
             company=company,
             first_name='John',
-            last_name='*Doe'
+            last_name='*Doe',
         )
         order = OrderFactory(
             delivery_date=dateutil_parse('2017-06-20'),
@@ -78,7 +78,7 @@ class TestGenerateQuoteContent:
             hourly_rate=hourly_rate,
             assignees=[],
             vat_status=VATStatus.uk,
-            contact_email='contact-email@mycoorp.com'
+            contact_email='contact-email@mycoorp.com',
         )
         OrderAssigneeFactory(
             order=order,
@@ -87,12 +87,12 @@ class TestGenerateQuoteContent:
                 last_name='*Bar',
             ),
             estimated_time=150,
-            is_lead=True
+            is_lead=True,
         )
 
         content = generate_quote_content(
             order=order,
-            expires_on=dateutil_parse('2017-05-18').date()
+            expires_on=dateutil_parse('2017-05-18').date(),
         )
         with open(COMPILED_QUOTE_TEMPLATE, 'r', encoding='utf-8') as f:
             expected_content = f.read()
@@ -111,15 +111,15 @@ class TestGenerateQuoteContent:
             registered_address_town='London',
             registered_address_county=None,
             registered_address_postcode='SW1A 1AA',
-            registered_address_country_id=None
+            registered_address_country_id=None,
         )
         order = OrderFactory(
             company=company,
-            contact=ContactFactory(company=company)
+            contact=ContactFactory(company=company),
         )
         content = generate_quote_content(
             order=order,
-            expires_on=dateutil_parse('2017-05-18').date()
+            expires_on=dateutil_parse('2017-05-18').date(),
         )
 
         assert 'line 1, London, SW1A 1AA' in content
@@ -132,17 +132,17 @@ class TestGenerateQuoteContent:
             discount_value=0,
             hourly_rate=hourly_rate,
             assignees=[],
-            vat_status=VATStatus.uk
+            vat_status=VATStatus.uk,
         )
         OrderAssigneeFactory(
             order=order,
             estimated_time=120,
-            is_lead=True
+            is_lead=True,
         )
 
         content = generate_quote_content(
             order=order,
-            expires_on=dateutil_parse('2017-05-18').date()
+            expires_on=dateutil_parse('2017-05-18').date(),
         )
 
         assert '25.00' in content
@@ -160,7 +160,7 @@ class TestCalculateQuoteExpiryDate:
         Therefore expiry date = 18/05/2017 (in 30 days)
         """
         order = mock.MagicMock(
-            delivery_date=dateutil_parse('2017-06-20').date()
+            delivery_date=dateutil_parse('2017-06-20').date(),
         )
         expiry_date = calculate_quote_expiry_date(order)
         assert expiry_date == dateutil_parse('2017-05-18').date()
@@ -174,7 +174,7 @@ class TestCalculateQuoteExpiryDate:
         Therefore expiry date = 20/04/2017 (in 2 days)
         """
         order = mock.MagicMock(
-            delivery_date=dateutil_parse('2017-05-11').date()
+            delivery_date=dateutil_parse('2017-05-11').date(),
         )
         expiry_date = calculate_quote_expiry_date(order)
         assert expiry_date == dateutil_parse('2017-04-20').date()
@@ -188,7 +188,7 @@ class TestCalculateQuoteExpiryDate:
         Therefore expiry date would be passed so an exception is raised.
         """
         order = mock.MagicMock(
-            delivery_date=dateutil_parse('2017-05-08').date()
+            delivery_date=dateutil_parse('2017-05-08').date(),
         )
 
         with pytest.raises(ValidationError):
