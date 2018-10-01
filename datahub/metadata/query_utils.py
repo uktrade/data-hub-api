@@ -35,7 +35,7 @@ def get_sector_name_subquery(relation_name=None):
     outer_ref_prefix = f'{relation_name}__' if relation_name is not None else ''
 
     subquery = Sector._base_manager.annotate(
-        name=_SectorStringAgg(F('segment'), Value(Sector.PATH_SEPARATOR))
+        name=_SectorStringAgg(F('segment'), Value(Sector.PATH_SEPARATOR)),
     ).filter(
         lft__lte=OuterRef(f'{outer_ref_prefix}lft'),
         rght__gte=OuterRef(f'{outer_ref_prefix}rght'),

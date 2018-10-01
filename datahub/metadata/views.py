@@ -26,7 +26,7 @@ def _create_metadata_view(mapping):
     )
 
     return view_set.as_view({
-        'get': 'list'
+        'get': 'list',
     })
 
 

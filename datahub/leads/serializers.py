@@ -15,10 +15,10 @@ class BusinessLeadSerializer(serializers.ModelSerializer):
     """Business lead serialiser."""
 
     company = NestedRelatedField(
-        Company, required=False, allow_null=True
+        Company, required=False, allow_null=True,
     )
     address_country = NestedRelatedField(
-        meta_models.Country, required=False, allow_null=True
+        meta_models.Country, required=False, allow_null=True,
     )
     archived = serializers.BooleanField(read_only=True)
     archived_on = serializers.DateTimeField(read_only=True)
@@ -100,5 +100,5 @@ class BusinessLeadSerializer(serializers.ModelSerializer):
             'archived': {'read_only': True},
             'archived_on': {'read_only': True},
             'archived_reason': {'read_only': True},
-            'archived_by': {'read_only': True}
+            'archived_by': {'read_only': True},
         }

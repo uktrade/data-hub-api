@@ -30,7 +30,7 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize(
             'metadata_view_name',
             view_names,
-            ids=[f'{view_name} metadata view' for view_name in view_names]
+            ids=[f'{view_name} metadata view' for view_name in view_names],
         )
 
     if 'ordered_mapping' in metafunc.fixturenames:
@@ -43,7 +43,7 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize(
             'ordered_mapping',
             view_data,
-            ids=[f'{view_data_item[0]} ordered metadata view' for view_data_item in view_data]
+            ids=[f'{view_data_item[0]} ordered metadata view' for view_data_item in view_data],
         )
 
 
@@ -110,12 +110,12 @@ def test_team_view(api_client):
         'name': 'Aberdeen City Council',
         'role': {
             'name': 'ATO',
-            'id': '846cb21e-6095-e211-a939-e4115bead28a'
+            'id': '846cb21e-6095-e211-a939-e4115bead28a',
         },
         'uk_region': None,
         'country': {
             'name': 'United Kingdom',
-            'id': '80756b9a-5d95-e211-a939-e4115bead28a'
+            'id': '80756b9a-5d95-e211-a939-e4115bead28a',
         },
         'disabled_on': None,
     }
@@ -129,12 +129,12 @@ def test_team_view(api_client):
         'name': 'Business Information Centre Bhopal India',
         'role': {
             'name': 'Post',
-            'id': '62329c18-6095-e211-a939-e4115bead28a'
+            'id': '62329c18-6095-e211-a939-e4115bead28a',
         },
         'uk_region': None,
         'country': {
             'name': 'India',
-            'id': '6f6a9ab2-5d95-e211-a939-e4115bead28a'
+            'id': '6f6a9ab2-5d95-e211-a939-e4115bead28a',
         },
         'disabled_on': '2013-03-31T16:21:07Z',
     }
@@ -184,7 +184,7 @@ class TestServiceView:
 
         ServiceFactory.create_batch(
             len(test_data_contexts),
-            contexts=factory.Iterator(test_data_contexts)
+            contexts=factory.Iterator(test_data_contexts),
         )
 
         url = reverse(viewname='service')
