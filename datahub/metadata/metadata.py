@@ -23,15 +23,15 @@ registry.register(
     filterset_class=ServiceFilterSet,
     metadata_id='service',
     model=models.Service,
-    serializer=ServiceSerializer
+    serializer=ServiceSerializer,
 )
 registry.register(metadata_id='team-role', model=models.TeamRole)
 registry.register(
     metadata_id='team',
     model=models.Team,
     queryset=models.Team.objects.select_related('role', 'uk_region', 'country'),
-    serializer=TeamSerializer
-),
+    serializer=TeamSerializer,
+)
 registry.register(metadata_id='title', model=models.Title)
 registry.register(metadata_id='turnover', model=models.TurnoverRange)
 registry.register(metadata_id='uk-region', model=models.UKRegion)
@@ -44,11 +44,11 @@ registry.register(metadata_id='referral-source-website', model=models.ReferralSo
 registry.register(metadata_id='referral-source-marketing', model=models.ReferralSourceMarketing)
 registry.register(
     metadata_id='investment-business-activity',
-    model=models.InvestmentBusinessActivity
+    model=models.InvestmentBusinessActivity,
 )
 registry.register(
     metadata_id='investment-strategic-driver',
-    model=models.InvestmentStrategicDriver
+    model=models.InvestmentStrategicDriver,
 )
 registry.register(metadata_id='salary-range', model=models.SalaryRange)
 registry.register(metadata_id='investment-project-stage', model=models.InvestmentProjectStage)

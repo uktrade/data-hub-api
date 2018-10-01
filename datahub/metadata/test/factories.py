@@ -13,7 +13,7 @@ class ServiceFactory(factory.django.DjangoModelFactory):
     id = factory.LazyFunction(uuid.uuid4)
     name = factory.Sequence(lambda n: f'name {n}')
     contexts = factory.LazyFunction(
-        lambda: sample(tuple(Service.CONTEXTS), randrange(0, len(Service.CONTEXTS)))
+        lambda: sample(tuple(Service.CONTEXTS), randrange(0, len(Service.CONTEXTS))),
     )
 
     class Meta:

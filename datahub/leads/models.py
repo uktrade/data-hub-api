@@ -25,29 +25,56 @@ class BusinessLead(ArchivableModel, BaseModel):
     first_name = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
     last_name = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
     job_title = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    company_name = models.CharField(max_length=MAX_LENGTH, null=True,
-                                    blank=True)
-    trading_name = models.CharField(max_length=MAX_LENGTH, null=True,
-                                    blank=True)
-    company = models.ForeignKey(
-        'company.Company', null=True, blank=True, on_delete=models.SET_NULL,
-        related_name='business_leads'
+    company_name = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
     )
-    telephone_number = models.CharField(max_length=MAX_LENGTH, null=True,
-                                        blank=True)
+    trading_name = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+    )
+    company = models.ForeignKey(
+        'company.Company',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='business_leads',
+    )
+    telephone_number = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+    )
     email = models.EmailField(null=True, blank=True)
     address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
     address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    address_town = models.CharField(max_length=MAX_LENGTH, blank=True,
-                                    null=True)
-    address_county = models.CharField(max_length=MAX_LENGTH, blank=True,
-                                      null=True)
-    address_country = models.ForeignKey(metadata_models.Country, null=True,
-                                        blank=True, on_delete=models.SET_NULL)
-    address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True,
-                                        null=True)
-    telephone_alternative = models.CharField(max_length=MAX_LENGTH,
-                                             blank=True, null=True)
+    address_town = models.CharField(
+        max_length=MAX_LENGTH,
+        blank=True,
+        null=True,
+    )
+    address_county = models.CharField(
+        max_length=MAX_LENGTH,
+        blank=True,
+        null=True,
+    )
+    address_country = models.ForeignKey(
+        metadata_models.Country,
+        null=True,
+        blank=True, on_delete=models.SET_NULL,
+    )
+    address_postcode = models.CharField(
+        max_length=MAX_LENGTH,
+        blank=True,
+        null=True,
+    )
+    telephone_alternative = models.CharField(
+        max_length=MAX_LENGTH,
+        blank=True,
+        null=True,
+    )
     email_alternative = models.EmailField(null=True, blank=True)
 
     # Marketing preferences

@@ -43,8 +43,8 @@ class DisableableMetadataAdmin(admin.ModelAdmin):
     Intended to be used across apps.
     """
 
-    fields = ('id', 'name', 'disabled_on',)
-    list_display = ('name', 'disabled_on',)
+    fields = ('id', 'name', 'disabled_on')
+    list_display = ('name', 'disabled_on')
     readonly_fields = ('id',)
     search_fields = ('name', 'pk')
     list_filter = (DisabledOnFilter,)
@@ -57,7 +57,7 @@ class ReadOnlyMetadataAdmin(ViewOnlyAdmin):
     Intended to be used across apps.
     """
 
-    list_display = ('name', 'disabled_on',)
+    list_display = ('name', 'disabled_on')
     search_fields = ('name', 'pk')
     list_filter = (DisabledOnFilter,)
 
@@ -69,8 +69,8 @@ class OrderedMetadataAdmin(admin.ModelAdmin):
     Intended to be used across apps.
     """
 
-    fields = ('id', 'name', 'order', 'disabled_on',)
-    list_display = ('name', 'order', 'disabled_on',)
+    fields = ('id', 'name', 'order', 'disabled_on')
+    list_display = ('name', 'order', 'disabled_on')
     readonly_fields = ('id',)
     search_fields = ('name', 'pk')
     list_filter = (DisabledOnFilter,)
@@ -91,7 +91,7 @@ admin.site.register(MODELS_TO_REGISTER_READ_ONLY, ReadOnlyMetadataAdmin)
 admin.site.register(MODELS_TO_REGISTER_WITH_ORDER, OrderedMetadataAdmin)
 admin.site.register(
     MODELS_TO_REGISTER_EDITABLE_ORDER_ONLY,
-    EditableOrderOnlyOrderedMetadataAdmin
+    EditableOrderOnlyOrderedMetadataAdmin,
 )
 
 
@@ -99,8 +99,8 @@ admin.site.register(
 class CountryAdmin(admin.ModelAdmin):
     """Admin for countries."""
 
-    fields = ('pk', 'name', 'overseas_region', 'disabled_on',)
-    list_display = ('name', 'overseas_region', 'disabled_on',)
+    fields = ('pk', 'name', 'overseas_region', 'disabled_on')
+    list_display = ('name', 'overseas_region', 'disabled_on')
     readonly_fields = ('pk',)
     search_fields = ('name', 'pk')
     list_filter = (DisabledOnFilter, 'overseas_region')
@@ -118,8 +118,8 @@ class ServiceAdmin(DisableableMetadataAdmin):
 class TeamAdmin(admin.ModelAdmin):
     """Team Admin."""
 
-    fields = ('id', 'name', 'country', 'uk_region', 'role', 'tags', 'disabled_on',)
-    list_display = ('name', 'role', 'get_tags_display', 'disabled_on',)
+    fields = ('id', 'name', 'country', 'uk_region', 'role', 'tags', 'disabled_on')
+    list_display = ('name', 'role', 'get_tags_display', 'disabled_on')
     list_select_related = ('role',)
     readonly_fields = ('id',)
     search_fields = ('name', 'pk')
@@ -130,8 +130,8 @@ class TeamAdmin(admin.ModelAdmin):
 class TeamRoleAdmin(admin.ModelAdmin):
     """Team Admin."""
 
-    fields = ('id', 'name', 'groups', 'disabled_on',)
-    list_display = ('name', 'disabled_on',)
+    fields = ('id', 'name', 'groups', 'disabled_on')
+    list_display = ('name', 'disabled_on')
     readonly_fields = ('id',)
     search_fields = ('name', 'pk')
     filter_horizontal = ('groups',)
@@ -142,8 +142,8 @@ class TeamRoleAdmin(admin.ModelAdmin):
 class SectorAdmin(MPTTModelAdmin):
     """Sector admin."""
 
-    fields = ('id', 'segment', 'parent', 'disabled_on',)
-    list_display = ('segment', 'disabled_on',)
+    fields = ('id', 'segment', 'parent', 'disabled_on')
+    list_display = ('segment', 'disabled_on')
     readonly_fields = ('id',)
     search_fields = ('segment', 'pk')
     list_filter = (DisabledOnFilter,)

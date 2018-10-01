@@ -29,7 +29,7 @@ class TestOAuthScopeBackend:
         app = app_and_scope.application
         client = APIClient()
         client.credentials(
-            HTTP_AUTHORIZATION=_create_auth_header(app.client_id, app.client_secret)
+            HTTP_AUTHORIZATION=_create_auth_header(app.client_id, app.client_secret),
         )
         data = {'grant_type': 'client_credentials'}
         url = reverse('token')
@@ -50,7 +50,7 @@ class TestOAuthScopeBackend:
         app = app_and_scope.application
         client = APIClient()
         client.credentials(
-            HTTP_AUTHORIZATION=_create_auth_header(app.client_id, app.client_secret)
+            HTTP_AUTHORIZATION=_create_auth_header(app.client_id, app.client_secret),
         )
         data = {
             'grant_type': 'client_credentials',
@@ -70,12 +70,12 @@ class TestOAuthScopeBackend:
         Test creating an access token when specifying a scope that the app hasn't been assigned.
         """
         app_and_scope = OAuthApplicationScopeFactory(scopes=[
-            TestScope.test_scope_1
+            TestScope.test_scope_1,
         ])
         app = app_and_scope.application
         client = APIClient()
         client.credentials(
-            HTTP_AUTHORIZATION=_create_auth_header(app.client_id, app.client_secret)
+            HTTP_AUTHORIZATION=_create_auth_header(app.client_id, app.client_secret),
         )
         data = {
             'grant_type': 'client_credentials',
@@ -89,7 +89,7 @@ class TestOAuthScopeBackend:
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert response.json() == {
-            'error': 'invalid_scope'
+            'error': 'invalid_scope',
         }
 
 
@@ -104,10 +104,13 @@ def test_urls():  # noqa: D403
 class TestOAuthViewScope(APITestMixin):
     """Tests app-specific OAuth scopes in views."""
 
-    @pytest.mark.parametrize('grant_type', (
-        Application.GRANT_PASSWORD,
-        Application.GRANT_CLIENT_CREDENTIALS,
-    ))
+    @pytest.mark.parametrize(
+        'grant_type',
+        (
+            Application.GRANT_PASSWORD,
+            Application.GRANT_CLIENT_CREDENTIALS,
+        ),
+    )
     def test_scope_allowed(self, test_urls, grant_type):
         """Tests a test view with the required scope."""
         client = self.create_api_client(TestScope.test_scope_1, grant_type=grant_type)
@@ -115,10 +118,13 @@ class TestOAuthViewScope(APITestMixin):
         response = client.get(url)
         assert response.status_code == status.HTTP_200_OK
 
-    @pytest.mark.parametrize('grant_type', (
-        Application.GRANT_PASSWORD,
-        Application.GRANT_CLIENT_CREDENTIALS,
-    ))
+    @pytest.mark.parametrize(
+        'grant_type',
+        (
+            Application.GRANT_PASSWORD,
+            Application.GRANT_CLIENT_CREDENTIALS,
+        ),
+    )
     def test_scope_not_allowed(self, test_urls, grant_type):
         """Tests a test view without the required scope."""
         client = self.create_api_client(TestScope.test_scope_2, grant_type=grant_type)
@@ -126,10 +132,13 @@ class TestOAuthViewScope(APITestMixin):
         response = client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    @pytest.mark.parametrize('grant_type', (
-        Application.GRANT_PASSWORD,
-        Application.GRANT_CLIENT_CREDENTIALS,
-    ))
+    @pytest.mark.parametrize(
+        'grant_type',
+        (
+            Application.GRANT_PASSWORD,
+            Application.GRANT_CLIENT_CREDENTIALS,
+        ),
+    )
     def test_expired_token(self, test_urls, grant_type):
         """Tests a test view with an expired token and the required scope."""
         application = self.get_application(grant_type=grant_type)
