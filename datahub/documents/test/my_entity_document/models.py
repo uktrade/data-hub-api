@@ -15,6 +15,9 @@ class MyEntityDocument(AbstractEntityDocumentModel):
     @property
     def url(self):
         """Returns URL to download endpoint."""
-        return reverse('test-document-item-download', kwargs={
-            'entity_document_pk': self.pk,
-        })
+        return reverse(
+            'test-document-item-download',
+            kwargs={
+                'entity_document_pk': self.pk,
+            },
+        )
