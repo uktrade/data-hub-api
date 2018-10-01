@@ -20,8 +20,10 @@ class Command(CSVBaseCommand):
         new_delivery_partners = parse_uuid_list(row['delivery_partners'])
 
         if investment_project.delivery_partners.all():
-            logger.warning('Not updating project with existing delivery partners: %s, %s',
-                           investment_project.project_code, investment_project)
+            logger.warning(
+                'Not updating project with existing delivery partners: %s, %s',
+                investment_project.project_code, investment_project,
+            )
             return
 
         if not simulate:

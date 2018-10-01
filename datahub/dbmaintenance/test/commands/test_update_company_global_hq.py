@@ -23,17 +23,17 @@ def test_run(s3_stubber, caplog):
     )
     other_global_hq = CompanyFactory(
         headquarter_type_id=HeadquarterType.ghq.value.id,
-        global_headquarters=None
+        global_headquarters=None,
     )
 
     company_needs_global_hq = CompanyFactory(
-        global_headquarters=None
+        global_headquarters=None,
     )
     company_should_keep_current_global_hq = CompanyFactory(
-        global_headquarters=other_global_hq
+        global_headquarters=other_global_hq,
     )
     company_should_also_keep_global_hq = CompanyFactory(
-        global_headquarters=other_global_hq
+        global_headquarters=other_global_hq,
     )
 
     companies = [
@@ -56,12 +56,12 @@ def test_run(s3_stubber, caplog):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command('update_company_global_hq', bucket, object_key)
@@ -88,21 +88,21 @@ def test_overwrite(s3_stubber, caplog):
     caplog.set_level('ERROR')
     global_hq = CompanyFactory(
         headquarter_type_id=HeadquarterType.ghq.value.id,
-        global_headquarters=None
+        global_headquarters=None,
     )
     other_global_hq = CompanyFactory(
         headquarter_type_id=HeadquarterType.ghq.value.id,
-        global_headquarters=None
+        global_headquarters=None,
     )
 
     company_needs_global_hq = CompanyFactory(
-        global_headquarters=None
+        global_headquarters=None,
     )
     company_should_get_new_global_hq = CompanyFactory(
-        global_headquarters=other_global_hq
+        global_headquarters=other_global_hq,
     )
     company_should_have_global_hq_removed = CompanyFactory(
-        global_headquarters=other_global_hq
+        global_headquarters=other_global_hq,
     )
 
     companies = [
@@ -125,12 +125,12 @@ def test_overwrite(s3_stubber, caplog):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command('update_company_global_hq', bucket, object_key, overwrite=True)
@@ -152,28 +152,28 @@ def test_overwrite(s3_stubber, caplog):
 
 @pytest.mark.parametrize(
     'overwrite',
-    (True, False)
+    (True, False),
 )
 def test_simulate(s3_stubber, caplog, overwrite):
     """Test that the command simulates updates if --simulate is passed in."""
     caplog.set_level('ERROR')
     global_hq = CompanyFactory(
         headquarter_type_id=HeadquarterType.ghq.value.id,
-        global_headquarters=None
+        global_headquarters=None,
     )
     other_global_hq = CompanyFactory(
         headquarter_type_id=HeadquarterType.ghq.value.id,
-        global_headquarters=None
+        global_headquarters=None,
     )
 
     company_needs_global_hq = CompanyFactory(
-        global_headquarters=None
+        global_headquarters=None,
     )
     company_should_get_new_global_hq = CompanyFactory(
-        global_headquarters=other_global_hq
+        global_headquarters=other_global_hq,
     )
     company_should_have_global_hq_removed = CompanyFactory(
-        global_headquarters=other_global_hq
+        global_headquarters=other_global_hq,
     )
 
     companies = [
@@ -196,12 +196,12 @@ def test_simulate(s3_stubber, caplog, overwrite):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command(
@@ -209,7 +209,7 @@ def test_simulate(s3_stubber, caplog, overwrite):
         bucket,
         object_key,
         simulate=True,
-        overwrite=overwrite
+        overwrite=overwrite,
     )
 
     for company in companies:
@@ -231,14 +231,14 @@ def test_audit_log(s3_stubber):
     """Test that reversion revisions are created."""
     company_ghq = CompanyFactory(
         headquarter_type_id=HeadquarterType.ghq.value.id,
-        global_headquarters=None
+        global_headquarters=None,
     )
     company_needs_global_hq = CompanyFactory(
-        global_headquarters=None
+        global_headquarters=None,
     )
     # Should not change
     company_ghq_set_already = CompanyFactory(
-        global_headquarters=company_ghq
+        global_headquarters=company_ghq,
     )
 
     bucket = 'test_bucket'
@@ -251,12 +251,12 @@ def test_audit_log(s3_stubber):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command('update_company_global_hq', bucket, object_key)
@@ -273,13 +273,13 @@ def test_override_audit_log(s3_stubber):
     """Test that reversion revisions are created."""
     company_ghq = CompanyFactory(
         headquarter_type_id=HeadquarterType.ghq.value.id,
-        global_headquarters=None
+        global_headquarters=None,
     )
     company_needs_global_hq = CompanyFactory(
-        global_headquarters=None
+        global_headquarters=None,
     )
     company_ghq_set_already = CompanyFactory(
-        global_headquarters=company_ghq
+        global_headquarters=company_ghq,
     )
 
     bucket = 'test_bucket'
@@ -292,12 +292,12 @@ def test_override_audit_log(s3_stubber):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command('update_company_global_hq', bucket, object_key, overwrite=True)
@@ -319,15 +319,15 @@ def test_validation(s3_stubber, caplog):
     )
     valid_global_hq = CompanyFactory(
         headquarter_type_id=HeadquarterType.ghq.value.id,
-        global_headquarters=None
+        global_headquarters=None,
     )
     other_valid_global_hq = CompanyFactory(
         headquarter_type_id=HeadquarterType.ghq.value.id,
-        global_headquarters=None
+        global_headquarters=None,
     )
 
     company_needs_global_hq = CompanyFactory(
-        global_headquarters=None
+        global_headquarters=None,
     )
 
     companies = [
@@ -348,12 +348,12 @@ def test_validation(s3_stubber, caplog):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command('update_company_global_hq', bucket, object_key)

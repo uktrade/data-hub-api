@@ -54,15 +54,15 @@ def test_run(s3_stubber, caplog, reset_unmatched):
         8,
         classification=factory.LazyFunction(
             lambda: random_obj_for_queryset(
-                CompanyClassification.objects.exclude(pk=new_classification.pk)
-            )
+                CompanyClassification.objects.exclude(pk=new_classification.pk),
+            ),
         ),
-        one_list_account_owner=factory.SubFactory(AdviserFactory)
+        one_list_account_owner=factory.SubFactory(AdviserFactory),
     )
     non_one_list_companies = CompanyFactory.create_batch(
         3,
         classification=None,
-        one_list_account_owner=None
+        one_list_account_owner=None,
     )
 
     for company in chain(one_list_companies, non_one_list_companies):
@@ -90,8 +90,8 @@ def test_run(s3_stubber, caplog, reset_unmatched):
         {'Body': BytesIO(csv_content.encode(encoding='utf-8'))},
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command('update_one_list_fields', bucket, object_key, reset_unmatched=reset_unmatched)
@@ -138,12 +138,12 @@ def test_run(s3_stubber, caplog, reset_unmatched):
 
     # non_one_list_companies[1]: nothing changed
     assert_did_not_change(
-        non_one_list_companies[1], 'classification_id', 'one_list_account_owner_id'
+        non_one_list_companies[1], 'classification_id', 'one_list_account_owner_id',
     )
 
     # non_one_list_companies[2]: nothing changed
     assert_did_not_change(
-        non_one_list_companies[2], 'classification_id', 'one_list_account_owner_id'
+        non_one_list_companies[2], 'classification_id', 'one_list_account_owner_id',
     )
 
     # one_list_companies[6] / [7]: if reset_unmatched == False => nothing changed else all changed
@@ -157,10 +157,10 @@ def test_run(s3_stubber, caplog, reset_unmatched):
         assert one_list_companies[7].one_list_account_owner is None
     else:
         assert_did_not_change(
-            one_list_companies[6], 'classification_id', 'one_list_account_owner_id'
+            one_list_companies[6], 'classification_id', 'one_list_account_owner_id',
         )
         assert_did_not_change(
-            one_list_companies[7], 'classification_id', 'one_list_account_owner_id'
+            one_list_companies[7], 'classification_id', 'one_list_account_owner_id',
         )
 
 
@@ -174,15 +174,15 @@ def test_simulate(s3_stubber, caplog, reset_unmatched):
         8,
         classification=factory.LazyFunction(
             lambda: random_obj_for_queryset(
-                CompanyClassification.objects.exclude(pk=new_classification.pk)
-            )
+                CompanyClassification.objects.exclude(pk=new_classification.pk),
+            ),
         ),
-        one_list_account_owner=factory.SubFactory(AdviserFactory)
+        one_list_account_owner=factory.SubFactory(AdviserFactory),
     )
     non_one_list_companies = CompanyFactory.create_batch(
         3,
         classification=None,
-        one_list_account_owner=None
+        one_list_account_owner=None,
     )
 
     for company in chain(one_list_companies, non_one_list_companies):
@@ -210,8 +210,8 @@ def test_simulate(s3_stubber, caplog, reset_unmatched):
         {'Body': BytesIO(csv_content.encode(encoding='utf-8'))},
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command(
@@ -219,7 +219,7 @@ def test_simulate(s3_stubber, caplog, reset_unmatched):
         bucket,
         object_key,
         reset_unmatched=reset_unmatched,
-        simulate=True
+        simulate=True,
     )
 
     for company in chain(one_list_companies, non_one_list_companies):
@@ -244,7 +244,7 @@ def test_audit_log(s3_stubber, caplog):
     company_without_change, company_with_change = CompanyFactory.create_batch(
         2,
         classification=classifications[0],
-        one_list_account_owner=AdviserFactory()
+        one_list_account_owner=AdviserFactory(),
     )
 
     bucket = 'test_bucket'
@@ -257,12 +257,12 @@ def test_audit_log(s3_stubber, caplog):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command('update_one_list_fields', bucket, object_key)

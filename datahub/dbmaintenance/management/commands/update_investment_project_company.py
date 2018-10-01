@@ -21,12 +21,14 @@ class Command(CSVBaseCommand):
             return None
         return uuid.UUID(company_id)
 
-    def _should_update(self,
-                       investment_project,
-                       investor_company_id,
-                       intermediate_company_id,
-                       uk_company_id,
-                       uk_company_decided):
+    def _should_update(
+        self,
+        investment_project,
+        investor_company_id,
+        intermediate_company_id,
+        uk_company_id,
+        uk_company_decided,
+    ):
         """
         Checks if Investment project should be updated.
 
@@ -80,6 +82,6 @@ class Command(CSVBaseCommand):
                             'intermediate_company',
                             'uk_company',
                             'uk_company_decided',
-                        )
+                        ),
                     )
                     reversion.set_comment('Companies data migration.')
