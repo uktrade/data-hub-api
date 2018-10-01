@@ -16,16 +16,16 @@ def test_run(s3_stubber, caplog):
     caplog.set_level('ERROR')
 
     company_no_hq_type = CompanyFactory(
-        headquarter_type_id=None
+        headquarter_type_id=None,
     )
     company_ghq = CompanyFactory(
-        headquarter_type_id=HeadquarterType.ghq.value.id
+        headquarter_type_id=HeadquarterType.ghq.value.id,
     )
     company_ukhq = CompanyFactory(
-        headquarter_type_id=HeadquarterType.ukhq.value.id
+        headquarter_type_id=HeadquarterType.ukhq.value.id,
     )
     company_ehq = CompanyFactory(
-        headquarter_type_id=HeadquarterType.ehq.value.id
+        headquarter_type_id=HeadquarterType.ehq.value.id,
     )
     companies = [
         company_no_hq_type,
@@ -46,12 +46,12 @@ def test_run(s3_stubber, caplog):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command('update_company_headquarter_type', bucket, object_key)
@@ -73,16 +73,16 @@ def test_simulate(s3_stubber, caplog):
     caplog.set_level('ERROR')
 
     company_no_hq_type = CompanyFactory(
-        headquarter_type_id=None
+        headquarter_type_id=None,
     )
     company_ghq = CompanyFactory(
-        headquarter_type_id=HeadquarterType.ghq.value.id
+        headquarter_type_id=HeadquarterType.ghq.value.id,
     )
     company_ukhq = CompanyFactory(
-        headquarter_type_id=HeadquarterType.ukhq.value.id
+        headquarter_type_id=HeadquarterType.ukhq.value.id,
     )
     company_ehq = CompanyFactory(
-        headquarter_type_id=HeadquarterType.ehq.value.id
+        headquarter_type_id=HeadquarterType.ehq.value.id,
     )
     companies = [
         company_no_hq_type,
@@ -103,12 +103,12 @@ def test_simulate(s3_stubber, caplog):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command('update_company_headquarter_type', bucket, object_key, simulate=True)
@@ -128,10 +128,10 @@ def test_simulate(s3_stubber, caplog):
 def test_audit_log(s3_stubber):
     """Test that reversion revisions are created."""
     company_no_hq_type = CompanyFactory(
-        headquarter_type_id=None
+        headquarter_type_id=None,
     )
     company_ehq = CompanyFactory(
-        headquarter_type_id=HeadquarterType.ehq.value.id
+        headquarter_type_id=HeadquarterType.ehq.value.id,
     )
 
     bucket = 'test_bucket'
@@ -144,12 +144,12 @@ def test_audit_log(s3_stubber):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command('update_company_headquarter_type', bucket, object_key)

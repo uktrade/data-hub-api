@@ -20,8 +20,10 @@ class Command(CSVBaseCommand):
         new_actual_uk_regions = parse_uuid_list(row['actual_uk_regions'])
 
         if investment_project.actual_uk_regions.all():
-            logger.warning('Not updating project with existing actual UK regions: %s, %s',
-                           investment_project.project_code, investment_project)
+            logger.warning(
+                'Not updating project with existing actual UK regions: %s, %s',
+                investment_project.project_code, investment_project,
+            )
             return
 
         if not simulate:

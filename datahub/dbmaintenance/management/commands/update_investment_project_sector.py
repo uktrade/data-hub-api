@@ -21,10 +21,11 @@ class Command(CSVBaseCommand):
             return None
         return Sector.objects.get(id=sector_id)
 
-    def _should_update(self,
-                       investment_project,
-                       old_sector,
-                       ):
+    def _should_update(
+        self,
+        investment_project,
+        old_sector,
+    ):
         """
         Checks if Investment project should be updated.
 
@@ -51,6 +52,6 @@ class Command(CSVBaseCommand):
                     investment_project.save(
                         update_fields=(
                             'sector',
-                        )
+                        ),
                     )
                     reversion.set_comment('Sector migration.')

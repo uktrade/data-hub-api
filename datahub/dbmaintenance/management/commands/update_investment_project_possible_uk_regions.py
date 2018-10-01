@@ -54,7 +54,7 @@ class Command(CSVBaseCommand):
 
         with reversion.create_revision():
             investment_project.save(
-                update_fields=('allow_blank_possible_uk_regions',)
+                update_fields=('allow_blank_possible_uk_regions',),
             )
             investment_project.uk_region_locations.set(uk_region_locations)
             reversion.set_comment('Possible UK regions data migration correction.')

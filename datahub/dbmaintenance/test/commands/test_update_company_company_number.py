@@ -39,12 +39,12 @@ def test_run(s3_stubber, caplog):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     with freeze_time('2018-11-11 00:00:00'):
@@ -57,7 +57,7 @@ def test_run(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert [company.company_number for company in companies] == [
-        '012345', '456', '', '087891', '087892'
+        '012345', '456', '', '087891', '087892',
     ]
     assert all(company.modified_on == original_datetime for company in companies)
 
@@ -86,12 +86,12 @@ def test_simulate(s3_stubber, caplog):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command('update_company_company_number', bucket, object_key, simulate=True)
@@ -124,12 +124,12 @@ def test_audit_log(s3_stubber):
     s3_stubber.add_response(
         'get_object',
         {
-            'Body': BytesIO(csv_content.encode(encoding='utf-8'))
+            'Body': BytesIO(csv_content.encode(encoding='utf-8')),
         },
         expected_params={
             'Bucket': bucket,
-            'Key': object_key
-        }
+            'Key': object_key,
+        },
     )
 
     call_command('update_company_company_number', bucket, object_key)
