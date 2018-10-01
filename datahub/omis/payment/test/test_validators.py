@@ -57,5 +57,5 @@ class TestReconcilablePaymentsValidator:
             'non_field_errors': (
                 'The sum of the amounts has to be '
                 'equal or greater than the order total.'
-            )
+            ),
         }

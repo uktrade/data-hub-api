@@ -10,7 +10,7 @@ from rest_framework.reverse import reverse
 from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import (
-    OrderFactory, OrderPaidFactory, OrderWithAcceptedQuoteFactory
+    OrderFactory, OrderPaidFactory, OrderWithAcceptedQuoteFactory,
 )
 from ..factories import PaymentFactory
 from ...constants import PaymentMethod
@@ -68,7 +68,7 @@ class TestCreatePayments(APITestMixin):
         'order_status',
         (
             OrderStatus.quote_accepted,
-        )
+        ),
     )
     def test_create(self, order_status):
         """Test a successful call to create a list of payments."""
@@ -81,14 +81,14 @@ class TestCreatePayments(APITestMixin):
                 {
                     'transaction_reference': 'some ref1',
                     'amount': 1,
-                    'received_on': '2017-04-20'
+                    'received_on': '2017-04-20',
                 },
                 {
                     'transaction_reference': 'some ref2',
                     'amount': order.total_cost - 1,
                     'method': PaymentMethod.manual,
-                    'received_on': '2017-04-21'
-                }
+                    'received_on': '2017-04-21',
+                },
             ],
         )
         assert response.status_code == status.HTTP_201_CREATED
@@ -101,7 +101,7 @@ class TestCreatePayments(APITestMixin):
                 'additional_reference': '',
                 'amount': 1,
                 'method': PaymentMethod.bacs,  # bacs is the default one
-                'received_on': '2017-04-20'
+                'received_on': '2017-04-20',
             },
             {
                 'created_on': '2017-04-25T13:00:00Z',
@@ -110,8 +110,8 @@ class TestCreatePayments(APITestMixin):
                 'additional_reference': '',
                 'amount': order.total_cost - 1,
                 'method': PaymentMethod.manual,
-                'received_on': '2017-04-21'
-            }
+                'received_on': '2017-04-21',
+            },
         ]
         order.refresh_from_db()
         assert order.status == OrderStatus.paid
@@ -124,26 +124,26 @@ class TestCreatePayments(APITestMixin):
             (
                 [
                     {'amount': 1, 'received_on': '2017-04-20', 'method': PaymentMethod.bacs},
-                    {'amount': 0, 'received_on': '2017-04-21', 'method': PaymentMethod.bacs}
+                    {'amount': 0, 'received_on': '2017-04-21', 'method': PaymentMethod.bacs},
                 ],
                 {
                     'non_field_errors': (
                         'The sum of the amounts has to be equal or greater than the order total.'
-                    )
-                }
+                    ),
+                },
             ),
             # required fields
             (
                 [
                     {'amount': 1, 'received_on': '2017-04-20', 'method': PaymentMethod.bacs},
                     {'received_on': '2017-04-21', 'method': PaymentMethod.bacs},
-                    {'amount': 0, 'method': PaymentMethod.bacs}
+                    {'amount': 0, 'method': PaymentMethod.bacs},
                 ],
                 [
                     {},
                     {'amount': ['This field is required.']},
-                    {'received_on': ['This field is required.']}
-                ]
+                    {'received_on': ['This field is required.']},
+                ],
             ),
             # payment method not allowed
             (
@@ -153,10 +153,10 @@ class TestCreatePayments(APITestMixin):
                 ],
                 [
                     {'method': ['"card" is not a valid choice.']},
-                    {'method': ['"cheque" is not a valid choice.']}
-                ]
-            )
-        )
+                    {'method': ['"cheque" is not a valid choice.']},
+                ],
+            ),
+        ),
     )
     def test_400_validation(self, data, errors):
         """Test validation errors."""
@@ -181,13 +181,13 @@ class TestCreatePayments(APITestMixin):
                 {
                     'amount': order.total_cost,
                     'method': PaymentMethod.bacs,
-                    'received_on': '2017-04-20'
+                    'received_on': '2017-04-20',
                 },
                 {
                     'amount': 1,
                     'method': PaymentMethod.bacs,
-                    'received_on': '2017-04-21'
-                }
+                    'received_on': '2017-04-21',
+                },
             ],
         )
         assert response.status_code == status.HTTP_201_CREATED
@@ -199,7 +199,7 @@ class TestCreatePayments(APITestMixin):
             OrderStatus.paid,
             OrderStatus.complete,
             OrderStatus.cancelled,
-        )
+        ),
     )
     def test_409_if_order_in_disallowed_status(self, disallowed_status):
         """

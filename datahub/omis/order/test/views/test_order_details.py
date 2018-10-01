@@ -76,38 +76,38 @@ class TestAddOrder(APITestMixin):
             'created_on': '2017-04-18T13:00:00Z',
             'created_by': {
                 'id': str(self.user.pk),
-                'name': self.user.name
+                'name': self.user.name,
             },
             'modified_on': '2017-04-18T13:00:00Z',
             'modified_by': {
                 'id': str(self.user.pk),
-                'name': self.user.name
+                'name': self.user.name,
             },
             'company': {
                 'id': str(company.pk),
-                'name': company.name
+                'name': company.name,
             },
             'contact': {
                 'id': str(contact.pk),
-                'name': contact.name
+                'name': contact.name,
             },
             'primary_market': {
                 'id': str(country.id),
-                'name': country.name
+                'name': country.name,
             },
             'sector': {
                 'id': sector.id,
-                'name': sector.name
+                'name': sector.name,
             },
             'uk_region': {
                 'id': uk_region.id,
-                'name': uk_region.name
+                'name': uk_region.name,
             },
             'service_types': [
                 {
                     'id': str(service_type.pk),
-                    'name': service_type.name
-                }
+                    'name': service_type.name,
+                },
             ],
             'description': 'Description test',
             'contacts_not_to_approach': 'Contacts not to approach details',
@@ -138,7 +138,7 @@ class TestAddOrder(APITestMixin):
             'billing_address_postcode': 'SW1A1AA',
             'billing_address_country': {
                 'id': str(Country.united_kingdom.value.id),
-                'name': Country.united_kingdom.value.name
+                'name': Country.united_kingdom.value.name,
             },
             'archived_documents_url_path': '',
             'paid_on': None,
@@ -170,7 +170,7 @@ class TestAddOrder(APITestMixin):
         assert response.json()['sector'] is None
         assert response.json()['uk_region'] == {  # populated automatically from the company
             'id': str(company.uk_region.id),
-            'name': company.uk_region.name
+            'name': company.uk_region.name,
         }
         assert response.json()['service_types'] == []
         assert response.json()['description'] == ''
@@ -252,7 +252,7 @@ class TestAddOrder(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            'service_types': [f'"{disabled_service_type.name}" disabled.']
+            'service_types': [f'"{disabled_service_type.name}" disabled.'],
         }
 
     def test_fails_if_primary_market_disabled(self):
@@ -266,13 +266,13 @@ class TestAddOrder(APITestMixin):
             {
                 'company': {'id': company.pk},
                 'contact': {'id': ContactFactory(company=company).pk},
-                'primary_market': {'id': disabled_country.pk}
+                'primary_market': {'id': disabled_country.pk},
             },
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            'primary_market': [f'"{disabled_country.name}" disabled.']
+            'primary_market': [f'"{disabled_country.name}" disabled.'],
         }
 
     def test_fails_if_primary_market_doesnt_exist(self):
@@ -292,15 +292,15 @@ class TestAddOrder(APITestMixin):
             {
                 'company': {'id': company.pk},
                 'contact': {'id': ContactFactory(company=company).pk},
-                'primary_market': {'id': non_market_country.pk}
+                'primary_market': {'id': non_market_country.pk},
             },
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
             'primary_market': [
-                f"The OMIS market for country '{non_market_country}' doesn't exist."
-            ]
+                f"The OMIS market for country '{non_market_country}' doesn't exist.",
+            ],
         }
 
     def test_cannot_post_legacy_fields(self):
@@ -339,7 +339,7 @@ class TestAddOrder(APITestMixin):
 
     @pytest.mark.parametrize(
         'vat_status',
-        (VATStatus.outside_eu, VATStatus.uk)
+        (VATStatus.outside_eu, VATStatus.uk),
     )
     def test_vat_number_and_verified_reset_if_vat_status_not_eu(self, vat_status):
         """
@@ -407,14 +407,14 @@ class TestGeneralChangeOrder(APITestMixin):
         """
         order = OrderFactory(
             vat_status=VATStatus.outside_eu,
-            uk_region_id=None
+            uk_region_id=None,
         )
         assert not order.uk_region
         assert order.company.uk_region
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
         response = self.api_client.patch(
-            url, {'description': 'Updated description'}
+            url, {'description': 'Updated description'},
         )
 
         order.refresh_from_db()
@@ -456,7 +456,7 @@ class TestGeneralChangeOrder(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
             'contact': [
-                'Invalid pk "00000000-0000-0000-0000-000000000000" - object does not exist.'
+                'Invalid pk "00000000-0000-0000-0000-000000000000" - object does not exist.',
             ],
         }
 
@@ -472,13 +472,13 @@ class TestGeneralChangeOrder(APITestMixin):
             {
                 'service_types': [
                     {'id': disabled_service_type.pk},
-                ]
+                ],
             },
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            'service_types': [f'"{disabled_service_type.name}" disabled.']
+            'service_types': [f'"{disabled_service_type.name}" disabled.'],
         }
 
     @freeze_time('2017-01-01 11:00:00.000000')
@@ -509,7 +509,7 @@ class TestGeneralChangeOrder(APITestMixin):
             {
                 'service_types': [
                     {'id': disabled_in_feb.pk},
-                ]
+                ],
             },
         )
 
@@ -517,8 +517,8 @@ class TestGeneralChangeOrder(APITestMixin):
         assert response.json()['service_types'] == [
             {
                 'id': str(disabled_in_feb.pk),
-                'name': disabled_in_feb.name
-            }
+                'name': disabled_in_feb.name,
+            },
         ]
 
     def test_cannot_change_readonly_fields(self):
@@ -546,7 +546,7 @@ class TestGeneralChangeOrder(APITestMixin):
                 'cancelled_by': order.created_by.pk,
                 'cancelled_on': now().isoformat(),
                 'cancellation_reason': {
-                    'id': uuid.uuid4()
+                    'id': uuid.uuid4(),
                 },
                 'billing_company_name': 'New Corp',
                 'billing_contact_name': 'John Doe',
@@ -581,7 +581,7 @@ class TestGeneralChangeOrder(APITestMixin):
 
     @pytest.mark.parametrize(
         'vat_status',
-        (VATStatus.outside_eu, VATStatus.uk)
+        (VATStatus.outside_eu, VATStatus.uk),
     )
     def test_vat_number_and_verified_reset_if_vat_status_not_eu(self, vat_status):
         """
@@ -591,7 +591,7 @@ class TestGeneralChangeOrder(APITestMixin):
         order = OrderFactory(
             vat_status=VATStatus.eu,
             vat_number='0123456789',
-            vat_verified=True
+            vat_verified=True,
         )
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
@@ -616,7 +616,7 @@ class TestGeneralChangeOrder(APITestMixin):
             billing_address_country_id=None,
             billing_address_county='',
             billing_address_postcode='',
-            billing_address_town=''
+            billing_address_town='',
         )
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
         response = self.api_client.patch(
@@ -643,7 +643,7 @@ class TestChangeOrderInDraft(APITestMixin):
         """Test changing an existing order."""
         order = OrderFactory(
             vat_status=VATStatus.outside_eu,
-            uk_region_id=UKRegion.alderney.value.id
+            uk_region_id=UKRegion.alderney.value.id,
         )
         new_contact = ContactFactory(company=order.company)
         new_sector = Sector.renewable_energy_wind.value
@@ -687,38 +687,38 @@ class TestChangeOrderInDraft(APITestMixin):
             'created_on': '2017-04-18T13:00:00Z',
             'created_by': {
                 'id': str(order.created_by.pk),
-                'name': order.created_by.name
+                'name': order.created_by.name,
             },
             'modified_on': '2017-04-18T13:00:00Z',
             'modified_by': {
                 'id': str(self.user.pk),
-                'name': self.user.name
+                'name': self.user.name,
             },
             'company': {
                 'id': str(order.company.pk),
-                'name': order.company.name
+                'name': order.company.name,
             },
             'contact': {
                 'id': str(new_contact.pk),
-                'name': new_contact.name
+                'name': new_contact.name,
             },
             'primary_market': {
                 'id': str(order.primary_market.pk),
-                'name': order.primary_market.name
+                'name': order.primary_market.name,
             },
             'sector': {
                 'id': new_sector.id,
-                'name': new_sector.name
+                'name': new_sector.name,
             },
             'uk_region': {
                 'id': new_uk_region.id,
-                'name': new_uk_region.name
+                'name': new_uk_region.name,
             },
             'service_types': [
                 {
                     'id': str(new_service_type.pk),
-                    'name': new_service_type.name
-                }
+                    'name': new_service_type.name,
+                },
             ],
             'description': 'Updated description',
             'contacts_not_to_approach': 'Updated contacts not to approach',
@@ -749,7 +749,7 @@ class TestChangeOrderInDraft(APITestMixin):
             'billing_address_postcode': 'SW1A1AA',
             'billing_address_country': {
                 'id': str(Country.united_kingdom.value.id),
-                'name': Country.united_kingdom.value.name
+                'name': Country.united_kingdom.value.name,
             },
             'archived_documents_url_path': '',
             'paid_on': None,
@@ -765,7 +765,7 @@ class TestChangeOrderInDraft(APITestMixin):
         (
             ('company', lambda o: CompanyFactory().pk),
             ('primary_market', Country.greece.value.id),
-        )
+        ),
     )
     def test_cannot_change_disallowed_fields(self, field, value):
         """Test that disallowed fields cannot be changed."""
@@ -786,7 +786,7 @@ class TestChangeOrderInDraft(APITestMixin):
             url,
             {
                 'company': order.company.pk,
-                'primary_market': order.primary_market.pk
+                'primary_market': order.primary_market.pk,
             },
         )
         assert response.status_code == status.HTTP_200_OK
@@ -803,7 +803,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
         (
             OrderWithOpenQuoteFactory,
             OrderWithAcceptedQuoteFactory,
-        )
+        ),
     )
     def test_can_change_allowed_fields(self, order_factory):
         """Test that allowed fields can be changed."""
@@ -842,8 +842,8 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
             },
             'contact': {
                 'id': str(new_contact.pk),
-                'name': new_contact.name
-            }
+                'name': new_contact.name,
+            },
         }
 
     @pytest.mark.parametrize(
@@ -851,7 +851,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
         (
             OrderWithOpenQuoteFactory,
             OrderWithAcceptedQuoteFactory,
-        )
+        ),
     )
     @pytest.mark.parametrize(
         'field,value',
@@ -861,7 +861,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
 
             (
                 'service_types',
-                lambda o: [ServiceType.objects.filter(disabled_on__isnull=True).first().id]
+                lambda o: [ServiceType.objects.filter(disabled_on__isnull=True).first().id],
             ),
             ('uk_region', UKRegion.jersey.value.id),
             ('sector', Sector.renewable_energy_wind.value.id),
@@ -870,7 +870,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
             ('contacts_not_to_approach', 'lorem ipsum'),
             ('description', 'lorem ipsum'),
             ('delivery_date', '2017-04-20'),
-        )
+        ),
     )
     def test_cannot_change_disallowed_fields(self, order_factory, field, value):
         """Test that disallowed fields cannot be changed."""
@@ -887,7 +887,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
         (
             OrderWithOpenQuoteFactory,
             OrderWithAcceptedQuoteFactory,
-        )
+        ),
     )
     def test_ok_with_unchanged_disallowed_fields(self, order_factory):
         """Test that disallowed fields can be passed in if their values don't change."""
@@ -925,7 +925,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
             ('vat_number', '987654321'),
             ('vat_verified', False),
             ('po_number', 'New po number'),
-        )
+        ),
     )
     def test_new_invoice_generated_if_quote_accepted(self, field, value):
         """
@@ -987,17 +987,17 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
             (OrderWithOpenQuoteFactory, {'vat_verified': False}),
             (
                 OrderWithOpenQuoteFactory,
-                {'contact': lambda o: ContactFactory(company=o.company).pk}
+                {'contact': lambda o: ContactFactory(company=o.company).pk},
             ),
             (
                 OrderWithAcceptedQuoteFactory,
-                {'contact': lambda o: ContactFactory(company=o.company).pk}
+                {'contact': lambda o: ContactFactory(company=o.company).pk},
             ),
             (
                 OrderPaidFactory,
-                {'contact': lambda o: ContactFactory(company=o.company).pk}
+                {'contact': lambda o: ContactFactory(company=o.company).pk},
             ),
-        )
+        ),
     )
     def test_invoice_not_generated(self, order_factory, data):
         """Test that changing `data` does not generate a new invoice."""
@@ -1037,7 +1037,7 @@ class TestChangeOrderInPaid(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['contact'] == {
             'id': str(new_contact.pk),
-            'name': new_contact.name
+            'name': new_contact.name,
         }
 
     @pytest.mark.parametrize(
@@ -1048,7 +1048,7 @@ class TestChangeOrderInPaid(APITestMixin):
 
             (
                 'service_types',
-                lambda o: [ServiceType.objects.filter(disabled_on__isnull=True).first().id]
+                lambda o: [ServiceType.objects.filter(disabled_on__isnull=True).first().id],
             ),
             ('uk_region', UKRegion.jersey.value.id),
             ('sector', Sector.renewable_energy_wind.value.id),
@@ -1068,7 +1068,7 @@ class TestChangeOrderInPaid(APITestMixin):
             ('vat_number', '987654321'),
             ('vat_verified', False),
             ('po_number', 'New po number'),
-        )
+        ),
     )
     def test_cannot_change_disallowed_fields(self, field, value):
         """Test that disallowed fields cannot be changed."""
@@ -1124,7 +1124,7 @@ class TestChangeOrderInEndStatuses(APITestMixin):
         (
             OrderCompleteFactory,
             OrderCancelledFactory,
-        )
+        ),
     )
     @pytest.mark.parametrize(
         'field,value',
@@ -1134,7 +1134,7 @@ class TestChangeOrderInEndStatuses(APITestMixin):
 
             (
                 'service_types',
-                lambda o: [ServiceType.objects.filter(disabled_on__isnull=True).first().id]
+                lambda o: [ServiceType.objects.filter(disabled_on__isnull=True).first().id],
             ),
             ('uk_region', UKRegion.jersey.value.id),
             ('sector', Sector.renewable_energy_wind.value.id),
@@ -1156,7 +1156,7 @@ class TestChangeOrderInEndStatuses(APITestMixin):
             ('po_number', 'New po number'),
 
             ('contact', lambda o: ContactFactory(company=o.company).pk),
-        )
+        ),
     )
     def test_cannot_change_disallowed_fields(self, order_factory, field, value):
         """Test that disallowed fields cannot be changed."""
@@ -1173,7 +1173,7 @@ class TestChangeOrderInEndStatuses(APITestMixin):
         (
             OrderCompleteFactory,
             OrderCancelledFactory,
-        )
+        ),
     )
     def test_ok_with_unchanged_disallowed_fields(self, order_factory):
         """Test that disallowed fields can be passed in if their values don't change."""
@@ -1219,7 +1219,7 @@ class TestMarkOrderAsComplete(APITestMixin):
     @freeze_time('2017-04-18 13:00')
     @pytest.mark.parametrize(
         'allowed_status',
-        (OrderStatus.paid,)
+        (OrderStatus.paid,),
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
         """Test marking an order as complete."""
@@ -1235,7 +1235,7 @@ class TestMarkOrderAsComplete(APITestMixin):
         assert response.json()['completed_on'] == format_date_or_datetime(expected_completed_on)
         assert response.json()['completed_by'] == {
             'id': str(self.user.pk),
-            'name': self.user.name
+            'name': self.user.name,
         }
 
         order.refresh_from_db()
@@ -1251,7 +1251,7 @@ class TestMarkOrderAsComplete(APITestMixin):
             OrderStatus.quote_accepted,
             OrderStatus.complete,
             OrderStatus.cancelled,
-        )
+        ),
     )
     def test_409_if_order_not_in_allowed_status(self, disallowed_status):
         """
@@ -1283,7 +1283,7 @@ class TestMarkOrderAsComplete(APITestMixin):
         assert response.json() == {
             'non_field_errors': (
                 'You must set the actual time for all assignees to complete this order.'
-            )
+            ),
         }
 
 
@@ -1293,7 +1293,7 @@ class TestCancelOrder(APITestMixin):
     @freeze_time('2017-04-18 13:00')
     @pytest.mark.parametrize(
         'allowed_status',
-        (OrderStatus.draft, OrderStatus.quote_awaiting_acceptance,)
+        (OrderStatus.draft, OrderStatus.quote_awaiting_acceptance),
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
         """Test cancelling an order."""
@@ -1305,8 +1305,8 @@ class TestCancelOrder(APITestMixin):
             url,
             {
                 'cancellation_reason': {
-                    'id': reason.pk
-                }
+                    'id': reason.pk,
+                },
             },
         )
 
@@ -1316,11 +1316,11 @@ class TestCancelOrder(APITestMixin):
         assert response.json()['cancelled_on'] == format_date_or_datetime(expected_cancelled_on)
         assert response.json()['cancellation_reason'] == {
             'id': str(reason.pk),
-            'name': reason.name
+            'name': reason.name,
         }
         assert response.json()['cancelled_by'] == {
             'id': str(self.user.pk),
-            'name': self.user.name
+            'name': self.user.name,
         }
 
         order.refresh_from_db()
@@ -1336,7 +1336,7 @@ class TestCancelOrder(APITestMixin):
             OrderStatus.paid,
             OrderStatus.complete,
             OrderStatus.cancelled,
-        )
+        ),
     )
     def test_409_if_order_not_in_allowed_status(self, disallowed_status):
         """
@@ -1350,8 +1350,8 @@ class TestCancelOrder(APITestMixin):
             url,
             {
                 'cancellation_reason': {
-                    'id': reason.pk
-                }
+                    'id': reason.pk,
+                },
             },
         )
 
@@ -1364,15 +1364,15 @@ class TestCancelOrder(APITestMixin):
         (
             (
                 {},
-                {'cancellation_reason': ['This field is required.']}
+                {'cancellation_reason': ['This field is required.']},
             ),
             (
                 {'cancellation_reason': {'id': '2f68875c-35a5-4c3d-8160-9ddc104260c2'}},
                 {'cancellation_reason': [
-                    'Invalid pk "2f68875c-35a5-4c3d-8160-9ddc104260c2" - object does not exist.'
-                ]}
-            )
-        )
+                    'Invalid pk "2f68875c-35a5-4c3d-8160-9ddc104260c2" - object does not exist.',
+                ]},
+            ),
+        ),
     )
     def test_validation_errors(self, data, errors):
         """
@@ -1393,7 +1393,7 @@ class TestViewOrderDetails(APITestMixin):
     def test_get(self):
         """Test getting an existing order."""
         order = OrderFactory(
-            archived_documents_url_path='/documents/123'
+            archived_documents_url_path='/documents/123',
         )
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
@@ -1407,37 +1407,37 @@ class TestViewOrderDetails(APITestMixin):
             'created_on': format_date_or_datetime(order.created_on),
             'created_by': {
                 'id': str(order.created_by.pk),
-                'name': order.created_by.name
+                'name': order.created_by.name,
             },
             'modified_on': format_date_or_datetime(order.modified_on),
             'modified_by': {
                 'id': str(order.modified_by.pk),
-                'name': order.modified_by.name
+                'name': order.modified_by.name,
             },
             'company': {
                 'id': str(order.company.pk),
-                'name': order.company.name
+                'name': order.company.name,
             },
             'contact': {
                 'id': str(order.contact.pk),
-                'name': order.contact.name
+                'name': order.contact.name,
             },
             'primary_market': {
                 'id': str(order.primary_market.pk),
-                'name': order.primary_market.name
+                'name': order.primary_market.name,
             },
             'sector': {
                 'id': str(order.sector.id),
-                'name': order.sector.name
+                'name': order.sector.name,
             },
             'uk_region': {
                 'id': str(order.uk_region.id),
-                'name': order.uk_region.name
+                'name': order.uk_region.name,
             },
             'service_types': [
                 {
                     'id': str(service_type.pk),
-                    'name': service_type.name
+                    'name': service_type.name,
                 } for service_type in order.service_types.all()
             ],
             'description': order.description,
@@ -1469,7 +1469,7 @@ class TestViewOrderDetails(APITestMixin):
             'billing_address_postcode': order.billing_address_postcode,
             'billing_address_country': {
                 'id': str(order.billing_address_country.pk),
-                'name': order.billing_address_country.name
+                'name': order.billing_address_country.name,
             },
             'archived_documents_url_path': order.archived_documents_url_path,
             'paid_on': None,
@@ -1484,7 +1484,7 @@ class TestViewOrderDetails(APITestMixin):
         """Test 404 when getting a non-existing order"""
         url = reverse(
             'api-v3:omis:order:detail',
-            kwargs={'pk': '00000000-0000-0000-0000-000000000000'}
+            kwargs={'pk': '00000000-0000-0000-0000-000000000000'},
         )
         response = self.api_client.get(url)
 

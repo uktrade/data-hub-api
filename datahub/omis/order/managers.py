@@ -19,12 +19,12 @@ class OrderQuerySet(models.QuerySet):
                 OrderStatus.quote_accepted,
                 OrderStatus.paid,
                 OrderStatus.complete,
-            )
+            ),
         )
         if include_reopened:
             q = q | models.Q(
                 status=OrderStatus.draft,
-                quote__cancelled_on__isnull=False
+                quote__cancelled_on__isnull=False,
             )
 
         return self.filter(q)

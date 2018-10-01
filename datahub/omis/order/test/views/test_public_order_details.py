@@ -23,23 +23,23 @@ class TestViewPublicOrderDetails(APITestMixin):
             OrderStatus.quote_awaiting_acceptance,
             OrderStatus.quote_accepted,
             OrderStatus.paid,
-            OrderStatus.complete
-        )
+            OrderStatus.complete,
+        ),
     )
     def test_get(self, order_status):
         """Test getting an existing order by `public_token`."""
         order = OrderFactory(
             quote=QuoteFactory(),
-            status=order_status
+            status=order_status,
         )
 
         url = reverse(
             'api-v3:omis-public:order:detail',
-            kwargs={'public_token': order.public_token}
+            kwargs={'public_token': order.public_token},
         )
         client = self.create_api_client(
             scope=Scope.public_omis_front_end,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
         )
         response = client.get(url)
 
@@ -55,15 +55,15 @@ class TestViewPublicOrderDetails(APITestMixin):
             },
             'contact': {
                 'id': str(order.contact.pk),
-                'name': order.contact.name
+                'name': order.contact.name,
             },
             'primary_market': {
                 'id': str(order.primary_market.id),
-                'name': order.primary_market.name
+                'name': order.primary_market.name,
             },
             'uk_region': {
                 'id': str(order.uk_region.id),
-                'name': order.uk_region.name
+                'name': order.uk_region.name,
             },
             'contact_email': order.contact_email,
             'contact_phone': order.contact_phone,
@@ -87,7 +87,7 @@ class TestViewPublicOrderDetails(APITestMixin):
             'billing_address_postcode': order.billing_address_postcode,
             'billing_address_country': {
                 'id': str(order.billing_address_country.pk),
-                'name': order.billing_address_country.name
+                'name': order.billing_address_country.name,
             },
             'paid_on': None,
             'completed_on': None,
@@ -99,11 +99,11 @@ class TestViewPublicOrderDetails(APITestMixin):
 
         url = reverse(
             'api-v3:omis-public:order:detail',
-            kwargs={'public_token': order.public_token}
+            kwargs={'public_token': order.public_token},
         )
         client = self.create_api_client(
             scope=Scope.public_omis_front_end,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
         )
         response = client.get(url)
 
@@ -113,11 +113,11 @@ class TestViewPublicOrderDetails(APITestMixin):
         """Test that if the order doesn't exist, the endpoint returns 404."""
         url = reverse(
             'api-v3:omis-public:order:detail',
-            kwargs={'public_token': ('1234-abcd-' * 5)}  # len(token) == 50
+            kwargs={'public_token': ('1234-abcd-' * 5)},  # len(token) == 50
         )
         client = self.create_api_client(
             scope=Scope.public_omis_front_end,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
         )
         response = client.get(url)
 
@@ -125,7 +125,7 @@ class TestViewPublicOrderDetails(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_status',
-        (OrderStatus.draft, OrderStatus.cancelled)
+        (OrderStatus.draft, OrderStatus.cancelled),
     )
     def test_404_if_in_disallowed_status(self, order_status):
         """Test that if the order is not in an allowed state, the endpoint returns 404."""
@@ -133,11 +133,11 @@ class TestViewPublicOrderDetails(APITestMixin):
 
         url = reverse(
             'api-v3:omis-public:order:detail',
-            kwargs={'public_token': order.public_token}
+            kwargs={'public_token': order.public_token},
         )
         client = self.create_api_client(
             scope=Scope.public_omis_front_end,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
         )
         response = client.get(url)
 
@@ -148,38 +148,38 @@ class TestViewPublicOrderDetails(APITestMixin):
         """Test that makes sure the other verbs are not allowed."""
         order = OrderFactory(
             quote=QuoteFactory(),
-            status=OrderStatus.quote_awaiting_acceptance
+            status=OrderStatus.quote_awaiting_acceptance,
         )
 
         url = reverse(
             'api-v3:omis-public:order:detail',
-            kwargs={'public_token': order.public_token}
+            kwargs={'public_token': order.public_token},
         )
         client = self.create_api_client(
             scope=Scope.public_omis_front_end,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
         )
         response = getattr(client, verb)(url)
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
     @pytest.mark.parametrize(
         'scope',
-        (s.value for s in Scope if s != Scope.public_omis_front_end.value)
+        (s.value for s in Scope if s != Scope.public_omis_front_end.value),
     )
     def test_403_if_scope_not_allowed(self, scope):
         """Test that other oauth2 scopes are not allowed."""
         order = OrderFactory(
             quote=QuoteFactory(),
-            status=OrderStatus.quote_awaiting_acceptance
+            status=OrderStatus.quote_awaiting_acceptance,
         )
 
         url = reverse(
             'api-v3:omis-public:order:detail',
-            kwargs={'public_token': order.public_token}
+            kwargs={'public_token': order.public_token},
         )
         client = self.create_api_client(
             scope=scope,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
         )
         response = client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN

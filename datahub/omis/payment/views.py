@@ -35,7 +35,7 @@ class PaymentViewSet(BasePaymentViewSet):
         """Create a list of payments."""
         serializer = self.get_serializer(
             data=request.data,
-            many=True
+            many=True,
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -77,7 +77,7 @@ class PublicPaymentGatewaySessionViewSet(BaseNestedOrderViewSet):
             OrderStatus.quote_accepted,
             OrderStatus.paid,
             OrderStatus.complete,
-        )
+        ),
     )
 
     queryset = PaymentGatewaySession.objects.all()

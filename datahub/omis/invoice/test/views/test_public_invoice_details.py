@@ -8,7 +8,7 @@ from datahub.oauth.scopes import Scope
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import (
     OrderCompleteFactory, OrderFactory,
-    OrderPaidFactory, OrderWithAcceptedQuoteFactory
+    OrderPaidFactory, OrderWithAcceptedQuoteFactory,
 )
 
 
@@ -20,8 +20,8 @@ class TestPublicGetInvoice(APITestMixin):
         (
             OrderWithAcceptedQuoteFactory,
             OrderPaidFactory,
-            OrderCompleteFactory
-        )
+            OrderCompleteFactory,
+        ),
     )
     def test_get(self, order_factory):
         """Test a successful call to get a invoice."""
@@ -29,11 +29,11 @@ class TestPublicGetInvoice(APITestMixin):
 
         url = reverse(
             'api-v3:omis-public:invoice:detail',
-            kwargs={'public_token': order.public_token}
+            kwargs={'public_token': order.public_token},
         )
         client = self.create_api_client(
             scope=Scope.public_omis_front_end,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
         )
         response = client.get(url)
 
@@ -51,7 +51,7 @@ class TestPublicGetInvoice(APITestMixin):
             'invoice_address_postcode': invoice.invoice_address_postcode,
             'invoice_address_country': {
                 'id': str(invoice.invoice_address_country.pk),
-                'name': invoice.invoice_address_country.name
+                'name': invoice.invoice_address_country.name,
             },
             'invoice_vat_number': invoice.invoice_vat_number,
             'payment_due_date': invoice.payment_due_date.isoformat(),
@@ -65,7 +65,7 @@ class TestPublicGetInvoice(APITestMixin):
             'billing_address_town': invoice.billing_address_town,
             'billing_address_country': {
                 'id': str(invoice.billing_address_country.pk),
-                'name': invoice.billing_address_country.name
+                'name': invoice.billing_address_country.name,
             },
             'po_number': invoice.po_number,
 
@@ -82,11 +82,11 @@ class TestPublicGetInvoice(APITestMixin):
         """Test that if the order doesn't exist, the endpoint returns 404."""
         url = reverse(
             'api-v3:omis-public:invoice:detail',
-            kwargs={'public_token': ('1234-abcd-' * 5)}  # len(token) == 50
+            kwargs={'public_token': ('1234-abcd-' * 5)},  # len(token) == 50
         )
         client = self.create_api_client(
             scope=Scope.public_omis_front_end,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
         )
         response = client.get(url)
 
@@ -99,11 +99,11 @@ class TestPublicGetInvoice(APITestMixin):
 
         url = reverse(
             'api-v3:omis-public:invoice:detail',
-            kwargs={'public_token': order.public_token}
+            kwargs={'public_token': order.public_token},
         )
         client = self.create_api_client(
             scope=Scope.public_omis_front_end,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
         )
         response = client.get(url)
 
@@ -111,7 +111,7 @@ class TestPublicGetInvoice(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_status',
-        (OrderStatus.draft, OrderStatus.quote_awaiting_acceptance, OrderStatus.cancelled)
+        (OrderStatus.draft, OrderStatus.quote_awaiting_acceptance, OrderStatus.cancelled),
     )
     def test_404_if_in_disallowed_status(self, order_status):
         """Test that if the order is not in an allowed state, the endpoint returns 404."""
@@ -119,11 +119,11 @@ class TestPublicGetInvoice(APITestMixin):
 
         url = reverse(
             'api-v3:omis-public:invoice:detail',
-            kwargs={'public_token': order.public_token}
+            kwargs={'public_token': order.public_token},
         )
         client = self.create_api_client(
             scope=Scope.public_omis_front_end,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
         )
         response = client.get(url)
 
@@ -136,18 +136,18 @@ class TestPublicGetInvoice(APITestMixin):
 
         url = reverse(
             'api-v3:omis-public:invoice:detail',
-            kwargs={'public_token': order.public_token}
+            kwargs={'public_token': order.public_token},
         )
         client = self.create_api_client(
             scope=Scope.public_omis_front_end,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
         )
         response = getattr(client, verb)(url)
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
     @pytest.mark.parametrize(
         'scope',
-        (s.value for s in Scope if s != Scope.public_omis_front_end.value)
+        (s.value for s in Scope if s != Scope.public_omis_front_end.value),
     )
     def test_403_if_scope_not_allowed(self, scope):
         """Test that other oauth2 scopes are not allowed."""
@@ -155,11 +155,11 @@ class TestPublicGetInvoice(APITestMixin):
 
         url = reverse(
             'api-v3:omis-public:invoice:detail',
-            kwargs={'public_token': order.public_token}
+            kwargs={'public_token': order.public_token},
         )
         client = self.create_api_client(
             scope=scope,
-            grant_type=Application.GRANT_CLIENT_CREDENTIALS
+            grant_type=Application.GRANT_CLIENT_CREDENTIALS,
         )
         response = client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
