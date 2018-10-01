@@ -49,7 +49,7 @@ def setup_data(setup_es):
             estimated_land_date=datetime.date(2011, 6, 13),
             actual_land_date=datetime.date(2010, 8, 13),
             investor_company=CompanyFactory(
-                registered_address_country_id=constants.Country.united_states.value.id
+                registered_address_country_id=constants.Country.united_states.value.id,
             ),
             status=InvestmentProject.STATUSES.ongoing,
             uk_region_locations=[
@@ -63,7 +63,7 @@ def setup_data(setup_es):
             estimated_land_date=datetime.date(2057, 6, 13),
             actual_land_date=datetime.date(2047, 8, 13),
             investor_company=CompanyFactory(
-                registered_address_country_id=constants.Country.japan.value.id
+                registered_address_country_id=constants.Country.japan.value.id,
             ),
             project_manager=AdviserFactory(),
             project_assurance_adviser=AdviserFactory(),
@@ -79,7 +79,7 @@ def setup_data(setup_es):
             estimated_land_date=datetime.date(2027, 9, 13),
             actual_land_date=datetime.date(2022, 11, 13),
             investor_company=CompanyFactory(
-                registered_address_country_id=constants.Country.united_kingdom.value.id
+                registered_address_country_id=constants.Country.united_kingdom.value.id,
             ),
             project_manager=AdviserFactory(),
             project_assurance_adviser=AdviserFactory(),
@@ -88,7 +88,7 @@ def setup_data(setup_es):
             uk_region_locations=[
                 constants.UKRegion.north_west.value.id,
             ],
-        )
+        ),
     ]
     setup_es.indices.refresh()
 
@@ -106,7 +106,7 @@ def created_on_data(setup_es):
     for date in dates:
         with freeze_time(date):
             investment_projects.append(
-                InvestmentProjectFactory()
+                InvestmentProjectFactory(),
             )
 
     setup_es.indices.refresh()
@@ -121,9 +121,12 @@ class TestSearch(APITestMixin):
         """Tests detailed investment project search."""
         url = reverse('api-v3:search:investment_project')
 
-        response = self.api_client.post(url, {
-            'original_query': 'abc defg',
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'original_query': 'abc defg',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -162,16 +165,21 @@ class TestSearch(APITestMixin):
 
         url = reverse('api-v3:search:investment_project')
 
-        response = self.api_client.post(url, {
-            'adviser': adviser.pk,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'adviser': adviser.pk,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['count'] == 6
         results = response_data['results']
-        expected_ids = {str(project_1.pk), str(project_2.pk), str(project_3.pk),
-                        str(project_4.pk), str(project_5.pk), str(project_6.pk)}
+        expected_ids = {
+            str(project_1.pk), str(project_2.pk), str(project_3.pk),
+            str(project_4.pk), str(project_5.pk), str(project_6.pk),
+        }
         assert {result['id'] for result in results} == expected_ids
 
     @pytest.mark.parametrize(
@@ -179,13 +187,13 @@ class TestSearch(APITestMixin):
         (
             (
                 {
-                    'estimated_land_date_before': '2017-06-13'
+                    'estimated_land_date_before': '2017-06-13',
                 },
                 1,
             ),
             (
                 {
-                    'estimated_land_date_after': '2017-06-13'
+                    'estimated_land_date_after': '2017-06-13',
                 },
                 2,
             ),
@@ -203,13 +211,13 @@ class TestSearch(APITestMixin):
                 },
                 0,
             ),
-        )
+        ),
     )
     def test_search_investment_project_estimated_land_date_json(
         self,
         setup_data,
         query,
-        num_results
+        num_results,
     ):
         """Tests detailed investment project search."""
         url = reverse('api-v3:search:investment_project')
@@ -235,7 +243,7 @@ class TestSearch(APITestMixin):
         (
             (
                 {
-                    'actual_land_date_before': '2010-12-13'
+                    'actual_land_date_before': '2010-12-13',
                 },
                 [
                     'abc defg',
@@ -243,7 +251,7 @@ class TestSearch(APITestMixin):
             ),
             (
                 {
-                    'actual_land_date_before': '2022-11-13'
+                    'actual_land_date_before': '2022-11-13',
                 },
                 [
                     'abc defg',
@@ -252,7 +260,7 @@ class TestSearch(APITestMixin):
             ),
             (
                 {
-                    'actual_land_date_after': '2010-12-13'
+                    'actual_land_date_after': '2010-12-13',
                 },
                 [
                     'delayed project',
@@ -261,7 +269,7 @@ class TestSearch(APITestMixin):
             ),
             (
                 {
-                    'actual_land_date_after': '2022-11-13'
+                    'actual_land_date_after': '2022-11-13',
                 },
                 [
                     'delayed project',
@@ -284,7 +292,7 @@ class TestSearch(APITestMixin):
                 },
                 [],
             ),
-        )
+        ),
     )
     def test_search_investment_project_actual_land_date_json(
         self,
@@ -303,28 +311,29 @@ class TestSearch(APITestMixin):
         assert Counter(result['name'] for result in results) == Counter(expected_results)
 
     @pytest.mark.parametrize(
-        'query,num_results', (
+        'query,num_results',
+        (
             (
                 {
-                    'created_on_before': '2016-09-13T09:44:31.062870Z'
+                    'created_on_before': '2016-09-13T09:44:31.062870Z',
                 },
                 2,
             ),
             (
                 {
-                    'created_on_before': '2016-09-12T00:00:00.000000Z'
+                    'created_on_before': '2016-09-12T00:00:00.000000Z',
                 },
                 2,
             ),
             (
                 {
-                    'created_on_after': '2017-06-13T09:44:31.062870Z'
+                    'created_on_after': '2017-06-13T09:44:31.062870Z',
                 },
                 3,
             ),
             (
                 {
-                    'created_on_after': '2016-09-12T00:00:00.000000Z'
+                    'created_on_after': '2016-09-12T00:00:00.000000Z',
                 },
                 4,
             ),
@@ -342,7 +351,7 @@ class TestSearch(APITestMixin):
                 },
                 0,
             ),
-        )
+        ),
     )
     def test_search_investment_project_created_on_json(self, created_on_data, query, num_results):
         """Tests detailed investment project search."""
@@ -368,9 +377,12 @@ class TestSearch(APITestMixin):
         """Tests detailed investment project search."""
         url = reverse('api-v3:search:investment_project')
 
-        response = self.api_client.post(url, {
-            'estimated_land_date_before': 'this is definitely not a valid date',
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'estimated_land_date_before': 'this is definitely not a valid date',
+            },
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
@@ -378,9 +390,12 @@ class TestSearch(APITestMixin):
         """Tests investment project search status filter."""
         url = reverse('api-v3:search:investment_project')
 
-        response = self.api_client.post(url, {
-            'status': ['delayed', 'won'],
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'status': ['delayed', 'won'],
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
@@ -392,9 +407,12 @@ class TestSearch(APITestMixin):
         """Tests investor company country filter."""
         url = reverse('api-v3:search:investment_project')
 
-        response = self.api_client.post(url, {
-            'investor_company_country': constants.Country.japan.value.id,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'investor_company_country': constants.Country.japan.value.id,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -405,9 +423,12 @@ class TestSearch(APITestMixin):
         """Tests uk_region_location filter."""
         url = reverse('api-v3:search:investment_project')
 
-        response = self.api_client.post(url, {
-            'uk_region_location': constants.UKRegion.east_midlands.value.id,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'uk_region_location': constants.UKRegion.east_midlands.value.id,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -425,20 +446,20 @@ class TestSearch(APITestMixin):
 
         projects = InvestmentProjectFactory.create_batch(
             num_sectors,
-            sector_id=factory.Iterator(sectors_ids)
+            sector_id=factory.Iterator(sectors_ids),
         )
         InvestmentProjectFactory.create_batch(
             3,
             sector=factory.LazyFunction(lambda: random_obj_for_queryset(
-                Sector.objects.exclude(pk__in=sectors_ids)
-            ))
+                Sector.objects.exclude(pk__in=sectors_ids),
+            )),
         )
 
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:investment_project')
         body = {
-            'sector_descends': hierarchical_sectors[sector_level].pk
+            'sector_descends': hierarchical_sectors[sector_level].pk,
         }
         response = self.api_client.post(url, body)
         assert response.status_code == status.HTTP_200_OK
@@ -472,7 +493,7 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:investment_project')
         investment_project1 = InvestmentProjectFactory(
             investment_type_id=constants.InvestmentType.fdi.value.id,
-            stage_id=constants.InvestmentProjectStage.active.value.id
+            stage_id=constants.InvestmentProjectStage.active.value.id,
         )
         investment_project2 = InvestmentProjectFactory(
             investment_type_id=constants.InvestmentType.fdi.value.id,
@@ -480,7 +501,7 @@ class TestSearch(APITestMixin):
         )
 
         InvestmentProjectFactory(
-            stage_id=constants.InvestmentProjectStage.won.value.id
+            stage_id=constants.InvestmentProjectStage.won.value.id,
         )
         InvestmentProjectFactory(
             investment_type_id=constants.InvestmentType.fdi.value.id,
@@ -489,17 +510,20 @@ class TestSearch(APITestMixin):
 
         setup_es.indices.refresh()
 
-        response = self.api_client.post(url, {
-            'investment_type': constants.InvestmentType.fdi.value.id,
-            'investor_company': [
-                investment_project1.investor_company.pk,
-                investment_project2.investor_company.pk,
-            ],
-            'stage': [
-                constants.InvestmentProjectStage.won.value.id,
-                constants.InvestmentProjectStage.active.value.id,
-            ],
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'investment_type': constants.InvestmentType.fdi.value.id,
+                'investor_company': [
+                    investment_project1.investor_company.pk,
+                    investment_project2.investor_company.pk,
+                ],
+                'stage': [
+                    constants.InvestmentProjectStage.won.value.id,
+                    constants.InvestmentProjectStage.active.value.id,
+                ],
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
@@ -508,7 +532,7 @@ class TestSearch(APITestMixin):
         # checks if we only have investment projects with stages we filtered
         assert {
             constants.InvestmentProjectStage.active.value.id,
-            constants.InvestmentProjectStage.won.value.id
+            constants.InvestmentProjectStage.won.value.id,
         } == {
             investment_project['stage']['id']
             for investment_project in response.data['results']
@@ -517,7 +541,7 @@ class TestSearch(APITestMixin):
         # checks if we only have investment projects with investor companies we filtered
         assert {
             str(investment_project1.investor_company.pk),
-            str(investment_project2.investor_company.pk)
+            str(investment_project2.investor_company.pk),
         } == {
             investment_project['investor_company']['id']
             for investment_project in response.data['results']
@@ -525,7 +549,7 @@ class TestSearch(APITestMixin):
 
         # checks if we only have investment projects with fdi investment type
         assert {
-            constants.InvestmentType.fdi.value.id
+            constants.InvestmentType.fdi.value.id,
         } == {
             investment_project['investment_type']['id']
             for investment_project in response.data['results']
@@ -537,7 +561,7 @@ class TestSearch(APITestMixin):
 
         InvestmentProjectFactory(
             name='Pear 1',
-            stage_id=constants.InvestmentProjectStage.active.value.id
+            stage_id=constants.InvestmentProjectStage.active.value.id,
         )
         InvestmentProjectFactory(
             name='Pear 2',
@@ -545,31 +569,36 @@ class TestSearch(APITestMixin):
         )
         InvestmentProjectFactory(
             name='Pear 3',
-            stage_id=constants.InvestmentProjectStage.prospect.value.id
+            stage_id=constants.InvestmentProjectStage.prospect.value.id,
         )
         InvestmentProjectFactory(
             name='Pear 4',
-            stage_id=constants.InvestmentProjectStage.won.value.id
+            stage_id=constants.InvestmentProjectStage.won.value.id,
         )
 
         setup_es.indices.refresh()
 
-        response = self.api_client.post(url, {
-            'original_query': 'Pear',
-            'stage': [
-                constants.InvestmentProjectStage.prospect.value.id,
-                constants.InvestmentProjectStage.active.value.id,
-            ],
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'original_query': 'Pear',
+                'stage': [
+                    constants.InvestmentProjectStage.prospect.value.id,
+                    constants.InvestmentProjectStage.active.value.id,
+                ],
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 3
         assert len(response.data['results']) == 3
         assert 'aggregations' in response.data
 
-        stages = [{'key': constants.InvestmentProjectStage.prospect.value.id, 'doc_count': 2},
-                  {'key': constants.InvestmentProjectStage.active.value.id, 'doc_count': 1},
-                  {'key': constants.InvestmentProjectStage.won.value.id, 'doc_count': 1}]
+        stages = [
+            {'key': constants.InvestmentProjectStage.prospect.value.id, 'doc_count': 2},
+            {'key': constants.InvestmentProjectStage.active.value.id, 'doc_count': 1},
+            {'key': constants.InvestmentProjectStage.won.value.id, 'doc_count': 1},
+        ]
         assert all(stage in response.data['aggregations']['stage'] for stage in stages)
 
 
@@ -584,10 +613,13 @@ class TestSearchPermissions(APITestMixin):
         response = api_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.view_all,),
-        (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
-    ))
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            (InvestmentProjectPermission.view_all,),
+            (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
+        ),
+    )
     def test_non_restricted_user_can_see_all_projects(self, setup_es, permissions):
         """Test that normal users can see all projects."""
         team = TeamFactory()
@@ -597,7 +629,7 @@ class TestSearchPermissions(APITestMixin):
 
         request_user = create_test_user(
             permission_codenames=permissions,
-            dit_team=team
+            dit_team=team,
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -628,7 +660,7 @@ class TestSearchPermissions(APITestMixin):
 
         adviser_other = AdviserFactory(dit_team_id=None)
         request_user = create_test_user(
-            permission_codenames=['view_associated_investmentproject']
+            permission_codenames=['view_associated_investmentproject'],
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -653,7 +685,7 @@ class TestSearchPermissions(APITestMixin):
         adviser_same_team = AdviserFactory(dit_team_id=team.id)
         request_user = create_test_user(
             permission_codenames=['view_associated_investmentproject'],
-            dit_team=team
+            dit_team=team,
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -676,8 +708,10 @@ class TestSearchPermissions(APITestMixin):
         assert response_data['count'] == 5
 
         results = response_data['results']
-        expected_ids = {str(project_1.id), str(project_2.id), str(project_3.id),
-                        str(project_4.id), str(project_5.id)}
+        expected_ids = {
+            str(project_1.id), str(project_2.id), str(project_3.id),
+            str(project_4.id), str(project_5.id),
+        }
 
         assert {result['id'] for result in results} == expected_ids
 
@@ -691,11 +725,12 @@ class TestInvestmentProjectExportView(APITestMixin):
     """Tests the investment project export view."""
 
     @pytest.mark.parametrize(
-        'permissions', (
+        'permissions',
+        (
             (),
             (InvestmentProjectPermission.view_all,),
             (InvestmentProjectPermission.export,),
-        )
+        ),
     )
     def test_user_without_permission_cannot_export(self, setup_es, permissions):
         """Test that a user without the correct permissions cannot export data."""
@@ -758,7 +793,7 @@ class TestInvestmentProjectExportView(APITestMixin):
         (
             ('created_on:desc', '-created_on'),
             ('investor_company.name', 'investor_company__name'),
-        )
+        ),
     )
     def test_export(self, setup_es, request_sortby, orm_ordering):
         """Test export of investment project search results."""
@@ -781,7 +816,7 @@ class TestInvestmentProjectExportView(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Disposition')) == (
-            'attachment', {'filename': 'Data Hub - Investment projects - 2018-01-01-11-12-13.csv'}
+            'attachment', {'filename': 'Data Hub - Investment projects - 2018-01-01-11-12-13.csv'},
         )
 
         sorted_projects = InvestmentProject.objects.order_by(orm_ordering, 'pk')
@@ -865,10 +900,13 @@ class TestBasicSearch(APITestMixin):
         term = 'abc defg'
 
         url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': term,
-            'entity': 'investment_project'
-        })
+        response = self.api_client.get(
+            url,
+            data={
+                'term': term,
+                'entity': 'investment_project',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -880,10 +918,13 @@ class TestBasicSearch(APITestMixin):
         investment_project = setup_data[0]
 
         url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': investment_project.project_code,
-            'entity': 'investment_project'
-        })
+        response = self.api_client.get(
+            url,
+            data={
+                'term': investment_project.project_code,
+                'entity': 'investment_project',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -893,10 +934,13 @@ class TestBasicSearch(APITestMixin):
 class TestBasicSearchPermissions(APITestMixin):
     """Tests basic search view permissions."""
 
-    @pytest.mark.parametrize('permissions', (
-        (InvestmentProjectPermission.view_all,),
-        (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
-    ))
+    @pytest.mark.parametrize(
+        'permissions',
+        (
+            (InvestmentProjectPermission.view_all,),
+            (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
+        ),
+    )
     def test_global_non_restricted_user_can_see_all_projects(self, setup_es, permissions):
         """Test that normal users can see all projects."""
         team = TeamFactory()
@@ -906,7 +950,7 @@ class TestBasicSearchPermissions(APITestMixin):
 
         request_user = create_test_user(
             permission_codenames=permissions,
-            dit_team=team
+            dit_team=team,
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -919,10 +963,13 @@ class TestBasicSearchPermissions(APITestMixin):
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:basic')
-        response = api_client.get(url, data={
-            'term': '',
-            'entity': 'investment_project'
-        })
+        response = api_client.get(
+            url,
+            data={
+                'term': '',
+                'entity': 'investment_project',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -941,7 +988,7 @@ class TestBasicSearchPermissions(APITestMixin):
         adviser_same_team = AdviserFactory(dit_team_id=team.id)
         request_user = create_test_user(
             permission_codenames=['view_associated_investmentproject'],
-            dit_team=team
+            dit_team=team,
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -958,18 +1005,23 @@ class TestBasicSearchPermissions(APITestMixin):
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:basic')
-        response = api_client.get(url, data={
-            'term': '',
-            'entity': 'investment_project'
-        })
+        response = api_client.get(
+            url,
+            data={
+                'term': '',
+                'entity': 'investment_project',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['count'] == 5
 
         results = response_data['results']
-        expected_ids = {str(project_1.id), str(project_2.id), str(project_3.id),
-                        str(project_4.id), str(project_5.id)}
+        expected_ids = {
+            str(project_1.id), str(project_2.id), str(project_3.id),
+            str(project_4.id), str(project_5.id),
+        }
 
         assert {result['id'] for result in results} == expected_ids
 
@@ -980,7 +1032,7 @@ class TestBasicSearchPermissions(APITestMixin):
         """
         adviser_other = AdviserFactory(dit_team_id=None)
         request_user = create_test_user(
-            permission_codenames=['view_associated_investmentproject']
+            permission_codenames=['view_associated_investmentproject'],
         )
         api_client = self.create_api_client(user=request_user)
 
@@ -990,10 +1042,13 @@ class TestBasicSearchPermissions(APITestMixin):
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:basic')
-        response = api_client.get(url, data={
-            'term': '',
-            'entity': 'investment_project'
-        })
+        response = api_client.get(
+            url,
+            data={
+                'term': '',
+                'entity': 'investment_project',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()

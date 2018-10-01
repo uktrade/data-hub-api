@@ -30,7 +30,7 @@ class Interaction(BaseESModel):
     service = fields.nested_id_name_field()
     service_delivery_status = fields.nested_id_name_field()
     subject = fields.SortableCaseInsensitiveKeywordText(
-        copy_to=['subject_english']
+        copy_to=['subject_english'],
     )
     subject_english = fields.EnglishText()
 
@@ -50,7 +50,7 @@ class Interaction(BaseESModel):
     COMPUTED_MAPPINGS = {
         'company_sector': dict_utils.computed_nested_sector_dict('company.sector'),
         'investment_project_sector': dict_utils.computed_nested_sector_dict(
-            'investment_project.sector'
+            'investment_project.sector',
         ),
         'is_event': attrgetter('is_event'),
     }

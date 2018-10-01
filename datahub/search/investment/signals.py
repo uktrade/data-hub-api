@@ -5,7 +5,7 @@ from django.db.models.signals import post_delete, post_save
 from datahub.company.models import Advisor
 from datahub.investment.models import (
     InvestmentProject as DBInvestmentProject,
-    InvestmentProjectTeamMember
+    InvestmentProjectTeamMember,
 )
 from .models import InvestmentProject as ESInvestmentProject
 from ..signals import SignalReceiver
@@ -42,7 +42,7 @@ def investment_project_sync_es_adviser_change(sender, instance, **kwargs):
             | Q(client_relationship_manager_id=instance.pk)
             | Q(project_manager_id=instance.pk)
             | Q(project_assurance_adviser_id=instance.pk)
-            | Q(team_members__adviser_id=instance.pk)
+            | Q(team_members__adviser_id=instance.pk),
         )
 
         for project in queryset:

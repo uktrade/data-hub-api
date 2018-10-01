@@ -36,7 +36,7 @@ class TestResyncAfterMigrate:
         mock_app = create_mock_search_app(
             read_indices=read_indices,
             write_index=write_index,
-            queryset=MockQuerySet([Mock(id=1), Mock(id=2)])
+            queryset=MockQuerySet([Mock(id=1), Mock(id=2)]),
         )
 
         resync_after_migrate(mock_app)
@@ -81,11 +81,11 @@ class TestResyncAfterMigrate:
                     {
                         'remove': {
                             'alias': 'test-read-alias',
-                            'indices': ANY
-                        }
+                            'indices': ANY,
+                        },
                     },
-                ]
-            }
+                ],
+            },
         )
 
         actions = mock_client.indices.update_aliases.call_args_list[0][1]['body']['actions']
@@ -115,7 +115,7 @@ class TestResyncAfterMigrate:
         mock_app = create_mock_search_app(
             read_indices=read_indices,
             write_index=write_index,
-            queryset=MockQuerySet([Mock(id=1), Mock(id=2)])
+            queryset=MockQuerySet([Mock(id=1), Mock(id=2)]),
         )
 
         with pytest.raises(DataHubException):
@@ -155,11 +155,11 @@ class TestResyncAfterMigrate:
                     {
                         'remove': {
                             'alias': 'test-read-alias',
-                            'indices': ['index2']
-                        }
+                            'indices': ['index2'],
+                        },
                     },
-                ]
-            }
+                ],
+            },
         )
 
         mock_client.indices.delete.assert_not_called()

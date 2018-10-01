@@ -15,7 +15,7 @@ class SearchCompanySerializer(SearchSerializer):
     headquarter_type = SingleOrListField(
         child=StringUUIDField(allow_null=True),
         required=False,
-        allow_null=True
+        allow_null=True,
     )
     name = serializers.CharField(required=False)
     sector = SingleOrListField(child=StringUUIDField(), required=False)
@@ -44,5 +44,5 @@ class SearchCompanySerializer(SearchSerializer):
         'trading_address_town',
         'turnover_range.name',
         'uk_based',
-        'uk_region.name'
+        'uk_region.name',
     )
