@@ -7,6 +7,8 @@
 
 Leeloo provides an API into Data Hub for Data Hub clients. Using Leeloo you can search for entities and manage companies, contacts and interactions.
 
+More guides can be found in the [docs](./docs/) folder.
+
 ## Installation with Docker
 
 Leeloo uses Docker compose to setup and run all the necessary components. The docker-compose.yml file provided is meant to be used for running tests and development.
@@ -132,7 +134,7 @@ Dependencies:
     ```shell
     ./manage.py createsuperuser
     ```
-    
+
 13. Start the server:
 
     ```shell
@@ -144,7 +146,7 @@ Dependencies:
     ```shell
     celery worker -A config -l info -Q celery,long-running -B
     ```
-    
+
     Note that in production the `-O fair --prefetch-multiplier 1` arguments are also used for better fairness when
     long-running tasks are running or pending execution.
 
