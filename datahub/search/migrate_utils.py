@@ -21,7 +21,7 @@ def resync_after_migrate(search_app):
     if not search_app.es_model.was_migration_started():
         logger.warning(
             f'No pending migration detected for the {search_app.name} search app, aborting '
-            f'resync...'
+            f'resync...',
         )
         return
 

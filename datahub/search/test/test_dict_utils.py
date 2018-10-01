@@ -53,7 +53,7 @@ def test_company_dict():
         id=123,
         name='Name',
         alias='Trading',
-        spec_set=('id', 'name', 'alias')
+        spec_set=('id', 'name', 'alias'),
     )
 
     res = dict_utils.company_dict(obj)
@@ -102,8 +102,8 @@ def test_contact_or_adviser_dict_include_dit_team():
         'name': obj.name,
         'dit_team': {
             'id': '321',
-            'name': 'team name'
-        }
+            'name': 'team name',
+        },
     }
 
 
@@ -123,7 +123,7 @@ def test_contact_or_adviser_dict_none_dit_team():
         'first_name': obj.first_name,
         'last_name': obj.last_name,
         'name': obj.name,
-        'dit_team': {}
+        'dit_team': {},
     }
 
 

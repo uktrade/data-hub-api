@@ -3,7 +3,7 @@ import pytest
 from datahub.omis.order.test.factories import (
     OrderAssigneeFactory, OrderCancelledFactory, OrderCompleteFactory,
     OrderFactory, OrderPaidFactory, OrderSubscriberFactory,
-    OrderWithAcceptedQuoteFactory
+    OrderWithAcceptedQuoteFactory,
 )
 from ..models import Order as ESOrder
 
@@ -17,8 +17,8 @@ pytestmark = pytest.mark.django_db
         OrderCompleteFactory,
         OrderFactory,
         OrderPaidFactory,
-        OrderWithAcceptedQuoteFactory
-    )
+        OrderWithAcceptedQuoteFactory,
+    ),
 )
 def test_order_to_dict(Factory):
     """Test converting an order to dict."""
@@ -41,27 +41,27 @@ def test_order_to_dict(Factory):
             'id': str(order.contact.pk),
             'first_name': order.contact.first_name,
             'last_name': order.contact.last_name,
-            'name': order.contact.name
+            'name': order.contact.name,
         },
         'primary_market': {
             'id': str(order.primary_market.pk),
-            'name': order.primary_market.name
+            'name': order.primary_market.name,
         },
         'sector': {
             'id': str(order.sector.pk),
             'name': order.sector.name,
             'ancestors': [{
                 'id': str(ancestor.pk),
-            } for ancestor in order.sector.get_ancestors()]
+            } for ancestor in order.sector.get_ancestors()],
         },
         'uk_region': {
             'id': str(order.uk_region.pk),
-            'name': order.uk_region.name
+            'name': order.uk_region.name,
         },
         'service_types': [
             {
                 'id': str(service_type.pk),
-                'name': service_type.name
+                'name': service_type.name,
             }
             for service_type in order.service_types.all()
         ],
@@ -73,8 +73,8 @@ def test_order_to_dict(Factory):
             'name': order.created_by.name,
             'dit_team': {
                 'id': str(order.created_by.dit_team.id),
-                'name': order.created_by.dit_team.name
-            }
+                'name': order.created_by.dit_team.name,
+            },
         },
         'modified_on': order.modified_on,
         'reference': order.reference,
@@ -95,7 +95,7 @@ def test_order_to_dict(Factory):
                 'dit_team': {
                     'id': str(subscriber.adviser.dit_team.pk),
                     'name': str(subscriber.adviser.dit_team.name),
-                }
+                },
             }
             for subscriber in order.subscribers.all()
         ],
@@ -108,7 +108,7 @@ def test_order_to_dict(Factory):
                 'dit_team': {
                     'id': str(assignee.adviser.dit_team.pk),
                     'name': str(assignee.adviser.dit_team.name),
-                }
+                },
             }
             for assignee in order.assignees.all()
         ],
@@ -133,26 +133,26 @@ def test_order_to_dict(Factory):
         'billing_address_postcode': order.billing_address_postcode,
         'billing_address_country': {
             'id': str(order.billing_address_country.pk),
-            'name': order.billing_address_country.name
+            'name': order.billing_address_country.name,
         },
         'paid_on': order.paid_on,
         'completed_by': {
             'id': str(order.completed_by.pk),
             'first_name': order.completed_by.first_name,
             'last_name': order.completed_by.last_name,
-            'name': order.completed_by.name
+            'name': order.completed_by.name,
         } if order.completed_by else None,
         'completed_on': order.completed_on,
         'cancelled_by': {
             'id': str(order.cancelled_by.pk),
             'first_name': order.cancelled_by.first_name,
             'last_name': order.cancelled_by.last_name,
-            'name': order.cancelled_by.name
+            'name': order.cancelled_by.name,
         } if order.cancelled_by else None,
         'cancelled_on': order.cancelled_on,
         'cancellation_reason': {
             'id': str(order.cancellation_reason.pk),
-            'name': order.cancellation_reason.name
+            'name': order.cancellation_reason.name,
         } if order.cancellation_reason else None,
     }
 

@@ -57,7 +57,7 @@ class BaseESModel(DocType):
     def get_read_and_write_indices(cls):
         """Gets the indices currently referenced by the read and write aliases."""
         read_indices, write_indices = get_indices_for_aliases(
-            cls.get_read_alias(), cls.get_write_alias()
+            cls.get_read_alias(), cls.get_write_alias(),
         )
         return read_indices, _get_write_index(write_indices)
 
@@ -78,8 +78,10 @@ class BaseESModel(DocType):
         current_write_index = cls.get_write_index()
         prefix = cls.get_index_prefix()
         if not current_write_index.startswith(prefix):
-            logger.warning(f'Unexpected index prefix for search model {cls._doc_type.name} and '
-                           f'index {current_write_index}. It may be a legacy index.')
+            logger.warning(
+                f'Unexpected index prefix for search model {cls._doc_type.name} and '
+                f'index {current_write_index}. It may be a legacy index.',
+            )
             return ''
         return current_write_index[len(prefix):]
 
@@ -123,8 +125,10 @@ class BaseESModel(DocType):
 
         # Should not normally happen
         if not alias_exists(cls.get_read_alias()):
-            logger.warning(f'Missing read alias {cls.get_read_alias()} detected, recreating '
-                           f'the alias...')
+            logger.warning(
+                f'Missing read alias {cls.get_read_alias()} detected, recreating '
+                f'the alias...',
+            )
             associate_index_with_alias(cls.get_read_alias(), cls.get_write_index())
 
     @classmethod

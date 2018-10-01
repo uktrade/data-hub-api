@@ -63,16 +63,16 @@ def setup_data(setup_es):
             contact=contact,
             discount_value=0,
             delivery_date=dateutil_parse('2018-01-01').date(),
-            vat_verified=False
+            vat_verified=False,
         )
         OrderSubscriberFactory(
             order=order,
-            adviser=AdviserFactory(dit_team_id=constants.Team.healthcare_uk.value.id)
+            adviser=AdviserFactory(dit_team_id=constants.Team.healthcare_uk.value.id),
         )
         OrderAssigneeFactory(
             order=order,
             adviser=AdviserFactory(dit_team_id=constants.Team.tees_valley_lep.value.id),
-            estimated_time=60
+            estimated_time=60,
         )
 
     with freeze_time('2017-02-01 13:00:00'):
@@ -88,16 +88,16 @@ def setup_data(setup_es):
             contact=contact,
             discount_value=0,
             delivery_date=dateutil_parse('2018-02-01').date(),
-            vat_verified=False
+            vat_verified=False,
         )
         OrderSubscriberFactory(
             order=order,
-            adviser=AdviserFactory(dit_team_id=constants.Team.td_events_healthcare.value.id)
+            adviser=AdviserFactory(dit_team_id=constants.Team.td_events_healthcare.value.id),
         )
         OrderAssigneeFactory(
             order=order,
             adviser=AdviserFactory(dit_team_id=constants.Team.food_from_britain.value.id),
-            estimated_time=120
+            estimated_time=120,
         )
 
         setup_es.indices.refresh()
@@ -119,148 +119,148 @@ class TestSearchOrder(APITestMixin):
         (
             (  # no filter => return all records
                 {},
-                ['efgh', 'abcd']
+                ['efgh', 'abcd'],
             ),
             (  # pagination
                 {'limit': 1, 'offset': 1},
-                ['abcd']
+                ['abcd'],
             ),
             (  # filter by primary market
                 {'primary_market': constants.Country.france.value.id},
-                ['efgh']
+                ['efgh'],
             ),
             (  # filter by uk region
                 {'uk_region': constants.UKRegion.east_midlands.value.id},
-                ['efgh']
+                ['efgh'],
             ),
             (  # filter by a range of date for created_on
                 {
                     'created_on_before': '2017-02-02',
-                    'created_on_after': '2017-02-01'
+                    'created_on_after': '2017-02-01',
                 },
-                ['efgh']
+                ['efgh'],
             ),
             (  # filter by created_on_before only
                 {'created_on_before': '2017-01-15'},
-                ['abcd']
+                ['abcd'],
             ),
             (  # filter by created_on_after only
                 {'created_on_after': '2017-01-15'},
-                ['efgh']
+                ['efgh'],
             ),
             (  # filter by status
                 {'status': 'quote_awaiting_acceptance'},
-                ['efgh']
+                ['efgh'],
             ),
             (  # invalid status => no results
                 {'status': 'invalid'},
-                []
+                [],
             ),
             (  # search by reference
                 {'original_query': 'efgh'},
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by reference partial
                 {'original_query': 'efg'},
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by contact name exact
                 {'original_query': 'Jenny Cakeman'},
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by contact name partial
                 {'original_query': 'Jenny Cakem'},
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by company name exact
                 {'original_query': 'Venus Ltd'},
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by company name partial
                 {'original_query': 'Venus'},
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by subtotal_cost
                 {'original_query': '2000'},
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by total_cost
                 {'original_query': '2400'},
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by reference
                 {'reference': 'efgh'},
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by reference partial
                 {'reference': 'efg'},
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by subtotal_cost
                 {'subtotal_cost': 2000},
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by total_cost
                 {'total_cost': 2400},
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by contact name exact
                 {'contact_name': 'Jenny Cakeman'},
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by contact name partial
                 {'contact_name': 'Jenny Cakem'},
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by company name exact
                 {'company_name': 'Venus Ltd'},
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by company name partial
                 {'company_name': 'Venus'},
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by trading name exact
                 {'company_name': 'Earth outsourcing'},
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by trading name partial
                 {'company_name': 'Earth'},
-                ['efgh']
+                ['efgh'],
             ),
             (  # sort by created_on ASC
                 {'sortby': 'created_on:asc'},
-                ['abcd', 'efgh']
+                ['abcd', 'efgh'],
             ),
             (  # sort by created_on DESC
                 {'sortby': 'created_on:desc'},
-                ['efgh', 'abcd']
+                ['efgh', 'abcd'],
             ),
             (  # sort by modified_on ASC
                 {'sortby': 'modified_on:asc'},
-                ['abcd', 'efgh']
+                ['abcd', 'efgh'],
             ),
             (  # sort by modified_on DESC
                 {'sortby': 'modified_on:desc'},
-                ['efgh', 'abcd']
+                ['efgh', 'abcd'],
             ),
             (  # sort by delivery_date ASC
                 {'sortby': 'delivery_date:asc'},
-                ['abcd', 'efgh']
+                ['abcd', 'efgh'],
             ),
             (  # sort by delivery_date DESC
                 {'sortby': 'delivery_date:desc'},
-                ['efgh', 'abcd']
+                ['efgh', 'abcd'],
             ),
             (  # sort by payment_due_date ASC
                 {'sortby': 'payment_due_date:asc'},
-                ['abcd', 'efgh']
+                ['abcd', 'efgh'],
             ),
             (  # sort by payment_due_date DESC
                 {'sortby': 'payment_due_date:desc'},
-                ['efgh', 'abcd']
+                ['efgh', 'abcd'],
             ),
-        )
+        ),
     )
     def test_search(self, setup_data, data, results):
         """Test search results."""
@@ -279,8 +279,9 @@ class TestSearchOrder(APITestMixin):
         url = reverse('api-v3:search:order')
 
         response = self.api_client.post(
-            url, {
-                'company': Company.objects.get(name='Venus Ltd').pk
+            url,
+            data={
+                'company': Company.objects.get(name='Venus Ltd').pk,
             },
         )
 
@@ -292,9 +293,12 @@ class TestSearchOrder(APITestMixin):
         """Test that if the dates are not in a valid format, the API return a validation error."""
         url = reverse('api-v3:search:order')
 
-        response = self.api_client.post(url, {
-            'created_on_before': 'invalid',
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'created_on_before': 'invalid',
+            },
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {'created_on_before': ['Date is in incorrect format.']}
@@ -306,9 +310,12 @@ class TestSearchOrder(APITestMixin):
         """
         url = reverse('api-v3:search:order')
 
-        response = self.api_client.post(url, {
-            'primary_market': 'invalid',
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'primary_market': 'invalid',
+            },
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {'primary_market': ['"invalid" is not a valid UUID.']}
@@ -324,20 +331,20 @@ class TestSearchOrder(APITestMixin):
 
         orders = OrderFactory.create_batch(
             num_sectors,
-            sector_id=factory.Iterator(sectors_ids)
+            sector_id=factory.Iterator(sectors_ids),
         )
         OrderFactory.create_batch(
             3,
             sector=factory.LazyFunction(lambda: random_obj_for_queryset(
-                Sector.objects.exclude(pk__in=sectors_ids)
-            ))
+                Sector.objects.exclude(pk__in=sectors_ids),
+            )),
         )
 
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:order')
         body = {
-            'sector_descends': hierarchical_sectors[sector_level].pk
+            'sector_descends': hierarchical_sectors[sector_level].pk,
         }
         response = self.api_client.post(url, body)
         assert response.status_code == status.HTTP_200_OK
@@ -355,9 +362,12 @@ class TestSearchOrder(APITestMixin):
 
         url = reverse('api-v3:search:order')
 
-        response = self.api_client.post(url, {
-            'assigned_to_adviser': assignee.adviser.pk
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'assigned_to_adviser': assignee.adviser.pk,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()['results']) == 1
@@ -369,9 +379,12 @@ class TestSearchOrder(APITestMixin):
 
         url = reverse('api-v3:search:order')
 
-        response = self.api_client.post(url, {
-            'assigned_to_team': assignee.adviser.dit_team.pk
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'assigned_to_team': assignee.adviser.dit_team.pk,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()['results']) == 1
@@ -386,7 +399,7 @@ class TestOrderExportView(APITestMixin):
             (),
             (f'order.{OrderPermission.view}',),
             (f'order.{OrderPermission.export}',),
-        )
+        ),
     )
     def test_user_without_permission_cannot_export(self, setup_es, permissions):
         """Test that a user without the correct permissions cannot export data."""
@@ -406,7 +419,7 @@ class TestOrderExportView(APITestMixin):
             ('modified_on:desc', '-modified_on'),
             ('delivery_date', 'delivery_date'),
             ('delivery_date:desc', '-delivery_date'),
-        )
+        ),
     )
     def test_export(
         self,
@@ -460,7 +473,7 @@ class TestOrderExportView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})
         assert parse_header(response.get('Content-Disposition')) == (
-            'attachment', {'filename': 'Data Hub - Orders - 2018-01-01-11-12-13.csv'}
+            'attachment', {'filename': 'Data Hub - Orders - 2018-01-01-11-12-13.csv'},
         )
 
         sorted_orders = Order.objects.order_by(orm_ordering, 'pk')
@@ -477,7 +490,7 @@ class TestOrderExportView(APITestMixin):
                 'Order reference': order.reference,
                 'Net price': Decimal(order.subtotal_cost) / 100,
                 'Net refund': Decimal(
-                    sum(refund.net_amount for refund in refunds)
+                    sum(refund.net_amount for refund in refunds),
                 ) / 100 if refunds else None,
                 'Status': order.get_status_display(),
                 'Link': order.get_datahub_frontend_url(),
@@ -518,51 +531,54 @@ class TestGlobalSearch(APITestMixin):
         (
             (  # no filter => return all records
                 '',
-                ['abcd', 'efgh']
+                ['abcd', 'efgh'],
             ),
             (  # search by reference
                 'efgh',
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by reference partial
                 'efg',
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by contact name exact
                 'Jenny Cakeman',
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by contact name partial
                 'Jenny Cakem',
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by company name exact
                 'Venus Ltd',
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by company name partial
                 'Venus',
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by subtotal_cost
                 '2000',
-                ['efgh']
+                ['efgh'],
             ),
             (  # search by total_cost
                 '2400',
-                ['efgh']
+                ['efgh'],
             ),
-        )
+        ),
     )
     def test_search(self, setup_data, term, results):
         """Test search results."""
         url = reverse('api-v3:search:basic')
 
-        response = self.api_client.get(url, {
-            'term': term,
-            'sortby': 'created_on:asc',
-            'entity': 'order'
-        })
+        response = self.api_client.get(
+            url,
+            data={
+                'term': term,
+                'sortby': 'created_on:asc',
+                'entity': 'order',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()['results']) == len(results)

@@ -29,16 +29,18 @@ class SignalReceiver:
 
     @property
     def _dispatch_uid(self):
-        return (f'{id(self.signal):x}'
-                f'__{self._receiver_func.__module__}.{self._receiver_func.__name__}'
-                f'__{self.sender.__name__}')
+        return (
+            f'{id(self.signal):x}'
+            f'__{self._receiver_func.__module__}.{self._receiver_func.__name__}'
+            f'__{self.sender.__name__}'
+        )
 
     def connect(self):
         """Connects the signal receiver."""
         self.signal.connect(
             self._receiver_func,
             sender=self.sender,
-            dispatch_uid=self._dispatch_uid
+            dispatch_uid=self._dispatch_uid,
         )
         self.is_connected = True
 
@@ -47,7 +49,7 @@ class SignalReceiver:
         self.signal.disconnect(
             self._receiver_func,
             sender=self.sender,
-            dispatch_uid=self._dispatch_uid
+            dispatch_uid=self._dispatch_uid,
         )
         self.is_connected = False
 

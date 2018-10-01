@@ -47,7 +47,7 @@ def setup_data(setup_es):
         trading_address_1='1 Fake Lane',
         trading_address_town='Downtown',
         trading_address_country_id=country_us,
-        registered_address_country_id=country_us
+        registered_address_country_id=country_us,
     )
     setup_es.indices.refresh()
 
@@ -86,10 +86,11 @@ class TestSearch(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize(
-        'archived', (
+        'archived',
+        (
             True,
             False,
-        )
+        ),
     )
     def test_archived_filter(self, setup_es, archived):
         """Tests filtering by archived."""
@@ -100,9 +101,12 @@ class TestSearch(APITestMixin):
 
         url = reverse('api-v3:search:company')
 
-        response = self.api_client.post(url, {
-            'archived': archived,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'archived': archived,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -117,9 +121,12 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:company')
         united_states_id = constants.Country.united_states.value.id
 
-        response = self.api_client.post(url, {
-            'trading_address_country': united_states_id,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'trading_address_country': united_states_id,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -131,9 +138,12 @@ class TestSearch(APITestMixin):
         url = reverse('api-v3:search:company')
         uk_region = constants.UKRegion.south_east.value.id
 
-        response = self.api_client.post(url, {
-            'uk_region': uk_region,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'uk_region': uk_region,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -141,7 +151,8 @@ class TestSearch(APITestMixin):
         assert response.data['results'][0]['uk_region']['id'] == uk_region
 
     @pytest.mark.parametrize(
-        'query,results', (
+        'query,results',
+        (
             (
                 {
                     'headquarter_type': None,
@@ -150,7 +161,7 @@ class TestSearch(APITestMixin):
             ),
             (
                 {
-                    'headquarter_type': constants.HeadquarterType.ghq.value.id
+                    'headquarter_type': constants.HeadquarterType.ghq.value.id,
                 },
                 {'ghq'},
             ),
@@ -173,7 +184,7 @@ class TestSearch(APITestMixin):
                 },
                 {'ehq', 'ghq', 'none'},
             ),
-        )
+        ),
     )
     def test_headquarter_type_filter(self, setup_headquarters_data, query, results):
         """Test headquarter type filter."""
@@ -206,8 +217,8 @@ class TestSearch(APITestMixin):
         response = self.api_client.post(
             url,
             {
-                'global_headquarters': ghq1.id
-            }
+                'global_headquarters': ghq1.id,
+            },
         )
         assert response.status_code == status.HTTP_200_OK
 
@@ -228,20 +239,20 @@ class TestSearch(APITestMixin):
 
         companies = CompanyFactory.create_batch(
             num_sectors,
-            sector_id=factory.Iterator(sectors_ids)
+            sector_id=factory.Iterator(sectors_ids),
         )
         CompanyFactory.create_batch(
             3,
             sector=factory.LazyFunction(lambda: random_obj_for_queryset(
-                Sector.objects.exclude(pk__in=sectors_ids)
-            ))
+                Sector.objects.exclude(pk__in=sectors_ids),
+            )),
         )
 
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:company')
         body = {
-            'sector_descends': hierarchical_sectors[sector_level].pk
+            'sector_descends': hierarchical_sectors[sector_level].pk,
         }
         response = self.api_client.post(url, body)
         assert response.status_code == status.HTTP_200_OK
@@ -260,7 +271,7 @@ class TestSearch(APITestMixin):
             (constants.Country.montserrat.value.id, True),
             (constants.Country.st_helena.value.id, False),
             (constants.Country.anguilla.value.id, False),
-        )
+        ),
     )
     def test_composite_country_filter(self, setup_es, country, match):
         """Tests composite country filter."""
@@ -272,9 +283,12 @@ class TestSearch(APITestMixin):
 
         url = reverse('api-v3:search:company')
 
-        response = self.api_client.post(url, {
-            'country': country,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'country': country,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         if match:
@@ -292,7 +306,7 @@ class TestSearch(APITestMixin):
             ('house lion', True),
             ('tiger', False),
             ('panda', False),
-        )
+        ),
     )
     def test_composite_name_filter(self, setup_es, name, match):
         """Tests composite name filter."""
@@ -304,9 +318,12 @@ class TestSearch(APITestMixin):
 
         url = reverse('api-v3:search:company')
 
-        response = self.api_client.post(url, {
-            'name': name,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'name': name,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         if match:
@@ -325,10 +342,13 @@ class TestSearch(APITestMixin):
         united_states_id = constants.Country.united_states.value.id
         united_kingdom_id = constants.Country.united_kingdom.value.id
 
-        response = self.api_client.post(url, {
-            'original_query': term,
-            'trading_address_country': [united_states_id, united_kingdom_id],
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'original_query': term,
+                'trading_address_country': [united_states_id, united_kingdom_id],
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
@@ -362,21 +382,24 @@ class TestSearch(APITestMixin):
             ('Pallas Hiding', 'Pallas Hid', True),
             ('Pallas Hiding', 'Pallas Hi', True),
             ('A & B', 'A & B', True),
-            ('A&B Properties Limited', 'a&b', True)
-        )
+            ('A&B Properties Limited', 'a&b', True),
+        ),
     )
     def test_name_filter_match(self, setup_es, company_name, search_name, match):
         """Tests company name partial search."""
         company = CompanyFactory(
-            name=company_name
+            name=company_name,
         )
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:company')
 
-        response = self.api_client.post(url, {
-            'name': search_name,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'name': search_name,
+            },
+        )
         assert response.status_code == status.HTTP_200_OK
 
         if match:
@@ -392,18 +415,24 @@ class TestSearch(APITestMixin):
         """Tests filter with null value."""
         url = reverse('api-v3:search:company')
 
-        response = self.api_client.post(url, {
-            'uk_region': None,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'uk_region': None,
+            },
+        )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {'uk_region': ['This field may not be null.']}
 
-    @pytest.mark.parametrize('sortby', (
-        {},
-        {'sortby': 'name:asc'},
-        {'sortby': 'created_on:asc'},
-    ))
+    @pytest.mark.parametrize(
+        'sortby',
+        (
+            {},
+            {'sortby': 'name:asc'},
+            {'sortby': 'created_on:asc'},
+        ),
+    )
     def test_company_search_paging(self, setup_es, sortby):
         """Tests if content placement is consistent between pages."""
         ids = sorted((uuid4() for _ in range(9)))
@@ -423,13 +452,16 @@ class TestSearch(APITestMixin):
 
         for page in range((len(ids) + page_size - 1) // page_size):
             url = reverse('api-v3:search:company')
-            response = self.api_client.post(url, {
-                'original_query': name,
-                'entity': 'company',
-                'offset': page * page_size,
-                'limit': page_size,
-                **sortby
-            })
+            response = self.api_client.post(
+                url,
+                data={
+                    'original_query': name,
+                    'entity': 'company',
+                    'offset': page * page_size,
+                    'limit': page_size,
+                    **sortby,
+                },
+            )
 
             assert response.status_code == status.HTTP_200_OK
 
@@ -469,9 +501,12 @@ class TestSearch(APITestMixin):
         """Tests detailed company search."""
         url = reverse('api-v3:search:company')
 
-        response = self.api_client.post(url, {
-            'uk_based': False,
-        })
+        response = self.api_client.post(
+            url,
+            data={
+                'uk_based': False,
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -483,11 +518,12 @@ class TestCompanyExportView(APITestMixin):
     """Tests the company export view."""
 
     @pytest.mark.parametrize(
-        'permissions', (
+        'permissions',
+        (
             (),
             (CompanyPermission.view_company,),
             (CompanyPermission.export_company,),
-        )
+        ),
     )
     def test_user_without_permission_cannot_export(self, setup_es, permissions):
         """Test that a user without the correct permissions cannot export data."""
@@ -504,7 +540,7 @@ class TestCompanyExportView(APITestMixin):
             ('name', 'name'),
             ('modified_on', 'modified_on'),
             ('modified_on:desc', '-modified_on'),
-        )
+        ),
     )
     def test_export(
         self,
@@ -530,7 +566,7 @@ class TestCompanyExportView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})
         assert parse_header(response.get('Content-Disposition')) == (
-            'attachment', {'filename': 'Data Hub - Companies - 2018-01-01-11-12-13.csv'}
+            'attachment', {'filename': 'Data Hub - Companies - 2018-01-01-11-12-13.csv'},
         )
 
         sorted_company = Company.objects.order_by(orm_ordering, 'pk')
@@ -564,10 +600,13 @@ class TestBasicSearch(APITestMixin):
     def test_all_companies(self, setup_data):
         """Tests basic aggregate all companies query."""
         url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': '',
-            'entity': 'company'
-        })
+        response = self.api_client.get(
+            url,
+            data={
+                'term': '',
+                'entity': 'company',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] > 0
@@ -577,10 +616,13 @@ class TestBasicSearch(APITestMixin):
         term = 'abc defg'
 
         url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': term,
-            'entity': 'company'
-        })
+        response = self.api_client.get(
+            url,
+            data={
+                'term': term,
+                'entity': 'company',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
@@ -594,10 +636,13 @@ class TestBasicSearch(APITestMixin):
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': term,
-            'entity': 'company'
-        })
+        response = self.api_client.get(
+            url,
+            data={
+                'term': term,
+                'entity': 'company',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
@@ -611,7 +656,7 @@ class TestBasicSearch(APITestMixin):
             ('trading_address_postcode', 'SW1A 1AA', 'SW1A 1AB', False),
             ('registered_address_postcode', 'SW1A 1AA', 'SW1A 1AA', True),
             ('registered_address_postcode', 'SW1A 1AA', 'SW1A 1AB', False),
-        )
+        ),
     )
     def test_search_in_field(self, setup_es, field, value, term, match):
         """Tests basic aggregate companies query."""
@@ -620,10 +665,13 @@ class TestBasicSearch(APITestMixin):
         setup_es.indices.refresh()
 
         url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': term,
-            'entity': 'company'
-        })
+        response = self.api_client.get(
+            url,
+            data={
+                'term': term,
+                'entity': 'company',
+            },
+        )
 
         assert response.status_code == status.HTTP_200_OK
         if match:
@@ -637,10 +685,13 @@ class TestBasicSearch(APITestMixin):
         term = 'there-should-be-no-match'
 
         url = reverse('api-v3:search:basic')
-        response = self.api_client.get(url, {
-            'term': term,
-            'entity': 'company'
-        })
+        response = self.api_client.get(
+            url,
+            data={
+                'term': term,
+                'entity': 'company',
+            },
+        )
 
         assert response.data['count'] == 0
 

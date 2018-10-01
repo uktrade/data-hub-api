@@ -14,12 +14,12 @@ for search_app in get_search_apps():
         urlpatterns.append(path(
             f'search/{search_app.name}',
             search_app.view.as_view(search_app=search_app),
-            name=search_app.name
+            name=search_app.name,
         ))
 
     if search_app.export_view:
         urlpatterns.append(path(
             f'search/{search_app.name}/export',
             search_app.export_view.as_view(search_app=search_app),
-            name=f'{search_app.name}-export'
+            name=f'{search_app.name}-export',
         ))

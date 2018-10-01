@@ -22,28 +22,28 @@ from datahub.search.query_builder import (
                 'match': {
                     'field_name': {
                         'query': 'field value',
-                        'operator': 'and'
-                    }
-                }
-            }
+                        'operator': 'and',
+                    },
+                },
+            },
         ),
         (
             'field_name.id',
             'field value',
             {
                 'match_phrase': {
-                    'field_name.id': 'field value'
-                }
-            }
+                    'field_name.id': 'field value',
+                },
+            },
         ),
         (
             'field_name.name_keyword',
             'field value',
             {
                 'match_phrase': {
-                    'field_name.name_keyword': 'field value'
-                }
-            }
+                    'field_name.name_keyword': 'field value',
+                },
+            },
         ),
         (
             'field_name.prop',
@@ -52,10 +52,10 @@ from datahub.search.query_builder import (
                 'match': {
                     'field_name.prop': {
                         'query': 'field value',
-                        'operator': 'and'
-                    }
-                }
-            }
+                        'operator': 'and',
+                    },
+                },
+            },
         ),
         (
             'field_name_exists',
@@ -65,12 +65,12 @@ from datahub.search.query_builder import (
                     'must': [
                         {
                             'exists': {
-                                'field': 'field_name'
-                            }
-                        }
-                    ]
-                }
-            }
+                                'field': 'field_name',
+                            },
+                        },
+                    ],
+                },
+            },
         ),
         (
             'field_name_exists',
@@ -80,12 +80,12 @@ from datahub.search.query_builder import (
                     'must_not': [
                         {
                             'exists': {
-                                'field': 'field_name'
-                            }
-                        }
-                    ]
-                }
-            }
+                                'field': 'field_name',
+                            },
+                        },
+                    ],
+                },
+            },
         ),
         (
             'field_name',
@@ -95,12 +95,12 @@ from datahub.search.query_builder import (
                     'must_not': [
                         {
                             'exists': {
-                                'field': 'field_name'
-                            }
-                        }
-                    ]
-                }
-            }
+                                'field': 'field_name',
+                            },
+                        },
+                    ],
+                },
+            },
         ),
         (
             'field_name_exists',
@@ -110,12 +110,12 @@ from datahub.search.query_builder import (
                     'must_not': [
                         {
                             'exists': {
-                                'field': 'field_name'
-                            }
-                        }
-                    ]
-                }
-            }
+                                'field': 'field_name',
+                            },
+                        },
+                    ],
+                },
+            },
         ),
         (
             'field_name',
@@ -128,23 +128,23 @@ from datahub.search.query_builder import (
                             'match': {
                                 'field_name': {
                                     'query': 'field value 1',
-                                    'operator': 'and'
-                                }
-                            }
+                                    'operator': 'and',
+                                },
+                            },
                         },
                         {
                             'match': {
                                 'field_name': {
                                     'query': 'field value 2',
-                                    'operator': 'and'
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
+                                    'operator': 'and',
+                                },
+                            },
+                        },
+                    ],
+                },
+            },
         ),
-    )
+    ),
 )
 def test_build_field_query(field, value, expected):
     """Test for the _build_field_query function."""
@@ -163,32 +163,34 @@ def test_build_field_query(field, value, expected):
                             'match_phrase': {
                                 'name_keyword': {
                                     'query': 'hello',
-                                    'boost': 2
-                                }
-                            }
-                        }, {
+                                    'boost': 2,
+                                },
+                            },
+                        },
+                        {
                             'match_phrase': {
-                                'id': 'hello'
-                            }
-                        }, {
+                                'id': 'hello',
+                            },
+                        },
+                        {
                             'multi_match': {
                                 'query': 'hello',
                                 'fields': ('country.id', 'sector'),
                                 'type': 'cross_fields',
-                                'operator': 'and'
-                            }
-                        }
-                    ]
-                }
-            }
+                                'operator': 'and',
+                            },
+                        },
+                    ],
+                },
+            },
         ),
         (
             '',
             {
-                'match_all': {}
-            }
-        )
-    )
+                'match_all': {},
+            },
+        ),
+    ),
 )
 def test_build_term_query(term, expected):
     """Tests search term query."""
@@ -201,12 +203,12 @@ def test_build_term_query(term, expected):
         (8950, 1000, 1000),
         (9950, 1000, 50),
         (10000, 1000, 0),
-    )
+    ),
 )
 def test_offset_near_max_results(offset, limit, expected_size):
     """Tests limit clipping when near max_results."""
     query = get_basic_search_query(
-        'test', entities=(mock.Mock(),), offset=offset, limit=limit
+        'test', entities=(mock.Mock(),), offset=offset, limit=limit,
     )
 
     query_dict = query.to_dict()
@@ -226,13 +228,13 @@ def test_date_range_fields():
     filters, ranges = _split_date_range_fields(fields)
 
     assert filters == {
-        'adviser.id': 1234
+        'adviser.id': 1234,
     }
     assert ranges == {
         'estimated_land_date': {
             'gte': now,
-            'lte': now
-        }
+            'lte': now,
+        },
     }
 
 
@@ -244,12 +246,12 @@ def test_date_range_fields():
         (
             [],
             {
-                'match_none': {}
-            }
+                'match_none': {},
+            },
         ),
         (
             None,
-            None
+            None,
         ),
         (
             [
@@ -258,10 +260,10 @@ def test_date_range_fields():
             {
                 'bool': {
                     'should': [
-                        {'term': {'field_name': 'field value'}}
-                    ]
-                }
-            }
+                        {'term': {'field_name': 'field value'}},
+                    ],
+                },
+            },
         ),
         (
             [
@@ -272,12 +274,12 @@ def test_date_range_fields():
                 'bool': {
                     'should': [
                         {'term': {'field_name1': 'field value 1'}},
-                        {'term': {'field_name2': 'field value 2'}}
-                    ]
-                }
-            }
-        )
-    )
+                        {'term': {'field_name2': 'field value 2'}},
+                    ],
+                },
+            },
+        ),
+    ),
 )
 def test_build_entity_permission_query_no_conditions(filters, expected):
     """Test for the _build_entity_permission_query function."""

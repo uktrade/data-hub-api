@@ -13,7 +13,7 @@ from ..deletion import (
     BULK_DELETION_TIMEOUT_SECS,
     Collector,
     delete_documents,
-    update_es_after_deletions
+    update_es_after_deletions,
 )
 from ..sync_async import sync_object_async
 
@@ -44,7 +44,7 @@ def test_delete_documents(es_bulk, mock_es_client):
         'chunk_size': BULK_CHUNK_SIZE,
         'request_timeout': BULK_DELETION_TIMEOUT_SECS,
         'max_chunk_bytes': settings.ES_BULK_MAX_CHUNK_BYTES,
-        'raise_on_error': False
+        'raise_on_error': False,
     }
 
 
@@ -56,7 +56,7 @@ def test_delete_documents_with_errors(es_bulk, mock_es_client):
         [
             {'delete': {'status': 404}},
             {'delete': {'status': 500}},
-        ]
+        ],
     )
 
     index = 'test-index'
@@ -122,7 +122,7 @@ def test_collector(monkeypatch, setup_es):
         assert receiver.connect.called
 
     assert collector.deletions == {
-        SimpleModel: [es_doc]
+        SimpleModel: [es_doc],
     }
 
     read_alias = search_app.es_model.get_read_alias()

@@ -14,7 +14,7 @@ def test_new_event_synced(setup_es):
     assert setup_es.get(
         index=EventSearchApp.es_model.get_write_index(),
         doc_type=EventSearchApp.name,
-        id=event.pk
+        id=event.pk,
     )
 
 
@@ -29,6 +29,6 @@ def test_updated_event_synced(setup_es):
     result = setup_es.get(
         index=EventSearchApp.es_model.get_write_index(),
         doc_type=EventSearchApp.name,
-        id=event.pk
+        id=event.pk,
     )
     assert result['_source']['name'] == new_name
