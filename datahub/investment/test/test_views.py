@@ -414,7 +414,7 @@ class TestCreateView(APITestMixin):
                 request_data['quotable_as_public_case_study'])
         assert response_data['likelihood_of_landing'] == request_data['likelihood_of_landing']
         assert response_data['priority'] == request_data['priority']
-        assert re.match('^DHP-\d+$', response_data['project_code'])
+        assert re.match(r'^DHP-\d+$', response_data['project_code'])
 
         assert response_data['investment_type']['id'] == request_data['investment_type']['id']
         assert response_data['investor_company']['id'] == str(investor_company.id)
