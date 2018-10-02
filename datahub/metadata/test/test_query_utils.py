@@ -11,9 +11,9 @@ def test_annotated_sector_name_root_node():
     """Test the sector name annotation for a sector at root level."""
     sector = SectorFactory(parent=None)
     annotated_sector = Sector.objects.annotate(
-        name_annotation=get_sector_name_subquery()
+        name_annotation=get_sector_name_subquery(),
     ).get(
-        pk=sector.pk
+        pk=sector.pk,
     )
 
     assert annotated_sector.name_annotation == sector.name
@@ -24,9 +24,9 @@ def test_annotated_sector_name_level_one():
     parent = SectorFactory()
     sector = SectorFactory(parent=parent)
     annotated_sector = Sector.objects.annotate(
-        name_annotation=get_sector_name_subquery()
+        name_annotation=get_sector_name_subquery(),
     ).get(
-        pk=sector.pk
+        pk=sector.pk,
     )
 
     assert annotated_sector.name_annotation == sector.name
@@ -38,9 +38,9 @@ def test_annotated_sector_name_level_two():
     parent = SectorFactory(parent=grandparent)
     sector = SectorFactory(parent=parent)
     annotated_sector = Sector.objects.annotate(
-        name_annotation=get_sector_name_subquery()
+        name_annotation=get_sector_name_subquery(),
     ).get(
-        pk=sector.pk
+        pk=sector.pk,
     )
 
     assert annotated_sector.name_annotation == sector.name
@@ -52,9 +52,9 @@ def test_annotated_sector_name_via_relation():
     parent = SectorFactory(parent=grandparent)
     sector = SectorFactory(parent=parent)
     annotated_sector = Sector.objects.annotate(
-        parent_name_annotation=get_sector_name_subquery('parent')
+        parent_name_annotation=get_sector_name_subquery('parent'),
     ).get(
-        pk=sector.pk
+        pk=sector.pk,
     )
 
     assert annotated_sector.parent_name_annotation == parent.name

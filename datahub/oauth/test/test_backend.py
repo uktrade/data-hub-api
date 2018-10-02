@@ -38,7 +38,7 @@ class TestContentTypeAwareOAuthLibCore(APITestMixin):
             'Bearer token',
             '',
             'Cool cats',
-        )
+        ),
     )
     @patch.object(RestrictedAccessViewSet, 'create')
     def test_request_is_not_parsed_if_oauth2_token_is_invalid_and_content_type_is_application_json(
@@ -60,7 +60,7 @@ class TestContentTypeAwareOAuthLibCore(APITestMixin):
             Authorization=token,
         )
         my_view = RestrictedAccessViewSet.as_view(
-            actions={'post': 'create'}
+            actions={'post': 'create'},
         )
         response = my_view(request)
 
@@ -73,7 +73,7 @@ class TestContentTypeAwareOAuthLibCore(APITestMixin):
             ('application/x-www-form-urlencoded; charset=utf-8', True),
             ('application/x-www-form-urlencoded;', True),
             ('application/cats-on-mars', False),
-        )
+        ),
     )
     @patch.object(RestrictedAccessViewSet, 'create')
     def test_request_is_parsed_if_oauth2_token_is_in_the_form(
@@ -96,7 +96,7 @@ class TestContentTypeAwareOAuthLibCore(APITestMixin):
             content_type=content_type,
         )
         my_view = RestrictedAccessViewSet.as_view(
-            actions={'post': 'create'}
+            actions={'post': 'create'},
         )
         response = my_view(request)
         if expected_authorized:
